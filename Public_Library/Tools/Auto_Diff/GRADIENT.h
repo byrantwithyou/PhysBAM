@@ -28,11 +28,11 @@ struct GRADIENT
     GRADIENT<TV,decltype(VEC_SCALE::Type(VEC(),T()))> operator* (T a) const {GRADIENT<TV,decltype(VEC_SCALE::Type(VEC(),T()))> r;VEC_SCALE()(r.x,x,a);return r;}
     GRADIENT<TV,decltype(VEC_SCALE_DIV::Type(VEC(),T()))> operator/ (T a) const {GRADIENT<TV,decltype(VEC_SCALE_DIV::Type(VEC(),T()))> r;VEC_SCALE_DIV()(r.x,x,a);return r;}
 
-    template<class VEC2>
-    GRADIENT<TV,decltype(VEC_ADD::Type(VEC(),VEC2()))> operator+ (const GRADIENT<TV,VEC2>& z) const {GRADIENT<TV,decltype(VEC_ADD::Type(VEC(),VEC2()))> r;VEC_ADD()(r.x,x,z.x);return r;}
+    template<class VEC1>
+    GRADIENT<TV,decltype(VEC_ADD::Type(VEC(),VEC1()))> operator+ (const GRADIENT<TV,VEC1>& z) const {GRADIENT<TV,decltype(VEC_ADD::Type(VEC(),VEC1()))> r;VEC_ADD()(r.x,x,z.x);return r;}
 
-    template<class VEC2>
-    GRADIENT<TV,decltype(VEC_SUB::Type(VEC(),VEC2()))> operator- (const GRADIENT<TV,VEC2>& z) const {GRADIENT<TV,decltype(VEC_SUB::Type(VEC(),VEC2()))> r;VEC_SUB()(r.x,x,z.x);return r;}
+    template<class VEC1>
+    GRADIENT<TV,decltype(VEC_SUB::Type(VEC(),VEC1()))> operator- (const GRADIENT<TV,VEC1>& z) const {GRADIENT<TV,decltype(VEC_SUB::Type(VEC(),VEC1()))> r;VEC_SUB()(r.x,x,z.x);return r;}
 
     TV operator()(int i) const {TV v;Get(v,x,i);return v;}
 
@@ -40,8 +40,8 @@ struct GRADIENT
     void Set_Entry(const TV& v) {Set<i>(x,v);}
 };
 
-template<class TV,class VEC,class VEC2>
-void Fill_From(GRADIENT<TV,VEC>& out,const GRADIENT<TV,VEC2>& in)
+template<class TV,class VEC,class VEC1>
+void Fill_From(GRADIENT<TV,VEC>& out,const GRADIENT<TV,VEC1>& in)
 {Fill_From(out.x,in.x);}
 
 template<class TV,class VEC>

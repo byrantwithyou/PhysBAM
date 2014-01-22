@@ -65,7 +65,7 @@ public:
     ARRAY<FRAME<TV> > displacement;
     // TODO: make this per superfragment once rigid bodies can be in more than one superfragment
 public:
-    HASHTABLE<TRIPLE<int,int,TV> > rigid_body_particles_intersections; // elements are body1,body2,body1_location
+    HASHTABLE<TRIPLE<int,int,TV> > rigid_body_particles_intersections; // elements are body0,body1,body1_location
     bool store_collision_intersections_for_projection;
     bool use_static_body_masses;
     bool use_parent_normal;
@@ -150,10 +150,10 @@ public:
     void Process_Contact_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body,const bool correct_contact_energy,const bool use_saved_pairs=false);
     void Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body,const bool use_saved_pairs=false);
     bool Update_Collision_Pair(const int id_1,const int id_2,const T dt,const T time,const bool mpi_one_ghost);
-    bool Update_Collision_Pair_Helper(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const T dt,const T time,const TV& collision_location,const TV& collision_normal,
+    bool Update_Collision_Pair_Helper(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const T dt,const T time,const TV& collision_location,const TV& collision_normal,
         const TV& collision_relative_velocity,const bool mpi_one_ghost);
     bool Update_Levelset_Collision_Pair(const int id_1,const int id_2,const T dt,const T time,const bool mpi_one_ghost);
-    bool Update_Analytic_Multibody_Collision(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const T dt,const T time,const bool mpi_one_ghost);
+    bool Update_Analytic_Multibody_Collision(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const T dt,const T time,const bool mpi_one_ghost);
     bool Update_Analytic_Multibody_Collision(const int id_1,const int id_2,MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>& multibody,IMPLICIT_OBJECT<TV>& levelset,const T dt,const T time,const bool mpi_one_ghost);
     bool Either_Body_Collides_With_The_Other(const int rigid_body_id_1,const int rigid_body_id_2) const;
     bool Body_Collides_With_The_Other(const int rigid_body_id_1,const int rigid_body_id_2) const;

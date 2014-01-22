@@ -742,8 +742,8 @@ void Get_Initial_Data()
             break;
         case 11:{
             tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
-            RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("hexlink",(T).25,(T).5);rigid_body1.Frame().t=TV((T).5,-(T).25,(T).5);rigid_body1.Frame().r=ROTATION<TV>((T)(pi/2),TV(0,0,1));
-            RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("hexlink",(T).25,(T).5);rigid_body2.Frame().t=TV((T)1.3,-(T).25,(T).5);rigid_body2.Frame().r=ROTATION<TV>((T)(pi/2),TV(0,0,1));
+            RIGID_BODY<TV>& rigid_body0=tests.Add_Rigid_Body("hexlink",(T).25,(T).5);rigid_body0.Frame().t=TV((T).5,-(T).25,(T).5);rigid_body0.Frame().r=ROTATION<TV>((T)(pi/2),TV(0,0,1));
+            RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("hexlink",(T).25,(T).5);rigid_body1.Frame().t=TV((T)1.3,-(T).25,(T).5);rigid_body1.Frame().r=ROTATION<TV>((T)(pi/2),TV(0,0,1));
             tests.Add_Rigid_Body("sphere",(T).25,(T).5).Frame().t=TV((T)1.2,(T).25,(T).5);
             break;}
         case 12:

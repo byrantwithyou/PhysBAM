@@ -72,8 +72,8 @@ Setup_Mesh()
         if(cut_order==3) theta=Compute_Cut3(it.Full_Index(),phi1,phi2);
         else if(cut_order==4) theta=Compute_Cut4(it.Full_Index(),phi1,phi2);
 
-        TV X1=dual_grid.X(node1),X2=dual_grid.X(node2);
-        TV XX=(1-theta)*X1+theta*X2;
+        TV X0=dual_grid.X(node1),X1=dual_grid.X(node2);
+        TV XX=(1-theta)*X0+theta*X1;
         mx=std::max(mx,abs((XX-index_map.grid.domain.Center()).Magnitude()-(T)0.01));
 
         HX.Set(it.Full_Index(),XX);

@@ -119,11 +119,11 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC
     DIAGONAL_MATRIX<T,2> F_inverse=(F.Determinant()>=failure_threshold?F:Clamp_To_Hyperbola(F)).Inverse();
     T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
     SYMMETRIC_MATRIX<T,2> F_inverse_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(F_inverse.To_Vector());
-    dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;//alpha+beta+gamma
-    dP_dF.x2222=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x22;
-    dP_dF.x2211=constant_lambda*F_inverse_outer.x21;//gamma
-    dP_dF.x2121=constant_mu;//alpha
-    dP_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;//beta
+    dP_dF.x0000=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;//alpha+beta+gamma
+    dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
+    dP_dF.x1100=constant_lambda*F_inverse_outer.x10;//gamma
+    dP_dF.x1010=constant_mu;//alpha
+    dP_dF.x1001=mu_minus_lambda_logJ*F_inverse_outer.x10;//beta
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################
@@ -135,16 +135,16 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
     DIAGONAL_MATRIX<T,3> F_inverse=(F.Determinant()>=failure_threshold?F:Clamp_To_Hyperbola(F)).Inverse();
     T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
     SYMMETRIC_MATRIX<T,3> F_inverse_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(F_inverse.To_Vector());
+    dPi_dF.x0000=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;
     dPi_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
     dPi_dF.x2222=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x22;
-    dPi_dF.x3333=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x33;
+    dPi_dF.x1100=constant_lambda*F_inverse_outer.x10;
+    dPi_dF.x2200=constant_lambda*F_inverse_outer.x20;
     dPi_dF.x2211=constant_lambda*F_inverse_outer.x21;
-    dPi_dF.x3311=constant_lambda*F_inverse_outer.x31;
-    dPi_dF.x3322=constant_lambda*F_inverse_outer.x32;
-    dPi_dF.x2121=constant_mu;dPi_dF.x3131=constant_mu;dPi_dF.x3232=constant_mu;
+    dPi_dF.x1010=constant_mu;dPi_dF.x2020=constant_mu;dPi_dF.x2121=constant_mu;
+    dPi_dF.x1001=mu_minus_lambda_logJ*F_inverse_outer.x10;
+    dPi_dF.x2002=mu_minus_lambda_logJ*F_inverse_outer.x20;
     dPi_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;
-    dPi_dF.x3113=mu_minus_lambda_logJ*F_inverse_outer.x31;
-    dPi_dF.x3223=mu_minus_lambda_logJ*F_inverse_outer.x32;
     if(enforce_definiteness) dPi_dF.Enforce_Definiteness();
 }
 //#####################################################################

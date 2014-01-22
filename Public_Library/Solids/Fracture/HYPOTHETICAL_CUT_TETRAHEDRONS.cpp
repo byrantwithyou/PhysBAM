@@ -55,12 +55,12 @@ Initialize_Triangle_Cut(const int isolated_node)
     int ep1=embedded_object.Embedded_Particle_On_Segment(isolated_node,on1),
         ep2=embedded_object.Embedded_Particle_On_Segment(isolated_node,on2),
         ep3=embedded_object.Embedded_Particle_On_Segment(isolated_node,on3);
-    VECTOR<T,3> x1,x2,x3,x4;
-    x1=embedded_object.simplicial_object.particles.X(isolated_node);
-    x2=embedded_object.simplicial_object.particles.X(on1);
-    x3=embedded_object.simplicial_object.particles.X(on2);
-    x4=embedded_object.simplicial_object.particles.X(on3);
-    assert(TETRAHEDRON<T>::Signed_Volume(x1,x2,x3,x4)>0);
+    VECTOR<T,3> x0,x1,x2,x3;
+    x0=embedded_object.simplicial_object.particles.X(isolated_node);
+    x1=embedded_object.simplicial_object.particles.X(on1);
+    x2=embedded_object.simplicial_object.particles.X(on2);
+    x3=embedded_object.simplicial_object.particles.X(on3);
+    assert(TETRAHEDRON<T>::Signed_Volume(x0,x1,x2,x3)>0);
     if(ep1&&ep2&&ep3){
         Add_Hypothetical_Node(isolated_node,on1,embedded_object.interpolation_fraction(ep1));
         Add_Hypothetical_Node(isolated_node,on2,embedded_object.interpolation_fraction(ep2));
@@ -270,10 +270,10 @@ Initialize_Quality_Metric_And_Quad_Diagonal_Indices_For_Initiation_Point()
                      n234=VECTOR<T,3>::Cross_Product(position2-position4,position3-position4).Normalized(),
                      n124=VECTOR<T,3>::Cross_Product(position2-position1,position4-position1).Normalized(),
                      n143=VECTOR<T,3>::Cross_Product(position3-position1,position4-position1).Normalized();
-        T metric23=abs(VECTOR<T,3>::Dot_Product(n123,fracture_normal))+abs(VECTOR<T,3>::Dot_Product(n234,fracture_normal));
-        T metric14=abs(VECTOR<T,3>::Dot_Product(n124,fracture_normal))+abs(VECTOR<T,3>::Dot_Product(n143,fracture_normal));
-        if(metric23 > metric14){quad_diagonal_indices.x=2;quad_diagonal_indices.y=3;cut_quality_metric=(T).5*metric23;}
-        else{quad_diagonal_indices.x=1;quad_diagonal_indices.y=4;cut_quality_metric=(T).5*metric14;}}
+        T metric12=abs(VECTOR<T,3>::Dot_Product(n123,fracture_normal))+abs(VECTOR<T,3>::Dot_Product(n234,fracture_normal));
+        T metric03=abs(VECTOR<T,3>::Dot_Product(n124,fracture_normal))+abs(VECTOR<T,3>::Dot_Product(n143,fracture_normal));
+        if(metric12 > metric03){quad_diagonal_indices.x=2;quad_diagonal_indices.y=3;cut_quality_metric=(T).5*metric12;}
+        else{quad_diagonal_indices.x=1;quad_diagonal_indices.y=4;cut_quality_metric=(T).5*metric03;}}
 }
 //#####################################################################
 // Function Initialize_Quality_Metric_And_Quad_Diagonal_Indices
@@ -291,10 +291,10 @@ Initialize_Quality_Metric_And_Quad_Diagonal_Indices()
                      n134=VECTOR<T,3>::Cross_Product(position3-position1,position4-position1).Normalized(),
                      n234=VECTOR<T,3>::Cross_Product(position2-position4,position3-position4).Normalized(),
                      n124=VECTOR<T,3>::Cross_Product(position2-position1,position4-position1).Normalized();
-        T metric13=abs(VECTOR<T,3>::Dot_Product(n123,fracture_normal))+abs(VECTOR<T,3>::Dot_Product(n134,fracture_normal));
-        T metric24=abs(VECTOR<T,3>::Dot_Product(n124,fracture_normal))+abs(VECTOR<T,3>::Dot_Product(n234,fracture_normal));
-        if(metric13 > metric24){quad_diagonal_indices.x=1;quad_diagonal_indices.y=3;cut_quality_metric=(T).5*metric13;}
-        else{quad_diagonal_indices.x=2;quad_diagonal_indices.y=4;cut_quality_metric=(T).5*metric24;}}
+        T metric02=abs(VECTOR<T,3>::Dot_Product(n123,fracture_normal))+abs(VECTOR<T,3>::Dot_Product(n134,fracture_normal));
+        T metric13=abs(VECTOR<T,3>::Dot_Product(n124,fracture_normal))+abs(VECTOR<T,3>::Dot_Product(n234,fracture_normal));
+        if(metric02 > metric13){quad_diagonal_indices.x=1;quad_diagonal_indices.y=3;cut_quality_metric=(T).5*metric02;}
+        else{quad_diagonal_indices.x=2;quad_diagonal_indices.y=4;cut_quality_metric=(T).5*metric13;}}
 }
 //#####################################################################
 // Function Cut_Already_Exists

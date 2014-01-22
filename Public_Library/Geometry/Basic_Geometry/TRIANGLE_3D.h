@@ -41,11 +41,11 @@ public:
     T Area() const 
     {return Area(X.x,X.y,X.z);}
     
-    static T Area(const TV& x1,const TV& x2,const TV& x3) // always positive for clockwise vertices: x1, x2, x3 
-    {return (T).5*TV::Cross_Product(x2-x1,x3-x1).Magnitude();}
+    static T Area(const TV& x0,const TV& x1,const TV& x2) // always positive for clockwise vertices: x0, x1, x2 
+    {return (T).5*TV::Cross_Product(x1-x0,x2-x0).Magnitude();}
     
-    static T Area_Squared(const TV& x1,const TV& x2,const TV& x3) // always positive for clockwise vertices: x1, x2, x3 
-    {return (T).25*TV::Cross_Product(x2-x1,x3-x1).Magnitude_Squared();}
+    static T Area_Squared(const TV& x0,const TV& x1,const TV& x2) // always positive for clockwise vertices: x0, x1, x2 
+    {return (T).25*TV::Cross_Product(x1-x0,x2-x0).Magnitude_Squared();}
 
     T Size() const
     {return Area();}
@@ -69,14 +69,14 @@ public:
     T u2=TV::Dot_Product(u,u),v2=TV::Dot_Product(v,v),w2=TV::Dot_Product(w,w);
     return max(u2,v2,w2)/sqrt(TV::Cross_Product(u,v).Magnitude_Squared());}
 
-    static T Minimum_Edge_Length(const TV& x1,const TV& x2,const TV& x3)
-    {return sqrt(min((x2-x1).Magnitude_Squared(),(x3-x1).Magnitude_Squared(),(x3-x2).Magnitude_Squared()));}
+    static T Minimum_Edge_Length(const TV& x0,const TV& x1,const TV& x2)
+    {return sqrt(min((x1-x0).Magnitude_Squared(),(x2-x0).Magnitude_Squared(),(x2-x1).Magnitude_Squared()));}
 
-    static T Maximum_Edge_Length(const TV& x1,const TV& x2,const TV& x3)
-    {return sqrt(max((x2-x1).Magnitude_Squared(),(x3-x1).Magnitude_Squared(),(x3-x2).Magnitude_Squared()));}
+    static T Maximum_Edge_Length(const TV& x0,const TV& x1,const TV& x2)
+    {return sqrt(max((x1-x0).Magnitude_Squared(),(x2-x0).Magnitude_Squared(),(x2-x1).Magnitude_Squared()));}
 
-    static T Minimum_Altitude(const TV& x1,const TV& x2,const TV& x3)
-    {return 2*Area(x1,x2,x3)/Maximum_Edge_Length(x1,x2,x3);}
+    static T Minimum_Altitude(const TV& x0,const TV& x1,const TV& x2)
+    {return 2*Area(x0,x1,x2)/Maximum_Edge_Length(x0,x1,x2);}
     
     template<class T_ARRAY>
     static TV Barycentric_Coordinates(const TV& location,const T_ARRAY& X)
@@ -92,8 +92,8 @@ public:
     TV Barycentric_Coordinates(const TV& location) const 
     {return Barycentric_Coordinates(location,X.x,X.y,X.z);}
 
-    static TV Point_From_Barycentric_Coordinates(const TV& weights,const TV& x1,const TV& x2,const TV& x3) // clockwise vertices
-    {return weights.x*x1+weights.y*x2+weights.z*x3;}
+    static TV Point_From_Barycentric_Coordinates(const TV& weights,const TV& x0,const TV& x1,const TV& x2) // clockwise vertices
+    {return weights.x*x0+weights.y*x1+weights.z*x2;}
 
     template<class T_ARRAY>
     static TV Point_From_Barycentric_Coordinates(const TV& weights,const T_ARRAY& X) // clockwise vertices
@@ -112,8 +112,8 @@ public:
     TV Raw_Normal() const
     {return TV::Cross_Product(X.y-X.x,X.z-X.x);}
 
-    static TV Center(const TV& x1,const TV& x2,const TV& x3) // centroid
-    {return (T)one_third*(x1+x2+x3);}
+    static TV Center(const TV& x0,const TV& x1,const TV& x2) // centroid
+    {return (T)one_third*(x0+x1+x2);}
 
     TV Center() const // centroid
     {return Center(X.x,X.y,X.z);}
@@ -181,8 +181,8 @@ public:
         T th[2],t[2];
     };
     bool Intersects(const TRIANGLE_3D<T>& triangle,T theta_tol=0,INTERSECTS_HELPER* ih=0) const;
-    static TV Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const TV& x3); // clockwise vertices
-    static TV Clamped_Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const TV& x3,const T tolerance=1e-7); // clockwise vertices
+    static TV Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1,const TV& x2); // clockwise vertices
+    static TV Clamped_Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1,const TV& x2,const T tolerance=1e-7); // clockwise vertices
 //#####################################################################
 };
 

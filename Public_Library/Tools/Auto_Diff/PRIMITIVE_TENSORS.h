@@ -657,14 +657,14 @@ template<class TV> SYMMETRIC_TENSOR<TV> Symmetric_Double_Contract_12(const PERM_
 }
 
 template<class T_TEN> typename ENABLE_IF<IS_TENSOR<T_TEN>::value,T_TEN>::TYPE Choose(const T_TEN& a,const T_TEN& b);
-template<class T_TEN,class T_TEN2> typename ENABLE_IF<IS_TENSOR<T_TEN>::value&&IS_TENSOR<T_TEN2>::value&&(!IS_SYM_TENSOR<T_TEN>::value || !IS_SYM_TENSOR<T_TEN2>::value),TENSOR<VECTOR<typename T_TEN::SCALAR,T_TEN::m> > >::TYPE Choose(const T_TEN& a,const T_TEN2& b);
-template<class T_TEN,class T_TEN2> typename ENABLE_IF<IS_SYM_TENSOR<T_TEN>::value && IS_SYM_TENSOR<T_TEN2>::value,SYMMETRIC_TENSOR<VECTOR<typename T_TEN::SCALAR,T_TEN::m> > >::TYPE Choose(const T_TEN& a,const T_TEN2& b);
+template<class T_TEN,class T_TEN1> typename ENABLE_IF<IS_TENSOR<T_TEN>::value&&IS_TENSOR<T_TEN1>::value&&(!IS_SYM_TENSOR<T_TEN>::value || !IS_SYM_TENSOR<T_TEN1>::value),TENSOR<VECTOR<typename T_TEN::SCALAR,T_TEN::m> > >::TYPE Choose(const T_TEN& a,const T_TEN1& b);
+template<class T_TEN,class T_TEN1> typename ENABLE_IF<IS_SYM_TENSOR<T_TEN>::value && IS_SYM_TENSOR<T_TEN1>::value,SYMMETRIC_TENSOR<VECTOR<typename T_TEN::SCALAR,T_TEN::m> > >::TYPE Choose(const T_TEN& a,const T_TEN1& b);
 template<class TV,class T_TEN> T_TEN Choose(const T_TEN& a,const ZERO_TENSOR<TV>& b);
 template<class TV,class T_TEN> T_TEN Choose(const ZERO_TENSOR<TV>& a,const T_TEN& b);
 template<class TV> ZERO_TENSOR<TV> Choose(const ZERO_TENSOR<TV>& a,const ZERO_TENSOR<TV>& b);
 
 template<class T_TEN> typename ENABLE_IF<IS_TENSOR<T_TEN>::value>::TYPE Fill_From(T_TEN& a,const T_TEN& b){a=b;}
-template<class T_TEN,class T_TEN2> typename ENABLE_IF<IS_TENSOR<T_TEN>::value&&IS_TENSOR<T_TEN2>::value>::TYPE Fill_From(T_TEN& a,const T_TEN2& b){return T_TEN()+b;}
+template<class T_TEN,class T_TEN1> typename ENABLE_IF<IS_TENSOR<T_TEN>::value&&IS_TENSOR<T_TEN1>::value>::TYPE Fill_From(T_TEN& a,const T_TEN1& b){return T_TEN()+b;}
 }
 }
 #endif

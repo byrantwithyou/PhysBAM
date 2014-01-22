@@ -68,9 +68,9 @@ Update_Springs(const bool search_hierarchy)
         const VECTOR<int,2> &segment1_nodes=guide_curve.mesh.elements(i.Key()[0]),&segment2_nodes=curve.mesh.elements(i.Key()[1]);
         SPRING_STATE& state=i.Data();
         SEGMENT_3D<T> segment1(guide_curve.particles.X.Subset(segment1_nodes)),segment2(curve.particles.X.Subset(segment2_nodes));
-        TV X1=(1-state.weights[0])*segment1.X.x+state.weights[0]*segment1.X.y;
-        TV X2=(1-state.weights[1])*segment2.X.x+state.weights[1]*segment2.X.y;
-        state.normal=X1-X2; 
+        TV X0=(1-state.weights[0])*segment1.X.x+state.weights[0]*segment1.X.y;
+        TV X1=(1-state.weights[1])*segment2.X.x+state.weights[1]*segment2.X.y;
+        state.normal=X0-X1; 
         state.distance=state.normal.Normalize();
         if(state.distance>thickness){
             deletion_list.Append(i.Key());
@@ -107,13 +107,13 @@ Update_Springs(const bool search_hierarchy)
             if(min_index==-1) continue;
             const VECTOR<int,2> &segment1_nodes=guide_curve.mesh.elements(min_index),&segment2_nodes=curve.mesh.elements(i);
             SEGMENT_3D<T> segment1(guide_curve.particles.X.Subset(segment1_nodes)),segment2(curve.particles.X.Subset(segment2_nodes));
-            TV X1=(1-state.weights[0])*segment1.X.x+state.weights[0]*segment1.X.y;
-            TV X2=(1-state.weights[1])*segment2.X.x+state.weights[1]*segment2.X.y;
+            TV X0=(1-state.weights[0])*segment1.X.x+state.weights[0]*segment1.X.y;
+            TV X1=(1-state.weights[1])*segment2.X.x+state.weights[1]*segment2.X.y;
             assert(particle_to_spring_id(segment1_nodes[0])==particle_to_spring_id(segment1_nodes[1]));
             assert(particle_to_spring_id(segment2_nodes[0])==particle_to_spring_id(segment2_nodes[1]));
             TV guide_root=guide_curve.particles.X(roots(particle_to_spring_id(segment1_nodes[0])));
             TV curve_root=curve.particles.X(roots(particle_to_spring_id(segment2_nodes[0])));
-            state.normal=X1-X2;
+            state.normal=X0-X1;
             state.distance=state.normal.Normalize();
             state.restlength=(guide_root-curve_root).Magnitude();
             state.nodes=guide_curve.mesh.elements(min_index).Append_Elements(segment_nodes);

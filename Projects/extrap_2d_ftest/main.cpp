@@ -89,12 +89,12 @@ int main(int argc,char* argv[])
     printf("P(1)                        : %10.5e \n",P(1));
     printf("P(2)                        : %10.5e \n",P(2));
     printf("\n");
-    printf("dPdF/1111                   : %10.5e \n",dPdF.x1111);
-    printf("dPdF/2222                   : %10.5e \n",dPdF.x2222);
-    printf("dPdF/2211                   : %10.5e \n",dPdF.x2211);
+    printf("dPdF/1111                   : %10.5e \n",dPdF.x0000);
+    printf("dPdF/2222                   : %10.5e \n",dPdF.x1111);
+    printf("dPdF/2211                   : %10.5e \n",dPdF.x1100);
     printf("\n");
-    printf("dPdF/2121                   : %10.5e \n",dPdF.x2121);
-    printf("dPdF/2112                   : %10.5e \n",dPdF.x2112);
+    printf("dPdF/2121                   : %10.5e \n",dPdF.x1010);
+    printf("dPdF/2112                   : %10.5e \n",dPdF.x1001);
     
     delete icm;
     return 0;

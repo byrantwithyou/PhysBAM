@@ -16,25 +16,25 @@ LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const ARRAY<T,FACE_INDEX<TV
     FACE_LOOKUP_UNIFORM<TV> face_velocities_lookup(face_velocities);
     static const int rotated_face_x[6]={0,1,2,3,4,5};
     u2=block.Face_X_Value(face_velocities_lookup,rotated_face_x[1]);u5=block.Face_X_Value(face_velocities_lookup,rotated_face_x[4]);
-    slope_u12=one_over_DX.x*(u2-block.Face_X_Value(face_velocities_lookup,rotated_face_x[0]));
-    slope_u23=one_over_DX.x*(block.Face_X_Value(face_velocities_lookup,rotated_face_x[2])-u2);
-    slope_u45=one_over_DX.x*(u5-block.Face_X_Value(face_velocities_lookup,rotated_face_x[3]));
-    slope_u56=one_over_DX.x*(block.Face_X_Value(face_velocities_lookup,rotated_face_x[5])-u5);
+    slope_u01=one_over_DX.x*(u2-block.Face_X_Value(face_velocities_lookup,rotated_face_x[0]));
+    slope_u12=one_over_DX.x*(block.Face_X_Value(face_velocities_lookup,rotated_face_x[2])-u2);
+    slope_u34=one_over_DX.x*(u5-block.Face_X_Value(face_velocities_lookup,rotated_face_x[3]));
+    slope_u45=one_over_DX.x*(block.Face_X_Value(face_velocities_lookup,rotated_face_x[5])-u5);
     static const int rotated_face_y[6]={0,2,4,1,3,5};
     v2=block.Face_Y_Value(face_velocities_lookup,rotated_face_y[1]);v5=block.Face_Y_Value(face_velocities_lookup,rotated_face_y[4]);
-    slope_v12=one_over_DX.y*(v2-block.Face_Y_Value(face_velocities_lookup,rotated_face_y[0]));
-    slope_v23=one_over_DX.y*(block.Face_Y_Value(face_velocities_lookup,rotated_face_y[2])-v2);
-    slope_v45=one_over_DX.y*(v5-block.Face_Y_Value(face_velocities_lookup,rotated_face_y[3]));
-    slope_v56=one_over_DX.y*(block.Face_Y_Value(face_velocities_lookup,rotated_face_y[5])-v5);
+    slope_v01=one_over_DX.y*(v2-block.Face_Y_Value(face_velocities_lookup,rotated_face_y[0]));
+    slope_v12=one_over_DX.y*(block.Face_Y_Value(face_velocities_lookup,rotated_face_y[2])-v2);
+    slope_v34=one_over_DX.y*(v5-block.Face_Y_Value(face_velocities_lookup,rotated_face_y[3]));
+    slope_v45=one_over_DX.y*(block.Face_Y_Value(face_velocities_lookup,rotated_face_y[5])-v5);
 }
 template<class T> VECTOR<T,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,2> >::
 Interpolate_Face(const VECTOR<T,2>& X) const
 {
     VECTOR<T,2> yx(X.y,X.x);
-    return VECTOR<T,2>(X.x<center.x?LINEAR_INTERPOLATION<T,T>::Bilinear(u2,u5,one_over_DX.y,center.x,base.y,slope_u12,slope_u45,X)
-                                    :LINEAR_INTERPOLATION<T,T>::Bilinear(u2,u5,one_over_DX.y,center.x,base.y,slope_u23,slope_u56,X),
-                        X.y<center.y?LINEAR_INTERPOLATION<T,T>::Bilinear(v2,v5,one_over_DX.x,center.y,base.x,slope_v12,slope_v45,yx)
-                                    :LINEAR_INTERPOLATION<T,T>::Bilinear(v2,v5,one_over_DX.x,center.y,base.x,slope_v23,slope_v56,yx));
+    return VECTOR<T,2>(X.x<center.x?LINEAR_INTERPOLATION<T,T>::Bilinear(u2,u5,one_over_DX.y,center.x,base.y,slope_u01,slope_u34,X)
+                                    :LINEAR_INTERPOLATION<T,T>::Bilinear(u2,u5,one_over_DX.y,center.x,base.y,slope_u12,slope_u45,X),
+                        X.y<center.y?LINEAR_INTERPOLATION<T,T>::Bilinear(v2,v5,one_over_DX.x,center.y,base.x,slope_v01,slope_v34,yx)
+                                    :LINEAR_INTERPOLATION<T,T>::Bilinear(v2,v5,one_over_DX.x,center.y,base.x,slope_v12,slope_v45,yx));
 }
 // assumes face_velocities are 0 where not valid
 template<class T> VECTOR<T,2> LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,2> >::

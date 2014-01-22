@@ -14,7 +14,7 @@ Initialize_XYZ_From_CIE_Tables()
     int i;
     
     // CIE 15.2-1986 Table 2.1 data
-    // CIE 1931 Standard Colorimetric Observer x2(lambda) data between 380 nm and 780 nm at 5 nm intervals
+    // CIE 1931 Standard Colorimetric Observer x1(lambda) data between 380 nm and 780 nm at 5 nm intervals
     double X_table[]={.0014,.0022,.0042,.0077,.0143,.0232,.0435,.0776,.1344,.2148,.2839,.3285,.3483,.3481,.3362,.3187,.2908,
                                 .2511,.1954,.1421,.0956,.0580,.0320,.0147,.0049,.0024,.0093,.0291,.0633,.1096,.1655,.2257,.2904,.3597,
                                 .4334,.5121,.5945,.6784,.7621,.8425,.9163,.9786,1.0263,1.0567,1.0622,1.0456,1.0026,.9384,.8544,.7514,
@@ -23,7 +23,7 @@ Initialize_XYZ_From_CIE_Tables()
     for(i=0;i<81;i++) X_spectrum(i)=(T)X_table[i];
 
     // CIE 15.2-1986 Table 2.1 data
-    // CIE 1931 Standard Colorimetric Observer y2(lambda) data between 380 nm and 780 nm at 5 nm intervals
+    // CIE 1931 Standard Colorimetric Observer y1(lambda) data between 380 nm and 780 nm at 5 nm intervals
     double Y_table[]={0,.0001,.0001,.0002,.0004,.0006,.0012,.0022,.004,.0073,.0116,.0168,.023,.0298,.038,.048,.06,.0739,.091,
                                 .1126,.139,.1693,.208,.2586,.323,.4073,.503,.6082,.71,.7932,.862,.9149,.954,.9803,.995,1,.995,.9786,.952,
                                 .9154,.87,.8163,.757,.6949,.631,.5668,.503,.4412,.381,.321,.265,.217,.175,.1382,.107,.0816,.061,.0446,
@@ -32,7 +32,7 @@ Initialize_XYZ_From_CIE_Tables()
     for(i=0;i<81;i++) Y_spectrum(i)=(T)Y_table[i];
     
     // CIE 15.2-1986 Table 2.1 data
-    // CIE 1931 Standard Colorimetric Observer z2(lambda) data between 380 nm and 630 nm at 5 nm intervals
+    // CIE 1931 Standard Colorimetric Observer z1(lambda) data between 380 nm and 630 nm at 5 nm intervals
     double Z_table[]={.0065,.0105,.0201,.0362,.0679,.1102,.2074,.3713,.6456,1.0391,1.3856,1.623,1.7471,1.7826,1.7721,
                                 1.7441,1.6692,1.5281,1.2876,1.0419,.813,.6162,.4652,.3533,.272,.2123,.1582,.1117,.0782,.0573,.0422,
                                 .0298,.0203,.0134,.0087,.0057,.0039,.0027,.0021,.0018,.0017,.0014,.0011,.001,.0008,.0006,.0003,.0002,

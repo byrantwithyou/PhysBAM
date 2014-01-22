@@ -22,8 +22,8 @@ template<class T> void Sector_Volumes_Helper(const SPHERE<VECTOR<T,2> >& circle,
     // sectors in usual order (left to right, bottom to top)
     if(circle.Inside(origin,thickness_over_two)){
         T radius_squared=sqr(radius),y_discriminant=sqrt(radius_squared-sqr(origin.y-center.y)),x_discriminant=sqrt(radius_squared-sqr(origin.x-center.x));
-        T x1=center.x+y_discriminant,x2=center.x-y_discriminant,y1=center.y+x_discriminant,y2=center.y-x_discriminant; // intersection points
-        T xl1=x1-origin.x,xl2=origin.x-x2,yl1=y1-origin.y,yl2=origin.y-y2; // the lengths of the axes inside the circle
+        T x0=center.x+y_discriminant,x1=center.x-y_discriminant,y0=center.y+x_discriminant,y1=center.y-x_discriminant; // intersection points
+        T xl1=x0-origin.x,xl2=origin.x-x1,yl1=y0-origin.y,yl2=origin.y-y1; // the lengths of the axes inside the circle
         T ry_times_x_discriminant=(center.y-origin.y)*x_discriminant,rx_times_y_discriminant=(center.x-origin.x)*y_discriminant;
         volumes[0]=(T).5*xl2*yl2+circle.Circular_Segment_Area(max((T)0,radius-sqrt((T).5*(radius_squared+ry_times_x_discriminant+rx_times_y_discriminant))));
         volumes[1]=(T).5*xl1*yl2+circle.Circular_Segment_Area(max((T)0,radius-sqrt((T).5*(radius_squared+ry_times_x_discriminant-rx_times_y_discriminant))));
@@ -73,9 +73,9 @@ Sector_Volumes(const TV& origin,T volumes[1<<d],const T thickness_over_two) cons
 //#####################################################################
 // Function Octant_Volume_Helper
 //#####################################################################
-template<class T> T Octant_Volume_Helper(T x,T x2,T y,T y2)
+template<class T> T Octant_Volume_Helper(T x,T x1,T y,T y1)
 {
-    T s2=max(1-x2-y2,(T)0),s=sqrt(s2),twoxys=2*x*y*s;return ((T)1/6)*(atan2(-twoxys,s2-x2*y2)+(3-y2)*y*(atan2(x,s)-(T)one_fourth_pi)+(3-x2)*x*(atan2(y,s)-(T)one_fourth_pi)+twoxys);
+    T s2=max(1-x1-y1,(T)0),s=sqrt(s2),twoxys=2*x*y*s;return ((T)1/6)*(atan2(-twoxys,s2-x1*y1)+(3-y1)*y*(atan2(x,s)-(T)one_fourth_pi)+(3-x1)*x*(atan2(y,s)-(T)one_fourth_pi)+twoxys);
 }
 //#####################################################################
 // Function Octant_Volume_Internal

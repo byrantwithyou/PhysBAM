@@ -44,7 +44,7 @@ public:
 
     MATRIX(const SYMMETRIC_MATRIX<T,2>& matrix_input)
     {
-        x[0]=matrix_input.x11;x[1]=x[2]=matrix_input.x21;x[3]=matrix_input.x22;
+        x[0]=matrix_input.x00;x[1]=x[2]=matrix_input.x10;x[3]=matrix_input.x11;
     }
 
     MATRIX(const DIAGONAL_MATRIX<T,2>& matrix_input)
@@ -54,12 +54,12 @@ public:
 
     MATRIX(const UPPER_TRIANGULAR_MATRIX<T,2>& matrix_input)
     {
-        x[0]=matrix_input.x11;x[2]=matrix_input.x12;x[3]=matrix_input.x22;x[1]=0;
+        x[0]=matrix_input.x00;x[2]=matrix_input.x01;x[3]=matrix_input.x11;x[1]=0;
     }
 
-    MATRIX(const T x11,const T x21,const T x12,const T x22)
+    MATRIX(const T x00,const T x10,const T x01,const T x11)
     {
-        x[0]=x11;x[1]=x21;x[2]=x12;x[3]=x22;
+        x[0]=x00;x[1]=x10;x[2]=x01;x[3]=x11;
     }
 
     MATRIX(const VECTOR<T,2> & column1,const VECTOR<T,2> & column2)
@@ -253,13 +253,13 @@ public:
     {return MATRIX(x[0]*A.x.x,x[1]*A.x.x,x[2]*A.x.y,x[3]*A.x.y);}
 
     MATRIX operator*(const UPPER_TRIANGULAR_MATRIX<T,2>& A) const // 6 mults, 2 adds
-    {return MATRIX(x[0]*A.x11,x[1]*A.x11,x[0]*A.x12+x[2]*A.x22,x[1]*A.x12+x[3]*A.x22);}
+    {return MATRIX(x[0]*A.x00,x[1]*A.x00,x[0]*A.x01+x[2]*A.x11,x[1]*A.x01+x[3]*A.x11);}
 
     MATRIX operator*(const SYMMETRIC_MATRIX<T,2>& A) const // 8 mults, 4 adds
-    {return MATRIX(x[0]*A.x11+x[2]*A.x21,x[1]*A.x11+x[3]*A.x21,x[0]*A.x21+x[2]*A.x22,x[1]*A.x21+x[3]*A.x22);}
+    {return MATRIX(x[0]*A.x00+x[2]*A.x10,x[1]*A.x00+x[3]*A.x10,x[0]*A.x10+x[2]*A.x11,x[1]*A.x10+x[3]*A.x11);}
 
     MATRIX Times_Transpose(const UPPER_TRIANGULAR_MATRIX<T,2>& A) const // 6 mults, 2 adds
-    {return MATRIX(x[0]*A.x11+x[2]*A.x12,x[1]*A.x11+x[3]*A.x12,x[2]*A.x22,x[3]*A.x22);}
+    {return MATRIX(x[0]*A.x00+x[2]*A.x01,x[1]*A.x00+x[3]*A.x01,x[2]*A.x11,x[3]*A.x11);}
 
     MATRIX Times_Transpose(const MATRIX& A) const // 8 mults, 4 adds
     {return MATRIX(x[0]*A.x[0]+x[2]*A.x[2],x[1]*A.x[0]+x[3]*A.x[2],x[0]*A.x[1]+x[2]*A.x[3],x[1]*A.x[1]+x[3]*A.x[3]);}
@@ -318,19 +318,19 @@ inline MATRIX<T,2> operator-(const T a,const MATRIX<T,2>& A)
 
 template<class T>
 inline MATRIX<T,2> operator+(const SYMMETRIC_MATRIX<T,2>& A,const MATRIX<T,2>& B)
-{return MATRIX<T,2>(A.x11+B.x[0],A.x21+B.x[1],A.x21+B.x[2],A.x22+B.x[3]);}
+{return MATRIX<T,2>(A.x00+B.x[0],A.x10+B.x[1],A.x10+B.x[2],A.x11+B.x[3]);}
 
 template<class T>
 inline MATRIX<T,2> operator-(const SYMMETRIC_MATRIX<T,2>& A,const MATRIX<T,2>& B)
-{return MATRIX<T,2>(A.x11-B.x[0],A.x21-B.x[1],A.x21-B.x[2],A.x22-B.x[3]);}
+{return MATRIX<T,2>(A.x00-B.x[0],A.x10-B.x[1],A.x10-B.x[2],A.x11-B.x[3]);}
 
 template<class T>
 inline MATRIX<T,2> operator+(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const MATRIX<T,2>& B)
-{return MATRIX<T,2>(A.x11+B.x[0],B.x[1],A.x12+B.x[2],A.x22+B.x[3]);}
+{return MATRIX<T,2>(A.x00+B.x[0],B.x[1],A.x01+B.x[2],A.x11+B.x[3]);}
 
 template<class T>
 inline MATRIX<T,2> operator-(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const MATRIX<T,2>& B)
-{return MATRIX<T,2>(A.x11-B.x[0],-B.x[1],A.x12-B.x[2],A.x22-B.x[3]);}
+{return MATRIX<T,2>(A.x00-B.x[0],-B.x[1],A.x01-B.x[2],A.x11-B.x[3]);}
 
 template<class T>
 inline MATRIX<T,2> operator*(const T a,const MATRIX<T,2>& A)
@@ -346,7 +346,7 @@ inline MATRIX<T,2> operator*(const DIAGONAL_MATRIX<T,2>& A,const MATRIX<T,2>& B)
 
 template<class T>
 inline MATRIX<T,2> operator*(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const MATRIX<T,2>& B)
-{return MATRIX<T,2>(A.x11*B.x[0]+A.x12*B.x[1],A.x22*B.x[1],A.x11*B.x[2]+A.x12*B.x[3],A.x22*B.x[3]);}
+{return MATRIX<T,2>(A.x00*B.x[0]+A.x01*B.x[1],A.x11*B.x[1],A.x00*B.x[2]+A.x01*B.x[3],A.x11*B.x[3]);}
 
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,2>& A)

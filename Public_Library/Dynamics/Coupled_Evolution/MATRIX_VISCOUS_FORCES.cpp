@@ -115,16 +115,16 @@ template<class TV> void MATRIX_VISCOUS_FORCES<TV>::
 Test_Matrix() const
 {
     RANDOM_NUMBERS<T> random;
-    ARRAY<T,VISCOUS_FORCE_ID> K(last_id),K2(K);
-    ARRAY<T> V(index_map.Number_Faces()),V2(V);
+    ARRAY<T,VISCOUS_FORCE_ID> K(last_id),K1(K);
+    ARRAY<T> V(index_map.Number_Faces()),V1(V);
 
     random.Fill_Uniform(K,-1,1);
     random.Fill_Uniform(V,-1,1);
-    Times(V,K2);
-    Transpose_Times(K,V2);
+    Times(V,K1);
+    Transpose_Times(K,V1);
 
-    T inner_V=V.Dot(V2);
-    T inner_K=K.Dot(K2);
+    T inner_V=V.Dot(V1);
+    T inner_K=K.Dot(K1);
     LOG::cout<<"MATRIX_VISCOUS_FORCES Symmetry Test: "<<inner_V<<"  vs  "<<inner_K<<"  relative  "<<abs(inner_V-inner_K)/maxabs((T)1e-30,inner_V,inner_K)<<std::endl;
 }
 //#####################################################################

@@ -164,15 +164,15 @@ Project(KRYLOV_VECTOR_BASE<T>& bV) const
 // Function Inner_Product
 //#####################################################################
 template<class TV,class T_MATRIX> double SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
-Inner_Product(const KRYLOV_VECTOR_BASE<T>& bV1,const KRYLOV_VECTOR_BASE<T>& bV2) const
+Inner_Product(const KRYLOV_VECTOR_BASE<T>& bV0,const KRYLOV_VECTOR_BASE<T>& bV1) const
 {
-    const VECTOR_T& V1=debug_cast<const VECTOR_T&>(bV1),&V2=debug_cast<const VECTOR_T&>(bV2);
-    double fluid_inner_product=0.0;for(int i=0;i<V1.pressure.m;i++) fluid_inner_product+=Dot_Product_Double_Precision(V1.pressure(i),V2.pressure(i));
+    const VECTOR_T& V0=debug_cast<const VECTOR_T&>(bV0),&V1=debug_cast<const VECTOR_T&>(bV1);
+    double fluid_inner_product=0.0;for(int i=0;i<V0.pressure.m;i++) fluid_inner_product+=Dot_Product_Double_Precision(V0.pressure(i),V1.pressure(i));
     double solid_inner_product=0.0;
-    for(int i=0;i<V1.solid_velocity.V.Size();i++) solid_inner_product+=Dot_Product(V1.solid_velocity.V(i),modified_mass(i)*V2.solid_velocity.V(i));
-    for(int i=0;i<V1.solid_velocity.rigid_V.Size();i++){
-        solid_inner_product+=Dot_Product(V1.solid_velocity.rigid_V(i).linear,modified_world_space_rigid_mass(i)*V2.solid_velocity.rigid_V(i).linear);
-        solid_inner_product+=Dot_Product(V1.solid_velocity.rigid_V(i).angular,modified_world_space_rigid_inertia_tensor(i)*V2.solid_velocity.rigid_V(i).angular);}
+    for(int i=0;i<V0.solid_velocity.V.Size();i++) solid_inner_product+=Dot_Product(V0.solid_velocity.V(i),modified_mass(i)*V1.solid_velocity.V(i));
+    for(int i=0;i<V0.solid_velocity.rigid_V.Size();i++){
+        solid_inner_product+=Dot_Product(V0.solid_velocity.rigid_V(i).linear,modified_world_space_rigid_mass(i)*V1.solid_velocity.rigid_V(i).linear);
+        solid_inner_product+=Dot_Product(V0.solid_velocity.rigid_V(i).angular,modified_world_space_rigid_inertia_tensor(i)*V1.solid_velocity.rigid_V(i).angular);}
     //LOG::cout<<"Inner product: solid: "<<solid_inner_product<<" fluid: "<<fluid_inner_product<<std::endl;
     return fluid_inner_product+solid_inner_product;
 }

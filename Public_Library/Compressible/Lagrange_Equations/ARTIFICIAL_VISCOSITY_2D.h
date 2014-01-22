@@ -24,8 +24,8 @@ protected:
 public:
 //#####################################################################
     virtual ~ARTIFICIAL_VISCOSITY_2D(){}
-    virtual void Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VECTOR<int,2> >& mass,const ARRAY<T,VECTOR<int,2> >& u,const ARRAY<T,VECTOR<int,2> >& v,const ARRAY<T,VECTOR<int,2> >& energy,ARRAY<T,VECTOR<int,2> >& Q1,
-        ARRAY<T,VECTOR<int,2> >& Q2,ARRAY<T,VECTOR<int,2> >& Q3,ARRAY<T,VECTOR<int,2> >& Q4){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+    virtual void Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VECTOR<int,2> >& mass,const ARRAY<T,VECTOR<int,2> >& u,const ARRAY<T,VECTOR<int,2> >& v,const ARRAY<T,VECTOR<int,2> >& energy,ARRAY<T,VECTOR<int,2> >& Q0,
+        ARRAY<T,VECTOR<int,2> >& Q1,ARRAY<T,VECTOR<int,2> >& Q2,ARRAY<T,VECTOR<int,2> >& Q3){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################
 };
 }

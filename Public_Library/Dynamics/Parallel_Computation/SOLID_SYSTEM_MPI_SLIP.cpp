@@ -76,14 +76,14 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 // Function Inner_Product
 //#####################################################################
 template<class TV> double SOLID_SYSTEM_MPI_SLIP<TV>::
-Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
+Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const
 {
-    const VECTOR_T& V1=debug_cast<const VECTOR_T&>(BV1);const VECTOR_T& V2=debug_cast<const VECTOR_T&>(BV2);
+    const VECTOR_T& V0=debug_cast<const VECTOR_T&>(BV0);const VECTOR_T& V1=debug_cast<const VECTOR_T&>(BV1);
     double inner_product_solid_velocities=0;
-    for(int i=0;i<V1.V.Size();i++) inner_product_solid_velocities+=Dot_Product(V1.V(i),V2.V(i));
-    for(int i=0;i<V1.rigid_V.Size();i++){
-        inner_product_solid_velocities+=Dot_Product(V1.rigid_V(i).linear,V2.rigid_V(i).linear);
-        inner_product_solid_velocities+=Dot_Product(V1.rigid_V(i).angular,V2.rigid_V(i).angular);}
+    for(int i=0;i<V0.V.Size();i++) inner_product_solid_velocities+=Dot_Product(V0.V(i),V1.V(i));
+    for(int i=0;i<V0.rigid_V.Size();i++){
+        inner_product_solid_velocities+=Dot_Product(V0.rigid_V(i).linear,V1.rigid_V(i).linear);
+        inner_product_solid_velocities+=Dot_Product(V0.rigid_V(i).angular,V1.rigid_V(i).angular);}
     return inner_product_solid_velocities;
 }
 //#####################################################################

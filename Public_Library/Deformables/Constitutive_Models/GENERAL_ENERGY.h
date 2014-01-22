@@ -130,52 +130,52 @@ public:
 
     void dddE(const VECTOR<T,2>& f, int simplex,SYMMETRIC_MATRIX<T,2>* sm) const
     {
-        sm[0].x11=Exxx(f.x,f.y,simplex);
-        sm[1].x11=sm[0].x21=Exxy(f.x,f.y,simplex);
-        sm[1].x21=sm[0].x22=Exyy(f.x,f.y,simplex);
-        sm[1].x22=Eyyy(f.x,f.y,simplex);
+        sm[0].x00=Exxx(f.x,f.y,simplex);
+        sm[1].x00=sm[0].x10=Exxy(f.x,f.y,simplex);
+        sm[1].x10=sm[0].x11=Exyy(f.x,f.y,simplex);
+        sm[1].x11=Eyyy(f.x,f.y,simplex);
     }
 
     void dddE(const VECTOR<T,3>& f, int simplex,SYMMETRIC_MATRIX<T,3>* sm) const
     {
-        sm[0].x11=Exxx(f.x,f.y,f.z,simplex);
-        sm[0].x21=sm[1].x11=Exxy(f.x,f.y,f.z,simplex);
-        sm[0].x31=sm[2].x11=Exxz(f.x,f.y,f.z,simplex);
-        sm[0].x22=sm[1].x21=Exyy(f.x,f.y,f.z,simplex);
-        sm[0].x32=sm[1].x31=sm[2].x21=Exyz(f.x,f.y,f.z,simplex);
-        sm[0].x33=sm[2].x31=Exzz(f.x,f.y,f.z,simplex);
-        sm[1].x22=Eyyy(f.x,f.y,f.z,simplex);
-        sm[1].x32=sm[2].x22=Eyyz(f.x,f.y,f.z,simplex);
-        sm[1].x33=sm[2].x32=Eyzz(f.x,f.y,f.z,simplex);
-        sm[2].x33=Ezzz(f.x,f.y,f.z,simplex);
+        sm[0].x00=Exxx(f.x,f.y,f.z,simplex);
+        sm[0].x10=sm[1].x00=Exxy(f.x,f.y,f.z,simplex);
+        sm[0].x20=sm[2].x00=Exxz(f.x,f.y,f.z,simplex);
+        sm[0].x11=sm[1].x10=Exyy(f.x,f.y,f.z,simplex);
+        sm[0].x21=sm[1].x20=sm[2].x10=Exyz(f.x,f.y,f.z,simplex);
+        sm[0].x22=sm[2].x20=Exzz(f.x,f.y,f.z,simplex);
+        sm[1].x11=Eyyy(f.x,f.y,f.z,simplex);
+        sm[1].x21=sm[2].x11=Eyyz(f.x,f.y,f.z,simplex);
+        sm[1].x22=sm[2].x21=Eyzz(f.x,f.y,f.z,simplex);
+        sm[2].x22=Ezzz(f.x,f.y,f.z,simplex);
     }
 
     void ddddE(const VECTOR<T,2>& f, int simplex,SYMMETRIC_MATRIX<T,2>* sm) const
     {
-        sm[0+2*0].x11=Exxxx(f.x,f.y,simplex);
-        sm[0+2*0].x21=sm[1+2*0].x11=sm[0+2*1].x11=Exxxy(f.x,f.y,simplex);
-        sm[1+2*1].x11=sm[0+2*1].x21=sm[1+2*0].x21=sm[0+2*0].x22=Exxyy(f.x,f.y,simplex);
-        sm[1+2*1].x21=sm[1+2*0].x22=sm[0+2*1].x22=Exyyy(f.x,f.y,simplex);
-        sm[1+2*1].x22=Eyyyy(f.x,f.y,simplex);
+        sm[0+2*0].x00=Exxxx(f.x,f.y,simplex);
+        sm[0+2*0].x10=sm[1+2*0].x00=sm[0+2*1].x00=Exxxy(f.x,f.y,simplex);
+        sm[1+2*1].x00=sm[0+2*1].x10=sm[1+2*0].x10=sm[0+2*0].x11=Exxyy(f.x,f.y,simplex);
+        sm[1+2*1].x10=sm[1+2*0].x11=sm[0+2*1].x11=Exyyy(f.x,f.y,simplex);
+        sm[1+2*1].x11=Eyyyy(f.x,f.y,simplex);
     }
 
     void ddddE(const VECTOR<T,3>& f, int simplex,SYMMETRIC_MATRIX<T,3>* sm) const
     {
-        sm[0+3*0].x11=Exxxx(f.x,f.y,f.z,simplex);
-        sm[1+3*0].x11=sm[0+3*0].x21=sm[0+3*1].x11=Exxxy(f.x,f.y,f.z,simplex);
-        sm[2+3*0].x11=sm[0+3*2].x11=sm[0+3*0].x31=Exxxz(f.x,f.y,f.z,simplex);
-        sm[0+3*1].x21=sm[1+3*0].x21=sm[0+3*0].x22=sm[1+3*1].x11=Exxyy(f.x,f.y,f.z,simplex);
-        sm[1+3*2].x11=sm[2+3*0].x21=sm[0+3*2].x21=sm[1+3*0].x31=sm[0+3*0].x32=sm[0+3*1].x31=sm[2+3*1].x11=Exxyz(f.x,f.y,f.z,simplex);
-        sm[0+3*0].x33=sm[0+3*2].x31=sm[2+3*0].x31=sm[2+3*2].x11=Exxzz(f.x,f.y,f.z,simplex);
-        sm[0+3*1].x22=sm[1+3*0].x22=sm[1+3*1].x21=Exyyy(f.x,f.y,f.z,simplex);
-        sm[0+3*1].x32=sm[0+3*2].x22=sm[1+3*0].x32=sm[1+3*1].x31=sm[1+3*2].x21=sm[2+3*0].x22=sm[2+3*1].x21=Exyyz(f.x,f.y,f.z,simplex);
-        sm[0+3*1].x33=sm[0+3*2].x32=sm[1+3*0].x33=sm[1+3*2].x31=sm[2+3*0].x32=sm[2+3*1].x31=sm[2+3*2].x21=Exyzz(f.x,f.y,f.z,simplex);
-        sm[0+3*2].x33=sm[2+3*0].x33=sm[2+3*2].x31=Exzzz(f.x,f.y,f.z,simplex);
-        sm[1+3*1].x22=Eyyyy(f.x,f.y,f.z,simplex);
-        sm[1+3*1].x32=sm[1+3*2].x22=sm[2+3*1].x22=Eyyyz(f.x,f.y,f.z,simplex);
-        sm[1+3*1].x33=sm[1+3*2].x32=sm[2+3*1].x32=sm[2+3*2].x22=Eyyzz(f.x,f.y,f.z,simplex);
-        sm[1+3*2].x33=sm[2+3*1].x33=sm[2+3*2].x32=Eyzzz(f.x,f.y,f.z,simplex);
-        sm[2+3*2].x33=Ezzzz(f.x,f.y,f.z,simplex);
+        sm[0+3*0].x00=Exxxx(f.x,f.y,f.z,simplex);
+        sm[1+3*0].x00=sm[0+3*0].x10=sm[0+3*1].x00=Exxxy(f.x,f.y,f.z,simplex);
+        sm[2+3*0].x00=sm[0+3*2].x00=sm[0+3*0].x20=Exxxz(f.x,f.y,f.z,simplex);
+        sm[0+3*1].x10=sm[1+3*0].x10=sm[0+3*0].x11=sm[1+3*1].x00=Exxyy(f.x,f.y,f.z,simplex);
+        sm[1+3*2].x00=sm[2+3*0].x10=sm[0+3*2].x10=sm[1+3*0].x20=sm[0+3*0].x21=sm[0+3*1].x20=sm[2+3*1].x00=Exxyz(f.x,f.y,f.z,simplex);
+        sm[0+3*0].x22=sm[0+3*2].x20=sm[2+3*0].x20=sm[2+3*2].x00=Exxzz(f.x,f.y,f.z,simplex);
+        sm[0+3*1].x11=sm[1+3*0].x11=sm[1+3*1].x10=Exyyy(f.x,f.y,f.z,simplex);
+        sm[0+3*1].x21=sm[0+3*2].x11=sm[1+3*0].x21=sm[1+3*1].x20=sm[1+3*2].x10=sm[2+3*0].x11=sm[2+3*1].x10=Exyyz(f.x,f.y,f.z,simplex);
+        sm[0+3*1].x22=sm[0+3*2].x21=sm[1+3*0].x22=sm[1+3*2].x20=sm[2+3*0].x21=sm[2+3*1].x20=sm[2+3*2].x10=Exyzz(f.x,f.y,f.z,simplex);
+        sm[0+3*2].x22=sm[2+3*0].x22=sm[2+3*2].x20=Exzzz(f.x,f.y,f.z,simplex);
+        sm[1+3*1].x11=Eyyyy(f.x,f.y,f.z,simplex);
+        sm[1+3*1].x21=sm[1+3*2].x11=sm[2+3*1].x11=Eyyyz(f.x,f.y,f.z,simplex);
+        sm[1+3*1].x22=sm[1+3*2].x21=sm[2+3*1].x21=sm[2+3*2].x11=Eyyzz(f.x,f.y,f.z,simplex);
+        sm[1+3*2].x22=sm[2+3*1].x22=sm[2+3*2].x21=Eyzzz(f.x,f.y,f.z,simplex);
+        sm[2+3*2].x22=Ezzzz(f.x,f.y,f.z,simplex);
     }
 
     void Compute_it(const VECTOR<T,2>& f,int simplex,VECTOR<T,1>& g_it,VECTOR<T,0>& H_xit,VECTOR<T,1>& H_iitt,VECTOR<T,0>& T_xxit,VECTOR<T,0>& T_xiitt,VECTOR<T,1>& T_iiittt,VECTOR<T,1>& T_itit) const

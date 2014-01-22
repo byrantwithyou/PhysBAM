@@ -56,7 +56,7 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const RANGE<VECTOR<T,3>
         PLANE<T> plane(VECTOR<T,3>::Axis_Vector(i),VECTOR<T,3>());
         T rate_of_approach=-ray.direction(i);
         for(int j=0;j<2;++j){
-            plane.x1(i)=corners[j](i);
+            plane.x0(i)=corners[j](i);
             if(Intersects(ray,plane,thickness_over_two,ray.endpoint(i)-corners[j](i),rate_of_approach)){
                 VECTOR<T,2> point_no_i=ray.Point(ray.t_max).Remove_Index(i);
                 if(point_no_i.All_Greater_Equal(min_thickened.Remove_Index(i)) && point_no_i.All_Less_Equal(max_thickened.Remove_Index(i))){

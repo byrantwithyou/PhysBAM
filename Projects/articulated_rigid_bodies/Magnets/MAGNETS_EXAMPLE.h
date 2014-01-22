@@ -22,7 +22,7 @@ public:
     using BASE::stream_type;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
 
-    RIGID_BODY<TV>* shelf11,*shelf12,*shelf21,*shelf22;
+    RIGID_BODY<TV>* shelf00,*shelf01,*shelf10,*shelf11;
     int current_frame,start_move,end_move;
     T increment;
     int selection;

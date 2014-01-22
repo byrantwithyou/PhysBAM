@@ -15,11 +15,11 @@ using std::sqrt;
 //#####################################################################
 // Function In_Place_Cholesky_Inverse
 //#####################################################################
-template<class T,class T_MATRIX> template<class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
-In_Place_Cholesky_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse)
+template<class T,class T_MATRIX> template<class T_MATRIX1> void MATRIX_BASE<T,T_MATRIX>::
+In_Place_Cholesky_Inverse(MATRIX_BASE<T,T_MATRIX1>& inverse)
 {
     assert(Rows()==Columns());
-    inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
+    inverse.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
     LEFT_VECTOR b((INITIAL_SIZE)Rows()); // holds piece of the identity matrix
     In_Place_Cholesky_Factorization();
     for(int j=0;j<Columns();j++){
@@ -30,11 +30,11 @@ In_Place_Cholesky_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse)
 //#####################################################################
 // Function In_Place_PLU_Inverse
 //#####################################################################
-template<class T,class T_MATRIX> template<class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
-In_Place_PLU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse)
+template<class T,class T_MATRIX> template<class T_MATRIX1> void MATRIX_BASE<T,T_MATRIX>::
+In_Place_PLU_Inverse(MATRIX_BASE<T,T_MATRIX1>& inverse)
 {
     assert(Rows()==Columns());
-    inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
+    inverse.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
     COLUMN_PERMUTATION p;
     T_MATRIX L;
     In_Place_PLU_Factorization(L,p);
@@ -47,11 +47,11 @@ In_Place_PLU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse)
 //#####################################################################
 // Function In_Place_LU_Inverse
 //#####################################################################
-template<class T,class T_MATRIX> template<class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
-In_Place_LU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) // don't assume ARRAY
+template<class T,class T_MATRIX> template<class T_MATRIX1> void MATRIX_BASE<T,T_MATRIX>::
+In_Place_LU_Inverse(MATRIX_BASE<T,T_MATRIX1>& inverse) // don't assume ARRAY
 {
     assert(Rows()==Columns());
-    inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
+    inverse.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
     T_MATRIX L;
     RIGHT_VECTOR b(Columns()); // used forpiece of the identity matrix
     In_Place_LU_Factorization(L);
@@ -63,12 +63,12 @@ In_Place_LU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) // don't assume ARRAY
 //#####################################################################
 // Function Gram_Schmidt_QR_Factorization
 //#####################################################################
-template<class T,class T_MATRIX> template<class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
-In_Place_Gram_Schmidt_QR_Factorization(MATRIX_BASE<T,T_MATRIX2>& R)
+template<class T,class T_MATRIX> template<class T_MATRIX1> void MATRIX_BASE<T,T_MATRIX>::
+In_Place_Gram_Schmidt_QR_Factorization(MATRIX_BASE<T,T_MATRIX1>& R)
 {
-    R.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
+    R.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
     for(int j=0;j<Columns();j++){ // for each column
-        for(int i=0;i<Rows();i++) R(j,j)+=sqr((*this)(i,j));R(j,j)=sqrt(R(j,j)); // compute the L2 norm
+        for(int i=0;i<Rows();i++) R(j,j)+=sqr((*this)(i,j));R(j,j)=sqrt(R(j,j)); // compute the L1 norm
         T one_over_Rjj=1/R(j,j);
         for(int i=0;i<Rows();i++) (*this)(i,j)*=one_over_Rjj; // orthogonalize the column
         for(int k=j+1;k<Columns();k++){ // subtract this columns contributution from the rest of the columns
@@ -78,10 +78,10 @@ In_Place_Gram_Schmidt_QR_Factorization(MATRIX_BASE<T,T_MATRIX2>& R)
 //#####################################################################
 // Function Householder_QR_Factorization
 //#####################################################################
-template<class T,class T_MATRIX> template<class T_MATRIX2,class T_MATRIX3> void MATRIX_BASE<T,T_MATRIX>::
-Householder_QR_Factorization(MATRIX_BASE<T,T_MATRIX2>& V,MATRIX_BASE<T,T_MATRIX3>& R)
+template<class T,class T_MATRIX> template<class T_MATRIX1,class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
+Householder_QR_Factorization(MATRIX_BASE<T,T_MATRIX1>& V,MATRIX_BASE<T,T_MATRIX2>& R)
 {
-    V.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());R.Derived()=T_MATRIX3(Columns(),Columns());T_MATRIX temp(*this);LEFT_VECTOR a(Rows()),v,new_a;
+    V.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());R.Derived()=T_MATRIX2(Columns(),Columns());T_MATRIX temp(*this);LEFT_VECTOR a(Rows()),v,new_a;
     for(int j=0;j<Columns();j++){ // for each column
         for(int i=0;i<Rows();i++) a(i)=temp(i,j);
         v=a.Householder_Vector(j);for(int i=0;i<Rows();i++) V(i,j)=v(i); // store the v's in V
@@ -93,8 +93,8 @@ Householder_QR_Factorization(MATRIX_BASE<T,T_MATRIX2>& V,MATRIX_BASE<T,T_MATRIX3
 //#####################################################################
 // Function Robust_Householder_QR_Solve
 //#####################################################################
-template<class T,class T_MATRIX> template<class T_VECTOR1,class T_VECTOR2> void MATRIX_BASE<T,T_MATRIX>::
-In_Place_Robust_Householder_QR_Solve(ARRAY_BASE<T,T_VECTOR1>& b,ARRAY_BASE<int,T_VECTOR2>& p)
+template<class T,class T_MATRIX> template<class T_VECTOR0,class T_VECTOR1> void MATRIX_BASE<T,T_MATRIX>::
+In_Place_Robust_Householder_QR_Solve(ARRAY_BASE<T,T_VECTOR0>& b,ARRAY_BASE<int,T_VECTOR1>& p)
 {
     assert(Rows()==b.Size() && Columns()==p.Size());
     ARRAY<T> a((INITIAL_SIZE)Rows());for(int i=0;i<Columns();i++) p(i)=i; // TODO: This should not assume ARRAY.
@@ -114,11 +114,11 @@ In_Place_Robust_Householder_QR_Solve(ARRAY_BASE<T,T_VECTOR1>& b,ARRAY_BASE<int,T
 //#####################################################################
 // Function Robust_Householder_QR_Solve
 //#####################################################################
-template<class T,class T_MATRIX> template<class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
-In_Place_PLU_Factorization(MATRIX_BASE<T,T_MATRIX2>& L,COLUMN_PERMUTATION& p)
+template<class T,class T_MATRIX> template<class T_MATRIX1> void MATRIX_BASE<T,T_MATRIX>::
+In_Place_PLU_Factorization(MATRIX_BASE<T,T_MATRIX1>& L,COLUMN_PERMUTATION& p)
 {
     assert((INITIAL_SIZE)Rows()==(INITIAL_SIZE)Columns());
-    L.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
+    L.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
     p=COLUMN_PERMUTATION(INITIAL_SIZE(Columns()));for(int i=0;i<Columns();i++) p(i)=i; // initialize p
     for(int j=0;j<Columns();j++){ // for each column
         // find the largest element and switch rows
@@ -147,11 +147,11 @@ In_Place_Cholesky_Factorization()
 //#####################################################################
 // Function In_Place_Cholesky_Factorization
 //#####################################################################
-template<class T,class T_MATRIX> template<class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
-In_Place_LU_Factorization(MATRIX_BASE<T,T_MATRIX2>& L)
+template<class T,class T_MATRIX> template<class T_MATRIX1> void MATRIX_BASE<T,T_MATRIX>::
+In_Place_LU_Factorization(MATRIX_BASE<T,T_MATRIX1>& L)
 {
     assert(Rows()==Columns());
-    L.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
+    L.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
     for(int j=0;j<Columns();j++){ // for each column
         T diagonal_inverse=1/(*this)(j,j);for(int i=j;i<Columns();i++) L(i,j)=(*this)(i,j)*diagonal_inverse; // fill in the column for L
         for(int i=j+1;i<Columns();i++) for(int k=j;k<Columns();k++) (*this)(i,k)-=L(i,j)*(*this)(j,k);} // sweep across each row below row j  TODO: can the order of these loops be swapped?

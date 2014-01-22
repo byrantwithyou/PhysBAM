@@ -65,17 +65,17 @@ Exact_Segment_Intersection(const VECTOR<float,2>& p1,const VECTOR<float,2>& p2,c
 //#####################################################################
 // Using Simulation Of Simplicity
 bool EXACT_SIMPLEX_INTERACTIONS::
-Positive_Signed_Area(VECTOR<float,2> x1,VECTOR<float,2> x2,VECTOR<float,2> x3,int rank1,int rank2,int rank3)
+Positive_Signed_Area(VECTOR<float,2> x0,VECTOR<float,2> x1,VECTOR<float,2> x2,int rank1,int rank2,int rank3)
 {
     bool positive=true;
-    if(rank1>rank2){exchange(rank1,rank2);exchange(x1,x2);positive=!positive;}
-    if(rank1>rank3){exchange(rank1,rank3);exchange(x1,x3);positive=!positive;}
-    if(rank2>rank3){exchange(rank2,rank3);exchange(x2,x3);positive=!positive;}
-    double area=Exact_Signed_Area(x1,x2,x3);
+    if(rank1>rank2){exchange(rank1,rank2);exchange(x0,x1);positive=!positive;}
+    if(rank1>rank3){exchange(rank1,rank3);exchange(x0,x2);positive=!positive;}
+    if(rank2>rank3){exchange(rank2,rank3);exchange(x1,x2);positive=!positive;}
+    double area=Exact_Signed_Area(x0,x1,x2);
     if(area!=0) return (area<0)^positive; // works with area=-0
-    else if (x3.x!=x2.x) return (x3.x<x2.x)^positive;
-    else if (x2.y!=x3.y) return (x2.y<x3.y)^positive;
-    else if (x1.x!=x3.x) return (x1.x<x3.x)^positive;
+    else if (x2.x!=x1.x) return (x2.x<x1.x)^positive;
+    else if (x1.y!=x2.y) return (x1.y<x2.y)^positive;
+    else if (x0.x!=x2.x) return (x0.x<x2.x)^positive;
     return positive;
 }
 //#####################################################################
@@ -83,15 +83,15 @@ Positive_Signed_Area(VECTOR<float,2> x1,VECTOR<float,2> x2,VECTOR<float,2> x3,in
 //#####################################################################
 // Using Simulation Of Simplicity and lexicographical ordering of vertices (assumes no vertices are coincident)
 bool EXACT_SIMPLEX_INTERACTIONS::
-Positive_Signed_Area(VECTOR<float,2> x1,VECTOR<float,2> x2,VECTOR<float,2> x3)
+Positive_Signed_Area(VECTOR<float,2> x0,VECTOR<float,2> x1,VECTOR<float,2> x2)
 {
     bool positive=true;
+    if(x0.x>x1.x || (x0.x==x1.x && x0.y>x1.y)){exchange(x0,x1);positive=!positive;}
+    if(x0.x>x2.x || (x0.x==x2.x && x0.y>x2.y)){exchange(x0,x2);positive=!positive;}
     if(x1.x>x2.x || (x1.x==x2.x && x1.y>x2.y)){exchange(x1,x2);positive=!positive;}
-    if(x1.x>x3.x || (x1.x==x3.x && x1.y>x3.y)){exchange(x1,x3);positive=!positive;}
-    if(x2.x>x3.x || (x2.x==x3.x && x2.y>x3.y)){exchange(x2,x3);positive=!positive;}
-    double area=Exact_Signed_Area(x1,x2,x3);
+    double area=Exact_Signed_Area(x0,x1,x2);
     if(area!=0) return (area<0)^positive; // works with area=-0
-    if (x3.x!=x2.x) return !positive;
+    if (x2.x!=x1.x) return !positive;
     return positive;
 }
 //#####################################################################
@@ -99,11 +99,11 @@ Positive_Signed_Area(VECTOR<float,2> x1,VECTOR<float,2> x2,VECTOR<float,2> x3)
 //#####################################################################
 // Sign is guaranteed to be exact (if area is zero, we get exactly zero)
 double EXACT_SIMPLEX_INTERACTIONS::
-Exact_Signed_Area(const VECTOR<float,2>& x1,const VECTOR<float,2>& x2,const VECTOR<float,2>& x3)
+Exact_Signed_Area(const VECTOR<float,2>& x0,const VECTOR<float,2>& x1,const VECTOR<float,2>& x2)
 {
     VECTOR<double,6> terms;
-    terms(0)=((double)x1.x)*((double)x2.y);terms(1)=((double)x2.x)*((double)x3.y);terms(2)=((double)x3.x)*((double)x1.y);
-    terms(3)=-((double)x1.y)*((double)x2.x);terms(4)=-((double)x2.y)*((double)x3.x);terms(5)=-((double)x3.y)*((double)x1.x);
+    terms(0)=((double)x0.x)*((double)x1.y);terms(1)=((double)x1.x)*((double)x2.y);terms(2)=((double)x2.x)*((double)x0.y);
+    terms(3)=-((double)x0.y)*((double)x1.x);terms(4)=-((double)x1.y)*((double)x2.x);terms(5)=-((double)x2.y)*((double)x0.x);
     for(int i=0;i<5;i++) for(int j=i+1;j<6;j++) if(abs(terms(i))<abs(terms(j))) exchange(terms(i),terms(j));
     for(int number_of_terms=4;number_of_terms>=0;number_of_terms--){
         int i=1;for(;i<number_of_terms-1;i++) if(terms(0)*terms(i)<0) break;

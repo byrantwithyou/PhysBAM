@@ -46,7 +46,7 @@ draw()
         for(int j=0;j<object_triangles(i)->mesh.elements.m;j++){
             VECTOR<int,3> nodes=object_triangles(i)->mesh.elements(j);
             TRIANGLE_3D<T> triangle(object_triangles(i)->particles.X(nodes(1)),object_triangles(i)->particles.X(nodes(2)),object_triangles(i)->particles.X(nodes(3)));
-            OpenGL_Normal(triangle.Normal());OpenGL_Vertex(triangle.x1);OpenGL_Vertex(triangle.x2);OpenGL_Vertex(triangle.x3);}
+            OpenGL_Normal(triangle.Normal());OpenGL_Vertex(triangle.x0);OpenGL_Vertex(triangle.x1);OpenGL_Vertex(triangle.x2);}
         glEnd();glPopMatrix();
         glDisable(GL_BLEND);glDepthMask(GL_TRUE);}
     glDisable(GL_LIGHTING);

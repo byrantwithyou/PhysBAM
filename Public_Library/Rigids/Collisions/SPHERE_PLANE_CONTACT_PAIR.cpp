@@ -33,28 +33,28 @@ bool Update_Sphere_Plane_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_coll
     int i1=id_1;
     int i2=id_2;
     FRAME<TV> transform;
-    RIGID_BODY<TV>* body1=&rigid_body_collection.Rigid_Body(i1);
-    RIGID_BODY<TV>* body2=&rigid_body_collection.Rigid_Body(i2);
+    RIGID_BODY<TV>* body0=&rigid_body_collection.Rigid_Body(i1);
+    RIGID_BODY<TV>* body1=&rigid_body_collection.Rigid_Body(i2);
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object2)){
         transform=*object_transformed->transform;object2=object_transformed->object_space_implicit_object;}
     ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >* implicit_sphere=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >*>(object2);
     if(!implicit_sphere){
         if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object1)){
             transform=*object_transformed->transform;object1=object_transformed->object_space_implicit_object;}
-        exchange(body1,body2);
+        exchange(body0,body1);
         exchange(i1,i2);
         exchange(object1,object2);
         implicit_sphere=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >*>(object2);}
     SPHERE<TV>& sphere=implicit_sphere->analytic;
 
-    TV sphere_center=(body2->Frame()*transform).t;
-    TV collision_normal=-body1->Frame().r.Rotated_Axis(1);
-    T separation=TV::Dot_Product(body1->Frame().t-sphere_center,collision_normal);
+    TV sphere_center=(body1->Frame()*transform).t;
+    TV collision_normal=-body0->Frame().r.Rotated_Axis(1);
+    T separation=TV::Dot_Product(body0->Frame().t-sphere_center,collision_normal);
     if(separation>=sphere.radius){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
-    if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
+    if(TV::Dot_Product(body0->Twist().linear-body1->Twist().linear,collision_normal)>=0) return false;
     T collision_depth=(T).5*(-sphere.radius+min(-separation,sphere.radius));
     TV collision_location=sphere_center-collision_depth*collision_normal;
-    TV collision_relative_velocity=body1->Pointwise_Object_Velocity(collision_location)-body2->Pointwise_Object_Velocity(collision_location);
+    TV collision_relative_velocity=body0->Pointwise_Object_Velocity(collision_location)-body1->Pointwise_Object_Velocity(collision_location);
 
     collision_callbacks.Swap_States(i1,i2);
     SOLVE_CONTACT::Update_Contact_Pair_Helper<TV>(rigid_body_collisions,collision_callbacks,i1,i2,dt,time,epsilon_scale,collision_location,collision_normal,collision_relative_velocity,

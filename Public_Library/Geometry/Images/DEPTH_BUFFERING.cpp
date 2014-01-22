@@ -84,8 +84,8 @@ Cut_By_Primitive(const DISPLAY_PRIMITIVE_CUTTING<T> &p)
             }break;
             case SEGMENT:{
                 PLANE<T> plane=DB::Get_Cutting_Plane(p.vertices(0),p.vertices(1));
-                Cut_By_Plane(PLANE<T>(plane.normal,plane.x1+plane.normal*DB_TOL_SEGMENT));
-                Cut_By_Plane(PLANE<T>(plane.normal,plane.x1-plane.normal*DB_TOL_SEGMENT));
+                Cut_By_Plane(PLANE<T>(plane.normal,plane.x0+plane.normal*DB_TOL_SEGMENT));
+                Cut_By_Plane(PLANE<T>(plane.normal,plane.x0-plane.normal*DB_TOL_SEGMENT));
             }break;
             case POINT:{
                 Cut_By_Plane(PLANE<T>(TV(1,0,0),p.vertices(0)+TV(1,0,0)*DB_TOL_POINT));

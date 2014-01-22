@@ -62,17 +62,17 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         TV max(parameters.Get_Parameter("Xmax",(T)1),parameters.Get_Parameter("Ymax",(T)1),parameters.Get_Parameter("Zmax",(T)1));
         object=new RENDERING_BOX<T>(RANGE<TV>(min,max));}
      else if(type=="Cylinder"){
-        TV X1=parameters.Get_Parameter("X1",TV(0,-1,0));
-        TV X2=parameters.Get_Parameter("X2",TV(0,1,0));
+        TV X0=parameters.Get_Parameter("X0",TV(0,-1,0));
+        TV X1=parameters.Get_Parameter("X1",TV(0,1,0));
         T radius=parameters.Get_Parameter("Radius",(T)1);
-        LOG::cout<<"Cylinder principal points X1="<<X1<<" X2="<<X2<<" radius="<<radius<<std::endl;
-        object=new RENDERING_CYLINDER<T>(X1,X2,radius);}
+        LOG::cout<<"Cylinder principal points X0="<<X0<<" X1="<<X1<<" radius="<<radius<<std::endl;
+        object=new RENDERING_CYLINDER<T>(X0,X1,radius);}
     else if(type=="Triangle"){
         LOG::cout<<"Triangle"<<std::endl;
-        TV x1=parameters.Get_Parameter("X1",TV(1,0,0));
-        TV x2=parameters.Get_Parameter("X2",TV(0,1,0));
-        TV x3=parameters.Get_Parameter("X3",TV(0,0,1));
-        object=new RENDERING_TRIANGLE<T>(x1,x2,x3);}
+        TV x0=parameters.Get_Parameter("X0",TV(1,0,0));
+        TV x1=parameters.Get_Parameter("X1",TV(0,1,0));
+        TV x2=parameters.Get_Parameter("X2",TV(0,0,1));
+        object=new RENDERING_TRIANGLE<T>(x0,x1,x2);}
     else if(type=="Wall"){
         LOG::cout<<"Wall"<<std::endl;
         std::string control=parameters.Get_Parameter("Control",std::string("Null"));

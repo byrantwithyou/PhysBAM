@@ -27,9 +27,9 @@ Bilinear(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const VECTOR<T,2>& 
 // Function Bilinear
 //#####################################################################
 template<class T,class T2> T2 LINEAR_INTERPOLATION<T,T2>::
-Bilinear(const T2& u1,const T2& u3,T one_over_y_top_minus_y_bottom,const T x_left,const T y_bottom,const T2& slope12,const T2& slope34,const VECTOR<T,2>& X)
+Bilinear(const T2& u1,const T2& u3,T one_over_y_top_minus_y_bottom,const T x_left,const T y_bottom,const T2& slope01,const T2& slope23,const VECTOR<T,2>& X)
 {
-    T2 u_bottom=Linear(x_left,u1,slope12,X.x),u_top=Linear(x_left,u3,slope34,X.x);
+    T2 u_bottom=Linear(x_left,u1,slope01,X.x),u_top=Linear(x_left,u3,slope23,X.x);
     return Linear_Predivided(y_bottom,one_over_y_top_minus_y_bottom,u_bottom,u_top,X.y);
 }
 //#####################################################################
@@ -63,11 +63,11 @@ Trilinear(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const T2& u5,const
 //#####################################################################
 template<class T,class T2> T2 LINEAR_INTERPOLATION<T,T2>::
 Trilinear(const T2& u1,const T2& u3,const T2& u5,const T2& u7,T one_over_y_top_minus_y_bottom,T one_over_z_back_minus_z_front,const T x_left,const T y_bottom,const T z_front,
-    const T2& slope12,const T2& slope34,const T2& slope56,const T2& slope78,const VECTOR<T,3>& X)
+    const T2& slope01,const T2& slope23,const T2& slope45,const T2& slope67,const VECTOR<T,3>& X)
 {
-    T2 u_bottom=Linear(x_left,u1,slope12,X.x),u_top=Linear(x_left,u3,slope34,X.x);
+    T2 u_bottom=Linear(x_left,u1,slope01,X.x),u_top=Linear(x_left,u3,slope23,X.x);
     T2 u_front=Linear_Predivided(y_bottom,one_over_y_top_minus_y_bottom,u_bottom,u_top,X.y);
-    u_bottom=Linear(x_left,u5,slope56,X.x);u_top=Linear(x_left,u7,slope78,X.x);    
+    u_bottom=Linear(x_left,u5,slope45,X.x);u_top=Linear(x_left,u7,slope67,X.x);    
     T2 u_back=Linear_Predivided(y_bottom,one_over_y_top_minus_y_bottom,u_bottom,u_top,X.y);
     return Linear_Predivided(z_front,one_over_z_back_minus_z_front,u_front,u_back,X.z);
 }

@@ -22,31 +22,31 @@ public:
     PLANE<T> plane1,plane2; // plane2 is height units behind circle
 
     RING()
-        :height(1),outer_radius(2),inner_radius(1),plane2(plane1.x1-height*plane1.normal,-plane1.normal)
+        :height(1),outer_radius(2),inner_radius(1),plane2(plane1.x0-height*plane1.normal,-plane1.normal)
     {}
 
-    RING(const TV& X1,const TV& X2,const T outer_radius,const T inner_radius)
+    RING(const TV& X0,const TV& X1,const T outer_radius,const T inner_radius)
         :outer_radius(outer_radius),inner_radius(inner_radius)
     {
-        Set_Endpoints(X1,X2);
+        Set_Endpoints(X0,X1);
     }
 
     void Set_Height(const T height_input)
-    {height=height_input;plane2.x1=plane1.x1-height*plane1.normal;}
+    {height=height_input;plane2.x0=plane1.x0-height*plane1.normal;}
 
-    void Set_Endpoints(const TV& X1,const TV& X2)
-    {TV plane_normal=X1-X2;height=plane_normal.Normalize();
-    plane1.x1=X1;plane1.normal=plane_normal;
-    plane2.x1=X2;plane2.normal=-plane_normal;}
+    void Set_Endpoints(const TV& X0,const TV& X1)
+    {TV plane_normal=X0-X1;height=plane_normal.Normalize();
+    plane1.x0=X0;plane1.normal=plane_normal;
+    plane2.x0=X1;plane2.normal=-plane_normal;}
 
     template<class RW>
     void Read(std::istream& input)
-    {Read_Binary<RW>(input,plane1.x1,plane2.x1,outer_radius,inner_radius);
-    Set_Endpoints(plane1.x1,plane2.x1);}
+    {Read_Binary<RW>(input,plane1.x0,plane2.x0,outer_radius,inner_radius);
+    Set_Endpoints(plane1.x0,plane2.x0);}
 
     template<class RW>
     void Write(std::ostream& output) const
-    {Write_Binary<RW>(output,plane1.x1,plane2.x1,outer_radius,inner_radius);}
+    {Write_Binary<RW>(output,plane1.x0,plane2.x0,outer_radius,inner_radius);}
 
 //#####################################################################
     RANGE<TV> Bounding_Box() const;

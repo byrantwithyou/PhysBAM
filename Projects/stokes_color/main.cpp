@@ -657,9 +657,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV F(const TV& X,int color)
                 {
                     TV x=X-0.5*m;
-                    T x2=x.Magnitude_Squared();
-                    T x2m2=x2/m2;
-                    return x*(2*p_term*cos(x2m2)/m2+u_term*mu(1)*((TV::m+2)*m2-2*x2)*4*exp(-x2m2)/m4)*color;
+                    T x1=x.Magnitude_Squared();
+                    T x2m2=x1/m2;
+                    return x*(2*p_term*cos(x2m2)/m2+u_term*mu(1)*((TV::m+2)*m2-2*x1)*4*exp(-x2m2)/m4)*color;
                 }
                 virtual TV j_surface(const TV& X,int color0,int color1)
                 {

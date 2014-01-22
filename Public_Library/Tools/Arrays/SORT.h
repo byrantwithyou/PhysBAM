@@ -50,8 +50,8 @@ struct FIELD_COMPARE
         :field(field_input)
     {}
 
-    bool operator()(const T& x1,const T& x2) const
-    {return x1.*field<x2.*field;}
+    bool operator()(const T& x0,const T& x1) const
+    {return x0.*field<x1.*field;}
 };
 
 template<class T,class T_FIELD>

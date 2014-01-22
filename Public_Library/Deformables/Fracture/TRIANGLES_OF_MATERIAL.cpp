@@ -73,18 +73,18 @@ Construct_Material_Surface_Mesh()
 // Function Add_To_Material_Surface_Mesh_Triangle
 //#####################################################################
 template<class TV> void TRIANGLES_OF_MATERIAL<TV>::
-Add_To_Material_Surface_Mesh_Triangle(const int x1,const int x2,const int x3)
+Add_To_Material_Surface_Mesh_Triangle(const int x0,const int x1,const int x2)
 {
-    material_surface_mesh.elements.Append(VECTOR<int,3>(x1,x2,x3));
+    material_surface_mesh.elements.Append(VECTOR<int,3>(x0,x1,x2));
 }
 //#####################################################################
 // Function Add_To_Material_Surface_Mesh_Quad
 //#####################################################################
 template<class TV> void TRIANGLES_OF_MATERIAL<TV>::
-Add_To_Material_Surface_Mesh_Quad(const int x1,const int x2,const int x3,const int x4)
+Add_To_Material_Surface_Mesh_Quad(const int x0,const int x1,const int x2,const int x3)
 {
-    material_surface_mesh.elements.Append(VECTOR<int,3>(x1,x2,x3));
-    material_surface_mesh.elements.Append(VECTOR<int,3>(x1,x3,x4));
+    material_surface_mesh.elements.Append(VECTOR<int,3>(x0,x1,x2));
+    material_surface_mesh.elements.Append(VECTOR<int,3>(x0,x2,x3));
 }
 //#####################################################################
 // Function Add_To_Material_Surface_Mesh_Subquadrilateral_Containing_Diamond_Node             

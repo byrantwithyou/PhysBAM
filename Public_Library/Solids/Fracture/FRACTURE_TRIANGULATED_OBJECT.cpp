@@ -59,9 +59,9 @@ Add_First_Cut_Based_On_Phi(const int triangle)
 // Function Add_Second_Embedded_Segment
 //#####################################################################
 template<class TV> bool
-Cut_31_Better_Than_Cut_32(const TV& x1,const TV& x2,const TV& x3,const TV& fracture_normal)
+Cut_31_Better_Than_Cut_32(const TV& x0,const TV& x1,const TV& x2,const TV& fracture_normal)
 {
-    return TV::Cross_Product((x3-x1).Normalized(),fracture_normal).Magnitude_Squared()>TV::Cross_Product((x3-x2).Normalized(),fracture_normal).Magnitude_Squared();
+    return TV::Cross_Product((x2-x0).Normalized(),fracture_normal).Magnitude_Squared()>TV::Cross_Product((x2-x1).Normalized(),fracture_normal).Magnitude_Squared();
 }
 template<class TV> void FRACTURE_TRIANGULATED_OBJECT<TV>::
 Add_Second_Embedded_Segment(const int triangle,const TV& fracture_normal)

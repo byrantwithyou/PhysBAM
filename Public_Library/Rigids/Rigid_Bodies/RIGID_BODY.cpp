@@ -377,18 +377,18 @@ Apply_Impulse_To_Body(const TV& location,const TV& impulse,const T_SPIN& angular
 // Function Apply_Impulse
 //#####################################################################
 template<class TV> void RIGID_BODY<TV>::
-Apply_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& impulse,const T_SPIN& angular_impulse,const bool half_impulse_for_accumulator)
+Apply_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& impulse,const T_SPIN& angular_impulse,const bool half_impulse_for_accumulator)
 {
-    body1.Apply_Impulse_To_Body(location,impulse,angular_impulse,half_impulse_for_accumulator);
-    body2.Apply_Impulse_To_Body(location,-impulse,-angular_impulse,half_impulse_for_accumulator);
+    body0.Apply_Impulse_To_Body(location,impulse,angular_impulse,half_impulse_for_accumulator);
+    body1.Apply_Impulse_To_Body(location,-impulse,-angular_impulse,half_impulse_for_accumulator);
 }
 //#####################################################################
 // Function Apply_Clamped_Impulse
 //#####################################################################
 template<class TV> void RIGID_BODY<TV>::
-Compute_Clamped_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,TWIST<TV>& impulse,const ROTATION<TV>& saved_rotation_1,const ROTATION<TV>& saved_rotation_2)
+Compute_Clamped_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,TWIST<TV>& impulse,const ROTATION<TV>& saved_rotation_1,const ROTATION<TV>& saved_rotation_2)
 {
-    RIGID_BODY<TV>* bodies[2]={&body1,&body2};
+    RIGID_BODY<TV>* bodies[2]={&body0,&body1};
     const ROTATION<TV>* saved_rotation[2]={&saved_rotation_1,&saved_rotation_2};
     T_SPIN jr[2],I_inverse_jr[2];
     T impulse_ratio_num[2]={0},impulse_ratio_denom[2]={0},impulse_linear_magnitude_squared=impulse.linear.Magnitude_Squared();
@@ -411,15 +411,15 @@ Compute_Clamped_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& lo
 //#####################################################################
 // clamp friction magnitude: should be (true) in the elastic collision case, (false) in the inelastic collision case
 template<class TV> TWIST<TV> RIGID_BODY<TV>::
-Compute_Collision_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const ROTATION<TV>& saved_rotation_1,const ROTATION<TV>& saved_rotation_2,const TV& location,const TV& normal,
+Compute_Collision_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const ROTATION<TV>& saved_rotation_1,const ROTATION<TV>& saved_rotation_2,const TV& location,const TV& normal,
     const TV& relative_velocity,const T coefficient_of_restitution,const T coefficient_of_friction,const bool clamp_friction_magnitude,const bool rolling_friction,const bool clamp_energy)
 {
-    if(body1.Has_Infinite_Inertia() && body2.Has_Infinite_Inertia()) return TWIST<TV>();
+    if(body0.Has_Infinite_Inertia() && body1.Has_Infinite_Inertia()) return TWIST<TV>();
     TWIST<TV> impulse;
     bool sticking_impulse;
-    impulse.linear=PhysBAM::Compute_Collision_Impulse(normal,Impulse_Factor(body1,body2,location),relative_velocity,coefficient_of_restitution,coefficient_of_friction,&sticking_impulse);
-    if(rolling_friction && sticking_impulse) impulse+=Apply_Rolling_Friction(body1,body2,location,normal,impulse.linear.Dot(normal));
-    if(clamp_energy) Compute_Clamped_Impulse(body1,body2,location,impulse,saved_rotation_1,saved_rotation_2);
+    impulse.linear=PhysBAM::Compute_Collision_Impulse(normal,Impulse_Factor(body0,body1,location),relative_velocity,coefficient_of_restitution,coefficient_of_friction,&sticking_impulse);
+    if(rolling_friction && sticking_impulse) impulse+=Apply_Rolling_Friction(body0,body1,location,normal,impulse.linear.Dot(normal));
+    if(clamp_energy) Compute_Clamped_Impulse(body0,body1,location,impulse,saved_rotation_1,saved_rotation_2);
     return impulse;
 }
 //#####################################################################
@@ -427,82 +427,82 @@ Compute_Collision_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const ROTA
 //#####################################################################
 // clamp friction magnitude: should be (true) in the elastic collision case, (false) in the inelastic collision case
 template<class TV> void RIGID_BODY<TV>::
-Apply_Collision_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const ROTATION<TV>& saved_rotation_1,const ROTATION<TV>& saved_rotation_2,const TV& location,const TV& normal,
+Apply_Collision_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const ROTATION<TV>& saved_rotation_1,const ROTATION<TV>& saved_rotation_2,const TV& location,const TV& normal,
     const TV& relative_velocity,const T coefficient_of_restitution,const T coefficient_of_friction,const bool clamp_friction_magnitude,const bool rolling_friction,const bool clamp_energy,
     const bool half_impulse_for_accumulator)
 {
-    TWIST<TV> impulse=Compute_Collision_Impulse(body1,body2,saved_rotation_1,saved_rotation_2,location,normal,relative_velocity,coefficient_of_restitution,
+    TWIST<TV> impulse=Compute_Collision_Impulse(body0,body1,saved_rotation_1,saved_rotation_2,location,normal,relative_velocity,coefficient_of_restitution,
         coefficient_of_friction,clamp_friction_magnitude,rolling_friction,clamp_energy);
-    Apply_Impulse(body1,body2,location,impulse.linear,impulse.angular,half_impulse_for_accumulator);
+    Apply_Impulse(body0,body1,location,impulse.linear,impulse.angular,half_impulse_for_accumulator);
 }
 //#####################################################################
 // Function Apply_Sticking_And_Angular_Sticking_Impulse
 //#####################################################################
 template<class TV> void RIGID_BODY<TV>::
-Apply_Sticking_And_Angular_Sticking_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TWIST<TV>& delta_relative_twist,const MATRIX_MXN<T>& angular_constraint_matrix,
+Apply_Sticking_And_Angular_Sticking_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,const TWIST<TV>& delta_relative_twist,const MATRIX_MXN<T>& angular_constraint_matrix,
     const MATRIX_MXN<T>& prismatic_constraint_matrix)
 {
-    //body1.Update_Angular_Velocity();body2.Update_Angular_Velocity();
+    //body0.Update_Angular_Velocity();body1.Update_Angular_Velocity();
     TWIST<TV> impulse;
 
     // faster version for fully constrained prismatic and angular impulse
     if(angular_constraint_matrix.Columns()==T_SPIN::dimension && prismatic_constraint_matrix.Columns()==TV::dimension)
-        impulse=Find_Impulse_And_Angular_Impulse(body1,body2,location,delta_relative_twist);
+        impulse=Find_Impulse_And_Angular_Impulse(body0,body1,location,delta_relative_twist);
     else if(angular_constraint_matrix.Columns()==0 && prismatic_constraint_matrix.Columns()==TV::dimension)
-        impulse.linear=Impulse_Factor(body1,body2,location).Inverse()*delta_relative_twist.linear;
-    else impulse=Find_Impulse_And_Angular_Impulse(body1,body2,location,delta_relative_twist,angular_constraint_matrix,prismatic_constraint_matrix);
-    Apply_Impulse(body1,body2,location,impulse.linear,impulse.angular);
+        impulse.linear=Impulse_Factor(body0,body1,location).Inverse()*delta_relative_twist.linear;
+    else impulse=Find_Impulse_And_Angular_Impulse(body0,body1,location,delta_relative_twist,angular_constraint_matrix,prismatic_constraint_matrix);
+    Apply_Impulse(body0,body1,location,impulse.linear,impulse.angular);
 }
 //#####################################################################
 // Function Apply_Rolling_Friction
 //#####################################################################
 // location is a point in world space about which body is rolling
-template<class T,class TV> static TWIST<TV> Apply_Rolling_Friction_Helper(RIGID_BODY<VECTOR<T,1> >& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T normal_impulse)
+template<class T,class TV> static TWIST<TV> Apply_Rolling_Friction_Helper(RIGID_BODY<VECTOR<T,1> >& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& normal,const T normal_impulse)
 {
     return TWIST<TV>(); // TODO: implement
 }
-template<class T,class TV> static TWIST<TV> Apply_Rolling_Friction_Helper(RIGID_BODY<VECTOR<T,2> >& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T normal_impulse)
+template<class T,class TV> static TWIST<TV> Apply_Rolling_Friction_Helper(RIGID_BODY<VECTOR<T,2> >& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& normal,const T normal_impulse)
 {
     return TWIST<TV>(); // TODO: implement
 }
-template<class T,class TV> static TWIST<TV> Apply_Rolling_Friction_Helper(RIGID_BODY<VECTOR<T,3> >& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T normal_impulse)
+template<class T,class TV> static TWIST<TV> Apply_Rolling_Friction_Helper(RIGID_BODY<VECTOR<T,3> >& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& normal,const T normal_impulse)
 {
-    PHYSBAM_ASSERT(!body1.Has_Infinite_Inertia() || !body2.Has_Infinite_Inertia());PHYSBAM_ASSERT(normal_impulse>=0);
-    T coefficient_of_rolling_friction=RIGID_BODY<TV>::Coefficient_Of_Rolling_Friction(body1,body2);if(!coefficient_of_rolling_friction) return TWIST<TV>();
-    body1.Update_Angular_Velocity();body2.Update_Angular_Velocity();
-    TV relative_angular_velocity=RIGID_BODY<TV>::Relative_Angular_Velocity(body1,body2);
+    PHYSBAM_ASSERT(!body0.Has_Infinite_Inertia() || !body1.Has_Infinite_Inertia());PHYSBAM_ASSERT(normal_impulse>=0);
+    T coefficient_of_rolling_friction=RIGID_BODY<TV>::Coefficient_Of_Rolling_Friction(body0,body1);if(!coefficient_of_rolling_friction) return TWIST<TV>();
+    body0.Update_Angular_Velocity();body1.Update_Angular_Velocity();
+    TV relative_angular_velocity=RIGID_BODY<TV>::Relative_Angular_Velocity(body0,body1);
     T normal_component=TV::Dot_Product(relative_angular_velocity,normal),normal_magnitude=abs(normal_component);
     TV tangential_component=relative_angular_velocity-normal_component*normal;T tangential_magnitude=tangential_component.Magnitude();
     TV tangential_direction;if(tangential_magnitude!=0) tangential_direction=tangential_component/tangential_magnitude;
     normal_magnitude-=coefficient_of_rolling_friction*normal_impulse;tangential_magnitude-=coefficient_of_rolling_friction*normal_impulse;
     TV new_relative_angular_velocity=sign(normal_component)*max((T)0,normal_magnitude)*normal+max((T)0,tangential_magnitude)*tangential_direction;
-    return RIGID_BODY<TV>::Find_Impulse_And_Angular_Impulse(body1,body2,location,TWIST<TV>(TV(),new_relative_angular_velocity-relative_angular_velocity));
+    return RIGID_BODY<TV>::Find_Impulse_And_Angular_Impulse(body0,body1,location,TWIST<TV>(TV(),new_relative_angular_velocity-relative_angular_velocity));
 }
 template<class TV> TWIST<TV> RIGID_BODY<TV>::
-Apply_Rolling_Friction(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T normal_impulse)
+Apply_Rolling_Friction(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& normal,const T normal_impulse)
 {
-    return Apply_Rolling_Friction_Helper(body1,body2,location,normal,normal_impulse);
+    return Apply_Rolling_Friction_Helper(body0,body1,location,normal,normal_impulse);
 }
 //#####################################################################
 // Function Find_Impulse_And_Angular_Impulse
 //#####################################################################
 template<class T,class TV> TWIST<TV>
-Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<VECTOR<T,1> >& body1,const RIGID_BODY<VECTOR<T,1> >& body2,const TV& location,const TWIST<TV>& delta_relative_twist_at_location,
+Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<VECTOR<T,1> >& body0,const RIGID_BODY<VECTOR<T,1> >& body1,const TV& location,const TWIST<TV>& delta_relative_twist_at_location,
     const MATRIX_MXN<T>& angular_constraint_matrix,const MATRIX_MXN<T>& prismatic_constraint_matrix)
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }
 template<class T,class TV> typename ENABLE_IF<(TV::m>1),TWIST<TV> >::TYPE
-Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2,const TV& location,const TWIST<TV>& delta_relative_twist_at_location,
+Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,const TV& location,const TWIST<TV>& delta_relative_twist_at_location,
     const MATRIX_MXN<T>& angular_constraint_matrix,const MATRIX_MXN<T>& prismatic_constraint_matrix)
 {
     // compute blocks of constrained matrix
     SYMMETRIC_MATRIX<T,TV::SPIN::m> I_inverse_1,I_inverse_2;T m1_inv_plus_m2_inv=0;
-    if(!body1.Has_Infinite_Inertia()){I_inverse_1=body1.World_Space_Inertia_Tensor_Inverse();m1_inv_plus_m2_inv=1/body1.Mass();}
-    if(!body2.Has_Infinite_Inertia()){I_inverse_2=body2.World_Space_Inertia_Tensor_Inverse();m1_inv_plus_m2_inv+=1/body2.Mass();}
+    if(!body0.Has_Infinite_Inertia()){I_inverse_1=body0.World_Space_Inertia_Tensor_Inverse();m1_inv_plus_m2_inv=1/body0.Mass();}
+    if(!body1.Has_Infinite_Inertia()){I_inverse_2=body1.World_Space_Inertia_Tensor_Inverse();m1_inv_plus_m2_inv+=1/body1.Mass();}
 
     // fill in NXN constrained matrix C
-    TV r1=location-body1.Frame().t,r2=location-body2.Frame().t;
+    TV r1=location-body0.Frame().t,r2=location-body1.Frame().t;
     int angular_constrained_axes=angular_constraint_matrix.Columns(),prismatic_constrained_axes=prismatic_constraint_matrix.Columns();
     MATRIX_MXN<T> r_cross_P_1=prismatic_constraint_matrix.Cross_Product_Matrix_Times(r1),r_cross_P_2=prismatic_constraint_matrix.Cross_Product_Matrix_Times(r2);
     MATRIX_MXN<T> P_T_r_cross_T_I_inverse_1=r_cross_P_1.Transpose_Times(I_inverse_1),P_T_r_cross_T_I_inverse_2=r_cross_P_2.Transpose_Times(I_inverse_2);
@@ -510,8 +510,8 @@ Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<TV>& body1,const RIGID_
     C.Set_Submatrix(0,0,P_T_r_cross_T_I_inverse_1*r_cross_P_1+P_T_r_cross_T_I_inverse_2*r_cross_P_2+m1_inv_plus_m2_inv*prismatic_constraint_matrix.Transpose_Times(prismatic_constraint_matrix));
     if(angular_constrained_axes){
         C.Set_Submatrix(prismatic_constrained_axes,prismatic_constrained_axes,angular_constraint_matrix.Transpose_Times((I_inverse_1+I_inverse_2)*angular_constraint_matrix));
-        MATRIX_MXN<T> c12=(P_T_r_cross_T_I_inverse_1+P_T_r_cross_T_I_inverse_2)*angular_constraint_matrix;
-        C.Set_Submatrix(0,prismatic_constrained_axes,c12);C.Set_Submatrix(prismatic_constrained_axes,0,c12.Transposed());}
+        MATRIX_MXN<T> c01=(P_T_r_cross_T_I_inverse_1+P_T_r_cross_T_I_inverse_2)*angular_constraint_matrix;
+        C.Set_Submatrix(0,prismatic_constrained_axes,c01);C.Set_Submatrix(prismatic_constrained_axes,0,c01.Transposed());}
 
     ARRAY<T> b(prismatic_constraint_matrix.Transpose_Times(delta_relative_twist_at_location.linear));
     if(angular_constrained_axes) b.Append_Elements(angular_constraint_matrix.Transpose_Times(delta_relative_twist_at_location.angular));
@@ -525,66 +525,66 @@ Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<TV>& body1,const RIGID_
     return impulse;
 }
 template<class TV> TWIST<TV> RIGID_BODY<TV>::
-Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2,const TV& location,const TWIST<TV>& delta_relative_twist_at_location,
+Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,const TV& location,const TWIST<TV>& delta_relative_twist_at_location,
     const MATRIX_MXN<T>& angular_constraint_matrix,const MATRIX_MXN<T>& prismatic_constraint_matrix)
 {
-    PHYSBAM_ASSERT(!body1.Has_Infinite_Inertia() || !body2.Has_Infinite_Inertia());
-    return Find_Impulse_And_Angular_Impulse_Helper(body1,body2,location,delta_relative_twist_at_location,angular_constraint_matrix,prismatic_constraint_matrix);
+    PHYSBAM_ASSERT(!body0.Has_Infinite_Inertia() || !body1.Has_Infinite_Inertia());
+    return Find_Impulse_And_Angular_Impulse_Helper(body0,body1,location,delta_relative_twist_at_location,angular_constraint_matrix,prismatic_constraint_matrix);
 }
 //#####################################################################
 // Function Find_Impulse_And_Angular_Impulse
 //#####################################################################
-template<class T,class TV> static TWIST<TV> Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<VECTOR<T,1> >& body1,const RIGID_BODY<TV>& body2,const TV& location,
+template<class T,class TV> static TWIST<TV> Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<VECTOR<T,1> >& body0,const RIGID_BODY<TV>& body1,const TV& location,
     const TWIST<TV>& delta_relative_twist_at_location)
 {
     return delta_relative_twist_at_location;
 }
-template<class T,class TV> static TWIST<TV> Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<VECTOR<T,2> >& body1,const RIGID_BODY<TV>& body2,const TV& location,
+template<class T,class TV> static TWIST<TV> Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<VECTOR<T,2> >& body0,const RIGID_BODY<TV>& body1,const TV& location,
     const TWIST<TV>& delta_relative_twist_at_location)
 {
-    SYMMETRIC_MATRIX<T,1> I_inverse_1=body1.World_Space_Inertia_Tensor_Inverse(),I_inverse_2=body2.World_Space_Inertia_Tensor_Inverse();
-    SYMMETRIC_MATRIX<T,2> c11=I_inverse_1.Conjugate_With_Cross_Product_Matrix(location-body1.Frame().t)+
-        I_inverse_2.Conjugate_With_Cross_Product_Matrix(location-body2.Frame().t)+1/body1.Mass()+1/body2.Mass();
-    MATRIX<T,1,2> c12=I_inverse_1.Times_Cross_Product_Matrix(location-body1.Frame().t)+I_inverse_2.Times_Cross_Product_Matrix(location-body2.Frame().t);
-    SYMMETRIC_MATRIX<T,1> c22=I_inverse_1+I_inverse_2;
-    SYMMETRIC_MATRIX<T,3> A(c11.x11,c11.x21,c12(0,0),c11.x22,c12(0,1),c22.x11);
+    SYMMETRIC_MATRIX<T,1> I_inverse_1=body0.World_Space_Inertia_Tensor_Inverse(),I_inverse_2=body1.World_Space_Inertia_Tensor_Inverse();
+    SYMMETRIC_MATRIX<T,2> c00=I_inverse_1.Conjugate_With_Cross_Product_Matrix(location-body0.Frame().t)+
+        I_inverse_2.Conjugate_With_Cross_Product_Matrix(location-body1.Frame().t)+1/body0.Mass()+1/body1.Mass();
+    MATRIX<T,1,2> c01=I_inverse_1.Times_Cross_Product_Matrix(location-body0.Frame().t)+I_inverse_2.Times_Cross_Product_Matrix(location-body1.Frame().t);
+    SYMMETRIC_MATRIX<T,1> c11=I_inverse_1+I_inverse_2;
+    SYMMETRIC_MATRIX<T,3> A(c00.x00,c00.x10,c01(0,0),c00.x11,c01(0,1),c11.x00);
 
     VECTOR<T,3> b(delta_relative_twist_at_location.linear.x,delta_relative_twist_at_location.linear.y,delta_relative_twist_at_location.angular.x);
     VECTOR<T,3> all_impulses=A.Inverse()*b;
     return TWIST<TV>(VECTOR<T,2>(all_impulses.x,all_impulses.y),VECTOR<T,1>(all_impulses.z));
 }
-template<class T,class TV> static TWIST<TV> Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<VECTOR<T,3> >& body1,const RIGID_BODY<TV>& body2,const TV& location,
+template<class T,class TV> static TWIST<TV> Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<VECTOR<T,3> >& body0,const RIGID_BODY<TV>& body1,const TV& location,
     const TWIST<TV>& delta_relative_twist_at_location)
 {
-    SYMMETRIC_MATRIX<T,3> I_inverse_1=body1.World_Space_Inertia_Tensor_Inverse(),I_inverse_2=body2.World_Space_Inertia_Tensor_Inverse();
-    MATRIX<T,3> r_cross_1=MATRIX<T,3>::Cross_Product_Matrix(location-body1.Frame().t),r_cross_I_inverse_1=r_cross_1*I_inverse_1,
-                r_cross_2=MATRIX<T,3>::Cross_Product_Matrix(location-body2.Frame().t),r_cross_I_inverse_2=r_cross_2*I_inverse_2;
-    SYMMETRIC_MATRIX<T,3> c11=SYMMETRIC_MATRIX<T,3>::Times_Transpose_With_Symmetric_Result(r_cross_I_inverse_1,r_cross_1)+
-                              SYMMETRIC_MATRIX<T,3>::Times_Transpose_With_Symmetric_Result(r_cross_I_inverse_2,r_cross_2)+1/body1.Mass()+1/body2.Mass();
-    MATRIX<T,3> c12=-(r_cross_I_inverse_1+r_cross_I_inverse_2);
-    SYMMETRIC_MATRIX<T,3> c22=I_inverse_1+I_inverse_2,c22_inverse=c22.Inverse();
-    MATRIX<T,3> c12_c22_inverse=c12*c22_inverse;
-    SYMMETRIC_MATRIX<T,3> A=c11-SYMMETRIC_MATRIX<T,3>::Times_Transpose_With_Symmetric_Result(c12_c22_inverse,c12);
+    SYMMETRIC_MATRIX<T,3> I_inverse_1=body0.World_Space_Inertia_Tensor_Inverse(),I_inverse_2=body1.World_Space_Inertia_Tensor_Inverse();
+    MATRIX<T,3> r_cross_1=MATRIX<T,3>::Cross_Product_Matrix(location-body0.Frame().t),r_cross_I_inverse_1=r_cross_1*I_inverse_1,
+                r_cross_2=MATRIX<T,3>::Cross_Product_Matrix(location-body1.Frame().t),r_cross_I_inverse_2=r_cross_2*I_inverse_2;
+    SYMMETRIC_MATRIX<T,3> c00=SYMMETRIC_MATRIX<T,3>::Times_Transpose_With_Symmetric_Result(r_cross_I_inverse_1,r_cross_1)+
+                              SYMMETRIC_MATRIX<T,3>::Times_Transpose_With_Symmetric_Result(r_cross_I_inverse_2,r_cross_2)+1/body0.Mass()+1/body1.Mass();
+    MATRIX<T,3> c01=-(r_cross_I_inverse_1+r_cross_I_inverse_2);
+    SYMMETRIC_MATRIX<T,3> c11=I_inverse_1+I_inverse_2,c22_inverse=c11.Inverse();
+    MATRIX<T,3> c12_c22_inverse=c01*c22_inverse;
+    SYMMETRIC_MATRIX<T,3> A=c00-SYMMETRIC_MATRIX<T,3>::Times_Transpose_With_Symmetric_Result(c12_c22_inverse,c01);
     TV b=delta_relative_twist_at_location.linear-c12_c22_inverse*delta_relative_twist_at_location.angular;
     TV linear_impulse=A.Inverse()*b;
-    TV angular_impulse=c22_inverse*(delta_relative_twist_at_location.angular-c12.Transpose_Times(linear_impulse));
+    TV angular_impulse=c22_inverse*(delta_relative_twist_at_location.angular-c01.Transpose_Times(linear_impulse));
     return TWIST<TV>(linear_impulse,angular_impulse);
 }
 template<class TV> TWIST<TV> RIGID_BODY<TV>::
-Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2,const TV& location,const TWIST<TV>& delta_relative_twist_at_location)
+Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,const TV& location,const TWIST<TV>& delta_relative_twist_at_location)
 {
-    PHYSBAM_ASSERT(!body1.Has_Infinite_Inertia() || !body2.Has_Infinite_Inertia());
+    PHYSBAM_ASSERT(!body0.Has_Infinite_Inertia() || !body1.Has_Infinite_Inertia());
 
-    if(body1.Has_Infinite_Inertia() || body2.Has_Infinite_Inertia()){
-        const RIGID_BODY<TV>& body=(!body1.Has_Infinite_Inertia())?body1:body2;TV r(location-body.Frame().t);
+    if(body0.Has_Infinite_Inertia() || body1.Has_Infinite_Inertia()){
+        const RIGID_BODY<TV>& body=(!body0.Has_Infinite_Inertia())?body0:body1;TV r(location-body.Frame().t);
         TV impulse_linear=body.Mass()*(delta_relative_twist_at_location.linear+TV::Cross_Product(r,delta_relative_twist_at_location.angular));
         T_SPIN impulse_angular=body.World_Space_Inertia_Tensor()*delta_relative_twist_at_location.angular-TV::Cross_Product(r,impulse_linear);
         return TWIST<TV>(impulse_linear,impulse_angular);}
 
-    // c11*impulse.linear+c12*impulse.angular=delta_relative_twist_at_location.linear
-    // c21*impulse.linear+c22*impulse.angular=delta_relative_twist_at_location.angular
-    // Note: c21=c12^T
-    return Find_Impulse_And_Angular_Impulse_Helper(body1,body2,location,delta_relative_twist_at_location);
+    // c00*impulse.linear+c01*impulse.angular=delta_relative_twist_at_location.linear
+    // c10*impulse.linear+c11*impulse.angular=delta_relative_twist_at_location.angular
+    // Note: c10=c01^T
+    return Find_Impulse_And_Angular_Impulse_Helper(body0,body1,location,delta_relative_twist_at_location);
 }
 //#####################################################################
 // Function Apply_Push
@@ -603,12 +603,12 @@ Apply_Push_To_Body(const TV& location,const TV& impulse,const T_SPIN& angular_im
 // Function Apply_Push
 //#####################################################################
 template<class TV> void RIGID_BODY<TV>::
-Apply_Push(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T distance)
+Apply_Push(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& normal,const T distance)
 {
-    if(body1.Has_Infinite_Inertia() && body2.Has_Infinite_Inertia()) return;
-    TV impulse=Impulse_Factor(body1,body2,location).Inverse()*(distance*normal);
-    body1.Apply_Push_To_Body(location,impulse);
-    body2.Apply_Push_To_Body(location,-impulse);
+    if(body0.Has_Infinite_Inertia() && body1.Has_Infinite_Inertia()) return;
+    TV impulse=Impulse_Factor(body0,body1,location).Inverse()*(distance*normal);
+    body0.Apply_Push_To_Body(location,impulse);
+    body1.Apply_Push_To_Body(location,-impulse);
 }
 //#####################################################################
 // Function Volume
@@ -639,7 +639,7 @@ Diagonalize_Inertia_Tensor_Helper(const SYMMETRIC_MATRIX<T,0>& inertia_input,DIA
 template<class T> void
 Diagonalize_Inertia_Tensor_Helper(const SYMMETRIC_MATRIX<T,1>& inertia_input,DIAGONAL_MATRIX<T,1>& inertia,ROTATION<VECTOR<T,2> >& rotation)
 {
-    inertia=DIAGONAL_MATRIX<T,1>(inertia_input.x11);
+    inertia=DIAGONAL_MATRIX<T,1>(inertia_input.x00);
 }
 //#####################################################################
 // Function Diagonalize_Inertia_Tensor

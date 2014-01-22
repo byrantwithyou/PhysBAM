@@ -21,14 +21,14 @@ public:
     typedef TV VECTOR_T;
 
     TV normal;
-    TV x1; // point on the plane
+    TV x0; // point on the plane
 
     PLANE()
-        :normal(0,1,0),x1(0,0,0)
+        :normal(0,1,0),x0(0,0,0)
     {}
 
     PLANE(const TV& normal_input,const TV& x1_input)
-        :normal(normal_input),x1(x1_input)
+        :normal(normal_input),x0(x1_input)
     {}
 
     PLANE(const TV& x1_input,const TV& x2_input,const TV& x3_input)
@@ -37,10 +37,10 @@ public:
     }
 
     void Specify_Three_Points(const TV& x1_input,const TV& x2_input,const TV& x3_input)
-    {normal=Normal(x1_input,x2_input,x3_input);x1=x1_input;}
+    {normal=Normal(x1_input,x2_input,x3_input);x0=x1_input;}
 
-    static TV Normal(const TV& x1,const TV& x2,const TV& x3)
-    {return TV::Cross_Product(x2-x1,x3-x1).Normalized();}
+    static TV Normal(const TV& x0,const TV& x1,const TV& x2)
+    {return TV::Cross_Product(x1-x0,x2-x0).Normalized();}
 
     template<class T_ARRAY>
     static TV Normal(const T_ARRAY& X)
@@ -52,15 +52,15 @@ public:
     TV Normal(const TV& X) const
     {return normal;}
 
-    static TV Normal_Direction(const TV& x1,const TV& x2,const TV& x3)
-    {return TV::Cross_Product(x2-x1,x3-x1);} // can have any magnitude
+    static TV Normal_Direction(const TV& x0,const TV& x1,const TV& x2)
+    {return TV::Cross_Product(x1-x0,x2-x0);} // can have any magnitude
 
     template<class T_ARRAY>
     static TV Normal_Direction(const T_ARRAY& X)
     {STATIC_ASSERT(T_ARRAY::m==3);return Normal_Direction(X(0),X(1),X(2));}
 
     T Signed_Distance(const TV& location) const
-    {return TV::Dot_Product(normal,location-x1);}
+    {return TV::Dot_Product(normal,location-x0);}
 
     // inside is the half space behind the normal
     bool Inside(const TV& location,const T thickness_over_two) const
@@ -99,11 +99,11 @@ public:
 
     template<class RW>
     void Read(std::istream& input)
-    {Read_Binary<RW>(input,normal,x1);}
+    {Read_Binary<RW>(input,normal,x0);}
 
     template<class RW>
     void Write(std::ostream& output) const
-    {Write_Binary<RW>(output,normal,x1);}
+    {Write_Binary<RW>(output,normal,x0);}
 
 //#####################################################################
     bool Segment_Plane_Intersection(const TV& endpoint1,const TV& endpoint2,T& interpolation_fraction) const;

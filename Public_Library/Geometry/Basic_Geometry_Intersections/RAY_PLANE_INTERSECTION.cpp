@@ -34,7 +34,7 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const PLANE<T>& plane, 
 //#####################################################################
 template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const PLANE<T>& plane, const T thickness_over_two)
 {
-    T distance=VECTOR<T,3>::Dot_Product(plane.normal,ray.endpoint-plane.x1);
+    T distance=VECTOR<T,3>::Dot_Product(plane.normal,ray.endpoint-plane.x0);
     if(distance>-thickness_over_two && distance<thickness_over_two){ray.semi_infinite=false;ray.t_max=0;ray.intersection_location=RAY<VECTOR<T,3> >::START_POINT;return true;} // within the boundary
     T rate_of_approach=-VECTOR<T,3>::Dot_Product(plane.normal,ray.direction);
     if(rate_of_approach*distance<=0) return false; // no intersection
@@ -55,7 +55,7 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const PLANE<T>& plane, 
 //#####################################################################
 template<class T> bool Lazy_Intersects(RAY<VECTOR<T,3> >& ray,const PLANE<T>& plane)
 {
-    T distance=VECTOR<T,3>::Dot_Product(plane.normal,ray.endpoint-plane.x1),rate_of_approach=-VECTOR<T,3>::Dot_Product(plane.normal,ray.direction);
+    T distance=VECTOR<T,3>::Dot_Product(plane.normal,ray.endpoint-plane.x0),rate_of_approach=-VECTOR<T,3>::Dot_Product(plane.normal,ray.direction);
     if(rate_of_approach*distance<=0) return false; // no intersection
     if(!ray.semi_infinite){ // t_max is defined
         if(rate_of_approach>0 && distance<ray.t_max*rate_of_approach){ray.t_max=distance/rate_of_approach;return true;}

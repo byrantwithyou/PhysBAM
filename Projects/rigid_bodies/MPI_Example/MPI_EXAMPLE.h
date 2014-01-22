@@ -180,15 +180,15 @@ void Pyramid_Of_Boxes()
         first_x -= 2.5;}
 
     for(int i=0;i<2;i++){
-        RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
-        rigid_body1->Frame().t=TV(first_x-10,i*20,0);
-        rigid_body1->is_static = true;
-        rigid_body1->name="left_box";
+        RIGID_BODY<TV>* rigid_body0=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
+        rigid_body0->Frame().t=TV(first_x-10,i*20,0);
+        rigid_body0->is_static = true;
+        rigid_body0->name="left_box";
 
-        RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
-        rigid_body2->Frame().t=TV(current_x+7.5,i*20,0);
-        rigid_body2->is_static = true;
-        rigid_body2->name="right_box";}
+        RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
+        rigid_body1->Frame().t=TV(current_x+7.5,i*20,0);
+        rigid_body1->is_static = true;
+        rigid_body1->name="right_box";}
 
     tests.Add_Ground(1, -10);
     last_frame = 400;
@@ -207,15 +207,15 @@ void Stacked_Boxes() {
             rigid_body->Set_Coefficient_Of_Restitution((T)0.5);}}
 
     for (int i = 0; i < height/4; i++) {
-        RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
-        rigid_body1->Frame().t=TV(-58,i*20,0);
-        rigid_body1->is_static = true;
-        rigid_body1->name="left_box";
+        RIGID_BODY<TV>* rigid_body0=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
+        rigid_body0->Frame().t=TV(-58,i*20,0);
+        rigid_body0->is_static = true;
+        rigid_body0->name="left_box";
     
-        RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
-        rigid_body2->Frame().t=TV(58,i*20,0);
-        rigid_body2->is_static = true;
-        rigid_body2->name="right_box";}
+        RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
+        rigid_body1->Frame().t=TV(58,i*20,0);
+        rigid_body1->is_static = true;
+        rigid_body1->name="right_box";}
 
     tests.Add_Ground(1, -10);
     last_frame = 250;
@@ -229,9 +229,9 @@ void Partition_Test() {
     rigid_body->Frame().t = TV(0,0,0);
     rigid_body->Twist().linear = TV(1,0,0);
 
-    RIGID_BODY<TV>* rigid_body2 = &tests.Add_Rigid_Body("box", (T)1, (T).1);
-    rigid_body2->Frame().t = TV(10,3,0);
-    rigid_body2->Twist().linear = TV(-1,0,0);
+    RIGID_BODY<TV>* rigid_body1 = &tests.Add_Rigid_Body("box", (T)1, (T).1);
+    rigid_body1->Frame().t = TV(10,3,0);
+    rigid_body1->Twist().linear = TV(-1,0,0);
 
     last_frame = 200;
 }
@@ -271,13 +271,13 @@ void Simple_Collision_Test() {
     rigid_body->Frame().t = TV(0,0,0);
     rigid_body->Twist().linear = TV(2,0,0);
 
-    RIGID_BODY<TV>* rigid_body2 = &tests.Add_Rigid_Body("box", (T)1, (T).1);
-    rigid_body2->Frame().t = TV(10,3,0);
-    rigid_body2->Twist().linear = TV(-1,0,0);
+    RIGID_BODY<TV>* rigid_body1 = &tests.Add_Rigid_Body("box", (T)1, (T).1);
+    rigid_body1->Frame().t = TV(10,3,0);
+    rigid_body1->Twist().linear = TV(-1,0,0);
 
-    RIGID_BODY<TV>* rigid_body3 = &tests.Add_Rigid_Body("box", (T)1, (T).1);
-    rigid_body3->Frame().t = TV(10,0,0);
-    rigid_body3->Twist().linear = TV(-1,0,0);
+    RIGID_BODY<TV>* rigid_body2 = &tests.Add_Rigid_Body("box", (T)1, (T).1);
+    rigid_body2->Frame().t = TV(10,0,0);
+    rigid_body2->Twist().linear = TV(-1,0,0);
 
     last_frame = 200;
 }

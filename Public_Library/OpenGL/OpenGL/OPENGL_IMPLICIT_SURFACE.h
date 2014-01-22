@@ -58,10 +58,10 @@ public:
     void Initialize_Slices();
     float inline Phi(VECTOR<T,3> x) const;
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
-    void Display_Tetrahedron(const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3,const VECTOR<T,3>& x4, 
+    void Display_Tetrahedron(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3, 
         const float phi1,const float phi2,const float phi3,const float phi4,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices,ARRAY<GLfloat>& normals) const;
-    void Display_Brick(const VECTOR<T,3>& x1,float p1,const VECTOR<T,3>& x2,float p2,const VECTOR<T,3>& x3,float p3,const VECTOR<T,3>& x4,
-        float p4,const VECTOR<T,3>& x5,float p5,const VECTOR<T,3>& x6,float p6,const VECTOR<T,3>& x7,float p7,const VECTOR<T,3>& x8,
+    void Display_Brick(const VECTOR<T,3>& x0,float p1,const VECTOR<T,3>& x1,float p2,const VECTOR<T,3>& x2,float p3,const VECTOR<T,3>& x3,
+        float p4,const VECTOR<T,3>& x4,float p5,const VECTOR<T,3>& x5,float p6,const VECTOR<T,3>& x6,float p7,const VECTOR<T,3>& x7,
         float p8,const int parity,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices,ARRAY<GLfloat>& normals) const;
 //#####################################################################
 };

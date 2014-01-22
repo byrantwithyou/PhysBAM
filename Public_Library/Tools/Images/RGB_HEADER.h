@@ -31,7 +31,7 @@ struct RGB_HEADER
     unsigned int dummy; // ignored
     char name[80];
     unsigned int colormap;
-    char dummy2[404];
+    char dummy1[404];
     
     void Initialize(const int width_input,const int height_input)
     {magic_number=474;compression=0;bytes_per_channel=1;dimensions=2;width=width_input;height=height_input;channels=3;pixel_maximum_value=0;pixel_maximum_value=255;strcpy(name,"PhysBAM");colormap=0;}
@@ -43,7 +43,7 @@ struct RGB_HEADER
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,magic_number,compression,bytes_per_channel,dimensions,width,height);
     Read_Binary<RW>(input,channels,pixel_minimum_value,pixel_maximum_value,dummy);
-    Read_Binary_Array<RW>(input,name,80);Read_Binary<RW>(input,colormap);Read_Binary_Array<RW>(input,dummy2,404);
+    Read_Binary_Array<RW>(input,name,80);Read_Binary<RW>(input,colormap);Read_Binary_Array<RW>(input,dummy1,404);
     Swap_Endian();
     
     //check validity
@@ -56,7 +56,7 @@ struct RGB_HEADER
     {RGB_HEADER swapped=*this;swapped.Swap_Endian();
     Write_Binary<RW>(output,swapped.magic_number,swapped.compression,swapped.bytes_per_channel,swapped.dimensions,swapped.width,swapped.height,swapped.channels);
     Write_Binary<RW>(output,swapped.pixel_minimum_value,swapped.pixel_maximum_value,swapped.dummy);
-    Write_Binary_Array<RW>(output,name,80);Write_Binary<RW>(output,colormap);Write_Binary_Array<RW>(output,dummy2,404);}
+    Write_Binary_Array<RW>(output,name,80);Write_Binary<RW>(output,colormap);Write_Binary_Array<RW>(output,dummy1,404);}
 };
 }
 #endif

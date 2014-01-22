@@ -178,7 +178,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Get_Initial_Data()
 {
     JOINT<TV>* joint=0;
-    RIGID_BODY<TV>* rigid_body1=0,*rigid_body2=0;
+    RIGID_BODY<TV>* rigid_body0=0,*rigid_body1=0;
     ROTATION<TV> rotation=ROTATION<TV>::From_Euler_Angles((T)79.9655*(T)pi/180,(T)12.0032*(T)pi/180,(T)50.4023*(T)pi/180);
 
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
@@ -194,44 +194,44 @@ void Get_Initial_Data()
     last_frame=96;
 
     if(test_number<=4 || test_number==10 || test_number==11 || (test_number>=13 && test_number<=16) || test_number==18 || test_number==29){
+        rigid_body0=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
         rigid_body1=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-        rigid_body2=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-        rigid_body1->Frame().t=TV(0,2,0);
-        rigid_body1->name="parent";
-        rigid_body2->name="child";}
+        rigid_body0->Frame().t=TV(0,2,0);
+        rigid_body0->name="parent";
+        rigid_body1->name="child";}
 
     switch(test_number){
         case 1: // point joint
-            rigid_body2->Frame().t=TV(0,4,2);
-            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            rigid_body1->Frame().t=TV(0,4,2);
+            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,-1,-1)));
             break;
         case 14:last_frame=1;
         case 2: // rigid with prismatic translation
-            rigid_body2->Frame().t=TV((T)2.5,2,0);
+            rigid_body1->Frame().t=TV((T)2.5,2,0);
             joint=new RIGID_JOINT<TV>();((RIGID_JOINT<TV>*)joint)->Set_Prismatic_Component_Translation(TV((T).5,0,0));
-            arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,1,1)));
             break;
         case 3: // hinge
-            rigid_body2->Frame().t=TV(2,4,0);
-            joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            rigid_body1->Frame().t=TV(2,4,0);
+            joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1),ROTATION<TV>(-(T)pi/2,TV(0,1,0))));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,1),ROTATION<TV>((T)pi/2,TV(0,0,1))*ROTATION<TV>(-(T)pi/2,TV(0,1,0))));
             break;
         case 29:last_frame=240;
         case 4: // twist
-            rigid_body2->Frame().t=TV((T)2.1,2,0);
-            joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            rigid_body1->Frame().t=TV((T)2.1,2,0);
+            joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,0,0)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-(T)1.1,0,0)));
             if(test_number==4){
-                rigid_body2->Angular_Momentum()=TV(15,0,0);
-                rigid_body2->Update_Angular_Velocity();}
+                rigid_body1->Angular_Momentum()=TV(15,0,0);
+                rigid_body1->Update_Angular_Velocity();}
             else{
-                rigid_body2->is_static=true;
+                rigid_body1->is_static=true;
                 arb.Use_PD_Actuators();
                 JOINT_FUNCTION<TV>* joint_function=arb.Create_Joint_Function(joint->id_number);
                 joint_function->Set_k_p(1000);
@@ -267,56 +267,56 @@ void Get_Initial_Data()
         case 9:{ // cluster break
             break;}
         case 10:{ // prismatic twist joint
-            rigid_body1->Frame().t=TV(2,4,0);
-            rigid_body2->Frame().t=TV(0,2,0);
+            rigid_body0->Frame().t=TV(2,4,0);
+            rigid_body1->Frame().t=TV(0,2,0);
             PRISMATIC_TWIST_JOINT<TV>* joint=new PRISMATIC_TWIST_JOINT<TV>();
-            arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Prismatic_Constraints(VECTOR<bool,3>(true,true,true),TV(0,-2,0),TV(0,2,0));
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(-1,0,0)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,0,0)));
             break;}
         case 11:{ // constrained twist
-            rigid_body2->Frame().t=TV((T)2.1,2,0);
-            rigid_body2->Angular_Momentum()=TV(3,0,0);
-            rigid_body2->Update_Angular_Velocity();
-            ANGLE_JOINT<TV>* joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            rigid_body1->Frame().t=TV((T)2.1,2,0);
+            rigid_body1->Angular_Momentum()=TV(3,0,0);
+            rigid_body1->Update_Angular_Velocity();
+            ANGLE_JOINT<TV>* joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,0,0)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-(T)1.1,0,0)));
             joint->Set_Angle_Constraints(true,-(T)pi/4,(T)pi/4);
             break;}
         case 12: Heavy_Bottom_Link_Test(); break;
         case 13: // universal joint (no twist or translation components)
-            rigid_body2->Frame().t=TV(0,2,3);
-            rigid_body1->Angular_Momentum()=TV(5,5,5);
+            rigid_body1->Frame().t=TV(0,2,3);
+            rigid_body0->Angular_Momentum()=TV(5,5,5);
+            rigid_body0->Update_Angular_Velocity();
             rigid_body1->Update_Angular_Velocity();
-            rigid_body2->Update_Angular_Velocity();
-            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(0,0,(T)1.5),ROTATION<TV>((T)pi/2,TV(0,1,0))));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(0,0,-(T)1.5),ROTATION<TV>((T)pi/2,TV(0,1,0))));
             static_cast<POINT_JOINT<TV>*>(joint)->Use_Twist_Constraint(0,0);
             LOG::cout<<"need both: "<<(joint->Has_Prismatic_Constraint() && joint->Has_Angular_Constraint())<<std::endl;
             break;
         case 15: // rigid as 3 point joints
-            rigid_body2->Frame().t=TV((T)2.5,2,0);
-            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            rigid_body1->Frame().t=TV((T)2.5,2,0);
+            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV((T)1.25,1,1)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-(T)1.25,1,1)));
-            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV((T)1.25,-1,1)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-(T)1.25,-1,1)));
-            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV((T)1.25,1,-1)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-(T)1.25,1,-1)));
             break;
         case 16:{ // twist as 2 point joints
             T separation=(T)2.1,distance=0;
-            rigid_body2->Frame().t=TV(separation,2,0);
-            rigid_body2->Angular_Momentum()=TV(15,0,0);
-            rigid_body2->Update_Angular_Velocity();
-            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            rigid_body1->Frame().t=TV(separation,2,0);
+            rigid_body1->Angular_Momentum()=TV(15,0,0);
+            rigid_body1->Update_Angular_Velocity();
+            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(-distance,0,0)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-(distance+separation),0,0)));
-            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(distance+separation,0,0)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(distance,0,0)));
             break;}
@@ -325,15 +325,15 @@ void Get_Initial_Data()
             break;
         case 18:{ // muscle hinge
             arb.muscle_list->muscle_force_curve.Initialize(data_directory);
-            rigid_body2->Frame().t=TV(2,4,0);
-            joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+            rigid_body1->Frame().t=TV(2,4,0);
+            joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1),ROTATION<TV>(-(T)pi/2,TV(0,1,0))));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,1),ROTATION<TV>((T)pi/2,TV(0,0,1))*ROTATION<TV>(-(T)pi/2,TV(0,1,0))));
             arb.Create_Joint_Function(joint->id_number)->muscle_control=true;
             peak_force=1000;
-            MUSCLE<TV>* muscle1=Add_Basic_Muscle("muscle",*rigid_body1,TV(1,-1,0),*rigid_body2,TV(1,-1,0));
+            MUSCLE<TV>* muscle1=Add_Basic_Muscle("muscle",*rigid_body0,TV(1,-1,0),*rigid_body1,TV(1,-1,0));
             muscle1->Set_Optimal_Length(sqrt((T)8.0));
-            MUSCLE<TV>* muscle2=Add_Basic_Muscle("muscle",*rigid_body1,TV(-1,1,0),*rigid_body2,TV(-1,1,0));
+            MUSCLE<TV>* muscle2=Add_Basic_Muscle("muscle",*rigid_body0,TV(-1,1,0),*rigid_body1,TV(-1,1,0));
             muscle2->Set_Optimal_Length(sqrt((T)8.0));
             Initialize_Muscle_Segments();
             arb.Use_Muscle_Actuators();

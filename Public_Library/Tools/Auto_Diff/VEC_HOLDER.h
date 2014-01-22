@@ -45,8 +45,8 @@ struct VEC_HOLDER
 };
 
 inline void Fill_From(VEC_END& o,const VEC_END& v) {}
-template<class OBJ,class BASE,class OBJ2,class BASE2>
-void Fill_From(VEC_HOLDER<OBJ2,BASE2>& o,const VEC_HOLDER<OBJ,BASE>& v)
+template<class OBJ,class BASE,class OBJ1,class BASE1>
+void Fill_From(VEC_HOLDER<OBJ1,BASE1>& o,const VEC_HOLDER<OBJ,BASE>& v)
 {
     Fill_From(o.x,v.x);
     Fill_From(o.z,v.z);

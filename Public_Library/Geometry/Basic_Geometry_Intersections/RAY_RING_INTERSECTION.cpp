@@ -19,8 +19,8 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const RING<T>& ring,con
     typedef VECTOR<T,3> TV;
     bool intersection=false;T thickness_over_two=(T).5*thickness;
     
-    // project ray into plane1 with x1 at the origin
-    TV ray_endpoint=ray.endpoint-ring.plane1.x1;
+    // project ray into plane1 with x0 at the origin
+    TV ray_endpoint=ray.endpoint-ring.plane1.x0;
     T vertical_endpoint=TV::Dot_Product(ray_endpoint,ring.plane1.normal);
     ray_endpoint-=vertical_endpoint*ring.plane1.normal;
     T vertical_direction=TV::Dot_Product(ray.direction,ring.plane1.normal);
@@ -80,8 +80,8 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const RING<T>& ring,con
     bool save_semi_infinite=ray.semi_infinite;T save_t_max=ray.t_max;int save_aggregate=ray.aggregate_id;
     if(INTERSECTION::Intersects(ray,ring.plane1,thickness)){
         TV point=ray.Point(ray.t_max);
-        point-=TV::Dot_Product(point-ring.plane1.x1,ring.plane1.normal)*ring.plane1.normal;
-        T distance=(point-ring.plane1.x1).Magnitude();
+        point-=TV::Dot_Product(point-ring.plane1.x0,ring.plane1.normal)*ring.plane1.normal;
+        T distance=(point-ring.plane1.x0).Magnitude();
         if(distance <= ring.outer_radius+thickness && distance >= ring.inner_radius-thickness){intersection=true;ray.aggregate_id=3;}
         else{ray.semi_infinite=save_semi_infinite;ray.t_max=save_t_max;ray.aggregate_id=save_aggregate;}}
     else{ray.semi_infinite=save_semi_infinite;ray.t_max=save_t_max;ray.aggregate_id=save_aggregate;}
@@ -89,8 +89,8 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const RING<T>& ring,con
     save_semi_infinite=ray.semi_infinite;save_t_max=ray.t_max;save_aggregate=ray.aggregate_id;
     if(INTERSECTION::Intersects(ray,ring.plane2,thickness)){ // TODO(jontg) ... thickness?
         TV point=ray.Point(ray.t_max);
-        point-=TV::Dot_Product(point-ring.plane1.x1,ring.plane1.normal)*ring.plane1.normal;
-        T distance = (point-ring.plane1.x1).Magnitude();
+        point-=TV::Dot_Product(point-ring.plane1.x0,ring.plane1.normal)*ring.plane1.normal;
+        T distance = (point-ring.plane1.x0).Magnitude();
         if(distance <= ring.outer_radius+thickness && distance >= ring.inner_radius-thickness){intersection=true;ray.aggregate_id=4;}
         else{ray.semi_infinite=save_semi_infinite;ray.t_max=save_t_max;ray.aggregate_id=save_aggregate;}}
     else{ray.semi_infinite=save_semi_infinite;ray.t_max=save_t_max;ray.aggregate_id=save_aggregate;}

@@ -39,8 +39,8 @@ Arbitrary_Test_One_Size(T_MATRIX A,int count) const
 //#####################################################################
 // Function Arbitrary_Test_Two_Sizes
 //#####################################################################
-template<class T> template<class T_MATRIX1,class T_MATRIX2> bool MATRIX_TESTS<T>::
-Arbitrary_Test_Two_Sizes(T_MATRIX1 A,T_MATRIX2 B,int count) const
+template<class T> template<class T_MATRIX0,class T_MATRIX1> bool MATRIX_TESTS<T>::
+Arbitrary_Test_Two_Sizes(T_MATRIX0 A,T_MATRIX1 B,int count) const
 {
     T tolerance=std::numeric_limits<T>::epsilon()*2;bool ok=true;
     Test(A.Columns()==B.Rows(),"Dimension tests (2A).",ok,A,B);
@@ -55,8 +55,8 @@ Arbitrary_Test_Two_Sizes(T_MATRIX1 A,T_MATRIX2 B,int count) const
 //#####################################################################
 // Function Arbitrary_Test_Two_Sizes
 //#####################################################################
-template<class T> template<class T_MATRIX1,class T_MATRIX2> bool MATRIX_TESTS<T>::
-Arbitrary_Test_Two_Sizes_TX(T_MATRIX1 A,T_MATRIX2 B,int count) const
+template<class T> template<class T_MATRIX0,class T_MATRIX1> bool MATRIX_TESTS<T>::
+Arbitrary_Test_Two_Sizes_TX(T_MATRIX0 A,T_MATRIX1 B,int count) const
 {
     T tolerance=std::numeric_limits<T>::epsilon()*2;bool ok=true;
     Test(A.Rows()==B.Rows(),"Dimension tests (TX).",ok,A,B);
@@ -71,8 +71,8 @@ Arbitrary_Test_Two_Sizes_TX(T_MATRIX1 A,T_MATRIX2 B,int count) const
 //#####################################################################
 // Function Arbitrary_Test_Two_Sizes
 //#####################################################################
-template<class T> template<class T_MATRIX1,class T_MATRIX2> bool MATRIX_TESTS<T>::
-Arbitrary_Test_Two_Sizes_XT(T_MATRIX1 A,T_MATRIX2 B,int count) const
+template<class T> template<class T_MATRIX0,class T_MATRIX1> bool MATRIX_TESTS<T>::
+Arbitrary_Test_Two_Sizes_XT(T_MATRIX0 A,T_MATRIX1 B,int count) const
 {
     T tolerance=std::numeric_limits<T>::epsilon()*2;bool ok=true;
     Test(A.Columns()==B.Columns(),"Dimension tests (XT).",ok,A,B);
@@ -108,8 +108,8 @@ Test(const bool test,const std::string& message,bool& ok,const T_MATRIX& A) cons
 //#####################################################################
 // Function Test
 //#####################################################################
-template<class T> template<class T_MATRIX1,class T_MATRIX2> bool MATRIX_TESTS<T>::
-Test(const bool test,const std::string& message,bool& ok,const T_MATRIX1& A,const T_MATRIX2& B) const
+template<class T> template<class T_MATRIX0,class T_MATRIX1> bool MATRIX_TESTS<T>::
+Test(const bool test,const std::string& message,bool& ok,const T_MATRIX0& A,const T_MATRIX1& B) const
 {
     if(Test(test,message,ok,A)) return true;
     Identify_Matrix(B);
@@ -118,8 +118,8 @@ Test(const bool test,const std::string& message,bool& ok,const T_MATRIX1& A,cons
 //#####################################################################
 // Function Test
 //#####################################################################
-template<class T> template<class T_MATRIX1,class T_MATRIX2,class T_MATRIX3> bool MATRIX_TESTS<T>::
-Test(const bool test,const std::string& message,bool& ok,const T_MATRIX1& A,const T_MATRIX2& B,const T_MATRIX3& C) const
+template<class T> template<class T_MATRIX0,class T_MATRIX1,class T_MATRIX2> bool MATRIX_TESTS<T>::
+Test(const bool test,const std::string& message,bool& ok,const T_MATRIX0& A,const T_MATRIX1& B,const T_MATRIX2& C) const
 {
     if(Test(test,message,ok,A,B)) return true;
     Identify_Matrix(C);

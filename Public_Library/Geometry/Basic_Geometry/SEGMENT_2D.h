@@ -54,8 +54,8 @@ public:
     TV Center() const
     {return (T).5*(X.x+X.y);}
 
-    static TV Normal(const TV& x1,const TV& x2) 
-    {return (x2-x1).Normalized().Rotate_Clockwise_90();}
+    static TV Normal(const TV& x0,const TV& x1) 
+    {return (x1-x0).Normalized().Rotate_Clockwise_90();}
 
     TV Normal() const
     {return SEGMENT_2D<T>::Normal(X.x,X.y);}
@@ -64,20 +64,20 @@ public:
     static TV Normal(const T_ARRAY& X)
     {STATIC_ASSERT(T_ARRAY::m==2);return Normal(X(0),X(1));}
 
-    static TV Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2) 
-    {TV v=x2-x1;
+    static TV Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1) 
+    {TV v=x1-x0;
     T denominator=TV::Dot_Product(v,v);
-    if(denominator == 0) return TV(1,0); // x1 and x2 are a single point
+    if(denominator == 0) return TV(1,0); // x0 and x1 are a single point
     else{
-        T t=TV::Dot_Product(location-x1,v)/denominator;
+        T t=TV::Dot_Product(location-x0,v)/denominator;
         return TV(1-t,t);}}
 
-    static TV Clamped_Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2) 
-    {TV v=x2-x1;
+    static TV Clamped_Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1) 
+    {TV v=x1-x0;
     T denominator=TV::Dot_Product(v,v);
-    if(denominator == 0) return TV(1,0); // x1 and x2 are a single point
+    if(denominator == 0) return TV(1,0); // x0 and x1 are a single point
     else{
-        T t=clamp(TV::Dot_Product(location-x1,v)/denominator,(T)0,(T)1);
+        T t=clamp(TV::Dot_Product(location-x0,v)/denominator,(T)0,(T)1);
         return TV(1-t,t);}}
 
     template<class T_ARRAY>
@@ -90,8 +90,8 @@ public:
     TV Barycentric_Coordinates(const TV& location) const
     {return Barycentric_Coordinates(location,X.x,X.y);}
 
-    static TV Point_From_Barycentric_Coordinates(const T alpha,const TV& x1,const TV& x2)
-    {return (x2-x1)*alpha+x1;}
+    static TV Point_From_Barycentric_Coordinates(const T alpha,const TV& x0,const TV& x1)
+    {return (x1-x0)*alpha+x0;}
 
     template<class T_ARRAY>
     static TV Point_From_Barycentric_Coordinates(const TV& weights,const T_ARRAY& X)

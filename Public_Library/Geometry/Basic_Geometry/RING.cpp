@@ -16,7 +16,7 @@ namespace PhysBAM{
 template<class T> RANGE<VECTOR<T,3> > RING<T>::
 Bounding_Box() const
 {
-    return CYLINDER<T>(plane1.x1,plane2.x1,outer_radius).Bounding_Box();
+    return CYLINDER<T>(plane1.x0,plane2.x0,outer_radius).Bounding_Box();
 }
 //#####################################################################
 // Function Signed_Distance
@@ -24,7 +24,7 @@ Bounding_Box() const
 template<class T> T RING<T>::
 Signed_Distance(const TV& X) const
 {
-    TV v=X-plane1.x1;
+    TV v=X-plane1.x0;
     T plane1_phi=TV::Dot_Product(v,plane1.normal),plane_phi=max(plane1_phi,-height-plane1_phi);
     T radius=(v-plane1_phi*plane1.normal).Magnitude();
     T radial_phi=max(radius-outer_radius,inner_radius-radius);
@@ -36,7 +36,7 @@ Signed_Distance(const TV& X) const
 template<class T> VECTOR<T,3> RING<T>::
 Surface(const TV& X) const 
 {
-    TV v=X-plane1.x1;
+    TV v=X-plane1.x0;
     T plane1_phi=TV::Dot_Product(v,plane1.normal),plane2_phi=-height-plane1_phi,plane_phi=max(plane1_phi,plane2_phi);
     TV radial_direction=v-plane1_phi*plane1.normal;
     T radius=radial_direction.Normalize();
@@ -44,7 +44,7 @@ Surface(const TV& X) const
     T radial_phi=max(inner_phi,outer_phi);
     if(radial_phi>0 || radial_phi>plane_phi){ // closest point is on one of the cylinders
         T nearest_radius=outer_phi>inner_phi?outer_radius:inner_radius;
-        return plane1.x1+clamp(plane1_phi,-height,(T)0)*plane1.normal+nearest_radius*radial_direction;}
+        return plane1.x0+clamp(plane1_phi,-height,(T)0)*plane1.normal+nearest_radius*radial_direction;}
     return plane1_phi > plane2_phi?X-plane1_phi*plane1.normal:X+plane2_phi*plane1.normal;
 }
 //#####################################################################
@@ -54,7 +54,7 @@ template<class T> VECTOR<T,3> RING<T>::
 Normal(const TV& X) const 
 {
     // compute plane normal
-    TV v=X-plane1.x1;
+    TV v=X-plane1.x0;
     T plane1_phi=TV::Dot_Product(v,plane1.normal),plane2_phi=-height-plane1_phi;
     TV plane_normal=plane1_phi>plane2_phi?plane1.normal:plane2.normal;
     T plane_phi=max(plane1_phi,plane2_phi);
@@ -78,11 +78,11 @@ Normal(const TV& X,const int aggregate) const
 {
     assert(aggregate>=0 && aggregate<4);
     if(aggregate==0){ // outer cylinder
-        TV normal=X-plane1.x1;
+        TV normal=X-plane1.x0;
         normal-=TV::Dot_Product(normal,plane1.normal)*plane1.normal;
         return normal.Normalized();}
     else if(aggregate==1){ // inner cylinder
-        TV normal=X-plane1.x1;
+        TV normal=X-plane1.x0;
         normal-=TV::Dot_Product(normal,plane1.normal)*plane1.normal;
         return -normal.Normalized();}
     else if(aggregate==2)
@@ -96,7 +96,7 @@ Normal(const TV& X,const int aggregate) const
 template<class T> SYMMETRIC_MATRIX<T,3> RING<T>::
 Hessian(const TV& X) const
 {
-    AUTO_HESS<TV,TV> Y=AUTO_HESS<TV,TV>::From_Var(X),v=Y-plane1.x1;
+    AUTO_HESS<TV,TV> Y=AUTO_HESS<TV,TV>::From_Var(X),v=Y-plane1.x0;
     AUTO_HESS<T,TV> plane1_phi=v.Dot(plane1.normal),plane_phi=max(plane1_phi,-height-plane1_phi);
     AUTO_HESS<T,TV> radius=(v-plane1_phi*plane1.normal).Magnitude();
     AUTO_HESS<T,TV> radial_phi=max(radius-outer_radius,inner_radius-radius);
@@ -108,7 +108,7 @@ Hessian(const TV& X) const
 template<class T> VECTOR<T,2> RING<T>::
 Principal_Curvatures(const TV& X) const
 {
-    TV v=X-plane1.x1;
+    TV v=X-plane1.x0;
     T plane1_phi=TV::Dot_Product(v,plane1.normal),plane_phi=max(plane1_phi,-height-plane1_phi);
     T radius=(v-plane1_phi*plane1.normal).Magnitude();
     T outer_phi=radius-outer_radius,inner_phi=inner_radius-radius;
@@ -122,7 +122,7 @@ template<class T> bool RING<T>::
 Lazy_Inside(const TV& X) const 
 {
     if(!plane1.Lazy_Inside(X) || !plane2.Lazy_Inside(X)) return false;
-    TV v=X-plane1.x1;
+    TV v=X-plane1.x0;
     v-=TV::Dot_Product(v,plane1.normal)*plane1.normal;
     T radius_sqr=v.Magnitude_Squared();
     return radius_sqr<=sqr(outer_radius) && radius_sqr>=sqr(inner_radius);
@@ -142,7 +142,7 @@ template<class T> bool RING<T>::
 Inside(const TV& X,const T thickness_over_two) const 
 {
     if(plane1.Inside(X,thickness_over_two) && plane2.Inside(X,thickness_over_two)){ // inside both planes, check the cylinder
-        TV distance=X-plane1.x1;
+        TV distance=X-plane1.x0;
         distance-=TV::Dot_Product(distance,plane1.normal)*plane1.normal;
         T distance_squared = TV::Dot_Product(distance,distance);
         if(distance_squared <= sqr(outer_radius-thickness_over_two) && distance_squared >= sqr(inner_radius+thickness_over_two)) return true;}
@@ -156,7 +156,7 @@ Outside(const TV& X,const T thickness_over_two) const
 {
     if(plane1.Outside(X,thickness_over_two) || plane2.Outside(X,thickness_over_two)) return true;
     else{ // check the cylinder
-        TV distance=X-plane1.x1;
+        TV distance=X-plane1.x0;
         distance-=TV::Dot_Product(distance,plane1.normal)*plane1.normal;
         T distance_squared = TV::Dot_Product(distance,distance);
         if(distance_squared >= sqr(outer_radius+thickness_over_two) || distance_squared <= sqr(inner_radius-thickness_over_two)) return true;

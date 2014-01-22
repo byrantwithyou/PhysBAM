@@ -57,9 +57,9 @@ Cut_With_Hyperplane(ARRAY<TV>& X,const LINE_2D<T>& cutting_plane,const VECTOR<in
 //#####################################################################
 // Function Cut_Simplex
 //#####################################################################
-template<class T> static inline void Add_Points_As_Triangle(const ARRAY<VECTOR<T,2> >& X,ARRAY<VECTOR<int,3> >& tris,const int x1,const int x2,const int x3)
+template<class T> static inline void Add_Points_As_Triangle(const ARRAY<VECTOR<T,2> >& X,ARRAY<VECTOR<int,3> >& tris,const int x0,const int x1,const int x2)
 {
-    tris.Append(VECTOR<int,3>(x1,x2,x3));
+    tris.Append(VECTOR<int,3>(x0,x1,x2));
 }
 template<class T> void TRIANGLE_2D<T>::
 Cut_Simplex(ARRAY<TV>& X,const VECTOR<int,3>& indices,const VECTOR<TV,3>& X_nodes,const VECTOR<T,3>& phi_nodes,ARRAY<VECTOR<int,3> >& left_tris,ARRAY<VECTOR<int,3> >& right_tris)

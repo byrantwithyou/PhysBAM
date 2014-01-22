@@ -41,10 +41,10 @@ template<class T_ARRAY> void Annotate(const T_ARRAY& array,const SIMPLE_UNIT& un
 {for(int i=0;i<array.Size();i++) Annotate(array(i),unit);}
 
 template<class T> void Annotate(const DIAGONAL_MATRIX<T,2>& matrix,const SIMPLE_UNIT& unit)
-{Annotate(matrix.x11,unit);Annotate(matrix.x22,unit);}
+{Annotate(matrix.x00,unit);Annotate(matrix.x11,unit);}
 
 template<class T> void Annotate(const DIAGONAL_MATRIX<T,3>& matrix,const SIMPLE_UNIT& unit)
-{Annotate(matrix.x11,unit);Annotate(matrix.x22,unit);Annotate(matrix.x33,unit);}
+{Annotate(matrix.x00,unit);Annotate(matrix.x11,unit);Annotate(matrix.x22,unit);}
 
 template<class TV,bool world_space> void Annotate(const RIGID_BODY_MASS<TV,world_space>& x)
 {Annotate(x.mass,mass);Annotate(x.inertia_tensor,inertia_tensor);}

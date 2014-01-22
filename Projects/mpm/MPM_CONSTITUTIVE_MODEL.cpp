@@ -121,26 +121,26 @@ Derivative_Test() const
     T lambda=youngs_modulus*poisson_ratio/((1.0+poisson_ratio)*(1.0-2.0*poisson_ratio));
 
     RANDOM_NUMBERS<T> rand_generator;
-    MATRIX<T,TV::m> F1,F2,dF;
+    MATRIX<T,TV::m> F0,F1,dF;
     T Psi1,Psi2;
-    MATRIX<T,TV::m> P1,P2,dP1,dP2;
+    MATRIX<T,TV::m> P0,P1,dP0,dP1;
     T eps=1e-5;
     for(int i=0;i<10000;i++){
-        rand_generator.Fill_Uniform(F1,-1,1);
+        rand_generator.Fill_Uniform(F0,-1,1);
         rand_generator.Fill_Uniform(dF,-eps,eps);
-        Fe=F1;
+        Fe=F0;
         Compute_Helper_Quantities_Using_F(Fe,Je,Re,Se);
         Psi1=Compute_Elastic_Energy_Density_Psi(mu,lambda,Fe,Re,Je);
-        P1=Compute_dPsi_dFe(mu,lambda,Fe,Re,Je);
-        dP1=Compute_d2Psi_dFe_dFe_Action_dF(mu,lambda,Fe,Je,Re,Se,dF);
-        F2=F1+dF;
-        Fe=F2;
+        P0=Compute_dPsi_dFe(mu,lambda,Fe,Re,Je);
+        dP0=Compute_d2Psi_dFe_dFe_Action_dF(mu,lambda,Fe,Je,Re,Se,dF);
+        F1=F0+dF;
+        Fe=F1;
         Compute_Helper_Quantities_Using_F(Fe,Je,Re,Se);
         Psi2=Compute_Elastic_Energy_Density_Psi(mu,lambda,Fe,Re,Je);
-        P2=Compute_dPsi_dFe(mu,lambda,Fe,Re,Je);
-        dP2=Compute_d2Psi_dFe_dFe_Action_dF(mu,lambda,Fe,Je,Re,Se,dF);
-        T energy_test_result=((Psi2-Psi1)-(P2+P1).Times_Transpose(dF).Trace()/2)/eps;
-        T force_test_result=((P2-P1)-(dP2+dP1)/2).Frobenius_Norm()/eps;
+        P1=Compute_dPsi_dFe(mu,lambda,Fe,Re,Je);
+        dP1=Compute_d2Psi_dFe_dFe_Action_dF(mu,lambda,Fe,Je,Re,Se,dF);
+        T energy_test_result=((Psi2-Psi1)-(P1+P0).Times_Transpose(dF).Trace()/2)/eps;
+        T force_test_result=((P1-P0)-(dP1+dP0)/2).Frobenius_Norm()/eps;
         LOG::cout<<"Energy Test: "<<energy_test_result<<std::endl;
         LOG::cout<<"P test     : "<<force_test_result<<std::endl;}
 }

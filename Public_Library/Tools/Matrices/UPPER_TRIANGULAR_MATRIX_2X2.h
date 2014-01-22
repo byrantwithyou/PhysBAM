@@ -29,21 +29,21 @@ public:
     typedef T SCALAR;
     enum WORKAROUND1 {m=2,n=2};
 
-    T x11,x12,x22;
+    T x00,x01,x11;
 
     UPPER_TRIANGULAR_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(2),INITIAL_SIZE nn=INITIAL_SIZE(2))
-        :x11(T()),x12(T()),x22(T())
+        :x00(T()),x01(T()),x11(T())
     {
         STATIC_ASSERT(sizeof(UPPER_TRIANGULAR_MATRIX)==3*sizeof(T));assert(mm==INITIAL_SIZE(2) && nn==INITIAL_SIZE(2));
     }
 
     template<class T2> explicit
     UPPER_TRIANGULAR_MATRIX(const UPPER_TRIANGULAR_MATRIX<T2,2>& matrix_input)
-        :x11(matrix_input.x11),x12(matrix_input.x12),x22(matrix_input.x22)
+        :x00(matrix_input.x00),x01(matrix_input.x01),x11(matrix_input.x11)
     {}
 
     UPPER_TRIANGULAR_MATRIX(const T x11_input,const T x12_input,const T x22_input)
-        :x11(x11_input),x12(x12_input),x22(x22_input)
+        :x00(x11_input),x01(x12_input),x11(x22_input)
     {}
 
     int Rows() const
@@ -62,67 +62,67 @@ public:
     {return (unsigned)i<=(unsigned)j && (unsigned)j<2;}
 
     bool operator==(const UPPER_TRIANGULAR_MATRIX& A) const
-    {return x11==A.x11 && x12==A.x12 && x22==A.x22;}
+    {return x00==A.x00 && x01==A.x01 && x11==A.x11;}
 
     bool operator!=(const UPPER_TRIANGULAR_MATRIX& A) const
     {return !(*this==A);}
 
     UPPER_TRIANGULAR_MATRIX operator-() const
-    {return UPPER_TRIANGULAR_MATRIX(-x11,-x12,-x22);}
+    {return UPPER_TRIANGULAR_MATRIX(-x00,-x01,-x11);}
 
     UPPER_TRIANGULAR_MATRIX& operator+=(const UPPER_TRIANGULAR_MATRIX& A)
-    {x11+=A.x11;x12+=A.x12;x22+=A.x22;return *this;}
+    {x00+=A.x00;x01+=A.x01;x11+=A.x11;return *this;}
 
     UPPER_TRIANGULAR_MATRIX& operator+=(const T& a)
-    {x11+=a;x22+=a;return *this;}
+    {x00+=a;x11+=a;return *this;}
 
     UPPER_TRIANGULAR_MATRIX& operator-=(const UPPER_TRIANGULAR_MATRIX& A)
-    {x11-=A.x11;x12-=A.x12;x22-=A.x22;return *this;}
+    {x00-=A.x00;x01-=A.x01;x11-=A.x11;return *this;}
 
     UPPER_TRIANGULAR_MATRIX& operator-=(const T& a)
-    {x11-=a;x22-=a;return *this;}
+    {x00-=a;x11-=a;return *this;}
 
     UPPER_TRIANGULAR_MATRIX operator+(const UPPER_TRIANGULAR_MATRIX& A) const
-    {return UPPER_TRIANGULAR_MATRIX(x11+A.x11,x12+A.x12,x22+A.x22);}
+    {return UPPER_TRIANGULAR_MATRIX(x00+A.x00,x01+A.x01,x11+A.x11);}
 
     UPPER_TRIANGULAR_MATRIX operator+(const DIAGONAL_MATRIX<T,2>& A) const
-    {return UPPER_TRIANGULAR_MATRIX(x11+A.x11,x12,x22+A.x22);}
+    {return UPPER_TRIANGULAR_MATRIX(x00+A.x00,x01,x11+A.x11);}
 
     UPPER_TRIANGULAR_MATRIX operator+(const T a) const
-    {return UPPER_TRIANGULAR_MATRIX(x11+a,x12,x22+a);}
+    {return UPPER_TRIANGULAR_MATRIX(x00+a,x01,x11+a);}
 
     UPPER_TRIANGULAR_MATRIX operator-(const UPPER_TRIANGULAR_MATRIX& A) const
-    {return UPPER_TRIANGULAR_MATRIX(x11-A.x11,x12-A.x12,x22-A.x22);}
+    {return UPPER_TRIANGULAR_MATRIX(x00-A.x00,x01-A.x01,x11-A.x11);}
 
     UPPER_TRIANGULAR_MATRIX operator-(const DIAGONAL_MATRIX<T,2>& A) const
-    {return UPPER_TRIANGULAR_MATRIX(x11-A.x11,x12,x22-A.x22);}
+    {return UPPER_TRIANGULAR_MATRIX(x00-A.x00,x01,x11-A.x11);}
 
     UPPER_TRIANGULAR_MATRIX operator-(const T a) const
-    {return UPPER_TRIANGULAR_MATRIX(x11-a,x12,x22-a);}
+    {return UPPER_TRIANGULAR_MATRIX(x00-a,x01,x11-a);}
 
     UPPER_TRIANGULAR_MATRIX& operator*=(const UPPER_TRIANGULAR_MATRIX& A)
     {return *this=*this*A;}
 
     UPPER_TRIANGULAR_MATRIX& operator*=(const T a)
-    {x11*=a;x12*=a;x22*=a;return *this;}
+    {x00*=a;x01*=a;x11*=a;return *this;}
 
     UPPER_TRIANGULAR_MATRIX& operator/=(const T a)
-    {assert(a!=0);T s=1/a;x11*=s;x12*=s;x22*=s;return *this;}
+    {assert(a!=0);T s=1/a;x00*=s;x01*=s;x11*=s;return *this;}
 
     UPPER_TRIANGULAR_MATRIX operator*(const T a) const
-    {return UPPER_TRIANGULAR_MATRIX(a*x11,a*x12,a*x22);}
+    {return UPPER_TRIANGULAR_MATRIX(a*x00,a*x01,a*x11);}
 
     UPPER_TRIANGULAR_MATRIX operator/(const T a) const
     {assert(a!=0);return *this*(1/a);}
 
     VECTOR<T,2> operator*(const VECTOR<T,2>& v) const
-    {return VECTOR<T,2>(x11*v.x+x12*v.y,x22*v.y);}
+    {return VECTOR<T,2>(x00*v.x+x01*v.y,x11*v.y);}
 
     UPPER_TRIANGULAR_MATRIX operator*(const UPPER_TRIANGULAR_MATRIX& A) const // 4 mults, 1 add
-    {return UPPER_TRIANGULAR_MATRIX(x11*A.x11,x11*A.x12+x12*A.x22,x22*A.x22);}
+    {return UPPER_TRIANGULAR_MATRIX(x00*A.x00,x00*A.x01+x01*A.x11,x11*A.x11);}
 
     UPPER_TRIANGULAR_MATRIX operator*(const DIAGONAL_MATRIX<T,2>& A) const // 3 mults
-    {return UPPER_TRIANGULAR_MATRIX(x11*A.x.x,x12*A.x.y,x22*A.x.y);}
+    {return UPPER_TRIANGULAR_MATRIX(x00*A.x.x,x01*A.x.y,x11*A.x.y);}
 
     template<class T_MATRIX>
     T_MATRIX operator*(const MATRIX_BASE<T,T_MATRIX>& A) const
@@ -140,59 +140,59 @@ public:
     for(int j=0;j<A.Columns();j++) for(int k=0;k<2;k++) for(int i=0;i<=k;i++) M(k,j)+=(*this)(i,k)*A(i,j);return M;}
 
     MATRIX<T,2,3> Times_Transpose(const MATRIX<T,3,2>& A) const
-    {return MATRIX<T,2,3>(x11*A.x[0]+x12*A.x[3],x22*A.x[3],x11*A.x[1]+x12*A.x[4],x22*A.x[4],x11*A.x[2]+x12*A.x[5],x22*A.x[5]);}
+    {return MATRIX<T,2,3>(x00*A.x[0]+x01*A.x[3],x11*A.x[3],x00*A.x[1]+x01*A.x[4],x11*A.x[4],x00*A.x[2]+x01*A.x[5],x11*A.x[5]);}
 
     UPPER_TRIANGULAR_MATRIX Times_Transpose(const DIAGONAL_MATRIX<T,2>& A) const
     {return *this*A;}
 
     MATRIX<T,2> Times_Transpose(const UPPER_TRIANGULAR_MATRIX& A) const
-    {return MATRIX<T,2>(x11*A.x11+x12*A.x12,x22*A.x12,x12*A.x22,x22*A.x22);}
+    {return MATRIX<T,2>(x00*A.x00+x01*A.x01,x11*A.x01,x01*A.x11,x11*A.x11);}
 
     MATRIX<T,2> Times_Transpose(const SYMMETRIC_MATRIX<T,2>& A) const
     {return *this*A;}
 
     MATRIX<T,2> Transpose_Times(const UPPER_TRIANGULAR_MATRIX& A) const
-    {return MATRIX<T,2>(x11*A.x11,x12*A.x11,x11*A.x12,x12*A.x12+x22*A.x22);}
+    {return MATRIX<T,2>(x00*A.x00,x01*A.x00,x00*A.x01,x01*A.x01+x11*A.x11);}
 
     MATRIX<T,2> Transpose_Times(const SYMMETRIC_MATRIX<T,2>& A) const
-    {return MATRIX<T,2>(x11*A.x11,x12*A.x11+x22*A.x21,x11*A.x21,x12*A.x21+x22*A.x22);}
+    {return MATRIX<T,2>(x00*A.x00,x01*A.x00+x11*A.x10,x00*A.x10,x01*A.x10+x11*A.x11);}
 
     MATRIX<T,2> Transpose_Times(const DIAGONAL_MATRIX<T,2>& A) const
-    {return MATRIX<T,2>(x11*A.x.x,x12*A.x.x,0,x22*A.x.y);}
+    {return MATRIX<T,2>(x00*A.x.x,x01*A.x.x,0,x11*A.x.y);}
 
     SYMMETRIC_MATRIX<T,2> Outer_Product_Matrix() const // 4 mults, 1 add
-    {return SYMMETRIC_MATRIX<T,2>(x11*x11+x12*x12,x12*x22,x22*x22);}
+    {return SYMMETRIC_MATRIX<T,2>(x00*x00+x01*x01,x01*x11,x11*x11);}
 
     T Determinant() const
-    {return x11*x22;}
+    {return x00*x11;}
 
     T Trace() const
-    {return x11+x22;}
+    {return x00+x11;}
 
     UPPER_TRIANGULAR_MATRIX Inverse() const
-    {assert(x11!=0 && x22!=0);T one_over_x11=1/x11,one_over_x22=1/x22;
-    return UPPER_TRIANGULAR_MATRIX(one_over_x11,-x12*one_over_x11*one_over_x22,one_over_x22);}
+    {assert(x00!=0 && x11!=0);T one_over_x11=1/x00,one_over_x22=1/x11;
+    return UPPER_TRIANGULAR_MATRIX(one_over_x11,-x01*one_over_x11*one_over_x22,one_over_x22);}
 
     VECTOR<T,2> Solve_Linear_System(const VECTOR<T,2>& b) const
     {return Inverse()*b;}
 
     UPPER_TRIANGULAR_MATRIX Cofactor_Matrix() const
-    {return UPPER_TRIANGULAR_MATRIX(x22,-x12,x11);}
+    {return UPPER_TRIANGULAR_MATRIX(x11,-x01,x00);}
 
     static UPPER_TRIANGULAR_MATRIX Identity_Matrix()
     {return UPPER_TRIANGULAR_MATRIX(1,0,1);}
 
     T Max_Abs() const
-    {return maxabs(x11,x12,x22);}
+    {return maxabs(x00,x01,x11);}
 
     T Frobenius_Norm() const
     {return sqrt(Frobenius_Norm_Squared());}
 
     T Frobenius_Norm_Squared() const
-    {return sqr(x11)+sqr(x12)+sqr(x22);}
+    {return sqr(x00)+sqr(x01)+sqr(x11);}
 
     T Simplex_Minimum_Altitude() const
-    {return Determinant()/max(abs(x11),sqrt(sqr(x22)+max(sqr(x12),sqr(x12-x11))));}
+    {return Determinant()/max(abs(x00),sqrt(sqr(x11)+max(sqr(x01),sqr(x01-x00))));}
 
     MATRIX<T,2> Transposed() const
     {return MATRIX<T,2>(*this).Transposed();}
@@ -203,11 +203,11 @@ public:
 
 template<class T>
 inline UPPER_TRIANGULAR_MATRIX<T,2> operator*(const DIAGONAL_MATRIX<T,2>& A,const UPPER_TRIANGULAR_MATRIX<T,2>& B) // 3 mults
-{return UPPER_TRIANGULAR_MATRIX<T,2>(A.x.x*B.x11,A.x.x*B.x12,A.x.y*B.x22);}
+{return UPPER_TRIANGULAR_MATRIX<T,2>(A.x.x*B.x00,A.x.x*B.x01,A.x.y*B.x11);}
 
 template<class T>
 inline std::ostream& operator<<(std::ostream& output_stream,const UPPER_TRIANGULAR_MATRIX<T,2>& A)
-{return output_stream<<"["<<A.x11<<" "<<A.x12<<" ; 0 "<<A.x22<<"]";}
+{return output_stream<<"["<<A.x00<<" "<<A.x01<<" ; 0 "<<A.x11<<"]";}
 //#####################################################################
 }
 #endif

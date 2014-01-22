@@ -16,7 +16,7 @@ Segment_Plane_Intersection(const TV& endpoint1,const TV& endpoint2,T& interpolat
 {
     T denominator=TV::Dot_Product(endpoint2-endpoint1,normal);
     if(!denominator){interpolation_fraction=FLT_MAX;return false;} // parallel
-    interpolation_fraction=TV::Dot_Product(x1-endpoint1,normal)/denominator;
+    interpolation_fraction=TV::Dot_Product(x0-endpoint1,normal)/denominator;
     return (interpolation_fraction>=0 && interpolation_fraction<=1);
 }
 //#####################################################################

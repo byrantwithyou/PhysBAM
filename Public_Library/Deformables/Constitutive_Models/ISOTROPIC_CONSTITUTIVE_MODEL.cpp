@@ -76,13 +76,13 @@ Report_Diagnostics(const DIAGONAL_MATRIX<T,2>& F,T E0,T* E,const DIAGONAL_MATRIX
     Report_Diagnostics("Px",E0,E[0],P0.x.x,P[0].x.x,e);
     Report_Diagnostics("Py",E0,E[1],P0.x.y,P[1].x.y,e);
 
-    Report_Diagnostics("Hxx",P0.x.x,P[0].x.x,dPi_dF0.x1111,dPi_dF[0].x1111,e);
-    Report_Diagnostics("Hyy",P0.x.y,P[1].x.y,dPi_dF0.x2222,dPi_dF[1].x2222,e);
-    Report_Diagnostics("Hxy",P0.x.x,P[1].x.x,dPi_dF0.x2211,dPi_dF[1].x2211,e);
+    Report_Diagnostics("Hxx",P0.x.x,P[0].x.x,dPi_dF0.x0000,dPi_dF[0].x0000,e);
+    Report_Diagnostics("Hyy",P0.x.y,P[1].x.y,dPi_dF0.x1111,dPi_dF[1].x1111,e);
+    Report_Diagnostics("Hxy",P0.x.x,P[1].x.x,dPi_dF0.x1100,dPi_dF[1].x1100,e);
     T ss1=sqr(F.x.x),ss2=sqr(F.x.y);
-    T s12=1/(ss1-ss2);
-    Report_Diagnostics("x2112",dPi_dF0.x2112,(-P0.x.y*F.x.x+P0.x.x*F.x.y)*s12);
-    Report_Diagnostics("x2121",dPi_dF0.x2121,(-P0.x.y*F.x.y+P0.x.x*F.x.x)*s12);
+    T s01=1/(ss1-ss2);
+    Report_Diagnostics("x1001",dPi_dF0.x1001,(-P0.x.y*F.x.x+P0.x.x*F.x.y)*s01);
+    Report_Diagnostics("x1010",dPi_dF0.x1010,(-P0.x.y*F.x.y+P0.x.x*F.x.x)*s01);
 }
 //#####################################################################
 // Function Report_Diagnostics
@@ -95,20 +95,20 @@ Report_Diagnostics(const DIAGONAL_MATRIX<T,3>& F,T E0,T* E,const DIAGONAL_MATRIX
     Report_Diagnostics("Py",E0,E[1],P0.x.y,P[1].x.y,e);
     Report_Diagnostics("Pz",E0,E[2],P0.x.z,P[2].x.z,e);
 
-    Report_Diagnostics("Hxx",P0.x.x,P[0].x.x,dPi_dF0.x1111,dPi_dF[0].x1111,e);
-    Report_Diagnostics("Hyy",P0.x.y,P[1].x.y,dPi_dF0.x2222,dPi_dF[1].x2222,e);
-    Report_Diagnostics("Hzz",P0.x.z,P[2].x.z,dPi_dF0.x3333,dPi_dF[2].x3333,e);
-    Report_Diagnostics("Hxy",P0.x.x,P[1].x.x,dPi_dF0.x2211,dPi_dF[1].x2211,e);
-    Report_Diagnostics("Hxz",P0.x.x,P[2].x.x,dPi_dF0.x3311,dPi_dF[2].x3311,e);
-    Report_Diagnostics("Hyz",P0.x.y,P[2].x.y,dPi_dF0.x3322,dPi_dF[2].x3322,e);
+    Report_Diagnostics("Hxx",P0.x.x,P[0].x.x,dPi_dF0.x0000,dPi_dF[0].x0000,e);
+    Report_Diagnostics("Hyy",P0.x.y,P[1].x.y,dPi_dF0.x1111,dPi_dF[1].x1111,e);
+    Report_Diagnostics("Hzz",P0.x.z,P[2].x.z,dPi_dF0.x2222,dPi_dF[2].x2222,e);
+    Report_Diagnostics("Hxy",P0.x.x,P[1].x.x,dPi_dF0.x1100,dPi_dF[1].x1100,e);
+    Report_Diagnostics("Hxz",P0.x.x,P[2].x.x,dPi_dF0.x2200,dPi_dF[2].x2200,e);
+    Report_Diagnostics("Hyz",P0.x.y,P[2].x.y,dPi_dF0.x2211,dPi_dF[2].x2211,e);
     T ss1=sqr(F.x.x),ss2=sqr(F.x.y),ss3=sqr(F.x.z);
-    T s12=1/(ss1-ss2),s13=1/(ss1-ss3),s23=1/(ss2-ss3);
-    Report_Diagnostics("x2112",dPi_dF0.x2112,(-P0.x.y*F.x.x+P0.x.x*F.x.y)*s12);
-    Report_Diagnostics("x2121",dPi_dF0.x2121,(-P0.x.y*F.x.y+P0.x.x*F.x.x)*s12);
-    Report_Diagnostics("x3113",dPi_dF0.x3113,(-P0.x.z*F.x.x+P0.x.x*F.x.z)*s13);
-    Report_Diagnostics("x3131",dPi_dF0.x3131,(-P0.x.z*F.x.z+P0.x.x*F.x.x)*s13);
-    Report_Diagnostics("x3223",dPi_dF0.x3223,(-P0.x.z*F.x.y+P0.x.y*F.x.z)*s23);
-    Report_Diagnostics("x3232",dPi_dF0.x3232,(-P0.x.z*F.x.z+P0.x.y*F.x.y)*s23);
+    T s01=1/(ss1-ss2),s02=1/(ss1-ss3),s12=1/(ss2-ss3);
+    Report_Diagnostics("x1001",dPi_dF0.x1001,(-P0.x.y*F.x.x+P0.x.x*F.x.y)*s01);
+    Report_Diagnostics("x1010",dPi_dF0.x1010,(-P0.x.y*F.x.y+P0.x.x*F.x.x)*s01);
+    Report_Diagnostics("x2002",dPi_dF0.x2002,(-P0.x.z*F.x.x+P0.x.x*F.x.z)*s02);
+    Report_Diagnostics("x2020",dPi_dF0.x2020,(-P0.x.z*F.x.z+P0.x.x*F.x.x)*s02);
+    Report_Diagnostics("x2112",dPi_dF0.x2112,(-P0.x.z*F.x.y+P0.x.y*F.x.z)*s12);
+    Report_Diagnostics("x2121",dPi_dF0.x2121,(-P0.x.z*F.x.z+P0.x.y*F.x.y)*s12);
 }
 //#####################################################################
 // Function Test

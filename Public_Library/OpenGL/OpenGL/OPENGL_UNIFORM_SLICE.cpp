@@ -31,8 +31,8 @@ Update_Clip_Planes()
     else {
         float pos=(mode==NODE_SLICE)?grid.Node(TV_INT()+index)[axis]:grid.Center(TV_INT()+index)[axis];
         PLANE<float> plane1(VECTOR<float,3>(0,0,0),VECTOR<float,3>(0,0,0)),plane2(VECTOR<float,3>(0,0,0),VECTOR<float,3>(0,0,0));
-        plane1.normal[axis]=1;plane1.x1[axis]=pos-grid.dX[axis]/1.9;
-        plane2.normal[axis]=-1;plane2.x1[axis]=pos+grid.dX[axis]/1.9;
+        plane1.normal[axis]=1;plane1.x0[axis]=pos-grid.dX[axis]/1.9;
+        plane2.normal[axis]=-1;plane2.x0[axis]=pos+grid.dX[axis]/1.9;
         if (clip_plane_id1==0) clip_plane_id1=world.Add_Clipping_Plane(plane1);
         else world.Set_Clipping_Plane(clip_plane_id1,plane1);
         if (clip_plane_id2==0) clip_plane_id2=world.Add_Clipping_Plane(plane2);

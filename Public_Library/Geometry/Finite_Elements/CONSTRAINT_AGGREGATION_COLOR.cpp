@@ -127,7 +127,7 @@ Aggregate_Constraints(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix_uu,const ARRAY<i
 //            assert(k>=0);
 //            weights(carried_nodes(c)+k)=(T)-1;}}
     
-    // Initialize two arrays of ints or bools: one saying whether the DOFs are adjacent to some IDOF, another saying whether each bdy cell is within a 4x4(x4) block of grid cells centered on an IDOF in I (these are both from Algorithm 1 of Jeff's paper)
+    // Initialize two arrays of ints or bools: one saying whether the DOFs are adjacent to some IDOF, another saying whether each bdy cell is within a 4x4(x3) block of grid cells centered on an IDOF in I (these are both from Algorithm 1 of Jeff's paper)
     // Here's what we do with cell_checker. Initially cell_checker will have a value of 1 for a non-cut cell, or 2 (or 3 or 4, etc., but probably 2) for a cut cell. Once the algorithm starts, all cells within the block of the new IDOF will be reduced to zero and hit_cells will be decremented.
     ARRAY<int> dof_adj_to_an_idof(all_dofs),cell_checker; cell_checker.Resize(total_cells,true,true,0);
     int hit_cells(0);
@@ -339,8 +339,8 @@ Build_Nullspace_And_Specific_Constraint_Solution(ARRAY<SPARSE_MATRIX_FLAT_MXN<T>
         ARRAY<T> ones_diag;ones_diag.Resize(z(c).m,true,true,(T)1); //Because I can't find a regular matrix multiply
         ztaz=ztaz+z_t_a(c)*(z(c));
     }
-//    OCTAVE_OUTPUT<T>("z1.txt").Write("z1",z(0));//,*vectors(0),*vectors(1));
-//    OCTAVE_OUTPUT<T>("z2.txt").Write("z2",z(1));//,*vectors(0),*vectors(1));
+//    OCTAVE_OUTPUT<T>("z0.txt").Write("z0",z(0));//,*vectors(0),*vectors(1));
+//    OCTAVE_OUTPUT<T>("z1.txt").Write("z1",z(1));//,*vectors(0),*vectors(1));
 //    OCTAVE_OUTPUT<T>("b1.txt").Write("b1",condensed_constraint_matrix(0));//,*vectors(0),*vectors(1));
 //    OCTAVE_OUTPUT<T>("b2.txt").Write("b2",condensed_constraint_matrix(1));
 //    OCTAVE_OUTPUT<T>("b10.txt").Write("b10",full_constraint_matrix(0));//,*vectors(0),*vectors(1));

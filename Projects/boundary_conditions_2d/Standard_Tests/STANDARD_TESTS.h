@@ -404,12 +404,12 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 typename VBC::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const FACE_INDEX<TV::m>& f2,T& theta,T& value) PHYSBAM_OVERRIDE
 {
     VECTOR<RANGE<TV_INT>,TV::dimension> fi=fluids_parameters.grid->Face_Indices(0);
-    TV X1=fluids_parameters.grid->Face(f1);
-    TV X2=fluids_parameters.grid->Face(f2);
+    TV X0=fluids_parameters.grid->Face(f1);
+    TV X1=fluids_parameters.grid->Face(f2);
 
     if(test_number==2 || test_number==3 || test_number==4){
         if(f2.index.x==fi(f2.axis).min_corner.x-(f2.axis!=1)){ // left
-            theta=(domain.min_corner.x-X1.x)/(X2.x-X1.x);
+            theta=(domain.min_corner.x-X0.x)/(X1.x-X0.x);
 //            if(test_number==2) value=velocity_multiplier;
 //            if((test_number==3 || test_number==4)) value=Get_Source_Velocity(f2);
             if(plane_types[0]!=VBC::slip) return plane_types[0];
@@ -417,24 +417,24 @@ typename VBC::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const 
 //            return VBC::noslip;}
 
         if(f2.index.y==fi(f2.axis).min_corner.y-(f2.axis!=2)){ // bottom
-            theta=(domain.min_corner.y-X1.y)/(X2.y-X1.y);
+            theta=(domain.min_corner.y-X0.y)/(X1.y-X0.y);
             if(plane_types[1]!=VBC::slip) return plane_types[1];
             return f2.axis==1?VBC::free:VBC::noslip;}
 
         if(f2.index.x==fi(f2.axis).max_corner.x+(f2.axis!=1)){ // right
-            theta=(domain.max_corner.x-X1.x)/(X2.x-X1.x);
+            theta=(domain.max_corner.x-X0.x)/(X1.x-X0.x);
             if(plane_types[2]!=VBC::slip) return plane_types[2];
             return f2.axis==2?VBC::free:VBC::noslip;}
 
         if(f2.index.y==fi(f2.axis).max_corner.y+(f2.axis!=2)){ // top
-            theta=(domain.max_corner.y-X1.y)/(X2.y-X1.y);
+            theta=(domain.max_corner.y-X0.y)/(X1.y-X0.y);
             if(plane_types[3]!=VBC::slip) return plane_types[3];
             return f2.axis==1?VBC::free:VBC::noslip;}}
 
     if(test_number==5){
-        for(int i=0;i<4;i++) if(planes[i].Signed_Distance(X2)>=-outside_tolerance){
+        for(int i=0;i<4;i++) if(planes[i].Signed_Distance(X1)>=-outside_tolerance){
                 if(i==0 && f1.axis==1){value=velocity_multiplier*sqr(1-fluids_parameters.grid->Face(f2).y);}
-                planes[i].Segment_Line_Intersection(X1,X2,theta);
+                planes[i].Segment_Line_Intersection(X0,X1,theta);
                 theta=clamp(theta,(T)0,(T)1);
                 return plane_types[i];}}
 
@@ -448,36 +448,36 @@ typename VBC::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const 
 typename VBC::RAY_TYPE Get_Boundary_Along_Ray(const TV_INT& c1,const TV_INT& c2,T& theta,T& value) PHYSBAM_OVERRIDE
 {
     RANGE<TV_INT> di=fluids_parameters.grid->Domain_Indices();
-    TV X1=fluids_parameters.grid->X(c1);
-    TV X2=fluids_parameters.grid->X(c2);
+    TV X0=fluids_parameters.grid->X(c1);
+    TV X1=fluids_parameters.grid->X(c2);
 
     if(test_number==2 || test_number==3 || test_number==4){
         if(c2.x<di.min_corner.x){ // left
-            theta=(domain.min_corner.x-X1.x)/(X2.x-X1.x);
+            theta=(domain.min_corner.x-X0.x)/(X1.x-X0.x);
 //            if(test_number==2) value=velocity_multiplier;
 //            if((test_number==3 || test_number==4)) value=Get_Source_Velocity(c2);
             if(plane_types[0]!=VBC::slip) return plane_types[0];
             return VBC::noslip;}
 
         if(c2.y<di.min_corner.y){ // bottom
-            theta=(domain.min_corner.y-X1.y)/(X2.y-X1.y);
+            theta=(domain.min_corner.y-X0.y)/(X1.y-X0.y);
             if(plane_types[1]!=VBC::slip) return plane_types[1];
             return VBC::noslip;}
 
         if(c2.x>di.max_corner.x){ // right
-            theta=(domain.max_corner.x-X1.x)/(X2.x-X1.x);
+            theta=(domain.max_corner.x-X0.x)/(X1.x-X0.x);
             if(plane_types[2]!=VBC::slip) return plane_types[2];
             return VBC::noslip;}
 
         if(c2.y>di.max_corner.y){ // top
-            theta=(domain.max_corner.y-X1.y)/(X2.y-X1.y);
+            theta=(domain.max_corner.y-X0.y)/(X1.y-X0.y);
             if(plane_types[3]!=VBC::slip) return plane_types[3];
             return VBC::noslip;}}
 
     if(test_number==5){
-        for(int i=0;i<4;i++) if(planes[i].Signed_Distance(X2)>=-outside_tolerance){
+        for(int i=0;i<4;i++) if(planes[i].Signed_Distance(X1)>=-outside_tolerance){
                 if(i==0){value=velocity_multiplier*sqr(1-fluids_parameters.grid->X(c2).y);}
-                planes[i].Segment_Line_Intersection(X1,X2,theta);
+                planes[i].Segment_Line_Intersection(X0,X1,theta);
                 theta=clamp(theta,(T)0,(T)1);
                 return plane_types[i];}}
 
@@ -558,24 +558,24 @@ void Bounding_Edge_From_Endpoints(int i,const TV& p1,const TV& p2,typename VBC::
 {
     TV d=p2-p1;
     T len=d.Normalize();
-    planes[i].x1=(p1+p2)/2;
+    planes[i].x0=(p1+p2)/2;
     planes[i].normal=TV(d.y,-d.x);
     plane_types[i]=t;
 
     int id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/ground",len/200);
-    solid_body_collection.rigid_body_collection.rigid_body_particles.frame(id).t=planes[i].x1;
+    solid_body_collection.rigid_body_collection.rigid_body_particles.frame(id).t=planes[i].x0;
     solid_body_collection.rigid_body_collection.rigid_body_particles.frame(id).r=ROTATION<VECTOR<T,2> >::From_Rotated_Vector(TV(0,1),planes[i].normal);
     solid_body_collection.rigid_body_collection.Rigid_Body(id).is_static=true;
 }
 //#####################################################################
 // Function Boundary_Conditions
 //#####################################################################
-void Bounding_Quad_From_Corners(const TV& p1,const TV& p2,const TV& p3,const TV& p4,typename VBC::RAY_TYPE t12,typename VBC::RAY_TYPE t23,typename VBC::RAY_TYPE t34,typename VBC::RAY_TYPE t41)
+void Bounding_Quad_From_Corners(const TV& p1,const TV& p2,const TV& p3,const TV& p4,typename VBC::RAY_TYPE t01,typename VBC::RAY_TYPE t12,typename VBC::RAY_TYPE t23,typename VBC::RAY_TYPE t30)
 {
-    Bounding_Edge_From_Endpoints(0,p1,p2,t12);
-    Bounding_Edge_From_Endpoints(1,p2,p3,t23);
-    Bounding_Edge_From_Endpoints(2,p3,p4,t34);
-    Bounding_Edge_From_Endpoints(3,p4,p1,t41);
+    Bounding_Edge_From_Endpoints(0,p1,p2,t01);
+    Bounding_Edge_From_Endpoints(1,p2,p3,t12);
+    Bounding_Edge_From_Endpoints(2,p3,p4,t23);
+    Bounding_Edge_From_Endpoints(3,p4,p1,t30);
 }
 //#####################################################################
 // Function Compute_Sample_Points

@@ -34,8 +34,8 @@ bool Update_Box_Plane_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisi
     int i1=id_1;
     int i2=id_2;
     FRAME<TV> transform;
-    RIGID_BODY<TV>* body1=&rigid_body_collection.Rigid_Body(i1);
-    RIGID_BODY<TV>* body2=&rigid_body_collection.Rigid_Body(i2);
+    RIGID_BODY<TV>* body0=&rigid_body_collection.Rigid_Body(i1);
+    RIGID_BODY<TV>* body1=&rigid_body_collection.Rigid_Body(i2);
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object2)){
         transform=*object_transformed->transform;object2=object_transformed->object_space_implicit_object;}
     ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >* implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >*>(object2);
@@ -44,7 +44,7 @@ bool Update_Box_Plane_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisi
             transform=*object_transformed->transform;object1=object_transformed->object_space_implicit_object;}
         exchange(object1,object2);
         exchange(i1,i2);
-        exchange(body1,body2);
+        exchange(body0,body1);
         implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >*>(object2);}
     RANGE<TV>& box=implicit_box->analytic;
 
@@ -54,18 +54,18 @@ bool Update_Box_Plane_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisi
         if(i>4) point(0)=box.max_corner(0);
         if(i%4==0||i%4==3) point(1)=box.max_corner(1);
         if(i%2==0) point(2)=box.max_corner(2);
-        TV transformed_point=body1->Frame().Inverse()*body2->Frame()*point;
+        TV transformed_point=body0->Frame().Inverse()*body1->Frame()*point;
         if(transformed_point(0)<0){
             intersect=true;
             transformed_point(0)*=.5;
             points.Append(transformed_point);}}
 
-    TV collision_normal=-body1->Frame().r.Rotated_Axis(0);
+    TV collision_normal=-body0->Frame().r.Rotated_Axis(0);
     if(!intersect){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}  
-    if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
+    if(TV::Dot_Product(body0->Twist().linear-body1->Twist().linear,collision_normal)>=0) return false;
 
-    TV collision_location;for(int i=0;i<points.m;i++) collision_location+=points(i);collision_location/=(T)points.m;collision_location=body1->Frame()*collision_location;
-    TV collision_relative_velocity=body1->Pointwise_Object_Velocity(collision_location)-body2->Pointwise_Object_Velocity(collision_location);
+    TV collision_location;for(int i=0;i<points.m;i++) collision_location+=points(i);collision_location/=(T)points.m;collision_location=body0->Frame()*collision_location;
+    TV collision_relative_velocity=body0->Pointwise_Object_Velocity(collision_location)-body1->Pointwise_Object_Velocity(collision_location);
 
     collision_callbacks.Swap_States(i1,i2);
     SOLVE_CONTACT::Update_Contact_Pair_Helper<TV>(rigid_body_collisions,collision_callbacks,i1,i2,dt,time,epsilon_scale,collision_location,collision_normal,collision_relative_velocity,

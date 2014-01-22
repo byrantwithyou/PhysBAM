@@ -185,7 +185,7 @@ From_Base_Node_Hessian_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTO
 {
     TV w=(X-grid.X(index))*grid.one_over_dX;
     SYMMETRIC_MATRIX<T2,1> S(Cubic_Interpolation_Diff2(&u(index-1),w.x));
-    S.x11*=sqr(grid.one_over_dX.x);
+    S.x00*=sqr(grid.one_over_dX.x);
     return S;
 }
 //#####################################################################
@@ -200,9 +200,9 @@ From_Base_Node_Hessian_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTO
     for(int i=0;i<4;i++,b+=u.stride.x)
         Cubic_Interpolation_Taylor(b,w.y,x[i],x_y[i],x_yy[i]);
     SYMMETRIC_MATRIX<T2,2> S(Cubic_Interpolation_Diff2(x,w.x),Cubic_Interpolation_Diff(x_y,w.x),Cubic_Interpolation(x_yy,w.x));
-    S.x11*=sqr(grid.one_over_dX.x);
-    S.x21*=grid.one_over_dX.x*grid.one_over_dX.y;
-    S.x22*=sqr(grid.one_over_dX.y);
+    S.x00*=sqr(grid.one_over_dX.x);
+    S.x10*=grid.one_over_dX.x*grid.one_over_dX.y;
+    S.x11*=sqr(grid.one_over_dX.y);
     return S;
 }
 //#####################################################################
@@ -227,12 +227,12 @@ From_Base_Node_Hessian_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTO
         Cubic_Interpolation(x_yy,w.x),
         Cubic_Interpolation(x_yz,w.x),
         Cubic_Interpolation(x_zz,w.x));
-    S.x11*=sqr(grid.one_over_dX.x);
-    S.x22*=sqr(grid.one_over_dX.y);
-    S.x33*=sqr(grid.one_over_dX.z);
-    S.x21*=grid.one_over_dX.x*grid.one_over_dX.y;
-    S.x31*=grid.one_over_dX.x*grid.one_over_dX.z;
-    S.x32*=grid.one_over_dX.y*grid.one_over_dX.z;
+    S.x00*=sqr(grid.one_over_dX.x);
+    S.x11*=sqr(grid.one_over_dX.y);
+    S.x22*=sqr(grid.one_over_dX.z);
+    S.x10*=grid.one_over_dX.x*grid.one_over_dX.y;
+    S.x20*=grid.one_over_dX.x*grid.one_over_dX.z;
+    S.x21*=grid.one_over_dX.y*grid.one_over_dX.z;
     return S;
 }
 }

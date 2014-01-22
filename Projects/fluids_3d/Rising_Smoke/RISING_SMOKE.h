@@ -108,9 +108,9 @@ void Write_Data_File(const GRID<TV>& grid,const ARRAY<T,VECTOR<int,3> >& u,const
         for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)output(j,ij)=temperature(m/2,j,ij);
         sprintf(filename,"%s/temperature",matlab_directory.c_str());matlab_output.Write_Output_File(filename,output,frame);
         for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)output(j,ij)=(T).5*(v(m/2,j,ij)+v(m/2,j+1,ij));
-        sprintf(filename,"%s/velocity1",matlab_directory.c_str());matlab_output.Write_Output_File(filename,output,frame);
+        sprintf(filename,"%s/velocity0",matlab_directory.c_str());matlab_output.Write_Output_File(filename,output,frame);
         for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)output(j,ij)=(T).5*(w(m/2,j,ij)+w(m/2,j,ij+1));
-        sprintf(filename,"%s/velocity2",matlab_directory.c_str());matlab_output.Write_Output_File(filename,output,frame);}
+        sprintf(filename,"%s/velocity1",matlab_directory.c_str());matlab_output.Write_Output_File(filename,output,frame);}
 
     if(write_output_files){
         std::ofstream output;

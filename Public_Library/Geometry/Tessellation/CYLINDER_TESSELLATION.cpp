@@ -21,7 +21,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const CYLINDER<T>&
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
     GEOMETRY_PARTICLES<TV>& particles=surface->particles;
     surface->Initialize_Cylinder_Mesh_And_Particles(resolution_height,resolution_radius,cylinder.height,cylinder.radius,true);
-    FRAME<TV> frame(cylinder.plane1.x1,ROTATION<TV>::From_Rotated_Vector(TV(1,0,0),cylinder.plane2.x1-cylinder.plane1.x1));
+    FRAME<TV> frame(cylinder.plane1.x0,ROTATION<TV>::From_Rotated_Vector(TV(1,0,0),cylinder.plane2.x0-cylinder.plane1.x0));
     for(int i=0;i<particles.X.m;i++) particles.X(i)=frame*particles.X(i);
     return surface;
 }

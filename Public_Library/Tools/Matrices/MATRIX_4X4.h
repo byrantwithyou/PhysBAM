@@ -32,10 +32,10 @@ public:
         for(int i=0;i<16;i++) x[i]=matrix_input.x[i];
     }
 
-    MATRIX(const T x11,const T x21,const T x31,const T x41,const T x12,const T x22,const T x32,const T x42,const T x13,const T x23,const T x33,const T x43,const T x14,const T x24,const T x34,
-        const T x44)
+    MATRIX(const T x00,const T x10,const T x20,const T x30,const T x01,const T x11,const T x21,const T x31,const T x02,const T x12,const T x22,const T x32,const T x03,const T x13,const T x23,
+        const T x33)
     {
-        x[0]=x11;x[1]=x21;x[2]=x31;x[3]=x41;x[4]=x12;x[5]=x22;x[6]=x32;x[7]=x42;x[8]=x13;x[9]=x23;x[10]=x33;x[11]=x43;x[12]=x14;x[13]=x24;x[14]=x34;x[15]=x44;
+        x[0]=x00;x[1]=x10;x[2]=x20;x[3]=x30;x[4]=x01;x[5]=x11;x[6]=x21;x[7]=x31;x[8]=x02;x[9]=x12;x[10]=x22;x[11]=x32;x[12]=x03;x[13]=x13;x[14]=x23;x[15]=x33;
     }
 
     template<class T_MATRIX>

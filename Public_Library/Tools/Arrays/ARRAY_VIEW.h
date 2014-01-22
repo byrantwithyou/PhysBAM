@@ -81,8 +81,8 @@ public:
     ARRAY_VIEW& operator=(const ARRAY_VIEW& source)
     {return BASE::operator=(source);}
 
-    template<class T_ARRAY2>
-    ARRAY_VIEW& operator=(const T_ARRAY2& source)
+    template<class T_ARRAY1>
+    ARRAY_VIEW& operator=(const T_ARRAY1& source)
     {return BASE::operator=(source);}
 
     T* Get_Array_Pointer()
@@ -106,8 +106,8 @@ public:
     ARRAY_VIEW<typename REMOVE_CONST<T>::TYPE>& Const_Cast() const // return reference to allow Exchange
     {return reinterpret_cast<ARRAY_VIEW<typename REMOVE_CONST<T>::TYPE>&>(const_cast<ARRAY_VIEW&>(*this));}
 
-    static bool Same_Array(const ARRAY_VIEW& array1,const ARRAY_VIEW& array2)
-    {return array1.Get_Array_Pointer()==array2.Get_Array_Pointer();}
+    static bool Same_Array(const ARRAY_VIEW& array0,const ARRAY_VIEW& array1)
+    {return array0.Get_Array_Pointer()==array1.Get_Array_Pointer();}
 
 private:
     template<class T2>

@@ -433,13 +433,13 @@ Signed_Solid_Angle_Of_Triangle_Web(const TV& location,int web_root_node) const
     for(int i=0;i<(*mesh.incident_elements)(web_root_node).m;i++){
         int t=(*mesh.incident_elements)(web_root_node)(i);
         int node1,node2,node3;mesh.elements(t).Get(node1,node2,node3);
-        TV x1=particles.X(node1),x2=particles.X(node2),x3=particles.X(node3);
+        TV x0=particles.X(node1),x1=particles.X(node2),x2=particles.X(node3);
         SPHERE<TV> sphere(location,1);
         // extend two of the triangle edges so their farther endpoints are on the unit sphere
-        if(web_root_node == node1){RAY<TV> ray1(x1,x2-x1);INTERSECTION::Intersects(ray1,sphere,(T)0);x2=ray1.Point(ray1.t_max);RAY<TV> ray2(x1,x3-x1);INTERSECTION::Intersects(ray2,sphere,(T)0);x3=ray2.Point(ray2.t_max);} 
-        else if(web_root_node == node2){RAY<TV> ray1(x2,x1-x2);INTERSECTION::Intersects(ray1,sphere,(T)0);x1=ray1.Point(ray1.t_max);RAY<TV> ray2(x2,x3-x2);INTERSECTION::Intersects(ray2,sphere,(T)0);x3=ray2.Point(ray2.t_max);} 
-        else{RAY<TV> ray1(x3,x1-x3);INTERSECTION::Intersects(ray1,sphere,(T)0);x1=ray1.Point(ray1.t_max);RAY<TV> ray2(x3,x2-x3);INTERSECTION::Intersects(ray2,sphere,(T)0);x2=ray2.Point(ray2.t_max);}
-        signed_solid_angle+=TRIANGLE_3D<T>(x1,x2,x3).Signed_Solid_Angle(location);} 
+        if(web_root_node == node1){RAY<TV> ray0(x0,x1-x0);INTERSECTION::Intersects(ray0,sphere,(T)0);x1=ray0.Point(ray0.t_max);RAY<TV> ray1(x0,x2-x0);INTERSECTION::Intersects(ray1,sphere,(T)0);x2=ray1.Point(ray1.t_max);} 
+        else if(web_root_node == node2){RAY<TV> ray0(x1,x0-x1);INTERSECTION::Intersects(ray0,sphere,(T)0);x0=ray0.Point(ray0.t_max);RAY<TV> ray1(x1,x2-x1);INTERSECTION::Intersects(ray1,sphere,(T)0);x2=ray1.Point(ray1.t_max);} 
+        else{RAY<TV> ray0(x2,x0-x2);INTERSECTION::Intersects(ray0,sphere,(T)0);x0=ray0.Point(ray0.t_max);RAY<TV> ray1(x2,x1-x2);INTERSECTION::Intersects(ray1,sphere,(T)0);x1=ray1.Point(ray1.t_max);}
+        signed_solid_angle+=TRIANGLE_3D<T>(x0,x1,x2).Signed_Solid_Angle(location);} 
     return signed_solid_angle;
 }
 //#####################################################################

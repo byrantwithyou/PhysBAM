@@ -175,12 +175,12 @@ public:
     void Update_Faces_And_Hierarchies_With_Collision_Free_Positions(const ARRAY_VIEW<TV>* X_other);
     void Compute_Interaction_Pairs(ARRAY_VIEW<const TV> X_other);
     int Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs);
-    template<class T_ARRAY1,class T_ARRAY2> void Update_Repulsion_Pairs_Using_History(T_ARRAY1& point_face_interaction_pairs,T_ARRAY2& edge_edge_interaction_pairs,bool prune_separating);
+    template<class T_ARRAY0,class T_ARRAY1> void Update_Repulsion_Pairs_Using_History(T_ARRAY0& point_face_interaction_pairs,T_ARRAY1& edge_edge_interaction_pairs,bool prune_separating);
     int Adjust_Velocity_For_Self_Repulsion_Using_History(const T dt,const bool use_repulsions,bool use_saved_pairs);
-    template<class T_ARRAY1,class T_ARRAY2> int Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_interaction_pairs,T_ARRAY2& edge_edge_interaction_pairs,
+    template<class T_ARRAY0,class T_ARRAY1> int Apply_Repulsions_To_Velocities(const T dt,T_ARRAY0& point_face_interaction_pairs,T_ARRAY1& edge_edge_interaction_pairs,
         const bool use_repulsions,bool use_saved_pairs);
-    template<class T_ARRAY1,class T_ARRAY2> int Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_boundary_pairs,T_ARRAY2& edge_edge_boundary_pairs,
-        T_ARRAY1& point_face_internal_pairs,T_ARRAY2& edge_edge_internal_pairs,const bool use_repulsions);
+    template<class T_ARRAY0,class T_ARRAY1> int Apply_Repulsions_To_Velocities(const T dt,T_ARRAY0& point_face_boundary_pairs,T_ARRAY1& edge_edge_boundary_pairs,
+        T_ARRAY0& point_face_internal_pairs,T_ARRAY1& edge_edge_internal_pairs,const bool use_repulsions);
     void Output_Interaction_Pairs(const STREAM_TYPE stream_type,const std::string& filename) const;
     static void Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& point_face_precomputed,
         const ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,3> >& field);

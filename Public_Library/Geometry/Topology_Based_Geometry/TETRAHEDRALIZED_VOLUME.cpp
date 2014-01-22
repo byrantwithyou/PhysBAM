@@ -164,8 +164,8 @@ template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Cylinder_Mesh_And_Particles(const CYLINDER<T>& cyl,int num_elements_height,int num_elements_radius)
 {
     TRIANGULATED_AREA<T>* ta=TESSELLATION::Generate_Triangles(SPHERE<VECTOR<T,2> >(VECTOR<T,2>(),cyl.radius),num_elements_radius);
-    TV axis=cyl.plane2.x1-cyl.plane1.x1;
-    Initialize_Swept_Mesh_And_Particles(*ta,num_elements_height,FRAME<TV>(cyl.plane1.x1,ROTATION<TV>::From_Rotated_Vector(TV(0,0,1),axis)),axis);
+    TV axis=cyl.plane2.x0-cyl.plane1.x0;
+    Initialize_Swept_Mesh_And_Particles(*ta,num_elements_height,FRAME<TV>(cyl.plane1.x0,ROTATION<TV>::From_Rotated_Vector(TV(0,0,1),axis)),axis);
     delete ta;
 }
 //#####################################################################
@@ -175,8 +175,8 @@ template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Check_Signed_Volumes_And_Make_Consistent(bool verbose)
 {
     for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
-        TV x1(particles.X(i)),x2(particles.X(j)),x3(particles.X(k)),x4(particles.X(l));
-        T sign_of_volume=TV::Dot_Product(TV::Cross_Product(x2-x1,x3-x1),x4-x1); // left out division by 6
+        TV x0(particles.X(i)),x1(particles.X(j)),x2(particles.X(k)),x3(particles.X(l));
+        T sign_of_volume=TV::Dot_Product(TV::Cross_Product(x1-x0,x2-x0),x3-x0); // left out division by 6
         if(sign_of_volume < 0){
             if(verbose) LOG::cout<<"tetrahedron number "<<t<<" is oriented improperly."<<std::endl;
             exchange(mesh.elements(t)(2),mesh.elements(t)(3));}}
@@ -616,8 +616,8 @@ Inverted_Tetrahedrons(ARRAY<int>& inverted_tetrahedrons) const
 {
     inverted_tetrahedrons.Resize(0);
     for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
-        TV x1(particles.X(i)),x2(particles.X(j)),x3(particles.X(k)),x4(particles.X(l));
-        T sign_of_volume=TV::Dot_Product(TV::Cross_Product(x2-x1,x3-x1),x4-x1); // left out division by 6
+        TV x0(particles.X(i)),x1(particles.X(j)),x2(particles.X(k)),x3(particles.X(l));
+        T sign_of_volume=TV::Dot_Product(TV::Cross_Product(x1-x0,x2-x0),x3-x0); // left out division by 6
         if(sign_of_volume < 0) inverted_tetrahedrons.Append(t);}
 }
 //#####################################################################
@@ -760,7 +760,7 @@ Split_Along_Fracture_Plane(const PLANE<T>& plane,ARRAY<int>& particle_replicated
     bool incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
     ARRAY<bool> positive_side(mesh.elements.m);int number_on_positive_side=0;
     int t;for(t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
-        TV x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),x4=particles.X(l),centroid=(T).25*(x1+x2+x3+x4);
+        TV x0=particles.X(i),x1=particles.X(j),x2=particles.X(k),x3=particles.X(l),centroid=(T).25*(x0+x1+x2+x3);
         if(plane.Signed_Distance(centroid) >= 0){positive_side(t)=true;number_on_positive_side++;}}
     int p;for(p=0;p<particles.Size();p++){
         bool seen_positive_side=false,seen_negative_side=false;
@@ -791,7 +791,7 @@ Split_Node(const int particle_index,const TV& normal)
     PLANE<T> plane(normal,particles.X(particle_index));ARRAY<int> tets_incident_on_old_particle,tets_incident_on_new_particle;
     int t;for(t=0;t<(*mesh.incident_elements)(particle_index).m;t++){
         int this_incident_tet=(*mesh.incident_elements)(particle_index)(t);int i,j,k,l;mesh.elements(this_incident_tet).Get(i,j,k,l);
-        TV x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),x4=particles.X(l),centroid=(T).25*(x1+x2+x3+x4);
+        TV x0=particles.X(i),x1=particles.X(j),x2=particles.X(k),x3=particles.X(l),centroid=(T).25*(x0+x1+x2+x3);
         if(plane.Signed_Distance(centroid) < 0) tets_incident_on_new_particle.Append(this_incident_tet);
         else tets_incident_on_old_particle.Append(this_incident_tet);}
     int new_particle=0;
@@ -801,7 +801,7 @@ Split_Node(const int particle_index,const TV& normal)
         particles.X(new_particle)=particles.X(particle_index);particles.V(new_particle)=particles.V(particle_index);
         for(t=0;t<(*mesh.incident_elements)(particle_index).m;t++){
             int this_incident_tet=(*mesh.incident_elements)(particle_index)(t);int i,j,k,l;mesh.elements(this_incident_tet).Get(i,j,k,l);
-            TV x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),x4=particles.X(l),centroid=(T).25*(x1+x2+x3+x4);
+            TV x0=particles.X(i),x1=particles.X(j),x2=particles.X(k),x3=particles.X(l),centroid=(T).25*(x0+x1+x2+x3);
             if(plane.Signed_Distance(centroid) < 0){ // relabel with duplicate node
                 if(i == particle_index) i=new_particle;if(j == particle_index) j=new_particle;if(k == particle_index) k=new_particle;if(l == particle_index) l=new_particle;
                 mesh.elements(this_incident_tet).Set(i,j,k,l);}}

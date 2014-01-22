@@ -247,15 +247,15 @@ void Create_Texture_Map(std::ofstream& fout,const HASHTABLE<std::string,std::str
 
     std::string patch_str=options.Get("patch");
     PROGRAM<T> patch_program;
+    patch_program.var_in.Append("x@");
+    patch_program.var_in.Append("y@");
+    patch_program.var_in.Append("z@");
     patch_program.var_in.Append("x0");
     patch_program.var_in.Append("y0");
     patch_program.var_in.Append("z0");
     patch_program.var_in.Append("x1");
     patch_program.var_in.Append("y1");
     patch_program.var_in.Append("z1");
-    patch_program.var_in.Append("x2");
-    patch_program.var_in.Append("y2");
-    patch_program.var_in.Append("z2");
     patch_program.var_in.Append("nx");
     patch_program.var_in.Append("ny");
     patch_program.var_in.Append("nz");

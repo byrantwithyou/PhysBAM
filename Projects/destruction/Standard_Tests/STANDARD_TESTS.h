@@ -431,7 +431,7 @@ void Ball_Hitting_Wall()
     rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);
 
     RIGID_BODY<TV>* sphere_body;
-    RIGID_BODY<TV>* sphere_body2;
+    RIGID_BODY<TV>* sphere_body1;
     switch(parameter){
         case 1:
             rigid_body->fracture_threshold=(T)1.0;
@@ -466,20 +466,20 @@ void Ball_Hitting_Wall()
             rigid_body->fracture_threshold=(T)1.0;
             sphere_body=&tests.Add_Rigid_Body("sphere",(T).5,(T).5,true,true);
             sphere_initial_location=TV((T)10,(T)-1,(T)-2);
-            sphere_body2=&tests.Add_Rigid_Body("sphere",(T).35,(T).5,true,true);
+            sphere_body1=&tests.Add_Rigid_Body("sphere",(T).35,(T).5,true,true);
             sphere2_initial_location=TV((T)22,(T).5,(T)1.5);
-            sphere_body2->Frame().t=sphere2_initial_location;
-            sphere_body2->Is_Kinematic()=true;
+            sphere_body1->Frame().t=sphere2_initial_location;
+            sphere_body1->Is_Kinematic()=true;
             solids_parameters.rigid_body_collision_parameters.allow_refracturing=true;
             break;
         case 7:
             rigid_body->fracture_threshold=(T)3.0;
             sphere_body=&tests.Add_Rigid_Body("sphere",(T).5,(T).5,true,true);
             sphere_initial_location=TV((T)10,(T)0,(T)0);
-            sphere_body2=&tests.Add_Rigid_Body("sphere",(T).5,(T).5,true,true);
+            sphere_body1=&tests.Add_Rigid_Body("sphere",(T).5,(T).5,true,true);
             sphere2_initial_location=TV((T)-20,(T)0,(T)-1.5);
-            sphere_body2->Frame().t=sphere2_initial_location;
-            sphere_body2->Is_Kinematic()=true;
+            sphere_body1->Frame().t=sphere2_initial_location;
+            sphere_body1->Is_Kinematic()=true;
             solids_parameters.rigid_body_collision_parameters.allow_refracturing=true;
             break;
         default:
@@ -562,26 +562,26 @@ void Raining_Spheres()
     rigid_body->is_static=true;
     rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);
 
+    RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("cyllink",(T).4,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body1;
+    rigid_body1.Frame().t=TV((T)-2.6,(T)-1.2,(T)-1.5);
+    rigid_body1.fracture_threshold=(T)FLT_MAX;
+    rigid_body1.is_static=true;
+    rigid_body1.Set_Mass(2.5);
     RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("cyllink",(T).4,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body2;
-    rigid_body2.Frame().t=TV((T)-2.6,(T)-1.2,(T)-1.5);
+    rigid_body2.Frame().t=TV((T)-2.6,(T)-1.2,(T)1.5);
     rigid_body2.fracture_threshold=(T)FLT_MAX;
     rigid_body2.is_static=true;
     rigid_body2.Set_Mass(2.5);
     RIGID_BODY<TV>& rigid_body3=tests.Add_Rigid_Body("cyllink",(T).4,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body3;
-    rigid_body3.Frame().t=TV((T)-2.6,(T)-1.2,(T)1.5);
+    rigid_body3.Frame().t=TV((T)2.6,(T)-1.2,(T)-1.5);
     rigid_body3.fracture_threshold=(T)FLT_MAX;
     rigid_body3.is_static=true;
     rigid_body3.Set_Mass(2.5);
     RIGID_BODY<TV>& rigid_body4=tests.Add_Rigid_Body("cyllink",(T).4,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body4;
-    rigid_body4.Frame().t=TV((T)2.6,(T)-1.2,(T)-1.5);
+    rigid_body4.Frame().t=TV((T)2.6,(T)-1.2,(T)1.5);
     rigid_body4.fracture_threshold=(T)FLT_MAX;
     rigid_body4.is_static=true;
     rigid_body4.Set_Mass(2.5);
-    RIGID_BODY<TV>& rigid_body5=tests.Add_Rigid_Body("cyllink",(T).4,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body5;
-    rigid_body5.Frame().t=TV((T)2.6,(T)-1.2,(T)1.5);
-    rigid_body5.fracture_threshold=(T)FLT_MAX;
-    rigid_body5.is_static=true;
-    rigid_body5.Set_Mass(2.5);
 
     RIGID_BODY<TV>& large_sphere_body=tests.Add_Rigid_Body("sphere",(T)1,(T).2,true,true);
     int world_height;

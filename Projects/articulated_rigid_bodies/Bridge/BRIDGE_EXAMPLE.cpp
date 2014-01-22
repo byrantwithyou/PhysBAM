@@ -152,15 +152,15 @@ Make_Bridge()
     Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).125,(T).5,0,FRAME<TV>(TV(x_shift+(T).8755*(num_rungs-1),0,(T)-.5),ROTATION<TV>(rotation,TV(0,1,0))),STRING_UTILITIES::string_sprintf("rail%d",(9*5+3)));
 
     // ropes
-    T rope_length=(T).75/(1+sqrt((T)3)),y1=(T).5-(T).5*rope_length*sin((T)pi/6)-(T).05,y2=(T).5-rope_length*sin((T)pi/6)-(T).05;
+    T rope_length=(T).75/(1+sqrt((T)3)),y0=(T).5-(T).5*rope_length*sin((T)pi/6)-(T).05,y1=(T).5-rope_length*sin((T)pi/6)-(T).05;
     for(int row=0;row<num_rungs-1;row++){
-        T x1=x_shift+(T).0625+(T).8755*row+(T).5*rope_length*cos((T)pi/6),x2=x1+(T).5*rope_length*(1+cos((T)pi/6)),x3=x2+(T).5*rope_length*(1+cos((T)pi/6));
-        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x1,y1,(T).5),ROTATION<TV>((T)pi/3,TV(0,0,1))),"rope",50);
-        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x2,y2,(T).5),ROTATION<TV>((T)pi/2,TV(0,0,1))),"rope",50);
-        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x3,y1,(T).5),ROTATION<TV>(-(T)pi/3,TV(0,0,1))),"rope",50);
-        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x1,y1,(T)-.5),ROTATION<TV>((T)pi/3,TV(0,0,1))),"rope",50);
-        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x2,y2,(T)-.5),ROTATION<TV>((T)pi/2,TV(0,0,1))),"rope",50);
-        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x3,y1,(T)-.5),ROTATION<TV>(-(T)pi/3,TV(0,0,1))),"rope",50);}
+        T x0=x_shift+(T).0625+(T).8755*row+(T).5*rope_length*cos((T)pi/6),x1=x0+(T).5*rope_length*(1+cos((T)pi/6)),x2=x1+(T).5*rope_length*(1+cos((T)pi/6));
+        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x0,y0,(T).5),ROTATION<TV>((T)pi/3,TV(0,0,1))),"rope",50);
+        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x1,y1,(T).5),ROTATION<TV>((T)pi/2,TV(0,0,1))),"rope",50);
+        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x2,y0,(T).5),ROTATION<TV>(-(T)pi/3,TV(0,0,1))),"rope",50);
+        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x0,y0,(T)-.5),ROTATION<TV>((T)pi/3,TV(0,0,1))),"rope",50);
+        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x1,y1,(T)-.5),ROTATION<TV>((T)pi/2,TV(0,0,1))),"rope",50);
+        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).03,(T).5,0,FRAME<TV>(TV(x2,y0,(T)-.5),ROTATION<TV>(-(T)pi/3,TV(0,0,1))),"rope",50);}
 
     // bases
     box1=&Add_Rigid_Body("plank",(T)2.25,(T).5,0,FRAME<TV>(TV(x_shift-(T)2.3755,(T)-11.8125,0),ROTATION<TV>((T)pi/2,TV(1,0,0))),"base1");box1->is_static=true;

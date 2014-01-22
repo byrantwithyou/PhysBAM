@@ -285,19 +285,19 @@ Compute_Intervals(int& intervals,INTERVAL<T>& interval1,INTERVAL<T>& interval2,I
 // Function Coefficients_From_Interpolation
 //#####################################################################
 template<class T> void CUBIC<T>::
-Coefficients_From_Interpolation(T x1,T y1,T x2,T y2,T x3,T y3,T x4,T y4)
+Coefficients_From_Interpolation(T x0,T y0,T x1,T y1,T x2,T y2,T x3,T y3)
 {
-    T dx1=x1-x4,dx2=x2-x4,dx3=x3-x4,dy1=y1-y4,dy2=y2-y4,dy3=y3-y4;
+    T dx1=x0-x3,dx2=x1-x3,dx3=x2-x3,dy0=y0-y3,dy1=y1-y3,dy2=y2-y3;
     T dx12=dx1-dx2,dx13=dx1-dx3,dx23=dx2-dx3,den=1/(dx1*dx2*dx3*dx12*dx13*dx23);
     T sx1=dx1*dx1,sx2=dx2*dx2,sx3=dx3*dx3,n1=dx2*dx3,n2=dx1*dx3,n3=dx1*dx2;
-    T k1=n1*dy1,k2=n2*dy2,k3=n3*dy3,m1=dx23*k1,m2=-dx13*k2,m3=dx12*k3;
+    T k1=n1*dy0,k2=n2*dy1,k3=n3*dy2,m1=dx23*k1,m2=-dx13*k2,m3=dx12*k3;
     T p3=m1+m2+m3;
     T p2=(sx3-sx2)*k1+(sx1-sx3)*k2+(sx2-sx1)*k3;
     T p1=n1*m1+n2*m2+n3*m3;
     c3=den*p3;
-    c2=den*(p2-3*p3*x4);
-    c1=den*(p1+x4*(3*x4*p3-2*p2));
-    c0=y4+den*x4*(x4*(p2-x4*p3)-p1);
+    c2=den*(p2-3*p3*x3);
+    c1=den*(p1+x3*(3*x3*p3-2*p2));
+    c0=y3+den*x3*(x3*(p2-x3*p3)-p1);
 }
 //#####################################################################
 namespace PhysBAM{

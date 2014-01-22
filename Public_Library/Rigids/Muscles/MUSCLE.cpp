@@ -103,13 +103,13 @@ Total_Length() const
 template<class TV> typename TV::SCALAR MUSCLE<TV>::
 Total_Velocity() const
 {
-    T total_velocity=0;TV position2,velocity2,path;
-    TV position1=attachment_point_1->Embedded_Position(),velocity1=attachment_point_1->Embedded_Velocity();
+    T total_velocity=0;TV position2,velocity1,path;
+    TV position1=attachment_point_1->Embedded_Position(),velocity0=attachment_point_1->Embedded_Velocity();
     for(int i=0;i<via_points.m;i++){
-        position2=via_points(i)->Embedded_Position();velocity2=via_points(i)->Embedded_Velocity();
-        total_velocity+=TV::Dot_Product(velocity1-velocity2,(position1-position2).Normalized());
-        position1=position2;velocity1=velocity2;}
-    return total_velocity+TV::Dot_Product(velocity1-attachment_point_2->Embedded_Velocity(),(position1-attachment_point_2->Embedded_Position()).Normalized());
+        position2=via_points(i)->Embedded_Position();velocity1=via_points(i)->Embedded_Velocity();
+        total_velocity+=TV::Dot_Product(velocity0-velocity1,(position1-position2).Normalized());
+        position1=position2;velocity0=velocity1;}
+    return total_velocity+TV::Dot_Product(velocity0-attachment_point_2->Embedded_Velocity(),(position1-attachment_point_2->Embedded_Position()).Normalized());
 }
 //#####################################################################
 // Function Calculate_Activation

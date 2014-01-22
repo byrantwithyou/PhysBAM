@@ -28,7 +28,7 @@ typedef VECTOR<int,TV::m> TV_INT;
 #if 0
 TV pt_from_planes(VECTOR<PLANE<T>,3> vp)
 {
-    TV rhs(vp(0).x1.Dot(vp(0).normal),vp(1).x1.Dot(vp(1).normal),vp(2).x1.Dot(vp(2).normal));
+    TV rhs(vp(0).x0.Dot(vp(0).normal),vp(1).x0.Dot(vp(1).normal),vp(2).x0.Dot(vp(2).normal));
     MATRIX<T,TV::m> M(vp(0).normal,vp(1).normal,vp(2).normal);
     return M.Transposed().Solve_Linear_System(rhs);
 }

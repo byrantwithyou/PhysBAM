@@ -25,9 +25,9 @@ class LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,3> >
     typedef ARRAY<T,TV_INT> T_ARRAYS;typedef TV_INT T_INDEX;
 private:
     TV base,center,one_over_DX;
-    T u2,u5,u8,u11,slope_u12,slope_u23,slope_u45,slope_u56,slope_u78,slope_u89,slope_u10_11,slope_u11_12; // standard z-y-x major ordering
-    T v2,v5,v8,v11,slope_v12,slope_v23,slope_v45,slope_v56,slope_v78,slope_v89,slope_v10_11,slope_v11_12; // z-x-y major ordering for symmetry with u
-    T w2,w5,w8,w11,slope_w12,slope_w23,slope_w45,slope_w56,slope_w78,slope_w89,slope_w10_11,slope_w11_12; // y-x-z major ordering for symmetry with u
+    T u2,u5,u8,u00,slope_u01,slope_u12,slope_u34,slope_u45,slope_u67,slope_u78,slope_u10_11,slope_u11_12; // standard z-y-x major ordering
+    T v2,v5,v8,v00,slope_v01,slope_v12,slope_v34,slope_v45,slope_v67,slope_v78,slope_v10_11,slope_v11_12; // z-x-y major ordering for symmetry with u
+    T w2,w5,w8,w00,slope_w01,slope_w12,slope_w34,slope_w45,slope_w67,slope_w78,slope_w10_11,slope_w11_12; // y-x-z major ordering for symmetry with u
 public:
 
     LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);

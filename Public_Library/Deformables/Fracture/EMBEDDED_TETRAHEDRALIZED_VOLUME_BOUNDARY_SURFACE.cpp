@@ -57,7 +57,7 @@ Conservative_Perturb_Nodes_For_Collision_Freeness(const T perturb_amount,const A
     for(int node=0;node<embedded_object.embedded_particles.active_indices.m;node++) if(!previously_perturbed(node) && particle_on_surface(node)){
         const VECTOR<int,2>& parents=embedded_object.parent_particles(node);
         ARRAY<int> tetrahedrons_on_edge;embedded_object.simplicial_object.mesh.Tetrahedrons_On_Edge(parents,tetrahedrons_on_edge);
-        bool parent1_ever_material_by_itself=false,parent2_ever_material_by_itself=false,more_than_one_other_node_on_boundary=false;int other_node_on_boundary1=0,other_node_on_boundary2=0;
+        bool parent1_ever_material_by_itself=false,parent2_ever_material_by_itself=false,more_than_one_other_node_on_boundary=false;int other_node_on_boundary0=0,other_node_on_boundary1=0;
         for(int t=0;t<tetrahedrons_on_edge.m;t++){
             int tetrahedron=tetrahedrons_on_edge(t);
             bool parent1_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[0],tetrahedron);
@@ -68,7 +68,7 @@ Conservative_Perturb_Nodes_For_Collision_Freeness(const T perturb_amount,const A
                 int other_node1,other_node2;embedded_object.simplicial_object.mesh.Other_Two_Nodes(parents[0],parents[1],tetrahedron,other_node1,other_node2);
                 if((embedded_object.Node_In_Simplex_Is_Material(other_node1,tetrahedron) || embedded_object.Node_In_Simplex_Is_Material(other_node2,tetrahedron))
                         && Center_Octahedron_In_Material(t)){
-                    if(!other_node_on_boundary1 && !other_node_on_boundary2){other_node_on_boundary1=other_node1;other_node_on_boundary2=other_node2;}
+                    if(!other_node_on_boundary0 && !other_node_on_boundary1){other_node_on_boundary0=other_node1;other_node_on_boundary1=other_node2;}
                     else more_than_one_other_node_on_boundary=true;}}}
         if(parent1_ever_material_by_itself){
             if(!parent2_ever_material_by_itself){
@@ -78,15 +78,15 @@ Conservative_Perturb_Nodes_For_Collision_Freeness(const T perturb_amount,const A
             VECTOR<T,3> perturb_direction=(particles.X(parents[1])-embedded_particles.X(node)).Normalized();
             embedded_particles.X(node)+=perturb_amount*perturb_direction;previously_perturbed(node)=true;}
         else if(!more_than_one_other_node_on_boundary){
-            if(other_node_on_boundary1 && other_node_on_boundary2){
-                VECTOR<T,3> opposite_midpoint((T).5*(particles.X(other_node_on_boundary1)+particles.X(other_node_on_boundary2)));
+            if(other_node_on_boundary0 && other_node_on_boundary1){
+                VECTOR<T,3> opposite_midpoint((T).5*(particles.X(other_node_on_boundary0)+particles.X(other_node_on_boundary1)));
                 VECTOR<T,3> perturb_direction=(opposite_midpoint-embedded_particles.X(node)).Normalized();
                 embedded_particles.X(node)+=perturb_amount*perturb_direction;previously_perturbed(node)=true;}
-            else if(other_node_on_boundary1 && !other_node_on_boundary2){
-                 VECTOR<T,3> perturb_direction=(particles.X(other_node_on_boundary1)-embedded_particles.X(node)).Normalized();
+            else if(other_node_on_boundary0 && !other_node_on_boundary1){
+                 VECTOR<T,3> perturb_direction=(particles.X(other_node_on_boundary0)-embedded_particles.X(node)).Normalized();
                 embedded_particles.X(node)+=perturb_amount*perturb_direction;previously_perturbed(node)=true;}
-            else if(!other_node_on_boundary1 && other_node_on_boundary2){
-                VECTOR<T,3> perturb_direction=(particles.X(other_node_on_boundary2)-embedded_particles.X(node)).Normalized();
+            else if(!other_node_on_boundary0 && other_node_on_boundary1){
+                VECTOR<T,3> perturb_direction=(particles.X(other_node_on_boundary1)-embedded_particles.X(node)).Normalized();
                 embedded_particles.X(node)+=perturb_amount*perturb_direction;previously_perturbed(node)=true;}}}
 }
 //#####################################################################
@@ -228,10 +228,10 @@ Add_To_Material_Surface_Tetrahedron_Face(const int i,const int j,const int l,con
 // Function Add_To_Material_Surface_Triangle
 //#####################################################################
 template<class T> void EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>::
-Add_To_Material_Surface_Triangle(int x1,int x2,int x3,const bool is_clockwise)
+Add_To_Material_Surface_Triangle(int x0,int x1,int x2,const bool is_clockwise)
 {
-    if(!is_clockwise) exchange(x2,x3);
-    material_surface_mesh.elements.Append(VECTOR<int,3>(x1,x2,x3));
+    if(!is_clockwise) exchange(x1,x2);
+    material_surface_mesh.elements.Append(VECTOR<int,3>(x0,x1,x2));
 }
 //#####################################################################
 // Function Add_To_Material_Surface_Quad
@@ -245,10 +245,10 @@ Add_To_Material_Surface_Quad_Cut(const int il,const int jl,const int jk,const in
 // Function Add_To_Material_Surface_Quad
 //#####################################################################
 template<class T> void EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>::
-Add_To_Material_Surface_Planar_Quad(const int x1,const int x2,const int x3,const int x4,const bool is_clockwise) 
+Add_To_Material_Surface_Planar_Quad(const int x0,const int x1,const int x2,const int x3,const bool is_clockwise) 
 {           
-    if(min(x1,x3)<min(x2,x4)){Add_To_Material_Surface_Triangle(x1,x2,x3,is_clockwise);Add_To_Material_Surface_Triangle(x3,x4,x1,is_clockwise);}
-    else{Add_To_Material_Surface_Triangle(x1,x2,x4,is_clockwise);Add_To_Material_Surface_Triangle(x2,x3,x4,is_clockwise);}
+    if(min(x0,x2)<min(x1,x3)){Add_To_Material_Surface_Triangle(x0,x1,x2,is_clockwise);Add_To_Material_Surface_Triangle(x2,x3,x0,is_clockwise);}
+    else{Add_To_Material_Surface_Triangle(x0,x1,x3,is_clockwise);Add_To_Material_Surface_Triangle(x1,x2,x3,is_clockwise);}
 }
 //#####################################################################
 // Function Add_To_Material_Surface_Subtetrahedron_And_Subprism

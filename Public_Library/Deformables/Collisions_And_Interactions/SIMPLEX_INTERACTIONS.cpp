@@ -331,12 +331,12 @@ template <class T> static VECTOR<T,2>
 Three_Triangle_Intersection_Barycentric_Coordinates_Helper(const VECTOR<VECTOR<T,3>,3>& triangle1,const VECTOR<VECTOR<T,3>,3>& triangle2,const VECTOR<VECTOR<T,3>,3>& triangle3)
 {
     T vol_x2=VECTOR<T,3>::Triple_Product(triangle2.x-triangle1.x,triangle2.y-triangle1.x,triangle2.z-triangle1.x);
-    T vol_y2=VECTOR<T,3>::Triple_Product(triangle2.x-triangle1.y,triangle2.y-triangle1.y,triangle2.z-triangle1.y);
-    T vol_z2=VECTOR<T,3>::Triple_Product(triangle2.x-triangle1.z,triangle2.y-triangle1.z,triangle2.z-triangle1.z);
+    T vol_y1=VECTOR<T,3>::Triple_Product(triangle2.x-triangle1.y,triangle2.y-triangle1.y,triangle2.z-triangle1.y);
+    T vol_z1=VECTOR<T,3>::Triple_Product(triangle2.x-triangle1.z,triangle2.y-triangle1.z,triangle2.z-triangle1.z);
     T vol_x3=VECTOR<T,3>::Triple_Product(triangle3.x-triangle1.x,triangle3.y-triangle1.x,triangle3.z-triangle1.x);
-    T vol_y3=VECTOR<T,3>::Triple_Product(triangle3.x-triangle1.y,triangle3.y-triangle1.y,triangle3.z-triangle1.y);
-    T vol_z3=VECTOR<T,3>::Triple_Product(triangle3.x-triangle1.z,triangle3.y-triangle1.z,triangle3.z-triangle1.z);
-    return MATRIX<T,2>(vol_z2-vol_x2,vol_z3-vol_x3,vol_z2-vol_y2,vol_z3-vol_y3).Solve_Linear_System(VECTOR<T,2>(vol_z2,vol_z3));
+    T vol_y2=VECTOR<T,3>::Triple_Product(triangle3.x-triangle1.y,triangle3.y-triangle1.y,triangle3.z-triangle1.y);
+    T vol_z2=VECTOR<T,3>::Triple_Product(triangle3.x-triangle1.z,triangle3.y-triangle1.z,triangle3.z-triangle1.z);
+    return MATRIX<T,2>(vol_z1-vol_x2,vol_z2-vol_x3,vol_z1-vol_y1,vol_z2-vol_y2).Solve_Linear_System(VECTOR<T,2>(vol_z1,vol_z2));
 }
 template <class T> bool SIMPLEX_INTERACTIONS<T>::
 Three_Triangle_Intersection_Barycentric_Coordinates(const VECTOR<VECTOR<T,3>,3>& triangle1,const VECTOR<VECTOR<T,3>,3>& triangle2,const VECTOR<VECTOR<T,3>,3>& triangle3,

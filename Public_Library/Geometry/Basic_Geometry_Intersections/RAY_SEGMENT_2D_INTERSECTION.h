@@ -14,8 +14,8 @@ template<class T> bool Intersects(RAY<VECTOR<T,2> >& ray,const SEGMENT_2D<T>& se
 template<class T> bool Fuzzy_Intersects(RAY<VECTOR<T,2> >& ray,const SEGMENT_2D<T>& segment,const T thickness_over_two=0);
 template<class T> bool Closest_Non_Intersecting_Point(RAY<VECTOR<T,2> >& ray,const SEGMENT_2D<T>& segment,const T thickness_over_two=0);
 
-template<class T> bool Intersection_X_Segment(RAY<VECTOR<T,2> >& ray,const T x1,const T x2,const T y,const T thickness_over_two);
-template<class T> bool Intersection_Y_Segment(RAY<VECTOR<T,2> >& ray,const T x,const T y1,const T y2,const T thickness_over_two);
+template<class T> bool Intersection_X_Segment(RAY<VECTOR<T,2> >& ray,const T x0,const T x1,const T y,const T thickness_over_two);
+template<class T> bool Intersection_Y_Segment(RAY<VECTOR<T,2> >& ray,const T x,const T y0,const T y1,const T thickness_over_two);
 //#####################################################################
 };
 };

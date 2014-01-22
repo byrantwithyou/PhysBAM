@@ -27,11 +27,11 @@ struct GRADIENT_VEC
     GRADIENT_VEC<TV,decltype(VEC_SCALE::Type(VEC(),T()))> operator* (T a) const {GRADIENT_VEC<TV,decltype(VEC_SCALE::Type(VEC(),T()))> r;VEC_SCALE()(r.x,x,a);return r;}
     GRADIENT_VEC<TV,decltype(VEC_SCALE_DIV::Type(VEC(),T()))> operator/ (T a) const {GRADIENT_VEC<TV,decltype(VEC_SCALE_DIV::Type(VEC(),T()))> r;VEC_SCALE_DIV()(r.x,x,a);return r;}
 
-    template<class VEC2>
-    GRADIENT_VEC<TV,decltype(VEC_ADD::Type(VEC(),VEC2()))> operator+ (const GRADIENT_VEC<TV,VEC2>& z) const {GRADIENT_VEC<TV,decltype(VEC_ADD::Type(VEC(),VEC2()))> r;VEC_ADD()(r.x,x,z.x);return r;}
+    template<class VEC1>
+    GRADIENT_VEC<TV,decltype(VEC_ADD::Type(VEC(),VEC1()))> operator+ (const GRADIENT_VEC<TV,VEC1>& z) const {GRADIENT_VEC<TV,decltype(VEC_ADD::Type(VEC(),VEC1()))> r;VEC_ADD()(r.x,x,z.x);return r;}
 
-    template<class VEC2>
-    GRADIENT_VEC<TV,decltype(VEC_SUB::Type(VEC(),VEC2()))> operator- (const GRADIENT_VEC<TV,VEC2>& z) const {GRADIENT_VEC<TV,decltype(VEC_SUB::Type(VEC(),VEC2()))> r;VEC_SUB()(r.x,x,z.x);return r;}
+    template<class VEC1>
+    GRADIENT_VEC<TV,decltype(VEC_SUB::Type(VEC(),VEC1()))> operator- (const GRADIENT_VEC<TV,VEC1>& z) const {GRADIENT_VEC<TV,decltype(VEC_SUB::Type(VEC(),VEC1()))> r;VEC_SUB()(r.x,x,z.x);return r;}
 
     template<class TV2>
     typename ENABLE_IF<IS_VECTOR<TV2>::value,GRADIENT<TV,decltype(VEC_TRANSPOSE_TIMES::Type(VEC(),TV2()))> >::TYPE Transpose_Times(const TV2& w) const
@@ -42,8 +42,8 @@ struct GRADIENT_VEC
     {GRADIENT_VEC<TV,decltype(VEC_TRANSPOSE_TIMES::Type(VEC(),T_MAT()))> r;VEC_TRANSPOSE_TIMES()(r.x,x,w);return r;}
 };
 
-template<class TV,class VEC,class VEC2>
-void Fill_From(GRADIENT_VEC<TV,VEC>& out,const GRADIENT_VEC<TV,VEC2>& in)
+template<class TV,class VEC,class VEC1>
+void Fill_From(GRADIENT_VEC<TV,VEC>& out,const GRADIENT_VEC<TV,VEC1>& in)
 {Fill_From(out.x,in.x);}
 
 template<class TV,class VEC>

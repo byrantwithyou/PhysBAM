@@ -81,11 +81,11 @@ template<class T,class TV> bool Closest_Non_Intersecting_Point(RAY<TV>& ray,cons
     PLANE<T> top_plane(normal,triangle.X.x);
     PLANE<T> bottom_plane(normal,triangle.X.x);
     PLANE<T> edge_plane_12(TV::Cross_Product(triangle.X.y-triangle.X.x,normal).Normalized(),triangle.X.x);
-    edge_plane_12.x1+=edge_plane_12.normal*thickness;
+    edge_plane_12.x0+=edge_plane_12.normal*thickness;
     PLANE<T> edge_plane_23(TV::Cross_Product(triangle.X.z-triangle.X.y,normal).Normalized(),triangle.X.y);
-    edge_plane_23.x1+=edge_plane_23.normal*thickness;
+    edge_plane_23.x0+=edge_plane_23.normal*thickness;
     PLANE<T> edge_plane_31(TV::Cross_Product(triangle.X.x-triangle.X.z,normal).Normalized(),triangle.X.z);
-    edge_plane_31.x1+=edge_plane_31.normal*thickness;
+    edge_plane_31.x0+=edge_plane_31.normal*thickness;
     bool found_intersection=false;
     if(INTERSECTION::Intersects(ray,top_triangle,thickness_over_two)) found_intersection=true;
     if(INTERSECTION::Intersects(ray,bottom_triangle,thickness_over_two)) found_intersection=true;

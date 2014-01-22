@@ -82,8 +82,8 @@ public:
     template<class T_ARRAYS> bool Gather_Cell_Data(const T_ARRAYS& local_data,T_ARRAYS& global_data) const;
     template<class T_ARRAYS> void Scatter_Cell_Data(const T_ARRAYS& global_data,T_ARRAYS& local_data) const;
     template<class T2> MPI_PACKAGE Package_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const RANGE<TV_INT>& region) const;
-    template<class T_FACE_ARRAYS2> MPI_PACKAGE Package_Face_Data(T_FACE_ARRAYS2& data,const ARRAY<RANGE<TV_INT> >& region) const;
-    template<class T_FACE_ARRAYS2> MPI_PACKAGE Package_Common_Face_Data(T_FACE_ARRAYS2& data,const int axis,const RANGE<TV_INT>& region) const;
+    template<class T_FACE_ARRAYS1> MPI_PACKAGE Package_Face_Data(T_FACE_ARRAYS1& data,const ARRAY<RANGE<TV_INT> >& region) const;
+    template<class T_FACE_ARRAYS1> MPI_PACKAGE Package_Common_Face_Data(T_FACE_ARRAYS1& data,const int axis,const RANGE<TV_INT>& region) const;
 //#####################################################################
 };
 }

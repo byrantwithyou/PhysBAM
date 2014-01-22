@@ -145,36 +145,36 @@ Test_Matrix() const
     random.Fill_Uniform(aggregate,-1,1);
 
     int number=solid_body_collection.deformable_body_collection.particles.number;
-    ARRAY<TV> V(number),V2(number),V3(number),V4(number),V5(number);
+    ARRAY<TV> V(number),V1(number),V2(number),V3(number),V4(number);
     random.Fill_Uniform(V,-1,1);
 
     int rigid_number=solid_body_collection.rigid_body_collection.rigid_body_particles.number;
     ARRAY<TWIST<TV> > twist(rigid_number),twist2(rigid_number),twist3(rigid_number),twist4(rigid_number),twist5(rigid_number);
     random.Fill_Uniform(twist,-1,1);
 
-    Add_Velocity_Dependent_Forces_Second_Half(aggregate,V2,twist2,0);
+    Add_Velocity_Dependent_Forces_Second_Half(aggregate,V1,twist2,0);
     Add_Velocity_Dependent_Forces_First_Half(V,twist,aggregate2,0);
-    Add_Velocity_Dependent_Forces_Second_Half(aggregate2,V3,twist3,0);
-    solid_body_collection.Add_Velocity_Dependent_Forces(V,twist,V4,twist4,0);
-    solid_body_collection.Add_Velocity_Dependent_Forces(V2,twist2,V5,twist5,0);
+    Add_Velocity_Dependent_Forces_Second_Half(aggregate2,V2,twist3,0);
+    solid_body_collection.Add_Velocity_Dependent_Forces(V,twist,V3,twist4,0);
+    solid_body_collection.Add_Velocity_Dependent_Forces(V1,twist2,V4,twist5,0);
 
     CONSTANT_ARRAY<RIGID_BODY_MASS<TV,true> > rigid_mass(twist.m,RIGID_BODY_MASS<TV,true>(1,DIAGONAL_MATRIX<T,TV::SPIN::m>()+1));
-    T inner_solids=V.Dot(V2)+twist.Inner_Product(rigid_mass,twist2);
+    T inner_solids=V.Dot(V1)+twist.Inner_Product(rigid_mass,twist2);
     T inner_aggregate=aggregate.Dot(aggregate2);
     LOG::cout<<"MATRIX_SOLID_FORCES Symmetry Test: "<<inner_solids<<"  vs  "<<inner_aggregate<<"  relative  "<<abs(inner_solids-inner_aggregate)/maxabs((T)1e-30,inner_solids,inner_aggregate)<<std::endl;
 
     T inner1=V.Dot(V)+twist.Inner_Product(rigid_mass,twist);
-    T inner3=V3.Dot(V3)+twist3.Inner_Product(rigid_mass,twist3);
-    T inner4=V4.Dot(V4)+twist4.Inner_Product(rigid_mass,twist4);
-    T inner_def=V.Dot(V4)+twist.Inner_Product(rigid_mass,twist4);
-    V3+=V4;
+    T inner3=V2.Dot(V2)+twist3.Inner_Product(rigid_mass,twist3);
+    T inner4=V3.Dot(V3)+twist4.Inner_Product(rigid_mass,twist4);
+    T inner_def=V.Dot(V3)+twist.Inner_Product(rigid_mass,twist4);
+    V2+=V3;
     twist3+=twist4;
-    T innerD=V3.Dot(V3)+twist3.Inner_Product(rigid_mass,twist3);
+    T innerD=V2.Dot(V2)+twist3.Inner_Product(rigid_mass,twist3);
     LOG::cout<<"MATRIX_SOLID_FORCES C vs D test: "<<inner3<<"  vs  "<<inner4<<"   diff "<<innerD<<"   orig "<<inner1<<"  relative  "<<abs(innerD)/maxabs((T)1e-30,inner3,inner4)<<std::endl;
     LOG::cout<<"MATRIX_SOLID_FORCES D definiteness (should be negative): "<<inner_def<<std::endl;
 
-    T solids_inner1=V.Dot(V5)+twist.Inner_Product(rigid_mass,twist5);
-    T solids_inner2=V2.Dot(V4)+twist2.Inner_Product(rigid_mass,twist4);
+    T solids_inner1=V.Dot(V4)+twist.Inner_Product(rigid_mass,twist5);
+    T solids_inner2=V1.Dot(V3)+twist2.Inner_Product(rigid_mass,twist4);
     LOG::cout<<"MATRIX_SOLID_FORCES D Symmetry Test: "<<solids_inner1<<"  vs  "<<solids_inner2<<"  relative  "<<abs(solids_inner1-solids_inner2)/maxabs((T)1e-30,solids_inner1,solids_inner2)<<std::endl;
 }
 //#####################################################################

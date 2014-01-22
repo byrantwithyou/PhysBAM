@@ -33,8 +33,8 @@ public:
         :direction(true)
     {}
 
-    POINT_SIMPLEX_1D(const TV& x1,const bool direction)
-        :X(x1),direction(direction)
+    POINT_SIMPLEX_1D(const TV& x0,const bool direction)
+        :X(x0),direction(direction)
     {}
 
     template<class T_ARRAY>
@@ -50,7 +50,7 @@ public:
     T Size() const
     {return (T)1;}
 
-    static TV Normal(const TV& x1,const int direction)
+    static TV Normal(const TV& x0,const int direction)
     {return TV((T)(direction?1:-1));}
 
     TV Normal() const
@@ -62,7 +62,7 @@ public:
     SYMMETRIC_MATRIX<T,1> Hessian(const TV& X) const
     {return SYMMETRIC_MATRIX<T,1>();}
 
-    static ONE Clamped_Barycentric_Coordinates(const TV& location,const TV& x1)
+    static ONE Clamped_Barycentric_Coordinates(const TV& location,const TV& x0)
     {return ONE();}
 
     template<class T_ARRAY>
@@ -76,8 +76,8 @@ public:
     ONE Barycentric_Coordinates(const TV& location) const
     {return ONE();}
 
-    static TV Point_From_Barycentric_Coordinates(const ONE,const TV& x1)
-    {return x1;}
+    static TV Point_From_Barycentric_Coordinates(const ONE,const TV& x0)
+    {return x0;}
 
     TV Point_From_Barycentric_Coordinates(const TV& weights)
     {return X.x;}

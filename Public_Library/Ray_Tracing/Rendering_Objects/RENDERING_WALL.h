@@ -153,14 +153,14 @@ public:
     
     virtual void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const
     {assert(aggregate>=0 && aggregate<6);
-    TV x1;TV texture_vector1,texture_vector2;
-    if(aggregate==0){x1=xmin.x1; texture_vector1=texture_vector_x_1;texture_vector2=texture_vector_x_2;}
-    else if(aggregate==1){x1=xmax.x1;texture_vector1=texture_vector_x_1;texture_vector2=texture_vector_x_2;}
-    else if(aggregate==2){x1=ymin.x1;texture_vector1=texture_vector_y_1;texture_vector2=texture_vector_y_2;}
-    else if(aggregate==3){x1=ymax.x1;texture_vector1=texture_vector_y_1;texture_vector2=texture_vector_y_2;}
-    else if(aggregate==4){x1=zmin.x1;texture_vector1=texture_vector_z_1;texture_vector2=texture_vector_z_2;}
-    else if(aggregate==5){x1=zmax.x1;texture_vector1=texture_vector_z_1;texture_vector2=texture_vector_z_2;}
-    TV p=object_space_point-x1;s=TV::Dot_Product(p,texture_vector1);t=TV::Dot_Product(p,texture_vector2);}
+    TV x0;TV texture_vector1,texture_vector2;
+    if(aggregate==0){x0=xmin.x0; texture_vector1=texture_vector_x_1;texture_vector2=texture_vector_x_2;}
+    else if(aggregate==1){x0=xmax.x0;texture_vector1=texture_vector_x_1;texture_vector2=texture_vector_x_2;}
+    else if(aggregate==2){x0=ymin.x0;texture_vector1=texture_vector_y_1;texture_vector2=texture_vector_y_2;}
+    else if(aggregate==3){x0=ymax.x0;texture_vector1=texture_vector_y_1;texture_vector2=texture_vector_y_2;}
+    else if(aggregate==4){x0=zmin.x0;texture_vector1=texture_vector_z_1;texture_vector2=texture_vector_z_2;}
+    else if(aggregate==5){x0=zmax.x0;texture_vector1=texture_vector_z_1;texture_vector2=texture_vector_z_2;}
+    TV p=object_space_point-x0;s=TV::Dot_Product(p,texture_vector1);t=TV::Dot_Product(p,texture_vector2);}
     
 
 //#####################################################################

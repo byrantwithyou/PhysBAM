@@ -49,18 +49,18 @@ public:
     VECTOR<T,2> Sum_Barycentric_Coordinates(const SEGMENT_1D<T>& embedded_segment) const
     {return Barycentric_Coordinates(embedded_segment.X.x)+Barycentric_Coordinates(embedded_segment.X.y);}
 
-    static VECTOR<T,2> Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2)
-    {T fraction=(location.x-x1.x)/(x2-x1).Magnitude();return VECTOR<T,2>((T)1-fraction,fraction);}
+    static VECTOR<T,2> Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1)
+    {T fraction=(location.x-x0.x)/(x1-x0).Magnitude();return VECTOR<T,2>((T)1-fraction,fraction);}
 
     template<class T_ARRAY>
     static VECTOR<T,2> Barycentric_Coordinates(const TV& location,const T_ARRAY& X)
     {STATIC_ASSERT(T_ARRAY::m==2);return Barycentric_Coordinates(location,X(0),X(1));}
 
-    static TV Point_From_Barycentric_Coordinates(const VECTOR<T,2>& weights,const TV& x1,const TV& x2)
-    {return weights.x*x1+weights.y*x2;}
+    static TV Point_From_Barycentric_Coordinates(const VECTOR<T,2>& weights,const TV& x0,const TV& x1)
+    {return weights.x*x0+weights.y*x1;}
 
-    static TV Point_From_Barycentric_Coordinates(const TV& weights,const TV& x1,const TV& x2)
-    {return weights.x*x1+(1-weights.x)*x2;}
+    static TV Point_From_Barycentric_Coordinates(const TV& weights,const TV& x0,const TV& x1)
+    {return weights.x*x0+(1-weights.x)*x1;}
 
     TV Point_From_Barycentric_Coordinates(const VECTOR<T,2>& weights) const
     {return Point_From_Barycentric_Coordinates(weights,X.x,X.y);}

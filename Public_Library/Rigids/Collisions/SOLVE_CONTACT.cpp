@@ -150,18 +150,18 @@ Update_Analytic_Multibody_Contact(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisio
 template<class TV> bool 
 Update_Analytic_Multibody_Contact(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks,
     HASHTABLE<VECTOR<std::string,2>,typename ANALYTICS<TV>::UPDATE_ANALYTIC_CONTACT_PAIR_T>& analytic_contact_registry,
-    RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const bool correct_contact_energy,const int max_iterations,
+    RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const bool correct_contact_energy,const int max_iterations,
     const typename TV::SCALAR epsilon_scale,const typename TV::SCALAR dt,const typename TV::SCALAR time,const bool mpi_one_ghost)
 {
     bool return_val=false;
+    MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>* multibody0=dynamic_cast<MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>*>(body0.implicit_object->object_space_implicit_object);
     MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>* multibody1=dynamic_cast<MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>*>(body1.implicit_object->object_space_implicit_object);
-    MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>* multibody2=dynamic_cast<MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>*>(body2.implicit_object->object_space_implicit_object);
-    if(multibody1 && multibody2) for(int i=0;i<multibody2->levelsets->m;i++) 
-        return_val|=Update_Analytic_Multibody_Contact(rigid_body_collisions,collision_callbacks,analytic_contact_registry,body1.particle_index,body2.particle_index,*multibody1,*(*multibody2->levelsets)(i),correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);
-    else if(multibody1) 
-        return_val=Update_Analytic_Multibody_Contact(rigid_body_collisions,collision_callbacks,analytic_contact_registry,body1.particle_index,body2.particle_index,*multibody1,*body2.implicit_object->object_space_implicit_object,correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);
+    if(multibody0 && multibody1) for(int i=0;i<multibody1->levelsets->m;i++) 
+        return_val|=Update_Analytic_Multibody_Contact(rigid_body_collisions,collision_callbacks,analytic_contact_registry,body0.particle_index,body1.particle_index,*multibody0,*(*multibody1->levelsets)(i),correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);
+    else if(multibody0) 
+        return_val=Update_Analytic_Multibody_Contact(rigid_body_collisions,collision_callbacks,analytic_contact_registry,body0.particle_index,body1.particle_index,*multibody0,*body1.implicit_object->object_space_implicit_object,correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);
     else 
-        return_val=Update_Analytic_Multibody_Contact(rigid_body_collisions,collision_callbacks,analytic_contact_registry,body1.particle_index,body2.particle_index,*multibody2,*body1.implicit_object->object_space_implicit_object,correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);
+        return_val=Update_Analytic_Multibody_Contact(rigid_body_collisions,collision_callbacks,analytic_contact_registry,body0.particle_index,body1.particle_index,*multibody1,*body0.implicit_object->object_space_implicit_object,correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);
     return return_val;
 }
 //#####################################################################
@@ -175,13 +175,13 @@ bool Update_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=rigid_body_collisions.rigid_body_collection;
     RIGID_BODY_COLLISION_PARAMETERS<TV>& parameters=rigid_body_collisions.parameters;
 
-    RIGID_BODY<TV>& body1=rigid_body_collection.Rigid_Body(id_1),&body2=rigid_body_collection.Rigid_Body(id_2);
-    VECTOR<std::string,2> key(typeid(*body1.implicit_object->object_space_implicit_object).name(),typeid(*body2.implicit_object->object_space_implicit_object).name());
+    RIGID_BODY<TV>& body0=rigid_body_collection.Rigid_Body(id_1),&body1=rigid_body_collection.Rigid_Body(id_2);
+    VECTOR<std::string,2> key(typeid(*body0.implicit_object->object_space_implicit_object).name(),typeid(*body1.implicit_object->object_space_implicit_object).name());
     if(key.x==typeid(MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>).name()||key.y==typeid(MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>).name()){
-        if(!body1.simplicial_object && !body2.simplicial_object) 
-            return Update_Analytic_Multibody_Contact(rigid_body_collisions,collision_callbacks,analytic_contact_registry,body1,body2,correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);}
+        if(!body0.simplicial_object && !body1.simplicial_object) 
+            return Update_Analytic_Multibody_Contact(rigid_body_collisions,collision_callbacks,analytic_contact_registry,body0,body1,correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);}
     if(typename ANALYTICS<TV>::UPDATE_ANALYTIC_CONTACT_PAIR_T* contact_function=analytic_contact_registry.Get_Pointer(key.Sorted()))
-        return (*contact_function)(rigid_body_collisions,collision_callbacks,id_1,id_2,body1.implicit_object->object_space_implicit_object,body2.implicit_object->object_space_implicit_object,correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);
+        return (*contact_function)(rigid_body_collisions,collision_callbacks,id_1,id_2,body0.implicit_object->object_space_implicit_object,body1.implicit_object->object_space_implicit_object,correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);
     return CONTACT_PAIRS::Update_Levelset_Contact_Pair(rigid_body_collisions,collision_callbacks,id_1,id_2,correct_contact_energy,max_iterations,epsilon_scale,dt,time,
         parameters.rigid_collisions_use_triangle_hierarchy,parameters.rigid_collisions_use_edge_intersection,parameters.rigid_collisions_use_triangle_hierarchy_center_phi_test,mpi_one_ghost);
 }
@@ -196,14 +196,14 @@ void Update_Contact_Pair_Helper(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=rigid_body_collisions.rigid_body_collection;
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_body_cluster_bindings=rigid_body_collisions.rigid_body_cluster_bindings;
 
-    RIGID_BODY<TV>& body1=rigid_body_collection.Rigid_Body(id_1);
-    RIGID_BODY<TV>& body2=rigid_body_collection.Rigid_Body(id_2);
-    int parent_id_1=rigid_body_cluster_bindings.Get_Parent(body1).particle_index;
-    int parent_id_2=rigid_body_cluster_bindings.Get_Parent(body2).particle_index;
+    RIGID_BODY<TV>& body0=rigid_body_collection.Rigid_Body(id_1);
+    RIGID_BODY<TV>& body1=rigid_body_collection.Rigid_Body(id_2);
+    int parent_id_1=rigid_body_cluster_bindings.Get_Parent(body0).particle_index;
+    int parent_id_2=rigid_body_cluster_bindings.Get_Parent(body1).particle_index;
     RIGID_BODY<TV>& parent_body_1=rigid_body_collection.Rigid_Body(parent_id_1);
     RIGID_BODY<TV>& parent_body_2=rigid_body_collection.Rigid_Body(parent_id_2);
-    rigid_body_collisions.rigid_body_particles_intersections.Set(Tuple(body1.particle_index,body2.particle_index,collision_location));
-    RIGID_BODY<TV>::Apply_Collision_Impulse(parent_body_1,parent_body_2,body1.Frame().r,body2.Frame().r,collision_location,collision_normal,collision_relative_velocity,
+    rigid_body_collisions.rigid_body_particles_intersections.Set(Tuple(body0.particle_index,body1.particle_index,collision_location));
+    RIGID_BODY<TV>::Apply_Collision_Impulse(parent_body_1,parent_body_2,body0.Frame().r,body1.Frame().r,collision_location,collision_normal,collision_relative_velocity,
         -1+epsilon_scale,RIGID_BODY<TV>::Coefficient_Of_Friction(parent_body_1,parent_body_2),false,rolling_friction,correct_contact_energy,mpi_one_ghost);
     collision_callbacks.Save_Position(parent_id_1);collision_callbacks.Save_Position(parent_id_2); // fix saved values & re-evolve bodies
     Euler_Step_Position(rigid_body_collisions,collision_callbacks,parent_id_1,dt,time);Euler_Step_Position(rigid_body_collisions,collision_callbacks,parent_id_2,dt,time);
@@ -380,7 +380,7 @@ void Push_Out(RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks,RIGID_BODY_COL
         const int max_iterations,const T epsilon_scale,const T dt,const T time,const bool mpi_one_ghost); \
     template bool Update_Analytic_Multibody_Contact<VECTOR<T,d> >(RIGID_BODY_COLLISIONS<VECTOR<T,d> >& rigid_body_collisions,RIGIDS_COLLISION_CALLBACKS<VECTOR<T,d> >& collision_callbacks, \
         HASHTABLE<VECTOR<std::string,2>,ANALYTICS<VECTOR<T,d> >::UPDATE_ANALYTIC_CONTACT_PAIR_T>& analytic_contact_registry, \
-        RIGID_BODY<VECTOR<T,d> >& body1,RIGID_BODY<VECTOR<T,d> >& body2,const bool correct_contact_energy,const int max_iterations, \
+        RIGID_BODY<VECTOR<T,d> >& body0,RIGID_BODY<VECTOR<T,d> >& body1,const bool correct_contact_energy,const int max_iterations, \
         const T epsilon_scale,const T dt,const T time,const bool mpi_one_ghost); \
     template bool Update_Contact_Pair<VECTOR<T,d> >(RIGID_BODY_COLLISIONS<VECTOR<T,d> >& rigid_body_collisions,RIGIDS_COLLISION_CALLBACKS<VECTOR<T,d> >& collision_callbacks, \
         HASHTABLE<VECTOR<std::string,2>,ANALYTICS<VECTOR<T,d> >::UPDATE_ANALYTIC_CONTACT_PAIR_T>& analytic_contact_registry,const int id_1,const int id_2,const bool correct_contact_energy, \

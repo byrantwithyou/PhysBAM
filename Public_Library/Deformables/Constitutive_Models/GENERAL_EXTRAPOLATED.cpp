@@ -195,15 +195,15 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     T dy = F.x.y - extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
 
+    dP_dF.x0000 = 0;
     dP_dF.x1111 = 0;
-    dP_dF.x2222 = 0;
-    dP_dF.x2211 = base.Exy(x,y,simplex);
+    dP_dF.x1100 = base.Exy(x,y,simplex);
 
-    if(dx < 0) dP_dF.x1111 += 2*k;
-    else dP_dF.x1111 += base.Exx(x,y,simplex);
+    if(dx < 0) dP_dF.x0000 += 2*k;
+    else dP_dF.x0000 += base.Exx(x,y,simplex);
 
-    if(dy < 0) dP_dF.x2222 += 2*k;
-    else dP_dF.x2222 += base.Eyy(x,y,simplex);
+    if(dy < 0) dP_dF.x1111 += 2*k;
+    else dP_dF.x1111 += base.Eyy(x,y,simplex);
 
     T xpy = F.x.x+F.x.y; if(fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
     T r=((dx < 0) != (dy < 0))?((F.x.x!=F.x.y)?dx/(F.x.x-F.x.y):1):0;
@@ -211,16 +211,16 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 
     if((dx < 0) && (dy >= 0)) // Rx
     {
-        dP_dF.x2222 += base.Exyy(x,y,simplex)*dx;
+        dP_dF.x1111 += base.Exyy(x,y,simplex)*dx;
     }
     else if((dx >= 0) && (dy < 0)) // Ry
     {
-        dP_dF.x1111 += base.Exxy(x,y,simplex)*dy;
+        dP_dF.x0000 += base.Exxy(x,y,simplex)*dy;
     }
 
     T S=P_From_Strain_Helper(F,1,simplex).Trace()/xpy, D=(2*k-base.Exy(x,y,simplex))*r+(1-r)*base.Ex_Ey_x_y(x,y,simplex);
-    dP_dF.x2112 = (D-S)/2;
-    dP_dF.x2121 = (D+S)/2;
+    dP_dF.x1001 = (D-S)/2;
+    dP_dF.x1010 = (D+S)/2;
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################
@@ -269,9 +269,9 @@ Isotropic_Stress_Derivative_Helper_Part(T fx,T fy,T fz,const int simplex,T& xxxx
 template<class T,int d> void GENERAL_EXTRAPOLATED<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int simplex) const
 {
-    Isotropic_Stress_Derivative_Helper_Part(F.x.x,F.x.y,F.x.z,simplex,dP_dF.x1111,dP_dF.x3322,dP_dF.x3232,dP_dF.x3223);
-    Isotropic_Stress_Derivative_Helper_Part(F.x.y,F.x.z,F.x.x,simplex,dP_dF.x2222,dP_dF.x3311,dP_dF.x3131,dP_dF.x3113);
-    Isotropic_Stress_Derivative_Helper_Part(F.x.z,F.x.x,F.x.y,simplex,dP_dF.x3333,dP_dF.x2211,dP_dF.x2121,dP_dF.x2112);
+    Isotropic_Stress_Derivative_Helper_Part(F.x.x,F.x.y,F.x.z,simplex,dP_dF.x0000,dP_dF.x2211,dP_dF.x2121,dP_dF.x2112);
+    Isotropic_Stress_Derivative_Helper_Part(F.x.y,F.x.z,F.x.x,simplex,dP_dF.x1111,dP_dF.x2200,dP_dF.x2020,dP_dF.x2002);
+    Isotropic_Stress_Derivative_Helper_Part(F.x.z,F.x.x,F.x.y,simplex,dP_dF.x2222,dP_dF.x1100,dP_dF.x1010,dP_dF.x1001);
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################

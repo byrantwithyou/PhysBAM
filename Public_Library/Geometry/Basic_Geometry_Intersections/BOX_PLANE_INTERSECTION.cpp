@@ -19,7 +19,7 @@ template<class T> bool Intersects(const RANGE<VECTOR<T,3> >& box,const PLANE<T>&
     bool points_on_positive_side=false,points_on_negative_side=false;
     for(int i=0;i<2;i++) for(int j=0;j<2;j++) for(int k=0;k<2;k++){
         TV test_point(i?box.min_corner.x:box.max_corner.x,j?box.min_corner.y:box.max_corner.y,k?box.min_corner.z:box.max_corner.z);
-        T distance=TV::Dot_Product(plane.normal,test_point-plane.x1);
+        T distance=TV::Dot_Product(plane.normal,test_point-plane.x0);
         if(distance>-thickness_over_two)points_on_positive_side=true;
         if(distance<thickness_over_two)points_on_negative_side=true;}
     return points_on_positive_side && points_on_negative_side;
@@ -42,7 +42,7 @@ template<class T> T Halfspace_Intersection_Size(const RANGE<VECTOR<T,3> >& box,c
 {
     // Normalize input and remember how.  After normalization: box is a unit box, normal.z>=normal.y>=normal.x>=0.
     bool flip[3]={false},exchange_xz=false,exchange_yz=false,exchange_xy=false,complement=false;
-    T z00=VECTOR<T,3>::Dot_Product(halfspace.x1-box.min_corner,halfspace.normal);VECTOR<T,3> scaling=box.Edge_Lengths(),normal=halfspace.normal*scaling;
+    T z00=VECTOR<T,3>::Dot_Product(halfspace.x0-box.min_corner,halfspace.normal);VECTOR<T,3> scaling=box.Edge_Lengths(),normal=halfspace.normal*scaling;
     for(int i=0;i<3;i++) if(normal(i)<0){normal(i)=-normal(i);z00+=normal(i);flip[i]=true;}
     if(normal.z<normal.x){exchange(normal.z,normal.x);exchange_xz=true;}
     if(normal.z<normal.y){exchange(normal.z,normal.y);exchange_yz=true;}

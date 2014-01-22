@@ -58,15 +58,15 @@ public:
         :BASE(array_input.Domain_Indices())
     {Initialize(array_input.array.Get_Array_Pointer());}
 
-    template<class T_ARRAY2>
-    ARRAY_VIEW& operator=(const T_ARRAY2& source)
+    template<class T_ARRAY1>
+    ARRAY_VIEW& operator=(const T_ARRAY1& source)
     {assert(Equal_Dimensions(*this,source));array=source.array;return *this;}
 
     void Exchange(ARRAY_VIEW& other)
     {STATIC_ASSERT(!IS_CONST<T>::value);this->BASE::Exchange(other);} // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
 
-    static void Exchange(ARRAY_VIEW& array1,ARRAY_VIEW& array2)
-    {STATIC_ASSERT(!IS_CONST<T>::value);array1.Exchange(array2);}
+    static void Exchange(ARRAY_VIEW& array0,ARRAY_VIEW& array1)
+    {STATIC_ASSERT(!IS_CONST<T>::value);array0.Exchange(array1);}
 
     void Set(const RANGE<TV_INT>& domain=RANGE<TV_INT>::Empty_Box(),typename REMOVE_CONST<T>::TYPE* raw_data=0)
     {Calculate_Acceleration_Constants(domain);Initialize(raw_data);}
@@ -85,8 +85,8 @@ public:
     ARRAY_VIEW<typename REMOVE_CONST<T>::TYPE>& Const_Cast() const // return reference to allow Exchange
     {return reinterpret_cast<ARRAY_VIEW<typename REMOVE_CONST<T>::TYPE>&>(const_cast<ARRAY_VIEW&>(*this));}
 
-    static bool Same_Array(const ARRAY_VIEW& array1,const ARRAY_VIEW& array2)
-    {return array1.Get_Array_Pointer()==array2.Get_Array_Pointer();}
+    static bool Same_Array(const ARRAY_VIEW& array0,const ARRAY_VIEW& array1)
+    {return array0.Get_Array_Pointer()==array1.Get_Array_Pointer();}
 
     template<class RW>
     void Read(std::istream& input)

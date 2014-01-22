@@ -67,55 +67,55 @@ public:
     {return current_tag=max(32,(current_tag+1)&((1<<15)-1));}
 
     template<class T1,class T2> void
-    Gather_Data(ARRAY<T1>& array1,ARRAY<T2>& array2)
-    {Gather_Data(ARRAY_VIEW<T1>(array1),ARRAY_VIEW<T2>(array2));}
+    Gather_Data(ARRAY<T1>& array0,ARRAY<T2>& array1)
+    {Gather_Data(ARRAY_VIEW<T1>(array0),ARRAY_VIEW<T2>(array1));}
     
     template<class T1,class T2> void
-    Scatter_Data(ARRAY<T1>& array1,ARRAY<T2>& array2)
-    {Scatter_Data(ARRAY_VIEW<T1>(array1),ARRAY_VIEW<T2>(array2));}
+    Scatter_Data(ARRAY<T1>& array0,ARRAY<T2>& array1)
+    {Scatter_Data(ARRAY_VIEW<T1>(array0),ARRAY_VIEW<T2>(array1));}
 
     template<class T1> void
-    Scatter_Data(ARRAY<T1>& array1)
-    {Scatter_Data(ARRAY_VIEW<T1>(array1));}
+    Scatter_Data(ARRAY<T1>& array0)
+    {Scatter_Data(ARRAY_VIEW<T1>(array0));}
 
     template<class T1,class T2> void
-    Broadcast_Data(ARRAY<T1>& array1,ARRAY<T2>& array2)
-    {Broadcast_Data(ARRAY_VIEW<T1>(array1),ARRAY_VIEW<T2>(array2));}
+    Broadcast_Data(ARRAY<T1>& array0,ARRAY<T2>& array1)
+    {Broadcast_Data(ARRAY_VIEW<T1>(array0),ARRAY_VIEW<T2>(array1));}
 
     template<class T1> void
-    Broadcast_Data(ARRAY<T1>& array1)
-    {Broadcast_Data(ARRAY_VIEW<T1>(array1));}
+    Broadcast_Data(ARRAY<T1>& array0)
+    {Broadcast_Data(ARRAY_VIEW<T1>(array0));}
 
     template<class T1,class T2> void
-    Exchange_Data(ARRAY<T1>& array1,ARRAY<T2>& array2)
-    {Exchange_Data(ARRAY_VIEW<T1>(array1),ARRAY_VIEW<T2>(array2));}
+    Exchange_Data(ARRAY<T1>& array0,ARRAY<T2>& array1)
+    {Exchange_Data(ARRAY_VIEW<T1>(array0),ARRAY_VIEW<T2>(array1));}
 
     template<class T1,class T2> void
-    Gather_Data(ARRAY_VIEW<T1> array1,ARRAY_VIEW<T2> array2)
-    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array1));packages.Append(Package(array2));Gather_Helper(packages);}
+    Gather_Data(ARRAY_VIEW<T1> array0,ARRAY_VIEW<T2> array1)
+    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array0));packages.Append(Package(array1));Gather_Helper(packages);}
 
     // Scatters all data from the root to the proper processing partitions on other processors
     template<class T1,class T2> void
-    Scatter_Data(ARRAY_VIEW<T1> array1,ARRAY_VIEW<T2> array2)
-    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array1));packages.Append(Package(array2));Scatter_Helper(packages);}
+    Scatter_Data(ARRAY_VIEW<T1> array0,ARRAY_VIEW<T2> array1)
+    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array0));packages.Append(Package(array1));Scatter_Helper(packages);}
 
     template<class T1> void
-    Scatter_Data(ARRAY_VIEW<T1> array1)
-    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array1));Scatter_Helper(packages);}
+    Scatter_Data(ARRAY_VIEW<T1> array0)
+    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array0));Scatter_Helper(packages);}
 
     // Broadcasts all data to every processor
     template<class T1,class T2> void
-    Broadcast_Data(ARRAY_VIEW<T1> array1,ARRAY_VIEW<T2> array2)
-    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array1));packages.Append(Package(array2));Broadcast_Helper(packages);}
+    Broadcast_Data(ARRAY_VIEW<T1> array0,ARRAY_VIEW<T2> array1)
+    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array0));packages.Append(Package(array1));Broadcast_Helper(packages);}
 
     template<class T1> void
-    Broadcast_Data(ARRAY_VIEW<T1> array1)
-    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array1));Broadcast_Helper(packages);}
+    Broadcast_Data(ARRAY_VIEW<T1> array0)
+    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array0));Broadcast_Helper(packages);}
 
     // Exchanges nodes required for force computation
     template<class T1,class T2> void
-    Exchange_Data(ARRAY_VIEW<T1> array1,ARRAY_VIEW<T2> array2)
-    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array1));packages.Append(Package(array2));Exchange_Helper(packages,mpi_partition_force);}
+    Exchange_Data(ARRAY_VIEW<T1> array0,ARRAY_VIEW<T2> array1)
+    {ARRAY<MPI_PACKAGE*> packages;packages.Append(Package(array0));packages.Append(Package(array1));Exchange_Helper(packages,mpi_partition_force);}
 
     template<class T>
     void Exchange_Force_Boundary_Data(ARRAY_VIEW<T> array) const
@@ -151,7 +151,7 @@ public:
     template<class T> void Gather_Data(ARRAY_VIEW<T> array) const;
     template<class T> void Broadcast(T* data,const int length) const;
     void All_Gather_Particles(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> V) const;
-    template<class T_PAIR1,class T_PAIR2> void Gather_Interaction_Pairs(ARRAY<T_PAIR1>& point_triangle_pairs,ARRAY<T_PAIR2>& edge_edge_pairs) const;
+    template<class T_PAIR0,class T_PAIR1> void Gather_Interaction_Pairs(ARRAY<T_PAIR0>& point_triangle_pairs,ARRAY<T_PAIR1>& edge_edge_pairs) const;
     void Broadcast_Collision_Modified_Data(ARRAY_VIEW<bool> modified,ARRAY_VIEW<bool> recently_modified,ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> V) const;
     void Gather_Collision_Modified_Data(ARRAY_VIEW<bool> modified,ARRAY_VIEW<bool> recently_modified,ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> V) const;
     template<int d1,int d2> void All_Gather_Intersecting_Pairs(HASHTABLE<VECTOR<int,d1> >& intersecting_point_face_pairs,HASHTABLE<VECTOR<int,d2> >& intersecting_edge_edge_pairs);

@@ -72,12 +72,12 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated)
 template<class TV> void RIGID_LINEAR_SPRINGS<TV>::
 Set_Overdamping_Fraction(int b,const T overdamping_fraction) // 1 is critically damped
 {
-    TV X1=Attachment_Location(b,0),X2=Attachment_Location(b,1);
-    TV direction=(X2-X1).Normalized();
+    TV X0=Attachment_Location(b,0),X1=Attachment_Location(b,1);
+    TV direction=(X1-X0).Normalized();
     RIGID_BODY<TV>& b1=Body(b,0);
     RIGID_BODY<TV>& b2=Body(b,1);
 
-    T harmonic_mass=TV::Dot_Product((b1.Impulse_Factor(X1)+b2.Impulse_Factor(X2))*direction,direction);
+    T harmonic_mass=TV::Dot_Product((b1.Impulse_Factor(X0)+b2.Impulse_Factor(X1))*direction,direction);
     Set_Damping(b,overdamping_fraction*2*sqrt(youngs_modulus(b)*restlength(b)/harmonic_mass));
 }
 //#####################################################################
@@ -90,14 +90,14 @@ Update_Position_Based_State(const T time)
     current_lengths.Resize(segment_mesh.elements.m);
     
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
-        TV X1=Attachment_Location(s,0),X2=Attachment_Location(s,1);
+        TV X0=Attachment_Location(s,0),X1=Attachment_Location(s,1);
         STATE& state=states(s);
         state.nodes=segment_mesh.elements(s);
-        state.direction=X2-X1;
+        state.direction=X1-X0;
         current_lengths(s)=state.direction.Normalize();
         state.coefficient=damping(s)/restlength(s);
-        state.r(0)=X1-Body(s,0).Frame().t;
-        state.r(1)=X2-Body(s,1).Frame().t;}
+        state.r(0)=X0-Body(s,0).Frame().t;
+        state.r(1)=X1-Body(s,1).Frame().t;}
 }
 //#####################################################################
 // Function Add_Force
@@ -341,10 +341,10 @@ Set_Restlength(int b,T length,T visual)
 // Function Add_Spring
 //#####################################################################
 template<class TV> void RIGID_LINEAR_SPRINGS<TV>::
-Add_Spring(int body1,int body2,const TV& r1,const TV& r2)
+Add_Spring(int body0,int body1,const TV& r1,const TV& r2)
 {
     attachment_radius.Append(VECTOR<TV,2>(r1,r2));
-    segment_mesh.elements.Append(VECTOR<int,2>(body1,body2));
+    segment_mesh.elements.Append(VECTOR<int,2>(body0,body1));
     Invalidate_CFL();
 }
 template<class TV> typename TV::SCALAR RIGID_LINEAR_SPRINGS<TV>::

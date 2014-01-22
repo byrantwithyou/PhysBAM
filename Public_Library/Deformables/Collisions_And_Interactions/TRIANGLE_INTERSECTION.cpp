@@ -53,10 +53,10 @@ Topology_Aware_Intersection_Test(VECTOR<int,3> a,VECTOR<int,3> b,ARRAY_VIEW<cons
     if(a1<0) exchange(a.y,a.z);
     if(a2<0) exchange(b.y,b.z);
     TV C(X(a.x));
-    MATRIX<T,2> M1(X(a.y)-C,X(a.z)-C),M2(X(b.y)-C,X(b.z)-C);
-    MATRIX<T,2> R=M1.Inverse()*M2;
+    MATRIX<T,2> M0(X(a.y)-C,X(a.z)-C),M1(X(b.y)-C,X(b.z)-C);
+    MATRIX<T,2> R=M0.Inverse()*M1;
     if(R.Column(0).All_Greater(TV()) || R.Column(1).All_Greater(TV())) return true;
-    MATRIX<T,2> S=M2.Inverse()*M1;
+    MATRIX<T,2> S=M1.Inverse()*M0;
     if(S.Column(0).All_Greater(TV()) || S.Column(1).All_Greater(TV())) return true;
     return false;
 }

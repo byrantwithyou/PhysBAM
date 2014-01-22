@@ -119,10 +119,10 @@ Compute_Position_Based_State(const T dt,const T time)
             // compute 6x6 matrix assuming impulse applied at r2 and measured at r1
             TV r1=joint_location(joint_index_1)-rigid_body.Frame().t,r2=joint_location(joint_index_2)-rigid_body.Frame().t;
             MATRIX<T,3> r_cross_1=MATRIX<T,3>::Cross_Product_Matrix(r1),r_cross_2=MATRIX<T,3>::Cross_Product_Matrix(r2);
-            MATRIX<T,3> c21=I_inverse.Times_Cross_Product_Matrix(r2),c12=I_inverse.Cross_Product_Matrix_Times(-r1);
-            MATRIX<T,3> c11=c21.Cross_Product_Matrix_Times(-r1)+1/rigid_body.Mass();
-            SYMMETRIC_MATRIX<T,3> c22=I_inverse;
-            MATRIX_MXN<T> C(6,6);C.Add_To_Submatrix(0,0,c11);C.Add_To_Submatrix(0,3,c12);C.Add_To_Submatrix(3,0,c21);C.Add_To_Submatrix(3,3,c22);
+            MATRIX<T,3> c10=I_inverse.Times_Cross_Product_Matrix(r2),c01=I_inverse.Cross_Product_Matrix_Times(-r1);
+            MATRIX<T,3> c00=c10.Cross_Product_Matrix_Times(-r1)+1/rigid_body.Mass();
+            SYMMETRIC_MATRIX<T,3> c11=I_inverse;
+            MATRIX_MXN<T> C(6,6);C.Add_To_Submatrix(0,0,c00);C.Add_To_Submatrix(0,3,c01);C.Add_To_Submatrix(3,0,c10);C.Add_To_Submatrix(3,3,c11);
             // important: sign of block is negative if the joints at which impulse is applied and measured are opposite types (parent/child)
             if(joints_on_rigid_body(id)(i).y!=joints_on_rigid_body(id)(j).y) C*=-1;
 
@@ -318,7 +318,7 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x,const T 
             int equations_to_keep=transformed_A.Number_Of_Nonzero_Rows((T)1e-6);
             MATRIX_MXN<T> R(equations_to_keep,equations_to_keep);MATRIX_MXN<T> U(equations_to_keep,A.n-equations_to_keep),G(A.m-equations_to_keep,A.n-equations_to_keep);
             transformed_A.Get_Submatrix(0,0,R);transformed_A.Get_Submatrix(0,equations_to_keep,U);transformed_A.Get_Submatrix(equations_to_keep,equations_to_keep,G);
-            ARRAY<T> b1(R.n),b2(G.m),x1(R.n),x2(U.n);
+            ARRAY<T> b1(R.n),b2(G.m),x0(R.n),x1(U.n);
             transformed_b.Extract(b1,b2);
 
             // Z is
@@ -357,9 +357,9 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x,const T 
                 ls_A.Set_Zero_Matrix();ls_A.Add_To_Submatrix(0,0,G);ls_A.Add_To_Submatrix(G.m,0,sqrt_D*Z);
                 ls_b.Combine(b2,sqrt_D*Z_rhs);
 
-                x2=ls_A.Normal_Equations_Solve(ls_b);
-                x1=negative_R_inverse_U*x2-negative_R_inverse_b1;
-                x.Combine(x1,x2);}
+                x1=ls_A.Normal_Equations_Solve(ls_b);
+                x0=negative_R_inverse_U*x1-negative_R_inverse_b1;
+                x.Combine(x0,x1);}
 
             x.Subset(permute)=ARRAY<T>(x);
 

@@ -14,14 +14,14 @@ using namespace PhysBAM;
 template<class T> void ARTIFICIAL_VISCOSITY_WILKINS_2D<T>::
 Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VECTOR<int,2> >& mass,
                                       const ARRAY<T,VECTOR<int,2> >& u,const ARRAY<T,VECTOR<int,2> >& v,const ARRAY<T,VECTOR<int,2> >& energy,
-                                      ARRAY<T,VECTOR<int,2> >& Q1,ARRAY<T,VECTOR<int,2> >& Q2,ARRAY<T,VECTOR<int,2> >& Q3,ARRAY<T,VECTOR<int,2> >& Q4)
+                                      ARRAY<T,VECTOR<int,2> >& Q0,ARRAY<T,VECTOR<int,2> >& Q1,ARRAY<T,VECTOR<int,2> >& Q2,ARRAY<T,VECTOR<int,2> >& Q3)
 {
     int i,j;
     int m=grid.m,n=grid.n; 
     
     // get grid information
-    ARRAY<T,VECTOR<int,2> > AA1(0,m-1,0,n-1),AA2(0,m-1,0,n-1),AA3(0,m-1,0,n-1),AA4(0,m-1,0,n-1);
-    grid.Get_Sub_Zone_Areas(AA1,AA2,AA3,AA4);
+    ARRAY<T,VECTOR<int,2> > AA0(0,m-1,0,n-1),AA1(0,m-1,0,n-1),AA2(0,m-1,0,n-1),AA3(0,m-1,0,n-1);
+    grid.Get_Sub_Zone_Areas(AA0,AA1,AA2,AA3);
     ARRAY<T,VECTOR<int,2> > NN1_x(0,m-1,0,n-1),NN1_y(0,m-1,0,n-1),NN2_x(0,m-1,0,n-1),NN2_y(0,m-1,0,n-1),
                       NN3_x(0,m-1,0,n-1),NN3_y(0,m-1,0,n-1),NN4_x(0,m-1,0,n-1),NN4_y(0,m-1,0,n-1);
     grid.Get_Sub_Zone_Normals(NN1_x,NN1_y,NN2_x,NN2_y,NN3_x,NN3_y,NN4_x,NN4_y);                  
@@ -31,7 +31,7 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VEC
     for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         T mass_over_4=mass(i,j)/4;
         M_node(i,j)+=mass_over_4;M_node(i+1,j)+=mass_over_4;M_node(i,j+1)+=mass_over_4;M_node(i+1,j+1)+=mass_over_4;
-        A_node(i,j)+=AA1(i,j);A_node(i+1,j)+=AA2(i,j);A_node(i,j+1)+=AA3(i,j);A_node(i+1,j+1)+=AA4(i,j);}
+        A_node(i,j)+=AA0(i,j);A_node(i+1,j)+=AA1(i,j);A_node(i,j+1)+=AA2(i,j);A_node(i+1,j+1)+=AA3(i,j);}
     for(i=0;i<m;i++) for(j=0;j<n;j++) density(i,j)=M_node(i,j)/A_node(i,j);
     
     // find the sound speed at each node
@@ -56,11 +56,11 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VEC
     // compute artificial viscosities
     for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         // bottom edge
-        if(V1_x(i,j)*NN3_x(i,j)+V1_y(i,j)*NN3_y(i,j) >= 0) Q1(i,j)=0;
+        if(V1_x(i,j)*NN3_x(i,j)+V1_y(i,j)*NN3_y(i,j) >= 0) Q0(i,j)=0;
         else{
             T density_ave=2*density(i,j)*density(i+1,j)/(density(i,j)+density(i+1,j));
             T sound_speed_min=min(sound_speed(i,j),sound_speed(i+1,j));
-            Q1(i,j)=density_ave*(linear_constant*sound_speed_min*abs(velocity_jump1(i,j))+
+            Q0(i,j)=density_ave*(linear_constant*sound_speed_min*abs(velocity_jump1(i,j))+
                                             quadratic_constant*sqr(velocity_jump1(i,j)));
                 if(limiter){
                 T delta_x=grid.x(i+1,j)-grid.x(i,j),delta_y=grid.y(i+1,j)-grid.y(i,j),delta=sqrt(sqr(delta_x)+sqr(delta_y));
@@ -77,13 +77,13 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VEC
                         T delta_right=delta_x_right*delta_x_direction+delta_y_right*delta_y_direction;
                         if(delta_right != 0) r_right=(u_jump1(i+1,j)*V1_x(i,j)+v_jump1(i+1,j)*V1_y(i,j))/delta_right/ux_center;}}
                 T psi=max((T)0,min((r_left+r_right)/2,2*r_left,2*r_right,(T)1));
-                Q1(i,j)=(1-psi)*Q1(i,j);}}
+                Q0(i,j)=(1-psi)*Q0(i,j);}}
         // top edge
-        if(V1_x(i,j+1)*NN4_x(i,j)+V1_y(i,j+1)*NN4_y(i,j) >= 0) Q2(i,j)=0;
+        if(V1_x(i,j+1)*NN4_x(i,j)+V1_y(i,j+1)*NN4_y(i,j) >= 0) Q1(i,j)=0;
         else{
             T density_ave=2*density(i,j+1)*density(i+1,j+1)/(density(i,j+1)+density(i+1,j+1));
             T sound_speed_min=min(sound_speed(i,j+1),sound_speed(i+1,j+1));
-            Q2(i,j)=density_ave*(linear_constant*sound_speed_min*abs(velocity_jump1(i,j+1))+
+            Q1(i,j)=density_ave*(linear_constant*sound_speed_min*abs(velocity_jump1(i,j+1))+
                                             quadratic_constant*sqr(velocity_jump1(i,j+1)));
             if(limiter){
                 T delta_x=grid.x(i+1,j+1)-grid.x(i,j+1),delta_y=grid.y(i+1,j+1)-grid.y(i,j+1),delta=sqrt(sqr(delta_x)+sqr(delta_y));
@@ -100,13 +100,13 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VEC
                         T delta_right=delta_x_right*delta_x_direction+delta_y_right*delta_y_direction;
                         if(delta_right != 0) r_right=(u_jump1(i+1,j+1)*V1_x(i,j+1)+v_jump1(i+1,j+1)*V1_y(i,j+1))/delta_right/ux_center;}}
                 T psi=max((T)0,min((r_left+r_right)/2,2*r_left,2*r_right,(T)1));
-                Q2(i,j)=(1-psi)*Q2(i,j);}}
+                Q1(i,j)=(1-psi)*Q1(i,j);}}
         // left edge
-        if(V2_x(i,j)*NN1_x(i,j)+V2_y(i,j)*NN1_y(i,j) >= 0) Q3(i,j)=0;
+        if(V2_x(i,j)*NN1_x(i,j)+V2_y(i,j)*NN1_y(i,j) >= 0) Q2(i,j)=0;
         else{
             T density_ave=2*density(i,j)*density(i,j+1)/(density(i,j)+density(i,j+1));
             T sound_speed_min=min(sound_speed(i,j),sound_speed(i,j+1));
-            Q3(i,j)=density_ave*(linear_constant*sound_speed_min*abs(velocity_jump2(i,j))+
+            Q2(i,j)=density_ave*(linear_constant*sound_speed_min*abs(velocity_jump2(i,j))+
                                             quadratic_constant*sqr(velocity_jump2(i,j)));
             if(limiter){
                 T delta_x=grid.x(i,j+1)-grid.x(i,j),delta_y=grid.y(i,j+1)-grid.y(i,j),delta=sqrt(sqr(delta_x)+sqr(delta_y));
@@ -123,13 +123,13 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VEC
                         T delta_top=delta_x_top*delta_x_direction+delta_y_top*delta_y_direction;
                         if(delta_top != 0) r_top=(u_jump2(i,j+1)*V2_x(i,j)+v_jump2(i,j+1)*V2_y(i,j))/delta_top/ux_center;}}
                 T psi=max((T)0,min((r_bottom+r_top)/2,2*r_bottom,2*r_top,(T)1));
-                Q3(i,j)=(1-psi)*Q3(i,j);}}
+                Q2(i,j)=(1-psi)*Q2(i,j);}}
         // right edge
-        if(V2_x(i+1,j)*NN2_x(i,j)+V2_y(i+1,j)*NN2_y(i,j) >= 0) Q4(i,j)=0;
+        if(V2_x(i+1,j)*NN2_x(i,j)+V2_y(i+1,j)*NN2_y(i,j) >= 0) Q3(i,j)=0;
         else{
             T density_ave=2*density(i+1,j)*density(i+1,j+1)/(density(i+1,j)+density(i+1,j+1));
             T sound_speed_min=min(sound_speed(i+1,j),sound_speed(i+1,j+1));
-            Q4(i,j)=density_ave*(linear_constant*sound_speed_min*abs(velocity_jump2(i+1,j))+
+            Q3(i,j)=density_ave*(linear_constant*sound_speed_min*abs(velocity_jump2(i+1,j))+
                                             quadratic_constant*sqr(velocity_jump2(i+1,j)));
             if(limiter){
                 T delta_x=grid.x(i+1,j+1)-grid.x(i+1,j),delta_y=grid.y(i+1,j+1)-grid.y(i+1,j),delta=sqrt(sqr(delta_x)+sqr(delta_y));
@@ -146,7 +146,7 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VEC
                         T delta_top=delta_x_top*delta_x_direction+delta_y_top*delta_y_direction;
                         if(delta_top != 0) r_top=(u_jump2(i+1,j+1)*V2_x(i+1,j)+v_jump2(i+1,j+1)*V2_y(i+1,j))/delta_top/ux_center;}}
                 T psi=max((T)0,min((r_bottom+r_top)/2,2*r_bottom,2*r_top,(T)1));
-                Q4(i,j)=(1-psi)*Q4(i,j);}}}
+                Q3(i,j)=(1-psi)*Q3(i,j);}}}
 }
 //#####################################################################
 namespace PhysBAM{

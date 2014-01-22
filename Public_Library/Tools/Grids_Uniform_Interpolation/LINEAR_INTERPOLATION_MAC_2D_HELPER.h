@@ -24,8 +24,8 @@ class LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,2> >
     typedef TV_INT T_INDEX;
 public:
     VECTOR<T,2> base,center,one_over_DX;
-    T u2,u5,slope_u12,slope_u23,slope_u45,slope_u56; // standard y-x major ordering
-    T v2,v5,slope_v12,slope_v23,slope_v45,slope_v56; // x-y major ordering for symmetry with u
+    T u2,u5,slope_u01,slope_u12,slope_u34,slope_u45; // standard y-x major ordering
+    T v2,v5,slope_v01,slope_v12,slope_v34,slope_v45; // x-y major ordering for symmetry with u
     
     LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
 

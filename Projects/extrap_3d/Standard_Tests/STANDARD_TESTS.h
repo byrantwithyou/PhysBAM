@@ -2291,7 +2291,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         // for(int i=0;i<number_of_vertices;i++) solid_body_collection.deformable_body_collection.collisions.check_collision(i)=true;
 
         // for(int t=0;t<fvm.Fe_hat.m;t++)
-            // if(fvm.Fe_hat(t).x11>=3)
+            // if(fvm.Fe_hat(t).x00>=3)
                 // for(int i=0;i<4;i++)
                     // if (solid_body_collection.deformable_body_collection.particles.X(tet_volume.mesh.elements(t)(i)).y<=0.06)
                         // solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=false;
@@ -2661,7 +2661,7 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
             TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,3>(particles.X(0).y,x,y),1,1).To_Vector();
             DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3> disd;
             icm.Isotropic_Stress_Derivative(DIAGONAL_MATRIX<T,3>(particles.X(0).y,x,y),disd,1);
-            SYMMETRIC_MATRIX<T,3> H(disd.x1111,disd.x2211,disd.x3311,disd.x2222,disd.x3322,disd.x3333);
+            SYMMETRIC_MATRIX<T,3> H(disd.x0000,disd.x1100,disd.x2200,disd.x1111,disd.x2211,disd.x2222);
             DIAGONAL_MATRIX<T,3> ev;
             MATRIX<T,3> eigenvectors;
             H.Fast_Solve_Eigenproblem(ev,eigenvectors);

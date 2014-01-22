@@ -41,9 +41,9 @@ public:
         assert(A.Rows()==2 && A.Columns()==3);for(int j=0;j<3;j++) for(int i=0;i<2;i++) (*this)(i,j)=A(i,j);
     }
 
-    MATRIX(const T x11,const T x21,const T x12,const T x22,const T x13,const T x23)
+    MATRIX(const T x00,const T x10,const T x01,const T x11,const T x02,const T x12)
     {
-        transpose=MATRIX<T,3,2>(x11,x12,x13,x21,x22,x23);
+        transpose=MATRIX<T,3,2>(x00,x01,x02,x10,x11,x12);
     }
 
     MATRIX(const VECTOR<T,2>& v1,const VECTOR<T,2>& v2,const VECTOR<T,2>& v3)

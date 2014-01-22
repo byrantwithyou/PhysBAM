@@ -90,7 +90,7 @@ public:
     void Compute_Total_Conserved_Quantity(const bool update_boundary_flux,const T dt,TV_DIMENSION& total_conserved_quantity);
     void Invalidate_Ghost_Cells();
     void Warn_For_Low_Internal_Energy() const;
-    bool Equal_Real_Data(const T_ARRAYS_DIMENSION_SCALAR& U1,const T_ARRAYS_DIMENSION_SCALAR& U2) const;
+    bool Equal_Real_Data(const T_ARRAYS_DIMENSION_SCALAR& U0,const T_ARRAYS_DIMENSION_SCALAR& U1) const;
     void Fill_Ghost_Cells(const T dt,const T time,const int ghost_cells) const;
     void Get_Dirichlet_Boundary_Conditions(const T dt,const T time);
     void Advance_One_Time_Step_Forces(const T dt,const T time);

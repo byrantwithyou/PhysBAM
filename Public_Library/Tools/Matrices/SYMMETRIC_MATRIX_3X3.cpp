@@ -27,10 +27,10 @@ Fast_Eigenvalues() const // 24 mults, 20 adds, 1 atan2, 1 sincos, 2 sqrts
 {
     if(!IS_SAME<T,double>::value) return DIAGONAL_MATRIX<T,3>(SYMMETRIC_MATRIX<double,3>(*this).Fast_Eigenvalues());
     // now T is double
-    T m=(T)one_third*(x11+x22+x33);
-    T a11=x11-m,a22=x22-m,a33=x33-m,a12_sqr=x21*x21,a13_sqr=x31*x31,a23_sqr=x32*x32;
-    T p=(T)one_sixth*(a11*a11+a22*a22+a33*a33+2*(a12_sqr+a13_sqr+a23_sqr));
-    T q=(T).5*(a11*(a22*a33-a23_sqr)-a22*a13_sqr-a33*a12_sqr)+x21*x31*x32;
+    T m=(T)one_third*(x00+x11+x22);
+    T a00=x00-m,a11=x11-m,a22=x22-m,a12_sqr=x10*x10,a13_sqr=x20*x20,a23_sqr=x21*x21;
+    T p=(T)one_sixth*(a00*a00+a11*a11+a22*a22+2*(a12_sqr+a13_sqr+a23_sqr));
+    T q=(T).5*(a00*(a11*a22-a23_sqr)-a11*a13_sqr-a22*a12_sqr)+x10*x20*x21;
     T sqrt_p=sqrt(p),disc=p*p*p-q*q;
     T phi=(T)one_third*atan2(sqrt(max((T)0,disc)),q),c=cos(phi),s=sin(phi);
     T sqrt_p_cos=sqrt_p*c,root_three_sqrt_p_sin=(T)root_three*sqrt_p*s;
@@ -91,18 +91,18 @@ Fast_Solve_Eigenproblem(DIAGONAL_MATRIX<T,3>& eigenvalues,MATRIX<T,3>& eigenvect
 template<class T> void SYMMETRIC_MATRIX<T,3>::
 Solve_Eigenproblem(DIAGONAL_MATRIX<T,3>& eigenvalues,MATRIX<T,3>& eigenvectors) const
 {
-    T a11=x11,a12=x21,a13=x31,a22=x22,a23=x32,a33=x33;
-    T v11=1,v12=0,v13=0,v21=0,v22=1,v23=0,v31=0,v32=0,v33=1;
+    T a00=x00,a01=x10,a02=x20,a11=x11,a12=x21,a22=x22;
+    T v00=1,v01=0,v02=0,v10=0,v11=1,v12=0,v20=0,v21=0,v22=1;
     int sweep;for(sweep=0;sweep<50;sweep++){
-        T sum=abs(a12)+abs(a13)+abs(a23);
+        T sum=abs(a01)+abs(a02)+abs(a12);
         if(sum==0) break;
         T threshold=sweep<4?(T)(1./45)*sum:0;
-        Jacobi_Transform(sweep,threshold,a11,a12,a22,a13,a23,v11,v12,v21,v22,v31,v32);
-        Jacobi_Transform(sweep,threshold,a11,a13,a33,a12,a23,v11,v13,v21,v23,v31,v33);
-        Jacobi_Transform(sweep,threshold,a22,a23,a33,a12,a13,v12,v13,v22,v23,v32,v33);}
+        Jacobi_Transform(sweep,threshold,a00,a01,a11,a02,a12,v00,v01,v10,v11,v20,v21);
+        Jacobi_Transform(sweep,threshold,a00,a02,a22,a01,a12,v00,v02,v10,v12,v20,v22);
+        Jacobi_Transform(sweep,threshold,a11,a12,a22,a01,a02,v01,v02,v11,v12,v21,v22);}
     assert(sweep<=50);
-    eigenvalues=DIAGONAL_MATRIX<T,3>(a11,a22,a33);
-    eigenvectors=MATRIX<T,3>(v11,v21,v31,v12,v22,v32,v13,v23,v33);
+    eigenvalues=DIAGONAL_MATRIX<T,3>(a00,a11,a22);
+    eigenvectors=MATRIX<T,3>(v00,v10,v20,v01,v11,v21,v02,v12,v22);
 }
 //#####################################################################
 // Function Jacobi_Transform

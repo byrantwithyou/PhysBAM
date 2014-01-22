@@ -217,11 +217,11 @@ public:
     void Get_Keys(ARRAY<TK>& keys) const
     {keys.Remove_All();Append_Keys(keys);}
 
-    template<class T_ARRAY1,class T_ARRAY2>
-    void Get_Complementary_Keys(const T_ARRAY1& keys_universe,T_ARRAY2& keys_complementary) const
-    {STATIC_ASSERT(IS_SAME<typename T_ARRAY1::ELEMENT,TK>::value && IS_SAME<typename T_ARRAY2::ELEMENT,TK>::value);
+    template<class T_ARRAY0,class T_ARRAY1>
+    void Get_Complementary_Keys(const T_ARRAY0& keys_universe,T_ARRAY1& keys_complementary) const
+    {STATIC_ASSERT(IS_SAME<typename T_ARRAY0::ELEMENT,TK>::value && IS_SAME<typename T_ARRAY1::ELEMENT,TK>::value);
     keys_complementary.Remove_All();keys_complementary.Preallocate(keys_universe.Size()-Size());
-    for(typename T_ARRAY1::INDEX i(0);i<keys_universe.Size();i++) if(!Contains(keys_universe(i))) keys_complementary.Append(keys_universe(i));}
+    for(typename T_ARRAY0::INDEX i(0);i<keys_universe.Size();i++) if(!Contains(keys_universe(i))) keys_complementary.Append(keys_universe(i));}
 
     void Append_Data(ARRAY<T_UNLESS_VOID>& data) const
     {data.Preallocate(Size());for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) data.Append(table(h).data);}

@@ -28,7 +28,7 @@ public:
 private:
     void Construct_Material_Surface_Mesh() PHYSBAM_OVERRIDE;
     void Add_To_Material_Surface_Mesh_Triangle(const int material_node1,const int material_node2,const int material_node3);
-    void Add_To_Material_Surface_Mesh_Quad(const int x1,const int x2,const int x3,const int x4);
+    void Add_To_Material_Surface_Mesh_Quad(const int x0,const int x1,const int x2,const int x3);
     void Add_To_Material_Surface_Mesh_Face_Triangle(const int triangle);
     void Add_To_Material_Surface_Mesh_Subquadrilateral_Containg_Diamond_Node(const int triangle);
     void Add_To_Material_Surface_Mesh_Diamond_Quad(const int tri_node,const int emb_node1,const int emb_node2,const int emb_node3);

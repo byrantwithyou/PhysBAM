@@ -110,10 +110,10 @@ Segment_Segment_Interaction(const SEGMENT_2D<T>& segment,const TV& v1,const TV& 
 {
     normal=Shortest_Vector_Between_Segments(segment,a,b);
     distance=normal.Magnitude();if(distance > interaction_distance) return 0; // no interaction
-    TV velocity1=(1-a)*v1+a*v2,velocity2=(1-b)*v3+b*v4;
+    TV velocity0=(1-a)*v1+a*v2,velocity1=(1-b)*v3+b*v4;
     if(distance > small_number) normal/=distance;
     else{ // set normal based on relative velocity perpendicular to the two points
-        TV relative_velocity=velocity1-velocity2;
+        TV relative_velocity=velocity0-velocity1;
         TV u=X.y-X.x;
         normal=relative_velocity-TV::Dot_Product(relative_velocity,u)/TV::Dot_Product(u,u)*u;
         T normal_magnitude=normal.Magnitude();
@@ -345,15 +345,15 @@ Cut_With_Hyperplane(const SEGMENT_2D<T>& segment,const LINE_2D<T>& cutting_plane
 // Function Clip_To_Box_Helper
 //#####################################################################
 template<class T> bool
-Clip_To_Box_Helper(T z1,T z2,T& a,T& b)
+Clip_To_Box_Helper(T z0,T z1,T& a,T& b)
 {
-    if(z1>z2){z1=1-z1;z2=1-z2;}
-    if(z1<0){
-        if(z2<0) return false;
-        a=max(a,z1/(z1-z2));}
-    if(z2>1){
-        if(z1>1) return false;
-        b=min(b,(z1-1)/(z1-z2));}
+    if(z0>z1){z0=1-z0;z1=1-z1;}
+    if(z0<0){
+        if(z1<0) return false;
+        a=max(a,z0/(z0-z1));}
+    if(z1>1){
+        if(z0>1) return false;
+        b=min(b,(z0-1)/(z0-z1));}
     return true;
 }
 //#####################################################################
@@ -362,11 +362,11 @@ Clip_To_Box_Helper(T z1,T z2,T& a,T& b)
 template<class T> bool SEGMENT_2D<T>::
 Clip_To_Box(const RANGE<TV>& box,T& a,T& b) const
 {
-    TV z1=(X.x-box.min_corner)/box.Edge_Lengths();
-    TV z2=(X.y-box.min_corner)/box.Edge_Lengths();
+    TV z0=(X.x-box.min_corner)/box.Edge_Lengths();
+    TV z1=(X.y-box.min_corner)/box.Edge_Lengths();
     a=0;
     b=1;
-    return Clip_To_Box_Helper(z1.x,z2.x,a,b) && Clip_To_Box_Helper(z1.y,z2.y,a,b) && a<b;
+    return Clip_To_Box_Helper(z0.x,z1.x,a,b) && Clip_To_Box_Helper(z0.y,z1.y,a,b) && a<b;
 }
 //#####################################################################
 namespace PhysBAM{

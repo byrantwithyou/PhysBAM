@@ -24,7 +24,7 @@ class LINEAR_INTERPOLATION_MAC_HELPER<VECTOR<T,1> >
     typedef TV_INT T_INDEX;
 public:
     VECTOR<T,1> center;
-    T u2,slope_u12,slope_u23; // standard y-x major ordering
+    T u2,slope_u01,slope_u12; // standard y-x major ordering
     
     LINEAR_INTERPOLATION_MAC_HELPER(const T_BLOCK& block,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
         :center(block.Center())
@@ -33,13 +33,13 @@ public:
         T one_over_dx=block.One_Over_DX().x;
         static const int rotated_face_x[3]={0,1,2};
         u2=block.Face_X_Value(face_velocities_lookup,rotated_face_x[1]);
-        slope_u12=one_over_dx*(u2-block.Face_X_Value(face_velocities_lookup,rotated_face_x[0]));
-        slope_u23=one_over_dx*(block.Face_X_Value(face_velocities_lookup,rotated_face_x[2])-u2);
+        slope_u01=one_over_dx*(u2-block.Face_X_Value(face_velocities_lookup,rotated_face_x[0]));
+        slope_u12=one_over_dx*(block.Face_X_Value(face_velocities_lookup,rotated_face_x[2])-u2);
     }
 
     VECTOR<T,1> Interpolate_Face(const VECTOR<T,1>& X) const
-    {return VECTOR<T,1>(X.x<center.x?LINEAR_INTERPOLATION<T,T>::Linear(center.x,u2,slope_u12,X)
-                                     :LINEAR_INTERPOLATION<T,T>::Linear(center.x,u2,slope_u23,X));}
+    {return VECTOR<T,1>(X.x<center.x?LINEAR_INTERPOLATION<T,T>::Linear(center.x,u2,slope_u01,X)
+                                     :LINEAR_INTERPOLATION<T,T>::Linear(center.x,u2,slope_u12,X));}
 
     template<class T_FACE_LOOKUP>
     static VECTOR<T,1> Interpolate_Face(const T_BLOCK& block,const T_FACE_LOOKUP& face_velocities,const VECTOR<T,1>& X)

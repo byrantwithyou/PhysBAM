@@ -62,10 +62,10 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 // Function Inner_Product
 //#####################################################################
 template<class TV> double BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::
-Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
+Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const
 {
-    const GENERALIZED_VELOCITY<TV>& V1=debug_cast<const GENERALIZED_VELOCITY<TV>&>(BV1),&V2=debug_cast<const GENERALIZED_VELOCITY<TV>&>(BV2);
-    return V1.V.Dot_Double_Precision(V2.V)+V1.rigid_V.Dot_Double_Precision(V2.rigid_V);
+    const GENERALIZED_VELOCITY<TV>& V0=debug_cast<const GENERALIZED_VELOCITY<TV>&>(BV0),&V1=debug_cast<const GENERALIZED_VELOCITY<TV>&>(BV1);
+    return V0.V.Dot_Double_Precision(V1.V)+V0.rigid_V.Dot_Double_Precision(V1.rigid_V);
 }
 //#####################################################################
 // Function Convergence_Norm

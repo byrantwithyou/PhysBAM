@@ -54,7 +54,7 @@ public:
     
     // This is wrong in general!!!  Only works if the two ring points are aligned along the y axis and have x=z=0
     RANGE<TV> Object_Space_Bounding_Box() const PHYSBAM_OVERRIDE
-    {return RANGE<TV>(-ring.outer_radius,ring.outer_radius,min(ring.plane1.x1.y,ring.plane2.x1.y),max(ring.plane1.x1.y,ring.plane2.x1.y),-ring.outer_radius,ring.outer_radius);}
+    {return RANGE<TV>(-ring.outer_radius,ring.outer_radius,min(ring.plane1.x0.y,ring.plane2.x0.y),max(ring.plane1.x0.y,ring.plane2.x0.y),-ring.outer_radius,ring.outer_radius);}
 
 //#####################################################################
 };   

@@ -36,7 +36,7 @@ public:
 
     ARTICULATED_RIGID_BODY<TV>* arb;
     SOLIDS_STANDARD_TESTS<TV> tests;
-    RIGID_BODY<TV>* shelf11,*shelf12,*shelf21,*shelf22;
+    RIGID_BODY<TV>* shelf00,*shelf01,*shelf10,*shelf11;
     int current_frame,start_move,end_move;
     T increment;
     int selection;
@@ -63,7 +63,7 @@ public:
         current_frame=0;
         increment=(T).05;
         start_move=5;end_move=40;
-        shelf11=shelf12=shelf21=shelf22=0;
+        shelf00=shelf01=shelf10=shelf11=0;
         write_last_frame=true;
     }
 
@@ -210,7 +210,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
           rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
           rigid_body->name="parent";
           rigid_body->is_static=true;
-          shelf11=rigid_body;
+          shelf00=rigid_body;
 
           rigid_body=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
           rigid_body->Frame().t=TV(1,10,0);

@@ -42,7 +42,7 @@ public:
     virtual void Swap_State(const int id)=0;
     virtual FRAME<TV> Saved_Particle_To_Levelset_Body_Transform(const int levelset_body,const int particle_body)=0;
     virtual void Exchange_Frame(const int id)=0;
-    virtual TWIST<TV> Compute_Collision_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const TV& relative_velocity,const T coefficient_of_restitution,
+    virtual TWIST<TV> Compute_Collision_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& normal,const TV& relative_velocity,const T coefficient_of_restitution,
         const T coefficient_of_friction,const bool clamp_friction_magnitude,const bool rolling_friction,const bool clamp_energy)=0;
     virtual void Subtract_Stored_Difference(TV& velocity,T_SPIN& momentum,const int particle_index)=0;
     virtual void Begin_Fracture(const int body_id)=0;

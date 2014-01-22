@@ -34,17 +34,17 @@ Draw_Highlighted_Vertex(const TV& position,int id,const OPENGL_COLOR& color)
     glPopAttrib();
 }
 template<class TV> void OPENGL_SELECTION::
-Draw_Highlighted_Segment(const TV& x1,const TV& x2,int id,const OPENGL_COLOR& color)
+Draw_Highlighted_Segment(const TV& x0,const TV& x1,int id,const OPENGL_COLOR& color)
 {
     glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);
     color.Send_To_GL_Pipeline();
     ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
-    OpenGL_Line(x1,x2,vertices);
+    OpenGL_Line(x0,x1,vertices);
     OpenGL_Draw_Arrays(GL_LINES,TV::dimension,vertices);
 #ifndef USE_OPENGLES
-    if(id>=0) OpenGL_String((typename TV::SCALAR).5*(x1+x2),STRING_UTILITIES::string_sprintf("   %d",id));
+    if(id>=0) OpenGL_String((typename TV::SCALAR).5*(x0+x1),STRING_UTILITIES::string_sprintf("   %d",id));
 #endif
     glPopAttrib();
 }
@@ -65,43 +65,43 @@ Draw_Highlighted_Curve(const ARRAY<VECTOR<TV,2> >& X,int id,const OPENGL_COLOR& 
     glPopAttrib();
 }
 template<class TV> void OPENGL_SELECTION::
-Draw_Highlighted_Triangle_Boundary(const TV& x1,const TV& x2,const TV& x3,int id,const OPENGL_COLOR& color)
+Draw_Highlighted_Triangle_Boundary(const TV& x0,const TV& x1,const TV& x2,int id,const OPENGL_COLOR& color)
 {
     glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);
     color.Send_To_GL_Pipeline();
     ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
+    OpenGL_Vertex(x0,vertices);
     OpenGL_Vertex(x1,vertices);
     OpenGL_Vertex(x2,vertices);
-    OpenGL_Vertex(x3,vertices);
     OpenGL_Draw_Arrays(GL_LINE_LOOP,TV::dimension,vertices);
 #ifndef USE_OPENGLES
-    if(id>=0) OpenGL_String((typename TV::SCALAR)one_third*(x1+x2+x3),STRING_UTILITIES::string_sprintf("%d",id));
+    if(id>=0) OpenGL_String((typename TV::SCALAR)one_third*(x0+x1+x2),STRING_UTILITIES::string_sprintf("%d",id));
 #endif
     glPopAttrib();
 }
 template<class T> void OPENGL_SELECTION::
-Draw_Highlighted_Tetrahedron_Boundary(const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3,const VECTOR<T,3>& x4,int id,const OPENGL_COLOR& color)
+Draw_Highlighted_Tetrahedron_Boundary(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3,int id,const OPENGL_COLOR& color)
 {
     glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);
     color.Send_To_GL_Pipeline();
     ARRAY<typename OPENGL_POLICY<T>::T_GL >vertices;
+    OpenGL_Vertex(x0,vertices);
     OpenGL_Vertex(x1,vertices);
     OpenGL_Vertex(x2,vertices);
+    OpenGL_Vertex(x0,vertices);
     OpenGL_Vertex(x3,vertices);
     OpenGL_Vertex(x1,vertices);
-    OpenGL_Vertex(x4,vertices);
-    OpenGL_Vertex(x2,vertices);
     OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices);
     vertices.Resize(0);
-    OpenGL_Vertex(x4,vertices);
     OpenGL_Vertex(x3,vertices);
+    OpenGL_Vertex(x2,vertices);
     OpenGL_Draw_Arrays(GL_LINES,3,vertices);
 #ifndef USE_OPENGLES
-    if(id>=0) OpenGL_String((T)0.25*(x1+x2+x3+x4),STRING_UTILITIES::string_sprintf("%d",id));
+    if(id>=0) OpenGL_String((T)0.25*(x0+x1+x2+x3),STRING_UTILITIES::string_sprintf("%d",id));
 #endif
     glPopAttrib();
 }

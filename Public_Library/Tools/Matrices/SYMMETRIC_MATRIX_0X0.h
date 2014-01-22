@@ -82,10 +82,10 @@ public:
     {return false;}
 
     static SYMMETRIC_MATRIX Componentwise_Min(const SYMMETRIC_MATRIX& v1,const SYMMETRIC_MATRIX& v2)
-    {return SYMMETRIC_MATRIX(min(v1.x11,v2.x11));}
+    {return SYMMETRIC_MATRIX(min(v1.x00,v2.x00));}
 
     static SYMMETRIC_MATRIX Componentwise_Max(const SYMMETRIC_MATRIX& v1,const SYMMETRIC_MATRIX& v2)
-    {return SYMMETRIC_MATRIX(max(v1.x11,v2.x11));}
+    {return SYMMETRIC_MATRIX(max(v1.x00,v2.x00));}
 
     SYMMETRIC_MATRIX operator-() const
     {return *this;}

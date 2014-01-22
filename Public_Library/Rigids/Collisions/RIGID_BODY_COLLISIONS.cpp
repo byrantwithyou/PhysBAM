@@ -122,11 +122,11 @@ Get_Deepest_Intersection_Point(const int id_1,const int id_2,ARRAY<RIGID_BODY_PA
         const RIGID_BODY_PARTICLE_INTERSECTION<TV>& intersection=particle_intersections(i);
         T phi=(*rigid_body_collection.Rigid_Body(intersection.levelset_body).implicit_object)(rigid_body_collection.Rigid_Body(intersection.particle_body).World_Space_Point(intersection.particle_location));
         if(phi<smallest_value){
-            RIGID_BODY<TV> &body1=rigid_body_collection.Rigid_Body(intersection.particle_body),&body2=rigid_body_collection.Rigid_Body(intersection.levelset_body);
-            RIGID_BODY<TV> &body_parent1=rigid_body_cluster_bindings.Get_Parent(body1),&body_parent2=rigid_body_cluster_bindings.Get_Parent(body2);
+            RIGID_BODY<TV> &body0=rigid_body_collection.Rigid_Body(intersection.particle_body),&body1=rigid_body_collection.Rigid_Body(intersection.levelset_body);
+            RIGID_BODY<TV> &body_parent1=rigid_body_cluster_bindings.Get_Parent(body0),&body_parent2=rigid_body_cluster_bindings.Get_Parent(body1);
             if(ignore_separating){
-                TV location=body1.World_Space_Point(intersection.particle_location);
-                TV normal=use_parent_normal?body_parent2.Implicit_Geometry_Normal(location):body2.Implicit_Geometry_Normal(location);
+                TV location=body0.World_Space_Point(intersection.particle_location);
+                TV normal=use_parent_normal?body_parent2.Implicit_Geometry_Normal(location):body1.Implicit_Geometry_Normal(location);
                 TV relative_velocity=RIGID_BODY<TV>::Relative_Velocity_At_Geometry1_Particle(body_parent1,body_parent2,location,intersection.particle_index);
                 if(TV::Dot_Product(relative_velocity,normal)>=0){ignored_separating=true;continue;}
                 collision_location=location;collision_normal=normal;collision_relative_velocity=relative_velocity;}
@@ -134,8 +134,8 @@ Get_Deepest_Intersection_Point(const int id_1,const int id_2,ARRAY<RIGID_BODY_PA
 
     if(smallest_index>=0 && !ignore_separating){ // these quantities are already computed if we ignore_separating
         const RIGID_BODY_PARTICLE_INTERSECTION<TV>& intersection=particle_intersections(smallest_index);
-        RIGID_BODY<TV> &body1=rigid_body_collection.Rigid_Body(intersection.particle_body),&body2=rigid_body_collection.Rigid_Body(intersection.levelset_body);
-        collision_location=body1.World_Space_Point(intersection.particle_location);collision_normal=body2.Implicit_Geometry_Normal(collision_location);collision_relative_velocity=TV();}
+        RIGID_BODY<TV> &body0=rigid_body_collection.Rigid_Body(intersection.particle_body),&body1=rigid_body_collection.Rigid_Body(intersection.levelset_body);
+        collision_location=body0.World_Space_Point(intersection.particle_location);collision_normal=body1.Implicit_Geometry_Normal(collision_location);collision_relative_velocity=TV();}
 
     return smallest_index>=0;
 }
@@ -145,55 +145,55 @@ Get_Deepest_Intersection_Point(const int id_1,const int id_2,ARRAY<RIGID_BODY_PA
 template<class TV> bool RIGID_BODY_COLLISIONS<TV>::
 Update_Collision_Pair(const int id_1,const int id_2,const T dt,const T time,const bool mpi_one_ghost)
 {
-    RIGID_BODY<TV>& body1=rigid_body_collection.Rigid_Body(id_1),&body2=rigid_body_collection.Rigid_Body(id_2);
-    VECTOR<std::string,2> key(typeid(*body1.implicit_object->object_space_implicit_object).name(),typeid(*body2.implicit_object->object_space_implicit_object).name());
+    RIGID_BODY<TV>& body0=rigid_body_collection.Rigid_Body(id_1),&body1=rigid_body_collection.Rigid_Body(id_2);
+    VECTOR<std::string,2> key(typeid(*body0.implicit_object->object_space_implicit_object).name(),typeid(*body1.implicit_object->object_space_implicit_object).name());
     if(key.x==typeid(MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>).name()||key.y==typeid(MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>).name()){
-        if(!body1.simplicial_object && !body2.simplicial_object) return Update_Analytic_Multibody_Collision(body1,body2,dt,time,mpi_one_ghost);}
+        if(!body0.simplicial_object && !body1.simplicial_object) return Update_Analytic_Multibody_Collision(body0,body1,dt,time,mpi_one_ghost);}
     if(bool (**collision_function)(RIGID_BODY_COLLISIONS&,const int,const int,IMPLICIT_OBJECT<TV>*,IMPLICIT_OBJECT<TV>*,const T,const T,const bool)=analytic_collision_registry.Get_Pointer(key.Sorted()))
-        return (*collision_function)(*this,id_1,id_2,body1.implicit_object->object_space_implicit_object,body2.implicit_object->object_space_implicit_object,dt,time,mpi_one_ghost);
+        return (*collision_function)(*this,id_1,id_2,body0.implicit_object->object_space_implicit_object,body1.implicit_object->object_space_implicit_object,dt,time,mpi_one_ghost);
     return Update_Levelset_Collision_Pair(id_1,id_2,dt,time,mpi_one_ghost);
 }
 //#####################################################################
 // Function Update_Collision_Pair_Helper
 //#####################################################################
 template<class TV> bool RIGID_BODY_COLLISIONS<TV>::
-Update_Collision_Pair_Helper(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const T dt,const T time,const TV& collision_location,const TV& collision_normal,const TV& collision_relative_velocity,
+Update_Collision_Pair_Helper(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const T dt,const T time,const TV& collision_location,const TV& collision_normal,const TV& collision_relative_velocity,
     const bool mpi_one_ghost)
 {
     fractured_bodies=VECTOR<int,2>();
-    RIGID_BODY<TV> &body_parent1=rigid_body_cluster_bindings.Get_Parent(body1),&body_parent2=rigid_body_cluster_bindings.Get_Parent(body2);
+    RIGID_BODY<TV> &body_parent1=rigid_body_cluster_bindings.Get_Parent(body0),&body_parent2=rigid_body_cluster_bindings.Get_Parent(body1);
     // TODO: ok to store object space location of intersection point?
     if(store_collision_intersections_for_projection)
-        rigid_body_particles_intersections.Set(Tuple(body1.particle_index,body2.particle_index,collision_location));
-    assert(Either_Body_Collides_With_The_Other(body1.particle_index,body2.particle_index));
+        rigid_body_particles_intersections.Set(Tuple(body0.particle_index,body1.particle_index,collision_location));
+    assert(Either_Body_Collides_With_The_Other(body0.particle_index,body1.particle_index));
     // TODO: put an assert where we compute joints that collisions are two-way (later make joint respect one-way collisions)
-    if(!Body_Collides_With_The_Other(body1.particle_index,body2.particle_index)) body_parent1.is_temporarily_static=true;
-    if(!Body_Collides_With_The_Other(body2.particle_index,body1.particle_index)) body_parent2.is_temporarily_static=true;
+    if(!Body_Collides_With_The_Other(body0.particle_index,body1.particle_index)) body_parent1.is_temporarily_static=true;
+    if(!Body_Collides_With_The_Other(body1.particle_index,body0.particle_index)) body_parent2.is_temporarily_static=true;
     TWIST<TV> impulse=collision_callbacks.Compute_Collision_Impulse(body_parent1,body_parent2,collision_location,collision_normal,collision_relative_velocity,
         RIGID_BODY<TV>::Coefficient_Of_Restitution(body_parent1,body_parent2),RIGID_BODY<TV>::Coefficient_Of_Friction(body_parent1,body_parent2),true,rolling_friction,true);
 
     if(parameters.use_fracture_pattern){
         if(!fracture_pattern) fracture_pattern=new FRACTURE_PATTERN<T>;
+        if(!body0.Has_Infinite_Inertia() && impulse.linear.Magnitude()>=body0.fracture_threshold){
+            TV object_space_collision_location=body0.Object_Space_Point(collision_location);
+            collision_callbacks.Begin_Fracture(body0.particle_index);
+            fracture_pattern->Intersect_With_Rigid_Body(body0,body0.World_Space_Point(object_space_collision_location),added_bodies(0),parameters.allow_refracturing,
+                parameters.use_fracture_particle_optimization);
+            fractured_bodies(0)=body0.particle_index;
+            rigid_body_collection.rigid_body_particles.Remove_Body(body0.particle_index);
+            rigid_body_collection.Destroy_Unreferenced_Geometry();
+            collision_callbacks.End_Fracture(body0.particle_index,added_bodies(0));}
+        else body0.Apply_Impulse_To_Body(collision_location,impulse.linear,impulse.angular,mpi_one_ghost);
         if(!body1.Has_Infinite_Inertia() && impulse.linear.Magnitude()>=body1.fracture_threshold){
             TV object_space_collision_location=body1.Object_Space_Point(collision_location);
             collision_callbacks.Begin_Fracture(body1.particle_index);
-            fracture_pattern->Intersect_With_Rigid_Body(body1,body1.World_Space_Point(object_space_collision_location),added_bodies(0),parameters.allow_refracturing,
+            fracture_pattern->Intersect_With_Rigid_Body(body1,body1.World_Space_Point(object_space_collision_location),added_bodies(1),parameters.allow_refracturing,
                 parameters.use_fracture_particle_optimization);
-            fractured_bodies(0)=body1.particle_index;
+            fractured_bodies(1)=body1.particle_index;
             rigid_body_collection.rigid_body_particles.Remove_Body(body1.particle_index);
             rigid_body_collection.Destroy_Unreferenced_Geometry();
-            collision_callbacks.End_Fracture(body1.particle_index,added_bodies(0));}
-        else body1.Apply_Impulse_To_Body(collision_location,impulse.linear,impulse.angular,mpi_one_ghost);
-        if(!body2.Has_Infinite_Inertia() && impulse.linear.Magnitude()>=body2.fracture_threshold){
-            TV object_space_collision_location=body2.Object_Space_Point(collision_location);
-            collision_callbacks.Begin_Fracture(body2.particle_index);
-            fracture_pattern->Intersect_With_Rigid_Body(body2,body2.World_Space_Point(object_space_collision_location),added_bodies(1),parameters.allow_refracturing,
-                parameters.use_fracture_particle_optimization);
-            fractured_bodies(1)=body2.particle_index;
-            rigid_body_collection.rigid_body_particles.Remove_Body(body2.particle_index);
-            rigid_body_collection.Destroy_Unreferenced_Geometry();
-            collision_callbacks.End_Fracture(body2.particle_index,added_bodies(1));}
-        else body2.Apply_Impulse_To_Body(collision_location,-impulse.linear,-impulse.angular,mpi_one_ghost);
+            collision_callbacks.End_Fracture(body1.particle_index,added_bodies(1));}
+        else body1.Apply_Impulse_To_Body(collision_location,-impulse.linear,-impulse.angular,mpi_one_ghost);
         if(fractured_bodies(0) || fractured_bodies(1)){
             rigid_body_collection.Update_Simulated_Particles();
             Initialize_Data_Structures(false);
@@ -239,14 +239,14 @@ Update_Analytic_Multibody_Collision(const int id_1,const int id_2,MULTIBODY_LEVE
 // Function Update_Analytic_Multibody_Collision
 //#####################################################################
 template<class TV> bool RIGID_BODY_COLLISIONS<TV>::
-Update_Analytic_Multibody_Collision(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const typename TV::SCALAR dt,const typename TV::SCALAR time,const bool mpi_one_ghost)
+Update_Analytic_Multibody_Collision(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const typename TV::SCALAR dt,const typename TV::SCALAR time,const bool mpi_one_ghost)
 {
     bool return_val=false;
+    MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>* multibody0=dynamic_cast<MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>*>(body0.implicit_object->object_space_implicit_object);
     MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>* multibody1=dynamic_cast<MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>*>(body1.implicit_object->object_space_implicit_object);
-    MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>* multibody2=dynamic_cast<MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>*>(body2.implicit_object->object_space_implicit_object);
-    if(multibody1 && multibody2) for(int i=0;i<multibody2->levelsets->m;i++) return_val|=Update_Analytic_Multibody_Collision(body1.particle_index,body2.particle_index,*multibody1,*(*multibody2->levelsets)(i),dt,time,mpi_one_ghost);
-    else if(multibody1) return_val=Update_Analytic_Multibody_Collision(body1.particle_index,body2.particle_index,*multibody1,*body2.implicit_object->object_space_implicit_object,dt,time,mpi_one_ghost);
-    else return_val=Update_Analytic_Multibody_Collision(body1.particle_index,body2.particle_index,*multibody2,*body1.implicit_object->object_space_implicit_object,dt,time,mpi_one_ghost);
+    if(multibody0 && multibody1) for(int i=0;i<multibody1->levelsets->m;i++) return_val|=Update_Analytic_Multibody_Collision(body0.particle_index,body1.particle_index,*multibody0,*(*multibody1->levelsets)(i),dt,time,mpi_one_ghost);
+    else if(multibody0) return_val=Update_Analytic_Multibody_Collision(body0.particle_index,body1.particle_index,*multibody0,*body1.implicit_object->object_space_implicit_object,dt,time,mpi_one_ghost);
+    else return_val=Update_Analytic_Multibody_Collision(body0.particle_index,body1.particle_index,*multibody1,*body0.implicit_object->object_space_implicit_object,dt,time,mpi_one_ghost);
     return return_val;
 }
 //#####################################################################
@@ -256,8 +256,8 @@ template<class TV> bool
 Update_Box_Box_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,const int i1,const int i2,IMPLICIT_OBJECT<TV>* object1,
     IMPLICIT_OBJECT<TV>* object2,const typename TV::SCALAR dt,const typename TV::SCALAR time,const bool mpi_one_ghost)
 {
-    RIGID_BODY<TV>& body1=rigid_body_collisions.rigid_body_collection.Rigid_Body(i1);
-    RIGID_BODY<TV>& body2=rigid_body_collisions.rigid_body_collection.Rigid_Body(i2);
+    RIGID_BODY<TV>& body0=rigid_body_collisions.rigid_body_collection.Rigid_Body(i1);
+    RIGID_BODY<TV>& body1=rigid_body_collisions.rigid_body_collection.Rigid_Body(i2);
     FRAME<TV> transform1,transform2;
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object1)){
         transform1=*object_transformed->transform;object1=object_transformed->object_space_implicit_object;}
@@ -265,16 +265,16 @@ Update_Box_Box_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,const 
         transform2=*object_transformed->transform;object2=object_transformed->object_space_implicit_object;}
     RANGE<TV>& box1=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >&>(*object1).analytic;
     RANGE<TV>& box2=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >&>(*object2).analytic;
-    ORIENTED_BOX<TV> box1_transformed(box1,body1.Frame());
-    ORIENTED_BOX<TV> box2_transformed(box2,body2.Frame());
+    ORIENTED_BOX<TV> box1_transformed(box1,body0.Frame());
+    ORIENTED_BOX<TV> box2_transformed(box2,body1.Frame());
 
-    TV collision_normal=body1.Frame().t-body2.Frame().t;collision_normal.Normalize();
+    TV collision_normal=body0.Frame().t-body1.Frame().t;collision_normal.Normalize();
     if(!box1_transformed.Intersection(box2_transformed)){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
-    if(TV::Dot_Product(collision_normal,body1.Twist().linear-body2.Twist().linear)>=0) return false;
-    TV collision_location=(body1.Frame().t-body2.Frame().t)*.5+body1.Frame().t;
-    rigid_body_collisions.Update_Collision_Pair_Helper(body1,body2,dt,time,collision_location,collision_normal,
-        body1.Pointwise_Object_Velocity(collision_location)-body2.Pointwise_Object_Velocity(collision_location),mpi_one_ghost);
+    if(TV::Dot_Product(collision_normal,body0.Twist().linear-body1.Twist().linear)>=0) return false;
+    TV collision_location=(body0.Frame().t-body1.Frame().t)*.5+body0.Frame().t;
+    rigid_body_collisions.Update_Collision_Pair_Helper(body0,body1,dt,time,collision_location,collision_normal,
+        body0.Pointwise_Object_Velocity(collision_location)-body1.Pointwise_Object_Velocity(collision_location),mpi_one_ghost);
     return true;
 }
 //#####################################################################
@@ -285,8 +285,8 @@ Update_Sphere_Sphere_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,
     IMPLICIT_OBJECT<TV>* object2,const typename TV::SCALAR dt,const typename TV::SCALAR time,const bool mpi_one_ghost)
 {
     typedef typename TV::SCALAR T;
-    RIGID_BODY<TV>& body1=rigid_body_collisions.rigid_body_collection.Rigid_Body(i1);
-    RIGID_BODY<TV>& body2=rigid_body_collisions.rigid_body_collection.Rigid_Body(i2);
+    RIGID_BODY<TV>& body0=rigid_body_collisions.rigid_body_collection.Rigid_Body(i1);
+    RIGID_BODY<TV>& body1=rigid_body_collisions.rigid_body_collection.Rigid_Body(i2);
     FRAME<TV> transform1,transform2;
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object1)){
         transform1=*object_transformed->transform;object1=object_transformed->object_space_implicit_object;}
@@ -295,15 +295,15 @@ Update_Sphere_Sphere_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,
     SPHERE<TV>& sphere1=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >&>(*object1).analytic;
     SPHERE<TV>& sphere2=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >&>(*object2).analytic;
 
-    TV sphere1_center=(body1.Frame()*transform1).t,sphere2_center=(body2.Frame()*transform2).t;
-    TV collision_normal=body1.Frame().t-body2.Frame().t;collision_normal.Normalize();
+    TV sphere1_center=(body0.Frame()*transform1).t,sphere2_center=(body1.Frame()*transform2).t;
+    TV collision_normal=body0.Frame().t-body1.Frame().t;collision_normal.Normalize();
     T d=(sphere1_center-sphere2_center).Magnitude(),r1=sphere1.radius,r2=sphere2.radius;
     if(d>r1+r2){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
-    if(TV::Dot_Product(collision_normal,body1.Twist().linear-body2.Twist().linear)>=0) return false;
+    if(TV::Dot_Product(collision_normal,body0.Twist().linear-body1.Twist().linear)>=0) return false;
     TV collision_location=sphere1_center+(T).5*(d+min(d,r2)-min(d,r1))*collision_normal;
-    rigid_body_collisions.Update_Collision_Pair_Helper(body1,body2,dt,time,collision_location,collision_normal,
-        body1.Pointwise_Object_Velocity(collision_location)-body2.Pointwise_Object_Velocity(collision_location),mpi_one_ghost);
+    rigid_body_collisions.Update_Collision_Pair_Helper(body0,body1,dt,time,collision_location,collision_normal,
+        body0.Pointwise_Object_Velocity(collision_location)-body1.Pointwise_Object_Velocity(collision_location),mpi_one_ghost);
     return true;
 }
 //#####################################################################
@@ -315,8 +315,8 @@ Update_Box_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,cons
 {
     typedef typename TV::SCALAR T;
     FRAME<TV> transform;
-    RIGID_BODY<TV>* body1=&rigid_body_collisions.rigid_body_collection.Rigid_Body(i1);
-    RIGID_BODY<TV>* body2=&rigid_body_collisions.rigid_body_collection.Rigid_Body(i2);
+    RIGID_BODY<TV>* body0=&rigid_body_collisions.rigid_body_collection.Rigid_Body(i1);
+    RIGID_BODY<TV>* body1=&rigid_body_collisions.rigid_body_collection.Rigid_Body(i2);
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object2)){
         transform=*object_transformed->transform;object2=object_transformed->object_space_implicit_object;}
     ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >* implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >*>(object2);
@@ -324,7 +324,7 @@ Update_Box_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,cons
         if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object1)){
             transform=*object_transformed->transform;object1=object_transformed->object_space_implicit_object;}
         exchange(object1,object2);
-        exchange(body1,body2);
+        exchange(body0,body1);
         implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >*>(object2);}
     RANGE<TV>& box=implicit_box->analytic;
 
@@ -334,20 +334,20 @@ Update_Box_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,cons
         if(i>4) point(0)=box.max_corner(0);
         if(i%4==0||i%4==3) point(1)=box.max_corner(1);
         if(i%2==0) point(2)=box.max_corner(2);
-        TV transformed_point=body1->Frame().Inverse()*body2->Frame()*point;
+        TV transformed_point=body0->Frame().Inverse()*body1->Frame()*point;
         if(transformed_point(0)<0){
             intersect=true;
             transformed_point(0)*=.5;
             points.Append(transformed_point);}}
 
-    TV collision_normal=-body1->Frame().r.Rotated_Axis(0);
+    TV collision_normal=-body0->Frame().r.Rotated_Axis(0);
     if(!intersect){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
-    if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
+    if(TV::Dot_Product(body0->Twist().linear-body1->Twist().linear,collision_normal)>=0) return false;
 
-    TV collision_location;for(int i=0;i<points.m;i++) collision_location+=points(i);collision_location/=(T)points.m;collision_location=body1->Frame()*collision_location;
-    rigid_body_collisions.Update_Collision_Pair_Helper(*body1,*body2,dt,time,collision_location,collision_normal,
-        body1->Pointwise_Object_Velocity(collision_location)-body2->Pointwise_Object_Velocity(collision_location),mpi_one_ghost);
+    TV collision_location;for(int i=0;i<points.m;i++) collision_location+=points(i);collision_location/=(T)points.m;collision_location=body0->Frame()*collision_location;
+    rigid_body_collisions.Update_Collision_Pair_Helper(*body0,*body1,dt,time,collision_location,collision_normal,
+        body0->Pointwise_Object_Velocity(collision_location)-body1->Pointwise_Object_Velocity(collision_location),mpi_one_ghost);
     return true;
 }
 //#####################################################################
@@ -359,8 +359,8 @@ Update_Sphere_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,c
 {
     typedef typename TV::SCALAR T;
     FRAME<TV> transform;
-    RIGID_BODY<TV>* body1=&rigid_body_collisions.rigid_body_collection.Rigid_Body(i1);
-    RIGID_BODY<TV>* body2=&rigid_body_collisions.rigid_body_collection.Rigid_Body(i2);
+    RIGID_BODY<TV>* body0=&rigid_body_collisions.rigid_body_collection.Rigid_Body(i1);
+    RIGID_BODY<TV>* body1=&rigid_body_collisions.rigid_body_collection.Rigid_Body(i2);
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object2)){
         transform=*object_transformed->transform;object2=object_transformed->object_space_implicit_object;}
     ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >* implicit_sphere=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >*>(object2);
@@ -368,21 +368,21 @@ Update_Sphere_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,c
         if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object1)){
             transform=*object_transformed->transform;object1=object_transformed->object_space_implicit_object;}
         exchange(object1,object2);
-        exchange(body1,body2);
+        exchange(body0,body1);
         implicit_sphere=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >*>(object2);}
     SPHERE<TV>& sphere=implicit_sphere->analytic;
 
-    TV sphere_center=(body2->Frame()*transform).t;
-    TV collision_normal=-body1->Frame().r.Rotated_Axis(1);
-    T separation=TV::Dot_Product(body1->Frame().t-sphere_center,collision_normal);
+    TV sphere_center=(body1->Frame()*transform).t;
+    TV collision_normal=-body0->Frame().r.Rotated_Axis(1);
+    T separation=TV::Dot_Product(body0->Frame().t-sphere_center,collision_normal);
     if(separation>=sphere.radius){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
-    if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
+    if(TV::Dot_Product(body0->Twist().linear-body1->Twist().linear,collision_normal)>=0) return false;
 
     T collision_depth=(T).5*(-sphere.radius+min(-separation,sphere.radius));
     TV collision_location=sphere_center-collision_depth*collision_normal;
-    rigid_body_collisions.Update_Collision_Pair_Helper(*body1,*body2,dt,time,collision_location,collision_normal,
-        body1->Pointwise_Object_Velocity(collision_location)-body2->Pointwise_Object_Velocity(collision_location),mpi_one_ghost);
+    rigid_body_collisions.Update_Collision_Pair_Helper(*body0,*body1,dt,time,collision_location,collision_normal,
+        body0->Pointwise_Object_Velocity(collision_location)-body1->Pointwise_Object_Velocity(collision_location),mpi_one_ghost);
     return true;
 }
 //#####################################################################
@@ -420,8 +420,8 @@ Update_Levelset_Collision_Pair(const int id_1,const int id_2,const T dt,const T 
                     collision_normal=levelset_body_parent.Implicit_Geometry_Normal(collision_location);}
                     else collision_normal=rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(intersection.levelset_body)).Implicit_Geometry_Normal(collision_location);}}
         const RIGID_BODY_PARTICLE_INTERSECTION<TV>& intersection=particle_intersections(smallest_index);
-        RIGID_BODY<TV> &body1=rigid_body_collection.Rigid_Body(intersection.particle_body),&body2=rigid_body_collection.Rigid_Body(intersection.levelset_body);
-        if(Update_Collision_Pair_Helper(body1,body2,dt,time,collision_location,collision_normal,collision_relative_velocity,mpi_one_ghost)) return false;}
+        RIGID_BODY<TV> &body0=rigid_body_collection.Rigid_Body(intersection.particle_body),&body1=rigid_body_collection.Rigid_Body(intersection.levelset_body);
+        if(Update_Collision_Pair_Helper(body0,body1,dt,time,collision_location,collision_normal,collision_relative_velocity,mpi_one_ghost)) return false;}
     return i>0; // if i==0, we didn't process any collisions
 }
 //#####################################################################
@@ -579,20 +579,20 @@ Process_Push_Out_Legacy()
                         if(!particle_intersections.m){skip_collision_check.Set_Last_Checked(id_1,id_2);continue;}
                         T smallest_value=FLT_MAX;int smallest_index=-1;
                         TV collision_location,collision_normal;T collision_push_distance=0;
-                        RIGID_BODY<TV> *collision_body1=0,*collision_body2=0;
+                        RIGID_BODY<TV> *collision_body0=0,*collision_body1=0;
                         for(int i=0;i<particle_intersections.m;i++){
                             const RIGID_BODY_PARTICLE_INTERSECTION<TV>& intersection=particle_intersections(i);
                             T phi=(*rigid_body_collection.Rigid_Body(intersection.levelset_body).implicit_object)(rigid_body_collection.Rigid_Body(intersection.particle_body).World_Space_Point(intersection.particle_location));
                             if(phi<smallest_value){
-                                RIGID_BODY<TV> &body1=rigid_body_collection.Rigid_Body(intersection.particle_body),&body2=rigid_body_collection.Rigid_Body(intersection.levelset_body);
-                                RIGID_BODY<TV> &body_parent1=rigid_body_cluster_bindings.Get_Parent(body1),&body_parent2=rigid_body_cluster_bindings.Get_Parent(body2);
-                                TV location=body1.World_Space_Point(intersection.particle_location);
-                                TV normal=use_parent_normal?body_parent2.Implicit_Geometry_Normal(location):body2.Implicit_Geometry_Normal(location);
+                                RIGID_BODY<TV> &body0=rigid_body_collection.Rigid_Body(intersection.particle_body),&body1=rigid_body_collection.Rigid_Body(intersection.levelset_body);
+                                RIGID_BODY<TV> &body_parent1=rigid_body_cluster_bindings.Get_Parent(body0),&body_parent2=rigid_body_cluster_bindings.Get_Parent(body1);
+                                TV location=body0.World_Space_Point(intersection.particle_location);
+                                TV normal=use_parent_normal?body_parent2.Implicit_Geometry_Normal(location):body1.Implicit_Geometry_Normal(location);
                                 T push_distance=move_fraction*max((T)0,desired_separation_distance-phi);
                                 collision_location=location;collision_normal=normal;collision_push_distance=push_distance;
-                                collision_body1=&body_parent1;collision_body2=&body_parent2;
+                                collision_body0=&body_parent1;collision_body1=&body_parent2;
                                 smallest_value=phi;smallest_index=i;}}
-                        RIGID_BODY<TV>::Apply_Push(*collision_body1,*collision_body2,collision_location,collision_normal,collision_push_distance);
+                        RIGID_BODY<TV>::Apply_Push(*collision_body0,*collision_body1,collision_location,collision_normal,collision_push_distance);
                         rigid_body_collection.Rigid_Body(particle_intersections(smallest_index).particle_body).Update_Bounding_Box();
                         rigid_body_collection.Rigid_Body(particle_intersections(smallest_index).levelset_body).Update_Bounding_Box();
                         skip_collision_check.Set_Last_Moved(id_1);skip_collision_check.Set_Last_Moved(id_2);
@@ -1235,9 +1235,9 @@ Clean_Up_Fractured_Items_From_Lists(ARRAY<VECTOR<int,2> >& pairs,const int curre
             else if(first_ids.m && !second_ids.m)
                 for(int body=0;body<first_ids.m;body++) pairs_processed_by_collisions.Set(VECTOR<int,2>(keys(k)(1),first_ids(body)).Sorted());
             else
-                for(int body1=0;body1<first_ids.m;body1++)
-                    for(int body2=0;body2<second_ids.m;body2++)
-                        pairs_processed_by_collisions.Set(VECTOR<int,2>(first_ids(body1),second_ids(body2)).Sorted());}
+                for(int body0=0;body0<first_ids.m;body0++)
+                    for(int body1=0;body1<second_ids.m;body1++)
+                        pairs_processed_by_collisions.Set(VECTOR<int,2>(first_ids(body0),second_ids(body1)).Sorted());}
         if(!called_from_contact){ // TODO: add new contact pairs to the list as well
             // Go through added bodies, and collide them against all other bodies and add them to the pairs list
             spatial_partition->Set_Collision_Body_Thickness(0);

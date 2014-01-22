@@ -42,13 +42,13 @@ Compute(const T x,T* ddf,T* df,T* f) const
 // Function Coefficients_From_Interpolation
 //#####################################################################
 template<class T> void QUADRATIC<T>::
-Coefficients_From_Interpolation(T x1,T y1,T x2,T y2,T x3,T y3)
+Coefficients_From_Interpolation(T x0,T y0,T x1,T y1,T x2,T y2)
 {
-    T dx1=x1-x3,dx2=x2-x3,dy1=y1-y3,dy2=y2-y3,den=1/(dx1*dx2*(dx1-dx2));
-    T m1=dy1*dx2,m2=dx1*dy2,p2=m1-m2,p1=dx1*m2-dx2*m1;
+    T dx1=x0-x2,dx2=x1-x2,dy0=y0-y2,dy1=y1-y2,den=1/(dx1*dx2*(dx1-dx2));
+    T m1=dy0*dx2,m2=dx1*dy1,p2=m1-m2,p1=dx1*m2-dx2*m1;
     a=den*p2;
-    b=den*(p1-2*p2*x3);
-    c=den*x3*(x3*p2-p1)+y3;
+    b=den*(p1-2*p2*x2);
+    c=den*x2*(x2*p2-p1)+y2;
 }
 //#####################################################################
 // Function Compute_Roots

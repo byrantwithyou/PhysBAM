@@ -56,7 +56,7 @@ Planar_Point_Inside_Triangle(const TV& point,const T thickness_over_2) const
     edge_plane.normal=TV::Cross_Product(X.x-X.z,normal).Normalized();
     if(edge_plane.Outside(point,thickness_over_2)) return false;
     edge_plane.normal=TV::Cross_Product(X.z-X.y,normal).Normalized();
-    edge_plane.x1=X.y;
+    edge_plane.x0=X.y;
     if(edge_plane.Outside(point,thickness_over_2)) return false;
     return true;
 }
@@ -123,26 +123,26 @@ Closest_Point(const TV& location,TV& weights) const
     weights=Barycentric_Coordinates(location);
     // project closest point to the triangle if it's not already inside it
     if(weights.x<0){
-        T a23=SEGMENT_3D<T>::Interpolation_Fraction(location,X.y,X.z); // Check edge X.y--X.z
-        if(a23<0){
+        T a12=SEGMENT_3D<T>::Interpolation_Fraction(location,X.y,X.z); // Check edge X.y--X.z
+        if(a12<0){
             if(weights.z<0){ // Closest point is on edge X.x--X.y
-                T a12=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,X.x,X.y),0,1);weights=TV(1-a12,a12,0);return weights.x*X.x+weights.y*X.y;}
+                T a01=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,X.x,X.y),0,1);weights=TV(1-a01,a01,0);return weights.x*X.x+weights.y*X.y;}
             else{weights=TV(0,1,0);return X.y;}} // Closest point is X.y
-        else if(a23>1){
+        else if(a12>1){
             if(weights.y<0){ // Closest point is on edge X.x--X.z
-                T a13=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,X.x,X.z),0,1);weights=TV(1-a13,0,a13);return weights.x*X.x+weights.z*X.z;}
+                T a02=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,X.x,X.z),0,1);weights=TV(1-a02,0,a02);return weights.x*X.x+weights.z*X.z;}
             else{weights=TV(0,0,1);return X.z;}} // Closest point is X.z
-        else{weights=TV(0,1-a23,a23);return weights.y*X.y+weights.z*X.z;}} // Closest point is on edge X.y--X.z
+        else{weights=TV(0,1-a12,a12);return weights.y*X.y+weights.z*X.z;}} // Closest point is on edge X.y--X.z
     else if(weights.y<0){
-        T a13=SEGMENT_3D<T>::Interpolation_Fraction(location,X.x,X.z); // Check edge X.x--X.z
-        if(a13<0){
+        T a02=SEGMENT_3D<T>::Interpolation_Fraction(location,X.x,X.z); // Check edge X.x--X.z
+        if(a02<0){
             if(weights.z<0){ // Closest point is on edge X.x--X.y
-                T a12=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,X.x,X.y),0,1);weights=TV(1-a12,a12,0);return weights.x*X.x+weights.y*X.y;}
+                T a01=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,X.x,X.y),0,1);weights=TV(1-a01,a01,0);return weights.x*X.x+weights.y*X.y;}
             else{weights=TV(1,0,0);return X.x;}} // Closest point is X.x
-        else if(a13>1){weights=TV(0,0,1);return X.z;} // Closest point is X.z
-        else{weights=TV(1-a13,0,a13);return weights.x*X.x+weights.z*X.z;}} // Closest point is on edge X.x--X.z
+        else if(a02>1){weights=TV(0,0,1);return X.z;} // Closest point is X.z
+        else{weights=TV(1-a02,0,a02);return weights.x*X.x+weights.z*X.z;}} // Closest point is on edge X.x--X.z
     else if(weights.z<0){ // Closest point is on edge X.x--X.y
-        T a12=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,X.x,X.y),0,1);weights=TV(1-a12,a12,0);return weights.x*X.x+weights.y*X.y;}
+        T a01=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,X.x,X.y),0,1);weights=TV(1-a01,a01,0);return weights.x*X.x+weights.y*X.y;}
     return weights.x*X.x+weights.y*X.y+weights.z*X.z; // Point is interior to the triangle
 }
 //#####################################################################
@@ -422,9 +422,9 @@ Intersects(const TRIANGLE_3D<T>& triangle,T theta_tol,INTERSECTS_HELPER* ih) con
 // Function Barycentric_Coordinates
 //#####################################################################
 template<class T> VECTOR<T,3> TRIANGLE_3D<T>::
-Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const TV& x3) // clockwise vertices
+Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1,const TV& x2) // clockwise vertices
 {
-    TV u=x2-x1,v=x3-x1,w=location-x1;
+    TV u=x1-x0,v=x2-x0,w=location-x0;
     T u_dot_u=TV::Dot_Product(u,u),v_dot_v=TV::Dot_Product(v,v),u_dot_v=TV::Dot_Product(u,v),
         u_dot_w=TV::Dot_Product(u,w),v_dot_w=TV::Dot_Product(v,w);
     T denominator=u_dot_u*v_dot_v-sqr(u_dot_v),one_over_denominator;
@@ -436,16 +436,16 @@ Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const TV& x
 // Function Clamped_Barycentric_Coordinates
 //#####################################################################
 template<class T> VECTOR<T,3> TRIANGLE_3D<T>::
-Clamped_Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const TV& x3,const T tolerance) // clockwise vertices
+Clamped_Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1,const TV& x2,const T tolerance) // clockwise vertices
 {
-    TV u=x2-x1,v=x3-x1,w=location-x1;
+    TV u=x1-x0,v=x2-x0,w=location-x0;
     T u_dot_u=TV::Dot_Product(u,u),v_dot_v=TV::Dot_Product(v,v),u_dot_v=TV::Dot_Product(u,v),
        u_dot_w=TV::Dot_Product(u,w),v_dot_w=TV::Dot_Product(v,w);
     if(abs(u_dot_u)<tolerance){
         if(abs(v_dot_v)<tolerance) return TV((T)one_third,(T)one_third,(T)one_third); // single point
-        T c=clamp(v_dot_w/v_dot_v,(T)0,(T)1);T a_and_b=(T).5*(1-c);return TV(a_and_b,a_and_b,c);} // x1 and x2 are a single point
+        T c=clamp(v_dot_w/v_dot_v,(T)0,(T)1);T a_and_b=(T).5*(1-c);return TV(a_and_b,a_and_b,c);} // x0 and x1 are a single point
     else if(abs(v_dot_v)<tolerance){
-        T b=clamp(u_dot_w/u_dot_u,(T)0,(T)1);T a_and_c=(T).5*(1-b);return TV(a_and_c,b,a_and_c);} // x1 and x3 are a single point
+        T b=clamp(u_dot_w/u_dot_u,(T)0,(T)1);T a_and_c=(T).5*(1-b);return TV(a_and_c,b,a_and_c);} // x0 and x2 are a single point
     else{
         T denominator=u_dot_u*v_dot_v-sqr(u_dot_v); 
         if(abs(denominator)<tolerance){

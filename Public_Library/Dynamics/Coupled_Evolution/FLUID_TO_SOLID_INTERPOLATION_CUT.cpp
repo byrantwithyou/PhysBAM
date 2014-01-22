@@ -337,11 +337,11 @@ Remove_Degeneracy()
     for(LOOP_ENTRY<TV>* p=pa->next;;p=p->next){
         LOOP_ENTRY<TV>* x=p;
         while(x->cell==x->next->cell) x=x->next;
-        TV X1=X(curve.mesh.elements(p->e.i).x);
-        TV X2=X(curve.mesh.elements(p->e.i).y);
-        TV X3=X(curve.mesh.elements(x->e.i).x);
-        TV X4=X(curve.mesh.elements(x->e.i).y);
-        SEGMENT_2D<T> segment(X1+(X2-X1)*p->e.a,X3+(X4-X3)*x->e.b);
+        TV X0=X(curve.mesh.elements(p->e.i).x);
+        TV X1=X(curve.mesh.elements(p->e.i).y);
+        TV X2=X(curve.mesh.elements(x->e.i).x);
+        TV X3=X(curve.mesh.elements(x->e.i).y);
+        SEGMENT_2D<T> segment(X0+(X1-X0)*p->e.a,X2+(X3-X2)*x->e.b);
         cut_cells.Get(x->cell).segment=segment;
         p=x;
         if(p==pa) break;}

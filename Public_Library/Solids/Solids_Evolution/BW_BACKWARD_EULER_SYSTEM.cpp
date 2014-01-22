@@ -106,12 +106,12 @@ Project(KRYLOV_VECTOR_BASE<T>& BV) const
 // Function Inner_Product
 //#####################################################################
 template<class TV> double BW_BACKWARD_EULER_SYSTEM<TV>::
-Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
+Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const
 {
-    const VECTOR_T& V1=debug_cast<const VECTOR_T&>(BV1),&V2=debug_cast<const VECTOR_T&>(BV2);
+    const VECTOR_T& V0=debug_cast<const VECTOR_T&>(BV0),&V1=debug_cast<const VECTOR_T&>(BV1);
     double inner_product=0;
-    for(int i=0;i<V1.V.Size();i++) inner_product+=V1.V(i).Dot(V2.V(i))*solid_body_collection.deformable_body_collection.particles.mass(i);
-//+ARRAYS_COMPUTATIONS::Inner_Product_Double_Precision(projection_data.mass.world_space_rigid_mass,V1.rigid_V,V2.rigid_V);
+    for(int i=0;i<V0.V.Size();i++) inner_product+=V0.V(i).Dot(V1.V(i))*solid_body_collection.deformable_body_collection.particles.mass(i);
+//+ARRAYS_COMPUTATIONS::Inner_Product_Double_Precision(projection_data.mass.world_space_rigid_mass,V0.rigid_V,V1.rigid_V);
     //TODO this should not be mass scaled
     return inner_product;
 }

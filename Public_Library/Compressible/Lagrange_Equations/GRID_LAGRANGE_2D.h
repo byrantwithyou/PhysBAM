@@ -26,13 +26,13 @@ public:
 
 //#####################################################################
     void Euler_Step(const ARRAY<T,VECTOR<int,2> >& u,const ARRAY<T,VECTOR<int,2> >& v,const T dt);
-    void Get_Lengths(ARRAY<T,VECTOR<int,2> >& L1,ARRAY<T,VECTOR<int,2> >& L2);
+    void Get_Lengths(ARRAY<T,VECTOR<int,2> >& L0,ARRAY<T,VECTOR<int,2> >& L1);
     void Get_Areas(ARRAY<T,VECTOR<int,2> >& A);
     void Get_Normals(ARRAY<T,VECTOR<int,2> >& N1_x,ARRAY<T,VECTOR<int,2> >& N1_y,ARRAY<T,VECTOR<int,2> >& N2_x,ARRAY<T,VECTOR<int,2> >& N2_y);
     void Get_Centers(ARRAY<T,VECTOR<int,2> >& C_x,ARRAY<T,VECTOR<int,2> >& C_y);
     void Get_Midpoints(ARRAY<T,VECTOR<int,2> >& M1_x,ARRAY<T,VECTOR<int,2> >& M1_y,ARRAY<T,VECTOR<int,2> >& M2_x,ARRAY<T,VECTOR<int,2> >& M2_y);
-    void Get_Sub_Zone_Lengths(ARRAY<T,VECTOR<int,2> >& LL1,ARRAY<T,VECTOR<int,2> >& LL2,ARRAY<T,VECTOR<int,2> >& LL3,ARRAY<T,VECTOR<int,2> >& LL4);
-    void Get_Sub_Zone_Areas(ARRAY<T,VECTOR<int,2> >& AA1,ARRAY<T,VECTOR<int,2> >& AA2,ARRAY<T,VECTOR<int,2> >& AA3,ARRAY<T,VECTOR<int,2> >& AA4);
+    void Get_Sub_Zone_Lengths(ARRAY<T,VECTOR<int,2> >& LL0,ARRAY<T,VECTOR<int,2> >& LL1,ARRAY<T,VECTOR<int,2> >& LL2,ARRAY<T,VECTOR<int,2> >& LL3);
+    void Get_Sub_Zone_Areas(ARRAY<T,VECTOR<int,2> >& AA0,ARRAY<T,VECTOR<int,2> >& AA1,ARRAY<T,VECTOR<int,2> >& AA2,ARRAY<T,VECTOR<int,2> >& AA3);
     void Get_Sub_Zone_Normals(ARRAY<T,VECTOR<int,2> >& NN1_x,ARRAY<T,VECTOR<int,2> >& NN1_y,ARRAY<T,VECTOR<int,2> >& NN2_x,ARRAY<T,VECTOR<int,2> >& NN2_y,ARRAY<T,VECTOR<int,2> >& NN3_x,ARRAY<T,VECTOR<int,2> >& NN3_y,ARRAY<T,VECTOR<int,2> >& NN4_x,ARRAY<T,VECTOR<int,2> >& NN4_y);
 //#####################################################################
 };

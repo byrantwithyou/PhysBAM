@@ -26,12 +26,12 @@ public:
     const T_ARRAY& Derived() const
     {return static_cast<const T_ARRAY&>(*this);}
 
-    template<class T_ARRAY1> static bool Same_Array(const T_ARRAY1& array1,const T_ARRAY1& array2)
-    {return &array1==&array2;}
+    template<class T_ARRAY0> static bool Same_Array(const T_ARRAY0& array0,const T_ARRAY0& array1)
+    {return &array0==&array1;}
 
-    template<class T_ARRAY1,class T_ARRAY2> static bool
-    Same_Array(const T_ARRAY1& array1,const T_ARRAY2& array2)
-    {return SAME_ARRAY<T_ARRAY1,T_ARRAY2>::Same_Array(array1,array2);}
+    template<class T_ARRAY0,class T_ARRAY1> static bool
+    Same_Array(const T_ARRAY0& array0,const T_ARRAY1& array1)
+    {return SAME_ARRAY<T_ARRAY0,T_ARRAY1>::Same_Array(array0,array1);}
 
     template<class T_INDICES>
     INDIRECT_ARRAY<T_ARRAY,T_INDICES&> Subset(const T_INDICES& indices)
@@ -47,9 +47,9 @@ protected:
     if(!T_ARRAY::Same_Array(self,source_)) for(RANGE_ITERATOR<dimension> iterator(domain_indices);iterator.Valid();iterator.Next()) self(iterator.index)=source_(iterator.index);
     return self;}
 
-    template<class T_ARRAY1>
-    T_ARRAY& operator=(const T_ARRAY1& source)
-    {STATIC_ASSERT(CAN_ASSIGN<T,typename T_ARRAY1::ELEMENT>::value);
+    template<class T_ARRAY0>
+    T_ARRAY& operator=(const T_ARRAY0& source)
+    {STATIC_ASSERT(CAN_ASSIGN<T,typename T_ARRAY0::ELEMENT>::value);
     T_ARRAY& self=Derived();RANGE<TV_INT> domain_indices=self.Domain_Indices();assert(domain_indices==source.Domain_Indices());
     if(!T_ARRAY::Same_Array(self,source)) for(RANGE_ITERATOR<dimension> iterator(domain_indices);iterator.Valid();iterator.Next()) self(iterator.index)=source(iterator.index);
     return self;}
@@ -89,8 +89,8 @@ protected:
     offset=-domain.min_corner.Dot(stride);}
 
 public:
-    template<class T_ARRAY2>
-    ARRAYS_ND_BASE& operator=(const T_ARRAY2& source)
+    template<class T_ARRAY1>
+    ARRAYS_ND_BASE& operator=(const T_ARRAY1& source)
     {assert(Equal_Dimensions(*this,source));array=source.array;return *this;}
 
     const RANGE<TV_INT>& Domain_Indices() const
@@ -148,12 +148,12 @@ public:
     int Pack_Size() const
     {return sizeof(T);}
 
-    template<class T_ARRAY1>
-    void Pack(T_ARRAY1& buffer,typename T_ARRAY1::INDEX& position,const TV_INT& p)
+    template<class T_ARRAY0>
+    void Pack(T_ARRAY0& buffer,typename T_ARRAY0::INDEX& position,const TV_INT& p)
     {*(T*)(&buffer(position+1))=(*this)(p);position+=sizeof(T);}
     
-    template<class T_ARRAY1>
-    void Unpack(const T_ARRAY1& buffer,typename T_ARRAY1::INDEX& position,const TV_INT& p)
+    template<class T_ARRAY0>
+    void Unpack(const T_ARRAY0& buffer,typename T_ARRAY0::INDEX& position,const TV_INT& p)
     {(*this)(p)=*(const T*)(&buffer(position+1));position+=sizeof(T);}
 
     void Fill(const T& constant)

@@ -663,24 +663,24 @@ void Point_Joint_Coupled_Drop(bool make_body_static)
 {
     last_frame=120;
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body1.Frame().t=TV(0,2,0);
-    rigid_body1.Set_Mass(1000);
-    rigid_body1.name="parent";
-    if(make_body_static) rigid_body1.is_static=true;
+    RIGID_BODY<TV>& rigid_body0=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
+    rigid_body0.Frame().t=TV(0,2,0);
+    rigid_body0.Set_Mass(1000);
+    rigid_body0.name="parent";
+    if(make_body_static) rigid_body0.is_static=true;
 
-    RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body2.Frame().t=TV(0,4,2);
-    rigid_body2.Set_Mass(1000);
-    rigid_body2.name="child";
+    RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
+    rigid_body1.Frame().t=TV(0,4,2);
+    rigid_body1.Set_Mass(1000);
+    rigid_body1.name="child";
 
     POINT_JOINT<TV>* joint=new POINT_JOINT<TV>();
-    arb.joint_mesh.Add_Articulation(rigid_body1.particle_index,rigid_body2.particle_index,joint);
+    arb.joint_mesh.Add_Articulation(rigid_body0.particle_index,rigid_body1.particle_index,joint);
     joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1)));
     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,-1,-1)));
 
     tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)5.5,(T)3.5))),true,true,1000);
-    tests.Bind_Particles_In_Rigid_Body(rigid_body2);
+    tests.Bind_Particles_In_Rigid_Body(rigid_body1);
     tests.Add_Ground((T).5,-2,1);
 }
 //#####################################################################
@@ -692,44 +692,44 @@ void Torsion_Spring()
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
 
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=3;
+    RIGID_BODY<TV>& rigid_body0=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
+    rigid_body0.Frame().t=TV(0,2,0);
+    rigid_body0.Set_Mass(30);
+    rigid_body0.name="parent";
+
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body1.Frame().t=TV(0,2,0);
+    rigid_body1.Frame().t=TV((T)2.1,2,0);
+    rigid_body1.name="child";
     rigid_body1.Set_Mass(30);
-    rigid_body1.name="parent";
+    rigid_body1.is_static=true;
 
-    RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body2.Frame().t=TV((T)2.1,2,0);
-    rigid_body2.name="child";
-    rigid_body2.Set_Mass(30);
-    rigid_body2.is_static=true;
-
-    JOINT<TV>* joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1.particle_index,rigid_body2.particle_index,joint);
+    JOINT<TV>* joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0.particle_index,rigid_body1.particle_index,joint);
     joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV((T)1.05,0,0),ROTATION<TV>()));
     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-(T)1.05,0,0),ROTATION<TV>()));
 
-    RIGID_BODY<TV>& rigid_body3=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body3.Frame().t=TV(-8,2,0);
-    rigid_body3.Set_Mass(30);
-    rigid_body3.name="kinematic";
-    rigid_body3.Is_Kinematic()=true;
-    kinematic_id=rigid_body3.particle_index;
-    curve.Add_Control_Point((T)0,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>()));
-    curve.Add_Control_Point((T)1,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>()));
-    curve.Add_Control_Point((T)2,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>((T)(.5*pi),TV(1,0,0))));
-    curve.Add_Control_Point((T)3,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>((T)(pi),TV(1,0,0))));
-    curve.Add_Control_Point((T)4,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>((T)(1.5*pi),TV(1,0,0))));
-    curve.Add_Control_Point((T)5,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>((T)(2*pi),TV(1,0,0))));
+    RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
+    rigid_body2.Frame().t=TV(-8,2,0);
+    rigid_body2.Set_Mass(30);
+    rigid_body2.name="kinematic";
+    rigid_body2.Is_Kinematic()=true;
+    kinematic_id=rigid_body2.particle_index;
+    curve.Add_Control_Point((T)0,FRAME<TV>(rigid_body2.Frame().t,ROTATION<TV>()));
+    curve.Add_Control_Point((T)1,FRAME<TV>(rigid_body2.Frame().t,ROTATION<TV>()));
+    curve.Add_Control_Point((T)2,FRAME<TV>(rigid_body2.Frame().t,ROTATION<TV>((T)(.5*pi),TV(1,0,0))));
+    curve.Add_Control_Point((T)3,FRAME<TV>(rigid_body2.Frame().t,ROTATION<TV>((T)(pi),TV(1,0,0))));
+    curve.Add_Control_Point((T)4,FRAME<TV>(rigid_body2.Frame().t,ROTATION<TV>((T)(1.5*pi),TV(1,0,0))));
+    curve.Add_Control_Point((T)5,FRAME<TV>(rigid_body2.Frame().t,ROTATION<TV>((T)(2*pi),TV(1,0,0))));
 
-    RIGID_BODY<TV>& rigid_body4=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body4.Frame().t=TV((T)1.05,(T)4.05,0);
-    rigid_body4.name="drop";
-    rigid_body4.Set_Mass(30);
+    RIGID_BODY<TV>& rigid_body3=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
+    rigid_body3.Frame().t=TV((T)1.05,(T)4.05,0);
+    rigid_body3.name="drop";
+    rigid_body3.Set_Mass(30);
 
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(33,5,5),RANGE<TV>(TV(-8,(T)1.5,-.5),TV(0,(T)2.5,.5))),true,0,1000);
 
-    tests.Bind_Particles_In_Rigid_Body(rigid_body1);
-    tests.Bind_Particles_In_Rigid_Body(rigid_body3);
+    tests.Bind_Particles_In_Rigid_Body(rigid_body0);
+    tests.Bind_Particles_In_Rigid_Body(rigid_body2);
     tests.Add_Ground((T).5,-2,1);
 }
 //#####################################################################
@@ -1576,10 +1576,10 @@ void Update_Subsamples()
 void Push_Out_Test2()
 {
     last_frame=360;
+    RIGID_BODY<TV>& rigid_body0=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
-    RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
-    rigid_body1.Frame().t=TV((T).5,10,0);
-    rigid_body2.Frame().t=TV((T)-.5,11,0);
+    rigid_body0.Frame().t=TV((T).5,10,0);
+    rigid_body1.Frame().t=TV((T)-.5,11,0);
 }
 //#####################################################################
 // Function Sphere_Fall

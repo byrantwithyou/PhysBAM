@@ -281,7 +281,7 @@ inline void OpenGL_Quad(const VECTOR<T,3> &bottom_left,const VECTOR<T,3> &right,
 #ifndef USE_OPENGLES
 template<class T>
 inline void OpenGL_Clip_Plane(GLenum id,const PLANE<T> &plane)
-{GLdouble equation[4]={plane.normal.x,plane.normal.y,plane.normal.z,-VECTOR<T,3>::Dot_Product(plane.normal,plane.x1)};
+{GLdouble equation[4]={plane.normal.x,plane.normal.y,plane.normal.z,-VECTOR<T,3>::Dot_Product(plane.normal,plane.x0)};
 glClipPlane(id,equation);}
 #endif
 

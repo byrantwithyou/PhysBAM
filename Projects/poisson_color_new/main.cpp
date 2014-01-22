@@ -465,8 +465,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
                 virtual T u(const TV& X,int color){return exp(-(X-0.5*m).Magnitude_Squared()/m2)*color;}
-                virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*color;}
-                virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*sqrt(x2)*2*mu(1)/m2;}
+                virtual T f_volume(const TV& X,int color){T x1=(X-0.5*m).Magnitude_Squared(); return exp(-x1/m2)*(2*TV::m/m2-x1*4/m4)*mu(color)*color;}
+                virtual T j_surface(const TV& X,int color0,int color1){T x1=(X-0.5*m).Magnitude_Squared(); return exp(-x1/m2)*sqrt(x1)*2*mu(1)/m2;}
                 virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
                 virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
@@ -650,8 +650,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T phi_value(const TV& X){TV x=X-0.5*m;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
                 virtual int phi_color(const TV& X){TV x=X-0.5*m;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?2:1):0;}
                 virtual T u(const TV& X,int color){return exp(-(X-0.5*m).Magnitude_Squared()/m2)*a(color);}
-                virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*a(color);}
-                virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5*m).Magnitude_Squared();if(color0==0) return exp(-x2/m2)*2*mu(color1)*a(color1)*sqrt(x2)/m2;else return T();}
+                virtual T f_volume(const TV& X,int color){T x1=(X-0.5*m).Magnitude_Squared(); return exp(-x1/m2)*(2*TV::m/m2-x1*4/m4)*mu(color)*a(color);}
+                virtual T j_surface(const TV& X,int color0,int color1){T x1=(X-0.5*m).Magnitude_Squared();if(color0==0) return exp(-x1/m2)*2*mu(color1)*a(color1)*sqrt(x1)/m2;else return T();}
                 virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
                 virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
@@ -676,7 +676,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T phi_value(const TV& X){TV x=X-0.5*m;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
                 virtual int phi_color(const TV& X){TV x=X-0.5*m;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?1:0):constraint;}
                 virtual T u(const TV& X,int color){return exp(-(X-0.5*m).Magnitude_Squared()/m2)*a(color);}
-                virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*a(color);}
+                virtual T f_volume(const TV& X,int color){T x1=(X-0.5*m).Magnitude_Squared(); return exp(-x1/m2)*(2*TV::m/m2-x1*4/m4)*mu(color)*a(color);}
                 virtual T j_surface(const TV& X,int color0,int color1){return T();}
                 virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_ASSERT(constraint==-2); return u(X,color1);}
                 virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}

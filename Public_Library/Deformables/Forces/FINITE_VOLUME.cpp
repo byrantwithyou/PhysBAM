@@ -364,14 +364,14 @@ Semi_Implicit_Recompute_Dt(const int element,T& time_plus_dt)
 namespace{
 template<class T> inline SYMMETRIC_MATRIX<T,2> Compute_P1_cap(const T dt_beta,const T dt_alpha,const DIAGONAL_MATRIX<T,2>& W,const SYMMETRIC_MATRIX<T,2>& P0_cap)
 {
-    VECTOR<T,2> P1_cap_diag=((T)1+((T)2*dt_beta+SYMMETRIC_MATRIX<T,2>::Unit_Matrix(dt_alpha))*W).Solve_Linear_System(VECTOR<T,2>(P0_cap.x11,P0_cap.x22));
-    T P1_cap_off=P0_cap.x21/((T)1+dt_beta*(W.Trace()));
+    VECTOR<T,2> P1_cap_diag=((T)1+((T)2*dt_beta+SYMMETRIC_MATRIX<T,2>::Unit_Matrix(dt_alpha))*W).Solve_Linear_System(VECTOR<T,2>(P0_cap.x00,P0_cap.x11));
+    T P1_cap_off=P0_cap.x10/((T)1+dt_beta*(W.Trace()));
     return SYMMETRIC_MATRIX<T,2>(P1_cap_diag.x,P1_cap_off,P1_cap_diag.y);
 }
 template<class T> inline SYMMETRIC_MATRIX<T,3> Compute_P1_cap(const T dt_beta,const T dt_alpha,const DIAGONAL_MATRIX<T,3>& W,const SYMMETRIC_MATRIX<T,3>& P0_cap)
 {
-    VECTOR<T,3> P1_cap_diag=((T)1+(2*dt_beta+SYMMETRIC_MATRIX<T,3>::Unit_Matrix(dt_alpha))*W).Solve_Linear_System(VECTOR<T,3>(P0_cap.x11,P0_cap.x22,P0_cap.x33));
-    VECTOR<T,3> P1_cap_off=((T)1+dt_beta*DIAGONAL_MATRIX<T,3>(W.x.x+W.x.y,W.x.x+W.x.z,W.x.y+W.x.z)).Solve_Linear_System(VECTOR<T,3>(P0_cap.x21,P0_cap.x31,P0_cap.x32));
+    VECTOR<T,3> P1_cap_diag=((T)1+(2*dt_beta+SYMMETRIC_MATRIX<T,3>::Unit_Matrix(dt_alpha))*W).Solve_Linear_System(VECTOR<T,3>(P0_cap.x00,P0_cap.x11,P0_cap.x22));
+    VECTOR<T,3> P1_cap_off=((T)1+dt_beta*DIAGONAL_MATRIX<T,3>(W.x.x+W.x.y,W.x.x+W.x.z,W.x.y+W.x.z)).Solve_Linear_System(VECTOR<T,3>(P0_cap.x10,P0_cap.x20,P0_cap.x21));
     return SYMMETRIC_MATRIX<T,3>(P1_cap_diag.x,P1_cap_off.x,P1_cap_off.y,P1_cap_diag.y,P1_cap_off.z,P1_cap_diag.z);
 }
 }

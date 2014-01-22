@@ -66,14 +66,14 @@ Test_Matrix(int number_particles,int number_rigid_particles) const
 {
     RANDOM_NUMBERS<T> random;
 
-    ARRAY<TV> V(number_particles),V2(number_particles);
+    ARRAY<TV> V(number_particles),V1(number_particles);
     random.Fill_Uniform(V,-1,1);
 
     ARRAY<TWIST<TV> > twist(number_rigid_particles),twist2(number_rigid_particles);
     random.Fill_Uniform(twist,-1,1);
 
     ARRAY<int> empty;
-    GENERALIZED_VELOCITY<TV> solids(V,empty,twist,empty,empty),solids2(V2,empty,twist2,empty,empty);
+    GENERALIZED_VELOCITY<TV> solids(V,empty,twist,empty,empty),solids2(V1,empty,twist2,empty,empty);
 
     ARRAY<T,COUPLING_CONSTRAINT_ID> constraints(Number_Of_Constraints()),constraints2(Number_Of_Constraints());
     random.Fill_Uniform(constraints,-1,1);
@@ -82,7 +82,7 @@ Test_Matrix(int number_particles,int number_rigid_particles) const
     Transpose_Times(constraints,solids2);
 
     CONSTANT_ARRAY<RIGID_BODY_MASS<TV,true> > rigid_mass(twist.m,RIGID_BODY_MASS<TV,true>(1,DIAGONAL_MATRIX<T,TV::SPIN::m>()+1));
-    T inner_solids=V.Dot(V2)+twist.Inner_Product(rigid_mass,twist2);
+    T inner_solids=V.Dot(V1)+twist.Inner_Product(rigid_mass,twist2);
     T inner_constraints=constraints.Dot(constraints2);
 
     LOG::cout<<"MATRIX_SOLID_INTERPOLATION_BASE Test: "<<inner_solids<<"  vs  "<<inner_constraints<<"  relative  "<<

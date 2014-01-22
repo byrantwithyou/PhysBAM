@@ -51,11 +51,11 @@ bool Update_Levelset_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisio
             FRAME<TV> saved_transform=collision_callbacks.Saved_Particle_To_Levelset_Body_Transform(intersection.levelset_body,intersection.particle_body);
             T phi=(*rigid_body_collection.Rigid_Body(intersection.levelset_body).implicit_object->object_space_implicit_object)(saved_transform*intersection.particle_location);
             if(phi<smallest_value){ // inside in *proposed configuration*
-                RIGID_BODY<TV> &body1=rigid_body_collection.Rigid_Body(intersection.particle_body),&body2=rigid_body_collection.Rigid_Body(intersection.levelset_body);
-                RIGID_BODY<TV> &body_parent1=rigid_body_cluster_bindings.Get_Parent(body1),&body_parent2=rigid_body_cluster_bindings.Get_Parent(body2);
-                TV location=body1.World_Space_Point(intersection.particle_location);
+                RIGID_BODY<TV> &body0=rigid_body_collection.Rigid_Body(intersection.particle_body),&body1=rigid_body_collection.Rigid_Body(intersection.levelset_body);
+                RIGID_BODY<TV> &body_parent1=rigid_body_cluster_bindings.Get_Parent(body0),&body_parent2=rigid_body_cluster_bindings.Get_Parent(body1);
+                TV location=body0.World_Space_Point(intersection.particle_location);
                 // use extended normal so it's defined if we're outside the body in the old configuration
-                TV normal=rigid_body_collisions.use_parent_normal?body_parent2.implicit_object->Extended_Normal(location):body2.implicit_object->Extended_Normal(location);
+                TV normal=rigid_body_collisions.use_parent_normal?body_parent2.implicit_object->Extended_Normal(location):body1.implicit_object->Extended_Normal(location);
                 TV relative_velocity=RIGID_BODY<TV>::Relative_Velocity_At_Geometry1_Particle(body_parent1,body_parent2,location,intersection.particle_index);
 
                 if(TV::Dot_Product(relative_velocity,normal)<0){ // approaching in *old configuration*

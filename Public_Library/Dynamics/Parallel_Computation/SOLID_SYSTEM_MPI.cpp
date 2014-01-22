@@ -91,13 +91,13 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 // Function Inner_Product
 //#####################################################################
 template<class TV> double SOLID_SYSTEM_MPI<TV>::
-Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
+Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const
 {
-    const VECTOR_T& V1=debug_cast<const VECTOR_T&>(BV1),&V2=debug_cast<const VECTOR_T&>(BV2);
-    double inner_product=V1.V.Inner_Product_Double_Precision(modified_mass,V2.V);
-    for(int i=0;i<V1.rigid_V.Size();i++){
-        inner_product+=TV::Dot_Product(V1.rigid_V(i).linear,modified_world_space_rigid_mass(i)*V2.rigid_V(i).linear);
-        inner_product+=TV::SPIN::Dot_Product(V1.rigid_V(i).angular,modified_world_space_rigid_inertia_tensor(i)*V2.rigid_V(i).angular);}
+    const VECTOR_T& V0=debug_cast<const VECTOR_T&>(BV0),&V1=debug_cast<const VECTOR_T&>(BV1);
+    double inner_product=V0.V.Inner_Product_Double_Precision(modified_mass,V1.V);
+    for(int i=0;i<V0.rigid_V.Size();i++){
+        inner_product+=TV::Dot_Product(V0.rigid_V(i).linear,modified_world_space_rigid_mass(i)*V1.rigid_V(i).linear);
+        inner_product+=TV::SPIN::Dot_Product(V0.rigid_V(i).angular,modified_world_space_rigid_inertia_tensor(i)*V1.rigid_V(i).angular);}
     return inner_product;
 }
 #ifdef USE_MPI

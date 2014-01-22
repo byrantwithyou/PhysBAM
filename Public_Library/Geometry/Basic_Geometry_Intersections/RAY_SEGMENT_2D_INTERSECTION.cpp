@@ -67,10 +67,10 @@ template<class T> bool Closest_Non_Intersecting_Point(RAY<VECTOR<T,2> >& ray,con
 //#####################################################################
 // Optimized intersection for segment(X.x,y),(X.y,y), must have X.x<X.y
 // Segment is lengthened at each end by thickness_over_two
-template<class T> bool Intersection_X_Segment(RAY<VECTOR<T,2> >& ray,const T x1,const T x2,const T y,const T thickness_over_two)
+template<class T> bool Intersection_X_Segment(RAY<VECTOR<T,2> >& ray,const T x0,const T x1,const T y,const T thickness_over_two)
 {
-    assert(x1<x2);
-    VECTOR<T,2> from_start_to_start(x1-ray.endpoint.x,y-ray.endpoint.y);T length=x2-x1;
+    assert(x0<x1);
+    VECTOR<T,2> from_start_to_start(x0-ray.endpoint.x,y-ray.endpoint.y);T length=x1-x0;
     T cross_product=-ray.direction.y,abs_cross_product=abs(cross_product);
     if((ray.semi_infinite && abs_cross_product>0) || (!ray.semi_infinite && ray.t_max*abs_cross_product>thickness_over_two)){
         T cross_recip=((T)1)/cross_product;
@@ -84,12 +84,12 @@ template<class T> bool Intersection_X_Segment(RAY<VECTOR<T,2> >& ray,const T x1,
 //#####################################################################
 // Function Intersection_Y_Segment
 //#####################################################################
-// Optimized intersection for segment (x,y1),(x,y2), must have y1<y2
+// Optimized intersection for segment (x,y0),(x,y1), must have y0<y1
 // Segment is lengthened at each end by thickness_over_two
-template<class T> bool Intersection_Y_Segment(RAY<VECTOR<T,2> >& ray,const T x,const T y1,const T y2,const T thickness_over_two)
+template<class T> bool Intersection_Y_Segment(RAY<VECTOR<T,2> >& ray,const T x,const T y0,const T y1,const T thickness_over_two)
 {
-    assert(y1<y2);
-    VECTOR<T,2> from_start_to_start(x-ray.endpoint.x,y1-ray.endpoint.y);T segment_length=y2-y1;
+    assert(y0<y1);
+    VECTOR<T,2> from_start_to_start(x-ray.endpoint.x,y0-ray.endpoint.y);T segment_length=y1-y0;
     T cross_product=ray.direction.x,abs_cross_product=abs(cross_product);
     if((ray.semi_infinite && abs_cross_product>0) || (!ray.semi_infinite && ray.t_max*abs_cross_product>thickness_over_two)){
         T cross_recip=((T)1)/cross_product;

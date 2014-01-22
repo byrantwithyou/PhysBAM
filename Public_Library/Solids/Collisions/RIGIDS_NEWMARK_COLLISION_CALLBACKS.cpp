@@ -148,10 +148,10 @@ Exchange_Frame(const int id)
 // Function Compute_Collision_Impulse
 //#####################################################################
 template<class TV> TWIST<TV> RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>::
-Compute_Collision_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const TV& relative_velocity,const T coefficient_of_restitution,
+Compute_Collision_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& normal,const TV& relative_velocity,const T coefficient_of_restitution,
     const T coefficient_of_friction,const bool clamp_friction_magnitude,const bool rolling_friction,const bool clamp_energy)
 {
-    return RIGID_BODY<TV>::Compute_Collision_Impulse(body1,body2,evolution.rigid_frame_save(body1.particle_index).r,evolution.rigid_frame_save(body2.particle_index).r,location,
+    return RIGID_BODY<TV>::Compute_Collision_Impulse(body0,body1,evolution.rigid_frame_save(body0.particle_index).r,evolution.rigid_frame_save(body1.particle_index).r,location,
         normal,relative_velocity,coefficient_of_restitution,coefficient_of_friction,clamp_friction_magnitude,rolling_friction,clamp_energy);
 }
 //#####################################################################

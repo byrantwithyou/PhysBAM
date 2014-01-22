@@ -17,7 +17,7 @@ template<class T> bool Intersects(const RANGE<VECTOR<T,2> >& box,const LINE_2D<T
     bool points_on_positive_side=false,points_on_negative_side=false;
     for(int i=0;i<2;i++)for(int j=0;j<2;j++){
         VECTOR<T,2> test_point(i?box.min_corner.x:box.max_corner.x,j?box.min_corner.y:box.max_corner.y);
-        T distance=VECTOR<T,2>::Dot_Product(line.normal,test_point-line.x1);
+        T distance=VECTOR<T,2>::Dot_Product(line.normal,test_point-line.x0);
         if(distance>-thickness_over_two) points_on_positive_side=true;
         if(distance<thickness_over_two) points_on_negative_side=true;}
     return points_on_positive_side&&points_on_negative_side;
@@ -29,7 +29,7 @@ template<class T> T Halfspace_Intersection_Size(const RANGE<VECTOR<T,2> >& box,c
 {
     // Normalize input and remember how.  After normalization: box is a unit box, normal.z>=normal.y>=normal.x>=0.  Normalize to cube center outside or on the boundary.
     bool flip[2]={false},exchange_xy=false,compliment=false;
-    T y0=VECTOR<T,2>::Dot_Product(halfspace.x1-box.min_corner,halfspace.normal);VECTOR<T,2> scaling=box.Edge_Lengths(),normal=halfspace.normal*scaling;
+    T y0=VECTOR<T,2>::Dot_Product(halfspace.x0-box.min_corner,halfspace.normal);VECTOR<T,2> scaling=box.Edge_Lengths(),normal=halfspace.normal*scaling;
     for(int i=0;i<2;i++) if(normal(i)<0){normal(i)=-normal(i);y0+=normal(i);flip[i]=true;}
     if(normal.y<normal.x){exchange(normal.y,normal.x);exchange_xy=true;}
     y0/=normal.y;normal/=normal.y;T nx=normal.x,volume=0;if(2*y0-nx>1){y0=1-y0+nx;compliment=true;}

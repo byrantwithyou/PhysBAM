@@ -76,7 +76,7 @@ Phi(VECTOR<T,3> x) const
 //#####################################################################
 template<class T>
 void OPENGL_IMPLICIT_SURFACE<T>::
-Display_Tetrahedron(const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3,const VECTOR<T,3>& x4, 
+Display_Tetrahedron(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3, 
     const float phi1,const float phi2,const float phi3,const float phi4,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices,ARRAY<GLfloat>& normals) const
 {
     VECTOR<T,3> p1,p2,p3,p4;
@@ -88,76 +88,76 @@ Display_Tetrahedron(const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3
         case 1:
             // one triangle
             if(phi1 > 0){
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x2,phi1/(phi1-phi2));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x4,phi1/(phi1-phi4));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x3,phi1/(phi1-phi3));} 
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x1,phi1/(phi1-phi2));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x3,phi1/(phi1-phi4));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x2,phi1/(phi1-phi3));} 
             else if(phi2 > 0){
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x1,phi2/(phi2-phi1));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x3,phi2/(phi2-phi3));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x4,phi2/(phi2-phi4));}
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x0,phi2/(phi2-phi1));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x2,phi2/(phi2-phi3));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x3,phi2/(phi2-phi4));}
             else if(phi3 > 0){
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x1,phi3/(phi3-phi1));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x4,phi3/(phi3-phi4));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x2,phi3/(phi3-phi2));}
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x0,phi3/(phi3-phi1));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x3,phi3/(phi3-phi4));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x1,phi3/(phi3-phi2));}
             else{
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x1,phi4/(phi4-phi1));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x2,phi4/(phi4-phi2));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x3, phi4/(phi4-phi3));} 
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x0,phi4/(phi4-phi1));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x1,phi4/(phi4-phi2));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x2, phi4/(phi4-phi3));} 
             OpenGL_Normal(surface.Normal(p1),normals);OpenGL_Vertex(p1,vertices);OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2,vertices);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3,vertices);
             break;
         case 2:
             // two triangles
             if(phi1 > 0 && phi2 > 0){
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x3,phi1/(phi1-phi3));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x4,phi1/(phi1-phi4));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x3,phi2/(phi2-phi3));
-                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x4,phi2/(phi2-phi4));}
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x2,phi1/(phi1-phi3));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x3,phi1/(phi1-phi4));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x2,phi2/(phi2-phi3));
+                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x3,phi2/(phi2-phi4));}
             else if(phi1 > 0 && phi3 > 0){
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x4,phi1/(phi1-phi4));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x2,phi1/(phi1-phi2));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x4,phi3/(phi3-phi4));
-                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x2,phi3/(phi3-phi2));}
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x3,phi1/(phi1-phi4));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x1,phi1/(phi1-phi2));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x3,phi3/(phi3-phi4));
+                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x1,phi3/(phi3-phi2));}
             else if(phi1 > 0 && phi4 > 0){
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x2,phi1/(phi1-phi2));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x3,phi1/(phi1-phi3));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x2,phi4/(phi4-phi2));
-                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x3,phi4/(phi4-phi3));}
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x1,phi1/(phi1-phi2));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x2,phi1/(phi1-phi3));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x1,phi4/(phi4-phi2));
+                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x2,phi4/(phi4-phi3));}
             else if(phi2 > 0 && phi3 > 0){
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x1,phi2/(phi2-phi1));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x4,phi2/(phi2-phi4));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x1,phi3/(phi3-phi1));
-                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x4,phi3/(phi3-phi4));}
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x0,phi2/(phi2-phi1));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x3,phi2/(phi2-phi4));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x0,phi3/(phi3-phi1));
+                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x3,phi3/(phi3-phi4));}
             else if(phi2 > 0 && phi4 > 0){
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x3,phi2/(phi2-phi3));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x1,phi2/(phi2-phi1));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x3,phi4/(phi4-phi3));
-                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x1,phi4/(phi4-phi1));}
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x2,phi2/(phi2-phi3));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x0,phi2/(phi2-phi1));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x2,phi4/(phi4-phi3));
+                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x0,phi4/(phi4-phi1));}
             else{
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x1,phi3/(phi3-phi1));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x2,phi3/(phi3-phi2));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x1,phi4/(phi4-phi1));
-                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x2,phi4/(phi4-phi2));}
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x0,phi3/(phi3-phi1));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x1,phi3/(phi3-phi2));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x0,phi4/(phi4-phi1));
+                p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x1,phi4/(phi4-phi2));}
             OpenGL_Normal(surface.Normal(p1),normals);OpenGL_Vertex(p1,vertices);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3,vertices);OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2,vertices);
             OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2,vertices);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3,vertices);OpenGL_Normal(surface.Normal(p4),normals);OpenGL_Vertex(p4,vertices);
             break;
         case 3:
             // one triangle
             if(phi1 <= 0){
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x2,phi1/(phi1-phi2));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x3,phi1/(phi1-phi3));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x4,phi1/(phi1-phi4));} 
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x1,phi1/(phi1-phi2));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x2,phi1/(phi1-phi3));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x0,x3,phi1/(phi1-phi4));} 
             else if(phi2 <= 0){
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x1,phi2/(phi2-phi1));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x4,phi2/(phi2-phi4));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x3,phi2/(phi2-phi3));}
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x0,phi2/(phi2-phi1));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x3,phi2/(phi2-phi4));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x1,x2,phi2/(phi2-phi3));}
             else if(phi3 <= 0){
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x1,phi3/(phi3-phi1));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x2,phi3/(phi3-phi2));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x4,phi3/(phi3-phi4));}
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x0,phi3/(phi3-phi1));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x1,phi3/(phi3-phi2));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x3,phi3/(phi3-phi4));}
             else{
-                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x1,phi4/(phi4-phi1));
-                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x3,phi4/(phi4-phi3));
-                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x4,x2,phi4/(phi4-phi2));}  
+                p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x0,phi4/(phi4-phi1));
+                p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x2,phi4/(phi4-phi3));
+                p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x1,phi4/(phi4-phi2));}  
             OpenGL_Normal(surface.Normal(p1),normals);OpenGL_Vertex(p1,vertices);OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2,vertices);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3,vertices);
             break;
         case 4:
@@ -174,22 +174,22 @@ Display_Tetrahedron(const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3
 //#####################################################################
 template<class T>
 void OPENGL_IMPLICIT_SURFACE<T>::
-Display_Brick(const VECTOR<T,3>& x1,float p1,const VECTOR<T,3>& x2,float p2,const VECTOR<T,3>& x3,float p3,const VECTOR<T,3>& x4,float p4,const VECTOR<T,3>& x5,float p5,const VECTOR<T,3>& x6,float p6,const VECTOR<T,3>& x7,float p7,const VECTOR<T,3>& x8,float p8,const int parity,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices,ARRAY<GLfloat>& normals) const
+Display_Brick(const VECTOR<T,3>& x0,float p1,const VECTOR<T,3>& x1,float p2,const VECTOR<T,3>& x2,float p3,const VECTOR<T,3>& x3,float p4,const VECTOR<T,3>& x4,float p5,const VECTOR<T,3>& x5,float p6,const VECTOR<T,3>& x6,float p7,const VECTOR<T,3>& x7,float p8,const int parity,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices,ARRAY<GLfloat>& normals) const
 {
     // is there a way to avoid computing normals redundantly (but not compute unnecessary ones as well)?
     if (!parity) { //means (i+j+k)%2==0
-        Display_Tetrahedron(x1,x2,x3,x5,p1,p2,p3,p5,vertices,normals);  //bottom left
-        Display_Tetrahedron(x2,x5,x6,x8,p2,p5,p6,p8,vertices,normals);  //bottom right
-        Display_Tetrahedron(x2,x3,x8,x4,p2,p3,p8,p4,vertices,normals);  //top towards
-        Display_Tetrahedron(x3,x5,x8,x7,p3,p5,p8,p7,vertices,normals);  //top away
-        Display_Tetrahedron(x2,x3,x5,x8,p2,p3,p5,p8,vertices,normals);  //center tetrahedron
+        Display_Tetrahedron(x0,x1,x2,x4,p1,p2,p3,p5,vertices,normals);  //bottom left
+        Display_Tetrahedron(x1,x4,x5,x7,p2,p5,p6,p8,vertices,normals);  //bottom right
+        Display_Tetrahedron(x1,x2,x7,x3,p2,p3,p8,p4,vertices,normals);  //top towards
+        Display_Tetrahedron(x2,x4,x7,x6,p3,p5,p8,p7,vertices,normals);  //top away
+        Display_Tetrahedron(x1,x2,x4,x7,p2,p3,p5,p8,vertices,normals);  //center tetrahedron
     }
     else { // means (i+j+k)%2==1
-        Display_Tetrahedron(x1,x2,x4,x6,p1,p2,p4,p6,vertices,normals); //bottom towards
-        Display_Tetrahedron(x1,x5,x6,x7,p1,p5,p6,p7,vertices,normals); //bottom away
-        Display_Tetrahedron(x1,x3,x7,x4,p1,p3,p7,p4,vertices,normals); //top left
-        Display_Tetrahedron(x4,x6,x8,x7,p4,p6,p8,p7,vertices,normals); //top right
-        Display_Tetrahedron(x1,x4,x7,x6,p1,p4,p7,p6,vertices,normals); //center tetrahedron
+        Display_Tetrahedron(x0,x1,x3,x5,p1,p2,p4,p6,vertices,normals); //bottom towards
+        Display_Tetrahedron(x0,x4,x5,x6,p1,p5,p6,p7,vertices,normals); //bottom away
+        Display_Tetrahedron(x0,x2,x6,x3,p1,p3,p7,p4,vertices,normals); //top left
+        Display_Tetrahedron(x3,x5,x7,x6,p4,p6,p8,p7,vertices,normals); //top right
+        Display_Tetrahedron(x0,x3,x6,x5,p1,p4,p7,p6,vertices,normals); //center tetrahedron
     }
 }
 //#####################################################################

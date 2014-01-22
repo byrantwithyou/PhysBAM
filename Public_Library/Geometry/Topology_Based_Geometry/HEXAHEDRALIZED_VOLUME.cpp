@@ -60,10 +60,10 @@ Update_Hexahedron_List()
     if(!hexahedron_list) hexahedron_list=new ARRAY<HEXAHEDRON<T> >(mesh.elements.m);
     for(int t=0;t<mesh.elements.m;t++){
         int p1,p2,p3,p4,p5,p6,p7,p8;mesh.elements(t).Get(p1,p2,p3,p4,p5,p6,p7,p8);
-        (*hexahedron_list)(t).x1=particles.X(p1);(*hexahedron_list)(t).x2=particles.X(p2);
-        (*hexahedron_list)(t).x3=particles.X(p3);(*hexahedron_list)(t).x4=particles.X(p4);
-        (*hexahedron_list)(t).x5=particles.X(p5);(*hexahedron_list)(t).x6=particles.X(p6);
-        (*hexahedron_list)(t).x7=particles.X(p7);(*hexahedron_list)(t).x8=particles.X(p8);}
+        (*hexahedron_list)(t).x0=particles.X(p1);(*hexahedron_list)(t).x1=particles.X(p2);
+        (*hexahedron_list)(t).x2=particles.X(p3);(*hexahedron_list)(t).x3=particles.X(p4);
+        (*hexahedron_list)(t).x4=particles.X(p5);(*hexahedron_list)(t).x5=particles.X(p6);
+        (*hexahedron_list)(t).x6=particles.X(p7);(*hexahedron_list)(t).x7=particles.X(p8);}
 }
 //#####################################################################
 // Funcion Initialize_Tetrahedralized_Volume

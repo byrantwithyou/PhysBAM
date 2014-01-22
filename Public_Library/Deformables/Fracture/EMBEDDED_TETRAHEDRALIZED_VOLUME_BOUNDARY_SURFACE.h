@@ -35,8 +35,8 @@ private:
     void Merge_Or_Cancel_Duplicate_Triangles();
     void Add_To_Material_Surface_Tetrahedron(const int i,const int j,const int k,const int l);
     void Add_To_Material_Surface_Tetrahedron_Face(const int i,const int j,const int l,const bool is_clockwise);
-    void Add_To_Material_Surface_Triangle(int x1,int x2,int x3,const bool is_clockwise);
-    void Add_To_Material_Surface_Planar_Quad(const int x1,const int x2,const int x3,const int x4,const bool is_clockwise);
+    void Add_To_Material_Surface_Triangle(int x0,int x1,int x2,const bool is_clockwise);
+    void Add_To_Material_Surface_Planar_Quad(const int x0,const int x1,const int x2,const int x3,const bool is_clockwise);
     void Add_To_Material_Surface_Quad_Cut(const int il,const int jl,const int jk,const int ik,const bool is_clockwise);
     void Add_To_Material_Surface_Subtetrahedron_And_Subprism(const int tetrahedron,const int embedded_triangle1,const int i,const int j,const int k,const int l);
     void Add_To_Material_Surface_Subtetrahedron(const int i,const int j,const int k,const int l,const bool is_clockwise);

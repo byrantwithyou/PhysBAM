@@ -24,29 +24,29 @@ public:
     typedef T SCALAR;
     enum WORKAROUND1 {m=2,n=2};
 
-    T x11,x21,x22;
+    T x00,x10,x11;
 
     SYMMETRIC_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(2),INITIAL_SIZE nn=INITIAL_SIZE(2))
-        :x11(T()),x21(T()),x22(T())
+        :x00(T()),x10(T()),x11(T())
     {
         assert(mm==INITIAL_SIZE(2) && nn==INITIAL_SIZE(2));
     }
 
     template<class T2> explicit
     SYMMETRIC_MATRIX(const SYMMETRIC_MATRIX<T2,2>& matrix_input)
-        :x11((T)matrix_input.x11),x21((T)matrix_input.x21),x22((T)matrix_input.x22)
+        :x00((T)matrix_input.x00),x10((T)matrix_input.x10),x11((T)matrix_input.x11)
     {}
 
     SYMMETRIC_MATRIX(const DIAGONAL_MATRIX<T,2>& matrix_input)
-        :x11(matrix_input.x11),x21(T()),x22(matrix_input.x22)
+        :x00(matrix_input.x00),x10(T()),x11(matrix_input.x11)
     {}
 
-    SYMMETRIC_MATRIX(const T y11,const T y21,const T y22)
-        :x11(y11),x21(y21),x22(y22)
+    SYMMETRIC_MATRIX(const T y00,const T y10,const T y11)
+        :x00(y00),x10(y10),x11(y11)
     {}
 
     void From_Matrix(const MATRIX<T,2>& matrix_input)
-    {x11=matrix_input(0,0);x21=matrix_input(1,0);x22=matrix_input(1,1);}
+    {x00=matrix_input(0,0);x10=matrix_input(1,0);x11=matrix_input(1,1);}
 
     int Rows() const
     {return 2;}
@@ -55,7 +55,7 @@ public:
     {return 2;}
 
     VECTOR<T,2> Column(const int axis) const
-    {assert((unsigned)axis<2);return axis==0?VECTOR<T,2>(x11,x21):VECTOR<T,2>(x21,x22);}
+    {assert((unsigned)axis<2);return axis==0?VECTOR<T,2>(x00,x10):VECTOR<T,2>(x10,x11);}
 
     VECTOR<T,2> Row(const int axis) const
     {return Column(axis);}
@@ -82,58 +82,58 @@ public:
     {assert((unsigned)i<(unsigned)2 && (unsigned)j<=(unsigned)i);return ((const T*)this)[((3-j)*j>>1)+i];}
 
     bool operator==(const SYMMETRIC_MATRIX& A) const
-    {return x11==A.x11 && x21==A.x21 && x22==A.x22;}
+    {return x00==A.x00 && x10==A.x10 && x11==A.x11;}
 
     bool operator!=(const SYMMETRIC_MATRIX& A) const
     {return !(*this==A);}
 
     static SYMMETRIC_MATRIX Componentwise_Min(const SYMMETRIC_MATRIX& v1,const SYMMETRIC_MATRIX& v2)
-    {return SYMMETRIC_MATRIX(min(v1.x11,v2.x11),min(v1.x21,v2.x21),min(v1.x22,v2.x22));}
+    {return SYMMETRIC_MATRIX(min(v1.x00,v2.x00),min(v1.x10,v2.x10),min(v1.x11,v2.x11));}
 
     static SYMMETRIC_MATRIX Componentwise_Max(const SYMMETRIC_MATRIX& v1,const SYMMETRIC_MATRIX& v2)
-    {return SYMMETRIC_MATRIX(max(v1.x11,v2.x11),max(v1.x21,v2.x21),max(v1.x22,v2.x22));}
+    {return SYMMETRIC_MATRIX(max(v1.x00,v2.x00),max(v1.x10,v2.x10),max(v1.x11,v2.x11));}
 
     SYMMETRIC_MATRIX operator-() const
-    {return SYMMETRIC_MATRIX(-x11,-x21,-x22);}
+    {return SYMMETRIC_MATRIX(-x00,-x10,-x11);}
 
     SYMMETRIC_MATRIX& operator+=(const SYMMETRIC_MATRIX& A)
-    {x11+=A.x11;x21+=A.x21;x22+=A.x22;return *this;}
+    {x00+=A.x00;x10+=A.x10;x11+=A.x11;return *this;}
 
     SYMMETRIC_MATRIX& operator+=(const T& a)
-    {x11+=a;x22+=a;return *this;}
+    {x00+=a;x11+=a;return *this;}
 
     SYMMETRIC_MATRIX& operator-=(const SYMMETRIC_MATRIX& A)
-    {x11-=A.x11;x21-=A.x21;x22-=A.x22;return *this;}
+    {x00-=A.x00;x10-=A.x10;x11-=A.x11;return *this;}
 
     SYMMETRIC_MATRIX& operator-=(const T& a)
-    {x11-=a;x22-=a;return *this;}
+    {x00-=a;x11-=a;return *this;}
 
     SYMMETRIC_MATRIX& operator*=(const T a)
-    {x11*=a;x21*=a;x22*=a;return *this;}
+    {x00*=a;x10*=a;x11*=a;return *this;}
 
     SYMMETRIC_MATRIX& operator/=(const T a)
-    {assert(a!=0);T s=1/a;x11*=s;x21*=s;x22*=s;return *this;}
+    {assert(a!=0);T s=1/a;x00*=s;x10*=s;x11*=s;return *this;}
 
     SYMMETRIC_MATRIX operator+(const SYMMETRIC_MATRIX& A) const
-    {return SYMMETRIC_MATRIX(x11+A.x11,x21+A.x21,x22+A.x22);}
+    {return SYMMETRIC_MATRIX(x00+A.x00,x10+A.x10,x11+A.x11);}
 
     SYMMETRIC_MATRIX operator+(const T a) const
-    {return SYMMETRIC_MATRIX(x11+a,x21,x22+a);}
+    {return SYMMETRIC_MATRIX(x00+a,x10,x11+a);}
 
     SYMMETRIC_MATRIX operator-(const SYMMETRIC_MATRIX& A) const
-    {return SYMMETRIC_MATRIX(x11-A.x11,x21-A.x21,x22-A.x22);}
+    {return SYMMETRIC_MATRIX(x00-A.x00,x10-A.x10,x11-A.x11);}
 
     SYMMETRIC_MATRIX operator-(const T a) const
-    {return SYMMETRIC_MATRIX(x11-a,x21,x22-a);}
+    {return SYMMETRIC_MATRIX(x00-a,x10,x11-a);}
 
     SYMMETRIC_MATRIX operator*(const T a) const
-    {return SYMMETRIC_MATRIX(a*x11,a*x21,a*x22);}
+    {return SYMMETRIC_MATRIX(a*x00,a*x10,a*x11);}
 
     SYMMETRIC_MATRIX operator/(const T a) const
     {assert(a!=0);return *this*(1/a);}
 
     VECTOR<T,2> operator*(const VECTOR<T,2>& v) const
-    {return VECTOR<T,2>(x11*v.x+x21*v.y,x21*v.x+x22*v.y);}
+    {return VECTOR<T,2>(x00*v.x+x10*v.y,x10*v.x+x11*v.y);}
 
     template<class T_MATRIX>
     typename PRODUCT<SYMMETRIC_MATRIX,T_MATRIX>::TYPE Transpose_Times(const T_MATRIX& M) const
@@ -144,10 +144,10 @@ public:
     {typename PRODUCT_TRANSPOSE<SYMMETRIC_MATRIX,T_MATRIX>::TYPE M((INITIAL_SIZE)A.Columns(),(INITIAL_SIZE)A.Rows());A.Add_Times_Transpose(*this,A.Derived(),M);return M;}
 
     T Determinant() const
-    {return x11*x22-x21*x21;}
+    {return x00*x11-x10*x10;}
 
     SYMMETRIC_MATRIX Inverse() const
-    {return SYMMETRIC_MATRIX(x22,-x21,x11)/Determinant();}
+    {return SYMMETRIC_MATRIX(x11,-x10,x00)/Determinant();}
 
     SYMMETRIC_MATRIX Transposed() const
     {return *this;}
@@ -159,7 +159,7 @@ public:
     {return *this*A.Transposed();}
 
     MATRIX<T,2,3> Times_Transpose(const MATRIX<T,3,2>& A) const
-    {return MATRIX<T,2,3>(x11*A.x[0]+x21*A.x[3],x21*A.x[0]+x22*A.x[3],x11*A.x[1]+x21*A.x[4],x21*A.x[1]+x22*A.x[4],x11*A.x[2]+x21*A.x[5],x21*A.x[2]+x22*A.x[5]);}
+    {return MATRIX<T,2,3>(x00*A.x[0]+x10*A.x[3],x10*A.x[0]+x11*A.x[3],x00*A.x[1]+x10*A.x[4],x10*A.x[1]+x11*A.x[4],x00*A.x[2]+x10*A.x[5],x10*A.x[2]+x11*A.x[5]);}
 
     MATRIX<T,2> Times_Transpose(const DIAGONAL_MATRIX<T,2>& A) const
     {return *this*A;}
@@ -171,42 +171,42 @@ public:
     {return MATRIX<T,1,2>::Cross_Product_Matrix(v)*(*this);}
 
     VECTOR<T,2> Solve_Linear_System(const VECTOR<T,2>& b) const
-    {return SYMMETRIC_MATRIX(x22,-x21,x11)*b/Determinant();}
+    {return SYMMETRIC_MATRIX(x11,-x10,x00)*b/Determinant();}
 
     VECTOR<T,2> Robust_Solve_Linear_System(const VECTOR<T,2>& b) const
     {T determinant=Determinant();
-    VECTOR<T,2> unscaled_result=SYMMETRIC_MATRIX(x22,-x21,x11)*b;
+    VECTOR<T,2> unscaled_result=SYMMETRIC_MATRIX(x11,-x10,x00)*b;
     T relative_tolerance=(T)FLT_MIN*unscaled_result.Max_Abs();
     if(abs(determinant)<=relative_tolerance){relative_tolerance=max(relative_tolerance,(T)FLT_MIN);determinant=determinant>=0?relative_tolerance:-relative_tolerance;}
     return unscaled_result/determinant;}
 
     T Trace() const
-    {return x11+x22;}
+    {return x00+x11;}
 
     static T Inner_Product(const SYMMETRIC_MATRIX& A,const SYMMETRIC_MATRIX& B)
-    {return A.x11*B.x11+A.x22*B.x22+2*A.x21*B.x21;}
+    {return A.x00*B.x00+A.x11*B.x11+2*A.x10*B.x10;}
 
     T Frobenius_Norm_Squared() const
-    {return x11*x11+x22*x22+2*x21*x21;}
+    {return x00*x00+x11*x11+2*x10*x10;}
 
     T Frobenius_Norm() const
     {return sqrt(Frobenius_Norm_Squared());}
 
     SYMMETRIC_MATRIX Cofactor_Matrix()
-    {return SYMMETRIC_MATRIX(x22,-x21,x11);}
+    {return SYMMETRIC_MATRIX(x11,-x10,x00);}
 
     VECTOR<T,2> Largest_Column() const
-    {return abs(x11)>abs(x22)?VECTOR<T,2>(x11,x21):VECTOR<T,2>(x21,x22);}
+    {return abs(x00)>abs(x11)?VECTOR<T,2>(x00,x10):VECTOR<T,2>(x10,x11);}
 
     VECTOR<T,2> Largest_Column_Normalized() const // 5 mults, 2 adds, 1 div, 1 sqrt
-    {T sqr11=sqr(x11),sqr12=sqr(x21),sqr22=sqr(x22);
-    T scale1=sqr11+sqr12,scale2=sqr12+sqr22;
-    if(scale1>scale2) return VECTOR<T,2>(x11,x21)/sqrt(scale1);
-    else if(scale2>0) return VECTOR<T,2>(x21,x22)/sqrt(scale2);
+    {T sqr00=sqr(x00),sqr01=sqr(x10),sqr11=sqr(x11);
+    T scale1=sqr00+sqr01,scale2=sqr01+sqr11;
+    if(scale1>scale2) return VECTOR<T,2>(x00,x10)/sqrt(scale1);
+    else if(scale2>0) return VECTOR<T,2>(x10,x11)/sqrt(scale2);
     else return VECTOR<T,2>(1,0);}
 
     T Max_Abs() const
-    {return maxabs(x11,x21,x22);}
+    {return maxabs(x00,x10,x11);}
 
     static SYMMETRIC_MATRIX Outer_Product(const VECTOR<T,2>& u)
     {return SYMMETRIC_MATRIX(u.x*u.x,u.x*u.y,u.y*u.y);}
@@ -221,7 +221,7 @@ public:
     {return SYMMETRIC_MATRIX(scale,scale,scale);}
 
     bool Positive_Definite() const
-    {return x11>0 && x11*x22>x21*x21;}
+    {return x00>0 && x00*x11>x10*x10;}
 
     bool Positive_Semidefinite(const T tolerance=(T)1e-7) const
     {T scale=Max_Abs();return !scale || (*this+tolerance*scale).Positive_Definite();}
@@ -234,19 +234,19 @@ public:
 
     DIAGONAL_MATRIX<T,2> Fast_Eigenvalues() const
     {T da;
-    if(x21==0) da=0;
-    else{T theta=(T).5*(x22-x11)/x21,t=1/(abs(theta)+sqrt(1+sqr(theta)));if(theta<0) t=-t;da=t*x21;}
-    DIAGONAL_MATRIX<T,2> eigenvalues(x11-da,x22+da);
+    if(x10==0) da=0;
+    else{T theta=(T).5*(x11-x00)/x10,t=1/(abs(theta)+sqrt(1+sqr(theta)));if(theta<0) t=-t;da=t*x10;}
+    DIAGONAL_MATRIX<T,2> eigenvalues(x00-da,x11+da);
     eigenvalues.x.Sort();return eigenvalues;}
 
     SYMMETRIC_MATRIX Positive_Definite_Part() const
     {DIAGONAL_MATRIX<T,2> D;MATRIX<T,2> V;Solve_Eigenproblem(D,V);D=D.Clamp_Min(0);return Conjugate(V,D);}
 
     DIAGONAL_MATRIX<T,2> Diagonal_Part() const
-    {return DIAGONAL_MATRIX<T,2>(x11,x22);}
+    {return DIAGONAL_MATRIX<T,2>(x00,x11);}
 
     VECTOR<T,1> Off_Diagonal_Part() const
-    {return VECTOR<T,1>(x21);}
+    {return VECTOR<T,1>(x10);}
 
     void Fast_Solve_Eigenproblem(DIAGONAL_MATRIX<T,2>& eigenvalues,MATRIX<T,2>& eigenvectors) const
     {Solve_Eigenproblem(eigenvalues,eigenvectors);}
@@ -258,13 +258,13 @@ public:
     {return SYMMETRIC_MATRIX(A.x[0]*B.x[0]+A.x[1]*B.x[1]+A.x[2]*B.x[2],A.x[3]*B.x[0]+A.x[4]*B.x[1]+A.x[5]*B.x[2],A.x[3]*B.x[3]+A.x[4]*B.x[4]+A.x[5]*B.x[5]);}
 
     static SYMMETRIC_MATRIX Transpose_Times_With_Symmetric_Result(const MATRIX<T,2>& A,const UPPER_TRIANGULAR_MATRIX<T,2>& B) // A^t*B and assume symmetric result, 4 mults, 1 adds
-    {return SYMMETRIC_MATRIX(A.x[0]*B.x11,A.x[2]*B.x11,A.x[2]*B.x12+A.x[3]*B.x22);}
+    {return SYMMETRIC_MATRIX(A.x[0]*B.x00,A.x[2]*B.x00,A.x[2]*B.x01+A.x[3]*B.x11);}
 
     template<class RW> void Read(std::istream& input)
-    {Read_Binary<RW>(input,x11,x21,x22);}
+    {Read_Binary<RW>(input,x00,x10,x11);}
 
     template<class RW> void Write(std::ostream& output) const
-    {Write_Binary<RW>(output,x11,x21,x22);}
+    {Write_Binary<RW>(output,x00,x10,x11);}
 
 //#####################################################################
     void Solve_Eigenproblem(DIAGONAL_MATRIX<T,2>& eigenvalues,MATRIX<T,2>& eigenvectors) const;
@@ -299,19 +299,19 @@ inline SYMMETRIC_MATRIX<T,2> operator-(const T a,const SYMMETRIC_MATRIX<T,2>& A)
 
 template<class T>
 inline SYMMETRIC_MATRIX<T,2> clamp(const SYMMETRIC_MATRIX<T,2>& x,const SYMMETRIC_MATRIX<T,2>& xmin,const SYMMETRIC_MATRIX<T,2>& xmax)
-{return SYMMETRIC_MATRIX<T,2>(clamp(x.x11,xmin.x11,xmax.x11),clamp(x.x21,xmin.x21,xmax.x21),clamp(x.x22,xmin.x22,xmax.x22));}
+{return SYMMETRIC_MATRIX<T,2>(clamp(x.x00,xmin.x00,xmax.x00),clamp(x.x10,xmin.x10,xmax.x10),clamp(x.x11,xmin.x11,xmax.x11));}
 
 template<class T>
 inline SYMMETRIC_MATRIX<T,2> clamp_min(const SYMMETRIC_MATRIX<T,2>& x,const SYMMETRIC_MATRIX<T,2>& xmin)
-{return SYMMETRIC_MATRIX<T,2>(clamp_min(x.x11,xmin.x11),clamp_min(x.x21,xmin.x21),clamp_min(x.x22,xmin.x22));}
+{return SYMMETRIC_MATRIX<T,2>(clamp_min(x.x00,xmin.x00),clamp_min(x.x10,xmin.x10),clamp_min(x.x11,xmin.x11));}
 
 template<class T>
 inline SYMMETRIC_MATRIX<T,2> clamp_max(const SYMMETRIC_MATRIX<T,2>& x,const SYMMETRIC_MATRIX<T,2>& xmax)
-{return SYMMETRIC_MATRIX<T,2>(clamp_max(x.x11,xmax.x11),clamp_max(x.x21,xmax.x21),clamp_max(x.x22,xmax.x22));}
+{return SYMMETRIC_MATRIX<T,2>(clamp_max(x.x00,xmax.x00),clamp_max(x.x10,xmax.x10),clamp_max(x.x11,xmax.x11));}
 
 template<class T>
 inline std::ostream& operator<< (std::ostream& output_stream,const SYMMETRIC_MATRIX<T,2>& A)
-{output_stream<<"["<<A.x11<<" "<<A.x21<<" ; "<<A.x21<<" "<<A.x22<<"]";return output_stream;}
+{output_stream<<"["<<A.x00<<" "<<A.x10<<" ; "<<A.x10<<" "<<A.x11<<"]";return output_stream;}
 
 template<class T>
 inline SYMMETRIC_MATRIX<T,2> log(const SYMMETRIC_MATRIX<T,2>& A)
@@ -328,8 +328,8 @@ template<class T> void SYMMETRIC_MATRIX<T,2>::
 Solve_Eigenproblem(DIAGONAL_MATRIX<T,2>& eigenvalues,MATRIX<T,2>& eigenvectors) const
 {
     typedef VECTOR<T,2> TV;
-    T a=(T).5*(x11+x22),b=(T).5*(x11-x22),c=x21;
-    T c_squared=sqr(c),m=sqrt(sqr(b)+c_squared),k=x11*x22-c_squared;
+    T a=(T).5*(x00+x11),b=(T).5*(x00-x11),c=x10;
+    T c_squared=sqr(c),m=sqrt(sqr(b)+c_squared),k=x00*x11-c_squared;
     if(a>=0){eigenvalues.x.x=a+m;eigenvalues.x.y=eigenvalues.x.x?k/eigenvalues.x.x:0;}
     else{eigenvalues.x.y=a-m;eigenvalues.x.x=eigenvalues.x.y?k/eigenvalues.x.y:0;}
     exchange_sort(eigenvalues.x.y,eigenvalues.x.x); // if order is wrong, matrix is nearly scalar
@@ -360,7 +360,7 @@ Conjugate(const MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 12 mults, 7 ad
 template<class T> inline SYMMETRIC_MATRIX<T,2> SYMMETRIC_MATRIX<T,2>::
 Conjugate(const DIAGONAL_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 6 mults
 {
-    return SYMMETRIC_MATRIX<T,2>(sqr(A.x11)*B.x11,A.x11*A.x22*B.x21,sqr(A.x22)*B.x22);
+    return SYMMETRIC_MATRIX<T,2>(sqr(A.x00)*B.x00,A.x00*A.x11*B.x10,sqr(A.x11)*B.x11);
 }
 //#####################################################################
 // Function Conjugate
@@ -385,7 +385,7 @@ template<class T> inline SYMMETRIC_MATRIX<T,2> SYMMETRIC_MATRIX<T,2>::
 Conjugate(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 
 {
     MATRIX<T,2> BA=B.Times_Transpose(A);
-    return SYMMETRIC_MATRIX<T,2>(A.x11*BA.x[0]+A.x12*BA.x[1],A.x22*BA.x[1],A.x22*BA.x[3]);
+    return SYMMETRIC_MATRIX<T,2>(A.x00*BA.x[0]+A.x01*BA.x[1],A.x11*BA.x[1],A.x11*BA.x[3]);
 }
 //#####################################################################
 // Function Conjugate_With_Transpose
@@ -433,7 +433,7 @@ Times_Transpose(const UPPER_TRIANGULAR_MATRIX<T,2>& A) const // 6 mults, 2 adds
 template<class T> inline MATRIX<T,2> SYMMETRIC_MATRIX<T,2>::
 operator*(const DIAGONAL_MATRIX<T,2>& A) const // 4 mults
 {
-    return MATRIX<T,2>(x11*A.x.x,x21*A.x.x,x21*A.x.y,x22*A.x.y);
+    return MATRIX<T,2>(x00*A.x.x,x10*A.x.x,x10*A.x.y,x11*A.x.y);
 }
 //#####################################################################
 // Function operator*
@@ -441,14 +441,14 @@ operator*(const DIAGONAL_MATRIX<T,2>& A) const // 4 mults
 template<class T> inline MATRIX<T,2> SYMMETRIC_MATRIX<T,2>::
 operator*(const UPPER_TRIANGULAR_MATRIX<T,2>& A) const // 6 mults, 2 adds
 {
-    return MATRIX<T,2>(x11*A.x11,x21*A.x11,x11*A.x12+x21*A.x22,x21*A.x12+x22*A.x22);
+    return MATRIX<T,2>(x00*A.x00,x10*A.x00,x00*A.x01+x10*A.x11,x10*A.x01+x11*A.x11);
 }
 //#####################################################################
 // Function operator*
 //#####################################################################
 template<class T> inline MATRIX<T,2> operator*(const DIAGONAL_MATRIX<T,2>& D,const SYMMETRIC_MATRIX<T,2>& A) // 4 mults
 {
-    return MATRIX<T,2>(D.x.x*A.x11,D.x.y*A.x21,D.x.x*A.x21,D.x.y*A.x22);
+    return MATRIX<T,2>(D.x.x*A.x00,D.x.y*A.x10,D.x.x*A.x10,D.x.y*A.x11);
 }
 //#####################################################################
 // Function operator*
@@ -456,7 +456,7 @@ template<class T> inline MATRIX<T,2> operator*(const DIAGONAL_MATRIX<T,2>& D,con
 template<class T>
 inline MATRIX<T,2> operator*(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 6 mults, 2 adds
 {
-    return MATRIX<T,2>(A.x11*B.x11+A.x12*B.x21,A.x22*B.x21,A.x11*B.x21+A.x12*B.x22,A.x22*B.x22);
+    return MATRIX<T,2>(A.x00*B.x00+A.x01*B.x10,A.x11*B.x10,A.x00*B.x10+A.x01*B.x11,A.x11*B.x11);
 }
 //#####################################################################
 // Function operator*
@@ -464,7 +464,7 @@ inline MATRIX<T,2> operator*(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const SYMMETR
 template<class T>
 inline MATRIX<T,2> operator*(const SYMMETRIC_MATRIX<T,2>& A,const MATRIX<T,2>& B) // 8 mults, 4 mults
 {
-    return MATRIX<T,2>(A.x11*B.x[0]+A.x21*B.x[1],A.x21*B.x[0]+A.x22*B.x[1],A.x11*B.x[2]+A.x21*B.x[3],A.x21*B.x[2]+A.x22*B.x[3]);
+    return MATRIX<T,2>(A.x00*B.x[0]+A.x10*B.x[1],A.x10*B.x[0]+A.x11*B.x[1],A.x00*B.x[2]+A.x10*B.x[3],A.x10*B.x[2]+A.x11*B.x[3]);
 }
 //#####################################################################
 // Function operator*
@@ -472,7 +472,7 @@ inline MATRIX<T,2> operator*(const SYMMETRIC_MATRIX<T,2>& A,const MATRIX<T,2>& B
 template<class T>
 inline MATRIX<T,2> operator*(const SYMMETRIC_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 8 mults, 4 adds
 {
-    return MATRIX<T,2>(A.x11*B.x11+A.x21*B.x21,A.x21*B.x11+A.x22*B.x21,A.x11*B.x21+A.x21*B.x22,A.x21*B.x21+A.x22*B.x22);
+    return MATRIX<T,2>(A.x00*B.x00+A.x10*B.x10,A.x10*B.x00+A.x11*B.x10,A.x00*B.x10+A.x10*B.x11,A.x10*B.x10+A.x11*B.x11);
 }
 //#####################################################################
 // Function operator+
@@ -480,7 +480,7 @@ inline MATRIX<T,2> operator*(const SYMMETRIC_MATRIX<T,2>& A,const SYMMETRIC_MATR
 template<class T> inline SYMMETRIC_MATRIX<T,2> SYMMETRIC_MATRIX<T,2>::
 operator+(const DIAGONAL_MATRIX<T,2>& A) const // 2 adds
 {
-    return SYMMETRIC_MATRIX<T,2>(x11+A.x11,x21,x22+A.x22);
+    return SYMMETRIC_MATRIX<T,2>(x00+A.x00,x10,x11+A.x11);
 }
 //#####################################################################
 // Function operator+
@@ -496,7 +496,7 @@ operator+(const DIAGONAL_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 2 add
 template<class T> inline MATRIX<T,2>
 operator+(const SYMMETRIC_MATRIX<T,2>& A,const UPPER_TRIANGULAR_MATRIX<T,2>& B)
 {
-    return MATRIX<T,2>(A.x11+B.x11,A.x21,A.x21+B.x12,A.x22+B.x22);
+    return MATRIX<T,2>(A.x00+B.x00,A.x10,A.x10+B.x01,A.x11+B.x11);
 }
 //#####################################################################
 // Function operator+
@@ -512,7 +512,7 @@ operator+(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B)
 template<class T> inline MATRIX<T,2>
 operator-(const SYMMETRIC_MATRIX<T,2>& A,const UPPER_TRIANGULAR_MATRIX<T,2>& B)
 {
-    return MATRIX<T,2>(A.x11-B.x11,A.x21,A.x21-B.x12,A.x22-B.x22);
+    return MATRIX<T,2>(A.x00-B.x00,A.x10,A.x10-B.x01,A.x11-B.x11);
 }
 //#####################################################################
 // Function operator-
@@ -528,7 +528,7 @@ operator-(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B)
 template<class T> inline SYMMETRIC_MATRIX<T,2>
 operator-(const DIAGONAL_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 2 adds
 {
-    return SYMMETRIC_MATRIX<T,2>(A.x.x-B.x11,-B.x21,A.x.y-B.x22);
+    return SYMMETRIC_MATRIX<T,2>(A.x.x-B.x00,-B.x10,A.x.y-B.x11);
 }
 //#####################################################################
 }

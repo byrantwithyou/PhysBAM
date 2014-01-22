@@ -298,8 +298,8 @@ template<class TV> ZERO_MAT<TV> Outer_Product_Helper(const TV& u,const ZERO_VEC<
 template<class TV> ZERO_MAT<TV> Outer_Product_Helper(const ZERO_VEC<TV>& u,const ZERO_VEC<TV>& v) {return ZERO_MAT<TV>();}
 
 template<class T_MAT> typename ENABLE_IF<IS_MATRIX<T_MAT>::value,T_MAT>::TYPE Choose(const T_MAT& a,const T_MAT& b);
-template<class T_MAT,class T_MAT2> typename ENABLE_IF<IS_MATRIX<T_MAT>::value&&IS_MATRIX<T_MAT2>::value&&(!IS_SYM_MATRIX<T_MAT>::value || !IS_SYM_MATRIX<T_MAT2>::value),MATRIX<typename T_MAT::SCALAR,T_MAT::m> >::TYPE Choose(const T_MAT& a,const T_MAT2& b);
-template<class T_MAT,class T_MAT2> typename ENABLE_IF<IS_SYM_MATRIX<T_MAT>::value && IS_SYM_MATRIX<T_MAT2>::value,SYMMETRIC_MATRIX<typename T_MAT::SCALAR,T_MAT::m> >::TYPE Choose(const T_MAT& a,const T_MAT2& b);
+template<class T_MAT,class T_MAT1> typename ENABLE_IF<IS_MATRIX<T_MAT>::value&&IS_MATRIX<T_MAT1>::value&&(!IS_SYM_MATRIX<T_MAT>::value || !IS_SYM_MATRIX<T_MAT1>::value),MATRIX<typename T_MAT::SCALAR,T_MAT::m> >::TYPE Choose(const T_MAT& a,const T_MAT1& b);
+template<class T_MAT,class T_MAT1> typename ENABLE_IF<IS_SYM_MATRIX<T_MAT>::value && IS_SYM_MATRIX<T_MAT1>::value,SYMMETRIC_MATRIX<typename T_MAT::SCALAR,T_MAT::m> >::TYPE Choose(const T_MAT& a,const T_MAT1& b);
 template<class TV,class T_MAT> T_MAT Choose(const T_MAT& a,const ZERO_MAT<TV>& b);
 template<class TV,class T_MAT> T_MAT Choose(const ZERO_MAT<TV>& a,const T_MAT& b);
 template<class TV> ZERO_MAT<TV> Choose(const ZERO_MAT<TV>& a,const ZERO_MAT<TV>& b);

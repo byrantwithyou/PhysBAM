@@ -112,33 +112,33 @@ void Two_Tumbling()
 //    joint->Set_Proportional_Constant(.50);
 //    joint->Set_Derivative_Constant(.50);
     
-    RIGID_BODY<TV> *rigid_body1=0,*rigid_body2=0;
+    RIGID_BODY<TV> *rigid_body0=0,*rigid_body1=0;
 
     T scale_factor=1;
 
-    rigid_body1=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
-    rigid_body1->Frame().t=TV(0,4);
+    rigid_body0=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
+    rigid_body0->Frame().t=TV(0,4);
     //rigid_body->Frame().r=ROTATION<TV>::From_Rotation_Vector(-(T)pi/4);
     //rigid_body->Angular_Momentum()=-10;
-    rigid_body1->Set_Coefficient_Of_Restitution((T)0.5);
-    rigid_body1->coefficient_of_friction=0;
-    rigid_body1->name="square1";
+    rigid_body0->Set_Coefficient_Of_Restitution((T)0.5);
+    rigid_body0->coefficient_of_friction=0;
+    rigid_body0->name="square1";
     joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(-1,1)));
     
-    rigid_body2=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
-    rigid_body2->Frame().t=TV(-2,6);
-    rigid_body2->Set_Coefficient_Of_Restitution((T)0.5);
-    rigid_body2->coefficient_of_friction=0;
-    rigid_body2->name="square2";
-    rigid_body2->is_static=true;
+    rigid_body1=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
+    rigid_body1->Frame().t=TV(-2,6);
+    rigid_body1->Set_Coefficient_Of_Restitution((T)0.5);
+    rigid_body1->coefficient_of_friction=0;
+    rigid_body1->name="square2";
+    rigid_body1->is_static=true;
     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,-1)));
 
-    JOINT_FUNCTION<TV>* jfunc=new JOINT_FUNCTION<TV>(*joint,*rigid_body1,*rigid_body2);
+    JOINT_FUNCTION<TV>* jfunc=new JOINT_FUNCTION<TV>(*joint,*rigid_body0,*rigid_body1);
     joint->Set_Joint_Function(jfunc);
     jfunc->Set_Target_Angle(ROTATION<TV>::From_Angle(-(T).3));
     joint->joint_function->Set_k_p(10);
 
-    arb->joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+    arb->joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
 }
 //#####################################################################
 // Function Chain
@@ -221,25 +221,25 @@ void Spring()
 //#####################################################################
 void Point_Constraint_With_2_Blocks()
 {
+    RIGID_BODY<TV>* rigid_body0=&tests.Add_Rigid_Body("square_refined",1,1);
+    rigid_body0->Frame().t=TV(0,16);
+    rigid_body0->Set_Coefficient_Of_Restitution((T).5);
+    rigid_body0->coefficient_of_friction=1;
+    rigid_body0->name="square1";
+    
     RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square_refined",1,1);
-    rigid_body1->Frame().t=TV(0,16);
+    rigid_body1->Frame().t=TV(2,18);
+    rigid_body1->Twist().angular=VECTOR<T,1>((T)4);
+    rigid_body1->Update_Angular_Momentum();
     rigid_body1->Set_Coefficient_Of_Restitution((T).5);
     rigid_body1->coefficient_of_friction=1;
-    rigid_body1->name="square1";
-    
-    RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("square_refined",1,1);
-    rigid_body2->Frame().t=TV(2,18);
-    rigid_body2->Twist().angular=VECTOR<T,1>((T)4);
-    rigid_body2->Update_Angular_Momentum();
-    rigid_body2->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body2->coefficient_of_friction=1;
-    rigid_body2->name="square2";
+    rigid_body1->name="square2";
 
     POINT_JOINT<TV>* joint=new POINT_JOINT<TV>();
     joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1)));
     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1)));
 
-    arb->joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
+    arb->joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
 }
 //#####################################################################
 // Function Five_Blocks
@@ -248,31 +248,31 @@ void Five_Blocks()
 {
     T scale_factor=1;
 
+    RIGID_BODY<TV>* rigid_body0=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
+    rigid_body0->Frame().t=TV(-1,3);
+    rigid_body0->Set_Coefficient_Of_Restitution((T).5);
+    rigid_body0->coefficient_of_friction=0;
+    rigid_body0->name="square1";
+    
     RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
-    rigid_body1->Frame().t=TV(-1,3);
+    rigid_body1->Frame().t=TV(0,2);
+    rigid_body1->Twist().linear=TV();
     rigid_body1->Set_Coefficient_Of_Restitution((T).5);
     rigid_body1->coefficient_of_friction=0;
-    rigid_body1->name="square1";
+    rigid_body1->name="squarejoint";
     
     RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
-    rigid_body2->Frame().t=TV(0,2);
+    rigid_body2->Frame().t=TV(1,3);
     rigid_body2->Twist().linear=TV();
     rigid_body2->Set_Coefficient_Of_Restitution((T).5);
     rigid_body2->coefficient_of_friction=0;
-    rigid_body2->name="squarejoint";
-    
-    RIGID_BODY<TV>* rigid_body3=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
-    rigid_body3->Frame().t=TV(1,3);
-    rigid_body3->Twist().linear=TV();
-    rigid_body3->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body3->coefficient_of_friction=0;
-    rigid_body3->name="square2";
+    rigid_body2->name="square2";
 
     JOINT<TV> *joint1=new RIGID_JOINT<TV>(),*joint2=new RIGID_JOINT<TV>();
     joint1->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,-1)));
     joint2->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1)));
-    arb->joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint1);
-    arb->joint_mesh.Add_Articulation(rigid_body2->particle_index,rigid_body3->particle_index,joint2);
+    arb->joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint1);
+    arb->joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint2);
 }
 //#####################################################################
 // Function Update_Solids_Parameters

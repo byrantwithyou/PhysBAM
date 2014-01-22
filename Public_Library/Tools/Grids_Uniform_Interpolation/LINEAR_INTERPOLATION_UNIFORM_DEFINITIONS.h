@@ -241,7 +241,7 @@ From_Base_Node_Hessian_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BAS
 {
     int i=index.x;
     SYMMETRIC_MATRIX<T2,1> S=LINEAR_INTERPOLATION<T,T2>::Linear_Hessian(u(index),u(i+1),w);
-    S.x11*=sqr(grid.one_over_dX.x);
+    S.x00*=sqr(grid.one_over_dX.x);
     return S;
 }
 //#####################################################################
@@ -252,9 +252,9 @@ From_Base_Node_Hessian_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BAS
 {
     int i=index.x,j=index.y;
     SYMMETRIC_MATRIX<T2,2> S=LINEAR_INTERPOLATION<T,T2>::Bilinear_Hessian(u(index),u(i+1,j),u(i,j+1),u(i+1,j+1),w);
-    S.x11*=sqr(grid.one_over_dX.x);
-    S.x21*=grid.one_over_dX.x*grid.one_over_dX.y;
-    S.x22*=sqr(grid.one_over_dX.y);
+    S.x00*=sqr(grid.one_over_dX.x);
+    S.x10*=grid.one_over_dX.x*grid.one_over_dX.y;
+    S.x11*=sqr(grid.one_over_dX.y);
     return S;
 }
 //#####################################################################
@@ -265,12 +265,12 @@ From_Base_Node_Hessian_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BAS
 {
     const T2 *base=&u(index),*basep1=base+u.stride.x;
     SYMMETRIC_MATRIX<T2,3> S=LINEAR_INTERPOLATION<T,T2>::Trilinear_Hessian(*base,*basep1,base[u.stride.y],basep1[u.stride.y],base[1],basep1[1],base[u.stride.y+1],basep1[u.stride.y+1],w);
-    S.x11*=sqr(grid.one_over_dX.x);
-    S.x22*=sqr(grid.one_over_dX.y);
-    S.x33*=sqr(grid.one_over_dX.z);
-    S.x21*=grid.one_over_dX.x*grid.one_over_dX.y;
-    S.x31*=grid.one_over_dX.x*grid.one_over_dX.z;
-    S.x32*=grid.one_over_dX.y*grid.one_over_dX.z;
+    S.x00*=sqr(grid.one_over_dX.x);
+    S.x11*=sqr(grid.one_over_dX.y);
+    S.x22*=sqr(grid.one_over_dX.z);
+    S.x10*=grid.one_over_dX.x*grid.one_over_dX.y;
+    S.x20*=grid.one_over_dX.x*grid.one_over_dX.z;
+    S.x21*=grid.one_over_dX.y*grid.one_over_dX.z;
     return S;
 }
 }

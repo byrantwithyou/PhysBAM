@@ -216,13 +216,13 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         if(!child_shader){LOG::cerr<<"Invalid shader "<<shader_name<<" specified in blend"<<std::endl;exit(1);}
         RENDERING_BLEND_SHADER<T>* blend_shader=dynamic_cast<RENDERING_BLEND_SHADER<T>*>(child_shader);
         if(!blend_shader){LOG::cerr<<shader_name<<" is not a blend shader"<<std::endl;exit(1);}
+        T reflectivity0=parameters.Get_Parameter("Reflectivity0",(T)1.0);
         T reflectivity1=parameters.Get_Parameter("Reflectivity1",(T)1.0);
-        T reflectivity2=parameters.Get_Parameter("Reflectivity2",(T)1.0);
         bool fresnel=parameters.Get_Parameter("Fresnel",true);
         std::string shift_direction=parameters.Get_Parameter("Shift_Direction",std::string("<unknown>"));
-        MATERIAL_SHADER<T>* shader=new RENDERING_TRANSPARENT_SHADER<T>(reflectivity1,reflectivity2,*blend_shader,fresnel,(shift_direction=="ray")?true:false,world);
+        MATERIAL_SHADER<T>* shader=new RENDERING_TRANSPARENT_SHADER<T>(reflectivity0,reflectivity1,*blend_shader,fresnel,(shift_direction=="ray")?true:false,world);
         shaders.Set(name,shader);
-        LOG::cout<<"Material '"<<name<<"' Transparent blend shader reflectivity="<<reflectivity1<<" "<<reflectivity2<<" blend_shader="<<shader_name<<" fresnel="<<fresnel<<std::endl;}
+        LOG::cout<<"Material '"<<name<<"' Transparent blend shader reflectivity="<<reflectivity0<<" "<<reflectivity1<<" blend_shader="<<shader_name<<" fresnel="<<fresnel<<std::endl;}
     else if(type=="Transparent_Material"){
         T reflectivity=parameters.Get_Parameter("Reflectivity",(T)1.0);
         bool fresnel=parameters.Get_Parameter("Fresnel",true);

@@ -151,7 +151,7 @@ Initialize_Boundary_Region(){
         const T_INDEX& coarse_index=coarse_iterator.Index();
         const T_INDEX base_fine_index=(coarse_index-1)*2;
 
-        // check if any 2x2(x2) children of the coarse cell are not interior cells
+        // check if any 2x2(x1) children of the coarse cell are not interior cells
         // if any are not interior, mark all fine cells with coarse cell 
         // in prolongation stencil as boundary
         if(index_is_interior_coarse_bitmask(coarse_index)!=full_interior_coarse_cell)
@@ -321,7 +321,7 @@ Initialize_Interior_Bitmaps_And_Diagonal_Entries(){
 #else
 
     // we're initializing bitmasks
-    // so loop over 2x2(x2) blocks
+    // so loop over 2x2(x1) blocks
 
     int full_diagonal=d*2;
     

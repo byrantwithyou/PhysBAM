@@ -47,9 +47,9 @@ public:
         for(int i=0;i<6;i++) x[i]=(T)matrix_input.x[i];
     }
 
-    MATRIX(const T x11,const T x21,const T x31,const T x12,const T x22,const T x32)
+    MATRIX(const T x00,const T x10,const T x20,const T x01,const T x11,const T x21)
     {
-        x[0]=x11;x[1]=x21;x[2]=x31;x[3]=x12;x[4]=x22;x[5]=x32;
+        x[0]=x00;x[1]=x10;x[2]=x20;x[3]=x01;x[4]=x11;x[5]=x21;
     }
 
     MATRIX(const VECTOR<T,3>& column1,const VECTOR<T,3>& column2)
@@ -135,7 +135,7 @@ public:
     {assert(2==A.m);MATRIX_MXN<T> matrix(3,A.n);for(int j=0;j<A.n;j++) for(int i=0;i<3;i++) for(int k=0;k<2;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
 
     MATRIX Times_Transpose(const UPPER_TRIANGULAR_MATRIX<T,2>& A) const // 9 mults, 3 adds
-    {return MATRIX(x[0]*A.x11+x[3]*A.x12,x[1]*A.x11+x[4]*A.x12,x[2]*A.x11+x[5]*A.x12,x[3]*A.x22,x[4]*A.x22,x[5]*A.x22);}
+    {return MATRIX(x[0]*A.x00+x[3]*A.x01,x[1]*A.x00+x[4]*A.x01,x[2]*A.x00+x[5]*A.x01,x[3]*A.x11,x[4]*A.x11,x[5]*A.x11);}
 
     MATRIX Times_Transpose(const MATRIX<T,2>& A) const // 12 mults, 6 adds
     {return MATRIX(x[0]*A.x[0]+x[3]*A.x[2],x[1]*A.x[0]+x[4]*A.x[2],x[2]*A.x[0]+x[5]*A.x[2],x[0]*A.x[1]+x[3]*A.x[3],x[1]*A.x[1]+x[4]*A.x[3],x[2]*A.x[1]+x[5]*A.x[3]);}
@@ -156,8 +156,8 @@ public:
 
     UPPER_TRIANGULAR_MATRIX<T,2> R_From_QR_Factorization() const // Gram Schmidt
     {T x_dot_x=Column(0).Magnitude_Squared(),x_dot_y=VECTOR<T,3>::Dot_Product(Column(0),Column(1)),y_dot_y=Column(1).Magnitude_Squared();
-    T r11=sqrt(x_dot_x),r12=r11?x_dot_y/r11:0,r22=sqrt(max((T)0,y_dot_y-r12*r12));
-    return UPPER_TRIANGULAR_MATRIX<T,2>(r11,r12,r22);}
+    T r00=sqrt(x_dot_x),r01=r00?x_dot_y/r00:0,r11=sqrt(max((T)0,y_dot_y-r01*r01));
+    return UPPER_TRIANGULAR_MATRIX<T,2>(r00,r01,r11);}
 
     SYMMETRIC_MATRIX<T,2> Normal_Equations_Matrix() const // 9 mults, 6 adds
     {return SYMMETRIC_MATRIX<T,2>(x[0]*x[0]+x[1]*x[1]+x[2]*x[2],x[3]*x[0]+x[4]*x[1]+x[5]*x[2],x[3]*x[3]+x[4]*x[4]+x[5]*x[5]);}
@@ -171,13 +171,13 @@ public:
                           x[0]*A.x[6]+x[1]*A.x[7]+x[2]*A.x[8],x[3]*A.x[6]+x[4]*A.x[7]+x[5]*A.x[8]);}
 
     MATRIX<T,2,3> Transpose_Times(const SYMMETRIC_MATRIX<T,3>& A) const
-    {return MATRIX<T,2,3>(x[0]*A.x11+x[1]*A.x21+x[2]*A.x31,x[3]*A.x11+x[4]*A.x21+x[5]*A.x31,
-                          x[0]*A.x21+x[1]*A.x22+x[2]*A.x32,x[3]*A.x21+x[4]*A.x22+x[5]*A.x32,
-                          x[0]*A.x31+x[1]*A.x32+x[2]*A.x33,x[3]*A.x31+x[4]*A.x32+x[5]*A.x33);}
+    {return MATRIX<T,2,3>(x[0]*A.x00+x[1]*A.x10+x[2]*A.x20,x[3]*A.x00+x[4]*A.x10+x[5]*A.x20,
+                          x[0]*A.x10+x[1]*A.x11+x[2]*A.x21,x[3]*A.x10+x[4]*A.x11+x[5]*A.x21,
+                          x[0]*A.x20+x[1]*A.x21+x[2]*A.x22,x[3]*A.x20+x[4]*A.x21+x[5]*A.x22);}
 
     MATRIX<T,2,3> Transpose_Times(const UPPER_TRIANGULAR_MATRIX<T,3>& A) const
-    {return MATRIX<T,2,3>(x[0]*A.x11,x[3]*A.x11,x[0]*A.x12+x[1]*A.x22,x[3]*A.x12+x[4]*A.x22,
-                          x[0]*A.x13+x[1]*A.x23+x[2]*A.x33,x[3]*A.x13+x[4]*A.x23+x[5]*A.x33);}
+    {return MATRIX<T,2,3>(x[0]*A.x00,x[3]*A.x00,x[0]*A.x01+x[1]*A.x11,x[3]*A.x01+x[4]*A.x11,
+                          x[0]*A.x02+x[1]*A.x12+x[2]*A.x22,x[3]*A.x02+x[4]*A.x12+x[5]*A.x22);}
 
     MATRIX<T,2,3> Transpose_Times(const DIAGONAL_MATRIX<T,3>& A) const
     {return MATRIX<T,2,3>(x[0]*A.x.x,x[3]*A.x.x,x[1]*A.x.y,x[4]*A.x.y,x[2]*A.x.z,x[5]*A.x.z);}
@@ -192,10 +192,10 @@ public:
     {return sqr(x[0])+sqr(x[1])+sqr(x[2])+sqr(x[3])+sqr(x[4])+sqr(x[5]);}
 
     MATRIX operator*(const UPPER_TRIANGULAR_MATRIX<T,2>& A) const // 9 mults, 3 adds
-    {return MATRIX(x[0]*A.x11,x[1]*A.x11,x[2]*A.x11,x[0]*A.x12+x[3]*A.x22,x[1]*A.x12+x[4]*A.x22,x[2]*A.x12+x[5]*A.x22);}
+    {return MATRIX(x[0]*A.x00,x[1]*A.x00,x[2]*A.x00,x[0]*A.x01+x[3]*A.x11,x[1]*A.x01+x[4]*A.x11,x[2]*A.x01+x[5]*A.x11);}
 
     MATRIX operator*(const SYMMETRIC_MATRIX<T,2>& A) const // 12 mults, 6 adds
-    {return MATRIX(x[0]*A.x11+x[3]*A.x21,x[1]*A.x11+x[4]*A.x21,x[2]*A.x11+x[5]*A.x21,x[0]*A.x21+x[3]*A.x22,x[1]*A.x21+x[4]*A.x22,x[2]*A.x21+x[5]*A.x22);}
+    {return MATRIX(x[0]*A.x00+x[3]*A.x10,x[1]*A.x00+x[4]*A.x10,x[2]*A.x00+x[5]*A.x10,x[0]*A.x10+x[3]*A.x11,x[1]*A.x10+x[4]*A.x11,x[2]*A.x10+x[5]*A.x11);}
 
     MATRIX operator*(const DIAGONAL_MATRIX<T,2>& A) const // 6 mults
     {return MATRIX(x[0]*A.x.x,x[1]*A.x.x,x[2]*A.x.x,x[3]*A.x.y,x[4]*A.x.y,x[5]*A.x.y);}
@@ -246,13 +246,13 @@ inline VECTOR<T,3> operator*(const VECTOR<T,2>& v,const MATRIX<T,3,2>& A) // 6 m
 
 template<class T>
 inline MATRIX<T,3,2> operator*(const SYMMETRIC_MATRIX<T,3>& A,const MATRIX<T,3,2>& B) // 18 mults, 12 adds
-{return MATRIX<T,3,2>(A.x11*B.x[0]+A.x21*B.x[1]+A.x31*B.x[2],A.x21*B.x[0]+A.x22*B.x[1]+A.x32*B.x[2],A.x31*B.x[0]+A.x32*B.x[1]+A.x33*B.x[2],
-    A.x11*B.x[3]+A.x21*B.x[4]+A.x31*B.x[5],A.x21*B.x[3]+A.x22*B.x[4]+A.x32*B.x[5],A.x31*B.x[3]+A.x32*B.x[4]+A.x33*B.x[5]);}
+{return MATRIX<T,3,2>(A.x00*B.x[0]+A.x10*B.x[1]+A.x20*B.x[2],A.x10*B.x[0]+A.x11*B.x[1]+A.x21*B.x[2],A.x20*B.x[0]+A.x21*B.x[1]+A.x22*B.x[2],
+    A.x00*B.x[3]+A.x10*B.x[4]+A.x20*B.x[5],A.x10*B.x[3]+A.x11*B.x[4]+A.x21*B.x[5],A.x20*B.x[3]+A.x21*B.x[4]+A.x22*B.x[5]);}
 
 template<class T>
 inline MATRIX<T,3,2> operator*(const UPPER_TRIANGULAR_MATRIX<T,3>& A,const MATRIX<T,3,2>& B)
-{return MATRIX<T,3,2>(A.x11*B.x[0]+A.x12*B.x[1]+A.x13*B.x[2],A.x22*B.x[1]+A.x23*B.x[2],A.x33*B.x[2],
-    A.x11*B.x[3]+A.x12*B.x[4]+A.x13*B.x[5],A.x22*B.x[4]+A.x23*B.x[5],A.x33*B.x[5]);}
+{return MATRIX<T,3,2>(A.x00*B.x[0]+A.x01*B.x[1]+A.x02*B.x[2],A.x11*B.x[1]+A.x12*B.x[2],A.x22*B.x[2],
+    A.x00*B.x[3]+A.x01*B.x[4]+A.x02*B.x[5],A.x11*B.x[4]+A.x12*B.x[5],A.x22*B.x[5]);}
 
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,3,2>& A)

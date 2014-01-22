@@ -70,7 +70,7 @@ public:
     {return plane.Signed_Distance(Object_Space_Point(location));}
 
     void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const PHYSBAM_OVERRIDE
-    {TV p=object_space_point-plane.x1;
+    {TV p=object_space_point-plane.x0;
     s=TV::Dot_Product(p,texture_vector1);t=TV::Dot_Product(p,texture_vector2);}
 
     TRIANGULATED_SURFACE<T>* Generate_Triangles() const PHYSBAM_OVERRIDE
@@ -78,8 +78,8 @@ public:
     TV u_vector=texture_vector1,v_vector=texture_vector2;
     GEOMETRY_PARTICLES<TV>* particles=new GEOMETRY_PARTICLES<TV>();
     int vertex_1=particles->Add_Element(),vertex_2=particles->Add_Element(),vertex_3=particles->Add_Element(),vertex_4=particles->Add_Element();
-    particles->X(vertex_1)=(plane.x1);particles->X(vertex_2)=(plane.x1+u_vector);
-    particles->X(vertex_3)=(plane.x1+u_vector+v_vector);particles->X(vertex_4)=(plane.x1+v_vector);
+    particles->X(vertex_1)=(plane.x0);particles->X(vertex_2)=(plane.x0+u_vector);
+    particles->X(vertex_3)=(plane.x0+u_vector+v_vector);particles->X(vertex_4)=(plane.x0+v_vector);
     ARRAY<VECTOR<int,3> > triangles(2);triangles(0).Set(0,1,3);triangles(1).Set(3,1,2);
     TRIANGLE_MESH* mesh=new TRIANGLE_MESH(particles->Size(),triangles);
     surface=new TRIANGULATED_SURFACE<T>(*mesh,*particles);

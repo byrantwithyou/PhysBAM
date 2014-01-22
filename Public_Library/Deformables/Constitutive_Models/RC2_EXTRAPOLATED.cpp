@@ -100,19 +100,19 @@ Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,2>& re,const DIAGONA
         if(b){
             helper.Compute_dE(re.base,F.To_Vector(),simplex);
             helper.Compute_ddE(re.base,F.To_Vector(),simplex);
+            dP_dF.x0000=helper.ddE.x00;
+            dP_dF.x1100=helper.ddE.x10;
             dP_dF.x1111=helper.ddE.x11;
-            dP_dF.x2211=helper.ddE.x21;
-            dP_dF.x2222=helper.ddE.x22;
             T S=helper.dE.Sum()/xpy,D=helper.dE_it.x;
-            dP_dF.x2112=(D-S)/2;
-            dP_dF.x2121=(D+S)/2;
+            dP_dF.x1001=(D-S)/2;
+            dP_dF.x1010=(D+S)/2;
             return;}}
-    dP_dF.x1111=re.base.Exx(x,y,simplex);
-    dP_dF.x2211=re.base.Exy(x,y,simplex);
-    dP_dF.x2222=re.base.Eyy(x,y,simplex);
+    dP_dF.x0000=re.base.Exx(x,y,simplex);
+    dP_dF.x1100=re.base.Exy(x,y,simplex);
+    dP_dF.x1111=re.base.Eyy(x,y,simplex);
     T S=re.P_From_Strain(F,1,simplex).Trace()/xpy,D=re.base.Ex_Ey_x_y(x,y,simplex);
-    dP_dF.x2112=(D-S)/2;
-    dP_dF.x2121=(D+S)/2;
+    dP_dF.x1001=(D-S)/2;
+    dP_dF.x1010=(D+S)/2;
 }
 ///#####################################################################
 // Function Isotropic_Stress_Derivative_Helper
@@ -131,43 +131,43 @@ Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,3>& re,const DIAGONA
         if(b){
             helper.Compute_dE(re.base,F.To_Vector(),simplex);
             helper.Compute_ddE(re.base,F.To_Vector(),simplex);
+            dP_dF.x0000=helper.ddE.x00;
             dP_dF.x1111=helper.ddE.x11;
             dP_dF.x2222=helper.ddE.x22;
-            dP_dF.x3333=helper.ddE.x33;
+            dP_dF.x1100=helper.ddE.x10;
+            dP_dF.x2200=helper.ddE.x20;
             dP_dF.x2211=helper.ddE.x21;
-            dP_dF.x3311=helper.ddE.x31;
-            dP_dF.x3322=helper.ddE.x32;
             T ss1=sqr(F.x.x),ss2=sqr(F.x.y),ss3=sqr(F.x.z);
-            T s12=ss1-ss2,s13=ss1-ss3,s23=ss2-ss3;
+            T s01=ss1-ss2,s02=ss1-ss3,s12=ss2-ss3;
+            if(fabs(s01)<re.panic_threshold) s01=s01<0?-re.panic_threshold:re.panic_threshold;
+            if(fabs(s02)<re.panic_threshold) s02=s02<0?-re.panic_threshold:re.panic_threshold;
             if(fabs(s12)<re.panic_threshold) s12=s12<0?-re.panic_threshold:re.panic_threshold;
-            if(fabs(s13)<re.panic_threshold) s13=s13<0?-re.panic_threshold:re.panic_threshold;
-            if(fabs(s23)<re.panic_threshold) s23=s23<0?-re.panic_threshold:re.panic_threshold;
-            T S12=(helper.dE.x+helper.dE.y)/xpy,D12=helper.dE_it.z;
+            T S01=(helper.dE.x+helper.dE.y)/xpy,D01=helper.dE_it.z;
+            dP_dF.x1001=(D01-S01)/2;
+            dP_dF.x1010=(D01+S01)/2;
+            T S02=(helper.dE.x+helper.dE.z)/xpz,D02=helper.dE_it.y;
+            dP_dF.x2002=(D02-S02)/2;
+            dP_dF.x2020=(D02+S02)/2;
+            T S12=(helper.dE.y+helper.dE.z)/ypz,D12=helper.dE_it.x;
             dP_dF.x2112=(D12-S12)/2;
             dP_dF.x2121=(D12+S12)/2;
-            T S13=(helper.dE.x+helper.dE.z)/xpz,D13=helper.dE_it.y;
-            dP_dF.x3113=(D13-S13)/2;
-            dP_dF.x3131=(D13+S13)/2;
-            T S23=(helper.dE.y+helper.dE.z)/ypz,D23=helper.dE_it.x;
-            dP_dF.x3223=(D23-S23)/2;
-            dP_dF.x3232=(D23+S23)/2;
             return;}}
-    dP_dF.x1111=re.base.Exx(x,y,z,simplex);
-    dP_dF.x2222=re.base.Eyy(x,y,z,simplex);
-    dP_dF.x3333=re.base.Ezz(x,y,z,simplex);
-    dP_dF.x2211=re.base.Exy(x,y,z,simplex);
-    dP_dF.x3311=re.base.Exz(x,y,z,simplex);
-    dP_dF.x3322=re.base.Eyz(x,y,z,simplex);
+    dP_dF.x0000=re.base.Exx(x,y,z,simplex);
+    dP_dF.x1111=re.base.Eyy(x,y,z,simplex);
+    dP_dF.x2222=re.base.Ezz(x,y,z,simplex);
+    dP_dF.x1100=re.base.Exy(x,y,z,simplex);
+    dP_dF.x2200=re.base.Exz(x,y,z,simplex);
+    dP_dF.x2211=re.base.Eyz(x,y,z,simplex);
     VECTOR<T,3> P=re.P_From_Strain(F,1,simplex).To_Vector();
-    T S12=(P.x+P.y)/xpy,D12=re.base.Ex_Ey_x_y(x,y,z,simplex);
+    T S01=(P.x+P.y)/xpy,D01=re.base.Ex_Ey_x_y(x,y,z,simplex);
+    dP_dF.x1001=(D01-S01)/2;
+    dP_dF.x1010=(D01+S01)/2;
+    T S02=(P.x+P.z)/xpz,D02=re.base.Ex_Ez_x_z(x,y,z,simplex);
+    dP_dF.x2002=(D02-S02)/2;
+    dP_dF.x2020=(D02+S02)/2;
+    T S12=(P.y+P.z)/ypz,D12=re.base.Ey_Ez_y_z(x,y,z,simplex);
     dP_dF.x2112=(D12-S12)/2;
     dP_dF.x2121=(D12+S12)/2;
-    T S13=(P.x+P.z)/xpz,D13=re.base.Ex_Ez_x_z(x,y,z,simplex);
-    dP_dF.x3113=(D13-S13)/2;
-    dP_dF.x3131=(D13+S13)/2;
-    T S23=(P.y+P.z)/ypz,D23=re.base.Ey_Ez_y_z(x,y,z,simplex);
-    dP_dF.x3223=(D23-S23)/2;
-    dP_dF.x3232=(D23+S23)/2;
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative

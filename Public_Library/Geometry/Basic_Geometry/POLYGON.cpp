@@ -130,9 +130,9 @@ template<class T> bool Inside_Polygon_Helper(const POLYGON<VECTOR<T,2> >& p, con
 
     // all sides except for the last one
     for(int k=1;k<p.X.m;k++){
-        VECTOR<T,2> X1=p.X(k)-X_point,X2=p.X(k+1)-X_point;
-        if(X1==VECTOR<T,2>() || X2==VECTOR<T,2>()) return true; // (x,y) lies on the polygon
-        T theta1=atan2(X1.y,X1.x),theta2=atan2(X2.y,X2.x); // atan2 returns values between -pi and pi, if (x,y) != (0,0)
+        VECTOR<T,2> X0=p.X(k)-X_point,X1=p.X(k+1)-X_point;
+        if(X0==VECTOR<T,2>() || X1==VECTOR<T,2>()) return true; // (x,y) lies on the polygon
+        T theta1=atan2(X0.y,X0.x),theta2=atan2(X1.y,X1.x); // atan2 returns values between -pi and pi, if (x,y) != (0,0)
         T theta=theta2-theta1;
         if(theta == (T)pi || theta == -(T)pi) return true; // (x,y) lies on the polygon
         if(theta > (T)pi) theta-=2*(T)pi;          // make sure the smaller angle is swept out
@@ -140,9 +140,9 @@ template<class T> bool Inside_Polygon_Helper(const POLYGON<VECTOR<T,2> >& p, con
         theta_total+=theta;}
 
     // last side
-    VECTOR<T,2> X1=p.X(p.X.m-1)-X_point,X2=p.X(0)-X_point;
-    if(X1==VECTOR<T,2>() || X2==VECTOR<T,2>()) return true; // (x,y) lies on the polygon
-    T theta1=atan2(X1.y,X1.x),theta2=atan2(X2.y,X2.x); // atan2 returns values between -pi and pi, if (x,y) != (0,0)
+    VECTOR<T,2> X0=p.X(p.X.m-1)-X_point,X1=p.X(0)-X_point;
+    if(X0==VECTOR<T,2>() || X1==VECTOR<T,2>()) return true; // (x,y) lies on the polygon
+    T theta1=atan2(X0.y,X0.x),theta2=atan2(X1.y,X1.x); // atan2 returns values between -pi and pi, if (x,y) != (0,0)
     T theta=theta2-theta1;
     if(theta == (T)pi || theta == -(T)pi) return true; // (x,y) lies on the polygon
     if(theta > (T)pi) theta-=2*(T)pi;          // make sure the smaller angle is swept out

@@ -195,9 +195,9 @@ void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
     BINDING_SPRINGS<TV>& binding_springs=solid_body_collection.template Find_Force<BINDING_SPRINGS<TV>&>();
     binding_stiffness.Resize(soft_bindings.bindings.m);
     for(int b=0;b<soft_bindings.bindings.m;b++){
-        TV& X1=particles.X(soft_bindings.bindings(b)(1));
-        TV& X2=particles.X(soft_bindings.bindings(b)(2));
-        T distance=(X1-X2).Magnitude();
+        TV& X0=particles.X(soft_bindings.bindings(b)(1));
+        TV& X1=particles.X(soft_bindings.bindings(b)(2));
+        T distance=(X0-X1).Magnitude();
         T ratio=distance/critical_distance;
         if(ratio>1)
             binding_stiffness(b)=(T)5e2/ratio;

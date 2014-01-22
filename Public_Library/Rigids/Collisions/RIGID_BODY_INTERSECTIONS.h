@@ -64,7 +64,7 @@ public:
     {use_edge_intersection=use_edge_intersection_input;}
 
 private:
-    void Flip_Transformation() const // then from body2 to body1
+    void Flip_Transformation() const // then from body1 to body0
     {exchange(rotation,rotation_reverse);exchange(translation,translation_reverse);}
 
 public:
@@ -82,8 +82,8 @@ private:
     //const T_SIMPLEX_HIERARCHY& Simplex_Hierarchy(const RIGID_BODY<TV>& rigid_body) const;
     void Particles_In_Levelset(const int particle_body_id,const int levelset_body_id,
         ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const T contour_value=0,const bool exit_early=false) const;
-    T_ORIENTED_BOX Oriented_Box2_In_Body1_Coordinates(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2) const;
-    void Initialize_Transformation_From_Body1_To_Body2_Coordinates(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2) const;
+    T_ORIENTED_BOX Oriented_Box2_In_Body1_Coordinates(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1) const;
+    void Initialize_Transformation_From_Body1_To_Body2_Coordinates(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1) const;
 //#####################################################################
 };
 }

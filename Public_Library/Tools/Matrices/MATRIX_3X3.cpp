@@ -79,12 +79,12 @@ template<class T> T MATRIX<T,3>::
 Simplex_Minimum_Altitude() const
 {
     typedef VECTOR<T,3> TV;
-    TV X1=Column(0),X2=Column(1),X3=Column(2);
+    TV X0=Column(0),X1=Column(1),X2=Column(2);
     return minabs(
-        TV::Dot_Product(X1,TV::Cross_Product(X2-X1,X3-X1).Normalized()),
-        TV::Dot_Product(X2-X1,TV::Cross_Product(X3,X2).Normalized()),
-        TV::Dot_Product(X3-X2,TV::Cross_Product(X1,X3).Normalized()),
-        TV::Dot_Product(X3,TV::Cross_Product(X1,X2).Normalized()));
+        TV::Dot_Product(X0,TV::Cross_Product(X1-X0,X2-X0).Normalized()),
+        TV::Dot_Product(X1-X0,TV::Cross_Product(X2,X1).Normalized()),
+        TV::Dot_Product(X2-X1,TV::Cross_Product(X0,X2).Normalized()),
+        TV::Dot_Product(X2,TV::Cross_Product(X0,X1).Normalized()));
 }
 //#####################################################################
 // Function Componentwise_Min
@@ -121,11 +121,11 @@ operator*(const MATRIX_MXN<T>& A) const
 template<class T> MATRIX<T,3> MATRIX<T,3>::
 Inverse() const
 {
-    T cofactor11=x[4]*x[8]-x[7]*x[5],cofactor12=x[7]*x[2]-x[1]*x[8],cofactor13=x[1]*x[5]-x[4]*x[2];
-    T determinant=x[0]*cofactor11+x[3]*cofactor12+x[6]*cofactor13;
+    T cofactor00=x[4]*x[8]-x[7]*x[5],cofactor01=x[7]*x[2]-x[1]*x[8],cofactor02=x[1]*x[5]-x[4]*x[2];
+    T determinant=x[0]*cofactor00+x[3]*cofactor01+x[6]*cofactor02;
     assert(determinant!=0);
     T s=1/determinant;
-    return s*MATRIX(cofactor11,cofactor12,cofactor13,x[6]*x[5]-x[3]*x[8],x[0]*x[8]-x[6]*x[2],x[3]*x[2]-x[0]*x[5],x[3]*x[7]-x[6]*x[4],x[6]*x[1]-x[0]*x[7],x[0]*x[4]-x[3]*x[1]);
+    return s*MATRIX(cofactor00,cofactor01,cofactor02,x[6]*x[5]-x[3]*x[8],x[0]*x[8]-x[6]*x[2],x[3]*x[2]-x[0]*x[5],x[3]*x[7]-x[6]*x[4],x[6]*x[1]-x[0]*x[7],x[0]*x[4]-x[3]*x[1]);
 }
 //#####################################################################
 // Function Solve_Linear_System
@@ -133,10 +133,10 @@ Inverse() const
 template<class T> VECTOR<T,3> MATRIX<T,3>::
 Solve_Linear_System(const VECTOR<T,3>& b) const // 33 mults, 17 adds, 1 div
 {
-    T cofactor11=x[4]*x[8]-x[7]*x[5],cofactor12=x[7]*x[2]-x[1]*x[8],cofactor13=x[1]*x[5]-x[4]*x[2];
-    T determinant=x[0]*cofactor11+x[3]*cofactor12+x[6]*cofactor13;
+    T cofactor00=x[4]*x[8]-x[7]*x[5],cofactor01=x[7]*x[2]-x[1]*x[8],cofactor02=x[1]*x[5]-x[4]*x[2];
+    T determinant=x[0]*cofactor00+x[3]*cofactor01+x[6]*cofactor02;
     assert(determinant!=0);
-    return MATRIX(cofactor11,cofactor12,cofactor13,x[6]*x[5]-x[3]*x[8],x[0]*x[8]-x[6]*x[2],x[3]*x[2]-x[0]*x[5],x[3]*x[7]-x[6]*x[4],x[6]*x[1]-x[0]*x[7],x[0]*x[4]-x[3]*x[1])*b/determinant;
+    return MATRIX(cofactor00,cofactor01,cofactor02,x[6]*x[5]-x[3]*x[8],x[0]*x[8]-x[6]*x[2],x[3]*x[2]-x[0]*x[5],x[3]*x[7]-x[6]*x[4],x[6]*x[1]-x[0]*x[7],x[0]*x[4]-x[3]*x[1])*b/determinant;
 }
 //#####################################################################
 // Function Robust_Solve_Linear_System
@@ -144,9 +144,9 @@ Solve_Linear_System(const VECTOR<T,3>& b) const // 33 mults, 17 adds, 1 div
 template<class T> VECTOR<T,3> MATRIX<T,3>::
 Robust_Solve_Linear_System(const VECTOR<T,3>& b) const // 34 mults, 17 adds, 1 div
 {
-    T cofactor11=x[4]*x[8]-x[7]*x[5],cofactor12=x[7]*x[2]-x[1]*x[8],cofactor13=x[1]*x[5]-x[4]*x[2];
-    T determinant=x[0]*cofactor11+x[3]*cofactor12+x[6]*cofactor13;
-    VECTOR<T,3> unscaled_result=MATRIX(cofactor11,cofactor12,cofactor13,x[6]*x[5]-x[3]*x[8],x[0]*x[8]-x[6]*x[2],x[3]*x[2]-x[0]*x[5],x[3]*x[7]-x[6]*x[4],x[6]*x[1]-x[0]*x[7],
+    T cofactor00=x[4]*x[8]-x[7]*x[5],cofactor01=x[7]*x[2]-x[1]*x[8],cofactor02=x[1]*x[5]-x[4]*x[2];
+    T determinant=x[0]*cofactor00+x[3]*cofactor01+x[6]*cofactor02;
+    VECTOR<T,3> unscaled_result=MATRIX(cofactor00,cofactor01,cofactor02,x[6]*x[5]-x[3]*x[8],x[0]*x[8]-x[6]*x[2],x[3]*x[2]-x[0]*x[5],x[3]*x[7]-x[6]*x[4],x[6]*x[1]-x[0]*x[7],
         x[0]*x[4]-x[3]*x[1])*b;
     T relative_tolerance=(T)FLT_MIN*unscaled_result.Max_Abs();
     if(abs(determinant)<=relative_tolerance){relative_tolerance=max(relative_tolerance,(T)FLT_MIN);determinant=determinant>=0?relative_tolerance:-relative_tolerance;}
@@ -159,24 +159,24 @@ template<class T> MATRIX<T,3> MATRIX<T,3>::
 Q_From_QR_Factorization() const // Gram Schmidt
 {
     int k;MATRIX Q=*this;
-    T one_over_r11=1/sqrt((sqr(Q.x[0])+sqr(Q.x[1])+sqr(Q.x[2])));
-    for(k=0;k<=2;k++) Q.x[k]=one_over_r11*Q.x[k];
-    T r12=Q.x[0]*Q.x[3]+Q.x[1]*Q.x[4]+Q.x[2]*Q.x[5];
-    Q.x[3]-=r12*Q.x[0];
-    Q.x[4]-=r12*Q.x[1];
-    Q.x[5]-=r12*Q.x[2];
-    T r13=Q.x[0]*Q.x[6]+Q.x[1]*Q.x[7]+Q.x[2]*Q.x[8];
-    Q.x[6]-=r13*Q.x[0];
-    Q.x[7]-=r13*Q.x[1];
-    Q.x[8]-=r13*Q.x[2];
-    T one_over_r22=1/sqrt((sqr(Q.x[3])+sqr(Q.x[4])+sqr(Q.x[5])));
-    for(k=3;k<=5;k++) Q.x[k]=one_over_r22*Q.x[k];
-    T r23=Q.x[3]*Q.x[6]+Q.x[4]*Q.x[7]+Q.x[5]*Q.x[8];
-    Q.x[6]-=r23*Q.x[3];
-    Q.x[7]-=r23*Q.x[4];
-    Q.x[8]-=r23*Q.x[5];
-    T one_over_r33=1/sqrt((sqr(Q.x[6])+sqr(Q.x[7])+sqr(Q.x[8])));
-    for(k=6;k<=8;k++) Q.x[k]=one_over_r33*Q.x[k];
+    T one_over_r00=1/sqrt((sqr(Q.x[0])+sqr(Q.x[1])+sqr(Q.x[2])));
+    for(k=0;k<=2;k++) Q.x[k]=one_over_r00*Q.x[k];
+    T r01=Q.x[0]*Q.x[3]+Q.x[1]*Q.x[4]+Q.x[2]*Q.x[5];
+    Q.x[3]-=r01*Q.x[0];
+    Q.x[4]-=r01*Q.x[1];
+    Q.x[5]-=r01*Q.x[2];
+    T r02=Q.x[0]*Q.x[6]+Q.x[1]*Q.x[7]+Q.x[2]*Q.x[8];
+    Q.x[6]-=r02*Q.x[0];
+    Q.x[7]-=r02*Q.x[1];
+    Q.x[8]-=r02*Q.x[2];
+    T one_over_r11=1/sqrt((sqr(Q.x[3])+sqr(Q.x[4])+sqr(Q.x[5])));
+    for(k=3;k<=5;k++) Q.x[k]=one_over_r11*Q.x[k];
+    T r12=Q.x[3]*Q.x[6]+Q.x[4]*Q.x[7]+Q.x[5]*Q.x[8];
+    Q.x[6]-=r12*Q.x[3];
+    Q.x[7]-=r12*Q.x[4];
+    Q.x[8]-=r12*Q.x[5];
+    T one_over_r22=1/sqrt((sqr(Q.x[6])+sqr(Q.x[7])+sqr(Q.x[8])));
+    for(k=6;k<=8;k++) Q.x[k]=one_over_r22*Q.x[k];
     return Q;
 }
 //#####################################################################
@@ -188,25 +188,25 @@ R_From_QR_Factorization() const // Gram Schmidt
     int k;
     MATRIX Q=*this;
     UPPER_TRIANGULAR_MATRIX<T,3> R;
-    R.x11=sqrt((sqr(Q.x[0])+sqr(Q.x[1])+sqr(Q.x[2])));
+    R.x00=sqrt((sqr(Q.x[0])+sqr(Q.x[1])+sqr(Q.x[2])));
+    T one_over_r00=1/R.x00;
+    for(k=0;k<=2;k++) Q.x[k]=one_over_r00*Q.x[k];
+    R.x01=Q.x[0]*Q.x[3]+Q.x[1]*Q.x[4]+Q.x[2]*Q.x[5];
+    Q.x[3]-=R.x01*Q.x[0];
+    Q.x[4]-=R.x01*Q.x[1];
+    Q.x[5]-=R.x01*Q.x[2];
+    R.x02=Q.x[0]*Q.x[6]+Q.x[1]*Q.x[7]+Q.x[2]*Q.x[8];
+    Q.x[6]-=R.x02*Q.x[0];
+    Q.x[7]-=R.x02*Q.x[1];
+    Q.x[8]-=R.x02*Q.x[2];
+    R.x11=sqrt((sqr(Q.x[3])+sqr(Q.x[4])+sqr(Q.x[5])));
     T one_over_r11=1/R.x11;
-    for(k=0;k<=2;k++) Q.x[k]=one_over_r11*Q.x[k];
-    R.x12=Q.x[0]*Q.x[3]+Q.x[1]*Q.x[4]+Q.x[2]*Q.x[5];
-    Q.x[3]-=R.x12*Q.x[0];
-    Q.x[4]-=R.x12*Q.x[1];
-    Q.x[5]-=R.x12*Q.x[2];
-    R.x13=Q.x[0]*Q.x[6]+Q.x[1]*Q.x[7]+Q.x[2]*Q.x[8];
-    Q.x[6]-=R.x13*Q.x[0];
-    Q.x[7]-=R.x13*Q.x[1];
-    Q.x[8]-=R.x13*Q.x[2];
-    R.x22=sqrt((sqr(Q.x[3])+sqr(Q.x[4])+sqr(Q.x[5])));
-    T one_over_r22=1/R.x22;
-    for(k=3;k<=5;k++) Q.x[k]=one_over_r22*Q.x[k];
-    R.x23=Q.x[3]*Q.x[6]+Q.x[4]*Q.x[7]+Q.x[5]*Q.x[8];
-    Q.x[6]-=R.x23*Q.x[3];
-    Q.x[7]-=R.x23*Q.x[4];
-    Q.x[8]-=R.x23*Q.x[5];
-    R.x33=sqrt((sqr(Q.x[6])+sqr(Q.x[7])+sqr(Q.x[8])));
+    for(k=3;k<=5;k++) Q.x[k]=one_over_r11*Q.x[k];
+    R.x12=Q.x[3]*Q.x[6]+Q.x[4]*Q.x[7]+Q.x[5]*Q.x[8];
+    Q.x[6]-=R.x12*Q.x[3];
+    Q.x[7]-=R.x12*Q.x[4];
+    Q.x[8]-=R.x12*Q.x[5];
+    R.x22=sqrt((sqr(Q.x[6])+sqr(Q.x[7])+sqr(Q.x[8])));
     return R;
 }
 //#####################################################################

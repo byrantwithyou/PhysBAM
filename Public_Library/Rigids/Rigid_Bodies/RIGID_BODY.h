@@ -70,8 +70,8 @@ public:
     static std::string Static_Name()
     {return STRING_UTILITIES::string_sprintf("RIGID_BODY<VECTOR<T,%d> >",TV::m);}
 
-    static T Coefficient_Of_Friction(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2)
-    {return min(body1.coefficient_of_friction,body2.coefficient_of_friction);}
+    static T Coefficient_Of_Friction(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1)
+    {return min(body0.coefficient_of_friction,body1.coefficient_of_friction);}
 
     RAY<TV> Object_Space_Ray(const RAY<TV>& world_space_ray) const
     {RAY<TV> transformed_ray(Object_Space_Point(world_space_ray.endpoint),Object_Space_Vector(world_space_ray.direction));
@@ -106,17 +106,17 @@ public:
     static TV Pointwise_Object_Velocity(const TWIST<TV>& twist,const TV& t,const TV& X)
     {return twist.linear+TV::Cross_Product(twist.angular,X-t);}
 
-    static TV Relative_Velocity(const RIGID_BODY<TV>& geometry1,const RIGID_BODY<TV>& geometry2,const TV& world_point)
-    {return geometry1.Pointwise_Object_Velocity(world_point)-geometry2.Pointwise_Object_Velocity(world_point);}
+    static TV Relative_Velocity(const RIGID_BODY<TV>& geometry0,const RIGID_BODY<TV>& geometry1,const TV& world_point)
+    {return geometry0.Pointwise_Object_Velocity(world_point)-geometry1.Pointwise_Object_Velocity(world_point);}
 
-    static TV Relative_Velocity_At_Geometry1_Particle(const RIGID_BODY<TV>& geometry1,const RIGID_BODY<TV>& geometry2,const TV& world_point,const int particle_index)
-    {return geometry1.Pointwise_Object_Velocity_At_Particle(world_point,particle_index)-geometry2.Pointwise_Object_Velocity(world_point);}
+    static TV Relative_Velocity_At_Geometry1_Particle(const RIGID_BODY<TV>& geometry0,const RIGID_BODY<TV>& geometry1,const TV& world_point,const int particle_index)
+    {return geometry0.Pointwise_Object_Velocity_At_Particle(world_point,particle_index)-geometry1.Pointwise_Object_Velocity(world_point);}
 
-    static T_SPIN Relative_Angular_Velocity(const RIGID_BODY<TV>& geometry1,const RIGID_BODY<TV>& geometry2) // make sure the angular velocities are updated before calling this!
-    {return geometry1.Twist().angular-geometry2.Twist().angular;}
+    static T_SPIN Relative_Angular_Velocity(const RIGID_BODY<TV>& geometry0,const RIGID_BODY<TV>& geometry1) // make sure the angular velocities are updated before calling this!
+    {return geometry0.Twist().angular-geometry1.Twist().angular;}
 
-    static TWIST<TV> Relative_Twist(const RIGID_BODY<TV>& geometry1,const RIGID_BODY<TV>& geometry2,const TV& world_point)
-    {return TWIST<TV>(geometry1.Pointwise_Object_Velocity(world_point)-geometry2.Pointwise_Object_Velocity(world_point),geometry1.Twist().angular-geometry2.Twist().angular);}
+    static TWIST<TV> Relative_Twist(const RIGID_BODY<TV>& geometry0,const RIGID_BODY<TV>& geometry1,const TV& world_point)
+    {return TWIST<TV>(geometry0.Pointwise_Object_Velocity(world_point)-geometry1.Pointwise_Object_Velocity(world_point),geometry0.Twist().angular-geometry1.Twist().angular);}
 
     const T_ORIENTED_BOX& Oriented_Bounding_Box() const
     {assert(bounding_box_up_to_date);return oriented_box;}
@@ -160,14 +160,14 @@ public:
     void Set_Coefficient_Of_Restitution(const T coefficient_input=.5)
     {coefficient_of_restitution=coefficient_input;}
 
-    static T Coefficient_Of_Restitution(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2)
-    {return min(body1.coefficient_of_restitution,body2.coefficient_of_restitution);}
+    static T Coefficient_Of_Restitution(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1)
+    {return min(body0.coefficient_of_restitution,body1.coefficient_of_restitution);}
 
     void Set_Coefficient_Of_Rolling_Friction(const T coefficient_input=.5)
     {coefficient_of_rolling_friction=coefficient_input;}
 
-    static T Coefficient_Of_Rolling_Friction(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2)
-    {return min(body1.coefficient_of_rolling_friction,body2.coefficient_of_rolling_friction);}
+    static T Coefficient_Of_Rolling_Friction(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1)
+    {return min(body0.coefficient_of_rolling_friction,body1.coefficient_of_rolling_friction);}
 
     bool& Is_Kinematic() PHYSBAM_ALWAYS_INLINE
     {return rigid_body_collection.rigid_body_particles.kinematic(particle_index);}
@@ -261,9 +261,9 @@ public:
     {if(Has_Infinite_Inertia()) return SYMMETRIC_MATRIX<T,TV::m>(); // return zero matrix
     return Conjugate_With_Cross_Product_Matrix(object_space_location,Inertia_Tensor().Inverse())+1/Mass();}
 
-    static SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2,const TV& location)
-    {assert(!body1.Has_Infinite_Inertia() || !body2.Has_Infinite_Inertia());
-    return body1.Impulse_Factor(location)+body2.Impulse_Factor(location);}
+    static SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,const TV& location)
+    {assert(!body0.Has_Infinite_Inertia() || !body1.Has_Infinite_Inertia());
+    return body0.Impulse_Factor(location)+body1.Impulse_Factor(location);}
 
     TV Simplex_Normal(const int id,const RIGID_BODY_STATE<TV>& state) const
     {return state.World_Space_Vector(simplicial_object->Normal(id));}
@@ -305,23 +305,23 @@ public:
     void Interpolate_Between_States(const RIGID_BODY_STATE<TV>& state1,const RIGID_BODY_STATE<TV>& state2,const T time,RIGID_BODY_STATE<TV>& interpolated_state);
     void Compute_Velocity_Between_States(const RIGID_BODY_STATE<TV>& state1,const RIGID_BODY_STATE<TV>& state2,RIGID_BODY_STATE<TV>& result_state);
     void Apply_Impulse_To_Body(const TV& location,const TV& impulse,const T_SPIN& angular_impulse=T_SPIN(),const bool half_impulse_for_accumulator=false);
-    static void Apply_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& impulse,const T_SPIN& angular_impulse=T_SPIN(),
+    static void Apply_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& impulse,const T_SPIN& angular_impulse=T_SPIN(),
         const bool half_impulse_for_accumulator=false);
-    static void Compute_Clamped_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,TWIST<TV>& impulse,const ROTATION<TV>& saved_rotation_1,
+    static void Compute_Clamped_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,TWIST<TV>& impulse,const ROTATION<TV>& saved_rotation_1,
         const ROTATION<TV>& saved_rotation_2);
-    static TWIST<TV> Compute_Collision_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const ROTATION<TV>& saved_rotation_1,const ROTATION<TV>& saved_rotation_2,const TV& location,
+    static TWIST<TV> Compute_Collision_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const ROTATION<TV>& saved_rotation_1,const ROTATION<TV>& saved_rotation_2,const TV& location,
         const TV& normal,const TV& relative_velocity,const T coefficient_of_restitution,const T coefficient_of_friction=0,const bool clamp_friction_magnitude=true,
         const bool rolling_friction=false,const bool clamp_energy=false);
-    static void Apply_Collision_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const ROTATION<TV>& saved_rotation_1,const ROTATION<TV>& saved_rotation_2,const TV& location,
+    static void Apply_Collision_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const ROTATION<TV>& saved_rotation_1,const ROTATION<TV>& saved_rotation_2,const TV& location,
         const TV& normal,const TV& relative_velocity,const T coefficient_of_restitution,const T coefficient_of_friction=0,const bool clamp_friction_magnitude=true,
         const bool rolling_friction=false,const bool clamp_energy=false,const bool half_impulse_for_accumulator=false);
-    static void Apply_Sticking_And_Angular_Sticking_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TWIST<TV>& delta_relative_twist,
+    static void Apply_Sticking_And_Angular_Sticking_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,const TWIST<TV>& delta_relative_twist,
         const MATRIX_MXN<T>& angular_constraint_matrix,const MATRIX_MXN<T>& prismatic_constraint_matrix);
-    static TWIST<TV> Apply_Rolling_Friction(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T normal_impulse);
-    static TWIST<TV> Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2,const TV& location,const TWIST<TV>& delta_rel_twist_at_location);
-    static TWIST<TV> Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2,const TV& location,const TWIST<TV>& delta_rel_twist_at_location,
+    static TWIST<TV> Apply_Rolling_Friction(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& normal,const T normal_impulse);
+    static TWIST<TV> Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,const TV& location,const TWIST<TV>& delta_rel_twist_at_location);
+    static TWIST<TV> Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,const TV& location,const TWIST<TV>& delta_rel_twist_at_location,
         const MATRIX_MXN<T>& angular_constraint_matrix,const MATRIX_MXN<T>& prismatic_constraint_matrix);
-    static void Apply_Push(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T distance);
+    static void Apply_Push(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& normal,const T distance);
     void Apply_Push_To_Body(const TV& location,const TV& impulse,const T_SPIN& angular_impulse=T_SPIN());
     T Volumetric_Density() const;
     void Diagonalize_Inertia_Tensor(const SYMMETRIC_MATRIX<T,TV::SPIN::m>& inertia_tensor_at_center_of_mass);

@@ -56,9 +56,9 @@ public:
     void Project(KRYLOV_VECTOR_BASE<T>& bdX) const PHYSBAM_OVERRIDE
     {KRYLOV_VECTOR_T& dX=debug_cast<KRYLOV_VECTOR_T&>(bdX);example_forces_and_velocities.Zero_Out_Enslaved_Position_Nodes(dX.v.array,time);}
 
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bdX1,const KRYLOV_VECTOR_BASE<T>& bdX2) const PHYSBAM_OVERRIDE
-    {const KRYLOV_VECTOR_T& dX1=debug_cast<const KRYLOV_VECTOR_T&>(bdX1),&dX2=debug_cast<const KRYLOV_VECTOR_T&>(bdX2);
-    T inner_product=dX1.v.Dot(dX2.v);
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bdX0,const KRYLOV_VECTOR_BASE<T>& bdX2) const PHYSBAM_OVERRIDE
+    {const KRYLOV_VECTOR_T& dX0=debug_cast<const KRYLOV_VECTOR_T&>(bdX0),&dX2=debug_cast<const KRYLOV_VECTOR_T&>(bdX2);
+    T inner_product=dX0.v.Dot(dX2.v);
     if(mpi_solids) inner_product=mpi_solids->Reduce_Add(inner_product);
     return inner_product;}
 

@@ -59,18 +59,18 @@ public:
 
     void Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,DIAGONALIZED_STRESS_DERIVATIVE<T,3>& dP_dF,const int tetrahedron=0) const PHYSBAM_OVERRIDE
     {DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold),C=F_threshold*F_threshold,C_inverse=C.Inverse();VECTOR<T,3> V_fiber=V.Transpose_Times(fiber_field(tetrahedron));
-    SYMMETRIC_MATRIX<T,3> C_inverse_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(VECTOR<T,3>(C_inverse.x11,C_inverse.x22,C_inverse.x33));
+    SYMMETRIC_MATRIX<T,3> C_inverse_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(VECTOR<T,3>(C_inverse.x00,C_inverse.x11,C_inverse.x22));
     SYMMETRIC_MATRIX<T,3> V_fiber_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(V_fiber);
     ARRAY<T> invariants(4),energy_gradient(4),energy_hessian(15);Invariants(invariants,C,V_fiber);
     Energy_Gradient(energy_gradient,invariants,tetrahedron);Energy_Hessian(energy_hessian,invariants,tetrahedron);
     ARRAY<VECTOR<T,3> > J_d(4),J_s(4);
     J_d(0)=VECTOR<T,3>((T)1,(T)1,(T)1);
-    J_d(1)=(T)2*VECTOR<T,3>(C.x11,C.x22,C.x33);
-    J_d(2)=invariants(2)*VECTOR<T,3>(C_inverse.x11,C_inverse.x22,C_inverse.x33);
-    J_d(3)=VECTOR<T,3>(V_fiber_outer.x11,V_fiber_outer.x22,V_fiber_outer.x33);
-    J_d(4)=(T)2*VECTOR<T,3>(C.x11*V_fiber_outer.x11,C.x22*V_fiber_outer.x22,C.x33*V_fiber_outer.x33);
-    J_s(3)=(T)root_two*VECTOR<T,3>(V_fiber_outer.x21,V_fiber_outer.x31,V_fiber_outer.x32);
-    J_s(4)=(T)root_two*VECTOR<T,3>((C.x11+C.x22)*V_fiber_outer.x21,(C.x11+C.x33)*V_fiber_outer.x31,(C.x22+C.x33)*V_fiber_outer.x32);
+    J_d(1)=(T)2*VECTOR<T,3>(C.x00,C.x11,C.x22);
+    J_d(2)=invariants(2)*VECTOR<T,3>(C_inverse.x00,C_inverse.x11,C_inverse.x22);
+    J_d(3)=VECTOR<T,3>(V_fiber_outer.x00,V_fiber_outer.x11,V_fiber_outer.x22);
+    J_d(4)=(T)2*VECTOR<T,3>(C.x00*V_fiber_outer.x00,C.x11*V_fiber_outer.x11,C.x22*V_fiber_outer.x22);
+    J_s(3)=(T)root_two*VECTOR<T,3>(V_fiber_outer.x10,V_fiber_outer.x20,V_fiber_outer.x21);
+    J_s(4)=(T)root_two*VECTOR<T,3>((C.x00+C.x11)*V_fiber_outer.x10,(C.x00+C.x22)*V_fiber_outer.x20,(C.x11+C.x22)*V_fiber_outer.x21);
     dP_dF.dSdC_d=dP_dF.dSdC_s=SYMMETRIC_MATRIX<T,3>();dP_dF.dSdC_ds=MATRIX<T,3>();dP_dF.F=F_threshold;dP_dF.S=S(C,V_fiber,invariants,energy_gradient);
     for(int n=0;n<5;n++) for(int m=n;m<=5;m++){
         int hessian_index=Hessian_Index(m,n);if(!energy_hessian(hessian_index))continue;
@@ -86,13 +86,13 @@ public:
         dP_dF.dSdC_d+=(T)4*energy_gradient(1);
         dP_dF.dSdC_s+=(T)4*energy_gradient(1);}
     if(energy_gradient(2)){
-        dP_dF.dSdC_d+=(T)2*energy_gradient(2)*invariants(2)*SYMMETRIC_MATRIX<T,3>(0,C_inverse_outer.x21,C_inverse_outer.x31,0,C_inverse_outer.x32,0);
-        dP_dF.dSdC_s-=(T)2*energy_gradient(2)*invariants(2)*DIAGONAL_MATRIX<T,3>(C_inverse_outer.x21,C_inverse_outer.x31,C_inverse_outer.x32);}
+        dP_dF.dSdC_d+=(T)2*energy_gradient(2)*invariants(2)*SYMMETRIC_MATRIX<T,3>(0,C_inverse_outer.x10,C_inverse_outer.x20,0,C_inverse_outer.x21,0);
+        dP_dF.dSdC_s-=(T)2*energy_gradient(2)*invariants(2)*DIAGONAL_MATRIX<T,3>(C_inverse_outer.x10,C_inverse_outer.x20,C_inverse_outer.x21);}
     if(energy_gradient(4)){
-        dP_dF.dSdC_d+=(T)4*energy_gradient(4)*DIAGONAL_MATRIX<T,3>(V_fiber_outer.x11,V_fiber_outer.x22,V_fiber_outer.x33);
-        dP_dF.dSdC_s+=(T)2*energy_gradient(4)*SYMMETRIC_MATRIX<T,3>(V_fiber_outer.x11+V_fiber_outer.x22,V_fiber_outer.x32,V_fiber_outer.x31,
-                                                                      V_fiber_outer.x11+V_fiber_outer.x33,V_fiber_outer.x21,V_fiber_outer.x22+V_fiber_outer.x33);
-        dP_dF.dSdC_ds+=(T)2*(T)root_two*energy_gradient(4)*MATRIX<T,3>(V_fiber_outer.x21,V_fiber_outer.x21,0,V_fiber_outer.x31,0,V_fiber_outer.x31,0,V_fiber_outer.x32,V_fiber_outer.x32);}
+        dP_dF.dSdC_d+=(T)4*energy_gradient(4)*DIAGONAL_MATRIX<T,3>(V_fiber_outer.x00,V_fiber_outer.x11,V_fiber_outer.x22);
+        dP_dF.dSdC_s+=(T)2*energy_gradient(4)*SYMMETRIC_MATRIX<T,3>(V_fiber_outer.x00+V_fiber_outer.x11,V_fiber_outer.x21,V_fiber_outer.x20,
+                                                                      V_fiber_outer.x00+V_fiber_outer.x22,V_fiber_outer.x10,V_fiber_outer.x11+V_fiber_outer.x22);
+        dP_dF.dSdC_ds+=(T)2*(T)root_two*energy_gradient(4)*MATRIX<T,3>(V_fiber_outer.x10,V_fiber_outer.x10,0,V_fiber_outer.x20,0,V_fiber_outer.x20,0,V_fiber_outer.x21,V_fiber_outer.x21);}
     if(enforce_definiteness)dP_dF.Enforce_Definiteness();}
 
 //#####################################################################

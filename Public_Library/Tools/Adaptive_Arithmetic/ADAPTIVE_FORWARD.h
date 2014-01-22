@@ -32,11 +32,11 @@ enum CACHED_TYPE {CACHED,NOT_CACHED};
 template<class DERIVED,class T_WRAPPED,CACHED_TYPE cached_type=NOT_CACHED> class ADAPTIVE_WRAPPER_BASE;
 
 template<class T,class EXACT_TYPE_T> class ADAPTIVE_ATOM;
-template<class T_ADAPTIVE1> class ADAPTIVE_NEGATION;
-template<class T_ADAPTIVE1,class T_ADAPTIVE2> class ADAPTIVE_SUM;
-template<class T_ADAPTIVE1,class T_ADAPTIVE2> class ADAPTIVE_DIFFERENCE;
-template<class T_ADAPTIVE1,class T_ADAPTIVE2> class ADAPTIVE_PRODUCT;
-template<class T_ADAPTIVE1,class T_ADAPTIVE2> class ADAPTIVE_QUOTIENT;
+template<class T_ADAPTIVE0> class ADAPTIVE_NEGATION;
+template<class T_ADAPTIVE0,class T_ADAPTIVE1> class ADAPTIVE_SUM;
+template<class T_ADAPTIVE0,class T_ADAPTIVE1> class ADAPTIVE_DIFFERENCE;
+template<class T_ADAPTIVE0,class T_ADAPTIVE1> class ADAPTIVE_PRODUCT;
+template<class T_ADAPTIVE0,class T_ADAPTIVE1> class ADAPTIVE_QUOTIENT;
 template<class T_ADAPTIVE,int d> class ADAPTIVE_DETERMINANT;
 template<class T_ADAPTIVE,int d> class ADAPTIVE_SIGNED_VOLUME;
 

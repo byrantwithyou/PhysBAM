@@ -193,10 +193,10 @@ All_Gather_Particles(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> V) const
 // Function Gather_Interaction_Pairs
 //#####################################################################
 namespace{
-template<class T,class T_PAIR1,class T_PAIR2> void Gather_Interaction_Pairs_Helper(const MPI_SOLIDS<VECTOR<T,1> >& mpi_solids,ARRAY<T_PAIR1>& point_triangle_pairs,ARRAY<T_PAIR2>& edge_edge_pairs)
+template<class T,class T_PAIR0,class T_PAIR1> void Gather_Interaction_Pairs_Helper(const MPI_SOLIDS<VECTOR<T,1> >& mpi_solids,ARRAY<T_PAIR0>& point_triangle_pairs,ARRAY<T_PAIR1>& edge_edge_pairs)
 {PHYSBAM_NOT_IMPLEMENTED();}
 
-template<class TV,class T_PAIR1,class T_PAIR2> void Gather_Interaction_Pairs_Helper(const MPI_SOLIDS<TV>& mpi_solids,ARRAY<T_PAIR1>& point_triangle_pairs,ARRAY<T_PAIR2>& edge_edge_pairs)
+template<class TV,class T_PAIR0,class T_PAIR1> void Gather_Interaction_Pairs_Helper(const MPI_SOLIDS<TV>& mpi_solids,ARRAY<T_PAIR0>& point_triangle_pairs,ARRAY<T_PAIR1>& edge_edge_pairs)
 {
     int tag=mpi_solids.Get_Unique_Tag();
     if(mpi_solids.rank!=0){
@@ -208,13 +208,13 @@ template<class TV,class T_PAIR1,class T_PAIR2> void Gather_Interaction_Pairs_Hel
             MPI::Status probe_status;mpi_solids.comm->Probe(MPI::ANY_SOURCE,tag,probe_status);
             ARRAY<char> buffer(probe_status.Get_count(MPI::PACKED));int position=0;
             mpi_solids.comm->Recv(buffer.Get_Array_Pointer(),buffer.m,MPI::PACKED,probe_status.Get_source(),probe_status.Get_tag());
-            ARRAY<T_PAIR1> temp_point_triangle_pairs;ARRAY<T_PAIR2> temp_edge_edge_pairs;
+            ARRAY<T_PAIR0> temp_point_triangle_pairs;ARRAY<T_PAIR1> temp_edge_edge_pairs;
             MPI_UTILITIES::Unpack(temp_point_triangle_pairs,temp_edge_edge_pairs,buffer,position,*mpi_solids.comm); // TODO: Make append unpack
             point_triangle_pairs.Append_Elements(temp_point_triangle_pairs);edge_edge_pairs.Append_Elements(temp_edge_edge_pairs);}}
 }
 };
-template<class TV> template<class T_PAIR1,class T_PAIR2> void MPI_SOLIDS<TV>::
-Gather_Interaction_Pairs(ARRAY<T_PAIR1>& point_triangle_pairs,ARRAY<T_PAIR2>& edge_edge_pairs) const
+template<class TV> template<class T_PAIR0,class T_PAIR1> void MPI_SOLIDS<TV>::
+Gather_Interaction_Pairs(ARRAY<T_PAIR0>& point_triangle_pairs,ARRAY<T_PAIR1>& edge_edge_pairs) const
 {
     Gather_Interaction_Pairs_Helper(*this,point_triangle_pairs,edge_edge_pairs);
 }
@@ -767,7 +767,7 @@ template<class TV> void MPI_SOLIDS<TV>::Exchange_Helper(const ARRAY<MPI_PACKAGE*
     {PHYSBAM_NOT_IMPLEMENTED();}
 template<class TV> const MPI::Intracomm& MPI_SOLIDS<TV>::Comm() const {PHYSBAM_NOT_IMPLEMENTED();}
 template<class TV> void MPI_SOLIDS<TV>::All_Gather_Particles(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> V) const {PHYSBAM_NOT_IMPLEMENTED();}
-template<class TV> template<class T_PAIR1,class T_PAIR2> void MPI_SOLIDS<TV>::Gather_Interaction_Pairs(ARRAY<T_PAIR1>& point_triangle_pairs,ARRAY<T_PAIR2>& edge_edge_pairs) const
+template<class TV> template<class T_PAIR0,class T_PAIR1> void MPI_SOLIDS<TV>::Gather_Interaction_Pairs(ARRAY<T_PAIR0>& point_triangle_pairs,ARRAY<T_PAIR1>& edge_edge_pairs) const
     {PHYSBAM_NOT_IMPLEMENTED();}
 template<class TV> void MPI_SOLIDS<TV>::Broadcast_Collision_Modified_Data(ARRAY_VIEW<bool> modified,ARRAY_VIEW<bool> recently_modified,ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> V) const {PHYSBAM_NOT_IMPLEMENTED();}
 template<class TV> void MPI_SOLIDS<TV>::Gather_Collision_Modified_Data(ARRAY_VIEW<bool> modified,ARRAY_VIEW<bool> recently_modified,ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> V) const {PHYSBAM_NOT_IMPLEMENTED();}

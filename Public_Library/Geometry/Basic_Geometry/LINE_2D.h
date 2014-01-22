@@ -22,14 +22,14 @@ public:
     typedef TV VECTOR_T;
 
     TV normal;
-    TV x1; // point on the line
+    TV x0; // point on the line
 
     LINE_2D()
         :normal(0,1)
     {}
 
     LINE_2D(const TV& normal_input,const TV& x1_input)
-        :normal(normal_input),x1(x1_input)
+        :normal(normal_input),x0(x1_input)
     {}
 
     TV Normal(const TV&) const
@@ -39,7 +39,7 @@ public:
     {return RANGE<TV>::Full_Box();}
 
     T Signed_Distance(const TV& location) const
-    {return TV::Dot_Product(normal,location-x1);}
+    {return TV::Dot_Product(normal,location-x0);}
 
     SYMMETRIC_MATRIX<T,2> Hessian(const TV& X) const
     {return SYMMETRIC_MATRIX<T,2>();}
@@ -63,7 +63,7 @@ public:
     bool Segment_Line_Intersection(const TV& endpoint1,const TV& endpoint2,T& interpolation_fraction) const 
     {T denominator=TV::Dot_Product(endpoint2-endpoint1,normal);
     if(!denominator){interpolation_fraction=FLT_MAX;return false;} // parallel
-    interpolation_fraction=TV::Dot_Product(x1-endpoint1,normal)/denominator;
+    interpolation_fraction=TV::Dot_Product(x0-endpoint1,normal)/denominator;
     return interpolation_fraction>=0 && interpolation_fraction<=1;}
 
     VECTOR<T,1> Principal_Curvatures(const TV& X) const
@@ -73,10 +73,10 @@ public:
     {return "LINE_2D<T>";}
 
     template<class RW> void Read(std::istream& input)
-    {Read_Binary<RW>(input,normal,x1);}
+    {Read_Binary<RW>(input,normal,x0);}
 
     template<class RW> void Write(std::ostream& output) const
-    {Write_Binary<RW>(output,normal,x1);}
+    {Write_Binary<RW>(output,normal,x0);}
 //##################################################################### 
 };
 }

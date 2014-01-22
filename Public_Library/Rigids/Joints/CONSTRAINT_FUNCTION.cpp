@@ -166,7 +166,7 @@ Jacobian(const T_IMPULSE& j) const
     for(int i=0;i<2;i++){
         MATRIX<T,3,1> A_angular;
         A_angular.Add_To_Submatrix(0,0,Jacobian_Linear_Helper(j_total[i],i));
-        A_angular(2,0)=angular.Jacobian_Helper(i).x11;
+        A_angular(2,0)=angular.Jacobian_Helper(i).x00;
         A.Add_To_Submatrix(0,2,A_angular);
         A.Add_To_Submatrix(0,0,A_angular*rhat_star[i]);}
     return A;

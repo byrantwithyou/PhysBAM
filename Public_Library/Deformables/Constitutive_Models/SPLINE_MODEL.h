@@ -24,16 +24,16 @@ private:
     ARRAY<T> coefficient,base;
 public:
 
-    template<class T_FIELD1,class T_FIELD2>
-    SPLINE_MODEL(const T_FIELD1& youngs_modulus_input=3e6,const T_FIELD1& poissons_ratio_input=.475,const T_FIELD2& hardening_deformation_input=.5,
-        const T_FIELD2& hardening_strength_input=7,const T_FIELD1& Rayleigh_coefficient=.05)
+    template<class T_FIELD0,class T_FIELD1>
+    SPLINE_MODEL(const T_FIELD0& youngs_modulus_input=3e6,const T_FIELD0& poissons_ratio_input=.475,const T_FIELD1& hardening_deformation_input=.5,
+        const T_FIELD1& hardening_strength_input=7,const T_FIELD0& Rayleigh_coefficient=.05)
     {
         Set_Parameters(youngs_modulus_input,poissons_ratio_input,hardening_deformation_input,hardening_strength_input,Rayleigh_coefficient);
     }
 
-    template<class T_FIELD1,class T_FIELD2>
-    void Set_Parameters(const T_FIELD1& youngs_modulus_input,const T_FIELD1& poissons_ratio_input,const T_FIELD2& hardening_deformation_input,const T_FIELD2& hardening_strength_input,
-        const T_FIELD1& Rayleigh_coefficient)
+    template<class T_FIELD0,class T_FIELD1>
+    void Set_Parameters(const T_FIELD0& youngs_modulus_input,const T_FIELD0& poissons_ratio_input,const T_FIELD1& hardening_deformation_input,const T_FIELD1& hardening_strength_input,
+        const T_FIELD0& Rayleigh_coefficient)
     {ROTATED_LINEAR<T,d>::Set_Parameters(youngs_modulus_input,poissons_ratio_input,Rayleigh_coefficient);
     Set(hardening_deformation,hardening_deformation_input);
     Set(hardening_strength,hardening_strength_input);

@@ -31,8 +31,8 @@ bool Update_Sphere_Sphere_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_col
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=rigid_body_collisions.rigid_body_collection;
 
     FRAME<TV> transform1,transform2;
-    RIGID_BODY<TV>& body1=rigid_body_collection.Rigid_Body(id_1);
-    RIGID_BODY<TV>& body2=rigid_body_collection.Rigid_Body(id_2);
+    RIGID_BODY<TV>& body0=rigid_body_collection.Rigid_Body(id_1);
+    RIGID_BODY<TV>& body1=rigid_body_collection.Rigid_Body(id_2);
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object1)){
         transform1=*object_transformed->transform;object1=object_transformed->object_space_implicit_object;}
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object2)){
@@ -40,13 +40,13 @@ bool Update_Sphere_Sphere_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_col
     SPHERE<TV>& sphere1=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >&>(*object1).analytic;
     SPHERE<TV>& sphere2=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >&>(*object2).analytic;
 
-    TV sphere1_center=(body1.Frame()*transform1).t,sphere2_center=(body2.Frame()*transform2).t;
-    TV collision_normal=body1.Frame().t-body2.Frame().t;collision_normal.Normalize();
+    TV sphere1_center=(body0.Frame()*transform1).t,sphere2_center=(body1.Frame()*transform2).t;
+    TV collision_normal=body0.Frame().t-body1.Frame().t;collision_normal.Normalize();
     T d=(sphere1_center-sphere2_center).Magnitude(),r1=sphere1.radius,r2=sphere2.radius;
     if(d>r1+r2){rigid_body_collisions.skip_collision_check.Set_Last_Checked(id_1,id_2);return false;}
-    if(TV::Dot_Product(collision_normal,body1.Twist().linear-body2.Twist().linear)>=0) return false;
+    if(TV::Dot_Product(collision_normal,body0.Twist().linear-body1.Twist().linear)>=0) return false;
     TV collision_location=sphere1_center+(T).5*(d+min(d,r2)-min(d,r1))*collision_normal;
-    TV collision_relative_velocity=body1.Pointwise_Object_Velocity(collision_location)-body2.Pointwise_Object_Velocity(collision_location);
+    TV collision_relative_velocity=body0.Pointwise_Object_Velocity(collision_location)-body1.Pointwise_Object_Velocity(collision_location);
 
     collision_callbacks.Swap_States(id_1,id_2);
     SOLVE_CONTACT::Update_Contact_Pair_Helper<TV>(rigid_body_collisions,collision_callbacks,id_1,id_2,dt,time,epsilon_scale,collision_location,collision_normal,collision_relative_velocity,

@@ -36,8 +36,8 @@ Assert_Zero(const T_MATRIX& a,T tolerance) const
 //#####################################################################
 // Function Assert_Equal
 //#####################################################################
-template<class T> template<class T_MATRIX1,class T_MATRIX2> bool MATRIX_TESTS<T>::
-Assert_Equal(const T_MATRIX1& a,const T_MATRIX2& b,T tolerance) const
+template<class T> template<class T_MATRIX0,class T_MATRIX1> bool MATRIX_TESTS<T>::
+Assert_Equal(const T_MATRIX0& a,const T_MATRIX1& b,T tolerance) const
 {
     tolerance*=max(a.Max_Abs(),b.Max_Abs(),(T)1);
     if(!Assert_Zero(a-b,tolerance)) LOG::cout<<a<<std::endl<<b<<std::endl;

@@ -56,18 +56,18 @@ private:
                 weights(2)(k)=(T).5*x*x+(T)1.5*x+(T)1.125;
             } break;
             case 4:{
-                T x2,x3;
-                x2=x*x;x3=x2*x;
-                weights(0)(k)=-((T)1/6)*x3+x2-(T)2*x+(T)4/3;
+                T x1,x2;
+                x1=x*x;x2=x1*x;
+                weights(0)(k)=-((T)1/6)*x2+x1-(T)2*x+(T)4/3;
                 x-=(T)1;
-                x2=x*x;x3=x2*x;
-                weights(1)(k)=(T).5*x3-x2+(T)2/3;
+                x1=x*x;x2=x1*x;
+                weights(1)(k)=(T).5*x2-x1+(T)2/3;
                 x-=(T)1;
-                x2=x*x;x3=x2*x;
-                weights(2)(k)=-(T).5*x3-x2+(T)2/3;
+                x1=x*x;x2=x1*x;
+                weights(2)(k)=-(T).5*x2-x1+(T)2/3;
                 x-=(T)1;
-                x2=x*x;x3=x2*x;
-                weights(3)(k)=((T)1/6)*x3+x2+(T)2*x+(T)4/3;
+                x1=x*x;x2=x1*x;
+                weights(3)(k)=((T)1/6)*x2+x1+(T)2*x+(T)4/3;
             } break;
             default: PHYSBAM_FATAL_ERROR();}
     }

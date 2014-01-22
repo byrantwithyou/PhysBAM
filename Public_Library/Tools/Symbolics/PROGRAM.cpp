@@ -1152,10 +1152,10 @@ Copy_Propagation()
     for(int bl=0;bl<code_blocks.m;bl++)
         if(CODE_BLOCK* B=code_blocks(bl))
             for(CODE_BLOCK_NODE* N=B->head;N;){
-                CODE_BLOCK_NODE* N2=N;
+                CODE_BLOCK_NODE* N1=N;
                 N=N->next;
-                if(N2->inst.type==op_copy || (N2->inst.type==op_phi && N2->inst.src0==N2->inst.src1))
-                    Propagate_Copy_And_Remove_Instruction(N2);}
+                if(N1->inst.type==op_copy || (N1->inst.type==op_phi && N1->inst.src0==N1->inst.src1))
+                    Propagate_Copy_And_Remove_Instruction(N1);}
 
     if(debug) LOG::cout<<__FUNCTION__<<std::endl;
     Print();
@@ -1188,19 +1188,19 @@ Simplify_Phis()
                 for(CODE_BLOCK_NODE* N=B->head;N;){
                     INSTRUCTION& o=N->inst;
                     if(o.type!=op_phi) break;
-                    CODE_BLOCK_NODE* N2=N;
+                    CODE_BLOCK_NODE* N1=N;
                     N=N->next;
-                    Change_Instruction(N2,op_copy,o.dest,j?o.src1:o.src0,-1);
-                    Propagate_Copy_And_Remove_Instruction(N2);}
+                    Change_Instruction(N1,op_copy,o.dest,j?o.src1:o.src0,-1);
+                    Propagate_Copy_And_Remove_Instruction(N1);}
                 B->prev[0]=B->prev[j];}
             else{
                 for(CODE_BLOCK_NODE* N=B->head;N;){
                     INSTRUCTION& o=N->inst;
                     if(o.type!=op_phi) break;
-                    CODE_BLOCK_NODE* N2=N;
+                    CODE_BLOCK_NODE* N1=N;
                     N=N->next;
                     if(o.src0!=o.src1) continue;
-                    Propagate_Copy_And_Remove_Instruction(N2);}}}
+                    Propagate_Copy_And_Remove_Instruction(N1);}}}
     
     if(debug) LOG::cout<<__FUNCTION__<<std::endl;
     Print();
@@ -1263,10 +1263,10 @@ Remove_Dead_Code()
     for(int bl=0;bl<code_blocks.m;bl++)
         if(CODE_BLOCK* B=code_blocks(bl))
             for(CODE_BLOCK_NODE* N=B->head;N;){
-                CODE_BLOCK_NODE* N2=N;
+                CODE_BLOCK_NODE* N1=N;
                 N=N->next;
-                if(N2->inst.type==op_label || N2->inst.type==op_nop)
-                    Delete_Instruction(N2);}
+                if(N1->inst.type==op_label || N1->inst.type==op_nop)
+                    Delete_Instruction(N1);}
 
     if(debug) LOG::cout<<__FUNCTION__<<std::endl;
     Print();
@@ -1667,11 +1667,11 @@ Simplify_With_Distributive_Law()
     for(int bl=0;bl<code_blocks.m;bl++)
         if(CODE_BLOCK* B=code_blocks(bl))
             for(CODE_BLOCK_NODE* N=B->tail;N;){
-                CODE_BLOCK_NODE* N2=N;
+                CODE_BLOCK_NODE* N1=N;
                 N=N->prev;
-                if(N2->inst.type!=op_neg && N2->inst.type!=op_add && N2->inst.type!=op_sub && N2->inst.type!=op_mul && N2->inst.type!=op_copy) continue;
-                if((N2->inst.dest&mem_mask)!=mem_in && (N2->inst.dest&mem_mask)!=mem_out && Get_Uses(N2->inst.dest).Size()<=1) continue;
-                N=Simplify_With_Distributive_Law(N2);}
+                if(N1->inst.type!=op_neg && N1->inst.type!=op_add && N1->inst.type!=op_sub && N1->inst.type!=op_mul && N1->inst.type!=op_copy) continue;
+                if((N1->inst.dest&mem_mask)!=mem_in && (N1->inst.dest&mem_mask)!=mem_out && Get_Uses(N1->inst.dest).Size()<=1) continue;
+                N=Simplify_With_Distributive_Law(N1);}
     if(debug) LOG::cout<<__FUNCTION__<<std::endl;
     Print();
     if(debug) LOG::cout<<__FUNCTION__<<std::endl;

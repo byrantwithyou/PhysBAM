@@ -43,7 +43,7 @@ public:
     {T tension=-1e10,compression=1e10;
     for(int t=0;t<log_Fp_goal.m;t++){
         DIAGONAL_MATRIX<T,3> eigenvalues=log_Fp_goal(t).Fast_Eigenvalues();
-        tension=max(tension,eigenvalues.x11);compression=min(compression,eigenvalues.x22);}
+        tension=max(tension,eigenvalues.x00);compression=min(compression,eigenvalues.x11);}
     LOG::cout<<"Maximum goal expansion = "<<exp(tension)<<", compression = "<<exp(compression)<<std::endl;}
     
     bool Project_Fe(const DIAGONAL_MATRIX<T,3>& Fe_trial,DIAGONAL_MATRIX<T,3>& Fe_project) const PHYSBAM_OVERRIDE

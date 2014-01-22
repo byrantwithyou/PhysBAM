@@ -23,8 +23,8 @@ class REACTIVE_EOS_GAMMA:public REACTIVE_EOS<TS>
 public:
     TS Ru;    // universal gas constant - J/(mol K)
 private:
-    TS MW1,MW2; // molecular weights
-    TS R1,R2; // specific gas constants
+    TS MW0,MW1; // molecular weights
+    TS R0,R1; // specific gas constants
     TS gamma1,gamma2; // ratio of specific heats
     TS Cv1,Cv2;  // specific heat at constant volume 
 
@@ -40,8 +40,8 @@ public:
     }
 
     void Set_Molecular_Weight(const TS MW1_input=29,const TS MW2_input=29) // units are g/mol - default is air  
-    {MW1=MW1_input*1000;MW2=MW2_input*1000;  // converts to  kg/mol
-     R1=Ru/MW1;R2=Ru/MW2;  // J/(kg K)
+    {MW0=MW1_input*1000;MW1=MW2_input*1000;  // converts to  kg/mol
+     R0=Ru/MW0;R1=Ru/MW1;  // J/(kg K)
      if(Cv1 || Cv2) Calculate_Cv();} // update Cv if MW is changed          
 
     void Set_Gamma(const TS gamma1_input=1.4,const TS gamma2_input=1.4) // default is air
@@ -52,16 +52,16 @@ public:
     {e_not1=e_not1_input;e_not2=e_not2_input;}
 
     void Calculate_Cv()
-    {Cv1=R1/(gamma1-1);Cv2=R2/(gamma2-1);} // units are J/(kg K)
+    {Cv1=R0/(gamma1-1);Cv2=R1/(gamma2-1);} // units are J/(kg K)
     
     TS MW(const TS Y)
-    {return 1/(Y/MW1+(1-Y)/MW2);}
+    {return 1/(Y/MW0+(1-Y)/MW1);}
 
     TS R(const TS Y)
-    {return Y*R1+(1-Y)*R2;}
+    {return Y*R0+(1-Y)*R1;}
     
     TS gamma(const TS Y)
-    {TS Cv_total=Y*Cv1+(1-Y)*Cv2,R_total=Y*R1+(1-Y)*R2;return (Cv_total+R_total)/Cv_total;}
+    {TS Cv_total=Y*Cv1+(1-Y)*Cv2,R_total=Y*R0+(1-Y)*R1;return (Cv_total+R_total)/Cv_total;}
     
     TS Cv(const TS Y)
     {return Y*Cv1+(1-Y)*Cv2;}

@@ -996,7 +996,7 @@ void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
             TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,2>(x,y),1,1).To_Vector();
             DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2> disd;
             icm.Isotropic_Stress_Derivative(DIAGONAL_MATRIX<T,2>(x,y),disd,1);
-            SYMMETRIC_MATRIX<T,2> H(disd.x1111,disd.x2211,disd.x2222);
+            SYMMETRIC_MATRIX<T,2> H(disd.x0000,disd.x1100,disd.x1111);
             DIAGONAL_MATRIX<T,2> ev;
             MATRIX<T,2> eigenvectors;
             H.Fast_Solve_Eigenproblem(ev,eigenvectors);
@@ -1088,7 +1088,7 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
             TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,2>(x,y),1,1).To_Vector();
             DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2> disd;
             icm.Isotropic_Stress_Derivative(DIAGONAL_MATRIX<T,2>(x,y),disd,1);
-            SYMMETRIC_MATRIX<T,2> H(disd.x1111,disd.x2211,disd.x2222);
+            SYMMETRIC_MATRIX<T,2> H(disd.x0000,disd.x1100,disd.x1111);
             DIAGONAL_MATRIX<T,2> ev;
             MATRIX<T,2> eigenvectors;
             H.Fast_Solve_Eigenproblem(ev,eigenvectors);

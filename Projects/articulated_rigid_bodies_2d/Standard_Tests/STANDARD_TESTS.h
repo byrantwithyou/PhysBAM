@@ -159,14 +159,14 @@ void Point_Joint()
 {
     last_frame=96;
     JOINT<TV>* joint=0;
+    RIGID_BODY<TV>& rigid_body0=tests.Add_Rigid_Body("square_refined",1,(T).5);
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("square_refined",1,(T).5);
-    RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("square_refined",1,(T).5);
-    rigid_body1.Frame().t=TV(0,2);
-    rigid_body2.Frame().t=TV(2,4);
-    rigid_body1.name="parent";
-    rigid_body2.name="child";
+    rigid_body0.Frame().t=TV(0,2);
+    rigid_body1.Frame().t=TV(2,4);
+    rigid_body0.name="parent";
+    rigid_body1.name="child";
 
-    joint=new POINT_JOINT<TV>();arb->joint_mesh.Add_Articulation(rigid_body1.particle_index,rigid_body2.particle_index,joint);
+    joint=new POINT_JOINT<TV>();arb->joint_mesh.Add_Articulation(rigid_body0.particle_index,rigid_body1.particle_index,joint);
     joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1)));
     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1)));
 }
@@ -176,14 +176,14 @@ void Point_Joint()
 void Rigid_Joint()
 {
     last_frame=96;
+    RIGID_BODY<TV>& rigid_body0=tests.Add_Rigid_Body("square_refined",1,(T).5);
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("square_refined",1,(T).5);
-    RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("square_refined",1,(T).5);
-    rigid_body1.Frame().t=TV(0,2);
-    rigid_body2.Frame().t=TV((T)2.5,2);
-    rigid_body1.name="parent";
-    rigid_body2.name="child";
+    rigid_body0.Frame().t=TV(0,2);
+    rigid_body1.Frame().t=TV((T)2.5,2);
+    rigid_body0.name="parent";
+    rigid_body1.name="child";
 
-    RIGID_JOINT<TV>* joint=new RIGID_JOINT<TV>();arb->joint_mesh.Add_Articulation(rigid_body1.particle_index,rigid_body2.particle_index,joint);
+    RIGID_JOINT<TV>* joint=new RIGID_JOINT<TV>();arb->joint_mesh.Add_Articulation(rigid_body0.particle_index,rigid_body1.particle_index,joint);
     joint->Set_Prismatic_Component_Translation(TV((T).5,0));
     joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1)));
     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,1)));

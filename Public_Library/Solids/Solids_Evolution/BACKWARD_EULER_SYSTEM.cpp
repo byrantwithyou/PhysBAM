@@ -133,11 +133,11 @@ Project(KRYLOV_VECTOR_BASE<T>& BV) const
 // Function Inner_Product
 //#####################################################################
 template<class TV> double BACKWARD_EULER_SYSTEM<TV>::
-Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
+Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const
 {
-    const VECTOR_T& V1=debug_cast<const VECTOR_T&>(BV1),&V2=debug_cast<const VECTOR_T&>(BV2);
-    double inner_product=V1.V.Inner_Product_Double_Precision(projection_data.mass.mass,V2.V)+
-        V1.rigid_V.Inner_Product_Double_Precision(projection_data.mass.world_space_rigid_mass,V2.rigid_V);
+    const VECTOR_T& V0=debug_cast<const VECTOR_T&>(BV0),&V1=debug_cast<const VECTOR_T&>(BV1);
+    double inner_product=V0.V.Inner_Product_Double_Precision(projection_data.mass.mass,V1.V)+
+        V0.rigid_V.Inner_Product_Double_Precision(projection_data.mass.world_space_rigid_mass,V1.rigid_V);
     if(mpi_solids) inner_product=mpi_solids->Reduce_Add(inner_product);
     return inner_product;
 }

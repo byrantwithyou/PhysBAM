@@ -42,9 +42,9 @@ public:
 //#####################################################################
 };
 
-template<class T_ARRAY2,class ENABLE=void> struct ARRAY_NEGATION_VALID {static const bool value=false;};
-template<class T_ARRAY2> struct ARRAY_NEGATION_VALID<T_ARRAY2,typename FIRST<void,typename NEGATION<typename T_ARRAY2::ELEMENT>::TYPE>::TYPE>
-{static const bool value=!FIXED_SIZE_VECTOR<T_ARRAY2>::value && IS_ARRAY<T_ARRAY2>::value;};
+template<class T_ARRAY1,class ENABLE=void> struct ARRAY_NEGATION_VALID {static const bool value=false;};
+template<class T_ARRAY1> struct ARRAY_NEGATION_VALID<T_ARRAY1,typename FIRST<void,typename NEGATION<typename T_ARRAY1::ELEMENT>::TYPE>::TYPE>
+{static const bool value=!FIXED_SIZE_VECTOR<T_ARRAY1>::value && IS_ARRAY<T_ARRAY1>::value;};
 
 template<class T,class T_ARRAY> typename ENABLE_IF<ARRAY_NEGATION_VALID<T_ARRAY>::value,ARRAY_NEGATION<T_ARRAY> >::TYPE
 operator-(const ARRAY_BASE<T,T_ARRAY,typename T_ARRAY::INDEX>& array)

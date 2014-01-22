@@ -402,8 +402,8 @@ Advance_Dynamics(const T time,const T stopping_time,const bool verbose)
 //#####################################################################
 // Function Discard_Valence_Zero_Particles_And_Renumber
 //#####################################################################
-template<class TV,class T_MESH1,class T_MESH2>
-void Discard_Valence_Zero_Particles_And_Renumber(DEFORMABLE_PARTICLES<TV>& particles,T_MESH1& mesh1,T_MESH2& mesh2,ARRAY<int>& condensation_mapping)
+template<class TV,class T_MESH0,class T_MESH1>
+void Discard_Valence_Zero_Particles_And_Renumber(DEFORMABLE_PARTICLES<TV>& particles,T_MESH0& mesh1,T_MESH1& mesh2,ARRAY<int>& condensation_mapping)
 {
     assert(mesh1.number_nodes==mesh2.number_nodes);
 

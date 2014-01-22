@@ -74,14 +74,14 @@ Remove_Body(COLLISION_GEOMETRY_ID id)
 // Function Intersection_Between_Points
 //##################################################################### 
 template<class TV> bool COLLISION_BODY_COLLECTION<TV>::
-Intersection_Between_Points(const TV& x1,const TV& x2,COLLISION_GEOMETRY_ID& body_id,int& triangle_id,TV& intersection_point,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
+Intersection_Between_Points(const TV& x0,const TV& x1,COLLISION_GEOMETRY_ID& body_id,int& triangle_id,TV& intersection_point,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
-    TV ray_vector=x2-x1;T ray_vector_length_squared=ray_vector.Magnitude_Squared();
+    TV ray_vector=x1-x0;T ray_vector_length_squared=ray_vector.Magnitude_Squared();
     if(ray_vector_length_squared==0){
-        if(Inside_Any_Simplex_Of_Any_Body(x1,body_id,triangle_id,objects)){intersection_point=x1;return true;}
+        if(Inside_Any_Simplex_Of_Any_Body(x0,body_id,triangle_id,objects)){intersection_point=x0;return true;}
         else return false;}
     else{
-        T ray_t_max=sqrt(ray_vector_length_squared);RAY<TV> ray(x1,ray_vector/ray_t_max,true);ray.semi_infinite=false;ray.t_max=ray_t_max;
+        T ray_t_max=sqrt(ray_vector_length_squared);RAY<TV> ray(x0,ray_vector/ray_t_max,true);ray.semi_infinite=false;ray.t_max=ray_t_max;
         if(Intersection_With_Any_Simplicial_Object(ray,body_id,objects)){triangle_id=ray.aggregate_id;intersection_point=ray.Point(ray.t_max);return true;}
         else return false;}
 }
@@ -89,12 +89,12 @@ Intersection_Between_Points(const TV& x1,const TV& x2,COLLISION_GEOMETRY_ID& bod
 // Function Intersection_Between_Points
 //##################################################################### 
 template<class TV> bool COLLISION_BODY_COLLECTION<TV>::
-Intersection_Between_Points(const TV& x1,const TV& x2,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
+Intersection_Between_Points(const TV& x0,const TV& x1,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
-    TV ray_vector=x2-x1;T ray_vector_length_squared=ray_vector.Magnitude_Squared();COLLISION_GEOMETRY_ID body_id;int triangle_id;
-    if(ray_vector_length_squared==0)return Inside_Any_Simplex_Of_Any_Body(x1,body_id,triangle_id,objects);
+    TV ray_vector=x1-x0;T ray_vector_length_squared=ray_vector.Magnitude_Squared();COLLISION_GEOMETRY_ID body_id;int triangle_id;
+    if(ray_vector_length_squared==0)return Inside_Any_Simplex_Of_Any_Body(x0,body_id,triangle_id,objects);
     else{
-        T ray_t_max=sqrt(ray_vector_length_squared);RAY<TV> ray(x1,ray_vector/ray_t_max,true);ray.semi_infinite=false;ray.t_max=ray_t_max;
+        T ray_t_max=sqrt(ray_vector_length_squared);RAY<TV> ray(x0,ray_vector/ray_t_max,true);ray.semi_infinite=false;ray.t_max=ray_t_max;
         return Intersection_With_Any_Simplicial_Object(ray,body_id,objects);}
 }
 //##################################################################### 

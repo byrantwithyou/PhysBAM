@@ -694,10 +694,10 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused;
     COLLISION_GEOMETRY_ID body_id;
-    TV X1=fluids_parameters.grid->Face(f1);
-    TV X2=fluids_parameters.grid->Face(f2);
-    T dx=(X1-X2).Magnitude();
-    RAY<TV> ray(SEGMENT_2D<T>(X1,X2));
+    TV X0=fluids_parameters.grid->Face(f1);
+    TV X1=fluids_parameters.grid->Face(f2);
+    T dx=(X0-X1).Magnitude();
+    RAY<TV> ray(SEGMENT_2D<T>(X0,X1));
     bool found=collision_bodies_affecting_fluid.Closest_Non_Intersecting_Point_Of_Any_Body(ray,body_id);
     if(found){
         T th=ray.t_max/dx;
@@ -709,13 +709,13 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
     VECTOR<RANGE<TV_INT>,TV::dimension> fi=fluids_parameters.grid->Face_Indices(0);
     for(int i=0;i<TV::m;i++){
         if(f2.index(i)<=fi(f2.axis).min_corner(i)-(f2.axis!=i)){
-            T th=abs(fluids_parameters.grid->domain.min_corner(i)-X1(i))/dx;
+            T th=abs(fluids_parameters.grid->domain.min_corner(i)-X0(i))/dx;
             if(type==BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused || th<theta){
                 theta=th;
                 value=0;
                 type=fluids_parameters.domain_walls[i][0]?BOUNDARY_CONDITIONS_CALLBACKS<TV>::noslip:BOUNDARY_CONDITIONS_CALLBACKS<TV>::free;}}
         else if(f2.index(i)>=fi(f2.axis).max_corner(i)+(f2.axis!=i)){
-            T th=abs(fluids_parameters.grid->domain.max_corner(i)-X1(i))/dx;
+            T th=abs(fluids_parameters.grid->domain.max_corner(i)-X0(i))/dx;
             if(type==BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused || th<theta){
                 theta=th;
                 value=0;
@@ -725,7 +725,7 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
 
     if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=debug_particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
         int p=debug_particles.Add_Element();
-        debug_particles.X(p)=X1+theta*(X2-X1);
+        debug_particles.X(p)=X0+theta*(X1-X0);
         (*color_attribute)(p)=color_map[type];}
 
     return type;

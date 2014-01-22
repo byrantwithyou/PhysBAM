@@ -35,17 +35,17 @@ public:
     virtual bool Node_Is_A_Corner(const int node_index) // customize this if you know the mesh has corners
     {return false;}
 
-    template<class T_ARRAY1,class T_ARRAY2> void Apply_Linear_Subdivision(const T_ARRAY1& base_values,T_ARRAY2& subdivided_values)
-    {Apply_Linear_Subdivision<typename T_ARRAY1::ELEMENT>(base_values,subdivided_values);}
+    template<class T_ARRAY0,class T_ARRAY1> void Apply_Linear_Subdivision(const T_ARRAY0& base_values,T_ARRAY1& subdivided_values)
+    {Apply_Linear_Subdivision<typename T_ARRAY0::ELEMENT>(base_values,subdivided_values);}
 
-    template<class T_ARRAY1,class T_ARRAY2> void Apply_Fractal_Subdivision(const T_ARRAY1& base_values,T_ARRAY2& subdivided_values,const float power)
-    {Apply_Fractal_Subdivision<typename T_ARRAY1::ELEMENT>(base_values,subdivided_values,power);}
+    template<class T_ARRAY0,class T_ARRAY1> void Apply_Fractal_Subdivision(const T_ARRAY0& base_values,T_ARRAY1& subdivided_values,const float power)
+    {Apply_Fractal_Subdivision<typename T_ARRAY0::ELEMENT>(base_values,subdivided_values,power);}
 
-    template<class T_ARRAY1,class T_ARRAY2> void Apply_Loop_Subdivision(const T_ARRAY1& base_values,T_ARRAY2& subdivided_values)
-    {Apply_Loop_Subdivision<typename T_ARRAY1::ELEMENT>(base_values,subdivided_values);}
+    template<class T_ARRAY0,class T_ARRAY1> void Apply_Loop_Subdivision(const T_ARRAY0& base_values,T_ARRAY1& subdivided_values)
+    {Apply_Loop_Subdivision<typename T_ARRAY0::ELEMENT>(base_values,subdivided_values);}
 
-    template<class T_ARRAY1,class T_ARRAY2> void Apply_Root_Three_Subdivision(const T_ARRAY1& base_values,T_ARRAY2& subdivided_values)
-    {Apply_Root_Three_Subdivision<typename T_ARRAY1::ELEMENT>(base_values,subdivided_values);}
+    template<class T_ARRAY0,class T_ARRAY1> void Apply_Root_Three_Subdivision(const T_ARRAY0& base_values,T_ARRAY1& subdivided_values)
+    {Apply_Root_Three_Subdivision<typename T_ARRAY0::ELEMENT>(base_values,subdivided_values);}
 
 //#####################################################################
     virtual void Clean_Memory();

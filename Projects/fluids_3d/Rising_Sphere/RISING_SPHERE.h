@@ -68,13 +68,13 @@ void Adjust_Phi_And_Get_Velocities_For_Objects(const T time)
             psi_N(i,j,ij)=true;
             u_fixed(i,j,ij)=0;v_fixed(i,j,ij)=y_velocity;w_fixed(i,j,ij)=0;}}
     
-    T lambda=(T).25,y_velocity=(T)1,x0=(T).5,y0=(T).25+y_velocity*time,z0=(T).5,radius=(T).075;
+    T lambda=(T).25,y_velocity=(T)1,x@=(T).5,y@=(T).25+y_velocity*time,z@=(T).5,radius=(T).075;
     for(i=0;i<m+1;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)
-        if(radius > sqrt(sqr(grid->x(i)-x0)+sqr(grid->y(j)-y0)+sqr(grid->z(ij)-z0))) (*u)(i,j,ij)=(*u)(i,j,ij)*lambda+(1-lambda)*0;
+        if(radius > sqrt(sqr(grid->x(i)-x@)+sqr(grid->y(j)-y@)+sqr(grid->z(ij)-z@))) (*u)(i,j,ij)=(*u)(i,j,ij)*lambda+(1-lambda)*0;
     for(i=0;i<m+1;i++) for(j=0;j<n+1;j++) for(ij=0;ij<mn;ij++)
-        if(radius > sqrt(sqr(grid->x(i)-x0)+sqr(grid->y(j)-y0)+sqr(grid->z(ij)-z0))) (*v)(i,j,ij)=(*v)(i,j,ij)*lambda+(1-lambda)*y_velocity;
+        if(radius > sqrt(sqr(grid->x(i)-x@)+sqr(grid->y(j)-y@)+sqr(grid->z(ij)-z@))) (*v)(i,j,ij)=(*v)(i,j,ij)*lambda+(1-lambda)*y_velocity;
     for(i=0;i<m+1;i++) for(j=0;j<n;j++) for(ij=0;ij<mn+1;ij++)
-        if(radius > sqrt(sqr(grid->x(i)-x0)+sqr(grid->y(j)-y0)+sqr(grid->z(ij)-z0))) (*w)(i,j,ij)=(*w)(i,j,ij)*lambda+(1-lambda)*0;
+        if(radius > sqrt(sqr(grid->x(i)-x@)+sqr(grid->y(j)-y@)+sqr(grid->z(ij)-z@))) (*w)(i,j,ij)=(*w)(i,j,ij)*lambda+(1-lambda)*0;
 }
 //#####################################################################
 };      

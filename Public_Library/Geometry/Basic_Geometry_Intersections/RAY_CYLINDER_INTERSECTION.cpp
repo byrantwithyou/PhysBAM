@@ -20,8 +20,8 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const CYLINDER<T>& cyli
     bool intersection=false;
     T thickness_over_two=(T).5*thickness;
     
-    // project ray into cylinder.plane1 with x1 at the origin
-    TV ray_endpoint=ray.endpoint-cylinder.plane1.x1;
+    // project ray into cylinder.plane1 with x0 at the origin
+    TV ray_endpoint=ray.endpoint-cylinder.plane1.x0;
     T vertical_endpoint=TV::Dot_Product(ray_endpoint,cylinder.plane1.normal);
     ray_endpoint-=vertical_endpoint*cylinder.plane1.normal;
     T vertical_direction=TV::Dot_Product(ray.direction,cylinder.plane1.normal);
@@ -62,13 +62,13 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const CYLINDER<T>& cyli
     bool save_semi_infinite=ray.semi_infinite;T save_t_max=ray.t_max;int save_aggregate=ray.aggregate_id;
     if(INTERSECTION::Intersects(ray,cylinder.plane1,thickness)){
         TV point=ray.Point(ray.t_max);
-        point-=TV::Dot_Product(point-cylinder.plane1.x1,cylinder.plane1.normal)*cylinder.plane1.normal;
-        if((point-cylinder.plane1.x1).Magnitude() <= cylinder.radius+thickness){intersection=true;ray.aggregate_id=2;}
+        point-=TV::Dot_Product(point-cylinder.plane1.x0,cylinder.plane1.normal)*cylinder.plane1.normal;
+        if((point-cylinder.plane1.x0).Magnitude() <= cylinder.radius+thickness){intersection=true;ray.aggregate_id=2;}
         else{ray.semi_infinite=save_semi_infinite;ray.t_max=save_t_max;ray.aggregate_id=save_aggregate;}}
     if(INTERSECTION::Intersects(ray,cylinder.plane2,thickness)){
         TV point=ray.Point(ray.t_max);
-        point-=TV::Dot_Product(point-cylinder.plane1.x1,cylinder.plane1.normal)*cylinder.plane1.normal;
-        if((point-cylinder.plane1.x1).Magnitude() <= cylinder.radius+thickness){intersection=true;ray.aggregate_id=3;}
+        point-=TV::Dot_Product(point-cylinder.plane1.x0,cylinder.plane1.normal)*cylinder.plane1.normal;
+        if((point-cylinder.plane1.x0).Magnitude() <= cylinder.radius+thickness){intersection=true;ray.aggregate_id=3;}
         else{ray.semi_infinite=save_semi_infinite;ray.t_max=save_t_max;ray.aggregate_id=save_aggregate;}}
 
     return intersection;

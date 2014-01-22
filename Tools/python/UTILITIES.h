@@ -75,13 +75,13 @@ template<class TV> std::string Repr_Helper(const SPHERE<TV>& sphere)
 {return (boost::format("%s(%s,%s)")%Class(sphere)%Repr(sphere.center)%Repr(sphere.radius)).str();}
 
 template<class T> std::string Repr_Helper(const PLANE<T>& plane)
-{return (boost::format("%s(%s,%s)")%Class(plane)%Repr(plane.normal)%Repr(plane.x1)).str();}
+{return (boost::format("%s(%s,%s)")%Class(plane)%Repr(plane.normal)%Repr(plane.x0)).str();}
 
 template<class T> std::string Repr_Helper(const CYLINDER<T>& cylinder)
-{return (boost::format("%s(%s,%s,%s)")%Class(cylinder)%Repr(cylinder.plane1.x1)%Repr(cylinder.plane2.x1)%Repr(cylinder.radius)).str();}
+{return (boost::format("%s(%s,%s,%s)")%Class(cylinder)%Repr(cylinder.plane1.x0)%Repr(cylinder.plane2.x0)%Repr(cylinder.radius)).str();}
 
 template<class T> std::string Repr_Helper(const RING<T>& ring)
-{return (boost::format("%s(%s,%s,%s,%s)")%Class(ring)%Repr(ring.plane1.x1)%Repr(ring.plane2.x1)%Repr(ring.outer_radius)%Repr(ring.inner_radius)).str();}
+{return (boost::format("%s(%s,%s,%s,%s)")%Class(ring)%Repr(ring.plane1.x0)%Repr(ring.plane2.x0)%Repr(ring.outer_radius)%Repr(ring.inner_radius)).str();}
 
 template<class T> std::string Repr_Helper(const ROTATION<VECTOR<T,3> >& rotation)
 {T angle;VECTOR<T,3> axis;rotation.Get_Angle_Axis(angle,axis); // not exact, unfortunately

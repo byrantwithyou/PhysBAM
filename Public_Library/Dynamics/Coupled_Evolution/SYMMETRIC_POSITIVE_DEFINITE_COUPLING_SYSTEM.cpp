@@ -304,7 +304,7 @@ Add_Surface_Tension(ARRAY<T>& fluid_velocity_vector) const
         T phi1=levelset->phi(cell1),phi2=levelset->phi(cell2),theta;
         if(phi1!=phi2) theta=LEVELSET_UTILITIES<T>::Theta(phi1,phi2);
         else theta=0.5;// use the boundary location when evaluate across boundary
-        TV X1=grid.X(cell1),X2=grid.X(cell2),X=X1+(X2-X1)*theta;
+        TV X0=grid.X(cell1),X1=grid.X(cell2),X=X0+(X1-X0)*theta;
         PHYSBAM_ASSERT(0<=theta && theta<=1);
         T jump=-surface_tension_coefficient*levelset->Compute_Curvature(X);
         mx=std::max(mx,abs(jump/surface_tension_coefficient-100));
@@ -621,14 +621,14 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bR) 
 // Function Inner_Product
 //#####################################################################
 template<class TV> double SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Inner_Product(const KRYLOV_VECTOR_BASE<T>& bV1,const KRYLOV_VECTOR_BASE<T>& bV2) const
+Inner_Product(const KRYLOV_VECTOR_BASE<T>& bV0,const KRYLOV_VECTOR_BASE<T>& bV1) const
 {
-    const VECTOR_T& V1=debug_cast<const VECTOR_T&>(bV1);const VECTOR_T& V2=debug_cast<const VECTOR_T&>(bV2);
-    double inner_product_pressure=Dot_Product_Double_Precision(V1.pressure,V2.pressure);
-    double inner_product_lambda=V1.lambda.Dot_Double_Precision(V2.lambda);
+    const VECTOR_T& V0=debug_cast<const VECTOR_T&>(bV0);const VECTOR_T& V1=debug_cast<const VECTOR_T&>(bV1);
+    double inner_product_pressure=Dot_Product_Double_Precision(V0.pressure,V1.pressure);
+    double inner_product_lambda=V0.lambda.Dot_Double_Precision(V1.lambda);
     double inner_product_force_coefficients=0;
-    if(!leakproof_solve) inner_product_force_coefficients=V1.force_coefficients.Dot_Double_Precision(V2.force_coefficients);
-    double inner_product_viscous_force_coefficients=V1.viscous_force_coefficients.Dot_Double_Precision(V2.viscous_force_coefficients);
+    if(!leakproof_solve) inner_product_force_coefficients=V0.force_coefficients.Dot_Double_Precision(V1.force_coefficients);
+    double inner_product_viscous_force_coefficients=V0.viscous_force_coefficients.Dot_Double_Precision(V1.viscous_force_coefficients);
     //LOG::cout<<"Inner products: p: "<<inner_product_pressure<<" lambda: "<<inner_product_lambda<<" solid: "<<inner_product_force_coefficients<<std::endl;
     double ret=inner_product_pressure+inner_product_lambda+inner_product_force_coefficients+inner_product_viscous_force_coefficients;
     T tmp=0;

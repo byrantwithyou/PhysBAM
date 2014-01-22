@@ -62,12 +62,12 @@ Compute_For_Two_Phase_Pressure_Jump(const ARRAY<T,TV_INT>& phi,const ARRAY<T,TV_
     one_over_fluid_mass_at_faces.Resize(index_map.Number_Faces());
     for(int i=0;i<index_map.indexed_faces.m;i++){
         FACE_INDEX<d> face=index_map.indexed_faces(i);
-        T density1=density(face.First_Cell_Index()),density2=density(face.Second_Cell_Index());
+        T density0=density(face.First_Cell_Index()),density1=density(face.Second_Cell_Index());
         T phi1=phi(face.First_Cell_Index()),phi2=phi(face.Second_Cell_Index());
         T theta;
         if((phi1>0)==(phi2>0)) theta=.5;
         else theta=LEVELSET_UTILITIES<T>::Theta(phi1,phi2);
-        one_over_fluid_mass_at_faces(i)=Inverse(density1*theta+density2*(1-theta));}
+        one_over_fluid_mass_at_faces(i)=Inverse(density0*theta+density1*(1-theta));}
     one_over_fluid_mass_at_faces*=index_map.grid.One_Over_Cell_Size();
 }
 //#####################################################################

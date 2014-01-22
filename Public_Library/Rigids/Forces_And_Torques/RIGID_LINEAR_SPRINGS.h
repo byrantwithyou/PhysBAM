@@ -54,7 +54,7 @@ public:
     {}
 
 //#####################################################################
-    void Add_Spring(int body1,int body2,const TV& r1,const TV& r2);
+    void Add_Spring(int body0,int body1,const TV& r1,const TV& r2);
     TV Attachment_Location(int s,int b) const;
     TV Endpoint_Velocity(int s,int b) const;
     T Spring_Length(int s) const;

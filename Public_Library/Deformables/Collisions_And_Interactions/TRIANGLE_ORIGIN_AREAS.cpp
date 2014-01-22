@@ -43,7 +43,7 @@ template<class T,class TV> void Intersect_Triangle_Point(PT_DATA<T>& data,const 
     data.n=4;
     TV n=TV::Cross_Product(A[1]-A[0],A[2]-A[0]),U[3];
     T nP=TV::Dot_Product(n,P),nA=TV::Dot_Product(n,A[0]),ABC=TV::Dot_Product(TV::Cross_Product(A[0],A[1]),A[2]),XYP[3];
-    MATRIX<T,3> oPn=MATRIX<T,3>::Outer_Product(P,n),onn=MATRIX<T,3>::Outer_Product(n,n),onU[3],H33=(T)2/(nP*nP*nP)*ABC*onn;
+    MATRIX<T,3> oPn=MATRIX<T,3>::Outer_Product(P,n),onn=MATRIX<T,3>::Outer_Product(n,n),onU[3],H22=(T)2/(nP*nP*nP)*ABC*onn;
     data.V=(nA/nP)*P;
     data.G[3]=-ABC/(nP*nP)*(oPn-nP);
     for(int k=0;k<3;k++){
@@ -53,7 +53,7 @@ template<class T,class TV> void Intersect_Triangle_Point(PT_DATA<T>& data,const 
         data.G[k]=XYP[k]*oPn;
         XYP[k]/=nP;
         onU[k]=MATRIX<T,3>::Outer_Product(n,U[k]);
-        data.H[k][3][3]=P(k)*H33-nP*ABC/(nP*nP*nP)*(MATRIX<T,3>::Outer_Product(TV::Axis_Vector(k),n)+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(k)));}
+        data.H[k][3][3]=P(k)*H22-nP*ABC/(nP*nP*nP)*(MATRIX<T,3>::Outer_Product(TV::Axis_Vector(k),n)+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(k)));}
     for(int k=0;k<3;k++){
         int r=(k+1)%3,s=(k+2)%3;
         MATRIX<T,3> Hkk=-XYP[k]*(onU[k]+onU[k].Transposed());

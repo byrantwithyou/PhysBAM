@@ -375,20 +375,20 @@ Test_Energy(const T time)
     ARRAY<TV> dX(particles.X.m);
     random.Fill_Uniform(dX,-e,e);
     ARRAY<TV> X2a(particles.X+dX);
-    ARRAY_VIEW<TV> X2(X2a);
+    ARRAY_VIEW<TV> X1(X2a);
     for(int i=0;i<deformables_forces.m;i++){
         ARRAY<TV> F(particles.X.m);
         deformables_forces(i)->Update_Position_Based_State(time,true);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);
-        T PE1=deformables_forces(i)->Potential_Energy(time);
-        particles.X.Exchange(X2);
+        T PE0=deformables_forces(i)->Potential_Energy(time);
+        particles.X.Exchange(X1);
         deformables_forces(i)->Update_Position_Based_State(time,true);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);
-        T PE2=deformables_forces(i)->Potential_Energy(time);
-        particles.X.Exchange(X2);
+        T PE1=deformables_forces(i)->Potential_Energy(time);
+        particles.X.Exchange(X1);
         deformables_forces(i)->Update_Position_Based_State(time,true);
         T W=F.Dot(dX)/2;
-        T dPE=(PE1-PE2)/e,dW=W/e,rel=(dPE-dW)/max(abs(dW),(T)1e-20);
+        T dPE=(PE0-PE1)/e,dW=W/e,rel=(dPE-dW)/max(abs(dW),(T)1e-20);
         LOG::cout<<"potential energy test d phi "<<dPE<<"  W "<<dW<<"   rel "<<rel<<"   "<<typeid(*deformables_forces(i)).name()<<std::endl;}
 }
 //#####################################################################
@@ -403,18 +403,18 @@ Test_Force_Derivatives(const T time)
     ARRAY<TV> dX(particles.X.m);
     random.Fill_Uniform(dX,-e,e);
     ARRAY<TV> X2a(particles.X+dX);
-    ARRAY_VIEW<TV> X2(X2a);
+    ARRAY_VIEW<TV> X1(X2a);
     for(int i=0;i<deformables_forces.m;i++){
         ARRAY<TV> F(particles.X.m),G(particles.X.m);
         deformables_forces(i)->Update_Position_Based_State(time,true);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);
         deformables_forces(i)->Add_Implicit_Velocity_Independent_Forces(dX,G,(T).5,time);
         F*=-(T)1;
-        particles.X.Exchange(X2);
+        particles.X.Exchange(X1);
         deformables_forces(i)->Update_Position_Based_State(time,true);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);
         deformables_forces(i)->Add_Implicit_Velocity_Independent_Forces(dX,G,(T).5,time);
-        particles.X.Exchange(X2);
+        particles.X.Exchange(X1);
         deformables_forces(i)->Update_Position_Based_State(time,true);
         T MF=sqrt(F.Magnitude_Squared());
         T MG=sqrt(G.Magnitude_Squared());

@@ -68,8 +68,8 @@ public:
     PROJECTED_ARRAY operator=(const PROJECTED_ARRAY& source)
     {return ARRAY_BASE<T,PROJECTED_ARRAY>::operator=(source);}
 
-    template<class T_ARRAY2>
-    PROJECTED_ARRAY operator=(const T_ARRAY2& source)
+    template<class T_ARRAY1>
+    PROJECTED_ARRAY operator=(const T_ARRAY1& source)
     {return ARRAY_BASE<T,PROJECTED_ARRAY>::operator=(source);}
 };
 //#####################################################################

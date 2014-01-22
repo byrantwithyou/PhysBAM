@@ -61,11 +61,11 @@ template<class T> static void Isotropic_Stress_Derivative_Helper(const DIAGONAL_
     DIAGONAL_MATRIX<T,2> F_threshold=F.Clamp_Min(failure_threshold);
     T lambda_tr_G_minus_mu=(T).5*lambda*(F_threshold*F_threshold-1).Trace()-mu,three_mu_plus_lambda=3*mu+lambda;
     SYMMETRIC_MATRIX<T,2> F_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(VECTOR<T,2>(F_threshold.x.x,F_threshold.x.y));
-    dP_dF.x1111=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x11;//alpha+beta+gamma
-    dP_dF.x2222=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x22;
-    dP_dF.x2211=lambda*F_outer.x21;//gamma
-    dP_dF.x2121=lambda_tr_G_minus_mu+mu*(F_outer.x22+F_outer.x11);//alpha
-    dP_dF.x2112=mu*F_outer.x21;//beta
+    dP_dF.x0000=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x00;//alpha+beta+gamma
+    dP_dF.x1111=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x11;
+    dP_dF.x1100=lambda*F_outer.x10;//gamma
+    dP_dF.x1010=lambda_tr_G_minus_mu+mu*(F_outer.x11+F_outer.x00);//alpha
+    dP_dF.x1001=mu*F_outer.x10;//beta
 }
 template<class T> static void Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,
     T failure_threshold,T mu,T lambda)
@@ -74,21 +74,21 @@ template<class T> static void Isotropic_Stress_Derivative_Helper(const DIAGONAL_
     T lambda_tr_G_minus_mu=(T).5*lambda*(F_threshold*F_threshold-1).Trace()-mu,three_mu_plus_lambda=3*mu+lambda;
     SYMMETRIC_MATRIX<T,3> F_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(VECTOR<T,3>(F_threshold.x.x,F_threshold.x.y,F_threshold.x.z));
     //alpha+beta+gamma
+    dPi_dF.x0000=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x00;
     dPi_dF.x1111=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x11;
     dPi_dF.x2222=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x22;
-    dPi_dF.x3333=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x33;
     //gamma
+    dPi_dF.x1100=lambda*F_outer.x10;
+    dPi_dF.x2200=lambda*F_outer.x20;
     dPi_dF.x2211=lambda*F_outer.x21;
-    dPi_dF.x3311=lambda*F_outer.x31;
-    dPi_dF.x3322=lambda*F_outer.x32;
     //alpha
+    dPi_dF.x1010=lambda_tr_G_minus_mu+mu*(F_outer.x11+F_outer.x00);
+    dPi_dF.x2020=lambda_tr_G_minus_mu+mu*(F_outer.x22+F_outer.x00);
     dPi_dF.x2121=lambda_tr_G_minus_mu+mu*(F_outer.x22+F_outer.x11);
-    dPi_dF.x3131=lambda_tr_G_minus_mu+mu*(F_outer.x33+F_outer.x11);
-    dPi_dF.x3232=lambda_tr_G_minus_mu+mu*(F_outer.x33+F_outer.x22);
     //beta
+    dPi_dF.x1001=mu*F_outer.x10;
+    dPi_dF.x2002=mu*F_outer.x20;
     dPi_dF.x2112=mu*F_outer.x21;
-    dPi_dF.x3113=mu*F_outer.x31;
-    dPi_dF.x3223=mu*F_outer.x32;
 }
 template<class T,int d> void ST_VENANT_KIRCHHOFF<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int simplex) const

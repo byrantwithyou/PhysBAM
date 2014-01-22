@@ -213,32 +213,32 @@ Clamped_Barycentric_Coordinates(const TV& location,const T tolerance) const
 // Function Interpolation_Fraction
 //#####################################################################
 template<class T> T SEGMENT_3D<T>::
-Interpolation_Fraction(const TV& location,const TV& x1,const TV& x2) 
+Interpolation_Fraction(const TV& location,const TV& x0,const TV& x1) 
 {  
-    TV v=x2-x1;
+    TV v=x1-x0;
     T denominator=TV::Dot_Product(v,v);
-    if(denominator==0) return 0; // x1 and x2 are a single point
-    else return TV::Dot_Product(location-x1,v)/denominator;
+    if(denominator==0) return 0; // x0 and x1 are a single point
+    else return TV::Dot_Product(location-x0,v)/denominator;
 }
 //#####################################################################
 // Function Barycentric_Coordinates
 //#####################################################################
 template<class T> VECTOR<T,2> SEGMENT_3D<T>::
-Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2)
+Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1)
 {  
-    T t=Interpolation_Fraction(location,x1,x2);
+    T t=Interpolation_Fraction(location,x0,x1);
     return VECTOR<T,2>(1-t,t);
 }
 //#####################################################################
 // Function Clamped_Barycentric_Coordinates
 //#####################################################################
 template<class T> VECTOR<T,2> SEGMENT_3D<T>::
-Clamped_Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const T tolerance)
+Clamped_Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1,const T tolerance)
 {  
-    TV v=x2-x1;
+    TV v=x1-x0;
     T denominator=TV::Dot_Product(v,v);
     if(abs(denominator)<tolerance) return VECTOR<T,2>((T).5,(T).5);
-    T a=clamp(TV::Dot_Product(location-x1,v)/denominator,(T)0,(T)1);
+    T a=clamp(TV::Dot_Product(location-x0,v)/denominator,(T)0,(T)1);
     return VECTOR<T,2>((T)1-a,a);
 }
 //#####################################################################

@@ -116,10 +116,10 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BR) 
 // Function Inner_Product
 //#####################################################################
 template<class TV> double FLUID_SYSTEM_MPI_SLIP<TV>::
-Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
+Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const
 {
-    const KRYLOV_VECTOR_T& V1=debug_cast<const KRYLOV_VECTOR_T&>(BV1);const KRYLOV_VECTOR_T& V2=debug_cast<const KRYLOV_VECTOR_T&>(BV2);
-    return Dot_Product_Double_Precision(V1.v.Array_View(interior_regions),V2.v.Array_View(interior_regions));
+    const KRYLOV_VECTOR_T& V0=debug_cast<const KRYLOV_VECTOR_T&>(BV0);const KRYLOV_VECTOR_T& V1=debug_cast<const KRYLOV_VECTOR_T&>(BV1);
+    return Dot_Product_Double_Precision(V0.v.Array_View(interior_regions),V1.v.Array_View(interior_regions));
 }
 //#####################################################################
 // Function Convergence_Norm

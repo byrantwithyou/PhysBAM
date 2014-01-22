@@ -265,8 +265,8 @@ template<class T,class TV> bool Edge_Edge_Interaction_Helper(ARRAY_VIEW<const VE
     T total_repulsion_thickness=repulsion_thickness_detection_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness);
     return segment.Edge_Edge_Interaction(SEGMENT_3D<T>(X(pair.nodes[2]),X(pair.nodes[3])),total_repulsion_thickness,pair.distance,pair.normal,pair.weights,false);
 }
-template<class TV> template<class T_ARRAY1,class T_ARRAY2> void TRIANGLE_REPULSIONS<TV>::
-Update_Repulsion_Pairs_Using_History(T_ARRAY1& point_face_pairs,T_ARRAY2& edge_edge_pairs,bool prune_separating)
+template<class TV> template<class T_ARRAY0,class T_ARRAY1> void TRIANGLE_REPULSIONS<TV>::
+Update_Repulsion_Pairs_Using_History(T_ARRAY0& point_face_pairs,T_ARRAY1& edge_edge_pairs,bool prune_separating)
 {
     ARRAY_VIEW<const TV> X(geometry.deformable_body_collection.particles.X),V(geometry.deformable_body_collection.particles.V);
     for(int pair_index=point_face_pairs.Size()-1;pair_index>=0;pair_index--){
@@ -322,8 +322,8 @@ template<> int TRIANGLE_REPULSIONS<VECTOR<double,1> >::Adjust_Velocity_For_Self_
 //#####################################################################
 // Function Adjust_Velocity_For_Self_Repulsion
 //#####################################################################
-template<class TV> template<class T_ARRAY1,class T_ARRAY2> int TRIANGLE_REPULSIONS<TV>::
-Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_interaction_pairs,T_ARRAY2& edge_edge_interaction_pairs,const bool use_repulsions,bool use_saved_pairs)
+template<class TV> template<class T_ARRAY0,class T_ARRAY1> int TRIANGLE_REPULSIONS<TV>::
+Apply_Repulsions_To_Velocities(const T dt,T_ARRAY0& point_face_interaction_pairs,T_ARRAY1& edge_edge_interaction_pairs,const bool use_repulsions,bool use_saved_pairs)
 {
     int repulsions=0;
 
@@ -363,9 +363,9 @@ Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_interaction_pairs
 //#####################################################################
 // Function Apply_Repulsions_To_Velocities
 //#####################################################################
-template<class TV> template<class T_ARRAY1,class T_ARRAY2> int TRIANGLE_REPULSIONS<TV>::
-Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_boundary_pairs,T_ARRAY2& edge_edge_boundary_pairs,
-    T_ARRAY1& point_face_internal_pairs,T_ARRAY2& edge_edge_internal_pairs,const bool use_repulsions)
+template<class TV> template<class T_ARRAY0,class T_ARRAY1> int TRIANGLE_REPULSIONS<TV>::
+Apply_Repulsions_To_Velocities(const T dt,T_ARRAY0& point_face_boundary_pairs,T_ARRAY1& edge_edge_boundary_pairs,
+    T_ARRAY0& point_face_internal_pairs,T_ARRAY1& edge_edge_internal_pairs,const bool use_repulsions)
 {
     ARRAY_VIEW<TV> X(geometry.deformable_body_collection.particles.X),V(geometry.deformable_body_collection.particles.V),X_self_collision_free(geometry.X_self_collision_free);
     int repulsions=0;bool used=false;

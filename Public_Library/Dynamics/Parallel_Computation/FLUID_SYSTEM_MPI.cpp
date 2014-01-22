@@ -72,12 +72,12 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bres
 // Function Inner_Product
 //#####################################################################
 template<class TV> double FLUID_SYSTEM_MPI<TV>::
-Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
+Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const
 {
-    const KRYLOV_VECTOR_T& V1=debug_cast<const KRYLOV_VECTOR_T&>(BV1),&V2=debug_cast<const KRYLOV_VECTOR_T&>(BV2);
+    const KRYLOV_VECTOR_T& V0=debug_cast<const KRYLOV_VECTOR_T&>(BV0),&V1=debug_cast<const KRYLOV_VECTOR_T&>(BV1);
     double product=0;
-    for(int i=0;i<V1.v.m;i++)
-        product+=Dot_Product_Double_Precision(V1.v(i).Array_View(interior_regions(i)),V2.v(i).Array_View(interior_regions(i)));
+    for(int i=0;i<V0.v.m;i++)
+        product+=Dot_Product_Double_Precision(V0.v(i).Array_View(interior_regions(i)),V1.v(i).Array_View(interior_regions(i)));
     return product;
 }
 //#####################################################################

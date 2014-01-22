@@ -91,10 +91,10 @@ Update_Position_Based_State(const T time,const bool is_position_update)
     for(CONSTRAINT_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int q=iterator.Data();
         typename BASE::STATE& state=states(q);
         BENDING_STATE& bending_state=bending_states(q);
-        TV x31=particles.X(state.nodes(2))-particles.X(state.nodes(0)),x21=particles.X(state.nodes(1))-particles.X(state.nodes(0));
-        TV x24=particles.X(state.nodes(1))-particles.X(state.nodes(3)),x34=particles.X(state.nodes(2))-particles.X(state.nodes(3));
-        bending_state.n_a=TV::Cross_Product(x31,x21);
-        bending_state.n_b=TV::Cross_Product(x24,x34);
+        TV x20=particles.X(state.nodes(2))-particles.X(state.nodes(0)),x10=particles.X(state.nodes(1))-particles.X(state.nodes(0));
+        TV x13=particles.X(state.nodes(1))-particles.X(state.nodes(3)),x23=particles.X(state.nodes(2))-particles.X(state.nodes(3));
+        bending_state.n_a=TV::Cross_Product(x20,x10);
+        bending_state.n_b=TV::Cross_Product(x13,x23);
         bending_state.e=particles.X(state.nodes(2))-particles.X(state.nodes(3));
         bending_state.n_a_magnitude=bending_state.n_a.Normalize();
         bending_state.n_b_magnitude=bending_state.n_b.Normalize();

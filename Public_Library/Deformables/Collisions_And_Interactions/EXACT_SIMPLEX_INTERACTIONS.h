@@ -17,9 +17,9 @@ public:
     static bool Exact_Segment_Intersection(const VECTOR<float,2>& p1,const VECTOR<float,2>& p2,const VECTOR<float,2>& q3,const VECTOR<float,2>& q4,
         const int rank1,const int rank2,const int rank3,const int rank4);
     static bool Exact_Segment_Intersection(const VECTOR<float,2>& p1,const VECTOR<float,2>& p2,const VECTOR<float,2>& q3,const VECTOR<float,2>& q4);
-    static bool Positive_Signed_Area(VECTOR<float,2> x1,VECTOR<float,2> x2,VECTOR<float,2> x3,int rank1,int rank2,int rank3);
-    static bool Positive_Signed_Area(VECTOR<float,2> x1,VECTOR<float,2> x2,VECTOR<float,2> x3);
-    static double Exact_Signed_Area(const VECTOR<float,2>& x1,const VECTOR<float,2>& x2,const VECTOR<float,2>& x3);
+    static bool Positive_Signed_Area(VECTOR<float,2> x0,VECTOR<float,2> x1,VECTOR<float,2> x2,int rank1,int rank2,int rank3);
+    static bool Positive_Signed_Area(VECTOR<float,2> x0,VECTOR<float,2> x1,VECTOR<float,2> x2);
+    static double Exact_Signed_Area(const VECTOR<float,2>& x0,const VECTOR<float,2>& x1,const VECTOR<float,2>& x2);
 //#####################################################################
 };   
 }

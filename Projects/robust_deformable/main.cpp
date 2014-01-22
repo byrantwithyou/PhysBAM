@@ -96,10 +96,10 @@ public:
         solid_body_collection.Add_Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,-1,time);
     }
 
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const
     {
-        const GENERALIZED_VELOCITY<TV>& V1=debug_cast<const GENERALIZED_VELOCITY<TV>&>(BV1),&V2=debug_cast<const GENERALIZED_VELOCITY<TV>&>(BV2);
-        return V1.V.Dot_Double_Precision(V2.V)+V1.rigid_V.Dot_Double_Precision(V2.rigid_V);
+        const GENERALIZED_VELOCITY<TV>& V0=debug_cast<const GENERALIZED_VELOCITY<TV>&>(BV0),&V1=debug_cast<const GENERALIZED_VELOCITY<TV>&>(BV1);
+        return V0.V.Dot_Double_Precision(V1.V)+V0.rigid_V.Dot_Double_Precision(V1.rigid_V);
     }
 
     typename TV::SCALAR Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const

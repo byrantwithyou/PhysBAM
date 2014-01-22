@@ -51,13 +51,13 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(SEGMENT_MESH& me
     for(int p=0;p<mesh.number_nodes;p++){const ARRAY<int>& neighbors=(*mesh.neighbor_nodes)(p);
         for(int i=0;i<neighbors.m;i++) for(int j=i+1;j<neighbors.m;j++){
             const VECTOR<int,3> nodes(neighbors(i),p,neighbors(j));
-            TV X1=X(nodes[0]),X2=X(nodes[1]),X3=X(nodes[2]);
-            TV e12=X2-X1,e23=X3-X2;
-            T length12=e12.Magnitude(),length23=e23.Magnitude();
-            // If edge lengths remain constant, we have |sin psi/2| = |(X1-X2)/length12 + (X3-X2)/length23|.
+            TV X0=X(nodes[0]),X1=X(nodes[1]),X2=X(nodes[2]);
+            TV e01=X1-X0,e12=X2-X1;
+            T length01=e01.Magnitude(),length12=e12.Magnitude();
+            // If edge lengths remain constant, we have |sin psi/2| = |(X0-X1)/length01 + (X2-X1)/length12|.
             // We'll define energy as stiffness/(2*length_scale)*(sin psi/2)^2
-            T scale=length12+length23;
-            VECTOR<T,3> c(1/length12,-1/length12-1/length23,1/length23);
+            T scale=length01+length12;
+            VECTOR<T,3> c(1/length01,-1/length01-1/length12,1/length12);
             for(int i=0;i<nodes.m;i++){
                 stiffness_matrix_diagonal(nodes[i])+=scale*sqr(c[i]);
                 for(int j=i+1;j<nodes.m;j++){int a=nodes[i],b=nodes[j];exchange_sort(a,b);
@@ -93,8 +93,8 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& m
     // for details see Wardetzky et al., "Discrete Quadratic Curvature Energies", Computer Aided Geometric Design, 2007
     stiffness_matrix_diagonal=CONSTANT_ARRAY<T>(mesh.number_nodes,0);
     for(int q=0;q<bending_quadruples.m;q++){const VECTOR<int,4>& nodes=bending_quadruples(q);
-        TV X1=X(nodes[0]),X2=X(nodes[1]),X3=X(nodes[2]),X4=X(nodes[3]);
-        TV e0=X3-X2,e1=X4-X2,e2=X1-X2,e3=X4-X3,e4=X1-X3; // edge numbering matches Wardetzky et al. p. 16
+        TV X0=X(nodes[0]),X1=X(nodes[1]),X2=X(nodes[2]),X3=X(nodes[3]);
+        TV e0=X2-X1,e1=X3-X1,e2=X0-X1,e3=X3-X2,e4=X0-X2; // edge numbering matches Wardetzky et al. p. 16
         T cross01=TV::Cross_Product(e0,e1).Magnitude(),cross02=TV::Cross_Product(e0,e2).Magnitude(),
             cross03=TV::Cross_Product(e0,e3).Magnitude(),cross04=TV::Cross_Product(e0,e4).Magnitude();
         T dot01=TV::Dot_Product(e0,e1),dot02=TV::Dot_Product(e0,e2),dot03=-TV::Dot_Product(e0,e3),dot04=-TV::Dot_Product(e0,e4);

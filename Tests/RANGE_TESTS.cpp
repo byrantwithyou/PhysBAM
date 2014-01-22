@@ -199,10 +199,10 @@ public:
         Test(box==new_box,"Box enlargement approaches agree.",ok);}
 
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        RANGE<TV> box1=Make_Random_Valid_Box<TV>(),box2=Make_Random_Valid_Box<TV>(),copy1=box1,copy2=box2,combined=RANGE<TV>::Combine(box1,box2);
-        copy1.Enlarge_To_Include_Box(box2);
-        copy2.Enlarge_To_Include_Box(box1);
-        Test(copy1.Contains(box1) && copy1.Contains(box2) && copy2.Contains(box1) && copy2.Contains(box2) && combined.Contains(box1) && combined.Contains(box2),
+        RANGE<TV> box1=Make_Random_Valid_Box<TV>(),box2=Make_Random_Valid_Box<TV>(),copy0=box1,copy1=box2,combined=RANGE<TV>::Combine(box1,box2);
+        copy0.Enlarge_To_Include_Box(box2);
+        copy1.Enlarge_To_Include_Box(box1);
+        Test(copy0.Contains(box1) && copy0.Contains(box2) && copy1.Contains(box1) && copy1.Contains(box2) && combined.Contains(box1) && combined.Contains(box2),
             "Simple box containment tests passed.",ok);}
     return ok;}
 
@@ -366,16 +366,16 @@ public:
     return ok;}
 
     template<class TV>
-    void Test_Ray_Box_Intersection_3D(const RANGE<TV>& box,const TV& direction,const RAY<TV>& ray1,const RAY<TV>& ray2,const RAY<TV>& ray3,RAY<TV>& ray4,bool& ok)
+    void Test_Ray_Box_Intersection_3D(const RANGE<TV>& box,const TV& direction,const RAY<TV>& ray0,const RAY<TV>& ray1,const RAY<TV>& ray2,RAY<TV>& ray3,bool& ok)
     {STATIC_ASSERT(TV::m!=3);}
 
     template<class T>
-    void Test_Ray_Box_Intersection_3D(const RANGE<VECTOR<T,3> >& box,const VECTOR<T,3>& direction,RAY<VECTOR<T,3> >& ray1,RAY<VECTOR<T,3> >& ray2,
-        RAY<VECTOR<T,3> >& ray3,RAY<VECTOR<T,3> >& ray4,bool& ok)
-    {Test(INTERSECTION::Lazy_Intersects(ray1,box,-epsilon) && INTERSECTION::Lazy_Intersects(ray2,box,-epsilon),"Box intersects rays with one endpoint inside; uses \"Lazy Inside\" routine.",ok);
-    if(direction.Magnitude()>epsilon) Test(!INTERSECTION::Lazy_Intersects(ray3,box,epsilon),"Ray outside radius of box does not intersect box; uses \"Lazy Inside\" routine.",ok);
-    Test(!INTERSECTION::Lazy_Intersects(ray4,box,epsilon),"Radial ray does not intersect box; uses \"Lazy Inside\" routine.",ok);
-    Test(!INTERSECTION::Lazy_Outside(ray1,box) && !INTERSECTION::Lazy_Outside(ray2,box),"Lazy_Outside gives complement of inside value.",ok);} // TODO: Test this function more
+    void Test_Ray_Box_Intersection_3D(const RANGE<VECTOR<T,3> >& box,const VECTOR<T,3>& direction,RAY<VECTOR<T,3> >& ray0,RAY<VECTOR<T,3> >& ray1,
+        RAY<VECTOR<T,3> >& ray2,RAY<VECTOR<T,3> >& ray3,bool& ok)
+    {Test(INTERSECTION::Lazy_Intersects(ray0,box,-epsilon) && INTERSECTION::Lazy_Intersects(ray1,box,-epsilon),"Box intersects rays with one endpoint inside; uses \"Lazy Inside\" routine.",ok);
+    if(direction.Magnitude()>epsilon) Test(!INTERSECTION::Lazy_Intersects(ray2,box,epsilon),"Ray outside radius of box does not intersect box; uses \"Lazy Inside\" routine.",ok);
+    Test(!INTERSECTION::Lazy_Intersects(ray3,box,epsilon),"Radial ray does not intersect box; uses \"Lazy Inside\" routine.",ok);
+    Test(!INTERSECTION::Lazy_Outside(ray0,box) && !INTERSECTION::Lazy_Outside(ray1,box),"Lazy_Outside gives complement of inside value.",ok);} // TODO: Test this function more
 
     template<class TV>
     bool Test_Ray_Box_Intersection()
@@ -385,14 +385,14 @@ public:
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
             TV random_inside1=rand.Get_Uniform_Vector(box),random_inside2=rand.Get_Uniform_Vector(box),random_vector;
             rand.Fill_Uniform(random_vector,(T)-2,(T)2);
-            RAY<TV> ray1(random_vector,random_inside1-random_vector),ray2(random_inside2,random_inside1-random_inside2),ray1_copy=ray1,ray2_copy=ray2; // both of these intersect the box
-            Test(INTERSECTION::Intersects(ray1,box,epsilon) && INTERSECTION::Intersects(ray2,box,epsilon),"Box intersects rays with one endpoint inside.",ok);
+            RAY<TV> ray0(random_vector,random_inside1-random_vector),ray1(random_inside2,random_inside1-random_inside2),ray1_copy=ray0,ray2_copy=ray1; // both of these intersect the box
+            Test(INTERSECTION::Intersects(ray0,box,epsilon) && INTERSECTION::Intersects(ray1,box,epsilon),"Box intersects rays with one endpoint inside.",ok);
             T radius=(box.Maximum_Corner()-box.Minimum_Corner()).Magnitude()/(T)2;
             TV endpoint=box.Center()+rand.template Get_Direction<TV>()*rand.Get_Uniform_Number(radius+(T).1,radius+(T)3),direction=rand.template Get_Direction<TV>();
             direction-=direction.Projected(endpoint-box.Center());
-            RAY<TV> ray3(endpoint,direction),ray4(endpoint,endpoint-box.Center()),ray3_copy=ray3,ray4_copy=ray4;
-            if(direction.Magnitude()>epsilon) Test(!INTERSECTION::Intersects(ray3,box,epsilon),"Ray outside radius of box does not intersect box.",ok);
-            Test(!INTERSECTION::Intersects(ray4,box,epsilon),"Radial ray does not intersect box.",ok);
+            RAY<TV> ray2(endpoint,direction),ray3(endpoint,endpoint-box.Center()),ray3_copy=ray2,ray4_copy=ray3;
+            if(direction.Magnitude()>epsilon) Test(!INTERSECTION::Intersects(ray2,box,epsilon),"Ray outside radius of box does not intersect box.",ok);
+            Test(!INTERSECTION::Intersects(ray3,box,epsilon),"Radial ray does not intersect box.",ok);
             Test_Ray_Box_Intersection_3D(box,direction,ray1_copy,ray2_copy,ray3_copy,ray4_copy,ok);}}
     return ok;}
 

@@ -26,7 +26,7 @@ Generate_Triangles(const PLANE<T>& plane,T tesselated_size,int elements_per_side
     TV u=tesselated_size*plane.normal.Unit_Orthogonal_Vector(),v=TV::Cross_Product(plane.normal,u);
     for(int j=0,p=0;j<=n;j++)
         for(int i=0;i<=n;i++)
-            surface->particles.X(p++)=plane.x1+u*((T)2*j/n-1)-v*((T)2*i/n-1);
+            surface->particles.X(p++)=plane.x0+u*((T)2*j/n-1)-v*((T)2*i/n-1);
     surface->Update_Number_Nodes();
     return surface;
 }
@@ -43,7 +43,7 @@ Tessellate_Boundary(const LINE_2D<T>& line,T tesselated_size,int elements_per_si
     curve->particles.Add_Elements(m);
     TV u=tesselated_size*line.normal.Orthogonal_Vector();
     for(int i=0;i<=n;i++)
-        curve->particles.X(i)=line.x1+u*((T)2*i/n-1);
+        curve->particles.X(i)=line.x0+u*((T)2*i/n-1);
     curve->Update_Number_Nodes();
     return curve;
 }

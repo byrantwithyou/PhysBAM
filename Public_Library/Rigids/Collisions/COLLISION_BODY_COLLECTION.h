@@ -63,8 +63,8 @@ public:
     COLLISION_GEOMETRY_ID Add_Body(COLLISION_GEOMETRY<TV>* collision_body,const int geometry_id,bool owns_collision_geometry_input);
     void Add_Bodies(COLLISION_BODY_COLLECTION<TV>& collision_body_list);
     void Remove_Body(COLLISION_GEOMETRY_ID id);
-    bool Intersection_Between_Points(const TV& x1,const TV& x2,COLLISION_GEOMETRY_ID& body_id,int& triangle_id,TV& intersection_point,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
-    bool Intersection_Between_Points(const TV& x1,const TV& x2,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
+    bool Intersection_Between_Points(const TV& x0,const TV& x1,COLLISION_GEOMETRY_ID& body_id,int& triangle_id,TV& intersection_point,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
+    bool Intersection_Between_Points(const TV& x0,const TV& x1,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
     bool Intersection_With_Any_Simplicial_Object(RAY<TV>& ray,COLLISION_GEOMETRY_ID& body_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
     bool Closest_Non_Intersecting_Point_Of_Any_Simplicial_Object(RAY<TV>& ray,COLLISION_GEOMETRY_ID& body_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
     bool Inside_Any_Simplex_Of_Any_Body(const TV& location,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;

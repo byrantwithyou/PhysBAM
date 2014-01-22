@@ -46,8 +46,8 @@ Package_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const RANG
 //#####################################################################
 // Function Package_Face_Data
 //#####################################################################
-template<class TV> template<class T_FACE_ARRAYS2> MPI_PACKAGE MPI_UNIFORM_GRID<TV>::
-Package_Face_Data(T_FACE_ARRAYS2& data,const ARRAY<RANGE<TV_INT> >& regions) const
+template<class TV> template<class T_FACE_ARRAYS1> MPI_PACKAGE MPI_UNIFORM_GRID<TV>::
+Package_Face_Data(T_FACE_ARRAYS1& data,const ARRAY<RANGE<TV_INT> >& regions) const
 {
     MPI::Aint displacements[TV::m];MPI::Datatype old_types[TV::m];int lengths[TV::m];
     for(int axis=0;axis<TV::m;axis++){
@@ -61,8 +61,8 @@ Package_Face_Data(T_FACE_ARRAYS2& data,const ARRAY<RANGE<TV_INT> >& regions) con
 //#####################################################################
 // Function Package_Common_Face_Data
 //#####################################################################
-template<class TV> template<class T_FACE_ARRAYS2> MPI_PACKAGE MPI_UNIFORM_GRID<TV>::
-Package_Common_Face_Data(T_FACE_ARRAYS2& data,const int axis,const RANGE<TV_INT>& region) const
+template<class TV> template<class T_FACE_ARRAYS1> MPI_PACKAGE MPI_UNIFORM_GRID<TV>::
+Package_Common_Face_Data(T_FACE_ARRAYS1& data,const int axis,const RANGE<TV_INT>& region) const
 {
     return MPI_PACKAGE(data.Component(axis),region);
 }
@@ -162,8 +162,8 @@ Get_Non_Overlapping_Face_Grid(const int axis) const
 namespace MPI{class Request{};}
 namespace PhysBAM{class MPI_PACKAGE{};}
 template<class TV> template<class T2> MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >&,const RANGE<TV_INT>&) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> template<class T_FACE_ARRAYS2> MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Face_Data(T_FACE_ARRAYS2&,const ARRAY<RANGE<TV_INT> >&) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> template<class T_FACE_ARRAYS2> MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Common_Face_Data(T_FACE_ARRAYS2&,const int,const RANGE<TV_INT>&) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> template<class T_FACE_ARRAYS1> MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Face_Data(T_FACE_ARRAYS1&,const ARRAY<RANGE<TV_INT> >&) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> template<class T_FACE_ARRAYS1> MPI_PACKAGE MPI_UNIFORM_GRID<TV>::Package_Common_Face_Data(T_FACE_ARRAYS1&,const int,const RANGE<TV_INT>&) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> GRID<TV> MPI_UNIFORM_GRID<TV>::Get_Non_Overlapping_Face_Grid(const int) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> template<class T_ARRAYS> bool MPI_UNIFORM_GRID<TV>::Gather_Cell_Data(const T_ARRAYS& local_data,T_ARRAYS& global_data) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> template<class T_ARRAYS> void MPI_UNIFORM_GRID<TV>::Scatter_Cell_Data(const T_ARRAYS& global_data,T_ARRAYS& local_data) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

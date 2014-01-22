@@ -39,8 +39,8 @@ public:
     T Size() const
     {return Length();}
 
-    static T Size(const TV& x1,const TV& x2)
-    {return (x2-x1).Magnitude();}
+    static T Size(const TV& x0,const TV& x1)
+    {return (x1-x0).Magnitude();}
 
     template<class T_ARRAY>
     static T Signed_Size(const T_ARRAY& X)
@@ -50,12 +50,12 @@ public:
     static T Size(const T_ARRAY& X)
     {return Signed_Size(X);}
 
-    static TV Normal(const TV& x1,const TV& x2,const TV& x3) 
-    {TV v=x2-x1,face_normal=TV::Cross_Product(v,x3-x1);
+    static TV Normal(const TV& x0,const TV& x1,const TV& x2) 
+    {TV v=x1-x0,face_normal=TV::Cross_Product(v,x2-x0);
     return TV::Cross_Product(face_normal,v).Normalized();} // rotate by 90 degrees clockwise
 
-    static TV Normal_Direction(const TV& x1,const TV& x2,const TV& x3) 
-    {TV v=x2-x1,face_normal=TV::Cross_Product(v,x3-x1);
+    static TV Normal_Direction(const TV& x0,const TV& x1,const TV& x2) 
+    {TV v=x1-x0,face_normal=TV::Cross_Product(v,x2-x0);
     return TV::Cross_Product(face_normal,v);} // can have any magnitude
 
     template<class T_ARRAY>
@@ -91,9 +91,9 @@ public:
     T Interpolation_Fraction(const TV& location) const;
     VECTOR<T,2> Barycentric_Coordinates(const TV& location) const;
     VECTOR<T,2> Clamped_Barycentric_Coordinates(const TV& location,const T tolerance=1e-7) const;
-    static T Interpolation_Fraction(const TV& location,const TV& x1,const TV& x2);
-    static VECTOR<T,2> Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2);
-    static VECTOR<T,2> Clamped_Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const T tolerance=1e-7);
+    static T Interpolation_Fraction(const TV& location,const TV& x0,const TV& x1);
+    static VECTOR<T,2> Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1);
+    static VECTOR<T,2> Clamped_Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1,const T tolerance=1e-7);
     bool Inside(const TV& point,const T thickness_over_two=0) const;
 //#####################################################################
 };   

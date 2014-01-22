@@ -226,11 +226,11 @@ Maximum_Dihedral_Angle() const
 // Function Signed_Reciprocal_Aspect_Ratio
 //#####################################################################
 template<class T> T TETRAHEDRON<T>::
-Signed_Reciprocal_Aspect_Ratio(const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3,const VECTOR<T,3>& x4)
+Signed_Reciprocal_Aspect_Ratio(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3)
 {
-    return min(VECTOR<T,3>::Dot_Product(x4-x1,PLANE<T>::Normal(x1,x2,x3)),VECTOR<T,3>::Dot_Product(x3-x1,PLANE<T>::Normal(x1,x4,x2)),
-                     VECTOR<T,3>::Dot_Product(x2-x1,PLANE<T>::Normal(x1,x3,x4)),VECTOR<T,3>::Dot_Product(x1-x2,PLANE<T>::Normal(x2,x4,x3)))/
-              max((x1-x2).Magnitude(),(x1-x3).Magnitude(),(x1-x4).Magnitude(),(x2-x3).Magnitude(),(x2-x4).Magnitude(),(x3-x4).Magnitude());
+    return min(VECTOR<T,3>::Dot_Product(x3-x0,PLANE<T>::Normal(x0,x1,x2)),VECTOR<T,3>::Dot_Product(x2-x0,PLANE<T>::Normal(x0,x3,x1)),
+                     VECTOR<T,3>::Dot_Product(x1-x0,PLANE<T>::Normal(x0,x2,x3)),VECTOR<T,3>::Dot_Product(x0-x1,PLANE<T>::Normal(x1,x3,x2)))/
+              max((x0-x1).Magnitude(),(x0-x2).Magnitude(),(x0-x3).Magnitude(),(x1-x2).Magnitude(),(x1-x3).Magnitude(),(x2-x3).Magnitude());
 }
 //#####################################################################
 // Function Negative_Material
@@ -362,9 +362,9 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
 //#####################################################################
 // Function Cut_Simplex
 //#####################################################################
-template<class T> static inline void Add_Points_As_Tetrahedron(const ARRAY<VECTOR<T,3> >& X,ARRAY<VECTOR<int,4> >& tets,const int x1,const int x2,const int x3,const int x4)
+template<class T> static inline void Add_Points_As_Tetrahedron(const ARRAY<VECTOR<T,3> >& X,ARRAY<VECTOR<int,4> >& tets,const int x0,const int x1,const int x2,const int x3)
 {
-    /*if(TETRAHEDRON<T>::Signed_Volume(X(x1),X(x2),X(x3),X(x4)))*/ tets.Append(VECTOR<int,4>(x1,x2,x3,x4));
+    /*if(TETRAHEDRON<T>::Signed_Volume(X(x0),X(x1),X(x2),X(x3)))*/ tets.Append(VECTOR<int,4>(x0,x1,x2,x3));
 }
 template<class T> void TETRAHEDRON<T>::
 Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VECTOR<T,3>,4>& X_nodes,const VECTOR<T,4>& phi_nodes,ARRAY<VECTOR<int,4> >& left_simplices,

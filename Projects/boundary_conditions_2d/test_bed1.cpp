@@ -12,16 +12,16 @@ int main(int argc,char* argv[])
     const int d=TV::m;
     typedef VECTOR<int,d> TV_INT;
 
-    T x0=0,x1=1;
+    T x@=0,x0=1;
     TEST_COMMON<TV> tc;
     tc.Init_1();
-    tc.parse_args.Add("-x0",&x0,"value","left endpoint (<= 0)");
-    tc.parse_args.Add("-x1",&x1,"value","right endpoint (>= 1)");
+    tc.parse_args.Add("-x@",&x@,"value","left endpoint (<= 0)");
+    tc.parse_args.Add("-x0",&x0,"value","right endpoint (>= 1)");
 
     tc.Init_2(argc,argv);
     output_directory=tc.output_directory;
 
-    tc.sim.obj.bc=new BOUNDARY_CONDITIONS_SEGMENT<TV>(tc.sim.obj.grid,x0,x1);
+    tc.sim.obj.bc=new BOUNDARY_CONDITIONS_SEGMENT<TV>(tc.sim.obj.grid,x@,x0);
 
     tc.Init_3();
 

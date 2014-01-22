@@ -80,14 +80,14 @@ Initialize(const ARRAY<TRIANGLE_3D<T> >& elements)
 
     for(typename HASHTABLE<FACE_INDEX<TV::m> >::ITERATOR it(boundary_faces);it.Valid();it.Next()){
         TV X=grid.X(it.Key().First_Cell_Index()),Y=grid.X(it.Key().Second_Cell_Index());
-        RAY<TV> ray1(X,TV::Axis_Vector(it.Key().axis),false);ray1.semi_infinite=false;ray1.t_max=grid.dX(it.Key().axis);
-        RAY<TV> ray2(Y,-TV::Axis_Vector(it.Key().axis),false);ray2.semi_infinite=false;ray2.t_max=grid.dX(it.Key().axis);
+        RAY<TV> ray0(X,TV::Axis_Vector(it.Key().axis),false);ray0.semi_infinite=false;ray0.t_max=grid.dX(it.Key().axis);
+        RAY<TV> ray1(Y,-TV::Axis_Vector(it.Key().axis),false);ray1.semi_infinite=false;ray1.t_max=grid.dX(it.Key().axis);
         VECTOR<int,2> closest_element;
         for(int s=0;s<2;s++){
             if(const ARRAY<int>* list=elements_in_cell.Get_Pointer(it.Key().Cell_Index(s))){
                 for(int i=0;i<list->m;i++){
-                    if(INTERSECTION::Intersects(ray1,elements((*list)(i)),thickness)) closest_element(0)=(*list)(i);
-                    if(INTERSECTION::Intersects(ray2,elements((*list)(i)),thickness)) closest_element(1)=(*list)(i);}}}
+                    if(INTERSECTION::Intersects(ray0,elements((*list)(i)),thickness)) closest_element(0)=(*list)(i);
+                    if(INTERSECTION::Intersects(ray1,elements((*list)(i)),thickness)) closest_element(1)=(*list)(i);}}}
             
         if(closest_element(0) && !closest_element(1)) closest_element(1)=closest_element(0);
         else if(closest_element(1) && !closest_element(0)) closest_element(0)=closest_element(1);

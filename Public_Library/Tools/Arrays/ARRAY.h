@@ -202,8 +202,8 @@ public:
     ARRAY<T2,ID>::Put(array,*temporary_array);for(ID i(0);i<compaction_array_m;i++) if(compaction_array(i)>0) array(compaction_array(i))=(*temporary_array)(i);
     if(!temporary_array_defined){delete temporary_array;temporary_array=0;}}
 
-    template<class T_ARRAY1,class T_ARRAY2>
-    void Find_Common_Elements(const ARRAY_BASE<T,T_ARRAY1,ID>& a,const ARRAY_BASE<T,T_ARRAY2,ID>& b)
+    template<class T_ARRAY0,class T_ARRAY1>
+    void Find_Common_Elements(const ARRAY_BASE<T,T_ARRAY0,ID>& a,const ARRAY_BASE<T,T_ARRAY1,ID>& b)
     {HASHTABLE<T> ht;ht.Set_All(b);Remove_All();for(ID i(0),m=a.Size();i<m;i++) if(ht.Contains(a(i))) Append(a(i));}
 
     T* begin() // for stl

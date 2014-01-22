@@ -219,9 +219,9 @@ void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
 typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const FACE_INDEX<TV::m>& f2,T& theta,T& value) PHYSBAM_OVERRIDE
 {
     typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused;
-    TV X1=fluids_parameters.grid->Face(f1);
-    TV X2=fluids_parameters.grid->Face(f2);
-    if(circle.Inside(X2,-fluids_parameters.grid->dX.Max()*(T)2)){ // circle
+    TV X0=fluids_parameters.grid->Face(f1);
+    TV X1=fluids_parameters.grid->Face(f2);
+    if(circle.Inside(X1,-fluids_parameters.grid->dX.Max()*(T)2)){ // circle
         theta=1;
         value=0;
         type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::noslip;}
@@ -243,7 +243,7 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
 
     if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=debug_particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
         int p=debug_particles.Add_Element();
-        debug_particles.X(p)=X1+theta*(X2-X1);
+        debug_particles.X(p)=X0+theta*(X1-X0);
         (*color_attribute)(p)=color_map[type];}
 
     return type;

@@ -64,29 +64,29 @@ public:
         for(int i=0;i<d;i++) array[i]=T();
     }
 
-    VECTOR(const T& x1,const T& x2,const T& x3,const T& x4)
+    VECTOR(const T& x0,const T& x1,const T& x2,const T& x3)
     {
-        STATIC_ASSERT(d==4);array[0]=x1;array[1]=x2;array[2]=x3;array[3]=x4;
+        STATIC_ASSERT(d==4);array[0]=x0;array[1]=x1;array[2]=x2;array[3]=x3;
     }
 
-    VECTOR(const T& x1,const T& x2,const T& x3,const T& x4,const T& x5)
+    VECTOR(const T& x0,const T& x1,const T& x2,const T& x3,const T& x4)
     {
-        STATIC_ASSERT(d==5);array[0]=x1;array[1]=x2;array[2]=x3;array[3]=x4;array[4]=x5;
+        STATIC_ASSERT(d==5);array[0]=x0;array[1]=x1;array[2]=x2;array[3]=x3;array[4]=x4;
     }
 
-    VECTOR(const T& x1,const T& x2,const T& x3,const T& x4,const T& x5,const T& x6)
+    VECTOR(const T& x0,const T& x1,const T& x2,const T& x3,const T& x4,const T& x5)
     {
-        STATIC_ASSERT(d==6);array[0]=x1;array[1]=x2;array[2]=x3;array[3]=x4;array[4]=x5;array[5]=x6;
+        STATIC_ASSERT(d==6);array[0]=x0;array[1]=x1;array[2]=x2;array[3]=x3;array[4]=x4;array[5]=x5;
     }
 
-    VECTOR(const T& x1,const T& x2,const T& x3,const T& x4,const T& x5,const T& x6,const T& x7)
+    VECTOR(const T& x0,const T& x1,const T& x2,const T& x3,const T& x4,const T& x5,const T& x6)
     {
-        STATIC_ASSERT(d==7);array[0]=x1;array[1]=x2;array[2]=x3;array[3]=x4;array[4]=x5;array[5]=x6;array[6]=x7;
+        STATIC_ASSERT(d==7);array[0]=x0;array[1]=x1;array[2]=x2;array[3]=x3;array[4]=x4;array[5]=x5;array[6]=x6;
     }
 
-    VECTOR(const T& x1,const T& x2,const T& x3,const T& x4,const T& x5,const T& x6,const T& x7,const T& x8)
+    VECTOR(const T& x0,const T& x1,const T& x2,const T& x3,const T& x4,const T& x5,const T& x6,const T& x7)
     {
-        STATIC_ASSERT(d==8);array[0]=x1;array[1]=x2;array[2]=x3;array[3]=x4;array[4]=x5;array[5]=x6;array[6]=x7;array[7]=x8;
+        STATIC_ASSERT(d==8);array[0]=x0;array[1]=x1;array[2]=x2;array[3]=x3;array[4]=x4;array[5]=x5;array[6]=x6;array[7]=x7;
     }
 
     template<class T_VECTOR>

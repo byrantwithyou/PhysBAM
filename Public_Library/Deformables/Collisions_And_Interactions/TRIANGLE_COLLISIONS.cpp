@@ -660,7 +660,7 @@ Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& node
     T total_repulsion_thickness=REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes);
     TV normal;VECTOR<T,TV::m+1> weights;
 
-    // check to see if the final position is too close - see if the edge x3-x4 intersects the cylinder around x1-x2
+    // check to see if the final position is too close - see if the edge x2-x3 intersects the cylinder around x0-x1
     T distance;
     T_EDGE edge1_final=SEGMENT_3D<T>(edge1.X.x+dt*V_edges(0),edge1.X.y+dt*V_edges(1));
     T_EDGE edge2_final=SEGMENT_3D<T>(edge2.X.x+dt*V_edges(2),edge2.X.y+dt*V_edges(3));

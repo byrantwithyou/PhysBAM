@@ -36,8 +36,8 @@ protected:
         :transpose(M.transpose)
     {}
 
-    template<class T_MATRIX2>
-    TRANSPOSE_MATRIX(const TRANSPOSE_MATRIX<T_MATRIX2>& M)
+    template<class T_MATRIX1>
+    TRANSPOSE_MATRIX(const TRANSPOSE_MATRIX<T_MATRIX1>& M)
         :transpose(M.transpose)
     {}
 public:
@@ -135,8 +135,8 @@ operator*(const typename TM::SCALAR& a,const TRANSPOSE_MATRIX<TM>& A)
     typename TRANSPOSE<TM>::TYPE result;result.transpose=A.transpose*a;return result;
 }
 
-template<class TM1,class TM2> typename TRANSPOSE<typename PRODUCT<TM2,typename TRANSPOSE<TM1>::TYPE>::TYPE>::TYPE
-operator*(const TM1& A,const TRANSPOSE_MATRIX<TM2>& B)
+template<class TM0,class TM1> typename TRANSPOSE<typename PRODUCT<TM1,typename TRANSPOSE<TM0>::TYPE>::TYPE>::TYPE
+operator*(const TM0& A,const TRANSPOSE_MATRIX<TM1>& B)
 {
     return A.Times_Transpose(B.transpose);
 }

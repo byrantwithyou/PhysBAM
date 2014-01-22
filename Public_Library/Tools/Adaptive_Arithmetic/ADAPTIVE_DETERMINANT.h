@@ -20,17 +20,17 @@ class ADAPTIVE_DETERMINANT<T_ADAPTIVE,1>
 public:
     typedef typename ADAPTIVE_WRAPPER_BASE<ADAPTIVE_DETERMINANT,T_ADAPTIVE>::WRAPPED_TYPE WRAPPED_TYPE;
 private:
-    const T_ADAPTIVE a11;
+    const T_ADAPTIVE a00;
     ADAPTIVE_DETERMINANT();
     void operator=(const ADAPTIVE_DETERMINANT&);
 
 public:
     ADAPTIVE_DETERMINANT(const T_ADAPTIVE& a11_input)
-        :a11(a11_input)
+        :a00(a11_input)
     {}
 
     WRAPPED_TYPE Wrapped_Implementation() const
-    {return a11;}
+    {return a00;}
 //#####################################################################
 };
 
@@ -42,17 +42,17 @@ class ADAPTIVE_DETERMINANT<T_ADAPTIVE,2>
 public:
     typedef typename ADAPTIVE_WRAPPER_BASE<ADAPTIVE_DETERMINANT,typename ADAPTIVE_VECTOR_OPERATION_POLICY<NIL,T_ADAPTIVE,2>::DETERMINANT>::WRAPPED_TYPE WRAPPED_TYPE;
 private:
-    const T_ADAPTIVE a11,a12,a21,a22;
+    const T_ADAPTIVE a00,a01,a10,a11;
     ADAPTIVE_DETERMINANT();
     void operator=(const ADAPTIVE_DETERMINANT&);
 
 public:
     ADAPTIVE_DETERMINANT(const T_ADAPTIVE& a11_input,const T_ADAPTIVE& a12_input,const T_ADAPTIVE& a21_input,const T_ADAPTIVE& a22_input)
-        :a11(a11_input),a12(a12_input),a21(a21_input),a22(a22_input)
+        :a00(a11_input),a01(a12_input),a10(a21_input),a11(a22_input)
     {}
 
     WRAPPED_TYPE Wrapped_Implementation() const
-    {return (a11*a22-a12*a21);}
+    {return (a00*a11-a01*a10);}
 //#####################################################################
 };
 
@@ -64,25 +64,25 @@ class ADAPTIVE_DETERMINANT<T_ADAPTIVE,3>
 public:
     typedef typename ADAPTIVE_WRAPPER_BASE<ADAPTIVE_DETERMINANT,typename ADAPTIVE_VECTOR_OPERATION_POLICY<NIL,T_ADAPTIVE,3>::DETERMINANT>::WRAPPED_TYPE WRAPPED_TYPE;
 private:
-    const T_ADAPTIVE a11,a12,a13,a21,a22,a23,a31,a32,a33;
+    const T_ADAPTIVE a00,a01,a02,a10,a11,a12,a20,a21,a22;
     ADAPTIVE_DETERMINANT();
     void operator=(const ADAPTIVE_DETERMINANT&);
 
 public:
     ADAPTIVE_DETERMINANT(const T_ADAPTIVE& a11_input,const T_ADAPTIVE& a12_input,const T_ADAPTIVE& a13_input,const T_ADAPTIVE& a21_input,const T_ADAPTIVE& a22_input,
         const T_ADAPTIVE& a23_input,const T_ADAPTIVE& a31_input,const T_ADAPTIVE& a32_input,const T_ADAPTIVE& a33_input)
-        :a11(a11_input),a12(a12_input),a13(a13_input),a21(a21_input),a22(a22_input),a23(a23_input),a31(a31_input),a32(a32_input),a33(a33_input)
+        :a00(a11_input),a01(a12_input),a02(a13_input),a10(a21_input),a11(a22_input),a12(a23_input),a20(a31_input),a21(a32_input),a22(a33_input)
     {}
 
     WRAPPED_TYPE Wrapped_Implementation() const
-    {return (a11*(a22*a33-a23*a32)+a12*(a23*a31-a21*a33)+a13*(a21*a32-a22*a31));}
+    {return (a00*(a11*a22-a12*a21)+a01*(a12*a20-a10*a22)+a02*(a10*a21-a11*a20));}
 //#####################################################################
 };
 
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,1>
-Adaptive_Determinant(const T& t11)
-{return ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,1>(t11);}
+Adaptive_Determinant(const T& t00)
+{return ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,1>(t00);}
 
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,1>
@@ -96,8 +96,8 @@ Adaptive_Determinant(const VECTOR<VECTOR<T,1>,1>& t)
 
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,2>
-Adaptive_Determinant(const T& t11,const T& t12,const T& t21,const T& t22)
-{return ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,2>(t11,t12,t21,t22);}
+Adaptive_Determinant(const T& t00,const T& t01,const T& t10,const T& t11)
+{return ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,2>(t00,t01,t10,t11);}
 
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,2>
@@ -111,8 +111,8 @@ Adaptive_Determinant(const VECTOR<VECTOR<T,2>,2>& t)
 
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,3>
-Adaptive_Determinant(const T& t11,const T& t12,const T& t13,const T& t21,const T& t22,const T& t23,const T& t31,const T& t32,const T& t33)
-{return ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,3>(t11,t12,t13,t21,t22,t23,t31,t32,t33);}
+Adaptive_Determinant(const T& t00,const T& t01,const T& t02,const T& t10,const T& t11,const T& t12,const T& t20,const T& t21,const T& t22)
+{return ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,3>(t00,t01,t02,t10,t11,t12,t20,t21,t22);}
 
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,3>

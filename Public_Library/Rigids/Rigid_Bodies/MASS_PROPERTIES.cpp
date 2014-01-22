@@ -126,7 +126,7 @@ template<class T> ROTATION<VECTOR<T,1> > Diagonalize_Inertia_Tensor(DIAGONAL_MAT
 }
 template<class T> ROTATION<VECTOR<T,2> > Diagonalize_Inertia_Tensor(DIAGONAL_MATRIX<T,1>& object_space_inertia_tensor,const SYMMETRIC_MATRIX<T,1>& inertia_tensor)
 {
-    object_space_inertia_tensor=DIAGONAL_MATRIX<T,1>(inertia_tensor.x11);
+    object_space_inertia_tensor=DIAGONAL_MATRIX<T,1>(inertia_tensor.x00);
     return ROTATION<VECTOR<T,2> >();
 }
 template<class T> ROTATION<VECTOR<T,3> > Diagonalize_Inertia_Tensor(DIAGONAL_MATRIX<T,3>& object_space_inertia_tensor,const SYMMETRIC_MATRIX<T,3>& inertia_tensor)

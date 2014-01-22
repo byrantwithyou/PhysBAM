@@ -24,12 +24,12 @@ Euler_Step(const T dt,const T time)
         M_node(i,j)+=mass_over_4;M_node(i+1,j)+=mass_over_4;M_node(i,j+1)+=mass_over_4;M_node(i+1,j+1)+=mass_over_4;}
     
     // get grid information
-    ARRAY<T,VECTOR<int,2> > L1(0,m-1,0,n),L2(0,m,0,n-1);grid.Get_Lengths(L1,L2);
+    ARRAY<T,VECTOR<int,2> > L0(0,m-1,0,n),L1(0,m,0,n-1);grid.Get_Lengths(L0,L1);
     ARRAY<T,VECTOR<int,2> > N1_x(0,m-1,0,n),N1_y(0,m-1,0,n),N2_x(0,m,0,n-1),N2_y(0,m,0,n-1);grid.Get_Normals(N1_x,N1_y,N2_x,N2_y);
-    ARRAY<T,VECTOR<int,2> > LL1(0,m-1,0,n-1),LL2(0,m-1,0,n-1),LL3(0,m-1,0,n-1),LL4(0,m-1,0,n-1);
-    grid.Get_Sub_Zone_Lengths(LL1,LL2,LL3,LL4); 
-    ARRAY<T,VECTOR<int,2> > AA1(0,m-1,0,n-1),AA2(0,m-1,0,n-1),AA3(0,m-1,0,n-1),AA4(0,m-1,0,n-1);
-    grid.Get_Sub_Zone_Areas(AA1,AA2,AA3,AA4);
+    ARRAY<T,VECTOR<int,2> > LL0(0,m-1,0,n-1),LL1(0,m-1,0,n-1),LL2(0,m-1,0,n-1),LL3(0,m-1,0,n-1);
+    grid.Get_Sub_Zone_Lengths(LL0,LL1,LL2,LL3); 
+    ARRAY<T,VECTOR<int,2> > AA0(0,m-1,0,n-1),AA1(0,m-1,0,n-1),AA2(0,m-1,0,n-1),AA3(0,m-1,0,n-1);
+    grid.Get_Sub_Zone_Areas(AA0,AA1,AA2,AA3);
     ARRAY<T,VECTOR<int,2> > NN1_x(0,m-1,0,n-1),NN1_y(0,m-1,0,n-1),NN2_x(0,m-1,0,n-1),NN2_y(0,m-1,0,n-1),
                       NN3_x(0,m-1,0,n-1),NN3_y(0,m-1,0,n-1),NN4_x(0,m-1,0,n-1),NN4_y(0,m-1,0,n-1);
     grid.Get_Sub_Zone_Normals(NN1_x,NN1_y,NN2_x,NN2_y,NN3_x,NN3_y,NN4_x,NN4_y); 
@@ -42,36 +42,36 @@ Euler_Step(const T dt,const T time)
         T mass_over_4=mass(i,j)/4;
         T pressure,force,force_x,force_y;
         // subzone 1
-        pressure=eos.p(mass_over_4/AA1(i,j),energy(i,j));
-        force=pressure*L1(i,j)/2;force_x=-force*N1_x(i,j);force_y=-force*N1_y(i,j);
+        pressure=eos.p(mass_over_4/AA0(i,j),energy(i,j));
+        force=pressure*L0(i,j)/2;force_x=-force*N1_x(i,j);force_y=-force*N1_y(i,j);
         F_x(i,j)+=force_x;F_y(i,j)+=force_y;H(i,j)+=-force_x*u(i,j)-force_y*v(i,j);
-        force=pressure*L2(i,j)/2;force_x=-force*N2_x(i,j);force_y=-force*N2_y(i,j);
+        force=pressure*L1(i,j)/2;force_x=-force*N2_x(i,j);force_y=-force*N2_y(i,j);
         F_x(i,j)+=force_x;F_y(i,j)+=force_y;H(i,j)+=-force_x*u(i,j)-force_y*v(i,j);
         // subzone 2
-        pressure=eos.p(mass_over_4/AA2(i,j),energy(i,j));
-        force=pressure*L1(i,j)/2;force_x=-force*N1_x(i,j);force_y=-force*N1_y(i,j);
+        pressure=eos.p(mass_over_4/AA1(i,j),energy(i,j));
+        force=pressure*L0(i,j)/2;force_x=-force*N1_x(i,j);force_y=-force*N1_y(i,j);
         F_x(i+1,j)+=force_x;F_y(i+1,j)+=force_y;H(i,j)+=-force_x*u(i+1,j)-force_y*v(i+1,j);
-        force=pressure*L2(i+1,j)/2;force_x=force*N2_x(i+1,j);force_y=force*N2_y(i+1,j);
+        force=pressure*L1(i+1,j)/2;force_x=force*N2_x(i+1,j);force_y=force*N2_y(i+1,j);
         F_x(i+1,j)+=force_x;F_y(i+1,j)+=force_y;H(i,j)+=-force_x*u(i+1,j)-force_y*v(i+1,j);
         // subzone 3
-        pressure=eos.p(mass_over_4/AA3(i,j),energy(i,j));
-        force=pressure*L1(i,j+1)/2;force_x=force*N1_x(i,j+1);force_y=force*N1_y(i,j+1);
+        pressure=eos.p(mass_over_4/AA2(i,j),energy(i,j));
+        force=pressure*L0(i,j+1)/2;force_x=force*N1_x(i,j+1);force_y=force*N1_y(i,j+1);
         F_x(i,j+1)+=force_x;F_y(i,j+1)+=force_y;H(i,j)+=-force_x*u(i,j+1)-force_y*v(i,j+1);
-        force=pressure*L2(i,j)/2;force_x=-force*N2_x(i,j);force_y=-force*N2_y(i,j);
+        force=pressure*L1(i,j)/2;force_x=-force*N2_x(i,j);force_y=-force*N2_y(i,j);
         F_x(i,j+1)+=force_x;F_y(i,j+1)+=force_y;H(i,j)+=-force_x*u(i,j+1)-force_y*v(i,j+1);
         // subzone 4
-        pressure=eos.p(mass_over_4/AA4(i,j),energy(i,j));
-        force=pressure*L1(i,j+1)/2;force_x=force*N1_x(i,j+1);force_y=force*N1_y(i,j+1);
+        pressure=eos.p(mass_over_4/AA3(i,j),energy(i,j));
+        force=pressure*L0(i,j+1)/2;force_x=force*N1_x(i,j+1);force_y=force*N1_y(i,j+1);
         F_x(i+1,j+1)+=force_x;F_y(i+1,j+1)+=force_y;H(i,j)+=-force_x*u(i+1,j+1)-force_y*v(i+1,j+1);
-        force=pressure*L2(i+1,j)/2;force_x=force*N2_x(i+1,j);force_y=force*N2_y(i+1,j);
+        force=pressure*L1(i+1,j)/2;force_x=force*N2_x(i+1,j);force_y=force*N2_y(i+1,j);
         F_x(i+1,j+1)+=force_x;F_y(i+1,j+1)+=force_y;H(i,j)+=-force_x*u(i+1,j+1)-force_y*v(i+1,j+1);}
 
     // boundary conditions - external forces 
     for(i=0;i<m;i++) for(j=0;j<n;j++){F_x(i,j)+=external_force_x(i,j);F_y(i,j)+=external_force_y(i,j);}
 
     // artificial viscosity  
-    ARRAY<T,VECTOR<int,2> > Q1(0,m-1,0,n-1),Q2(0,m-1,0,n-1),Q3(0,m-1,0,n-1),Q4(0,m-1,0,n-1);
-    artificial_viscosity->Get_Artificial_Viscosity(eos,grid,mass,u,v,energy,Q1,Q2,Q3,Q4);
+    ARRAY<T,VECTOR<int,2> > Q0(0,m-1,0,n-1),Q1(0,m-1,0,n-1),Q2(0,m-1,0,n-1),Q3(0,m-1,0,n-1);
+    artificial_viscosity->Get_Artificial_Viscosity(eos,grid,mass,u,v,energy,Q0,Q1,Q2,Q3);
     // compute directions of the velocity jumps
     ARRAY<T,VECTOR<int,2> > V1_x(0,m-1,0,n),V1_y(0,m-1,0,n);
     for(i=0;i<m-1;i++) for(j=0;j<n;j++){
@@ -88,22 +88,22 @@ Euler_Step(const T dt,const T time)
     for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         // bottom
         fraction=V1_x(i,j)*NN3_x(i,j)+V1_y(i,j)*NN3_y(i,j);
-        force=Q1(i,j)*LL3(i,j)*fraction;force_x=force*V1_x(i,j);force_y=force*V1_y(i,j);
+        force=Q0(i,j)*LL2(i,j)*fraction;force_x=force*V1_x(i,j);force_y=force*V1_y(i,j);
         F_x(i,j)+=-force_x;F_y(i,j)+=-force_y;H(i,j)+=force_x*u(i,j)+force_y*v(i,j);
         F_x(i+1,j)+=force_x;F_y(i+1,j)+=force_y;H(i,j)+=-force_x*u(i+1,j)-force_y*v(i+1,j);
         // top
         fraction=V1_x(i,j+1)*NN4_x(i,j)+V1_y(i,j+1)*NN4_y(i,j);
-        force=Q2(i,j)*LL4(i,j)*fraction;force_x=force*V1_x(i,j+1);force_y=force*V1_y(i,j+1);
+        force=Q1(i,j)*LL3(i,j)*fraction;force_x=force*V1_x(i,j+1);force_y=force*V1_y(i,j+1);
         F_x(i,j+1)+=-force_x;F_y(i,j+1)+=-force_y;H(i,j)+=force_x*u(i,j+1)+force_y*v(i,j+1);
         F_x(i+1,j+1)+=force_x;F_y(i+1,j+1)+=force_y;H(i,j)+=-force_x*u(i+1,j+1)-force_y*v(i+1,j+1);
         // left
         fraction=V2_x(i,j)*NN1_x(i,j)+V2_y(i,j)*NN1_y(i,j);
-        force=Q3(i,j)*LL1(i,j)*fraction;force_x=force*V2_x(i,j);force_y=force*V2_y(i,j);
+        force=Q2(i,j)*LL0(i,j)*fraction;force_x=force*V2_x(i,j);force_y=force*V2_y(i,j);
         F_x(i,j)+=-force_x;F_y(i,j)+=-force_y;H(i,j)+=force_x*u(i,j)+force_y*v(i,j);
         F_x(i,j+1)+=force_x;F_y(i,j+1)+=force_y;H(i,j)+=-force_x*u(i,j+1)-force_y*v(i,j+1);
         // right
         fraction=V2_x(i+1,j)*NN2_x(i,j)+V2_y(i+1,j)*NN2_y(i,j);
-        force=Q4(i,j)*LL2(i,j)*fraction;force_x=force*V2_x(i+1,j);force_y=force*V2_y(i+1,j);
+        force=Q3(i,j)*LL1(i,j)*fraction;force_x=force*V2_x(i+1,j);force_y=force*V2_y(i+1,j);
         F_x(i+1,j)+=-force_x;F_y(i+1,j)+=-force_y;H(i,j)+=force_x*u(i+1,j)+force_y*v(i+1,j);
         F_x(i+1,j+1)+=force_x;F_y(i+1,j+1)+=force_y;H(i,j)+=-force_x*u(i+1,j+1)-force_y*v(i+1,j+1);}
 
@@ -114,25 +114,25 @@ Euler_Step(const T dt,const T time)
             // bottom
             delta_x=grid.x(i+1,j)-grid.x(i,j);delta_y=grid.y(i+1,j)-grid.y(i,j);delta=sqrt(sqr(delta_x)+sqr(delta_y));
             delta_x_direction=delta_x/delta;delta_y_direction=delta_y/delta;
-            S=-stiffness*(L1(i,j)/L1_not(i,j)-1);S_x=S*delta_x_direction;S_y=S*delta_y_direction;
+            S=-stiffness*(L0(i,j)/L1_not(i,j)-1);S_x=S*delta_x_direction;S_y=S*delta_y_direction;
             F_x(i,j)+=-S_x;F_y(i,j)+=-S_y;H(i,j)+=S_x*u(i,j)+S_y*v(i,j);
             F_x(i+1,j)+=S_x;F_y(i+1,j)+=S_y;H(i,j)+=-S_x*u(i+1,j)-S_y*v(i+1,j);
             // top
             delta_x=grid.x(i+1,j+1)-grid.x(i,j+1);delta_y=grid.y(i+1,j+1)-grid.y(i,j+1);delta=sqrt(sqr(delta_x)+sqr(delta_y));
             delta_x_direction=delta_x/delta;delta_y_direction=delta_y/delta;
-            S=-stiffness*(L1(i,j+1)/L1_not(i,j+1)-1);S_x=S*delta_x_direction;S_y=S*delta_y_direction;
+            S=-stiffness*(L0(i,j+1)/L1_not(i,j+1)-1);S_x=S*delta_x_direction;S_y=S*delta_y_direction;
             F_x(i,j+1)+=-S_x;F_y(i,j+1)+=-S_y;H(i,j)+=S_x*u(i,j+1)+S_y*v(i,j+1);
             F_x(i+1,j+1)+=S_x;F_y(i+1,j+1)+=S_y;H(i,j)+=-S_x*u(i+1,j+1)-S_y*v(i+1,j+1);
             // left
             delta_x=grid.x(i,j+1)-grid.x(i,j);delta_y=grid.y(i,j+1)-grid.y(i,j);delta=sqrt(sqr(delta_x)+sqr(delta_y));
             delta_x_direction=delta_x/delta;delta_y_direction=delta_y/delta;
-            S=-stiffness*(L2(i,j)/L2_not(i,j)-1);S_x=S*delta_x_direction;S_y=S*delta_y_direction;
+            S=-stiffness*(L1(i,j)/L2_not(i,j)-1);S_x=S*delta_x_direction;S_y=S*delta_y_direction;
             F_x(i,j)+=-S_x;F_y(i,j)+=-S_y;H(i,j)+=S_x*u(i,j)+S_y*v(i,j);
             F_x(i,j+1)+=S_x;F_y(i,j+1)+=S_y;H(i,j)+=-S_x*u(i,j+1)-S_y*v(i,j+1);
             // right
             delta_x=grid.x(i+1,j+1)-grid.x(i+1,j);delta_y=grid.y(i+1,j+1)-grid.y(i+1,j);delta=sqrt(sqr(delta_x)+sqr(delta_y));
             delta_x_direction=delta_x/delta;delta_y_direction=delta_y/delta;
-            S=-stiffness*(L2(i+1,j)/L2_not(i+1,j)-1);S_x=S*delta_x_direction;S_y=S*delta_y_direction;
+            S=-stiffness*(L1(i+1,j)/L2_not(i+1,j)-1);S_x=S*delta_x_direction;S_y=S*delta_y_direction;
             F_x(i+1,j)+=-S_x;F_y(i+1,j)+=-S_y;H(i,j)+=S_x*u(i+1,j)+S_y*v(i+1,j);
             F_x(i+1,j+1)+=S_x;F_y(i+1,j+1)+=S_y;H(i,j)+=-S_x*u(i+1,j+1)-S_y*v(i+1,j+1);}}
         
@@ -160,36 +160,36 @@ CFL()
 
     // grid
     ARRAY<T,VECTOR<int,2> > length(0,m-1,0,n-1);
-    ARRAY<T,VECTOR<int,2> > L1(0,m-1,0,n),L2(0,m,0,n-1);grid.Get_Lengths(L1,L2);
-    ARRAY<T,VECTOR<int,2> > LL1(0,m-1,0,n-1),LL2(0,m-1,0,n-1),LL3(0,m-1,0,n-1),LL4(0,m-1,0,n-1);
-    grid.Get_Sub_Zone_Lengths(LL1,LL2,LL3,LL4);
-    for(i=0;i<m-1;i++) for(j=0;j<n-1;j++) length(i,j)=min(L1(i,j),L1(i,j+1),L2(i,j),L2(i+1,j),LL1(i,j)+LL2(i,j),LL3(i,j)+LL4(i,j));
+    ARRAY<T,VECTOR<int,2> > L0(0,m-1,0,n),L1(0,m,0,n-1);grid.Get_Lengths(L0,L1);
+    ARRAY<T,VECTOR<int,2> > LL0(0,m-1,0,n-1),LL1(0,m-1,0,n-1),LL2(0,m-1,0,n-1),LL3(0,m-1,0,n-1);
+    grid.Get_Sub_Zone_Lengths(LL0,LL1,LL2,LL3);
+    for(i=0;i<m-1;i++) for(j=0;j<n-1;j++) length(i,j)=min(L0(i,j),L0(i,j+1),L1(i,j),L1(i+1,j),LL0(i,j)+LL1(i,j),LL2(i,j)+LL3(i,j));
 
     // artificial viscosity
-    ARRAY<T,VECTOR<int,2> > Q(0,m-1,0,n-1),Q1(0,m-1,0,n-1),Q2(0,m-1,0,n-1),Q3(0,m-1,0,n-1),Q4(0,m-1,0,n-1);
-    artificial_viscosity->Get_Artificial_Viscosity(eos,grid,mass,u,v,energy,Q1,Q2,Q3,Q4);
-    for(i=0;i<m-1;i++) for(j=0;j<n-1;j++) Q(i,j)=max(Q1(i,j),Q2(i,j),Q3(i,j),Q4(i,j));
+    ARRAY<T,VECTOR<int,2> > Q(0,m-1,0,n-1),Q0(0,m-1,0,n-1),Q1(0,m-1,0,n-1),Q2(0,m-1,0,n-1),Q3(0,m-1,0,n-1);
+    artificial_viscosity->Get_Artificial_Viscosity(eos,grid,mass,u,v,energy,Q0,Q1,Q2,Q3);
+    for(i=0;i<m-1;i++) for(j=0;j<n-1;j++) Q(i,j)=max(Q0(i,j),Q1(i,j),Q2(i,j),Q3(i,j));
 
     // material strength
     ARRAY<T,VECTOR<int,2> > S(0,m-1,0,n-1);
     if(material_strength){
-        T S1,S2,S3,S4;
+        T S0,S1,S2,S3;
         for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
-            S1=-stiffness*(L1(i,j)/L1_not(i,j)-1);S2=-stiffness*(L1(i,j+1)/L1_not(i,j+1)-1);
-            S3=-stiffness*(L2(i,j)/L2_not(i,j)-1);S4=-stiffness*(L2(i+1,j)/L2_not(i+1,j)-1);
-            S(i,j)=maxabs(S1/LL3(i,j),S2/LL4(i,j),S3/LL1(i,j),S4/LL2(i,j));}}
+            S0=-stiffness*(L0(i,j)/L1_not(i,j)-1);S1=-stiffness*(L0(i,j+1)/L1_not(i,j+1)-1);
+            S2=-stiffness*(L1(i,j)/L2_not(i,j)-1);S3=-stiffness*(L1(i+1,j)/L2_not(i+1,j)-1);
+            S(i,j)=maxabs(S0/LL2(i,j),S1/LL3(i,j),S2/LL0(i,j),S3/LL1(i,j));}}
     
     // determine the time step
     ARRAY<T,VECTOR<int,2> > timestep(0,m-1,0,n-1);
-    ARRAY<T,VECTOR<int,2> > AA1(0,m-1,0,n-1),AA2(0,m-1,0,n-1),AA3(0,m-1,0,n-1),AA4(0,m-1,0,n-1);
-    grid.Get_Sub_Zone_Areas(AA1,AA2,AA3,AA4);
+    ARRAY<T,VECTOR<int,2> > AA0(0,m-1,0,n-1),AA1(0,m-1,0,n-1),AA2(0,m-1,0,n-1),AA3(0,m-1,0,n-1);
+    grid.Get_Sub_Zone_Areas(AA0,AA1,AA2,AA3);
     for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         T mass_over_4=mass(i,j)/4;
-        T density1=mass_over_4/AA1(i,j),density2=mass_over_4/AA2(i,j),
-                   density3=mass_over_4/AA3(i,j),density4=mass_over_4/AA4(i,j);
-        T density=min(density1,density2,density3,density4);
-        T P=max(eos.p(density1,energy(i,j)),eos.p(density2,energy(i,j)),
-                               eos.p(density3,energy(i,j)),eos.p(density4,energy(i,j)))+Q(i,j)+abs(S(i,j));
+        T density0=mass_over_4/AA0(i,j),density1=mass_over_4/AA1(i,j),
+                   density2=mass_over_4/AA2(i,j),density3=mass_over_4/AA3(i,j);
+        T density=min(density0,density1,density2,density3);
+        T P=max(eos.p(density0,energy(i,j)),eos.p(density1,energy(i,j)),
+                               eos.p(density2,energy(i,j)),eos.p(density3,energy(i,j)))+Q(i,j)+abs(S(i,j));
         T E=eos.e_From_p_And_rho(P,density);
         timestep(i,j)=eos.c(density,E)/length(i,j);}
 

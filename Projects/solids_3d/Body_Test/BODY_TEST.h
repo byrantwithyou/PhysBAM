@@ -29,7 +29,7 @@ public:
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
-    RIGID_BODY<TV>* body1;
+    RIGID_BODY<TV>* body0;
     RIGID_BODY<TV>* ground;
 
     BODY_TEST(const STREAM_TYPE stream_type)
@@ -39,7 +39,7 @@ public:
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     {
         COLLISION_GEOMETRY_ID body1_collision_geometry_id=
-            solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(body1->particle_index);
+            solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(body0->particle_index);
         COLLISION_GEOMETRY_ID ground_collision_geometry_id=
             solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(ground->particle_index);
         if(time*24.0 > 10 && body1_collision_geometry_id && time*24.0 < 25){
@@ -50,7 +50,7 @@ public:
         else if (time*24.0 > 20 && !ground_collision_geometry_id)
             solid_body_collection.collision_body_list.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(*ground),ground->particle_index,true);
         else if (time*24.0 > 25 && !body1_collision_geometry_id)
-            solid_body_collection.collision_body_list.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(*body1),body1->particle_index,true);
+            solid_body_collection.collision_body_list.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(*body0),body0->particle_index,true);
         else
             LOG::cout<<"updat esolids param"<<std::endl;
     }
@@ -63,7 +63,7 @@ public:
         tests.Create_Cloth_Panel(20,1,1,0);
         //deformable_body_collection.Add_Structure(&cloth);
         tests.Add_Ground();
-        body1=&tests.Add_Rigid_Body("sphere",(T).25,(T)0);body1->Frame().t.z=.5;
+        body0=&tests.Add_Rigid_Body("sphere",(T).25,(T)0);body0->Frame().t.z=.5;
         ground=&solid_body_collection.rigid_body_collection.Rigid_Body(1);
         deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
         deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);

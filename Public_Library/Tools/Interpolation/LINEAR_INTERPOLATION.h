@@ -48,13 +48,13 @@ public:
     static T2 Bilinear(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const VECTOR<T,2>& minimum_corner,const VECTOR<T,2>& maximum_corner,const VECTOR<T,2>& X);
     // X in [0,1]x[0,1]
     static T2 Bilinear(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const VECTOR<T,2>& X);
-    static T2 Bilinear(const T2& u1,const T2& u3,T one_over_y_top_minus_y_bottom,const T x_left,const T y_bottom,const T2& slope12,const T2& slope34,const VECTOR<T,2>& X);
+    static T2 Bilinear(const T2& u1,const T2& u3,T one_over_y_top_minus_y_bottom,const T x_left,const T y_bottom,const T2& slope01,const T2& slope23,const VECTOR<T,2>& X);
     static T2 Trilinear(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const T2& u5,const T2& u6,const T2& u7,const T2& u8,
         const VECTOR<T,3>& minimum_corner,const VECTOR<T,3>& maximum_corner,const VECTOR<T,3>& X);
     // X in [0,1]x[0,1]x[0,1]
     static T2 Trilinear(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const T2& u5,const T2& u6,const T2& u7,const T2& u8,const VECTOR<T,3>& X);
     static T2 Trilinear(const T2& u1,const T2& u3,const T2& u5,const T2& u7,T one_over_y_top_minus_y_bottom,T one_over_z_back_minus_z_front,const T x_left,const T y_bottom,const T z_front,
-        const T2& slope12,const T2& slope34,const T2& slope56,const T2& slope78,const VECTOR<T,3>& X);
+        const T2& slope01,const T2& slope23,const T2& slope45,const T2& slope67,const VECTOR<T,3>& X);
 
     static VECTOR<T2,1> Linear_Gradient(const T2& u_left,const T2& u_right,const VECTOR<T,1>& X)
     {return VECTOR<T2,1>(u_right-u_left);}

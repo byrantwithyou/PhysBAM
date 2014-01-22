@@ -959,8 +959,8 @@ Rebuild_Surface()
         T phi1=phi(cell1),phi2=phi(cell2);
         if((phi1>0)==(phi2>0)) continue;
         T theta=LEVELSET_UTILITIES<T>::Theta(phi1,phi2);
-        TV X1=fluids_parameters.grid->X(cell1),X2=fluids_parameters.grid->X(cell2);
-        TV X=(1-theta)*X1+theta*X2;
+        TV X0=fluids_parameters.grid->X(cell1),X1=fluids_parameters.grid->X(cell2);
+        TV X=(1-theta)*X0+theta*X1;
 
         typename MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::ENTRY entry={face,phi1<=0?1:2,X};
         fluid_interpolation_entries.Append(entry);

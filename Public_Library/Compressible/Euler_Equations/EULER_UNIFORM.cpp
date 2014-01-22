@@ -182,10 +182,10 @@ Invalidate_Ghost_Cells()
 // Function Equal_Real_Data
 //#####################################################################
 template<class TV> bool EULER_UNIFORM<TV>::
-Equal_Real_Data(const T_ARRAYS_DIMENSION_SCALAR& U1,const T_ARRAYS_DIMENSION_SCALAR& U2) const
+Equal_Real_Data(const T_ARRAYS_DIMENSION_SCALAR& U0,const T_ARRAYS_DIMENSION_SCALAR& U1) const
 {
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        if(U1(cell_index)!=U2(cell_index)) return false;}
+        if(U0(cell_index)!=U1(cell_index)) return false;}
     return true;
 }
 //#####################################################################

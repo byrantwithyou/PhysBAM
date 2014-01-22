@@ -71,38 +71,38 @@ public:
 
     static void Refine_Simplex(const IMPLICIT_OBJECT_INTERSECTOR<VECTOR<T,1> >& implicit_object_intersector,ARRAY<VECTOR<int,2> >& segments,
         ARRAY<VECTOR<T,1> >& particle_X,const VECTOR<int,2>& indices)
-    {const int x1=indices[0],x2=indices[1];
-    const VECTOR<T,1> X1=particle_X(x1),X2=particle_X(x2);
-    int midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X2));
-    segments.Append(VECTOR<int,2>(x1,midpoint));
-    segments.Append(VECTOR<int,2>(midpoint,x2));}
+    {const int x0=indices[0],x1=indices[1];
+    const VECTOR<T,1> X0=particle_X(x0),X1=particle_X(x1);
+    int midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X0,X1));
+    segments.Append(VECTOR<int,2>(x0,midpoint));
+    segments.Append(VECTOR<int,2>(midpoint,x1));}
 
     static void Refine_Simplex(const IMPLICIT_OBJECT_INTERSECTOR<VECTOR<T,2> >& implicit_object_intersector,ARRAY<VECTOR<int,3> >& tris,
         ARRAY<VECTOR<T,2> >& particle_X,const VECTOR<int,3>& indices)
-    {const int x1=indices[0],x2=indices[1],x3=indices[2];
-    const VECTOR<T,2> X1=particle_X(x1),X2=particle_X(x2),X3=particle_X(x3);
-    int first_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X2));
-    int second_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X2,X3));
-    int third_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X3,X1));
-    tris.Append(VECTOR<int,3>(x1,first_midpoint,third_midpoint));
-    tris.Append(VECTOR<int,3>(x2,second_midpoint,first_midpoint));
-    tris.Append(VECTOR<int,3>(x3,third_midpoint,second_midpoint));
+    {const int x0=indices[0],x1=indices[1],x2=indices[2];
+    const VECTOR<T,2> X0=particle_X(x0),X1=particle_X(x1),X2=particle_X(x2);
+    int first_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X0,X1));
+    int second_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X2));
+    int third_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X2,X0));
+    tris.Append(VECTOR<int,3>(x0,first_midpoint,third_midpoint));
+    tris.Append(VECTOR<int,3>(x1,second_midpoint,first_midpoint));
+    tris.Append(VECTOR<int,3>(x2,third_midpoint,second_midpoint));
     tris.Append(VECTOR<int,3>(first_midpoint,second_midpoint,third_midpoint));}
 
     static void Refine_Simplex(const IMPLICIT_OBJECT_INTERSECTOR<VECTOR<T,3> >& implicit_object_intersector,ARRAY<VECTOR<int,4> >& tets,
         ARRAY<VECTOR<T,3> >& particle_X,const VECTOR<int,4>& indices)
-    {const int x1=indices[0],x2=indices[1],x3=indices[2],x4=indices[3];
-    const VECTOR<T,3> X1=particle_X(x1),X2=particle_X(x2),X3=particle_X(x3),X4=particle_X(x4);
-    int first_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X2));
-    int second_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X3));
-    int third_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X4));
-    int fourth_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X2,X3));
-    int fifth_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X2,X4));
-    int sixth_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X3,X4));
-    tets.Append(VECTOR<int,4>(x1,first_midpoint,second_midpoint,third_midpoint));
-    tets.Append(VECTOR<int,4>(x2,fourth_midpoint,first_midpoint,fifth_midpoint));
-    tets.Append(VECTOR<int,4>(x3,second_midpoint,fourth_midpoint,sixth_midpoint));
-    tets.Append(VECTOR<int,4>(x4,third_midpoint,sixth_midpoint,fifth_midpoint));
+    {const int x0=indices[0],x1=indices[1],x2=indices[2],x3=indices[3];
+    const VECTOR<T,3> X0=particle_X(x0),X1=particle_X(x1),X2=particle_X(x2),X3=particle_X(x3);
+    int first_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X0,X1));
+    int second_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X0,X2));
+    int third_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X0,X3));
+    int fourth_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X2));
+    int fifth_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X3));
+    int sixth_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X2,X3));
+    tets.Append(VECTOR<int,4>(x0,first_midpoint,second_midpoint,third_midpoint));
+    tets.Append(VECTOR<int,4>(x1,fourth_midpoint,first_midpoint,fifth_midpoint));
+    tets.Append(VECTOR<int,4>(x2,second_midpoint,fourth_midpoint,sixth_midpoint));
+    tets.Append(VECTOR<int,4>(x3,third_midpoint,sixth_midpoint,fifth_midpoint));
     // pick our octagon diagonal as first_midpoint,sixth_midpoint
     tets.Append(VECTOR<int,4>(first_midpoint,sixth_midpoint,third_midpoint,fifth_midpoint));
     tets.Append(VECTOR<int,4>(first_midpoint,sixth_midpoint,fifth_midpoint,fourth_midpoint));

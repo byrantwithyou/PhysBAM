@@ -8,7 +8,7 @@ typedef float T;
 MATRIX<T,4> Reflect_About_Plane(const PLANE<T>& plane)
 {
     MATRIX<T,3> reflection=MATRIX<T,3>::Identity_Matrix()-(T)2*MATRIX<T,3>::Outer_Product(plane.normal,plane.normal);
-    VECTOR<T,3> translation=(T)2*plane.x1.Projected_On_Unit_Direction(plane.normal);
+    VECTOR<T,3> translation=(T)2*plane.x0.Projected_On_Unit_Direction(plane.normal);
     return MATRIX<T,4>::Translation_Matrix(translation)*MATRIX<T,4>(reflection);
 }
 
@@ -26,14 +26,14 @@ int main(int argc,char*argv[])
         for(int i=0;i<tri_surf->particles.number;i++) tri_surf->particles.X(i)=rigid_body.frame*tri_surf->particles.X(i);    }
 
 #if 0
-    VECTOR<T,3> x1=(T).5*(VECTOR<T,3>(0.298154,0.147101,0.979182)+VECTOR<T,3>(0.298926,0.144395,0.979307))+VECTOR<T,3>(0.002,0,0);
+    VECTOR<T,3> x0=(T).5*(VECTOR<T,3>(0.298154,0.147101,0.979182)+VECTOR<T,3>(0.298926,0.144395,0.979307))+VECTOR<T,3>(0.002,0,0);
     VECTOR<T,3> normal=VECTOR<T,3>(1,0.01,-0.03).Normalized();
-    MATRIX<T,4> xform=Reflect_About_Plane(PLANE<T>(normal,x1));
+    MATRIX<T,4> xform=Reflect_About_Plane(PLANE<T>(normal,x0));
 #endif
 #if 0
-    VECTOR<T,3> x1=(T).5*(VECTOR<T,3>(0.298154,0.147101,0.979182)+VECTOR<T,3>(0.298926,0.144395,0.979307))+VECTOR<T,3>(0.002,0,0);
+    VECTOR<T,3> x0=(T).5*(VECTOR<T,3>(0.298154,0.147101,0.979182)+VECTOR<T,3>(0.298926,0.144395,0.979307))+VECTOR<T,3>(0.002,0,0);
     VECTOR<T,3> normal=VECTOR<T,3>(1,-0.02,-0.01).Normalized();
-    MATRIX<T,4> xform=Reflect_About_Plane(PLANE<T>(normal,x1));
+    MATRIX<T,4> xform=Reflect_About_Plane(PLANE<T>(normal,x0));
 #endif
     MATRIX<T,4> xform(-0.999,0.03998,0.01999,0,0.03998,0.9992,-0.0003998,0,0.01999,-0.0003998,0.9998,0,0.575378,-0.0115075,-0.00575377,1);
 

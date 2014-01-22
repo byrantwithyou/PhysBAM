@@ -289,20 +289,20 @@ Update_Position_Based_State_Particle(int pp)
     TV weights=t.Barycentric_Coordinates(location);
     const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,4>& > X=particles.X.Subset(nodes);
     if(weights.x<0){
-        T a23=SEGMENT_3D<T>::Interpolation_Fraction(location,t.X.y,t.X.z); // Check edge X.y--X.z
-        if(a23<0){
+        T a12=SEGMENT_3D<T>::Interpolation_Fraction(location,t.X.y,t.X.z); // Check edge X.y--X.z
+        if(a12<0){
             if(weights.z<0) Penalty(VECTOR<int,3>(0,1,2),X,e,de,he); // Closest point is on edge X.x--X.y
             else Penalty(VECTOR<int,2>(0,2),X,e,de,he);} // Closest point is t.X.y
-        else if(a23>1){
+        else if(a12>1){
             if(weights.y<0) Penalty(VECTOR<int,3>(0,1,3),X,e,de,he); // Closest point is on edge t.X.x--t.X.z
             else Penalty(VECTOR<int,2>(0,3),X,e,de,he);} // Closest point is t.X.z
         else Penalty(VECTOR<int,3>(0,2,3),X,e,de,he);} // Closest point is on edge t.X.y--t.X.z
     else if(weights.y<0){
-        T a13=SEGMENT_3D<T>::Interpolation_Fraction(location,t.X.x,t.X.z); // Check edge t.X.x--t.X.z
-        if(a13<0){
+        T a02=SEGMENT_3D<T>::Interpolation_Fraction(location,t.X.x,t.X.z); // Check edge t.X.x--t.X.z
+        if(a02<0){
             if(weights.z<0) Penalty(VECTOR<int,3>(0,1,2),X,e,de,he); // Closest point is on edge t.X.x--t.X.y
             else Penalty(VECTOR<int,2>(0,1),X,e,de,he);} // Closest point is t.X.x
-        else if(a13>1) Penalty(VECTOR<int,2>(0,3),X,e,de,he); // Closest point is t.X.z
+        else if(a02>1) Penalty(VECTOR<int,2>(0,3),X,e,de,he); // Closest point is t.X.z
         else Penalty(VECTOR<int,3>(0,1,3),X,e,de,he);} // Closest point is on edge t.X.x--t.X.z
     else if(weights.z<0) Penalty(VECTOR<int,3>(0,1,2),X,e,de,he); // Closest point is on edge t.X.x--t.X.y
     else Penalty(VECTOR<int,4>(0,1,2,3),X,e,de,he);

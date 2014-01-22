@@ -103,13 +103,13 @@ template<class T,int d> void COROTATED<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
 {
     T mu=constant_mu,la=constant_lambda,mu2la=2*mu+la,la2mu2=2*la+2*mu;
-    T d12=F.x.x+F.x.y;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
-    T i12=la2mu2/d12;
+    T d01=F.x.x+F.x.y;if(fabs(d01)<panic_threshold) d01=d01<0?-panic_threshold:panic_threshold;
+    T i01=la2mu2/d01;
+    dP_dF.x0000=mu2la;
+    dP_dF.x1001=i01-la;
+    dP_dF.x1010=mu2la-i01;
+    dP_dF.x1100=la;
     dP_dF.x1111=mu2la;
-    dP_dF.x2112=i12-la;
-    dP_dF.x2121=mu2la-i12;
-    dP_dF.x2211=la;
-    dP_dF.x2222=mu2la;
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################
@@ -119,22 +119,22 @@ template<class T,int d> void COROTATED<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const
 {
     T mu=constant_mu,la=constant_lambda,mu2la=2*mu+la,la3mu2=3*la+2*mu;
-    T d12=F.x.x+F.x.y;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
-    T d13=F.x.x+F.x.z;if(fabs(d13)<panic_threshold) d13=d13<0?-panic_threshold:panic_threshold;
-    T d23=F.x.y+F.x.z;if(fabs(d23)<panic_threshold) d23=d23<0?-panic_threshold:panic_threshold;
-    T i12=(la3mu2-la*F.x.z)/d12,i13=(la3mu2-la*F.x.y)/d13,i23=(la3mu2-la*F.x.x)/d23;
+    T d01=F.x.x+F.x.y;if(fabs(d01)<panic_threshold) d01=d01<0?-panic_threshold:panic_threshold;
+    T d02=F.x.x+F.x.z;if(fabs(d02)<panic_threshold) d02=d02<0?-panic_threshold:panic_threshold;
+    T d12=F.x.y+F.x.z;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
+    T i01=(la3mu2-la*F.x.z)/d01,i02=(la3mu2-la*F.x.y)/d02,i12=(la3mu2-la*F.x.x)/d12;
+    dPi_dF.x0000=mu2la;
     dPi_dF.x1111=mu2la;
     dPi_dF.x2222=mu2la;
-    dPi_dF.x3333=mu2la;
+    dPi_dF.x1100=la;
+    dPi_dF.x2200=la;
     dPi_dF.x2211=la;
-    dPi_dF.x3311=la;
-    dPi_dF.x3322=la;
+    dPi_dF.x1001=i01-la;
+    dPi_dF.x2002=i02-la;
     dPi_dF.x2112=i12-la;
-    dPi_dF.x3113=i13-la;
-    dPi_dF.x3223=i23-la;
+    dPi_dF.x1010=mu2la-i01;
+    dPi_dF.x2020=mu2la-i02;
     dPi_dF.x2121=mu2la-i12;
-    dPi_dF.x3131=mu2la-i13;
-    dPi_dF.x3232=mu2la-i23;
     if(enforce_definiteness) dPi_dF.Enforce_Definiteness();
 }
 //#####################################################################

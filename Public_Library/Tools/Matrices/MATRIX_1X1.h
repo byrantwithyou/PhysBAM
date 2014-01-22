@@ -25,48 +25,48 @@ public:
     typedef MATRIX_BASE<T,MATRIX<T,1> > BASE;using BASE::operator*;
     typedef int HAS_UNTYPED_READ_WRITE;
 
-    T x11;
+    T x00;
 
     explicit MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(1),INITIAL_SIZE nn=INITIAL_SIZE(1))
-        :x11(T())
+        :x00(T())
     {
         assert(mm==INITIAL_SIZE(1) && nn==INITIAL_SIZE(1));
     }
 
     MATRIX(const MATRIX& matrix)
-        :x11(matrix.x11)
+        :x00(matrix.x00)
     {}
 
     template<class T2>
     explicit MATRIX(const MATRIX<T2,1>& matrix)
-        :x11(matrix.x11)
+        :x00(matrix.x00)
     {}
 
     template<class T_MATRIX>
     explicit MATRIX(const MATRIX_BASE<T,T_MATRIX>& A)
-        :x11(A(0,0))
+        :x00(A(0,0))
     {
         assert(A.Rows()==1 && A.Columns()==1);
     }
 
-    explicit MATRIX(const T x11)
-        :x11(x11)
+    explicit MATRIX(const T x00)
+        :x00(x00)
     {}
 
     explicit MATRIX(const VECTOR<T,1>& v)
-        :x11(v.x)
+        :x00(v.x)
     {}
 
     MATRIX(const SYMMETRIC_MATRIX<T,1>& matrix_input)
-        :x11(matrix_input.x11)
+        :x00(matrix_input.x00)
     {}
 
     MATRIX(const DIAGONAL_MATRIX<T,1>& matrix_input)
-        :x11(matrix_input.x11)
+        :x00(matrix_input.x00)
     {}
 
     MATRIX& operator=(const MATRIX& matrix)
-    {x11=matrix.x11;return *this;}
+    {x00=matrix.x00;return *this;}
 
     int Rows() const
     {return 1;}
@@ -75,28 +75,28 @@ public:
     {return 1;}
 
     T& operator()(const int i,const int j=1)
-    {assert(i==0 && j==0);return x11;}
+    {assert(i==0 && j==0);return x00;}
 
     const T& operator()(const int i,const int j=1) const
-    {assert(i==0 && j==0);return x11;}
+    {assert(i==0 && j==0);return x00;}
 
     bool Valid_Index(const int i,const int j) const
     {return i==0 && j==0;}
 
     VECTOR<T,1> Column(const int j) const
-    {assert(j==0);return VECTOR<T,1>(x11);}
+    {assert(j==0);return VECTOR<T,1>(x00);}
 
     void Set_Column(const int j,const VECTOR<T,1>& v)
-    {assert(j==0);x11=v.x;}
+    {assert(j==0);x00=v.x;}
 
     VECTOR<T,1> Row(const int j) const
-    {assert(j==0);return VECTOR<T,1>(x11);}
+    {assert(j==0);return VECTOR<T,1>(x00);}
 
     void Set_Row(const int j,const VECTOR<T,1>& v)
-    {assert(j==0);x11=v.x;}
+    {assert(j==0);x00=v.x;}
 
     bool operator==(const MATRIX& A) const
-    {return x11==A.x11;}
+    {return x00==A.x00;}
 
     bool operator!=(const MATRIX& A) const
     {return !(*this==A);}
@@ -108,82 +108,82 @@ public:
     {return VECTOR<T,1>(Column(0).Magnitude());}
 
     MATRIX Inverse() const
-    {assert(x11);return MATRIX(1/x11);}
+    {assert(x00);return MATRIX(1/x00);}
 
     VECTOR<T,1> Solve_Linear_System(const VECTOR<T,1>& b) const
-    {return VECTOR<T,1>(b.x/x11);}
+    {return VECTOR<T,1>(b.x/x00);}
 
     VECTOR<T,1> Robust_Solve_Linear_System(const VECTOR<T,1>& b) const
-    {return VECTOR<T,1>(Robust_Divide(b.x,x11));}
+    {return VECTOR<T,1>(Robust_Divide(b.x,x00));}
 
     MATRIX Cofactor_Matrix() const
     {return MATRIX(1);}
 
     MATRIX Normal_Equations_Matrix() const // 1 mult
-    {return MATRIX(sqr(x11));}
+    {return MATRIX(sqr(x00));}
 
     MATRIX operator-() const
-    {return MATRIX(-x11);}
+    {return MATRIX(-x00);}
 
     MATRIX operator+(const T a) const
-    {return MATRIX(x11+a);}
+    {return MATRIX(x00+a);}
 
     MATRIX operator+(const MATRIX& A) const
-    {return MATRIX(x11+A.x11);}
+    {return MATRIX(x00+A.x00);}
 
     MATRIX operator-(const T a) const
-    {return MATRIX(x11-a);}
+    {return MATRIX(x00-a);}
 
     MATRIX operator-(const MATRIX& A) const
-    {return MATRIX(x11-A.x11);}
+    {return MATRIX(x00-A.x00);}
 
     MATRIX operator*(const MATRIX& A) const
-    {return MATRIX(x11*A.x11);}
+    {return MATRIX(x00*A.x00);}
 
     MATRIX operator*(const T a) const
-    {return MATRIX(a*x11);}
+    {return MATRIX(a*x00);}
 
     MATRIX operator/(const T a) const
-    {return MATRIX(x11/a);}
+    {return MATRIX(x00/a);}
 
     VECTOR<T,1> operator*(const VECTOR<T,1>& v) const
-    {return VECTOR<T,1>(x11*v.x);}
+    {return VECTOR<T,1>(x00*v.x);}
 
     MATRIX& operator+=(const MATRIX& A)
-    {x11+=A.x11;return *this;}
+    {x00+=A.x00;return *this;}
 
     MATRIX& operator+=(const DIAGONAL_MATRIX<T,1>& A)
-    {x11+=A.x.x;return *this;}
+    {x00+=A.x.x;return *this;}
 
     MATRIX& operator+=(const SYMMETRIC_MATRIX<T,1>& A)
-    {x11+=A.x11;return *this;}
+    {x00+=A.x00;return *this;}
 
     MATRIX& operator-=(const MATRIX& A)
-    {x11-=A.x11;return *this;}
+    {x00-=A.x00;return *this;}
 
     MATRIX& operator-=(const DIAGONAL_MATRIX<T,1>& A)
-    {x11-=A.x.x;return *this;}
+    {x00-=A.x.x;return *this;}
 
     MATRIX& operator-=(const SYMMETRIC_MATRIX<T,1>& A)
-    {x11-=A.x11;return *this;}
+    {x00-=A.x00;return *this;}
 
     MATRIX& operator+=(const T& a)
-    {x11+=a;return *this;}
+    {x00+=a;return *this;}
 
     MATRIX& operator-=(const T& a)
-    {x11-=a;return *this;}
+    {x00-=a;return *this;}
 
     MATRIX& operator*=(const T a)
-    {x11*=a;return *this;}
+    {x00*=a;return *this;}
 
     MATRIX& operator*=(const MATRIX& A)
-    {x11*=A.x11;return *this;}
+    {x00*=A.x00;return *this;}
 
     MATRIX& operator/=(const T a)
-    {x11/=a;return *this;}
+    {x00/=a;return *this;}
 
     VECTOR<T,1> Transpose_Times(const VECTOR<T,1>& v) const
-    {return VECTOR<T,1>(x11*v.x);}
+    {return VECTOR<T,1>(x00*v.x);}
 
     template<class T_MATRIX>
     T_MATRIX Transpose_Times(const MATRIX_BASE<T,T_MATRIX>& A) const
@@ -224,43 +224,43 @@ public:
     {return *this;}
 
     T Trace() const
-    {return x11;}
+    {return x00;}
 
     T Determinant() const
-    {return x11;}
+    {return x00;}
 
     MATRIX<T,1> Fast_Eigenvalues() const
     {return *this;}
 
     T Max() const
-    {return x11;}
+    {return x00;}
 
     T Min() const
-    {return x11;}
+    {return x00;}
 
     T Frobenius_Norm() const
-    {return abs(x11);}
+    {return abs(x00);}
 
     T Frobenius_Norm_Squared() const
-    {return sqr(x11);}
+    {return sqr(x00);}
 
     T Inner_Product(const VECTOR<T,1>& u,const VECTOR<T,1>& v) const
-    {return x11*u.x*v.x;}
+    {return x00*u.x*v.x;}
 
     T Inverse_Inner_Product(const VECTOR<T,1>& u,const VECTOR<T,1>& v) const
-    {return u.x*v.x/x11;}
+    {return u.x*v.x/x00;}
 
     MATRIX<T,1,2> Times_Cross_Product_Matrix(const VECTOR<T,2>& v) const
-    {return x11*MATRIX<T,1,2>::Cross_Product_Matrix(v);}
+    {return x00*MATRIX<T,1,2>::Cross_Product_Matrix(v);}
 
     MATRIX<T,0,1> Cross_Product_Matrix_Times(const VECTOR<T,1>& v)
     {return MATRIX<T,0,1>();}
 
     bool Positive_Definite() const
-    {return x11>0;}
+    {return x00>0;}
 
     bool Positive_Semidefinite() const
-    {return x11>=0;}
+    {return x00>=0;}
 
     MATRIX Positive_Definite_Part() const
     {return Clamp_Min(0);}
@@ -269,19 +269,19 @@ public:
     {return *this;}
 
     MATRIX Sqrt() const
-    {return MATRIX(sqrt(x11));}
+    {return MATRIX(sqrt(x00));}
 
     MATRIX Clamp_Min(const T a) const
-    {return MATRIX(clamp_min(x11,a));}
+    {return MATRIX(clamp_min(x00,a));}
 
     MATRIX Clamp_Max(const T a) const
-    {return MATRIX(clamp_max(x11,a));}
+    {return MATRIX(clamp_max(x00,a));}
 
     MATRIX Abs() const
-    {return MATRIX(abs(x11));}
+    {return MATRIX(abs(x00));}
 
     MATRIX Sign() const
-    {return MATRIX(sign(x11));}
+    {return MATRIX(sign(x00));}
 
     static MATRIX Identity_Matrix()
     {return MATRIX((T)1);}
@@ -290,7 +290,7 @@ public:
     {return *this;}
 
     VECTOR<T,1> To_Vector() const
-    {return VECTOR<T,1>(x11);}
+    {return VECTOR<T,1>(x00);}
 
     static MATRIX Conjugate(const MATRIX& A,const MATRIX& B)
     {return A*B*A;}
@@ -299,16 +299,16 @@ public:
     {Fast_Solve_Eigenproblem(D,V);}
 
     void Fast_Solve_Eigenproblem(MATRIX& D,MATRIX& V) const
-    {V.x11=1;D=*this;}
+    {V.x00=1;D=*this;}
     
     void Fast_Singular_Value_Decomposition(MATRIX& U,MATRIX& D,MATRIX& V) const
-    {U.x11=V.x11=1;D=*this;}
+    {U.x00=V.x00=1;D=*this;}
 
     template<class RW> void Read(std::istream& input)
-    {Read_Binary<RW>(input,x11);}
+    {Read_Binary<RW>(input,x00);}
 
     template<class RW> void Write(std::ostream& output) const
-    {Write_Binary<RW>(output,x11);}
+    {Write_Binary<RW>(output,x00);}
 //#####################################################################
 };
 
@@ -322,38 +322,38 @@ inline MATRIX<T,1> operator+(const T a,const MATRIX<T,1>& A)
 
 template<class T>
 inline MATRIX<T,1> operator-(const T a,const MATRIX<T,1>& A)
-{return MATRIX<T,1>(a-A.x11);}
+{return MATRIX<T,1>(a-A.x00);}
 
 template<class T>
 inline MATRIX<T,1> operator+(const SYMMETRIC_MATRIX<T,1>& A,const MATRIX<T,1>& B)
-{return MATRIX<T,1>(A.x11+B.x11);}
+{return MATRIX<T,1>(A.x00+B.x00);}
 
 template<class T>
 inline MATRIX<T,1> operator-(const SYMMETRIC_MATRIX<T,1>& A,const MATRIX<T,1>& B)
-{return MATRIX<T,1>(A.x11-B.x11);}
+{return MATRIX<T,1>(A.x00-B.x00);}
 
 template<class T>
 inline MATRIX<T,1> clamp(const MATRIX<T,1>& x,const MATRIX<T,1>& xmin,const MATRIX<T,1>& xmax)
-{return MATRIX<T,1>(clamp(x.x11,xmin.x11,xmax.x11));}
+{return MATRIX<T,1>(clamp(x.x00,xmin.x00,xmax.x00));}
 
 template<class T>
 inline MATRIX<T,1> clamp_min(const MATRIX<T,1>& x,const MATRIX<T,1>& xmin)
-{return MATRIX<T,1>(clamp_min(x.x11,xmin.x11));}
+{return MATRIX<T,1>(clamp_min(x.x00,xmin.x00));}
 
 template<class T>
 inline MATRIX<T,1> clamp_max(const MATRIX<T,1>& x,const MATRIX<T,1>& xmax)
-{return MATRIX<T,1>(clamp_max(x.x11,xmax.x11));}
+{return MATRIX<T,1>(clamp_max(x.x00,xmax.x00));}
 
 template<class T>
 inline MATRIX<T,1> log(const MATRIX<T,1>& A)
-{return MATRIX<T,1>(log(A.x11));}
+{return MATRIX<T,1>(log(A.x00));}
 
 template<class T>
 inline MATRIX<T,1> exp(const MATRIX<T,1>& A)
-{return MATRIX<T,1>(exp(A.x11));}
+{return MATRIX<T,1>(exp(A.x00));}
 
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,1>& A)
-{FILE_UTILITIES::Ignore(input,'[');input>>A.x11;FILE_UTILITIES::Ignore(input,']');return input;}
+{FILE_UTILITIES::Ignore(input,'[');input>>A.x00;FILE_UTILITIES::Ignore(input,']');return input;}
 }
 #endif

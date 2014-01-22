@@ -10,7 +10,7 @@ using namespace PhysBAM;
 template<class T> T HEXAHEDRON<T>::
 Volume() const
 {
-    return Volume(x1,x2,x3,x4,x5,x6,x7,x8);
+    return Volume(x0,x1,x2,x3,x4,x5,x6,x7);
 }
 //#####################################################################
 // Function Signed_Volume
@@ -18,7 +18,7 @@ Volume() const
 template<class T> T HEXAHEDRON<T>::
 Signed_Volume() const
 {
-    return Signed_Volume(x1,x2,x3,x4,x5,x6,x7,x8);
+    return Signed_Volume(x0,x1,x2,x3,x4,x5,x6,x7);
 }
 //#####################################################################
 namespace PhysBAM{
