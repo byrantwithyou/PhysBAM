@@ -9,7 +9,6 @@
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Math_Tools/INTERVAL.h>
-#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 namespace PhysBAM{
 
 template<class T>
