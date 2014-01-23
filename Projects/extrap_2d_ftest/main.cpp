@@ -86,8 +86,8 @@ int main(int argc,char* argv[])
     printf("Mu                          : %10.5e \n\n",icm->constant_mu);
     printf("Energy                      : %10.5e \n",energy);
     printf("\n");
+    printf("P(0)                        : %10.5e \n",P(0));
     printf("P(1)                        : %10.5e \n",P(1));
-    printf("P(2)                        : %10.5e \n",P(2));
     printf("\n");
     printf("dPdF/1111                   : %10.5e \n",dPdF.x0000);
     printf("dPdF/2222                   : %10.5e \n",dPdF.x1111);
