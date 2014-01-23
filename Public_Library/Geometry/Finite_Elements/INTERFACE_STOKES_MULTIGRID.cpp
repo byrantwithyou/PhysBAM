@@ -19,12 +19,13 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> INTERFACE_STOKES_MULTIGRID<TV>::
-INTERFACE_STOKES_MULTIGRID(int num_levels,INTERFACE_STOKES_SYSTEM_COLOR<TV>* iss,
-    const ARRAY<ARRAY<T,TV_INT> >& phi_per_color_input,const ARRAY<ARRAY<T,TV_INT> >& phi_boundary_input,
-    int number_of_ghost_cells)
-    :levels(num_levels),boundary_smoother_iterations(5),number_of_ghost_cells(number_of_ghost_cells)
+INTERFACE_STOKES_MULTIGRID(int num_levels,const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& phi_value_input,
+    const ARRAY<int,TV_INT>& phi_color_input,bool mac_phi,const ARRAY<ARRAY<T,TV_INT> >& phi_per_color_input,
+    const VECTOR<ARRAY<T,TV_INT>,num_bc>& phi_boundary_input,int number_of_ghost_cells)
+    :INTERFACE_STOKES_SYSTEM_COLOR<TV>(grid_input,phi_value_input,phi_color_input,mac_phi),
+    levels(num_levels),boundary_smoother_iterations(5),number_of_ghost_cells(number_of_ghost_cells)
 {
-    levels(0).iss=iss;
+    levels(0).iss=this;
     levels(0).phi_per_color=phi_per_color_input;
     levels(0).phi_boundary=phi_boundary_input;
 
@@ -77,7 +78,7 @@ Construct_Level(int l)
 // Function Apply_Preconditioner
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
-Apply_Preconditioner(T_VECTOR& z,const T_VECTOR& x,bool initial_guess)
+Apply_Preconditioner(T_VECTOR& z,const T_VECTOR& x,bool initial_guess) const
 {
     if(initial_guess){
         levels(0).iss->Multiply(z,levels(0).tmp1);
@@ -482,6 +483,14 @@ Initialize()
     iss->Get_Sparse_Matrix(L);
     Get_Change_Of_Variables_Matrix(M);
     interior_indices=IDENTITY_ARRAY<>(L.m);
+}
+//#####################################################################
+// Function Apply_Preconditioner
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
+Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
+{
+    Apply_Preconditioner(debug_cast<T_VECTOR&>(z),debug_cast<const T_VECTOR&>(r),false);
 }
 namespace PhysBAM{
 template class INTERFACE_STOKES_MULTIGRID<VECTOR<float,2> >;

@@ -61,6 +61,9 @@ public:
     bool save_pressure;
     bool use_polymer_stress;
 
+    int num_multigrid_levels;
+    bool use_multigrid;
+
     GRID<TV> grid;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid;
     PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>& particle_levelset_evolution_multiple;

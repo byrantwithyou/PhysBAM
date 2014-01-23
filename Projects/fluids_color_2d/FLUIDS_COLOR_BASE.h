@@ -52,13 +52,15 @@ class FLUIDS_COLOR_BASE:public PLS_FC_EXAMPLE<TV>
     typedef PLS_FC_EXAMPLE<TV> BASE;
 
 public:
-    using BASE::grid;using BASE::output_directory;using BASE::face_velocities;
-    using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;using BASE::use_level_set_method;using BASE::use_pls;
-    using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::sparse_dump_matrix;using BASE::number_of_colors;
+    using BASE::grid;using BASE::output_directory;using BASE::face_velocities;using BASE::write_substeps_level;
+    using BASE::restart;using BASE::last_frame;using BASE::use_level_set_method;using BASE::use_pls;
+    using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;
+    using BASE::sparse_dump_matrix;using BASE::number_of_colors;using BASE::num_multigrid_levels;using BASE::use_multigrid;
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
     using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
     using BASE::particle_levelset_evolution_multiple;using BASE::face_color;using BASE::substeps_delay_frame;
-    using BASE::dump_largest_eigenvector;using BASE::save_pressure;using BASE::use_polymer_stress;using BASE::pressure;using BASE::polymer_stress;
+    using BASE::dump_largest_eigenvector;using BASE::save_pressure;using BASE::use_polymer_stress;using BASE::pressure;
+    using BASE::polymer_stress;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -134,7 +136,8 @@ public:
         parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
         parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
         parse_args.Add("-dump_eigen",&dump_largest_eigenvector,"Dump largest few eigenvectors");
-        parse_args.Parse(true);
+        parse_args.Add("-use_mg",&use_multigrid,"Use multigrid preconditioning");
+        parse_args.Add("-mg_levels",&num_multigrid_levels,"levels","Number of multigrid levels");
 
 #ifdef USE_OPENMP
         omp_set_num_threads(number_of_threads);

@@ -20,6 +20,7 @@
 #include <Tools/Vectors/VECTOR_UTILITIES.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
+#include <Geometry/Finite_Elements/INTERFACE_STOKES_MULTIGRID.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h>
 #include <Geometry/Finite_Elements/VOLUME_FORCE_COLOR.h>
@@ -359,7 +360,15 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     bccl.dt=dt;
     bccl.use_discontinuous_velocity=example.use_discontinuous_velocity;
 
-    INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color,true);
+    INTERFACE_STOKES_SYSTEM_COLOR<TV>* issp=0;
+
+    ARRAY<ARRAY<T,TV_INT> >& phis=example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;
+    if(example.use_multigrid)
+        issp=new INTERFACE_STOKES_MULTIGRID<TV>(example.num_multigrid_levels,example.grid,example.levelset_color.phi,
+            example.levelset_color.color,true,phis,example.bc_phis,example.number_of_ghost_cells);
+    else issp=new INTERFACE_STOKES_SYSTEM_COLOR<TV>(example.grid,example.levelset_color.phi,example.levelset_color.color,true);
+    INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss=*issp;
+
     iss.use_preconditioner=example.use_preconditioner;
     iss.use_p_null_mode=example.use_p_null_mode;
     iss.use_polymer_stress=example.use_polymer_stress;
