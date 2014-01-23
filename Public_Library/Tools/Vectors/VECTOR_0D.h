@@ -167,6 +167,18 @@ public:
     VECTOR<T,1> Insert(const T& element,const int index) const
     {VECTOR<T,1> r;r[index]=element;return r;}
 
+    bool All_Greater(const VECTOR& v) const
+    {return true;}
+
+    bool All_Less(const VECTOR& v) const
+    {return true;}
+
+    bool All_Greater_Equal(const VECTOR& v) const
+    {return true;}
+
+    bool All_Less_Equal(const VECTOR& v) const
+    {return true;}
+
     static VECTOR Constant_Vector(const T& constant)
     {return VECTOR();}
 
