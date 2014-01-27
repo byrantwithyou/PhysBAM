@@ -24,7 +24,6 @@
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Deformables/Particles/FREE_PARTICLES.h>
 using namespace PhysBAM;
 namespace PhysBAM{
 bool Register_Structures(){
