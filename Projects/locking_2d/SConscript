@@ -1,5 +1,6 @@
 # SConscript
 
 Import('env Automatic_Program')
+env=env.Copy(USE_GEOMETRY=1)
 Automatic_Program(env,"locking_2d",["main.cpp"])
 

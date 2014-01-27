@@ -1,6 +1,7 @@
 # SConscript
 
 Import('env Automatic_Program')
+env=env.Copy(USE_DYNAMICS=1)
 Automatic_Program(env)
 
 #Automatic_Program(env,'Burning_Paper/render_preprocess')

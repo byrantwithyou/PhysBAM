@@ -22,6 +22,15 @@ variables.AddVariables(
     BoolVariable('wrapper','Build wrapper executable file',1),
     BoolVariable('shared_objects','Build shareable objects when without shared libraries',1),
     BoolVariable('USE_RAY_TRACING','Use ray tracing',0),
+    BoolVariable('USE_COMPRESSIBLE','Use compressible flow',0),
+    BoolVariable('USE_DEFORMABLES','Use deformable objects',0),
+    BoolVariable('USE_DYNAMICS','Use dynamics',0),
+    BoolVariable('USE_FLUIDS','Use fluids',0),
+    BoolVariable('USE_GEOMETRY','Use geometry',0),
+    BoolVariable('USE_INCOMPRESSIBLE','Use incompressible',0),
+    BoolVariable('USE_RIGIDS','Use rigid bodies',0),
+    BoolVariable('USE_SOLIDS','Use solids',0),
+    BoolVariable('USE_TOOLS','Use tools',0),
     BoolVariable('compile_id_types_as_int','Treat ID types as int to avoid possible performance consequences',0),
     BoolVariable('fast_math','compile with -ffast-math',0),
     BoolVariable('install_programs','install programs into source directories',1),
@@ -219,9 +228,32 @@ def Link_Flags(env):
     if env['shared']:
         env.Append(RPATH=[Dir(public_library).abspath])
     if not env['shared'] or not env['single_so']:
-        if env['USE_OPENGL']: env.Append(LIBS=['PhysBAM_OpenGL'+library_suffix])
-        if env['USE_RAY_TRACING']: env.Append(LIBS=['PhysBAM_Ray_Tracing'+library_suffix])
-    env.Append(LIBS=common_libraries)
+        if env['USE_OPENGL']:
+            env.Append(LIBS=['PhysBAM_OpenGL'+library_suffix])
+            env['USE_DEFORMABLES']=1
+        if env['USE_RAY_TRACING']:
+            env.Append(LIBS=['PhysBAM_Ray_Tracing'+library_suffix])
+            env['USE_DYNAMICS']=1
+        if env['USE_COMPRESSIBLE'] or env['USE_INCOMPRESSIBLE'] or env['USE_DYNAMICS']:
+            env.Append(LIBS=['PhysBAM_Dynamics'+library_suffix])
+            env.Append(LIBS=['PhysBAM_Fluids'+library_suffix])
+            env.Append(LIBS=['PhysBAM_Incompressible'+library_suffix])
+            env.Append(LIBS=['PhysBAM_Compressible'+library_suffix])
+            env['USE_SOLIDS']=1
+        if env['USE_SOLIDS']:
+            env.Append(LIBS=['PhysBAM_Solids'+library_suffix])
+            env['USE_DEFORMABLES']=1
+        if env['USE_DEFORMABLES']:
+            env.Append(LIBS=['PhysBAM_Deformables'+library_suffix])
+            env['USE_RIGIDS']=1
+        if env['USE_RIGIDS']:
+            env.Append(LIBS=['PhysBAM_Rigids'+library_suffix])
+            env['USE_GEOMETRY']=1
+        if env['USE_GEOMETRY']:
+            env.Append(LIBS=['PhysBAM_Geometry'+library_suffix])
+            env['USE_TOOLS']=1
+        if env['USE_TOOLS']: env.Append(LIBS=['PhysBAM_Tools'+library_suffix])
+#    env.Append(LIBS=common_libraries)
     for name,lib in external_libraries.items():
         if env['USE_'+name.upper()]:
             env.Append(LINKFLAGS=lib['linkflags'],LIBS=lib['libs'])

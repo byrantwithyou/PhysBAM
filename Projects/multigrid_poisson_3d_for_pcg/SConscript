@@ -1,6 +1,7 @@
 # SConscript
 
 Import('env Automatic_Program')
+env=env.Copy(USE_DYNAMICS=1)
 env.Append(CXXFLAGS=['-pthread','-IProjects/multigrid_poisson_3d_optimized_kernels/Thread_Queueing'])
 env.Append(LINKFLAGS=['-pthread'])
 Automatic_Program(env,"multigrid_poisson_3d_optimized",["MULTIGRID_POISSON.cpp","main.cpp","MULTIGRID_POISSON_REFINEMENT.cpp",

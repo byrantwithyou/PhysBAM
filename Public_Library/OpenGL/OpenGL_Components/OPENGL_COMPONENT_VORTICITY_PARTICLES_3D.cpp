@@ -4,10 +4,10 @@
 //#####################################################################
 // Class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D
 //#####################################################################
-#include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_VORTICITY_PARTICLES_3D.h>
 using namespace PhysBAM;
 
+const ATTRIBUTE_ID ATTRIBUTE_ID_VORTICITY(16);
 template<class T,class RW> OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T,RW>::
 OPENGL_COMPONENT_VORTICITY_PARTICLES_3D(const std::string &filename,bool use_ids_input)
     :OPENGL_COMPONENT_PARTICLES_3D<T,RW>(filename,"",use_ids_input,false)

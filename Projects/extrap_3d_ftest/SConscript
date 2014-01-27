@@ -1,4 +1,5 @@
 # SConscript
 
 Import('env Automatic_Program')
+env=env.Copy(USE_DEFORMABLES=1)
 Automatic_Program(env,"extrap_3d_ftest",["main.cpp"])

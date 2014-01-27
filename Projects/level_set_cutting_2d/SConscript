@@ -1,6 +1,7 @@
 # SConscript
 
 Import('env Automatic_Program')
+env=env.Copy(USE_GEOMETRY=1)
 
 Automatic_Program(env,"testing",["main.cpp", "MARCHING_TETRAHEDRA_CUTTING.cpp"])
 Automatic_Program(env,"testing3",["main3.cpp", "MARCHING_TETRAHEDRA_CUTTING.cpp"])
