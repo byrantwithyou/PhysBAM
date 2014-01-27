@@ -1,4 +1,5 @@
 local_env=Environment();
+local_env=local_env.Copy(USE_TOOLS=1)
 
 local_env.Append(CXXFLAGS=['-I/usr/local/include', '-g'])
 local_env.Append(LINKFLAGS=['-L/usr/local/lib'])

@@ -1,4 +1,5 @@
 # SConscript
 
 Import('env Automatic_Program')
+env=env.Copy(USE_TOOLS=1)
 Automatic_Program(env)
