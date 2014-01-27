@@ -7,8 +7,8 @@
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <Incompressible/INCOMPRESSIBLE_DRIVER.h>
-#include <Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
+#include <Incompressible/Drivers/INCOMPRESSIBLE_DRIVER.h>
+#include <Incompressible/Drivers/INCOMPRESSIBLE_EXAMPLE.h>
 
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 using namespace PhysBAM;

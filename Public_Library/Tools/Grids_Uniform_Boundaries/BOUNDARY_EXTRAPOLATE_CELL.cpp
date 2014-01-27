@@ -4,7 +4,7 @@
 //#####################################################################
 // Class BOUNDARY_EXTRAPOLATE_CELL
 //#####################################################################
-#include <Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
+#include <Tools/Extrapolation/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform_Boundaries/BOUNDARY_EXTRAPOLATE_CELL.h>

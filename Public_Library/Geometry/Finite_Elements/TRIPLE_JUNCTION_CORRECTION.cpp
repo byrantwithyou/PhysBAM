@@ -3,7 +3,7 @@
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Tools/Data_Structures/PAIR.h>
 #include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
+#include <Tools/Extrapolation/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND_VIEW.h>

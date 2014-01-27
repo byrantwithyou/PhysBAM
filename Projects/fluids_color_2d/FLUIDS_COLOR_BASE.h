@@ -33,8 +33,8 @@
 #include <Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
-#include "ANALYTIC_VELOCITY.h"
 #include "ANALYTIC_POLYMER_STRESS.h"
+#include "ANALYTIC_VELOCITY.h"
 
 #ifdef USE_OPENMP
 #include <omp.h>

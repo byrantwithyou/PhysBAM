@@ -4,9 +4,9 @@
 //#####################################################################
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Incompressible/Drivers/INCOMPRESSIBLE_EXAMPLE.h>
 #include <Incompressible/Forces/FLUID_GRAVITY.h>
 #include <Incompressible/Forces/INCOMPRESSIBILITY.h>
-#include <Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
 using namespace PhysBAM;
 //#####################################################################
 // INCOMPRESSIBLE_EXAMPLE

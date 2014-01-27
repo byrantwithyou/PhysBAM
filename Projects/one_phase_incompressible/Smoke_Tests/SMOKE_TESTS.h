@@ -12,8 +12,8 @@
 #include <Tools/Vectors/Dot_Product.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Incompressible/Drivers/INCOMPRESSIBLE_EXAMPLE.h>
 #include <Incompressible/Forces/VORTICITY_CONFINEMENT.h>
-#include <Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
 
 namespace PhysBAM{
 
