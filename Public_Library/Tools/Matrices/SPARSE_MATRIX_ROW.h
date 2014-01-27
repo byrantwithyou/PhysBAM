@@ -26,7 +26,7 @@ public:
 
     T Dot(const SPARSE_MATRIX_ROW& r) const
     {
-        assert(n==a.n);
+        assert(n==r.n);
         T x=0;
         int i=0,j=0;
         while(i<A.m && j<r.A.m){
