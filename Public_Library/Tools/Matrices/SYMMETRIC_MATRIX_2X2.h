@@ -232,12 +232,11 @@ public:
     VECTOR<T,2> Last_Eigenvector_From_Ordered_Eigenvalues(const DIAGONAL_MATRIX<T,2>& eigenvalues) const
     {return (*this-eigenvalues.x.y).Cofactor_Matrix().Largest_Column_Normalized();}
 
-    DIAGONAL_MATRIX<T,2> Fast_Eigenvalues() const
+    DIAGONAL_MATRIX<T,2> Fast_Eigenvalues() const // lambda_x > lambda_y
     {T da;
     if(x10==0) da=0;
     else{T theta=(T).5*(x11-x00)/x10,t=1/(abs(theta)+sqrt(1+sqr(theta)));if(theta<0) t=-t;da=t*x10;}
-    DIAGONAL_MATRIX<T,2> eigenvalues(x00-da,x11+da);
-    eigenvalues.x.Sort();return eigenvalues;}
+    return DIAGONAL_MATRIX<T,2>(VECTOR<T,2>(x00-da,x11+da).Sorted().Reversed());}
 
     SYMMETRIC_MATRIX Positive_Definite_Part() const
     {DIAGONAL_MATRIX<T,2> D;MATRIX<T,2> V;Solve_Eigenproblem(D,V);D=D.Clamp_Min(0);return Conjugate(V,D);}

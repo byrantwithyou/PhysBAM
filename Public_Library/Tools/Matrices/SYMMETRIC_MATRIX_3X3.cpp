@@ -34,9 +34,8 @@ Fast_Eigenvalues() const // 24 mults, 20 adds, 1 atan2, 1 sincos, 2 sqrts
     T sqrt_p=sqrt(p),disc=p*p*p-q*q;
     T phi=(T)one_third*atan2(sqrt(max((T)0,disc)),q),c=cos(phi),s=sin(phi);
     T sqrt_p_cos=sqrt_p*c,root_three_sqrt_p_sin=(T)root_three*sqrt_p*s;
-    DIAGONAL_MATRIX<T,3> lambda(m+2*sqrt_p_cos,m-sqrt_p_cos-root_three_sqrt_p_sin,m-sqrt_p_cos+root_three_sqrt_p_sin);
-    lambda.x.Sort();
-    return lambda;
+    VECTOR<T,3> lambda(m+2*sqrt_p_cos,m-sqrt_p_cos-root_three_sqrt_p_sin,m-sqrt_p_cos+root_three_sqrt_p_sin);
+    return DIAGONAL_MATRIX<T,3>(lambda.Sorted().Reversed());
 }
 //#####################################################################
 // Function Fast_Eigenvectors

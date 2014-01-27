@@ -319,7 +319,7 @@ public:
     static SYMMETRIC_MATRIX Conjugate_With_Transpose(const MATRIX<T,3>& A,const DIAGONAL_MATRIX<T,3>& B);
     static SYMMETRIC_MATRIX Conjugate_With_Transpose(const MATRIX<T,3>& A,const SYMMETRIC_MATRIX& B);
     static SYMMETRIC_MATRIX Conjugate_With_Transpose(const UPPER_TRIANGULAR_MATRIX<T,3>& A,const SYMMETRIC_MATRIX& B);
-    DIAGONAL_MATRIX<T,3> Fast_Eigenvalues() const;
+    DIAGONAL_MATRIX<T,3> Fast_Eigenvalues() const; // lambda_x > lambda_y > lambda_z
     void Fast_Solve_Eigenproblem(DIAGONAL_MATRIX<T,3>& eigenvalues,MATRIX<T,3>& eigenvectors) const;
     void Solve_Eigenproblem(DIAGONAL_MATRIX<T,3>& eigenvalues,MATRIX<T,3>& eigenvectors) const;
 private:
