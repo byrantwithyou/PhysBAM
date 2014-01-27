@@ -1,5 +1,6 @@
 # SConscript
 
 Import('env Automatic_Program Find_Sources')
+env=env.Copy(USE_GEOMETRY=1)
 Automatic_Program(env,"core_tests",Find_Sources(["."])[0])
 
