@@ -4,7 +4,7 @@
 //#####################################################################
 // Class RED_GREEN_TRIANGLES
 //##################################################################### 
-#include <Dynamics/Meshing/RED_GREEN_TRIANGLES.h>
+#include <Solids/Meshing/RED_GREEN_TRIANGLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Initialize

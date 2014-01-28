@@ -11,7 +11,7 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <Dynamics/Meshing/TETRAHEDRAL_MESHING.h>
+#include <Solids/Meshing/TETRAHEDRAL_MESHING.h>
 #include "MESHING_EXAMPLE.h"
 using namespace PhysBAM;
 

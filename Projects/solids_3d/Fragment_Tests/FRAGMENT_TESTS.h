@@ -18,13 +18,13 @@
 namespace PhysBAM{
 
 template<class T_input>
-class FRAGMENT_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class FRAGMENT_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
 
@@ -35,7 +35,7 @@ public:
 
 
     FRAGMENT_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),unite_fragments(false),unite_some_fragments(false),use_single_mesh(false)
+        :BASE(stream_type),unite_fragments(false),unite_some_fragments(false),use_single_mesh(false)
     {
     }
 

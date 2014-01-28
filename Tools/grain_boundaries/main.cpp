@@ -11,7 +11,7 @@
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Dynamics/Meshing/RED_GREEN_TETRAHEDRA.h>
+#include <Solids/Meshing/RED_GREEN_TETRAHEDRA.h>
 
 using namespace PhysBAM;
 

@@ -21,20 +21,20 @@
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include "../../rigid_bodies/RANDOM_PLACEMENT.h"
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,1> >
+class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,1> >
 {
     typedef T_input T;typedef VECTOR<T,1> TV;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::parse_args;using BASE::test_number;using BASE::Set_External_Positions;using BASE::data_directory; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -43,9 +43,8 @@ public:
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection)
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection)
     {
-        fluids_parameters.simulate=false;
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=1;

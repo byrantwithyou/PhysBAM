@@ -19,17 +19,17 @@
 #include <Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_STATE.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include "../ARB_PARAMETERS.h"
 namespace PhysBAM{
 
 template<class T_input>
-class CURL_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class CURL_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::stream_type;using BASE::fluids_parameters;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::stream_type;
     using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solid_body_collection;
     using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::parse_args;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Position_Nodes; // silence -Woverloaded-virtual
@@ -50,11 +50,10 @@ public:
     std::string parameter_file;
 
     CURL_EXAMPLE(const STREAM_TYPE stream_type,std::string parameter_file_input="")
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),parameter_file(parameter_file_input)
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),parameter_file(parameter_file_input)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
-        fluids_parameters.simulate=false;
 
         last_frame=2000;
         frame_rate=60;

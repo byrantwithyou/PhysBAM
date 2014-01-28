@@ -71,20 +71,20 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
     typedef typename TV::SPIN T_SPIN;
 
-    using BASE::fluids_parameters;using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::last_frame;
+    using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::last_frame;
     using BASE::stream_type;using BASE::frame_rate;using BASE::solid_body_collection;using BASE::test_number;using BASE::parse_args;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -106,10 +106,9 @@ public:
     NONLINEAR_PENDULUM nonlinear_pendulum;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),peak_force(10),parameter(3),use_prestab_iterations(false)
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),peak_force(10),parameter(3),use_prestab_iterations(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-        fluids_parameters.simulate=false;
 
         solids_parameters.cfl=(T).9;
         solids_parameters.triangle_collision_parameters.output_interaction_pairs=true;

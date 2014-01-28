@@ -16,6 +16,10 @@
 #include <Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
+<<<<<<< HEAD
+=======
+#include <Geometry/Finite_Elements/INTERFACE_STOKES_MULTIGRID.h>
+>>>>>>> aeb0b3f... Eliminate fluids dependencies in solids projects
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
 #include <Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_HELPER_COLOR.h>
 #include <Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h>

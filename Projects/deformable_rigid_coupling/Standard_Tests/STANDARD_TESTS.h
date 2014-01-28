@@ -76,17 +76,17 @@
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T_input,3> TV;typedef VECTOR<int,3> TV_INT;
@@ -134,12 +134,12 @@ public:
     bool use_forces_for_drift;
     bool project_nullspace;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
     using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;using BASE::parse_args;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),parameter(1),
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),parameter(1),
         rigid_body_collection(solid_body_collection.rigid_body_collection),number_of_joints(2),subsamples(8),refinement_distance((T).2),dynamic_subsampling(false),
         temporarily_disable_dynamic_subsampling(false),old_number_particles(0),ring_mass(10000),num_objects_multiplier((T)1),fish_mattress(false),fully_implicit(false),
         use_forces_for_drift(false),project_nullspace(false)
@@ -296,7 +296,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     random_numbers.Set_Seed(1234);
-    fluids_parameters.simulate=false;
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.cfl=1;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;

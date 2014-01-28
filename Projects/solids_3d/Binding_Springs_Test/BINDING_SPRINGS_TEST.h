@@ -16,19 +16,19 @@
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Fracture/EMBEDDED_MATERIAL_SURFACE.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>
-class BINDING_SPRINGS_TEST:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class BINDING_SPRINGS_TEST:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T,3> TV;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::parse_args;using BASE::test_number;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::parse_args;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solid_body_collection; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -39,7 +39,7 @@ public:
     T overdamping_fraction;
 
     BINDING_SPRINGS_TEST(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),stiffness(1100),overdamping_fraction(0)
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),stiffness(1100),overdamping_fraction(0)
     {
     }
 

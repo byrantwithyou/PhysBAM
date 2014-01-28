@@ -68,6 +68,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_CLUSTER_CONSTITUENT_ID.h>
 #include <Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
@@ -78,7 +79,7 @@
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T_input,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -95,12 +96,12 @@ public:
     RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager;
     bool print_matrix;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> > BASE;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
+    typedef SOLIDS_EXAMPLE<VECTOR<T_input,3> > BASE;
+    using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
     using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;using BASE::parse_args;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),small_block_mass(1),
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),small_block_mass(1),
         parameter(0),collision_manager(0),print_matrix(false)
     {
     }

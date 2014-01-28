@@ -16,20 +16,20 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <Deformables/Fracture/EMBEDDING.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
+#include <Solids/Meshing/RED_GREEN_TRIANGLES.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Meshing/RED_GREEN_TRIANGLES.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>
-class EMBEDDED_COLLISIONS_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class EMBEDDED_COLLISIONS_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T,3> TV;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::solid_body_collection;using BASE::Set_External_Positions;using BASE::parse_args; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -40,7 +40,7 @@ public:
     T sphere_scale;
 
     EMBEDDED_COLLISIONS_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),redgreen(0),maximum_number_of_boundary_refinements(4),refinement_ratio(.5),
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),redgreen(0),maximum_number_of_boundary_refinements(4),refinement_ratio(.5),
         sphere_scale(.5)
     {
     }

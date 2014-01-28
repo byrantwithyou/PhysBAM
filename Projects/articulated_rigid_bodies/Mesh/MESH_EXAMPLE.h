@@ -11,19 +11,19 @@
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <Rigids/Joints/POINT_JOINT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include "../ARB_PARAMETERS.h"
 namespace PhysBAM{
 
 template<class T_input>
-class MESH_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class MESH_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
 public:
     typedef T_input T;
-    typedef VECTOR<T,3> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef VECTOR<T,3> TV;typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;
-    using BASE::write_last_frame;using BASE::data_directory;using BASE::fluids_parameters;using BASE::stream_type;using BASE::solid_body_collection;
+    using BASE::write_last_frame;using BASE::data_directory;using BASE::stream_type;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
 
     ARTICULATED_RIGID_BODY<TV>* arb;
@@ -34,11 +34,10 @@ public:
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     MESH_EXAMPLE(const STREAM_TYPE stream_type):
-        BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection)
+        BASE(stream_type),tests(stream_type,data_directory,solid_body_collection)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
-        fluids_parameters.simulate=false;
 
         last_frame=1000;
         frame_rate=24;

@@ -11,13 +11,13 @@
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 namespace ARB_PARAMETERS{
 
 template<class T>
-inline void Read_Common_Parameters(const std::string& filename,SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T,2> >& example,PARAMETER_LIST& parameter_list)
+inline void Read_Common_Parameters(const std::string& filename,SOLIDS_EXAMPLE<VECTOR<T,2> >& example,PARAMETER_LIST& parameter_list)
 {
     typedef VECTOR<T,2> TV;
     SOLIDS_PARAMETERS<TV>& solids_parameters=example.solids_parameters;

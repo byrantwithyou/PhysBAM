@@ -7,8 +7,13 @@
 #ifndef __INTERFACE_STOKES_MULTIGRID__
 #define __INTERFACE_STOKES_MULTIGRID__
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+<<<<<<< HEAD
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
 
+=======
+#include <Geometry/Finite_Elements/BOUNDARY_CONDITIONS_COLOR.h>
+#include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
+>>>>>>> aeb0b3f... Eliminate fluids dependencies in solids projects
 namespace PhysBAM{
 
 template<class TV>

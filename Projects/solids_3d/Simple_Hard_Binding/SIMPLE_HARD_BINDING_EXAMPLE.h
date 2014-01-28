@@ -21,20 +21,20 @@
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/TRIANGLE_BENDING_ELEMENTS.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
+#include <Solids/Meshing/RED_GREEN_TRIANGLES.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Meshing/RED_GREEN_TRIANGLES.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>
-class SIMPLE_HARD_BINDING_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class SIMPLE_HARD_BINDING_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T,3> TV;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
 
@@ -51,7 +51,7 @@ public:
     ARRAY<T> refinement_distance;
 
     SIMPLE_HARD_BINDING_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),surface(0),redgreen(0),subsamples(6),sphere_scale((T).05),dynamic_subsampling(false),
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),surface(0),redgreen(0),subsamples(6),sphere_scale((T).05),dynamic_subsampling(false),
         refinement_level(3),refinement_distance(2)
     {
     }
@@ -110,7 +110,6 @@ void Initialize_Redgreen()
     solids_parameters.write_static_variables_every_frame=true;
     refinement_distance(1)=refinement_distance(2)=(T).04;
     random_numbers.Set_Seed(1234);
-    fluids_parameters.simulate=false;
 
     redgreen=new RED_GREEN_TRIANGLES<TV>(*surface);
     redgreen->object.Update_Number_Nodes();

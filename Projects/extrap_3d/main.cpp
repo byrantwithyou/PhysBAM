@@ -6,9 +6,9 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include <climits>
 #include "Standard_Tests/STANDARD_TESTS.h"
 
@@ -21,7 +21,7 @@ int main(int argc,char* argv[])
     typedef VECTOR<T,3> TV;
     RW rw=RW();STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
     
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example;
+    SOLIDS_EXAMPLE<TV>* example;
     
 
     example=new STANDARD_TESTS<T>(stream_type);
@@ -33,7 +33,7 @@ int main(int argc,char* argv[])
     if(example->mpi_world->initialized) example->solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
     example->Adjust_Output_Directory_For_MPI(example->solid_body_collection.deformable_body_collection.mpi_solids);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*example);
+    SOLIDS_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();
 
     delete example;

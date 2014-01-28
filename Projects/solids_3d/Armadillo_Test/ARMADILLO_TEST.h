@@ -23,13 +23,13 @@
 namespace PhysBAM{
 
 template<class T_input>
-class ARMADILLO_TEST:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class ARMADILLO_TEST:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T,3> TV;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
 
@@ -42,7 +42,7 @@ public:
     bool use_binding_springs;
 
     ARMADILLO_TEST(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),use_bindings(false),use_soft_bindings(false),
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),use_bindings(false),use_soft_bindings(false),
         use_impulses(false),use_edge_springs(false),use_binding_springs(false)
     {
     }

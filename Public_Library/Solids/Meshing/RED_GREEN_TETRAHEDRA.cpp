@@ -4,7 +4,7 @@
 //#####################################################################
 // Class RED_GREEN_TETRAHEDRA
 //##################################################################### 
-#include <Dynamics/Meshing/RED_GREEN_TETRAHEDRA.h>
+#include <Solids/Meshing/RED_GREEN_TETRAHEDRA.h>
 using namespace PhysBAM; 
 template<class T> RED_GREEN_TETRAHEDRA<T>::
 RED_GREEN_TETRAHEDRA(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume_input)

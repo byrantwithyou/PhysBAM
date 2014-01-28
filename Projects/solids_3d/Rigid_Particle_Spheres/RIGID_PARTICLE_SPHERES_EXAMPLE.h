@@ -14,27 +14,27 @@
 #include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Forces/IMPLICIT_ZERO_LENGTH_SPRINGS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>
-class RIGID_PARTICLE_SPHERES_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class RIGID_PARTICLE_SPHERES_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
 public:
     typedef T_input T;typedef VECTOR<T,3> TV;
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::data_directory;
     using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;
-    using BASE::fluids_parameters;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
+    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     SEGMENT_MESH segment_mesh;
 
     RIGID_PARTICLE_SPHERES_EXAMPLE(const STREAM_TYPE stream_type):
-        BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection)
+        BASE(stream_type),tests(stream_type,data_directory,solid_body_collection)
     {
     }
 

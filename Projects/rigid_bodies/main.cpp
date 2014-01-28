@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 #include "MPI_Example/MPI_EXAMPLE.h"
 #include "Standard_Tests/STANDARD_TESTS.h"
 using namespace PhysBAM;
@@ -27,8 +27,8 @@ int main(int argc,char* argv[])
     example->want_mpi_world=true;
     example->Parse(parse_args);
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* solid_fluid_example=dynamic_cast<SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>*>(example);
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*solid_fluid_example);
+    SOLIDS_EXAMPLE<TV>* solid_fluid_example=dynamic_cast<SOLIDS_EXAMPLE<TV>*>(example);
+    SOLIDS_DRIVER<TV> driver(*solid_fluid_example);
     driver.Execute_Main_Program();
     delete example;
 

@@ -17,17 +17,17 @@
 #include <Rigids/Joints/RIGID_JOINT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>
-class CHAINS_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class CHAINS_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::fluids_parameters;using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::stream_type;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::stream_type;
     using BASE::restart;using BASE::initial_time;using BASE::first_frame;using BASE::last_frame;using BASE::restart_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::test_number;using BASE::parse_args;using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
     
@@ -38,7 +38,7 @@ public:
     bool use_rigid_deformable_evolution_old;
 
     CHAINS_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),arb(0),tests(stream_type,data_directory,solid_body_collection),square1(0),square2(0),num_poles(5),num_rings(20),selection(0),
+        :BASE(stream_type),arb(0),tests(stream_type,data_directory,solid_body_collection),square1(0),square2(0),num_poles(5),num_rings(20),selection(0),
         use_rigid_deformable_evolution_old(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
@@ -128,7 +128,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     solid_body_collection.Update_Simulated_Particles();
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Initialize_Bodies();
+    SOLIDS_EXAMPLE<TV>::Initialize_Bodies();
 }
 //#####################################################################
 // Function Make_Block_Chain

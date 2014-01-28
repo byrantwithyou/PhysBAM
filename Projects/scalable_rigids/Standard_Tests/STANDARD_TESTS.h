@@ -19,18 +19,18 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include "../../rigid_bodies/RANDOM_PLACEMENT.h"
 
 
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T_input,3> TV;typedef VECTOR<int,3> TV_INT;
@@ -39,13 +39,13 @@ public:
 
     int parameter;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
     using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;
-    using BASE::fluids_parameters;
+    
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),parameter(0)
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),parameter(0)
     {
     }
 

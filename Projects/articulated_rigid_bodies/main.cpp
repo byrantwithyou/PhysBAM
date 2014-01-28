@@ -6,7 +6,7 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 //#include "ARB/ARB_EXAMPLE_3D.h"
 //#include "ARB_Skeleton/ARB_SKELETON_EXAMPLE.h"
 #include "Bridge/BRIDGE_EXAMPLE.h"
@@ -56,8 +56,8 @@ int main(int argc,char** argv)
     else example=new STANDARD_TESTS<T>(stream_type);
     example->Parse(parse_args);
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* solid_fluid_example=dynamic_cast<SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>*>(example);
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*solid_fluid_example);
+    SOLIDS_EXAMPLE<TV>* solid_fluid_example=dynamic_cast<SOLIDS_EXAMPLE<TV>*>(example);
+    SOLIDS_DRIVER<TV> driver(*solid_fluid_example);
     driver.Execute_Main_Program();
     delete example;
 

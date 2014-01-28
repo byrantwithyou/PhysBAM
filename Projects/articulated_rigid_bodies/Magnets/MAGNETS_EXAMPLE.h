@@ -9,16 +9,16 @@
 #define __MAGNETS_EXAMPLE__
 
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 namespace PhysBAM{
 
 template<class T_input>
-class MAGNETS_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class MAGNETS_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
 public:
-    using BASE::fluids_parameters;using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;
     using BASE::stream_type;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
 

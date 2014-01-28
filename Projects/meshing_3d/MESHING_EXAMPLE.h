@@ -10,8 +10,8 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Solids/Meshing/TETRAHEDRAL_MESHING.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <Dynamics/Meshing/TETRAHEDRAL_MESHING.h>
 #include "MULTIPLE_LEVELSET_IMPLICIT_SURFACE.h"
 namespace PhysBAM{
 

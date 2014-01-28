@@ -25,13 +25,13 @@
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
+#include <Solids/Meshing/RED_GREEN_TETRAHEDRA.h>
+#include <Solids/Meshing/TETRAHEDRAL_MESHING.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Meshing/RED_GREEN_TETRAHEDRA.h>
-#include <Dynamics/Meshing/TETRAHEDRAL_MESHING.h>
 
 using namespace PhysBAM;
 template<class T> TETRAHEDRAL_MESHING<T>::

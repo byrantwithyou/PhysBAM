@@ -8,6 +8,7 @@
 #ifndef __BINDING_PLASTICITY_EXAMPLE__
 #define __BINDING_PLASTICITY_EXAMPLE__
 
+#include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
@@ -23,23 +24,23 @@
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/TRIANGLE_BENDING_ELEMENTS.h>
 #include <Deformables/Fracture/EMBEDDING.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
+#include <Solids/Meshing/RED_GREEN_TRIANGLES.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <Dynamics/Heat_Flows/HEAT_UNIFORM.h>
-#include <Dynamics/Meshing/RED_GREEN_TRIANGLES.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>
-class BINDING_PLASTICITY_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class BINDING_PLASTICITY_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;
-    using BASE::fluids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;
+    using BASE::write_last_frame;using BASE::data_directory;using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -58,7 +59,7 @@ public:
     INTERPOLATION_CURVE<T,T> angle_curve;
 
     BINDING_PLASTICITY_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),redgreen(0),refinement_level(3),spring_force(0),plastic_yield_threshold((T).07),
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),redgreen(0),refinement_level(3),spring_force(0),plastic_yield_threshold((T).07),
         letters_initial_height(10),letters_scale(3),base_scale((T)2.5),base_thickness((T).5*base_scale),stamp_depth((T).2),final_time(2),letters_frames_save(8),base_id(0),ground_id(0),
         handle_id(0),version(2)
     {
@@ -351,7 +352,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     solid_body_collection.Update_Simulated_Particles();
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Initialize_Bodies();
+    SOLIDS_EXAMPLE<TV>::Initialize_Bodies();
 
     // set the surface of the embedding geometry to collide with the base and ground only
     deformable_body_collection.collisions.Use_Structure_Collide_Collision_Body();

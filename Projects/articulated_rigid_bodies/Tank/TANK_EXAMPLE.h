@@ -23,13 +23,13 @@
 namespace PhysBAM{
 
 template<class T_input>
-class TANK_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class TANK_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
-    typedef VECTOR<T,3> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef VECTOR<T,3> TV;typedef SOLIDS_EXAMPLE<TV> BASE;
 public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::solids_parameters;using BASE::data_directory;using BASE::stream_type;
-    using BASE::test_number;using BASE::parse_args;using BASE::fluids_parameters;using BASE::solid_body_collection;using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
+    using BASE::test_number;using BASE::parse_args;using BASE::solid_body_collection;using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
 
     ARTICULATED_RIGID_BODY<TV>* arb;
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -44,12 +44,11 @@ public:
     FRAME<TV> parent_to_joint[10];
 
     TANK_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),turn_in_place(false),start_on_fridge(false)
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),turn_in_place(false),start_on_fridge(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-        fluids_parameters.simulate=false;
         last_frame=2000;
         frame_rate=24;
         LOG::cout<<"Frame rate: "<<frame_rate<<std::endl;
@@ -129,7 +128,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     tests.Add_Gravity();
     solid_body_collection.Update_Simulated_Particles();
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Initialize_Bodies();
+    SOLIDS_EXAMPLE<TV>::Initialize_Bodies();
 }
 //#####################################################################
 // Function Make_Gun

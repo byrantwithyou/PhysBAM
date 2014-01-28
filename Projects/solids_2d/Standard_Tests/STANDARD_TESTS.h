@@ -63,23 +63,23 @@
 #include <Deformables/Forces/SEGMENT_BENDING_ELEMENTS.h>
 #include <Deformables/Forces/SEGMENT_BENDING_SPRINGS.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Solids_Evolution/QUASISTATIC_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
+class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,2> >
 {
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solids_evolution; // silence -Woverloaded-virtual
     using BASE::parse_args;using BASE::test_number;using BASE::data_directory;
 
@@ -111,7 +111,7 @@ public:
     bool project_nullspace,print_residuals;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean_refined(false),use_corotated(false),dump_sv(false),
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean_refined(false),use_corotated(false),dump_sv(false),
         print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1),project_nullspace(false),print_residuals(false)
     {
     }
@@ -599,7 +599,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
     if(fully_implicit) for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Initialize_Bodies();
+    SOLIDS_EXAMPLE<TV>::Initialize_Bodies();
 }
 //#####################################################################
 // Function Set_Kinematic_Positions

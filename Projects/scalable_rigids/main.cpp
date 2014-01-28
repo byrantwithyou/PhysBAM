@@ -2,7 +2,7 @@
 // Copyright 2010, Elliot English, Jon Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 #include "Standard_Tests/STANDARD_TESTS.h"
 
 #include <Tools/Arrays/ARRAY.h>
@@ -316,9 +316,9 @@ int main(int argc,char* argv[])
     PARSE_ARGS parse_args(argc,argv);
     example->Parse(parse_args);
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* solid_fluid_example=dynamic_cast<SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>*>(example);
+    SOLIDS_EXAMPLE<TV>* solid_fluid_example=dynamic_cast<SOLIDS_EXAMPLE<TV>*>(example);
     LOG::Instance()->Copy_Log_To_File(example->output_directory+"/common/log.txt",solid_fluid_example->restart);
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*solid_fluid_example);
+    SOLIDS_DRIVER<TV> driver(*solid_fluid_example);
     driver.Execute_Main_Program();
     delete example;
 #endif

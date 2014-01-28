@@ -29,7 +29,6 @@
 //  23. Two Rigid Boats
 //  24. Incompressible sphere free falling to the ground.
 //  25. Simple cloth ramp with single point and segment
-//  26. Embedded Collisions
 //  27. cylinder and sphere cloth for pinching (tests protectors)
 //  28. point moving down level set incline plane.
 //  29. Two Cloth Curtains on a plane
@@ -97,6 +96,7 @@
 #include <Deformables/Fracture/EMBEDDED_MATERIAL_SURFACE.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Forces_And_Torques/WIND_DRAG_3D.h>
@@ -105,21 +105,19 @@
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Solids_Evolution/QUASISTATIC_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Meshing/RED_GREEN_TRIANGLES.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <boost/math/special_functions/asinh.hpp>
 namespace PhysBAM{
 
 using boost::math::asinh;
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -206,7 +204,7 @@ public:
     bool opt_residuals;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),parameter(0),use_forces_for_drift(false),
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),parameter(0),use_forces_for_drift(false),
         number_side_panels(40),aspect_ratio((T)1.7),side_length((T)1.0),cloth_triangles(INT_MAX),constrained_particle(0),
         suspended_particle(0),drifting_particle(0),test_24_poissons_ratio((T).5),no_altitude_springs(false),stiffness_multiplier(1),
         damping_multiplier(1),bending_stiffness_multiplier(1),bending_damping_multiplier(1),planar_damping_multiplier(1),
@@ -520,10 +518,6 @@ void Parse_Options()
             //solids_parameters.collisions_repulsion_clamp_fraction=(T).9;
             //solids_parameters.collision_repulsion_spring_multiplier=(T)100;
             //solids_parameters.collisions_repulsion_thickness=(T).1;
-            break;
-        case 26:
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            number_of_boundary_refinements=3;
             break;
         case 27:
             last_frame=(int)(6*frame_rate);
@@ -932,25 +926,6 @@ void Get_Initial_Data()
             // set ramps to inifinite mass
             particles.mass.Subset(cloth_ramp_particles).Fill((T)FLT_MAX);
             tests.Add_Ground();
-            break;}
-        case 26:{
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
-                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2,0))),true,true,1000);
-            // initialize and refine boundary
-            EMBEDDING<TV>& embedding=*new EMBEDDING<TV>(particles);
-            tetrahedralized_volume.Initialize_Triangulated_Surface();
-            embedding.material_surface_mesh.Initialize_Mesh(tetrahedralized_volume.triangulated_surface->mesh);
-            delete tetrahedralized_volume.triangulated_surface;tetrahedralized_volume.triangulated_surface=0;
-            TRIANGULATED_SURFACE<T>& triangulated_surface=embedding.material_surface;
-            RED_GREEN_TRIANGLES<TV> redgreen(triangulated_surface);
-            for(int level=0;level<number_of_boundary_refinements;level++) redgreen.Refine_Simplex_List(IDENTITY_ARRAY<>(triangulated_surface.mesh.elements.m));
-            deformable_body_collection.Add_Structure(&embedding);
-            Bind_Redgreen_Segment_Midpoints(redgreen);
-            // create soft bindings for all embedded particles
-//            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
-            tests.Add_Ground();
-            RIGID_BODY<TV>& rigid_sphere=tests.Add_Rigid_Body("sphere",(T).5,(T).5);
-            rigid_sphere.is_static=true;
             break;}
         case 27:{
             RIGID_BODY<TV>& cylinder_body=tests.Add_Rigid_Body("cylinder",(T).95,(T)0);cylinder_body.Frame().t=TV(0,(T)1.5,0);
@@ -1512,11 +1487,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                     solid_body_collection.Add_Force(spring_force);}}
             if(test_number==25) solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));}
             break;
-        case 26:{
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
-            solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
-            break;}
         case 27:{
             for(int i=0;i<deformable_body_collection.structures.m;i++){
                 LINEAR_SPRINGS<TV>* spring_force=0;
@@ -1952,22 +1922,6 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM
         //frame.t=curve.Value(time);
     }
     else if(test_number==32 && id==int(0)){frame.r=ROTATION<TV>::From_Rotation_Vector(time*TV(0,(T)-pi/4,0))*ROTATION<TV>((T)pi/2,TV(1,0,0));}
-}
-//#####################################################################
-// Function Bind_Redgreen_Segment_Midpoints
-//#####################################################################
-void Bind_Redgreen_Segment_Midpoints(RED_GREEN_TRIANGLES<TV>& redgreen)
-{
-    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
-    redgreen.Initialize_Segment_Index_From_Midpoint_Index();
-    ARRAY<int> parents;ARRAY<T> weights;
-    for(int s=0;s<redgreen.segment_midpoints.m;s++) if(const int midpoint=redgreen.segment_midpoints(s)){
-        redgreen.Unrefined_Parents(midpoint,parents,weights);
-        switch(parents.m){
-            case 2:binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,midpoint,VECTOR<int,2>(parents),VECTOR<T,2>(weights)));break;
-            case 3:binding_list.Add_Binding(new LINEAR_BINDING<TV,3>(particles,midpoint,VECTOR<int,3>(parents),VECTOR<T,3>(weights)));break;
-            default: PHYSBAM_FATAL_ERROR("unexpected number of parents in refined triangle mesh");}}
 }
 //#####################################################################
 };

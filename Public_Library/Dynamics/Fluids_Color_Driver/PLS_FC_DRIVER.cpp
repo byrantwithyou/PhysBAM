@@ -9,6 +9,7 @@
 #include <Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
+#include <Tools/Krylov_Solvers/GMRES.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>

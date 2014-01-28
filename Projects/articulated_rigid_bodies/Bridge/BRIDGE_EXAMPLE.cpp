@@ -28,7 +28,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> BRIDGE_EXAMPLE<T>::
 BRIDGE_EXAMPLE(const STREAM_TYPE stream_type)
-    :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),box1(0),box2(0),start_rolling(100),num_rolling_frames(1000),start_drop(2000),num_rungs(10),
+    :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),box1(0),box2(0),start_rolling(100),num_rolling_frames(1000),start_drop(2000),num_rungs(10),
     selection(0)
 {
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
@@ -80,7 +80,7 @@ Initialize_Bodies()
 
     solid_body_collection.Update_Simulated_Particles();
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Initialize_Bodies();
+    SOLIDS_EXAMPLE<TV>::Initialize_Bodies();
 }
 //#####################################################################
 // Function Update_Solids_Parameters

@@ -6,7 +6,7 @@
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 #include "Standard_Tests/STANDARD_TESTS.h"
 using namespace PhysBAM;
 
@@ -25,7 +25,7 @@ int main(int argc,char *argv[])
     PARSE_ARGS parse_args(argc,argv);
     example.Parse(parse_args);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(example);
+    SOLIDS_DRIVER<TV> driver(example);
     driver.Execute_Main_Program();
 
     return 0;

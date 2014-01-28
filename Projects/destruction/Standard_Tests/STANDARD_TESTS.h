@@ -59,19 +59,19 @@
 #include <Deformables/Forces/TRIANGLE_BENDING_SPRINGS.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <climits>
 #include <cstdio>
 
 namespace PhysBAM{
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T_input,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
@@ -98,12 +98,12 @@ public:
     T maximum_fall_speed;
     bool createpattern;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::frame_rate;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::frame_rate;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),parameter(0),prune_stacks_from_contact(false),prune_contact_using_velocity(false),
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),parameter(0),prune_stacks_from_contact(false),prune_contact_using_velocity(false),
         use_nonanalytic_levelsets(false),rigid_body_collection(solid_body_collection.rigid_body_collection),createpattern(false)
     {
     }
@@ -199,7 +199,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number==12) solids_parameters.rigid_body_collision_parameters.use_legacy_push_out=true;
     else solids_parameters.rigid_body_collision_parameters.use_legacy_push_out=false;
     solids_parameters.use_rigid_deformable_contact=true;
-    fluids_parameters.simulate=false;
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.cfl=1;
     last_frame=240;

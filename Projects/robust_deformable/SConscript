@@ -1,6 +1,6 @@
 # SConscript
 
 Import('env Automatic_Program')
-env=env.Copy(USE_DYNAMICS=1)
+env=env.Copy(USE_SOLIDS=1)
 Automatic_Program(env,"robust_deformable",["main.cpp","LOCAL_NEWTONS_METHOD.cpp","LOCAL_LINE_SEARCH.cpp","LOCAL_TRUST_REGION_NEWTONS_METHOD.cpp","LOCAL_TR_CONJUGATE_GRADIENT.cpp"])
 

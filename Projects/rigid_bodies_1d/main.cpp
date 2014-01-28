@@ -6,8 +6,8 @@
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "Standard_Tests/STANDARD_TESTS.h"
 using namespace PhysBAM;
 
@@ -29,7 +29,7 @@ int main(int argc,char *argv[])
     if(example.mpi_world->initialized) example.solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
     example.Adjust_Output_Directory_For_MPI(example.solid_body_collection.deformable_body_collection.mpi_solids);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(example);
+    SOLIDS_DRIVER<TV> driver(example);
     driver.Execute_Main_Program();
 
     return 0;

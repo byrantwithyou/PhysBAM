@@ -50,20 +50,20 @@
 #include <Deformables/Forces/BINDING_SPRINGS.h>
 #include <Deformables/Forces/INCOMPRESSIBLE_FINITE_VOLUME.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <climits>
 namespace PhysBAM{
 
 template<class T_input>
-class INCOMPRESSIBLE_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class INCOMPRESSIBLE_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::Time_At_Frame;using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;using BASE::parse_args;using BASE::mpi_world;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
 
@@ -105,7 +105,7 @@ public:
     ARRAY<RIGID_BODY_STATE<TV> > tori_initial_states;
 
     INCOMPRESSIBLE_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),test_poissons_ratio((T).5),hittime(1),
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),test_poissons_ratio((T).5),hittime(1),
         minimum_volume_recovery_time_scale(0),high_resolution(false),stiffen(1),max_cg_iterations(20),solids_cg_tolerance((T)1e-3),
         ground_friction(0),merge_at_boundary(false),tori_m(2),tori_n(2),tori_mn(2),tori_base_height((T)1.5),tori_max_angular_velocity(2)
     {

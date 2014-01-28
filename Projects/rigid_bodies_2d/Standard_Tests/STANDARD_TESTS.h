@@ -32,23 +32,22 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS_SIMPLE_FRACTURE.h>
 #include <Rigids/Standard_Tests/RIGIDS_STANDARD_TESTS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include "../../rigid_bodies/RANDOM_PLACEMENT.h"
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
+class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,2> >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;
 public:
     int width, height, num_bodies;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;using BASE::frame_rate;
     using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;using BASE::parse_args;
 
@@ -58,7 +57,7 @@ public:
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,this->fluids_parameters.NONE),width(2),height(4),num_bodies(6),tests(stream_type,data_directory,solid_body_collection)
+        :BASE(stream_type),width(2),height(4),num_bodies(6),tests(stream_type,data_directory,solid_body_collection)
     {
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;

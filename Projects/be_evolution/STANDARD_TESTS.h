@@ -99,6 +99,7 @@
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Deformables/Forces/RALEIGH_DAMPING_FORCE.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
@@ -108,18 +109,17 @@
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <fstream>
 namespace PhysBAM{
 
 template<class TV> class STANDARD_TESTS;
 template<class T_input>
-class STANDARD_TESTS<VECTOR<T_input,3> >:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class STANDARD_TESTS<VECTOR<T_input,3> >:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::stream_type;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;using BASE::data_directory;using BASE::m;using BASE::s;using BASE::kg;
 
     std::ofstream svout;
@@ -187,7 +187,7 @@ public:
     bool use_vanilla_newton;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),test_forces(false),
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),test_forces(false),
         with_bunny(false),with_hand(false),with_big_arm(false),gears_of_pain(false),override_collisions(false),override_no_collisions(false),
         print_matrix(false),resolution(0),jello_size(20),number_of_jellos(12),stiffness_multiplier(1),damping_multiplier(1),
         degrees_wedge(2),degrees_incline(5),rebound_time((T).2),rebound_stiffness(5),rebound_drop((T)1.5),

@@ -38,25 +38,25 @@
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Fracture/FRACTURE_OBJECT.h>
 #include <Solids/Fracture/FRACTURE_TETRAHEDRALIZED_VOLUME.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>
-class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
     typedef T_input T;
     typedef VECTOR<T_input,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     SOLIDS_STANDARD_TESTS<TV> tests;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
 
     T initial_height;
@@ -72,7 +72,7 @@ public:
     FRACTURE_OBJECT<TV,3>* fracture_object;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),fracture_object(0)
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),fracture_object(0)
     {
     }
 
@@ -120,7 +120,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     tests.data_directory=data_directory;
-    fluids_parameters.simulate=false;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.cfl=1;
@@ -251,7 +250,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);
 
     // viewer and restart output
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Write_Output_Files(frame);
+    SOLIDS_EXAMPLE<TV>::Write_Output_Files(frame);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/fracture_object"+f,*fracture_object);
     if(plasticity_model) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/fp_inverse"+f,plasticity_model->Fp_inverse);
 
@@ -282,7 +281,7 @@ void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
 {
     std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Read_Output_Files_Solids(frame);
+    SOLIDS_EXAMPLE<TV>::Read_Output_Files_Solids(frame);
     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/fracture_object"+f,*fracture_object);
     if(plasticity_model) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/fp_inverse"+f,plasticity_model->Fp_inverse);
 

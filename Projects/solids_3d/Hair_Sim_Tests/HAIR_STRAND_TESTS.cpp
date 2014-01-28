@@ -42,7 +42,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_input> HAIR_STRAND_TESTS<T_input>::
 HAIR_STRAND_TESTS(const STREAM_TYPE stream_type)
-    :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),use_adhesion(false),reset(false)
+    :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),use_adhesion(false),reset(false)
 {
 }
 //#####################################################################

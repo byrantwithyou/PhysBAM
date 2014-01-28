@@ -11,18 +11,18 @@
 #include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SEGMENT_BENDING_ELEMENTS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>
-class RIGID_PARTICLE_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
+class RIGID_PARTICLE_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 {
 public:
     typedef T_input T;typedef VECTOR<T,3> TV;
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef SOLIDS_EXAMPLE<TV> BASE;
     typedef typename TV::SPIN T_SPIN;
-    using BASE::last_frame;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;
+    using BASE::last_frame;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
 
@@ -31,7 +31,7 @@ public:
     int ground_id;
 
     RIGID_PARTICLE_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),initial_height((T)5),use_ground(true)
+        :BASE(stream_type),initial_height((T)5),use_ground(true)
     {
     }
 
@@ -118,7 +118,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
     output_directory="Rigid_Particle/output";
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-    fluids_parameters.simulate=false;
 
     Get_Initial_Data();
 
@@ -132,7 +131,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     solid_body_collection.Update_Simulated_Particles();
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Initialize_Bodies();
+    SOLIDS_EXAMPLE<TV>::Initialize_Bodies();
 }
 //#####################################################################
 // Function Set_External_Velocities

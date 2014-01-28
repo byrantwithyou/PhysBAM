@@ -7,9 +7,9 @@
 #ifndef __TETRAHEDRAL_MESHING__
 #define __TETRAHEDRAL_MESHING__
 
+#include <Solids/Meshing/LEVEL_SET_FORCES_AND_VELOCITIES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
-#include <Dynamics/Meshing/LEVEL_SET_FORCES_AND_VELOCITIES.h>
 namespace PhysBAM{
 
 template<class T> class RED_GREEN_TETRAHEDRA;

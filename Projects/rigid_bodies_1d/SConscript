@@ -1,5 +1,5 @@
 # SConscript
 
 Import('env Automatic_Program')
-env=env.Copy(USE_DYNAMICS=1)
+env=env.Copy(USE_SOLIDS=1)
 Automatic_Program(env,"rigid_bodies_1d",["main.cpp"])

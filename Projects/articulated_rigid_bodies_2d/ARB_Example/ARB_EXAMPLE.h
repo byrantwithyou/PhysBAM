@@ -18,20 +18,20 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include "../ARB_PARAMETERS.h"
 namespace PhysBAM{
 
 template<class T_input,class RW>
-class ARB_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
+class ARB_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,2> >
 {
     typedef T_input T;
 public:
-    typedef VECTOR<T,2> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
+    typedef VECTOR<T,2> TV;typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;
     using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solid_body_collection;using BASE::solids_evolution;
-    using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::test_number;
+    using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::test_number;
 
     ARTICULATED_RIGID_BODY<TV>* arb;
     int id1,id2,id3;
@@ -41,7 +41,7 @@ public:
     RIGID_BODY<TV> *ground;
 
     ARB_EXAMPLE(const STREAM_TYPE stream_type,const int test_number_input=1)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(stream_type,data_directory,solid_body_collection),add_ground(true),ground(0)
+        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),add_ground(true),ground(0)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
@@ -99,7 +99,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     tests.Add_Gravity();
     solid_body_collection.Update_Simulated_Particles();
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Initialize_Bodies();
+    SOLIDS_EXAMPLE<TV>::Initialize_Bodies();
 }
 //#####################################################################
 // Function Two_Tumbling

@@ -5,7 +5,7 @@
 //#####################################################################
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
-#include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
+#include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 #include "ARB_Example/ARB_EXAMPLE.h"
 //#include "Little_Man/LITTLE_MAN_EXAMPLE.h"
 //#include "Simple_Muscle/SIMPLE_MUSCLE_EXAMPLE.h"
@@ -22,7 +22,7 @@ int main(int argc,char** argv)
     STREAM_TYPE stream_type((RW()));
     typedef VECTOR<T,2> TV;
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
+    SOLIDS_EXAMPLE<TV>* example=0;
 
     bool opt_arb=false;
     PARSE_ARGS parse_args(argc,argv);
@@ -33,7 +33,7 @@ int main(int argc,char** argv)
     else example=new STANDARD_TESTS<T>(stream_type);
     example->Parse(parse_args);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<TV> driver(*example);
+    SOLIDS_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();
     delete example;
 
