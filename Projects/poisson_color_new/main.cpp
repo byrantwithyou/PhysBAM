@@ -194,7 +194,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         
     INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV> ips(grid,phi_value,phi_color);
     ips.use_preconditioner=use_preconditioner;
-    ips.Set_Matrix(at.mu,at.wrap,&at,aggregated_constraints,cell_centered_u,eliminate_nullspace);
+    ips.Set_Matrix(at.mu,&at,aggregated_constraints,cell_centered_u,eliminate_nullspace);
 
     printf("\n");
     for(int c=0;c<ips.cdi->colors;c++) printf("u%d [%i]\t",c,ips.cm_u->dofs(c));printf("\n");
@@ -394,8 +394,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 0:{ // One color, periodic. No interface, no forces, u=0.
             struct ANALYTIC_TEST_0:public ANALYTIC_TEST<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);}
                 virtual T phi_value(const TV& X){return (T)1;}
                 virtual int phi_color(const TV& X){return T();}
                 virtual T u(const TV& X,int color){return T();}
@@ -409,8 +409,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 1:{ // One color, periodic. No interface, u=sin(2*pi*x), f=(2*pi)^2*sin(2*pi*x).
             struct ANALYTIC_TEST_1:public ANALYTIC_TEST<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);}
                 virtual T phi_value(const TV& X){return (T)1;}
                 virtual int phi_color(const TV& X){return T();}
                 virtual T u(const TV& X,int color){return sin(2*M_PI*X.x);}
@@ -424,8 +424,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 2:{ // Two colors, periodic. Linear on [0,1/3],[1/3,2/3],[2/3,1], no volumetric forces.
             struct ANALYTIC_TEST_2:public ANALYTIC_TEST<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);mu.Append(2);}
                 virtual T phi_value(const TV& X){return abs(-m/(T)6+abs(X.x-0.5*m));}
                 virtual int phi_color(const TV& X){return (-m/(T)6+abs(X.x-0.5*m))<0;}
                 virtual T u(const TV& X,int color){return (color?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
@@ -440,9 +440,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             struct ANALYTIC_TEST_3:public ANALYTIC_TEST<TV>
             {
                 T r;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){
-                    wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;
+                    mu.Append(1);mu.Append(2);r=m/M_PI;
                     this->use_discontinuous_scalar_field=true;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
@@ -458,9 +458,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
             {
                 T r,m2,m4;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){
-                    wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;m2=sqr(m);m4=sqr(m2);
+                    mu.Append(1);mu.Append(2);r=m/M_PI;m2=sqr(m);m4=sqr(m2);
                     this->use_discontinuous_scalar_field=true;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
@@ -476,10 +476,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             struct ANALYTIC_TEST_5:public ANALYTIC_TEST<TV>
             {
                 T a,b,c;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    mu.Append(1);mu.Append(2);mu.Append(3);
                     a=m/6;b=m*5/12;c=m*5/6;
                     this->use_discontinuous_scalar_field=true;
                 }
@@ -529,10 +529,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 T a,b,c;
                 int constraint; // [-1] - Neumann, [-2] - Dirichlet
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);
+                    mu.Append(1);mu.Append(2);
                     a=m/6;b=m*5/12;c=m*5/6;
                     constraint=-1;
                     this->use_discontinuous_scalar_field=true;
@@ -591,10 +591,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 T r;
                 TV n;
                 VECTOR<T,3> a;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    mu.Append(1);mu.Append(2);mu.Append(3);
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
                     this->use_discontinuous_scalar_field=true;
@@ -615,10 +615,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 T r;
                 TV n;
                 VECTOR<T,3> a;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    mu.Append(1);mu.Append(2);mu.Append(3);
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
                     this->use_discontinuous_scalar_field=true;
@@ -639,10 +639,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 T r,a1,a2,m2,m4;
                 TV n;
                 VECTOR<T,3> a;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    mu.Append(1);mu.Append(2);mu.Append(3);
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;m2=sqr(m);m4=sqr(m2);
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
                     this->use_discontinuous_scalar_field=true;
@@ -664,10 +664,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 TV n;
                 VECTOR<T,3> a;
                 int constraint;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);
+                    mu.Append(1);mu.Append(2);
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;m2=sqr(m);m4=sqr(m2);
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
                     constraint=-2;
@@ -692,10 +692,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 VECTOR<TV,3> centers;
                 VECTOR<TV,3> normals;
                 VECTOR<VECTOR<int,3>,3> sectors;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    mu.Append(1);mu.Append(2);mu.Append(3);
                     r=(T)1/(2*M_PI-1);
                     n=TV::Axis_Vector(1);a=TV()+M_PI/200;
                     centers(0)=TV::Axis_Vector(1);

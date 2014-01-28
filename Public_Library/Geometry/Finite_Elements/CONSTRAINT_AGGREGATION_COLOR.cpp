@@ -234,7 +234,6 @@ Aggregate_Constraints(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix_uu,const ARRAY<i
 template<class TV> void CONSTRAINT_AGGREGATION_COLOR<TV>::
 Build_Condensed_Constraint_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix)
 {
-    if(!cdi->wrap) PHYSBAM_FATAL_ERROR();
     matrix.Resize(cdi->colors);
     
     int m=idofs.m;

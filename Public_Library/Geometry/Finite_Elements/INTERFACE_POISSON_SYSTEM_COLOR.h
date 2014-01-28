@@ -72,7 +72,7 @@ public:
     virtual ~INTERFACE_POISSON_SYSTEM_COLOR();
 
 //#####################################################################
-    void Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc);
+    void Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc);
     void Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;

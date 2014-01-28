@@ -81,7 +81,7 @@ template<class TV,class CELL_ELEMENTS> void Dump(const GRID<TV>& grid,const HASH
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc)
+Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc)
 {
     // SET UP STENCILS
 
@@ -98,10 +98,9 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
     // GATHER CELL DOMAIN & INTERFACE INFO 
 
     int padding;
-    if(wrap) padding=u_stencil.Overlap_Padding(u_stencil);
-    else padding=u_stencil.Padding();
+    padding=u_stencil.Overlap_Padding(u_stencil);
 
-    cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m,wrap); 
+    cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m); 
     cm_u=new CELL_MANAGER_COLOR<TV>(*cdi);
 
     TRIPLE_JUNCTION_CORRECTION<TV> tjc(phi_grid.Get_Regular_Grid(),color_phi,ghost*2);

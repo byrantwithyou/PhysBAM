@@ -41,14 +41,14 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d0>& s0,const BASIS_STENCIL_UNIFORM<TV
 template<class TV> void SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>::
 Mark_Active_Cells(T tol)
 {
-    if(cdi->wrap) // add ghost rows to material ones 
-        for(CELL_ITERATOR<TV> it(cdi->grid,cdi->padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next()){
-            int i=cdi->Flatten(it.index);
-            int r=cdi->remap(i);
-            for(int c=0;c<cdi->colors;c++)
-                for(int k=0;k<data(c).n;k++){
-                    data(c)(r,k)+=data(c)(i,k);
-                    data(c)(i,k)=0;}}
+    // add ghost rows to material ones 
+    for(CELL_ITERATOR<TV> it(cdi->grid,cdi->padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next()){
+        int i=cdi->Flatten(it.index);
+        int r=cdi->remap(i);
+        for(int c=0;c<cdi->colors;c++)
+            for(int k=0;k<data(c).n;k++){
+                data(c)(r,k)+=data(c)(i,k);
+                data(c)(i,k)=0;}}
     for(int c=0;c<cdi->colors;c++)
         for(int l=0;l<data(c).m;l++)
             for(int k=0;k<data(c).n;k++)
@@ -63,7 +63,6 @@ Mark_Active_Cells(T tol)
 template<class TV> void SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>::
 Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix)
 {
-    if(!cdi->wrap) PHYSBAM_FATAL_ERROR();
     matrix.Resize(cdi->colors);
 
     for(int c=0;c<cdi->colors;c++){

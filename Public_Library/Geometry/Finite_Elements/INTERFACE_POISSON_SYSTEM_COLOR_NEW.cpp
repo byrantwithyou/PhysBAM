@@ -47,7 +47,7 @@ template<class TV> INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool aggregated_constraints,bool cell_centered_u,bool eliminate_nullspace_input)
+Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool aggregated_constraints,bool cell_centered_u,bool eliminate_nullspace_input)
 {
     // SET UP STENCILS
 
@@ -65,10 +65,9 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
     eliminate_nullspace=eliminate_nullspace_input;
 
     int padding;
-    if(wrap) padding=u_stencil.Overlap_Padding(u_stencil);
-    else padding=u_stencil.Padding();
+    padding=u_stencil.Overlap_Padding(u_stencil);
 
-    cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m,wrap); 
+    cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m); 
     cm_u=new CELL_MANAGER_COLOR<TV>(*cdi);
     cdi->Construct_Surface_Meshes(phi_grid,phi_value,phi_color);
 

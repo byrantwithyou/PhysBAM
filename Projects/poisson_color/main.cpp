@@ -185,7 +185,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
 
     INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,color_phi);
     ips.use_preconditioner=use_preconditioner;
-    ips.Set_Matrix(at.mu,true,&at);
+    ips.Set_Matrix(at.mu,&at);
 
     printf("\n");
     for(int c=0;c<ips.cdi->colors;c++) printf("u%d [%i]\t",c,ips.cm_u->dofs(c));printf("\n");

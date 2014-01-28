@@ -10,9 +10,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> CELL_DOMAIN_INTERFACE_COLOR<TV>::
-CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int colors_input,bool wrap_input)
+CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int colors_input)
     :grid(grid_input),padding(padding_input),size(grid.counts+2*padding),flat_size(size.Product()),
-    colors(colors_input),wrap(wrap_input)
+    colors(colors_input)
 {
     a(TV::m-1)=1;
     for(int i=TV::m-2;i>=0;i--) a(i)=a(i+1)*size(i+1);
@@ -27,15 +27,14 @@ CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int col
     flat_base(TV::m-1)=&flat_base_n;
     constraint_base(TV::m-1)=&constraint_base_n;
 
-    if(wrap){
-        for(int axis=0;axis<TV::m;axis++)
-            for(int s=0;s<2;s++){
-                int side=axis*2+s;
-                int sign=s?-1:1;
-                int diff=Flatten_Diff(sign*grid.counts(axis)*TV_INT::Axis_Vector(axis));
-                for(CELL_ITERATOR<TV> it(grid,padding,GRID<TV>::GHOST_REGION,side);it.Valid();it.Next()){
-                    int f=Flatten(it.index);
-                    remap(f)=remap(f+diff);}}}
+    for(int axis=0;axis<TV::m;axis++)
+        for(int s=0;s<2;s++){
+            int side=axis*2+s;
+            int sign=s?-1:1;
+            int diff=Flatten_Diff(sign*grid.counts(axis)*TV_INT::Axis_Vector(axis));
+            for(CELL_ITERATOR<TV> it(grid,padding,GRID<TV>::GHOST_REGION,side);it.Valid();it.Next()){
+                int f=Flatten(it.index);
+                remap(f)=remap(f+diff);}}
 
     cell_location.Resize(flat_size);
     for(CELL_ITERATOR<TV> it(grid,-padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next())

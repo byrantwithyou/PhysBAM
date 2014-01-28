@@ -23,7 +23,6 @@ struct ANALYTIC_TEST: public BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
     typedef typename TV::SCALAR T;
     T kg,m,s;
 
-    bool wrap;
     ARRAY<T> mu;
 
     ANALYTIC_TEST():kg(1),m(1),s(1){}
@@ -106,7 +105,7 @@ public:
     virtual ~INTERFACE_POISSON_SYSTEM_COLOR_NEW();
 
 //#####################################################################
-    void Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool aggregated_constraints=false,bool cell_centered_u=false,bool eliminate_nullspace_input=false);
+    void Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool aggregated_constraints=false,bool cell_centered_u=false,bool eliminate_nullspace_input=false);
     void Build_Full_Solution_From_Condensed(KRYLOV_VECTOR_BASE<T>& small,KRYLOV_VECTOR_BASE<T>& big);
     void Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc,bool cell_centered_u=false);
     void Create_Condensed_RHS(VECTOR_T& rhs);

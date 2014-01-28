@@ -55,7 +55,7 @@ template<class TV> INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* system_inertia,ARRAY<T>* rhs_inertia)
+Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* system_inertia,ARRAY<T>* rhs_inertia)
 {
     PHYSBAM_ASSERT((bool)system_inertia==(bool)rhs_inertia);
     // SET UP STENCILS
@@ -83,18 +83,14 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
     // GATHER CELL DOMAIN & INTERFACE INFO 
 
     int padding;
-    if(wrap){
-        padding=0;
-        for(int i=0;i<TV::m;i++)
-            for(int j=i;j<TV::m;j++)
-                padding=max(u_stencil(i)->Overlap_Padding(*u_stencil(j)),padding);
-        for(int i=0;i<TV::m;i++)
-            padding=max(p_stencil.Overlap_Padding(*u_stencil(i)),padding);}
-    else{
-        padding=p_stencil.Padding();
-        for(int i=0;i<TV::m;i++) padding=max(u_stencil(i)->Padding(),padding);}
+    padding=0;
+    for(int i=0;i<TV::m;i++)
+        for(int j=i;j<TV::m;j++)
+            padding=max(u_stencil(i)->Overlap_Padding(*u_stencil(j)),padding);
+    for(int i=0;i<TV::m;i++)
+        padding=max(p_stencil.Overlap_Padding(*u_stencil(i)),padding);
 
-    cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m,wrap); 
+    cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m); 
     cdi->Construct_Surface_Meshes(phi_grid,phi_value,phi_color);
 
     cm_p=new CELL_MANAGER_COLOR<TV>(*cdi);

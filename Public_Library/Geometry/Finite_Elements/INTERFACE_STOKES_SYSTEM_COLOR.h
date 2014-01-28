@@ -96,7 +96,7 @@ public:
     virtual ~INTERFACE_STOKES_SYSTEM_COLOR();
 
 //#####################################################################
-    void Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* system_inertia,ARRAY<T>* rhs_inertia);
+    void Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* system_inertia,ARRAY<T>* rhs_inertia);
     void Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction);
     void Add_Polymer_Stress_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;

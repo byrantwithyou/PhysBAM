@@ -49,11 +49,10 @@ public:
     };
 
     const GRID<TV>& grid;
-    const int padding;
-    const TV_INT size;
-    const int flat_size;
-    const int colors;
-    const bool wrap;
+    int padding;
+    TV_INT size;
+    int flat_size;
+    int colors;
 
     bool nc_present;
     bool dc_present;
@@ -74,7 +73,7 @@ public:
 
     HASHTABLE<TV_INT,CELL_ELEMENTS> index_to_cell_elements;
     
-    CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int colors_input,bool wrap_input);
+    CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int colors_input);
 
     int Flatten(const TV_INT& index) const
     {return index.Dot(a)+b;}

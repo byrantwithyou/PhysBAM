@@ -375,7 +375,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     iss.use_polymer_stress=example.use_polymer_stress;
     ARRAY<T> system_inertia=example.rho,dt_mu(example.mu*dt);
     if(!first_step) system_inertia*=(T)1.5;
-    iss.Set_Matrix(dt_mu,example.wrap,&bccl,&system_inertia,&system_inertia);
+    iss.Set_Matrix(dt_mu,&bccl,&system_inertia,&system_inertia);
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}

@@ -25,28 +25,21 @@ CELL_MANAGER_COLOR(const CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi_input):cdi(cdi_inp
 template<class TV> void CELL_MANAGER_COLOR<TV>::
 Compress_Indices()
 {
-    if(cdi.wrap)
-        for(int c=0;c<cdi.colors;c++){
-            for(CELL_ITERATOR<TV> it(cdi.grid);it.Valid();it.Next()){
-                int i=cdi.Flatten(it.index);
-                if(compressed(c)(i)==-2) compressed(c)(i)=dofs(c)++;}
-            for(CELL_ITERATOR<TV> it(cdi.grid,cdi.padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next()){
-                int i=cdi.Flatten(it.index);
-                if(compressed(c)(i)==-2) compressed(c)(i)=compressed(c)(cdi.remap(i));}}
-    else
-        for(int c=0;c<cdi.colors;c++)
-            for(CELL_ITERATOR<TV> it(cdi.grid,cdi.padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
-                int i=cdi.Flatten(it.index);
-                if(compressed(c)(i)==-2) compressed(c)(i)=dofs(c)++;}
+    for(int c=0;c<cdi.colors;c++){
+        for(CELL_ITERATOR<TV> it(cdi.grid);it.Valid();it.Next()){
+            int i=cdi.Flatten(it.index);
+            if(compressed(c)(i)==-2) compressed(c)(i)=dofs(c)++;}
+        for(CELL_ITERATOR<TV> it(cdi.grid,cdi.padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next()){
+            int i=cdi.Flatten(it.index);
+            if(compressed(c)(i)==-2) compressed(c)(i)=compressed(c)(cdi.remap(i));}}
     int total_dofs(0),offset(0);
     for(int c=0;c<cdi.colors;c++){
         offset=total_dofs;
         total_dofs+=dofs(c);
         uncompressed.Resize(total_dofs);
-        for(int i=0;i<compressed(c).m;i++){
-            if(compressed(c)(i)>=0) uncompressed(compressed(c)(i)+offset)=VECTOR<int,2>(c,cdi.remap(i));     
-        }
-    }
+        for(int i=0;i<compressed(c).m;i++)
+            if(compressed(c)(i)>=0)
+                uncompressed(compressed(c)(i)+offset)=VECTOR<int,2>(c,cdi.remap(i));}
 }
 namespace PhysBAM{
 template class CELL_MANAGER_COLOR<VECTOR<float,2> >;

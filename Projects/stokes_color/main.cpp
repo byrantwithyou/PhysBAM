@@ -274,7 +274,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     iss.use_preconditioner=use_preconditioner;
 //    iss.use_p_null_mode=true;
 //    iss.use_u_null_mode=true;
-    iss.Set_Matrix(at.mu,at.wrap,&at,0,0);
+    iss.Set_Matrix(at.mu,&at,0,0);
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
