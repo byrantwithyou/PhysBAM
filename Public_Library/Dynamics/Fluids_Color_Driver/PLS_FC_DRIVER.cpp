@@ -364,8 +364,8 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     ARRAY<T> inertia=example.rho,dt_mu(example.mu*dt);
     if(!first_step) inertia*=(T)1.5;
     iss.Set_Matrix(dt_mu,example.use_discontinuous_velocity,
-        [=](const TV& X,int color0,int color1){return example.Velocity_Jump(X,color0,color1,time);},
-        [=](const TV& X,int color0,int color1){return example.Jump_Interface_Condition(X,color0,color1,time)*dt;},
+        [=](const TV& X,int color0,int color1){return example.Velocity_Jump(X,color0,color1,time+dt);},
+        [=](const TV& X,int color0,int color1){return example.Jump_Interface_Condition(X,color0,color1,time+dt)*dt;},
         &inertia,true);
 
     printf("\n");
@@ -376,7 +376,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     printf("\n");
 
     INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
-    iss.Set_RHS(rhs,[=](const TV& X,int color){return example.Volume_Force(X,color,time)*dt;},&example.face_velocities,false);
+    iss.Set_RHS(rhs,[=](const TV& X,int color){return example.Volume_Force(X,color,time+dt)*dt;},&example.face_velocities,false);
     if(example.use_polymer_stress) iss.Add_Polymer_Stress_RHS(rhs,example.polymer_stress); //if needed
     iss.Resize_Vector(sol);
 
