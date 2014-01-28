@@ -51,15 +51,15 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool agg
 {
     // SET UP STENCILS
 
-    BASIS_STENCIL_UNIFORM<TV,1> u_stencil(grid.dX);
-    VECTOR<BASIS_STENCIL_UNIFORM<TV,1>*,TV::m> udx_stencil;
+    BASIS_STENCIL_UNIFORM<TV,1> u_stencil;
+    VECTOR<BASIS_STENCIL_UNIFORM<TV,1>,TV::m> udx_stencil;
     if(cell_centered_u)u_stencil.Set_Center(); else u_stencil.Set_Node();
-    u_stencil.Set_Multilinear_Stencil();
-    u_stencil.Dice_Stencil();
+    u_stencil.Set_Multilinear_Stencil(grid.dX);
+    u_stencil.Dice_Stencil(grid.dX);
     for(int i=0;i<TV::m;i++){
-        udx_stencil(i)=new BASIS_STENCIL_UNIFORM<TV,1>(u_stencil);
-        udx_stencil(i)->Differentiate(i);
-        udx_stencil(i)->Dice_Stencil();}
+        udx_stencil(i)=u_stencil;
+        udx_stencil(i).Differentiate(i);
+        udx_stencil(i).Dice_Stencil(grid.dX);}
     
     // GATHER CELL DOMAIN & INTERFACE INFO 
     eliminate_nullspace=eliminate_nullspace_input;
@@ -85,7 +85,7 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool agg
         rhs_surface(c).Resize(cdi->flat_size);
 
     for(int i=0;i<TV::m;i++)
-        biu.Add_Volume_Block(helper_uu,*udx_stencil(i),*udx_stencil(i),mu);
+        biu.Add_Volume_Block(helper_uu,udx_stencil(i),udx_stencil(i),mu);
     biu.Add_Surface_Block_Scalar(helper_qu,u_stencil,abc,rhs_surface,1);
     biu.Add_Volume_Block(helper_rhs_uu,u_stencil,u_stencil,ARRAY<T>(CONSTANT_ARRAY<T>(mu.m,(T)1)));
 
@@ -153,8 +153,6 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool agg
         null_u_condensed.v.Fill(1);
         null_u_condensed.v.Normalize();
     }
-    
-    for(int i=0;i<TV::m;i++) delete udx_stencil(i);
 }
 //#####################################################################
 // Function Build_Full_Solution_From_Condensed

@@ -60,44 +60,43 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* syste
     PHYSBAM_ASSERT((bool)system_inertia==(bool)rhs_inertia);
     // SET UP STENCILS
 
-    BASIS_STENCIL_UNIFORM<TV,0> p_stencil(grid.dX);
-    VECTOR<BASIS_STENCIL_UNIFORM<TV,1>*,TV::m> u_stencil;
-    VECTOR<VECTOR<BASIS_STENCIL_UNIFORM<TV,1>*,TV::m>,TV::m> udx_stencil;
-    BASIS_STENCIL_UNIFORM<TV,1> polymer_stress_stencil(grid.dX);
+    BASIS_STENCIL_UNIFORM<TV,0> p_stencil;
+    VECTOR<BASIS_STENCIL_UNIFORM<TV,1>,TV::m> u_stencil;
+    VECTOR<VECTOR<BASIS_STENCIL_UNIFORM<TV,1>,TV::m>,TV::m> udx_stencil;
+    BASIS_STENCIL_UNIFORM<TV,1> polymer_stress_stencil;
     p_stencil.Set_Center();
-    p_stencil.Set_Constant_Stencil();
-    p_stencil.Dice_Stencil();
+    p_stencil.Set_Constant_Stencil(grid.dX);
+    p_stencil.Dice_Stencil(grid.dX);
     polymer_stress_stencil.Set_Center();
-    polymer_stress_stencil.Set_Multilinear_Stencil();
-    polymer_stress_stencil.Dice_Stencil();
+    polymer_stress_stencil.Set_Multilinear_Stencil(grid.dX);
+    polymer_stress_stencil.Dice_Stencil(grid.dX);
     for(int i=0;i<TV::m;i++){
-        u_stencil(i)=new BASIS_STENCIL_UNIFORM<TV,1>(grid.dX);
-        u_stencil(i)->Set_Face(i);
-        u_stencil(i)->Set_Multilinear_Stencil();
-        u_stencil(i)->Dice_Stencil();
+        u_stencil(i).Set_Face(i);
+        u_stencil(i).Set_Multilinear_Stencil(grid.dX);
+        u_stencil(i).Dice_Stencil(grid.dX);
         for(int j=0;j<TV::m;j++){
-            udx_stencil(i)(j)=new BASIS_STENCIL_UNIFORM<TV,1>(*u_stencil(i));
-            udx_stencil(i)(j)->Differentiate(j);
-            udx_stencil(i)(j)->Dice_Stencil();}}
+            udx_stencil(i)(j)=u_stencil(i);
+            udx_stencil(i)(j).Differentiate(j);
+            udx_stencil(i)(j).Dice_Stencil(grid.dX);}}
 
-    // GATHER CELL DOMAIN & INTERFACE INFO 
+    // GATHER CELL DOMAIN & INTERFACE INFO
 
     int padding;
     padding=0;
     for(int i=0;i<TV::m;i++)
         for(int j=i;j<TV::m;j++)
-            padding=max(u_stencil(i)->Overlap_Padding(*u_stencil(j)),padding);
+            padding=max(u_stencil(i).Overlap_Padding(u_stencil(j)),padding);
     for(int i=0;i<TV::m;i++)
-        padding=max(p_stencil.Overlap_Padding(*u_stencil(i)),padding);
+        padding=max(p_stencil.Overlap_Padding(u_stencil(i)),padding);
 
-    cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m); 
+    cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m);
     cdi->Construct_Surface_Meshes(phi_grid,phi_value,phi_color);
 
     cm_p=new CELL_MANAGER_COLOR<TV>(*cdi);
     for(int i=0;i<TV::m;i++) cm_u(i)=new CELL_MANAGER_COLOR<TV>(*cdi);
 
     // STENCILS INTEGRATION
-    
+
     BASIS_INTEGRATION_UNIFORM_COLOR<TV,2> biu(grid,phi_grid,phi_color,*cdi);
     VECTOR<VECTOR<SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>,TV::m>,TV::m> helper_uu;
     VECTOR<SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>,TV::m> helper_pu,helper_rhs_pu,helper_inertial_rhs;
@@ -106,16 +105,16 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* syste
 
     for(int i=0;i<TV::m;i++){
         for(int j=i;j<TV::m;j++)
-            helper_uu(i)(j).Initialize(*u_stencil(i),*u_stencil(j),*cm_u(i),*cm_u(j),*cdi);
-        helper_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);
-        helper_qu(i).Initialize(*u_stencil(i),*cm_u(i),*cdi);
-        helper_rhs_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);
+            helper_uu(i)(j).Initialize(u_stencil(i),u_stencil(j),*cm_u(i),*cm_u(j),*cdi);
+        helper_pu(i).Initialize(p_stencil,u_stencil(i),*cm_p,*cm_u(i),*cdi);
+        helper_qu(i).Initialize(u_stencil(i),*cm_u(i),*cdi);
+        helper_rhs_pu(i).Initialize(p_stencil,u_stencil(i),*cm_p,*cm_u(i),*cdi);
         if(system_inertia)
-            helper_inertial_rhs(i).Initialize(*u_stencil(i),*u_stencil(i),*cm_u(i),*cm_u(i),*cdi);}
+            helper_inertial_rhs(i).Initialize(u_stencil(i),u_stencil(i),*cm_u(i),*cm_u(i),*cdi);}
     if(use_polymer_stress)
         for(int i=0;i<TV::m;i++)
             for(int j=0;j<TV::m;j++)
-                helper_polymer_stress_rhs(i)(j).Initialize(*u_stencil(i),polymer_stress_stencil,*cm_u(i),*cm_p,*cdi);
+                helper_polymer_stress_rhs(i)(j).Initialize(u_stencil(i),polymer_stress_stencil,*cm_u(i),*cm_p,*cdi);
 
     ARRAY<T> double_mu(mu*(T)2),ones(CONSTANT_ARRAY<T>(mu.m,(T)1)),minus_ones(CONSTANT_ARRAY<T>(mu.m,-(T)1));
 
@@ -127,36 +126,36 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* syste
     // Diagonal blocks
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<TV::m;j++)
-            biu.Add_Volume_Block(helper_uu(i)(i),*udx_stencil(i)(j),*udx_stencil(i)(j),(i==j)?double_mu:mu);
+            biu.Add_Volume_Block(helper_uu(i)(i),udx_stencil(i)(j),udx_stencil(i)(j),(i==j)?double_mu:mu);
     // Off-diagonal blocks
     for(int i=0;i<TV::m;i++)
         for(int j=i+1;j<TV::m;j++)
-            biu.Add_Volume_Block(helper_uu(i)(j),*udx_stencil(i)(j),*udx_stencil(j)(i),mu);
+            biu.Add_Volume_Block(helper_uu(i)(j),udx_stencil(i)(j),udx_stencil(j)(i),mu);
     // Diagonal inertial term
     if(system_inertia){
         PHYSBAM_ASSERT(system_inertia->m==mu.m && system_inertia->m==rhs_inertia->m);
         for(int i=0;i<TV::m;i++){
-            biu.Add_Volume_Block(helper_uu(i)(i),*u_stencil(i),*u_stencil(i),*system_inertia);
-            biu.Add_Volume_Block(helper_inertial_rhs(i),*u_stencil(i),*u_stencil(i),*rhs_inertia);}}
+            biu.Add_Volume_Block(helper_uu(i)(i),u_stencil(i),u_stencil(i),*system_inertia);
+            biu.Add_Volume_Block(helper_inertial_rhs(i),u_stencil(i),u_stencil(i),*rhs_inertia);}}
     // Pressure blocks
     for(int i=0;i<TV::m;i++)
-        biu.Add_Volume_Block(helper_pu(i),p_stencil,*udx_stencil(i)(i),minus_ones);
+        biu.Add_Volume_Block(helper_pu(i),p_stencil,udx_stencil(i)(i),minus_ones);
     // Traction blocks
     for(int i=0;i<TV::m;i++)
-        biu.Add_Surface_Block(helper_qu(i),*u_stencil(i),abc,rhs_surface(i),i,1);
+        biu.Add_Surface_Block(helper_qu(i),u_stencil(i),abc,rhs_surface(i),i,1);
     // RHS pressure blocks
     for(int i=0;i<TV::m;i++)
-        biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,*u_stencil(i),ones);
+        biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,u_stencil(i),ones);
     // RHS polymer stress blocks
     if(use_polymer_stress)
         for(int i=0;i<TV::m;i++)
             for(int j=0;j<TV::m;j++)
-                biu.Add_Volume_Block(helper_polymer_stress_rhs(i)(j),*udx_stencil(i)(j),polymer_stress_stencil,ones);
+                biu.Add_Volume_Block(helper_polymer_stress_rhs(i)(j),udx_stencil(i)(j),polymer_stress_stencil,ones);
 
     biu.Compute_Entries();
-        
+
     // BUILD SYSTEM MATRIX BLOCKS
-    
+
     for(int i=0;i<TV::m;i++){
         for(int j=i;j<TV::m;j++)
             helper_uu(i)(j).Mark_Active_Cells();
@@ -183,10 +182,10 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* syste
     // QU Block
     for(int i=0;i<TV::m;i++)
         helper_qu(i).Build_Matrix(matrix_qu(i),q_rhs);
-    // RHS PU Block 
+    // RHS PU Block
     for(int i=0;i<TV::m;i++)
         helper_rhs_pu(i).Build_Matrix(matrix_rhs_pu(i));
-    // RHS Inertial Block 
+    // RHS Inertial Block
     if(system_inertia)
         for(int i=0;i<TV::m;i++)
             helper_inertial_rhs(i).Build_Matrix(matrix_inertial_rhs(i));
@@ -221,11 +220,6 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* syste
     for(int i=0;i<null_modes.m;i++){
         Clear_Unused_Entries(*null_modes(i));
         null_modes(i)->Normalize();}
-
-    for(int i=0;i<TV::m;i++){
-        delete u_stencil(i);
-        for(int j=0;j<TV::m;j++)
-            delete udx_stencil(i)(j);}
 }
 //#####################################################################
 // Function Set_RHS
@@ -234,7 +228,7 @@ template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction)
 {
     VECTOR<ARRAY<ARRAY<T> >,TV::m> F_volume;
-    
+
     Resize_Vector(rhs); // assumes rhs was 0
     rhs.q=q_rhs;
 
@@ -367,7 +361,7 @@ Pack(const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u,VECTOR<ARRAY<ARRAY<T> >,TV::m>
             v(i)(c).Resize(cm_u(i)->dofs(c));}}
 
     for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
-        FACE_INDEX<TV::m> face(it.Full_Index()); 
+        FACE_INDEX<TV::m> face(it.Full_Index());
         for(int c=0;c<cdi->colors;c++){
             int k=cm_u(face.axis)->Get_Index(it.index,c);
             if(k>=0) v(face.axis)(c)(k)=u(c)(face);}}

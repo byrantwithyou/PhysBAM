@@ -11,8 +11,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV,int d> BASIS_STENCIL_UNIFORM<TV,d>::
-BASIS_STENCIL_UNIFORM(TV dx)
-    :dX(dx)
+BASIS_STENCIL_UNIFORM()
 {
 }
 //#####################################################################
@@ -64,7 +63,7 @@ Scale_Axes(TV scale)
 // Function Dice_Stencil
 //#####################################################################
 template<class TV,int d> void BASIS_STENCIL_UNIFORM<TV,d>::
-Dice_Stencil()
+Dice_Stencil(const TV& dX)
 {
     const VECTOR<TV_INT,(1<<TV::m)>& counts=GRID<TV>::Binary_Counts(TV_INT());
 
@@ -87,7 +86,7 @@ Dice_Stencil()
 // Function Set_Constant_Stencil
 //#####################################################################
 template<class TV,int d> void BASIS_STENCIL_UNIFORM<TV,d>::
-Set_Constant_Stencil()
+Set_Constant_Stencil(const TV& dX)
 {
     ENTRY e;
     e.region=RANGE<TV_INT>::Centered_Box();
@@ -99,7 +98,7 @@ Set_Constant_Stencil()
 // Function Set_Multilinear_Stencil
 //#####################################################################
 template<class TV,int d> void BASIS_STENCIL_UNIFORM<TV,d>::
-Set_Multilinear_Stencil()
+Set_Multilinear_Stencil(const TV& dX)
 {
     ENTRY e;
     e.region.min_corner=TV_INT();
