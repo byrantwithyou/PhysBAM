@@ -37,9 +37,6 @@ INTERFACE_STOKES_MULTIGRID(int num_levels,const GRID<TV>& grid_input,const ARRAY
         range.min_corner(i)--;
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
             u_restriction_stencil(i).Append(it.index);}
-
-    for(int i=0;i<levels.m;i++)
-        Construct_Level(i);
 }
 //#####################################################################
 // Destructor
@@ -53,7 +50,7 @@ template<class TV> INTERFACE_STOKES_MULTIGRID<TV>::
 // Function Construct_Level
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
-Construct_Level(int l)
+Construct_Level(int l,const ARRAY<T>& mu,ARRAY<T>* inertia)
 {
     ARRAY<ARRAY<T,TV_INT> >& cr_phis=levels(l).phi_per_color;
     ARRAY<ARRAY<T,TV_INT> >& bc_phis=levels(l).phi_boundary;
@@ -69,8 +66,8 @@ Construct_Level(int l)
         Fill_Color_Levelset(coarse_grid,cr_phis,bc_phis,levels(l).color_levelset_phi,levels(l).color_levelset_color);
 
         levels(l).iss=new INTERFACE_STOKES_SYSTEM_COLOR<TV>(coarse_grid,levels(l).color_levelset_phi,
-            levels(l).color_levelset_color,true);}
-    // TODO: NEED TO GENERATE: ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > pressure_poisson;
+            levels(l).color_levelset_color,true);
+        levels(l).iss->Set_Matrix(mu,false,0,0,inertia,false);}
 
     levels(l).Initialize();
 }
@@ -493,6 +490,16 @@ template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
 {
     Apply_Preconditioner(debug_cast<T_VECTOR&>(z),debug_cast<const T_VECTOR&>(r),false);
+}
+//#####################################################################
+// Function Set_Matrix
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
+Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,boost::function<TV(const TV& X,int color0,int color1)> u_jump,
+    boost::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<T>* inertia,bool use_rhs)
+{
+    INTERFACE_STOKES_SYSTEM_COLOR<TV>::Set_Matrix(mu,use_discontinuous_velocity,u_jump,j_surface,inertia,use_rhs);
+    for(int i=0;i<levels.m;i++) Construct_Level(i,mu,inertia);
 }
 namespace PhysBAM{
 template class INTERFACE_STOKES_MULTIGRID<VECTOR<float,2> >;

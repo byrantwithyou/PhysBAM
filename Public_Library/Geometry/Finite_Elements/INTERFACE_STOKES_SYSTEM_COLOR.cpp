@@ -55,8 +55,7 @@ template<class TV> INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,boost::function<TV(const TV& X,int color0,int color1)> u_jump,
-    boost::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<T>* inertia,
-    bool use_rhs)
+    boost::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<T>* inertia,bool use_rhs)
 {
     // SET UP STENCILS
 

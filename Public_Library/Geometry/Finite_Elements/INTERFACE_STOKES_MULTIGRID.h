@@ -58,7 +58,7 @@ public:
         const VECTOR<ARRAY<T,TV_INT>,num_bc>& phi_boundary_input,int number_of_ghost_cells);
     ~INTERFACE_STOKES_MULTIGRID();
 
-    void Construct_Level(int l);
+    void Construct_Level(int l,const ARRAY<T>& mu,ARRAY<T>* inertia);
 
     void Restriction(T_VECTOR& z,const T_VECTOR& x,int fine_level) const;
     void Prolongation(T_VECTOR& z,const T_VECTOR& x,int fine_level) const;
@@ -72,6 +72,10 @@ public:
     void Fill_Color_Levelset(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV_INT> >& cr_phis,const ARRAY<ARRAY<T,TV_INT> >& bc_phis,ARRAY<T,TV_INT>& color_phi,ARRAY<int,TV_INT>& colors) const;
 
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const PHYSBAM_OVERRIDE;
+    void Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,
+        boost::function<TV(const TV& X,int color0,int color1)> u_jump,
+        boost::function<TV(const TV& X,int color0,int color1)> j_surface,
+        ARRAY<T>* inertia,bool use_rhs) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

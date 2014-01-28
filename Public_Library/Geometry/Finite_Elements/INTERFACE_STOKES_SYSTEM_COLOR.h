@@ -96,11 +96,11 @@ public:
     virtual ~INTERFACE_STOKES_SYSTEM_COLOR();
 
 //#####################################################################
-    void Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,
+    virtual void Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,
         boost::function<TV(const TV& X,int color0,int color1)> u_jump,
         boost::function<TV(const TV& X,int color0,int color1)> j_surface,
         ARRAY<T>* inertia,bool use_rhs);
-    void Set_RHS(VECTOR_T& rhs,boost::function<TV(const TV& X,int color)> body_force,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction);
+    virtual void Set_RHS(VECTOR_T& rhs,boost::function<TV(const TV& X,int color)> body_force,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction);
     void Add_Polymer_Stress_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
