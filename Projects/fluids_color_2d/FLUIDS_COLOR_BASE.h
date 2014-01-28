@@ -138,6 +138,7 @@ public:
         parse_args.Add("-dump_eigen",&dump_largest_eigenvector,"Dump largest few eigenvectors");
         parse_args.Add("-use_mg",&use_multigrid,"Use multigrid preconditioning");
         parse_args.Add("-mg_levels",&num_multigrid_levels,"levels","Number of multigrid levels");
+        parse_args.Parse(true);
 
 #ifdef USE_OPENMP
         omp_set_num_threads(number_of_threads);
