@@ -9,16 +9,15 @@
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Geometry/Finite_Elements/BOUNDARY_CONDITIONS_SCALAR_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h>
 #include <Geometry/Finite_Elements/KRYLOV_VECTOR_CONDENSED_POISSON.h>
-#include <Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
+#include <boost/function.hpp>
 
 namespace PhysBAM{
 
 template<class TV>
-struct ANALYTIC_TEST: public BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
+struct ANALYTIC_TEST
 {
     typedef typename TV::SCALAR T;
     T kg,m,s;
@@ -34,8 +33,10 @@ struct ANALYTIC_TEST: public BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
     virtual T u(const TV& X,int color)=0;
     virtual T f_volume(const TV& X,int color)=0;
 
-    virtual T u_jump(const TV& X,int color0,int color1)
+    T u_jump(const TV& X,int color0,int color1)
     {return u(X,color1)-u(X,color0);}
+
+    virtual T j_surface(const TV& X,int color0,int color1)=0;
 
     T u(const TV& X){return u(X,phi_color(X));}
 };
@@ -105,9 +106,12 @@ public:
     virtual ~INTERFACE_POISSON_SYSTEM_COLOR_NEW();
 
 //#####################################################################
-    void Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool aggregated_constraints=false,bool cell_centered_u=false,bool eliminate_nullspace_input=false);
+    void Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_scalar_field,
+        boost::function<T(const TV& X,int color0,int color1)> u_jump,
+        boost::function<T(const TV& X,int color0,int color1)> j_surface,
+        bool aggregated_constraints=false,bool cell_centered_u=false,bool eliminate_nullspace_input=false);
     void Build_Full_Solution_From_Condensed(KRYLOV_VECTOR_BASE<T>& small,KRYLOV_VECTOR_BASE<T>& big);
-    void Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc,bool cell_centered_u=false);
+    void Set_RHS(VECTOR_T& rhs,boost::function<T(const TV& X,int color)> body_force,bool cell_centered_u=false);
     void Create_Condensed_RHS(VECTOR_T& rhs);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Resize_Condensed_Vector(KRYLOV_VECTOR_BASE<T>& x) const;

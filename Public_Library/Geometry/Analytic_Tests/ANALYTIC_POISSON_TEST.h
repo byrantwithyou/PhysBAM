@@ -8,12 +8,11 @@
 #define __ANALYTIC_POISSON_TEST__
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_POISSON_SOLUTION.h>
-#include <Geometry/Finite_Elements/BOUNDARY_CONDITIONS_SCALAR_COLOR.h>
 
 namespace PhysBAM{
 
 template<class TV>
-struct ANALYTIC_POISSON_TEST:public BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
+struct ANALYTIC_POISSON_TEST
 {
     typedef typename TV::SCALAR T;
 
@@ -25,7 +24,7 @@ struct ANALYTIC_POISSON_TEST:public BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
         :analytic_levelset(0)
     {}
     
-    virtual ~ANALYTIC_POISSON_TEST()
+    ~ANALYTIC_POISSON_TEST()
     {
         delete analytic_levelset;
         analytic_solution.Delete_Pointers_And_Clean_Memory();

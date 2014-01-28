@@ -25,7 +25,6 @@
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_COLOR.h>
-#include <Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
@@ -185,8 +184,9 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
 
     INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,color_phi);
     ips.use_preconditioner=use_preconditioner;
-    ips.Set_Matrix(at.mu,&at);
-
+    ips.Set_Matrix(at.mu,true,
+        [&](const TV& X,int color0,int color1){return at.u_jump(X,color0,color1);},
+        [&](const TV& X,int color0,int color1){return at.j_surface(X,color0,color1);});
     printf("\n");
     for(int c=0;c<ips.cdi->colors;c++) printf("u%d [%i]\t",c,ips.cm_u->dofs(c));printf("\n");
     printf("q [%i] ",ips.cdi->constraint_base_scalar);
@@ -194,13 +194,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
 
     INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
 
-    struct VOLUME_FORCE_SCALAR_COLOR_LOCAL: public VOLUME_FORCE_SCALAR_COLOR<TV>
-    {
-        ANALYTIC_POISSON_TEST<TV>* at;
-        virtual T F(const TV& X,int color){return -at->mu(color)*at->analytic_solution(color)->Laplacian(X);}
-    } vfscl;
-    vfscl.at=&at;
-    ips.Set_RHS(rhs,&vfscl);
+    ips.Set_RHS(rhs,[&](const TV& X,int color){return -at.mu(color)*at.analytic_solution(color)->Laplacian(X);});
     ips.Resize_Vector(sol);
 
     MINRES<T> mr;
@@ -380,14 +374,12 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(1);
             test.mu.Append(2);
             test.analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T)0.5,1/(T)pi,1,0);
-            test.use_discontinuous_scalar_field=true;
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+1,TV()-1,(T).25*TV::m));
             break;}
         case 4:{ // Two colors, periodic. u=exp(-x^2) for r<R, zero elsewhere.
             test.mu.Append(1);
             test.mu.Append(2);
-            test.use_discontinuous_scalar_field=true;
             test.analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T)0.5,1/(T)pi,1,0);
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
             test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(1,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m));
@@ -396,7 +388,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
-            test.use_discontinuous_scalar_field=true;
             T a=(T)1/6,b=(T)5/12,c=(T)5/6;
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*a,TV::Axis_Vector(0),0,1);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*c,TV::Axis_Vector(0),2,0);
@@ -409,7 +400,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             T a=(T)1/6,b=(T)5/12,c=(T)5/6,constraint=-1;
             test.mu.Append(1);
             test.mu.Append(2);
-            test.use_discontinuous_scalar_field=true;
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*a,TV::Axis_Vector(0),constraint,0);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*c,TV::Axis_Vector(0),1,constraint);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*b,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
@@ -424,7 +414,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
-            test.use_discontinuous_scalar_field=true;
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,2,1);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
@@ -440,7 +429,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
-            test.use_discontinuous_scalar_field=true;
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,2,1);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
@@ -456,7 +444,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(1);
             test.mu.Append(2);
             test.mu.Append(3);
-            test.use_discontinuous_scalar_field=true;
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,2,1);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
@@ -472,7 +459,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             n.Normalize();
             test.mu.Append(1);
             test.mu.Append(2);
-            test.use_discontinuous_scalar_field=true;
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,1,0);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),constraint,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
@@ -484,7 +470,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test.mu.Append(2);
             test.mu.Append(3);
             test.mu.Append(4);
-            test.use_discontinuous_scalar_field=true;
             struct ANALYTIC_POISSON_LEVELSET_11:public ANALYTIC_LEVELSET<TV>
             {
                 T r;

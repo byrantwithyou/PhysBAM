@@ -10,8 +10,8 @@
 
 #include <Tools/Symbolics/STATIC_POLYNOMIAL.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Geometry/Finite_Elements/BOUNDARY_CONDITIONS_SCALAR_COLOR.h>
 #include <Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.h>
+#include <boost/function.hpp>
 
 namespace PhysBAM{
 
@@ -37,12 +37,15 @@ public:
     
     T scale;
     ARRAY<ARRAY<T> >* rhs;
-    BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* bc;
+    bool use_discontinuous_scalar_field;
+    boost::function<T(const TV& X,int color0,int color1)> u_jump;
+    boost::function<T(const TV& X,int color0,int color1)> j_surface;
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
 
     template<int d>
     void Initialize(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* bc_input,ARRAY<ARRAY<T> >& rhs_input,T scale_input);
+        bool use_discontinuous_scalar_field_input,boost::function<T(const TV& X,int color0,int color1)> u_jump_input,
+        boost::function<T(const TV& X,int color0,int color1)> j_surface_input,ARRAY<ARRAY<T> >& rhs_input,T scale_input);
 
     void Add_Entry(int constraint_index,int flat_index_diff_ref,int color,T value)
     {helper->data(color)(constraint_index,flat_index_diff_ref)+=value*scale;}

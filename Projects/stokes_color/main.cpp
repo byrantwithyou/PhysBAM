@@ -16,11 +16,9 @@
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <Geometry/Finite_Elements/BOUNDARY_CONDITIONS_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
-#include <Geometry/Finite_Elements/VOLUME_FORCE_COLOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
@@ -236,15 +234,14 @@ void Dump_u_p(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& u,const AR
 //#################################################################################################################################################
 
 template<class TV>
-struct ANALYTIC_TEST:public BOUNDARY_CONDITIONS_COLOR<TV>,public VOLUME_FORCE_COLOR<TV>
+struct ANALYTIC_TEST
 {
     typedef typename TV::SCALAR T;
     T kg,m,s;
 
-    bool wrap;
     ARRAY<T> mu;
 
-    ANALYTIC_TEST(): kg(1),m(1),s(1),wrap(false) {}
+    ANALYTIC_TEST(): kg(1),m(1),s(1) {}
     virtual ~ANALYTIC_TEST(){}
 
     virtual void Initialize()=0;
@@ -253,6 +250,8 @@ struct ANALYTIC_TEST:public BOUNDARY_CONDITIONS_COLOR<TV>,public VOLUME_FORCE_CO
     virtual TV u(const TV& X,int color)=0;
     virtual T p(const TV& X)=0;
     virtual TV F(const TV& X,int color)=0;
+    virtual TV j_surface(const TV& X,int color0,int color1)=0;
+    virtual TV u_jump(const TV& X,int color0,int color1)=0;
 
     TV u(const TV& X){return u(X,phi_color(X));}
 };
@@ -274,7 +273,9 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     iss.use_preconditioner=use_preconditioner;
 //    iss.use_p_null_mode=true;
 //    iss.use_u_null_mode=true;
-    iss.Set_Matrix(at.mu,&at,0,0);
+    iss.Set_Matrix(at.mu,true,
+        [&](const TV& X,int color0,int color1){return at.u_jump(X,color0,color1);},
+        [&](const TV& X,int color0,int color1){return at.j_surface(X,color0,color1);},0,false);
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
@@ -296,7 +297,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
                 FACE_INDEX<TV::m> face(it.Full_Index()); 
                 u(c)(face)=at.u(it.Location(),c)(face.axis);}
         
-        iss.Set_RHS(rhs,&at,&u,false);
+        iss.Set_RHS(rhs,[&](const TV& X,int color){return at.F(X,color);},&u,false);
         iss.Resize_Vector(sol);
     }
 
@@ -453,8 +454,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 0:{ // Two colors, periodic. Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], no pressure
             struct ANALYTIC_TEST_0:public ANALYTIC_TEST<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);mu.Append(2);}
                 virtual T phi_value(const TV& X){return abs(-m/(T)6+abs(X.x-0.5*m));}
                 virtual int phi_color(const TV& X){return (-m/(T)6+abs(X.x-0.5*m))<0;}
                 virtual TV u(const TV& X,int color){return TV::Axis_Vector(1)*(color?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
@@ -468,8 +469,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 1:{ // Two colors, periodic. Linear flow [u,v]=[0,v(x)] on [0,0.25],[0.25,0.75],[0.75,1], no pressure
             struct ANALYTIC_TEST_1:public ANALYTIC_TEST<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);mu.Append(2);}
                 virtual T phi_value(const TV& X){return abs(-0.25*m+abs(X.x-0.5*m));}
                 virtual int phi_color(const TV& X){return (-0.25*m+abs(X.x-0.5*m))<0;}
                 virtual TV u(const TV& X,int color){return TV::Axis_Vector(1)*(color?(X.x-0.5*m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
@@ -483,8 +484,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 2:{ // Two colors, periodic. Poiseuille flow (parabolic velocity profile) [u,v]=[u,v(x)] on [0.25,0.75], 0 velocity outside, no pressure
             struct ANALYTIC_TEST_2:public ANALYTIC_TEST<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);mu.Append(2);}
                 virtual T phi_value(const TV& X){return abs(-0.25*m+abs(X.x-0.5*m));}
                 virtual int phi_color(const TV& X){return (-0.25*m+abs(X.x-0.5*m))<0;}
                 virtual TV u(const TV& X,int color)
@@ -499,8 +500,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 3:{ // Two colors, periodic. Opposite Poiseuille flows on [0.25,0.75] and [0,0.25],[0.75,1], no pressure
             struct ANALYTIC_TEST_3:public ANALYTIC_TEST<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);mu.Append(2);}
                 virtual T phi_value(const TV& X){return abs(-0.25*m+abs(X.x-0.5*m));}
                 virtual int phi_color(const TV& X){return (-0.25*m+abs(X.x-0.5*m))<0;}
                 virtual TV u(const TV& X,int color)
@@ -516,10 +517,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
             {
                 T ra,rb,ra2,rb2,rb2mra2,r_avg,r_avg2;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);
+                    mu.Append(1);mu.Append(2);
                     ra=0.1666*m;rb=0.3333*m;ra2=sqr(ra);rb2=sqr(rb);
                     rb2mra2=rb2-ra2;r_avg=(ra+rb)/2;r_avg2=sqr(r_avg);
                 }
@@ -568,8 +569,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 5:{ // Two colors, periodic. Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], periodic pressure p(y)
             struct ANALYTIC_TEST_5:public ANALYTIC_TEST<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);mu.Append(2);}
                 virtual T phi_value(const TV& X){return abs(-m/(T)6+abs(X.x-0.5*m));}
                 virtual int phi_color(const TV& X){return (-m/(T)6+abs(X.x-0.5*m))<0;}
                 virtual TV u(const TV& X,int color){return TV::Axis_Vector(1)*(color?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
@@ -584,8 +585,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 6:{ // Two colors, periodic. Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], linear pressure p(x) color
             struct ANALYTIC_TEST_6:public ANALYTIC_TEST<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);mu.Append(2);}
                 virtual T phi_value(const TV& X){return abs(-m/(T)6+abs(X.x-0.5*m));}
                 virtual int phi_color(const TV& X){return (-m/(T)6+abs(X.x-0.5*m))<0;}
                 virtual TV u(const TV& X,int color){return TV::Axis_Vector(1)*(color?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
@@ -600,8 +601,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 7:{ // One color, periodic. No interface, no forces
             struct ANALYTIC_TEST_7:public ANALYTIC_TEST<TV>
             {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);}
                 virtual T phi_value(const TV& X){return 1;}
                 virtual int phi_color(const TV& X){return 0;}
                 virtual TV u(const TV& X,int color){return TV();}
@@ -616,8 +617,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             struct ANALYTIC_TEST_8:public ANALYTIC_TEST<TV>
             {
                 T r;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);mu.Append(2);r=m/M_PI;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
                 virtual TV u(const TV& X,int color){return (X-0.5*m)*color;}
@@ -632,8 +633,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             struct ANALYTIC_TEST_9:public ANALYTIC_TEST<TV>
             {
                 T r;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);mu.Append(2);r=m/M_PI;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
                 virtual TV u(const TV& X,int color){return (X-0.5*m)*color;}
@@ -648,8 +649,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             struct ANALYTIC_TEST_10:public ANALYTIC_TEST<TV>
             {
                 T r,m2,m4,u_term,p_term;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;m2=sqr(m);m4=sqr(m2);u_term=1;p_term=1;}
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){mu.Append(1);mu.Append(2);r=m/M_PI;m2=sqr(m);m4=sqr(m2);u_term=1;p_term=1;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
                 virtual TV u(const TV& X,int color){TV x=X-0.5*m; return x*u_term*exp(-x.Magnitude_Squared()/m2)*color;}
@@ -676,9 +677,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 T r,m2,m4,u_term,p_term;
                 int bc_type;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 ANALYTIC_TEST_11(int bc):bc_type(bc){}
-                virtual void Initialize(){wrap=true;mu.Append(1);r=m/pi;m2=sqr(m);m4=sqr(m2);u_term=1;p_term=1;}
+                virtual void Initialize(){mu.Append(1);r=m/pi;m2=sqr(m);m4=sqr(m2);u_term=1;p_term=1;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0?0:bc_type;}
                 virtual TV u(const TV& X,int color){TV x=X-0.5*m;TV u;u(0)=x.x;u(1)=-x.y;return u;}

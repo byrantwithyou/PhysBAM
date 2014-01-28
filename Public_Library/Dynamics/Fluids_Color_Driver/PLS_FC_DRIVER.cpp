@@ -24,7 +24,6 @@
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_MULTIGRID.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h>
-#include <Geometry/Finite_Elements/VOLUME_FORCE_COLOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
@@ -37,6 +36,7 @@
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION_MULTIPLE.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
+#include <boost/function.hpp>
 using namespace PhysBAM;
 namespace{
     template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
@@ -349,18 +349,6 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 {
     if(example.omit_solve) return;
     static int solve_id=-1;solve_id++;
-    struct BOUNDARY_CONDITIONS_COLOR_LOCAL:public BOUNDARY_CONDITIONS_COLOR<TV>
-    {
-        PLS_FC_EXAMPLE<TV>* example;
-        T time,dt;
-        virtual TV u_jump(const TV& X,int color0,int color1) {return example->Velocity_Jump(X,color0,color1,time);}
-        virtual TV j_surface(const TV& X,int color0,int color1) {return example->Jump_Interface_Condition(X,color0,color1,time)*dt;}
-    } bccl;
-    bccl.example=&example;
-    bccl.time=time+dt;
-    bccl.dt=dt;
-    bccl.use_discontinuous_velocity=example.use_discontinuous_velocity;
-
     INTERFACE_STOKES_SYSTEM_COLOR<TV>* issp=0;
 
     ARRAY<ARRAY<T,TV_INT> >& phis=example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;
@@ -373,9 +361,12 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     iss.use_preconditioner=example.use_preconditioner;
     iss.use_p_null_mode=example.use_p_null_mode;
     iss.use_polymer_stress=example.use_polymer_stress;
-    ARRAY<T> system_inertia=example.rho,dt_mu(example.mu*dt);
-    if(!first_step) system_inertia*=(T)1.5;
-    iss.Set_Matrix(dt_mu,&bccl,&system_inertia,&system_inertia);
+    ARRAY<T> inertia=example.rho,dt_mu(example.mu*dt);
+    if(!first_step) inertia*=(T)1.5;
+    iss.Set_Matrix(dt_mu,example.use_discontinuous_velocity,
+        [=](const TV& X,int color0,int color1){return example.Velocity_Jump(X,color0,color1,time);},
+        [=](const TV& X,int color0,int color1){return example.Jump_Interface_Condition(X,color0,color1,time)*dt;},
+        &inertia,true);
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
@@ -385,19 +376,8 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     printf("\n");
 
     INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
-
-    struct VOLUME_FORCE_COLOR_LOCAL:public VOLUME_FORCE_COLOR<TV>
-    {
-        PLS_FC_EXAMPLE<TV>* example;
-        T time,dt;
-        virtual TV F(const TV& X,int color) {return example->Volume_Force(X,color,time)*dt;}
-    } vfcl;
-    vfcl.example=&example;
-    vfcl.time=time+dt;
-    vfcl.dt=dt;
-
-    iss.Set_RHS(rhs,&vfcl,&example.face_velocities,false);
-    if(example.use_polymer_stress) iss.Add_Polymer_Stress_RHS(rhs,&vfcl,example.polymer_stress); //if needed
+    iss.Set_RHS(rhs,[=](const TV& X,int color){return example.Volume_Force(X,color,time)*dt;},&example.face_velocities,false);
+    if(example.use_polymer_stress) iss.Add_Polymer_Stress_RHS(rhs,example.polymer_stress); //if needed
     iss.Resize_Vector(sol);
 
     MINRES<T> mr;

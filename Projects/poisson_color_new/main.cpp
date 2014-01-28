@@ -19,7 +19,6 @@
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_COLOR_NEW.h>
-#include <Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
@@ -194,22 +193,17 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         
     INTERFACE_POISSON_SYSTEM_COLOR_NEW<TV> ips(grid,phi_value,phi_color);
     ips.use_preconditioner=use_preconditioner;
-    ips.Set_Matrix(at.mu,&at,aggregated_constraints,cell_centered_u,eliminate_nullspace);
-
+    ips.Set_Matrix(at.mu,true,
+        [&](const TV& X,int color0,int color1){return at.u_jump(X,color0,color1);},
+        [&](const TV& X,int color0,int color1){return at.j_surface(X,color0,color1);},
+        aggregated_constraints,cell_centered_u,eliminate_nullspace);
     printf("\n");
     for(int c=0;c<ips.cdi->colors;c++) printf("u%d [%i]\t",c,ips.cm_u->dofs(c));printf("\n");
     printf("q [%i] ",ips.cdi->constraint_base_scalar);
     printf("\n");
 
     INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
-
-    struct VOLUME_FORCE_SCALAR_COLOR_LOCAL: public VOLUME_FORCE_SCALAR_COLOR<TV>
-    {
-        ANALYTIC_TEST<TV>* at;
-        virtual T F(const TV& X,int color){return at->f_volume(X,color);}
-    } vfscl;
-    vfscl.at=&at;
-    ips.Set_RHS(rhs,&vfscl,cell_centered_u);
+    ips.Set_RHS(rhs,[&](const TV& X,int color){return at.f_volume(X,color);},cell_centered_u);
     ips.Resize_Vector(sol);
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
@@ -442,8 +436,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 T r;
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){
-                    mu.Append(1);mu.Append(2);r=m/M_PI;
-                    this->use_discontinuous_scalar_field=true;}
+                    mu.Append(1);mu.Append(2);r=m/M_PI;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
                 virtual T u(const TV& X,int color){return (X-0.5*m).Magnitude_Squared()*color;}
@@ -460,8 +453,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 T r,m2,m4;
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){
-                    mu.Append(1);mu.Append(2);r=m/M_PI;m2=sqr(m);m4=sqr(m2);
-                    this->use_discontinuous_scalar_field=true;}
+                    mu.Append(1);mu.Append(2);r=m/M_PI;m2=sqr(m);m4=sqr(m2);}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
                 virtual T u(const TV& X,int color){return exp(-(X-0.5*m).Magnitude_Squared()/m2)*color;}
@@ -481,7 +473,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 {
                     mu.Append(1);mu.Append(2);mu.Append(3);
                     a=m/6;b=m*5/12;c=m*5/6;
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X)
                 {
@@ -535,7 +526,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     mu.Append(1);mu.Append(2);
                     a=m/6;b=m*5/12;c=m*5/6;
                     constraint=-1;
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X)
                 {
@@ -597,7 +587,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     mu.Append(1);mu.Append(2);mu.Append(3);
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X){TV x=X-0.5*m;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
                 virtual int phi_color(const TV& X){TV x=X-0.5*m;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?2:1):0;}
@@ -621,7 +610,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     mu.Append(1);mu.Append(2);mu.Append(3);
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X){TV x=X-0.5*m;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
                 virtual int phi_color(const TV& X){TV x=X-0.5*m;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?2:1):0;}
@@ -645,7 +633,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     mu.Append(1);mu.Append(2);mu.Append(3);
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;m2=sqr(m);m4=sqr(m2);
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X){TV x=X-0.5*m;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
                 virtual int phi_color(const TV& X){TV x=X-0.5*m;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?2:1):0;}
@@ -671,7 +658,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;m2=sqr(m);m4=sqr(m2);
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
                     constraint=-2;
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual T phi_value(const TV& X){TV x=X-0.5*m;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
                 virtual int phi_color(const TV& X){TV x=X-0.5*m;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?1:0):constraint;}
@@ -706,7 +692,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                         normals(i).y=centers(i).x;
                         centers(i)*=r;
                         for(int j=0;j<3;j++) sectors(i)(j)=(i+j)%3;}
-                    this->use_discontinuous_scalar_field=true;
                 }
                 virtual TV Transform(const TV& X){return X-0.5+a;}
                 virtual T phi_value(const TV& X)

@@ -19,7 +19,6 @@
 #include <Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.h>
 #include <Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h>
 #include <Geometry/Finite_Elements/TRIPLE_JUNCTION_CORRECTION.h>
-#include <Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
@@ -81,7 +80,9 @@ template<class TV,class CELL_ELEMENTS> void Dump(const GRID<TV>& grid,const HASH
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
-Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc)
+Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_scalar_field,
+    boost::function<T(const TV& X,int color0,int color1)> u_jump,
+    boost::function<T(const TV& X,int color0,int color1)> j_surface)
 {
     // SET UP STENCILS
 
@@ -125,7 +126,7 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc)
 
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_uu,udx_stencil(i),udx_stencil(i),mu);
-    biu.Add_Surface_Block_Scalar(helper_qu,u_stencil,abc,rhs_surface,1);
+    biu.Add_Surface_Block_Scalar(helper_qu,u_stencil,use_discontinuous_scalar_field,u_jump,j_surface,rhs_surface,1);
     biu.Add_Volume_Block(helper_rhs_uu,u_stencil,u_stencil,ARRAY<T>(CONSTANT_ARRAY<T>(mu.m,(T)1)));
 
     biu.Compute_Entries();
@@ -165,7 +166,7 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc)
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
-Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc)
+Set_RHS(VECTOR_T& rhs,boost::function<T(const TV& X,int color)> body_force)
 {
     ARRAY<ARRAY<T> > F_volume;
 
@@ -179,7 +180,7 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc)
     for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
         for(int c=0;c<cdi->colors;c++){
             int k=cm_u->Get_Index(it.index,c);
-            if(k>=0) F_volume(c)(k)=vfsc->F(it.Location(),c);}
+            if(k>=0) F_volume(c)(k)=body_force(it.Location(),c);}
 
     for(int c=0;c<cdi->colors;c++)
         matrix_rhs_uu(c).Transpose_Times_Add(F_volume(c),rhs.u(c));

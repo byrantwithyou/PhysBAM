@@ -310,30 +310,34 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const 
                         
                         TV X=V.face.Center()+grid.Center(cell);
                         if(V.color_pair.x>=0){
-                            T value=integral*sb->bc->j_surface(X,V.color_pair.x,V.color_pair.y)(sb->axis);
-                            value*=(T)0.5;
-                            (*sb->rhs)(V.color_pair.x)(flat_index)+=value;
-                            (*sb->rhs)(V.color_pair.y)(flat_index)+=value;
+                            if(sb->j_surface){
+                                T value=integral*sb->j_surface(X,V.color_pair.x,V.color_pair.y)(sb->axis);
+                                value*=(T)0.5;
+                                (*sb->rhs)(V.color_pair.x)(flat_index)+=value;
+                                (*sb->rhs)(V.color_pair.y)(flat_index)+=value;}
 
-                            if(sb->bc->use_discontinuous_velocity)
+                            if(sb->use_discontinuous_velocity && sb->u_jump)
                                 if(sb->axis==0){ // This code should not be repeated for each block
-                                    TV value=integral*orientations(k).Transpose_Times(sb->bc->u_jump(X,V.color_pair.x,V.color_pair.y));
+                                    TV value=integral*orientations(k).Transpose_Times(sb->u_jump(X,V.color_pair.x,V.color_pair.y));
                                     for(int d=0;d<TV::m;d++)
                                         sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,V.color_pair.y,value(d));}}
                         else if(V.color_pair.x==BC::NEUMANN){
-                            T value=integral*sb->bc->j_surface(X,V.color_pair.x,V.color_pair.y)(sb->axis);
-                            (*sb->rhs)(V.color_pair.y)(flat_index)+=value;}
+                            if(sb->j_surface){
+                                T value=integral*sb->j_surface(X,V.color_pair.x,V.color_pair.y)(sb->axis);
+                                (*sb->rhs)(V.color_pair.y)(flat_index)+=value;}}
                         else if(V.color_pair.x==BC::DIRICHLET){
-                            if(sb->axis==0){ // This code should not be repeated for each block
-                                TV value=integral*orientations(k).Transpose_Times(sb->bc->u_jump(X,V.color_pair.x,V.color_pair.y));
+                            if(sb->axis==0 && sb->u_jump){ // This code should not be repeated for each block
+                                TV value=integral*orientations(k).Transpose_Times(sb->u_jump(X,V.color_pair.x,V.color_pair.y));
                                 for(int d=0;d<TV::m;d++)
                                     sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,V.color_pair.y,value(d));}}
                         else{
                             TV N=-orientations(k).Column(TV::m-1);
-                            T n_value=integral*sb->bc->j_surface(X,V.color_pair.x,V.color_pair.y).Projected_Orthogonal_To_Unit_Direction(N)(sb->axis);
-                            (*sb->rhs)(V.color_pair.y)(flat_index)+=n_value;
-                            if(sb->axis==0){ // This code should not be repeated for each block
-                                T d_value=-integral*sb->bc->u_jump(X,V.color_pair.x,V.color_pair.y).Dot(N);
+                            if(sb->j_surface){
+                                T n_value=integral*sb->j_surface(X,V.color_pair.x,V.color_pair.y).
+                                    Projected_Orthogonal_To_Unit_Direction(N)(sb->axis);
+                                (*sb->rhs)(V.color_pair.y)(flat_index)+=n_value;}
+                            if(sb->axis==0 && sb->u_jump){ // This code should not be repeated for each block
+                                T d_value=-integral*sb->u_jump(X,V.color_pair.x,V.color_pair.y).Dot(N);
                                 sb->Add_Constraint_Rhs_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,V.color_pair.y,d_value);}}}}}}
 
     if(surface_blocks_scalar.m){
@@ -362,19 +366,21 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const 
                         TV X=V.face.Center()+cell_center;
                         int flat_index=cdi.Flatten(cell)+sbs->Flat_Diff(op.flat_index_diff_ref);
                         if(V.color_pair.x>=0){
-                            T value=integral*sbs->bc->j_surface(X,V.color_pair.x,V.color_pair.y);
-                            value*=(T)0.5;
-                            (*sbs->rhs)(V.color_pair.x)(flat_index)+=value;
-                            (*sbs->rhs)(V.color_pair.y)(flat_index)+=value;
+                            if(sbs->j_surface){
+                                T value=integral*sbs->j_surface(X,V.color_pair.x,V.color_pair.y);
+                                value*=(T)0.5;
+                                (*sbs->rhs)(V.color_pair.x)(flat_index)+=value;
+                                (*sbs->rhs)(V.color_pair.y)(flat_index)+=value;}
                             
-                            if(sbs->bc->use_discontinuous_scalar_field){
-                                T value=-integral*sbs->bc->u_jump(X,V.color_pair.x,V.color_pair.y);
+                            if(sbs->use_discontinuous_scalar_field && sbs->u_jump){
+                                T value=-integral*sbs->u_jump(X,V.color_pair.x,V.color_pair.y);
                                 sbs->Add_Constraint_Rhs_Entry(cdi.constraint_base_scalar+constraint_offset,V.color_pair.y,value);}}
                         else if(V.color_pair.x==BC::NEUMANN){
-                            T value=integral*sbs->bc->j_surface(X,V.color_pair.x,V.color_pair.y);
-                            (*sbs->rhs)(V.color_pair.y)(flat_index)+=value;}
-                        else{
-                            T value=-integral*sbs->bc->u_jump(X,V.color_pair.x,V.color_pair.y);
+                            if(sbs->j_surface){
+                                T value=integral*sbs->j_surface(X,V.color_pair.x,V.color_pair.y);
+                                (*sbs->rhs)(V.color_pair.y)(flat_index)+=value;}}
+                        else if(sbs->u_jump){
+                            T value=-integral*sbs->u_jump(X,V.color_pair.x,V.color_pair.y);
                             sbs->Add_Constraint_Rhs_Entry(cdi.constraint_base_scalar+constraint_offset,V.color_pair.y,value);}}}}}
 }
 //#####################################################################
@@ -399,10 +405,11 @@ Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCI
 //#####################################################################
 template<class TV,int static_degree> template<int d> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
 Add_Surface_Block(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-    BOUNDARY_CONDITIONS_COLOR<TV>* bc,ARRAY<ARRAY<T> >& f_surface,int axis,T scale)
+    bool use_discontinuous_velocity,boost::function<TV(const TV& X,int color0,int color1)> u_jump,
+        boost::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<ARRAY<T> >& f_surface,int axis,T scale)
 {
     SURFACE_BLOCK* sb=new SURFACE_BLOCK;
-    sb->Initialize(helper,s,bc,f_surface,axis,scale);
+    sb->Initialize(helper,s,use_discontinuous_velocity,u_jump,j_surface,f_surface,axis,scale);
     surface_blocks.Append(sb);
         
     for(int i=0;i<sb->overlap_polynomials.m;i++){
@@ -416,10 +423,11 @@ Add_Surface_Block(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STEN
 //#####################################################################
 template<class TV,int static_degree> template<int d> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
 Add_Surface_Block_Scalar(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-    BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* bc,ARRAY<ARRAY<T> >& f_surface,T scale)
+    bool use_discontinuous_scalar_field,boost::function<T(const TV& X,int color0,int color1)> u_jump,
+    boost::function<T(const TV& X,int color0,int color1)> j_surface,ARRAY<ARRAY<T> >& f_surface,T scale)
 {
     SURFACE_BLOCK_SCALAR* sbs=new SURFACE_BLOCK_SCALAR;
-    sbs->Initialize(helper,s,bc,f_surface,scale);
+    sbs->Initialize(helper,s,use_discontinuous_scalar_field,u_jump,j_surface,f_surface,scale);
     surface_blocks_scalar.Append(sbs);
         
     for(int i=0;i<sbs->overlap_polynomials.m;i++){
@@ -431,38 +439,22 @@ Add_Surface_Block_Scalar(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper,co
 namespace PhysBAM{
 template class BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>;
 template class BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>;
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ARRAY<float> const&);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ARRAY<float> const&);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BOUNDARY_CONDITIONS_COLOR<VECTOR<float,3> >*,ARRAY<ARRAY<float> >&,int,float);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<float,3> >*,ARRAY<ARRAY<float> >&,float);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ARRAY<float> const&);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ARRAY<float> const&);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BOUNDARY_CONDITIONS_COLOR<VECTOR<float,2> >*,ARRAY<ARRAY<float> >&,int,float);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<float,2> >*,ARRAY<ARRAY<float> >&,float);
 template class BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>;
 template class BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>;
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ARRAY<double> const&);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ARRAY<double> const&);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BOUNDARY_CONDITIONS_COLOR<VECTOR<double,3> >*,ARRAY<ARRAY<double> >&,int,double);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<double,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<double,3> >*,ARRAY<ARRAY<double> >&,double);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ARRAY<double> const&);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ARRAY<double> const&);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BOUNDARY_CONDITIONS_COLOR<VECTOR<double,2> >*,ARRAY<ARRAY<double> >&,int,double);
-template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<double,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<double,2> >*,ARRAY<ARRAY<double> >&,double);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,bool,boost::function<VECTOR<double,2> (VECTOR<double,2> const&,int,int)>,boost::function<VECTOR<double,2> (VECTOR<double,2> const&,int,int)>,ARRAY<ARRAY<double,int>,int>&,int,double);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,bool,boost::function<double (VECTOR<double,2> const&,int,int)>,boost::function<double (VECTOR<double,2> const&,int,int)>,ARRAY<ARRAY<double,int>,int>&,double);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ARRAY<double,int> const&);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ARRAY<double,int> const&);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,bool,boost::function<VECTOR<double,3> (VECTOR<double,3> const&,int,int)>,boost::function<VECTOR<double,3> (VECTOR<double,3> const&,int,int)>,ARRAY<ARRAY<double,int>,int>&,int,double);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,bool,boost::function<double (VECTOR<double,3> const&,int,int)>,boost::function<double (VECTOR<double,3> const&,int,int)>,ARRAY<ARRAY<double,int>,int>&,double);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ARRAY<double,int> const&);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ARRAY<double,int> const&);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,bool,boost::function<VECTOR<float,2> (VECTOR<float,2> const&,int,int)>,boost::function<VECTOR<float,2> (VECTOR<float,2> const&,int,int)>,ARRAY<ARRAY<float,int>,int>&,int,float);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,bool,boost::function<float (VECTOR<float,2> const&,int,int)>,boost::function<float (VECTOR<float,2> const&,int,int)>,ARRAY<ARRAY<float,int>,int>&,float);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ARRAY<float,int> const&);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ARRAY<float,int> const&);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,bool,boost::function<VECTOR<float,3> (VECTOR<float,3> const&,int,int)>,boost::function<VECTOR<float,3> (VECTOR<float,3> const&,int,int)>,ARRAY<ARRAY<float,int>,int>&,int,float);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,bool,boost::function<float (VECTOR<float,3> const&,int,int)>,boost::function<float (VECTOR<float,3> const&,int,int)>,ARRAY<ARRAY<float,int>,int>&,float);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ARRAY<float,int> const&);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ARRAY<float,int> const&);
 }

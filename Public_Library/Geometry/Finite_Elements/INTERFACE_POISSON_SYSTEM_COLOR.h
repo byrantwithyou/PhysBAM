@@ -10,10 +10,9 @@
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
-#include <Geometry/Finite_Elements/BOUNDARY_CONDITIONS_SCALAR_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h>
-#include <Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
+#include <boost/function.hpp>
 
 namespace PhysBAM{
 
@@ -72,8 +71,10 @@ public:
     virtual ~INTERFACE_POISSON_SYSTEM_COLOR();
 
 //#####################################################################
-    void Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc);
-    void Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc);
+    void Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_scalar_field,
+        boost::function<T(const TV& X,int color0,int color1)> u_jump,
+        boost::function<T(const TV& X,int color0,int color1)> j_surface);
+    void Set_RHS(VECTOR_T& rhs,boost::function<T(const TV& X,int color)> body_force);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;

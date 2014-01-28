@@ -19,7 +19,6 @@
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
 #include <Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_HELPER_COLOR.h>
 #include <Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h>
-#include <Geometry/Finite_Elements/VOLUME_FORCE_COLOR.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
@@ -55,9 +54,10 @@ template<class TV> INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* system_inertia,ARRAY<T>* rhs_inertia)
+Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,boost::function<TV(const TV& X,int color0,int color1)> u_jump,
+    boost::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<T>* inertia,
+    bool use_rhs)
 {
-    PHYSBAM_ASSERT((bool)system_inertia==(bool)rhs_inertia);
     // SET UP STENCILS
 
     BASIS_STENCIL_UNIFORM<TV,0> p_stencil;
@@ -108,10 +108,10 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* syste
             helper_uu(i)(j).Initialize(u_stencil(i),u_stencil(j),*cm_u(i),*cm_u(j),*cdi);
         helper_pu(i).Initialize(p_stencil,u_stencil(i),*cm_p,*cm_u(i),*cdi);
         helper_qu(i).Initialize(u_stencil(i),*cm_u(i),*cdi);
-        helper_rhs_pu(i).Initialize(p_stencil,u_stencil(i),*cm_p,*cm_u(i),*cdi);
-        if(system_inertia)
-            helper_inertial_rhs(i).Initialize(u_stencil(i),u_stencil(i),*cm_u(i),*cm_u(i),*cdi);}
-    if(use_polymer_stress)
+        if(use_rhs) helper_rhs_pu(i).Initialize(p_stencil,u_stencil(i),*cm_p,*cm_u(i),*cdi);
+        if(inertia)
+            if(use_rhs) helper_inertial_rhs(i).Initialize(u_stencil(i),u_stencil(i),*cm_u(i),*cm_u(i),*cdi);}
+    if(use_rhs && use_polymer_stress)
         for(int i=0;i<TV::m;i++)
             for(int j=0;j<TV::m;j++)
                 helper_polymer_stress_rhs(i)(j).Initialize(u_stencil(i),polymer_stress_stencil,*cm_u(i),*cm_p,*cdi);
@@ -132,22 +132,22 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* syste
         for(int j=i+1;j<TV::m;j++)
             biu.Add_Volume_Block(helper_uu(i)(j),udx_stencil(i)(j),udx_stencil(j)(i),mu);
     // Diagonal inertial term
-    if(system_inertia){
-        PHYSBAM_ASSERT(system_inertia->m==mu.m && system_inertia->m==rhs_inertia->m);
+    if(inertia){
         for(int i=0;i<TV::m;i++){
-            biu.Add_Volume_Block(helper_uu(i)(i),u_stencil(i),u_stencil(i),*system_inertia);
-            biu.Add_Volume_Block(helper_inertial_rhs(i),u_stencil(i),u_stencil(i),*rhs_inertia);}}
+            biu.Add_Volume_Block(helper_uu(i)(i),u_stencil(i),u_stencil(i),*inertia);
+            if(use_rhs) biu.Add_Volume_Block(helper_inertial_rhs(i),u_stencil(i),u_stencil(i),*inertia);}}
     // Pressure blocks
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_pu(i),p_stencil,udx_stencil(i)(i),minus_ones);
     // Traction blocks
     for(int i=0;i<TV::m;i++)
-        biu.Add_Surface_Block(helper_qu(i),u_stencil(i),abc,rhs_surface(i),i,1);
+        biu.Add_Surface_Block(helper_qu(i),u_stencil(i),use_discontinuous_velocity,u_jump,j_surface,rhs_surface(i),i,1);
     // RHS pressure blocks
-    for(int i=0;i<TV::m;i++)
-        biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,u_stencil(i),ones);
+    if(use_rhs)
+        for(int i=0;i<TV::m;i++)
+            biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,u_stencil(i),ones);
     // RHS polymer stress blocks
-    if(use_polymer_stress)
+    if(use_rhs && use_polymer_stress)
         for(int i=0;i<TV::m;i++)
             for(int j=0;j<TV::m;j++)
                 biu.Add_Volume_Block(helper_polymer_stress_rhs(i)(j),udx_stencil(i)(j),polymer_stress_stencil,ones);
@@ -161,10 +161,10 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* syste
             helper_uu(i)(j).Mark_Active_Cells();
         helper_pu(i).Mark_Active_Cells();
         helper_qu(i).Mark_Active_Cells();
-        helper_rhs_pu(i).Mark_Active_Cells();
-        if(system_inertia)
+        if(use_rhs) helper_rhs_pu(i).Mark_Active_Cells();
+        if(inertia && use_rhs)
             helper_inertial_rhs(i).Mark_Active_Cells();}
-    if(use_polymer_stress)
+    if(use_polymer_stress && use_rhs)
         for(int i=0;i<TV::m;i++)
             for(int j=i;j<TV::m;j++)
                 helper_polymer_stress_rhs(i)(j).Mark_Active_Cells();
@@ -182,17 +182,18 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* syste
     // QU Block
     for(int i=0;i<TV::m;i++)
         helper_qu(i).Build_Matrix(matrix_qu(i),q_rhs);
-    // RHS PU Block
-    for(int i=0;i<TV::m;i++)
-        helper_rhs_pu(i).Build_Matrix(matrix_rhs_pu(i));
-    // RHS Inertial Block
-    if(system_inertia)
+    if(use_rhs){
+        // RHS PU Block
         for(int i=0;i<TV::m;i++)
-            helper_inertial_rhs(i).Build_Matrix(matrix_inertial_rhs(i));
-    if(use_polymer_stress)
-        for(int i=0;i<TV::m;i++)
-            for(int j=0;j<TV::m;j++)
-                helper_polymer_stress_rhs(i)(j).Build_Matrix(matrix_polymer_stress_rhs(i)(j));
+            helper_rhs_pu(i).Build_Matrix(matrix_rhs_pu(i));
+        // RHS Inertial Block
+        if(inertia)
+            for(int i=0;i<TV::m;i++)
+                helper_inertial_rhs(i).Build_Matrix(matrix_inertial_rhs(i));
+        if(use_polymer_stress)
+            for(int i=0;i<TV::m;i++)
+                for(int j=0;j<TV::m;j++)
+                    helper_polymer_stress_rhs(i)(j).Build_Matrix(matrix_polymer_stress_rhs(i)(j));}
 
     // FILL IN THE NULL MODES
     for(int i=0;i<TV::m;i++) inactive_u(i).Resize(cdi->colors);
@@ -210,7 +211,7 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* syste
             for(int k=start;k<end;k++)
                 null_modes.Last()->q(k)=-1;}}
 
-    if(!system_inertia && use_u_null_mode)
+    if(!inertia && use_u_null_mode)
         for(int i=0;i<TV::m;i++){
             null_modes.Append(new VECTOR_T);
             Resize_Vector(*null_modes.Last());
@@ -225,7 +226,7 @@ Set_Matrix(const ARRAY<T>& mu,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* syste
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction)
+Set_RHS(VECTOR_T& rhs,boost::function<TV(const TV& X,int color)> body_force,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction)
 {
     VECTOR<ARRAY<ARRAY<T> >,TV::m> F_volume;
 
@@ -242,7 +243,7 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX
             int k=cm_p->Get_Index(it.index,c);
             if(k>=0)
                 for(int i=0;i<TV::m;i++)
-                    F_volume(i)(c)(k)=vfc->F(it.Location(),c)(i);}
+                    F_volume(i)(c)(k)=body_force(it.Location(),c)(i);}
 
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++)
@@ -278,7 +279,7 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX
 // Function Add_Polymer_Stress_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Add_Polymer_Stress_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress)
+Add_Polymer_Stress_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress)
 {
     VECTOR<VECTOR<ARRAY<ARRAY<T> >,TV::m>,TV::m> S;
     Pack(polymer_stress,S);
