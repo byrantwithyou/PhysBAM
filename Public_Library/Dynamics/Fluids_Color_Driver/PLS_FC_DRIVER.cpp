@@ -12,6 +12,7 @@
 #include <Tools/Krylov_Solvers/GMRES.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
+#include <Tools/Krylov_Solvers/GMRES.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
@@ -381,7 +382,9 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     iss.Resize_Vector(sol);
 
     MINRES<T> mr;
+    GMRES<T> gr;
     KRYLOV_SOLVER<T>* solver=&mr;
+    if(example.use_multigrid) solver=&gr;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
     if(example.dump_matrix){
