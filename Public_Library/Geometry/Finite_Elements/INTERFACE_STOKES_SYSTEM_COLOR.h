@@ -72,7 +72,7 @@ public:
     ARRAY<ARRAY<int> > inactive_p;
     ARRAY<int> inactive_q;
 
-    const GRID<TV>& grid;
+    GRID<TV> grid;
 
     GRID<TV> phi_grid;
     ARRAY<T,TV_INT> phi_value;
