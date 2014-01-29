@@ -60,7 +60,7 @@ Construct_Level(int l)
     if(l){
         const GRID<TV>& fine_grid=levels(l-1).iss->grid;
         TV_INT coarse_counts=(fine_grid.counts+1)/2;
-        TV coarse_dX=fine_grid.dX/2;
+        TV coarse_dX=fine_grid.dX*2;
         RANGE<TV> coarse_range(fine_grid.domain.min_corner,fine_grid.domain.min_corner+TV(coarse_counts)*coarse_dX);
         GRID<TV> coarse_grid(coarse_counts,coarse_range,true);
 
@@ -278,8 +278,7 @@ Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const
                 x_flat(track)=x.u(i)(c)(k);
                 z_flat(track++)=z.u(i)(c)(k);}
     for(int c=0;c<iss->cdi->colors;c++)
-        for(int i=0;i<TV::m;i++)
-            for(int k=0;k<iss->matrix_pu(i)(c).m;k++){
+        for(int k=0;k<x.p(c).m;k++){
                 x_flat(track)=x.p(c)(k);
                 z_flat(track++)=z.p(c)(k);}
     for(int k=0;k<x.q.m;k++){
@@ -311,7 +310,7 @@ Interior_Smoother(T_VECTOR& z,const T_VECTOR& x) const
 template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::LEVEL::
 Boundary_Smoother(T_VECTOR& z,const T_VECTOR& x,int iterations) const
 {
-    PHYSBAM_WARNING("Boundary_Smoother is not implimented.");
+    PHYSBAM_WARNING("Boundary_Smoother is not implemented.");
 }
 //#####################################################################
 // Function Fill_Ghost
@@ -363,6 +362,9 @@ template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
 Fill_Color_Levelset(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV_INT> >& cr_phis,const ARRAY<ARRAY<T,TV_INT> >& bc_phis,
     ARRAY<T,TV_INT>& color_phi,ARRAY<int,TV_INT>& colors) const
 {
+    color_phi.Resize(grid.Cell_Indices(number_of_ghost_cells));
+    colors.Resize(grid.Cell_Indices(number_of_ghost_cells));
+
     for(CELL_ITERATOR<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
         T phi=0;
         int color=INT_MAX;
@@ -397,18 +399,18 @@ Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const
 {
     const int colors=iss->cdi->colors;
     SPARSE_MATRIX_FLAT_MXN<T> temp;
-    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > gtg_poisson(3); //per color
-    
+    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > gtg_poisson(colors); //per color
+
     for(int c=0;c<colors;c++){
         gtg_poisson(c).m=iss->matrix_pu(0)(c).m;
         gtg_poisson(c).n=iss->matrix_pu(0)(c).m;
-        gtg_poisson(c)*=0;
+        gtg_poisson(c).offsets.Resize(iss->matrix_pu(0)(c).m+1);
         temp.m=iss->matrix_pu(1)(c).n;
         temp.n=iss->matrix_pu(1)(c).m;
         for(int i=0;i<TV::m;i++){
             iss->matrix_pu(i)(c).Transpose(temp);
             temp*=(T)2;
-            gtg_poisson(c)=gtg_poisson(c)+temp*iss->matrix_pu(i)(c);}}
+            gtg_poisson(c)=gtg_poisson(c)+iss->matrix_pu(i)(c)*temp;}}
     
     int size=0;
     VECTOR<ARRAY<int>,TV::m> first_row_u;
@@ -417,7 +419,7 @@ Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const
     for(int i=0;i<TV::m;i++)
         for(int k=0;k<colors;k++){
             first_row_u(i).Append(size);
-            size+=iss->matrix_uu(i)(0)(k).m;}
+            size+=iss->matrix_uu(i)(i)(k).m;}
     int u_size=size;
     for(int k=0;k<colors;k++){
         first_row_p.Append(size);
@@ -426,7 +428,7 @@ Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const
     M.m=size;
     M.n=size;
 
-    ARRAY<int> row_entries, &next_entry=row_entries;
+    ARRAY<int> row_entries(size),&next_entry=row_entries;
 
     for(int i=0;i<TV::m;i++)
         for (int k=0;k<colors;k++){
