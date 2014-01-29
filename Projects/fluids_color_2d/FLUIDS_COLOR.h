@@ -56,6 +56,7 @@ public:
     using BASE::test_analytic_diff;using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
     using BASE::use_discontinuous_velocity;using BASE::gravity;using BASE::analytic_initial_only;
     using BASE::override_surface_tension;using BASE::unit_p;using BASE::use_advection;
+    using BASE::use_polymer_stress;using BASE::analytic_polymer_stress;
 
     T epsilon,radius;
     int mode;
@@ -339,6 +340,16 @@ public:
                 use_level_set_method=true;
                 use_p_null_mode=false;                
                 break;}
+            case 252:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).6,0,-4);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),VECTOR<T,1>(1),rho0/unit_rho));
+                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_MAGNITUDE<TV>(rho0));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                use_polymer_stress=true;
+                break;
+            }
+
 
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }

@@ -22,6 +22,7 @@ struct ANALYTIC_POLYMER_STRESS
     virtual T_MATRIX S(const TV& X,T t) const=0;
     virtual T_MATRIX dSdX(const TV& X,T t,int i) const=0;
     virtual T_MATRIX dSdt(const TV& X,T t) const=0;
+    virtual TV divS(const TV& X,T t) const {TV val;for(int i=0;i<TV::m;i++)for(int j=0;j<TV::m;j++)val(j)+=dSdX(X,t,i)(j,i);return val;}
     virtual T_MATRIX F_S(const TV& X,T t) const=0;
     virtual void Test(const TV& X) const
     {
@@ -44,6 +45,18 @@ struct ANALYTIC_POLYMER_STRESS_CONST:public ANALYTIC_POLYMER_STRESS<TV>
     ANALYTIC_POLYMER_STRESS_CONST() {}
     virtual T_MATRIX S(const TV& X,T t) const {return T_MATRIX::Identity_Matrix();}
     virtual T_MATRIX dSdX(const TV& X,T t,int i) const {return T_MATRIX();}
+    virtual T_MATRIX dSdt(const TV& X,T t) const {return T_MATRIX();}
+    virtual T_MATRIX F_S(const TV& X,T t) const {return T_MATRIX();}
+};
+template<class TV>
+struct ANALYTIC_POLYMER_STRESS_MAGNITUDE:public ANALYTIC_POLYMER_STRESS<TV>
+{
+    typedef typename TV::SCALAR T;
+    typedef SYMMETRIC_MATRIX<T,TV::m> T_MATRIX;
+    T rho;
+    ANALYTIC_POLYMER_STRESS_MAGNITUDE(T rho): rho(rho){}
+    virtual T_MATRIX S(const TV& X,T t) const {return T_MATRIX::Identity_Matrix()*(rho*X.Magnitude_Squared()+(T)1);}
+    virtual T_MATRIX dSdX(const TV& X,T t,int i) const {return T_MATRIX::Identity_Matrix()*(rho*X(i)*(T)2);}
     virtual T_MATRIX dSdt(const TV& X,T t) const {return T_MATRIX();}
     virtual T_MATRIX F_S(const TV& X,T t) const {return T_MATRIX();}
 };

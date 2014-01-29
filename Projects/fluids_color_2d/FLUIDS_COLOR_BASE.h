@@ -715,8 +715,9 @@ public:
 
     TV Volume_Force(const TV& X,int color,T time) PHYSBAM_OVERRIDE
     {
-        if(analytic_velocity.m && analytic_levelset && !analytic_initial_only)
-            return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s);
+        if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
+            if(use_polymer_stress) {return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s)+analytic_polymer_stress(color)->divS(X/m,time/s)*kg/(m*s*s)*1;}
+            else return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s);}
         return gravity;
     }
 
