@@ -10,8 +10,8 @@
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <sstream>
 #include <string>
-#include <ctype.h>
-#include <stdarg.h>
+#include <cctype>
+#include <cstdarg>
 namespace PhysBAM{
 
 namespace STRING_UTILITIES{

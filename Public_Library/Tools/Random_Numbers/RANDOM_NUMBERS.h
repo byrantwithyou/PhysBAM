@@ -9,7 +9,7 @@
 
 #include <Tools/Random_Numbers/MT19937.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <time.h>
+#include <ctime>
 namespace PhysBAM{
 
 template<class TV> class RANGE;

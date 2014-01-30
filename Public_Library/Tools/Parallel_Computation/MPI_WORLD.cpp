@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <mpi.h>
-#include <stdio.h>
+#include <cstdio>
 #ifdef LAM_MPI
 #include <lam_config.h>
 #endif
