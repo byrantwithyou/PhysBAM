@@ -101,7 +101,7 @@ public:
         boost::function<TV(const TV& X,int color0,int color1)> j_surface,
         ARRAY<T>* inertia,bool use_rhs);
     virtual void Set_RHS(VECTOR_T& rhs,boost::function<TV(const TV& X,int color)> body_force,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction);
-    void Add_Polymer_Stress_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress);
+    void Add_Polymer_Stress_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,T dt);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;
@@ -112,7 +112,7 @@ public:
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const;
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const;
     void Pack(const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u,VECTOR<ARRAY<ARRAY<T> >,TV::m>& v) const;
-    void Pack(const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,VECTOR<VECTOR<ARRAY<ARRAY<T> >,TV::m>,TV::m>& S) const;
+    void Pack(const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,VECTOR<VECTOR<ARRAY<ARRAY<T> >,TV::m>,TV::m>& S,T scale) const;
     void Get_Sparse_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const;
 private:
     void Set_Jacobi_Preconditioner();

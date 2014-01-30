@@ -278,10 +278,10 @@ Set_RHS(VECTOR_T& rhs,boost::function<TV(const TV& X,int color)> body_force,cons
 // Function Add_Polymer_Stress_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Add_Polymer_Stress_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress)
+Add_Polymer_Stress_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress, T dt)
 {
     VECTOR<VECTOR<ARRAY<ARRAY<T> >,TV::m>,TV::m> S;
-    Pack(polymer_stress,S);
+    Pack(polymer_stress,S,-dt);//We are actually subtracting this term from the RHS
 
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<TV::m;j++)
@@ -370,7 +370,7 @@ Pack(const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u,VECTOR<ARRAY<ARRAY<T> >,TV::m>
 // Function Pack
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Pack(const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,VECTOR<VECTOR<ARRAY<ARRAY<T> >,TV::m>,TV::m>& S) const
+Pack(const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,VECTOR<VECTOR<ARRAY<ARRAY<T> >,TV::m>,TV::m>& S,T scale) const
 {
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<TV::m;j++){
@@ -385,7 +385,7 @@ Pack(const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,VECTO
                 SYMMETRIC_MATRIX<T,TV::m> SM=polymer_stress(c)(it.index);
                 for(int i=0;i<TV::m;i++)
                     for(int j=0;j<TV::m;j++)
-                        S(i)(j)(c)(k)=SM(i,j);}}
+                        S(i)(j)(c)(k)=SM(i,j)*scale;}}
 }
 //#####################################################################
 // Function Multiply

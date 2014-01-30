@@ -378,7 +378,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 
     INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
     iss.Set_RHS(rhs,[=](const TV& X,int color){return example.Volume_Force(X,color,time+dt)*dt;},&example.face_velocities,false);
-    if(example.use_polymer_stress) iss.Add_Polymer_Stress_RHS(rhs,example.polymer_stress); //if needed
+    if(example.use_polymer_stress) iss.Add_Polymer_Stress_RHS(rhs,example.polymer_stress,dt); //if needed
     iss.Resize_Vector(sol);
 
     MINRES<T> mr;

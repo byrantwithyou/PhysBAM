@@ -60,6 +60,19 @@ struct ANALYTIC_POLYMER_STRESS_MAGNITUDE:public ANALYTIC_POLYMER_STRESS<TV>
     virtual T_MATRIX dSdt(const TV& X,T t) const {return T_MATRIX();}
     virtual T_MATRIX F_S(const TV& X,T t) const {return T_MATRIX();}
 };
+template<class TV>
+struct ANALYTIC_POLYMER_STRESS_LINEAR:public ANALYTIC_POLYMER_STRESS<TV>
+{
+    typedef typename TV::SCALAR T;
+    typedef SYMMETRIC_MATRIX<T,TV::m> T_MATRIX;
+    T rho;
+    TV a;
+    ANALYTIC_POLYMER_STRESS_LINEAR(T rho,TV a): rho(rho),a(a){}
+    virtual T_MATRIX S(const TV& X,T t) const {return T_MATRIX::Identity_Matrix()*(rho*X.Dot(a)+(T)1);}
+    virtual T_MATRIX dSdX(const TV& X,T t,int i) const {return T_MATRIX::Identity_Matrix()*(rho*a(i));}
+    virtual T_MATRIX dSdt(const TV& X,T t) const {return T_MATRIX();}
+    virtual T_MATRIX F_S(const TV& X,T t) const {return T_MATRIX();}
+};
 
 
 }
