@@ -340,11 +340,22 @@ public:
                 use_level_set_method=true;
                 use_p_null_mode=false;                
                 break;}
-            case 252:{
+            case 253:{
+                TV a;a(0)++;
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).6,0,-4);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
+//                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),VECTOR<T,1>(1),rho0/unit_rho));
+                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_LINEAR<TV>(rho0/unit_rho,a));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
+                use_polymer_stress=true;
+                break;
+        }
+            case 254:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).6,0,-4);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),VECTOR<T,1>(1),rho0/unit_rho));
-                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_MAGNITUDE<TV>(rho0));
+                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_MAGNITUDE<TV>(rho0/unit_rho));
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 use_polymer_stress=true;
                 break;

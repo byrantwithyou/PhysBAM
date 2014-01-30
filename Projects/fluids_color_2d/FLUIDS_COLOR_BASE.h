@@ -455,30 +455,7 @@ public:
                 use_polymer_stress=true;
                 break;
             }
-            case 253:{
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);    
-                T x0=(T).2,x1=(T).5,x2=(T).8;
-                ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x0,TV::Axis_Vector(0),-4,0);
-                ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x2,TV::Axis_Vector(0),0,-4);
-                analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
-                use_p_null_mode=true;
-                break;
-        }
-            case 254:{
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);    
-                T x0=(T).2,x1=(T).5,x2=(T).8;
-                ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x0,TV::Axis_Vector(0),-4,0);
-                ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x2,TV::Axis_Vector(0),0,-4);
-                analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
-                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_CONST<TV>());
-                if(bc_type!=NEUMANN) use_p_null_mode=true;
-                use_p_null_mode=true;
-                use_polymer_stress=true;
-                break;
-        }
-            case 255:{
+            case 252:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);    
                 T x0=(T).2,x1=(T).5,x2=(T).8;TV a;a(0)++;
                 ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x0,TV::Axis_Vector(0),-4,0);
@@ -752,7 +729,7 @@ public:
     TV Volume_Force(const TV& X,int color,T time) PHYSBAM_OVERRIDE
     {
         if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
-            if(use_polymer_stress) {return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s)+analytic_polymer_stress(color)->divS(X/m,time/s)*kg/(m*s*s)*0;}
+            if(use_polymer_stress) {return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s)-analytic_polymer_stress(color)->divS(X/m,time/s)*kg/(m*s*s);}
             else return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s);}
         return gravity;
     }
