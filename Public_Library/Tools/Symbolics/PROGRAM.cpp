@@ -12,8 +12,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <set>
+#ifdef USE_LEX_YACC
 #include <Tools/Symbolics/PROGRAM_LEX.hpp>
 #include <Tools/Symbolics/PROGRAM_YACC.hpp>
+#endif
 
 extern int yyparse();
 
@@ -423,6 +425,7 @@ Print_Node(PROGRAM_PARSE_NODE* node)
 template<class T> int PROGRAM<T>::
 Process_Node(PROGRAM_PARSE_NODE* node)
 {
+#ifdef USE_LEX_YACC
     int aa=-1,bb=-1;
     if(node->a && node->type!=TOKEN_FUNC) aa=Process_Node(node->a);
     if(node->b && node->type!='?' && node->type!=TOKEN_FUNC) bb=Process_Node(node->b);
@@ -524,6 +527,9 @@ Process_Node(PROGRAM_PARSE_NODE* node)
 
         default: PHYSBAM_FATAL_ERROR("Unexpected node");
     }
+#else
+    PHYSBAM_FATAL_ERROR("Parsing support disabled; compile with USE_LEX_YACC.");
+#endif
 }
 //#####################################################################
 // Function Parse
@@ -581,6 +587,7 @@ Parse(const char* str,bool keep_all_vars)
 template<class T> void PROGRAM<T>::
 Parse_Command(const char* str)
 {
+#ifdef USE_LEX_YACC
     YY_BUFFER_STATE state=yy_scan_string(str);
     yyparse();
     Process_Node(parse_root);
@@ -589,6 +596,9 @@ Parse_Command(const char* str)
     parse_constants.Remove_All();
     yy_delete_buffer(state);
     yylex_destroy();
+#else
+    PHYSBAM_FATAL_ERROR("Parsing support disabled; compile with USE_LEX_YACC.");
+#endif
 }
 const char* messages[op_last]={
     "nop\n",

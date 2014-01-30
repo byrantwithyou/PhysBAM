@@ -31,6 +31,7 @@ variables.AddVariables(
     BoolVariable('USE_RIGIDS','Use rigid bodies',0),
     BoolVariable('USE_SOLIDS','Use solids',0),
     BoolVariable('USE_TOOLS','Use tools',0),
+    BoolVariable('USE_LEX_YACC','Use lex and yacc to allow parsing for symbolics',0),
     BoolVariable('compile_id_types_as_int','Treat ID types as int to avoid possible performance consequences',0),
     BoolVariable('fast_math','compile with -ffast-math',0),
     BoolVariable('install_programs','install programs into source directories',1),
@@ -204,6 +205,7 @@ else: # assume g++...
 if env['TYPE']=='release' or env['TYPE']=='profile' or env['TYPE']=='optdebug': env.Append(CPPDEFINES=['NDEBUG'])
 else: env['USE_BOOSTIO']=1
 if env['compile_id_types_as_int']: env.Append(CPPDEFINES=['COMPILE_ID_TYPES_AS_INT'])
+if env['USE_LEX_YACC']: env.Append(CPPDEFINES=['USE_LEX_YACC'])
 
 ### teach scons about icecream environment variables
 if env['CXX'].find('ice')!=-1:
@@ -284,7 +286,9 @@ def Find_Sources(dirs,ignore=[],sources=[],exclude=[]):
         if test_file.startswith('#') or (test_file.startswith('.') and not test_file.startswith('./')): return False
         test_results=map(lambda x: not test_file.endswith(x),ignore)
         test_results_exclude=map(lambda x: test_file.find(x)<0,exclude)
-        return (test_file.endswith(".h") or test_file.endswith(".cpp") or test_file.endswith(".ll") or test_file.endswith(".yy")) and reduce(lambda x,y: x and y,test_results,True) and reduce(lambda x,y: x and y,test_results_exclude,True)
+        type_ok=test_file.endswith(".h") or test_file.endswith(".cpp")
+        if(env['USE_LEX_YACC'] and (test_file.endswith(".ll") or test_file.endswith(".yy"))): type_ok=True
+        return type_ok and reduce(lambda x,y: x and y,test_results,True) and reduce(lambda x,y: x and y,test_results_exclude,True)
     build_directory=Dir('.').srcnode().abspath;build_directory_length=len(build_directory)+1
     for subdir in dirs:
         for root,dirs,files in os.walk(os.path.join(build_directory,subdir)):
