@@ -36,6 +36,8 @@ inline int yyerror(const char *msg) {
 %token TOKEN_ELSE
 %token <node> TOKEN_NUMBER
 %token <node> TOKEN_IDENT
+%nonassoc IF_NO_ELSE
+%nonassoc TOKEN_ELSE
 
 %type <node> and_expression or_expression program
 %type <node> statement_list expression statement assignment_expression
@@ -59,8 +61,8 @@ statement_list
 statement
     : expression ';' { $$ = $1; }
     | '{' statement_list '}' { $$ = $2; }
-    | TOKEN_IF '(' expression ')' statement { $$ = new PROGRAM_PARSE_NODE('?',0,$3,new PROGRAM_PARSE_NODE(':',0,$5,0)); }
-    | TOKEN_IF '(' expression ')' statement TOKEN_ELSE statement { $$ = new PROGRAM_PARSE_NODE('?',0,$3,new PROGRAM_PARSE_NODE(':',0,$5,0)); }
+    | TOKEN_IF '(' expression ')' statement %prec IF_NO_ELSE { $$ = new PROGRAM_PARSE_NODE('?',0,$3,new PROGRAM_PARSE_NODE(':',0,$5,0)); }
+    | TOKEN_IF '(' expression ')' statement TOKEN_ELSE statement { $$ = new PROGRAM_PARSE_NODE('?',0,$3,new PROGRAM_PARSE_NODE(':',0,$5,$7)); }
     ;
 
 expression
