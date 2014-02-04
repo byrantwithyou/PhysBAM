@@ -4,33 +4,45 @@
 //#####################################################################
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
+#include <Tools/Math_Tools/INTERVAL.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Math_Tools/INTERVAL.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY_2D.h>
-#include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Collisions_And_Interactions/LEVELSET_VOLUME_COLLISIONS.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
+using namespace HETERO_DIFF;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> LEVELSET_VOLUME_COLLISIONS<TV>::
-    LEVELSET_VOLUME_COLLISIONS(DEFORMABLE_PARTICLES<TV>& particles,OBJECT& collision_body,IMPLICIT_OBJECT<TV>& implicit_surface,
-        T stiffness)
-    :COLLISION_FORCE<TV>(particles),collision_body(collision_body),stiffness(stiffness),pe(0)
+LEVELSET_VOLUME_COLLISIONS(DEFORMABLE_PARTICLES<TV>& particles,T stiffness)
+    :COLLISION_FORCE<TV>(particles),stiffness(stiffness),pe(0)
 {
-    collision_body.Initialize_Hierarchy();
     undeformed_phi.Resize(particles.X.m);
-    for(int i=0;i<particles.X.m;i++)
-        undeformed_phi(i)=implicit_surface(particles.X(i));
+}
+//#####################################################################
+// Function Add_Mesh
+//#####################################################################
+template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
+Add_Mesh(OBJECT& object,const IMPLICIT_OBJECT<TV>& implicit_surface)
+{
+    object.Initialize_Hierarchy();
+    collision_bodies.Append(&object);
+    ARRAY<int> unique_particles(object.mesh.elements.Flattened());
+    unique_particles.Prune_Duplicates();
+    for(int i=0;i<unique_particles.m;i++)
+        undeformed_phi(i)=implicit_surface(particles.X(unique_particles(i)));
+    undeformed_phi.Subset(object.Get_Boundary_Object().mesh.elements.Flattened()).Fill(0);
 }
 //#####################################################################
 // Destructor
@@ -53,83 +65,98 @@ template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
 }
+//#####################################################################
+// Function Simplex_Intersection
+//#####################################################################
 template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
-Simplex_Intersection(const SIMPLEX& s,const ARRAY<HYPER_PLANE>& f,ARRAY<unsigned char>& polytope)
+Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POLYTOPE& polytope)
 {
-    ARRAY<TV> polytope_vertex(TV::m+1,false);
-    for(int j=0;j<TV::m+1;j++){
-        polytope(j)=(1u<<(TV::m+1))-1u-(1u<<(TV::m+1-j));
-        polytope_vertex(j)=s.X(j);}
-    ARRAY<T> d(TV::m+1);
+    VECTOR<TV,max_pts> polytope_vertex(s);
+    for(int j=0;j<TV::m+1;j++)
+        polytope.poly(j)=(1u<<(TV::m+1))-1u-(1u<<j);
     for(int i=0;i<f.m;i++){
         const HYPER_PLANE& p=f(i);
-        d.Resize(polytope.m);
-        for(int j=0;j<polytope_vertex.m-1;j++)
-            d(j)=p.Signed_Distance(polytope_vertex(j));
-        for(int j=polytope_vertex.m-1;j>=0;j--){
-            T dj = d(j);
-            if(dj<=0) continue;
-            TV u=polytope_vertex(j);
-            unsigned char planes=polytope(j);
-            polytope_vertex.Remove_Index_Lazy(j);
-            polytope.Remove_Index_Lazy(j);
-            d.Remove_Index_Lazy(j);
-            for(int k=polytope_vertex.m-1;k>=0;k--){
-                if(d(k)>=0) continue;
-                unsigned char edge=planes&polytope(k);
-                if(count_bits(edge)!=2) continue;
-                const TV& v=polytope_vertex(k);
-                polytope_vertex.Append((d(k)*v-dj*u)/(d(k)-dj));
-                polytope.Append((1u<<(TV::m+1+i))|edge);}}}
+        POLYTOPE in,out;
+        VECTOR<TV,max_pts> in_vert,out_vert;
+        VECTOR<T,max_pts> in_phi,out_phi;
+        for(int j=0;j<polytope.size;j++){
+            T phi=p.Signed_Distance(polytope_vertex(j));
+            if(phi<=0){
+                in_phi(in.size)=phi;
+                in_vert(in.size)=polytope_vertex(j);
+                in.poly(in.size++)=polytope.poly(j);}
+            else{
+                out_phi(out.size)=phi;
+                out_vert(out.size)=polytope_vertex(j);
+                out.poly(out.size++)=polytope.poly(j);}}
+        for(int j=0;j<in.size;j++)
+            for(int k=0;k<out.size;k++){
+                unsigned char b=in.poly(j)&in.poly(j);
+                if(count_bits(b)!=2) continue;
+                polytope_vertex(in.size)=(in_phi(j)*out_vert(j)-out_phi(k)*in_vert(k))/(in_phi(j)-out_phi(k));
+                in.poly(in.size++)=b|p.plane;}
+        polytope=in;
+        polytope_vertex=in_vert;}
 }
-
-template<class T> VECTOR<T,3>
+//#####################################################################
+// Function Normal_To_Face
+//#####################################################################
+template<class T> static VECTOR<T,3>
 Normal_To_Face(int i,const INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<T,3>,int>,VECTOR<int,4>&>& v)
 {
-    VECTOR<int,3> nodes=VECTOR<int,4>(3,2,1,0).Remove_Index(i);
+    VECTOR<int,3> nodes=VECTOR<int,4>(0,1,2,3).Remove_Index(i);
     VECTOR<T,3> n=(v(nodes(2))-v(nodes(0))).Cross(v(nodes(1))-v(nodes(0)));
     if(n.Dot(v(3-i)-v(nodes(0)))>0)
         n*=-1;
     return n.Normalized();
 }
-
-template<class T> VECTOR<T,2>
+//#####################################################################
+// Function Normal_To_Face
+//#####################################################################
+template<class T> static VECTOR<T,2>
 Normal_To_Face(int i,const INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<T,2>,int>,VECTOR<int,3>&>& v)
 {
-    VECTOR<int,2> nodes=VECTOR<int,3>(2,1,0).Remove_Index(i);
+    VECTOR<int,2> nodes=VECTOR<int,3>(0,1,2).Remove_Index(i);
     VECTOR<T,2> n=(v(nodes(1))-v(nodes(0))).Perpendicular();
     if(n.Dot(v(2-i)-v(nodes(0)))>0)
         n*=-1;
     return n.Normalized();
 }
-
-template<int n> void 
-Triangulate(int number_of_planes,const ARRAY<unsigned char>& polytope,ARRAY<VECTOR<unsigned char,n> >& triangulation)
+//#####################################################################
+// Function Triangulate
+//#####################################################################
+template<int n> static void 
+Triangulate(int number_of_planes,const LEVELSET_VOLUME_COLLISIONS_POLYTOPE& polytope,ARRAY<VECTOR<unsigned char,n> >& triangulation)
 {
-    unsigned char x=polytope(0);
+    if(!polytope.size) return;
+    unsigned char x=polytope.poly(0);
     for(int i=0;i<number_of_planes;i++){
         unsigned char plane=1u<<i;
         if(x&plane) continue;
-        ARRAY<unsigned char> p;
+        LEVELSET_VOLUME_COLLISIONS_POLYTOPE p;
         ARRAY<VECTOR<unsigned char,n-1> > t;
-        for(int j=0;j<polytope.m;j++)
-            if(polytope(j)&plane)
-                p.Append(polytope(j)&~plane);
+        for(int j=0;j<polytope.size;j++)
+            if(polytope.poly(j)&plane)
+                p.poly(p.size++)=polytope.poly(j)&~plane;
         Triangulate(number_of_planes,p,t);
         for(int j=0;j<t.m;j++)
             triangulation.Append(t(j).Append(x));}
 }
-
+//#####################################################################
+// Function Triangulate
+//#####################################################################
 template<> void 
-Triangulate<1>(int number_of_planes,const ARRAY<unsigned char>& polytope,ARRAY<VECTOR<unsigned char,1> >& triangulation)
+Triangulate<1>(int number_of_planes,const LEVELSET_VOLUME_COLLISIONS_POLYTOPE& polytope,ARRAY<VECTOR<unsigned char,1> >& triangulation)
 {
-        for(int i=0;i<polytope.m;i++)
-            triangulation.Append(VECTOR<unsigned char,1>(polytope(i)));
-        return;
+    for(int i=0;i<polytope.size;i++)
+        triangulation.Append(VECTOR<unsigned char,1>(polytope.poly(i)));
+    return;
 }
-
-template<class T,class TV_ARRAY> void 
-Add_Plane_Edge_Intersection(const VECTOR<int,5> nodes, const TV_ARRAY& X, VECTOR<T,3>& v, VECTOR<MATRIX<T,3>,5>& dv, SYMMETRIC_MATRIX<VECTOR<MATRIX<T,3>,3>,5>& ddv)
+//#####################################################################
+// Function Triangulate
+//#####################################################################
+template<class T,class TV_ARRAY> static void 
+Add_Plane_Edge_Intersection(const VECTOR<int,5>& nodes, const TV_ARRAY& X, VECTOR<T,3>& v, VECTOR<MATRIX<T,3>,5>& dv, SYMMETRIC_MATRIX<TENSOR<VECTOR<T,3> >,5>& ddv)
 {
     auto p0=From_Var<5,0>(X(nodes(0)));
     auto p1=From_Var<5,1>(X(nodes(1)));
@@ -140,15 +167,18 @@ Add_Plane_Edge_Intersection(const VECTOR<int,5> nodes, const TV_ARRAY& X, VECTOR
     auto d0=normal.Dot(e0-p0);
     auto d1=normal.Dot(e1-p0);
     auto z=(e0*d1-e1*d0)/(d1-d0);
+    v=z.x;
     for(int i=0;i<5;i++)
-        dv(i)=z.dx(i);
+        Get(dv(i),z.dx.x,i);
     for(int i=0;i<5;i++)
         for(int j=i;j<5;j++)
-            ddv(i,j)=z.ddx(i,j);
+            Get(ddv(i,j),z.ddx.x,i,j);
 }
-
-template<class T,class TV_ARRAY> void 
-Add_Plane_Edge_Intersection(const VECTOR<int,4> nodes, const TV_ARRAY& X, VECTOR<T,2>& v, VECTOR<MATRIX<T,2>,4>& dv, SYMMETRIC_MATRIX<VECTOR<MATRIX<T,2>,2>,4>& ddv)
+//#####################################################################
+// Function Add_Plane_Edge_Intersection
+//#####################################################################
+template<class T,class TV_ARRAY> static void 
+Add_Plane_Edge_Intersection(const VECTOR<int,4>& nodes, const TV_ARRAY& X, VECTOR<T,2>& v, VECTOR<MATRIX<T,2>,4>& dv, SYMMETRIC_MATRIX<VECTOR<MATRIX<T,2>,2>,4>& ddv)
 {
     auto p0=From_Var<4,0>(X(nodes(0)));
     auto p1=From_Var<4,1>(X(nodes(1)));
@@ -158,22 +188,25 @@ Add_Plane_Edge_Intersection(const VECTOR<int,4> nodes, const TV_ARRAY& X, VECTOR
     auto d0=normal.Dot(e0-p0);
     auto d1=normal.Dot(e1-p0);
     auto z=(e0*d1-e1*d0)/(d1-d0);
+    v=z.x;
     for(int i=0;i<4;i++)
         dv(i)=z.dx(i);
     for(int i=0;i<4;i++)
         for(int j=i;j<4;j++)
             ddv(i,j)=z.ddx(i,j);
 }
-
-template<class T,class T_ARRAY>
-void Integrate_Levelset(const VECTOR<VECTOR<T,2>,6>& v,const T_ARRAY& undeformed_phi,T& pe,VECTOR<VECTOR<T,2>,6>& dpe, SYMMETRIC_MATRIX<MATRIX<T,2>,6>& ddpe)
+//#####################################################################
+// Function Integrate_Levelset
+//#####################################################################
+template<class T,class T_ARRAY> static void
+Integrate_Levelset(const VECTOR<VECTOR<T,2>,6>& v,const T_ARRAY& undeformed_phi,T& pe,VECTOR<VECTOR<T,2>,6>& dpe, SYMMETRIC_MATRIX<MATRIX<T,2>,6>& ddpe)
 {
-    auto a=From_Var<8,0>(v(0));
-    auto b=From_Var<8,1>(v(1));
-    auto c=From_Var<8,2>(v(2));
-    auto d=From_Var<8,3>(v(3));
-    auto e=From_Var<8,4>(v(4));
-    auto f=From_Var<8,5>(v(5));
+    auto a=From_Var<6,0>(v(0));
+    auto b=From_Var<6,1>(v(1));
+    auto c=From_Var<6,2>(v(2));
+    auto d=From_Var<6,3>(v(3));
+    auto e=From_Var<6,4>(v(4));
+    auto f=From_Var<6,5>(v(5));
     auto X=(d+e+f)/3-c;
     auto A=a-c;
     auto B=b-c;
@@ -195,9 +228,11 @@ void Integrate_Levelset(const VECTOR<VECTOR<T,2>,6>& v,const T_ARRAY& undeformed
     /*     for(int j=0;j<8;j++) */
     /*         ddpe(i,j)=integral.ddx(i,j); */
 }
-
-template<class T,class T_ARRAY>
-void Integrate_Levelset(const VECTOR<VECTOR<T,3>,8>& v,const T_ARRAY& undeformed_phi,T& pe,VECTOR<VECTOR<T,3>,8>& dpe, SYMMETRIC_MATRIX<MATRIX<T,3>,8>& ddpe)
+//#####################################################################
+// Function Integrate_Levelset
+//#####################################################################
+template<class T,class T_ARRAY> static void
+Integrate_Levelset(const VECTOR<VECTOR<T,3>,8>& v,const T_ARRAY& undeformed_phi,T& pe,VECTOR<VECTOR<T,3>,8>& dpe, SYMMETRIC_MATRIX<MATRIX<T,3>,8>& ddpe)
 {
     auto a=From_Var<8,0>(v(0));
     auto b=From_Var<8,1>(v(1));
@@ -229,8 +264,11 @@ void Integrate_Levelset(const VECTOR<VECTOR<T,3>,8>& v,const T_ARRAY& undeformed
         for(int j=0;j<8;j++)
             ddpe(i,j)=integral.ddx(i,j);
 }
-
-void Calculate_Vertex_Dependencies(VECTOR<unsigned char,4> simplex,ARRAY<int> vertex_dependencies,ARRAY<VECTOR<int,5> > non_particle_vertex_nodes)
+//#####################################################################
+// Function Calculate_Vertex_Dependencies
+//#####################################################################
+static void
+Calculate_Vertex_Dependencies(const VECTOR<unsigned char,4>& simplex,ARRAY<int>& vertex_dependencies,ARRAY<VECTOR<int,5> >& non_particle_vertex_nodes)
 {
     const int n=4;
     unsigned char mask=(1u<<n)-1u;
@@ -242,27 +280,29 @@ void Calculate_Vertex_Dependencies(VECTOR<unsigned char,4> simplex,ARRAY<int> ve
         unsigned char p2=vertex>>n;
         switch(count_bits(vertex&mask)){
             case 0:{
-                int node=2*n-integer_log_exact(p2^mask);
+                int node=n+integer_log_exact(p2^mask);
                 vertex_dependencies.Append(node);
                 break;}
             case 1:{
-                VECTOR<int,3>  p=VECTOR<int,n>(3,2,1,0).Remove_Index(integer_log_exact(p1));
-                unsigned char v0=p2&(unsigned char)-(signed char)p2;
+                VECTOR<int,3> p=VECTOR<int,n>(0,1,2,3).Remove_Index(integer_log_exact(p1));
+                p2^=mask;
+                unsigned char v0=p2&-p2;
                 unsigned char v1=p2-v0;
                 VECTOR<int,2> e(integer_log_exact(v0)+n,integer_log_exact(v1)+n);
                 non_particle_vertex_nodes.Append(p.Append_Elements(e));
                 vertex_dependencies.Append(-non_particle_vertex_nodes.m);
                 break;}
             case 2:{
-                VECTOR<int,3>  p=VECTOR<int,n>(7,6,5,4).Remove_Index(integer_log_exact(p2));
-                unsigned char v0=p1&(unsigned char)-(signed char)p1;
+                VECTOR<int,3> p=VECTOR<int,n>(4,5,6,7).Remove_Index(integer_log_exact(p2));
+                p1^=mask;
+                unsigned char v0=p1&-p1;
                 unsigned char v1=p1-v0;
                 VECTOR<int,2> e(integer_log_exact(v0),integer_log_exact(v1));
                 non_particle_vertex_nodes.Append(p.Append_Elements(e));
                 vertex_dependencies.Append(-non_particle_vertex_nodes.m);
                 break;}
             case 3:{
-                int node=n-integer_log_exact(p1^mask);
+                int node=integer_log_exact(p1^mask);
                 vertex_dependencies.Append(node);
                 break;}
             default:
@@ -271,8 +311,12 @@ void Calculate_Vertex_Dependencies(VECTOR<unsigned char,4> simplex,ARRAY<int> ve
         }
     }
 }
-
-void Calculate_Vertex_Dependencies(VECTOR<unsigned char,3> simplex,ARRAY<int> vertex_dependencies,ARRAY<VECTOR<int,4> > non_particle_vertex_nodes)
+//#####################################################################
+// Function Calculate_Vertex_Dependencies
+//#####################################################################
+#if 0
+static void
+Calculate_Vertex_Dependencies(const VECTOR<unsigned char,3>& simplex,ARRAY<int>& vertex_dependencies,ARRAY<VECTOR<int,4> >& non_particle_vertex_nodes)
 {
     const int n=3;
     unsigned char mask=(1u<<n)-1u;
@@ -288,8 +332,8 @@ void Calculate_Vertex_Dependencies(VECTOR<unsigned char,3> simplex,ARRAY<int> ve
                 vertex_dependencies.Append(node);
                 break;}
             case 1:{
-                VECTOR<int,2>  p=VECTOR<int,n>(2,1,0).Remove_Index(integer_log_exact(p1));
-                VECTOR<int,2>  e=VECTOR<int,n>(5,4,3).Remove_Index(integer_log_exact(p2));
+                VECTOR<int,2> p=VECTOR<int,n>(0,1,2).Remove_Index(integer_log_exact(p1));
+                VECTOR<int,2> e=VECTOR<int,n>(3,4,5).Remove_Index(integer_log_exact(p2));
                 non_particle_vertex_nodes.Append(p.Append_Elements(e));
                 vertex_dependencies.Append(-non_particle_vertex_nodes.m);
                 break;}
@@ -303,21 +347,25 @@ void Calculate_Vertex_Dependencies(VECTOR<unsigned char,3> simplex,ARRAY<int> ve
         }
     }
 }
-
-template<class TV> void
-LEVELSET_VOLUME_COLLISIONS<TV>::Integrate_Simplex(VECTOR<unsigned char,TV::m+1> simplex,const X_ARRAY& X,const PHI_ARRAY& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf)
+#endif
+//#####################################################################
+// Function Integrate_Simplex
+//#####################################################################
+template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
+Integrate_Simplex(const VECTOR<unsigned char,TV::m+1>& simplex,const X_ARRAY& X,const PHI_ARRAY& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf)
 {
     ARRAY<int> vertex_dependencies;
     ARRAY<VECTOR<int,TV::m+2> > non_particle_vertex_nodes;
+    Calculate_Vertex_Dependencies(simplex,vertex_dependencies,non_particle_vertex_nodes);
     VECTOR<TV,2*TV::m+2> vertex;
     ARRAY<VECTOR<MATRIX<T,TV::m>,TV::m+2> > non_particle_vertex_jacobian;
-    ARRAY<SYMMETRIC_MATRIX<VECTOR<MATRIX<T,TV::m>,TV::m>,TV::m+2> > non_particle_vertex_tensor;
+    ARRAY<SYMMETRIC_MATRIX<TENSOR<VECTOR<T,TV::m> >,TV::m+2> > non_particle_vertex_tensor;
     for(int i=0;i<vertex_dependencies.m;i++){
         int k=vertex_dependencies(i);
         if(k<0){
             TV v;
             VECTOR<MATRIX<T,TV::m>,TV::m+2> dv;
-            SYMMETRIC_MATRIX<VECTOR<MATRIX<T,TV::m>,TV::m>,TV::m+2> ddv;
+            SYMMETRIC_MATRIX<TENSOR<VECTOR<T,TV::m> >,TV::m+2> ddv;
             Add_Plane_Edge_Intersection(non_particle_vertex_nodes(~k),X,v,dv,ddv);    
             vertex(i)=v;
             non_particle_vertex_jacobian.Append(dv);
@@ -351,10 +399,8 @@ LEVELSET_VOLUME_COLLISIONS<TV>::Integrate_Simplex(VECTOR<unsigned char,TV::m+1> 
                         const VECTOR<int,TV::m+2>& npj=non_particle_vertex_nodes(~vdj);
                         for(int m=0;m<TV::m+2;m++){
                             ddf(npi(l),npj(m))+=ddintegral(i,j)*non_particle_vertex_jacobian(i)(npi(l))*non_particle_vertex_jacobian(j)(npj(m));
-                            const VECTOR<MATRIX<T,TV::m>,TV::m> t=non_particle_vertex_tensor(i)(npi(l),npi(m));
-                            for(int p=0;p<TV::m;p++) ddf(npi(l),npi(m))+=t(p)*dintegral(i)(p);}}}}}}
+                            ddf(npi(l),npi(m))+=Contract_0(non_particle_vertex_tensor(i)(npi(l),npi(m)),dintegral(i));}}}}}}
 }
-
 //#####################################################################
 // Function Update_Position_Based_State
 //#####################################################################
@@ -364,34 +410,53 @@ Update_Position_Based_State(const T time,const bool is_position_update)
     pe=0;
     grad_pe.Remove_All();
     H_pe.Remove_All();
-    collision_body.hierarchy->Update_Boxes(1e-15);
-    for(int e=0;e<=collision_body.mesh.elements.m;e++){
-        const VECTOR<int,TV::m+1>& nodes1=collision_body.mesh.elements(e);
+    for(int i=0;i<collision_bodies.m;i++)
+        collision_bodies(i)->hierarchy->Update_Boxes(1e-15);
+    for(int i=0;i<collision_bodies.m;i++)
+        for(int j=i;j<collision_bodies.m;j++)
+            Update_Position_Based_State_Pair(*collision_bodies(i),*collision_bodies(j));
+}
+//#####################################################################
+// Function Update_Position_Based_State
+//#####################################################################
+template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
+Update_Position_Based_State_Pair(const OBJECT& o0,const OBJECT& o1)
+{
+    for(int e=0;e<o0.mesh.elements.m;e++){
+        const VECTOR<int,TV::m+1>& nodes0=o0.mesh.elements(e);
         ARRAY<int> intersection_list;
-        SIMPLEX s(particles.X.Subset(nodes1));
-        collision_body.hierarchy->Intersection_List(s.Bounding_Box(),intersection_list);
+        VECTOR<TV,TV::m+1> s(particles.X.Subset(nodes0));
+        o1.hierarchy->Intersection_List(RANGE<TV>::Bounding_Box(s),intersection_list);
         for(int n=0;n<intersection_list.m;n++){
             int t=intersection_list(n);
             if(t==e) continue;
-            VECTOR<int,TV::m+1> nodes2=collision_body.mesh.elements(t);
-            ARRAY<unsigned char> polytope(TV::m+1,false);
-            auto v=particles.X.Subset(nodes2);
+            const VECTOR<int,TV::m+1>& nodes1=o1.mesh.elements(t);
+            int num_match=0;
+            for(int i=0;i<TV::m+1;i++)
+                if(nodes1.Contains(nodes0(i)))
+                    num_match++;
+            if(num_match==TV::m) continue;
+            POLYTOPE polytope;
+            VECTOR<TV,TV::m+1> v(particles.X.Subset(nodes1));
             ARRAY<HYPER_PLANE> f;
             for(int i=0;i<TV::m+1;i++){
                 unsigned char p=1u<<(TV::m+1+i);
-                TV n=Normal_To_Face(i,v);
-                T s=v(0).Dot(n);
+                VECTOR<TV,TV::m> w=v.Remove_Index(i);
+                TV n=TRIANGLE_3D<T>::Normal(w);
+                T s=w(0).Dot(n);
+                if(v(i).Dot(n)>s){n=-n;s=-s;}
                 f.Append({p,n,s});}
             Simplex_Intersection(s,f,polytope);
-            if(polytope.m==0)
+            if(polytope.size<=TV::m)
                 continue;
             ARRAY<VECTOR<unsigned char,TV::m+1> > triangulation;
+            LOG::cout<<VECTOR<int,max_pts>(polytope.poly)<<std::endl;
             Triangulate(2*(TV::m+1),polytope,triangulation);
             VECTOR<TV,2*TV::m+2> df;
             MATRIX<MATRIX<T,TV::m>,2*TV::m+2> ddf;
-            VECTOR<int,2*TV::m+2> nodes=nodes1.Append_Elements(nodes2);
+            VECTOR<int,2*TV::m+2> nodes=nodes0.Append_Elements(nodes1);
             for(int i=0;i<triangulation.m;i++)
-                Integrate_Simplex(triangulation(i),particles.X.Subset(nodes),undeformed_phi.Subset(nodes1),df,ddf);
+                Integrate_Simplex(triangulation(i),particles.X.Subset(nodes),undeformed_phi.Subset(nodes0),df,ddf);
             overlapping_particles.Append(nodes);
             grad_pe.Append(df);
             H_pe.Append(ddf);}}

@@ -17,6 +17,15 @@ namespace PhysBAM{
 
 template<class TV> class IMPLICIT_OBJECT;
 
+struct LEVELSET_VOLUME_COLLISIONS_POLYTOPE
+{
+    enum WORKAROUND{max_pts=14};
+    VECTOR<unsigned char,max_pts> poly;
+    int size;
+
+    LEVELSET_VOLUME_COLLISIONS_POLYTOPE():size(0){}
+};
+
 template<class TV>
 class LEVELSET_VOLUME_COLLISIONS:public COLLISION_FORCE<TV>
 {
@@ -24,10 +33,12 @@ class LEVELSET_VOLUME_COLLISIONS:public COLLISION_FORCE<TV>
     typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<int,TV::m+1> SIMPLEX_NODES;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE SIMPLEX_FACE;
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX SIMPLEX;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT OBJECT;
     typedef INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,2*TV::m+2>& > X_ARRAY;
     typedef INDIRECT_ARRAY<ARRAY<T>,VECTOR<int,TV::m+1>& > PHI_ARRAY;
+    typedef LEVELSET_VOLUME_COLLISIONS_POLYTOPE POLYTOPE;
+    enum WORKAROUND{max_pts=POLYTOPE::max_pts};
+
     struct HYPER_PLANE
     {
         unsigned char plane;
@@ -41,7 +52,7 @@ class LEVELSET_VOLUME_COLLISIONS:public COLLISION_FORCE<TV>
 
 public:
     using DEFORMABLES_FORCES<TV>::particles;using COLLISION_FORCE<TV>::coefficient_of_friction;
-    OBJECT& collision_body;
+    ARRAY<OBJECT*> collision_bodies;
     ARRAY<T> undeformed_phi;
 
     T stiffness;
@@ -51,13 +62,14 @@ public:
     ARRAY<VECTOR<TV,2*TV::m+2> > grad_pe;
     ARRAY<MATRIX<MATRIX<T,TV::m>,2*TV::m+2> > H_pe;
 
-    LEVELSET_VOLUME_COLLISIONS(DEFORMABLE_PARTICLES<TV>& particles,OBJECT& collision_body,IMPLICIT_OBJECT<TV>& implicit_surface,
-        T stiffness=(T)1e4);
+    LEVELSET_VOLUME_COLLISIONS(DEFORMABLE_PARTICLES<TV>& particles,T stiffness=(T)1e4);
     virtual ~LEVELSET_VOLUME_COLLISIONS();
 
+    void Add_Mesh(OBJECT& object,const IMPLICIT_OBJECT<TV>& implicit_surface);
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
     void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
     void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE;
+    void Update_Position_Based_State_Pair(const OBJECT& o0,const OBJECT& o1);
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
     int Velocity_Dependent_Forces_Size() const PHYSBAM_OVERRIDE;
@@ -71,8 +83,8 @@ public:
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
     void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################
-    void Simplex_Intersection(const SIMPLEX& s,const ARRAY<HYPER_PLANE>& f,ARRAY<unsigned char>& polytope);
-    void Integrate_Simplex(VECTOR<unsigned char,TV::m+1> simplex,const X_ARRAY& X,const PHI_ARRAY& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf);
+    void Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POLYTOPE& polytope);
+    void Integrate_Simplex(const VECTOR<unsigned char,TV::m+1>& simplex,const X_ARRAY& X,const PHI_ARRAY& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf);
 };
 }
 #endif

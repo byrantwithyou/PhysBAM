@@ -59,6 +59,9 @@ struct TENSOR
 
     SYMMETRIC_TENSOR<TV> Twice_Symmetric_Part_12() const
     {SYMMETRIC_TENSOR<TV> t;for(int i=0;i<TV::m;i++) t.x(i)=x(i).Twice_Symmetric_Part();return t;}
+
+    TENSOR<TV> Transposed() const
+    {TENSOR<TV> t;for(int i=0;i<TV::m;i++) t.x(i)=x(i).Transposed();return t;}
 };
 
 // T_ijk=0
@@ -664,7 +667,7 @@ template<class TV,class T_TEN> T_TEN Choose(const ZERO_TENSOR<TV>& a,const T_TEN
 template<class TV> ZERO_TENSOR<TV> Choose(const ZERO_TENSOR<TV>& a,const ZERO_TENSOR<TV>& b);
 
 template<class T_TEN> typename ENABLE_IF<IS_TENSOR<T_TEN>::value>::TYPE Fill_From(T_TEN& a,const T_TEN& b){a=b;}
-template<class T_TEN,class T_TEN1> typename ENABLE_IF<IS_TENSOR<T_TEN>::value&&IS_TENSOR<T_TEN1>::value>::TYPE Fill_From(T_TEN& a,const T_TEN1& b){return T_TEN()+b;}
+template<class T_TEN,class T_TEN1> typename ENABLE_IF<IS_TENSOR<T_TEN>::value&&IS_TENSOR<T_TEN1>::value>::TYPE Fill_From(T_TEN& a,const T_TEN1& b){a=b;}
 }
 }
 #endif
