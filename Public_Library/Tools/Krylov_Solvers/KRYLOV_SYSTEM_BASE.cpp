@@ -31,11 +31,16 @@ template<class T> KRYLOV_SYSTEM_BASE<T>::
 // Function Test_System
 //#####################################################################
 template<class T> void KRYLOV_SYSTEM_BASE<T>::
-Test_System(KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& y,KRYLOV_VECTOR_BASE<T>& z) const
+Test_System(const KRYLOV_VECTOR_BASE<T>& t) const
 {
+    KRYLOV_VECTOR_BASE<T>& w=*t.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>& x=*t.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>& y=*t.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>& z=*t.Clone_Default();
+
     T tolerance=(T)1e-5;
     RANDOM_NUMBERS<T> random;
-    double a,b,r;
+    T a,b,r;
     bool pass=true;
     int n=x.Raw_Size();
     for(int i=0;i<n;i++){
@@ -44,15 +49,15 @@ Test_System(KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& y,KRYLOV_VECTOR_BASE
 
     a=Inner_Product(x,y);
     b=Inner_Product(y,x);
-    r=abs(a-b)/maxabs(1e-30,a,b);
+    r=abs(a-b)/maxabs((T)1e-30,a,b);
     if(r>tolerance) {pass=false;LOG::cout<<"Inner Product Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}
 
     Multiply(x,z);
     a=Inner_Product(y,z);
     Multiply(y,z);
     b=Inner_Product(x,z);
-    r=abs(a-b)/maxabs(1e-30,a,b);
-    if(r>tolerance) {pass=false;LOG::cout<<"System Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<abs(a-b)/maxabs(1e-30,a,b)<<std::endl;}
+    r=abs(a-b)/maxabs((T)1e-30,a,b);
+    if(r>tolerance) {pass=false;LOG::cout<<"System Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}
 
     z=x;
     Project(z);
@@ -60,16 +65,16 @@ Test_System(KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& y,KRYLOV_VECTOR_BASE
     z=y;
     Project(z);
     b=Inner_Product(x,z);
-    r=abs(a-b)/maxabs(1e-30,a,b);
-    if(r>tolerance) {pass=false;LOG::cout<<"Projection Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<abs(a-b)/maxabs(1e-30,a,b)<<std::endl;}
+    r=abs(a-b)/maxabs((T)1e-30,a,b);
+    if(r>tolerance) {pass=false;LOG::cout<<"Projection Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}
 
     z=x;
     Project(z);
     a=Inner_Product(z,z);
     Project(z);
     b=Inner_Product(z,z);
-    r=abs(a-b)/maxabs(1e-30,a,b);
-    if(r>tolerance) {pass=false;LOG::cout<<"Projection Idempotence Test: "<<a<<"  vs  "<<b<<"  relative  "<<abs(a-b)/maxabs(1e-30,a,b)<<std::endl;}
+    r=abs(a-b)/maxabs((T)1e-30,a,b);
+    if(r>tolerance) {pass=false;LOG::cout<<"Projection Idempotence Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}
 
     z=x;
     Project_Nullspace(z);
@@ -77,25 +82,62 @@ Test_System(KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& y,KRYLOV_VECTOR_BASE
     z=y;
     Project_Nullspace(z);
     b=Inner_Product(x,z);
-    r=abs(a-b)/maxabs(1e-30,a,b);
-    if(r>tolerance) {pass=false;LOG::cout<<"Project Nullspace Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<abs(a-b)/maxabs(1e-30,a,b)<<std::endl;}
+    r=abs(a-b)/maxabs((T)1e-30,a,b);
+    if(r>tolerance) {pass=false;LOG::cout<<"Project Nullspace Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}
 
     z=x;
     Project_Nullspace(z);
     a=Inner_Product(z,z);
     Project_Nullspace(z);
     b=Inner_Product(z,z);
-    r=abs(a-b)/maxabs(1e-30,a,b);
-    if(r>tolerance) {pass=false;LOG::cout<<"Project Nullspace Idempotence Test: "<<a<<"  vs  "<<b<<"  relative  "<<abs(a-b)/maxabs(1e-30,a,b)<<std::endl;}
+    r=abs(a-b)/maxabs((T)1e-30,a,b);
+    if(r>tolerance) {pass=false;LOG::cout<<"Project Nullspace Idempotence Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}
 
     z*=(T)0;
     a=Inner_Product(y,Precondition(x,z));
     z*=(T)0;
     b=Inner_Product(x,Precondition(y,z));
-    r=abs(a-b)/maxabs(1e-30,a,b);
-    if(r>tolerance) {pass=false;LOG::cout<<"Preconditioner Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<abs(a-b)/maxabs(1e-30,a,b)<<std::endl;}
+    r=abs(a-b)/maxabs((T)1e-30,a,b);
+    if(r>tolerance) {pass=false;LOG::cout<<"Preconditioner Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}
+
+    T rx=random.Get_Uniform_Number(-1,1);
+    T ry=random.Get_Uniform_Number(-1,1);
+    w.Copy(rx,x);
+    w.Copy(ry,y,w);
+    Multiply(w,z);
+    T mag_Aw=sqrt(z.Dot(z));
+    Multiply(y,w);
+    T mag_Ay=sqrt(w.Dot(w));
+    z.Copy(-ry,w,z);
+    Multiply(x,w);
+    T mag_Ax=sqrt(w.Dot(w));
+    z.Copy(-rx,w,z);
+    T mag_resid=sqrt(z.Dot(z));
+    r=mag_resid/max((T)1e-30,mag_Aw,mag_Ax,mag_Ay);
+    if(r>tolerance) {pass=false;LOG::cout<<"Linearity Test: "<<mag_resid<<"  relative  "<<r<<std::endl;}
+
+    w.Copy(rx,x);
+    w.Copy(ry,y,w);
+    const KRYLOV_VECTOR_BASE<T>& tz=Precondition(w,z);
+    if(&tz!=&z) z=tz;
+    mag_Aw=sqrt(z.Dot(z));
+    const KRYLOV_VECTOR_BASE<T>& tw=Precondition(y,w);
+    if(&tw!=&z) w=tw;
+    mag_Ay=sqrt(w.Dot(w));
+    z.Copy(-ry,w,z);
+    const KRYLOV_VECTOR_BASE<T>& tw2=Precondition(x,w);
+    if(&tw2!=&w) w=tw2;
+    mag_Ax=sqrt(w.Dot(w));
+    z.Copy(-rx,w,z);
+    mag_resid=sqrt(z.Dot(z));
+    r=mag_resid/max((T)1e-30,mag_Aw,mag_Ax,mag_Ay);
+    if(r>tolerance) {pass=false;LOG::cout<<"Preconditioner Linearity Test: "<<mag_resid<<"  relative  "<<r<<std::endl;}
 
     LOG::cout<<"Krylov System Test Result: "<<(pass?"PASS":"FAIL")<<std::endl;
+    delete &w;
+    delete &x;
+    delete &y;
+    delete &z;
 }
 //#####################################################################
 // Function Apply_Preconditioner

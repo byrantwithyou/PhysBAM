@@ -610,9 +610,9 @@ Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
     Resize_System_Vector(rhs);
     Resize_System_Vector(x);
-    KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
+    KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,2);
 
-    if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
+    if(test_system) system.Test_System(x);
     if(print_matrix){
         LOG::cout<<"arb solve id "<<solve_id<<std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));

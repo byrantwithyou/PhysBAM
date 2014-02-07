@@ -230,9 +230,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*krylov_vectors(0));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",B);}
 
-    if(solids_parameters.implicit_solve_parameters.test_system){
-        KRYLOV_SOLVER<T>::Ensure_Size(krylov_vectors,V,3);
-        system.Test_System(*krylov_vectors(0),*krylov_vectors(1),*krylov_vectors(2));}
+    if(solids_parameters.implicit_solve_parameters.test_system) system.Test_System(V);
     if(!solver->Solve(system,V,B,krylov_vectors,solids_parameters.implicit_solve_parameters.cg_tolerance,1,solids_parameters.implicit_solve_parameters.cg_iterations) && solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure)
         throw std::runtime_error("Backward Euler Failed");
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",V);

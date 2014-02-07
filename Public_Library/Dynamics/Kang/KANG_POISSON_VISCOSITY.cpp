@@ -199,8 +199,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     SYSTEM system(matrix);
     system.P=matrix.C;
 
-    KRYLOV_SOLVER<T>::Ensure_Size(vectors,p,3);
-    if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
+    if(test_system) system.Test_System(p);
 
     static int solve_id=-1;solve_id++;
     if(print_matrix){
@@ -269,7 +268,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     u.v.Resize(num_dual_cells);
     b.v.Resize(num_dual_cells);
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
-    KRYLOV_SOLVER<T>::Ensure_Size(vectors,u,3);
+    KRYLOV_SOLVER<T>::Ensure_Size(vectors,u,2);
     KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> >& r=debug_cast<KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> >&>(*vectors(0));
     KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> >& q=debug_cast<KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> >&>(*vectors(1));
 
@@ -350,7 +349,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         SYMMQMR<T> qm;
         KRYLOV_SOLVER<T>* solver=&cg;
         solver->restart_iterations=fluids_parameters.cg_restart_iterations;
-        if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
+        if(test_system) system.Test_System(u);
         solver->Solve(system,u,b,vectors,fluids_parameters.incompressible_tolerance,0,fluids_parameters.incompressible_iterations);
     }
     else{

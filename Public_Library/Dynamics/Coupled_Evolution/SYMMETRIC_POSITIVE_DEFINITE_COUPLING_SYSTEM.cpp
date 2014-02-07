@@ -721,8 +721,7 @@ Test_Matrix() const
 
     VECTOR_T a;
     Resize_Coupled_System_Vector(a);
-    VECTOR_T b(a),c(a);
-    Test_System(a,b,c);
+    Test_System(a);
 }
 //#####################################################################
 // Function Test_Incompressibility
