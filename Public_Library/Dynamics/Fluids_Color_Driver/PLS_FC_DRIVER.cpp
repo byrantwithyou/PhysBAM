@@ -12,7 +12,6 @@
 #include <Tools/Krylov_Solvers/GMRES.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
-#include <Tools/Krylov_Solvers/GMRES.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>

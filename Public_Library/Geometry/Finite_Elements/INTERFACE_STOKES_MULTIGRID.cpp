@@ -6,6 +6,7 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
+#include <Tools/Log/LOG.h>
 #include <Tools/Matrices/SPARSE_MATRIX_ROW.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>

@@ -11,10 +11,10 @@
 
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <cstdio>
 #include <cstdlib>
 #include <stdexcept>
 #include <mpi.h>
-#include <cstdio>
 #ifdef LAM_MPI
 #include <lam_config.h>
 #endif

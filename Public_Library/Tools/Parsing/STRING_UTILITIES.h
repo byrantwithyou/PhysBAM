@@ -8,10 +8,10 @@
 #define __STRING_UTILITIES__
 
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <sstream>
-#include <string>
 #include <cctype>
 #include <cstdarg>
+#include <sstream>
+#include <string>
 namespace PhysBAM{
 
 namespace STRING_UTILITIES{
