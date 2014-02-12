@@ -9,10 +9,10 @@
 
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <Deformables/Forces/COLLISION_FORCE.h>
-#include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
+#include <Deformables/Forces/COLLISION_FORCE.h>
+#include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 
 template<class TV> class IMPLICIT_OBJECT;
@@ -20,10 +20,21 @@ template<class TV> class IMPLICIT_OBJECT;
 struct LEVELSET_VOLUME_COLLISIONS_POLYTOPE
 {
     enum WORKAROUND{max_pts=14};
-    VECTOR<unsigned char,max_pts> poly;
+    VECTOR<int,max_pts> poly;
     int size;
 
     LEVELSET_VOLUME_COLLISIONS_POLYTOPE():size(0){}
+
+    std::string s() const
+    {
+        std::string x="(";
+        for(int i=0;i<size;i++){
+            if(i) x+=' ';
+            for(int j=0;j<8;j++)
+                if(poly(i)&(1<<j))
+                    x+="abcdrstu"[j];}
+        return x+")";
+    }
 };
 
 template<class TV>
@@ -41,7 +52,7 @@ class LEVELSET_VOLUME_COLLISIONS:public COLLISION_FORCE<TV>
 
     struct HYPER_PLANE
     {
-        unsigned char plane;
+        int plane;
         TV normal;
         T s;
         T Signed_Distance(const TV& location) const
@@ -84,7 +95,7 @@ public:
     void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################
     void Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POLYTOPE& polytope);
-    void Integrate_Simplex(const VECTOR<unsigned char,TV::m+1>& simplex,const X_ARRAY& X,const PHI_ARRAY& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf);
+    void Integrate_Simplex(const VECTOR<int,TV::m+1>& simplex,const X_ARRAY& X,const PHI_ARRAY& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf);
 };
 }
 #endif

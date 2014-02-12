@@ -90,6 +90,7 @@
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
+#include <Deformables/Collisions_And_Interactions/LEVELSET_VOLUME_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_PENALTY.h>
@@ -178,6 +179,7 @@ public:
     T unit_rho,unit_p,unit_N,unit_J;
     T density;
     bool use_penalty_self_collisions;
+    bool use_distance_based_self_collisions;
     T rod_length;
     T rod_radius;
     T attachment_length;
@@ -199,7 +201,7 @@ public:
         backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
         use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
         penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),
-        use_penalty_self_collisions(true),rod_length(4),rod_radius(.3),attachment_length(.6),self_collide_surface_only(false),
+        use_penalty_self_collisions(true),use_distance_based_self_collisions(false),rod_length(4),rod_radius(.3),attachment_length(.6),self_collide_surface_only(false),
         use_vanilla_newton(false)
     {
         this->fixed_dt=1./240;
@@ -328,6 +330,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
     parse_args->Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
     parse_args->Add_Not("-no_self",&use_penalty_self_collisions,"disable penalty self collisions");
+    parse_args->Add("-old_self",&use_distance_based_self_collisions,"use distance based penalty self collisions");
     parse_args->Add("-use_tri_col",&solids_parameters.triangle_collision_parameters.perform_self_collision,"use triangle collisions");
     parse_args->Add("-no_self_interior",&self_collide_surface_only,"do not process penalty self collisions against interior particles");
     parse_args->Add("-use_vanilla_newton",&use_vanilla_newton,"use triangle collisions");
@@ -2151,26 +2154,36 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             if(solids_parameters.triangle_collision_parameters.perform_self_collision)
                 solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.structures(i));}
 
-    if(use_penalty_self_collisions)
-        for(int b=0;b<deformable_body_collection.structures.m;b++){
-            DEFORMABLE_PARTICLES<TV>& undeformed_particles=*particles.Clone();
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(b);
-            if(!tetrahedralized_volume.triangulated_surface) tetrahedralized_volume.Initialize_Triangulated_Surface();
-            TRIANGULATED_SURFACE<T>* triangulated_surface=tetrahedralized_volume.triangulated_surface;
-            TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
-            LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(undeformed_triangulated_surface,100);
-            DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>* coll=new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,tetrahedralized_volume,
-                undeformed_triangulated_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation);
-            if(self_collide_surface_only){
-                coll->colliding_particles=tetrahedralized_volume.triangulated_surface->mesh.elements.Flattened();
-                coll->colliding_particles.Prune_Duplicates();}
-            int force_id=solid_body_collection.Add_Force(coll);
-            if(backward_euler_evolution) backward_euler_evolution->minimization_objective.deformables_forces_lazy.Set(force_id);}
+    if(use_penalty_self_collisions){
+        if(use_distance_based_self_collisions){
+            for(int b=0;b<deformable_body_collection.structures.m;b++){
+                DEFORMABLE_PARTICLES<TV>& undeformed_particles=*particles.Clone();
+                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(b);
+                if(!tetrahedralized_volume.triangulated_surface) tetrahedralized_volume.Initialize_Triangulated_Surface();
+                TRIANGULATED_SURFACE<T>* triangulated_surface=tetrahedralized_volume.triangulated_surface;
+                TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
+                LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(undeformed_triangulated_surface,100);
+                DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>* coll=new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,tetrahedralized_volume,
+                    undeformed_triangulated_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation);
+                if(self_collide_surface_only){
+                    coll->colliding_particles=tetrahedralized_volume.triangulated_surface->mesh.elements.Flattened();
+                    coll->colliding_particles.Prune_Duplicates();}
+                int force_id=solid_body_collection.Add_Force(coll);
+                if(backward_euler_evolution) backward_euler_evolution->minimization_objective.deformables_forces_lazy.Set(force_id);}}
+        else{
+                LEVELSET_VOLUME_COLLISIONS<TV>* lvc=new LEVELSET_VOLUME_COLLISIONS<TV>(particles,penalty_collisions_stiffness);
+                for(int b=0;b<deformable_body_collection.structures.m;b++){
+                    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(b);
+                    LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(tetrahedralized_volume.Get_Boundary_Object(),20);
+                    lvc->Add_Mesh(tetrahedralized_volume,undeformed_levelset);
+                    delete &undeformed_levelset;}
+                int force_id=solid_body_collection.Add_Force(lvc);
+                if(backward_euler_evolution)
+                    backward_euler_evolution->minimization_objective.deformables_forces_lazy.Set(force_id);}}
 
     if(solids_parameters.triangle_collision_parameters.perform_self_collision){
-      solid_body_collection.Add_Force(new TRIANGLE_REPULSIONS_PENALTY<TV>(particles,deformable_body_collection.triangle_repulsions.point_face_interaction_pairs));
-      solid_body_collection.Add_Force(new TRIANGLE_REPULSIONS_PENALTY<TV>(particles,deformable_body_collection.triangle_repulsions.edge_edge_interaction_pairs));
-    }
+        solid_body_collection.Add_Force(new TRIANGLE_REPULSIONS_PENALTY<TV>(particles,deformable_body_collection.triangle_repulsions.point_face_interaction_pairs));
+        solid_body_collection.Add_Force(new TRIANGLE_REPULSIONS_PENALTY<TV>(particles,deformable_body_collection.triangle_repulsions.edge_edge_interaction_pairs));}
 
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
