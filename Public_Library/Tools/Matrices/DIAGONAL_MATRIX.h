@@ -192,9 +192,28 @@ public:
 
     static VECTOR<T,1> Cofactor_Matrix_Helper(const VECTOR<T,1>& v){return VECTOR<T,1>(1);}
     static VECTOR<T,2> Cofactor_Matrix_Helper(const VECTOR<T,2>& v){return VECTOR<T,2>(v.y,v.x);}
+    static VECTOR<T,3> Cofactor_Matrix_Helper(const VECTOR<T,3>& v){return VECTOR<T,3>(v.y*v.z,v.x*v.z,v.x*v.y);}
 
     template<int n>
-    static VECTOR<T,n> Cofactor_Matrix_Helper(const VECTOR<T,n>& v){VECTOR<T,n/2> v1;VECTOR<T,n-n/2> v2;v.Split(v1,v2);return Cofactor_Matrix_Helper(v1).Append_Elements(Cofactor_Matrix_Helper(v2));}
+    static VECTOR<T,n> Cofactor_Matrix_Helper(const VECTOR<T,n>& v)
+    {
+        VECTOR<T,n> v1;
+        T p=1;
+        int first_zero=-1;
+        for(int i=0;i<n;i++)
+            if(v(i))
+                p*=v(i);
+            else{
+                if(first_zero>=0)
+                    return v1;
+                first_zero=i;}
+        if(first_zero>=0){
+            v1(first_zero)=p;
+            return v1;}
+        for(int i=0;i<n;i++)
+            v1(i)/=v(i);
+        return v1;
+    }
 
     DIAGONAL_MATRIX Cofactor_Matrix() const
     {return DIAGONAL_MATRIX(Cofactor_Matrix_Helper(x));}
