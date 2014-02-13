@@ -190,33 +190,22 @@ public:
     MATRIX<T,d> Times_Transpose(const UPPER_TRIANGULAR_MATRIX<T,d>& M) const
     {return (M**this).Transposed();}
 
-    static VECTOR<T,1> Cofactor_Matrix_Helper(const VECTOR<T,1>& v){return VECTOR<T,1>(1);}
-    static VECTOR<T,2> Cofactor_Matrix_Helper(const VECTOR<T,2>& v){return VECTOR<T,2>(v.y,v.x);}
-    static VECTOR<T,3> Cofactor_Matrix_Helper(const VECTOR<T,3>& v){return VECTOR<T,3>(v.y*v.z,v.x*v.z,v.x*v.y);}
-
-    template<int n>
-    static VECTOR<T,n> Cofactor_Matrix_Helper(const VECTOR<T,n>& v)
+    static VECTOR<T,1> Cofactor_Matrix_Helper(const VECTOR<T,1>& v,T& prod){prod=v.x;return VECTOR<T,1>(1);}
+    static VECTOR<T,2> Cofactor_Matrix_Helper(const VECTOR<T,2>& v,T& prod){prod=v.Product();return VECTOR<T,2>(v.y,v.x);}
+    template<int n> static VECTOR<T,n> Cofactor_Matrix_Helper(const VECTOR<T,n>& v,T& prod)
     {
-        VECTOR<T,n> v1;
-        T p=1;
-        int first_zero=-1;
-        for(int i=0;i<n;i++)
-            if(v(i))
-                p*=v(i);
-            else{
-                if(first_zero>=0)
-                    return v1;
-                first_zero=i;}
-        if(first_zero>=0){
-            v1(first_zero)=p;
-            return v1;}
-        for(int i=0;i<n;i++)
-            v1(i)/=v(i);
-        return v1;
+        T p1,p2;
+        VECTOR<T,n/2> v1;
+        VECTOR<T,n-n/2> v2;
+        v.Split(v1,v2);
+        v1=Cofactor_Matrix_Helper(v1,p1);
+        v2=Cofactor_Matrix_Helper(v2,p2);
+        prod=p1*p2;
+        return (v1*p2).Append_Elements(v2*p1);
     }
 
     DIAGONAL_MATRIX Cofactor_Matrix() const
-    {return DIAGONAL_MATRIX(Cofactor_Matrix_Helper(x));}
+    {T p;return DIAGONAL_MATRIX(Cofactor_Matrix_Helper(x,p));}
 
     SYMMETRIC_MATRIX<T,3> Conjugate_With_Cross_Product_Matrix(const VECTOR<T,3>& v) const
     {T yy=sqr(v.y),zz=sqr(v.z),bx=x.y*v.x,cx=x.z*v.x;return SYMMETRIC_MATRIX<T,3>(x.y*zz+x.z*yy,-cx*v.y,-bx*v.z,x.x*zz+cx*v.x,-v.y*v.z*x.x,x.x*yy+bx*v.x);}
