@@ -290,7 +290,7 @@ Solve_The_Linear_System()
     KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
     rhs.v=node_V_star;
     x.v=rhs.v;
-    if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
+    if(test_system) system.Test_System(rhs);
     CONJUGATE_GRADIENT<T> cg;
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cg;
