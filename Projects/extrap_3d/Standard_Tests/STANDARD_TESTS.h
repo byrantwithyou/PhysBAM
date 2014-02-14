@@ -2665,7 +2665,7 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
             DIAGONAL_MATRIX<T,3> ev;
             MATRIX<T,3> eigenvectors;
             H.Fast_Solve_Eigenproblem(ev,eigenvectors);
-            evec(VECTOR<int,2>(i,j))=eigenvectors.Column(ev.To_Vector().Arg_Abs_Max());
+            evec(VECTOR<int,2>(i,j))=eigenvectors.Column(abs(ev.To_Vector()).Arg_Max());
             grad(VECTOR<int,2>(i,j))=g;}
 
     for(int i=0;i<image_size-1;i++)
