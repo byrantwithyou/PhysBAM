@@ -45,8 +45,8 @@ class LEVELSET_VOLUME_COLLISIONS:public COLLISION_FORCE<TV>
     typedef VECTOR<int,TV::m+1> SIMPLEX_NODES;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE SIMPLEX_FACE;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT OBJECT;
-    typedef INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,2*TV::m+2>& > X_ARRAY;
-    typedef INDIRECT_ARRAY<ARRAY<T>,VECTOR<int,TV::m+1>& > PHI_ARRAY;
+    typedef VECTOR<TV,2*TV::m+2> X_VECTOR;
+    typedef VECTOR<T,TV::m+1> PHI_VECTOR;
     typedef LEVELSET_VOLUME_COLLISIONS_POLYTOPE POLYTOPE;
     enum WORKAROUND{max_pts=POLYTOPE::max_pts};
 
@@ -95,7 +95,7 @@ public:
     void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################
     void Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POLYTOPE& polytope);
-    void Integrate_Simplex(const VECTOR<int,TV::m+1>& simplex,const X_ARRAY& X,const PHI_ARRAY& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf);
+    void Integrate_Simplex(const VECTOR<int,TV::m+1>& simplex,const X_VECTOR& X,const PHI_VECTOR& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf);
 };
 }
 #endif

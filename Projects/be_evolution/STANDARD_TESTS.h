@@ -62,6 +62,7 @@
 //   64. Stretching mattress lucky vanilla newton failure
 //   65. Stretching mattress with shock
 //   66. Force a deformable torus through a rigid torus
+//   67. Two mattresses collide
 //   77. Squeeze in a box
 //   80. Armadillo
 //  100. Primary contour field
@@ -378,7 +379,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         backward_euler_evolution->minimization_objective.collision_thickness*=m;}
 
     switch(test_number){
-        case 17: case 18: case 24: case 25: case 27: case 11: case 23: case 57: case 77: case 80: case 8: case 12: case 13:
+        case 17: case 18: case 24: case 25: case 27: case 11: case 23: case 57: case 77: case 80: case 8: case 12: case 13: case 67:
             if(!resolution) resolution=10;
             mattress_grid=GRID<TV>(TV_INT(resolution+1,resolution+1,resolution+1),RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1))*m);
             break;
@@ -437,6 +438,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 17:
         case 18:
         case 56:
+        case 67:
         case 77:
             solids_parameters.cfl=(T)5;
             /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
@@ -1612,6 +1614,13 @@ void Get_Initial_Data()
             curves(0).Add_Control_Point(0,FRAME<TV>(TV(0,y_start,0)*m,ROTATION<TV>(pi/2,TV(1,0,0))));
             curves(0).Add_Control_Point(t_stop,FRAME<TV>(TV(0,y_stop,0)*m,ROTATION<TV>(pi/2,TV(1,0,0))));
             break;}
+        case 67:{
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,1,0)*m));
+            tests.Create_Mattress(mattress_grid,true,&initial_state,density);
+            RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(1.1,3.1,1.1)*m));
+            tests.Create_Mattress(mattress_grid,true,&initial_state2,density);
+            tests.Add_Ground();
+            break;}
         case 77: {
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)*m));
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
@@ -1716,6 +1725,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             if(test_number==80) particles.X.template Project<T,&TV::x>()*=-(T).97;
             if(test_number==80) particles.X.template Project<T,&TV::y>()*=(T).98;
             break;}
+        case 67:
         case 9:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(0);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
