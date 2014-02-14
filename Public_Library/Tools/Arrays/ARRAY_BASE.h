@@ -285,6 +285,9 @@ public:
     T Sum() const
     {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result+=self(i);return result;}
 
+    T Product() const
+    {const T_ARRAY& self=Derived();T result(1);ID m=self.Size();for(ID i(0);i<m;i++) result*=self(i);return result;}
+
     double Sum_Double_Precision() const
     {const T_ARRAY& self=Derived();double result=0;ID m=self.Size();for(ID i(0);i<m;i++) result+=self(i);return result;}
 
@@ -293,6 +296,9 @@ public:
     
     T Average() const
     {const T_ARRAY& self=Derived();return self.Size()?Sum()/typename ARRAY_BASE<T,T_ARRAY,ID>::SCALAR(self.Size()):T();}
+
+    T Lp_Norm(const T& p) const
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result+=pow(abs(self(i)),p);return pow(result,1/p);}
 
     template<class T_ARRAY1> typename SCALAR_POLICY<T>::TYPE
     Dot(const ARRAY_BASE<T,T_ARRAY1,ID>& a) const
@@ -396,6 +402,23 @@ public:
 
     void Reverse()
     {for(ID i(0),s=Size();i<s-1-i;i++) exchange((*this)(i),(*this)(s-1-i));}
+
+    template<class T_ARRAY0>
+    bool All_Greater_Equal(const ARRAY_BASE<T,T_ARRAY0,ID>& v) const
+    {Assert_Same_Size(*this,v);const T_ARRAY& self=Derived();const T_ARRAY0& vd=v.Derived();
+    for(int i=0,n=self.Size();i<n;i++) if(self(i)<vd(i)) return false;return true;}
+
+    template<class T_ARRAY0>
+    bool All_Less_Equal(const ARRAY_BASE<T,T_ARRAY0,ID>& v) const
+    {return v.All_Greater_Equal(*this);}
+
+    template<class T_ARRAY0>
+    bool All_Greater(const ARRAY_BASE<T,T_ARRAY0,ID>& v) const
+    {return !v.All_Greater_Equal(*this);}
+
+    template<class T_ARRAY0>
+    bool All_Less(const ARRAY_BASE<T,T_ARRAY0,ID>& v) const
+    {return !All_Greater_Equal(v);}
 
     ID Find(const T& element) const
     {const T_ARRAY& self=Derived();ID m=self.Size();

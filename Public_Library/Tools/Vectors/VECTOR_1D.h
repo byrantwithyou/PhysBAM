@@ -11,6 +11,7 @@
 #include <Tools/Math_Tools/argmax.h>
 #include <Tools/Math_Tools/argmin.h>
 #include <Tools/Math_Tools/clamp.h>
+#include <Tools/Math_Tools/constants.h>
 #include <Tools/Math_Tools/Inverse.h>
 #include <Tools/Math_Tools/max.h>
 #include <Tools/Math_Tools/min.h>
@@ -74,6 +75,10 @@ public:
 
     template<class T2> explicit VECTOR(const VECTOR<T2,1>& vector_input)
         :x((T)vector_input.x)
+    {}
+
+    template<class T2> explicit VECTOR(const VECTOR<T2,0>& vector_input)
+        :x()
     {}
 
     VECTOR(const VECTOR& vector_input)
@@ -296,8 +301,14 @@ public:
     T Product() const
     {return x;}
 
-    const VECTOR& Column_Sum() const
-    {return *this;}
+    T Lp_Norm(const T& p) const
+    {return abs(x);}
+
+    VECTOR Orthogonal_Vector() const
+    {PHYSBAM_FATAL_ERROR();}
+
+    VECTOR Unit_Orthogonal_Vector() const
+    {PHYSBAM_FATAL_ERROR();}
 
     int Number_True() const
     {STATIC_ASSERT((IS_SAME<T,bool>::value));return x;}
@@ -348,11 +359,14 @@ public:
     VECTOR<T,2> Insert(const T& element,const int index) const
     {VECTOR<T,2> r;r[index]=element;r[1-index]=x;return r;}
 
+    VECTOR<T,2> Prepend(const T& element) const
+    {return VECTOR<T,2>(element,x);}
+
     VECTOR<T,2> Append(const T& element) const
     {return VECTOR<T,2>(x,element);}
 
     template<int d2> VECTOR<T,1+d2> Append_Elements(const VECTOR<T,d2>& elements) const
-    {VECTOR<T,1+d2> r;r[1]=x;for(int i=0;i<d2;i++) r[i+1]=elements[i];return r;}
+    {VECTOR<T,1+d2> r;r[0]=x;for(int i=0;i<d2;i++) r[i+1]=elements[i];return r;}
 
     VECTOR Reversed() const
     {return *this;}
@@ -364,6 +378,27 @@ public:
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,1-n>& v2) const
     {for(int i=0;i<n;i++) v1(i)=(*this)(i);
     for(int i=n;i<2;i++) v2(i-n)=(*this)(i);}
+
+    VECTOR Sorted() const
+    {return *this;}
+
+    void Sort()
+    {}
+
+    static T Angle_Between(const VECTOR& u,const VECTOR& v)
+    {return (u.x>0)!=(v.x>0)?pi:0;}
+
+    template<class T_VECTOR>
+    void Set_Subvector(const int istart,const T_VECTOR& v)
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i)=v(i);}
+
+    template<class T_VECTOR>
+    void Add_Subvector(const int istart,const T_VECTOR& v)
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i)+=v(i);}
+    
+    template<class T_VECTOR>
+    void Get_Subvector(const int istart,T_VECTOR& v) const
+    {for(int i=0;i<v.Size();i++) v(i)=(*this)(istart+i);}
 
     T* Get_Array_Pointer()
     {return &x;}
@@ -447,6 +482,10 @@ sqrt(const VECTOR<T,1>& v)
 template<class T> inline VECTOR<T,1>
 log(const VECTOR<T,1>& v)
 {return VECTOR<T,1>(log(v.x));}
+
+template<class T> inline VECTOR<T,1>
+wrap(const VECTOR<T,1>& v,const VECTOR<T,1>& vmin,const VECTOR<T,1>& vmax)
+{return VECTOR<T,1 >(wrap(v.x,vmin.x,vmax.x));}
 
 template<class T> inline VECTOR<T,1>
 Inverse(const VECTOR<T,1>& v)

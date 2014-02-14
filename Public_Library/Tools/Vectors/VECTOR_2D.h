@@ -82,6 +82,10 @@ public:
         :x((T)vector_input.x),y(T())
     {}
 
+    template<class T2> explicit VECTOR(const VECTOR<T2,0>& vector_input)
+        :x(T()),y(T())
+    {}
+
     template<class T_VECTOR>
     explicit VECTOR(const ARRAY_BASE<T,T_VECTOR>& v)
         :x(v(0)),y(v(1))
@@ -319,9 +323,6 @@ public:
     T Product() const
     {return x*y;}
 
-    const VECTOR& Column_Sum() const
-    {return *this;}
-
     int Number_True() const
     {STATIC_ASSERT((IS_SAME<T,bool>::value));return x+y;}
 
@@ -333,12 +334,6 @@ public:
 
     static VECTOR All_Ones_Vector()
     {return Constant_Vector(1);}
-
-    VECTOR<T,1> Horizontal_Vector() const
-    {return VECTOR<T,1>(x);}
-
-    VECTOR<T,1> Vertical_Vector() const
-    {return VECTOR<T,1>(y);}
 
     void Fill(const T& constant)
     {x=y=constant;}
@@ -377,6 +372,9 @@ public:
     VECTOR<T,3> Insert(const T& element,const int index) const
     {VECTOR<T,3> r;r[index]=element;for(int i=0;i<2;i++) r[i+(i>=index)]=(*this)[i];return r;}
 
+    VECTOR<T,3> Prepend(const T& element) const
+    {return VECTOR<T,3>(element,x,y);}
+
     VECTOR<T,3> Append(const T& element) const
     {return VECTOR<T,3>(x,y,element);}
 
@@ -385,6 +383,9 @@ public:
 
     VECTOR<T,2> Sorted() const
     {VECTOR<T,2> r(*this);exchange_sort(r.x,r.y);return r;}
+
+    void Sort()
+    {exchange_sort(x,y);}
 
     VECTOR Reversed() const
     {return VECTOR(y,x);}

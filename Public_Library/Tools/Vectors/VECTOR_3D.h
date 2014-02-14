@@ -76,6 +76,18 @@ public:
         :x((T)vector_input.x),y((T)vector_input.y),z((T)vector_input.z)
     {}
 
+    template<class T2> explicit VECTOR(const VECTOR<T2,2>& vector_input)
+        :x((T)vector_input.x),y((T)vector_input.y),z()
+    {}
+
+    template<class T2> explicit VECTOR(const VECTOR<T2,1>& vector_input)
+        :x((T)vector_input.x),y(),z()
+    {}
+
+    template<class T2> explicit VECTOR(const VECTOR<T2,0>& vector_input)
+        :x(),y(),z()
+    {}
+
     template<class T_VECTOR>
     explicit VECTOR(const ARRAY_BASE<T,T_VECTOR>& v)
         :x(v(0)),y(v(1)),z(v(2))
@@ -96,14 +108,6 @@ public:
         x=v(0);y=v(1);z=v(2);
         return *this;
     }
-
-    explicit VECTOR(const VECTOR<T,2>& vector_input)
-        :x(vector_input.x),y(vector_input.y),z(T())
-    {}
-
-    explicit VECTOR(const VECTOR<T,1>& vector_input)
-        :x(vector_input.x),y(T()),z(T())
-    {}
 
     template<int n>
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,3-n>& v2)
@@ -230,9 +234,6 @@ public:
     int Arg_Max() const
     {return argmax(x,y,z);}
 
-    int Arg_Abs_Max() const
-    {return argmax(abs(x),abs(y),abs(z));}
-
     bool Elements_Equal() const
     {return x==y && x==z;}
 
@@ -308,9 +309,6 @@ public:
     T Product() const
     {return x*y*z;}
 
-    const VECTOR& Column_Sum() const
-    {return *this;}
-
     int Number_True() const
     {STATIC_ASSERT((IS_SAME<T,bool>::value));return x+y+z;}
 
@@ -322,9 +320,6 @@ public:
 
     static VECTOR All_Ones_Vector()
     {return Constant_Vector(1);}
-
-    VECTOR<T,2> Horizontal_Vector() const
-    {return VECTOR<T,2>(x,z);}
 
     void Fill(const T& constant)
     {x=y=z=constant;}
@@ -363,14 +358,20 @@ public:
     VECTOR<T,4> Insert(const T& element,const int index) const
     {VECTOR<T,4> r;r[index]=element;for(int i=0;i<3;i++) r[i+(i>=index)]=(*this)[i];return r;}
 
+    VECTOR<T,4> Prepend(const T& element) const
+    {return VECTOR<T,4>(element,x,y,z);}
+
     VECTOR<T,4> Append(const T& element) const
     {return VECTOR<T,4>(x,y,z,element);}
 
     template<int d2> VECTOR<T,3+d2> Append_Elements(const VECTOR<T,d2>& elements) const
     {VECTOR<T,3+d2> r;r[0]=x;r[1]=y;r[2]=z;for(int i=0;i<d2;i++) r[i+3]=elements[i];return r;}
 
-    VECTOR<T,3> Sorted() const
-    {VECTOR<T,3> r(*this);exchange_sort(r.x,r.y,r.z);return r;}
+    VECTOR Sorted() const
+    {VECTOR r(*this);exchange_sort(r.x,r.y,r.z);return r;}
+
+    void Sort()
+    {exchange_sort(x,y,z);}
 
     VECTOR Reversed() const
     {return VECTOR(z,y,x);}

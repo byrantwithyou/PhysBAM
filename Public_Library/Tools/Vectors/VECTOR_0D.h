@@ -9,6 +9,7 @@
 
 #include <Tools/Arrays/ARRAY_BASE.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Math_Tools/Inverse.h>
 #include <Tools/Vectors/SCALAR_POLICY.h>
 #include <cmath>
 #include <cstdlib>
@@ -143,8 +144,22 @@ public:
     VECTOR operator/(const T&) const
     {return *this;}
 
+    VECTOR operator*(const INT_INVERSE a) const
+    {return VECTOR();}
+
+    VECTOR& operator*=(const INT_INVERSE a)
+    {return *this;}
+
     bool Contains(const T&) const
     {return false;}
+
+    template<class T_ARRAY>
+    bool Contains_All(const T_ARRAY& elements) const
+    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));return !elements.Size();}
+
+    template<class T_ARRAY>
+    bool Contains_Any(const T_ARRAY& elements) const
+    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));return false;}
 
     T Magnitude_Squared() const
     {return 0;}
@@ -163,6 +178,39 @@ public:
 
     static T Dot_Product(const VECTOR&,const VECTOR&)
     {return T();}
+
+    T Sum() const
+    {return 0;}
+
+    T Average() const
+    {PHYSBAM_FATAL_ERROR();}
+
+    T Product() const
+    {return 1;}
+
+    T Min() const
+    {PHYSBAM_FATAL_ERROR();}
+
+    T Max() const
+    {PHYSBAM_FATAL_ERROR();}
+
+    T Max_Abs() const
+    {return 0;}
+
+    T Sum_Abs() const
+    {return 0;}
+
+    int Arg_Min() const
+    {PHYSBAM_FATAL_ERROR();}
+
+    int Arg_Max() const
+    {PHYSBAM_FATAL_ERROR();}
+
+    VECTOR<T,1> Append(const T& element) const
+    {return VECTOR<T,1>(element);}
+
+    VECTOR<T,1> Prepend(const T& element) const
+    {return VECTOR<T,1>(element);}
 
     VECTOR<T,1> Insert(const T& element,const int index) const
     {VECTOR<T,1> r;r[index]=element;return r;}
@@ -197,11 +245,105 @@ public:
     static VECTOR Componentwise_Max(const VECTOR& v1,const VECTOR& v2)
     {return VECTOR();}
 
+    VECTOR Projected_On_Unit_Direction(const VECTOR& direction) const
+    {return VECTOR();}
+
+    VECTOR Projected(const VECTOR& direction) const // un-normalized direction
+    {return VECTOR();}
+
+    void Project_On_Unit_Direction(const VECTOR& direction)
+    {}
+
+    void Project(const VECTOR& direction) // un-normalized direction
+    {}
+
+    VECTOR Projected_Orthogonal_To_Unit_Direction(const VECTOR& direction) const
+    {return VECTOR();}
+
+    void Project_Orthogonal_To_Unit_Direction(const VECTOR& direction)
+    {}
+
+    VECTOR Reversed() const
+    {return *this;}
+
+    VECTOR<T,1> Cross(const VECTOR<T,1>) const
+    {return VECTOR<T,1>();}
+
+    bool Elements_Equal() const
+    {return true;}
+
+    int Dominant_Axis() const
+    {PHYSBAM_FATAL_ERROR();}
+
+    int Number_True() const
+    {STATIC_ASSERT((IS_SAME<T,bool>::value));return 0;}
+
+    int Find(const T& element) const
+    {return -1;}
+
+    static VECTOR Axis_Vector(const int axis)
+    {PHYSBAM_FATAL_ERROR();}
+
+    template<class T_FUNCTION>
+    static VECTOR Map(const T_FUNCTION& f,const VECTOR& v)
+    {return VECTOR();}
+
+    void Split(VECTOR& v1,VECTOR& v2) const
+    {}
+
+    template<int d2> VECTOR<T,d2> Append_Elements(const VECTOR<T,d2>& elements) const
+    {return elements;}
+
+    void Fill(const T& constant)
+    {}
+
+    T Lp_Norm(const T& p) const
+    {return 0;}
+
+    VECTOR Orthogonal_Vector() const
+    {PHYSBAM_FATAL_ERROR();}
+
+    VECTOR Unit_Orthogonal_Vector() const
+    {PHYSBAM_FATAL_ERROR();}
+
+    VECTOR Sorted() const
+    {return *this;}
+
+    void Sort()
+    {}
+
+    static T Angle_Between(const VECTOR& u,const VECTOR& v)
+    {return 0;}
+
+    template<class T_VECTOR>
+    void Set_Subvector(const int istart,const T_VECTOR& v)
+    {assert(istart==0 && v.Size()==0);}
+
+    template<class T_VECTOR>
+    void Add_Subvector(const int istart,const T_VECTOR& v)
+    {assert(istart==0 && v.Size()==0);}
+    
+    template<class T_VECTOR>
+    void Get_Subvector(const int istart,T_VECTOR& v) const
+    {assert(istart==0 && v.Size()==0);}
+
     T* Get_Array_Pointer()
     {return (T*)this;}
 
     const T* Get_Array_Pointer() const
     {return (const T*)this;}
+
+    T* begin() // for stl
+    {return (T*)this;}
+
+    const T* begin() const // for stl
+    {return (T*)this;}
+
+    T* end() // for stl
+    {return (T*)this;}
+
+    const T* end() const // for stl
+    {return (T*)this;}
 
     template<class RW>
     void Read(std::istream& input)
@@ -231,6 +373,77 @@ operator/(const T&,const VECTOR<T,0>& v)
 template<class T> inline VECTOR<T,0>
 Inverse(const VECTOR<T,0>& v)
 {return v;}
+
+template<class T> inline VECTOR<T,0>
+abs(const VECTOR<T,0>& v)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+floor(const VECTOR<T,0>& v)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+ceil(const VECTOR<T,0>& v)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+rint(const VECTOR<T,0>& v)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+exp(const VECTOR<T,0>& v)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+sin(const VECTOR<T,0>& v)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+cos(const VECTOR<T,0>& v)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+sqrt(const VECTOR<T,0>& v)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+log(const VECTOR<T,0>& v)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+wrap(const VECTOR<T,0>& v,const VECTOR<T,0>& vmin,const VECTOR<T,0>& vmax)
+{return VECTOR<T,0 >();}
+
+//#####################################################################
+// Functions clamp, clamp_min, clamp_max, in_bounds
+//#####################################################################
+template<class T> inline VECTOR<T,0>
+clamp(const VECTOR<T,0>& v,const VECTOR<T,0>& vmin,const VECTOR<T,0>& vmax)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+clamp(const VECTOR<T,0>& v,T min,T max)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+clamp_min(const VECTOR<T,0>& v,const VECTOR<T,0>& vmin)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+clamp_min(const VECTOR<T,0>& v,const T& min)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+clamp_max(const VECTOR<T,0>& v,const VECTOR<T,0>& vmax)
+{return v;}
+
+template<class T> inline VECTOR<T,0>
+clamp_max(const VECTOR<T,0>& v,const T& max)
+{return v;}
+
+template<class T> inline bool
+in_bounds(const VECTOR<T,0>& v,const VECTOR<T,0>& vmin,const VECTOR<T,0>& vmax)
+{return true;}
 
 //#####################################################################
 }

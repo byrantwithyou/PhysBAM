@@ -64,40 +64,28 @@ public:
         for(int i=0;i<d;i++) array[i]=T();
     }
 
-    VECTOR(const T& x0,const T& x1,const T& x2,const T& x3)
-    {
-        STATIC_ASSERT(d==4);array[0]=x0;array[1]=x1;array[2]=x2;array[3]=x3;
-    }
+    template<class ...Args>
+    VECTOR(const T& a,const T& b,const T& c,const T& e,Args &&... args)
+    {STATIC_ASSERT(d==4+sizeof...(Args));Set_Helper(a,b,c,e,args...);}
 
-    VECTOR(const T& x0,const T& x1,const T& x2,const T& x3,const T& x4)
-    {
-        STATIC_ASSERT(d==5);array[0]=x0;array[1]=x1;array[2]=x2;array[3]=x3;array[4]=x4;
-    }
+    template<class ...Args>
+    void Set_Helper(const T& a,Args&&... args)
+    {array[d-1-sizeof...(Args)]=a;Set_Helper(args...);}
 
-    VECTOR(const T& x0,const T& x1,const T& x2,const T& x3,const T& x4,const T& x5)
-    {
-        STATIC_ASSERT(d==6);array[0]=x0;array[1]=x1;array[2]=x2;array[3]=x3;array[4]=x4;array[5]=x5;
-    }
+    template<class ...Args>
+    void Set_Helper()
+    {}
 
-    VECTOR(const T& x0,const T& x1,const T& x2,const T& x3,const T& x4,const T& x5,const T& x6)
-    {
-        STATIC_ASSERT(d==7);array[0]=x0;array[1]=x1;array[2]=x2;array[3]=x3;array[4]=x4;array[5]=x5;array[6]=x6;
-    }
+    template<class ...Args>
+    void Get_Helper(T& a,Args&... args) const
+    {a=array[d-1-sizeof...(Args)];Get_Helper(args...);}
 
-    VECTOR(const T& x0,const T& x1,const T& x2,const T& x3,const T& x4,const T& x5,const T& x6,const T& x7)
-    {
-        STATIC_ASSERT(d==8);array[0]=x0;array[1]=x1;array[2]=x2;array[3]=x3;array[4]=x4;array[5]=x5;array[6]=x6;array[7]=x7;
-    }
+    template<class ...Args>
+    void Get_Helper() const
+    {}
 
     template<class T_VECTOR>
     explicit VECTOR(const ARRAY_BASE<T,T_VECTOR>& v)
-    {
-        Assert_Same_Size(*this,v);
-        for(int i=0;i<d;i++) array[i]=v(i);
-    }
-
-    template<class T_VECTOR>
-    VECTOR(const ARRAY_EXPRESSION<T,T_VECTOR>& v)
     {
         Assert_Same_Size(*this,v);
         for(int i=0;i<d;i++) array[i]=v(i);
@@ -172,7 +160,7 @@ public:
     {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]*a;return r;}
 
     VECTOR operator/(const T& a) const
-    {return *this*(1/a);}
+    {return *this*Inverse(a);}
 
     VECTOR operator+(const VECTOR& v) const
     {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]+v.array[i];return r;}
@@ -188,6 +176,9 @@ public:
 
     VECTOR operator*(const INT_INVERSE a) const
     {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]*a;return r;}
+
+    VECTOR Normalized() const
+    {VECTOR r(*this);r.Normalize();return r;}
 
     bool Elements_Equal() const
     {bool equal=true;for(int i=1;i<d;i++) equal&=(array[i]==array[0]);return equal;}
@@ -222,9 +213,6 @@ public:
     void Project_Orthogonal_To_Unit_Direction(const VECTOR& direction)
     {*this-=Dot_Product(*this,direction)*direction;}
 
-    const VECTOR& Column_Sum() const
-    {return *this;}
-
     int Number_True() const
     {STATIC_ASSERT((IS_SAME<T,bool>::value));int count=0;for(int i=0;i<d;i++)if(array[i]) count++;return count;}
 
@@ -240,35 +228,13 @@ public:
     void Fill(const T& constant)
     {for(int i=0;i<d;i++) array[i]=constant;}
 
-    void Get(T& element1,T& element2,T& element3,T& element4) const
-    {STATIC_ASSERT(d==4);element1=array[0];element2=array[1];element3=array[2];element4=array[3];}
+    template<class ...Args>
+    void Get(Args&... args) const
+    {STATIC_ASSERT(d==sizeof...(Args));Get_Helper(args...);}
 
-    void Get(T& element1,T& element2,T& element3,T& element4,T& element5) const
-    {STATIC_ASSERT(d==5);element1=array[0];element2=array[1];element3=array[2];element4=array[3];element5=array[4];}
-
-    void Get(T& element1,T& element2,T& element3,T& element4,T& element5,T& element6) const
-    {STATIC_ASSERT(d==6);element1=array[0];element2=array[1];element3=array[2];element4=array[3];element5=array[4];element6=array[5];}
-
-    void Get(T& element1,T& element2,T& element3,T& element4,T& element5,T& element6,T& element7) const
-    {STATIC_ASSERT(d==7);element1=array[0];element2=array[1];element3=array[2];element4=array[3];element5=array[4];element6=array[5];element7=array[6];}
-
-    void Get(T& element1,T& element2,T& element3,T& element4,T& element5,T& element6,T& element7,T& element8) const
-    {STATIC_ASSERT(d==8);element1=array[0];element2=array[1];element3=array[2];element4=array[3];element5=array[4];element6=array[5];element7=array[6];element8=array[7];}
-
-    void Set(const T& element1,const T& element2,const T& element3,const T& element4)
-    {STATIC_ASSERT(d==4);array[0]=element1;array[1]=element2;array[2]=element3;array[3]=element4;}
-
-    void Set(const T& element1,const T& element2,const T& element3,const T& element4,const T& element5)
-    {STATIC_ASSERT(d==5);array[0]=element1;array[1]=element2;array[2]=element3;array[3]=element4;array[4]=element5;}
-
-    void Set(const T& element1,const T& element2,const T& element3,const T& element4,const T& element5,const T& element6)
-    {STATIC_ASSERT(d==6);array[0]=element1;array[1]=element2;array[2]=element3;array[3]=element4;array[4]=element5;array[5]=element6;}
-
-    void Set(const T& element1,const T& element2,const T& element3,const T& element4,const T& element5,const T& element6,const T& element7)
-    {STATIC_ASSERT(d==7);array[0]=element1;array[1]=element2;array[2]=element3;array[3]=element4;array[4]=element5;array[5]=element6;array[6]=element7;}
-
-    void Set(const T& element1,const T& element2,const T& element3,const T& element4,const T& element5,const T& element6,const T& element7,const T& element8)
-    {STATIC_ASSERT(d==8);array[0]=element1;array[1]=element2;array[2]=element3;array[3]=element4;array[4]=element5;array[5]=element6;array[6]=element7;array[7]=element8;}
+    template<class ...Args>
+    void Set(Args&&... args)
+    {STATIC_ASSERT(d==sizeof...(Args));Set_Helper(args...);}
 
     template<class T_FUNCTION>
     static VECTOR Map(const T_FUNCTION& f,const VECTOR& v)
@@ -298,6 +264,9 @@ public:
     VECTOR<T,d+1> Insert(const T& element,const int index) const
     {VECTOR<T,d+1> r;r[index]=element;for(int i=0;i<d;i++) r[i+(i>=index)]=(*this)[i];return r;}
 
+    VECTOR<T,d+1> Prepend(const T& element) const
+    {VECTOR<T,d+1> r;r[0]=element;for(int i=0;i<d;i++) r[i+1]=(*this)[i];return r;}
+
     VECTOR<T,d+1> Append(const T& element) const
     {VECTOR<T,d+1> r;for(int i=0;i<d;i++) r[i]=(*this)[i];r[d]=element;return r;}
 
@@ -307,8 +276,8 @@ public:
     for(int i=0;i<d2;i++) r[i+d]=elements[i];
     return r;}
 
-    VECTOR<T,4> Sorted() const
-    {STATIC_ASSERT(d==4);VECTOR<T,4> r(*this);exchange_sort(r[0],r[1],r[2],r[3]);return r;}
+    VECTOR Sorted() const
+    {VECTOR r(*this);r.Sort();return r;}
 
     VECTOR Reversed() const
     {VECTOR r;for(int i=0;i<d;i++) r.array[d-i-1]=array[i];return r;}
@@ -320,6 +289,24 @@ public:
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,d-n>& v2) const
     {for(int i=0;i<n;i++) v1(i)=(*this)(i);
     for(int i=n;i<d;i++) v2(i-n)=(*this)(i);}
+
+    VECTOR Orthogonal_Vector() const
+    {int a=Dominant_Axis(),b=!a;VECTOR r;r(a)=(*this)(b);r(b)=-(*this)(a);return r;}
+
+    VECTOR Unit_Orthogonal_Vector() const
+    {return Orthogonal_Vector().Normalized();}
+
+    template<class T_VECTOR>
+    void Set_Subvector(const int istart,const T_VECTOR& v)
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i)=v(i);}
+
+    template<class T_VECTOR>
+    void Add_Subvector(const int istart,const T_VECTOR& v)
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i)+=v(i);}
+    
+    template<class T_VECTOR>
+    void Get_Subvector(const int istart,T_VECTOR& v) const
+    {for(int i=0;i<v.Size();i++) v(i)=(*this)(istart+i);}
 
     T* Get_Array_Pointer()
     {return array;}
@@ -378,7 +365,7 @@ Inverse(const VECTOR<T,d>& v)
 template<class T,int d> inline int VECTOR<T,d>::
 Dominant_Axis() const
 {
-    int axis=1;
+    int axis=0;
     T abs_max=abs(array[0]);
     for(int i=1;i<d;i++){T abs_i=abs(array[i]);if(abs_max<abs_i){abs_max=abs_i;axis=i;}}
     return axis;
@@ -431,6 +418,16 @@ exp(const VECTOR<T,d>& v)
 {
     VECTOR<T,d> r;
     for(int i=0;i<d;i++) r.array[i]=exp(v.array[i]);
+    return r;
+}
+//#####################################################################
+// Function log
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+log(const VECTOR<T,d>& v)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=log(v.array[i]);
     return r;
 }
 //#####################################################################
@@ -532,11 +529,26 @@ in_bounds(const VECTOR<T,d>& v,const VECTOR<T,d>& vmin,const VECTOR<T,d>& vmax)
     for(int i=0;i<d;i++) if(!in_bounds(v.array[i],vmin.array[i],vmax.array[i])) return false;
     return true;
 }
+
+//#####################################################################
+// Function wrap
+//#####################################################################
+template<class T,int d> inline VECTOR<T,d>
+wrap(const VECTOR<T,d>& v,const VECTOR<T,d>& vmin,const VECTOR<T,d>& vmax)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r(i)=wrap(v(i),vmin(i),vmax(i));
+    return r;
+}
 //#####################################################################
 
 //#####################################################################
 // Vector construction
 //#####################################################################
+template<class T> VECTOR<T,0>
+Vector()
+{return VECTOR<T,0>();}
+
 template<class T> VECTOR<T,1>
 Vector(const T& d1)
 {return VECTOR<T,1>(d1);}
@@ -549,25 +561,9 @@ template<class T> VECTOR<T,3>
 Vector(const T& d1,const T& d2,const T& d3)
 {return VECTOR<T,3>(d1,d2,d3);}
 
-template<class T> VECTOR<T,4>
-Vector(const T& d1,const T& d2,const T& d3,const T& d4)
-{return VECTOR<T,4>(d1,d2,d3,d4);}
-
-template<class T> VECTOR<T,5>
-Vector(const T& d1,const T& d2,const T& d3,const T& d4,const T& d5)
-{return VECTOR<T,5>(d1,d2,d3,d4,d5);}
-
-template<class T> VECTOR<T,6>
-Vector(const T& d1,const T& d2,const T& d3,const T& d4,const T& d5,const T& d6)
-{return VECTOR<T,6>(d1,d2,d3,d4,d5,d6);}
-
-template<class T> VECTOR<T,7>
-Vector(const T& d1,const T& d2,const T& d3,const T& d4,const T& d5,const T& d6,const T& d7)
-{return VECTOR<T,7>(d1,d2,d3,d4,d5,d6,d7);}
-
-template<class T> VECTOR<T,8>
-Vector(const T& d1,const T& d2,const T& d3,const T& d4,const T& d5,const T& d6,const T& d7,const T& d8)
-{return VECTOR<T,8>(d1,d2,d3,d4,d5,d6,d7,d8);}
+template<class T,class ...Args> VECTOR<T,sizeof...(Args)>
+Vector(const T& d1,const Args&... d2)
+{return VECTOR<T,sizeof...(Args)>(d1,d2...);}
 
 //#####################################################################
 template<class T,int d> struct SUM<VECTOR<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};

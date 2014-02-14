@@ -38,14 +38,14 @@ template<class T> void Sector_Volumes_Helper(const SPHERE<VECTOR<T,2> >& circle,
         else{
             if(origin.y>center.y){volumes[0]=horizontal_area;volumes[1]=remaining_area;volumes[2]=0;volumes[3]=vertical_area;}
             else{volumes[0]=0;volumes[1]=vertical_area;volumes[2]=horizontal_area;volumes[3]=remaining_area;}}}
-    else if(circle.Bounding_Box().Get_Horizontal_Box().Inside(VECTOR<T,1>(origin.x),thickness_over_two)){ // cuts through vertically
+    else if(circle.Bounding_Box().Remove_Dimension(1).Inside(VECTOR<T,1>(origin.x),thickness_over_two)){ // cuts through vertically
         T left,right;
         T h=origin.x-center.x;
         if(h>0){right=circle.Circular_Segment_Area(max((T)0,radius-h));left=circle.Size()-right;}
         else{left=circle.Circular_Segment_Area(max((T)0,radius+h));right=circle.Size()-left;}
         if(origin.y>center.y){volumes[0]=left;volumes[1]=right;volumes[2]=volumes[3]=0;}
         else{volumes[2]=left;volumes[3]=right;volumes[0]=volumes[1]=0;}}
-    else if(circle.Bounding_Box().Get_Vertical_Box().Inside(VECTOR<T,1>(origin.y),thickness_over_two)){
+    else if(circle.Bounding_Box().Remove_Dimension(0).Inside(VECTOR<T,1>(origin.y),thickness_over_two)){
         T top,bottom;
         T h=origin.y-center.y;
         if(h>0){top=circle.Circular_Segment_Area(max((T)0,radius-h));bottom=circle.Size()-top;}

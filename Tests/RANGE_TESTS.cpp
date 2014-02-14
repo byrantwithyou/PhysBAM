@@ -88,7 +88,6 @@ public:
             if(!Test_Remove_Dimension<VECTOR<T,2> >() || !Test_Remove_Dimension<VECTOR<T,3> >()) return failure;
             if(!Test_Box_Intersection<VECTOR<T,1> >() || !Test_Box_Intersection<VECTOR<T,2> >() || !Test_Box_Intersection<VECTOR<T,3> >()) return failure;
             if(!Test_Box_Project_Onto_Line<VECTOR<T,1> >() || !Test_Box_Project_Onto_Line<VECTOR<T,2> >() || !Test_Box_Project_Onto_Line<VECTOR<T,3> >()) return failure;
-            if(!Test_Horizontal_Box<VECTOR<T,2> >() || !Test_Horizontal_Box<VECTOR<T,3> >()) return failure;
             return success;
         case 3:
             if(!Test_Box_Sphere_Intersection<VECTOR<T,2> >() || !Test_Box_Sphere_Intersection<VECTOR<T,3> >()) return failure;
@@ -337,18 +336,6 @@ public:
         Test(box_four_points.Lazy_Inside(points(5)) && box_four_points.Lazy_Inside(points(6)) && box_four_points.Lazy_Inside(points(7)) && box_four_points.Lazy_Inside(points(9)),
             "Bounding box of two points contains those points.",ok);
         for(int j=0;j<20 && ok;j++) Test(box_full.Lazy_Inside(points(j)),"Full bounding box contains all points from which it was constructed.",ok);}
-    return ok;}
-
-    template<class TV>
-    bool Test_Horizontal_Box()
-    {bool ok=true;
-    for(int i=0;i<num_iterations_per_test && ok;i++){
-        RANGE<TV> box=Make_Random_Valid_Box<TV>();
-        RANGE<VECTOR<T,TV::dimension-1> > horizontal=box.Get_Horizontal_Box();
-        Test(Equal_To_Tolerance(horizontal.Size()*(box.Edge_Lengths())(1),box.Size()),"Removing dimension has correct effect on area/volume.",ok);
-        RANGE<VECTOR<T,TV::dimension-1> > dimension_removed=box.Remove_Dimension(1);
-        Test(Equal_To_Tolerance(horizontal.Minimum_Corner(),dimension_removed.Minimum_Corner()),"Minimum corner of horizontal box matches that of box with dimension removed.",ok);
-        Test(Equal_To_Tolerance(horizontal.Maximum_Corner(),dimension_removed.Maximum_Corner()),"Maximum corner of horizontal box matches that of box with dimension removed.",ok);}
     return ok;}
 
     template<class TV>

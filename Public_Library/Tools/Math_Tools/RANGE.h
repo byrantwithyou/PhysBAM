@@ -308,12 +308,6 @@ public:
     if(!points.Size()) return Empty_Box();
     RANGE<TV> box(points(0));for(int i=1;i<points.Size();i++) box.Enlarge_Nonempty_Box_To_Include_Point(points(i));return box;}
 
-    RANGE<VECTOR<T,d-1> > Get_Horizontal_Box() const
-    {return RANGE<VECTOR<T,d-1> >(min_corner.Horizontal_Vector(),max_corner.Horizontal_Vector());}
-
-    RANGE<VECTOR<T,d-1> > Get_Vertical_Box() const
-    {STATIC_ASSERT(d==2);return RANGE<VECTOR<T,d-1> >(min_corner.Vertical_Vector(),max_corner.Vertical_Vector());}
-
     RANGE<VECTOR<T,d-1> > Remove_Dimension(int dimension) const
     {return RANGE<VECTOR<T,d-1> >(min_corner.Remove_Index(dimension),max_corner.Remove_Index(dimension));}
 
