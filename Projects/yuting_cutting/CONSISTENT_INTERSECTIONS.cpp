@@ -49,7 +49,7 @@ Compute_VE_Helper(int p,I2 e,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xe,T& gamma)
 {
     TV P=Xp(p),A=Xe(e.x),B=Xe(e.y),u=B-A,w=P-A;
     T mag=u.Normalize();
-    if(mag<tol_vv) return false;
+    if(mag<tol_vv/2) return false;
     T dist=u.Cross(w).Magnitude();
     if(dist>tol_ev) return false;
     gamma=u.Dot(w)/mag;
