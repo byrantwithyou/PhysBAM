@@ -250,7 +250,7 @@ public:
     {return x<=v.x && y<=v.y && z<=v.z;}
 
     int Dominant_Axis() const
-    {T abs_x=abs(x),abs_y=abs(y),abs_z=abs(z);return (abs_x>abs_y && abs_x>abs_z) ? 1:((abs_y>abs_z) ? 2:3);}
+    {T abs_x=abs(x),abs_y=abs(y),abs_z=abs(z);return (abs_x>abs_y && abs_x>abs_z)?0:((abs_y>abs_z)?1:2);}
 
     static T Dot_Product(const VECTOR& v1,const VECTOR& v2)
     {return v1.x*v2.x+v1.y*v2.y+v1.z*v2.z;}
