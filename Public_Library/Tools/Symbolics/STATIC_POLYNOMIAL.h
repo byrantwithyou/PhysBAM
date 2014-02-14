@@ -76,8 +76,8 @@ struct STATIC_POLYNOMIAL
 {
     typedef VECTOR<int,rank> TV_INT;
     typedef VECTOR<T,rank> TV;
-    TV_INT size;
-    STATIC_TENSOR<T,rank,d+1> terms;
+    TV_INT size; // maximum degree present for each variable
+    STATIC_TENSOR<T,rank,d+1> terms; // polynomial coefficents
 
     void Set_Term(const TV_INT& power,T x)
     {size=size.Componentwise_Max(power);terms(power)=x;}
@@ -138,7 +138,7 @@ struct STATIC_POLYNOMIAL
         return *this;
     }
 
-    template<int d2> // Result must fit
+    template<int d2> // Result must fit, assumes this is zero
     STATIC_POLYNOMIAL& operator=(const STATIC_POLYNOMIAL<T,rank,d2>& a)
     {
         PHYSBAM_ASSERT(a.size.All_Less_Equal(TV_INT()+d));
@@ -168,7 +168,7 @@ struct STATIC_POLYNOMIAL
             r.terms(it.index-TV_INT::Axis_Vector(v))=terms(it.index)*it.index(v);
         r.size=size;
         r.size(v)--;
-        if(r.size(v)<0) r.size(v)=0;
+        if(r.size(v)<0) r.size=TV_INT();
         return r;
     }
 
