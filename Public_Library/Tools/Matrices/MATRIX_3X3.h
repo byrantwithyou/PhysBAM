@@ -187,11 +187,11 @@ public:
     MATRIX Rotation_Only() const
     {return MATRIX(x[0],x[1],0,x[3],x[4],0,0,0,1);}
 
-    const VECTOR<T,2>& Translation() const
-    {return *(const VECTOR<T,2>*)(x+6);} // x[6],x[7]
+    VECTOR<T,2> Extract_Translation() const
+    {return VECTOR<T,2>(x[6],x[7]);}
 
-    VECTOR<T,2>& Translation()
-    {return *(VECTOR<T,2>*)(x+6);} // x[6],x[7]
+    void Set_Translation(const VECTOR<T,2>& v)
+    {x[6]=v.x;x[7]=v.y;}
 
     MATRIX<T,2> Extract_Rotation() const
     {return MATRIX<T,2>(x[0],x[1],x[3],x[4]);}
@@ -237,12 +237,6 @@ public:
 
     VECTOR<T,3> Column_Magnitudes() const
     {return VECTOR<T,3>(Column(0).Magnitude(),Column(1).Magnitude(),Column(2).Magnitude());}
-
-    VECTOR<T,3> Largest_Normalized_Column() const
-    {T scale1=sqr(x[0])+sqr(x[1])+sqr(x[2]),scale2=sqr(x[3])+sqr(x[4])+sqr(x[5]),scale3=sqr(x[6])+sqr(x[7])+sqr(x[8]);
-    if(scale1>scale2){if(scale1>scale3)return VECTOR<T,3>(x[0],x[1],x[2])/sqrt(scale1);}
-    else if(scale2>scale3)return VECTOR<T,3>(x[3],x[4],x[5])/sqrt(scale2);
-    return VECTOR<T,3>(x[6],x[7],x[8])/sqrt(scale3);}
 
     static MATRIX Transpose(const MATRIX& A)
     {return MATRIX(A.x[0],A.x[3],A.x[6],A.x[1],A.x[4],A.x[7],A.x[2],A.x[5],A.x[8]);}

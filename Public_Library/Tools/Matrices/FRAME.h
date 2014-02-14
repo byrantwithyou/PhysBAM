@@ -85,7 +85,7 @@ public:
     {return FRAME((1-s)*f1.t+s*f2.t,ROTATION<TV>::Spherical_Linear_Interpolation(f1.r,f2.r,s));}
 
     MATRIX<T,d+1> Matrix() const
-    {MATRIX<T,d+1> matrix=MATRIX<T,d+1>::From_Linear(r.Rotation_Matrix());matrix.Translation()=t;return matrix;}
+    {MATRIX<T,d+1> matrix=MATRIX<T,d+1>::From_Linear(r.Rotation_Matrix());matrix.Set_Translation(t);return matrix;}
 
     static FRAME<TV> From_Delta(const TWIST<TV>& twist)
     {return FRAME<TV>(twist.linear,ROTATION<TV>::From_Rotation_Vector(twist.angular));}

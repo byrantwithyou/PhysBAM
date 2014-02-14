@@ -158,11 +158,11 @@ public:
     MATRIX Rotation_Only() const
     {return MATRIX(x[0],x[1],x[2],0,x[4],x[5],x[6],0,x[8],x[9],x[10],0,0,0,0,1);}
 
-    const VECTOR<T,3>& Translation() const
-    {return *(const VECTOR<T,3>*)(x+12);} // x[12],x[13],x[14]
+    VECTOR<T,3> Extract_Translation() const
+    {return VECTOR<T,3>(x[12],x[13],x[14]);}
 
-    VECTOR<T,3>& Translation()
-    {return *(VECTOR<T,3>*)(x+12);} // x[12],x[13],x[14]
+    void Set_Translation(const VECTOR<T,3>& v)
+    {x[12]=v.x;x[13]=v.y;x[14]=v.z;}
 
     MATRIX<T,3> Extract_Rotation() const
     {return MATRIX<T,3>(x[0],x[1],x[2],x[4],x[5],x[6],x[8],x[9],x[10]);}
