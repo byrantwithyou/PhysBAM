@@ -37,7 +37,7 @@ Set_Tol(T tol)
 template<class T> bool CONSISTENT_INTERSECTIONS<VECTOR<T,2> >::
 Compute_VV(int p,int q)
 {
-    if((ta.particles.X(p)-sc.particles.X(q)).Magnitude_Squared()>sqr(tol_vv)) return false;
+    if((ta.particles.X(p)-sc.particles.X(q)).Magnitude()>tol_vv) return false;
     hash_vv.Set(I2(p,q));
     return true;
 }
@@ -49,7 +49,7 @@ Compute_VE_Helper(int p,I2 e,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xe,T& gamma)
 {
     TV P=Xp(p),A=Xe(e.x),B=Xe(e.y),u=B-A,w=P-A;
     T mag=u.Normalize();
-    if(mag<tol_vv/2) return false;
+    if(mag<tol_vv*(T).5) return false;
     T dist=u.Cross(w).Magnitude();
     if(dist>tol_ev) return false;
     gamma=u.Dot(w)/mag;
@@ -98,7 +98,7 @@ Compute_EE(I2 e,I2 g)
         if(hash_ve.Contains(g.Insert(e(i),0))) return false;
         if(hash_ev.Contains(e.Append(g(i)))) return false;}
 
-    T tol=sqr(tol_ev)/2;
+    T tol=sqr(tol_ev)*(T).5;
     TV A=ta.particles.X(e.x),B=ta.particles.X(e.y);
     TV P=sc.particles.X(g.x),Q=sc.particles.X(g.y);
     T area_ABP=TRIANGLE_2D<T>::Signed_Area(A,B,P);
@@ -124,7 +124,7 @@ Compute_FV(I3 f,int p)
         if(hash_vv.Contains(I2(f(i),p))) return false;
         if(hash_ev.Contains(f.Remove_Index(i).Append(p))) return false;}
 
-    T tol=sqr(tol_ev)/2;
+    T tol=sqr(tol_ev)*(T).5;
     TV A=ta.particles.X(f.x),B=ta.particles.X(f.y),C=ta.particles.X(f.z);
     TV P=sc.particles.X(p);
     T area_PBC=TRIANGLE_2D<T>::Signed_Area(P,B,C);
@@ -213,7 +213,7 @@ Set_Tol(T tol)
 template<class T> bool CONSISTENT_INTERSECTIONS<VECTOR<T,3> >::
 Compute_VV(int p,int q)
 {
-    if((tv.particles.X(p)-ts.particles.X(q)).Magnitude_Squared()>sqr(tol_vv)) return false;
+    if((tv.particles.X(p)-ts.particles.X(q)).Magnitude()>tol_vv) return false;
     hash_vv.Set(I2(p,q));
     return true;
 }
