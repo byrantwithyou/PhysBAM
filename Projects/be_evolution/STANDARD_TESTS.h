@@ -1615,7 +1615,7 @@ void Get_Initial_Data()
             curves(0).Add_Control_Point(t_stop,FRAME<TV>(TV(0,y_stop,0)*m,ROTATION<TV>(pi/2,TV(1,0,0))));
             break;}
         case 67:{
-            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,1,0)*m));
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,1.01,0)*m));
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(1.1,3.1,1.1)*m));
             tests.Create_Mattress(mattress_grid,true,&initial_state2,density);

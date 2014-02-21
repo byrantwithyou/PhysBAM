@@ -12,6 +12,7 @@
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
+#include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY_2D.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -37,11 +38,14 @@ Add_Mesh(OBJECT& object,const IMPLICIT_OBJECT<TV>& implicit_surface)
 {
     object.Initialize_Hierarchy();
     collision_bodies.Append(&object);
+    object.mesh.Initialize_Adjacent_Elements();
     ARRAY<int> unique_particles(object.mesh.elements.Flattened());
     unique_particles.Prune_Duplicates();
     for(int i=0;i<unique_particles.m;i++)
         undeformed_phi(unique_particles(i))=implicit_surface(particles.X(unique_particles(i)));
-    undeformed_phi.Subset(object.Get_Boundary_Object().mesh.elements.Flattened()).Fill(0);
+    OBJECT_BOUNDARY& ob=object.Get_Boundary_Object();
+    ob.Initialize_Hierarchy();
+    undeformed_phi.Subset(ob.mesh.elements.Flattened()).Fill(0);
 }
 //#####################################################################
 // Destructor
@@ -68,7 +72,7 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 // Function Simplex_Intersection
 //#####################################################################
 template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
-Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POLYTOPE& polytope)
+Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POLYTOPE& polytope) const 
 {
     VECTOR<TV,max_pts> polytope_vertex(s);
     for(int j=0;j<TV::m+1;j++)
@@ -81,7 +85,7 @@ Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POL
         VECTOR<T,max_pts> in_phi,out_phi;
         for(int j=0;j<polytope.size;j++){
             T phi=p.Signed_Distance(polytope_vertex(j));
-            if(phi<1e-14){
+            if(phi<0){
                 in_phi(in.size)=phi;
                 in_vert(in.size)=polytope_vertex(j);
                 in.poly(in.size++)=polytope.poly(j);}
@@ -97,7 +101,7 @@ Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POL
                 int b=in.poly(j)&out.poly(k);
                 if(count_bits(b)!=2) continue;
                 T lambda=in_phi(j)/(in_phi(j)-out_phi(k));
-                if(lambda<=0) continue;
+                /* if(lambda<=0) continue; */
                 polytope_vertex(polytope.size)=in_vert(j)+lambda*(out_vert(k)-in_vert(j));
                 polytope.poly(polytope.size++)=b|p.plane;}}
 }
@@ -169,7 +173,8 @@ Add_Plane_Edge_Intersection(const VECTOR<int,4>& nodes,const TV_VECTOR& X,VECTOR
     auto normal=(p1-p0);
     auto d0=normal.Dot(e0-p0);
     auto d1=normal.Dot(e1-p0);
-    auto z=e0+d0/(d0-d1+1e16)*(e1-e0);
+    auto lambda=d0/(d0-d1);
+    auto z=e0+lambda*(e1-e0);
     v=z.x;
     for(int i=0;i<4;i++)
         dv(i)=z.dx(i);
@@ -213,6 +218,27 @@ Integrate_Levelset(const VECTOR<VECTOR<T,2>,6>& v,const T_VECTOR& undeformed_phi
 //#####################################################################
 // Function Integrate_Levelset
 //#####################################################################
+template<class T> static void
+Integrate_Levelset_Interior(const VECTOR<VECTOR<T,3>,4>& v,T phi,T stiffness,T& pe,VECTOR<VECTOR<T,3>,4>& dpe,MATRIX<MATRIX<T,3>,4>& ddpe)
+{
+    auto a=From_Var<8,0>(v(0));
+    auto b=From_Var<8,1>(v(1));
+    auto c=From_Var<8,2>(v(2));
+    auto d=From_Var<8,3>(v(3));
+    auto A=a-d;
+    auto B=b-d;
+    auto C=c-d;
+    auto integral=stiffness*abs(A.Dot(B.Cross(C))*phi);
+    pe+=integral.x;
+    for(int i=0;i<4;i++)
+        dpe(i)=integral.dx(i);
+    for(int i=0;i<4;i++)
+        for(int j=0;j<4;j++)
+            ddpe(i,j)=integral.ddx(i,j);
+}
+//#####################################################################
+// Function Integrate_Levelset
+//#####################################################################
 template<class T,class T_VECTOR> static void
 Integrate_Levelset(const VECTOR<VECTOR<T,3>,8>& v,const T_VECTOR& undeformed_phi,T stiffness,T& pe,VECTOR<VECTOR<T,3>,8>& dpe,MATRIX<MATRIX<T,3>,8>& ddpe)
 {
@@ -230,6 +256,7 @@ Integrate_Levelset(const VECTOR<VECTOR<T,3>,8>& v,const T_VECTOR& undeformed_phi
     auto C=c-d;
     auto B_cross_C=B.Cross(C);
     auto Det=A.Dot(B_cross_C);
+    if(Det.x==0) return;
     auto Y=X/Det;
     auto wA=Y.Dot(B_cross_C);
     auto C_cross_A=C.Cross(A);
@@ -240,7 +267,6 @@ Integrate_Levelset(const VECTOR<VECTOR<T,3>,8>& v,const T_VECTOR& undeformed_phi
     auto phi=undeformed_phi(0)*wA+undeformed_phi(1)*wB+undeformed_phi(2)*wC+undeformed_phi(3)*wD;
     auto integral=stiffness*abs((e-h).Dot((f-h).Cross(g-h))*phi);
     pe+=integral.x;
-    if(integral.x<=0) return;
     for(int i=0;i<8;i++)
         dpe(i)=integral.dx(i);
     for(int i=0;i<8;i++)
@@ -335,7 +361,7 @@ Calculate_Vertex_Dependencies(const VECTOR<int,3>& simplex,ARRAY<int>& vertex_de
 // Function Integrate_Simplex
 //#####################################################################
 template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
-Integrate_Simplex(const VECTOR<int,TV::m+1>& simplex,const X_VECTOR& X,const PHI_VECTOR& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf)
+Integrate_Simplex(const SIMPLEX_NODES& simplex,const X_VECTOR& X,const PHI_VECTOR& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf)
 {
     ARRAY<int> vertex_dependencies;
     ARRAY<VECTOR<int,TV::m+2> > non_particle_vertex_nodes;
@@ -395,8 +421,13 @@ Update_Position_Based_State(const T time,const bool is_position_update)
     grad_pe.Remove_All();
     H_pe.Remove_All();
     overlapping_particles.Remove_All();
-    for(int i=0;i<collision_bodies.m;i++)
-        collision_bodies(i)->hierarchy->Update_Boxes(1e-15);
+    interior_grad_pe.Remove_All();
+    interior_H_pe.Remove_All();
+    interior_overlapping_particles.Remove_All();
+    for(int i=0;i<collision_bodies.m;i++){
+        collision_bodies(i)->hierarchy->Update_Boxes((T)1e-14);
+        collision_bodies(i)->Get_Boundary_Object().hierarchy->Update_Boxes((T)1e-14);
+    }
     for(int i=0;i<collision_bodies.m;i++)
         for(int j=0;j<collision_bodies.m;j++)
             Update_Position_Based_State_Pair(*collision_bodies(i),*collision_bodies(j));
@@ -405,17 +436,44 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
-Update_Position_Based_State_Pair(const OBJECT& o0,const OBJECT& o1)
+Update_Position_Based_State_Pair(const OBJECT& o0,OBJECT& o1)
 {
+    const OBJECT_BOUNDARY& b1=o1.Get_Boundary_Object();
+    HASHTABLE<int,void> visited0(o0.mesh.elements.m);
+    ARRAY<int> boundary_list;
+    ARRAY<int> worklist;
     for(int e=0;e<o0.mesh.elements.m;e++){
-        const VECTOR<int,TV::m+1> nodes0=o0.mesh.elements(e).Sorted();
-        ARRAY<int> intersection_list;
+        const SIMPLEX_NODES nodes0=o0.mesh.elements(e);
         VECTOR<TV,TV::m+1> s(particles.X.Subset(nodes0));
+        ARRAY<int> intersection_list;
+        b1.hierarchy->Intersection_List(RANGE<TV>::Bounding_Box(s),intersection_list);
+        for(int n=0;n<intersection_list.m;n++){
+            int t=intersection_list(n);
+            const TV_INT face_nodes=b1.mesh.elements(t);
+            bool inside=false;
+            bool outside=false;
+            SIMPLEX_FACE f(particles.X.Subset(face_nodes));
+            for(int i=0;i<nodes0.m;i++){
+                if(!face_nodes.Contains(nodes0(i))){
+                    inside=inside||f.Inside_Plane(s(i),-1e14);
+                    outside=outside||f.Outside_Plane(s(i),-1e14);}}
+            if(!(inside&&outside))
+                continue;
+            boundary_list.Append(e);
+            break;}}
+    for(int k=0;k<boundary_list.m;k++){
+        int e=boundary_list(k);
+        if(visited0.Contains(e))
+            continue;
+        visited0.Insert(e);
+        bool intersecting=false;
+        const SIMPLEX_NODES nodes0=o0.mesh.elements(e);
+        VECTOR<TV,TV::m+1> s(particles.X.Subset(nodes0));
+        ARRAY<int> intersection_list;
         o1.hierarchy->Intersection_List(RANGE<TV>::Bounding_Box(s),intersection_list);
         for(int n=0;n<intersection_list.m;n++){
             int t=intersection_list(n);
-            if(t==e && &o0==&o1) continue;
-            const VECTOR<int,TV::m+1> nodes1=o1.mesh.elements(t).Sorted();
+            const SIMPLEX_NODES nodes1=o1.mesh.elements(t);
             int num_match=0;
             for(int i=0;i<TV::m+1;i++)
                 if(nodes1.Contains(nodes0(i)))
@@ -423,18 +481,19 @@ Update_Position_Based_State_Pair(const OBJECT& o0,const OBJECT& o1)
             if(num_match) continue;
             POLYTOPE polytope;
             VECTOR<TV,TV::m+1> v(particles.X.Subset(nodes1));
-            ARRAY<HYPER_PLANE> f;
-            for(int i=0;i<TV::m+1;i++){
+            ARRAY<HYPER_PLANE> faces;
+            for(int i=0;i<v.m;i++){
                 int p=1<<(TV::m+1+i);
                 VECTOR<TV,TV::m> w=v.Remove_Index(i);
-                TV n=TRIANGLE_3D<T>::Normal(w);
+                TV n=SIMPLEX_FACE::Normal(w);
                 T s=w(0).Dot(n);
                 if(v(i).Dot(n)>s){n=-n;s=-s;}
-                f.Append({p,n,s});}
-            Simplex_Intersection(s,f,polytope);
+                faces.Append({p,n,s});}
+            Simplex_Intersection(s,faces,polytope);
             if(polytope.size<=TV::m)
                 continue;
-            ARRAY<VECTOR<int,TV::m+1> > triangulation;
+            intersecting=true;
+            ARRAY<SIMPLEX_NODES> triangulation;
             Triangulate(2*(TV::m+1),polytope,triangulation);
             VECTOR<TV,2*TV::m+2> df;
             MATRIX<MATRIX<T,TV::m>,2*TV::m+2> ddf;
@@ -443,7 +502,50 @@ Update_Position_Based_State_Pair(const OBJECT& o0,const OBJECT& o1)
                 Integrate_Simplex(triangulation(i),s.Append_Elements(v),PHI_VECTOR(undeformed_phi.Subset(nodes0)),df,ddf);
             overlapping_particles.Append(nodes);
             grad_pe.Append(df);
-            H_pe.Append(ddf);}}
+            H_pe.Append(ddf);}
+        if(intersecting)
+            worklist.Append_Elements((*o0.mesh.adjacent_elements)(e));}
+    while(worklist.m>0){
+        int e=worklist.Pop();
+        if(visited0.Contains(e))
+            continue;
+        visited0.Insert(e);
+        bool intersecting=false;
+        const SIMPLEX_NODES nodes0=o0.mesh.elements(e);
+        VECTOR<TV,TV::m+1> s(particles.X.Subset(nodes0));
+        ARRAY<int> intersection_list;
+        o1.hierarchy->Intersection_List(RANGE<TV>::Bounding_Box(s),intersection_list);
+        for(int n=0;n<intersection_list.m;n++){
+            int t=intersection_list(n);
+            const SIMPLEX_NODES nodes1=o1.mesh.elements(t);
+            int num_match=0;
+            for(int i=0;i<TV::m+1;i++)
+                if(nodes1.Contains(nodes0(i)))
+                    num_match++;
+            if(num_match) continue;
+            POLYTOPE polytope;
+            VECTOR<TV,TV::m+1> v(particles.X.Subset(nodes1));
+            ARRAY<HYPER_PLANE> faces;
+            for(int i=0;i<v.m;i++){
+                int p=1<<(TV::m+1+i);
+                VECTOR<TV,TV::m> w=v.Remove_Index(i);
+                TV n=SIMPLEX_FACE::Normal(w);
+                T s=w(0).Dot(n);
+                if(v(i).Dot(n)>s){n=-n;s=-s;}
+                faces.Append({p,n,s});}
+            Simplex_Intersection(s,faces,polytope);
+            if(polytope.size<=TV::m)
+                continue;
+            intersecting=true;
+            VECTOR<TV,TV::m+1> df;
+            MATRIX<MATRIX<T,TV::m>,TV::m+1> ddf;
+            Integrate_Levelset_Interior(s,undeformed_phi.Subset(nodes0).Sum()/(TV::m+1),stiffness,pe,df,ddf);
+            interior_overlapping_particles.Append(nodes0);
+            interior_grad_pe.Append(df);
+            interior_H_pe.Append(ddf);
+            break;}
+        if(intersecting)
+            worklist.Append_Elements((*o0.mesh.adjacent_elements)(e));}
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
@@ -453,6 +555,8 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     for(int pp=0;pp<overlapping_particles.m;pp++)
         F.Subset(overlapping_particles(pp))-=grad_pe(pp);
+    for(int pp=0;pp<interior_overlapping_particles.m;pp++)
+        F.Subset(interior_overlapping_particles(pp))-=interior_grad_pe(pp);
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -505,6 +609,12 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
             int p=n(i);
             for(int j=0;j<n.m;j++)
                 F(p)-=H_pe(pp)(i,j)*V(n(j))*scale;}}
+    for(int pp=0;pp<interior_overlapping_particles.m;pp++){
+        const VECTOR<int,TV::m+1>& n=interior_overlapping_particles(pp);
+        for(int i=0;i<n.m;i++){
+            int p=n(i);
+            for(int j=0;j<n.m;j++)
+                F(p)-=interior_H_pe(pp)(i,j)*V(n(j))*scale;}}
 }
 //#####################################################################
 // Function Enforce_Definiteness

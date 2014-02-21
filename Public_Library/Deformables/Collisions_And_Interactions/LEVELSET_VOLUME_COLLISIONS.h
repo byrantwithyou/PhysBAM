@@ -45,6 +45,7 @@ class LEVELSET_VOLUME_COLLISIONS:public COLLISION_FORCE<TV>
     typedef VECTOR<int,TV::m+1> SIMPLEX_NODES;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE SIMPLEX_FACE;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT OBJECT;
+    typedef typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::TRIANGULATED_OBJECT OBJECT_BOUNDARY;
     typedef VECTOR<TV,2*TV::m+2> X_VECTOR;
     typedef VECTOR<T,TV::m+1> PHI_VECTOR;
     typedef LEVELSET_VOLUME_COLLISIONS_POLYTOPE POLYTOPE;
@@ -65,13 +66,18 @@ public:
     using DEFORMABLES_FORCES<TV>::particles;using COLLISION_FORCE<TV>::coefficient_of_friction;
     ARRAY<OBJECT*> collision_bodies;
     ARRAY<T> undeformed_phi;
+    ARRAY<ARRAY<int> > simplex_for_face;
 
     T stiffness;
 
     ARRAY<VECTOR<int,2*TV::m+2> > overlapping_particles;
+    ARRAY<VECTOR<int,TV::m+1> > interior_overlapping_particles;
     T pe;
     ARRAY<VECTOR<TV,2*TV::m+2> > grad_pe;
+    ARRAY<VECTOR<TV,TV::m+1> > interior_grad_pe;
     ARRAY<MATRIX<MATRIX<T,TV::m>,2*TV::m+2> > H_pe;
+    ARRAY<MATRIX<MATRIX<T,TV::m>,TV::m+1> > interior_H_pe;
+
 
     LEVELSET_VOLUME_COLLISIONS(DEFORMABLE_PARTICLES<TV>& particles,T stiffness=(T)1e4);
     virtual ~LEVELSET_VOLUME_COLLISIONS();
@@ -80,7 +86,7 @@ public:
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
     void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
     void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE;
-    void Update_Position_Based_State_Pair(const OBJECT& o0,const OBJECT& o1);
+    void Update_Position_Based_State_Pair(const OBJECT& o0,OBJECT& o1);
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
     int Velocity_Dependent_Forces_Size() const PHYSBAM_OVERRIDE;
@@ -94,7 +100,7 @@ public:
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
     void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################
-    void Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POLYTOPE& polytope);
+    void Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POLYTOPE& polytope) const;
     void Integrate_Simplex(const VECTOR<int,TV::m+1>& simplex,const X_VECTOR& X,const PHI_VECTOR& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf);
 };
 }
