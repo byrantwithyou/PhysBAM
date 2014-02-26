@@ -98,8 +98,8 @@ Thickened(const T thickness_over_two) const
 {
     assert(Signed_Volume()>0);
     T m1=thickness_over_two/triangle(3).Signed_Distance(X[0]),m2=thickness_over_two/triangle(2).Signed_Distance(X[1]),m3=thickness_over_two/triangle(1).Signed_Distance(X[2]),m4=thickness_over_two/triangle(0).Signed_Distance(X[3]);
-    return TETRAHEDRON<T>(Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,m2,m3)),Point_From_Barycentric_Coordinates(VECTOR<T,3>((T)1-m2-m3-(T)root_three*m4,m2,m3)),
-                          Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,(T)1-m1-m3-(T)root_three*m4,m3)),Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,m2,(T)1-m1-m2-(T)root_three*m4)));
+    return TETRAHEDRON<T>(Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,m2,m3)),Point_From_Barycentric_Coordinates(VECTOR<T,3>((T)1-m2-m3-sqrt((T)3)*m4,m2,m3)),
+                          Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,(T)1-m1-m3-sqrt((T)3)*m4,m3)),Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,m2,(T)1-m1-m2-sqrt((T)3)*m4)));
 }
 //#####################################################################
 // Function Bounding_Box
@@ -160,7 +160,7 @@ Closest_Point(const VECTOR<T,3>& location,VECTOR<T,3>& weights) const
 template<class T> T TETRAHEDRON<T>::
 Volume() const
 {
-    return (T)one_sixth*abs(VECTOR<T,3>::Dot_Product(VECTOR<T,3>::Cross_Product(X[1]-X[0],X[2]-X[0]),X[3]-X[0]));
+    return ((T)1/6)*abs(VECTOR<T,3>::Dot_Product(VECTOR<T,3>::Cross_Product(X[1]-X[0],X[2]-X[0]),X[3]-X[0]));
 }
 //#####################################################################
 // Function Signed_Volume
@@ -168,7 +168,7 @@ Volume() const
 template<class T> T TETRAHEDRON<T>::
 Signed_Volume() const
 {  
-    return (T)one_sixth*VECTOR<T,3>::Dot_Product(VECTOR<T,3>::Cross_Product(X[1]-X[0],X[2]-X[0]),X[3]-X[0]); 
+    return ((T)1/6)*VECTOR<T,3>::Dot_Product(VECTOR<T,3>::Cross_Product(X[1]-X[0],X[2]-X[0]),X[3]-X[0]); 
 }
 //#####################################################################
 // Function Minimum_Angle

@@ -169,7 +169,7 @@ Apply_Loop_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> subdivide
                 do{
                     T u=cos((T)(2*pi)*(j-loop_start)/neighbors(end1).m);
                     T w;switch(neighbors(end1).m){
-                        case 3:w=(T)one_sixth*((T)1.25+u);break;case 4:w=(T).5*sqr((T).5+(T).375*u);break;
+                        case 3:w=((T)1/6)*((T)1.25+u);break;case 4:w=(T).5*sqr((T).5+(T).375*u);break;
                         case 5:w=(T).16362712429686842801278667714785*sqr((T).55278640450004206071816526625374+u);break;
                         default:{T lambda=(T).375+(T).25*cos((T)(2*pi)/neighbors(end1).m);
                             w=2*cube(lambda)/(neighbors(end1).m*(1-lambda))*(1+u)*sqr(1/lambda-(T)1.5+u);}}
@@ -187,7 +187,7 @@ Apply_Loop_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> subdivide
                 do{
                     T u=cos((T)(2*pi)*(j-loop_start)/neighbors(end2).m);
                     T w;switch(neighbors(end2).m){
-                        case 3:w=(T)one_sixth*((T)1.25+u);break;case 4:w=(T).5*sqr((T).5+(T).375*u);break;
+                        case 3:w=((T)1/6)*((T)1.25+u);break;case 4:w=(T).5*sqr((T).5+(T).375*u);break;
                         case 5:w=(T).16362712429686842801278667714785*sqr((T).55278640450004206071816526625374+u);break;
                         default:{T lambda=(T).375+(T).25*cos((T)(2*pi)/neighbors(end2).m);
                             w=2*cube(lambda)/(neighbors(end2).m*(1-lambda))*(1+u)*sqr(1/lambda-(T)1.5+u);}}
@@ -212,7 +212,7 @@ Apply_Root_Three_Subdivision(ARRAY_VIEW<const TV> base_values,ARRAY_VIEW<TV> sub
         subdivided_values(p)=(1-alpha)*base_values(p)+alpha*one_over_n*sum;}
     for(int t=0;t<triangle_mesh.elements.m;t++){
         int i,j,k;triangle_mesh.elements(t).Get(i,j,k);
-        subdivided_values(start_index_for_new_nodes+t)=(T)one_third*(base_values(i)+base_values(j)+base_values(k));}
+        subdivided_values(start_index_for_new_nodes+t)=((T)1/3)*(base_values(i)+base_values(j)+base_values(k));}
 }
 //#####################################################################
 template void TRIANGLE_SUBDIVISION::Apply_Linear_Subdivision(ARRAY_VIEW<const VECTOR<float,3> > base_values,ARRAY_VIEW<VECTOR<float,3> > subdivided_values);

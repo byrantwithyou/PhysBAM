@@ -181,7 +181,7 @@ ROTATION<TV> Upright_Orientation(const TV& x,const TV& y)
 }
 TV Sidewinding_Position(const T time,const T segment)
 {
-    const T k=(T)two_pi/wavelength,w=(T)two_pi/period,theta=segment*k+time*w;
+    const T k=(T)pi*2/wavelength,w=(T)pi*2/period,theta=segment*k+time*w;
     T y=height_amplitude*cos(theta);
     T x=bend_amplitude*sin(theta);
     return TV(x,y,segment);
@@ -246,7 +246,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         collisions.Use_Freezing_With_Push_Out(false);}
     if(test_number==2){collisions.Set_Shock_Propagation_Iterations(0);collisions.Use_Freezing_With_Push_Out(false);}
     if(test_number==8){
-        T desired_x=(T)two_pi/16;
+        T desired_x=(T)pi*2/16;
         ROTATION<TV> desired_rotation=ROTATION<TV>(desired_x*sin(4*time),TV(0,1,0));
         for(int i=0;i<arb.joint_mesh.Num_Joints();i++){JOINT<TV>& joint=*arb.joint_mesh.Joints(i);
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(desired_rotation);}}
@@ -265,7 +265,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         T sim_time=max((T)0,time-start_time);
         for(int i=0;i<arb.joint_mesh.Num_Joints();i++){JOINT<TV>& joint=*arb.joint_mesh.Joints(i);
             ROTATION<TV> previous_orientation;
-            ROTATION<TV> next_orientation(sin((T)two_pi*sim_time/period),TV(0,1,0));
+            ROTATION<TV> next_orientation(sin((T)pi*2*sim_time/period),TV(0,1,0));
             ROTATION<TV> joint_frame=joint.frame_jp.r*initial_orientation.Inverse()*previous_orientation.Inverse()*next_orientation*initial_orientation*joint.frame_cj.r;
             if(time<start_time) joint_frame=joint_frame.Scale_Angle(time/start_time);
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(joint_frame);}}
@@ -274,7 +274,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         for(int i=0;i<arb.joint_mesh.Num_Joints();i++){JOINT<TV>& joint=*arb.joint_mesh.Joints(i);
             int maggot=(i+1)/2;
             ROTATION<TV> previous_orientation;
-            ROTATION<TV> next_orientation(sin((T)two_pi*sim_time/periods(maggot)+phases(maggot)),TV(0,1,0));
+            ROTATION<TV> next_orientation(sin((T)pi*2*sim_time/periods(maggot)+phases(maggot)),TV(0,1,0));
             ROTATION<TV> joint_frame=joint.frame_jp.r*initial_orientation.Inverse()*previous_orientation.Inverse()*next_orientation*initial_orientation*joint.frame_cj.r;
             if(time<start_time) joint_frame=joint_frame.Scale_Angle(time/start_time);
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(joint_frame);}}
@@ -432,7 +432,7 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM
     if(test_number==3 && id==kinematic_id){
         frame.r=torus_rotation;
         if(time<start_time || time>start_time+period) frame.t=torus_min;
-        else{TV half=(T).5*(torus_max-torus_min);frame.t=torus_min+half-half*cos((T)two_pi/period*(time-start_time));}}
+        else{TV half=(T).5*(torus_max-torus_min);frame.t=torus_min+half-half*cos((T)pi*2/period*(time-start_time));}}
     if((test_number==4 || test_number==13) && id==kinematic_id){
         T magnitude=max((T)0,(T).5*sqr(time)*(T)9.8*(sin(ground_angle_rad)-mu*cos(ground_angle_rad)));
         TV direction(-cos(ground_angle_rad),-sin(ground_angle_rad),0);
@@ -447,7 +447,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBA
     if(test_number==3 && id==kinematic_id){
         twist.angular=TV();
         if(time<start_time || time>start_time+period) twist.linear=TV();
-        else{T w=(T)two_pi/period;TV half=(T).5*(torus_max-torus_min);twist.linear=w*half*sin(w*(time-start_time));}}
+        else{T w=(T)pi*2/period;TV half=(T).5*(torus_max-torus_min);twist.linear=w*half*sin(w*(time-start_time));}}
     if((test_number==4 || test_number==13) && id==kinematic_id){
         T magnitude=max((T)0,time*(T)9.8*(sin(ground_angle_rad)-mu*cos(ground_angle_rad)));
         TV direction(-cos(ground_angle_rad),-sin(ground_angle_rad),0);
@@ -571,7 +571,7 @@ void Trampoline()
     bending_damping_multiplier=(T)1;
 //    int n=2,levels=4;
     T separation=(T)2.4;
-    torus_rotation=ROTATION<TV>((T)half_pi,TV(1,0,0));
+    torus_rotation=ROTATION<TV>((T)pi/2,TV(1,0,0));
     torus_min=TV(0,3,0);
     torus_max=TV(0,5,0);
     period=2;
@@ -809,7 +809,7 @@ void Floppy_Fish()
 //    tests.PD_Curl(scale,center-(T).5*(extent-scale*plank_length)*TV::Axis_Vector(0),ROTATION<TV>(),25,number_of_joints,false);
 
     // add the fish
-    RIGID_BODY_STATE<TV> fish_state(FRAME<TV>(TV(0,3,0),ROTATION<TV>((T)half_pi,TV(1,0,0))));
+    RIGID_BODY_STATE<TV> fish_state(FRAME<TV>(TV(0,3,0),ROTATION<TV>((T)pi/2,TV(1,0,0))));
     if(fish_mattress){
         RANGE<TV> box(-TV((T)3.93278,(T)1.07277,(T)0.384066),TV((T)2.68344,(T)1.1747,(T)0.384353));VECTOR<int,3> counts(20,15,5);
         GRID<TV> mattress_grid=GRID<TV>(counts,box);
@@ -1091,7 +1091,7 @@ void PD_Snake(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
     RIGID_BODY<TV> *parent_body=0,*child_body=0;
     T cheight=(T)0;
-    initial_orientation=ROTATION<TV>((T)half_pi,TV(0,0,1));
+    initial_orientation=ROTATION<TV>((T)pi/2,TV(0,0,1));
 
     // Create first body
     parent_body=&tests.Add_Rigid_Body("cyllink",scale*(T).2,friction);
@@ -1101,7 +1101,7 @@ void PD_Snake(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p
     parent_body->Set_Mass(50);
 
     // Add children and joints
-    T desired_x=(T)two_pi/(T)(number_of_joints+1);
+    T desired_x=(T)pi*2/(T)(number_of_joints+1);
     for(int i=0;i<number_of_joints;i++){
         cheight+=scale*((T)1.25+space_adjustment);
         child_body=&tests.Add_Rigid_Body("cyllink",scale*(T).2,friction);
@@ -1179,7 +1179,7 @@ void Sidewinding()
     for(int i=0;i<count;i++) for(int j=0;j<6;j++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("plank",(T)1,friction);
         rigid_body.Frame().t=TV((T)(-(T)35+10*j),(T).2*steps[i-1]-(T).1,(T)(-4-2*i));
-        rigid_body.Frame().r=ROTATION<TV>((T)half_pi,TV(0,1,0));
+        rigid_body.Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
         rigid_body.name="obstruction";
         rigid_body.is_static=true;
         rigid_body.Set_Mass(30);}
@@ -1336,7 +1336,7 @@ void Bowl_Of_Maggots(bool use_blocks)
 
     RIGID_BODY<TV>& bowl=tests.Add_Rigid_Body("bowl",(T)5,(T).2);
     bowl.Frame().t=TV(0,(T)0.1,0);
-    bowl.Frame().r=ROTATION<TV>(-(T)half_pi,TV(1,0,0));
+    bowl.Frame().r=ROTATION<TV>(-(T)pi/2,TV(1,0,0));
     bowl.name="bowl";
     bowl.is_static=true;
 
@@ -1352,7 +1352,7 @@ void Bowl_Of_Maggots(bool use_blocks)
     for(int i=0;i<20;i++){
         FRAME<TV> frame=Find_Placement(random_numbers,maggot_box*scale*(T)1.2,bounding_boxes,world,true);
         periods.Append(random_numbers.Get_Uniform_Number((T).7,(T)1.3));
-        phases.Append(random_numbers.Get_Uniform_Number((T)0,(T)two_pi));
+        phases.Append(random_numbers.Get_Uniform_Number((T)0,(T)pi*2));
         Add_Maggot(scale,RIGID_BODY_STATE<TV>(frame),use_blocks?"3":"3");
         if(use_blocks){
             RIGID_BODY<TV>& block=tests.Add_Rigid_Body("torus",torus_scale,(T).2);
@@ -1393,7 +1393,7 @@ void Trapped_Maggot()
     period=(T)1;
     start_time=(T)5;
 
-    Add_Maggot((T).65,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T).4,0),ROTATION<TV>((T)half_pi,TV(1,0,0)))),"8");
+    Add_Maggot((T).65,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T).4,0),ROTATION<TV>((T)pi/2,TV(1,0,0)))),"8");
 
     RIGID_BODY<TV>& block=tests.Add_Rigid_Body("torus",5,(T).6);
     block.Set_Coefficient_Of_Restitution(0);
@@ -1649,7 +1649,7 @@ void Two_Way_Tori()
     RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("torus",1,(T).5);
     rigid_body->Set_Mass(1000);
     rigid_body->Frame().t=TV(0,(T)2,0);
-    rigid_body->Frame().r=ROTATION<TV>((T)half_pi,TV(0,0,1));
+    rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,0,1));
     tests.Add_Ground();
     if(use_forces_for_drift){
         soft_bindings.use_impulses_for_collisions.Fill(false);

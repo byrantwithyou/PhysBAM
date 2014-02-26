@@ -77,7 +77,7 @@ Draw_Highlighted_Triangle_Boundary(const TV& x0,const TV& x1,const TV& x2,int id
     OpenGL_Vertex(x2,vertices);
     OpenGL_Draw_Arrays(GL_LINE_LOOP,TV::dimension,vertices);
 #ifndef USE_OPENGLES
-    if(id>=0) OpenGL_String((typename TV::SCALAR)one_third*(x0+x1+x2),STRING_UTILITIES::string_sprintf("%d",id));
+    if(id>=0) OpenGL_String(((typename TV::SCALAR)1/3)*(x0+x1+x2),STRING_UTILITIES::string_sprintf("%d",id));
 #endif
     glPopAttrib();
 }

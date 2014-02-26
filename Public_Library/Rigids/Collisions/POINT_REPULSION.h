@@ -93,7 +93,7 @@ public:
     ARRAY_VIEW<const TV> X(surface.particles.X),normals(*surface.vertex_normals);
     for(int t=0;t<surface.mesh.elements.m;t++){
         int i,j,k;surface.mesh.elements(t).Get(i,j,k);
-        TV position=(T)one_third*(X(i)+X(j)+X(k)), normal=(T)one_third*(normals(i)+normals(j)+normals(k));
+        TV position=((T)1/3)*(X(i)+X(j)+X(k)), normal=((T)1/3)*(normals(i)+normals(j)+normals(k));
         radii_of_curvature(t)=min(Radius_Of_Curvature_Estimate(position,normal,X(i),normals(i)),
             Radius_Of_Curvature_Estimate(position,normal,X(j),normals(j)),
             Radius_Of_Curvature_Estimate(position,normal,X(k),normals(k)));}}

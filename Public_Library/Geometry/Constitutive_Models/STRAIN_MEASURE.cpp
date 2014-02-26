@@ -70,11 +70,11 @@ Copy_Dm_Inverse_Save_Into_Dm_Inverse(const ARRAY<int>& map)
 namespace{
 template<class T> UPPER_TRIANGULAR_MATRIX<T,2> Equilateral_Dm(const VECTOR<T,2>&)
 {
-    return UPPER_TRIANGULAR_MATRIX<T,2>(1,.5,T(root_three/2));
+    return UPPER_TRIANGULAR_MATRIX<T,2>(1,.5,sqrt((T)3)/2);
 }
 template<class T> UPPER_TRIANGULAR_MATRIX<T,3> Equilateral_Dm(const VECTOR<T,3>&)
 {
-    T x=(T)root_three/3,d=(T).5*x,h=(T)root_six/3;
+    T x=sqrt((T)3)/3,d=(T).5*x,h=sqrt((T)6)/3;
     return MATRIX<T,3>(x,0,-h,-d,.5,-h,-d,-.5,-h).R_From_QR_Factorization();
 }}
 template<class TV,int d> void STRAIN_MEASURE<TV,d>::

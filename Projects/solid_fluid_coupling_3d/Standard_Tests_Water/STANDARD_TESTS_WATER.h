@@ -482,7 +482,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==9){
         ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-        T desired_x=(T)two_pi/16;
+        T desired_x=(T)pi*2/16;
         ROTATION<TV> desired_rotation=ROTATION<TV>(desired_x*sin(4*time),TV(0,1,0));
         for(int i=0;i<arb.joint_mesh.Num_Joints();i++){JOINT<TV>& joint=*arb.joint_mesh.Joints(i);
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(desired_rotation);}}
@@ -526,7 +526,7 @@ void Floppy_Fish()
     T scale=(T)2;
     T bone_density=200;
     T bone_unscaled_volume=.1875;
-    RIGID_BODY_STATE<TV> fish_state(FRAME<TV>(TV(0,(T)3,0),ROTATION<TV>((T)half_pi,TV(1,0,0))));
+    RIGID_BODY_STATE<TV> fish_state(FRAME<TV>(TV(0,(T)3,0),ROTATION<TV>((T)pi/2,TV(1,0,0))));
 
     ARRAY<RIGID_BODY<TV>*> bones;
     T bone_scales[5]={(T)1,(T)1,(T)1,(T).7,(T).6};
@@ -730,7 +730,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 15:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solids_tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_44K.tet",
-                RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T).5,(T).75,(T).5),ROTATION<TV>(-(T)half_pi,TV::Axis_Vector(1)))),true,true,1000,(T).15);
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T).5,(T).75,(T).5),ROTATION<TV>(-(T)pi/2,TV::Axis_Vector(1)))),true,true,1000,(T).15);
             
 //                mattress_grid=GRID<TV>(sub_test*20,sub_test*5,sub_test*20,(T).3,(T).7,(T).6,(T).72,(T).3,(T).7);
             tetrahedralized_volume.Check_Signed_Volumes_And_Make_Consistent(true);
@@ -760,7 +760,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             // place a bunch of rigid bodies - blocks and spheres
             int num_spheres=bodies;int num_blocks=bodies;
             T scale=(T).04;
-            T sphere_mass=(T)four_thirds_pi*cube(scale)*solid_density,block_mass=(T)cube(2*scale)*solid_density;
+            T sphere_mass=(T)pi*4/3*cube(scale)*solid_density,block_mass=(T)cube(2*scale)*solid_density;
             ARRAY<ORIENTED_BOX<TV> > bounding_boxes;
             GRID<TV> grid;
             if(fluids_parameters.mpi_grid) grid=fluids_parameters.mpi_grid->global_grid;
@@ -841,7 +841,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 9: Floppy_Fish();break;
         case 10:{
-            T fluid_mass=(T)four_thirds_pi*cube((T).4)*fluids_parameters.density;
+            T fluid_mass=(T)pi*4/3*cube((T).4)*fluids_parameters.density;
             // really light cork
             RIGID_BODY<TV>& light_cork=solids_tests.Add_Rigid_Body("sphere",(T).4,(T)0);
             light_cork.Frame()=FRAME<TV>(TV((T)-1.5,light_sphere_initial_height,(T)0));
@@ -871,7 +871,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rigid_bodies_to_simulate.Append(heavy_cork.particle_index);
             break;}
         case 21:{
-            T fluid_mass=(T)four_thirds_pi*cube((T).1)*fluids_parameters.density;
+            T fluid_mass=(T)pi*4/3*cube((T).1)*fluids_parameters.density;
             for(int i=0;i<6;++i) for(int j=0;j<4;++j) {
                 RIGID_BODY<TV>& sphere=solids_tests.Add_Rigid_Body("sphere",(T).1,(T)0);
                 TV position=TV((T).125+(T)i*(T).25,light_sphere_initial_height,(T).125+(T)j*(T).25);
@@ -891,7 +891,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;
         case 12:{
             T fraction=(T).2;
-            T volume=(T)four_thirds_pi*cube((T).05);
+            T volume=(T)pi*4/3*cube((T).05);
             RIGID_BODY<TV>& sphere=solids_tests.Add_Rigid_Body("sphere",(T).1,(T)0);
             sphere.Frame()=FRAME<TV>(TV((T)1.25,(T).55,(T).5));
             sphere.Twist().linear=TV((T)-6,(T)-7.23333333333,(T)0);
@@ -905,7 +905,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             // place a bunch of rigid bodies - blocks and spheres
             int num_spheres=bodies;int num_blocks=bodies;
             T scale=(T).04;
-            T sphere_mass=(T)four_thirds_pi*cube(scale)*solid_density,block_mass=(T)cube(2*scale)*solid_density;
+            T sphere_mass=(T)pi*4/3*cube(scale)*solid_density,block_mass=(T)cube(2*scale)*solid_density;
             ARRAY<ORIENTED_BOX<TV> > bounding_boxes;
             GRID<TV> grid;
             if(fluids_parameters.mpi_grid) grid=fluids_parameters.mpi_grid->global_grid;
@@ -943,7 +943,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RIGID_BODY<TV>& dropped_object=solids_tests.Add_Rigid_Body("sphere_66k",(T).125,(T)0,true,true);
             dropped_object.Frame().t=TV((T)0,(T)1.5,(T)0);
             dropped_object.name="falling body";
-            T volume=(T)four_thirds_pi*cube((T).25);
+            T volume=(T)pi*4/3*cube((T).25);
             dropped_object.Set_Mass(volume*solid_density);
             dropped_object.Set_Coefficient_Of_Restitution((T)0);
             rigid_bodies_to_simulate.Append(dropped_object.particle_index);

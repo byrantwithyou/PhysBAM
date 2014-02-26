@@ -17,6 +17,7 @@ using namespace PhysBAM;
 
 using ::std::abs;
 using ::std::pow;
+using ::std::sqrt;
 
 //#####################################################################
 // Constructor
@@ -66,22 +67,22 @@ Compute_Roots_Noniterative()
 {
     if(c3 == 0){QUADRATIC<T> quadratic(c2,c1,c0);quadratic.Compute_Roots();roots=quadratic.roots;root1=quadratic.root1;root2=quadratic.root2;return;}
     else{
-            T one_over_c3=1/c3,a1=c2*one_over_c3,a2=c1*one_over_c3,a3=c0*one_over_c3;
-            T Q=(T)one_ninth*a1*a1-(T)one_third*a2,R=a1*((T)one_twenty_seventh*a1*a1-(T)one_sixth*a2)+(T).5*a3;
-            T Q_Q_Q=Q*Q*Q,R2_minus_Q3=R*R-Q_Q_Q;       
-            if(R2_minus_Q3 <= 0){ // three real roots
-                roots=3;
-                T theta=acos(R/sqrt(Q_Q_Q)),theta_over_3=(T)one_third*theta,minus_two_sqrt_Q=(T)(-2)*sqrt(Q),minus_a1_over_3=(T)(-one_third)*a1;
-                root1=minus_two_sqrt_Q*cos(theta_over_3)+minus_a1_over_3;
-                root2=minus_two_sqrt_Q*cos(theta_over_3+(T)two_thirds_pi)+minus_a1_over_3;
-                root3=minus_two_sqrt_Q*cos(theta_over_3+(T)four_thirds_pi)+minus_a1_over_3;
-                exchange_sort(root1,root2,root3);}      
+        T one_over_c3=1/c3,a1=c2*one_over_c3,a2=c1*one_over_c3,a3=c0*one_over_c3;
+        T Q=((T)1/9)*a1*a1-((T)1/3)*a2,R=a1*((T)1/27*a1*a1-((T)1/6)*a2)+(T).5*a3;
+        T Q_Q_Q=Q*Q*Q,R2_minus_Q3=R*R-Q_Q_Q;       
+        if(R2_minus_Q3 <= 0){ // three real roots
+            roots=3;
+            T theta=acos(R/sqrt(Q_Q_Q)),theta_over_3=((T)1/3)*theta,minus_two_sqrt_Q=(T)(-2)*sqrt(Q),minus_a1_over_3=(-(T)1/3)*a1;
+            root1=minus_two_sqrt_Q*cos(theta_over_3)+minus_a1_over_3;
+            root2=minus_two_sqrt_Q*cos(theta_over_3+(T)pi*2/3)+minus_a1_over_3;
+            root3=minus_two_sqrt_Q*cos(theta_over_3+(T)pi*4/3)+minus_a1_over_3;
+            exchange_sort(root1,root2,root3);}      
         else{ // one real root
             roots=1;
-            root1=pow(sqrt(R2_minus_Q3)+abs(R),(T)one_third);
+            root1=pow(sqrt(R2_minus_Q3)+abs(R),((T)1/3));
             root1+=(T)Q/root1;
             root1*=(R<(T)0)?(T)1:(T)-1;
-            root1-=(T)one_third*a1;}}
+            root1-=((T)1/3)*a1;}}
 }
 //#####################################################################
 // Function Compute_Roots

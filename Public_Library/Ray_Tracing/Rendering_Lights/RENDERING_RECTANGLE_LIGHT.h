@@ -69,7 +69,7 @@ public:
     VECTOR<T,3> Emitted_Light(const RENDERING_RAY<T>& ray) const PHYSBAM_OVERRIDE
     {T cosine_of_angle=-VECTOR<T,3>::Dot_Product(ray.ray.direction,normal);
     if(cosine_of_angle<0)return VECTOR<T,3>(0,0,0);
-    else return cosine_of_angle*color*brightness*T(one_over_four_pi)/sqr(ray.ray.t_max);}
+    else return (1/((T)pi*4))*cosine_of_angle*color*brightness/sqr(ray.ray.t_max);}
 
     int Emit_Photons(RENDERING_RAY<T>& parent_ray,PHOTON_MAP<T>& photon_map,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type) const  PHYSBAM_OVERRIDE
     {int number_emitted=0;

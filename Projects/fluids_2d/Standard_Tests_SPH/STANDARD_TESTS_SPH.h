@@ -144,7 +144,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
                 sph_particles.X(id)=X;}}}
     else if(test_number==2){
         number_of_particles=10000;
-        int left_particles_number=(int)(one_third*number_of_particles),right_particles_number=(int)(two_thirds*number_of_particles);
+        int left_particles_number=number_of_particles/3,right_particles_number=number_of_particles-left_particles_number;
         fluids_parameters.sph_evolution->target_particles_per_unit_volume=number_of_particles*(T).5;
         for(int i=0;i<left_particles_number;i++){
             TV X=random.Get_Uniform_Vector(grid.domain.min_corner,TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.max_corner.y));

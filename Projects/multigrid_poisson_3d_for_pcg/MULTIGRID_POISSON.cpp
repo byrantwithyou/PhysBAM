@@ -534,7 +534,6 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
     return T();
 #else
     const T one_over_diagonal=(T)1/(2*d);
-    const T two_thirds=2./3.;
     
     // NOTE: when running in parallel,
     // care must be taken to ensure 
@@ -594,7 +593,7 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
                 delta(fine_index)-=u(fine_index);
                 
                 if(index_has_full_diagonal_coarse_bitmask(shifted_coarse_index) & mask){
-                    u(shifted_fine_index)+=two_thirds*delta(shifted_fine_index);
+                    u(shifted_fine_index)+=((T)2/3)*delta(shifted_fine_index);
                 }
 
 
@@ -617,7 +616,7 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
 
                 const T_INDEX& fine_index=fine_iterator.Index();
                 if(index_has_full_diagonal_coarse_bitmask(coarse_index) & mask){
-                    u(fine_index)+=two_thirds*delta(fine_index);
+                    u(fine_index)+=((T)2/3)*delta(fine_index);
                     
                 }
                 if(compute_dot_product && loop==loops)

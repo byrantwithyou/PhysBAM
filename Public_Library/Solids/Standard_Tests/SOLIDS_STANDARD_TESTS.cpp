@@ -97,7 +97,7 @@ PD_Curl(const T scale,const FRAME<TV>& frame,const T k_p,const int number_of_joi
     parent_body->is_static=parent_static;
 
     // Add children and joints
-    T desired_x=(T)two_pi/(T)(number_of_joints+1);
+    T desired_x=(T)pi*2/(T)(number_of_joints+1);
     for(int i=0;i<number_of_joints;i++){
         cheight+=scale*(T)1.25;
         child_body=&Add_Rigid_Body("miniplank25wide2",scale,friction);

@@ -32,7 +32,7 @@ public:
     static T Signed_Volume(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3,
                            const VECTOR<T,3>& x4,const VECTOR<T,3>& x5,const VECTOR<T,3>& x6,const VECTOR<T,3>& x7)
     {VECTOR<T,3> x17=x7-x1,x12=x2-x1,x13=x3-x1,x24=x4-x2,x47=x7-x2,x46=x6-x4,x14=x4-x1,x15=x5-x1,x04=x4-x0;
-    return (T)one_sixth*(VECTOR<T,3>::Triple_Product(x17,x12,x13)-VECTOR<T,3>::Triple_Product(x24,x47,x46)+VECTOR<T,3>::Triple_Product(x14,x17,x15)
+    return ((T)1/6)*(VECTOR<T,3>::Triple_Product(x17,x12,x13)-VECTOR<T,3>::Triple_Product(x24,x47,x46)+VECTOR<T,3>::Triple_Product(x14,x17,x15)
         +VECTOR<T,3>::Triple_Product(x12,x17,x14)-VECTOR<T,3>::Triple_Product(x14,x24,x04));}
 
 //#####################################################################

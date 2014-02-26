@@ -480,7 +480,7 @@ T Target_Density_Factor(const TV& location,const T time) const PHYSBAM_OVERRIDE
     if(time<targetting_time_start+targetting_falloff_time) target_density_alpha=(time-targetting_time_start)/targetting_falloff_time;
     else target_density_alpha=1;
 
-    target_density=(1-color.Magnitude()*(T)root_three)*target_density_factor_low+color.Magnitude()*(T)root_three*target_density_factor_high;
+    target_density=(1-color.Magnitude()*sqrt((T)3))*target_density_factor_low+color.Magnitude()*sqrt((T)3)*target_density_factor_high;
     return 1+target_density_alpha*(target_density-1);
 }
 //#####################################################################

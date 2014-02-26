@@ -65,7 +65,7 @@ template<class T,class TV> static void Apply_Cooling_Helper(TEMPERATURE_CONTAINE
 template<class TV> void TEMPERATURE_CONTAINER<TV>::
 Apply_Individual_Cooling(T& temperature,const T constant)
 {
-    if(abs(temperature-ambient_temperature) > (T).1) temperature=ambient_temperature+pow(1/(constant+1/cube(temperature-ambient_temperature)),(T)one_third);
+    if(abs(temperature-ambient_temperature) > (T).1) temperature=ambient_temperature+pow(1/(constant+1/cube(temperature-ambient_temperature)),((T)1/3));
 }
 //#####################################################################
 // Function Use_Semi_Lagrangian_Collidable_Advection

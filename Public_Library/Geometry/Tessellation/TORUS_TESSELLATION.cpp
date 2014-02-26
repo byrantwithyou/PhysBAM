@@ -18,7 +18,7 @@ namespace TESSELLATION{
 template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const TORUS<T>& torus,const int m,const int n)
 {
     typedef VECTOR<T,3> TV;
-    T mscale=(T)two_pi/m,nscale=(T)two_pi/n;
+    T mscale=(T)pi*2/m,nscale=(T)pi*2/n;
     TV y=torus.axis.Unit_Orthogonal_Vector();
     MATRIX<T,3> transform(y,TV::Cross_Product(torus.axis,y),torus.axis);
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();

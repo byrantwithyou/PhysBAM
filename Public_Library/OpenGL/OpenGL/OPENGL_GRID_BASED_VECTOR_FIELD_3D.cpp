@@ -54,7 +54,7 @@ Update()
         vector_locations.Resize(num_vectors);
         int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;index=0;
         if(count>max_vectors_3d){
-            int inc=max(1,(int)ceil(pow((T)count/max_vectors_3d,(T)one_third)));
+            int inc=max(1,(int)ceil(pow((T)count/max_vectors_3d,((T)1/3))));
             m/=inc;n/=inc;mn/=inc;
             for(int i=0;i<m;i++)for(int j=0;j<n;j++)for(int ij=0;ij<mn;ij++){
                 VECTOR<int,3> grid_index(i*inc,j*inc,ij*inc);

@@ -36,7 +36,7 @@ public:
 template<class T,class T2> void ADVECTION_NONCONSERVATIVE_FLUX_FORM_ENO<T,T2>::
 Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const ARRAY<T,VECTOR<int,1> >& u,ARRAY<T2,VECTOR<int,1> >& u_Zx)
 {
-    T one_over_dx=1/dx,one_over_two_dx=.5*one_over_dx,one_over_three_dx=one_third*one_over_dx;
+    T one_over_dx=1/dx,one_over_two_dx=.5*one_over_dx,one_over_three_dx=((T)1/3)*one_over_dx;
     ARRAY<T2,VECTOR<int,1> > D0(-2,m+3),D1(-2,m+2),D2(-2,m+1); // divided differences
     for(int i=-3;i<m+3;i++) D0(i)=Z(i); 
     if(order >= 2) for(int i=-3;i<m+2;i++) D1(i)=(D0(i+1)-D0(i))*one_over_two_dx;     

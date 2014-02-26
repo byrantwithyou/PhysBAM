@@ -69,8 +69,8 @@ public:
     J_d(2)=invariants(2)*VECTOR<T,3>(C_inverse.x00,C_inverse.x11,C_inverse.x22);
     J_d(3)=VECTOR<T,3>(V_fiber_outer.x00,V_fiber_outer.x11,V_fiber_outer.x22);
     J_d(4)=(T)2*VECTOR<T,3>(C.x00*V_fiber_outer.x00,C.x11*V_fiber_outer.x11,C.x22*V_fiber_outer.x22);
-    J_s(3)=(T)root_two*VECTOR<T,3>(V_fiber_outer.x10,V_fiber_outer.x20,V_fiber_outer.x21);
-    J_s(4)=(T)root_two*VECTOR<T,3>((C.x00+C.x11)*V_fiber_outer.x10,(C.x00+C.x22)*V_fiber_outer.x20,(C.x11+C.x22)*V_fiber_outer.x21);
+    J_s(3)=sqrt((T)2)*VECTOR<T,3>(V_fiber_outer.x10,V_fiber_outer.x20,V_fiber_outer.x21);
+    J_s(4)=sqrt((T)2)*VECTOR<T,3>((C.x00+C.x11)*V_fiber_outer.x10,(C.x00+C.x22)*V_fiber_outer.x20,(C.x11+C.x22)*V_fiber_outer.x21);
     dP_dF.dSdC_d=dP_dF.dSdC_s=SYMMETRIC_MATRIX<T,3>();dP_dF.dSdC_ds=MATRIX<T,3>();dP_dF.F=F_threshold;dP_dF.S=S(C,V_fiber,invariants,energy_gradient);
     for(int n=0;n<5;n++) for(int m=n;m<=5;m++){
         int hessian_index=Hessian_Index(m,n);if(!energy_hessian(hessian_index))continue;
@@ -92,7 +92,7 @@ public:
         dP_dF.dSdC_d+=(T)4*energy_gradient(4)*DIAGONAL_MATRIX<T,3>(V_fiber_outer.x00,V_fiber_outer.x11,V_fiber_outer.x22);
         dP_dF.dSdC_s+=(T)2*energy_gradient(4)*SYMMETRIC_MATRIX<T,3>(V_fiber_outer.x00+V_fiber_outer.x11,V_fiber_outer.x21,V_fiber_outer.x20,
                                                                       V_fiber_outer.x00+V_fiber_outer.x22,V_fiber_outer.x10,V_fiber_outer.x11+V_fiber_outer.x22);
-        dP_dF.dSdC_ds+=(T)2*(T)root_two*energy_gradient(4)*MATRIX<T,3>(V_fiber_outer.x10,V_fiber_outer.x10,0,V_fiber_outer.x20,0,V_fiber_outer.x20,0,V_fiber_outer.x21,V_fiber_outer.x21);}
+        dP_dF.dSdC_ds+=(T)2*sqrt((T)2)*energy_gradient(4)*MATRIX<T,3>(V_fiber_outer.x10,V_fiber_outer.x10,0,V_fiber_outer.x20,0,V_fiber_outer.x20,0,V_fiber_outer.x21,V_fiber_outer.x21);}
     if(enforce_definiteness)dP_dF.Enforce_Definiteness();}
 
 //#####################################################################

@@ -27,8 +27,8 @@ template<class T> T LEVELSET_UTILITIES<T>::
 Theta_Cubic(const T phi_left_left,const T phi_left,const T phi_right,const T phi_right_right,const T dx)
 {
     T one_over_dx=1/dx,one_over_dx_squared=sqr(one_over_dx);
-    CUBIC<T> cubic((T)one_sixth*(3*(phi_left-phi_right)-phi_left_left+phi_right_right)*one_over_dx_squared*one_over_dx,(T).5*(-2*phi_left+phi_right+phi_left_left)*one_over_dx_squared,
-        ((T)-.5*phi_left+phi_right-(T)one_third*phi_left_left-(T)one_sixth*phi_right_right)*one_over_dx,phi_left);
+    CUBIC<T> cubic(((T)1/6)*(3*(phi_left-phi_right)-phi_left_left+phi_right_right)*one_over_dx_squared*one_over_dx,(T).5*(-2*phi_left+phi_right+phi_left_left)*one_over_dx_squared,
+        ((T)-.5*phi_left+phi_right-((T)1/3)*phi_left_left-((T)1/6)*phi_right_right)*one_over_dx,phi_left);
     cubic.Compute_Roots_In_Interval(0,dx);assert(cubic.roots==1);return cubic.root1*one_over_dx;
 }
 //#####################################################################

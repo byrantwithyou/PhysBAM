@@ -61,7 +61,7 @@ Compute_Properties(MASS_PROPERTIES<TV,d>&,NORMAL_IMPLEMENTATION)
             LOG::cout<<object.particles.X(nodes(2))<<base<<std::endl;}
         scaled_volume+=scaled_element_volume;
         scaled_center_times_volume+=scaled_element_volume*DX.Column_Sum();}
-    volume=(T)1/FACTORIAL<d+filled>::value*scaled_volume;
+    volume=(T)1/factorial(d+filled)*scaled_volume;
     if(!volume) PHYSBAM_FATAL_ERROR("zero volume");
     center=base+(T)1/(d+1+filled)*scaled_center_times_volume/scaled_volume;
 
@@ -74,7 +74,7 @@ Compute_Properties(MASS_PROPERTIES<TV,d>&,NORMAL_IMPLEMENTATION)
         T scaled_element_volume=filled?DX.Parallelepiped_Measure():STRAIN_MEASURE<TV,d>::Ds(object.particles.X,nodes).Parallelepiped_Measure();
         scaled_covariance+=Scaled_Element_Covariance(scaled_element_volume,DX);}
     
-    inertia_tensor_over_density=Inertia_Tensor_From_Covariance((T)1/FACTORIAL<d+2+filled>::value*scaled_covariance);
+    inertia_tensor_over_density=Inertia_Tensor_From_Covariance((T)1/factorial(d+2+filled)*scaled_covariance);
     LOG::cout<<"inertia tensor over density "<<inertia_tensor_over_density<<std::endl; // THIS NEEDS TO BE HERE BECAUSE OF A COMPILER BUG IN GCC 4.0.2 (Frank wants it to stay std::endl)
 }
 template<class TV,int d> template<bool thin_shell> void MASS_PROPERTIES<TV,d>::
@@ -103,7 +103,7 @@ Shell_Volume_Helper(const T_SIMPLICIAL_OBJECT& object)
     for(int t=0;t<object.mesh.elements.m;t++){const VECTOR<int,d+1>& nodes=object.mesh.elements(t);
         MATRIX<T,TV::m,d> Ds=STRAIN_MEASURE<TV,d>::Ds(object.particles.X,nodes);
         scaled_volume+=Ds.Parallelepiped_Measure();}
-    return (T)1/FACTORIAL<d>::value*scaled_volume;
+    return (T)1/factorial(d)*scaled_volume;
 }
 template<class T> T
 Shell_Volume_Helper(const POINT_SIMPLICES_1D<T>& object)

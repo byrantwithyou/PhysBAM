@@ -85,7 +85,7 @@ protected:
     if(no_y) return Solve_Close_Point(no_x,value_x,phix_dx,no_z,value_z,phiz_dz,dz_squared_over_dx_squared,tolerance);
     if(no_z) return Solve_Close_Point(no_x,value_x,phix_dx,no_y,value_y,phiy_dy,dy_squared_over_dx_squared,tolerance);
     // candidates exist in all three directions
-    T a=phix_dx*dz_squared_over_dx_squared,b=phiy_dy*dz_squared_over_dy_squared,c=phiz_dz,denominator=a+b+c,fraction_1=(T)one_third,fraction_2=(T)one_third;
+    T a=phix_dx*dz_squared_over_dx_squared,b=phiy_dy*dz_squared_over_dy_squared,c=phiz_dz,denominator=a+b+c,fraction_1=((T)1/3),fraction_2=((T)1/3);
     if(denominator > tolerance){fraction_1=clamp(a/denominator,(T)0,(T)1);fraction_2=clamp(b/denominator,(T)0,1-fraction_1);}
     return fraction_1*value_x+fraction_2*value_y+(1-fraction_1-fraction_2)*value_z;}
 

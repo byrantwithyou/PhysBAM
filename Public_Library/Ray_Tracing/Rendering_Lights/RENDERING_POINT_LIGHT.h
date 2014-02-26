@@ -28,7 +28,7 @@ public:
     {sample_array.Resize(1);sample_array(0)=RAY<VECTOR<T,3> >(SEGMENT_3D<T>(surface_position,position));}
 
     VECTOR<T,3> Emitted_Light(const RENDERING_RAY<T>& ray) const PHYSBAM_OVERRIDE
-    {if(distance_attenuation)return brightness*color*T(one_over_four_pi)/sqr(ray.ray.t_max);
+    {if(distance_attenuation)return 1/((T)pi*4)*brightness*color/sqr(ray.ray.t_max);
     else return brightness*color;}
 
     int Emit_Photons(RENDERING_RAY<T>& parent_ray,PHOTON_MAP<T>& photon_map,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type) const  PHYSBAM_OVERRIDE

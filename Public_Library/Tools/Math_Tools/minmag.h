@@ -17,9 +17,9 @@ template<class T>
 inline T minmag(const T a,const T b)
 {return abs(a)<abs(b)?a:b;}
 
-template<class T>
-inline T minmag(const T a,const T b,const T c)
-{return minmag(a,minmag(b,c));}
+template<class T,class ...Args>
+inline T minmag(const T a,const T b,Args&&... c)
+{return minmag(a,minmag(b,c...));}
 
 }
 #endif

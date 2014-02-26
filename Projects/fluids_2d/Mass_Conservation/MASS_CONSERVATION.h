@@ -51,14 +51,12 @@ public:
     T initial_water_level;
     TV zalesak_center,zalesak_velocity_center;
     RANDOM_NUMBERS<T> random;
-    T pi_over_314;
-    T root_two_over_two;
 
     PARAMETER_LIST parameter_list;
     T period;
 
     MASS_CONSERVATION(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >(stream_type,1,fluids_parameters.WATER),pi_over_314((T)pi/314),root_two_over_two((T).5*(T)root_two)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >(stream_type,1,fluids_parameters.WATER)
     {
     }
 
@@ -419,12 +417,12 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
             else face_velocities.Component(1)(face)=(T)-.625;}
     else if(test_number==2)
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
-            face_velocities.Component(iterator.Axis())(iterator.Face_Index())=root_two_over_two;
+            face_velocities.Component(iterator.Axis())(iterator.Face_Index())=sqrt((T)1/2);
     else if(test_number==3 || test_number==4){
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();TV location=iterator.Location();
-            if(axis==1) face_velocities.Component(axis)(face_index)=pi_over_314*(zalesak_velocity_center.y-location.y);
-            else face_velocities.Component(axis)(face_index)=pi_over_314*(location.x-zalesak_velocity_center.x);}}
+            if(axis==1) face_velocities.Component(axis)(face_index)=((T)pi/314)*(zalesak_velocity_center.y-location.y);
+            else face_velocities.Component(axis)(face_index)=((T)pi/314)*(location.x-zalesak_velocity_center.x);}}
     else if(test_number==5 || test_number==13){
         T time_reversal_factor=test_number==5?(T)cos((T)pi*time/period):(T)1;
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -484,8 +482,8 @@ VECTOR<T,2> Get_Analytic_Velocity(const VECTOR<T,2>& location,const T time) cons
 {
     if(test_number==1 || test_number==11) return TV((T)0,(T).625);
     else if (test_number==12) return TV((T)0,(T)-.625);
-    else if(test_number==2) return TV::All_Ones_Vector()*root_two_over_two;
-    else if(test_number==3 || test_number==4) return TV(zalesak_velocity_center.y-location.y,location.x-zalesak_velocity_center.x)*pi_over_314;
+    else if(test_number==2) return TV::All_Ones_Vector()*sqrt((T)1/2);
+    else if(test_number==3 || test_number==4) return TV(zalesak_velocity_center.y-location.y,location.x-zalesak_velocity_center.x)*((T)pi/314);
     else if(test_number==5 || test_number==13){
         T time_reversal_factor=test_number==5?(T)cos((T)pi*time/period):(T)1;T x=location.x,y=location.y;
         return TV(-sqr((T)sin((T)pi*x))*(T)2*(T)sin((T)pi*y)*(T)cos((T)pi*y),(T)2*sin((T)pi*x)*cos((T)pi*x)*sqr(sin((T)pi*y)))*time_reversal_factor;}

@@ -30,7 +30,7 @@ Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient) // assumes mass
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         for(int s=0;s<4;s++){int node1,node2,node3,node4;
             Fill_Node_Indices(i,j,k,l,s,node1,node2,node3,node4);
-            T one_over_triangle_mass=(T)one_ninth*(particles.one_over_effective_mass(node2)+particles.one_over_effective_mass(node3)+particles.one_over_effective_mass(node4)),
+            T one_over_triangle_mass=((T)1/9)*(particles.one_over_effective_mass(node2)+particles.one_over_effective_mass(node3)+particles.one_over_effective_mass(node4)),
                   one_over_particle_mass=particles.one_over_effective_mass(node1),harmonic_mass=Pseudo_Inverse(one_over_particle_mass+one_over_triangle_mass);
             parameters(t)(s).youngs_modulus=scaling_coefficient*harmonic_mass/parameters(t)(s).restlength;}}
 }
@@ -72,13 +72,13 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
     for(int t=0;t<mesh.elements.m;t++){
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         // TODO: use a for loop instead
-        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(i)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
+        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(i)+((T)1/9)*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
         parameters(t)(0).damping=overdamping_fraction*2*sqrt(parameters(t)(0).youngs_modulus*parameters(t)(0).restlength*harmonic_mass);
-        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(j)+(T)one_ninth*(particles.one_over_effective_mass(i)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
+        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(j)+((T)1/9)*(particles.one_over_effective_mass(i)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
         parameters(t)(1).damping=overdamping_fraction*2*sqrt(parameters(t)(1).youngs_modulus*parameters(t)(1).restlength*harmonic_mass);
-        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(k)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(i)+particles.one_over_effective_mass(l)));
+        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(k)+((T)1/9)*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(i)+particles.one_over_effective_mass(l)));
         parameters(t)(2).damping=overdamping_fraction*2*sqrt(parameters(t)(2).youngs_modulus*parameters(t)(2).restlength*harmonic_mass);
-        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(l)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(i)));
+        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(l)+((T)1/9)*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(i)));
         parameters(t)(3).damping=overdamping_fraction*2*sqrt(parameters(t)(3).youngs_modulus*parameters(t)(3).restlength*harmonic_mass);}
     Invalidate_CFL();
 }
@@ -91,13 +91,13 @@ Set_Overdamping_Fraction(const ARRAY<VECTOR<T,4> >& overdamping_fraction) // 1 i
     for(int t=0;t<mesh.elements.m;t++){
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         // TODO: use a for loop instead
-        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(i)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
+        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(i)+((T)1/9)*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
         parameters(t)(0).damping=overdamping_fraction(t)(0)*2*sqrt(parameters(t)(0).youngs_modulus*parameters(t)(0).restlength*harmonic_mass);
-        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(j)+(T)one_ninth*(particles.one_over_effective_mass(i)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
+        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(j)+((T)1/9)*(particles.one_over_effective_mass(i)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
         parameters(t)(1).damping=overdamping_fraction(t)(1)*2*sqrt(parameters(t)(1).youngs_modulus*parameters(t)(1).restlength*harmonic_mass);
-        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(k)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(i)+particles.one_over_effective_mass(l)));
+        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(k)+((T)1/9)*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(i)+particles.one_over_effective_mass(l)));
         parameters(t)(2).damping=overdamping_fraction(t)(2)*2*sqrt(parameters(t)(2).youngs_modulus*parameters(t)(2).restlength*harmonic_mass);
-        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(l)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(i)));
+        harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(l)+((T)1/9)*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(i)));
         parameters(t)(3).damping=overdamping_fraction(t)(3)*2*sqrt(parameters(t)(3).youngs_modulus*parameters(t)(3).restlength*harmonic_mass);}
     Invalidate_CFL();
 }

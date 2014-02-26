@@ -136,7 +136,7 @@ public:
     {return Barycentric_Coordinates(embedded_triangle.X[0],X)+Barycentric_Coordinates(embedded_triangle.X[1],X)+Barycentric_Coordinates(embedded_triangle.X[2],X);}
 
     static TV Center(const TV& x0,const TV& x1,const TV& x2) // centroid
-    {return (T)one_third*(x0+x1+x2);}
+    {return ((T)1/3)*(x0+x1+x2);}
 
     TV Center() const // centroid
     {return Center(X[0],X[1],X[2]);}

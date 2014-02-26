@@ -314,7 +314,7 @@ void Reset_Joints()
         TV offset=tread->Frame().t-gear->Frame().t;
         T angle_x=TV::Dot_Product(forward,offset);
         T angle_y=TV::Dot_Product(up,offset);
-        T angle=atan2(angle_y,angle_x);if(!(gear_index&1)) angle+=(T)pi;angle=fmod(angle+(T)two_pi,(T)two_pi);
+        T angle=atan2(angle_y,angle_x);if(!(gear_index&1)) angle+=(T)pi;angle=fmod(angle+(T)pi*2,(T)pi*2);
         if(angle>(T)1.5*(T)pi || offset.Magnitude_Squared()>sqr(2*gear_radius)) continue;
         if(angle<(T).7*(T)pi){int leading_tread=34*s+(i+1)%34;next_slot[index]=(next_slot[leading_tread]+9)%10;next_gear[index]=next_gear[leading_tread];continue;}
         JOINT<TV>* joint=new POINT_JOINT<TV>();arb->joint_mesh.Add_Articulation(gear->particle_index,tread->particle_index,joint);
@@ -331,7 +331,7 @@ void Initialize_Tread_Tracking()
     next_slot[16]=2;next_slot[33]=7;next_slot[50]=2;next_slot[67]=7;
     for(int i=0;i<4;i++) for(int j=15;j>=0;j--){int index=17*i+j;next_slot[index]=(next_slot[index+1]+9)%10;}
     for(int i=0;i<4;i++) for(int j=0;j<17;j++) next_gear[17*i+j]=i;
-    for(int i=0;i<10;i++){ROTATION<TV> rotation((T)two_pi*i/10,TV(1,0,0));parent_to_joint[i]=FRAME<TV>(rotation.Rotated_Z_Axis()*radius,rotation);}
+    for(int i=0;i<10;i++){ROTATION<TV> rotation((T)pi*2*i/10,TV(1,0,0));parent_to_joint[i]=FRAME<TV>(rotation.Rotated_Z_Axis()*radius,rotation);}
 }
 //#####################################################################
 };

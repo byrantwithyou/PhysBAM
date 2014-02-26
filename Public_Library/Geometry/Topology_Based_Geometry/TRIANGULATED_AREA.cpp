@@ -176,7 +176,7 @@ template<class T> VECTOR<T,2> TRIANGULATED_AREA<T>::
 Centroid(const int triangle) const
 {
     int i,j,k;mesh.elements(triangle).Get(i,j,k);
-    return (T)one_third*(particles.X(i)+particles.X(j)+particles.X(k));
+    return ((T)1/3)*(particles.X(i)+particles.X(j)+particles.X(k));
 }
 //#####################################################################
 // Function Rescale
@@ -327,7 +327,7 @@ Split_Node(const int particle_index,const TV& normal)
     VECTOR<T,2> x0=particles.X(particle_index);ARRAY<int> tris_incident_on_old_particle,tris_incident_on_new_particle;
     int t;for(t=0;t<(*mesh.incident_elements)(particle_index).m;t++){
         int this_incident_tri=(*mesh.incident_elements)(particle_index)(t);int i,j,k;mesh.elements(this_incident_tri).Get(i,j,k);
-        VECTOR<T,2> x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),centroid=(T)one_third*(x1+x2+x3);
+        VECTOR<T,2> x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),centroid=((T)1/3)*(x1+x2+x3);
         if((centroid.x-x0.x)*normal.x+(centroid.y-x0.y)*normal.y < 0) tris_incident_on_new_particle.Append(this_incident_tri); 
         else tris_incident_on_old_particle.Append(this_incident_tri);}
     int new_particle=0;
@@ -337,7 +337,7 @@ Split_Node(const int particle_index,const TV& normal)
         particles.X(new_particle)=particles.X(particle_index);particles.V(new_particle)=particles.V(particle_index);
         for(t=0;t<(*mesh.incident_elements)(particle_index).m;t++){
             int this_incident_tri=(*mesh.incident_elements)(particle_index)(t);int i,j,k;mesh.elements(this_incident_tri).Get(i,j,k);
-            VECTOR<T,2> x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),centroid=(T)one_third*(x1+x2+x3);
+            VECTOR<T,2> x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),centroid=((T)1/3)*(x1+x2+x3);
             if((centroid.x-x0.x)*normal.x+(centroid.y-x0.y)*normal.y < 0){ // relabel with duplicate node
                 if(i == particle_index) i=new_particle;if(j == particle_index) j=new_particle;if(k == particle_index) k=new_particle;
                 mesh.elements(this_incident_tri).Set(i,j,k);}}        
@@ -406,7 +406,7 @@ Compute_Nodal_Areas(bool save_triangle_areas)
         int i,j,k;mesh.elements(t).Get(i,j,k);
         T area=TRIANGLE_2D<T>::Signed_Area(particles.X(i),particles.X(j),particles.X(k));
         if(save_triangle_areas) (*triangle_areas)(t)=area;
-        if(!triangle_area_fractions){area*=(T)one_third;(*nodal_areas)(i)+=area;(*nodal_areas)(j)+=area;(*nodal_areas)(k)+=area;}
+        if(!triangle_area_fractions){area*=((T)1/3);(*nodal_areas)(i)+=area;(*nodal_areas)(j)+=area;(*nodal_areas)(k)+=area;}
         else{T wi,wj;(*triangle_area_fractions)(t).Get(wi,wj);(*nodal_areas)(i)+=wi*area;(*nodal_areas)(j)+=wj*area;(*nodal_areas)(k)+=(1-wi-wj)*area;}}
 }
 //#####################################################################

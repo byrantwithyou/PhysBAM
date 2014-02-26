@@ -59,7 +59,7 @@ Get_Uniform_Integer(const int a,const int b)
 template<class T,class GENERATOR> T RANDOM_NUMBERS<T,GENERATOR>::
 Get_Uniform_Number(const T a,const T b)
 {
-    STATIC_ASSERT((NOT<std::numeric_limits<T>::is_integer>::value));
+    STATIC_ASSERT((!std::numeric_limits<T>::is_integer));
     return a+(b-a)*Get_Number(); // in [a,b)
 }
 //#####################################################################

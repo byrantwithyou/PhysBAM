@@ -501,7 +501,7 @@ void PD_Curl(TV shift,ROTATION<TV> orient,const T k_p)
     parent_body->is_static=true;
 
     // Add children and joints
-    T desired_x=((T)two_pi)/((T)(parameter+1));
+    T desired_x=((T)pi*2)/((T)(parameter+1));
     for(int i=0;i<parameter;i++){
         cheight+=(T)1.25;
         child_body=&tests.Add_Rigid_Body("miniplank25wide2",(T).8,(T).5);

@@ -34,9 +34,8 @@ public:
 
     VECTOR<T,3> Shade_Surface_Using_Direct_Illumination(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,
         const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& intersection_point,const VECTOR<T,3>& same_side_normal) const
-    {static T one_over_two_pi=(T)1/((T)two_pi),one_over_pi=(T)1/(T)pi;
-    T theta=acos(ray.ray.direction.y),t=1-theta*one_over_pi; // maps theta=0 to t=1, theta=pi to t=0
-    T phi=atan2(ray.ray.direction.x,ray.ray.direction.z)-rotation,s=phi*one_over_two_pi;if(s<0)s+=1; // maps phi=0 to s=0, s increases with positive rotation about y axis
+    {T theta=acos(ray.ray.direction.y),t=1-1/(T)pi*theta; // maps theta=0 to t=1, theta=pi to t=0
+    T phi=atan2(ray.ray.direction.x,ray.ray.direction.z)-rotation,s=1/((T)pi*2)*phi;if(s<0)s+=1; // maps phi=0 to s=0, s increases with positive rotation about y axis
     return interpolation.Clamped_To_Array_Cell(grid,pixels,VECTOR<T,2>(s,t));}
     
 //#####################################################################

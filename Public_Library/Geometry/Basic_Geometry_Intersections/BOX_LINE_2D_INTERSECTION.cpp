@@ -35,8 +35,8 @@ template<class T> T Halfspace_Intersection_Size(const RANGE<VECTOR<T,2> >& box,c
     y0/=normal.y;normal/=normal.y;T nx=normal.x,volume=0;if(2*y0-nx>1){y0=1-y0+nx;compliment=true;}
     // At this point, there are three case.  Compute them analytically.  Same approach as 3D, but much simpler.
     if(y0<=0){if(centroid) *centroid=box.Center();return compliment?box.Size():0;}
-    else if(y0-nx<=0){volume=sqr(y0)/(2*nx);if(centroid) *centroid=(T)one_third*y0/normal;}
-    else{volume=y0-(T).5*nx;if(centroid) *centroid=VECTOR<T,2>(y0-(T)two_thirds*nx,sqr(volume)+sqr(nx)/12)/(volume*2);}
+    else if(y0-nx<=0){volume=sqr(y0)/(2*nx);if(centroid) *centroid=((T)1/3)*y0/normal;}
+    else{volume=y0-(T).5*nx;if(centroid) *centroid=VECTOR<T,2>(y0-((T)2/3)*nx,sqr(volume)+sqr(nx)/12)/(volume*2);}
     // Undo the normalizations to convert normalized centroid and volume into world space.
     if(compliment){volume=1-volume;if(centroid) *centroid=-((volume-1)**centroid+(T).5)/volume+1;}
     if(centroid){if(exchange_xy) exchange(centroid->y,centroid->x);for(int i=0;i<2;i++) if(flip[i]) (*centroid)(i)=1-(*centroid)(i);*centroid=*centroid*scaling+box.min_corner;}

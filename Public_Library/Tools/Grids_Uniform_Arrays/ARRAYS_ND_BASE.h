@@ -128,7 +128,7 @@ public:
     operator*=(const T2 a)
     {array*=(T)a;return *this;}
 
-    template<class T2> typename ENABLE_IF<AND<IS_SCALAR<T2>::value,NOT<IS_CONVERTIBLE<T2,T>::value>::value>::value,ARRAYS_ND_BASE&>::TYPE
+    template<class T2> typename ENABLE_IF<IS_SCALAR<T2>::value && !IS_CONVERTIBLE<T2,T>::value,ARRAYS_ND_BASE&>::TYPE
     operator*=(const T2 a)
     {array*=a;return *this;}
 

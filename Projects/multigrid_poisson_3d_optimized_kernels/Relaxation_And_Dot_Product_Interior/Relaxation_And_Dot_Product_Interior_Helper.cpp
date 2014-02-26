@@ -76,8 +76,6 @@ Run_Parallel(const int number_of_partitions)
 template<class T,int y_size,int z_size> void Relaxation_And_Dot_Product_Interior_Size_Specific_Helper<T,y_size,z_size>::
 Compute_Delta_X_Range(const int xmin,const int xmax,const int partition_number)
 {    
-    const T one_sixth=1./6.;
-
     for(int block_i=xmin;block_i<=xmax;block_i+=x_block_size)
     for(int block_j=1;block_j<=y_size;block_j+=y_block_size)
     for(int block_k=1;block_k<=z_size;block_k+=z_block_size)
@@ -88,7 +86,7 @@ Compute_Delta_X_Range(const int xmin,const int xmax,const int partition_number)
         {
             int index=i*x_shift+j*y_shift+k*z_shift;
 
-            delta[index]=one_sixth*(
+            delta[index]=(T)1/6*(
                 u[index+x_plus_one_shift]
                 +u[index+x_minus_one_shift]
                 +u[index+y_plus_one_shift]
@@ -104,8 +102,6 @@ Compute_Delta_X_Range(const int xmin,const int xmax,const int partition_number)
 template<class T,int y_size,int z_size> void Relaxation_And_Dot_Product_Interior_Size_Specific_Helper<T,y_size,z_size>::
 Apply_Delta_X_Range(const int xmin,const int xmax,const int partition_number)
 {    
-    const T two_thirds=2./3.;
-    const T minus_one_ninth=-1./9.;
     double local_u_dot_b=0;
 
     for(int block_i=xmin;block_i<=xmax;block_i+=x_block_size)
@@ -120,36 +116,36 @@ Apply_Delta_X_Range(const int xmin,const int xmax,const int partition_number)
             int coarse_index=i*coarse_x_shift+j*coarse_y_shift+k*coarse_z_shift;
             
             if(bit_writemask[coarse_index] & 0x01){
-                u[index]+=two_thirds*delta[index];
-                u[index]+=minus_one_ninth*b[index];}
+                u[index]+=((T)2/3)*delta[index];
+                u[index]+=(-(T)1/9)*b[index];}
             local_u_dot_b+=u[index]*b[index];
             if(bit_writemask[coarse_index] & 0x02){
-                u[index+z_shift]+=two_thirds*delta[index+z_shift];
-                u[index+z_shift]+=minus_one_ninth*b[index+z_shift];}
+                u[index+z_shift]+=((T)2/3)*delta[index+z_shift];
+                u[index+z_shift]+=(-(T)1/9)*b[index+z_shift];}
             local_u_dot_b+=u[index+z_shift]*b[index+z_shift];
             if(bit_writemask[coarse_index] & 0x04){
-                u[index+y_shift]+=two_thirds*delta[index+y_shift];
-                u[index+y_shift]+=minus_one_ninth*b[index+y_shift];}
+                u[index+y_shift]+=((T)2/3)*delta[index+y_shift];
+                u[index+y_shift]+=(-(T)1/9)*b[index+y_shift];}
             local_u_dot_b+=u[index+y_shift]*b[index+y_shift];
             if(bit_writemask[coarse_index] & 0x08){
-                u[index+y_shift+z_shift]+=two_thirds*delta[index+y_shift+z_shift];
-                u[index+y_shift+z_shift]+=minus_one_ninth*b[index+y_shift+z_shift];}
+                u[index+y_shift+z_shift]+=((T)2/3)*delta[index+y_shift+z_shift];
+                u[index+y_shift+z_shift]+=(-(T)1/9)*b[index+y_shift+z_shift];}
             local_u_dot_b+=u[index+y_shift+z_shift]*b[index+y_shift+z_shift];
             if(bit_writemask[coarse_index] & 0x10){
-                u[index+x_shift]+=two_thirds*delta[index+x_shift];
-                u[index+x_shift]+=minus_one_ninth*b[index+x_shift];}
+                u[index+x_shift]+=((T)2/3)*delta[index+x_shift];
+                u[index+x_shift]+=(-(T)1/9)*b[index+x_shift];}
             local_u_dot_b+=u[index+x_shift]*b[index+x_shift];
             if(bit_writemask[coarse_index] & 0x20){
-                u[index+x_shift+z_shift]+=two_thirds*delta[index+x_shift+z_shift];
-                u[index+x_shift+z_shift]+=minus_one_ninth*b[index+x_shift+z_shift];}
+                u[index+x_shift+z_shift]+=((T)2/3)*delta[index+x_shift+z_shift];
+                u[index+x_shift+z_shift]+=(-(T)1/9)*b[index+x_shift+z_shift];}
             local_u_dot_b+=u[index+x_shift+z_shift]*b[index+x_shift+z_shift];
             if(bit_writemask[coarse_index] & 0x40){
-                u[index+x_shift+y_shift]+=two_thirds*delta[index+x_shift+y_shift];
-                u[index+x_shift+y_shift]+=minus_one_ninth*b[index+x_shift+y_shift];}
+                u[index+x_shift+y_shift]+=((T)2/3)*delta[index+x_shift+y_shift];
+                u[index+x_shift+y_shift]+=(-(T)1/9)*b[index+x_shift+y_shift];}
             local_u_dot_b+=u[index+x_shift+y_shift]*b[index+x_shift+y_shift];
             if(bit_writemask[coarse_index] & 0x80){
-                u[index+x_shift+y_shift+z_shift]+=two_thirds*delta[index+x_shift+y_shift+z_shift];
-                u[index+x_shift+y_shift+z_shift]+=minus_one_ninth*b[index+x_shift+y_shift+z_shift];}
+                u[index+x_shift+y_shift+z_shift]+=((T)2/3)*delta[index+x_shift+y_shift+z_shift];
+                u[index+x_shift+y_shift+z_shift]+=(-(T)1/9)*b[index+x_shift+y_shift+z_shift];}
             local_u_dot_b+=u[index+x_shift+y_shift+z_shift]*b[index+x_shift+y_shift+z_shift];
         }
 

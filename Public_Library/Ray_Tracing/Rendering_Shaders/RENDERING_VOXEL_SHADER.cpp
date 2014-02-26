@@ -175,13 +175,13 @@ Scatter_Photon_Ray(const RENDERING_OBJECT<T>& object,RENDERING_RAY<T>& ray,TV& p
     // use russian roulette to determine whether we absorb or scatter
     T source_term=(T).5*(voxel_object->Source_Term(1,ray.ray.endpoint)+voxel_object->Source_Term(1,ray.ray.Point(fixed_step_size)));
     TV extinction_coefficient=source_term*(absorption+scattering);
-    T k=(T)one_third*(extinction_coefficient.x+extinction_coefficient.y+extinction_coefficient.z);
+    T k=((T)1/3)*(extinction_coefficient.x+extinction_coefficient.y+extinction_coefficient.z);
     T p=exp(-k*fixed_step_size);
     TV scattering_albedo=scattering/extinction_coefficient;
-    T average_scattering_albedo=(T)one_third*(scattering_albedo.x+scattering_albedo.y+scattering_albedo.z);
+    T average_scattering_albedo=((T)1/3)*(scattering_albedo.x+scattering_albedo.y+scattering_albedo.z);
     T u=world.random.Get_Uniform_Number((T)0,(T)1);
     if(u>p){// scatter
-        T p_s=(T)one_third*(scattering/(absorption+scattering)).Sum();
+        T p_s=((T)1/3)*(scattering/(absorption+scattering)).Sum();
         if(world.random.Get_Uniform_Number((T)0,(T)1)<p_s){
             if(type==PHOTON_MAP<T>::VOLUME_PHOTON_MAP) world.volume_photon_map.Store_Photon(ray.ray.Point((T)-1*log(u)/k),ray.ray.direction,photon_power,ray.recursion_depth);
             photon_power=photon_power*scattering_albedo*(T(1)/T(average_scattering_albedo));

@@ -39,7 +39,7 @@ template<class T> struct IS_PRIMITIVE_BINARY_IO_SAFE {static const bool value=!b
 
 // classify types which can be written directly to files without conversion
 template<class T,class RW,class ENABLER> struct IS_BINARY_IO_SAFE {static const bool value=false;};
-template<class T,class RW> struct IS_BINARY_IO_SAFE<T,RW,typename ENABLE_IF<OR<IS_INTEGRAL<T>::value,IS_ENUM<T>::value>::value>::TYPE>:public IS_PRIMITIVE_BINARY_IO_SAFE<T>{};
+template<class T,class RW> struct IS_BINARY_IO_SAFE<T,RW,typename ENABLE_IF<IS_INTEGRAL<T>::value || IS_ENUM<T>::value>::TYPE>:public IS_PRIMITIVE_BINARY_IO_SAFE<T>{};
 template<> struct IS_BINARY_IO_SAFE<float,float>:public IS_PRIMITIVE_BINARY_IO_SAFE<float>{};
 template<> struct IS_BINARY_IO_SAFE<double,double>:public IS_PRIMITIVE_BINARY_IO_SAFE<double>{};
 

@@ -105,7 +105,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
         for(int s=0;s<4;s++){ // point face
             const VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);const SPRING_PARAMETER& param=spring_parameters(t)(s);
             T one_over_mass_times_restlength=particles.one_over_effective_mass(spring_nodes[0]);
-            for(int j=1;j<4;j++) one_over_mass_times_restlength+=(T)one_ninth*particles.one_over_effective_mass(spring_nodes[j]);
+            for(int j=1;j<4;j++) one_over_mass_times_restlength+=((T)1/9)*particles.one_over_effective_mass(spring_nodes[j]);
             one_over_mass_times_restlength/=param.restlength;
             T elastic_squared=4*param.youngs_modulus*one_over_mass_times_restlength*one_over_cfl_number_squared;
             T damping=2*param.damping*one_over_mass_times_restlength*one_over_cfl_number;
@@ -241,7 +241,7 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
             VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);
             SPRING_PARAMETER& spring_param=spring_parameters(t)(s);
             T harmonic_mass=Pseudo_Inverse(one_over_effective_mass(spring_nodes[0])
-                +(T)one_ninth*(one_over_effective_mass(spring_nodes[1])+one_over_effective_mass(spring_nodes[2])+one_over_effective_mass(spring_nodes[3])));
+                +((T)1/9)*(one_over_effective_mass(spring_nodes[1])+one_over_effective_mass(spring_nodes[2])+one_over_effective_mass(spring_nodes[3])));
             spring_param.damping=overdamping_fraction*2*sqrt(spring_param.youngs_modulus*spring_param.restlength*harmonic_mass);}
         for(int s=4;s<7;s++){
             VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);

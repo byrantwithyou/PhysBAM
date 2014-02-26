@@ -27,15 +27,6 @@ template<class T> struct DISABLE_IF<false,T>{typedef T TYPE;};
 template<bool b,class T1,class T2> struct IF{typedef T1 TYPE;};
 template<class T1,class T2> struct IF<false,T1,T2>{typedef T2 TYPE;};
 
-template<bool b> struct NOT {static const bool value=false;};
-template<> struct NOT<false> {static const bool value=true;};
-
-template<bool b1,bool b2,bool b3=true,bool b4=true> struct AND {static const bool value=b1 && b2 && b3 && b4;};
-template<bool b1,bool b2,bool b3=false,bool b4=false> struct OR {static const bool value=b1 || b2 || b3 || b4;};
-
-template<int i,int j> struct INTS_EQUAL {static const bool value=false;};
-template<int i> struct INTS_EQUAL<i,i> {static const bool value=true;};
-
 template<class T1,class T2> struct IS_SAME {static const bool value=false;};
 template<class T> struct IS_SAME<T,T> {static const bool value=true;};
 
@@ -73,7 +64,7 @@ template<class T> struct REMOVE_REFERENCE<T&>{typedef T TYPE;};
 
 template<class T1,class T2=void,class T3=void,class T4=void> struct FIRST{typedef T1 TYPE;};
 
-template<class T> struct IS_FLOAT_OR_DOUBLE:public OR<IS_SAME<T,float>::value,IS_SAME<T,double>::value>{};
+template<class T> struct IS_FLOAT_OR_DOUBLE {static const bool value=IS_SAME<T,float>::value || IS_SAME<T,double>::value;};
 
 template<class T_ARRAY,class ENABLER=void> struct IS_ARRAY {static const bool value=false;};
 template<class T_ARRAY> struct IS_ARRAY<const T_ARRAY>:public IS_ARRAY<T_ARRAY>{};
@@ -95,7 +86,7 @@ template <class T>
 struct IS_CLASS
 {
     static const bool union_value=false; // TODO: use __is_union(T) for gcc 4.3+
-    static const bool value=AND<sizeof(Is_Class_Tester<T>(0)) == sizeof(YES_TYPE),NOT<union_value>::value>::value;
+    static const bool value=sizeof(Is_Class_Tester<T>(0))==sizeof(YES_TYPE) && !union_value;
 };
 
 template<class T> struct IS_VOID {static const bool value=false;};
@@ -123,8 +114,8 @@ PHYSBAM_TYPE_TRAIT_DECLARE_CV_QUALIFIERS(IS_FLOATING_POINT,float,true)
 PHYSBAM_TYPE_TRAIT_DECLARE_CV_QUALIFIERS(IS_FLOATING_POINT,double,true)
 PHYSBAM_TYPE_TRAIT_DECLARE_CV_QUALIFIERS(IS_FLOATING_POINT,long double,true)
 
-template<class T> struct IS_SCALAR {static const bool value=OR<IS_INTEGRAL<T>::value,IS_FLOATING_POINT<T>::value>::value;};
-template<class T> struct IS_FUNDAMENTAL {static const bool value=OR<IS_SCALAR<T>::value,IS_VOID<T>::value>::value;};
+template<class T> struct IS_SCALAR {static const bool value=IS_INTEGRAL<T>::value || IS_FLOATING_POINT<T>::value;};
+template<class T> struct IS_FUNDAMENTAL {static const bool value=IS_SCALAR<T>::value || IS_VOID<T>::value;};
 
 template <class T> struct REMOVE_CV_POINTER{};
 template <class T> struct REMOVE_CV_POINTER<T*>{typedef T TYPE;};
@@ -189,7 +180,7 @@ template <class T1, class T2>
 struct IS_CONVERTIBLE_IMPL
 {
     typedef typename ADD_REFERENCE<T1>::TYPE ref_type;
-    static const bool value=AND<IS_CONVERTIBLE_BASIC_IMPL<ref_type,T2>::value,NOT<IS_ARRAY<T2>::value>::value>::value;
+    static const bool value=IS_CONVERTIBLE_BASIC_IMPL<ref_type,T2>::value && !IS_ARRAY<T2>::value;
 };
 struct TRUE_TYPE {static const bool value=true;};
 struct FALSE_TYPE {static const bool value=false;};
@@ -233,13 +224,13 @@ PHYSBAM_TYPE_TRAIT_DECLARE_CV_QUALIFIERS2(IS_CONVERTIBLE_IMPL,void,void,true)
 #undef PHYSBAM_TYPE_TRAIT_DECLARE_CV_QUALIFIERS2_PART1
 template<class T1,class T2> struct IS_CONVERTIBLE {static const bool value=IS_CONVERTIBLE_DISPATCH<T1,T2>::value;};
 
-template<class T> struct IS_FUNCTION {static const bool value=NOT<IS_CONVERTIBLE<T*, const volatile void*>::value>::value;};
+template<class T> struct IS_FUNCTION {static const bool value=!IS_CONVERTIBLE<T*, const volatile void*>::value;};
 struct INT_CONVERTIBLE {INT_CONVERTIBLE(int);};
 template <bool is_typename_arithmetic_or_reference = true> struct IS_ENUM_HELPER {template <class T> struct type {static const bool value=false;};};
 template <> struct IS_ENUM_HELPER<false> {template <class T> struct type {static const bool value=IS_CONVERTIBLE<typename ADD_REFERENCE<T>::TYPE,INT_CONVERTIBLE>::value;};};
 template <class T> struct IS_ENUM_IMPL
 {
-    static const bool selector=OR<OR<IS_SCALAR<T>::value,IS_REFERENCE<T>::value,IS_FUNCTION<T>::value,IS_CLASS<T>::value>::value,IS_ARRAY<T>::value>::value;
+    static const bool selector=IS_SCALAR<T>::value || IS_REFERENCE<T>::value || IS_FUNCTION<T>::value || IS_CLASS<T>::value || IS_ARRAY<T>::value;
     typedef IS_ENUM_HELPER<selector> se_t;
     typedef typename se_t::template type<T> helper;
     static const bool value = helper::value;
@@ -249,7 +240,7 @@ template<class T> struct IS_ENUM {static const bool value=IS_ENUM_IMPL<T>::value
 
 template<class T,T v> struct STATIC_CONST {static const T value=v;};
 
-template<class T> struct HAS_CHEAP_COPY:public OR<IS_FUNDAMENTAL<T>::value,IS_ENUM<T>::value,IS_ARRAY_VIEW<T>::value>{};
+template<class T> struct HAS_CHEAP_COPY {static const bool value=IS_FUNDAMENTAL<T>::value || IS_ENUM<T>::value || IS_ARRAY_VIEW<T>::value;};
 
 template<class T> struct REMOVE_ALL_EXTENTS {typedef T type;};
 template<class T,int size> struct REMOVE_ALL_EXTENTS<T[size]> {typedef typename REMOVE_ALL_EXTENTS<T>::type type;};
@@ -264,8 +255,8 @@ template<class T> struct HAS_TRIVIAL_DESTRUCTOR {static const bool value=IS_POD<
 template<class T,class RW,class ENABLER=void> struct IS_BINARY_IO_SAFE;
 
 template<class T,class SCALAR,class ENABLER=void> struct REPLACE_FLOATING_POINT{};
-template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename ENABLE_IF<AND<IS_FLOAT_OR_DOUBLE<T>::value,IS_FLOAT_OR_DOUBLE<SCALAR>::value>::value>::TYPE>{typedef SCALAR TYPE;};
-template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename ENABLE_IF<AND<AND<NOT<IS_FLOAT_OR_DOUBLE<T>::value>::value,IS_FUNDAMENTAL<T>::value>::value,IS_FLOAT_OR_DOUBLE<SCALAR>::value>::value>::TYPE>{typedef T TYPE;};
+template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename ENABLE_IF<IS_FLOAT_OR_DOUBLE<T>::value && IS_FLOAT_OR_DOUBLE<SCALAR>::value>::TYPE>{typedef SCALAR TYPE;};
+template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename ENABLE_IF<!IS_FLOAT_OR_DOUBLE<T>::value && IS_FUNDAMENTAL<T>::value && IS_FLOAT_OR_DOUBLE<SCALAR>::value>::TYPE>{typedef T TYPE;};
 template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename ENABLE_IF<IS_POINTER<T>::value>::TYPE> {typedef typename REPLACE_FLOATING_POINT<typename REMOVE_POINTER<T>::TYPE,SCALAR>::TYPE* TYPE;};
 }
 #endif

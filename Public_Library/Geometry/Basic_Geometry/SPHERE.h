@@ -65,7 +65,7 @@ public:
     {STATIC_ASSERT(d==2);return sqr(radius)*acos((radius-h)/radius)-(radius-h)*sqrt(2*radius*h-sqr(h));}
 
     T Size() const
-    {return (T)unit_sphere_size<d>::value*pow<d>(radius);}
+    {return (T)unit_sphere_size[d]*pow<d>(radius);}
 
     RANGE<TV> Bounding_Box() const
     {return RANGE<TV>(center).Thickened(radius);}

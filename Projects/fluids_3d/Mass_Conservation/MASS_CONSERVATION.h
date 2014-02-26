@@ -101,7 +101,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(FILE_UTILITIES::File_Exists(filename)){std::cout<<"Reading parameter file '"<<filename<<"'"<<std::endl;parameter_list.Read(filename);}
 
     random.Set_Seed(3891);
-    root_three_over_three=(T)root_three/(T)3;
+    root_three_over_three=sqrt((T)3)/(T)3;
     pi_over_314 = (T)pi/314;
 
     // Common parameters
@@ -320,9 +320,9 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT face_index=iterator.Face_Index();int axis=iterator.Axis();TV location=iterator.Location();
             T x=location.x,y=location.y,z=location.z;
-            if(axis==1) face_velocities.Component(axis)(face_index)=(T)2*sqr(sin((T)pi*x))*sin((T)two_pi*y)*sin((T)two_pi*z)*time_reversal_factor;
-            else if(axis==2) face_velocities.Component(axis)(face_index)=-sin((T)two_pi*x)*sqr(sin((T)pi*y))*sin((T)two_pi*z)*time_reversal_factor;
-            else face_velocities.Component(axis)(face_index)=-sin((T)two_pi*x)*sin((T)two_pi*y)*sqr(sin((T)pi*z))*time_reversal_factor;}}
+            if(axis==1) face_velocities.Component(axis)(face_index)=(T)2*sqr(sin((T)pi*x))*sin((T)pi*2*y)*sin((T)pi*2*z)*time_reversal_factor;
+            else if(axis==2) face_velocities.Component(axis)(face_index)=-sin((T)pi*2*x)*sqr(sin((T)pi*y))*sin((T)pi*2*z)*time_reversal_factor;
+            else face_velocities.Component(axis)(face_index)=-sin((T)pi*2*x)*sin((T)pi*2*y)*sqr(sin((T)pi*z))*time_reversal_factor;}}
 #endif
 }
 //#####################################################################
@@ -335,7 +335,7 @@ VECTOR<T,3> Get_Analytic_Velocity(const VECTOR<T,3>& location,const T time) cons
     else if(test_number==3 || test_number==4) return TV(zalesak_velocity_center.y-location.y,location.x-zalesak_velocity_center.x,(T)0)*pi_over_314;
     else if (test_number==6){
         T time_reversal_factor=(T)cos((T)pi*time/period);T x=location.x,y=location.y,z=location.z;
-        return TV((T)2*sqr(sin((T)pi*x))*sin((T)two_pi*y)*sin((T)two_pi*z),-sin((T)two_pi*x)*sqr(sin((T)pi*y))*sin((T)two_pi*z),-sin((T)two_pi*x)*sin((T)two_pi*y)*sqr(sin((T)pi*z)))*time_reversal_factor;}
+        return TV((T)2*sqr(sin((T)pi*x))*sin((T)pi*2*y)*sin((T)pi*2*z),-sin((T)pi*2*x)*sqr(sin((T)pi*y))*sin((T)pi*2*z),-sin((T)pi*2*x)*sin((T)pi*2*y)*sqr(sin((T)pi*z)))*time_reversal_factor;}
     return TV();
 }
 //#####################################################################

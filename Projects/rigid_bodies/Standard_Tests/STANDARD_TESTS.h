@@ -941,14 +941,14 @@ void Cluster_Cluster_Interaction_Kinematic()
     RIGID_BODY<TV>* rigid_body_1=&tests.Add_Rigid_Body(longboxfile,(T)2,(T)0);
     rigid_body_1->is_static=true;
     rigid_body_1->Frame().t=TV(0,4,0);
-    rigid_body_1->Frame().r=ROTATION<TV>((T)half_pi,TV(0,0,1));
+    rigid_body_1->Frame().r=ROTATION<TV>((T)pi/2,TV(0,0,1));
     rigid_body_1->Set_Coefficient_Of_Restitution((T).5);
     rigid_body_1->name="longbox1";
     
     RIGID_BODY<TV>* rigid_body_2=&tests.Add_Rigid_Body(longboxfile,(T)3,(T)0);
     rigid_body_2->is_static=true;
     rigid_body_2->Frame().t=TV(0,7,0);
-    rigid_body_2->Frame().r=ROTATION<TV>((T)half_pi,TV(0,1,0));
+    rigid_body_2->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
     rigid_body_2->Set_Coefficient_Of_Restitution((T).5);
     rigid_body_2->name="longbox2";
 

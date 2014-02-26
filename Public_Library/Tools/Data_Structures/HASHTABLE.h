@@ -107,7 +107,7 @@ public:
     ENTRY& entry=table(h);entry.key=v;entry.state=ENTRY_ACTIVE;}
 
     T_UNLESS_VOID& Insert(const TK& v,const T_UNLESS_VOID& value) // assumes no entry with v exists
-    {STATIC_ASSERT((NOT<IS_SAME<T,void>::value>::value));
+    {STATIC_ASSERT((!IS_SAME<T,void>::value));
     if(number_of_entries>next_resize) Resize_Table();
     number_of_entries++;
     int h=Hash_Index(v);assert(!Contains(v,h));
@@ -159,7 +159,7 @@ public:
     ENTRY& entry=table(h);entry.key=v;entry.state=ENTRY_ACTIVE;return true;}
 
     bool Set(const TK& v,const T_UNLESS_VOID& value) // if v doesn't exist insert value, else sets its value, returns whether it added a new entry
-    {STATIC_ASSERT((NOT<IS_SAME<T,void>::value>::value));
+    {STATIC_ASSERT((!IS_SAME<T,void>::value));
     if(number_of_entries>next_resize) Resize_Table(); // if over load average, have to grow (must do this before computing hash index)
     int h=Hash_Index(v);
     for(;table(h).state!=ENTRY_FREE;h=Next_Index(h))

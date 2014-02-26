@@ -442,7 +442,7 @@ Clamped_Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1,con
     T u_dot_u=TV::Dot_Product(u,u),v_dot_v=TV::Dot_Product(v,v),u_dot_v=TV::Dot_Product(u,v),
        u_dot_w=TV::Dot_Product(u,w),v_dot_w=TV::Dot_Product(v,w);
     if(abs(u_dot_u)<tolerance){
-        if(abs(v_dot_v)<tolerance) return TV((T)one_third,(T)one_third,(T)one_third); // single point
+        if(abs(v_dot_v)<tolerance) return TV(((T)1/3),((T)1/3),((T)1/3)); // single point
         T c=clamp(v_dot_w/v_dot_v,(T)0,(T)1);T a_and_b=(T).5*(1-c);return TV(a_and_b,a_and_b,c);} // x0 and x1 are a single point
     else if(abs(v_dot_v)<tolerance){
         T b=clamp(u_dot_w/u_dot_u,(T)0,(T)1);T a_and_c=(T).5*(1-b);return TV(a_and_c,b,a_and_c);} // x0 and x2 are a single point

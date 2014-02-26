@@ -36,7 +36,7 @@ public:
     {return abs(Signed_Volume(x0,x1,x2,x3));}
 
     static T Signed_Volume(const TV& x0,const TV& x1,const TV& x2,const TV& x3)
-    {return T(one_sixth)*TV::Triple_Product(x1-x0,x2-x0,x3-x0);} 
+    {return (T)1/6*TV::Triple_Product(x1-x0,x2-x0,x3-x0);} 
 
     TV First_Three_Barycentric_Coordinates(const TV& location) const
     {return First_Three_Barycentric_Coordinates(location,X[0],X[1],X[2],X[3]);}

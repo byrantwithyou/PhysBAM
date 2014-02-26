@@ -82,7 +82,7 @@ Initialize_Material_State(ARRAY_VIEW<const TV> X)
         MATRIX<T,TV::m,d> Dm=Ds(X,t);
         if(TV::m>d) normals(t)=Normal(Dm);
         Dm_inverse(t)=Pseudoinverse(Dm);
-        Bm(t)=-(T)1/FACTORIAL<d>::value*Dm.Cofactor_Matrix();}
+        Bm(t)=-(T)1/factorial(d)*Dm.Cofactor_Matrix();}
 }
 //#####################################################################
 // Function Add_Dependencies

@@ -38,7 +38,7 @@ public:
     bounding_box=bounding_box.Thickened(thickness_over_two);
     VECTOR<T,3> lengths=bounding_box.Edge_Lengths();
     VECTOR<int,3> dimensions;
-    int max_axis=lengths.Dominant_Axis();T max_dimension=((T)3*pow((T)boxes_input.m,(T)one_third));
+    int max_axis=lengths.Dominant_Axis();T max_dimension=((T)3*pow((T)boxes_input.m,((T)1/3)));
     dimensions[max_axis]=(int)max_dimension; 
     int other_axis_1=(max_axis+1)%3;int other_axis_2=(other_axis_1+1)%3; // rotate to get other axis indices
     dimensions[other_axis_1]=(int)(max_dimension*T(lengths[other_axis_1])/T(lengths[max_axis]));

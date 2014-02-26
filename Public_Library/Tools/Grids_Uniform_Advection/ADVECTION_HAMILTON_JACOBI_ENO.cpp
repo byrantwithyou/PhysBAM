@@ -20,7 +20,7 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
 template<class TV,class T2> void ADVECTION_HAMILTON_JACOBI_ENO<TV,T2>::
 Advection_Solver(const int m_start,const int m_end,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const ARRAY<T,VECTOR<int,1> >& u,ARRAY<T2,VECTOR<int,1> >& u_Zx)
 {
-    int i;T one_over_dx=1/dx,one_over_two_dx=(T).5*one_over_dx,one_over_three_dx=(T)one_third*one_over_dx;
+    int i;T one_over_dx=1/dx,one_over_two_dx=(T).5*one_over_dx,one_over_three_dx=((T)1/3)*one_over_dx;
     ARRAY<T2,VECTOR<int,1> > D0(m_start-3,m_end+2),D1(m_start-3,m_end+1),D2(m_start-3,m_end);
     for(i=m_start-3;i<m_end+2;i++) D0(i)=(Z(i+1)-Z(i))*one_over_dx; 
     if(order >= 2) for(i=m_start-3;i<m_end+1;i++) D1(i)=(D0(i+1)-D0(i))*one_over_two_dx;

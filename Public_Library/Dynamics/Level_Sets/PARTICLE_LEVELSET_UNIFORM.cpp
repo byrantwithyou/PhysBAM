@@ -1175,7 +1175,7 @@ Reincorporate_Removed_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET
 {
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
     T one_over_radius_multiplier=-sign/radius_fraction;
-    T half_unit_sphere_size_over_cell_size=(T).5*(T)unit_sphere_size<TV::dimension>::value/levelset.grid.Cell_Size();
+    T half_unit_sphere_size_over_cell_size=(T).5*(T)unit_sphere_size[TV::dimension]/levelset.grid.Cell_Size();
     for(int k=removed_particles.Size()-1;k>=0;k--) if(reincorporate_removed_particles_everywhere || (one_over_radius_multiplier*levelset.Phi(removed_particles.X(k))<removed_particles.radius(k))){
         if(!particles) particles=Allocate_Particles(template_particles);
         // rasterize the velocity onto the velocity field

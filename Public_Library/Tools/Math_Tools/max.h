@@ -13,33 +13,9 @@ template<class T>
 inline T max(const T a, const T b)
 {return (a>b)?a:b;}
 
-template<class T>
-inline T max(const T a,const T b,const T c)
-{return max(a,max(b,c));}
-
-template<class T>
-inline T max(const T a,const T b,const T c,const T d)
-{return max(a,max(b,c,d));}
-
-template<class T>
-inline T max(const T a,const T b,const T c,const T d,const T e)
-{return max(a,max(b,c,d,e));}
-
-template<class T>
-inline T max(const T a,const T b,const T c,const T d,const T e,const T f)
-{return max(a,max(b,c,d,e,f));}
-
-template<class T>
-inline T max(const T a,const T b,const T c,const T d,const T e,const T f,const T g)
-{return max(a,max(b,c,d,e,f,g));}
-
-template<class T>
-inline T max(const T a,const T b,const T c,const T d,const T e,const T f,const T g,const T h)
-{return max(a,max(b,c,d,e,f,g,h));}
-
-template<class T>
-inline T max(const T a,const T b,const T c,const T d,const T e,const T f,const T g,const T h,const T i)
-{return max(a,max(b,c,d,e,f,g,h,i));}
+template<class T,class ...Args>
+inline T max(const T a,const T b,Args&&... c)
+{return max(a,max(b,c...));}
 
 }
 #endif

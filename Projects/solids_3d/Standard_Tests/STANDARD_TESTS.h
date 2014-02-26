@@ -251,7 +251,7 @@ public:
 //#####################################################################
 T Test_32_Arc_Length(const T t)
 {
-    return -(1-2*t)*sqrt((T)2.5-9*t+9*sqr(t))-(T)one_sixth*asinh((T)(3-6*t))+sqrt((T)2.5)+asinh((T)3)/6; // 3/2 x^2
+    return -(1-2*t)*sqrt((T)2.5-9*t+9*sqr(t))-((T)1/6)*asinh((T)(3-6*t))+sqrt((T)2.5)+asinh((T)3)/6; // 3/2 x^2
 }
 //#####################################################################
 // Function Test_32_Find_Parameter

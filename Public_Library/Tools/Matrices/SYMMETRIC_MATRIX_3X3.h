@@ -189,7 +189,7 @@ public:
     {}
 
     T Dilational() const
-    {return (T)one_third*Trace();}
+    {return ((T)1/3)*Trace();}
 
     SYMMETRIC_MATRIX Deviatoric() const
     {return *this-Dilational();}

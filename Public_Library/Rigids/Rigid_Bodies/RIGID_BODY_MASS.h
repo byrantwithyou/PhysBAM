@@ -71,36 +71,36 @@ public:
     {STATIC_ASSERT(world_space);return mass*TV::Dot_Product(v1.linear,v2.linear)+TV::SPIN::Dot_Product(v1.angular,inertia_tensor*v2.angular);}
 
     SYMMETRIC_MATRIX<T,0> World_Space_Inertia_Tensor(const ROTATION<VECTOR<T,1> > orientation) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return SYMMETRIC_MATRIX<T,0>();}
+    {STATIC_ASSERT((!world_space && TV::m==1));return SYMMETRIC_MATRIX<T,0>();}
 
     SYMMETRIC_MATRIX<T,0> World_Space_Inertia_Tensor_Inverse(const ROTATION<VECTOR<T,1> > orientation) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return SYMMETRIC_MATRIX<T,0>();}
+    {STATIC_ASSERT((!world_space && TV::m==1));return SYMMETRIC_MATRIX<T,0>();}
 
     SYMMETRIC_MATRIX<T,1> World_Space_Inertia_Tensor(const ROTATION<VECTOR<T,2> >& orientation) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==2>::value));return inertia_tensor;}
+    {STATIC_ASSERT((!world_space && TV::m==2));return inertia_tensor;}
 
     SYMMETRIC_MATRIX<T,1> World_Space_Inertia_Tensor_Inverse(const ROTATION<VECTOR<T,2> >& orientation) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==2>::value));return inertia_tensor.Inverse();}
+    {STATIC_ASSERT((!world_space && TV::m==2));return inertia_tensor.Inverse();}
 
     SYMMETRIC_MATRIX<T,3> World_Space_Inertia_Tensor(const ROTATION<VECTOR<T,3> >& orientation) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==3>::value));
+    {STATIC_ASSERT((!world_space && TV::m==3));
     MATRIX<T,3> object_to_world_transformation=orientation.Rotation_Matrix();
     return SYMMETRIC_MATRIX<T,3>::Conjugate(object_to_world_transformation,inertia_tensor);}
 
     SYMMETRIC_MATRIX<T,3> World_Space_Inertia_Tensor_Inverse(const ROTATION<VECTOR<T,3> >& orientation) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==3>::value));
+    {STATIC_ASSERT((!world_space && TV::m==3));
     MATRIX<T,3> object_to_world_transformation=orientation.Rotation_Matrix();
     return SYMMETRIC_MATRIX<T,3>::Conjugate(object_to_world_transformation,inertia_tensor.Inverse());}
 
     SYMMETRIC_MATRIX<T,0> World_Space_Inertia_Tensor(const FRAME<TV>& frame,const VECTOR<T,1>& reference_point) const // relative to a reference point
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return SYMMETRIC_MATRIX<T,0>();}
+    {STATIC_ASSERT((!world_space && TV::m==1));return SYMMETRIC_MATRIX<T,0>();}
 
     SYMMETRIC_MATRIX<T,1> World_Space_Inertia_Tensor(const FRAME<TV>& frame,const VECTOR<T,2>& reference_point) const // relative to a reference point
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==2>::value));TV offset=reference_point-frame.t;
+    {STATIC_ASSERT((!world_space && TV::m==2));TV offset=reference_point-frame.t;
     return inertia_tensor+mass*offset.Magnitude_Squared();}
 
     SYMMETRIC_MATRIX<T,3> World_Space_Inertia_Tensor(const FRAME<TV>& frame,const VECTOR<T,3>& reference_point) const // relative to a reference point
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==3>::value));TV offset=reference_point-frame.t;
+    {STATIC_ASSERT((!world_space && TV::m==3));TV offset=reference_point-frame.t;
     return World_Space_Inertia_Tensor(frame.r)+mass*(offset.Magnitude_Squared()-SYMMETRIC_MATRIX<T,3>::Outer_Product(offset));}
 
     VECTOR<T,0> World_Space_Inertia_Tensor_Times(const ROTATION<VECTOR<T,1> > orientation,const VECTOR<T,0> angular_velocity) const
@@ -110,25 +110,25 @@ public:
     {return VECTOR<T,0>();}
 
     VECTOR<T,1> World_Space_Inertia_Tensor_Times(const ROTATION<VECTOR<T,2> >& orientation,const VECTOR<T,1> angular_velocity) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==2>::value));return inertia_tensor*angular_velocity;}
+    {STATIC_ASSERT((!world_space && TV::m==2));return inertia_tensor*angular_velocity;}
 
     VECTOR<T,1> World_Space_Inertia_Tensor_Inverse_Times(const ROTATION<VECTOR<T,2> >& orientation,const VECTOR<T,1> angular_momentum) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==2>::value));return inertia_tensor.Solve_Linear_System(angular_momentum);}
+    {STATIC_ASSERT((!world_space && TV::m==2));return inertia_tensor.Solve_Linear_System(angular_momentum);}
 
     VECTOR<T,3> World_Space_Inertia_Tensor_Times(const ROTATION<VECTOR<T,3> >& orientation,const VECTOR<T,3>& angular_velocity) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==3>::value));return orientation.Rotate(inertia_tensor*orientation.Inverse_Rotate(angular_velocity));}
+    {STATIC_ASSERT((!world_space && TV::m==3));return orientation.Rotate(inertia_tensor*orientation.Inverse_Rotate(angular_velocity));}
 
     VECTOR<T,3> World_Space_Inertia_Tensor_Inverse_Times(const ROTATION<VECTOR<T,3> >& orientation,const VECTOR<T,3>& angular_momentum) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==3>::value));return orientation.Rotate(inertia_tensor.Solve_Linear_System(orientation.Inverse_Rotate(angular_momentum)));}
+    {STATIC_ASSERT((!world_space && TV::m==3));return orientation.Rotate(inertia_tensor.Solve_Linear_System(orientation.Inverse_Rotate(angular_momentum)));}
 
     T Rotational_Kinetic_Energy(const ROTATION<VECTOR<T,1> > orientation,const VECTOR<T,0> angular_momentum) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return 0;}
+    {STATIC_ASSERT((!world_space && TV::m==1));return 0;}
 
     T Rotational_Kinetic_Energy(const ROTATION<VECTOR<T,2> >& orientation,const VECTOR<T,1> angular_momentum) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==2>::value));return (T).5*inertia_tensor.Inverse_Inner_Product(angular_momentum,angular_momentum);}
+    {STATIC_ASSERT((!world_space && TV::m==2));return (T).5*inertia_tensor.Inverse_Inner_Product(angular_momentum,angular_momentum);}
 
     T Rotational_Kinetic_Energy(const ROTATION<VECTOR<T,3> >& orientation,const VECTOR<T,3>& angular_momentum) const
-    {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==3>::value));TV object_space_angular_momentum=orientation.Inverse_Rotate(angular_momentum);
+    {STATIC_ASSERT((!world_space && TV::m==3));TV object_space_angular_momentum=orientation.Inverse_Rotate(angular_momentum);
     return (T).5*inertia_tensor.Inverse_Inner_Product(object_space_angular_momentum,object_space_angular_momentum);}
 
     template<class RW> void Read(std::istream& input)

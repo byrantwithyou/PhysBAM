@@ -102,7 +102,7 @@ Update_Parameters()
     T curve_length=Curve_Length(),tendon_length=Tendon_Length(),length_ratio=tendon_length/curve_length;
     
     if(curve_type==CURVE_ELLIPSE){
-        T discriminant=9*sqr(initial_curve_offset_thickness)*(T)pi_squared-16*(3*sqr(initial_curve_offset_thickness)*(2+2*length_ratio)-6*initial_volume/(curve_length*(T)pi));
+        T discriminant=9*sqr(initial_curve_offset_thickness)*sqr((T)pi)-16*(3*sqr(initial_curve_offset_thickness)*(2+2*length_ratio)-6*initial_volume/(curve_length*(T)pi));
         if(discriminant<0){curve_thickness=0;curve_offset_thickness=sqrt(2*initial_volume/((T)pi*curve_length)/(2+2*length_ratio));}
         else{T new_curve_thickness=2*(3*sqr(initial_curve_offset_thickness)*(2+2*length_ratio)-6*initial_volume/(curve_length*(T)pi))/(-3*initial_curve_offset_thickness*(T)pi-sqrt(discriminant));
             if(new_curve_thickness>=0) {curve_thickness=new_curve_thickness;curve_offset_thickness=initial_curve_offset_thickness;}
@@ -145,7 +145,7 @@ Get_Fractional_Curve_Value(const T fraction,const bool initial) const
     if(fraction<=tendon_fraction_1_scaled||fraction>=(1-tendon_fraction_2_scaled)) return curve_offset_thickness_var;
     T curve_fraction=(fraction-tendon_fraction_1_scaled)/curve_length_fraction;
     if(curve_type==CURVE_ELLIPSE) return curve_offset_thickness_var+sqrt(sqr(curve_thickness_var)*(1-sqr(2*curve_fraction-1)));
-    else{assert(curve_type==CURVE_COSINE);return -curve_thickness_var*cos((T)two_pi*curve_fraction)+curve_thickness_var+curve_offset_thickness_var;}
+    else{assert(curve_type==CURVE_COSINE);return -curve_thickness_var*cos((T)pi*2*curve_fraction)+curve_thickness_var+curve_offset_thickness_var;}
 }
 //#####################################################################
 // Function Analytic_Inside_Test
@@ -179,7 +179,7 @@ template<class T> void ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>::
 Get_Local_Positions_For_Particles(const int m,const int n,GEOMETRY_PARTICLES<TV>& particles)
 {
     assert(particles.Size()==m*n+2);
-    T length=Length(),dtheta=(T)two_pi/n;
+    T length=Length(),dtheta=(T)pi*2/n;
     for(int i=0;i<m;i++){
         T x_fraction=i/(T)(m-1);T distance_from_axis=Get_Fractional_Curve_Value(x_fraction,false);
         for(int j=0;j<n;j++) particles.X(j+i*n)=TV(x_fraction*length,distance_from_axis*sin(j*dtheta),distance_from_axis*cos(j*dtheta));}

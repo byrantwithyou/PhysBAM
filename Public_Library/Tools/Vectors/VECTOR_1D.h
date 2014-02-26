@@ -36,6 +36,7 @@ using ::std::cos;
 using ::std::abs;
 using ::std::exp;
 using ::std::log;
+using ::std::sqrt;
 
 template<class T>
 class VECTOR<T,1>:public ARRAY_BASE<T,VECTOR<T,1> >

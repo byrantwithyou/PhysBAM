@@ -75,21 +75,21 @@ Sector_Volumes(const TV& origin,T volumes[1<<d],const T thickness_over_two) cons
 //#####################################################################
 template<class T> T Octant_Volume_Helper(T x,T x1,T y,T y1)
 {
-    T s2=max(1-x1-y1,(T)0),s=sqrt(s2),twoxys=2*x*y*s;return ((T)1/6)*(atan2(-twoxys,s2-x1*y1)+(3-y1)*y*(atan2(x,s)-(T)one_fourth_pi)+(3-x1)*x*(atan2(y,s)-(T)one_fourth_pi)+twoxys);
+    T s2=max(1-x1-y1,(T)0),s=sqrt(s2),twoxys=2*x*y*s;return ((T)1/6)*(atan2(-twoxys,s2-x1*y1)+(3-y1)*y*(atan2(x,s)-(T)pi/4)+(3-x1)*x*(atan2(y,s)-(T)pi/4)+twoxys);
 }
 //#####################################################################
 // Function Octant_Volume_Internal
 //#####################################################################
 template<class T> T Octant_Volume_Internal(const VECTOR<T,3>& p)
 {
-    T x2=sqr(p.x),y2=sqr(p.y),z2=sqr(p.z);return Octant_Volume_Helper(p.x,x2,p.y,y2)+Octant_Volume_Helper(p.x,x2,p.z,z2)+Octant_Volume_Helper(p.y,y2,p.z,z2)-p.x*p.y*p.z+(T)one_sixth_pi;
+    T x2=sqr(p.x),y2=sqr(p.y),z2=sqr(p.z);return Octant_Volume_Helper(p.x,x2,p.y,y2)+Octant_Volume_Helper(p.x,x2,p.z,z2)+Octant_Volume_Helper(p.y,y2,p.z,z2)-p.x*p.y*p.z+pi/6;
 }
 //#####################################################################
 // Function Octant_Volume_Wedge
 //#####################################################################
 template<class T> T Octant_Volume_Wedge(T x,T y)
 {
-    T x2=sqr(x),y2=sqr(y);return 2*(Octant_Volume_Helper(x,x2,y,y2)-((T)pi/24)*((3-x2)*x+(3-y2)*y)+(T)one_sixth_pi);
+    T x2=sqr(x),y2=sqr(y);return 2*(Octant_Volume_Helper(x,x2,y,y2)-((T)pi/24)*((3-x2)*x+(3-y2)*y)+pi/6);
 }
 //#####################################################################
 // Function Octant_Volume_Cap
@@ -109,7 +109,7 @@ Octant_Volume(const VECTOR<T,3>& min_corner) const
     exchange_sort(p.x,p.y,p.z); // x <= y <= z
     // Trivial & cheap cases (none, all, cap)
     if(p.z>=1) return 0;
-    if(p.z<=-1) return (T)four_thirds_pi*r3;
+    if(p.z<=-1) return (T)pi*4/3*r3;
     if(p.y<=-1) return Octant_Volume_Cap(p.z)*r3;
     // Inside
     if(p.Magnitude_Squared()<=1) return Octant_Volume_Internal(p)*r3;

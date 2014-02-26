@@ -88,7 +88,7 @@ Get_Ellipsoid(const int p) const
     for(int i=0;i<number_of_points_in_estimate;i++)positions(i)=particles.X(points_found(i));
 
     ELLIPSOID<T> covariance=ELLIPSOID<T>::Covariance_Ellipsoid(positions);
-    T density=number_of_points_in_estimate/((T)four_thirds_pi*cube(sqrt(max_squared_distance_to_points_found)));
+    T density=number_of_points_in_estimate/((T)pi*4/3*cube(sqrt(max_squared_distance_to_points_found)));
 
     if(density<density_threshold){
         TV x_axis=particles.V(p).Normalized(),y_axis=x_axis.Unit_Orthogonal_Vector(),z_axis=TV::Cross_Product(x_axis,y_axis).Normalized();

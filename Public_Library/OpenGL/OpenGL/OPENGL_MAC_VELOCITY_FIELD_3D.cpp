@@ -102,7 +102,7 @@ Update()
         int inc=1;
         if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE){
             int num_vectors=m*n*mn;
-            inc=(int)pow((double)PhysBAM::max(1, num_vectors/max_vectors_3d),(double)one_third);
+            inc=(int)pow((double)PhysBAM::max(1, num_vectors/max_vectors_3d),1./3);
             m=(int)ceil((T)m/inc);n=(int)ceil((T)n/inc);mn=(int)ceil((T)mn/inc);}
 
         int num_vectors=m*n*mn;

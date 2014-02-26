@@ -27,12 +27,12 @@ Local_ENO_Reinitialize(const int order,const int m,const T dx,const ARRAY<T,VECT
     else if(order == 3){for(int i=0;i<m;i++) if(abs(distance(i)) <= half_band_width){
         T D2_left=phi(i)-2*phi(i-1)+phi(i-2),D2_right=phi(i+1)-2*phi(i)+phi(i-1); // both scaled (multiplied by) 2*dx*dx
         if(abs(D2_left) <= abs(D2_right))
-            phix_minus(i)=(phi(i)-phi(i-1)+(T).5*D2_left+(T)one_third*minmag(phi(i)-3*(phi(i-1)-phi(i-2))-phi(i-3),phi(i+1)-3*(phi(i)-phi(i-1))-phi(i-2)))*one_over_dx;
-        else phix_minus(i)=(phi(i)-phi(i-1)+(T).5*D2_right-(T)one_sixth*minmag(phi(i+2)-3*(phi(i+1)-phi(i))-phi(i-1),phi(i+1)-3*(phi(i)-phi(i-1))-phi(i-2)))*one_over_dx;
+            phix_minus(i)=(phi(i)-phi(i-1)+(T).5*D2_left+((T)1/3)*minmag(phi(i)-3*(phi(i-1)-phi(i-2))-phi(i-3),phi(i+1)-3*(phi(i)-phi(i-1))-phi(i-2)))*one_over_dx;
+        else phix_minus(i)=(phi(i)-phi(i-1)+(T).5*D2_right-((T)1/6)*minmag(phi(i+2)-3*(phi(i+1)-phi(i))-phi(i-1),phi(i+1)-3*(phi(i)-phi(i-1))-phi(i-2)))*one_over_dx;
         D2_left=phi(i+2)-2*phi(i+1)+phi(i);D2_right=phi(i+1)-2*phi(i)+phi(i-1); // both scaled (multiplied by) -2*dx*dx
         if(abs(D2_left) <= abs(D2_right))
-            phix_plus(i)=(phi(i+1)-phi(i)-(T).5*D2_left+(T)one_third*minmag(phi(i+3)-3*(phi(i+2)-phi(i+1))+phi(i),phi(i+2)-3*(phi(i+1)-phi(i))+phi(i-1)))*one_over_dx;
-        else phix_plus(i)=(phi(i+1)-phi(i)-(T).5*D2_right-(T)one_sixth*minmag(phi(i+1)-3*(phi(i)-phi(i-1))+phi(i-2),phi(i+2)-3*(phi(i+1)-phi(i))+phi(i-1)))*one_over_dx;}}
+            phix_plus(i)=(phi(i+1)-phi(i)-(T).5*D2_left+((T)1/3)*minmag(phi(i+3)-3*(phi(i+2)-phi(i+1))+phi(i),phi(i+2)-3*(phi(i+1)-phi(i))+phi(i-1)))*one_over_dx;
+        else phix_plus(i)=(phi(i+1)-phi(i)-(T).5*D2_right-((T)1/6)*minmag(phi(i+1)-3*(phi(i)-phi(i-1))+phi(i-2),phi(i+2)-3*(phi(i+1)-phi(i))+phi(i-1)))*one_over_dx;}}
 }
 //#####################################################################
 // Function Local_WENO_Reinitialize

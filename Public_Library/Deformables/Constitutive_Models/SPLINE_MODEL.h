@@ -38,7 +38,7 @@ public:
     Set(hardening_deformation,hardening_deformation_input);
     Set(hardening_strength,hardening_strength_input);
     coefficient=(hardening_strength-1)/(3*(hardening_deformation*hardening_deformation));
-    base=hardening_deformation*(hardening_strength-1)*(T)two_thirds;}
+    base=hardening_deformation*(hardening_strength-1)*((T)2/3);}
 
 private:
     static void Set(ARRAY<T>& parameter,const T value)

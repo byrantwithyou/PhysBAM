@@ -74,7 +74,7 @@ private:
     {H.Resize(8);
     for(int i=0;i<2;i++)for(int j=0;j<2;j++)for(int ij=0;ij<2;ij++){
         int gauss_index=4*i+2*j+ij+1;H(gauss_index).Resize(8);
-        TV xi=(T)one_over_root_three*TV((T)(2*i-1),(T)(2*j-1),(T)(2*ij-1));
+        TV xi=1/sqrt((T)3)*TV((T)(2*i-1),(T)(2*j-1),(T)(2*ij-1));
         for(int ii=0;ii<2;ii++)for(int jj=0;jj<2;jj++)for(int ijij=0;ijij<2;ijij++){
             int node=4*ii+2*jj+ijij+1;TV s((T)(2*ii-1),(T)(2*jj-1),(T)(2*ijij-1)),sxi=s*xi;
             H(gauss_index)(node)=(T).125*s*TV((1+sxi.y)*(1+sxi.z),(1+sxi.x)*(1+sxi.z),(1+sxi.x)*(1+sxi.y));}}}

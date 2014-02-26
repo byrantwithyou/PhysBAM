@@ -121,7 +121,7 @@ template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Update_Be_Scales()
 {
     Be_scales.Resize(strain_measure.Dm_inverse.m,false,false);
-    for(int t=0;t<Be_scales.m;t++) Be_scales(t)=-(T)1/FACTORIAL<d>::value/strain_measure.Dm_inverse(t).Determinant();
+    for(int t=0;t<Be_scales.m;t++) Be_scales(t)=-(T)1/factorial(d)/strain_measure.Dm_inverse(t).Determinant();
 }
 //#####################################################################
 // Function Initialize_Be_Scales_Save
@@ -230,7 +230,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                 plasticity_model->Project_Fp(t,Fe_project_hat.Inverse()*U(t).Transpose_Times(F));
                 (F*plasticity_model->Fp_inverse(t)).Fast_Singular_Value_Decomposition(U(t),Fe_hat(t),V_local);}
             De_inverse_hat(t)=strain_measure.Dm_inverse(t)*plasticity_model->Fp_inverse(t)*V_local;
-            Be_scales(t)=-(T)1/FACTORIAL<d>::value/De_inverse_hat(t).Determinant();}}
+            Be_scales(t)=-(T)1/factorial(d)/De_inverse_hat(t).Determinant();}}
 
     if(compute_half_forces){
         sqrt_Be_scales.Resize(Be_scales.m);

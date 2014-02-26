@@ -100,8 +100,8 @@ Update_Position_Based_State(const T time,const bool is_position_update)
     Bs_per_node.Resize(strain_measure.mesh.elements.m,false,false);
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         T_MATRIX Ds=strain_measure.Ds(particles.X,t);
-        element_volumes(t)=(T)1/FACTORIAL<d>::value*Ds.Parallelepiped_Measure();
-        Bs_per_node(t)=(T)1/FACTORIAL<d+1>::value*Ds.Cofactor_Matrix();}
+        element_volumes(t)=(T)1/factorial(d)*Ds.Parallelepiped_Measure();
+        Bs_per_node(t)=(T)1/factorial(d+1)*Ds.Cofactor_Matrix();}
 
     boundary_normals.Resize(strain_measure.mesh.boundary_mesh->elements.m,false,false);
 

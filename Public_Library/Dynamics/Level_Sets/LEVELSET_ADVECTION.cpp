@@ -75,7 +75,7 @@ HJ_WENO(const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,ARRAY<T,VECTOR
 template<class TV> void LEVELSET_ADVECTION<TV>::
 HJ_ENO(const int order,const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,ARRAY<T,VECTOR<int,1> >& phix_minus,ARRAY<T,VECTOR<int,1> >& phix_plus) const
 {
-    T one_over_dx=1/dx,one_over_two_dx=(T).5*one_over_dx,one_over_three_dx=(T)one_third*one_over_dx;
+    T one_over_dx=1/dx,one_over_two_dx=(T).5*one_over_dx,one_over_three_dx=((T)1/3)*one_over_dx;
     ARRAY<T,VECTOR<int,1> > D0(-2,m+2),D1(-2,m+1),D2(-2,m); // divided differences
     for(int i=-3;i<m+2;i++) D0(i)=(phi(i+1)-phi(i))*one_over_dx;
     if(order >= 2) for(int i=-3;i<m+1;i++) D1(i)=(D0(i+1)-D0(i))*one_over_two_dx;
@@ -173,13 +173,13 @@ Local_ENO_Advect(const int order,const int m,const T dx,const ARRAY<T,VECTOR<int
         if(u(i) > 0){
             T D2_left=phi(i)-2*phi(i-1)+phi(i-2),D2_right=phi(i+1)-2*phi(i)+phi(i-1); // both scaled (multiplied by) 2*dx*dx
             if(abs(D2_left) <= abs(D2_right))
-                u_phix(i)=u(i)*(phi(i)-phi(i-1)+(T).5*D2_left+(T)one_third*minmag(phi(i)-3*(phi(i-1)-phi(i-2))-phi(i-3),phi(i+1)-3*(phi(i)-phi(i-1))-phi(i-2)))*one_over_dx;
-            else u_phix(i)=u(i)*(phi(i)-phi(i-1)+(T).5*D2_right-(T)one_sixth*minmag(phi(i+2)-3*(phi(i+1)-phi(i))-phi(i-1),phi(i+1)-3*(phi(i)-phi(i-1))-phi(i-2)))*one_over_dx;}
+                u_phix(i)=u(i)*(phi(i)-phi(i-1)+(T).5*D2_left+((T)1/3)*minmag(phi(i)-3*(phi(i-1)-phi(i-2))-phi(i-3),phi(i+1)-3*(phi(i)-phi(i-1))-phi(i-2)))*one_over_dx;
+            else u_phix(i)=u(i)*(phi(i)-phi(i-1)+(T).5*D2_right-((T)1/6)*minmag(phi(i+2)-3*(phi(i+1)-phi(i))-phi(i-1),phi(i+1)-3*(phi(i)-phi(i-1))-phi(i-2)))*one_over_dx;}
         else{
             T D2_left=phi(i+2)-2*phi(i+1)+phi(i),D2_right=phi(i+1)-2*phi(i)+phi(i-1); // both scaled (multiplied by) -2*dx*dx
             if(abs(D2_left) <= abs(D2_right))
-                u_phix(i)=u(i)*(phi(i+1)-phi(i)-(T).5*D2_left+(T)one_third*minmag(phi(i+3)-3*(phi(i+2)-phi(i+1))+phi(i),phi(i+2)-3*(phi(i+1)-phi(i))+phi(i-1)))*one_over_dx;
-            else u_phix(i)=u(i)*(phi(i+1)-phi(i)-(T).5*D2_right-(T)one_sixth*minmag(phi(i+1)-3*(phi(i)-phi(i-1))+phi(i-2),phi(i+2)-3*(phi(i+1)-phi(i))+phi(i-1)))*one_over_dx;}}}
+                u_phix(i)=u(i)*(phi(i+1)-phi(i)-(T).5*D2_left+((T)1/3)*minmag(phi(i+3)-3*(phi(i+2)-phi(i+1))+phi(i),phi(i+2)-3*(phi(i+1)-phi(i))+phi(i-1)))*one_over_dx;
+            else u_phix(i)=u(i)*(phi(i+1)-phi(i)-(T).5*D2_right-((T)1/6)*minmag(phi(i+1)-3*(phi(i)-phi(i-1))+phi(i-2),phi(i+2)-3*(phi(i+1)-phi(i))+phi(i-1)))*one_over_dx;}}}
 }
 template<class T,class TV,class TV_INT> static void
 Euler_Step_High_Order(const GRID<TV>& grid,const ARRAY<TV,TV_INT>& V,const ARRAY<T,TV_INT>& phi,const ARRAY<T,TV_INT>& phi_ghost,ARRAY<T,TV_INT>& rhs,const int spatial_order,const T half_band_width)

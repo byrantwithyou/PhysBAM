@@ -29,6 +29,7 @@ using ::std::cos;
 using ::std::abs;
 using ::std::floor;
 using ::std::ceil;
+using ::std::sqrt;
 
 template<class T_ARRAY,class T_INDICES> class INDIRECT_ARRAY;
 
@@ -304,7 +305,7 @@ public:
     {return x+y+z;}
 
     T Average() const
-    {return (T)one_third*Sum();}
+    {return ((T)1/3)*Sum();}
 
     T Product() const
     {return x*y*z;}

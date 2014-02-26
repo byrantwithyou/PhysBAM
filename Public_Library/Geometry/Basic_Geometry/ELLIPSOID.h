@@ -68,7 +68,7 @@ public:
     {return 1/radii.Min();}
 
     T Volume() const
-    {return (T)four_thirds_pi*radii.Determinant();}
+    {return (T)pi*4/3*radii.Determinant();}
 
 //#####################################################################
     TV Normal(const TV& location) const;

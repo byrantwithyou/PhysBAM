@@ -207,7 +207,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             heavy_sphere_drop_time=(T)2.5;
             heavy_sphere_initial_height=(T).35;
             light_sphere_initial_height=(T).35;
-            source_velocity=TV(2*(T)root_two,2*(T)root_two,(T)0);
+            source_velocity=TV(2*sqrt((T)2),2*sqrt((T)2),(T)0);
             source_cylinder=CYLINDER<T>(TV((T).5,(T)0,(T).5),TV((T).5,(T).1,(T).5),(T).05);
             break;
         default:

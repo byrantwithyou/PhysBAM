@@ -113,7 +113,7 @@ public:
     {return TV::Cross_Product(X.y-X.x,X.z-X.x);}
 
     static TV Center(const TV& x0,const TV& x1,const TV& x2) // centroid
-    {return (T)one_third*(x0+x1+x2);}
+    {return ((T)1/3)*(x0+x1+x2);}
 
     TV Center() const // centroid
     {return Center(X.x,X.y,X.z);}

@@ -11,6 +11,7 @@
 #ifndef __integer_log__
 #define __integer_log__
 
+#include <Tools/Math_Tools/COUNT_BITS.h>
 #include <Tools/Utilities/STATIC_ASSERT.h>
 #include <cassert>
 namespace PhysBAM{
@@ -36,12 +37,5 @@ inline int rightmost_bit(unsigned int v)
 inline int integer_log_exact(const unsigned int v) // this only works if v is a power of 2
 {int log_value= (((v&0xffff0000)!=0)<<4)+(((v&0xff00ff00)!=0)<<3)+(((v&0xf0f0f0f0)!=0)<<2)+(((v&0xcccccccc)!=0)<<1)+((v&0xaaaaaaaa)!=0);
 assert(v==(unsigned int)1<<log_value);return log_value;}
-
-inline int count_bits(unsigned int v)
-{
-    int c=0;
-    while(v){c++;v&=v-1;}
-    return c;
-}
 }
 #endif

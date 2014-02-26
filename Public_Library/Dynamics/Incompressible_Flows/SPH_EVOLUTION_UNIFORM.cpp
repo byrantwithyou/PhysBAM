@@ -120,7 +120,7 @@ template<class TV> void SPH_EVOLUTION_UNIFORM<TV>::
 Calculate_SPH_Constants()
 {
     radius=particle_radius*grid.dX.Min();
-    radius_plus_half_dx_squared=sqr(radius+(T)root_three/(T)2*grid.dX.Max());
+    radius_plus_half_dx_squared=sqr(radius+sqrt((T)3)/(T)2*grid.dX.Max());
     one_over_radius_squared=1/sqr(radius);
     radius_vector=(radius+grid.dX.Min())*TV::All_Ones_Vector();
     target_particles_per_cell=target_particles_per_unit_volume*grid.Cell_Size();

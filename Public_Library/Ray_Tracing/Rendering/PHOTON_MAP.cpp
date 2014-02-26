@@ -113,8 +113,8 @@ Irradiance_Estimate(const TV& location,const TV& normal,const T max_distance_squ
         if(ray.debug_ray)ray.debug_ray->photons_used.Append(nearby_photons(i));
         if(TV::Dot_Product(photon.direction,normal)<0)irradiance+=photon.power*filter_weight;}
     TV total_irradiance;
-    if(type==PHOTON_MAP<T>::VOLUME_PHOTON_MAP) total_irradiance=irradiance/((T(4)/T(3))*T(pi)*max_distance_cubed)/(1-T(two_thirds)*one_over_k);
-    else total_irradiance=irradiance/(T(pi)*actual_max_distance_squared)/(1-T(two_thirds)*one_over_k);
+    if(type==PHOTON_MAP<T>::VOLUME_PHOTON_MAP) total_irradiance=irradiance/((T(4)/T(3))*T(pi)*max_distance_cubed)/(1-(T)2/3*one_over_k);
+    else total_irradiance=irradiance/(T(pi)*actual_max_distance_squared)/(1-(T)2/3*one_over_k);
     if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("Irradiance Estimate from Photon Map %f %f %f",total_irradiance.x,total_irradiance.y,total_irradiance.z));
     return total_irradiance;
 }

@@ -17,9 +17,7 @@ template<class T,class EXACT_TYPE>
 struct IS_ADAPTIVE<ADAPTIVE_ATOM<T,EXACT_TYPE> > {static const bool value=true;};
 
 template<class T, class EXACT_TYPE> struct IS_ATOMIZABLE
-    :public AND<IS_CONVERTIBLE<T,typename EXACT_TYPE::FP_PRIMITIVE>::value,
-    std::numeric_limits<T>::digits<=std::numeric_limits<typename EXACT_TYPE::FP_PRIMITIVE>::digits>
-{};
+{static const bool value=IS_CONVERTIBLE<T,typename EXACT_TYPE::FP_PRIMITIVE>::value && std::numeric_limits<T>::digits<=std::numeric_limits<typename EXACT_TYPE::FP_PRIMITIVE>::digits;};
 
 template<class T,class EXACT_TYPE_T>
 class ADAPTIVE_ATOM

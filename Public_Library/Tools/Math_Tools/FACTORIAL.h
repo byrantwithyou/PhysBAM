@@ -7,17 +7,7 @@
 #ifndef __FACTORIAL__
 #define __FACTORIAL__
 
-#include <Tools/Utilities/STATIC_ASSERT.h>
 namespace PhysBAM{
-
-template<unsigned d> struct FACTORIAL;
-
-template<> struct FACTORIAL<0>{enum WORKAROUND {value=1};};
-
-template<unsigned d> struct FACTORIAL
-{
-    STATIC_ASSERT((d<=12));
-    enum WORKAROUND {value=d*FACTORIAL<d-1>::value};
-};
+constexpr int factorial(int d) {return d==0?1:d*factorial(d-1);}
 }
 #endif

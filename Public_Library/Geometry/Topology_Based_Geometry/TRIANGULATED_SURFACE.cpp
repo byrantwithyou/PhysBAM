@@ -152,7 +152,7 @@ template<class T> void TRIANGULATED_SURFACE<T>::
 Initialize_Cylinder_Mesh_And_Particles(const int m,const int n,const T length,const T radius,const bool create_caps)
 {
     typedef VECTOR<T,3> TV;
-    particles.Delete_All_Elements();T dtheta=(T)two_pi/n;T dlength=length/(m-1);
+    particles.Delete_All_Elements();T dtheta=(T)pi*2/n;T dlength=length/(m-1);
     for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         int p=particles.Add_Element();T theta=j*dtheta;
         particles.X(p)=TV(dlength*i,radius*sin(theta),radius*cos(theta));}
@@ -757,7 +757,7 @@ Make_Orientations_Consistent_With_Implicit_Surface(const IMPLICIT_OBJECT<TV>& im
 {
     for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
-        TV centroid=(T)one_third*(particles.X(i)+particles.X(j)+particles.X(k));
+        TV centroid=((T)1/3)*(particles.X(i)+particles.X(j)+particles.X(k));
         TV normal=PLANE<T>::Normal(particles.X(i),particles.X(j),particles.X(k));
         if(TV::Dot_Product(normal,implicit_surface.Normal(centroid))<0)mesh.elements(t).Set(i,k,j);}
 }

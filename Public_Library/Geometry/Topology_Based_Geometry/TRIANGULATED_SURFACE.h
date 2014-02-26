@@ -59,7 +59,7 @@ public:
     
     TV Centroid(const int triangle) const
     {int i,j,k;mesh.elements(triangle).Get(i,j,k);
-    return (T)one_third*(particles.X(i)+particles.X(j)+particles.X(k));}
+    return ((T)1/3)*(particles.X(i)+particles.X(j)+particles.X(k));}
 
     T Area(const int triangle) const
     {int i,j,k;mesh.elements(triangle).Get(i,j,k);

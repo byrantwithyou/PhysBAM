@@ -24,9 +24,8 @@ public:
     ARRAY<ELLIPSOID<T>*> ellipsoid_list;
     ARRAY<T> volume_list;
     T shorter_radii;
-    T three_fourths_div_pi;
 
-    ELLIPSOID_MUSCLE(const MUSCLE_FORCE_CURVE<T>& force_curve_input,T shorter_radii_input=(T)1):MUSCLE<TV>(force_curve_input),shorter_radii(shorter_radii_input),three_fourths_div_pi(3/(4*pi))
+    ELLIPSOID_MUSCLE(const MUSCLE_FORCE_CURVE<T>& force_curve_input,T shorter_radii_input=(T)1):MUSCLE<TV>(force_curve_input),shorter_radii(shorter_radii_input)
     {}
 
     virtual ~ELLIPSOID_MUSCLE()
@@ -50,18 +49,18 @@ public:
         T radius_x,radius_yz;
         if(!via_points.m){
             radius_x=((attachment_point_1->Position()-attachment_point_2->Position()).Magnitude())/2.0;
-            radius_yz=sqrt(three_fourths_div_pi*volume_list(0)*(1/radius_x));
+            radius_yz=sqrt((3/(4*(T)pi))*volume_list(0)*(1/radius_x));
             ellipsoid_list(0)->radii=DIAGONAL_MATRIX<T,3>(radius_x,radius_yz,radius_yz);}
         else{
             radius_x=((attachment_point_1->Position()-via_points(0)->Position()).Magnitude())/2.0;
-            radius_yz=sqrt(three_fourths_div_pi*volume_list(0)*(1/radius_x));
+            radius_yz=sqrt((3/(4*(T)pi))*volume_list(0)*(1/radius_x));
             ellipsoid_list(0)->radii=DIAGONAL_MATRIX<T,3>(radius_x,radius_yz,radius_yz);
             for(int i=1;i<via_points.m;i++){
                 radius_x=((via_points(i)->Position()-via_points(i+1)->Position()).Magnitude())/2.0;
-                radius_yz=sqrt(three_fourths_div_pi*volume_list(i+1)*(1/radius_x));
+                radius_yz=sqrt((3/(4*(T)pi))*volume_list(i+1)*(1/radius_x));
                 ellipsoid_list(i+1)->radii=DIAGONAL_MATRIX<T,3>(radius_x,radius_yz,radius_yz);}
             radius_x=((via_points.Last()->Position()-attachment_point_2->Position()).Magnitude())/2.0;
-            radius_yz=sqrt(three_fourths_div_pi*volume_list(via_points.m+1)*(1/radius_x));
+            radius_yz=sqrt((3/(4*(T)pi))*volume_list(via_points.m+1)*(1/radius_x));
             ellipsoid_list(via_points.m+1)->radii=DIAGONAL_MATRIX<T,3>(radius_x,radius_yz,radius_yz);}
     }
 

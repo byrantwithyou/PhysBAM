@@ -213,11 +213,11 @@ Highlight_Boundary_Normal_Vectors_Of_Current_Tetrahedron() const
 {
     int t=current_tetrahedron,i,j,k,l;mesh->elements(t).Get(i,j,k,l);
     VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k),xl=particles->X(l);
-    OPENGL_SHAPES::Draw_Dot((T)one_third*(xj+xl+xk),OPENGL_COLOR((float).7,0,0),5);
-    OPENGL_SHAPES::Draw_Vector((T)one_third*(xj+xl+xk),PLANE<T>::Normal(xj,xl,xk),OPENGL_COLOR(1,0,1),2);
-    OPENGL_SHAPES::Draw_Vector((T)one_third*(xi+xk+xl),PLANE<T>::Normal(xi,xk,xl),OPENGL_COLOR(1,0,1),1);
-    OPENGL_SHAPES::Draw_Vector((T)one_third*(xi+xl+xj),PLANE<T>::Normal(xi,xl,xj),OPENGL_COLOR(1,0,1),1);
-    OPENGL_SHAPES::Draw_Vector((T)one_third*(xi+xj+xk),PLANE<T>::Normal(xi,xj,xk),OPENGL_COLOR(1,0,1),1);
+    OPENGL_SHAPES::Draw_Dot(((T)1/3)*(xj+xl+xk),OPENGL_COLOR((float).7,0,0),5);
+    OPENGL_SHAPES::Draw_Vector(((T)1/3)*(xj+xl+xk),PLANE<T>::Normal(xj,xl,xk),OPENGL_COLOR(1,0,1),2);
+    OPENGL_SHAPES::Draw_Vector(((T)1/3)*(xi+xk+xl),PLANE<T>::Normal(xi,xk,xl),OPENGL_COLOR(1,0,1),1);
+    OPENGL_SHAPES::Draw_Vector(((T)1/3)*(xi+xl+xj),PLANE<T>::Normal(xi,xl,xj),OPENGL_COLOR(1,0,1),1);
+    OPENGL_SHAPES::Draw_Vector(((T)1/3)*(xi+xj+xk),PLANE<T>::Normal(xi,xj,xk),OPENGL_COLOR(1,0,1),1);
 }
 //#####################################################################
 // Function Highlight_Boundary_Nodes_Of_Current_Tetrahedron
@@ -275,7 +275,7 @@ Draw_Current_Tetrahedron() const
 template<class T>
 void Set_Color_From_Aspect_Ratio(const TRIANGLE_3D<T>& triangle)
 {
-    if(abs(triangle.Aspect_Ratio()-root_two)<1e-3) OPENGL_MATERIAL::Plastic(OPENGL_COLOR(1.f,.1f,.3f)).Send_To_GL_Pipeline();
+    if(abs(triangle.Aspect_Ratio()-sqrt((T)2))<1e-3) OPENGL_MATERIAL::Plastic(OPENGL_COLOR(1.f,.1f,.3f)).Send_To_GL_Pipeline();
     else OPENGL_MATERIAL::Plastic(OPENGL_COLOR(.5f,1.f,.3f)).Send_To_GL_Pipeline();
 }
 //#####################################################################

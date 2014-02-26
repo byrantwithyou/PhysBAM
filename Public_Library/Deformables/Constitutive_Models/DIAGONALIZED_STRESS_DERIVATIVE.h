@@ -27,8 +27,8 @@ public:
 
     MATRIX<T,2> Differential(const MATRIX<T,2>& dF) const
     {SYMMETRIC_MATRIX<T,2> dC((F*dF).Twice_Symmetric_Part());
-    VECTOR<T,3> ds=dSdC*VECTOR<T,3>(dC.x00,dC.x11,(T)root_two*dC.x10);
-    SYMMETRIC_MATRIX<T,2> dS(ds.x,(T)one_over_root_two*ds.z,ds.y);
+    VECTOR<T,3> ds=dSdC*VECTOR<T,3>(dC.x00,dC.x11,sqrt((T)2)*dC.x10);
+    SYMMETRIC_MATRIX<T,2> dS(ds.x,sqrt((T)1/2)*ds.z,ds.y);
     return dF*S+F*dS;}
 
     void Enforce_Definiteness()
@@ -46,9 +46,9 @@ public:
 
     MATRIX<T,3> Differential(const MATRIX<T,3>& dF) const
     {SYMMETRIC_MATRIX<T,3> dC((F*dF).Twice_Symmetric_Part());
-    VECTOR<T,3> dC_d(dC.x00,dC.x11,dC.x22),dC_s((T)root_two*dC.x10,(T)root_two*dC.x20,(T)root_two*dC.x21);
+    VECTOR<T,3> dC_d(dC.x00,dC.x11,dC.x22),dC_s(sqrt((T)2)*dC.x10,sqrt((T)2)*dC.x20,sqrt((T)2)*dC.x21);
     VECTOR<T,3> dS_d(dSdC_d*dC_d+dSdC_ds*dC_s),dS_s(dSdC_ds.Transpose_Times(dC_d)+dSdC_s*dC_s);
-    SYMMETRIC_MATRIX<T,3> dS(dS_d.x,(T)one_over_root_two*dS_s.x,(T)one_over_root_two*dS_s.y,dS_d.y,(T)one_over_root_two*dS_s.z,dS_d.z);
+    SYMMETRIC_MATRIX<T,3> dS(dS_d.x,sqrt((T)1/2)*dS_s.x,sqrt((T)1/2)*dS_s.y,dS_d.y,sqrt((T)1/2)*dS_s.z,dS_d.z);
     return dF*S+F*dS;}
 
     void Enforce_Definiteness()

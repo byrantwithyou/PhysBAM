@@ -66,16 +66,13 @@ Run_Parallel(const int number_of_partitions)
 template<class T,int y_size,int z_size> void Relaxation_Interior_Size_Specific_Helper<T,y_size,z_size>::
 Run_Major_X_Range(const int xmin,const int xmax)
 { 
-    const T one_sixth=1./6.;
-    const T two_thirds=2./3.;
-
     int i=xmin;
     for(int j=0;j<coarse_y_size;j++)
     for(int k=0;k<coarse_z_size;k++)
     {
         int index=2*(i*x_shift+j*y_shift+k*z_shift)-x_plus_one_y_plus_one_z_plus_one_shift;
 
-        delta[index]=one_sixth*(
+        delta[index]=(T)1/6*(
             u[index+x_plus_one_shift]
             +u[index+x_minus_one_shift]
             +u[index+y_plus_one_shift]
@@ -84,8 +81,8 @@ Run_Major_X_Range(const int xmin,const int xmax)
             +u[index+z_minus_one_shift]
             -b[index]);
         delta[index]-=u[index];
-
-        delta[index+z_plus_one_shift]=one_sixth*(
+ 
+       delta[index+z_plus_one_shift]=(T)1/6*(
             u[index+x_plus_one_z_plus_one_shift]
             +u[index+x_minus_one_z_plus_one_shift]
             +u[index+y_plus_one_z_plus_one_shift]
@@ -95,7 +92,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+z_plus_one_shift]);
         delta[index+z_plus_one_shift]-=u[index+z_plus_one_shift];
 
-        delta[index+y_plus_one_shift]=one_sixth*(
+        delta[index+y_plus_one_shift]=(T)1/6*(
             u[index+x_plus_one_y_plus_one_shift]
             +u[index+x_minus_one_y_plus_one_shift]
             +u[index+y_plus_two_shift]
@@ -105,7 +102,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+y_plus_one_shift]);
         delta[index+y_plus_one_shift]-=u[index+y_plus_one_shift];
     
-        delta[index+y_plus_one_z_plus_one_shift]=one_sixth*(
+        delta[index+y_plus_one_z_plus_one_shift]=(T)1/6*(
             u[index+x_plus_one_y_plus_one_z_plus_one_shift]
             +u[index+x_minus_one_y_plus_one_z_plus_one_shift]
             +u[index+y_plus_two_z_plus_one_shift]
@@ -115,7 +112,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+y_plus_one_z_plus_one_shift]);
         delta[index+y_plus_one_z_plus_one_shift]-=u[index+y_plus_one_z_plus_one_shift];
 
-        delta[index+x_plus_one_shift]=one_sixth*(
+        delta[index+x_plus_one_shift]=(T)1/6*(
             u[index+x_plus_two_shift]
             +u[index]
             +u[index+x_plus_one_y_plus_one_shift]
@@ -125,7 +122,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+x_plus_one_shift]);
         delta[index+x_plus_one_shift]-=u[index+x_plus_one_shift];
     
-        delta[index+x_plus_one_z_plus_one_shift]=one_sixth*(
+        delta[index+x_plus_one_z_plus_one_shift]=(T)1/6*(
             u[index+x_plus_two_z_plus_one_shift]
             +u[index+z_plus_one_shift]
             +u[index+x_plus_one_y_plus_one_z_plus_one_shift]
@@ -135,7 +132,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+x_plus_one_z_plus_one_shift]);
         delta[index+x_plus_one_z_plus_one_shift]-=u[index+x_plus_one_z_plus_one_shift];
 
-        delta[index+x_plus_one_y_plus_one_shift]=one_sixth*(
+        delta[index+x_plus_one_y_plus_one_shift]=(T)1/6*(
             u[index+x_plus_two_y_plus_one_shift]
             +u[index+y_plus_one_shift]
             +u[index+x_plus_one_y_plus_two_shift]
@@ -145,7 +142,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+x_plus_one_y_plus_one_shift]);
         delta[index+x_plus_one_y_plus_one_shift]-=u[index+x_plus_one_y_plus_one_shift];
 
-        delta[index+x_plus_one_y_plus_one_z_plus_one_shift]=one_sixth*(
+        delta[index+x_plus_one_y_plus_one_z_plus_one_shift]=(T)1/6*(
             u[index+x_plus_two_y_plus_one_z_plus_one_shift]
             +u[index+y_plus_one_z_plus_one_shift]
             +u[index+x_plus_one_y_plus_two_z_plus_one_shift]
@@ -162,7 +159,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
     {
         int index=2*(i*x_shift+j*y_shift+k*z_shift)-x_plus_one_y_plus_one_z_plus_one_shift;
 
-        delta[index]=one_sixth*(
+        delta[index]=(T)1/6*(
             u[index+x_plus_one_shift]
             +u[index+x_minus_one_shift]
             +u[index+y_plus_one_shift]
@@ -172,7 +169,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index]);
         delta[index]-=u[index];
 
-        delta[index+z_plus_one_shift]=one_sixth*(
+        delta[index+z_plus_one_shift]=(T)1/6*(
             u[index+x_plus_one_z_plus_one_shift]
             +u[index+x_minus_one_z_plus_one_shift]
             +u[index+y_plus_one_z_plus_one_shift]
@@ -182,7 +179,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+z_plus_one_shift]);
         delta[index+z_plus_one_shift]-=u[index+z_plus_one_shift];
 
-        delta[index+y_plus_one_shift]=one_sixth*(
+        delta[index+y_plus_one_shift]=(T)1/6*(
             u[index+x_plus_one_y_plus_one_shift]
             +u[index+x_minus_one_y_plus_one_shift]
             +u[index+y_plus_two_shift]
@@ -192,7 +189,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+y_plus_one_shift]);
         delta[index+y_plus_one_shift]-=u[index+y_plus_one_shift];
     
-        delta[index+y_plus_one_z_plus_one_shift]=one_sixth*(
+        delta[index+y_plus_one_z_plus_one_shift]=(T)1/6*(
             u[index+x_plus_one_y_plus_one_z_plus_one_shift]
             +u[index+x_minus_one_y_plus_one_z_plus_one_shift]
             +u[index+y_plus_two_z_plus_one_shift]
@@ -202,7 +199,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+y_plus_one_z_plus_one_shift]);
         delta[index+y_plus_one_z_plus_one_shift]-=u[index+y_plus_one_z_plus_one_shift];
 
-        delta[index+x_plus_one_shift]=one_sixth*(
+        delta[index+x_plus_one_shift]=(T)1/6*(
             u[index+x_plus_two_shift]
             +u[index]
             +u[index+x_plus_one_y_plus_one_shift]
@@ -212,7 +209,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+x_plus_one_shift]);
         delta[index+x_plus_one_shift]-=u[index+x_plus_one_shift];
     
-        delta[index+x_plus_one_z_plus_one_shift]=one_sixth*(
+        delta[index+x_plus_one_z_plus_one_shift]=(T)1/6*(
             u[index+x_plus_two_z_plus_one_shift]
             +u[index+z_plus_one_shift]
             +u[index+x_plus_one_y_plus_one_z_plus_one_shift]
@@ -222,7 +219,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+x_plus_one_z_plus_one_shift]);
         delta[index+x_plus_one_z_plus_one_shift]-=u[index+x_plus_one_z_plus_one_shift];
 
-        delta[index+x_plus_one_y_plus_one_shift]=one_sixth*(
+        delta[index+x_plus_one_y_plus_one_shift]=(T)1/6*(
             u[index+x_plus_two_y_plus_one_shift]
             +u[index+y_plus_one_shift]
             +u[index+x_plus_one_y_plus_two_shift]
@@ -232,7 +229,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
             -b[index+x_plus_one_y_plus_one_shift]);
         delta[index+x_plus_one_y_plus_one_shift]-=u[index+x_plus_one_y_plus_one_shift];
 
-        delta[index+x_plus_one_y_plus_one_z_plus_one_shift]=one_sixth*(
+        delta[index+x_plus_one_y_plus_one_z_plus_one_shift]=(T)1/6*(
             u[index+x_plus_two_y_plus_one_z_plus_one_shift]
             +u[index+y_plus_one_z_plus_one_shift]
             +u[index+x_plus_one_y_plus_two_z_plus_one_shift]
@@ -246,21 +243,21 @@ Run_Major_X_Range(const int xmin,const int xmax)
         int coarse_shifted_index=(i-1)*coarse_x_shift+j*coarse_y_shift+k*coarse_z_shift;
     
         if(bit_writemask[coarse_shifted_index] & 0x01)
-            u[shifted_index]+=two_thirds*delta[shifted_index];
+            u[shifted_index]+=(T)2/3*delta[shifted_index];
         if(bit_writemask[coarse_shifted_index] & 0x02)            
-            u[shifted_index+z_plus_one_shift]+=two_thirds*delta[shifted_index+z_plus_one_shift];
+            u[shifted_index+z_plus_one_shift]+=(T)2/3*delta[shifted_index+z_plus_one_shift];
         if(bit_writemask[coarse_shifted_index] & 0x04)
-            u[shifted_index+y_plus_one_shift]+=two_thirds*delta[shifted_index+y_plus_one_shift];
+            u[shifted_index+y_plus_one_shift]+=(T)2/3*delta[shifted_index+y_plus_one_shift];
         if(bit_writemask[coarse_shifted_index] & 0x08)
-            u[shifted_index+y_plus_one_z_plus_one_shift]+=two_thirds*delta[shifted_index+y_plus_one_z_plus_one_shift];
+            u[shifted_index+y_plus_one_z_plus_one_shift]+=(T)2/3*delta[shifted_index+y_plus_one_z_plus_one_shift];
         if(bit_writemask[coarse_shifted_index] & 0x10)
-            u[shifted_index+x_plus_one_shift]+=two_thirds*delta[shifted_index+x_plus_one_shift];
+            u[shifted_index+x_plus_one_shift]+=(T)2/3*delta[shifted_index+x_plus_one_shift];
         if(bit_writemask[coarse_shifted_index] & 0x20)
-            u[shifted_index+x_plus_one_z_plus_one_shift]+=two_thirds*delta[shifted_index+x_plus_one_z_plus_one_shift];
+            u[shifted_index+x_plus_one_z_plus_one_shift]+=(T)2/3*delta[shifted_index+x_plus_one_z_plus_one_shift];
         if(bit_writemask[coarse_shifted_index] & 0x40)
-            u[shifted_index+x_plus_one_y_plus_one_shift]+=two_thirds*delta[shifted_index+x_plus_one_y_plus_one_shift];
+            u[shifted_index+x_plus_one_y_plus_one_shift]+=(T)2/3*delta[shifted_index+x_plus_one_y_plus_one_shift];
         if(bit_writemask[coarse_shifted_index] & 0x80)
-            u[shifted_index+x_plus_one_y_plus_one_z_plus_one_shift]+=two_thirds*delta[shifted_index+x_plus_one_y_plus_one_z_plus_one_shift];
+            u[shifted_index+x_plus_one_y_plus_one_z_plus_one_shift]+=(T)2/3*delta[shifted_index+x_plus_one_y_plus_one_z_plus_one_shift];
     }
 }
 //#####################################################################
@@ -269,8 +266,6 @@ Run_Major_X_Range(const int xmin,const int xmax)
 template<class T,int y_size,int z_size> void Relaxation_Interior_Size_Specific_Helper<T,y_size,z_size>::
 Run_Minor_X_Range(const int xmin,const int xmax)
 {    
-    const T two_thirds=2./3.;
-
     int i=xmax;
     for(int block_j=1;block_j<=coarse_y_size;block_j+=y_block_size)
     for(int block_k=1;block_k<=coarse_z_size;block_k+=z_block_size)
@@ -282,21 +277,21 @@ Run_Minor_X_Range(const int xmin,const int xmax)
             int coarse_index=i*coarse_x_shift+j*coarse_y_shift+k*coarse_z_shift;
 
             if(bit_writemask[coarse_index] & 0x01)
-                u[index]+=two_thirds*delta[index];
+                u[index]+=(T)2/3*delta[index];
             if(bit_writemask[coarse_index] & 0x02)            
-                u[index+z_plus_one_shift]+=two_thirds*delta[index+z_plus_one_shift];
+                u[index+z_plus_one_shift]+=(T)2/3*delta[index+z_plus_one_shift];
             if(bit_writemask[coarse_index] & 0x04)
-                u[index+y_plus_one_shift]+=two_thirds*delta[index+y_plus_one_shift];
+                u[index+y_plus_one_shift]+=(T)2/3*delta[index+y_plus_one_shift];
             if(bit_writemask[coarse_index] & 0x08)
-                u[index+y_plus_one_z_plus_one_shift]+=two_thirds*delta[index+y_plus_one_z_plus_one_shift];
+                u[index+y_plus_one_z_plus_one_shift]+=(T)2/3*delta[index+y_plus_one_z_plus_one_shift];
             if(bit_writemask[coarse_index] & 0x10)
-                u[index+x_plus_one_shift]+=two_thirds*delta[index+x_plus_one_shift];
+                u[index+x_plus_one_shift]+=(T)2/3*delta[index+x_plus_one_shift];
             if(bit_writemask[coarse_index] & 0x20)
-                u[index+x_plus_one_z_plus_one_shift]+=two_thirds*delta[index+x_plus_one_z_plus_one_shift];
+                u[index+x_plus_one_z_plus_one_shift]+=(T)2/3*delta[index+x_plus_one_z_plus_one_shift];
             if(bit_writemask[coarse_index] & 0x40)
-                u[index+x_plus_one_y_plus_one_shift]+=two_thirds*delta[index+x_plus_one_y_plus_one_shift];
+                u[index+x_plus_one_y_plus_one_shift]+=(T)2/3*delta[index+x_plus_one_y_plus_one_shift];
             if(bit_writemask[coarse_index] & 0x80)
-                u[index+x_plus_one_y_plus_one_z_plus_one_shift]+=two_thirds*delta[index+x_plus_one_y_plus_one_z_plus_one_shift];
+                u[index+x_plus_one_y_plus_one_z_plus_one_shift]+=(T)2/3*delta[index+x_plus_one_y_plus_one_z_plus_one_shift];
     }
 }
 //#####################################################################

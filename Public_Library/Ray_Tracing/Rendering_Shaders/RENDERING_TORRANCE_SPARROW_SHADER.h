@@ -32,7 +32,7 @@ public:
     TV half=(T).5*(reflected_direction+incident_direction);T cos_half_reflected=abs(TV::Dot_Product(half,reflected_direction));
     T cos_half_normal=abs(TV::Dot_Product(half,normal));
     T geometry_attenuation=min((T)1,min((T)2*cos_half_normal*cos_incident_normal/cos_half_reflected,(T)2*cos_half_normal*cos_reflected_normal/cos_half_reflected));
-    T distribution=(exponent+2)*(T)one_over_two_pi*(T)pow(max((T)0,cos_half_normal),exponent);
+    T distribution=(exponent+2)*(1/(2*(T)pi))*(T)pow(max((T)0,cos_half_normal),exponent);
     T fresnel=FRESNEL<T>::Conductor_Reflection(index_of_refraction,cos_half_normal,absorption_coefficient);
     return fresnel*geometry_attenuation*distribution*reflectance/(4*cos_reflected_normal*cos_incident_normal);}
 

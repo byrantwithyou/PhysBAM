@@ -141,7 +141,7 @@ Update_Close_Point(ARRAYS_ND_BASE<T2,TV_INT>& u,const T_ARRAYS_BASE& phi,const A
         u(index)=fraction*value[0]+(1-fraction)*value[1];}
     else{PHYSBAM_ASSERT(TV::m==3); // should only get here in 3D
         T a=phix_dx[0]*optimization_scale[1],b=phix_dx[1]*optimization_scale[0],c=phix_dx[2],denominator=a+b+c;
-        T fraction_1=(T)one_third,fraction_2=(T)one_third;
+        T fraction_1=((T)1/3),fraction_2=((T)1/3);
         if(denominator > small_number){fraction_1=clamp(a/denominator,(T)0,(T)1);fraction_2=clamp(b/denominator,(T)0,1-fraction_1);}
         u(index)=fraction_1*value[0]+fraction_2*value[1]+((T)1-fraction_1-fraction_2)*value[2];}
 }

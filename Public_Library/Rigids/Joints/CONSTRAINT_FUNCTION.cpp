@@ -56,7 +56,7 @@ Jacobian_Helper(const T_IMPULSE& j,const int i) const
     if(rigid_body[i]->Has_Infinite_Inertia()) return MATRIX<T,2>();
     T sign=(T)(1-2*i);
     // rotate by d/dt e^{it} = i e^{it} = e^{i(t+pi/2)}
-    return MATRIX<T,2,1>(ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i]+(sign*inverse_inertia_rhat_star[i]*j)(0)+(T)half_pi).Rotate(r[i]))*inverse_inertia_rhat_star[i];
+    return MATRIX<T,2,1>(ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i]+(sign*inverse_inertia_rhat_star[i]*j)(0)+(T)pi/2).Rotate(r[i]))*inverse_inertia_rhat_star[i];
 }
 //#####################################################################
 // Function Initialize
@@ -205,7 +205,7 @@ Jacobian_Linear_Helper(const T_SPIN& j,const int i) const
 {
     if(linear.rigid_body[i]->Has_Infinite_Inertia()) return MATRIX<T,2,1>();
     T sign=(T)(1-2*i);
-    return MATRIX<T,2,1>(ROTATION<TV>::From_Rotation_Vector(linear.dt_angular_velocity[i]+sign*angular.inverse_inertia[i]*j+(T)half_pi).Rotate(linear.r[i]))*
+    return MATRIX<T,2,1>(ROTATION<TV>::From_Rotation_Vector(linear.dt_angular_velocity[i]+sign*angular.inverse_inertia[i]*j+(T)pi/2).Rotate(linear.r[i]))*
         angular.inverse_inertia[i];
 }
 //#####################################################################

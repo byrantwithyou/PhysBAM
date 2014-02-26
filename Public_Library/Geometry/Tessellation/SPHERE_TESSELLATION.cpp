@@ -66,7 +66,7 @@ template<class T> SEGMENTED_CURVE_2D<T>* Tessellate_Boundary(const SPHERE<VECTOR
     SEGMENTED_CURVE_2D<T>* curve=SEGMENTED_CURVE_2D<T>::Create();
     int n=1<<levels;
     curve->particles.Add_Elements(n);
-    for(int i=0;i<n;i++) curve->particles.X(i)=VECTOR<T,2>((T)cos(i*two_pi/n),(T)sin(i*two_pi/n))*sphere.radius+sphere.center;
+    for(int i=0;i<n;i++) curve->particles.X(i)=VECTOR<T,2>((T)cos((T)pi*2*i/n),(T)sin((T)pi*2*i/n))*sphere.radius+sphere.center;
     for(int i=0;i<n-1;i++) curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));
     curve->mesh.elements.Append(VECTOR<int,2>(n-1,0));
     curve->Update_Number_Nodes();

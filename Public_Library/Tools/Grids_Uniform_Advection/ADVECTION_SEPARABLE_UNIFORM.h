@@ -38,11 +38,11 @@ public:
     {if(abs(D2_left) <= abs(D2_right)) return D1+dx*(D2_left+dx*2*minmag(D3_left,D3_center));else return D1+dx*(D2_right-dx*minmag(D3_right,D3_center));}
 
     static T WENO(const T v1,const T v2,const T v3,const T v4,const T v5,const T epsilon)
-    {T s1=(T)thirteen_over_twelve*sqr(v1-2*v2+v3)+(T).25*sqr(v1-4*v2+3*v3),s2=(T)thirteen_over_twelve*sqr(v2-2*v3+v4)+(T).25*sqr(v2-v4),
-        s3=(T)thirteen_over_twelve*sqr(v3-2*v4+v5)+(T).25*sqr(3*v3-4*v4+v5);
+    {T s1=(T)13/12*sqr(v1-2*v2+v3)+(T).25*sqr(v1-4*v2+3*v3),s2=(T)13/12*sqr(v2-2*v3+v4)+(T).25*sqr(v2-v4),
+        s3=(T)13/12*sqr(v3-2*v4+v5)+(T).25*sqr(3*v3-4*v4+v5);
     T a1=(T).1/sqr(epsilon+s1),a2=(T).6/sqr(epsilon+s2),a3=(T).3/sqr(epsilon+s3),one_over_sum_a=1/(a1+a2+a3);
     T w1=a1*one_over_sum_a,w2=a2*one_over_sum_a,w3=1-w1-w2;
-    return (T)one_sixth*(w1*(2*v1-7*v2+11*v3)+w2*(-v2+5*v3+2*v4)+w3*(2*v3+5*v4-v5));}
+    return ((T)1/6)*(w1*(2*v1-7*v2+11*v3)+w2*(-v2+5*v3+2*v4)+w3*(2*v3+5*v4-v5));}
 
 //#####################################################################
     virtual void Set_Order(const int order_input=3){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

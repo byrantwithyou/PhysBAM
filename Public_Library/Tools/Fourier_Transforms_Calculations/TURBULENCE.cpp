@@ -34,7 +34,7 @@ Generate_Random_Turbulence(const GRID<TV>& grid,VECTOR<ARRAY<T,TV_INT>,TV::m>& u
         T k2=k.Magnitude_Squared(),km=sqrt(k2);
         T area=coeff*k2;
         T energy=0;
-        if(km > k_inertial) energy=constant*pow(epsilon,(T)two_thirds)*pow((T)km,(T)-five_thirds)/area;
+        if(km > k_inertial) energy=constant*pow(epsilon,((T)2/3))*pow((T)km,-(T)5/3)/area;
         T sqrt_energy_over_two=sqrt((T).5*energy);
         for(int i=0;i<TV::m;i++){
             T r=random->Get_Gaussian(),theta=(T)pi*random->Get_Uniform_Number((T)0,(T)1);

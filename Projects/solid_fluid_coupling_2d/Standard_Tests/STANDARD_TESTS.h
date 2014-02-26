@@ -1479,7 +1479,7 @@ TV Oscillating_Disk_Domain_Velocity_Sample(TV location)
     // stream function is psi = psi_0 sin(k_x x) sin (k_y y), psi_0 = 5e-2, k_x=k_y=2pi
     // v_x=psi_0 k_y sin(k_x x) cos(k_y y)
     // v_y=-psi_0 k_x cos(k_x x) sin(k_y y)
-    T k_x=two_pi,k_y=two_pi;
+    T k_x=(T)pi*2,k_y=(T)pi*2;
     T psi_0=5e-2;
     return TV(psi_0*k_y*sin(k_x*location.x)*cos(k_y*location.y),-psi_0*k_x*cos(k_x*location.x)*sin(k_y*location.y));
 }

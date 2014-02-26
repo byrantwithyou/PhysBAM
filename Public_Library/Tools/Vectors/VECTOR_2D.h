@@ -33,6 +33,7 @@ using ::std::ceil;
 using ::std::sin;
 using ::std::cos;
 using ::std::abs;
+using ::std::sqrt;
 
 template<class T>
 class VECTOR<T,2>:public ARRAY_BASE<T,VECTOR<T,2> >
