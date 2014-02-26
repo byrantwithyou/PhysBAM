@@ -129,7 +129,7 @@ Fill_Uncovered_Cells()
 {
     if(!euler.timesplit || !thinshell){
         T_LINEAR_INTERPOLATION_DIMENSION interpolation;
-        T max_distance,object_velocity_normal_component;TV location,normal_direction,object_velocity,reflected_point;
+        T max_distance=0,object_velocity_normal_component=0;TV location,normal_direction,object_velocity,reflected_point;
         for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             if(uncovered_cells(cell_index)){location=euler.grid.Center(cell_index);
                 max_distance=phi_all_solids_negated(cell_index)*(T)2;
@@ -160,7 +160,7 @@ Extrapolate_State_Into_Solids(ARRAY<T,TV_INT>& phi_all_solids_negated,const int 
 
     T band_width=number_of_cells_to_extrapolate*euler.grid.dX.Max();
     T_LINEAR_INTERPOLATION_DIMENSION interpolation;
-    T max_distance,object_velocity_normal_component;TV location,normal_direction,object_velocity,reflected_point;
+    T max_distance=0,object_velocity_normal_component=0;TV location,normal_direction,object_velocity,reflected_point;
     const RANGE<TV>& domain=RANGE<TV>::Intersect(euler.grid.Ghost_Domain(number_of_ghost_cells),mpi_grid?mpi_grid->global_grid.Domain():euler.grid.Domain());
 
     for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();TV location=iterator.Location();
