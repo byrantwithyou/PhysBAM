@@ -24,7 +24,7 @@ class CONSISTENT_INTERSECTIONS<VECTOR<T,2> >
     typedef VECTOR<int,3> I3;
     typedef VECTOR<int,4> I4;
     typedef VECTOR<T,3> T3;
-    enum WORKAROUND {d=TV::m};
+    enum WORKAROUND {d=TV::m,assume=0,prune=1,test=2,safe=3};
 public:
 
     TRIANGULATED_AREA<T>& ta;
@@ -36,8 +36,8 @@ public:
     HASHTABLE<I4,TV> hash_ee;
     HASHTABLE<I4,T3> hash_fv;
 
-    T tol_vv;
-    T tol_ev;
+    T tol_vv[4];
+    T tol_ev[4];
 
     CONSISTENT_INTERSECTIONS(TRIANGULATED_AREA<T>& ta,SEGMENTED_CURVE<TV>& sc)
         :ta(ta),sc(sc)
@@ -45,7 +45,7 @@ public:
 
     ~CONSISTENT_INTERSECTIONS(){}
 
-    void Set_Tol(T tol=(T)1e-5);
+    void Set_Tol();
     bool Compute_VV(int p,int q);
     bool Compute_VE_Helper(int p,I2 e,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xe,T& gamma);
     bool Compute_VE(int p,I2 e);
@@ -67,7 +67,7 @@ class CONSISTENT_INTERSECTIONS<VECTOR<T,3> >
     typedef VECTOR<int,5> I5;
     typedef VECTOR<T,2> T2;
     typedef VECTOR<T,4> T4;
-    enum WORKAROUND {d=TV::m};
+    enum WORKAROUND {d=TV::m,assume=0,prune=1,test=2,safe=3};
 public:
 
     TETRAHEDRALIZED_VOLUME<T>& tv;
@@ -81,10 +81,10 @@ public:
     HASHTABLE<I5,T4> hash_fe,hash_ef;
     HASHTABLE<I5,T4> hash_tv;
 
-    T tol_vv;
-    T tol_ev;
-    T tol_ee;
-    T tol_fv;
+    T tol_vv[4];
+    T tol_ev[4];
+    T tol_ee[4];
+    T tol_fv[4];
 
     CONSISTENT_INTERSECTIONS(TETRAHEDRALIZED_VOLUME<T>& tv,TRIANGULATED_SURFACE<T>& ts)
         :tv(tv),ts(ts)
@@ -92,7 +92,7 @@ public:
 
     ~CONSISTENT_INTERSECTIONS(){}
 
-    void Set_Tol(T tol=(T)1e-5);
+    void Set_Tol();
     bool Compute_VV(int p,int q);
     bool Compute_VE_Helper(int p,I2 e,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xe,T& gamma);
     bool Compute_VE(int p,I2 e);

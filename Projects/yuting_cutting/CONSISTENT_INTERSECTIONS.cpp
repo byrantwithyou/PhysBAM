@@ -26,10 +26,25 @@ using std::abs;
 // Function Set_Tol
 //#####################################################################
 template<class T> void CONSISTENT_INTERSECTIONS<VECTOR<T,2> >::
-Set_Tol(T tol)
+Set_Tol()
 {
-    tol_vv=tol;
-    tol_ev=(T).75*tol_vv;
+    T L_ta=0,L_sc=0;
+    for(int i=0;i<ta.mesh.elements.m;i++)
+        L_ta=max(L_ta,RANGE<TV>::Bounding_Box(ta.particles.X.Subset(ta.mesh.elements(i))).Edge_Lengths().Max());
+    for(int i=0;i<sc.mesh.elements.m;i++)
+        L_sc=max(L_sc,RANGE<TV>::Bounding_Box(sc.particles.X.Subset(sc.mesh.elements(i))).Edge_Lengths().Max());
+    T L=L_ta+L_sc;
+    T eps=std::numeric_limits<T>::epsilon(),sqrt_eps_L=sqrt(eps)*L;
+
+    tol_vv[safe]=54*sqrt_eps_L;
+    tol_vv[assume]=53*sqrt_eps_L;
+    tol_ev[safe]=5*sqrt_eps_L;
+    tol_ev[assume]=4*sqrt_eps_L;
+
+    tol_vv[test]=(3*tol_vv[safe]+tol_vv[assume])/4;
+    tol_vv[prune]=(tol_vv[safe]+3*tol_vv[assume])/4;
+    tol_ev[test]=(3*tol_ev[safe]+tol_ev[assume])/4;
+    tol_ev[prune]=(tol_ev[safe]+3*tol_ev[assume])/4;
 }
 //#####################################################################
 // Function Compute_VV
@@ -37,7 +52,8 @@ Set_Tol(T tol)
 template<class T> bool CONSISTENT_INTERSECTIONS<VECTOR<T,2> >::
 Compute_VV(int p,int q)
 {
-    if((ta.particles.X(p)-sc.particles.X(q)).Magnitude()>tol_vv) return false;
+    T d2=(ta.particles.X(p)-sc.particles.X(q)).Magnitude_Squared();
+    if(d2>sqr(tol_vv[test])) return false;
     hash_vv.Set(I2(p,q));
     return true;
 }
@@ -48,12 +64,14 @@ template<class T> bool CONSISTENT_INTERSECTIONS<VECTOR<T,2> >::
 Compute_VE_Helper(int p,I2 e,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xe,T& gamma)
 {
     TV P=Xp(p),A=Xe(e.x),B=Xe(e.y),u=B-A,w=P-A;
-    T mag=u.Normalize();
-    if(mag<tol_vv*(T).5) return false;
-    T dist=u.Cross(w).Magnitude();
-    if(dist>tol_ev) return false;
-    gamma=u.Dot(w)/mag;
-    return gamma>0 && gamma<1;
+    T m=u.Normalize();
+    if(m<tol_vv[prune]) return false;
+    T d=u.Cross(w).Magnitude();
+    if(d>tol_ev[test]) return false;
+    T a_hat=u.Dot(w),a_bar=m-a_hat;
+    if(a_hat<0 || a_bar<0) return false;
+    gamma=a_hat/m;
+    return true;
 }
 //#####################################################################
 // Function Compute_VE
@@ -98,7 +116,7 @@ Compute_EE(I2 e,I2 g)
         if(hash_ve.Contains(g.Insert(e(i),0))) return false;
         if(hash_ev.Contains(e.Append(g(i)))) return false;}
 
-    T tol=sqr(tol_ev)*(T).5;
+    T tol=sqr(tol_ev[prune]);
     TV A=ta.particles.X(e.x),B=ta.particles.X(e.y);
     TV P=sc.particles.X(g.x),Q=sc.particles.X(g.y);
     T area_ABP=TRIANGLE_2D<T>::Signed_Area(A,B,P);
@@ -124,7 +142,7 @@ Compute_FV(I3 f,int p)
         if(hash_vv.Contains(I2(f(i),p))) return false;
         if(hash_ev.Contains(f.Remove_Index(i).Append(p))) return false;}
 
-    T tol=sqr(tol_ev)*(T).5;
+    T tol=sqr(tol_ev[prune]);
     TV A=ta.particles.X(f.x),B=ta.particles.X(f.y),C=ta.particles.X(f.z);
     TV P=sc.particles.X(p);
     T area_PBC=TRIANGLE_2D<T>::Signed_Area(P,B,C);
@@ -143,6 +161,7 @@ Compute_FV(I3 f,int p)
 template<class T> void CONSISTENT_INTERSECTIONS<VECTOR<T,2> >::
 Compute()
 {
+    Set_Tol();
     sc.Initialize_Hierarchy();
     ARRAY<int> sc_particles(sc.mesh.elements.Flattened());
     sc_particles.Prune_Duplicates();
@@ -158,7 +177,7 @@ Compute()
     ARRAY<ARRAY<int> > a;
     BOX_VISITOR_TRIVIAL v(a);
     a.Resize(ta_particles.m);
-    ta_ph.Intersection_List(sc_ph,v,tol_vv);
+    ta_ph.Intersection_List(sc_ph,v,tol_vv[test]);
     for(int i=0;i<a.m;i++){
         int p=ta_particles(i);
         for(int j=0;j<a(i).m;j++)
@@ -166,7 +185,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(ta_particles.m);
-    ta_ph.Intersection_List(*sc.hierarchy,v,tol_ev);
+    ta_ph.Intersection_List(*sc.hierarchy,v,tol_ev[test]);
     for(int i=0;i<a.m;i++){
         int p=ta_particles(i);
         for(int j=0;j<a(i).m;j++)
@@ -174,7 +193,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(ta_sc.mesh.elements.m);
-    ta_sc.hierarchy->Intersection_List(sc_ph,v,tol_ev);
+    ta_sc.hierarchy->Intersection_List(sc_ph,v,tol_ev[test]);
     for(int i=0;i<a.m;i++){
         I2 e=ta_sc.mesh.elements(i);
         for(int j=0;j<a(i).m;j++)
@@ -182,7 +201,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(ta_sc.mesh.elements.m);
-    ta_sc.hierarchy->Intersection_List(*sc.hierarchy,v,tol_ev);
+    ta_sc.hierarchy->Intersection_List(*sc.hierarchy,v,0);
     for(int i=0;i<a.m;i++){
         I2 e=ta_sc.mesh.elements(i);
         for(int j=0;j<a(i).m;j++)
@@ -190,7 +209,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(ta.mesh.elements.m);
-    ta.hierarchy->Intersection_List(sc_ph,v,tol_ev);
+    ta.hierarchy->Intersection_List(sc_ph,v,0);
     for(int i=0;i<a.m;i++){
         I3 f=ta.mesh.elements(i);
         for(int j=0;j<a(i).m;j++)
@@ -200,12 +219,26 @@ Compute()
 // Function Set_Tol
 //#####################################################################
 template<class T> void CONSISTENT_INTERSECTIONS<VECTOR<T,3> >::
-Set_Tol(T tol)
+Set_Tol()
 {
-    tol_vv=tol;
-    tol_ev=(T).75*tol_vv;
-    tol_ee=(T).5*tol_ev;
-    tol_fv=(T).5*tol_ev;
+    T L_tv=0,L_ts=0;
+    for(int i=0;i<tv.mesh.elements.m;i++)
+        L_tv=max(L_tv,RANGE<TV>::Bounding_Box(tv.particles.X.Subset(tv.mesh.elements(i))).Edge_Lengths().Max());
+    for(int i=0;i<ts.mesh.elements.m;i++)
+        L_ts=max(L_ts,RANGE<TV>::Bounding_Box(ts.particles.X.Subset(ts.mesh.elements(i))).Edge_Lengths().Max());
+    T L=L_tv+L_ts;
+    T eps=std::numeric_limits<T>::epsilon(),sqrt_sqrt_eps_L=sqrt(sqrt(eps))*L;
+
+    T* tol[4]={tol_vv,tol_ev,tol_ee,tol_fv};
+    T safe_scales[4]={7,5,3,3};
+    T assume_scales[4]={6,4,2,2};
+
+    for(int i=0;i<4;i++){
+        T a=safe_scales[i]*sqrt_sqrt_eps_L,b=assume_scales[i]*sqrt_sqrt_eps_L;
+        tol[i][safe]=a;
+        tol[i][assume]=b;
+        tol[i][test]=(3*a+b)/4;
+        tol[i][prune]=(a+3*b)/4;}
 }
 //#####################################################################
 // Function Compute_VV
@@ -213,7 +246,8 @@ Set_Tol(T tol)
 template<class T> bool CONSISTENT_INTERSECTIONS<VECTOR<T,3> >::
 Compute_VV(int p,int q)
 {
-    if((tv.particles.X(p)-ts.particles.X(q)).Magnitude()>tol_vv) return false;
+    T d2=(tv.particles.X(p)-ts.particles.X(q)).Magnitude_Squared();
+    if(d2>sqr(tol_vv[test])) return false;
     hash_vv.Set(I2(p,q));
     return true;
 }
@@ -224,12 +258,14 @@ template<class T> bool CONSISTENT_INTERSECTIONS<VECTOR<T,3> >::
 Compute_VE_Helper(int p,I2 e,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xe,T& gamma)
 {
     TV P=Xp(p),A=Xe(e.x),B=Xe(e.y),u=B-A,w=P-A;
-    T mag=u.Normalize();
-    if(mag<tol_vv) return false;
-    T dist=u.Cross(w).Magnitude();
-    if(dist>tol_ev) return false;
-    gamma=u.Dot(w)/mag;
-    return gamma>0 && gamma<1;
+    T m=u.Normalize();
+    if(m<tol_vv[prune]) return false;
+    T d2=u.Cross(w).Magnitude_Squared();
+    if(d2>sqr(tol_ev[test])) return false;
+    T a_hat=u.Dot(w),a_bar=m-a_hat;
+    if(a_hat<0 || a_bar<0) return false;
+    gamma=a_hat/m;
+    return true;
 }
 //#####################################################################
 // Function Compute_VE
@@ -277,14 +313,14 @@ Compute_EE(I2 e,I2 g)
     TV A=tv.particles.X(e.x),B=tv.particles.X(e.y);
     TV P=ts.particles.X(g.x),Q=ts.particles.X(g.y);
     TV u=B-A,v=Q-P,w=P-A,r=u.Cross(v);
-    T m=r.Normalize();
-    if(m<2*sqr(tol_ev)) return false;
-    T d=r.Dot(w);
-    if(abs(d)>tol_ee) return false;
+    T m2=r.Magnitude_Squared();
+    if(m2<16*sqr(sqr(tol_ev[prune])-sqr(tol_ee[test]))) return false;
+    T d_hat=r.Dot(w);
+    if(sqr(d_hat)>sqr(tol_ee[test])*m2) return false;
     TV n=r.Cross(w);
-    T a=n.Dot(v),b=n.Dot(u);
-    if(a<0 || a>m || b<0 || b>m) return false;
-    hash_ee.Set(e.Append_Elements(g),T2(a,b)/m);
+    T a_hat=n.Dot(v),b_hat=n.Dot(u),a_bar=m2-a_hat,b_bar=m2-b_hat;
+    if(a_hat<0 || a_bar<0 || b_hat<0 || b_bar<0) return false;
+    hash_ee.Set(e.Append_Elements(g),T2(a_hat,b_hat)/m2);
     return true;
 }
 //#####################################################################
@@ -295,15 +331,13 @@ Compute_VF_Helper(int p,I3 f,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xf,TV& gamma)
 {
     TV A=Xf(f.x),B=Xf(f.y),C=Xf(f.z);
     TV P=Xp(p);
-    TV u=B-A,v=C-A,w=P-A,r=u.Cross(v);
-    T m=r.Normalize();
-    if(m<3*sqr(tol_ev)) return false;
-    T d=r.Dot(w);
-    if(abs(d)>tol_fv) return false;
-    TV n=r.Cross(w);
-    T b=n.Dot(v),c=-n.Dot(u),a=m-b-c;
-    if(a<0 || b<0 || c<0) return false;
-    gamma=TV(a,b,c)/m;
+    TV u=B-A,v=C-A,w=P-A,r=u.Cross(v),n=r.Cross(w);
+    T m2=r.Magnitude_Squared();
+    if(m2<108*sqr(sqr(tol_ev[prune])-sqr(tol_fv[test]))) return false;
+    T d_hat=r.Dot(w),b_hat=n.Dot(v),c_hat=-n.Dot(u),a_hat=m2-b_hat-c_hat;
+    if(sqr(d_hat)>sqr(tol_fv[test])*m2) return false;
+    if(a_hat<0 || b_hat<0 || c_hat<0) return false;
+    gamma=TV(a_hat,b_hat,c_hat)/m2;
     return true;
 }
 //#####################################################################
@@ -346,24 +380,24 @@ Compute_EF_Helper(I2 e,I3 f,ARRAY_VIEW<TV> Xe,ARRAY_VIEW<TV> Xf,T& gamma,TV& bar
 {
     TV A=Xf(f.x),B=Xf(f.y),C=Xf(f.z);
     TV P=Xe(e.x),Q=Xe(e.y);
-    T aA=TETRAHEDRON<T>::Signed_Volume(B,C,P,Q);
-    T aB=TETRAHEDRON<T>::Signed_Volume(C,A,P,Q);
-    T aC=TETRAHEDRON<T>::Signed_Volume(A,B,P,Q);
+    T vA=TETRAHEDRON<T>::Signed_Volume(B,C,P,Q);
+    T vB=TETRAHEDRON<T>::Signed_Volume(C,A,P,Q);
+    T vC=TETRAHEDRON<T>::Signed_Volume(A,B,P,Q);
 
-    T tol1=2*tol_fv*sqr(tol_ev);
-    if(abs(aA)<tol1 || abs(aB)<tol1 || abs(aC)<tol1) return false;
-    bool a=aA<0,b=aB<0,c=aC<0;
+    T tol1=2*tol_fv[prune]*sqr(tol_ee[prune]);
+    if(abs(vA)<tol1 || abs(vB)<tol1 || abs(vC)<tol1) return false;
+    bool a=vA<0,b=vB<0,c=vC<0;
     if(a!=b || b!=c) return false;
 
-    T aP=TETRAHEDRON<T>::Signed_Volume(A,B,C,P);
-    T aQ=TETRAHEDRON<T>::Signed_Volume(A,B,C,Q);
-    T tol2=3*sqrt(3)*tol_fv*sqr(tol_ev);
-    if(abs(aP)<tol2 || abs(aQ)<tol2) return false;
-    if((aP<0)==(aQ<0)) return false;
+    T vP=TETRAHEDRON<T>::Signed_Volume(A,B,C,P);
+    T vQ=TETRAHEDRON<T>::Signed_Volume(A,B,C,Q);
+    T tol2=3*sqrt(3)*tol_fv[prune]*sqr(tol_ee[prune]);
+    if(abs(vP)<tol2 || abs(vQ)<tol2) return false;
+    if((vP<0)==(vQ<0)) return false;
 
-    TV g(aA,aB,aC);
+    TV g(vA,vB,vC);
     bary=g/g.Sum();
-    gamma=aP/(aP-aQ);
+    gamma=vP/(vP-vQ);
     return true;
 }
 //#####################################################################
@@ -426,7 +460,7 @@ Compute_TV(I4 t,int p)
         for(int j=i+1;j<4;j++)
             if(hash_ev.Contains(I3(t(i),t(j),p))) return false;
 
-    T tol=cube(tol_fv);
+    T tol=sqrt((T)3)*cube(tol_fv[prune]);
     TV A=tv.particles.X(t(0)),B=tv.particles.X(t(1)),C=tv.particles.X(t(2)),D=tv.particles.X(t(3));
     TV P=ts.particles.X(p);
     T vA=TETRAHEDRON<T>::Signed_Volume(P,B,C,D);
@@ -446,6 +480,7 @@ Compute_TV(I4 t,int p)
 template<class T> void CONSISTENT_INTERSECTIONS<VECTOR<T,3> >::
 Compute()
 {
+    Set_Tol();
     ts.Initialize_Hierarchy();
     SEGMENTED_CURVE<TV> ts_sc(ts.Get_Segment_Mesh(),ts.particles);
     ts_sc.Initialize_Hierarchy();
@@ -466,7 +501,7 @@ Compute()
     ARRAY<ARRAY<int> > a;
     BOX_VISITOR_TRIVIAL v(a);
     a.Resize(tv_particles.m);
-    tv_ph.Intersection_List(ts_ph,v,tol_vv);
+    tv_ph.Intersection_List(ts_ph,v,tol_vv[test]);
     for(int i=0;i<a.m;i++){
         int p=tv_particles(i);
         for(int j=0;j<a(i).m;j++)
@@ -474,7 +509,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(tv_particles.m);
-    tv_ph.Intersection_List(*ts_sc.hierarchy,v,tol_ev);
+    tv_ph.Intersection_List(*ts_sc.hierarchy,v,tol_ev[test]);
     for(int i=0;i<a.m;i++){
         int p=tv_particles(i);
         for(int j=0;j<a(i).m;j++)
@@ -482,7 +517,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(tv_particles.m);
-    tv_ph.Intersection_List(*ts.hierarchy,v,tol_fv);
+    tv_ph.Intersection_List(*ts.hierarchy,v,tol_fv[test]);
     for(int i=0;i<a.m;i++){
         int p=tv_particles(i);
         for(int j=0;j<a(i).m;j++)
@@ -490,7 +525,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(tv_sc.mesh.elements.m);
-    tv_sc.hierarchy->Intersection_List(ts_ph,v,tol_ev);
+    tv_sc.hierarchy->Intersection_List(ts_ph,v,tol_ev[test]);
     for(int i=0;i<a.m;i++){
         I2 e=tv_sc.mesh.elements(i);
         for(int j=0;j<a(i).m;j++)
@@ -498,7 +533,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(tv_sc.mesh.elements.m);
-    tv_sc.hierarchy->Intersection_List(*ts_sc.hierarchy,v,tol_ee);
+    tv_sc.hierarchy->Intersection_List(*ts_sc.hierarchy,v,tol_ee[test]);
     for(int i=0;i<a.m;i++){
         I2 e=tv_sc.mesh.elements(i);
         for(int j=0;j<a(i).m;j++)
@@ -506,7 +541,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(tv_sc.mesh.elements.m);
-    tv_sc.hierarchy->Intersection_List(*ts.hierarchy,v,tol_fv);
+    tv_sc.hierarchy->Intersection_List(*ts.hierarchy,v,tol_fv[test]);
     for(int i=0;i<a.m;i++){
         I2 e=tv_sc.mesh.elements(i);
         for(int j=0;j<a(i).m;j++)
@@ -514,7 +549,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(tv_ts.mesh.elements.m);
-    tv_ts.hierarchy->Intersection_List(ts_ph,v,tol_fv);
+    tv_ts.hierarchy->Intersection_List(ts_ph,v,tol_fv[test]);
     for(int i=0;i<a.m;i++){
         I3 f=tv_ts.mesh.elements(i);
         for(int j=0;j<a(i).m;j++)
@@ -522,7 +557,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(tv_ts.mesh.elements.m);
-    tv_ts.hierarchy->Intersection_List(*ts_sc.hierarchy,v,tol_fv);
+    tv_ts.hierarchy->Intersection_List(*ts_sc.hierarchy,v,0);
     for(int i=0;i<a.m;i++){
         I3 f=tv_ts.mesh.elements(i);
         for(int j=0;j<a(i).m;j++)
@@ -530,7 +565,7 @@ Compute()
 
     a.Remove_All();
     a.Resize(tv.mesh.elements.m);
-    tv.hierarchy->Intersection_List(ts_ph,v,tol_fv);
+    tv.hierarchy->Intersection_List(ts_ph,v,0);
     for(int i=0;i<a.m;i++){
         I4 t=tv.mesh.elements(i);
         for(int j=0;j<a(i).m;j++)
