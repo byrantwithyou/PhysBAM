@@ -10,8 +10,6 @@ namespace PhysBAM{
 template<class TV> template<class T_VISITOR> void BOX_HIERARCHY<TV>::
 Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const int self_box,const int other_box,const T extra_thickness) const
 {
-    assert((IS_SAME<T,ZERO>::value || !!extra_thickness));
-
     // borrow stack ownership to improve aliasing semantics
     STACK<VECTOR<int,2> > stack;stack.Exchange(dual_traversal_stack); // borrow stack ownership to improve aliasing semantics
     assert(stack.Empty());stack.Push(VECTOR<int,2>(self_box,other_box));
