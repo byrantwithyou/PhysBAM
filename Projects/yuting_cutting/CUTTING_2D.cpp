@@ -23,6 +23,7 @@
 #include "CUTTING_2D.h"
 #include "CONSISTENT_INTERSECTIONS.h"
 using namespace PhysBAM;
+using namespace std;
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -42,6 +43,7 @@ Run(T tol)
     intersections.Set_Tol();
     intersections.Compute();
 
+    cout << "here" << endl;
     ARRAY<ARRAY<int> > inter_list;
     BOX_VISITOR_TRIVIAL v(inter_list);
     int num_old_tris=ta.mesh.elements.m;
@@ -125,8 +127,11 @@ Run(T tol)
                 else{
                     tri_cuttings.Append(tc_new);
                     ta.mesh.elements.Append(new_tri);
-                    split_tris.Set(tri_cuttings.m-1);}}}}
-    //neighbors also need to duplicate
+                    split_tris.Set(tri_cuttings.m-1);}}
+            //neighbors also need to duplicate
+            
+        }
+    }
     
     //union
     HASHTABLE<I3,I2> ht;
@@ -185,9 +190,9 @@ Run(T tol)
                 new_tri_particles.Set(tri.Sorted(),p);
                 TV par;
                 for(int j=0;j<3;++j)
-                    par+=ta.particles.X(tri(i))*tc.face_center(j);
-                int p=ta.particles.Add_Element();
-                ta.particles.X(p)=par;}
+                    par+=ta.particles.X(tri(i))*tc.face_center.Value()(j);
+                int pp=ta.particles.Add_Element();
+                ta.particles.X(pp)=par;}
             for(int j=0;j<3;++j){
                 int q;
                 I2 e(tri(j),tri((j+1)%3));
@@ -195,10 +200,10 @@ Run(T tol)
                     q=ta.particles.X.m;
                     new_edge_particles.Get(e.Sorted(),p);
                     TV par;
-                    for(int k=0;k<2;++j)
-                        par+=ta.particles.X(e(k))*tc.face_center(j);
-                    int p=ta.particles.Add_Element();
-                    ta.particles.X(p)=par;}
+                    for(int k=0;k<2;++k)
+                        par+=ta.particles.X(e(k))*tc.edge_centers(j).Value()(k);
+                    int pp=ta.particles.Add_Element();
+                    ta.particles.X(pp)=par;}
                 if(tc.material.Contains(2*j))
                     new_elements.Append(I3(e(0),q,p));
                 if(tc.material.Contains(2*j+1))

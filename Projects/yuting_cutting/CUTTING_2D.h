@@ -32,20 +32,47 @@ public:
     TRIANGULATED_AREA<T>& ta;
     SEGMENTED_CURVE<TV>& sc;
     
+    template<class TV>
+    struct POTENTIAL_CENTER
+    {
+        TV sum;
+        int n;
+        bool set;
+        
+        POTENTIAL_CENTER():n(0),set(0)
+        {
+        }
+        
+        TV Value()
+        {
+            if(!n){
+                TV c;
+                for(int i=0;i<TV::m;++i)
+                    c(i)=1./TV::m;
+                return c;
+            }
+            return sum/n;
+        }
+        
+        void Add(const TV& c){
+            if(!set){
+                sum+=c;
+                ++n;
+            }
+        }
+    };
+    
     struct TRI_CUTTING
     {
         ARRAY<int> material;
         VECTOR<bool,12> turned_on;
-        VECTOR<TV,3> edge_centers;
-        T3 face_center;
+        VECTOR<POTENTIAL_CENTER<TV>,3> edge_centers;
+        POTENTIAL_CENTER<T3> face_center;
         
         TRI_CUTTING()
         {
             for(int i=0;i<6;++i)
                 material.Append(i);
-            for(int i=0;i<3;++i)
-                edge_centers(i)=TV(0.5,0.5);
-            face_center=T3(1./3,1./3,1./3);
         }
     };
     ARRAY<TRI_CUTTING> tri_cuttings;
