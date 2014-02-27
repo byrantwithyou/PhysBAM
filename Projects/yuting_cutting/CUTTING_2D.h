@@ -25,6 +25,7 @@ class CUTTING<VECTOR<T,2> >
     typedef VECTOR<int,2> I2;
     typedef VECTOR<int,3> I3;
     typedef VECTOR<int,4> I4;
+    typedef VECTOR<int,5> I5;
     typedef VECTOR<T,3> T3;
     enum WORKAROUND {d=TV::m};
     
@@ -45,19 +46,14 @@ public:
         
         TV Value()
         {
-            if(!n){
-                TV c;
-                for(int i=0;i<TV::m;++i)
-                    c(i)=1./TV::m;
-                return c;
-            }
+            if(!n) return TV()+(T)1/TV::m;
             return sum/n;
         }
         
         void Add(const TV& c){
             if(!set){
                 sum+=c;
-                ++n;
+                n++;
             }
         }
     };
@@ -71,7 +67,7 @@ public:
         
         TRI_CUTTING()
         {
-            for(int i=0;i<6;++i)
+            for(int i=0;i<6;i++)
                 material.Append(i);
         }
     };

@@ -43,18 +43,78 @@ Run(T tol)
     intersections.Set_Tol();
     intersections.Compute();
 
+    HASHTABLE<I3,int> tri_from_face;
+    HASHTABLE<I2,ARRAY<int> > tri_from_edge;
+    ARRAY<ARRAY<int> > tri_from_vertex(ta.particles.number);
+
+    for(int i=0;i<ta.mesh.elements.m;i++){
+        I3 e=ta.mesh.elements(i).Sorted();
+        tri_from_face.Set(e,i);
+        for(int j=0;j<3;j++) tri_from_edge.Get_Or_Insert(e.Remove_Index(j)).Append(i);
+        for(int j=0;j<3;j++) tri_from_vertex(e(j)).Append(i);}
+
+    HASHTABLE<I2,int> seg_from_edge;
+    ARRAY<ARRAY<int> > seg_from_vertex(ta.particles.number);
+
+    for(int i=0;i<sc.mesh.elements.m;i++){
+        I2 e=sc.mesh.elements(i).Sorted();
+        seg_from_edge.Set(e,i);
+        for(int j=0;j<3;j++) seg_from_vertex(e(j)).Append(i);}
+
+    typedef PAIR<I5,T3> P;
+    HASHTABLE<int,HASHTABLE<int,ARRAY<P> > > components;
+
+    for(typename HASHTABLE<I2>::ITERATOR it(intersections.hash_vv);it.Valid();it.Next()){
+        I2 key=it.Key();
+        const ARRAY<int>& a=tri_from_vertex(key.x);
+        const ARRAY<int>& b=seg_from_vertex(key.y);
+        for(int i=0;i<a.m;i++)
+            for(int j=0;j<b.m;j++)
+                components.Get_Or_Insert(a(i)).Get_Or_Insert(b(j)).Append(P(I5(key.x,-1,-1,key.y,-1),T3()));}
+
+    for(typename HASHTABLE<I3,T>::ITERATOR it(intersections.hash_ve);it.Valid();it.Next()){
+        I3 key=it.Key();
+        const ARRAY<int>& a=tri_from_vertex(key.x);
+        int b=seg_from_edge.Get(key.Remove_Index(0));
+        for(int i=0;i<a.m;i++)
+            components.Get_Or_Insert(a(i)).Get_Or_Insert(b).Append(P(I5(key.x,-1,-1,key.y,key.z),T3(it.Data(),0,0)));}
+
+    for(typename HASHTABLE<I3,T>::ITERATOR it(intersections.hash_ev);it.Valid();it.Next()){
+        I3 key=it.Key();
+        const ARRAY<int>& a=tri_from_edge.Get(key.Remove_Index(2));
+        const ARRAY<int>& b=seg_from_vertex(key.z);
+        for(int i=0;i<a.m;i++)
+            for(int j=0;j<b.m;j++)
+                components.Get_Or_Insert(a(i)).Get_Or_Insert(b(j)).Append(P(I5(key.x,key.y,-1,key.z,-1),T3(it.Data(),0,0)));}
+
+    for(typename HASHTABLE<I4,TV>::ITERATOR it(intersections.hash_ee);it.Valid();it.Next()){
+        I4 key=it.Key();
+        const ARRAY<int>& a=tri_from_edge.Get(I2(key(0),key(1)));
+        int b=seg_from_edge.Get(I2(key(2),key(3)));
+        for(int i=0;i<a.m;i++)
+            components.Get_Or_Insert(a(i)).Get_Or_Insert(b).Append(P(key.Insert(-1,2),it.Data().Append(0)));}
+
+    for(typename HASHTABLE<I4,T3>::ITERATOR it(intersections.hash_fv);it.Valid();it.Next()){
+        I4 key=it.Key();
+        int a=tri_from_face.Get(key.Remove_Index(3));
+        const ARRAY<int>& b=seg_from_vertex(key.Last());
+        for(int j=0;j<b.m;j++)
+            components.Get_Or_Insert(a).Get_Or_Insert(b(j)).Append(P(key.Append(-1),it.Data()));}
+
+
+
+
+
     cout << "here" << endl;
-    ARRAY<ARRAY<int> > inter_list;
-    BOX_VISITOR_TRIVIAL v(inter_list);
     int num_old_tris=ta.mesh.elements.m;
-    inter_list.Resize(num_old_tris);
-    ARRAY<int> parent_particles(num_old_tris);
-    for(int i=0;i<num_old_tris;++i)
-        parent_particles(i)=i;
+    ARRAY<ARRAY<int> > inter_list(num_old_tris);
+    BOX_VISITOR_TRIVIAL v(inter_list);
+    ARRAY<int> parent_particles(IDENTITY_ARRAY<>(ta.particles.number));
     ta.hierarchy->Intersection_List(*sc.hierarchy,v,tol);
     
     //turn on
     HASHTABLE<int> split_tris;
+    tri_cuttings.Resize(num_old_tris);
     for(int i=0;i<num_old_tris;i++){
         TRI_CUTTING tc=tri_cuttings(i);
         I3 tri=ta.mesh.elements(i);
