@@ -114,7 +114,6 @@ void mouse(int button, int state, int x, int y)
                 glEnd();
                 unsigned char val;
                 glReadPixels(x, HEIGHT-y, 1, 1, GL_RED, GL_UNSIGNED_BYTE, &val);
-                cout << (int)val << endl;
                 dragging_particles.Clean_Memory();
                 for(int t=0;t<ta->mesh.elements.m;t++)
                     if(labels(t)==(int)val)
@@ -207,19 +206,19 @@ void Initialize_Meshes()
 {
     //ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),3);
     ta=TRIANGULATED_AREA<T>::Create();
-    ta->particles.Add_Elements(3);
+    ta->particles.Add_Elements(4);
     ta->particles.X(0)=TV(0,.5);
     ta->particles.X(1)=TV(-.5,0);
     ta->particles.X(2)=TV(.5,0); 
     ta->particles.X(3)=TV(0,-.5);
     ta->mesh.elements.Append(I3(0,1,2));
-    //ta->mesh.elements.Append(I3(2,1,3));
+    ta->mesh.elements.Append(I3(2,1,3));
     ta->Update_Number_Nodes();
     
     sc=SEGMENTED_CURVE_2D<T>::Create();
     sc->particles.Add_Elements(2);
-    sc->particles.X(0)=TV(0,1);
-    sc->particles.X(1)=TV(0,0);
+    sc->particles.X(0)=TV(.1,.8);
+    sc->particles.X(1)=TV(.1,-.8);
     sc->mesh.elements.Append(I2(0,1));
     
     CUTTING<TV> cutting(*ta,*sc);
