@@ -38,6 +38,7 @@ CUTTING(TRIANGULATED_AREA<T>& ta,SEGMENTED_CURVE<TV>& sc)
 template<class T> void CUTTING<VECTOR<T,2> >::
 Run(T tol)
 {
+    cout<<"*********cutting**************"<<endl;
     //preprocessing
     cout<<"preprocessing"<<endl;
     CONSISTENT_INTERSECTIONS<TV> intersections(ta,sc);
@@ -358,6 +359,8 @@ Run(T tol)
     ta.particles.X=new_par;
     ta.mesh.elements=new_elements;
     ta.Update_Number_Nodes();
+    
+    cout<<"*********cutting done**************"<<endl;
 }
 //#####################################################################
 template class CUTTING<VECTOR<double,2> >;
