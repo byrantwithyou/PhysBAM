@@ -188,7 +188,7 @@ void Render(){
 
 void Initialize_Meshes()
 {
-    ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),5);
+    ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),20);
 //    ta=TRIANGULATED_AREA<T>::Create();
 //    ta->particles.Add_Elements(4);
 //    ta->particles.X(0)=TV(0,.5);

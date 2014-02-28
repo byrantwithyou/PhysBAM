@@ -290,6 +290,7 @@ Run(T tol)
     HASHTABLE<I2,int> new_edge_particles;
     HASHTABLE<I3,int> new_tri_particles;
     ARRAY<I3> new_elements;
+    //subdivide split tris
     for(int i=0;i<tri_cuttings.m;++i){
         TRI_CUTTING tc=tri_cuttings(i);
         if(tc.materials.Find(0)!=-1){
@@ -318,6 +319,7 @@ Run(T tol)
                         new_elements.Append(I3(e(0),q,p));
                     if(tc.materials(2*j+1))
                         new_elements.Append(I3(q,e(1),p));}}}}
+    //subdivide neighbors
     for(int i=0;i<tri_cuttings.m;++i){
         I3 tri=ta.mesh.elements(i);
         if(tri_cuttings(i).materials.Find(0)==-1){
