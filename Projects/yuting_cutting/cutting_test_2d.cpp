@@ -41,7 +41,6 @@ typedef VECTOR<int,3> I3;
 //global variables
 int argc1;
 char **argv1;
-bool dragging=0;//dragging=0 means cutting
 TV starting_position;
 T trans_speed=0.1;
 T scale_speed=1.1;
@@ -49,107 +48,91 @@ TRIANGULATED_AREA<T>* ta;
 SEGMENTED_CURVE_2D<T>* sc;
 ARRAY<int> labels;
 HASHTABLE<int> dragging_particles;
-
-static void SpecialKey(int key,int x,int y)
-{
-    switch(key){
-        case GLUT_KEY_DOWN:
-            for(int i=0;i<ta->particles.X.m;++i){
-                ta->particles.X(i)/=scale_speed;
-                sc->particles.X(i)/=scale_speed;
-            }
-            break;
-        case GLUT_KEY_UP:
-            for(int i=0;i<ta->particles.X.m;++i){
-                ta->particles.X(i)*=scale_speed;
-                sc->particles.X(i)*=scale_speed;
-            }
-            break;
-        case GLUT_KEY_RIGHT:
-            for(int i=0;i<ta->particles.X.m;++i){
-                ta->particles.X(i)+=trans_speed;
-                sc->particles.X(i)+=trans_speed;
-            }
-            break;
-        case GLUT_KEY_LEFT:
-            for(int i=0;i<ta->particles.X.m;++i){
-                ta->particles.X(i)-=trans_speed;
-                sc->particles.X(i)-=trans_speed;
-            }
-            break;
-    }
-    glutPostRedisplay();
-}
+bool dragging=false,cutting=false;
 
 static void Key(unsigned char key, int x, int y)
 {
     switch( key ) {
         case 033: // Escape Key
-            exit( EXIT_SUCCESS );
-            break;
-        case 'd':
-            dragging = 1;
-            break;
-        case 'c':
-            dragging = 0;
+            exit(EXIT_SUCCESS);
             break;
     }
 }
 
-void mouse(int button, int state, int x, int y)
+void Mouse(int button, int state, int x, int y)
 {
     TV location(2*x/T(WIDTH)-1,1-2*y/T(HEIGHT));
+    if(button==4){
+        for(int i=0;i<ta->particles.X.m;++i)
+            ta->particles.X(i)/=scale_speed;
+        for(int i=0;i<sc->particles.X.m;++i)
+            sc->particles.X(i)/=scale_speed;
+        glutPostRedisplay();
+        return;
+    }
+    else if(button==3){
+        for(int i=0;i<ta->particles.X.m;++i)
+            ta->particles.X(i)*=scale_speed;
+        for(int i=0;i<sc->particles.X.m;++i)
+            sc->particles.X(i)*=scale_speed;
+        glutPostRedisplay();
+        return;            
+    }
     if(state==GLUT_DOWN){
-        if(button==GLUT_LEFT_BUTTON){
-            if(dragging){
-                starting_position=location;
-                glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                glBegin(GL_TRIANGLES);
-                for(int t=0;t<ta->mesh.elements.m;t++){
-                    I3 tri=ta->mesh.elements(t);
-                    glColor4d(labels(t)/255.,0,0,0);
-                    for(int j=0;j<3;++j)
-                        glVertex2d(ta->particles.X(tri(j))(0),ta->particles.X(tri(j))(1));
-                }
-                glEnd();
-                unsigned char val;
-                glReadPixels(x, HEIGHT-y, 1, 1, GL_RED, GL_UNSIGNED_BYTE, &val);
-                dragging_particles.Clean_Memory();
-                for(int t=0;t<ta->mesh.elements.m;t++)
-                    if(labels(t)==(int)val)
-                        for(int i=0;i<3;++i)
-                            dragging_particles.Set(ta->mesh.elements(t)(i));
+        if(button==GLUT_RIGHT_BUTTON){
+            dragging=true;
+            cutting=false;
+            starting_position=location;
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glBegin(GL_TRIANGLES);
+            for(int t=0;t<ta->mesh.elements.m;t++){
+                I3 tri=ta->mesh.elements(t);
+                glColor4d(labels(t)/255.,0,0,0);
+                for(int j=0;j<3;++j)
+                    glVertex2d(ta->particles.X(tri(j))(0),ta->particles.X(tri(j))(1));
             }
-            else{
-                delete sc;
-                sc=SEGMENTED_CURVE_2D<T>::Create();
-                int p=sc->particles.Add_Element();
-                sc->Update_Number_Nodes();
-                sc->particles.X(p)=location;
-            }
+            glEnd();
+            unsigned char val;
+            glReadPixels(x, HEIGHT-y, 1, 1, GL_RED, GL_UNSIGNED_BYTE, &val);
+            dragging_particles.Clean_Memory();
+            for(int t=0;t<ta->mesh.elements.m;t++)
+                if(labels(t)==(int)val)
+                    for(int i=0;i<3;++i)
+                        dragging_particles.Set(ta->mesh.elements(t)(i));
+        }
+        else if(button==GLUT_LEFT_BUTTON){
+            cutting=true;
+            dragging=false;
+            delete sc;
+            sc=SEGMENTED_CURVE_2D<T>::Create();
+            int p=sc->particles.Add_Element();
+            sc->Update_Number_Nodes();
+            sc->particles.X(p)=location;
         }
     }
-    else if(state==GLUT_UP)
+    else if(state==GLUT_UP){
         if(button==GLUT_LEFT_BUTTON){
-            if(!dragging){
-                CUTTING<TV> cutting(*ta,*sc);
-                cutting.Run(.01);
-                ta->mesh.Identify_Connected_Components(labels);
-                glutPostRedisplay();
-            }
+            CUTTING<TV> cutter(*ta,*sc);
+            cutter.Run(.01);
+            ta->mesh.Identify_Connected_Components(labels);
+            cutting=false;
+            glutPostRedisplay();
         }
+        else if(button==GLUT_RIGHT_BUTTON)
+            dragging=false;
+    }
 }
 
-void motion(int x, int y)
+void Motion(int x, int y)
 {
     TV location(2*x/T(WIDTH)-1,1-2*y/T(HEIGHT));
-    if (!dragging) {
+    if (cutting){
         int p=sc->particles.Add_Element();
         sc->particles.X(p)=location;
         sc->mesh.elements.Append(I2(p-1,p));
         sc->Update_Number_Nodes();
     }
-    else {
+    else if(dragging){
         for(typename HASHTABLE<int>::ITERATOR it(dragging_particles);it.Valid();it.Next())
             ta->particles.X(it.Key())+=(location-starting_position);
         starting_position=location;
@@ -157,7 +140,7 @@ void motion(int x, int y)
     glutPostRedisplay();
 }
 
-void display(){
+void Render(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnableClientState(GL_VERTEX_ARRAY);
     
@@ -205,27 +188,32 @@ void display(){
 
 void Initialize_Meshes()
 {
-    //ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),3);
-    ta=TRIANGULATED_AREA<T>::Create();
-    ta->particles.Add_Elements(4);
-    ta->particles.X(0)=TV(0,.5);
-    ta->particles.X(1)=TV(-.5,0);
-    ta->particles.X(2)=TV(.5,0); 
-    ta->particles.X(3)=TV(0,-.5);
-    ta->mesh.elements.Append(I3(0,1,2));
-    ta->mesh.elements.Append(I3(2,1,3));
-    ta->Update_Number_Nodes();
+    ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),5);
+//    ta=TRIANGULATED_AREA<T>::Create();
+//    ta->particles.Add_Elements(4);
+//    ta->particles.X(0)=TV(0,.5);
+//    ta->particles.X(1)=TV(-.5,0);
+//    ta->particles.X(2)=TV(.5,0); 
+//    ta->particles.X(3)=TV(0,-.5);
+//    ta->mesh.elements.Append(I3(0,1,2));
+//    ta->mesh.elements.Append(I3(2,1,3));
+//    ta->Update_Number_Nodes();
+    ta->mesh.Identify_Connected_Components(labels);
     
     sc=SEGMENTED_CURVE_2D<T>::Create();
-    sc->particles.Add_Elements(2);
-    sc->particles.X(0)=TV(.1,.8);
-    sc->particles.X(1)=TV(.1,-.8);
-    sc->mesh.elements.Append(I2(0,1));
+     
+//    sc->particles.Add_Elements(3);
+//    sc->particles.X(0)=TV(.1,.8);
+//    sc->particles.X(1)=TV(.1,-.1);
+//    sc->particles.X(2)=TV(.1,-.8);
+//    sc->mesh.elements.Append(I2(0,1));
+//    sc->mesh.elements.Append(I2(1,2));
+//    CUTTING<TV> cutter(*ta,*sc);
+//    cutter.Run(0.01);
+//    ta->mesh.Identify_Connected_Components(labels);
+//    cout << "cc: " << labels << endl;
     
-    CUTTING<TV> cutting(*ta,*sc);
-    cutting.Run(0.01);
-    ta->mesh.Identify_Connected_Components(labels);
-    cout << "cc: " << labels << endl;
+    
     cout << "initialized mesh\n";
 }
 
@@ -243,12 +231,12 @@ int main(int argc, char **argv)
     
     Initialize_Meshes();
     
-    glutSpecialFunc(SpecialKey);
+    //glutSpecialFunc(Special_Key);
     glutKeyboardFunc(Key);
-    glutMouseFunc(mouse);
-    glutMotionFunc(motion);
-    glutDisplayFunc(display);
-                   
+    glutMouseFunc(Mouse);
+    glutMotionFunc(Motion);
+    glutDisplayFunc(Render);  
+    
     glutMainLoop();
     
     return 0;
