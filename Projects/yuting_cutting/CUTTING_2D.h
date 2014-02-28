@@ -27,6 +27,7 @@ class CUTTING<VECTOR<T,2> >
     typedef VECTOR<int,4> I4;
     typedef VECTOR<int,5> I5;
     typedef VECTOR<T,3> T3;
+    
     enum WORKAROUND {d=TV::m};
     
 public:
@@ -46,7 +47,7 @@ public:
         
         TV Value()
         {
-            if(!n) return TV()+(T)1/TV::m;
+            if(!n||!set) return TV()+(T)1/TV::m;
             return sum/n;
         }
         
@@ -60,15 +61,14 @@ public:
     
     struct TRI_CUTTING
     {
-        ARRAY<int> material;
+        VECTOR<bool,6> materials;
         VECTOR<bool,12> turned_on;
         VECTOR<POTENTIAL_CENTER<TV>,3> edge_centers;
         POTENTIAL_CENTER<T3> face_center;
         
         TRI_CUTTING()
         {
-            for(int i=0;i<6;i++)
-                material.Append(i);
+            materials.Fill(1);
         }
     };
     ARRAY<TRI_CUTTING> tri_cuttings;
