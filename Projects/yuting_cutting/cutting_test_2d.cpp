@@ -121,7 +121,8 @@ void mouse(int button, int state, int x, int y)
                             dragging_particles.Set(ta->mesh.elements(t)(i));
             }
             else{
-                sc->Clean_Memory();
+                delete sc;
+                sc=SEGMENTED_CURVE_2D<T>::Create();
                 int p=sc->particles.Add_Element();
                 sc->Update_Number_Nodes();
                 sc->particles.X(p)=location;

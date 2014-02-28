@@ -120,7 +120,7 @@ Run(T tol)
                 const I5& p=intersects(k).x;
                 const T3& weight=intersects(k).y;
                 if(p(1)==-1)
-                    hit(tri.Find(p(0)*2))=1;
+                    hit(tri.Find(p(0))*2)=1;
                 else if(p(2)==-1){
                     I2 e(tri.Find(p(0)),tri.Find(p(1)));
                     e.Sort();
