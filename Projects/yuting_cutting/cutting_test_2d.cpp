@@ -27,9 +27,6 @@
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Tools/Data_Structures/HASHTABLE.h>
 
-#define WIDTH 600
-#define HEIGHT 600
-
 using namespace PhysBAM;
 using namespace std;
 
@@ -41,6 +38,8 @@ typedef VECTOR<int,3> I3;
 //global variables
 int argc1;
 char **argv1;
+int window_width=600;
+int window_height=600;
 TV starting_position;
 T trans_speed=0.1;
 T scale_speed=1.1;
@@ -61,7 +60,7 @@ static void Key(unsigned char key, int x, int y)
 
 void Mouse(int button, int state, int x, int y)
 {
-    TV location(2*x/T(WIDTH)-1,1-2*y/T(HEIGHT));
+    TV location(2*x/T(window_width)-1,1-2*y/T(window_height));
     if(button==4){
         for(int i=0;i<ta->particles.X.m;++i)
             ta->particles.X(i)/=scale_speed;
@@ -93,7 +92,7 @@ void Mouse(int button, int state, int x, int y)
             }
             glEnd();
             unsigned char val;
-            glReadPixels(x, HEIGHT-y, 1, 1, GL_RED, GL_UNSIGNED_BYTE, &val);
+            glReadPixels(x, window_height-y, 1, 1, GL_RED, GL_UNSIGNED_BYTE, &val);
             dragging_particles.Clean_Memory();
             for(int t=0;t<ta->mesh.elements.m;t++)
                 if(labels(t)==(int)val)
@@ -133,7 +132,7 @@ void Mouse(int button, int state, int x, int y)
 
 void Motion(int x, int y)
 {
-    TV location(2*x/T(WIDTH)-1,1-2*y/T(HEIGHT));
+    TV location(2*x/T(window_width)-1,1-2*y/T(window_height));
     if (cutting){
         int p=sc->particles.Add_Element();
         sc->particles.X(p)=location;
@@ -194,18 +193,27 @@ void Render(){
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
+void Reshape(GLint newWidth,GLint newHeight) {
+    glViewport(0,0,newWidth,newHeight);
+    window_width=newWidth;
+    window_height=newHeight;
+    glutPostRedisplay();
+}
+
+
 void Initialize_Meshes()
 {
-    //ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),20);
-    ta=TRIANGULATED_AREA<T>::Create();
-    ta->particles.Add_Elements(4);
-    ta->particles.X(0)=TV(0,.5);
-    ta->particles.X(1)=TV(-.5,0);
-    ta->particles.X(2)=TV(.5,0); 
-    ta->particles.X(3)=TV(0,-.5);
-    ta->mesh.elements.Append(I3(0,1,2));
-    //ta->mesh.elements.Append(I3(2,1,3));
-    ta->Update_Number_Nodes();
+    ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),20);
+//    ta=TRIANGULATED_AREA<T>::Create();
+//    ta->particles.Add_Elements(4);
+//    ta->particles.X(0)=TV(0,.5);
+//    ta->particles.X(1)=TV(-.5,0);
+//    ta->particles.X(2)=TV(.5,0); 
+//    ta->particles.X(3)=TV(0,-.5);
+//    ta->mesh.elements.Append(I3(0,1,2));
+//    //ta->mesh.elements.Append(I3(2,1,3));
+//    ta->Update_Number_Nodes();
+
     ta->mesh.Identify_Connected_Components(labels);
     
     sc=SEGMENTED_CURVE_2D<T>::Create();
@@ -231,7 +239,7 @@ int main(int argc, char **argv)
     argv1 = argv;
     glutInit( &argc, argv );
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
-    glutInitWindowSize(WIDTH,HEIGHT);
+    glutInitWindowSize(window_width,window_height);
     string window_name="cutting";
     glutCreateWindow(window_name.c_str());
     glClearColor(0.0,0.0,0.0,1.0);
@@ -244,6 +252,7 @@ int main(int argc, char **argv)
     glutMouseFunc(Mouse);
     glutMotionFunc(Motion);
     glutDisplayFunc(Render);  
+    glutReshapeFunc(Reshape);
     
     glutMainLoop();
     
