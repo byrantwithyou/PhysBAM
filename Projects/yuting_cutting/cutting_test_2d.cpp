@@ -43,11 +43,33 @@ int window_height=600;
 TV starting_position;
 T trans_speed=0.1;
 T scale_speed=1.1;
-TRIANGULATED_AREA<T>* ta;
-SEGMENTED_CURVE_2D<T>* sc;
+TRIANGULATED_AREA<T>* ta=NULL;
+SEGMENTED_CURVE_2D<T>* sc=NULL;
 ARRAY<int> labels;
 HASHTABLE<int> dragging_particles;
 bool dragging=false,cutting=false;
+
+void Run_Cutter()
+{
+    CUTTING<TV> cutter(*ta,*sc);
+    if(sc->mesh.elements.m>0){
+        cutter.Run(.01);
+        ta->mesh.Identify_Connected_Components(labels);
+        cutting=false;
+        
+        //reinitialize cutter->ta
+        TRIANGULATED_AREA<T>* nta=TRIANGULATED_AREA<T>::Create();
+        nta->particles.Resize(ta->particles.X.m);
+        for(int i=0;i<ta->particles.X.m;++i)
+            nta->particles.X(i)=ta->particles.X(i);
+        nta->mesh.elements=ta->mesh.elements;
+        nta->Update_Number_Nodes();
+        delete ta;
+        ta=nta;
+    }
+    delete sc;
+    sc=SEGMENTED_CURVE_2D<T>::Create();
+}
 
 static void Key(unsigned char key, int x, int y)
 {
@@ -89,7 +111,7 @@ void Mouse(int button, int state, int x, int y)
         for(int i=0;i<sc->particles.X.m;++i)
             sc->particles.X(i)*=scale_speed;
         glutPostRedisplay();
-        return;            
+        return;
     }
     if(state==GLUT_DOWN){
         if(button==GLUT_RIGHT_BUTTON){
@@ -116,8 +138,6 @@ void Mouse(int button, int state, int x, int y)
         else if(button==GLUT_LEFT_BUTTON){
             cutting=true;
             dragging=false;
-            delete sc;
-            sc=SEGMENTED_CURVE_2D<T>::Create();
             int p=sc->particles.Add_Element();
             sc->Update_Number_Nodes();
             sc->particles.X(p)=location;
@@ -125,18 +145,7 @@ void Mouse(int button, int state, int x, int y)
     }
     else if(state==GLUT_UP){
         if(button==GLUT_LEFT_BUTTON){
-            CUTTING<TV> cutter(*ta,*sc);
-            cutter.Run(.01);
-            ta->mesh.Identify_Connected_Components(labels);
-            cutting=false;
-            TRIANGULATED_AREA<T>* nta=TRIANGULATED_AREA<T>::Create();
-            nta->particles.Resize(ta->particles.X.m);
-            for(int i=0;i<ta->particles.X.m;++i)
-                nta->particles.X(i)=ta->particles.X(i);
-            nta->mesh.elements=ta->mesh.elements;
-            nta->Update_Number_Nodes();
-            delete ta;
-            ta=nta;
+            Run_Cutter();
             glutPostRedisplay();
         }
         else if(button==GLUT_RIGHT_BUTTON)
@@ -176,12 +185,12 @@ void Render(){
     glDrawArrays(GL_LINES,0,vertices.m);
     
     vertices.Remove_All();
-//    ta->mesh.Initialize_Boundary_Mesh();
-//    for(int t=0;t<ta->mesh.boundary_mesh->elements.m;t++){
-//        I2 edge=ta->mesh.boundary_mesh->elements(t);
-//        for(int i=0;i<2;++i)
-//            vertices.Append(ta->particles.X(edge(i)));
-//    }
+    //    ta->mesh.Initialize_Boundary_Mesh();
+    //    for(int t=0;t<ta->mesh.boundary_mesh->elements.m;t++){
+    //        I2 edge=ta->mesh.boundary_mesh->elements(t);
+    //        for(int i=0;i<2;++i)
+    //            vertices.Append(ta->particles.X(edge(i)));
+    //    }
     for(int t=0;t<ta->mesh.elements.m;t++){
         I3 tri=ta->mesh.elements(t);
         for(int i=0;i<3;++i){
@@ -216,42 +225,36 @@ void Reshape(GLint newWidth,GLint newHeight) {
 
 void Initialize_Meshes()
 {
-    ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),20);
+    //ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),20);
     ta=TRIANGULATED_AREA<T>::Create();
     ta->particles.Add_Elements(4);
     ta->particles.X(0)=TV(0,.5);
     ta->particles.X(1)=TV(-.5,0);
-    ta->particles.X(2)=TV(.5,0); 
+    ta->particles.X(2)=TV(.5,0);
     ta->particles.X(3)=TV(0,-.5);
     ta->mesh.elements.Append(I3(0,1,2));
     ta->mesh.elements.Append(I3(2,1,3));
     ta->Update_Number_Nodes();
-
+    
     ta->mesh.Identify_Connected_Components(labels);
     
     sc=SEGMENTED_CURVE_2D<T>::Create();
-     
+    
     sc->particles.Add_Elements(3);
     sc->particles.X(0)=TV(-.8,0);
     sc->particles.X(1)=TV(.1,0);
     sc->particles.X(2)=TV(.8,0);
     sc->mesh.elements.Append(I2(0,1));
     sc->mesh.elements.Append(I2(1,2));
-    CUTTING<TV> cutter(*ta,*sc);
-    cutter.Run(0.01);
-    ta->mesh.Identify_Connected_Components(labels);
-    TRIANGULATED_AREA<T>* nta=TRIANGULATED_AREA<T>::Create();
-    nta->particles.Resize(ta->particles.X.m);
-    for(int i=0;i<ta->particles.X.m;++i)
-        nta->particles.X(i)=ta->particles.X(i);
-    nta->mesh.elements=ta->mesh.elements;
-    nta->Update_Number_Nodes();
-    delete ta;
-    ta=nta;
+    sc->Update_Number_Nodes();
+    
+    Run_Cutter();
+    
+    cout << "initialized mesh\n";
 }
 
 int main(int argc, char **argv)
-{ 
+{
     argc1 = argc;
     argv1 = argv;
     glutInit( &argc, argv );
@@ -268,7 +271,7 @@ int main(int argc, char **argv)
     glutKeyboardFunc(Key);
     glutMouseFunc(Mouse);
     glutMotionFunc(Motion);
-    glutDisplayFunc(Render);  
+    glutDisplayFunc(Render);
     glutReshapeFunc(Reshape);
     
     glutMainLoop();
