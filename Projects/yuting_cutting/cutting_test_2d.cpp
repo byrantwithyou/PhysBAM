@@ -55,6 +55,20 @@ static void Key(unsigned char key, int x, int y)
         case 033: // Escape Key
             exit(EXIT_SUCCESS);
             break;
+        case 'w':
+            for(int i=0;i<ta->particles.X.m;++i)
+                ta->particles.X(i)*=scale_speed;
+            for(int i=0;i<sc->particles.X.m;++i)
+                sc->particles.X(i)*=scale_speed;
+            glutPostRedisplay();
+            break;
+        case 's':
+            for(int i=0;i<ta->particles.X.m;++i)
+                ta->particles.X(i)/=scale_speed;
+            for(int i=0;i<sc->particles.X.m;++i)
+                sc->particles.X(i)/=scale_speed;
+            glutPostRedisplay();
+            break;
     }
 }
 
@@ -199,7 +213,6 @@ void Reshape(GLint newWidth,GLint newHeight) {
     window_height=newHeight;
     glutPostRedisplay();
 }
-
 
 void Initialize_Meshes()
 {
