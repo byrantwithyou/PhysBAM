@@ -232,9 +232,9 @@ void Initialize_Meshes()
     sc=SEGMENTED_CURVE_2D<T>::Create();
      
     sc->particles.Add_Elements(3);
-    sc->particles.X(0)=TV(.0,.8);
-    sc->particles.X(1)=TV(.0,-.1);
-    sc->particles.X(2)=TV(.0,-.8);
+    sc->particles.X(0)=TV(-.8,0);
+    sc->particles.X(1)=TV(.1,0);
+    sc->particles.X(2)=TV(.8,0);
     sc->mesh.elements.Append(I2(0,1));
     sc->mesh.elements.Append(I2(1,2));
     CUTTING<TV> cutter(*ta,*sc);

@@ -175,7 +175,7 @@ Run(T tol)
                     tc.turned_on(k2+6)=1;
             }
         }
-        
+        cout << tc.turned_on << endl;
         //split based on turn-on and intersections
         ARRAY<int> a;
         for(int j=0;j<6;++j)
