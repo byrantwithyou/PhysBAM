@@ -67,8 +67,6 @@ void Run_Cutter()
         delete ta;
         ta=nta;
     }
-    delete sc;
-    sc=SEGMENTED_CURVE_2D<T>::Create();
 }
 
 static void Key(unsigned char key, int x, int y)
@@ -138,6 +136,8 @@ void Mouse(int button, int state, int x, int y)
         else if(button==GLUT_LEFT_BUTTON){
             cutting=true;
             dragging=false;
+            delete sc;
+            sc=SEGMENTED_CURVE_2D<T>::Create();
             int p=sc->particles.Add_Element();
             sc->Update_Number_Nodes();
             sc->particles.X(p)=location;
