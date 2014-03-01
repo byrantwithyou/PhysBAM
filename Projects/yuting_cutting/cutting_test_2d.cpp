@@ -217,33 +217,37 @@ void Reshape(GLint newWidth,GLint newHeight) {
 void Initialize_Meshes()
 {
     ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),20);
-//    ta=TRIANGULATED_AREA<T>::Create();
-//    ta->particles.Add_Elements(4);
-//    ta->particles.X(0)=TV(0,.5);
-//    ta->particles.X(1)=TV(-.5,0);
-//    ta->particles.X(2)=TV(.5,0); 
-//    ta->particles.X(3)=TV(0,-.5);
-//    ta->mesh.elements.Append(I3(0,1,2));
-//    //ta->mesh.elements.Append(I3(2,1,3));
-//    ta->Update_Number_Nodes();
+    ta=TRIANGULATED_AREA<T>::Create();
+    ta->particles.Add_Elements(4);
+    ta->particles.X(0)=TV(0,.5);
+    ta->particles.X(1)=TV(-.5,0);
+    ta->particles.X(2)=TV(.5,0); 
+    ta->particles.X(3)=TV(0,-.5);
+    ta->mesh.elements.Append(I3(0,1,2));
+    ta->mesh.elements.Append(I3(2,1,3));
+    ta->Update_Number_Nodes();
 
     ta->mesh.Identify_Connected_Components(labels);
     
     sc=SEGMENTED_CURVE_2D<T>::Create();
      
-//    sc->particles.Add_Elements(3);
-//    sc->particles.X(0)=TV(.1,.8);
-//    sc->particles.X(1)=TV(.1,-.1);
-//    sc->particles.X(2)=TV(.1,-.8);
-//    sc->mesh.elements.Append(I2(0,1));
-//    sc->mesh.elements.Append(I2(1,2));
-//    CUTTING<TV> cutter(*ta,*sc);
-//    cutter.Run(0.01);
-//    ta->mesh.Identify_Connected_Components(labels);
-//    cout << "cc: " << labels << endl;
-    
-    
-    cout << "initialized mesh\n";
+    sc->particles.Add_Elements(3);
+    sc->particles.X(0)=TV(.0,.8);
+    sc->particles.X(1)=TV(.0,-.1);
+    sc->particles.X(2)=TV(.0,-.8);
+    sc->mesh.elements.Append(I2(0,1));
+    sc->mesh.elements.Append(I2(1,2));
+    CUTTING<TV> cutter(*ta,*sc);
+    cutter.Run(0.01);
+    ta->mesh.Identify_Connected_Components(labels);
+    TRIANGULATED_AREA<T>* nta=TRIANGULATED_AREA<T>::Create();
+    nta->particles.Resize(ta->particles.X.m);
+    for(int i=0;i<ta->particles.X.m;++i)
+        nta->particles.X(i)=ta->particles.X(i);
+    nta->mesh.elements=ta->mesh.elements;
+    nta->Update_Number_Nodes();
+    delete ta;
+    ta=nta;
 }
 
 int main(int argc, char **argv)
