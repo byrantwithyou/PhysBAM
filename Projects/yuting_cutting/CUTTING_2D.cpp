@@ -253,8 +253,8 @@ Run(T tol)
         if(!split_tris.Contains(i)){
             for(int j=0;j<3;++j){
                 if(dup_nodes.Contains(tri(j))){
-                    tri(j)=parent_particles.m;
                     parent_particles.Append(tri(j));
+                    tri(j)=parent_particles.m-1;
                 }
             }
             split_tris.Set(i);
