@@ -28,8 +28,8 @@ using namespace std;
 // Constructor
 //#####################################################################
 template<class T> CUTTING<VECTOR<T,2> >::
-CUTTING(TRIANGULATED_AREA<T>* sim_ta,SEGMENTED_CURVE<TV>* sc)
-:sim_ta(sim_ta),sc(sc)
+CUTTING(TRIANGULATED_AREA<T>* sim_ta_,SEGMENTED_CURVE<TV>* sc_)
+:sim_ta(sim_ta_),sc(sc_)
 {
     //ta
     ta=TRIANGULATED_AREA<T>::Create();

@@ -78,7 +78,7 @@ public:
     ARRAY<int> tri_in_sim;
     ARRAY<PAIR<int, T3> > particle_in_sim;
     
-    CUTTING(TRIANGULATED_AREA<T>* sim_ta,SEGMENTED_CURVE<TV>* sc);
+    CUTTING(TRIANGULATED_AREA<T>* sim_ta_,SEGMENTED_CURVE<TV>* sc_);
     ~CUTTING(){}
 
     void Run(T tol);
