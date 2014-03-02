@@ -9,6 +9,7 @@
 
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Tools/Vectors/VECTOR.h>
+#include <Tools/Data_Structures/PAIR.h>
 namespace PhysBAM{
 
 template<class TV> class CONSISTENT_INTERSECTIONS;
@@ -31,8 +32,9 @@ class CUTTING<VECTOR<T,2> >
     enum WORKAROUND {d=TV::m};
     
 public:
-    TRIANGULATED_AREA<T>& ta;
-    SEGMENTED_CURVE<TV>& sc;
+    TRIANGULATED_AREA<T>* sim_ta;
+    TRIANGULATED_AREA<T>* ta;
+    SEGMENTED_CURVE<TV>* sc;
     
     template<class TV>
     struct POTENTIAL_CENTER
@@ -71,12 +73,16 @@ public:
             materials.Fill(1);
         }
     };
-    ARRAY<TRI_CUTTING> tri_cuttings;
     
-    CUTTING(TRIANGULATED_AREA<T>& ta,SEGMENTED_CURVE<TV>& sc);
+    ARRAY<TRI_CUTTING> tri_cuttings;
+    ARRAY<int> tri_in_sim;
+    ARRAY<PAIR<int, T3> > particle_in_sim;
+    
+    CUTTING(TRIANGULATED_AREA<T>* sim_ta,SEGMENTED_CURVE<TV>* sc);
     ~CUTTING(){}
 
     void Run(T tol);
+    void Update_Material_Particles();
 };
 }
 #endif

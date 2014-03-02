@@ -43,29 +43,30 @@ int window_height=600;
 TV starting_position;
 T trans_speed=0.1;
 T scale_speed=1.1;
-TRIANGULATED_AREA<T>* ta=NULL;
+TRIANGULATED_AREA<T>* sim_ta=NULL;
 SEGMENTED_CURVE_2D<T>* sc=NULL;
+CUTTING<TV>* cutter;
 ARRAY<int> labels;
 HASHTABLE<int> dragging_particles;
 bool dragging=false,cutting=false;
 
 void Run_Cutter()
 {
-    CUTTING<TV> cutter(*ta,*sc);
     if(sc->mesh.elements.m>0){
-        cutter.Run(.01);
-        ta->mesh.Identify_Connected_Components(labels);
+        cutter->Run(.01);
+        cutter->ta->mesh.Identify_Connected_Components(labels);
+        
         cutting=false;
         
-        //reinitialize cutter->ta
+        //reinitialize ta
         TRIANGULATED_AREA<T>* nta=TRIANGULATED_AREA<T>::Create();
-        nta->particles.Resize(ta->particles.X.m);
-        for(int i=0;i<ta->particles.X.m;++i)
-            nta->particles.X(i)=ta->particles.X(i);
-        nta->mesh.elements=ta->mesh.elements;
+        nta->particles.Resize(cutter->ta->particles.X.m);
+        for(int i=0;i<cutter->ta->particles.X.m;++i)
+            nta->particles.X(i)=cutter->ta->particles.X(i);
+        nta->mesh.elements=cutter->ta->mesh.elements;
         nta->Update_Number_Nodes();
-        delete ta;
-        ta=nta;
+        delete cutter->ta;
+        cutter->ta=nta;
     }
 }
 
@@ -76,15 +77,17 @@ static void Key(unsigned char key, int x, int y)
             exit(EXIT_SUCCESS);
             break;
         case 'w':
-            for(int i=0;i<ta->particles.X.m;++i)
-                ta->particles.X(i)*=scale_speed;
+            for(int i=0;i<sim_ta->particles.X.m;++i)
+                sim_ta->particles.X(i)*=scale_speed;
+            cutter->Update_Material_Particles();
             for(int i=0;i<sc->particles.X.m;++i)
                 sc->particles.X(i)*=scale_speed;
             glutPostRedisplay();
             break;
         case 's':
-            for(int i=0;i<ta->particles.X.m;++i)
-                ta->particles.X(i)/=scale_speed;
+            for(int i=0;i<sim_ta->particles.X.m;++i)
+                sim_ta->particles.X(i)/=scale_speed;
+            cutter->Update_Material_Particles();
             for(int i=0;i<sc->particles.X.m;++i)
                 sc->particles.X(i)/=scale_speed;
             glutPostRedisplay();
@@ -96,16 +99,18 @@ void Mouse(int button, int state, int x, int y)
 {
     TV location(2*x/T(window_width)-1,1-2*y/T(window_height));
     if(button==4){
-        for(int i=0;i<ta->particles.X.m;++i)
-            ta->particles.X(i)/=scale_speed;
+        for(int i=0;i<sim_ta->particles.X.m;++i)
+            sim_ta->particles.X(i)/=scale_speed;
+        cutter->Update_Material_Particles();
         for(int i=0;i<sc->particles.X.m;++i)
             sc->particles.X(i)/=scale_speed;
         glutPostRedisplay();
         return;
     }
     else if(button==3){
-        for(int i=0;i<ta->particles.X.m;++i)
-            ta->particles.X(i)*=scale_speed;
+        for(int i=0;i<sim_ta->particles.X.m;++i)
+            sim_ta->particles.X(i)*=scale_speed;
+        cutter->Update_Material_Particles();
         for(int i=0;i<sc->particles.X.m;++i)
             sc->particles.X(i)*=scale_speed;
         glutPostRedisplay();
@@ -118,26 +123,31 @@ void Mouse(int button, int state, int x, int y)
             starting_position=location;
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glBegin(GL_TRIANGLES);
-            for(int t=0;t<ta->mesh.elements.m;t++){
-                I3 tri=ta->mesh.elements(t);
+            for(int t=0;t<cutter->ta->mesh.elements.m;t++){
+                I3 tri=cutter->ta->mesh.elements(t);
                 glColor4d(labels(t)/255.,0,0,0);
                 for(int j=0;j<3;++j)
-                    glVertex2d(ta->particles.X(tri(j))(0),ta->particles.X(tri(j))(1));
+                    glVertex2d(cutter->ta->particles.X(tri(j))(0),cutter->ta->particles.X(tri(j))(1));
             }
             glEnd();
             unsigned char val;
             glReadPixels(x, window_height-y, 1, 1, GL_RED, GL_UNSIGNED_BYTE, &val);
             dragging_particles.Clean_Memory();
-            for(int t=0;t<ta->mesh.elements.m;t++)
+            for(int t=0;t<cutter->ta->mesh.elements.m;t++)
                 if(labels(t)==(int)val)
-                    for(int i=0;i<3;++i)
-                        dragging_particles.Set(ta->mesh.elements(t)(i));
+                    for(int i=0;i<3;++i){
+                        int f=cutter->particle_in_sim(cutter->ta->mesh.elements(t)(i)).x;
+                        for(int j=0;j<3;++j)
+                            dragging_particles.Set(sim_ta->mesh.elements(f)(j));
+                    }
         }
         else if(button==GLUT_LEFT_BUTTON){
             cutting=true;
             dragging=false;
+            //reinitialize cutting curve
             delete sc;
             sc=SEGMENTED_CURVE_2D<T>::Create();
+            cutter->sc=sc;
             int p=sc->particles.Add_Element();
             sc->Update_Number_Nodes();
             sc->particles.X(p)=location;
@@ -164,7 +174,8 @@ void Motion(int x, int y)
     }
     else if(dragging){
         for(typename HASHTABLE<int>::ITERATOR it(dragging_particles);it.Valid();it.Next())
-            ta->particles.X(it.Key())+=(location-starting_position);
+            sim_ta->particles.X(it.Key())+=(location-starting_position);
+        cutter->Update_Material_Particles();
         starting_position=location;
     }
     glutPostRedisplay();
@@ -174,6 +185,7 @@ void Render(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnableClientState(GL_VERTEX_ARRAY);
     
+    //cutting curve
     ARRAY<TV> vertices;
     for(int t=0;t<sc->mesh.elements.m;t++){
         I2 edge=sc->mesh.elements(t);
@@ -184,29 +196,38 @@ void Render(){
     glColor4f(0.0, 0.0, 1.0, 1.0);
     glDrawArrays(GL_LINES,0,vertices.m);
     
+    //edges of sim_ta
     vertices.Remove_All();
-    //    ta->mesh.Initialize_Boundary_Mesh();
-    //    for(int t=0;t<ta->mesh.boundary_mesh->elements.m;t++){
-    //        I2 edge=ta->mesh.boundary_mesh->elements(t);
-    //        for(int i=0;i<2;++i)
-    //            vertices.Append(ta->particles.X(edge(i)));
-    //    }
-    for(int t=0;t<ta->mesh.elements.m;t++){
-        I3 tri=ta->mesh.elements(t);
+    for(int t=0;t<sim_ta->mesh.elements.m;t++){
+        I3 tri=sim_ta->mesh.elements(t);
         for(int i=0;i<3;++i){
-            vertices.Append(ta->particles.X(tri(i)));
-            vertices.Append(ta->particles.X(tri((i+1)%3)));
+            vertices.Append(sim_ta->particles.X(tri(i)));
+            vertices.Append(sim_ta->particles.X(tri((i+1)%3)));
         }
     }
     glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
     glColor4f(0.0, 1.0, 0.0, 1.0);
     glDrawArrays(GL_LINES,0,vertices.m);
     
+    //edges of ta
     vertices.Remove_All();
-    for(int t=0;t<ta->mesh.elements.m;t++){
-        I3 tri=ta->mesh.elements(t);
+    for(int t=0;t<cutter->ta->mesh.elements.m;t++){
+        I3 tri=cutter->ta->mesh.elements(t);
+        for(int i=0;i<3;++i){
+            vertices.Append(cutter->ta->particles.X(tri(i)));
+            vertices.Append(cutter->ta->particles.X(tri((i+1)%3)));
+        }
+    }
+    glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
+    glColor4f(0.0, 0.0, 1.0, 1.0);
+    glDrawArrays(GL_LINES,0,vertices.m);
+    
+    //material elements
+    vertices.Remove_All();
+    for(int t=0;t<cutter->ta->mesh.elements.m;t++){
+        I3 tri=cutter->ta->mesh.elements(t);
         for(int i=0;i<3;++i)
-            vertices.Append(ta->particles.X(tri(i)));
+            vertices.Append(cutter->ta->particles.X(tri(i)));
     }
     glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
     glColor4f(1.0, 0.0, 0.0, 0.0);
@@ -226,17 +247,16 @@ void Reshape(GLint newWidth,GLint newHeight) {
 void Initialize_Meshes()
 {
     //ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),20);
-    ta=TRIANGULATED_AREA<T>::Create();
-    ta->particles.Add_Elements(4);
-    ta->particles.X(0)=TV(0,.5);
-    ta->particles.X(1)=TV(-.5,0);
-    ta->particles.X(2)=TV(.5,0);
-    ta->particles.X(3)=TV(0,-.5);
-    ta->mesh.elements.Append(I3(0,1,2));
-    ta->mesh.elements.Append(I3(2,1,3));
-    ta->Update_Number_Nodes();
-    
-    ta->mesh.Identify_Connected_Components(labels);
+    sim_ta=TRIANGULATED_AREA<T>::Create();
+    sim_ta->particles.Add_Elements(4);
+    sim_ta->particles.X(0)=TV(0,.5);
+    sim_ta->particles.X(1)=TV(-.5,0);
+    sim_ta->particles.X(2)=TV(.5,0);
+    sim_ta->particles.X(3)=TV(0,-.5);
+    sim_ta->mesh.elements.Append(I3(0,1,2));
+    sim_ta->mesh.elements.Append(I3(2,1,3));
+    sim_ta->Update_Number_Nodes();
+    sim_ta->mesh.Identify_Connected_Components(labels);
     
     sc=SEGMENTED_CURVE_2D<T>::Create();
     
@@ -248,7 +268,8 @@ void Initialize_Meshes()
     sc->mesh.elements.Append(I2(1,2));
     sc->Update_Number_Nodes();
     
-    Run_Cutter();
+    cutter=new CUTTING<TV>(sim_ta,sc);
+//    Run_Cutter();
     
     cout << "initialized mesh\n";
 }

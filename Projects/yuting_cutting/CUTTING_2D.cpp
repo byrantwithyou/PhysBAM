@@ -28,10 +28,34 @@ using namespace std;
 // Constructor
 //#####################################################################
 template<class T> CUTTING<VECTOR<T,2> >::
-CUTTING(TRIANGULATED_AREA<T>& ta,SEGMENTED_CURVE<TV>& sc)
-    :ta(ta),sc(sc)
+CUTTING(TRIANGULATED_AREA<T>* sim_ta,SEGMENTED_CURVE<TV>* sc)
+:sim_ta(sim_ta),sc(sc)
 {
+    //ta
+    ta=TRIANGULATED_AREA<T>::Create();
+    int p=sim_ta->particles.X.m;
+    ta->particles.Resize(p);
+    ta->Update_Number_Nodes();
+    particle_in_sim.Resize(p);
+    for(int i=0;i<p;++i){
+        ta->particles.X(i)=sim_ta->particles.X(i);
+    }
+    ta->mesh.elements=sim_ta->mesh.elements;
+    
+    //tri_in_mesh
+    tri_in_sim.Resize(ta->mesh.elements.m);
+    for(int i=0;i<ta->mesh.elements.m;++i)
+        tri_in_sim(i)=i;
+    
+    //particle_in_sim
+    for(int i=0;i<ta->mesh.elements.m;++i)
+        for(int j=0;j<3;++j){
+            T3 w;
+            w(j)=1;
+            particle_in_sim(ta->mesh.elements(i)(j))=PAIR<int,T3>(i,w);
+        }
 }
+
 //#####################################################################
 // Function Run
 //#####################################################################
@@ -41,25 +65,25 @@ Run(T tol)
     cout<<"*********cutting**************"<<endl;
     //preprocessing
     cout<<"preprocessing"<<endl;
-    CONSISTENT_INTERSECTIONS<TV> intersections(ta,sc);
+    CONSISTENT_INTERSECTIONS<TV> intersections(*ta,*sc);
     intersections.Set_Tol();
     intersections.Compute();
     
     HASHTABLE<I3,int> tri_from_face;
     HASHTABLE<I2,ARRAY<int> > tri_from_edge;
-    ARRAY<ARRAY<int> > tri_from_vertex(ta.particles.number);
+    ARRAY<ARRAY<int> > tri_from_vertex(ta->particles.number);
 
-    for(int i=0;i<ta.mesh.elements.m;i++){
-        I3 e=ta.mesh.elements(i).Sorted();
+    for(int i=0;i<ta->mesh.elements.m;i++){
+        I3 e=ta->mesh.elements(i).Sorted();
         tri_from_face.Set(e,i);
         for(int j=0;j<3;j++) tri_from_edge.Get_Or_Insert(e.Remove_Index(j)).Append(i);
         for(int j=0;j<3;j++) tri_from_vertex(e(j)).Append(i);}
 
     HASHTABLE<I2,int> seg_from_edge;
-    ARRAY<ARRAY<int> > seg_from_vertex(sc.particles.number);
+    ARRAY<ARRAY<int> > seg_from_vertex(sc->particles.number);
 
-    for(int i=0;i<sc.mesh.elements.m;i++){
-        I2 e=sc.mesh.elements(i).Sorted();
+    for(int i=0;i<sc->mesh.elements.m;i++){
+        I2 e=sc->mesh.elements(i).Sorted();
         seg_from_edge.Set(e,i);
         for(int j=0;j<2;j++) seg_from_vertex(e(j)).Append(i);}
 
@@ -105,14 +129,14 @@ Run(T tol)
 
     //split
     cout<<"splitting"<<endl;
-    int num_old_tris=ta.mesh.elements.m;
-    ARRAY<int> parent_particles(IDENTITY_ARRAY<>(ta.particles.number));
+    int num_old_tris=ta->mesh.elements.m;
+    ARRAY<int> parent_particles(IDENTITY_ARRAY<>(ta->particles.number));
     HASHTABLE<int> split_tris;
     tri_cuttings.Resize(num_old_tris);
     for(typename HASHTABLE<int,HASHTABLE<int,ARRAY<P> > >::ITERATOR it(components);it.Valid();it.Next()){
         int i=it.Key();
         TRI_CUTTING tc=tri_cuttings(i);
-        I3 tri=ta.mesh.elements(i);
+        I3 tri=ta->mesh.elements(i);
         //turn on by each cutting segment based on itersections
         for(typename HASHTABLE<int,ARRAY<P> >::ITERATOR seg_it(it.Data());seg_it.Valid();seg_it.Next()){
             const ARRAY<P>& intersects=seg_it.Data();
@@ -203,16 +227,16 @@ Run(T tol)
                 //new particles and element
                 for(int k=0;k<3;++k){
                     int pid=tri(k);
-                    ta.particles.Append(ta.particles,pid);
+                    ta->particles.Append(ta->particles,pid);
                     parent_particles.Append(pid);}
-                I3 new_tri(ta.particles.X.m-3,ta.particles.X.m-2,ta.particles.X.m-1);
+                I3 new_tri(ta->particles.X.m-3,ta->particles.X.m-2,ta->particles.X.m-1);
                 if(j==0){
                     tri_cuttings(i)=tc_new;
-                    ta.mesh.elements(i)=new_tri;
+                    ta->mesh.elements(i)=new_tri;
                     split_tris.Set(i);}
                 else{
                     tri_cuttings.Append(tc_new);
-                    ta.mesh.elements.Append(new_tri);
+                    ta->mesh.elements.Append(new_tri);
                     split_tris.Set(tri_cuttings.m-1);}}
             
         }
@@ -221,18 +245,18 @@ Run(T tol)
     HASHTABLE<int> dup_nodes;
     for(HASHTABLE_ITERATOR<int> it(split_tris);it.Valid();it.Next()){
         int i=it.Key();
-        I3 tri=ta.mesh.elements(i);
+        I3 tri=ta->mesh.elements(i);
         for(int j=0;j<3;++j){
             dup_nodes.Set(parent_particles(tri(j)));
         }    
     }
-    for(int i=0;i<ta.mesh.elements.m;++i){
-        I3& tri=ta.mesh.elements(i);
+    for(int i=0;i<ta->mesh.elements.m;++i){
+        I3& tri=ta->mesh.elements(i);
         if(!split_tris.Contains(i)){
             for(int j=0;j<3;++j){
                 if(dup_nodes.Contains(tri(j))){
-                    int p=ta.particles.Add_Element();
-                    ta.particles.X(p)=ta.particles.X(tri(j));
+                    int p=ta->particles.Add_Element();
+                    ta->particles.X(p)=ta->particles.X(tri(j));
                     parent_particles.Append(tri(j));
                     tri(j)=p;
                 }
@@ -247,7 +271,7 @@ Run(T tol)
     UNION_FIND<int> uf(parent_particles.m);
     for(HASHTABLE_ITERATOR<int> it(split_tris);it.Valid();it.Next()){
         int tri_id=it.Key();
-        I3 tri=ta.mesh.elements(tri_id);
+        I3 tri=ta->mesh.elements(tri_id);
         for(int i=0;i<6;++i){
             if(tri_cuttings(tri_id).materials(i) && !tri_cuttings(tri_id).turned_on(i+6)){
                 int j1=tri(i/2);
@@ -277,14 +301,14 @@ Run(T tol)
     ARRAY<TV> new_par;
     for(int i=0;i<tri_cuttings.m;++i){
         for(int j=0;j<3;++j){
-            int a=uf.Find(ta.mesh.elements(i)(j));
-            if(!new_pids.Get(a,ta.mesh.elements(i)(j))){
-                new_par.Append(ta.particles.X(ta.mesh.elements(i)(j)));
-                ta.mesh.elements(i)(j)=new_pid;
+            int a=uf.Find(ta->mesh.elements(i)(j));
+            if(!new_pids.Get(a,ta->mesh.elements(i)(j))){
+                new_par.Append(ta->particles.X(ta->mesh.elements(i)(j)));
+                ta->mesh.elements(i)(j)=new_pid;
                 new_pids.Set(a,new_pid);
                 ++new_pid;}}}
-    ta.particles.Resize(new_par.m);
-    ta.particles.X=new_par;
+    ta->particles.Resize(new_par.m);
+    ta->particles.X=new_par;
     
     //subdivide
     cout<<"subdividing"<<endl;
@@ -295,15 +319,15 @@ Run(T tol)
     for(int i=0;i<tri_cuttings.m;++i){
         TRI_CUTTING tc=tri_cuttings(i);
         if(tc.materials.Find(0)!=-1){
-            I3 tri=ta.mesh.elements(i);
+            I3 tri=ta->mesh.elements(i);
             int p;
             if(!new_tri_particles.Get(tri.Sorted(),p)){
                 new_tri_particles.Set(tri.Sorted(),p);
                 TV par;
                 for(int j=0;j<3;++j)
-                    par+=ta.particles.X(tri(j))*tc.face_center.Value()(j);
-                p=ta.particles.Add_Element();
-                ta.particles.X(p)=par;}
+                    par+=ta->particles.X(tri(j))*tc.face_center.Value()(j);
+                p=ta->particles.Add_Element();
+                ta->particles.X(p)=par;}
             for(int j=0;j<3;++j){
                 if(tc.materials(2*j)||tc.materials(2*j+1)){
                     int q;
@@ -311,18 +335,18 @@ Run(T tol)
                     if(!new_edge_particles.Get(e.Sorted(),q)){
                         TV par;
                         for(int k=0;k<2;++k){
-                            par+=ta.particles.X(e(k))*tc.edge_centers(j).Value()(k);
+                            par+=ta->particles.X(e(k))*tc.edge_centers(j).Value()(k);
                         }
-                        q=ta.particles.Add_Element();
+                        q=ta->particles.Add_Element();
                         new_edge_particles.Set(e.Sorted(),q);
-                        ta.particles.X(q)=par;}
+                        ta->particles.X(q)=par;}
                     if(tc.materials(2*j))
                         new_elements.Append(I3(e(0),q,p));
                     if(tc.materials(2*j+1))
                         new_elements.Append(I3(q,e(1),p));}}}}
     //subdivide neighbors
     for(int i=0;i<tri_cuttings.m;++i){
-        I3 tri=ta.mesh.elements(i);
+        I3 tri=ta->mesh.elements(i);
         if(tri_cuttings(i).materials.Find(0)==-1){
             int p=-1;
             for(int j=0;j<3;++j){
@@ -351,16 +375,25 @@ Run(T tol)
         for(int j=0;j<3;++j){
             int& id=new_elements(i)(j);
             if(!new_pids.Get(id,id)){
-                new_par.Append(ta.particles.X(id));
+                new_par.Append(ta->particles.X(id));
                 new_pids.Set(id,new_pid); 
                 id=new_pid;
                 ++new_pid;}}
-    ta.particles.Resize(new_par.m);
-    ta.particles.X=new_par;
-    ta.mesh.elements=new_elements;
-    ta.Update_Number_Nodes();
+    ta->particles.Resize(new_par.m);
+    ta->particles.X=new_par;
+    ta->mesh.elements=new_elements;
+    ta->Update_Number_Nodes();
     
     cout<<"*********cutting done**************"<<endl;
+}
+
+//#####################################################################
+// Function Update_Material_Particles
+//#####################################################################
+template<class T> void CUTTING<VECTOR<T,2> >::
+Update_Material_Particles()
+{
+    
 }
 //#####################################################################
 template class CUTTING<VECTOR<double,2> >;
