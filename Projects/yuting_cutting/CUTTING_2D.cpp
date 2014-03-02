@@ -52,8 +52,11 @@ CUTTING(TRIANGULATED_AREA<T>* sim_ta_,SEGMENTED_CURVE<TV>* sc_)
         for(int j=0;j<3;++j){
             T3 w;
             w(j)=1;
-            particle_in_sim(ta->mesh.elements(i)(j))=PAIR<int,T3>(i,w);
+            particle_in_sim(ta->mesh.elements(i)(j))=PS(i,w);
         }
+    
+    //tri_cuttings
+    tri_cuttings.Resize(ta->mesh.elements.m);
 }
 
 //#####################################################################
@@ -129,12 +132,12 @@ Run(T tol)
 
     //split
     cout<<"splitting"<<endl;
-    int num_old_tris=ta->mesh.elements.m;
     ARRAY<int> parent_particles(IDENTITY_ARRAY<>(ta->particles.number));
     ARRAY<int> sim_parent_particles(IDENTITY_ARRAY<>(sim_ta->particles.number));
-    HASHTABLE<int> split_tris, split_sim_tris;
-    tri_cuttings.Resize(num_old_tris);
+    HASHTABLE<int> split_tris, duplicated_sim_tris;
     HASHTABLE<int> dup_nodes;
+    ARRAY<I3> original_sim_elements=sim_ta->mesh.elements;
+    ARRAY<int> original_tri_in_sim=tri_in_sim;
     for(typename HASHTABLE<int,HASHTABLE<int,ARRAY<P> > >::ITERATOR it(components);it.Valid();it.Next()){
         int i=it.Key();
         TRI_CUTTING tc=tri_cuttings(i);
@@ -214,11 +217,23 @@ Run(T tol)
                 if(a(j)%2)
                     tc.edge_centers(a(j)/2).set=true;}
             //split
+            I3 parent_tri=original_sim_elements(tri_in_sim(i));
             for(int j=0;j<a.m;++j){
                 //duplicate sim tri
-                
-                
-                //split cutting tri
+                for(int k=0;k<3;++k)
+                    sim_parent_particles.Append(parent_tri(k));
+                int parent_tri_id=original_tri_in_sim(i);
+                I3 new_sim_tri(sim_parent_particles.m-3,sim_parent_particles.m-2,sim_parent_particles.m-1);
+                if(duplicated_sim_tris.Contains(parent_tri_id)){
+                    parent_tri_id=sim_ta->mesh.elements.m;
+                    sim_ta->mesh.elements.Append(new_sim_tri);
+                }
+                else{
+                    duplicated_sim_tris.Set(parent_tri_id);
+                    sim_ta->mesh.elements(parent_tri_id)=new_sim_tri;
+                }
+
+                //split cutting tri, take care of parent-child relationship
                 TRI_CUTTING tc_new=tc;
                 //material of new element
                 tc_new.materials.Fill(0);
@@ -235,39 +250,54 @@ Run(T tol)
                     int pid=tri(k);
                     parent_particles.Append(pid);
                     dup_nodes.Set(pid);
+                    int s=particle_in_sim(pid).x;
+                    I3 tri1=original_sim_elements(s);
+                    T3 w1=particle_in_sim(pid).y;
+                    I3 tri=original_sim_elements(parent_tri_id);
+                    particle_in_sim.Append(PS(parent_tri_id,Weight_In_Tri(tri,tri1,w1)));
                 }
                 I3 new_tri(parent_particles.m-3,parent_particles.m-2,parent_particles.m-1);
                 if(j==0){
                     tri_cuttings(i)=tc_new;
                     ta->mesh.elements(i)=new_tri;
-                    split_tris.Set(i);}
+                    split_tris.Set(i);
+                    tri_in_sim(i)=parent_tri_id;
+                }
                 else{
                     tri_cuttings.Append(tc_new);
                     ta->mesh.elements.Append(new_tri);
-                    split_tris.Set(tri_cuttings.m-1);}}
+                    split_tris.Set(tri_cuttings.m-1);
+                    tri_in_sim.Append(parent_tri_id);
+                }
+            }
         }
     }
+    
+    
+    //NOT DONE YET!!!
     //split triangles' neighbors' sharing node also need to duplicate, and parent needs to be cuplicated too
     for(int i=0;i<ta->mesh.elements.m;++i){
         I3& tri=ta->mesh.elements(i);
         if(!split_tris.Contains(i)){
             for(int j=0;j<3;++j){
                 if(dup_nodes.Contains(tri(j))){
-                    parent_particles.Append(tri(j));
-                    tri(j)=parent_particles.m-1;
+//                    parent_particles.Append(tri(j));
+//                    tri(j)=parent_particles.m-1;
+                    split_tris.Set(i);
                 }
             }
-            split_tris.Set(i);
         }
     }
     
     //union
     cout<<"merging"<<endl;
-    HASHTABLE<I3,I2> ht;
+    HASHTABLE<I3,I3> ht;
     UNION_FIND<int> uf(parent_particles.m);
+    UNION_FIND<int> sim_uf(sim_parent_particles.m);
     for(HASHTABLE_ITERATOR<int> it(split_tris);it.Valid();it.Next()){
         int tri_id=it.Key();
         I3 tri=ta->mesh.elements(tri_id);
+        int parent_tri_id=tri_in_sim(tri_id);
         for(int i=0;i<6;++i){
             if(tri_cuttings(tri_id).materials(i) && !tri_cuttings(tri_id).turned_on(i+6)){
                 int j1=tri(i/2);
@@ -283,102 +313,161 @@ Run(T tol)
                     j1=j2;
                     j2=temp;
                     i3=1-i3;}
-                I2 saved(j1,j2);
+                I3 saved(j1,j2,parent_tri_id);
                 //cout << I2(i1, i2) << saved << endl;
                 if(ht.Get(I3(i1,i2,i3),saved)){
+                    //union material nodes
                     uf.Union(j1,saved(0));
-                    uf.Union(j2,saved(1));}
+                    uf.Union(j2,saved(1));
+                    //union sim nodes
+                    for(int j=0;j<3;++j){
+                        int p1=sim_ta->mesh.elements(parent_tri_id)(j);
+                        for(int k=0;k<3;++k){
+                            int p2=sim_ta->mesh.elements(saved(2))(k);
+                            if(sim_parent_particles(p1)==sim_parent_particles(p2))
+                                sim_uf.Union(p1,p2);
+                        }
+                    }
+                }
                 else
                     ht.Set(I3(i1,i2,i3),saved);}}}
 
     //merge
-    HASHTABLE<int,int> new_pids;
-    int new_pid=0;
-    ARRAY<TV> new_par;
-    for(int i=0;i<tri_cuttings.m;++i){
-        for(int j=0;j<3;++j){
-            int a=uf.Find(ta->mesh.elements(i)(j));
-            if(!new_pids.Get(a,ta->mesh.elements(i)(j))){
-                new_par.Append(ta->particles.X(parent_particles(a)));
-                ta->mesh.elements(i)(j)=new_pid;
-                new_pids.Set(a,new_pid);
-                ++new_pid;}}}
-    ta->particles.Resize(new_par.m);
-    ta->particles.X=new_par;
+    //sim_ta
+    ARRAY<int> sim_tri_becomes(sim_ta->mesh.elements.m);
+    {
+        //delete unused nodes
+        HASHTABLE<int,int> new_pids;
+        int new_pid=0;
+        ARRAY<TV> new_par;
+        for(int i=0;i<sim_ta->mesh.elements.m;++i){
+            for(int j=0;j<3;++j){
+                int a=sim_uf.Find(sim_ta->mesh.elements(i)(j));
+                if(!new_pids.Get(a,sim_ta->mesh.elements(i)(j))){
+                    new_par.Append(sim_ta->particles.X(sim_parent_particles(a)));
+                    sim_ta->mesh.elements(i)(j)=new_pid;
+                    new_pids.Set(a,new_pid);
+                    ++new_pid;}}}
+        sim_ta->particles.Resize(new_par.m);
+        sim_ta->particles.X=new_par;
+        
+        //delete duplicated sim triangles
+        HASHTABLE<I3,int> tri_becomes;
+        int new_tid=0;
+        for(int i=0;i<sim_ta->mesh.elements.m;++i){
+            I3 tri=sim_ta->mesh.elements(i);
+            if(!tri_becomes.Get(tri,sim_tri_becomes(i))){
+                tri_becomes.Set(tri,new_tid);
+                sim_tri_becomes(i)=new_tid;
+                sim_ta->mesh.elements(new_tid)=tri;
+                ++new_tid;
+            }
+        }
+        sim_ta->mesh.elements.Resize(new_tid);
+    }
     
-    //subdivide
-    cout<<"subdividing"<<endl;
-    HASHTABLE<I2,int> new_edge_particles;
-    HASHTABLE<I3,int> new_tri_particles;
-    ARRAY<I3> new_elements;
-    //subdivide split tris
-    for(int i=0;i<tri_cuttings.m;++i){
-        TRI_CUTTING tc=tri_cuttings(i);
-        if(tc.materials.Find(0)!=-1){
-            I3 tri=ta->mesh.elements(i);
-            int p;
-            if(!new_tri_particles.Get(tri.Sorted(),p)){
-                new_tri_particles.Set(tri.Sorted(),p);
-                TV par;
-                for(int j=0;j<3;++j)
-                    par+=ta->particles.X(tri(j))*tc.face_center.Value()(j);
-                p=ta->particles.Add_Element();
-                ta->particles.X(p)=par;}
+    //ta
+    {
+        HASHTABLE<int,int> new_pids;
+        int new_pid=0;
+        ARRAY<PS> new_particle_in_sim;
+        for(int i=0;i<tri_cuttings.m;++i){
+            tri_in_sim(i)=sim_tri_becomes(tri_in_sim(i));
             for(int j=0;j<3;++j){
-                if(tc.materials(2*j)||tc.materials(2*j+1)){
-                    int q;
-                    I2 e(tri(j),tri((j+1)%3));
-                    if(!new_edge_particles.Get(e.Sorted(),q)){
-                        TV par;
-                        for(int k=0;k<2;++k){
-                            par+=ta->particles.X(e(k))*tc.edge_centers(j).Value()(k);
+                int& n=ta->mesh.elements(i)(j);
+                int a=uf.Find(n);
+                if(!new_pids.Get(a,n)){
+                    PS ps=particle_in_sim(n);
+                    new_particle_in_sim.Append(PS(sim_tri_becomes(ps.x),ps.y));
+                    n=new_pid;
+                    new_pids.Set(a,new_pid);
+                    ++new_pid;
+                }}}
+        particle_in_sim=new_particle_in_sim;
+    }
+    
+    //subdivide and delete unused nodes
+    {
+        cout<<"subdividing"<<endl;
+        HASHTABLE<I2,int> new_edge_particles;
+        ARRAY<I3> new_elements;
+        ARRAY<int> new_tri_in_sim;
+        //subdivide split tris
+        for(int i=0;i<tri_cuttings.m;++i){
+            TRI_CUTTING tc=tri_cuttings(i);
+            if(tc.materials.Find(0)!=-1){
+                I3 tri=ta->mesh.elements(i);
+                int p=particle_in_sim.m;
+                particle_in_sim.Append(PS(tri_in_sim(i),Weight_In_Sim(i,tc.face_center.Value())));
+                for(int j=0;j<3;++j){
+                    if(tc.materials(2*j)||tc.materials(2*j+1)){
+                        int q;
+                        I2 e(tri(j),tri((j+1)%3));
+                        if(!new_edge_particles.Get(e.Sorted(),q)){
+                            new_edge_particles.Set(e.Sorted(),particle_in_sim.m);
+                            T3 w;
+                            for(int k=0;k<2;++k)
+                                w[(j+k)%3]=tc.edge_centers(j).Value()(k);
+                            particle_in_sim.Append(PS(tri_in_sim(i),Weight_In_Sim(i,w)));
                         }
-                        q=ta->particles.Add_Element();
-                        new_edge_particles.Set(e.Sorted(),q);
-                        ta->particles.X(q)=par;}
-                    if(tc.materials(2*j))
-                        new_elements.Append(I3(e(0),q,p));
-                    if(tc.materials(2*j+1))
-                        new_elements.Append(I3(q,e(1),p));}}}}
-    //subdivide neighbors
-    for(int i=0;i<tri_cuttings.m;++i){
-        I3 tri=ta->mesh.elements(i);
-        if(tri_cuttings(i).materials.Find(0)==-1){
-            int p=-1;
+                        if(tc.materials(2*j)){
+                            new_elements.Append(I3(e(0),q,p));
+                            new_tri_in_sim.Append(tri_in_sim(i));
+                        }
+                        if(tc.materials(2*j+1)){
+                            new_elements.Append(I3(q,e(1),p));
+                            new_tri_in_sim.Append(tri_in_sim(i));
+                        }}}}}
+        //subdivide neighbors
+        for(int i=0;i<tri_cuttings.m;++i){
+            I3 tri=ta->mesh.elements(i);
+            if(tri_cuttings(i).materials.Find(0)==-1){
+                int p=-1;
+                int n=new_elements.m;
+                for(int j=0;j<3;++j){
+                    I2 e(tri(j),tri((j+1)%3));
+                    if(new_edge_particles.Get(e.Sorted(),p)){
+                        int n=tri((j+2)%3);
+                        int q;
+                        if(new_edge_particles.Get(I2(e(0),n).Sorted(),q)){
+                            new_elements.Append(I3(n,q,p));
+                            new_elements.Append(I3(q,e(0),p));}
+                        else
+                            new_elements.Append(I3(e(0),p,n));
+                        if(new_edge_particles.Get(I2(e(1),n).Sorted(),q)){
+                            new_elements.Append(I3(n,p,q));
+                            new_elements.Append(I3(q,p,e(1)));}
+                        else
+                            new_elements.Append(I3(p,e(1),n));
+                        break;
+                    }
+                }
+                if(p==-1)
+                    new_elements.Append(tri);
+                for(int j=n;j<new_elements.m;++j)
+                    new_tri_in_sim.Append(tri_in_sim(i));
+            }
+        }
+        //reset per-triangle data
+        ta->mesh.elements=new_elements;
+        tri_in_sim=new_tri_in_sim;
+        tri_cuttings.Remove_All();
+        tri_cuttings.Resize(tri_in_sim.m);
+        //get rid of unused particles produced by subdivision
+        HASHTABLE<int,int> new_pids;
+        int new_pid=0;
+        ARRAY<PS> new_particle_in_sim;
+        for(int i=0;i<ta->mesh.elements.m;++i)
             for(int j=0;j<3;++j){
-                I2 e(tri(j),tri((j+1)%3));
-                if(new_edge_particles.Get(e.Sorted(),p)){
-                    int n=tri((j+2)%3);
-                    int q;
-                    if(new_edge_particles.Get(I2(e(0),n).Sorted(),q)){
-                        new_elements.Append(I3(n,q,p));
-                        new_elements.Append(I3(q,e(0),p));}
-                    else
-                        new_elements.Append(I3(e(0),p,n));
-                    if(new_edge_particles.Get(I2(e(1),n).Sorted(),q)){
-                        new_elements.Append(I3(n,p,q));
-                        new_elements.Append(I3(q,p,e(1)));}
-                    else
-                        new_elements.Append(I3(p,e(1),n));
-                    break;}}
-            if(p==-1)
-                new_elements.Append(tri);}}
-    //get rid of unused particles
-    new_pids.Clean_Memory();
-    new_pid=0;
-    new_par.Remove_All();
-    for(int i=0;i<new_elements.m;++i)
-        for(int j=0;j<3;++j){
-            int& id=new_elements(i)(j);
-            if(!new_pids.Get(id,id)){
-                new_par.Append(ta->particles.X(id));
-                new_pids.Set(id,new_pid); 
-                id=new_pid;
-                ++new_pid;}}
-    ta->particles.Resize(new_par.m);
-    ta->particles.X=new_par;
-    ta->mesh.elements=new_elements;
-    ta->Update_Number_Nodes();
+                int& id=ta->mesh.elements(i)(j);
+                if(!new_pids.Get(id,id)){
+                    new_particle_in_sim.Append(particle_in_sim(id));
+                    new_pids.Set(id,new_pid); 
+                    id=new_pid;
+                    ++new_pid;}}
+        particle_in_sim=new_particle_in_sim;
+        Update_Material_Particles();
+    }
     
     cout<<"*********cutting done**************"<<endl;
 }
@@ -389,7 +478,9 @@ Run(T tol)
 template<class T> void CUTTING<VECTOR<T,2> >::
 Update_Material_Particles()
 {
-    int p=ta->particles.X.m;
+    int p=particle_in_sim.m;
+    ta->particles.Resize(p);
+    ta->Update_Number_Nodes();
     for(int i=0;i<p;++i){
         T3 w=particle_in_sim(i).y;
         I3 tri=sim_ta->mesh.elements(particle_in_sim(i).x);

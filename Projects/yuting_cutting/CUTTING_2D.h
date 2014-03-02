@@ -28,7 +28,7 @@ class CUTTING<VECTOR<T,2> >
     typedef VECTOR<int,4> I4;
     typedef VECTOR<int,5> I5;
     typedef VECTOR<T,3> T3;
-    
+    typedef PAIR<int,T3> PS;
     enum WORKAROUND {d=TV::m};
     
 public:
@@ -76,11 +76,37 @@ public:
     
     ARRAY<TRI_CUTTING> tri_cuttings;
     ARRAY<int> tri_in_sim;
-    ARRAY<PAIR<int, T3> > particle_in_sim;
+    ARRAY<PS> particle_in_sim;
     
     CUTTING(TRIANGULATED_AREA<T>* sim_ta_,SEGMENTED_CURVE<TV>* sc_);
     ~CUTTING(){}
 
+    T3 Weight_In_Tri(const I3& tri,const I3& tri1,const T3 w1)
+    {
+        T3 w;
+        for(int l=0;l<3;++l)
+            for(int m=0;m<3;++m)
+                if(tri(l)==tri1(m))
+                    w(l)=w1(m);
+        return w;
+    }
+    
+    T3 Weight_In_Sim(int tri_id,const T3& w)
+    {
+        int pid=tri_in_sim(tri_id);
+        I3 ptri=sim_ta->mesh.elements(pid);
+        I3 tri=ta->mesh.elements(tri_id);
+        T3 weight;
+        for(int i=0;i<3;++i){
+            int pid1=particle_in_sim(tri(i)).x;
+            I3 ptri1=sim_ta->mesh.elements(pid1);
+            T3 w1=particle_in_sim(tri(i)).y;
+            T3 ww=Weight_In_Tri(ptri,ptri1,w1);
+            weight+=(ww*w[i]);
+        }
+        return weight;
+    }
+    
     void Run(T tol);
     void Update_Material_Particles();
 };

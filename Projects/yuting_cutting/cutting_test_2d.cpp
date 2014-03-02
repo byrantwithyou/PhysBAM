@@ -156,6 +156,7 @@ void Mouse(int button, int state, int x, int y)
     else if(state==GLUT_UP){
         if(button==GLUT_LEFT_BUTTON){
             Run_Cutter();
+            cout << labels << endl;
             glutPostRedisplay();
         }
         else if(button==GLUT_RIGHT_BUTTON)
