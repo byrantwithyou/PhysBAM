@@ -206,7 +206,7 @@ void Render(){
         }
     }
     glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
-    glColor4f(0.0, 1.0, 0.0, 1.0);
+    glColor4f(0.0, 0.0, 1.0, 1.0);
     glDrawArrays(GL_LINES,0,vertices.m);
     
     //edges of ta
@@ -219,7 +219,7 @@ void Render(){
         }
     }
     glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
-    glColor4f(0.0, 0.0, 1.0, 1.0);
+    glColor4f(0.0, 1.0, 0.0, 1.0);
     glDrawArrays(GL_LINES,0,vertices.m);
     
     //material elements
