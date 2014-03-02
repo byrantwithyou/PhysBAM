@@ -39,8 +39,8 @@ public:
     T tol_vv[4];
     T tol_ev[4];
 
-    CONSISTENT_INTERSECTIONS(TRIANGULATED_AREA<T>& ta,SEGMENTED_CURVE<TV>& sc)
-        :ta(ta),sc(sc)
+    CONSISTENT_INTERSECTIONS(TRIANGULATED_AREA<T>& ta_,SEGMENTED_CURVE<TV>& sc_)
+        :ta(ta_),sc(sc_)
     {}
 
     ~CONSISTENT_INTERSECTIONS(){}
@@ -86,8 +86,8 @@ public:
     T tol_ee[4];
     T tol_fv[4];
 
-    CONSISTENT_INTERSECTIONS(TETRAHEDRALIZED_VOLUME<T>& tv,TRIANGULATED_SURFACE<T>& ts)
-        :tv(tv),ts(ts)
+    CONSISTENT_INTERSECTIONS(TETRAHEDRALIZED_VOLUME<T>& tv_,TRIANGULATED_SURFACE<T>& ts_)
+        :tv(tv_),ts(ts_)
     {}
 
     ~CONSISTENT_INTERSECTIONS(){}
