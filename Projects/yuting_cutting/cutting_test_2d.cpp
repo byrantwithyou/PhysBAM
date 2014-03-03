@@ -255,16 +255,15 @@ void Initialize_Meshes()
     sim_ta->particles.X(2)=TV(.5,0);
     sim_ta->particles.X(3)=TV(0,-.5);
     sim_ta->mesh.elements.Append(I3(0,1,2));
-//    sim_ta->mesh.elements.Append(I3(2,1,3));
+    sim_ta->mesh.elements.Append(I3(2,1,3));
     sim_ta->Update_Number_Nodes();
-    sim_ta->mesh.Identify_Connected_Components(labels);
-    
+
     sc=SEGMENTED_CURVE_2D<T>::Create();
     
     sc->particles.Add_Elements(3);
-    sc->particles.X(0)=TV(-.8,0.1);
-    sc->particles.X(1)=TV(.1,0.1);
-    sc->particles.X(2)=TV(.8,0.1);
+    sc->particles.X(0)=TV(-.8,0.25);
+    sc->particles.X(1)=TV(.0,0.25);
+    sc->particles.X(2)=TV(.8,0.25);
     sc->mesh.elements.Append(I2(0,1));
     sc->mesh.elements.Append(I2(1,2));
     sc->Update_Number_Nodes();
