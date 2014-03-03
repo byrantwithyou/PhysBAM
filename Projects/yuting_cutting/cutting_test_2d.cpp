@@ -247,16 +247,16 @@ void Reshape(GLint newWidth,GLint newHeight) {
 
 void Initialize_Meshes()
 {
-    //ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),20);
-    sim_ta=TRIANGULATED_AREA<T>::Create();
-    sim_ta->particles.Add_Elements(4);
-    sim_ta->particles.X(0)=TV(0,.5);
-    sim_ta->particles.X(1)=TV(-.5,0);
-    sim_ta->particles.X(2)=TV(.5,0);
-    sim_ta->particles.X(3)=TV(0,-.5);
-    sim_ta->mesh.elements.Append(I3(0,1,2));
-    sim_ta->mesh.elements.Append(I3(2,1,3));
-    sim_ta->Update_Number_Nodes();
+    ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),20);
+//    sim_ta=TRIANGULATED_AREA<T>::Create();
+//    sim_ta->particles.Add_Elements(4);
+//    sim_ta->particles.X(0)=TV(0,.5);
+//    sim_ta->particles.X(1)=TV(-.5,0);
+//    sim_ta->particles.X(2)=TV(.5,0);
+//    sim_ta->particles.X(3)=TV(0,-.5);
+//    sim_ta->mesh.elements.Append(I3(0,1,2));
+//    sim_ta->mesh.elements.Append(I3(2,1,3));
+//    sim_ta->Update_Number_Nodes();
 
     sc=SEGMENTED_CURVE_2D<T>::Create();
     
