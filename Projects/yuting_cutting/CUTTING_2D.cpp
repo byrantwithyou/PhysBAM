@@ -253,8 +253,7 @@ Run(T tol)
                     int s=particle_in_sim(pid).x;
                     I3 tri1=original_sim_elements(s);
                     T3 w1=particle_in_sim(pid).y;
-                    I3 tri=original_sim_elements(parent_tri_id);
-                    particle_in_sim.Append(PS(parent_tri_id,Weight_In_Tri(tri,tri1,w1)));
+                    particle_in_sim.Append(PS(parent_tri_id,Weight_In_Tri(parent_tri,tri1,w1)));
                 }
                 I3 new_tri(parent_particles.m-3,parent_particles.m-2,parent_particles.m-1);
                 if(j==0){

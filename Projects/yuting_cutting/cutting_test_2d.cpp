@@ -255,7 +255,7 @@ void Initialize_Meshes()
     sim_ta->particles.X(2)=TV(.5,0);
     sim_ta->particles.X(3)=TV(0,-.5);
     sim_ta->mesh.elements.Append(I3(0,1,2));
-    sim_ta->mesh.elements.Append(I3(2,1,3));
+//    sim_ta->mesh.elements.Append(I3(2,1,3));
     sim_ta->Update_Number_Nodes();
     sim_ta->mesh.Identify_Connected_Components(labels);
     
@@ -270,7 +270,7 @@ void Initialize_Meshes()
     sc->Update_Number_Nodes();
     
     cutter=new CUTTING<TV>(sim_ta,sc);
-//    Run_Cutter();
+    Run_Cutter();
     
     cout << "initialized mesh\n";
 }
