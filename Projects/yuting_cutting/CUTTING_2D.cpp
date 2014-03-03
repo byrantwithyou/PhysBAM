@@ -383,11 +383,11 @@ Run(T tol)
                 }}}
         particle_in_sim=new_particle_in_sim;
     }
-    cout << "particle in sim: " << particle_in_sim << endl;
-    cout << "elements: " << ta->mesh.elements << endl;
-    cout << "tri in sim: " << tri_in_sim << endl;
-    cout << "sim elements: " << sim_ta->mesh.elements << endl;
-    cout << "sim particles: " << sim_ta->particles.X << endl;
+//    cout << "particle in sim: " << particle_in_sim << endl;
+//    cout << "elements: " << ta->mesh.elements << endl;
+//    cout << "tri in sim: " << tri_in_sim << endl;
+//    cout << "sim elements: " << sim_ta->mesh.elements << endl;
+//    cout << "sim particles: " << sim_ta->particles.X << endl;
     
     
     //subdivide and delete unused nodes
@@ -414,7 +414,7 @@ Run(T tol)
                             for(int k=0;k<2;++k)
                                 w[(j+k)%3]=tc.edge_centers(j).Value()(k);
                             particle_in_sim.Append(PS(tri_in_sim(i),Weight_In_Sim(i,w)));
-                            cout << particle_in_sim.Last() << endl;
+                            //cout << particle_in_sim.Last() << endl;
                         }
                         if(tc.materials(2*j)){
                             new_elements.Append(I3(e(0),q,p));
@@ -428,7 +428,6 @@ Run(T tol)
         for(int i=0;i<tri_cuttings.m;++i){
             I3 tri=ta->mesh.elements(i);
             if(tri_cuttings(i).materials.Find(0)==-1){
-                cout << "in" << endl;
                 int p=-1;
                 int n=new_elements.m;
                 for(int j=0;j<3;++j){
@@ -460,11 +459,11 @@ Run(T tol)
         tri_in_sim=new_tri_in_sim;
         tri_cuttings.Remove_All();
         tri_cuttings.Resize(tri_in_sim.m);
-        cout << "particle in sim: " << particle_in_sim << endl;
-        cout << "elements: " << ta->mesh.elements << endl;
-        cout << "tri in sim: " << tri_in_sim << endl;
-        cout << "sim elements: " << sim_ta->mesh.elements << endl;
-        cout << "sim particles: " << sim_ta->particles.X << endl;
+//        cout << "particle in sim: " << particle_in_sim << endl;
+//        cout << "elements: " << ta->mesh.elements << endl;
+//        cout << "tri in sim: " << tri_in_sim << endl;
+//        cout << "sim elements: " << sim_ta->mesh.elements << endl;
+//        cout << "sim particles: " << sim_ta->particles.X << endl;
         
         //get rid of unused particles produced by subdivision
         HASHTABLE<int,int> new_pids;
@@ -480,11 +479,11 @@ Run(T tol)
                     ++new_pid;}}
         particle_in_sim=new_particle_in_sim;
         Update_Material_Particles();
-        cout << "particle in sim: " << particle_in_sim << endl;
-        cout << "elements: " << ta->mesh.elements << endl;
-        cout << "tri in sim: " << tri_in_sim << endl;
-        cout << "sim elements: " << sim_ta->mesh.elements << endl;
-        cout << "sim particles: " << sim_ta->particles.X << endl;
+//        cout << "particle in sim: " << particle_in_sim << endl;
+//        cout << "elements: " << ta->mesh.elements << endl;
+//        cout << "tri in sim: " << tri_in_sim << endl;
+//        cout << "sim elements: " << sim_ta->mesh.elements << endl;
+//        cout << "sim particles: " << sim_ta->particles.X << endl;
     }
     
     cout<<"*********cutting done**************"<<endl;
