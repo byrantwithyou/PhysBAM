@@ -204,7 +204,7 @@ Run(T tol)
                     tc.turned_on(k2+6)=1;
             }
         }
-        cout << tc.turned_on << endl;
+        //cout << tc.turned_on << endl;
         //split based on turn-on and intersections
         ARRAY<int> a;
         for(int j=0;j<6;++j)
@@ -217,7 +217,7 @@ Run(T tol)
                 if(a(j)%2)
                     tc.edge_centers(a(j)/2).set=true;}
             //split
-            I3 parent_tri=original_sim_elements(tri_in_sim(i));
+            I3 parent_tri=original_sim_elements(original_tri_in_sim(i));
             for(int j=0;j<a.m;++j){
                 //duplicate sim tri
                 for(int k=0;k<3;++k)
@@ -275,15 +275,39 @@ Run(T tol)
     //NOT DONE YET!!!
     //split triangles' neighbors' sharing node also need to duplicate, and parent needs to be cuplicated too
     for(int i=0;i<ta->mesh.elements.m;++i){
-        I3& tri=ta->mesh.elements(i);
         if(!split_tris.Contains(i)){
+            I3& tri=ta->mesh.elements(i);
+            I3 parent_tri=original_sim_elements(original_tri_in_sim(i));
+            //duplicate parent sim tri
+            for(int k=0;k<3;++k)
+                sim_parent_particles.Append(parent_tri(k));
+            int parent_tri_id=original_tri_in_sim(i);
+            I3 new_sim_tri(sim_parent_particles.m-3,sim_parent_particles.m-2,sim_parent_particles.m-1);
+            if(duplicated_sim_tris.Contains(parent_tri_id)){
+                parent_tri_id=sim_ta->mesh.elements.m;
+                sim_ta->mesh.elements.Append(new_sim_tri);
+            }
+            else{
+                duplicated_sim_tris.Set(parent_tri_id);
+                sim_ta->mesh.elements(parent_tri_id)=new_sim_tri;
+            }
+            tri_in_sim(i)=parent_tri_id;
+            
+            //duplicate material nodes that are shared with split triangles
             for(int j=0;j<3;++j){
                 if(dup_nodes.Contains(tri(j))){
-//                    parent_particles.Append(tri(j));
-//                    tri(j)=parent_particles.m-1;
-                    split_tris.Set(i);
+                    int pid=tri(j);
+                    parent_particles.Append(pid);
+                    int s=particle_in_sim(pid).x;
+                    I3 tri1=original_sim_elements(s);
+                    T3 w1=particle_in_sim(pid).y;
+                    particle_in_sim.Append(PS(parent_tri_id,Weight_In_Tri(parent_tri,tri1,w1)));
+                    tri(j)=parent_particles.m-1;
                 }
+                else if(particle_in_sim(tri(j)).x==original_tri_in_sim(i))
+                    particle_in_sim(tri(j)).x=parent_tri_id;
             }
+            split_tris.Set(i);//for now every triangle is to be merged
         }
     }
     

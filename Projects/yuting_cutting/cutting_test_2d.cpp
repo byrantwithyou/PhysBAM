@@ -247,7 +247,7 @@ void Reshape(GLint newWidth,GLint newHeight) {
 
 void Initialize_Meshes()
 {
-    sim_ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),20);
+    sim_ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),3);
 //    sim_ta=TRIANGULATED_AREA<T>::Create();
 //    sim_ta->particles.Add_Elements(4);
 //    sim_ta->particles.X(0)=TV(0,.5);
