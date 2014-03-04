@@ -420,6 +420,7 @@ Run(T tol)
         cout<<"subdividing"<<endl;
         HASHTABLE<I2,int> new_edge_particles;
         ARRAY<I3> new_elements;
+        ARRAY<TRI_CUTTING> new_tri_cuttings;
         ARRAY<int> new_tri_in_sim;
         //subdivide split tris
         for(int i=0;i<tri_cuttings.m;++i){
@@ -444,10 +445,12 @@ Run(T tol)
                         if(tc.materials(2*j)){
                             new_elements.Append(I3(e(0),q,p));
                             new_tri_in_sim.Append(tri_in_sim(i));
+                            new_tri_cuttings.Append(TRI_CUTTING());
                         }
                         if(tc.materials(2*j+1)){
                             new_elements.Append(I3(q,e(1),p));
                             new_tri_in_sim.Append(tri_in_sim(i));
+                            new_tri_cuttings.Append(TRI_CUTTING());
                         }}}}}
         //subdivide neighbors
         for(int i=0;i<tri_cuttings.m;++i){
@@ -473,22 +476,22 @@ Run(T tol)
                         break;
                     }
                 }
-                if(p==-1)
+                if(p==-1){
                     new_elements.Append(tri);
-                for(int j=n;j<new_elements.m;++j)
+                    new_tri_cuttings.Append(tri_cuttings(i));
+                }
+                for(int j=n;j<new_elements.m;++j){
                     new_tri_in_sim.Append(tri_in_sim(i));
+                    if(p!=-1)
+                        new_tri_cuttings.Append(TRI_CUTTING());
+                }
             }
         }
         //reset per-triangle data
         ta->mesh.elements=new_elements;
         tri_in_sim=new_tri_in_sim;
-        tri_cuttings.Remove_All();
-        tri_cuttings.Resize(tri_in_sim.m);
-//        cout << "particle in sim: " << particle_in_sim << endl;
-//        cout << "elements: " << ta->mesh.elements << endl;
-//        cout << "tri in sim: " << tri_in_sim << endl;
-//        cout << "sim elements: " << sim_ta->mesh.elements << endl;
-//        cout << "sim particles: " << sim_ta->particles.X << endl;
+        tri_cuttings=new_tri_cuttings;
+        cout<<new_tri_cuttings.m<<" "<<new_tri_in_sim.m<<endl;
         
         //get rid of unused particles produced by subdivision
         HASHTABLE<int,int> new_pids;
