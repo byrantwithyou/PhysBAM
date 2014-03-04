@@ -192,7 +192,7 @@ Run(T tol)
                     tc.face_center.Add(c);}}
             //turn on
             for(int k=0;k<6;++k)
-                if(hit(k)&&(hit((k+3)%6)||hit(6)||(k+4)%6))
+                if(hit(k)&&(hit((k+3)%6)||hit(6)||hit((k+4)%6)||hit((k+2)%6)))
                     tc.turned_on(k)=1;
             for(int k=0;k<3;++k){
                 int k1=2*k;
@@ -204,7 +204,9 @@ Run(T tol)
                     tc.turned_on(k2+6)=1;
             }
         }
-        //cout << tc.turned_on << endl;
+        cout << tc.turned_on << endl;
+        tri_cuttings(i)=tc;
+        
         //split based on turn-on and intersections
         ARRAY<int> a;
         for(int j=0;j<6;++j)
@@ -272,8 +274,7 @@ Run(T tol)
         }
     }
     
-    //NOT DONE YET!!!
-    //split triangles' neighbors' sharing node also need to duplicate, and parent needs to be cuplicated too
+    //split triangles' neighbors' sharing node and cut on edges also need to duplicate, and all parent tris needs to be cuplicated in case miss splits
     for(int i=0;i<ta->mesh.elements.m;++i){
         if(!split_tris.Contains(i)){
             I3& tri=ta->mesh.elements(i);
@@ -293,9 +294,9 @@ Run(T tol)
             }
             tri_in_sim(i)=parent_tri_id;
             
-            //duplicate material nodes that are shared with split triangles
+            //duplicate material nodes that are shared with split triangles or on an edge being cut
             for(int j=0;j<3;++j){
-                if(dup_nodes.Contains(tri(j))){
+                if(dup_nodes.Contains(tri(j))||tri_cuttings(i).turned_on(6+(2*j+5)%6)||tri_cuttings(i).turned_on(6+2*j)){
                     int pid=tri(j);
                     parent_particles.Append(pid);
                     int s=particle_in_sim(pid).x;

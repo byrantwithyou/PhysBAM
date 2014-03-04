@@ -193,7 +193,7 @@ void Render(){
             vertices.Append(sc->particles.X(edge(i)));
     }
     glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
-    glColor4f(0.0, 0.0, 1.0, 1.0);
+    glColor4f(1.0, 1.0, 1.0, 1.0);
     glDrawArrays(GL_LINES,0,vertices.m);
     
     //edges of sim_ta
@@ -246,25 +246,30 @@ void Reshape(GLint newWidth,GLint newHeight) {
 
 void Initialize_Meshes()
 {
-    sim_ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),3);
-//    sim_ta=TRIANGULATED_AREA<T>::Create();
-//    sim_ta->particles.Add_Elements(4);
-//    sim_ta->particles.X(0)=TV(0,.5);
-//    sim_ta->particles.X(1)=TV(-.5,0);
-//    sim_ta->particles.X(2)=TV(.5,0);
-//    sim_ta->particles.X(3)=TV(0,-.5);
-//    sim_ta->mesh.elements.Append(I3(0,1,2));
-//    sim_ta->mesh.elements.Append(I3(2,1,3));
-//    sim_ta->Update_Number_Nodes();
+    //sim_ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),3);
+    sim_ta=TRIANGULATED_AREA<T>::Create();
+    sim_ta->particles.Add_Elements(4);
+    sim_ta->particles.X(0)=TV(0,.5);
+    sim_ta->particles.X(1)=TV(-.5,0);
+    sim_ta->particles.X(2)=TV(.5,0);
+    sim_ta->particles.X(3)=TV(0,-.5);
+    sim_ta->mesh.elements.Append(I3(0,1,2));
+    sim_ta->mesh.elements.Append(I3(2,1,3));
+    sim_ta->Update_Number_Nodes();
 
     sc=SEGMENTED_CURVE_2D<T>::Create();
     
-    sc->particles.Add_Elements(3);
-    sc->particles.X(0)=TV(-.8,0.1);
-    sc->particles.X(1)=TV(.0,0.1);
-    sc->particles.X(2)=TV(.8,0.1);
+    sc->particles.Add_Elements(6);
+    sc->particles.X(0)=TV(0,0.8);
+    sc->particles.X(1)=TV(.0,0);
+    sc->particles.X(2)=TV(0,-0.8);
+    sc->particles.X(3)=TV(-0.8,0);
+    sc->particles.X(4)=TV(.0,0);
+    sc->particles.X(5)=TV(0.8,0);
     sc->mesh.elements.Append(I2(0,1));
     sc->mesh.elements.Append(I2(1,2));
+    sc->mesh.elements.Append(I2(3,4));
+    sc->mesh.elements.Append(I2(4,5));
     sc->Update_Number_Nodes();
     
     cutter=new CUTTING<TV>(sim_ta,sc);
