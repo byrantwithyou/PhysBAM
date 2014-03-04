@@ -156,7 +156,6 @@ void Mouse(int button, int state, int x, int y)
     else if(state==GLUT_UP){
         if(button==GLUT_LEFT_BUTTON){
             Run_Cutter();
-            cout << labels << endl;
             glutPostRedisplay();
         }
         else if(button==GLUT_RIGHT_BUTTON)
@@ -261,16 +260,15 @@ void Initialize_Meshes()
     sc=SEGMENTED_CURVE_2D<T>::Create();
     
     sc->particles.Add_Elements(3);
-    sc->particles.X(0)=TV(-.8,0.25);
-    sc->particles.X(1)=TV(.0,0.25);
-    sc->particles.X(2)=TV(.8,0.25);
+    sc->particles.X(0)=TV(-.8,0.1);
+    sc->particles.X(1)=TV(.0,0.1);
+    sc->particles.X(2)=TV(.8,0.1);
     sc->mesh.elements.Append(I2(0,1));
     sc->mesh.elements.Append(I2(1,2));
     sc->Update_Number_Nodes();
     
     cutter=new CUTTING<TV>(sim_ta,sc);
     Run_Cutter();
-    
     cout << "initialized mesh\n";
 }
 
@@ -278,6 +276,10 @@ int main(int argc, char **argv)
 {
     argc1 = argc;
     argv1 = argv;
+    
+    Initialize_Meshes();
+    
+    
     glutInit( &argc, argv );
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
     glutInitWindowSize(window_width,window_height);
@@ -285,8 +287,6 @@ int main(int argc, char **argv)
     glutCreateWindow(window_name.c_str());
     glClearColor(0.0,0.0,0.0,1.0);
     glEnable(GL_DEPTH_TEST);
-    
-    Initialize_Meshes();
     
     //glutSpecialFunc(Special_Key);
     glutKeyboardFunc(Key);

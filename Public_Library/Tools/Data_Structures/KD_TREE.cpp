@@ -15,6 +15,7 @@
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <algorithm>
+
 using namespace PhysBAM;
 //#####################################################################
 // Function Inside_Node
@@ -177,6 +178,7 @@ Median_Split(const int partition_index,const int first_index,const int last_inde
 {
     ARRAY_VIEW<int> permutation_subset(permutation_array.Subset(first_index+IDENTITY_ARRAY<>(last_index-first_index)));
     ARRAY<T> values(points.Subset(permutation_subset).Project(axis)); // copy so that nth_element doesn't mess up original values
+
     std::nth_element(values.begin(),&values(partition_index-first_index),values.end());
     T split_value=values(partition_index-first_index);
     Partition_Helper_Less_Equal partition_helper_less_equal(&points,axis,split_value);
