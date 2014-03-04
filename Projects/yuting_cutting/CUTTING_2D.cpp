@@ -191,8 +191,9 @@ Run(T tol)
                         c(tri.Find(p(j)))=weight(j);
                     tc.face_center.Add(c);}}
             //turn on
+            //cout<<hit<<endl;
             for(int k=0;k<6;++k)
-                if(hit(k)&&(hit((k+3)%6)||hit(6)||hit((k+4)%6)||hit((k+2)%6)))
+                if(hit(k)&&(hit((k+3)%6)||hit(6)||((k%2)&&(hit((k+4)%6)||hit((k+2)%6)))))
                     tc.turned_on(k)=1;
             for(int k=0;k<3;++k){
                 int k1=2*k;
@@ -204,7 +205,7 @@ Run(T tol)
                     tc.turned_on(k2+6)=1;
             }
         }
-        cout << tc.turned_on << endl;
+        //cout<<tc.turned_on<<endl;
         tri_cuttings(i)=tc;
         
         //split based on turn-on and intersections
@@ -491,7 +492,6 @@ Run(T tol)
         ta->mesh.elements=new_elements;
         tri_in_sim=new_tri_in_sim;
         tri_cuttings=new_tri_cuttings;
-        cout<<new_tri_cuttings.m<<" "<<new_tri_in_sim.m<<endl;
         
         //get rid of unused particles produced by subdivision
         HASHTABLE<int,int> new_pids;
@@ -513,7 +513,6 @@ Run(T tol)
 //        cout << "sim elements: " << sim_ta->mesh.elements << endl;
 //        cout << "sim particles: " << sim_ta->particles.X << endl;
     }
-    
     cout<<"*********cutting done**************"<<endl;
 }
 
