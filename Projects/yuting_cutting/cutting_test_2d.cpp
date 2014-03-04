@@ -82,7 +82,6 @@ static void Key(unsigned char key, int x, int y)
             cutter->Update_Material_Particles();
             for(int i=0;i<sc->particles.X.m;++i)
                 sc->particles.X(i)*=scale_speed;
-            glutPostRedisplay();
             break;
         case 's':
             for(int i=0;i<sim_ta->particles.X.m;++i)
@@ -90,9 +89,9 @@ static void Key(unsigned char key, int x, int y)
             cutter->Update_Material_Particles();
             for(int i=0;i<sc->particles.X.m;++i)
                 sc->particles.X(i)/=scale_speed;
-            glutPostRedisplay();
             break;
     }
+    glutPostRedisplay();
 }
 
 void Mouse(int button, int state, int x, int y)
@@ -246,7 +245,7 @@ void Reshape(GLint newWidth,GLint newHeight) {
 
 void Initialize_Meshes()
 {
-    sim_ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),1);
+    sim_ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),30);
 //    sim_ta=TRIANGULATED_AREA<T>::Create();
 //    sim_ta->particles.Add_Elements(4);
 //    sim_ta->particles.X(0)=TV(0,.5);
