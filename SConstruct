@@ -20,7 +20,6 @@ variables.AddVariables(
     ('cache','Cache directory to use',''),
     BoolVariable('shared','Build shared libraries',1),
     BoolVariable('wrapper','Build wrapper executable file',1),
-    BoolVariable('shared_objects','Build shareable objects when without shared libraries',1),
     BoolVariable('USE_RAY_TRACING','Use ray tracing',0),
     BoolVariable('USE_COMPRESSIBLE','Use compressible flow',0),
     BoolVariable('USE_DEFORMABLES','Use deformable objects',0),
@@ -38,7 +37,6 @@ variables.AddVariables(
     BoolVariable('compile_headers','compile headers without .cpp files',1),
     BoolVariable('install_headers','install Public_Library headers into $INSTALL_DIR/include/physbam',1),
     BoolVariable('use_rpath','use rpaths for dynamic libraries',1),
-    BoolVariable('single_so','generate only one global shared library',0),
     ('CXXFLAGS_EXTRA','',[]),
     ('LINKFLAGS_EXTRA','',[]),
     ('CPPPATH_EXTRA','',[]),
@@ -219,7 +217,6 @@ if env['PLATFORM']=='darwin':
 env.Append(CPPPATH=['#/Public_Library'])
 
 ### linker flags
-common_libraries=[]
 extra_program_depends=[] # for win32 because dll's are actually needed for running while linking can be done with just .libs
 def Link_Flags(env):
     if env['INSTALL_PATH']:
@@ -229,33 +226,28 @@ def Link_Flags(env):
     env.Append(LIBPATH=public_library)
     if env['shared']:
         env.Append(RPATH=[Dir(public_library).abspath])
-    if not env['shared'] or not env['single_so']:
-        if env['USE_OPENGL']:
-            env.Append(LIBS=['PhysBAM_OpenGL'+library_suffix])
-            env['USE_DEFORMABLES']=1
-        if env['USE_RAY_TRACING']:
-            env.Append(LIBS=['PhysBAM_Ray_Tracing'+library_suffix])
-            env['USE_DYNAMICS']=1
-        if env['USE_COMPRESSIBLE'] or env['USE_INCOMPRESSIBLE'] or env['USE_DYNAMICS']:
-            env.Append(LIBS=['PhysBAM_Dynamics'+library_suffix])
-            env.Append(LIBS=['PhysBAM_Fluids'+library_suffix])
-            env.Append(LIBS=['PhysBAM_Incompressible'+library_suffix])
-            env.Append(LIBS=['PhysBAM_Compressible'+library_suffix])
-            env['USE_SOLIDS']=1
-        if env['USE_SOLIDS']:
-            env.Append(LIBS=['PhysBAM_Solids'+library_suffix])
-            env['USE_DEFORMABLES']=1
-        if env['USE_DEFORMABLES']:
-            env.Append(LIBS=['PhysBAM_Deformables'+library_suffix])
-            env['USE_RIGIDS']=1
-        if env['USE_RIGIDS']:
-            env.Append(LIBS=['PhysBAM_Rigids'+library_suffix])
-            env['USE_GEOMETRY']=1
-        if env['USE_GEOMETRY']:
-            env.Append(LIBS=['PhysBAM_Geometry'+library_suffix])
-            env['USE_TOOLS']=1
-        if env['USE_TOOLS']: env.Append(LIBS=['PhysBAM_Tools'+library_suffix])
-#    env.Append(LIBS=common_libraries)
+    if env['USE_OPENGL']:
+        env.Append(LIBS=['PhysBAM_OpenGL'+library_suffix])
+        env['USE_DEFORMABLES']=1
+    if env['USE_RAY_TRACING']:
+        env.Append(LIBS=['PhysBAM_Ray_Tracing'+library_suffix])
+        env['USE_DYNAMICS']=1
+    if env['USE_COMPRESSIBLE'] or env['USE_INCOMPRESSIBLE'] or env['USE_DYNAMICS']:
+        env.Append(LIBS=['PhysBAM_Dynamics'+library_suffix])
+        env['USE_SOLIDS']=1
+    if env['USE_SOLIDS']:
+        env.Append(LIBS=['PhysBAM_Solids'+library_suffix])
+        env['USE_DEFORMABLES']=1
+    if env['USE_DEFORMABLES']:
+        env.Append(LIBS=['PhysBAM_Deformables'+library_suffix])
+        env['USE_RIGIDS']=1
+    if env['USE_RIGIDS']:
+        env.Append(LIBS=['PhysBAM_Rigids'+library_suffix])
+        env['USE_GEOMETRY']=1
+    if env['USE_GEOMETRY']:
+        env.Append(LIBS=['PhysBAM_Geometry'+library_suffix])
+        env['USE_TOOLS']=1
+    if env['USE_TOOLS']: env.Append(LIBS=['PhysBAM_Tools'+library_suffix])
     for name,lib in external_libraries.items():
         if env['USE_'+name.upper()]:
             env.Append(LINKFLAGS=lib['linkflags'],LIBS=lib['libs'])
@@ -272,13 +264,6 @@ def Find_SConscripts_In_Subdirectories(env,dir):
     for c in glob.glob(os.path.join(dir,"*","SConscript"))+glob.glob(os.path.join(dir,"*/*","SConscript")):
         env.SConscript(os.path.join(variant_build,c))
 
-### find directories matching a given find pattern
-def Find_Directories(find_filter_function=None):
-    directory=Dir('.').srcnode().abspath
-    directories=filter(lambda x: os.path.isdir(os.path.join(directory,x)),os.listdir(directory))
-    if find_filter_function==None: return directories
-    else: return filter(find_filter_function,directories)
-
 ### find all .cpp files below current directory
 def Find_Sources(dirs,ignore=[],sources=[],exclude=[]):
     local_sources=sources[:]
@@ -290,11 +275,10 @@ def Find_Sources(dirs,ignore=[],sources=[],exclude=[]):
         if(env['USE_LEX_YACC'] and (test_file.endswith(".ll") or test_file.endswith(".yy"))): type_ok=True
         return type_ok and reduce(lambda x,y: x and y,test_results,True) and reduce(lambda x,y: x and y,test_results_exclude,True)
     build_directory=Dir('.').srcnode().abspath;build_directory_length=len(build_directory)+1
-    for subdir in dirs:
-        for root,dirs,files in os.walk(os.path.join(build_directory,subdir)):
+    for d in dirs:
+        for root,dirs,files in os.walk(os.path.join(build_directory,d)):
             modified_root=root[build_directory_length:]
             local_sources.extend(filter(lambda filename: source_filter(filename,ignore),map(lambda file: os.path.join(modified_root,file),files)))
-    cmd_ignore=' -not -name '.join(['.\*']+ignore)
     cpps=filter(lambda s:s.endswith('.cpp') or s.endswith('.ll') or s.endswith('.yy'),local_sources)
     cpp_set=set(cpps)
     headers=filter(lambda s:s.endswith('.h') and not (s[:-2]+'.cpp' in cpp_set),local_sources)
@@ -315,9 +299,10 @@ def Automatic_Object_Helper(env,source,libraries):
         source_path=source_path.replace("Public_Library/","")
         env.Command(cpp,source,'echo \#include \\<'+source_path+'\\> > $TARGET')
     else: cpp=source
-    if env['shared_objects'] or env['shared']: builder=env.SharedObject
+    if env['shared']: builder=env.SharedObject
     else: builder=env.StaticObject
     return builder(cpp,CPPDEFINES=cppdefines_reversed[::-1],CPPPATH_HIDDEN=cpppath_reversed[::-1])
+
 def Automatic_Objects(env,sources):
     libraries=[external_libraries[name] for name in external_libraries.keys() if env['USE_'+name.upper()]]
     if type(sources)==list: return [Automatic_Object_Helper(env,source,libraries) for source in sources]
@@ -392,16 +377,6 @@ def Automatic_Circular_DLLs(env,dirs):
         env_link.Append(LIBS=other_libraries)
         dlls=env_link.SharedLibrary(library_name,source=[def_file,objects])
         extra_program_depends.extend(Flatten(dlls))
-        common_libraries.append(library_name)
-
-def Name_From_Library(env,library):
-    if env['PLATFORM'].startswith("win32"):
-        name=os.path.splitext(os.path.basename(library[0].path))[0]
-        return name
-    else:
-        assert(len(library)==1)
-        name=os.path.splitext(os.path.basename(library[0].path))[0]
-        return name[3:]
 
 # Generate a wrapper on Posix 
 wrapper_template_file=File('#Scripts/scons/wrapper_template')
@@ -423,6 +398,7 @@ def Generate_Wrapper(source,target,env):
     binary_path,binary_name=os.path.split(binary.path)
     open(target[0].abspath,"w").write(wrapper_template%(":".join(paths),relative_path(wrapper_dir,binary_path),binary_name))
     os.chmod(target[0].abspath,0755)
+
 env.Append(BUILDERS={'Wrapper':Builder(action=Generate_Wrapper)})
 
 # Generate DEF/DLL files for Windows
@@ -458,6 +434,7 @@ def DllDef_File(source,target,env):
         deffp.write(item+"\n")
     deffp.close()
     return None
+
 env.Append(BUILDERS={"DllDef":Builder(action=DllDef_File)})
 env.Append(BUILDERS={"DllImportLibrary":Builder(action="${AR} /out:${TARGETS[0]} /def:${SOURCES[0]} ${SOURCES[1:]} ")})
 #env.Append(BUILDERS={"Dll":Builder(action="${AR} /out:${TARGETS[0]} /def:${SOURCES[0]} ${SOURCES[1:]} ")})
@@ -487,8 +464,7 @@ def Automatic_Program(env,name='',sources=None):
     else:
         executable_target_path=os.path.join(Dir('.').srcnode().abspath,install_name)
     ### Mac OS X does not support -rdynamic    
-    if sys.platform!="darwin":
-        if not env['shared']: env_link.Append(LINKFLAGS='-rdynamic')
+    if sys.platform!="darwin" and not env['shared']: env_link.Append(LINKFLAGS='-rdynamic')
     if env['install_programs']:
         if env['shared'] and env['wrapper']:
             rpath_save=env_link['RPATH']
@@ -513,10 +489,8 @@ def Automatic_Global_Library(env,name,source_libs):
     if env_global["use_rpath"]==0 or env_global['PLATFORM']=='darwin': env_global.Replace(RPATH=[])
     return env_global.SharedLibrary(name,source_libs)
 
-exported_objects={} # dictionary to allow sharing object files between directories
-
 ### build everything
-Export('env Automatic_Library Automatic_Program Automatic_Circular_DLLs Automatic_Global_Library Automatic_Objects Find_Directories Find_Sources variant_build common_libraries exported_objects Name_From_Library')
+Export('env Automatic_Library Automatic_Program Automatic_Circular_DLLs Automatic_Global_Library Find_Sources variant_build')
 env.SConscript(variant_build+'/Public_Library/SConscript')
 Find_SConscripts_In_Subdirectories(env,'Projects')
 Find_SConscripts(env,'Tests')
