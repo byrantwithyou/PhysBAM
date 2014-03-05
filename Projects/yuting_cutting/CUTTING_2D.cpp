@@ -146,6 +146,8 @@ Run(T tol)
         for(typename HASHTABLE<int,ARRAY<P> >::ITERATOR seg_it(it.Data());seg_it.Valid();seg_it.Next()){
             const ARRAY<P>& intersects=seg_it.Data();
             VECTOR<bool,7> hit;
+            ARRAY<T3> face_center;
+            VECTOR<ARRAY<TV>,3> edge_centers;
             for(int k=0;k<intersects.m;++k){
                 const I5& p=intersects(k).x;
                 const T3& weight=intersects(k).y;
@@ -153,7 +155,7 @@ Run(T tol)
                     hit(tri.Find(p(0))*2)=1;
                     T3 c;
                     c(tri.Find(p(0)))=1;
-                    tc.face_center.Add(c);
+                    face_center.Append(c);
                 }
                 else if(p(2)==-1){
                     I2 e(tri.Find(p(0)),tri.Find(p(1)));
@@ -170,18 +172,18 @@ Run(T tol)
                         hit(3)=1;
                         eid=1;}
                     if(tri(eid)==p(0)){
-                        tc.edge_centers(eid).Add(TV(1-weight(0),weight(0)));
+                        edge_centers(eid).Append(TV(1-weight(0),weight(0)));
                         T3 c;
                         c(eid)=1-weight(0);
                         c((eid+1)%3)=weight(0);
-                        tc.face_center.Add(c);
+                        face_center.Append(c);
                     }
                     else{
-                        tc.edge_centers(eid).Add(TV(weight(0),1-weight(0)));
+                        edge_centers(eid).Append(TV(weight(0),1-weight(0)));
                         T3 c;
                         c(eid)=weight(0);
                         c((eid+1)%3)=1-weight(0);
-                        tc.face_center.Add(c);
+                        face_center.Append(c);
                     }
                 }
                 else{
@@ -189,12 +191,15 @@ Run(T tol)
                     T3 c;
                     for(int j=0;j<3;++j)
                         c(tri.Find(p(j)))=weight(j);
-                    tc.face_center.Add(c);}}
-            //turn on
+                    face_center.Append(c);}}
             //cout<<hit<<endl;
+            //turn on
+            bool add=0;
             for(int k=0;k<6;++k)
-                if(hit(k)&&(hit((k+3)%6)||hit(6)||((k%2)&&(hit((k+4)%6)||hit((k+2)%6)))))
+                if(hit(k)&&(hit((k+3)%6)||hit(6)||((k%2)&&(hit((k+4)%6)||hit((k+2)%6))))){
+                    add=1;
                     tc.turned_on(k)=1;
+                }
             for(int k=0;k<3;++k){
                 int k1=2*k;
                 int k2=2*k+1;
@@ -203,6 +208,14 @@ Run(T tol)
                     tc.turned_on(k1+6)=1;
                 if(hit(k3)&&(hit(k1)||hit(k2)))
                     tc.turned_on(k2+6)=1;
+            }
+            //add centers
+            if(add){
+                for(int k=0;k<face_center.m;++k)
+                    tc.face_center.Add(face_center(k));
+                for(int k=0;k<3;++k)
+                    for(int l=0;l<edge_centers(k).m;++l)
+                        tc.edge_centers(k).Add(edge_centers(k)(l));
             }
         }
         //cout<<tc.turned_on<<endl;
