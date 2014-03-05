@@ -153,6 +153,7 @@ Run(T tol)
                 const T3& weight=intersects(k).y;
                 if(p(1)==-1){
                     hit(tri.Find(p(0))*2)=1;
+                    dup_nodes.Set(p(0));
                     T3 c;
                     c(tri.Find(p(0)))=1;
                     face_center.Append(c);

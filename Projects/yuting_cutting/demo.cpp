@@ -42,13 +42,13 @@ int window_width=600;
 int window_height=600;
 TV starting_position;
 T trans_speed=0.1;
-T scale_speed=1.1;
+T scale_speed=1.4;
 TRIANGULATED_AREA<T>* sim_ta=NULL;
 SEGMENTED_CURVE_2D<T>* sc=NULL;
-CUTTING<TV>* cutter;
+CUTTING<TV>* cutter=NULL;
 ARRAY<int> labels;
 HASHTABLE<int> dragging_particles;
-bool dragging=false,cutting=false,draw_sim=true,draw_cutting_edge=true;
+bool dragging=false,cutting=false,draw_sim=false,draw_cutting_edge=true;
 
 void Run_Cutter()
 {
@@ -68,64 +68,6 @@ void Run_Cutter()
         delete cutter->ta;
         cutter->ta=nta;
     }
-}
-
-static void Key(unsigned char key, int x, int y)
-{
-    switch( key ) {
-        case 033: // Escape Key
-            exit(EXIT_SUCCESS);
-            break;
-        case 'z':
-            draw_sim=!draw_sim;
-            break;
-        case 'x':
-            draw_cutting_edge=!draw_cutting_edge;
-            break;
-        case 'q':
-            for(int i=0;i<sim_ta->particles.X.m;++i)
-                sim_ta->particles.X(i)*=scale_speed;
-            cutter->Update_Material_Particles();
-            for(int i=0;i<sc->particles.X.m;++i)
-                sc->particles.X(i)*=scale_speed;
-            break;
-        case 'e':
-            for(int i=0;i<sim_ta->particles.X.m;++i)
-                sim_ta->particles.X(i)/=scale_speed;
-            cutter->Update_Material_Particles();
-            for(int i=0;i<sc->particles.X.m;++i)
-                sc->particles.X(i)/=scale_speed;
-            break;
-        case 'w':
-            for(int i=0;i<sim_ta->particles.X.m;++i)
-                sim_ta->particles.X(i)(1)+=trans_speed;
-            cutter->Update_Material_Particles();
-            for(int i=0;i<sc->particles.X.m;++i)
-                sc->particles.X(i)(1)+=trans_speed;
-            break;
-        case 's':
-            for(int i=0;i<sim_ta->particles.X.m;++i)
-                sim_ta->particles.X(i)(1)-=trans_speed;
-            cutter->Update_Material_Particles();
-            for(int i=0;i<sc->particles.X.m;++i)
-                sc->particles.X(i)(1)-=trans_speed;
-            break;
-        case 'a':
-            for(int i=0;i<sim_ta->particles.X.m;++i)
-                sim_ta->particles.X(i)(0)-=trans_speed;
-            cutter->Update_Material_Particles();
-            for(int i=0;i<sc->particles.X.m;++i)
-                sc->particles.X(i)(0)-=trans_speed;
-            break;
-        case 'd':
-            for(int i=0;i<sim_ta->particles.X.m;++i)
-                sim_ta->particles.X(i)(0)+=trans_speed;
-            cutter->Update_Material_Particles();
-            for(int i=0;i<sc->particles.X.m;++i)
-                sc->particles.X(i)(0)+=trans_speed;
-            break;
-    }
-    glutPostRedisplay();
 }
 
 void Mouse(int button, int state, int x, int y)
@@ -281,104 +223,287 @@ void Reshape(GLint newWidth,GLint newHeight) {
     glutPostRedisplay();
 }
 
-void Initialize_Meshes()
+//1.one triangle, cut by mouse to show split.
+//2.one triangle, degenerate cases.
+//3.two triangles, not sharing node, cut by mouse to show effect without merging.
+//4.two triangles, with merging, cut by mouse.
+//5.two triangles, cut on the sharing edge, cut on nodes.
+//6.two triangles, show sim triangles.
+//7.disk with many triangles.
+
+//one triangle split
+void Step1()
 {
-    sim_ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),10);
+    if(sim_ta) delete sim_ta;
+    sim_ta=TRIANGULATED_AREA<T>::Create();
+    sim_ta->particles.Add_Elements(3);
+    sim_ta->particles.X(0)=TV(0,.5);
+    sim_ta->particles.X(1)=TV(-0.5/sqrt(3),0);
+    sim_ta->particles.X(2)=TV(.5/sqrt(3),0);
+    sim_ta->mesh.elements.Append(I3(0,1,2));
+    sim_ta->Update_Number_Nodes();
     
-    //four triangles
-//    sim_ta=TRIANGULATED_AREA<T>::Create();
-//    sim_ta->particles.Add_Elements(4);
-//    sim_ta->particles.X(0)=TV(0,.5);
-//    sim_ta->particles.X(1)=TV(-.5,0);
-//    sim_ta->particles.X(2)=TV(.5,0);
-//    sim_ta->particles.X(3)=TV(0,-.5);
-//    sim_ta->mesh.elements.Append(I3(0,1,2));
-//    sim_ta->mesh.elements.Append(I3(2,1,3));
-//    sim_ta->Update_Number_Nodes();
-    
-    
-    //six triangles
-//    sim_ta=TRIANGULATED_AREA<T>::Create();
-//    sim_ta->particles.Add_Elements(5);
-//    sim_ta->particles.X(0)=TV(0,.5);
-//    sim_ta->particles.X(1)=TV(-.5,0);
-//    sim_ta->particles.X(2)=TV(0,-.5);
-//    sim_ta->particles.X(3)=TV(.5,0);
-//    sim_ta->particles.X(4)=TV(0,0);
-//    for(int i=0;i<4;++i)
-//        sim_ta->mesh.elements.Append(I3(i,(i+1)%4,4));
-//    sim_ta->Update_Number_Nodes();
-    
+    if(sc) delete sc;
     sc=SEGMENTED_CURVE_2D<T>::Create();
     
-    sc->particles.Add_Elements(12);
-    sc->particles.X(0)=TV(0,0.8);
-    sc->particles.X(1)=TV(.0,0);
-    sc->particles.X(2)=TV(0,-0.8);
-    sc->particles.X(3)=TV(-0.8,0);
-    sc->particles.X(4)=TV(.0,0);
-    sc->particles.X(5)=TV(0.8,0);
-    sc->particles.X(6)=TV(-0.5,-0.5);
-    sc->particles.X(7)=TV(0,0);
-    sc->particles.X(8)=TV(0.5,0.5);
-    sc->particles.X(9)=TV(-0.5,0.5);
-    sc->particles.X(10)=TV(0,0);
-    sc->particles.X(11)=TV(0.5,-0.5);
-    sc->mesh.elements.Append(I2(0,1));
-    sc->mesh.elements.Append(I2(1,2));
-    sc->mesh.elements.Append(I2(3,4));
-    sc->mesh.elements.Append(I2(4,5));
-    sc->mesh.elements.Append(I2(6,7));
-    sc->mesh.elements.Append(I2(7,8));
-    sc->mesh.elements.Append(I2(9,10));
-    sc->mesh.elements.Append(I2(10,11));
-    sc->Update_Number_Nodes();
-    
+    if(cutter) delete cutter;
     cutter=new CUTTING<TV>(sim_ta,sc);
     Run_Cutter();
-    cout << "initialized mesh\n";
 }
 
-//one triangle degeneracy tests
-void Initialize_Meshes0()
+//one triangle one segment cut on node
+void Step2()
 {
+    if(sim_ta) delete sim_ta;
+    sim_ta=TRIANGULATED_AREA<T>::Create();
+    sim_ta->particles.Add_Elements(3);
+    sim_ta->particles.X(0)=TV(0,.5);
+    sim_ta->particles.X(1)=TV(-0.5/sqrt(3),0);
+    sim_ta->particles.X(2)=TV(.5/sqrt(3),0);
+    sim_ta->mesh.elements.Append(I3(0,1,2));
+    sim_ta->Update_Number_Nodes();
+    
+    if(sc) delete sc;
+    sc=SEGMENTED_CURVE_2D<T>::Create();
+    sc->particles.Add_Elements(2);
+    sc->particles.X(0)=TV(0,0.5);
+    sc->particles.X(1)=TV(0,0);
+    sc->mesh.elements.Append(I2(0,1));
+    sc->Update_Number_Nodes();
+    
+    if(cutter) delete cutter;
+    cutter=new CUTTING<TV>(sim_ta,sc);
+    Run_Cutter();
+}
+
+//one triangle 3 segments cut on node
+void Step3()
+{
+    if(sim_ta) delete sim_ta;
+    sim_ta=TRIANGULATED_AREA<T>::Create();
+    sim_ta->particles.Add_Elements(3);
+    sim_ta->particles.X(0)=TV(0,.5);
+    sim_ta->particles.X(1)=TV(-0.5/sqrt(3),0);
+    sim_ta->particles.X(2)=TV(.5/sqrt(3),0);
+    sim_ta->mesh.elements.Append(I3(0,1,2));
+    sim_ta->Update_Number_Nodes();
+    
+    if(sc) delete sc;
+    sc=SEGMENTED_CURVE_2D<T>::Create();
+    sc->particles.Add_Elements(6);
+    sc->particles.X(0)=TV(0,0.5);
+    sc->particles.X(1)=TV(0,0);
+    sc->particles.X(2)=TV(0.5/sqrt(3),0);
+    sc->particles.X(3)=TV(-0.25/sqrt(3),0.25);
+    sc->particles.X(4)=TV(-0.5/sqrt(3),0);
+    sc->particles.X(5)=TV(0.25/sqrt(3),0.25);
+    sc->mesh.elements.Append(I2(0,1));
+    sc->mesh.elements.Append(I2(2,3));
+    sc->mesh.elements.Append(I2(4,5));
+    sc->Update_Number_Nodes();
+    
+    if(cutter) delete cutter;
+    cutter=new CUTTING<TV>(sim_ta,sc);
+    Run_Cutter();
+}
+
+void Step4()
+{
+    if(sim_ta) delete sim_ta;
+    sim_ta=TRIANGULATED_AREA<T>::Create();
+    sim_ta->particles.Add_Elements(6);
+    sim_ta->particles.X(0)=TV(0,.5);
+    sim_ta->particles.X(1)=TV(-0.5,0);
+    sim_ta->particles.X(2)=TV(0,-0.5);
+    sim_ta->particles.X(3)=TV(0,0.5);
+    sim_ta->particles.X(4)=TV(0,-0.5);
+    sim_ta->particles.X(5)=TV(0.5,0);
+    sim_ta->mesh.elements.Append(I3(0,1,2));
+    sim_ta->mesh.elements.Append(I3(3,4,5));
+    sim_ta->Update_Number_Nodes();
+    
+    if(sc) delete sc;
+    sc=SEGMENTED_CURVE_2D<T>::Create();
+    
+    if(cutter) delete cutter;
+    cutter=new CUTTING<TV>(sim_ta,sc);
+    Run_Cutter();
+}
+
+void Step5()
+{
+    if(sim_ta) delete sim_ta;
     sim_ta=TRIANGULATED_AREA<T>::Create();
     sim_ta->particles.Add_Elements(4);
     sim_ta->particles.X(0)=TV(0,.5);
-    sim_ta->particles.X(1)=TV(0,0);
-    sim_ta->particles.X(2)=TV(.5,0);
-    sim_ta->particles.X(3)=TV(0,-0.5);
+    sim_ta->particles.X(1)=TV(-0.5,0);
+    sim_ta->particles.X(2)=TV(0,-0.5);
+    sim_ta->particles.X(3)=TV(0.5,0);
     sim_ta->mesh.elements.Append(I3(0,1,2));
-    sim_ta->mesh.elements.Append(I3(2,1,3));
+    sim_ta->mesh.elements.Append(I3(0,2,3));
     sim_ta->Update_Number_Nodes();
     
+    if(sc) delete sc;
     sc=SEGMENTED_CURVE_2D<T>::Create();
     
-    sc->particles.Add_Elements(12);
-    sc->particles.X(0)=TV(0,0.8);
-    sc->particles.X(1)=TV(0,0.1);
-    sc->particles.X(2)=TV(0,-0.1);
-    sc->particles.X(3)=TV(-0.1,0);
-    sc->particles.X(4)=TV(0.1,0);
-    sc->particles.X(5)=TV(0.8,0);
-    sc->particles.X(6)=TV(0.5,0);
-    sc->particles.X(7)=TV(0,0.25);
-    sc->particles.X(8)=TV(0,0.5);
-    sc->particles.X(9)=TV(0.25,0);
-    sc->particles.X(10)=TV(-0.1,-0.1);
-    sc->particles.X(11)=TV(0.3,0.3);
-    sc->mesh.elements.Append(I2(0,1));
-    sc->mesh.elements.Append(I2(1,2));
-    sc->mesh.elements.Append(I2(3,4));
-    sc->mesh.elements.Append(I2(4,5));
-    sc->mesh.elements.Append(I2(6,7));
-    sc->mesh.elements.Append(I2(8,9));
-    sc->mesh.elements.Append(I2(10,11));
-    sc->Update_Number_Nodes();
-    
+    if(cutter) delete cutter;
     cutter=new CUTTING<TV>(sim_ta,sc);
     Run_Cutter();
-    cout << "initialized mesh\n";
+}
+void Step6()
+{
+    if(sim_ta) delete sim_ta;
+    sim_ta=TRIANGULATED_AREA<T>::Create();
+    sim_ta->particles.Add_Elements(4);
+    sim_ta->particles.X(0)=TV(0,.5);
+    sim_ta->particles.X(1)=TV(-0.5,0);
+    sim_ta->particles.X(2)=TV(0,-0.5);
+    sim_ta->particles.X(3)=TV(0.5,0);
+    sim_ta->mesh.elements.Append(I3(0,1,2));
+    sim_ta->mesh.elements.Append(I3(0,2,3));
+    sim_ta->Update_Number_Nodes();
+    
+    if(sc) delete sc;
+    sc=SEGMENTED_CURVE_2D<T>::Create();
+    sc->particles.Add_Elements(2);
+    sc->particles.X(0)=TV(0,0.5);
+    sc->particles.X(1)=TV(0,-0.5);
+    sc->mesh.elements.Append(I2(0,1));
+    
+    if(cutter) delete cutter;
+    cutter=new CUTTING<TV>(sim_ta,sc);
+    Run_Cutter();
+}
+
+void Step7()
+{
+    if(sim_ta) delete sim_ta;
+    sim_ta=TRIANGULATED_AREA<T>::Create();
+    sim_ta->particles.Add_Elements(4);
+    sim_ta->particles.X(0)=TV(0,.5);
+    sim_ta->particles.X(1)=TV(-0.5,0);
+    sim_ta->particles.X(2)=TV(0,-0.5);
+    sim_ta->particles.X(3)=TV(0.5,0);
+    sim_ta->mesh.elements.Append(I3(0,1,2));
+    sim_ta->mesh.elements.Append(I3(0,2,3));
+    sim_ta->Update_Number_Nodes();
+    
+    if(sc) delete sc;
+    sc=SEGMENTED_CURVE_2D<T>::Create();
+    sc->particles.Add_Elements(2);
+    sc->particles.X(0)=TV(-0.5,0);
+    sc->particles.X(1)=TV(0.5,0);
+    sc->mesh.elements.Append(I2(0,1));
+    
+    if(cutter) delete cutter;
+    cutter=new CUTTING<TV>(sim_ta,sc);
+    Run_Cutter();
+}
+void Step8()
+{
+    if(sim_ta) delete sim_ta;
+    sim_ta=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),.5),30);
+    
+    if(sc) delete sc;
+    sc=SEGMENTED_CURVE_2D<T>::Create();
+    sc->particles.Add_Elements(4);
+    sc->particles.X(0)=TV(-0.5,0);
+    sc->particles.X(1)=TV(0.5,0);
+    sc->particles.X(2)=TV(0,0.5);
+    sc->particles.X(3)=TV(0,-0.5);
+    sc->mesh.elements.Append(I2(0,1));
+    //sc->mesh.elements.Append(I2(2,3));
+    
+    if(cutter) delete cutter;
+    cutter=new CUTTING<TV>(sim_ta,sc);
+    Run_Cutter();
+}
+void Step9()
+{
+}
+static void Key(unsigned char key, int x, int y)
+{
+    switch( key ) {
+        case 033: // Escape Key
+            exit(EXIT_SUCCESS);
+            break;
+        case '1':
+            Step1();
+            break;
+        case '2':
+            Step2();
+            break;
+        case '3':
+            Step3();
+            break;
+        case '4':
+            Step4();
+            break;
+        case '5':
+            Step5();
+            break;
+        case '6':
+            Step6();
+            break;
+        case '7':
+            Step7();
+            break;
+        case '8':
+            Step8();
+            break;
+        case '9':
+            Step9();
+            break;
+        case 'z':
+            draw_sim=!draw_sim;
+            break;
+        case 'x':
+            draw_cutting_edge=!draw_cutting_edge;
+            break;
+        case 'q':
+            for(int i=0;i<sim_ta->particles.X.m;++i)
+                sim_ta->particles.X(i)*=scale_speed;
+            cutter->Update_Material_Particles();
+            for(int i=0;i<sc->particles.X.m;++i)
+                sc->particles.X(i)*=scale_speed;
+            break;
+        case 'e':
+            for(int i=0;i<sim_ta->particles.X.m;++i)
+                sim_ta->particles.X(i)/=scale_speed;
+            cutter->Update_Material_Particles();
+            for(int i=0;i<sc->particles.X.m;++i)
+                sc->particles.X(i)/=scale_speed;
+            break;
+        case 'w':
+            for(int i=0;i<sim_ta->particles.X.m;++i)
+                sim_ta->particles.X(i)(1)+=trans_speed;
+            cutter->Update_Material_Particles();
+            for(int i=0;i<sc->particles.X.m;++i)
+                sc->particles.X(i)(1)+=trans_speed;
+            break;
+        case 's':
+            for(int i=0;i<sim_ta->particles.X.m;++i)
+                sim_ta->particles.X(i)(1)-=trans_speed;
+            cutter->Update_Material_Particles();
+            for(int i=0;i<sc->particles.X.m;++i)
+                sc->particles.X(i)(1)-=trans_speed;
+            break;
+        case 'a':
+            for(int i=0;i<sim_ta->particles.X.m;++i)
+                sim_ta->particles.X(i)(0)-=trans_speed;
+            cutter->Update_Material_Particles();
+            for(int i=0;i<sc->particles.X.m;++i)
+                sc->particles.X(i)(0)-=trans_speed;
+            break;
+        case 'd':
+            for(int i=0;i<sim_ta->particles.X.m;++i)
+                sim_ta->particles.X(i)(0)+=trans_speed;
+            cutter->Update_Material_Particles();
+            for(int i=0;i<sc->particles.X.m;++i)
+                sc->particles.X(i)(0)+=trans_speed;
+            break;
+    }
+    glutPostRedisplay();
 }
 
 int main(int argc, char **argv)
@@ -386,7 +511,7 @@ int main(int argc, char **argv)
     argc1 = argc;
     argv1 = argv;
     
-    Initialize_Meshes();
+    Step1();
     
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
