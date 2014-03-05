@@ -54,8 +54,6 @@ void Run_Cutter()
 {
     if(sc->mesh.elements.m>0){
         cutter->Run(.1);
-        cutter->ta->mesh.Identify_Connected_Components(labels);
-        
         cutting=false;
         
         //reinitialize ta
@@ -68,6 +66,7 @@ void Run_Cutter()
         delete cutter->ta;
         cutter->ta=nta;
     }
+    cutter->ta->mesh.Identify_Connected_Components(labels);
 }
 
 void Mouse(int button, int state, int x, int y)

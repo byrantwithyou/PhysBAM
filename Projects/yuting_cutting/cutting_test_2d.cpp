@@ -53,7 +53,7 @@ bool dragging=false,cutting=false,draw_sim=true,draw_cutting_edge=true;
 void Run_Cutter()
 {
     if(sc->mesh.elements.m>0){
-        cutter->Run(.1);
+        cutter->Run(.01);
         cutter->ta->mesh.Identify_Connected_Components(labels);
         
         cutting=false;
