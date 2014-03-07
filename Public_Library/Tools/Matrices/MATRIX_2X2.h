@@ -28,7 +28,7 @@ public:
 
     explicit MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(2),INITIAL_SIZE nn=INITIAL_SIZE(2))
     {
-        assert(mm==INITIAL_SIZE(2) && nn==INITIAL_SIZE(2));for(int i=0;i<4;i++) x[i]=0;
+        assert(mm==INITIAL_SIZE(2) && nn==INITIAL_SIZE(2));for(int i=0;i<4;i++) x[i]=T();
     }
 
     MATRIX(const MATRIX& matrix_input)
@@ -49,12 +49,12 @@ public:
 
     MATRIX(const DIAGONAL_MATRIX<T,2>& matrix_input)
     {
-        x[0]=matrix_input.x.x;x[1]=0;x[2]=0;x[3]=matrix_input.x.y;
+        x[0]=matrix_input.x.x;x[1]=T();x[2]=T();x[3]=matrix_input.x.y;
     }
 
     MATRIX(const UPPER_TRIANGULAR_MATRIX<T,2>& matrix_input)
     {
-        x[0]=matrix_input.x00;x[2]=matrix_input.x01;x[3]=matrix_input.x11;x[1]=0;
+        x[0]=matrix_input.x00;x[2]=matrix_input.x01;x[3]=matrix_input.x11;x[1]=T();
     }
 
     MATRIX(const T x00,const T x10,const T x01,const T x11)

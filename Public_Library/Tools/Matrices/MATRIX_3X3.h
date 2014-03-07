@@ -44,7 +44,7 @@ public:
 
     MATRIX(const DIAGONAL_MATRIX<T,3>& matrix_input)
     {
-        x[0]=matrix_input.x.x;x[4]=matrix_input.x.y;x[8]=matrix_input.x.z;x[1]=x[2]=x[3]=x[5]=x[6]=x[7]=0;
+        x[0]=matrix_input.x.x;x[4]=matrix_input.x.y;x[8]=matrix_input.x.z;x[1]=x[2]=x[3]=x[5]=x[6]=x[7]=T();
     }
 
     MATRIX(const SYMMETRIC_MATRIX<T,3>& matrix_input)
@@ -54,7 +54,7 @@ public:
 
     MATRIX(const UPPER_TRIANGULAR_MATRIX<T,3>& matrix_input)
     {
-        x[0]=matrix_input.x00;x[3]=matrix_input.x01;x[4]=matrix_input.x11;x[6]=matrix_input.x02;x[7]=matrix_input.x12;x[8]=matrix_input.x22;x[1]=x[2]=x[5]=0;
+        x[0]=matrix_input.x00;x[3]=matrix_input.x01;x[4]=matrix_input.x11;x[6]=matrix_input.x02;x[7]=matrix_input.x12;x[8]=matrix_input.x22;x[1]=x[2]=x[5]=T();
     }
 
     MATRIX(const T x00,const T x10,const T x20,const T x01,const T x11,const T x21,const T x02,const T x12,const T x22)

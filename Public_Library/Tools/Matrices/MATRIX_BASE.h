@@ -432,7 +432,7 @@ public:
     {for(int j=0;j<Columns();j++) a(j)=(*this)(i,j);}
 
     void Set_Zero_Matrix()
-    {for(int i=0;i<Rows();i++) for(int j=0;j<Columns();j++) (*this)(i,j)=0;}
+    {for(int i=0;i<Rows();i++) for(int j=0;j<Columns();j++) (*this)(i,j)=T();}
 
     void Add_Identity_Matrix()
     {assert(Rows()==Columns());for(int i=0;i<Columns();i++) (*this)(i,i)+=1;}

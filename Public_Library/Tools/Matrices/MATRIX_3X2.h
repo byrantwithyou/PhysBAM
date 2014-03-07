@@ -28,12 +28,12 @@ public:
 
     MATRIX()
     {
-        for(int i=0;i<6;i++) x[i]=0;
+        for(int i=0;i<6;i++) x[i]=T();
     }
 
     explicit MATRIX(INITIAL_SIZE mm,INITIAL_SIZE nn)
     {
-        assert(mm==INITIAL_SIZE(3) && nn==INITIAL_SIZE(2));for(int i=0;i<6;i++) x[i]=0;
+        assert(mm==INITIAL_SIZE(3) && nn==INITIAL_SIZE(2));for(int i=0;i<6;i++) x[i]=T();
     }
 
     MATRIX(const MATRIX& matrix_input)
