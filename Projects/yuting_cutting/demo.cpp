@@ -48,7 +48,7 @@ SEGMENTED_CURVE_2D<T>* sc=NULL;
 CUTTING<TV>* cutter=NULL;
 ARRAY<int> labels;
 HASHTABLE<int> dragging_particles;
-bool dragging=false,cutting=false,draw_sim=false,draw_cutting_edge=true;
+bool dragging=false,cutting=false,draw_sim=true,draw_cutting_edge=false;
 
 void Run_Cutter()
 {
@@ -410,7 +410,7 @@ void Step8()
     sc->particles.X(1)=TV(0.5,0);
     sc->particles.X(2)=TV(0,0.5);
     sc->particles.X(3)=TV(0,-0.5);
-    sc->mesh.elements.Append(I2(0,1));
+    //sc->mesh.elements.Append(I2(0,1));
     //sc->mesh.elements.Append(I2(2,3));
     
     if(cutter) delete cutter;
