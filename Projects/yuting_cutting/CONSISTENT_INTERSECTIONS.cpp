@@ -34,7 +34,7 @@ Set_Tol()
     for(int i=0;i<sc.mesh.elements.m;i++)
         L_sc=max(L_sc,RANGE<TV>::Bounding_Box(sc.particles.X.Subset(sc.mesh.elements(i))).Edge_Lengths().Max());
     T L=L_ta+L_sc;
-    //L*=5e4;
+    L=1e5;
     T eps=std::numeric_limits<T>::epsilon(),sqrt_eps_L=sqrt(eps)*L;
     
     tol_vv[safe]=54*sqrt_eps_L;
