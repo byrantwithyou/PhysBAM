@@ -468,6 +468,16 @@ public:
                 use_polymer_stress=true;
                 break;
         }
+            case 255:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
+//                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0/unit_rho));
+                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_CONST_DECAY<TV>(weiss_inv));
+                 if(bc_type!=NEUMANN) use_p_null_mode=true;
+                use_polymer_stress=true;
+                break;
+            }
 
             default: return false;}
         return true;
