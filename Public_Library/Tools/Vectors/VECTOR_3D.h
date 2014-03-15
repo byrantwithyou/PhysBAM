@@ -374,6 +374,10 @@ public:
     void Sort()
     {exchange_sort(x,y,z);}
 
+    template<class T_COMPARE>
+    void Sort(const T_COMPARE comparison)
+    {exchange_sort(x,y,z,comparison);}
+
     VECTOR Reversed() const
     {return VECTOR(z,y,x);}
 

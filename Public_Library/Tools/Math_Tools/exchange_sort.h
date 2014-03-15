@@ -26,6 +26,18 @@ template<class T>
 inline void exchange_sort(T& a,T& b,T& c,T& d)
 {if(a>b) exchange(a,b);if(c>d) exchange(c,d);if(a>c) exchange(a,c);if(b>d) exchange(b,d);if(b>c) exchange(b,c);}
 
+template<class T,class T_COMPARE>
+inline void exchange_sort(T& a,T& b,const T_COMPARE& comp)
+{if(comp(b,a)) exchange(a,b);}
+
+template<class T,class T_COMPARE>
+inline void exchange_sort(T& a,T& b,T& c,const T_COMPARE& comp)
+{if(comp(b,a)) exchange(a,b);if(comp(c,b)) exchange(b,c);if(comp(b,a)) exchange(a,b);}
+
+template<class T,class T_COMPARE>
+inline void exchange_sort(T& a,T& b,T& c,T& d,const T_COMPARE& comp)
+{if(comp(b,a)) exchange(a,b);if(comp(d,c)) exchange(c,d);if(comp(c,a)) exchange(a,c);if(comp(d,b)) exchange(b,d);if(comp(c,b)) exchange(b,c);}
+
 }
 #endif
 

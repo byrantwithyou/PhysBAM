@@ -312,6 +312,10 @@ public:
     void Sort()
     {}
 
+    template<class T_COMPARE>
+    void Sort(const T_COMPARE comparison)
+    {}
+
     static T Angle_Between(const VECTOR& u,const VECTOR& v)
     {return 0;}
 
