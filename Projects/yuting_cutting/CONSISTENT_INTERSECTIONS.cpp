@@ -575,3 +575,5 @@ Compute()
 //#####################################################################
 template class CONSISTENT_INTERSECTIONS<VECTOR<double,2> >;
 template class CONSISTENT_INTERSECTIONS<VECTOR<double,3> >;
+template class CONSISTENT_INTERSECTIONS<VECTOR<float,2> >;
+template class CONSISTENT_INTERSECTIONS<VECTOR<float,3> >;

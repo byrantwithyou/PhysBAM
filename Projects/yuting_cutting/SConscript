@@ -1,0 +1,26 @@
+# SConscript
+
+Import('env Automatic_Program')
+
+env_gl=env.Copy(USE_OPENGL=1)
+
+env_gl.Append(LIBS=['X11'])
+
+env_gl['FRAMEWORKS'] = ['OpenGL', 'GLUT']
+
+env_gl.Append(LIBS=['GLEW'])
+
+#Automatic_Program(env_gl,"cutting",["offline.cpp", "mesh_cutting_subd.cpp","CONSISTENT_INTERSECTIONS.cpp"])
+
+env_geo=env.Copy(USE_SOLIDS=1)
+
+
+#Automatic_Program(env_gl,"interactive_3d",["interactive_3d.cpp","CONSISTENT_INTERSECTIONS.cpp","mesh_cutting_subd.cpp"])
+Automatic_Program(env_gl,"offline",["offline.cpp","CONSISTENT_INTERSECTIONS.cpp","mesh_cutting_subd.cpp"])
+#Automatic_Program(env_geo,"test_2d",["examples_2d.cpp","CONSISTENT_INTERSECTIONS.cpp"])
+#Automatic_Program(env_geo,"test_3d",["test_3d.cpp","CONSISTENT_INTERSECTIONS.cpp"])
+#Automatic_Program(env_geo,"rand_2d",["rand_2d.cpp","CONSISTENT_INTERSECTIONS.cpp"])
+#Automatic_Program(env_geo,"rand_3d",["rand_3d.cpp","CONSISTENT_INTERSECTIONS.cpp"])
+#Automatic_Program(env_geo,"proof_2d",["proof_2d.cpp","CUTTING_2D.cpp"])
+#Automatic_Program(env_geo,"proof_3d",["proof_3d.cpp"])
+#Automatic_Program(env_gl,"demo",["demo.cpp","CUTTING_2D.cpp","CONSISTENT_INTERSECTIONS.cpp"])
