@@ -45,6 +45,10 @@ template<class TV,class MAT,class MAT1>
 void Fill_From(HESSIAN<TV,MAT>& out,const HESSIAN<TV,MAT1>& in)
 {Fill_From(out.x,in.x);}
 
+template<class T,int m,int d,class MAT> inline void
+Extract(MATRIX<MATRIX<T,m>,d>& ddx,const HESSIAN<VECTOR<T,m>,MAT>& h)
+{Extract(ddx,h.x);}
+
 template<class TV,class MAT>
 HESSIAN<TV,decltype(MAT_SCALE::Type(MAT(),typename TV::SCALAR()))> operator* (typename TV::SCALAR a,const HESSIAN<TV,MAT>& h){return h*a;}
 

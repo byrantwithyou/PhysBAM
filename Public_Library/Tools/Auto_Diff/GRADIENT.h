@@ -47,6 +47,10 @@ void Fill_From(GRADIENT<TV,VEC>& out,const GRADIENT<TV,VEC1>& in)
 template<class TV,class VEC>
 GRADIENT<TV,decltype(VEC_SCALE::Type(VEC(),typename TV::SCALAR()))> operator* (typename TV::SCALAR a,const GRADIENT<TV,VEC>& u){return u*a;}
 
+template<class TV,int d,class VEC> inline void
+Extract(VECTOR<TV,d>& dx,const GRADIENT<TV,VEC>& v)
+{Extract(dx,v.x);}
+
 }
 }
 #endif

@@ -451,6 +451,7 @@ using HETERO_DIFF::AUTO_HESS_EXT;
 using HETERO_DIFF::AUTO_HESS_EXT_VEC;
 using HETERO_DIFF::From_Const;
 using HETERO_DIFF::From_Var;
+using HETERO_DIFF::Extract;
 using HETERO_DIFF::sin;
 using HETERO_DIFF::cos;
 using HETERO_DIFF::tan;

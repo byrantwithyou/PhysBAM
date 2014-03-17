@@ -60,6 +60,24 @@ void Get(OUT& o,const VEC_HOLDER<OBJ,BASE>& v,int i)
     Fill_From(o,v.x);
 }
 
+template<int d,int i> struct EXTRACT_VEC_HELPER
+{
+    template<class TV,class OBJ,class BASE>
+    static void f(VECTOR<TV,d>& dx,const VEC_HOLDER<OBJ,BASE>& v)
+    {Fill_From(dx(i),v.x);EXTRACT_VEC_HELPER<d,i+1>::f(dx,v.z);}
+};
+
+template<int d> struct EXTRACT_VEC_HELPER<d,d>
+{
+    template<class TV>
+    static void f(VECTOR<TV,d>& dx,const VEC_END& v)
+    {}
+};
+
+template<class TV,int d,class OBJ,class BASE> inline void
+Extract(VECTOR<TV,d>& dx,const VEC_HOLDER<OBJ,BASE>& v)
+{EXTRACT_VEC_HELPER<d,0>::f(dx,v);}
+
 template<int n,class IN,class OBJ,class BASE> void Set(VEC_HOLDER<OBJ,BASE>& out,const IN& in) {Set_Helper(out,in,(VECTOR<int,n>*)0);}
 template<int n,class IN,class OBJ,class BASE> void Set_Helper(VEC_HOLDER<OBJ,BASE>& out,const IN& in,VECTOR<int,n>*) {Set_Helper(out.z,in,(VECTOR<int,n-1>*)0);}
 template<class IN,class OBJ,class BASE> void Set_Helper(VEC_HOLDER<OBJ,BASE>& out,const IN& in,VECTOR<int,0>*){out.x=in;}

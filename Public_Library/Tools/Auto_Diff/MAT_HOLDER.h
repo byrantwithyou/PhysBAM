@@ -62,6 +62,38 @@ void Get_Diag(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& m,int i)
     Fill_From(o,m.x);
 }
 
+template<int d,int i,int j> struct EXTRACT_MAT_HELPER
+{
+    template<class T,int m,class OBJ,class BASE> inline void
+    static f(MATRIX<MATRIX<T,m>,d>& ddx,const VEC_HOLDER<OBJ,BASE>& v)
+    {MATRIX<T,m> o;Fill_From(o,v.x);ddx(i,j)=o;ddx(j,i)=o.Transposed();EXTRACT_MAT_HELPER<d,i+1,j>::f(ddx,v.z);}
+};
+
+template<int d,int i> struct EXTRACT_MAT_HELPER<d,i,i>
+{
+    template<class T,int m,class OBJ,class COL,class BASE> inline void
+    static f(MATRIX<MATRIX<T,m>,d>& ddx,const MAT_HOLDER<OBJ,COL,BASE>& h)
+    {Fill_From(ddx(i,i),h.x);EXTRACT_MAT_HELPER<d,i+1,i>::f(ddx,h.y);EXTRACT_MAT_HELPER<d,i+1,i+1>::f(ddx,h.z);}
+};
+
+template<int d,int i> struct EXTRACT_MAT_HELPER<d,d,i>
+{
+    template<class T,int m>
+    static void f(MATRIX<MATRIX<T,m>,d>& ddx,const VEC_END& v)
+    {}
+};
+
+template<int d> struct EXTRACT_MAT_HELPER<d,d,d>
+{
+    template<class T,int m>
+    static void f(MATRIX<MATRIX<T,m>,d>& ddx,const MAT_END& v)
+    {}
+};
+
+template<class T,int m,int d,class OBJ,class COL,class BASE> inline void
+Extract(MATRIX<MATRIX<T,m>,d>& ddx,const MAT_HOLDER<OBJ,COL,BASE>& h)
+{EXTRACT_MAT_HELPER<d,0,0>::f(ddx,h);}
+
 template<class TV,int n> struct EMPTY_MAT
 {typedef MAT_HOLDER<ZERO_MAT<TV>,typename EMPTY_VEC_MAT<TV,n-1>::TYPE,typename EMPTY_MAT<TV,n-1>::TYPE> TYPE;};
 template<class TV> struct EMPTY_MAT<TV,0> {typedef MAT_END TYPE;};
