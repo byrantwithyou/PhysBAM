@@ -147,6 +147,7 @@ public:
     ARRAY<ARRAY<T> > levelsets;
     
     //for drawing
+    bool interactive;
     ARRAY<bool> is_blue;
     ARRAY<ARRAY<int> > tet_cc, node_cc;
     ARRAY<int> element2cc;
@@ -176,7 +177,7 @@ public:
     void Reinitialize_Elasticity();
     
     MESH_CUTTING();
-    MESH_CUTTING(TETRAHEDRALIZED_VOLUME<T>* volume_input, T timestep_input, int ratio_input);
+    MESH_CUTTING(TETRAHEDRALIZED_VOLUME<T>* volume_input, T timestep_input, int ratio_input, bool interactive_input);
     ~MESH_CUTTING();
     
     void Initialize_Cutting_Volume();

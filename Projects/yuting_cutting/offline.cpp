@@ -82,7 +82,7 @@ void Initialize(const string& filename)
     sim_volume->mesh.elements = sim_volume_float->mesh.elements;
     
     Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
-    mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio);
+    mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, false);
     cutting_tri_mesh = new TRIANGULATED_SURFACE<T>();
 }
 
@@ -148,7 +148,7 @@ void initialize_cubes(int width, int height, int depth, T low, T high, T left, T
         tet_index += (width+1);    
     }
     
-    mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio);
+    mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, false);
     cutting_tri_mesh = new TRIANGULATED_SURFACE<T>();
 }
 
@@ -818,7 +818,7 @@ int main(int argc, char** argv) {
                 sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>((i+1)%4, i, 4, 5));
             }
             
-            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio);
+            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, false);
             mcut->Initialize_Elasticity();
             
             cutting_tri_mesh = new TRIANGULATED_SURFACE<T>();
@@ -1017,10 +1017,10 @@ int main(int argc, char** argv) {
                     cutting_tri_mesh->Update_Number_Nodes();
                     cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(0, 1, 2));
                     cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(1, 2, 3));
-                    cutting_tri_mesh->particles.X(0) = TV(-0.5, 0, -1);
-                    cutting_tri_mesh->particles.X(1) = TV(-0.5, 0, 1);
-                    cutting_tri_mesh->particles.X(2) = TV(0.5, 0, -1);
-                    cutting_tri_mesh->particles.X(3) = TV(0.5, 0, 1);
+                    cutting_tri_mesh->particles.X(0) = TV(-0.5, 0.5, -1);
+                    cutting_tri_mesh->particles.X(1) = TV(-0.5, 0.5, 1);
+                    cutting_tri_mesh->particles.X(2) = TV(0.5, -0.5, -1);
+                    cutting_tri_mesh->particles.X(3) = TV(0.5, -0.5, 1);
                     mcut->Cut(*cutting_tri_mesh, 1);
                 }
                 
@@ -1134,7 +1134,7 @@ int main(int argc, char** argv) {
             sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 3, 4));
             //sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 3, 4));
 
-            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio);
+            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, false);
             //simulation setup: dirichlet, initial configuration
             for (int i = 0; i < mcut->sim_volume->particles.X.m; i++) {
                 if (i == 0 || i == 2) {
@@ -1150,7 +1150,7 @@ int main(int argc, char** argv) {
             int frame = 0;
             //T xshift = 0;
             //T yshift = 0;
-            while (frame < 5) {
+            while (frame < 10) {
                 ++frame;
                 //                if (frame == 20) {
                 //                    energyTest();
@@ -1167,6 +1167,12 @@ int main(int argc, char** argv) {
                     cutting_tri_mesh->particles.X(2) = TV(-0.5, 0.25, -1);
                     cutting_tri_mesh->particles.X(3) = TV(0.5, 0.25, -1);
                     cutting_tri_mesh->Update_Number_Nodes();
+                    mcut->Cut(*cutting_tri_mesh, 1);
+                    
+                    cutting_tri_mesh->particles.X(0) = TV(0.1, 1, 1);
+                    cutting_tri_mesh->particles.X(1) = TV(0.1, -1, 1);
+                    cutting_tri_mesh->particles.X(2) = TV(0.1, -1, -1);
+                    cutting_tri_mesh->particles.X(3) = TV(0.1, 1, -1);
                     mcut->Cut(*cutting_tri_mesh, 1);
                 }
                 

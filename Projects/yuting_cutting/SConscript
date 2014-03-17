@@ -14,8 +14,7 @@ env_gl.Append(LIBS=['GLEW'])
 
 env_geo=env.Copy(USE_SOLIDS=1)
 
-
-#Automatic_Program(env_gl,"interactive_3d",["interactive_3d.cpp","CONSISTENT_INTERSECTIONS.cpp","mesh_cutting_subd.cpp"])
+Automatic_Program(env_gl,"interactive_3d",["interactive_3d.cpp","CONSISTENT_INTERSECTIONS.cpp","mesh_cutting_subd.cpp"])
 Automatic_Program(env_gl,"offline",["offline.cpp","CONSISTENT_INTERSECTIONS.cpp","mesh_cutting_subd.cpp"])
 #Automatic_Program(env_geo,"test_2d",["examples_2d.cpp","CONSISTENT_INTERSECTIONS.cpp"])
 #Automatic_Program(env_geo,"test_3d",["test_3d.cpp","CONSISTENT_INTERSECTIONS.cpp"])

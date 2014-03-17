@@ -39,7 +39,7 @@ struct timeval starttime,stoptime;
 void start_timer(){gettimeofday(&starttime,NULL);read_tsc();}
 void stop_timer(){gettimeofday(&stoptime,NULL);read_tsc();}
 double get_time(){return (double)stoptime.tv_sec-(double)starttime.tv_sec+(double)1e-6*(double)stoptime.tv_usec-(double)1e-6*(double)starttime.tv_usec;}
-#define DE cout<<"file "<<__FILE__<<"   line "<<__LINE__<<"  "<<&volume->particles.X<<"   "<<volume->particles.X<<endl;
+#define DE //cout<<"file "<<__FILE__<<"   line "<<__LINE__<<"  "<<&volume->particles.X<<"   "<<volume->particles.X<<endl;
 
 using namespace PhysBAM;
 using namespace std;
@@ -174,7 +174,7 @@ template<class T>
 MESH_CUTTING<T>::MESH_CUTTING(){}
 
 template<class T> 
-MESH_CUTTING<T>::MESH_CUTTING(TETRAHEDRALIZED_VOLUME<T>* sim_volume_input, T timestep_input, int ratio_input): sim_volume(sim_volume_input), timestep(timestep_input), ratio(ratio_input)
+MESH_CUTTING<T>::MESH_CUTTING(TETRAHEDRALIZED_VOLUME<T>* sim_volume_input, T timestep_input, int ratio_input, bool interactive_input): sim_volume(sim_volume_input), interactive(interactive_input), timestep(timestep_input), ratio(ratio_input)
 {
     Initialize_Cutting_Volume();
     Update_For_Draw();
@@ -276,7 +276,7 @@ void MESH_CUTTING<T>::Subdivide_Cutting_Mesh_Into_Eyeball()
                     if (ARRAY<int>* ts = edge2tet.Get_Pointer(EDGE(e[1], ii[k]).Sorted())){
                         int id = -1;
                         if (!ts->Find(old_element_id, id)){
-                            cout << "should be able to find!!!\n";
+                            //cout << "should be able to find!!!\n";
                         }
                         else {
                             ts->operator()(id) = new_element_id;
@@ -339,10 +339,10 @@ void MESH_CUTTING<T>::Initialize_Cutting_Volume()
         }
         volume->mesh.elements.Append(e);
     }
-    cout << volume->mesh.elements << endl;
+    //cout << volume->mesh.elements << endl;
     tet_cuttings.Resize(sim_volume->mesh.elements.m);
     Update_Cutting_Particles();
-    cout << volume->particles.X << endl;
+    //cout << volume->particles.X << endl;
     
     //refine cutting volume
     int num_refinements = 0;
@@ -553,34 +553,37 @@ void MESH_CUTTING<T>::Initialize_Elasticity()
     //be->Initialize_CG();
     be->Initialize_MINRES();
     
-//    my_constrained = new ALGEBRA::VECTOR<int>(3*diri_nodes.Size());
-//    my_constrained_locations = new ALGEBRA::VECTOR<T>(3*diri_nodes.Size());
-//    int i = 0;
-//    for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
-//        int fixed_node = it.Key();
-//        my_constrained->Set_Value(3*i,3*fixed_node); my_constrained->Set_Value(3*i+1,3*fixed_node+1); my_constrained->Set_Value(3*i+2,3*fixed_node+2); // first node constrained
-//        my_constrained_locations->Set_Value(3*i,sim_volume->particles.X(fixed_node)(0));
-//        my_constrained_locations->Set_Value(3*i+1,sim_volume->particles.X(fixed_node)(1));
-//        my_constrained_locations->Set_Value(3*i+2,sim_volume->particles.X(fixed_node)(2));
-//        i++;
-//    }
-    
-    //z component of every node fixed, x,y component of all diri nodes fixed.
-    my_constrained = new ALGEBRA::VECTOR<int>(2*diri_nodes.Size()+sim_volume->particles.X.m);
-    my_constrained_locations = new ALGEBRA::VECTOR<T>(2*diri_nodes.Size()+sim_volume->particles.X.m);
-    int i = 0;
-    for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
-        int fixed_node = it.Key();
-        my_constrained->Set_Value(i,3*fixed_node);
-        my_constrained->Set_Value(i+1,3*fixed_node+1);
-        my_constrained_locations->Set_Value(i,sim_volume->particles.X(fixed_node)(0));
-        my_constrained_locations->Set_Value(i+1,sim_volume->particles.X(fixed_node)(1));
-        i += 2;
+    if (interactive) {
+        my_constrained = new ALGEBRA::VECTOR<int>(3*diri_nodes.Size());
+        my_constrained_locations = new ALGEBRA::VECTOR<T>(3*diri_nodes.Size());
+        int i = 0;
+        for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
+            int fixed_node = it.Key();
+            my_constrained->Set_Value(3*i,3*fixed_node); my_constrained->Set_Value(3*i+1,3*fixed_node+1); my_constrained->Set_Value(3*i+2,3*fixed_node+2); // first node constrained
+            my_constrained_locations->Set_Value(3*i,sim_volume->particles.X(fixed_node)(0));
+            my_constrained_locations->Set_Value(3*i+1,sim_volume->particles.X(fixed_node)(1));
+            my_constrained_locations->Set_Value(3*i+2,sim_volume->particles.X(fixed_node)(2));
+            i++;
+        }
     }
-    for (int j = 0; j < sim_volume->particles.X.m; ++j) {
-        my_constrained->Set_Value(i,3*j+2);
-        my_constrained_locations->Set_Value(i,sim_volume->particles.X(j)(2));
-        i++;
+    else {
+        //z component of every node fixed, x,y component of all diri nodes fixed.
+        my_constrained = new ALGEBRA::VECTOR<int>(2*diri_nodes.Size()+sim_volume->particles.X.m);
+        my_constrained_locations = new ALGEBRA::VECTOR<T>(2*diri_nodes.Size()+sim_volume->particles.X.m);
+        int i = 0;
+        for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
+            int fixed_node = it.Key();
+            my_constrained->Set_Value(i,3*fixed_node);
+            my_constrained->Set_Value(i+1,3*fixed_node+1);
+            my_constrained_locations->Set_Value(i,sim_volume->particles.X(fixed_node)(0));
+            my_constrained_locations->Set_Value(i+1,sim_volume->particles.X(fixed_node)(1));
+            i += 2;
+        }
+        for (int j = 0; j < sim_volume->particles.X.m; ++j) {
+            my_constrained->Set_Value(i,3*j+2);
+            my_constrained_locations->Set_Value(i,sim_volume->particles.X(j)(2));
+            i++;
+        }
     }
     
     be->Set_Boundary_Conditions(*my_constrained, *my_constrained_locations);
@@ -626,7 +629,7 @@ void MESH_CUTTING<T>::Reinitialize_Elasticity()
     fem->Set_Constitutive_Model(*le);
     for (int i = 0; i < undeformed_config_copy.m; i++){
          fem->Dm_inverse(i) = undeformed_config_copy(i);
-         //cout << fem->Dm_inverse(i).Determinant() << endl;
+         ////cout << fem->Dm_inverse(i).Determinant() << endl;
     }
     
     //Choose time stepping: backward Euler
@@ -644,35 +647,38 @@ void MESH_CUTTING<T>::Reinitialize_Elasticity()
     
     delete my_constrained;
     delete my_constrained_locations;
-//    my_constrained = new ALGEBRA::VECTOR<int>(3*diri_nodes.Size());
-//    my_constrained_locations = new ALGEBRA::VECTOR<T>(3*diri_nodes.Size());
-//    int i = 0;
-//    for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
-//        int fixed_node = it.Key();
-//        my_constrained->Set_Value(3*i,3*fixed_node); my_constrained->Set_Value(3*i+1,3*fixed_node+1); my_constrained->Set_Value(3*i+2,3*fixed_node+2); // first node constrained
-//        my_constrained_locations->Set_Value(3*i,sim_volume->particles.X(fixed_node)(0));
-//        my_constrained_locations->Set_Value(3*i+1,sim_volume->particles.X(fixed_node)(1));
-//        my_constrained_locations->Set_Value(3*i+2,sim_volume->particles.X(fixed_node)(2));
-//        i++;
-//    }
     
-    
-    //z component of every node fixed, x,y component of all diri nodes fixed.
-    my_constrained = new ALGEBRA::VECTOR<int>(2*diri_nodes.Size()+sim_volume->particles.X.m);
-    my_constrained_locations = new ALGEBRA::VECTOR<T>(2*diri_nodes.Size()+sim_volume->particles.X.m);
-    int i = 0;
-    for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
-        int fixed_node = it.Key();
-        my_constrained->Set_Value(i,3*fixed_node);
-        my_constrained->Set_Value(i+1,3*fixed_node+1);
-        my_constrained_locations->Set_Value(i,sim_volume->particles.X(fixed_node)(0));
-        my_constrained_locations->Set_Value(i+1,sim_volume->particles.X(fixed_node)(1));
-        i += 2;
+    if (interactive) {
+        my_constrained = new ALGEBRA::VECTOR<int>(3*diri_nodes.Size());
+        my_constrained_locations = new ALGEBRA::VECTOR<T>(3*diri_nodes.Size());
+        int i = 0;
+        for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
+            int fixed_node = it.Key();
+            my_constrained->Set_Value(3*i,3*fixed_node); my_constrained->Set_Value(3*i+1,3*fixed_node+1); my_constrained->Set_Value(3*i+2,3*fixed_node+2); // first node constrained
+            my_constrained_locations->Set_Value(3*i,sim_volume->particles.X(fixed_node)(0));
+            my_constrained_locations->Set_Value(3*i+1,sim_volume->particles.X(fixed_node)(1));
+            my_constrained_locations->Set_Value(3*i+2,sim_volume->particles.X(fixed_node)(2));
+            i++;
+        }
     }
-    for (int j = 0; j < sim_volume->particles.X.m; ++j) {
-        my_constrained->Set_Value(i,3*j+2);
-        my_constrained_locations->Set_Value(i,sim_volume->particles.X(j)(2));
-        i++;
+    else {
+        //z component of every node fixed, x,y component of all diri nodes fixed.
+        my_constrained = new ALGEBRA::VECTOR<int>(2*diri_nodes.Size()+sim_volume->particles.X.m);
+        my_constrained_locations = new ALGEBRA::VECTOR<T>(2*diri_nodes.Size()+sim_volume->particles.X.m);
+        int i = 0;
+        for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
+            int fixed_node = it.Key();
+            my_constrained->Set_Value(i,3*fixed_node);
+            my_constrained->Set_Value(i+1,3*fixed_node+1);
+            my_constrained_locations->Set_Value(i,sim_volume->particles.X(fixed_node)(0));
+            my_constrained_locations->Set_Value(i+1,sim_volume->particles.X(fixed_node)(1));
+            i += 2;
+        }
+        for (int j = 0; j < sim_volume->particles.X.m; ++j) {
+            my_constrained->Set_Value(i,3*j+2);
+            my_constrained_locations->Set_Value(i,sim_volume->particles.X(j)(2));
+            i++;
+        }
     }
     
     
@@ -684,7 +690,7 @@ void MESH_CUTTING<T>::Reinitialize_Elasticity()
 template<class T>
 void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRAY<int>& sim_node_from, ARRAY<bool>& sim_tet_split, ARRAY<int>& material_node_from)
 {
-    cout << "******" << tri2inter << endl;
+    //cout << "******" << tri2inter << endl;
     TET_CUTTING tc = tet_cuttings(tet_id);
     VECTOR<bool, NumSplitTurnOns> can_split;
     for (int i = 0; i < NumSplitTurnOns; i++){
@@ -756,7 +762,7 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
             int n2 = face2node[j][1];
             int n3 = face2node[j][2];
             if (vcenters[n1].m+vcenters[n2].m+vcenters[n3].m+ecenters[e1].m+ecenters[e2].m+ecenters[e3].m+fcenters[j].m == intersects.Size()) {
-//                cout << "no merge: " << tet_id << " " << tet_element << " " << j << " " << I3(tet_element(n1), tet_element(n2), tet_element(n3)) << endl;
+//                //cout << "no merge: " << tet_id << " " << tet_element << " " << j << " " << I3(tet_element(n1), tet_element(n2), tet_element(n3)) << endl;
                 if (vcenters[n1].m && (vcenters[n2].m || ecenters[e1].m) && (vcenters[n3].m || ecenters[e2].m || ecenters[e3].m || fcenters[j].m)) {
                     tc.no_merge(j*6) = 1;
                 }
@@ -778,7 +784,7 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
                 cut_through = 0;
                 face_cut = 1;
                 cutFaces.Set(I3(tet_element(n1), tet_element(n2), tet_element(n3)).Sorted());
-                cout << I3(tet_element(n1), tet_element(n2), tet_element(n3)) << endl;
+                //cout << I3(tet_element(n1), tet_element(n2), tet_element(n3)) << endl;
                 break;
             }
         }
@@ -865,9 +871,9 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
     for (int i = 0; i < NumMaterials; i++) {
         if (!picked[tc.material_ids(i)]) {
             ARRAY<int> cc = tc.Find_CC(tc.material_ids(i), picked);
-            //cout << cc << endl;
+            ////cout << cc << endl;
             if (cc.m != NumMaterials || face_cut) {
-                //cout << cc << endl;
+                ////cout << cc << endl;
                 //find parent sim tet_cc and split it
                 int parent_sim_tet_id = original_ctet2stet(tet_id);
                 TET& parent_sim_tet = original_sim_elements(parent_sim_tet_id);
@@ -877,7 +883,7 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
                 for(int j = 0; j < cc.m; j++){
                     has_mat(material2node[cc(j)]) = 1;
                 }
-                //cout << has_mat << endl;
+                ////cout << has_mat << endl;
                 for (int j = 0; j < NumNodesPerTet; j++){
                     sim_node_from.Append(parent_sim_tet[j]);
                     CENTER c; c[j] = 1;
@@ -887,7 +893,7 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
                 //sim mesh related
                 int sim_size = sim_node_from.m;
                 if (!sim_tet_split(parent_sim_tet_id)){//no sim tet appended
-                    //if (i!=0) cout << "ridiculous!*************************************" << endl;
+                    //if (i!=0) //cout << "ridiculous!*************************************" << endl;
                     for (int j = 0; j < NumNodesPerTet; j++){
                         weights_in_sim.Append(PARENT(parent_sim_tet_id, wei[j]));
                         material_node_from.Append(tet_element(j));
@@ -944,7 +950,7 @@ int MESH_CUTTING<T>::Sorted_Id(const I3& sorted_tri, const I3& tri, int material
 template<class T>
 void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
 {
-    cout << "cutting*************************************" << endl;
+    //cout << "cutting*************************************" << endl;
     
     start_timer();
     
@@ -1079,7 +1085,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
     ARRAY<TET>& elements = volume->mesh.elements;
     ARRAY<TET>& sim_elements = sim_volume->mesh.elements;
     
-    int num_elements = elements.m; cout << num_elements << " elements" << endl;
+    int num_elements = elements.m; //cout << num_elements << " elements" << endl;
     int num_nodes = volume->particles.number;
     ARRAY<int> material_node_from(num_nodes);
     for (int i = 0; i < num_nodes; ++i) {
@@ -1107,7 +1113,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
         need_merge(i) = 1;
         need_dup.Subset(original_elements(i)).Fill(1);
     }
-    cout << components.Size() << " tets touched\n";
+    //cout << components.Size() << " tets touched\n";
 
     //duplicated all touched nodes and split all sim tets that are cut
     for (int i = 0; i < num_elements; i++) {
@@ -1159,9 +1165,9 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
     
     stop_timer();
     printf("split time:    %f\n",get_time());
-    cout << "total particles: " << weights_in_sim.m << endl;
-    cout << elements << endl;
-    cout << material_node_from << endl;
+    //cout << "total particles: " << weights_in_sim.m << endl;
+    //cout << elements << endl;
+    //cout << material_node_from << endl;
     //merge nodes
     //identify which un-plit tet need merging
     start_timer();
@@ -1169,10 +1175,10 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
     HASHTABLE<I4,int> ht;
     UNION_FIND<int> node_classes(weights_in_sim.m);//cluster merging nodes
     UNION_FIND<int> sim_node_classes(sim_node_from.m);
-    cout << "cut faces: " << cutFaces << endl;
+    //cout << "cut faces: " << cutFaces << endl;
 
     for (int i = 0; i < elements.m; i++) {
-        cout << tet_cuttings(i).material_ids << endl;
+        //cout << tet_cuttings(i).material_ids << endl;
         if (1){//need_merge(i)) {
             I4 pt = sim_elements(ctet2stet(i));
             for (int j = 0; j < 4; ++j) {
@@ -1185,14 +1191,14 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
                         int sorted_k = Sorted_Id(sof, of, k);
                         if (tet_cuttings(i).has_material(material_id)) {
                             int tid = i;
-                            //cout << sof.Append(sorted_k) << endl;
+                            ////cout << sof.Append(sorted_k) << endl;
                             if (ht.Get(sof.Append(sorted_k),tid)) {
                                 
                                 for (int l = 0; l < 3; ++l) {
                                     for (int m = 0; m < 4; ++m) {
                                         if (of(l) == material_node_from(elements(tid)(m))) {
                                             node_classes.Union(f(l), elements(tid)(m));
-                                            cout << "union " << f(l) << " " << elements(tid)(m) << endl;
+                                            //cout << "union " << f(l) << " " << elements(tid)(m) << endl;
                                             break;
                                         }
                                     }
@@ -1212,7 +1218,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
                         }
                     }
                     else {
-                        cout << "no merge: " << i << " " << material_id << endl;
+                        //cout << "no merge: " << i << " " << material_id << endl;
                     }
                 }
             }
@@ -1319,8 +1325,8 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
     for (int i = 0; i < new_sim_particles.m; i++){
         sim_volume->particles.X(i) = new_sim_particles(i);
     }
-    cout << volume->mesh.elements << endl;
-    cout << sim_volume->mesh.elements << endl;
+    //cout << volume->mesh.elements << endl;
+    //cout << sim_volume->mesh.elements << endl;
     
     stop_timer();
     printf("merge time:    %f\n",get_time());  
@@ -1346,7 +1352,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
     for (int i = 0; i < num_elements1; i++) {
         if (!picked(i)) {
             tet_cc.Append(Find_Cutting_Tet_CC(i, picked, itot, node_cc)); }}
-    cout << tet_cc.m << " cutting mesh CCs" << endl;   
+    //cout << tet_cc.m << " cutting mesh CCs" << endl;   
     
     if (refine) {
         Partial_Refine();
@@ -1401,7 +1407,7 @@ void MESH_CUTTING<T>::Partial_Refine()
             VECTOR<int, NumEdgesPerTet> ec;
             for (int j = 0; j < NumEdgesPerTet; j++){
                 CENTER c = Weight_In_Sim_Tet(tc.edge_centers[j].Value(), element, parent_sim_tet);
-                //cout << "e weight: " << tc.edge_centers[j] << endl;
+                ////cout << "e weight: " << tc.edge_centers[j] << endl;
                 VECTOR<int,2> edge = VECTOR<int,2>(element(edge2node[j][0]),element(edge2node[j][1])).Sorted();
                 //store the weight
                 if (!(new_nodes.Get(edge,ec[j]))){
@@ -1478,8 +1484,9 @@ void MESH_CUTTING<T>::Partial_Refine()
                     }
                     else {
                         int k;
-                        if (!ht.Get(face, k)) 
-                            cout << "should have been set!!!\n";
+                        if (!ht.Get(face, k)) {
+                            //cout << "should have been set!!!\n";
+                        }
                         else {
                             new_e(k) = TET(new_node, element(face2node[j][0]), element(face2node[j][1]), nn);
                             new_e.Append(TET(new_node, element(face2node[j][1]), element(face2node[j][2]), nn));
@@ -1650,8 +1657,9 @@ void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volu
                     }
                     else {
                         int k;
-                        if (!ht.Get(face, k))
-                            cout << "should have been set!!!\n";
+                        if (!ht.Get(face, k)) {
+                            //cout << "should have been set!!!\n";
+                        }
                         else {
                             new_e(k) = TET(new_node, element(face2node[j][0]), element(face2node[j][1]), nn);
                             new_e.Append(TET(new_node, element(face2node[j][1]), element(face2node[j][2]), nn));
@@ -1779,85 +1787,87 @@ ARRAY<int> MESH_CUTTING<T>::Find_Tet_CC(int m, ARRAY<bool>& picked, ARRAY<ARRAY<
 template<class T> 
 void MESH_CUTTING<T>::Update_For_Draw()
 {
-    cout << "Updating for draw...\n";
+    //cout << "Updating for draw...\n";
     sim_volume->Update_Number_Nodes();
-    sim_volume->mesh.Initialize_Boundary_Mesh(); //cout << "sim boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
+    sim_volume->mesh.Initialize_Boundary_Mesh(); ////cout << "sim boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
     sim_volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
     
     Fix_Orientation();
     volume->Update_Number_Nodes();
-    volume->mesh.Initialize_Boundary_Mesh(); //cout << "cutting boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
+    volume->mesh.Initialize_Boundary_Mesh(); ////cout << "cutting boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
     volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
     
-//    tet_cc.Remove_All();
-//    node_cc.Remove_All();
-//    int num_elements = sim_volume->mesh.elements.m;
-//    cout << "total sim elements: " << num_elements << endl;
-//    cout << "total sim particles: " << sim_volume->particles.X.m << endl;
-//    //find tet connected components
-//    ARRAY<bool> picked(num_elements);
-//    ARRAY<ARRAY<int> > itot(sim_volume->particles.X.m); //node index to tet index
-//    for (int i = 0; i < num_elements; i++) {
-//            VECTOR<int, NumNodesPerTet> element = sim_volume->mesh.elements(i);
-//            for (int j = 0; j < NumNodesPerTet; j++) {
-//                itot(element(j)).Append(i); }}
-//            
-//    for (int i = 0; i < num_elements; i++) {
-//        if (!picked(i)) {
-//            tet_cc.Append(Find_Tet_CC(i, picked, itot, node_cc)); }}
-//    cout << tet_cc.m << " CCs" << endl;      
-//      
-//    element2cc.Resize(sim_volume->mesh.elements.m);
-//    for (int i = 0; i < tet_cc.m; i++){
-//        for (int j = 0; j < tet_cc(i).m; j++) {
-//            element2cc(tet_cc(i)(j)) = i;
-//        }
-//    }
-//    
-//    node2cc.Resize(sim_volume->particles.X.m);
-//    for (int i = 0; i < node_cc.m; i++){
-//        for (int j = 0; j < node_cc(i).m; j++) {
-//            node2cc(node_cc(i)(j)) = i;
-//        }
-//    }
-//
-//    //faces and interfaces to be drawn
-//    start_timer();
-//    faces_to_draw.Remove_All();
-//    interfaces_to_draw.Remove_All();
-//    HASHTABLE<TV_INT,bool> htf;
-//    bool b = 0;
-//    for (int i = 0; i < volume->mesh.elements.m; i++){
-//        //faces
-//        for (int j = 0; j < 4; j++){
-//            TV_INT f(volume->mesh.elements(i)[face2node[j][0]], volume->mesh.elements(i)[face2node[j][1]], volume->mesh.elements(i)[face2node[j][2]]);
-//            TV_INT ff = f.Sorted();
-//            if (htf.Get(ff,b)){
-//                htf.Set(ff,0);
-//            }
-//            else {
-//                htf.Set(ff,1);
-//            }
-//        }
-//        
-//        //interfaces
-//        for (int j = 0; j < NumSplitTurnOns; j++){
-//            if (tet_cuttings(i).has_material[face2material[j][0]] ^ tet_cuttings(i).has_material[face2material[j][1]]){
-//                interfaces_to_draw.Append(VECTOR<int,2>(i,j));
-//            }
-//        }
-//    }
-//    
-//    for (int i = 0; i < volume->mesh.elements.m; i++){
-//        //faces
-//        for (int j = 0; j < 4; j++){
-//            htf.Get(TV_INT(volume->mesh.elements(i)[face2node[j][0]], volume->mesh.elements(i)[face2node[j][1]], volume->mesh.elements(i)[face2node[j][2]]).Sorted(),b);
-//            if (b){
-//                faces_to_draw.Append(VECTOR<int,2>(i,j));
-//            }
-//        }
-//    }
-//    stop_timer();
+    if (interactive) {
+        tet_cc.Remove_All();
+        node_cc.Remove_All();
+        int num_elements = sim_volume->mesh.elements.m;
+        //cout << "total sim elements: " << num_elements << endl;
+        //cout << "total sim particles: " << sim_volume->particles.X.m << endl;
+        //find tet connected components
+        ARRAY<bool> picked(num_elements);
+        ARRAY<ARRAY<int> > itot(sim_volume->particles.X.m); //node index to tet index
+        for (int i = 0; i < num_elements; i++) {
+                VECTOR<int, NumNodesPerTet> element = sim_volume->mesh.elements(i);
+                for (int j = 0; j < NumNodesPerTet; j++) {
+                    itot(element(j)).Append(i); }}
+
+        for (int i = 0; i < num_elements; i++) {
+            if (!picked(i)) {
+                tet_cc.Append(Find_Tet_CC(i, picked, itot, node_cc)); }}
+        //cout << tet_cc.m << " CCs" << endl;
+
+        element2cc.Resize(sim_volume->mesh.elements.m);
+        for (int i = 0; i < tet_cc.m; i++){
+            for (int j = 0; j < tet_cc(i).m; j++) {
+                element2cc(tet_cc(i)(j)) = i;
+            }
+        }
+
+        node2cc.Resize(sim_volume->particles.X.m);
+        for (int i = 0; i < node_cc.m; i++){
+            for (int j = 0; j < node_cc(i).m; j++) {
+                node2cc(node_cc(i)(j)) = i;
+            }
+        }
+
+        //faces and interfaces to be drawn
+        start_timer();
+        faces_to_draw.Remove_All();
+        interfaces_to_draw.Remove_All();
+        HASHTABLE<TV_INT,bool> htf;
+        bool b = 0;
+        for (int i = 0; i < volume->mesh.elements.m; i++){
+            //faces
+            for (int j = 0; j < 4; j++){
+                TV_INT f(volume->mesh.elements(i)[face2node[j][0]], volume->mesh.elements(i)[face2node[j][1]], volume->mesh.elements(i)[face2node[j][2]]);
+                TV_INT ff = f.Sorted();
+                if (htf.Get(ff,b)){
+                    htf.Set(ff,0);
+                }
+                else {
+                    htf.Set(ff,1);
+                }
+            }
+
+            //interfaces
+            for (int j = 0; j < NumSplitTurnOns; j++){
+                if (tet_cuttings(i).has_material[face2material[j][0]] ^ tet_cuttings(i).has_material[face2material[j][1]]){
+                    interfaces_to_draw.Append(VECTOR<int,2>(i,j));
+                }
+            }
+        }
+        
+        for (int i = 0; i < volume->mesh.elements.m; i++){
+            //faces
+            for (int j = 0; j < 4; j++){
+                htf.Get(TV_INT(volume->mesh.elements(i)[face2node[j][0]], volume->mesh.elements(i)[face2node[j][1]], volume->mesh.elements(i)[face2node[j][2]]).Sorted(),b);
+                if (b){
+                    faces_to_draw.Append(VECTOR<int,2>(i,j));
+                }
+            }
+        }
+    }
+    stop_timer();
     printf("update for draw time:    %f\n",get_time());
 }
 
@@ -1914,7 +1924,7 @@ int MESH_CUTTING<T>::Compute_Intersection(const T& x, const T& y)
             CENTER w = Weight_In_Sim_Tet(c, volume->mesh.elements(element_id), sim_tet);
             dragging_weights.Append(TV(w[0],w[1],w[2]));
             dragging_targets.Append(TV(x,y,z));
-            cout << "dragging sim_tet " << sim_tet << endl;
+            //cout << "dragging sim_tet " << sim_tet << endl;
             return dragging_elements.m-1;
         }
     }
@@ -1951,10 +1961,10 @@ void MESH_CUTTING<T>::Colors_OpenGL(const VECTOR<int,2>& f, ARRAY<TV>& color_vec
         if (is_blue(f[0]))
             color_vec.Append(TV(0,0,1));
         else
-            color_vec.Append(TV(1,1,1));
+            color_vec.Append(TV(1,0,0));
     }
     else if (mode == picking){
-        color_vec.Append(TV((T)element2cc(ctet2stet(f[0]))/tet_cc.m,0,0));
+        color_vec.Append(TV((T)element2cc(ctet2stet(f[0]))/256,0,0));
     } 
 }
 
@@ -2080,7 +2090,7 @@ void MESH_CUTTING<T>::Draw(bool draw_cutting_mesh, const DRAWING_MODE& mode) con
 //        OpenGL_Triangle(xi,xj,xk,vertices);}  
 //    glVertexPointer(3, GL_DOUBLE,0,vertices.base_pointer);
 //    glColor4f(1.0, 0.0, 0.0, 1.0);
-//    cout << vertices.m << endl;
+//    //cout << vertices.m << endl;
 //    glDrawArrays(GL_TRIANGLES,0,vertices.m/3);
     
     ARRAY<TV> mesh_vec, color_vec, refine_edges, normal_vec;
@@ -2093,7 +2103,7 @@ void MESH_CUTTING<T>::Draw(bool draw_cutting_mesh, const DRAWING_MODE& mode) con
     }
     
     
-//    cout << mesh_vec << endl;
+//    //cout << mesh_vec << endl;
     glVertexPointer(3, GL_FLOAT,0,mesh_vec.base_pointer);
     glColorPointer(3, GL_FLOAT, 0, color_vec.base_pointer);
     glNormalPointer(GL_FLOAT, 0, normal_vec.base_pointer);
@@ -2104,7 +2114,7 @@ void MESH_CUTTING<T>::Draw(bool draw_cutting_mesh, const DRAWING_MODE& mode) con
     
     if (mode == normal){
         //sim edges
-        if(0) {
+        if(1) {
             vertices.Remove_All();
             for(int t=0;t<sim_volume->mesh.boundary_mesh->segment_mesh->elements.m;t++){
                 int i,j;sim_volume->mesh.boundary_mesh->segment_mesh->elements(t).Get(i,j);
@@ -2225,5 +2235,5 @@ void MESH_CUTTING<T>::Keep_CC(int cc_id)
     Update_For_Draw();
 }
 
-//template class MESH_CUTTING<float>;
+template class MESH_CUTTING<float>;
 template class MESH_CUTTING<double>;

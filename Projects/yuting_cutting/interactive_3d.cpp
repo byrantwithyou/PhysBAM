@@ -50,7 +50,7 @@ using namespace std;
 typedef float T;
 typedef PhysBAM::VECTOR<T, 3> TV;
 typedef PhysBAM::MATRIX<T, 3> TM;
-
+typedef PhysBAM::VECTOR<int, 4> I4;
 //global variables
 int argc1;
 char **argv1;
@@ -79,8 +79,9 @@ T intrude = -2;
 
 int cutting_surface_id = 0;
 fstream interaction_file;
-bool writing_interaction_to_file = 1;
+bool writing_interaction_to_file = 0;
 int current_frame = 0;
+bool run_sim = 0;
 
 ARRAY<TV> cutting_curve;
 MESH_CUTTING<T> *mcut;
@@ -97,22 +98,22 @@ int ratio = 10;
 void time_func(int value)
 {    
     //cout << "*********************frame starts*******************************" << endl;
-    VS::start_timer();
-    for (int i = 0; i < ratio; i++) {
-        mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
-    }
-    VS::stop_timer();
-    printf("sim time:    %f\n",VS::get_time());
-    for (int i = 0; i<mcut->sim_volume->particles.X.m; i++){
-        for (int k = 0; k<3; k++){
-            mcut->sim_volume->particles.X(i)(k) = mcut->deformable_object->X(i)(k);
-            mcut->sim_volume->particles.V(i)(k) = mcut->deformable_object->V(i)(k);
+    if (run_sim) {
+        VS::start_timer();
+        for (int i = 0; i < ratio; i++) {
+            mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
+        }
+        VS::stop_timer();
+        printf("sim time:    %f\n",VS::get_time());
+        for (int i = 0; i<mcut->sim_volume->particles.X.m; i++){
+            for (int k = 0; k<3; k++){
+                mcut->sim_volume->particles.X(i)(k) = mcut->deformable_object->X(i)(k);
+                mcut->sim_volume->particles.V(i)(k) = mcut->deformable_object->V(i)(k);
+            }
         }
     }
-    mcut->Update_Cutting_Particles();
-//    cout << mcut->volume->particles.V << endl;
-//    cout << mcut->volume->particles.X << endl;
     
+    mcut->Update_Cutting_Particles();
     mcut->Draw(drawing_cutting);
     glutTimerFunc(timestep, time_func, 0);
     
@@ -290,7 +291,7 @@ void mouse(int button, int state, int x, int y)
                 mcut->Draw_For_Picking();
                 unsigned char val;
                 glReadPixels(x, HEIGHT-y, 1, 1, GL_RED, GL_UNSIGNED_BYTE, &val);
-                picked_cc_id = PhysBAM::rint(val/(T(255)/mcut->tet_cc.m));
+                picked_cc_id = val;
             }
         }
         else if (button == 3) {
@@ -349,14 +350,6 @@ void mouse(int button, int state, int x, int y)
     else if (state == GLUT_UP) {
         if (button == GLUT_LEFT_BUTTON) { 
             if (translating) {
-                if (picked_cc_id >= 0) {
-                    mcut->Translate_CC(picked_cc_id, end_position - starting_position);
-                    for (int i = 0; i < sim_volume->particles.X.m; i++) {
-                        for (int k = 0; k < 3; k++){
-                            mcut->deformable_object->Positions()(i*3+k) = mcut->sim_volume->particles.X(i)(k);
-                        }
-                    }
-                }
                 picked_cc_id = -1;
             }
             else if (dragging) {
@@ -459,26 +452,47 @@ void motion(int x, int y)
     end_position = TV( xx, yy, intrude/2);
 
     if (cutting) {
-        if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude_Squared() > 0.0005)
+        if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude_Squared() > 0.5)
             cutting_curve.Append(end_position);
     }
     else if(dragging) {
         if(dragging_id >= 0){
-            mcut->dragging_targets(dragging_id)(0) += (xx-starting_dragging[0]);
-            mcut->dragging_targets(dragging_id)(1) += (yy-starting_dragging[1]);
+            T shiftx = xx-starting_dragging[0];
+            T shifty = yy-starting_dragging[1];
             starting_dragging[0] = xx;
             starting_dragging[1] = yy;
-            if (writing_interaction_to_file) {
-                interaction_file << "d " << dragging_id << " " << xx << " " << yy << endl;
+            if (run_sim) {
+                mcut->dragging_targets(dragging_id)(0) += shiftx;
+                mcut->dragging_targets(dragging_id)(1) += shifty;
+                if (writing_interaction_to_file) {
+                    interaction_file << "d " << dragging_id << " " << xx << " " << yy << endl;
+                }
             }
         }
     }
     else if(rotating) {
-        //cout << "processing rotation" << endl;
         if (writing_interaction_to_file) {
             interaction_file << "r " << xx << " " << yy << endl;
         }
         rotate_meshes(xx, yy);
+    }
+    else {
+        T shiftx = xx - starting_position(0);
+        T shifty = yy - starting_position(1);
+        starting_position(0) = xx;
+        starting_position(1) = yy;
+        ARRAY<bool> shifted(sim_volume->particles.X.m);
+        for (int i = 0; i < mcut->node_cc(picked_cc_id).m; ++i) {
+            int p = mcut->weights_in_sim(mcut->node_cc(picked_cc_id)(i)).id;
+            I4 e = sim_volume->mesh.elements(p);
+            for (int j = 0; j < 4; ++j) {
+                if (!shifted(e(j))) {
+                    sim_volume->particles.X(e(j))(0) += shiftx;
+                    sim_volume->particles.X(e(j))(1) += shifty;
+                    shifted(e(j)) = 1;
+                }
+            }
+        }
     }
 }
 
@@ -513,17 +527,20 @@ void initialize_cutting_mesh()
 
 void initialize_volume1()
 {       
-    sim_volume->particles.Add_Elements(4);
-    sim_volume->particles.X(0) = TV(-0.5, 0.0, -0.5);    
-    sim_volume->particles.X(1) = TV(0.5, 0.0, -0.5);    
-    sim_volume->particles.X(2) = TV(0.0, 0.0, 0.0);    
-    sim_volume->particles.X(3) = TV(0.0, 0.5, 0.0);    
-    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0,2,1,3));
-    perturb_particles(*sim_volume);
+    sim_volume->particles.Add_Elements(5);
+    sim_volume->particles.X(0) = TV(0.5, 0.0, 0.0);
+    sim_volume->particles.X(1) = TV(0.0, 0, -0.5);
+    sim_volume->particles.X(2) = TV(-0.5, 0.0, 0.0);
+    sim_volume->particles.X(3) = TV(0.0, 0.0, 0.5);
+    sim_volume->particles.X(4) = TV(0.0, 0.5, 0);
+    sim_volume->Update_Number_Nodes();
+    
+    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 3, 4));
+    //sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 3, 4));
 }
 
 void initialize_volume2()
-{       
+{
     sim_volume->particles.Add_Elements(5);
     sim_volume->particles.X(0) = TV(-0.5, 0.0, -0.5);    
     sim_volume->particles.X(1) = TV(0.5, 0.0, -0.5);  
@@ -712,15 +729,15 @@ void Initialize(bool reinitialize_cutting_mesh)
     }
     
     if(argc1 == 1) {
-        initialize_cubes();
-        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio);
+        initialize_volume1();
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
         mcut->Initialize_Elasticity();
     }
     else {
         const std::string filename(argv1[1]);
         FILE_UTILITIES::Read_From_File<T>(filename, *sim_volume);
         Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
-        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio);
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
         mcut->Initialize_Elasticity();
         if(argc1 == 2) {
             if (writing_interaction_to_file){
@@ -839,7 +856,7 @@ int main(int argc, char **argv)
     glutInitWindowSize( WIDTH, HEIGHT );
     string window_name = "cutting";
     glutCreateWindow( window_name.c_str() );
-    glClearColor( 0.0, 0.0, 0.0, 1.0 );
+    glClearColor(1, 1, 1, 1);
     glEnable( GL_DEPTH_TEST );
     
     if (lighting_on) {
