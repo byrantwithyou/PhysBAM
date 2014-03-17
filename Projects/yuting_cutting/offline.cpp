@@ -848,7 +848,6 @@ int main(int argc, char** argv) {
             T far = 0.05;
             T near = -0.05;
             initialize_cubes(width, height, depth, low, high, left, right, far, near);
-            sim_volume->particles.Store_Velocity();
             
             //simulation setup: dirichlet, initial configuration
             for (int i = 0; i < mcut->sim_volume->particles.X.m; i++) {
@@ -986,9 +985,9 @@ int main(int argc, char** argv) {
         case 6: //degeneracy cubes
         {
             string outputDir(argv[2]);
-            int width = 2;
-            int height = 2;
-            int depth = 2;
+            int width = 1;
+            int height = 1;
+            int depth = 1;
             T low = -0.5;
             T high = 0.5;
             T left = -0.5;
@@ -1004,48 +1003,24 @@ int main(int argc, char** argv) {
                     mcut->diri_nodes.Set(i);
                 }
             }
-            
             mcut->Initialize_Elasticity();
-            //energyTest();
-            //exit(1);
-            //TETRAHEDRALIZED_VOLUME<T> *refined_volume = new TETRAHEDRALIZED_VOLUME<T>();
             
             int frame = 0;
-            //T xshift = 0;
-            //T yshift = 0;
-            while (frame < 20) {
+            while (frame < 10) {
                 ++frame;
                 //                if (frame == 20) {
                 //                    energyTest();
                 //                    exit(1);
                 //                }
-                T xx = 1;
                 if (frame == 1) {
-                    TV pert(0, 0, 0);
-                    cutting_tri_mesh->particles.Add_Elements(12);
+                    cutting_tri_mesh->particles.Add_Elements(4);
+                    cutting_tri_mesh->Update_Number_Nodes();
                     cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(0, 1, 2));
                     cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(1, 2, 3));
-                    cutting_tri_mesh->particles.X(0) = TV(-0.5, 0, -1)+pert;
-                    cutting_tri_mesh->particles.X(1) = TV(-0.5, 0, 1)+pert;
-                    cutting_tri_mesh->particles.X(2) = TV(0.5, 0, -1)+pert;
-                    cutting_tri_mesh->particles.X(3) = TV(0.5, 0, 1)+pert;
-                    mcut->Cut(*cutting_tri_mesh, 1);
-                    
-                    cutting_tri_mesh->mesh.elements.Remove_All();
-                    cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(4, 5, 6));
-                    cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(5, 6, 7));
-                    cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(8, 9, 10));
-                    cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(9, 10, 11));
-                    cutting_tri_mesh->particles.X(4) = TV(xx, -1, -1)+pert;
-                    cutting_tri_mesh->particles.X(5) = TV(xx, -1, 1)+pert;
-                    cutting_tri_mesh->particles.X(6) = TV(-xx, 1, -1)+pert;
-                    cutting_tri_mesh->particles.X(7) = TV(-xx, 1, 1)+pert;
-                    
-                    cutting_tri_mesh->particles.X(8) = TV(-xx, -1, -1)+pert;
-                    cutting_tri_mesh->particles.X(9) = TV(-xx, -1, 1)+pert;
-                    cutting_tri_mesh->particles.X(10) = TV(xx, 1, -1)+pert;
-                    cutting_tri_mesh->particles.X(11) = TV(xx, 1, 1)+pert;
-                    
+                    cutting_tri_mesh->particles.X(0) = TV(-0.5, 0, -1);
+                    cutting_tri_mesh->particles.X(1) = TV(-0.5, 0, 1);
+                    cutting_tri_mesh->particles.X(2) = TV(0.5, 0, -1);
+                    cutting_tri_mesh->particles.X(3) = TV(0.5, 0, 1);
                     mcut->Cut(*cutting_tri_mesh, 1);
                 }
                 
@@ -1062,15 +1037,7 @@ int main(int argc, char** argv) {
                     }
                 }
                 mcut->Update_Cutting_Particles();
-                
-//                mcut->Refine_And_Save_To(refined_volume);
-//                Fix_Orientation(refined_volume);
-//                refined_volume->Update_Number_Nodes();
-//                refined_volume->mesh.Initialize_Boundary_Mesh();
-//                refined_volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
-//                Write_Boundary_Mesh_To_File(outputDir, "refined_volume_boundary", frame, refined_volume);
-//                Write_Volume_To_File(outputDir, "refined_volume", frame, refined_volume);
-                
+
                 WriteToPovRay(mcut->volume, outputDir, frame, mcut->cuttingFaces);
                 Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);
                 //Write_Volume_To_File(outputDir, "sim_volume", frame, mcut->sim_volume);
@@ -1165,7 +1132,7 @@ int main(int argc, char** argv) {
             sim_volume->Update_Number_Nodes();
             
             sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 3, 4));
-            sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 3, 4));
+            //sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 3, 4));
 
             mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio);
             //simulation setup: dirichlet, initial configuration
@@ -1183,7 +1150,7 @@ int main(int argc, char** argv) {
             int frame = 0;
             //T xshift = 0;
             //T yshift = 0;
-            while (frame < 10) {
+            while (frame < 5) {
                 ++frame;
                 //                if (frame == 20) {
                 //                    energyTest();
@@ -1195,10 +1162,10 @@ int main(int argc, char** argv) {
                     cutting_tri_mesh->particles.Add_Elements(4);
                     cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(0, 1, 2));
                     cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(0, 2, 3));
-                    cutting_tri_mesh->particles.X(0) = TV(0, 1, -1);
-                    cutting_tri_mesh->particles.X(1) = TV(0, 1, 1);
-                    cutting_tri_mesh->particles.X(2) = TV(0, -1, 1);
-                    cutting_tri_mesh->particles.X(3) = TV(0, -1, -1);
+                    cutting_tri_mesh->particles.X(0) = TV(0.5, 0.25, 1);
+                    cutting_tri_mesh->particles.X(1) = TV(-0.5, 0.25, 1);
+                    cutting_tri_mesh->particles.X(2) = TV(-0.5, 0.25, -1);
+                    cutting_tri_mesh->particles.X(3) = TV(0.5, 0.25, -1);
                     cutting_tri_mesh->Update_Number_Nodes();
                     mcut->Cut(*cutting_tri_mesh, 1);
                 }
