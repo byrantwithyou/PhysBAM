@@ -985,8 +985,8 @@ int main(int argc, char** argv) {
         case 6: //degeneracy cubes
         {
             string outputDir(argv[2]);
-            int width = 1;
-            int height = 1;
+            int width = 3;
+            int height = 3;
             int depth = 1;
             T low = -0.5;
             T high = 0.5;
@@ -1012,15 +1012,16 @@ int main(int argc, char** argv) {
                 //                    energyTest();
                 //                    exit(1);
                 //                }
+                T x = 0.5;
                 if (frame == 1) {
                     cutting_tri_mesh->particles.Add_Elements(4);
                     cutting_tri_mesh->Update_Number_Nodes();
                     cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(0, 1, 2));
                     cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(1, 2, 3));
-                    cutting_tri_mesh->particles.X(0) = TV(-0.5, 0.5, -1);
-                    cutting_tri_mesh->particles.X(1) = TV(-0.5, 0.5, 1);
-                    cutting_tri_mesh->particles.X(2) = TV(0.5, -0.5, -1);
-                    cutting_tri_mesh->particles.X(3) = TV(0.5, -0.5, 1);
+                    cutting_tri_mesh->particles.X(0) = TV(x, 0.5, -1);
+                    cutting_tri_mesh->particles.X(1) = TV(x, 0.5, 1);
+                    cutting_tri_mesh->particles.X(2) = TV(-x, -0.5, -1);
+                    cutting_tri_mesh->particles.X(3) = TV(-x, -0.5, 1);
                     mcut->Cut(*cutting_tri_mesh, 1);
                 }
                 

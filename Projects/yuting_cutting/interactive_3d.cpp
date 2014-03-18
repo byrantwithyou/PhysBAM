@@ -47,7 +47,7 @@ double get_time(){return (double)stoptime.tv_sec-(double)starttime.tv_sec+(doubl
 using namespace PhysBAM;
 using namespace std;
 
-typedef float T;
+typedef double T;
 typedef PhysBAM::VECTOR<T, 3> TV;
 typedef PhysBAM::MATRIX<T, 3> TM;
 typedef PhysBAM::VECTOR<int, 4> I4;
@@ -452,7 +452,7 @@ void motion(int x, int y)
     end_position = TV( xx, yy, intrude/2);
 
     if (cutting) {
-        if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude_Squared() > 0.5)
+        if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude_Squared() > 0.01)
             cutting_curve.Append(end_position);
     }
     else if(dragging) {
@@ -735,7 +735,16 @@ void Initialize(bool reinitialize_cutting_mesh)
     }
     else {
         const std::string filename(argv1[1]);
-        FILE_UTILITIES::Read_From_File<T>(filename, *sim_volume);
+        TETRAHEDRALIZED_VOLUME<float> *sim_volume_float;
+        sim_volume_float = TETRAHEDRALIZED_VOLUME<float>::Create();
+        FILE_UTILITIES::Read_From_File<float>(filename, *sim_volume_float);
+        sim_volume->particles.Add_Elements(sim_volume_float->particles.X.m);
+        for (int i = 0; i < sim_volume_float->particles.X.m; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                sim_volume->particles.X(i)(j) = sim_volume_float->particles.X(i)(j);
+            }
+        }
+        sim_volume->mesh.elements = sim_volume_float->mesh.elements;
         Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
         mcut->Initialize_Elasticity();
