@@ -1023,6 +1023,7 @@ int main(int argc, char** argv) {
                     cutting_tri_mesh->particles.X(2) = TV(-x, -0.5, -1);
                     cutting_tri_mesh->particles.X(3) = TV(-x, -0.5, 1);
                     mcut->Cut(*cutting_tri_mesh, 1);
+                    
                 }
                 
                 VS::start_timer();
@@ -1039,6 +1040,15 @@ int main(int argc, char** argv) {
                 }
                 mcut->Update_Cutting_Particles();
 
+//                TETRAHEDRALIZED_VOLUME<T> *refined_volume = new TETRAHEDRALIZED_VOLUME<T>();
+//                mcut->Refine_And_Save_To(refined_volume);
+//                Fix_Orientation(refined_volume);
+//                refined_volume->Update_Number_Nodes();
+//                refined_volume->mesh.Initialize_Boundary_Mesh();
+//                refined_volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
+//                Write_Boundary_Mesh_To_File(outputDir, "refined_volume_boundary", frame, refined_volume);
+//                Write_Volume_To_File(outputDir, "refined_volume", frame, refined_volume);
+                
                 WriteToPovRay(mcut->volume, outputDir, frame, mcut->cuttingFaces);
                 Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);
                 //Write_Volume_To_File(outputDir, "sim_volume", frame, mcut->sim_volume);

@@ -93,7 +93,6 @@ ARRAY<TV> cutting_curve;
 MESH_CUTTING<T> *mcut;
 TRIANGULATED_SURFACE<T> *cutting_tri_mesh;
 TETRAHEDRALIZED_VOLUME<T> *sim_volume;
-TETRAHEDRALIZED_VOLUME<T> *refined_volume;
 
 ARRAY<int> labels;
 HASHTABLE<int> picked_nodes;
@@ -109,21 +108,24 @@ void Reshape(GLint newWidth,GLint newHeight) {
     window_height=newHeight;
 }
 
-bool draw_sim = 1, draw_material_edges = 1;
+bool draw_sim = 1, draw_material_edges = 1, draw_cutting_surface = 1;
 void Render(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnableClientState(GL_VERTEX_ARRAY);
-    
-    //cutting curve
     ARRAY<TV> vertices;
-    for(int t=0;t<cutting_tri_mesh->mesh.elements.m;t++){
-        I3 e=cutting_tri_mesh->mesh.elements(t);
-        for(int i=0;i<3;++i)
-            vertices.Append(cutting_tri_mesh->particles.X(e(i)));
+    
+    //cutting mesh
+    if (draw_cutting_surface) {
+        for(int t=0;t<cutting_tri_mesh->mesh.elements.m;t++){
+            I3 e=cutting_tri_mesh->mesh.elements(t);
+            for(int i=0;i<3;++i)
+                vertices.Append(cutting_tri_mesh->particles.X(e(i)));
+        }
+        glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
+        glColor4f(0.0, 1.0, 1.0, 1.0);
+        cout << "fafdsafdsa: " << vertices.m << endl;
+        glDrawArrays(GL_TRIANGLES,0,vertices.m);
     }
-    glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
-    glColor4d(0, 1, 1, 1);
-    glDrawArrays(GL_TRIANGLES,0,vertices.m);
     
     //edges of sim mesh
     if(draw_sim){
@@ -141,10 +143,10 @@ void Render(){
     //edges material mesh
     if(draw_material_edges){
         vertices.Remove_All();
-        ARRAY<I2> segments = sim_volume->mesh.boundary_mesh->segment_mesh->elements;
+        ARRAY<I2> segments = mcut->volume->mesh.boundary_mesh->segment_mesh->elements;
         for (int i = 0; i < segments.m; ++i) {
-            vertices.Append(sim_volume->particles.X(segments(i)(0)));
-            vertices.Append(sim_volume->particles.X(segments(i)(1)));
+            vertices.Append(mcut->volume->particles.X(segments(i)(0)));
+            vertices.Append(mcut->volume->particles.X(segments(i)(1)));
         }
         glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
         glColor4f(0, 1, 0, 1.0);
@@ -153,11 +155,11 @@ void Render(){
     
     //material elements
     vertices.Remove_All();
-    ARRAY<I3> boundary_tri = refined_volume->mesh.boundary_mesh->elements;
+    ARRAY<I3> boundary_tri = mcut->volume->mesh.boundary_mesh->elements;
     for(int t=0;t<boundary_tri.m;t++){
         I3 tri=boundary_tri(t);
         for(int i=0;i<3;++i)
-            vertices.Append(refined_volume->particles.X(tri(i)));
+            vertices.Append(mcut->volume->particles.X(tri(i)));
     }
     glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
     glColor4f(1.0, 0.0, 0.0, 0.0);
@@ -198,51 +200,9 @@ void time_func(int value)
 
 static void SpecialKey( int key, int x, int y )
 {
-    VS::start_timer();
-    TM r;
-    switch( key ) {
-        case GLUT_KEY_DOWN: 
-            r =TM::Rotation_Matrix_X_Axis(rotate_speed);
-        break;
-        case GLUT_KEY_UP: 
-            r = TM::Rotation_Matrix_X_Axis(-rotate_speed);
-        break;
-        case GLUT_KEY_RIGHT: 
-            r = TM::Rotation_Matrix_Y_Axis(rotate_speed);
-        break;
-        case GLUT_KEY_LEFT: 
-            r = TM::Rotation_Matrix_Y_Axis(-rotate_speed);
-        break;
-    }
-    for (int i = 0; i < sim_volume->particles.X.m; i++) {
-        sim_volume->particles.X(i) = r * sim_volume->particles.X(i);
-        sim_volume->particles.V(i) = r * sim_volume->particles.V(i);
-
-        for (int k = 0; k < 3; k++){
-            mcut->deformable_object->Positions()(i*3+k) = mcut->sim_volume->particles.X(i)(k);
-            mcut->deformable_object->Velocities()(i*3+k) = mcut->sim_volume->particles.V(i)(k);
-        }
-    }
-    mcut->Update_Cutting_Particles();
-    
-    for (int i = 0; i < mcut->dragging_targets.m; i++) {
-        mcut->dragging_targets(i) = r * mcut->dragging_targets(i);
-    }
-    
-    for (int i = 0; i < mcut->my_constrained->n/3; i++){
-        int fixed_node = mcut->my_constrained->operator()(3*i)/3;
-        for (int k = 0; k < 3; k++){
-            mcut->my_constrained_locations->operator()(3*i+k) = sim_volume->particles.X(fixed_node)(k);
-        }
-    }
-    mcut->be->Set_Boundary_Conditions(*(mcut->my_constrained), *(mcut->my_constrained_locations));
-
-    VS::stop_timer();
-    printf("rotation time:    %f\n",VS::get_time());
 }
 
 void Initialize(bool);
-void Recover_Volume();
 
 void Translate_Volume(const TV& translation)
 {
@@ -320,11 +280,7 @@ static void Key( unsigned char key, int x, int y )
                 mcut->Update_Cutting_Particles();
             }
         break;
-        case 'z': 
-            Recover_Volume();
-        break;
     }
-
 }
 
 void mouse(int button, int state, int x, int y)
@@ -361,18 +317,19 @@ void mouse(int button, int state, int x, int y)
                 starting_position = TV( xcoor, ycoor, intrude/2);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 glBegin(GL_TRIANGLES);
-                ARRAY<I3> tris = refined_volume->mesh.boundary_mesh->elements;
+                ARRAY<I3> tris = mcut->volume->mesh.boundary_mesh->elements;
                 for(int t=0;t<tris.m;t++){
                     I3 tri=tris(t);
                     glColor4d(labels(t)/255.,0,0,0);
                     for(int j=0;j<3;++j) {
-                        TV p = refined_volume->particles.X(tri(j));
+                        TV p = mcut->volume->particles.X(tri(j));
                         glVertex3d(p(0), p(1), p(2));
                     }
                 }
                 glEnd();
                 unsigned char val;
                 glReadPixels(x, window_height-y, 1, 1, GL_RED, GL_UNSIGNED_BYTE, &val);
+                cout << "picked cc: " << (int)val << endl;
                 picked_nodes.Clean_Memory();
                 for(int t=0;t<tris.m;t++)
                     if(labels(t)==(int)val)
@@ -421,9 +378,8 @@ void mouse(int button, int state, int x, int y)
                         cutting_surface_id++;
                     }
                     mcut->Cut(*cutting_tri_mesh);
-                    mcut->Refine_And_Save_To(refined_volume);
-                    refined_volume->mesh.Initialize_Boundary_Mesh();
-                    refined_volume->mesh.boundary_mesh->Identify_Connected_Components(labels);
+                    mcut->volume->mesh.boundary_mesh->Identify_Connected_Components(labels);
+                    cout << labels.Max() << " CCs" << endl;
                 }
             } 
         }                  
@@ -720,14 +676,6 @@ void Initialize_Sphere_Levelset()
     }  
 }
 
-void Recover_Volume()
-{
-    cout << cutting_tri_mesh->mesh.elements.m << endl;
-    Initialize(0);
-    cout << cutting_tri_mesh->mesh.elements.m << endl;
-    mcut->Cut(*cutting_tri_mesh);
-}
-
 void Initialize(bool reinitialize_cutting_mesh)
 {
     drawing_cutting = 1;
@@ -863,12 +811,15 @@ void Initialize(bool reinitialize_cutting_mesh)
             exit(0);
         }
     }
-    mcut->Refine_And_Save_To(refined_volume);
-    refined_volume->mesh.Initialize_Boundary_Mesh();
-    refined_volume->mesh.boundary_mesh->Identify_Connected_Components(labels);
     sim_volume->Update_Number_Nodes();
     sim_volume->mesh.Initialize_Boundary_Mesh(); //cout << "sim boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
     sim_volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
+    
+    mcut->volume->Update_Number_Nodes();
+    mcut->volume->mesh.Initialize_Boundary_Mesh(); //cout << "cutting boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
+    mcut->volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
+    mcut->volume->mesh.boundary_mesh->Identify_Connected_Components(labels);
+    
 }
 
 void display(){}

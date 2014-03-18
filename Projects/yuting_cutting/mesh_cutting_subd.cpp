@@ -1356,10 +1356,10 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
     volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
     
     //reinitialize elasticity
-//    start_timer();
-//    Reinitialize_Elasticity();
-//    stop_timer();
-//    printf("elasticity reinitialization time:    %f\n",get_time());
+    start_timer();
+    Reinitialize_Elasticity();
+    stop_timer();
+    printf("elasticity reinitialization time:    %f\n",get_time());
 }
 
 template<class T>
