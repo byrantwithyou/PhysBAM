@@ -138,11 +138,7 @@ public:
     ARRAY<PARENT> weights_in_sim;//decides the particles in cutting volume
     ARRAY<int> ctet2stet;//cutting tet to sim tet mapping
     ARRAY<TET_CUTTING> tet_cuttings;
-    
-    
-    //cutting triangle mesh
-    ARRAY<TV> cutting_vertices;
-    
+
     //levelset as cutter
     ARRAY<ARRAY<T> > levelsets;
     
@@ -199,7 +195,7 @@ public:
     void Draw(bool drawing_cutting_mesh, const DRAWING_MODE& mode = normal) const;
     void Write_To_File(const std::string& writing_directory, int frame) const;
     void Write_Boundary_Mesh_To_File(const std::string& writing_directory, int frame) const;
-    void Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume);
+    void Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>*& refined_volume);
 private:
     ARRAY<VECTOR<int, NumNodesPerTet> > original_elements,original_sim_elements;
     HASHTABLE<VECTOR<int,3> > cutFaces;

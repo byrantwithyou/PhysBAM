@@ -9,6 +9,7 @@
 #include <Tools/Matrices/MATRIX.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Matrices/ROTATION.h>
@@ -47,7 +48,12 @@ double get_time(){return (double)stoptime.tv_sec-(double)starttime.tv_sec+(doubl
 using namespace PhysBAM;
 using namespace std;
 
+
 typedef double T;
+typedef PhysBAM::VECTOR<int, 2> I2;
+typedef PhysBAM::VECTOR<int, 3> I3;
+typedef PhysBAM::VECTOR<int, 4> I4;
+
 typedef PhysBAM::VECTOR<T, 3> TV;
 typedef PhysBAM::MATRIX<T, 3> TM;
 typedef PhysBAM::VECTOR<int, 4> I4;
@@ -60,7 +66,7 @@ bool cutting = 1;
 bool dragging = 0;
 bool rotating = 0;
 bool translating = 0;
-bool lighting_on = 1;
+bool lighting_on = 0;
 
 bool drawing_cutting = 1;
 int dragging_id = -1;
@@ -87,17 +93,84 @@ ARRAY<TV> cutting_curve;
 MESH_CUTTING<T> *mcut;
 TRIANGULATED_SURFACE<T> *cutting_tri_mesh;
 TETRAHEDRALIZED_VOLUME<T> *sim_volume;
+TETRAHEDRALIZED_VOLUME<T> *refined_volume;
 
-#define HEIGHT 512
-#define WIDTH 512
+ARRAY<int> labels;
+HASHTABLE<int> picked_nodes;
+
+int window_height = 600;
+int window_width = 600;
 
 #define DE cout<<"file "<<__FILE__<<"   line "<<__LINE__<<"  "<<&mcut->volume->particles.X<<"   "<<mcut->volume->particles.X<<endl;
+
+void Reshape(GLint newWidth,GLint newHeight) {
+    glViewport(0,0,newWidth,newHeight);
+    window_width=newWidth;
+    window_height=newHeight;
+}
+
+bool draw_sim = 1, draw_material_edges = 1;
+void Render(){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    
+    //cutting curve
+    ARRAY<TV> vertices;
+    for(int t=0;t<cutting_tri_mesh->mesh.elements.m;t++){
+        I3 e=cutting_tri_mesh->mesh.elements(t);
+        for(int i=0;i<3;++i)
+            vertices.Append(cutting_tri_mesh->particles.X(e(i)));
+    }
+    glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
+    glColor4d(0, 1, 1, 1);
+    glDrawArrays(GL_TRIANGLES,0,vertices.m);
+    
+    //edges of sim mesh
+    if(draw_sim){
+        vertices.Remove_All();
+        ARRAY<I2> segments = sim_volume->mesh.boundary_mesh->segment_mesh->elements;
+        for (int i = 0; i < segments.m; ++i) {
+            vertices.Append(sim_volume->particles.X(segments(i)(0)));
+            vertices.Append(sim_volume->particles.X(segments(i)(1)));
+        }
+        glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
+        glColor4f(0.0, 0.0, 1.0, 1.0);
+        glDrawArrays(GL_LINES,0,vertices.m);
+    }
+    
+    //edges material mesh
+    if(draw_material_edges){
+        vertices.Remove_All();
+        ARRAY<I2> segments = sim_volume->mesh.boundary_mesh->segment_mesh->elements;
+        for (int i = 0; i < segments.m; ++i) {
+            vertices.Append(sim_volume->particles.X(segments(i)(0)));
+            vertices.Append(sim_volume->particles.X(segments(i)(1)));
+        }
+        glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
+        glColor4f(0, 1, 0, 1.0);
+        glDrawArrays(GL_LINES,0,vertices.m);
+    }
+    
+    //material elements
+    vertices.Remove_All();
+    ARRAY<I3> boundary_tri = refined_volume->mesh.boundary_mesh->elements;
+    for(int t=0;t<boundary_tri.m;t++){
+        I3 tri=boundary_tri(t);
+        for(int i=0;i<3;++i)
+            vertices.Append(refined_volume->particles.X(tri(i)));
+    }
+    glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
+    glColor4f(1.0, 0.0, 0.0, 0.0);
+    glDrawArrays(GL_TRIANGLES,0,vertices.m);
+    
+    glutSwapBuffers();
+    glDisableClientState(GL_VERTEX_ARRAY);
+}
 
 int current = 0;
 int ratio = 10;
 void time_func(int value)
-{    
-    //cout << "*********************frame starts*******************************" << endl;
+{
     if (run_sim) {
         VS::start_timer();
         for (int i = 0; i < ratio; i++) {
@@ -114,14 +187,13 @@ void time_func(int value)
     }
     
     mcut->Update_Cutting_Particles();
-    mcut->Draw(drawing_cutting);
+    Render();
     glutTimerFunc(timestep, time_func, 0);
     
     if (writing_interaction_to_file) {
         interaction_file << "f " << current_frame << endl;
         current_frame++;
     }
-    //cout << "*********************frame ends*********************************" << endl << endl;
 }
 
 static void SpecialKey( int key, int x, int y )
@@ -164,10 +236,7 @@ static void SpecialKey( int key, int x, int y )
         }
     }
     mcut->be->Set_Boundary_Conditions(*(mcut->my_constrained), *(mcut->my_constrained_locations));
-        
-    for (int i = 0; i < mcut->cutting_vertices.m; i++) {
-        mcut->cutting_vertices(i) = r * mcut->cutting_vertices(i);
-    }
+
     VS::stop_timer();
     printf("rotation time:    %f\n",VS::get_time());
 }
@@ -258,11 +327,10 @@ static void Key( unsigned char key, int x, int y )
 
 }
 
-ARRAY<TV> cutting_copy;
 void mouse(int button, int state, int x, int y)
 {
-    T xcoor = 2 * x / T(WIDTH) - 1;
-    T ycoor = 1 - 2 * y / T(HEIGHT);
+    T xcoor = 2 * x / T(window_width) - 1;
+    T ycoor = 1 - 2 * y / T(window_height);
     if (state == GLUT_DOWN) {
         if (button == GLUT_LEFT_BUTTON){    
             if (dragging) {
@@ -283,67 +351,36 @@ void mouse(int button, int state, int x, int y)
                 }
             }
             else if (cutting){
+                delete cutting_tri_mesh;
+                cutting_tri_mesh = new TRIANGULATED_SURFACE<T>();
+                cutting_curve.Remove_All();
                 starting_position = TV( xcoor, ycoor, intrude/2);
                 cutting_curve.Append(starting_position);
             }
             else {
                 starting_position = TV( xcoor, ycoor, intrude/2);
-                mcut->Draw_For_Picking();
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                glBegin(GL_TRIANGLES);
+                ARRAY<I3> tris = refined_volume->mesh.boundary_mesh->elements;
+                for(int t=0;t<tris.m;t++){
+                    I3 tri=tris(t);
+                    glColor4d(labels(t)/255.,0,0,0);
+                    for(int j=0;j<3;++j) {
+                        TV p = refined_volume->particles.X(tri(j));
+                        glVertex3d(p(0), p(1), p(2));
+                    }
+                }
+                glEnd();
                 unsigned char val;
-                glReadPixels(x, HEIGHT-y, 1, 1, GL_RED, GL_UNSIGNED_BYTE, &val);
-                picked_cc_id = val;
-            }
-        }
-        else if (button == 3) {
-            //cout << "processing mouse rolling\n";
-            if(cubes){
-                for (int i = 0; i < sim_volume->particles.X.m; i++) {
-                    sim_volume->particles.X(i) *= 1.1;
-                    for (int k = 0; k < 3; k++){
-                        mcut->deformable_object->Positions()(i*3+k) = mcut->sim_volume->particles.X(i)(k);
-                    }
-                }
-                mcut->Update_Cutting_Particles();
-            }
-//            else {
-//                int i = 0;
-//                for (set<MESH_CUTTING<T>::DIRI,MESH_CUTTING<T>::DIRI_LESS>::iterator it = mcut->diri_nodes.begin(); it != mcut->diri_nodes.end(); it++) {
-//                    if((*it)(1)==1){
-//                        (*(mcut->my_constrained_locations))(3*i) += 0.05;}
-//                    else {
-//                        (*(mcut->my_constrained_locations))(3*i) -= 0.05;}
-//                    i++;
-//                }
-//                mcut->be->Set_Boundary_Conditions(*(mcut->my_constrained), *(mcut->my_constrained_locations));
-//            }
-            for (int i = 0; i < mcut->cutting_vertices.m; i++) {
-                mcut->cutting_vertices(i) *= 1.1;
-            }
-        }
-        else if (button == 4) { 
-            //cout << "processing mouse rolling\n";
-            if (cubes){
-                for (int i = 0; i < sim_volume->particles.X.m; i++) {
-                    sim_volume->particles.X(i) *= 0.9;
-                    for (int k = 0; k < 3; k++){
-                        mcut->deformable_object->Positions()(i*3+k) = mcut->sim_volume->particles.X(i)(k);
-                    }
-                }
-                mcut->Update_Cutting_Particles();
-            }
-//            else {
-//                int i = 0;
-//                for (set<MESH_CUTTING<T>::DIRI,MESH_CUTTING<T>::DIRI_LESS>::iterator it = mcut->diri_nodes.begin(); it != mcut->diri_nodes.end(); it++) {
-//                    if((*it)(1)==1){
-//                        (*(mcut->my_constrained_locations))(3*i) -= 0.05;}
-//                    else {
-//                        (*(mcut->my_constrained_locations))(3*i) += 0.05;}
-//                    i++;
-//                }
-//                mcut->be->Set_Boundary_Conditions(*(mcut->my_constrained), *(mcut->my_constrained_locations));
-//            }
-            for (int i = 0; i < mcut->cutting_vertices.m; i++) {
-                mcut->cutting_vertices(i) *= 0.9;
+                glReadPixels(x, window_height-y, 1, 1, GL_RED, GL_UNSIGNED_BYTE, &val);
+                picked_nodes.Clean_Memory();
+                for(int t=0;t<tris.m;t++)
+                    if(labels(t)==(int)val)
+                        for(int i=0;i<3;++i){
+                            int f=mcut->weights_in_sim(tris(t)(i)).id;
+                            for(int j=0;j<4;++j)
+                                picked_nodes.Set(sim_volume->mesh.elements(f)(j));
+                        }
             }
         }
     }
@@ -383,26 +420,11 @@ void mouse(int button, int state, int x, int y)
                         FILE_UTILITIES::Write_To_File<T>(string("cutting_surfaces/")+ss.str()+string(".tet.gz"), cutting_tri_mesh->particles, cutting_tri_mesh->mesh);
                         cutting_surface_id++;
                     }
-                    
-                    for (int i = 0; i < cutting_curve.m-1; i++) {
-                        mcut->cutting_vertices.Append(cutting_curve(i));
-                        mcut->cutting_vertices.Append(cutting_curve(i) - TV(0,0,intrude));
-                        mcut->cutting_vertices.Append(cutting_curve(i));
-                        mcut->cutting_vertices.Append(cutting_curve(i+1));
-                        mcut->cutting_vertices.Append(cutting_curve(i) - TV(0,0,intrude));
-                        mcut->cutting_vertices.Append(cutting_curve(i+1) - TV(0,0,intrude));
-                        mcut->cutting_vertices.Append(cutting_curve(i));
-                        mcut->cutting_vertices.Append(cutting_curve(i+1) - TV(0,0,intrude));
-                    }
-                    mcut->cutting_vertices.Append(cutting_curve(cutting_curve.m-1));
-                    mcut->cutting_vertices.Append(cutting_curve(cutting_curve.m-1) - TV(0,0,intrude));
-                    
-                    cutting_copy = mcut->cutting_vertices;
                     mcut->Cut(*cutting_tri_mesh);
-                }      
-                delete cutting_tri_mesh;
-                cutting_tri_mesh = new TRIANGULATED_SURFACE<T>();
-                cutting_curve.Remove_All();
+                    mcut->Refine_And_Save_To(refined_volume);
+                    refined_volume->mesh.Initialize_Boundary_Mesh();
+                    refined_volume->mesh.boundary_mesh->Identify_Connected_Components(labels);
+                }
             } 
         }                  
     }
@@ -437,18 +459,14 @@ void rotate_meshes(T xx, T yy)
     }
     mcut->be->Set_Boundary_Conditions(*(mcut->my_constrained), *(mcut->my_constrained_locations));
 
-    for (int i = 0; i < mcut->cutting_vertices.m; i++) {
-        mcut->cutting_vertices(i) = r * mcut->cutting_vertices(i);
-    }
-
     starting_rotation[0] = xx;
     starting_rotation[1] = yy;
 }
 
 void motion(int x, int y)
 {
-    T xx = 2 * x / T(WIDTH) - 1;
-    T yy = 1 - 2 * y / T(HEIGHT);
+    T xx = 2 * x / T(window_width) - 1;
+    T yy = 1 - 2 * y / T(window_height);
     end_position = TV( xx, yy, intrude/2);
 
     if (cutting) {
@@ -481,18 +499,11 @@ void motion(int x, int y)
         T shifty = yy - starting_position(1);
         starting_position(0) = xx;
         starting_position(1) = yy;
-        ARRAY<bool> shifted(sim_volume->particles.X.m);
-        for (int i = 0; i < mcut->node_cc(picked_cc_id).m; ++i) {
-            int p = mcut->weights_in_sim(mcut->node_cc(picked_cc_id)(i)).id;
-            I4 e = sim_volume->mesh.elements(p);
-            for (int j = 0; j < 4; ++j) {
-                if (!shifted(e(j))) {
-                    sim_volume->particles.X(e(j))(0) += shiftx;
-                    sim_volume->particles.X(e(j))(1) += shifty;
-                    shifted(e(j)) = 1;
-                }
-            }
+        for(typename HASHTABLE<int>::ITERATOR it(picked_nodes);it.Valid();it.Next()) {
+            mcut->sim_volume->particles.X(it.Key())(0) += shiftx;
+            mcut->sim_volume->particles.X(it.Key())(1) += shifty;
         }
+        mcut->Update_Cutting_Particles();
     }
 }
 
@@ -714,7 +725,6 @@ void Recover_Volume()
     cout << cutting_tri_mesh->mesh.elements.m << endl;
     Initialize(0);
     cout << cutting_tri_mesh->mesh.elements.m << endl;
-    mcut->cutting_vertices = cutting_copy;
     mcut->Cut(*cutting_tri_mesh);
 }
 
@@ -794,7 +804,7 @@ void Initialize(bool reinitialize_cutting_mesh)
                         }
                     }
                     mcut->Update_Cutting_Particles();
-                    mcut->Write_To_File(writing_directory, frame);
+                    //mcut->Write_To_File(writing_directory, frame);
                     frame++;
                 }
                 else if (event[0] == 'c'){
@@ -853,6 +863,12 @@ void Initialize(bool reinitialize_cutting_mesh)
             exit(0);
         }
     }
+    mcut->Refine_And_Save_To(refined_volume);
+    refined_volume->mesh.Initialize_Boundary_Mesh();
+    refined_volume->mesh.boundary_mesh->Identify_Connected_Components(labels);
+    sim_volume->Update_Number_Nodes();
+    sim_volume->mesh.Initialize_Boundary_Mesh(); //cout << "sim boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
+    sim_volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
 }
 
 void display(){}
@@ -862,7 +878,7 @@ int main(int argc, char **argv)
     argv1 = argv;
     glutInit( &argc, argv );
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
-    glutInitWindowSize( WIDTH, HEIGHT );
+    glutInitWindowSize( window_width, window_height );
     string window_name = "cutting";
     glutCreateWindow( window_name.c_str() );
     glClearColor(1, 1, 1, 1);
@@ -886,7 +902,8 @@ int main(int argc, char **argv)
     glutMouseFunc( mouse );
     glutMotionFunc( motion );
     glutDisplayFunc( display );
-                   
+    glutReshapeFunc(Reshape);
+    
     glutMainLoop();
     
     return 0;
