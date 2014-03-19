@@ -1356,6 +1356,16 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
     volume->mesh.Initialize_Boundary_Mesh(); //cout << "cutting boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
     volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
     
+    //print statistics after cut
+    cout << volume->mesh.elements.m << " elements after cut\n";
+    cout << "weights_in_sim: ";
+    for (int i = 0; i < weights_in_sim.m; ++i) {
+        cout << weights_in_sim(i).weight << " ";
+    }
+    cout << endl;
+    ARRAY<int> labels;
+    volume->mesh.boundary_mesh->Identify_Connected_Components(labels);
+    cout << labels.Max() << " CCs after cut\n";
     //reinitialize elasticity
     start_timer();
     Reinitialize_Elasticity();

@@ -240,6 +240,7 @@ Set_Tol()
         tol[i][assume]=b;
         tol[i][test]=(3*a+b)/4;
         tol[i][prune]=(a+3*b)/4;}
+    std::cout << "tol_vv: " << tol_vv[0] << tol_vv[1] << tol_vv[2] << tol_vv[3] << std::endl;
 }
 //#####################################################################
 // Function Compute_VV

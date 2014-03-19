@@ -98,7 +98,7 @@ public:
             
             CENTER Value() const
             {
-                if(!n||!set) return sum;
+                if(!n) return sum;
                 return sum/n;
             }
         };

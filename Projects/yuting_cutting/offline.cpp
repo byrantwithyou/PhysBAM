@@ -1165,19 +1165,19 @@ int main(int argc, char** argv) {
                 if (frame == 1) {
                     cutting_tri_mesh = new TRIANGULATED_SURFACE<T>();
                     cutting_tri_mesh->particles.Add_Elements(4);
+                    cutting_tri_mesh->Update_Number_Nodes();
                     cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(0, 1, 2));
                     cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(0, 2, 3));
-                    cutting_tri_mesh->particles.X(0) = TV(0.5, 0.25, 1);
-                    cutting_tri_mesh->particles.X(1) = TV(-0.5, 0.25, 1);
-                    cutting_tri_mesh->particles.X(2) = TV(-0.5, 0.25, -1);
-                    cutting_tri_mesh->particles.X(3) = TV(0.5, 0.25, -1);
-                    cutting_tri_mesh->Update_Number_Nodes();
-                    mcut->Cut(*cutting_tri_mesh, 1);
-                    
                     cutting_tri_mesh->particles.X(0) = TV(0.1, 1, 1);
                     cutting_tri_mesh->particles.X(1) = TV(0.1, -1, 1);
                     cutting_tri_mesh->particles.X(2) = TV(0.1, -1, -1);
                     cutting_tri_mesh->particles.X(3) = TV(0.1, 1, -1);
+                    mcut->Cut(*cutting_tri_mesh, 1);
+                    
+                    cutting_tri_mesh->particles.X(0) = TV(0.11, 1, 1);
+                    cutting_tri_mesh->particles.X(1) = TV(0.11, -1, 1);
+                    cutting_tri_mesh->particles.X(2) = TV(0.11, -1, -1);
+                    cutting_tri_mesh->particles.X(3) = TV(0.11, 1, -1);
                     mcut->Cut(*cutting_tri_mesh, 1);
                 }
                 

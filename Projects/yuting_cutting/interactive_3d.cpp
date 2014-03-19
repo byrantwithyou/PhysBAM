@@ -68,7 +68,6 @@ bool rotating = 0;
 bool translating = 0;
 bool lighting_on = 0;
 
-bool drawing_cutting = 1;
 int dragging_id = -1;
 T K = 50000;
 
@@ -108,14 +107,27 @@ void Reshape(GLint newWidth,GLint newHeight) {
     window_height=newHeight;
 }
 
-bool draw_sim = 1, draw_material_edges = 1, draw_cutting_surface = 1;
+bool draw_sim = 1, draw_material_edges = 1, drawing_cutting = 1;
 void Render(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnableClientState(GL_VERTEX_ARRAY);
     ARRAY<TV> vertices;
     
     //cutting mesh
-    if (draw_cutting_surface) {
+    if (drawing_cutting && cutting_tri_mesh->mesh.elements.m) {
+        vertices.Remove_All();
+        for(int t=0;t<cutting_tri_mesh->mesh.elements.m;t++){
+            I3 e=cutting_tri_mesh->mesh.elements(t);
+            for(int i=0;i<3;++i) {
+                vertices.Append(cutting_tri_mesh->particles.X(e(i)));
+                vertices.Append(cutting_tri_mesh->particles.X(e((i+1)%3)));
+            }
+        }
+        glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
+        glColor4f(1, 0, 1, 1.0);
+        glDrawArrays(GL_LINES,0,vertices.m);
+        
+        vertices.Remove_All();
         for(int t=0;t<cutting_tri_mesh->mesh.elements.m;t++){
             I3 e=cutting_tri_mesh->mesh.elements(t);
             for(int i=0;i<3;++i)
@@ -218,6 +230,20 @@ void Translate_Volume(const TV& translation)
     }
 }
 
+void Scale_Volume(T scale) {
+    for (int i = 0; i < sim_volume->particles.X.m; i++) {
+        sim_volume->particles.X(i) *= scale;
+        for (int k = 0; k < 3; k++){
+            mcut->deformable_object->Positions()(i*3+k) = mcut->sim_volume->particles.X(i)(k);
+        }
+    }
+    mcut->Update_Cutting_Particles();
+    
+    for (int i = 0; i < cutting_tri_mesh->particles.X.m; i++) {
+        cutting_tri_mesh->particles.X(i) *= scale;
+    }
+}
+
 static void Key( unsigned char key, int x, int y )
 {
     TM r;
@@ -265,8 +291,20 @@ static void Key( unsigned char key, int x, int y )
         case 'd': 
             Translate_Volume(TV(0.05,0,0));
         break;
+        case 'f':
+            Scale_Volume(1.1);
+            break;
+        case 'g':
+            Scale_Volume(0.9);
+            break;
         case 'e': 
             drawing_cutting = !drawing_cutting;
+        break;
+        case 'z':
+            draw_sim = !draw_sim;
+        break;
+        case 'x':
+            draw_material_edges = !draw_material_edges;
         break;
         case 'p':
             if(cubes){
@@ -368,6 +406,7 @@ void mouse(int button, int state, int x, int y)
                         cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(pid1+1,pid1+3,pid1+2));  
                         pid1+=2;
                     }
+                    cutting_tri_mesh->mesh.Initialize_Boundary_Mesh();
                     
                     //writing cutting information to file for high res simulation
                     if (writing_interaction_to_file){
@@ -376,6 +415,7 @@ void mouse(int button, int state, int x, int y)
                         FILE_UTILITIES::Write_To_File<T>(string("cutting_surfaces/")+ss.str()+string(".tet.gz"), cutting_tri_mesh->particles, cutting_tri_mesh->mesh);
                         cutting_surface_id++;
                     }
+                    
                     mcut->Cut(*cutting_tri_mesh);
                     mcut->volume->mesh.boundary_mesh->Identify_Connected_Components(labels);
                     cout << labels.Max() << " CCs" << endl;
@@ -414,6 +454,10 @@ void rotate_meshes(T xx, T yy)
     }
     mcut->be->Set_Boundary_Conditions(*(mcut->my_constrained), *(mcut->my_constrained_locations));
 
+    for (int i = 0; i < cutting_tri_mesh->particles.X.m; i++) {
+        cutting_tri_mesh->particles.X(i) = r * cutting_tri_mesh->particles.X(i);
+    }
+    
     starting_rotation[0] = xx;
     starting_rotation[1] = yy;
 }
