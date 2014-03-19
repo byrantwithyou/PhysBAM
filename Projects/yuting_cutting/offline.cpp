@@ -667,6 +667,7 @@ int main(int argc, char** argv) {
             break;
         }
 
+        //incrementally cut armadillo: change DEFORMABLE_OBJECT.h's Dm_inverse, change mesh_cutting_subd.cpp's dirichlet constraints and mesh_cutting_subd's cut() to copy material space nodes into volume
         case 2:
         {
             cout << "incremental\n";
@@ -737,7 +738,7 @@ int main(int argc, char** argv) {
                         cutting_tri_mesh->particles.X(2) = TV(x1, y1, -1);
                         cutting_tri_mesh->particles.X(3) = TV(x1, y1, 0.1);
                     }
-                    mcut->Cut(*cutting_tri_mesh, frame == f2);
+                    mcut->Cut(*cutting_tri_mesh, frame == f2, true);
                 }
                 else if (frame > f3 && frame <= f4) {
                     x1=xx+(frame-f3-1)*xxx;
@@ -747,7 +748,7 @@ int main(int argc, char** argv) {
                     cutting_tri_mesh->particles.X(1) = TV(x1, y1, 1);
                     cutting_tri_mesh->particles.X(2) = TV(x1+xxx, y1, -1);
                     cutting_tri_mesh->particles.X(3) = TV(x1+xxx, y1, 1);
-                    mcut->Cut(*cutting_tri_mesh, frame == f4);
+                    mcut->Cut(*cutting_tri_mesh, frame == f4, true);
                 }
                 else if (frame > f5 && frame <= f6) {
                     x1=0;
@@ -757,7 +758,7 @@ int main(int argc, char** argv) {
                     cutting_tri_mesh->particles.X(1) = TV(x1, y1, 1);
                     cutting_tri_mesh->particles.X(2) = TV(x1, y1-yyy, -1);
                     cutting_tri_mesh->particles.X(3) = TV(x1, y1-yyy, 1);
-                    mcut->Cut(*cutting_tri_mesh, frame == f6);
+                    mcut->Cut(*cutting_tri_mesh, frame == f6, true);
                 }
                 else {
                     laserZ2=-9;
@@ -838,7 +839,7 @@ int main(int argc, char** argv) {
             break;
         }
             
-        case 5://cubes, carve letters on it
+        case 5://cubes, carve letters on it: change DEFORMABLE_OBJECT.h's Dm_inverse, change mesh_cutting_subd.cpp's dirichlet constraints
         {
             string outputDir(argv[2]);
             int width = 10;

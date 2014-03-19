@@ -747,7 +747,7 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
         }
         if (tcenters.m == NumNodesPerTriangle) continue;
         
-        //whether all segments are on one face. if so, flag them as no_merge and return
+        //whether all centers are on one face. if so, flag them as no_merge and return
         bool cut_through = 1;
         for (int j = 0; j < 4; ++j) {
             int e1 = face2edge[j][0];
@@ -942,7 +942,7 @@ int MESH_CUTTING<T>::Sorted_Id(const I3& sorted_tri, const I3& tri, int material
 }
 
 template<class T>
-void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
+void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine, bool material_space)
 {
     cout << "cutting*************************************" << endl;
     
@@ -962,6 +962,12 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
     delete volume;
     volume = tv;
     
+    //do this if doing incremental cutting in material space!!!
+    if (material_space) {
+        for(int i=0;i<volume->particles.X.m;++i)
+            volume->particles.X(i)=cutting_particle_material_space(i);
+    }
+
     //keep a copy of original element-wise data
     original_elements = volume->mesh.elements;
     original_sim_elements = sim_volume->mesh.elements;
@@ -1390,7 +1396,7 @@ void MESH_CUTTING<T>::Fix_Orientation()
     }
 }
 
-template<class T> 
+template<class T>
 void MESH_CUTTING<T>::Partial_Refine()
 {
     HASHTABLE<VECTOR<int,2>,int> new_nodes;//edge to edge intersection point's index
@@ -1399,14 +1405,12 @@ void MESH_CUTTING<T>::Partial_Refine()
     ARRAY<TET> new_elements;
     ARRAY<int> new_ctet2stet;
     ARRAY<bool> new_is_blue;
-    int n = volume->mesh.elements.m;
-    
-    for (int i = 0; i < n; i++) {
+    cuttingFaces.Clean_Memory();
+    for (int i = 0; i < volume->mesh.elements.m; i++) {
         if (tet_cuttings(i).material_ids.m < MaxPieces){
             const int parent_sim_tet = ctet2stet(i);
             VECTOR<int,4> &element = volume->mesh.elements(i);
             TET_CUTTING& tc = tet_cuttings(i);
-            ARRAY<I4> ne;
             
             //tet center
             int cid = weights_in_sim.m;
@@ -1415,102 +1419,103 @@ void MESH_CUTTING<T>::Partial_Refine()
                 weights_in_sim.Append(PARENT(parent_sim_tet, c));
             }
             
-            for (int j = 0; j < 4; ++j) {
-                int fc = weights_in_sim.m;
-                int n1 = element(face2node[j][0]);
-                int n2 = element(face2node[j][1]);
-                int n3 = element(face2node[j][2]);
-                bool add = 0;
-                for (int k = 0; k < 6; ++k) {
-                    if (!tet_cuttings(i).has_material(j*6+k)) {
-                        CENTER c = Weight_In_Sim_Tet(tc.face_centers[j].Value(), element, parent_sim_tet);
-                        add = 1;
-                        I3 face = I3(n1, n2, n3).Sorted();
-                        if (!new_nodes2.Get(face, fc)) {
-                            new_nodes2.Set(face, fc);
-                            weights_in_sim.Append(PARENT(parent_sim_tet, c));
-                        }
-                        break;
-                    }
-                }
-                if (add) {
-                    for (int k = 0; k < 3; ++k) {
-                        int fn1 = element(face2node[j][k]);
-                        int fn2 = element(face2node[j][(k+1)%3]);
-                        int m1 = j * 6 + k * 2;
-                        int m2 = j * 6 + k * 2 + 1;
-                        if (tet_cuttings(i).has_material(m1) && tet_cuttings(i).has_material(m2)) {
-                            ne.Append(I4(cid, fc, fn1, fn2));
-                        }
-                        else if (tet_cuttings(i).has_material(m1) || tet_cuttings(i).has_material(m2)){
-                            int eid = weights_in_sim.m;
-                            I2 edge = I2(fn1, fn2).Sorted();
-                            if (!new_nodes.Get(edge, eid)) {
-                                CENTER c = Weight_In_Sim_Tet(tc.edge_centers[face2edge[j][k]].Value(), element, parent_sim_tet);
-                                new_nodes.Set(edge,eid);
-                                weights_in_sim.Append(PARENT(parent_sim_tet, c));
-                            }
-                            if (tet_cuttings(i).has_material(m1)) {
-                                ne.Append(I4(cid, fc, fn1, eid));
-                            }
-                            else {
-                                ne.Append(I4(cid, fc, fn2, eid));
-                            }
-                        }
-                    };
-                }
-                else {
-                    ne.Append(I4(cid, n1, n2, n3));
+            //edge centers
+            VECTOR<int, NumEdgesPerTet> ec;
+            for (int j = 0; j < NumEdgesPerTet; j++){
+                CENTER c = Weight_In_Sim_Tet(tc.edge_centers[j].Value(), element, parent_sim_tet);
+                //cout << "e weight: " << tc.edge_centers[j] << endl;
+                VECTOR<int,2> edge = VECTOR<int,2>(element(edge2node[j][0]),element(edge2node[j][1])).Sorted();
+                //store the weight
+                if (!(new_nodes.Get(edge,ec[j]))){
+                    int eid = weights_in_sim.m;
+                    ec[j] = eid;
+                    new_nodes.Set(edge,eid);
+                    weights_in_sim.Append(PARENT(parent_sim_tet, c));
                 }
             }
-            element = ne(0);
-            for (int j = 1; j < ne.m; ++j) {
-                volume->mesh.elements.Append(ne(j));
-                is_blue.Append(is_blue(i));
-                ctet2stet.Append(ctet2stet(i));
+            
+            //face centers
+            VECTOR<int, NumFacesPerTet> fc;
+            for (int j = 0; j < NumFacesPerTet; j++){
+                CENTER c = Weight_In_Sim_Tet(tc.face_centers[j].Value(), element, parent_sim_tet);
+                TV_INT face = TV_INT(element(face2node[j][0]),element(face2node[j][1]),element(face2node[j][2])).Sorted();
+                if (!(new_nodes2.Get(face,fc[j]))){
+                    int fid = weights_in_sim.m;
+                    fc[j] = fid;
+                    new_nodes2.Set(face,fid);
+                    weights_in_sim.Append(PARENT(parent_sim_tet, c));
+                }
             }
+            
+            for (int j = 0; j < tc.material_ids.m; j++) {
+                int mid = tc.material_ids(j);
+                int fid = mid / 6;
+                new_elements.Append(VECTOR<int,4>(element(face2node[fid][((mid%6+1)%6)/2]), cid, fc[fid], ec[face2edge[fid][(mid%6)/2]]));
+                new_ctet2stet.Append(parent_sim_tet);
+                new_is_blue.Append(is_blue(i));
+            }
+            
+            //            VECTOR<bool,4> has_node;
+            //            for (int j = 0; j < tc.material_ids.m; j++) {
+            //                has_node(material2node[tc.material_ids(j)]) = 1;
+            //            }
+            //            for (int j = 0; j < 4; j++){
+            //                if(has_node(j)) {
+            //                    for (int k = 0; k < 3; k++){
+            //                        new_elements.Append(VECTOR<int,4>(element(j), cid, fc[node2face[j][k]], ec[node2edge[j][k][0]]));
+            //                        new_elements.Append(VECTOR<int,4>(element(j), cid, fc[node2face[j][k]], ec[node2edge[j][k][1]]));
+            //                        cuttingFaces.Set(VECTOR<int,3>(cid, fc[node2face[j][k]], ec[node2edge[j][k][0]]).Sorted());
+            //                        cuttingFaces.Set(VECTOR<int,3>(cid, fc[node2face[j][k]], ec[node2edge[j][k][1]]).Sorted());
+            //                        new_ctet2stet.Append(parent_sim_tet);
+            //                        new_ctet2stet.Append(parent_sim_tet);
+            //                        new_is_blue.Append(is_blue(i));
+            //                        new_is_blue.Append(is_blue(i));
+            //                    }
+            //                }
+            //            }
         }
     }
     
     //subdivide by face intersections
     for (int i = 0; i < volume->mesh.elements.m; i++) {
-        const int parent_sim_tet = ctet2stet(i);
-        TET element = volume->mesh.elements(i);
-        ARRAY<TET> new_e;
-        new_e.Append(element);
-        
-        int nn = -1;
-        HASHTABLE<TV_INT, int> ht;
-        for (int j = 0; j < NumFacesPerTet; j++){
-            TV_INT face = TV_INT(element(face2node[j][0]),element(face2node[j][1]),element(face2node[j][2])).Sorted();
-            int new_node = -1;//subdivide the tet by this node
-            if (new_nodes2.Get(face, new_node)){
-                if(new_e.m == 1) {//subdivide the original tet
-                    new_e.Resize(NumNodesPerTriangle);
-                    for (int k = 0; k < NumNodesPerTriangle; k++){
-                        new_e(k) = TET(new_node, element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j]));
-                        ht.Set(TV_INT(element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j])).Sorted(), k);
-                    }
-                    nn = new_node;
-                }
-                else {
-                    int k;
-                    if (!ht.Get(face, k)) {
-                        cout << "should have been set!!!\n";
+        if (tet_cuttings(i).material_ids.m == MaxPieces){
+            const int parent_sim_tet = ctet2stet(i);
+            TET element = volume->mesh.elements(i);
+            ARRAY<TET> new_e;
+            new_e.Append(element);
+            
+            int nn = -1;
+            HASHTABLE<TV_INT, int> ht;
+            for (int j = 0; j < NumFacesPerTet; j++){
+                TV_INT face = TV_INT(element(face2node[j][0]),element(face2node[j][1]),element(face2node[j][2])).Sorted();
+                int new_node = -1;//subdivide the tet by this node
+                if (new_nodes2.Get(face, new_node)){
+                    if(new_e.m == 1) {//subdivide the original tet
+                        new_e.Resize(NumNodesPerTriangle);
+                        for (int k = 0; k < NumNodesPerTriangle; k++){
+                            new_e(k) = TET(new_node, element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j]));
+                            ht.Set(TV_INT(element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j])).Sorted(), k);
+                        }
+                        nn = new_node;
                     }
                     else {
-                        new_e(k) = TET(new_node, element(face2node[j][0]), element(face2node[j][1]), nn);
-                        new_e.Append(TET(new_node, element(face2node[j][1]), element(face2node[j][2]), nn));
-                        new_e.Append(TET(new_node, element(face2node[j][2]), element(face2node[j][0]), nn));
+                        int k;
+                        if (!ht.Get(face, k))
+                            cout << "should have been set!!!\n";
+                        else {
+                            new_e(k) = TET(new_node, element(face2node[j][0]), element(face2node[j][1]), nn);
+                            new_e.Append(TET(new_node, element(face2node[j][1]), element(face2node[j][2]), nn));
+                            new_e.Append(TET(new_node, element(face2node[j][2]), element(face2node[j][0]), nn));
+                        }
                     }
                 }
             }
-        }
-        
-        for (int j = 0; j < new_e.m; j++){
-            new_ctet2stet.Append(parent_sim_tet);
-            new_elements.Append(new_e(j));
-            new_is_blue.Append(is_blue(i));
+            
+            for (int j = 0; j < new_e.m; j++){
+                new_ctet2stet.Append(parent_sim_tet);
+                new_elements.Append(new_e(j));
+                new_is_blue.Append(is_blue(i));
+            }
         }
     }
     
@@ -1545,7 +1550,7 @@ void MESH_CUTTING<T>::Partial_Refine()
                     }
                 }
             }
-
+            
             new_elements.Append(TET(n1, n2, nn, e2));
             new_ctet2stet.Append(new_ctet2stet(tid));
             new_is_blue.Append(new_is_blue(tid));
@@ -1567,22 +1572,7 @@ void MESH_CUTTING<T>::Partial_Refine()
             }
         }
     }
-
-    //delete unused nodes in volume
-    HASHTABLE<int,int> new_pids;
-    int new_pid=0;
-    ARRAY<PARENT> new_weights_in_sim;
-    for(int i=0;i<new_elements.m;++i)
-        for(int j=0;j<4;++j){
-            int& id=new_elements(i)(j);
-            if(!new_pids.Get(id,id)){
-                new_weights_in_sim.Append(weights_in_sim(id));
-                new_pids.Set(id,new_pid);
-                id=new_pid;
-                ++new_pid;}}
-    weights_in_sim=new_weights_in_sim;
-
-    //reset data
+    
     volume->mesh.elements = new_elements;
     tet_cuttings.Remove_All();
     tet_cuttings.Resize(volume->mesh.elements.m);
@@ -1598,21 +1588,16 @@ void MESH_CUTTING<T>::Partial_Refine()
 template<class T>
 void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume)
 {
-    refined_volume->mesh.elements = volume->mesh.elements;
-    
     HASHTABLE<VECTOR<int,2>,int> new_nodes;//edge to edge intersection point's index
     HASHTABLE<VECTOR<int,2>, std::set<int> > edge2tets;
     HASHTABLE<VECTOR<int,3>,int> new_nodes2;
     ARRAY<TET> new_elements;
     ARRAY<PARENT> new_weights_in_sim = weights_in_sim;
-    
-    int n = refined_volume->mesh.elements.m;
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < volume->mesh.elements.m; i++) {
         if (tet_cuttings(i).material_ids.m < MaxPieces){
             const int parent_sim_tet = ctet2stet(i);
-            VECTOR<int,4> &element = refined_volume->mesh.elements(i);
+            VECTOR<int,4> &element = volume->mesh.elements(i);
             TET_CUTTING& tc = tet_cuttings(i);
-            ARRAY<I4> ne;
             
             //tet center
             int cid = new_weights_in_sim.m;
@@ -1621,97 +1606,85 @@ void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volu
                 new_weights_in_sim.Append(PARENT(parent_sim_tet, c));
             }
             
-            for (int j = 0; j < 4; ++j) {
-                int fc = new_weights_in_sim.m;
-                int n1 = element(face2node[j][0]);
-                int n2 = element(face2node[j][1]);
-                int n3 = element(face2node[j][2]);
-                bool add = 0;
-                for (int k = 0; k < 6; ++k) {
-                    if (!tet_cuttings(i).has_material(j*6+k)) {
-                        CENTER c = Weight_In_Sim_Tet(tc.face_centers[j].Value(), element, parent_sim_tet);
-                        add = 1;
-                        I3 face = I3(n1, n2, n3).Sorted();
-                        if (!new_nodes2.Get(face, fc)) {
-                            new_nodes2.Set(face, fc);
-                            new_weights_in_sim.Append(PARENT(parent_sim_tet, c));
-                        }
-                        break;
-                    }
-                }
-                if (add) {
-                    for (int k = 0; k < 3; ++k) {
-                        int fn1 = element(face2node[j][k]);
-                        int fn2 = element(face2node[j][(k+1)%3]);
-                        int m1 = j * 6 + k * 2;
-                        int m2 = j * 6 + k * 2 + 1;
-                        if (tet_cuttings(i).has_material(m1) && tet_cuttings(i).has_material(m2)) {
-                            ne.Append(I4(cid, fc, fn1, fn2));
-                        }
-                        else if (tet_cuttings(i).has_material(m1) || tet_cuttings(i).has_material(m2)){
-                            int eid = new_weights_in_sim.m;
-                            I2 edge = I2(fn1, fn2).Sorted();
-                            if (!new_nodes.Get(edge, eid)) {
-                                CENTER c = Weight_In_Sim_Tet(tc.edge_centers[face2edge[j][k]].Value(), element, parent_sim_tet);
-                                new_nodes.Set(edge,eid);
-                                new_weights_in_sim.Append(PARENT(parent_sim_tet, c));
-                            }
-                            if (tet_cuttings(i).has_material(m1)) {
-                                ne.Append(I4(cid, fc, fn1, eid));
-                            }
-                            else {
-                                ne.Append(I4(cid, fc, fn2, eid));
-                            }
-                        }
-                    };
-                }
-                else {
-                    ne.Append(I4(cid, n1, n2, n3));
+            //edge centers
+            VECTOR<int, NumEdgesPerTet> ec;
+            for (int j = 0; j < NumEdgesPerTet; j++){
+                CENTER c = Weight_In_Sim_Tet(tc.edge_centers[j].Value(), element, parent_sim_tet);
+                VECTOR<int,2> edge = VECTOR<int,2>(element(edge2node[j][0]),element(edge2node[j][1])).Sorted();
+                //store the weight
+                if (!(new_nodes.Get(edge,ec[j]))){
+                    int eid = new_weights_in_sim.m;
+                    ec[j] = eid;
+                    new_nodes.Set(edge,eid);
+                    new_weights_in_sim.Append(PARENT(parent_sim_tet, c));
                 }
             }
-            element = ne(0);
-            for (int j = 1; j < ne.m; ++j) {
-                refined_volume->mesh.elements.Append(ne(j));
+            
+            //face centers
+            VECTOR<int, NumFacesPerTet> fc;
+            for (int j = 0; j < NumFacesPerTet; j++){
+                CENTER c = Weight_In_Sim_Tet(tc.face_centers[j].Value(), element, parent_sim_tet);
+                TV_INT face = TV_INT(element(face2node[j][0]),element(face2node[j][1]),element(face2node[j][2])).Sorted();
+                if (!(new_nodes2.Get(face,fc[j]))){
+                    int fid = new_weights_in_sim.m;
+                    fc[j] = fid;
+                    new_nodes2.Set(face,fid);
+                    new_weights_in_sim.Append(PARENT(parent_sim_tet, c));
+                }
+            }
+            
+            VECTOR<bool,4> has_node;
+            for (int j = 0; j < tc.material_ids.m; j++) {
+                has_node(material2node[tc.material_ids(j)]) = 1;
+            }
+            for (int j = 0; j < 4; j++){
+                if(has_node(j)) {
+                    for (int k = 0; k < 3; k++){
+                        new_elements.Append(VECTOR<int,4>(element(j), cid, fc[node2face[j][k]], ec[node2edge[j][k][0]]));
+                        new_elements.Append(VECTOR<int,4>(element(j), cid, fc[node2face[j][k]], ec[node2edge[j][k][1]]));
+                    }
+                }
             }
         }
     }
     
     //subdivide by face intersections
-    for (int i = 0; i < refined_volume->mesh.elements.m; i++) {
-        TET element = refined_volume->mesh.elements(i);
-        ARRAY<TET> new_e;
-        new_e.Append(element);
-        
-        int nn = -1;
-        HASHTABLE<TV_INT, int> ht;
-        for (int j = 0; j < NumFacesPerTet; j++){
-            TV_INT face = TV_INT(element(face2node[j][0]),element(face2node[j][1]),element(face2node[j][2])).Sorted();
-            int new_node = -1;//subdivide the tet by this node
-            if (new_nodes2.Get(face, new_node)){
-                if(new_e.m == 1) {//subdivide the original tet
-                    new_e.Resize(NumNodesPerTriangle);
-                    for (int k = 0; k < NumNodesPerTriangle; k++){
-                        new_e(k) = TET(new_node, element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j]));
-                        ht.Set(TV_INT(element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j])).Sorted(), k);
-                    }
-                    nn = new_node;
-                }
-                else {
-                    int k;
-                    if (!ht.Get(face, k)) {
-                        cout << "should have been set!!!\n";
+    for (int i = 0; i < volume->mesh.elements.m; i++) {
+        if (tet_cuttings(i).material_ids.m == MaxPieces){
+            TET element = volume->mesh.elements(i);
+            ARRAY<TET> new_e;
+            new_e.Append(element);
+            
+            int nn = -1;
+            HASHTABLE<TV_INT, int> ht;
+            for (int j = 0; j < NumFacesPerTet; j++){
+                TV_INT face = TV_INT(element(face2node[j][0]),element(face2node[j][1]),element(face2node[j][2])).Sorted();
+                int new_node = -1;//subdivide the tet by this node
+                if (new_nodes2.Get(face, new_node)){
+                    if(new_e.m == 1) {//subdivide the original tet
+                        new_e.Resize(NumNodesPerTriangle);
+                        for (int k = 0; k < NumNodesPerTriangle; k++){
+                            new_e(k) = TET(new_node, element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j]));
+                            ht.Set(TV_INT(element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j])).Sorted(), k);
+                        }
+                        nn = new_node;
                     }
                     else {
-                        new_e(k) = TET(new_node, element(face2node[j][0]), element(face2node[j][1]), nn);
-                        new_e.Append(TET(new_node, element(face2node[j][1]), element(face2node[j][2]), nn));
-                        new_e.Append(TET(new_node, element(face2node[j][2]), element(face2node[j][0]), nn));
+                        int k;
+                        if (!ht.Get(face, k))
+                            cout << "should have been set!!!\n";
+                        else {
+                            new_e(k) = TET(new_node, element(face2node[j][0]), element(face2node[j][1]), nn);
+                            new_e.Append(TET(new_node, element(face2node[j][1]), element(face2node[j][2]), nn));
+                            new_e.Append(TET(new_node, element(face2node[j][2]), element(face2node[j][0]), nn));
+                        }
                     }
                 }
             }
-        }
-        
-        for (int j = 0; j < new_e.m; j++){
-            new_elements.Append(new_e(j));
+            
+            for (int j = 0; j < new_e.m; j++){
+                new_elements.Append(new_e(j));
+            }
         }
     }
     
@@ -1767,13 +1740,406 @@ void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volu
         }
     }
     
-    refined_volume->mesh.elements = new_elements;
     refined_volume->particles.Resize(new_weights_in_sim.m);
     for (int i = 0; i < new_weights_in_sim.m; i++){
         refined_volume->particles.X(i) = weight2vec_sim(new_weights_in_sim(i).id, new_weights_in_sim(i).weight);
     }
     refined_volume->Update_Number_Nodes();
+    refined_volume->mesh.elements = new_elements;
 }
+
+
+//template<class T> 
+//void MESH_CUTTING<T>::Partial_Refine()
+//{
+//    HASHTABLE<VECTOR<int,2>,int> new_nodes;//edge to edge intersection point's index
+//    HASHTABLE<VECTOR<int,2>, std::set<int> > edge2tets;
+//    HASHTABLE<VECTOR<int,3>,int> new_nodes2;
+//    ARRAY<TET> new_elements;
+//    ARRAY<int> new_ctet2stet;
+//    ARRAY<bool> new_is_blue;
+//    int n = volume->mesh.elements.m;
+//    
+//    for (int i = 0; i < n; i++) {
+//        if (tet_cuttings(i).material_ids.m < MaxPieces){
+//            const int parent_sim_tet = ctet2stet(i);
+//            VECTOR<int,4> &element = volume->mesh.elements(i);
+//            TET_CUTTING& tc = tet_cuttings(i);
+//            ARRAY<I4> ne;
+//            
+//            //tet center
+//            int cid = weights_in_sim.m;
+//            {
+//                CENTER c = Weight_In_Sim_Tet(tc.tet_center.Value(), element, parent_sim_tet);
+//                weights_in_sim.Append(PARENT(parent_sim_tet, c));
+//                cutting_particle_material_space.Append(weight2vec_material_space(i, c));
+//            }
+//            
+//            for (int j = 0; j < 4; ++j) {
+//                int fc = weights_in_sim.m;
+//                int n1 = element(face2node[j][0]);
+//                int n2 = element(face2node[j][1]);
+//                int n3 = element(face2node[j][2]);
+//                bool add = 0;
+//                for (int k = 0; k < 6; ++k) {
+//                    if (!tet_cuttings(i).has_material(j*6+k)) {
+//                        CENTER c = Weight_In_Sim_Tet(tc.face_centers[j].Value(), element, parent_sim_tet);
+//                        add = 1;
+//                        I3 face = I3(n1, n2, n3).Sorted();
+//                        if (!new_nodes2.Get(face, fc)) {
+//                            new_nodes2.Set(face, fc);
+//                            weights_in_sim.Append(PARENT(parent_sim_tet, c));
+//                            cutting_particle_material_space.Append(weight2vec_material_space(i, c));
+//                        }
+//                        break;
+//                    }
+//                }
+//                if (add) {
+//                    for (int k = 0; k < 3; ++k) {
+//                        int fn1 = element(face2node[j][k]);
+//                        int fn2 = element(face2node[j][(k+1)%3]);
+//                        int m1 = j * 6 + k * 2;
+//                        int m2 = j * 6 + k * 2 + 1;
+//                        if (tet_cuttings(i).has_material(m1) && tet_cuttings(i).has_material(m2)) {
+//                            ne.Append(I4(cid, fc, fn1, fn2));
+//                        }
+//                        else if (tet_cuttings(i).has_material(m1) || tet_cuttings(i).has_material(m2)){
+//                            int eid = weights_in_sim.m;
+//                            I2 edge = I2(fn1, fn2).Sorted();
+//                            if (!new_nodes.Get(edge, eid)) {
+//                                CENTER c = Weight_In_Sim_Tet(tc.edge_centers[face2edge[j][k]].Value(), element, parent_sim_tet);
+//                                new_nodes.Set(edge,eid);
+//                                weights_in_sim.Append(PARENT(parent_sim_tet, c));
+//                                cutting_particle_material_space.Append(weight2vec_material_space(i, c));
+//                            }
+//                            if (tet_cuttings(i).has_material(m1)) {
+//                                ne.Append(I4(cid, fc, fn1, eid));
+//                            }
+//                            else {
+//                                ne.Append(I4(cid, fc, fn2, eid));
+//                            }
+//                        }
+//                    };
+//                }
+//                else {
+//                    ne.Append(I4(cid, n1, n2, n3));
+//                }
+//            }
+//            element = ne(0);
+//            for (int j = 1; j < ne.m; ++j) {
+//                volume->mesh.elements.Append(ne(j));
+//                is_blue.Append(is_blue(i));
+//                ctet2stet.Append(ctet2stet(i));
+//            }
+//        }
+//    }
+//    
+//    //subdivide by face intersections
+//    for (int i = 0; i < volume->mesh.elements.m; i++) {
+//        const int parent_sim_tet = ctet2stet(i);
+//        TET element = volume->mesh.elements(i);
+//        ARRAY<TET> new_e;
+//        new_e.Append(element);
+//        
+//        int nn = -1;
+//        HASHTABLE<TV_INT, int> ht;
+//        for (int j = 0; j < NumFacesPerTet; j++){
+//            TV_INT face = TV_INT(element(face2node[j][0]),element(face2node[j][1]),element(face2node[j][2])).Sorted();
+//            int new_node = -1;//subdivide the tet by this node
+//            if (new_nodes2.Get(face, new_node)){
+//                if(new_e.m == 1) {//subdivide the original tet
+//                    new_e.Resize(NumNodesPerTriangle);
+//                    for (int k = 0; k < NumNodesPerTriangle; k++){
+//                        new_e(k) = TET(new_node, element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j]));
+//                        ht.Set(TV_INT(element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j])).Sorted(), k);
+//                    }
+//                    nn = new_node;
+//                }
+//                else {
+//                    int k;
+//                    if (!ht.Get(face, k)) {
+//                        cout << "should have been set!!!\n";
+//                    }
+//                    else {
+//                        new_e(k) = TET(new_node, element(face2node[j][0]), element(face2node[j][1]), nn);
+//                        new_e.Append(TET(new_node, element(face2node[j][1]), element(face2node[j][2]), nn));
+//                        new_e.Append(TET(new_node, element(face2node[j][2]), element(face2node[j][0]), nn));
+//                    }
+//                }
+//            }
+//        }
+//        
+//        for (int j = 0; j < new_e.m; j++){
+//            new_ctet2stet.Append(parent_sim_tet);
+//            new_elements.Append(new_e(j));
+//            new_is_blue.Append(is_blue(i));
+//        }
+//    }
+//    
+//    //subdivide by edge intersections
+//    for (int i = 0; i < new_elements.m; i++) {
+//        VECTOR<int,4> element = new_elements(i);
+//        for (int j = 0; j < 6; ++j) {
+//            VECTOR<int,2> edge = VECTOR<int,2>(element(edge2node[j][0]),element(edge2node[j][1])).Sorted();
+//            if (new_nodes.Contains(edge)) {
+//                edge2tets.Get_Or_Insert(edge).insert(i);
+//            }
+//        }
+//    }
+//    
+//    for(typename HASHTABLE<VECTOR<int,2>, std::set<int> >::ITERATOR iterator(edge2tets);iterator.Valid();iterator.Next()){
+//        VECTOR<int,2> edge = iterator.Key();
+//        int e1 = edge(0);
+//        int e2 = edge(1);
+//        int nn = new_nodes.Get(edge);
+//        set<int>& tets = iterator.Data();
+//        for (set<int>::iterator it = tets.begin(); it != tets.end(); ++it) {
+//            int tid = *it;
+//            VECTOR<int,4> element = new_elements(tid);
+//            int n1 = -1, n2 = -1;
+//            for (int i = 0; i < 4; ++i) {
+//                if (element(i) != e1 && element(i) != e2) {
+//                    if (n1 < 0) {
+//                        n1 = element(i);
+//                    }
+//                    else {
+//                        n2 = element(i);
+//                    }
+//                }
+//            }
+//
+//            new_elements.Append(TET(n1, n2, nn, e2));
+//            new_ctet2stet.Append(new_ctet2stet(tid));
+//            new_is_blue.Append(new_is_blue(tid));
+//            new_elements(tid) = TET(n1, n2, nn, e1);
+//            
+//            VECTOR<int, 2> ee = VECTOR<int, 2>(n1, n2).Sorted();
+//            if (edge2tets.Contains(ee)) {
+//                edge2tets.Get(ee).insert(new_elements.m-1);
+//            }
+//            ee = VECTOR<int,2>(n1, e2).Sorted();
+//            if (edge2tets.Contains(ee)) {
+//                edge2tets.Get(ee).erase(tid);
+//                edge2tets.Get(ee).insert(new_elements.m-1);
+//            }
+//            ee = VECTOR<int,2>(n2, e2).Sorted();
+//            if (edge2tets.Contains(ee)) {
+//                edge2tets.Get(ee).erase(tid);
+//                edge2tets.Get(ee).insert(new_elements.m-1);
+//            }
+//        }
+//    }
+//
+//    //delete unused nodes in volume
+//    HASHTABLE<int,int> new_pids;
+//    int new_pid=0;
+//    ARRAY<PARENT> new_weights_in_sim;
+//    ARRAY<TV> new_cutting_particles_material_space;
+//    for(int i=0;i<new_elements.m;++i)
+//        for(int j=0;j<4;++j){
+//            int& id=new_elements(i)(j);
+//            if(!new_pids.Get(id,id)){
+//                new_weights_in_sim.Append(weights_in_sim(id));
+//                new_cutting_particles_material_space.Append(cutting_particle_material_space(id));
+//                new_pids.Set(id,new_pid);
+//                id=new_pid;
+//                ++new_pid;}}
+//    weights_in_sim=new_weights_in_sim;
+//
+//    //reset data
+//    volume->mesh.elements = new_elements;
+//    tet_cuttings.Remove_All();
+//    tet_cuttings.Resize(volume->mesh.elements.m);
+//    ctet2stet = new_ctet2stet;
+//    is_blue = new_is_blue;
+//    volume->Update_Number_Nodes();
+//    Update_Cutting_Particles();
+//    
+//    cutting_particle_material_space = new_cutting_particles_material_space;
+////    cutting_particle_material_space.Resize(volume->particles.X.m);
+////    for(int i=0;i<volume->particles.X.m;++i)
+////        cutting_particle_material_space(i)=volume->particles.X(i);
+//}
+
+//template<class T>
+//void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume)
+//{
+//    refined_volume->mesh.elements = volume->mesh.elements;
+//    
+//    HASHTABLE<VECTOR<int,2>,int> new_nodes;//edge to edge intersection point's index
+//    HASHTABLE<VECTOR<int,2>, std::set<int> > edge2tets;
+//    HASHTABLE<VECTOR<int,3>,int> new_nodes2;
+//    ARRAY<TET> new_elements;
+//    ARRAY<PARENT> new_weights_in_sim = weights_in_sim;
+//    
+//    int n = refined_volume->mesh.elements.m;
+//    for (int i = 0; i < n; i++) {
+//        if (tet_cuttings(i).material_ids.m < MaxPieces){
+//            const int parent_sim_tet = ctet2stet(i);
+//            VECTOR<int,4> &element = refined_volume->mesh.elements(i);
+//            TET_CUTTING& tc = tet_cuttings(i);
+//            ARRAY<I4> ne;
+//            
+//            //tet center
+//            int cid = new_weights_in_sim.m;
+//            {
+//                CENTER c = Weight_In_Sim_Tet(tc.tet_center.Value(), element, parent_sim_tet);
+//                new_weights_in_sim.Append(PARENT(parent_sim_tet, c));
+//            }
+//            
+//            for (int j = 0; j < 4; ++j) {
+//                int fc = new_weights_in_sim.m;
+//                int n1 = element(face2node[j][0]);
+//                int n2 = element(face2node[j][1]);
+//                int n3 = element(face2node[j][2]);
+//                bool add = 0;
+//                for (int k = 0; k < 6; ++k) {
+//                    if (!tet_cuttings(i).has_material(j*6+k)) {
+//                        CENTER c = Weight_In_Sim_Tet(tc.face_centers[j].Value(), element, parent_sim_tet);
+//                        add = 1;
+//                        I3 face = I3(n1, n2, n3).Sorted();
+//                        if (!new_nodes2.Get(face, fc)) {
+//                            new_nodes2.Set(face, fc);
+//                            new_weights_in_sim.Append(PARENT(parent_sim_tet, c));
+//                        }
+//                        break;
+//                    }
+//                }
+//                if (add) {
+//                    for (int k = 0; k < 3; ++k) {
+//                        int fn1 = element(face2node[j][k]);
+//                        int fn2 = element(face2node[j][(k+1)%3]);
+//                        int m1 = j * 6 + k * 2;
+//                        int m2 = j * 6 + k * 2 + 1;
+//                        if (tet_cuttings(i).has_material(m1) && tet_cuttings(i).has_material(m2)) {
+//                            ne.Append(I4(cid, fc, fn1, fn2));
+//                        }
+//                        else if (tet_cuttings(i).has_material(m1) || tet_cuttings(i).has_material(m2)){
+//                            int eid = new_weights_in_sim.m;
+//                            I2 edge = I2(fn1, fn2).Sorted();
+//                            if (!new_nodes.Get(edge, eid)) {
+//                                CENTER c = Weight_In_Sim_Tet(tc.edge_centers[face2edge[j][k]].Value(), element, parent_sim_tet);
+//                                new_nodes.Set(edge,eid);
+//                                new_weights_in_sim.Append(PARENT(parent_sim_tet, c));
+//                            }
+//                            if (tet_cuttings(i).has_material(m1)) {
+//                                ne.Append(I4(cid, fc, fn1, eid));
+//                            }
+//                            else {
+//                                ne.Append(I4(cid, fc, fn2, eid));
+//                            }
+//                        }
+//                    };
+//                }
+//                else {
+//                    ne.Append(I4(cid, n1, n2, n3));
+//                }
+//            }
+//            element = ne(0);
+//            for (int j = 1; j < ne.m; ++j) {
+//                refined_volume->mesh.elements.Append(ne(j));
+//            }
+//        }
+//    }
+//    
+//    //subdivide by face intersections
+//    for (int i = 0; i < refined_volume->mesh.elements.m; i++) {
+//        TET element = refined_volume->mesh.elements(i);
+//        ARRAY<TET> new_e;
+//        new_e.Append(element);
+//        
+//        int nn = -1;
+//        HASHTABLE<TV_INT, int> ht;
+//        for (int j = 0; j < NumFacesPerTet; j++){
+//            TV_INT face = TV_INT(element(face2node[j][0]),element(face2node[j][1]),element(face2node[j][2])).Sorted();
+//            int new_node = -1;//subdivide the tet by this node
+//            if (new_nodes2.Get(face, new_node)){
+//                if(new_e.m == 1) {//subdivide the original tet
+//                    new_e.Resize(NumNodesPerTriangle);
+//                    for (int k = 0; k < NumNodesPerTriangle; k++){
+//                        new_e(k) = TET(new_node, element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j]));
+//                        ht.Set(TV_INT(element(face2node[j][k]), element(face2node[j][(k+1)%NumNodesPerTriangle]), element(face2opposite_node[j])).Sorted(), k);
+//                    }
+//                    nn = new_node;
+//                }
+//                else {
+//                    int k;
+//                    if (!ht.Get(face, k)) {
+//                        cout << "should have been set!!!\n";
+//                    }
+//                    else {
+//                        new_e(k) = TET(new_node, element(face2node[j][0]), element(face2node[j][1]), nn);
+//                        new_e.Append(TET(new_node, element(face2node[j][1]), element(face2node[j][2]), nn));
+//                        new_e.Append(TET(new_node, element(face2node[j][2]), element(face2node[j][0]), nn));
+//                    }
+//                }
+//            }
+//        }
+//        
+//        for (int j = 0; j < new_e.m; j++){
+//            new_elements.Append(new_e(j));
+//        }
+//    }
+//    
+//    //subdivide by edge intersections
+//    for (int i = 0; i < new_elements.m; i++) {
+//        VECTOR<int,4> element = new_elements(i);
+//        for (int j = 0; j < 6; ++j) {
+//            VECTOR<int,2> edge = VECTOR<int,2>(element(edge2node[j][0]),element(edge2node[j][1])).Sorted();
+//            if (new_nodes.Contains(edge)) {
+//                edge2tets.Get_Or_Insert(edge).insert(i);
+//            }
+//        }
+//    }
+//    
+//    for(typename HASHTABLE<VECTOR<int,2>, std::set<int> >::ITERATOR iterator(edge2tets);iterator.Valid();iterator.Next()){
+//        VECTOR<int,2> edge = iterator.Key();
+//        int e1 = edge(0);
+//        int e2 = edge(1);
+//        int nn = new_nodes.Get(edge);
+//        set<int>& tets = iterator.Data();
+//        for (set<int>::iterator it = tets.begin(); it != tets.end(); ++it) {
+//            int tid = *it;
+//            VECTOR<int,4> element = new_elements(tid);
+//            int n1 = -1, n2 = -1;
+//            for (int i = 0; i < 4; ++i) {
+//                if (element(i) != e1 && element(i) != e2) {
+//                    if (n1 < 0) {
+//                        n1 = element(i);
+//                    }
+//                    else {
+//                        n2 = element(i);
+//                    }
+//                }
+//            }
+//            
+//            new_elements.Append(TET(n1, n2, nn, e2));
+//            new_elements(tid) = TET(n1, n2, nn, e1);
+//            
+//            VECTOR<int, 2> ee = VECTOR<int, 2>(n1, n2).Sorted();
+//            if (edge2tets.Contains(ee)) {
+//                edge2tets.Get(ee).insert(new_elements.m-1);
+//            }
+//            ee = VECTOR<int,2>(n1, e2).Sorted();
+//            if (edge2tets.Contains(ee)) {
+//                edge2tets.Get(ee).erase(tid);
+//                edge2tets.Get(ee).insert(new_elements.m-1);
+//            }
+//            ee = VECTOR<int,2>(n2, e2).Sorted();
+//            if (edge2tets.Contains(ee)) {
+//                edge2tets.Get(ee).erase(tid);
+//                edge2tets.Get(ee).insert(new_elements.m-1);
+//            }
+//        }
+//    }
+//    
+//    refined_volume->mesh.elements = new_elements;
+//    refined_volume->particles.Resize(new_weights_in_sim.m);
+//    for (int i = 0; i < new_weights_in_sim.m; i++){
+//        refined_volume->particles.X(i) = weight2vec_sim(new_weights_in_sim(i).id, new_weights_in_sim(i).weight);
+//    }
+//    refined_volume->Update_Number_Nodes();
+//}
 
 template<typename T> 
 inline typename MESH_CUTTING<T>::TV& MESH_CUTTING<T>::Position(const int element_id, const int node_id) const
@@ -1974,6 +2340,16 @@ typename MESH_CUTTING<T>::TV MESH_CUTTING<T>::weight2vec(int tet_id, CENTER c) c
     TV v;
     for (int i = 0; i < NumNodesPerTet; i++) {
         v += volume->particles.X(volume->mesh.elements(tet_id)(i))*c[i];
+    }
+    return v;
+}
+
+template<class T>
+typename MESH_CUTTING<T>::TV MESH_CUTTING<T>::weight2vec_material_space(int tet_id, CENTER c) const
+{
+    TV v;
+    for (int i = 0; i < NumNodesPerTet; i++) {
+        v += cutting_particle_material_space(volume->mesh.elements(tet_id)(i))*c[i];
     }
     return v;
 }

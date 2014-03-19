@@ -187,7 +187,7 @@ public:
     void Become_Sphere();
     void Keep_CC(int cc_id);
     
-    void Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine = true);
+    void Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine = true, bool material_space = false);
     int Compute_Intersection(const T& x, const T& y);
     void Update_For_Draw();
     void Draw_For_Picking();
@@ -214,6 +214,8 @@ private:
     ARRAY<int> Find_Cutting_Tet_CC(int m, ARRAY<bool>& picked, ARRAY<ARRAY<int> >& itot, ARRAY<ARRAY<int> >& node_cc);
     TV weight2vec(int tet_id, CENTER c) const;
     TV weight2vec_sim(int tet_id, CENTER c) const;
+    TV weight2vec_material_space(int tet_id, CENTER c) const;
+
     void Faces_For_OpenGL(const VECTOR<int,2>& f, ARRAY<TV>& mesh_vec, ARRAY<TV>& color_vec, ARRAY<TV>& normal_vec, ARRAY<TV>& refine_edges, const DRAWING_MODE& mode) const;
     void Interfaces_OpenGL(const VECTOR<int,2>& f, ARRAY<TV>& mesh_vec, ARRAY<TV>& refine_edges) const;
     void Interfaces_For_OpenGL(const VECTOR<int,2>& f, ARRAY<TV>& mesh_vec, ARRAY<TV>& refine_edges, ARRAY<TV>& color_vec, const DRAWING_MODE& mode) const;
