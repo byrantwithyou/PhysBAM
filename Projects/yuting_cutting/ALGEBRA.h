@@ -772,109 +772,109 @@ public:
             return VECTOR_3D<T>(0,0,0);}
     }
     
-    void SVD(MATRIX_3X3<T>& U,VECTOR_3D<T>& sigma,MATRIX_3X3<T>& V,const T tol=(T)1e-10,const int max_iterations=10)const {
-        PhysBAM::MATRIX<T,3> m;
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                m(i, j) = (*this)(i, j);
-            }
-        }
-        PhysBAM::MATRIX<T,3> u, v;
-        PhysBAM::DIAGONAL_MATRIX<T,3> singular_values;
-        m.Fast_Singular_Value_Decomposition(u,singular_values, v);
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                U(i, j) = u(i, j);
-                V(i, j) = v(i, j);
-            }
-            sigma(i) = singular_values(i, i);
-        }
-    }
-    
 //    void SVD(MATRIX_3X3<T>& U,VECTOR_3D<T>& sigma,MATRIX_3X3<T>& V,const T tol=(T)1e-10,const int max_iterations=10)const {
-//        
-//        //solve the symmetric eigenvalue problem (Jacobi) for V
-//        MATRIX_3X3<T> A=(this->Transposed())*(*this);U=MATRIX_3X3<T>::Identity();V=MATRIX_3X3<T>::Identity();
-//        for(int it=0;it<max_iterations;it++){
-//            MATRIX_3X3<T> G12=MATRIX_3X3<T>::Jacobi_Givens_Rotation_12(A(0,0),A(1,1),A(1,0));
-//            A=G12*A*G12.Transposed();
-//            MATRIX_3X3<T> G13=MATRIX_3X3<T>::Jacobi_Givens_Rotation_13(A(0,0),A(2,2),A(2,0));
-//            A=G13*A*G13.Transposed();
-//            MATRIX_3X3<T> G23=MATRIX_3X3<T>::Jacobi_Givens_Rotation_23(A(1,1),A(2,2),A(1,2));
-//            A=G23*A*G23.Transposed();
-//            V=G23*G13*G12*V;}
-//        
-//        //sort the singular values
-//        VECTOR_3D<T> s_squared(A(0,0),A(1,1),A(2,2));
-//        VECTOR_3D<int> order(0,1,2);
-//        int k;T temp;
-//        for(int i=0;i<2;i++){
-//            for(int j=i+1;j<3;j++){
-//                if(s_squared(i)<s_squared(j)){
-//                    k=order(i);
-//                    temp=s_squared(i);
-//                    order(i)=order(j);
-//                    s_squared(i)=s_squared(j);
-//                    order(j)=k;
-//                    s_squared(j)=temp;}}}
-//        
-//        //transpose V and re-order the columns in order of increasing singular values
-//        V=MATRIX_3X3<T>(V.Row(order(0)),V.Row(order(1)),V.Row(order(2)));
-//        
-//        //take the QR of FV to get U and Sigma
-//        MATRIX_3X3<T> B=(*this)*V;
-//        //the first Givens
-//        T a=B(1,0);T b=B(2,0);
-//        T c=(T)1;T s=(T)0;T alpha=sqrt(a*a+b*b);
-//        if(alpha>tol){
-//            c=-a/alpha;s=b/alpha;}
-//        MATRIX_3X3<T> G1((T)1,(T)0,(T)0,(T)0,c,s,(T)0,-s,c);
-//        B=G1*B;
-//        //the second Givens
-//        a=B(0,0);b=B(1,0);
-//        c=(T)1;s=(T)0;
-//        alpha=sqrt(a*a+b*b);
-//        if(alpha>tol){
-//            c=-a/alpha;s=b/alpha;}
-//        MATRIX_3X3<T> G2(c,s,(T)0,-s,c,(T)0,(T)0,(T)0,(T)1);
-//        B=G2*B;
-//        //the third Givens
-//        a=B(1,1);b=B(2,1);
-//        c=(T)1;s=(T)0;
-//        alpha=sqrt(a*a+b*b);
-//        if(alpha>tol){
-//            c=-a/alpha;s=b/alpha;}
-//        MATRIX_3X3<T> G3((T)1,(T)0,(T)0,(T)0,c,s,(T)0,-s,c);
-//        B=G3*B;
-//        //collect all Givens into one rotation to get U
-//        U=G3*G2*G1;
-//        U.Transpose();
-//        sigma(0)=B(0,0);sigma(1)=B(1,1);sigma(2)=B(2,2);
-//        
-//        //fix sign convention
-//        T det=this->Determinant();
-//        if(sigma(0)<0){
-//            sigma(0)=-sigma(0);
-//            V(0,0)=-V(0,0);
-//            V(1,0)=-V(1,0);
-//            V(2,0)=-V(2,0);}
-//        if(sigma(1)<0){
-//            sigma(1)=-sigma(1);
-//            V(0,1)=-V(0,1);
-//            V(1,1)=-V(1,1);
-//            V(2,1)=-V(2,1);}
-//        if((det<-tol && sigma(2)>0) || (det>tol && sigma(2)<0)){
-//            sigma(2)=-sigma(2);
-//            V(0,2)=-V(0,2);
-//            V(1,2)=-V(1,2);
-//            V(2,2)=-V(2,2);}
-//        else if(fabs(det)<tol){
-//            sigma(2)=0;
-//            if(V.Determinant()<0){
-//                V(0,2)=-V(0,2);
-//                V(1,2)=-V(1,2);
-//                V(2,2)=-V(2,2);}}
+//        PhysBAM::MATRIX<T,3> m;
+//        for (int i = 0; i < 3; ++i) {
+//            for (int j = 0; j < 3; ++j) {
+//                m(i, j) = (*this)(i, j);
+//            }
+//        }
+//        PhysBAM::MATRIX<T,3> u, v;
+//        PhysBAM::DIAGONAL_MATRIX<T,3> singular_values;
+//        m.Fast_Singular_Value_Decomposition(u,singular_values, v);
+//        for (int i = 0; i < 3; ++i) {
+//            for (int j = 0; j < 3; ++j) {
+//                U(i, j) = u(i, j);
+//                V(i, j) = v(i, j);
+//            }
+//            sigma(i) = singular_values(i, i);
+//        }
 //    }
+    
+    void SVD(MATRIX_3X3<T>& U,VECTOR_3D<T>& sigma,MATRIX_3X3<T>& V,const T tol=(T)1e-10,const int max_iterations=10)const {
+        
+        //solve the symmetric eigenvalue problem (Jacobi) for V
+        MATRIX_3X3<T> A=(this->Transposed())*(*this);U=MATRIX_3X3<T>::Identity();V=MATRIX_3X3<T>::Identity();
+        for(int it=0;it<max_iterations;it++){
+            MATRIX_3X3<T> G12=MATRIX_3X3<T>::Jacobi_Givens_Rotation_12(A(0,0),A(1,1),A(1,0));
+            A=G12*A*G12.Transposed();
+            MATRIX_3X3<T> G13=MATRIX_3X3<T>::Jacobi_Givens_Rotation_13(A(0,0),A(2,2),A(2,0));
+            A=G13*A*G13.Transposed();
+            MATRIX_3X3<T> G23=MATRIX_3X3<T>::Jacobi_Givens_Rotation_23(A(1,1),A(2,2),A(1,2));
+            A=G23*A*G23.Transposed();
+            V=G23*G13*G12*V;}
+        
+        //sort the singular values
+        VECTOR_3D<T> s_squared(A(0,0),A(1,1),A(2,2));
+        VECTOR_3D<int> order(0,1,2);
+        int k;T temp;
+        for(int i=0;i<2;i++){
+            for(int j=i+1;j<3;j++){
+                if(s_squared(i)<s_squared(j)){
+                    k=order(i);
+                    temp=s_squared(i);
+                    order(i)=order(j);
+                    s_squared(i)=s_squared(j);
+                    order(j)=k;
+                    s_squared(j)=temp;}}}
+        
+        //transpose V and re-order the columns in order of increasing singular values
+        V=MATRIX_3X3<T>(V.Row(order(0)),V.Row(order(1)),V.Row(order(2)));
+        
+        //take the QR of FV to get U and Sigma
+        MATRIX_3X3<T> B=(*this)*V;
+        //the first Givens
+        T a=B(1,0);T b=B(2,0);
+        T c=(T)1;T s=(T)0;T alpha=sqrt(a*a+b*b);
+        if(alpha>tol){
+            c=-a/alpha;s=b/alpha;}
+        MATRIX_3X3<T> G1((T)1,(T)0,(T)0,(T)0,c,s,(T)0,-s,c);
+        B=G1*B;
+        //the second Givens
+        a=B(0,0);b=B(1,0);
+        c=(T)1;s=(T)0;
+        alpha=sqrt(a*a+b*b);
+        if(alpha>tol){
+            c=-a/alpha;s=b/alpha;}
+        MATRIX_3X3<T> G2(c,s,(T)0,-s,c,(T)0,(T)0,(T)0,(T)1);
+        B=G2*B;
+        //the third Givens
+        a=B(1,1);b=B(2,1);
+        c=(T)1;s=(T)0;
+        alpha=sqrt(a*a+b*b);
+        if(alpha>tol){
+            c=-a/alpha;s=b/alpha;}
+        MATRIX_3X3<T> G3((T)1,(T)0,(T)0,(T)0,c,s,(T)0,-s,c);
+        B=G3*B;
+        //collect all Givens into one rotation to get U
+        U=G3*G2*G1;
+        U.Transpose();
+        sigma(0)=B(0,0);sigma(1)=B(1,1);sigma(2)=B(2,2);
+        
+        //fix sign convention
+        T det=this->Determinant();
+        if(sigma(0)<0){
+            sigma(0)=-sigma(0);
+            V(0,0)=-V(0,0);
+            V(1,0)=-V(1,0);
+            V(2,0)=-V(2,0);}
+        if(sigma(1)<0){
+            sigma(1)=-sigma(1);
+            V(0,1)=-V(0,1);
+            V(1,1)=-V(1,1);
+            V(2,1)=-V(2,1);}
+        if((det<-tol && sigma(2)>0) || (det>tol && sigma(2)<0)){
+            sigma(2)=-sigma(2);
+            V(0,2)=-V(0,2);
+            V(1,2)=-V(1,2);
+            V(2,2)=-V(2,2);}
+        else if(fabs(det)<tol){
+            sigma(2)=0;
+            if(V.Determinant()<0){
+                V(0,2)=-V(0,2);
+                V(1,2)=-V(1,2);
+                V(2,2)=-V(2,2);}}
+    }
     
     void Invert(){
         T cofactor11=x[4]*x[8]-x[7]*x[5],cofactor12=x[7]*x[2]-x[1]*x[8],cofactor13=x[1]*x[5]-x[4]*x[2];

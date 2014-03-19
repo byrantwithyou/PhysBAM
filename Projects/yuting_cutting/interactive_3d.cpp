@@ -469,7 +469,7 @@ void motion(int x, int y)
     end_position = TV( xx, yy, intrude/2);
 
     if (cutting) {
-        if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude_Squared() > 0.01)
+        if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude_Squared() > 0.001)
             cutting_curve.Append(end_position);
     }
     else if(dragging) {
@@ -730,7 +730,7 @@ void Initialize(bool reinitialize_cutting_mesh)
     }
     
     if(argc1 == 1) {
-        initialize_volume1();
+        initialize_cubes();
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
         mcut->Initialize_Elasticity();
     }

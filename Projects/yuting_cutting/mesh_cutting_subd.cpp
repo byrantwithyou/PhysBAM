@@ -346,6 +346,7 @@ void MESH_CUTTING<T>::Initialize_Cutting_Volume()
     for (int i = 0; i < num_refinements; i++){
         Refine_Cutting_Volume();
     }
+    Fix_Orientation();
     
     cutting_particle_material_space.Resize(volume->particles.X.m);
     for(int i=0;i<volume->particles.X.m;++i)
@@ -1357,15 +1358,16 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine)
     volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
     
     //print statistics after cut
-    cout << volume->mesh.elements.m << " elements after cut\n";
-    cout << "weights_in_sim: ";
-    for (int i = 0; i < weights_in_sim.m; ++i) {
-        cout << weights_in_sim(i).weight << " ";
-    }
-    cout << endl;
+//    cout << volume->mesh.elements.m << " elements after cut\n";
+//    cout << "weights_in_sim: ";
+//    for (int i = 0; i < weights_in_sim.m; ++i) {
+//        cout << weights_in_sim(i).weight << " ";
+//    }
+//    cout << endl;
     ARRAY<int> labels;
     volume->mesh.boundary_mesh->Identify_Connected_Components(labels);
     cout << labels.Max() << " CCs after cut\n";
+    
     //reinitialize elasticity
     start_timer();
     Reinitialize_Elasticity();
@@ -1566,6 +1568,21 @@ void MESH_CUTTING<T>::Partial_Refine()
         }
     }
 
+    //delete unused nodes in volume
+    HASHTABLE<int,int> new_pids;
+    int new_pid=0;
+    ARRAY<PARENT> new_weights_in_sim;
+    for(int i=0;i<new_elements.m;++i)
+        for(int j=0;j<4;++j){
+            int& id=new_elements(i)(j);
+            if(!new_pids.Get(id,id)){
+                new_weights_in_sim.Append(weights_in_sim(id));
+                new_pids.Set(id,new_pid);
+                id=new_pid;
+                ++new_pid;}}
+    weights_in_sim=new_weights_in_sim;
+
+    //reset data
     volume->mesh.elements = new_elements;
     tet_cuttings.Remove_All();
     tet_cuttings.Resize(volume->mesh.elements.m);

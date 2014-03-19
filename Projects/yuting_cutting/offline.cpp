@@ -51,7 +51,7 @@ double get_time(){return (double)stoptime.tv_sec-(double)starttime.tv_sec+(doubl
 using namespace PhysBAM;
 using namespace std;
 
-typedef double T;
+typedef float T;
 typedef PhysBAM::VECTOR<T, 3> TV;
 typedef PhysBAM::MATRIX<T, 3> TM;
 
@@ -519,14 +519,14 @@ void energyTest() {
 }
 
 template<typename T>
-void generateAndSaveRefinedVolume(TETRAHEDRALIZED_VOLUME<T>* refined_volume, int frame, const string& outputDir) {
+void generateAndSaveRefinedVolume(TETRAHEDRALIZED_VOLUME<T>* refined_volume, int frame, const string& outputDir, const string& prefix) {
     mcut->Refine_And_Save_To(refined_volume);
     Fix_Orientation(refined_volume);
     refined_volume->Update_Number_Nodes();
     refined_volume->mesh.Initialize_Boundary_Mesh();
     refined_volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
-    Write_Boundary_Mesh_To_File(outputDir, "refined_volume_boundary", frame, refined_volume);
-    Write_Volume_To_File(outputDir, "refined_volume", frame, refined_volume);
+    Write_Boundary_Mesh_To_File(outputDir, prefix + "_boundary", frame, refined_volume);
+    Write_Volume_To_File(outputDir, prefix, frame, refined_volume);
 }
 
 int main(int argc, char** argv) {
@@ -657,7 +657,7 @@ int main(int argc, char** argv) {
                 }
                 mcut->Update_Cutting_Particles();
 
-                generateAndSaveRefinedVolume(refined_volume, frame, outputDir);
+                generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "refined_volume");
                 
                 WriteToPovRay(mcut->volume, outputDir, frame, mcut->cuttingFaces);
                 Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);
@@ -666,7 +666,7 @@ int main(int argc, char** argv) {
             }
             break;
         }
-        
+
         case 2:
         {
             cout << "incremental\n";
@@ -699,14 +699,14 @@ int main(int argc, char** argv) {
             T xxx = 0.01;
             T yy = 0.8;
             T yyy = 0.02;
-            T x1=0,y1=0;
+            T x1 = 0, y1 = 0;
             int f1=30,f2=90,f3=105,f4=165,f5=200,f6=260;
             while (frame < 300) {
                 ++frame;
-//                if (frame == 20) {
-//                    energyTest();
-//                    exit(1);
-//                }
+                //                if (frame == 20) {
+                //                    energyTest();
+                //                    exit(1);
+                //                }
                 if (frame > f1 && frame <= f2) {
                     int i=frame-f1-1;
                     laserZ2=0.1;
@@ -779,8 +779,7 @@ int main(int argc, char** argv) {
                 }
                 mcut->Update_Cutting_Particles();
                 
-                Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);
-                generateAndSaveRefinedVolume(refined_volume, frame, outputDir);
+                generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "cutting_volume");
                 WriteToPovRay(refined_volume, outputDir, frame);
             }
             break;
@@ -1195,7 +1194,7 @@ int main(int argc, char** argv) {
                 }
                 mcut->Update_Cutting_Particles();
                 
-                generateAndSaveRefinedVolume(refined_volume, frame, outputDir);
+                generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "refined_volume");
                 
                 WriteToPovRay(mcut->volume, outputDir, frame, mcut->cuttingFaces);
                 Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);

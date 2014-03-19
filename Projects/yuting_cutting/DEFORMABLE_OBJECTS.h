@@ -14,7 +14,6 @@
 using namespace GEOMETRY;
 using namespace ALGEBRA;
 
-
 template <class T>
 class HYPERELASTICITY_CONSTITUTIVE_MODEL_3D{
 public:
@@ -403,15 +402,15 @@ public:
                 VECTOR_4D<int>& indices=tet_mesh->Nodes_Of_Element(t);
                 VECTOR_3D<T> x0=X(indices(0));VECTOR_3D<T> x1=X(indices(1));
                 VECTOR_3D<T> x2=X(indices(2));VECTOR_3D<T> x3=X(indices(3));
-                //Dm_inverse(t)=MATRIX_3X3<T>((x1-x0)*0.7,(x2-x0)*0.7,(x3-x0)*0.7);
+                Dm_inverse(t)=MATRIX_3X3<T>((x1-x0)*0.7,(x2-x0)*0.7,(x3-x0)*0.7);
                 //Dm_inverse(t)=MATRIX_3X3<T>(x1-x0,x2-x0,x3-x0);
-                VECTOR_3D<T> x10=x1-x0;
-                VECTOR_3D<T> x20=x2-x0;
-                VECTOR_3D<T> x30=x3-x0;
-                x30(0)*=0.9; x30(1)*=0.9;
-                x20(0)*=0.9; x20(1)*=0.9;
-                x10(0)*=0.9; x10(1)*=0.9;
-                Dm_inverse(t)=MATRIX_3X3<T>(x10,x20,x30);
+//                VECTOR_3D<T> x10=x1-x0;
+//                VECTOR_3D<T> x20=x2-x0;
+//                VECTOR_3D<T> x30=x3-x0;
+//                x30(0)*=0.9; x30(1)*=0.9;
+//                x20(0)*=0.9; x20(1)*=0.9;
+//                x10(0)*=0.9; x10(1)*=0.9;
+//                Dm_inverse(t)=MATRIX_3X3<T>(x10,x20,x30);
                 Dm_inverse(t).Invert();}}
         if(tri_mesh){
             for(int t=0;t<tri_mesh->Number_Of_Triangles();t++){
