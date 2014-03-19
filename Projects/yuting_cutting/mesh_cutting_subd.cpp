@@ -486,6 +486,7 @@ void MESH_CUTTING<T>::Update_Cutting_Particles()
     for (int i = 0; i < weights_in_sim.m; i++){
         volume->particles.X(i) = weight2vec_sim(weights_in_sim(i).id, weights_in_sim(i).weight);
     }
+    volume->Update_Number_Nodes();
     stop_timer();
     //printf("update_cutting_particles:    %f\n",get_time());
 }
@@ -550,7 +551,7 @@ void MESH_CUTTING<T>::Initialize_Elasticity()
     //be->Initialize_CG();
     be->Initialize_MINRES();
     
-    if (interactive) {
+    if (1) {
         my_constrained = new ALGEBRA::VECTOR<int>(3*diri_nodes.Size());
         my_constrained_locations = new ALGEBRA::VECTOR<T>(3*diri_nodes.Size());
         int i = 0;
@@ -1568,16 +1569,8 @@ void MESH_CUTTING<T>::Partial_Refine()
 }
 
 template<class T>
-void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>*& refined_volume)
+void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume)
 {
-    //copy volume to refined_volume
-    delete refined_volume;
-    refined_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
-    refined_volume->particles.Add_Elements(volume->particles.X.m);
-    refined_volume->Update_Number_Nodes();
-    for (int i = 0; i < volume->particles.X.m; ++i) {
-        refined_volume->particles.X(i) = volume->particles.X(i);
-    }
     refined_volume->mesh.elements = volume->mesh.elements;
     
     HASHTABLE<VECTOR<int,2>,int> new_nodes;//edge to edge intersection point's index

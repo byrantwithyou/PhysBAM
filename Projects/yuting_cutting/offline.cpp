@@ -437,9 +437,11 @@ void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, i
 
 template<class T>
 void Write_Boundary_Mesh_To_File(const string& writing_directory, const string& filename, int frame, TETRAHEDRALIZED_VOLUME<T>* volume)
-{//assume volume boundary has been initialized
+{
     stringstream ss;
     ss << frame;
+    volume->mesh.Initialize_Boundary_Mesh();
+    volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
     FILE_UTILITIES::Write_To_File<T>(writing_directory+"/"+filename+ss.str()+string(".tet.gz"), volume->particles, volume->mesh.boundary_mesh);
 }
 
@@ -672,6 +674,7 @@ int main(int argc, char** argv) {
             string outputDir(argv[3]);
             Initialize(volumeFile);
             cutting_tri_mesh->particles.Add_Elements(4);
+            cutting_tri_mesh->Update_Number_Nodes();
             cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(0, 1, 2));
             cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(1, 2, 3));
             
@@ -776,6 +779,7 @@ int main(int argc, char** argv) {
                 }
                 mcut->Update_Cutting_Particles();
                 
+                Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);
                 generateAndSaveRefinedVolume(refined_volume, frame, outputDir);
                 WriteToPovRay(refined_volume, outputDir, frame);
             }
@@ -985,9 +989,9 @@ int main(int argc, char** argv) {
         case 6: //degeneracy cubes
         {
             string outputDir(argv[2]);
-            int width = 3;
-            int height = 3;
-            int depth = 1;
+            int width = 10;
+            int height = 10;
+            int depth = 2;
             T low = -0.5;
             T high = 0.5;
             T left = -0.5;
@@ -1023,7 +1027,6 @@ int main(int argc, char** argv) {
                     cutting_tri_mesh->particles.X(2) = TV(-x, -0.5, -1);
                     cutting_tri_mesh->particles.X(3) = TV(-x, -0.5, 1);
                     mcut->Cut(*cutting_tri_mesh, 1);
-                    
                 }
                 
                 VS::start_timer();
@@ -1040,15 +1043,6 @@ int main(int argc, char** argv) {
                 }
                 mcut->Update_Cutting_Particles();
 
-//                TETRAHEDRALIZED_VOLUME<T> *refined_volume = new TETRAHEDRALIZED_VOLUME<T>();
-//                mcut->Refine_And_Save_To(refined_volume);
-//                Fix_Orientation(refined_volume);
-//                refined_volume->Update_Number_Nodes();
-//                refined_volume->mesh.Initialize_Boundary_Mesh();
-//                refined_volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
-//                Write_Boundary_Mesh_To_File(outputDir, "refined_volume_boundary", frame, refined_volume);
-//                Write_Volume_To_File(outputDir, "refined_volume", frame, refined_volume);
-                
                 WriteToPovRay(mcut->volume, outputDir, frame, mcut->cuttingFaces);
                 Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);
                 //Write_Volume_To_File(outputDir, "sim_volume", frame, mcut->sim_volume);

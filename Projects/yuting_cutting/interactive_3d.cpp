@@ -123,7 +123,6 @@ void Render(){
         }
         glVertexPointer(TV::m, GL_DOUBLE,0,vertices.base_pointer);
         glColor4f(0.0, 1.0, 1.0, 1.0);
-        cout << "fafdsafdsa: " << vertices.m << endl;
         glDrawArrays(GL_TRIANGLES,0,vertices.m);
     }
     
