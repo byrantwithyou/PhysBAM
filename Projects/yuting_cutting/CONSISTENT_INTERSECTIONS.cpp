@@ -228,7 +228,6 @@ Set_Tol()
     for(int i=0;i<ts.mesh.elements.m;i++)
         L_ts=max(L_ts,RANGE<TV>::Bounding_Box(ts.particles.X.Subset(ts.mesh.elements(i))).Edge_Lengths().Max());
     T L=L_tv+L_ts;
-    L *= 1e-3;
     T eps=std::numeric_limits<T>::epsilon(),sqrt_sqrt_eps_L=sqrt(sqrt(eps))*L;
 
     T* tol[4]={tol_vv,tol_ev,tol_ee,tol_fv};
