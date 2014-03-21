@@ -51,7 +51,7 @@ double get_time(){return (double)stoptime.tv_sec-(double)starttime.tv_sec+(doubl
 using namespace PhysBAM;
 using namespace std;
 
-typedef float T;
+typedef double T;
 typedef PhysBAM::VECTOR<T, 3> TV;
 typedef PhysBAM::MATRIX<T, 3> TM;
 

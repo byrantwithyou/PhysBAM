@@ -196,6 +196,7 @@ public:
     void Write_To_File(const std::string& writing_directory, int frame) const;
     void Write_Boundary_Mesh_To_File(const std::string& writing_directory, int frame) const;
     void Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume);
+    int Sorted_Id(const I3& sorted_tri, const I3& tri, int material_id);
 private:
     ARRAY<VECTOR<int, NumNodesPerTet> > original_elements,original_sim_elements;
     HASHTABLE<VECTOR<int,3> > cutFaces;
@@ -224,8 +225,6 @@ private:
     ARRAY<TV> Interfaces_For_OpenGL(const VECTOR<int,2>& f) const;
     inline TV& Position(const int element_id, const int node_id) const;
     inline int Index(const int element_id, const int node_id) const;
-    int Sorted_Id(const I3& sorted_tri, const I3& tri, int material_id);
-
 };
 
 template<class TV>

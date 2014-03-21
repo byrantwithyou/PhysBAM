@@ -228,19 +228,20 @@ Set_Tol()
     for(int i=0;i<ts.mesh.elements.m;i++)
         L_ts=max(L_ts,RANGE<TV>::Bounding_Box(ts.particles.X.Subset(ts.mesh.elements(i))).Edge_Lengths().Max());
     T L=L_tv+L_ts;
+    L *= 0;
     T eps=std::numeric_limits<T>::epsilon(),sqrt_sqrt_eps_L=sqrt(sqrt(eps))*L;
 
     T* tol[4]={tol_vv,tol_ev,tol_ee,tol_fv};
     T safe_scales[4]={7,5,3,3};
     T assume_scales[4]={6,4,2,2};
-
+    
     for(int i=0;i<4;i++){
         T a=safe_scales[i]*sqrt_sqrt_eps_L,b=assume_scales[i]*sqrt_sqrt_eps_L;
         tol[i][safe]=a;
         tol[i][assume]=b;
         tol[i][test]=(3*a+b)/4;
         tol[i][prune]=(a+3*b)/4;}
-    std::cout << "tol_vv: " << tol_vv[0] << " " << tol_vv[1] << " " << tol_vv[2] << " " << tol_vv[3] << std::endl;
+    std::cout << "L: " << L << std::endl << "tol_vv: " << tol_vv[0] << " " << tol_vv[1] << " " << tol_vv[2] << " " << tol_vv[3] << std::endl;
 }
 //#####################################################################
 // Function Compute_VV
@@ -264,6 +265,7 @@ Compute_VE_Helper(int p,I2 e,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xe,T& gamma)
     if(m<tol_vv[prune]) return false;
     T d2=u.Cross(w).Magnitude_Squared();
     if(d2>sqr(tol_ev[test])) return false;
+    else std::cout << "ve degeneracy: " << sqrt(d2) << std::endl;
     T a_hat=u.Dot(w),a_bar=m-a_hat;
     if(a_hat<0 || a_bar<0) return false;
     gamma=a_hat/m;
@@ -340,6 +342,7 @@ Compute_VF_Helper(int p,I3 f,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xf,TV& gamma)
     if(sqr(d_hat)>sqr(tol_fv[test])*m2) return false;
     if(a_hat<0 || b_hat<0 || c_hat<0) return false;
     gamma=TV(a_hat,b_hat,c_hat)/m2;
+    std::cout << "vf degeneracy: " << P << " " << d_hat/sqrt(m2) << std::endl;
     return true;
 }
 //#####################################################################

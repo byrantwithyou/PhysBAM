@@ -552,7 +552,7 @@ void MESH_CUTTING<T>::Initialize_Elasticity()
     //be->Initialize_CG();
     be->Initialize_MINRES();
     
-    if (1) {
+    if (0) {
         my_constrained = new ALGEBRA::VECTOR<int>(3*diri_nodes.Size());
         my_constrained_locations = new ALGEBRA::VECTOR<T>(3*diri_nodes.Size());
         int i = 0;
@@ -703,7 +703,6 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
         ARRAY<CENTER> ecenters[NumEdgesPerTet];
         ARRAY<CENTER> fcenters[NumFacesPerTet];
         ARRAY<CENTER> tcenters;
-        ARRAY<CENTER> intersections;//for computing potential center if no node of the cutting triangle is inside the tet
         
         for (typename H::ITERATOR it2(intersects); it2.Valid(); it2.Next()) {
             I4 t = it2.Key();
@@ -757,7 +756,9 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
             int n2 = face2node[j][1];
             int n3 = face2node[j][2];
             if (vcenters[n1].m+vcenters[n2].m+vcenters[n3].m+ecenters[e1].m+ecenters[e2].m+ecenters[e3].m+fcenters[j].m == intersects.Size()) {
-//                cout << "no merge: " << tet_id << " " << tet_element << " " << j << " " << I3(tet_element(n1), tet_element(n2), tet_element(n3)) << endl;
+                cout << "no merge: " << tet_id << " " << tet_element << " " << j << " " << I3(tet_element(n1), tet_element(n2), tet_element(n3)) << endl;
+                cout << "ffff: " << intersects << endl;
+                cout <<vcenters[n1].m<<vcenters[n2].m<<vcenters[n3].m<<ecenters[e1].m<<ecenters[e2].m<<ecenters[e3].m<<fcenters[j].m << endl;
                 if (vcenters[n1].m && (vcenters[n2].m || ecenters[e1].m) && (vcenters[n3].m || ecenters[e2].m || ecenters[e3].m || fcenters[j].m)) {
                     tc.no_merge(j*6) = 1;
                 }
@@ -938,7 +939,7 @@ template<class T>
 int MESH_CUTTING<T>::Sorted_Id(const I3& sorted_tri, const I3& tri, int material_id) {
     I3 in(sorted_tri.Find(tri(0)), sorted_tri.Find(tri(1)), sorted_tri.Find(tri(2)));
     bool inv = (in == I3(0, 2, 1) || in == I3(1, 0, 2) || in == I3(2, 1, 0));
-    return tri_node2material[sorted_tri.Find(tri((material_id+1)%6/2))][inv^(material_id&1)];
+    return tri_node2material[sorted_tri.Find(tri(((material_id+1)%6)/2))][inv^(material_id&1)];
 }
 
 template<class T>
@@ -1176,7 +1177,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
     
     stop_timer();
     printf("split time:    %f\n",get_time());
-    cout << "total particles: " << weights_in_sim.m << endl;
+    cout << "total particles: " << weights_in_sim.m << " " << material_node_from.m << endl;
 //    cout << elements << endl;
 //    cout << material_node_from << endl;
     
@@ -1220,6 +1221,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
                                     for (int m = 0; m < 4; ++m) {
                                         if (sim_node_from(pt(l)) == sim_node_from(pt2(m))) {
                                             sim_node_classes.Union(pt(l), pt2(m));
+                                            break;
                                         }
                                     }
                                 }
@@ -1373,6 +1375,16 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
     ARRAY<int> labels;
     volume->mesh.boundary_mesh->Identify_Connected_Components(labels);
     cout << labels.Max() << " CCs after cut\n";
+    
+    sim_volume->mesh.boundary_mesh->Identify_Connected_Components(labels);
+    cout << labels.Max() << " sim CCs after cut\n";
+    
+    volume->mesh.Identify_Edge_Connected_Components(labels);
+    cout << labels.Max() << " CCs after cut\n";
+    
+    sim_volume->mesh.Identify_Edge_Connected_Components(labels);
+    cout << labels.Max() << " sim CCs after cut\n";
+    
     
     //reinitialize elasticity
     start_timer();
