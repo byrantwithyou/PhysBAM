@@ -34,18 +34,18 @@ Set_Tol()
     for(int i=0;i<sc.mesh.elements.m;i++)
         L_sc=max(L_sc,RANGE<TV>::Bounding_Box(sc.particles.X.Subset(sc.mesh.elements(i))).Edge_Lengths().Max());
     T L=L_ta+L_sc;
-    L=1e5;
-    T eps=std::numeric_limits<T>::epsilon(),sqrt_eps_L=sqrt(eps)*L;
-    
-    tol_vv[safe]=54*sqrt_eps_L;
-    tol_vv[assume]=53*sqrt_eps_L;
-    tol_ev[safe]=5*sqrt_eps_L;
-    tol_ev[assume]=4*sqrt_eps_L;
+    T eps=std::numeric_limits<T>::epsilon(),sqrt_eps=sqrt(eps);
+    L*=(1+5*eps)/(1-7*sqrt_eps);
+    T sqrt_eps_L=sqrt_eps*L;
 
-    tol_vv[test]=(3*tol_vv[safe]+tol_vv[assume])/4;
-    tol_vv[prune]=(tol_vv[safe]+3*tol_vv[assume])/4;
-    tol_ev[test]=(3*tol_ev[safe]+tol_ev[assume])/4;
-    tol_ev[prune]=(tol_ev[safe]+3*tol_ev[assume])/4;
+    tol_vv[safe]=7*sqrt_eps_L;
+    tol_vv[test]=(T)6.75*sqrt_eps_L;
+    tol_vv[prune]=(T)6.25*sqrt_eps_L;
+    tol_vv[assume]=6*sqrt_eps_L;
+    tol_ev[safe]=5*sqrt_eps_L;
+    tol_ev[test]=(T)4.75*sqrt_eps_L;
+    tol_ev[prune]=(T)4.25*sqrt_eps_L;
+    tol_ev[assume]=4*sqrt_eps_L;
 }
 //#####################################################################
 // Function Compute_VV
@@ -117,7 +117,7 @@ Compute_EE(I2 e,I2 g)
         if(hash_ve.Contains(g.Insert(e(i),0))) return false;
         if(hash_ev.Contains(e.Append(g(i)))) return false;}
 
-    T tol=sqr(tol_ev[prune]);
+    T tol=(T).5*sqr(tol_ev[prune]);
     TV A=ta.particles.X(e.x),B=ta.particles.X(e.y);
     TV P=sc.particles.X(g.x),Q=sc.particles.X(g.y);
     T area_ABP=TRIANGLE_2D<T>::Signed_Area(A,B,P);
@@ -143,7 +143,7 @@ Compute_FV(I3 f,int p)
         if(hash_vv.Contains(I2(f(i),p))) return false;
         if(hash_ev.Contains(f.Remove_Index(i).Append(p))) return false;}
 
-    T tol=sqr(tol_ev[prune]);
+    T tol=(T).5*sqr(tol_ev[prune]);
     TV A=ta.particles.X(f.x),B=ta.particles.X(f.y),C=ta.particles.X(f.z);
     TV P=sc.particles.X(p);
     T area_PBC=TRIANGLE_2D<T>::Signed_Area(P,B,C);
