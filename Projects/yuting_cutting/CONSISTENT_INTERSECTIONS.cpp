@@ -228,20 +228,21 @@ Set_Tol()
     for(int i=0;i<ts.mesh.elements.m;i++)
         L_ts=max(L_ts,RANGE<TV>::Bounding_Box(ts.particles.X.Subset(ts.mesh.elements(i))).Edge_Lengths().Max());
     T L=L_tv+L_ts;
-    L *= 0;
-    T eps=std::numeric_limits<T>::epsilon(),sqrt_sqrt_eps_L=sqrt(sqrt(eps))*L;
+    T eps=std::numeric_limits<T>::epsilon(),sqrt_sqrt_eps=sqrt(sqrt(eps));
+    L*=(1+5*eps)/(1-7*sqrt_sqrt_eps);
+    T sqrt_sqrt_eps_L=sqrt_sqrt_eps*L;
 
     T* tol[4]={tol_vv,tol_ev,tol_ee,tol_fv};
-    T safe_scales[4]={7,5,3,3};
+    T safe_scales[4]={7,5,(T)2.5,(T)2.5};
+    T test_scales[4]={(T)6.75,(T)4.75,(T)2.375,(T)2.375};
+    T prune_scales[4]={(T)6.25,(T)4.25,(T)2.125,(T)2.125};
     T assume_scales[4]={6,4,2,2};
     
     for(int i=0;i<4;i++){
-        T a=safe_scales[i]*sqrt_sqrt_eps_L,b=assume_scales[i]*sqrt_sqrt_eps_L;
-        tol[i][safe]=a;
-        tol[i][assume]=b;
-        tol[i][test]=(3*a+b)/4;
-        tol[i][prune]=(a+3*b)/4;}
-    std::cout << "L: " << L << std::endl << "tol_vv: " << tol_vv[0] << " " << tol_vv[1] << " " << tol_vv[2] << " " << tol_vv[3] << std::endl;
+        tol[i][safe]=safe_scales[i]*sqrt_sqrt_eps_L;
+        tol[i][test]=test_scales[i]*sqrt_sqrt_eps_L;
+        tol[i][prune]=prune_scales[i]*sqrt_sqrt_eps_L;
+        tol[i][assume]=assume_scales[i]*sqrt_sqrt_eps_L;}
 }
 //#####################################################################
 // Function Compute_VV
@@ -318,7 +319,7 @@ Compute_EE(I2 e,I2 g)
     TV P=ts.particles.X(g.x),Q=ts.particles.X(g.y);
     TV u=B-A,v=Q-P,w=P-A,r=u.Cross(v);
     T m2=r.Magnitude_Squared();
-    if(m2<16*sqr(sqr(tol_ev[prune])-sqr(tol_ee[test]))) return false;
+    if(m2<12*sqr(sqr(tol_ev[prune])-sqr(tol_ee[test]))) return false;
     T d_hat=r.Dot(w);
     if(sqr(d_hat)>sqr(tol_ee[test])*m2) return false;
     TV n=r.Cross(w);
@@ -337,7 +338,7 @@ Compute_VF_Helper(int p,I3 f,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xf,TV& gamma)
     TV P=Xp(p);
     TV u=B-A,v=C-A,w=P-A,r=u.Cross(v),n=r.Cross(w);
     T m2=r.Magnitude_Squared();
-    if(m2<108*sqr(sqr(tol_ev[prune])-sqr(tol_fv[test]))) return false;
+    if(m2<72*sqr(sqr(tol_ev[prune])-sqr(tol_fv[test]))) return false;
     T d_hat=r.Dot(w),b_hat=n.Dot(v),c_hat=-n.Dot(u),a_hat=m2-b_hat-c_hat;
     if(sqr(d_hat)>sqr(tol_fv[test])*m2) return false;
     if(a_hat<0 || b_hat<0 || c_hat<0) return false;
@@ -389,14 +390,14 @@ Compute_EF_Helper(I2 e,I3 f,ARRAY_VIEW<TV> Xe,ARRAY_VIEW<TV> Xf,T& gamma,TV& bar
     T vB=TETRAHEDRON<T>::Signed_Volume(C,A,P,Q);
     T vC=TETRAHEDRON<T>::Signed_Volume(A,B,P,Q);
 
-    T tol1=2*tol_fv[prune]*sqr(tol_ee[prune]);
+    T tol1=tol_fv[prune]*sqr(tol_ee[prune]);
     if(abs(vA)<tol1 || abs(vB)<tol1 || abs(vC)<tol1) return false;
     bool a=vA<0,b=vB<0,c=vC<0;
     if(a!=b || b!=c) return false;
 
     T vP=TETRAHEDRON<T>::Signed_Volume(A,B,C,P);
     T vQ=TETRAHEDRON<T>::Signed_Volume(A,B,C,Q);
-    T tol2=3*sqrt(3)*tol_fv[prune]*sqr(tol_ee[prune]);
+    T tol2=(T)1.5*sqrt(3)*tol_fv[prune]*sqr(tol_ee[prune]);
     if(abs(vP)<tol2 || abs(vQ)<tol2) return false;
     if((vP<0)==(vQ<0)) return false;
 
@@ -465,7 +466,7 @@ Compute_TV(I4 t,int p)
         for(int j=i+1;j<4;j++)
             if(hash_ev.Contains(I3(t(i),t(j),p))) return false;
 
-    T tol=sqrt((T)3)*cube(tol_fv[prune]);
+    T tol=3*sqrt((T)3)*cube(tol_fv[prune]);
     TV A=tv.particles.X(t(0)),B=tv.particles.X(t(1)),C=tv.particles.X(t(2)),D=tv.particles.X(t(3));
     TV P=ts.particles.X(p);
     T vA=TETRAHEDRON<T>::Signed_Volume(P,B,C,D);
