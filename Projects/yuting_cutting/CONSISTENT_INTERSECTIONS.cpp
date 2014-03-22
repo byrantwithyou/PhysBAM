@@ -266,7 +266,6 @@ Compute_VE_Helper(int p,I2 e,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xe,T& gamma)
     if(m<tol_vv[prune]) return false;
     T d2=u.Cross(w).Magnitude_Squared();
     if(d2>sqr(tol_ev[test])) return false;
-    else std::cout << "ve degeneracy: " << sqrt(d2) << std::endl;
     T a_hat=u.Dot(w),a_bar=m-a_hat;
     if(a_hat<0 || a_bar<0) return false;
     gamma=a_hat/m;
@@ -343,7 +342,6 @@ Compute_VF_Helper(int p,I3 f,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xf,TV& gamma)
     if(sqr(d_hat)>sqr(tol_fv[test])*m2) return false;
     if(a_hat<0 || b_hat<0 || c_hat<0) return false;
     gamma=TV(a_hat,b_hat,c_hat)/m2;
-    std::cout << "vf degeneracy: " << P << " " << d_hat/sqrt(m2) << std::endl;
     return true;
 }
 //#####################################################################
