@@ -13,6 +13,7 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Matrices/ROTATION.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 
 #include <fstream>
 #include <sstream>
@@ -100,6 +101,20 @@ int window_height = 600;
 int window_width = 600;
 
 #define DE cout<<"file "<<__FILE__<<"   line "<<__LINE__<<"  "<<&mcut->volume->particles.X<<"   "<<mcut->volume->particles.X<<endl;
+
+void copy(TETRAHEDRALIZED_VOLUME<T>*& vt, TETRAHEDRALIZED_VOLUME<T> *vf)
+{
+    if (vt) {
+        delete vt;
+    }
+    vt = TETRAHEDRALIZED_VOLUME<T>::Create();
+    vt->particles.Resize(vf->particles.X.m);
+    vt->Update_Number_Nodes();
+    for (int i = 0; i < vf->particles.X.m; ++i) {
+        vt->particles.X(i) = vf->particles.X(i);
+    }
+    vt->mesh.elements = vf->mesh.elements;
+}
 
 void Reshape(GLint newWidth,GLint newHeight) {
     glViewport(0,0,newWidth,newHeight);
@@ -975,7 +990,64 @@ void Initialize(bool reinitialize_cutting_mesh)
                 string interaction_file_name = "interactions/interaction2.txt";
                 interaction_file.open(interaction_file_name.c_str());
             }
-
+            if (1) {//check whether cutting result is correct
+                T vo = sim_volume->Total_Volume();
+                int ii;
+                T mvo = sim_volume->Minimum_Volume(&ii);
+                TETRAHEDRALIZED_VOLUME<T>* v = NULL;
+                copy(v, sim_volume);
+                cutting_tri_mesh->particles.Add_Elements(4);
+                cutting_tri_mesh->Update_Number_Nodes();
+                cutting_tri_mesh->mesh.elements.Append(I3(0, 1, 2));
+                cutting_tri_mesh->mesh.elements.Append(I3(1, 2, 3));
+                RANDOM_NUMBERS<T> r;
+                for (int i = 0; i < 1e4; ++i) {
+                    copy(sim_volume, v);
+                    sim_volume->particles.Store_Velocity();
+                    
+                    if (mcut) {
+                        delete mcut;
+                    }
+                    mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+                    mcut->Initialize_Elasticity();
+                    
+                    T rr = (r.Get_Number() - 0.5) * 20;
+                    cout << "rr" << i << ":" << rr << endl;
+                    TV pert(r.Get_Number(), r.Get_Number(), r.Get_Number());
+                    pert *= 0.1;
+                    
+                    cutting_tri_mesh->particles.X(0) = TV(1, rr, -1) + pert;
+                    cutting_tri_mesh->particles.X(1) = TV(1, rr, 1) + pert;
+                    cutting_tri_mesh->particles.X(2) = TV(-1, -rr, -1) + pert;
+                    cutting_tri_mesh->particles.X(3) = TV(-1, -rr, 1) + pert;
+                    mcut->Cut(*cutting_tri_mesh);
+                    ARRAY<int> l;
+                    mcut->Connected_Components(mcut->volume, l);
+                    int cc = l.Max();
+                    cout << cc << " CCs after cut\n";
+                    ARRAY<T> vcc(cc);
+                    for (int j = 0; j < l.m; ++j) {
+                        I4 e = mcut->volume->mesh.elements(j);
+                        vcc(l(j)-1) += TETRAHEDRON<T>(mcut->volume->particles.X(e(0)),
+                                                    mcut->volume->particles.X(e(1)),
+                                                    mcut->volume->particles.X(e(2)),
+                                                    mcut->volume->particles.X(e(3))).Signed_Volume();
+                    }
+                    vcc.Sort();
+                    int ecc = 0;
+                    for (int j = 0; j < vcc.m; ++j) {
+                        if (vcc(j) > mvo) {
+                            ++ecc;
+                        }
+                    }
+                    T s = vcc.Sum();
+                    cout << ecc << " effective CCs after cut" << endl;
+                    cout << vcc << " sums to " << s << ", while original volume is " << vo << endl;
+                    if (ecc != 2 || fabs(s - vo) > 1e-6) {
+                        break;
+                    }
+                }
+            }
         }
         if(argc1 == 3) {
             const std::string surface_filename(argv1[2]);
