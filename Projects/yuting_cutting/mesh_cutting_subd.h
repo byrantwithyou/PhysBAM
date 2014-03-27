@@ -130,6 +130,16 @@ public:
     };
     
     typedef VECTOR<CUT_FACE, NumMaterialsPerFace> TV_TV_INT;
+    
+    typedef VECTOR<int,3> CS;
+    struct FLAG
+    {
+        CS cs;
+        int m0,m1,m2;
+        TV color;
+    };
+    ARRAY<FLAG> flags;
+    
 public:
     //meshes
     TETRAHEDRALIZED_VOLUME<T>* sim_volume;
@@ -186,7 +196,8 @@ public:
     void Cut_By_Levelset(ARRAY<int>& lsi);
     void Become_Sphere();
     void Keep_CC(int cc_id);
-    
+    void Connected_Components(TETRAHEDRALIZED_VOLUME<T>* v, ARRAY<int>& labels);
+        
     void Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine = true, bool material_space = false);
     int Compute_Intersection(const T& x, const T& y);
     void Update_For_Draw();
@@ -210,6 +221,8 @@ private:
     void Partial_Refine();
     void Fix_Orientation();
     void Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRAY<int>& sim_node_from, ARRAY<bool>& sim_tet_split, ARRAY<int>& material_nodes_from);
+    void Split2(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRAY<int>& sim_node_from, ARRAY<bool>& sim_tet_split, ARRAY<int>& material_nodes_from);
+    void Split3(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRAY<int>& sim_node_from, ARRAY<bool>& sim_tet_split, ARRAY<int>& material_nodes_from);
     void Union(const TV_TV_INT& cface,  TV_TV_INT& cface_found, UNION_FIND<int>& node_classes, UNION_FIND<int>& sim_node_classes, const int shift, const bool inverse);
     ARRAY<int> Find_Tet_CC(int m, ARRAY<bool>& picked, ARRAY<ARRAY<int> >& itot, ARRAY<ARRAY<int> >& node_cc);
     ARRAY<int> Find_Cutting_Tet_CC(int m, ARRAY<bool>& picked, ARRAY<ARRAY<int> >& itot, ARRAY<ARRAY<int> >& node_cc);

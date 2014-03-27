@@ -36,6 +36,7 @@ Set_Tol()
     T L=L_ta+L_sc;
     T eps=std::numeric_limits<T>::epsilon(),sqrt_eps=sqrt(eps);
     L*=(1+5*eps)/(1-7*sqrt_eps);
+    L*=1e6;
     T sqrt_eps_L=sqrt_eps*L;
 
     tol_vv[safe]=7*sqrt_eps_L;
@@ -46,6 +47,7 @@ Set_Tol()
     tol_ev[test]=(T)4.75*sqrt_eps_L;
     tol_ev[prune]=(T)4.25*sqrt_eps_L;
     tol_ev[assume]=4*sqrt_eps_L;
+    std::cout << "L: " << L << std::endl << "tol_vv: " << tol_vv[0] << " " << tol_vv[1] << " " << tol_vv[2] << " " << tol_vv[3] << std::endl;
 }
 //#####################################################################
 // Function Compute_VV
@@ -228,6 +230,7 @@ Set_Tol()
     for(int i=0;i<ts.mesh.elements.m;i++)
         L_ts=max(L_ts,RANGE<TV>::Bounding_Box(ts.particles.X.Subset(ts.mesh.elements(i))).Edge_Lengths().Max());
     T L=L_tv+L_ts;
+    
     T eps=std::numeric_limits<T>::epsilon(),sqrt_sqrt_eps=sqrt(sqrt(eps));
     L*=(1+5*eps)/(1-7*sqrt_sqrt_eps);
     T sqrt_sqrt_eps_L=sqrt_sqrt_eps*L;

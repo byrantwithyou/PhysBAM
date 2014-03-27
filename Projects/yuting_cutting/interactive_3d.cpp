@@ -89,9 +89,9 @@ bool run_sim = 0;
 int ratio = 10;
 
 ARRAY<TV> cutting_curve;
-MESH_CUTTING<T> *mcut;
-TRIANGULATED_SURFACE<T> *cutting_tri_mesh;
-TETRAHEDRALIZED_VOLUME<T> *sim_volume;
+MESH_CUTTING<T> *mcut = NULL;
+TRIANGULATED_SURFACE<T> *cutting_tri_mesh = NULL;
+TETRAHEDRALIZED_VOLUME<T> *sim_volume = NULL;
 
 ARRAY<int> labels;
 HASHTABLE<int> picked_nodes;
@@ -229,44 +229,43 @@ static void Key( unsigned char key, int x, int y )
             break;
         case 'q': 
             Initialize(1);
-            return;
-        break;
+            break;
         case 'm':
             cutting = 0;
             translating = 0;
             dragging = 1;
             rotating = 0;
-        break;
+            break;
         case 't':
             cutting = 0;
             translating = 1;
             dragging = 0;
             rotating = 0;
-        break;
+            break;
         case 'c': 
             cutting = 1;
             translating = 0;
             dragging = 0;
             rotating = 0;
-        break;
+            break;
         case 'r': 
             cutting = 0;
             translating = 0;
             dragging = 0;
             rotating = 1;
-        break;
+            break;
         case 'w': 
             Translate_Volume(TV(0,0.05,0));
-        break;
+            break;
         case 's': 
             Translate_Volume(TV(0,-0.05,0));
-        break;
+            break;
         case 'a': 
             Translate_Volume(TV(-0.05,0,0));
-        break;
+            break;
         case 'd': 
             Translate_Volume(TV(0.05,0,0));
-        break;
+            break;
         case 'f':
             Scale_Volume(1.1);
             break;
@@ -275,13 +274,13 @@ static void Key( unsigned char key, int x, int y )
             break;
         case 'e': 
             drawing_cutting = !drawing_cutting;
-        break;
+            break;
         case 'z':
             draw_sim = !draw_sim;
-        break;
+            break;
         case 'x':
             draw_material_edges = !draw_material_edges;
-        break;
+            break;
     }
     glutPostRedisplay();
 }
@@ -401,9 +400,11 @@ void mouse(int button, int state, int x, int y)
                         FILE_UTILITIES::Write_To_File<T>(string("cutting_surfaces/")+ss.str()+string(".tet.gz"), cutting_tri_mesh->particles, cutting_tri_mesh->mesh);
                         cutting_surface_id++;
                     }
-                    
+                    FILE_UTILITIES::Write_To_File<T>("cutting_surface.tet.gz", cutting_tri_mesh->particles, cutting_tri_mesh->mesh);
                     mcut->Cut(*cutting_tri_mesh);
-                    mcut->volume->mesh.Identify_Face_Connected_Components(labels);
+                    mcut->Connected_Components(mcut->volume, labels);
+                    cout << labels.m << " labels max: " << labels.Max() << ", " << mcut->volume->mesh.elements.m << endl;
+                    
                 }
                 glutPostRedisplay();
             } 
@@ -455,7 +456,7 @@ void motion(int x, int y)
     end_position = TV( xx, yy, intrude/2);
 
     if (cutting) {
-        if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude_Squared() > 1e-4)
+        if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude() > 1e-2)
             cutting_curve.Append(end_position);
     }
     else if(dragging) {
@@ -525,6 +526,7 @@ void initialize_cutting_mesh()
 void initialize_volume1()
 {       
     sim_volume->particles.Add_Elements(5);
+    sim_volume->Update_Number_Nodes();
     sim_volume->particles.X(0) = TV(0.5, 0.0, 0.0);
     sim_volume->particles.X(1) = TV(0.0, 0, -0.5);
     sim_volume->particles.X(2) = TV(-0.5, 0.0, 0.0);
@@ -539,6 +541,7 @@ void initialize_volume1()
 void initialize_volume2()
 {
     sim_volume->particles.Add_Elements(5);
+    sim_volume->Update_Number_Nodes();
     sim_volume->particles.X(0) = TV(-0.5, 0.0, -0.5);    
     sim_volume->particles.X(1) = TV(0.5, 0.0, -0.5);  
     sim_volume->particles.X(2) = TV(0.5, 0.0, 0.5);  
@@ -550,22 +553,56 @@ void initialize_volume2()
 }
 
 void initialize_volume3()
-{       
-    sim_volume->particles.Add_Elements(6);
-    sim_volume->particles.X(0) = TV(-0.5, 0.0, -0.5);    
-    sim_volume->particles.X(1) = TV(0.5, 0.0, -0.5);  
-    sim_volume->particles.X(2) = TV(0.5, 0.0, 0.5);  
-    sim_volume->particles.X(3) = TV(-0.5, 0.0, 0.5);   
-    sim_volume->particles.X(4) = TV(0.0, 0.0, 0.0);    
-    sim_volume->particles.X(5) = TV(0.0, 0.5, 0.0);    
-    for (int i = 0; i < 4; i++) {
-        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>((i+1)%4, i, 4, 5));
+{
+    cutting_tri_mesh->particles.Add_Elements(4);
+    cutting_tri_mesh->Update_Number_Nodes();
+    cutting_tri_mesh->mesh.elements.Append(I3(0, 1, 2));
+    cutting_tri_mesh->mesh.elements.Append(I3(1, 2, 3));
+    RANDOM_NUMBERS<T> r;
+    for (int i = 0; i < 1e4; ++i) {
+        if (sim_volume) {
+            delete sim_volume;
+        }
+        sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
+        sim_volume->particles.Store_Velocity();
+        
+        sim_volume->particles.Add_Elements(6);
+        sim_volume->Update_Number_Nodes();
+        sim_volume->particles.X(0) = TV(-0.5, -0.5, 0.0);
+        sim_volume->particles.X(1) = TV(0.5, -0.5, 0.0);
+        sim_volume->particles.X(2) = TV(0.5, 0.5, 0.0);
+        sim_volume->particles.X(3) = TV(-0.5, 0.5, 0.0);
+        sim_volume->particles.X(4) = TV(0.0, 0.0, 0.0);
+        sim_volume->particles.X(5) = TV(0.0, 0.0, 0.5);
+        for (int i = 0; i < 4; i++) {
+            sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>((i+1)%4, i, 4, 5));
+        }
+        
+        if (mcut) {
+            delete mcut;
+        }
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut->Initialize_Elasticity();
+        
+        T rr = (r.Get_Number() - 0.5) * 2;
+        cout << "rr" << i << ":" << rr << endl;
+        cutting_tri_mesh->particles.X(0) = TV(1, rr, -1);
+        cutting_tri_mesh->particles.X(1) = TV(1, rr, 1);
+        cutting_tri_mesh->particles.X(2) = TV(-1, -rr, -1);
+        cutting_tri_mesh->particles.X(3) = TV(-1, -rr, 1);
+        mcut->Cut(*cutting_tri_mesh);
+        ARRAY<int> l;
+        sim_volume->mesh.boundary_mesh->Identify_Connected_Components(l);
+        if (l.Max() != 2) {
+            break;
+        }
     }
 }
 
 void initialize_volume4()
 {
     sim_volume->particles.Add_Elements(10);
+    sim_volume->Update_Number_Nodes();
     sim_volume->particles.X(0) = TV(-0.5, 0.0, -0.5);
     sim_volume->particles.X(1) = TV(0.0, 0.0, -0.5);
     sim_volume->particles.X(2) = TV(0.5, 0.0, -0.5);
@@ -584,25 +621,60 @@ void initialize_volume4()
 
 void initialize_volume5()
 {
-    sim_volume->particles.Add_Elements(7);
-    sim_volume->particles.X(0) = TV(0.0, 0.0, 0.0);
-    sim_volume->particles.X(1) = TV(0.5, 0.0, 0.0);
-    sim_volume->particles.X(2) = TV(0.0, 0.0, 0.5);
-    sim_volume->particles.X(3) = TV(0.0, 0.5, 0.0);
-    sim_volume->particles.X(4) = TV(0.0, -0.5, 0.0);
-    sim_volume->particles.X(5) = TV(-0.5, 0.0, 0.0);
-    sim_volume->particles.X(6) = TV(0.0, 0.0, -0.5);
-    //sim_volume->particles.X(7) = TV(0.5, 0.5, 0.5);
-
-    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 2, 1, 3));
-    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 2, 4));
-    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 5, 2, 3));
-    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 2, 5, 4));
-    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 6, 3));
-    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 6, 1, 4));
-    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 6, 5, 3));
-    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 5, 6, 4));
-    //sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 3, 7));
+    cutting_tri_mesh->particles.Add_Elements(4);
+    cutting_tri_mesh->Update_Number_Nodes();
+    cutting_tri_mesh->mesh.elements.Append(I3(0, 1, 2));
+    cutting_tri_mesh->mesh.elements.Append(I3(1, 2, 3));
+    RANDOM_NUMBERS<T> r;
+    for (int i = 0; i < 1e4; ++i) {
+        if (sim_volume) {
+            delete sim_volume;
+        }
+        sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
+        sim_volume->particles.Store_Velocity();
+        
+        sim_volume->particles.Add_Elements(7);
+        sim_volume->Update_Number_Nodes();
+        sim_volume->particles.X(0) = TV(0.0, 0.0, 0.0);
+        sim_volume->particles.X(1) = TV(0.5, 0.0, 0.0);
+        sim_volume->particles.X(2) = TV(0.0, 0.0, 0.5);
+        sim_volume->particles.X(3) = TV(0.0, 0.5, 0.0);
+        sim_volume->particles.X(4) = TV(0.0, -0.5, 0.0);
+        sim_volume->particles.X(5) = TV(-0.5, 0.0, 0.0);
+        sim_volume->particles.X(6) = TV(0.0, 0.0, -0.5);
+        //sim_volume->particles.X(7) = TV(0.5, 0.5, 0.5);
+        
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 2, 1, 3));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 2, 4));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 5, 2, 3));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 2, 5, 4));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 6, 3));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 6, 1, 4));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 6, 5, 3));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 5, 6, 4));
+        //sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 3, 7));
+        
+        if (mcut) {
+            delete mcut;
+        }
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut->Initialize_Elasticity();
+        
+        T rr = (r.Get_Number() - 0.5) * 2;
+        cout << "rr" << i << ":" << rr << endl;
+        TV pert(r.Get_Number(), r.Get_Number(), r.Get_Number());
+        pert *= 0.1;
+        cutting_tri_mesh->particles.X(0) = TV(1, rr, -1) + pert;
+        cutting_tri_mesh->particles.X(1) = TV(1, rr, 1) + pert;
+        cutting_tri_mesh->particles.X(2) = TV(-1, -rr, -1) + pert;
+        cutting_tri_mesh->particles.X(3) = TV(-1, -rr, 1) + pert;
+        mcut->Cut(*cutting_tri_mesh);
+        ARRAY<int> l;
+        sim_volume->mesh.boundary_mesh->Identify_Connected_Components(l);
+        if (l.Max() != 2) {
+            break;
+        }
+    }
 }
 
 void initialize_volume6()
@@ -619,6 +691,169 @@ void initialize_volume6()
     sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 4, 2, 3));
     sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 5, 3));
     sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 5, 4, 3));
+}
+
+void initialize_volume7()
+{
+    cutting_tri_mesh->particles.Add_Elements(4);
+    cutting_tri_mesh->Update_Number_Nodes();
+    cutting_tri_mesh->mesh.elements.Append(I3(0, 1, 2));
+    cutting_tri_mesh->mesh.elements.Append(I3(1, 2, 3));
+    RANDOM_NUMBERS<T> r;
+    for (int i = 0; i < 1e4; ++i) {
+        if (sim_volume) {
+            delete sim_volume;
+        }
+        sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
+        sim_volume->particles.Store_Velocity();
+        
+        sim_volume->particles.Add_Elements(6);
+        sim_volume->Update_Number_Nodes();
+        sim_volume->particles.X(0) = TV(0, 0.5, 0.0);
+        sim_volume->particles.X(1) = TV(0.5, 0, 0.0);
+        sim_volume->particles.X(2) = TV(0, -0.5, 0.0);
+        sim_volume->particles.X(3) = TV(-0.5, 0, 0.0);
+        sim_volume->particles.X(4) = TV(0, 0, 0.0);
+        sim_volume->particles.X(5) = TV(0.0, 0.0, -0.5);
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 4, 5));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 4, 5));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(2, 3, 4, 5));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(3, 0, 4, 5));
+        
+        if (mcut) {
+            delete mcut;
+        }
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut->Initialize_Elasticity();
+    
+        T rr = (r.Get_Number() - 0.5) * 2;
+        cout << "rr" << i << ":" << rr << endl;
+        TV pert(r.Get_Number(), r.Get_Number(), r.Get_Number());
+        pert *= 0.1;
+        
+        cutting_tri_mesh->particles.X(0) = TV(1, rr, -1) + pert;
+        cutting_tri_mesh->particles.X(1) = TV(1, rr, 1) + pert;
+        cutting_tri_mesh->particles.X(2) = TV(-1, -rr, -1) + pert;
+        cutting_tri_mesh->particles.X(3) = TV(-1, -rr, 1) + pert;
+        mcut->Cut(*cutting_tri_mesh);
+        ARRAY<int> l;
+        sim_volume->mesh.boundary_mesh->Identify_Connected_Components(l);
+        if (l.Max() != 2) {
+            break;
+        }
+    }
+}
+
+void initialize_volume8()
+{
+    cutting_tri_mesh->particles.Add_Elements(4);
+    cutting_tri_mesh->Update_Number_Nodes();
+    cutting_tri_mesh->mesh.elements.Append(I3(0, 1, 2));
+    cutting_tri_mesh->mesh.elements.Append(I3(1, 2, 3));
+    RANDOM_NUMBERS<T> r;
+    for (int i = 0; i < 1e6; ++i) {
+        if (sim_volume) {
+            delete sim_volume;
+        }
+        sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
+        sim_volume->particles.Store_Velocity();
+        
+        sim_volume->particles.Add_Elements(7);
+        sim_volume->Update_Number_Nodes();
+        sim_volume->particles.X(0) = TV(0, 0.5, 0.0);
+        sim_volume->particles.X(1) = TV(0.5, 0, 0.0);
+        sim_volume->particles.X(2) = TV(0, -0.5, 0.0);
+        sim_volume->particles.X(3) = TV(-0.5, 0, 0.0);
+        sim_volume->particles.X(4) = TV(0, 0, 0.0);
+        sim_volume->particles.X(5) = TV(0.0, 0.0, -0.5);
+        sim_volume->particles.X(6) = TV(0.0, 0.0, 0.5);
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 4, 5));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 4, 5));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(2, 3, 4, 5));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(3, 0, 4, 5));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 4, 6));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 4, 6));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(2, 3, 4, 6));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(3, 0, 4, 6));
+        
+        if (mcut) {
+            delete mcut;
+        }
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut->Initialize_Elasticity();
+        
+        T rr = (r.Get_Number() - 0.5) * 2;
+        cout << "rr" << i << ":" << rr << endl;
+        TV pert(r.Get_Number(), r.Get_Number(), r.Get_Number());
+        pert *= 0;
+        
+        cutting_tri_mesh->particles.X(0) = TV(1, rr, -1) + pert;
+        cutting_tri_mesh->particles.X(1) = TV(1, rr, 1) + pert;
+        cutting_tri_mesh->particles.X(2) = TV(-1, -rr, -1) + pert;
+        cutting_tri_mesh->particles.X(3) = TV(-1, -rr, 1) + pert;
+        mcut->Cut(*cutting_tri_mesh);
+        ARRAY<int> l;
+        sim_volume->mesh.boundary_mesh->Identify_Connected_Components(l);
+        if (l.Max() < 2) {
+            break;
+        }
+    }
+}
+
+void initialize_volume9()//cubes
+{
+    cutting_tri_mesh->particles.Add_Elements(4);
+    cutting_tri_mesh->Update_Number_Nodes();
+    cutting_tri_mesh->mesh.elements.Append(I3(0, 1, 2));
+    cutting_tri_mesh->mesh.elements.Append(I3(1, 2, 3));
+    RANDOM_NUMBERS<T> r;
+    for (int i = 0; i < 1e6; ++i) {
+        if (sim_volume) {
+            delete sim_volume;
+        }
+        sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
+        sim_volume->particles.Store_Velocity();
+        
+        sim_volume->particles.Add_Elements(7);
+        sim_volume->Update_Number_Nodes();
+        sim_volume->particles.X(0) = TV(0, 0.5, 0.0);
+        sim_volume->particles.X(1) = TV(0.5, 0, 0.0);
+        sim_volume->particles.X(2) = TV(0, -0.5, 0.0);
+        sim_volume->particles.X(3) = TV(-0.5, 0, 0.0);
+        sim_volume->particles.X(4) = TV(0, 0, 0.0);
+        sim_volume->particles.X(5) = TV(0.0, 0.0, -0.5);
+        sim_volume->particles.X(6) = TV(0.0, 0.0, 0.5);
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 4, 5));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 4, 5));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(2, 3, 4, 5));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(3, 0, 4, 5));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 4, 6));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 4, 6));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(2, 3, 4, 6));
+        sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(3, 0, 4, 6));
+        
+        if (mcut) {
+            delete mcut;
+        }
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut->Initialize_Elasticity();
+        
+        T rr = (r.Get_Number() - 0.5) * 2;
+        cout << "rr" << i << ":" << rr << endl;
+        TV pert(r.Get_Number(), r.Get_Number(), r.Get_Number());
+        pert *= 0;
+        
+        cutting_tri_mesh->particles.X(0) = TV(1, rr, -1) + pert;
+        cutting_tri_mesh->particles.X(1) = TV(1, rr, 1) + pert;
+        cutting_tri_mesh->particles.X(2) = TV(-1, -rr, -1) + pert;
+        cutting_tri_mesh->particles.X(3) = TV(-1, -rr, 1) + pert;
+        mcut->Cut(*cutting_tri_mesh);
+        ARRAY<int> l;
+        sim_volume->mesh.boundary_mesh->Identify_Connected_Components(l);
+        if (l.Max() < 2) {
+            break;
+        }
+    }
 }
 
 void initialize_cubes()
@@ -639,6 +874,7 @@ void initialize_cubes()
     int offset = (width+1)*(height+1);
     
     sim_volume->particles.Add_Elements(offset*(depth+1));
+    sim_volume->Update_Number_Nodes();
     int node_index = 0;
     
     for (int i = 0; i < height+1; i++) {
@@ -717,9 +953,7 @@ void Initialize(bool reinitialize_cutting_mesh)
     }
     
     if(argc1 == 1) {
-        initialize_volume1();
-        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
-        mcut->Initialize_Elasticity();
+        initialize_volume7();
     }
     else {
         const std::string filename(argv1[1]);
@@ -741,6 +975,7 @@ void Initialize(bool reinitialize_cutting_mesh)
                 string interaction_file_name = "interactions/interaction2.txt";
                 interaction_file.open(interaction_file_name.c_str());
             }
+
         }
         if(argc1 == 3) {
             const std::string surface_filename(argv1[2]);

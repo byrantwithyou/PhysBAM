@@ -687,8 +687,6 @@ int main(int argc, char** argv) {
             }
             
             mcut->Initialize_Elasticity();
-            //energyTest();
-            //exit(1);
             TETRAHEDRALIZED_VOLUME<T> *refined_volume = new TETRAHEDRALIZED_VOLUME<T>();
             
             int frame = 0;
@@ -704,10 +702,10 @@ int main(int argc, char** argv) {
             int f1=30,f2=90,f3=105,f4=165,f5=200,f6=260;
             while (frame < 300) {
                 ++frame;
-                //                if (frame == 20) {
-                //                    energyTest();
-                //                    exit(1);
-                //                }
+//                if (frame == 2) {
+//                    energyTest();
+//                    exit(1);
+//                }
                 if (frame > f1 && frame <= f2) {
                     int i=frame-f1-1;
                     laserZ2=0.1;

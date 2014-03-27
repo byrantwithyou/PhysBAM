@@ -750,7 +750,7 @@ public:
     dt(dt_input),final_time(final_time_input),start_time(start_time_input),deformable_object(object_input),elastic_forces(0),cg(0),minres(0),bc_dofs(0),
     be_matrix(deformable_object.Positions().Size(),deformable_object.Positions().Size()),
     mass(deformable_object.Positions().Size()),be_rhs(deformable_object.Positions().Size()),old_positions(deformable_object.Positions().Size()),
-    rho((T)1000),matrix_intialized(false),use_gravity(false),linear_solver_type(-1), alpha_damping(0.1){
+    rho((T)10000),matrix_intialized(false),use_gravity(false),linear_solver_type(-1), alpha_damping(0.1){
         time=start_time;
     }
     
@@ -875,7 +875,7 @@ public:
             SPARSE_ROW<T>& be_row=be_matrix.Row(i);
             for(int j=0;j<k_row.Number_Nonzero();j++){
                 T kij=k_row.Value_At_Sparse_Index(j);
-                be_row(k_row.Index(j))-=dt*dt*kij;
+                be_row(k_row.Index(j))=-dt*dt*kij;
                 //be_row(k_row.Index(j)) -= dt*alpha_damping*kij; //damping force
             }
         }
@@ -884,7 +884,7 @@ public:
         for(int i=0;i<be_matrix.M();i++){
             SPARSE_ROW<T>& be_row=be_matrix.Row(i);
             if(be_row.Number_Nonzero()) be_row(i)+=mass(i);}//std::cout << be_row(i) << std::endl;}
-        //be_matrix.Write_DAT_File("be_matrix222.txt", 1);
+        //be_matrix.Write_DAT_File("be_matrix222.txt");
         //exit(1);
     }
     
@@ -900,7 +900,7 @@ public:
             
             Update_BE_RHS_And_System_Matrix(mcut, K);
             //elastic_forces->Stiffness_Matrix().Write_DAT_File("matrix.txt");
-
+            //exit(1);
             //the unknowns are the positions
             Solve_Linearized_System();
             for(int p=0;p<deformable_object.Positions().Size();p++)
