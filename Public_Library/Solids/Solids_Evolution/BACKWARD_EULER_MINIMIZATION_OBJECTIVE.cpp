@@ -151,23 +151,20 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
         if(int* object_index=minimization_system.forced_collisions.Get_Pointer(p)){
             deepest_index=*object_index;
             deepest_phi=collision_objects(deepest_index)->Extended_Phi(X);}
-        else
-            for(int j=0;j<collision_objects.m;j++){
-                if(disabled_collision.Contains(PAIR<int,int>(j,p))) continue;
-                IMPLICIT_OBJECT<TV>* io=collision_objects(j);
-                T phi=io->Extended_Phi(X);
-                if(phi<deepest_phi){
-                    deepest_phi=phi;
-                    deepest_index=j;}}
+        for(int j=0;j<collision_objects.m;j++){
+            if(disabled_collision.Contains(PAIR<int,int>(j,p))) continue;
+            IMPLICIT_OBJECT<TV>* io=collision_objects(j);
+            T phi=io->Extended_Phi(X);
+            if(phi<deepest_phi){
+                deepest_phi=phi;
+                deepest_index=j;}}
         if(deepest_index==-1) continue;
         IMPLICIT_OBJECT<TV>* io=collision_objects(deepest_index);
-        T s = sign(deepest_phi);
+        COLLISION c={deepest_index,p,deepest_phi,0,io->Extended_Normal(X),TV(),io->Hessian(X)};
+        minimization_system.collisions.Append(c);
         for(int i=0;i<50 && abs(deepest_phi)>collision_thickness;i++){
             X-=deepest_phi*io->Extended_Normal(X);
             deepest_phi=io->Extended_Phi(X);}
-        deepest_phi=s*(X0(p)+dt*V-X).Magnitude();
-        COLLISION c={deepest_index,p,deepest_phi,0,io->Extended_Normal(X),TV(),io->Hessian(X)};
-        minimization_system.collisions.Append(c);
         V=(X-X0(p))/dt;
         dV=V-v0.V.array(p);
         dv.V.array(p)=dV;}

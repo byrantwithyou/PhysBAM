@@ -1633,7 +1633,7 @@ void Get_Initial_Data()
             break;}
         case 69:{
             int spikes_per_side=3;
-            T spike_scale=0.1;
+            T spike_scale=0.18;
             RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(1,1.1,1)*m);
             RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(1,1.1,1)*m);
             box1.Frame().t=TV(0,0.5,-1)*m;
@@ -1644,45 +1644,51 @@ void Get_Initial_Data()
             kinematic_ids.Append(box2.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(box1.particle_index)=true;
             rigid_body_collection.rigid_body_particles.kinematic(box2.particle_index)=true;
+            box1.coefficient_of_friction=input_friction;
+            box2.coefficient_of_friction=input_friction;
             curves.Resize(2+2*spikes_per_side*spikes_per_side);
             int c=0;
             curves(c).Add_Control_Point(0,FRAME<TV>(TV(0,0.5,-1)));
-            curves(c).Add_Control_Point(1,FRAME<TV>(TV(0,0.5,-0.6)));
-            curves(c).Add_Control_Point(2,FRAME<TV>(TV(-1,0.5,-0.6)));
+            curves(c).Add_Control_Point(1,FRAME<TV>(TV(0,0.5,-0.57)));
+            curves(c).Add_Control_Point(2,FRAME<TV>(TV(0,0.75,-0.57)));
+            curves(c).Add_Control_Point(3,FRAME<TV>(TV(1,0.75,-0.57)));
             c++;
             curves(c).Add_Control_Point(0,FRAME<TV>(TV(0,0.5,1)));
-            curves(c).Add_Control_Point(1,FRAME<TV>(TV(0,0.5,0.6)));
-            curves(c).Add_Control_Point(2,FRAME<TV>(TV(1,0.5,0.6)));
+            curves(c).Add_Control_Point(1,FRAME<TV>(TV(0,0.5,0.57)));
+            curves(c).Add_Control_Point(2,FRAME<TV>(TV(0,0.5,0.57)));
+            curves(c).Add_Control_Point(3,FRAME<TV>(TV(-1,0.5,0.57)));
             c++;
             for(int i=0;i<spikes_per_side;i++){
               for(int j=0;j<spikes_per_side;j++){
                 RIGID_BODY<TV>& spike=tests.Add_Analytic_Box(TV(1,1,1)*spike_scale*m);
-                TV d((i-spikes_per_side/2-0.25)*0.3*m,(j-spikes_per_side/2-0.25)*0.3*m,0.5);
+                TV d((i-spikes_per_side/2-0.2)*0.3*m,(j-spikes_per_side/2-0.2)*0.3*m,(0.5-spike_scale/3)*m);
+                ROTATION<TV> r(MATRIX<T,3>(sqrt(2)/2,sqrt(6)/6,sqrt(3)/3,-sqrt(2)/2,sqrt(6)/6,sqrt(3)/3,0,-sqrt(6)/3,sqrt(3)/3));
                 spike.Frame().t=box1.Frame().t+d;
-                spike.Frame().r=ROTATION<TV>(pi/4,TV(1,1,1));
+                spike.Frame().r=r;
                 spike.is_static=false;
                 kinematic_ids.Append(spike.particle_index);
                 rigid_body_collection.rigid_body_particles.kinematic(spike.particle_index)=true;
-                curves(c).Add_Control_Point(0,FRAME<TV>(TV(0,0.5,-1)+d,ROTATION<TV>(pi/4,TV(1,1,1))));
-                curves(c).Add_Control_Point(1,FRAME<TV>(TV(0,0.5,-0.6)+d,ROTATION<TV>(pi/4,TV(1,1,1))));
-                curves(c).Add_Control_Point(2,FRAME<TV>(TV(-1,0.5,-0.6)+d,ROTATION<TV>(pi/4,TV(1,1,1))));
-                c++;
-              }}
+                spike.coefficient_of_friction=input_friction;
+                const ARRAY<typename INTERPOLATION_CURVE<T,FRAME<TV> >::CONTROL_POINT>& cp=curves(0).control_points;
+                for(int k=0;k<cp.m;k++)
+                  curves(c).Add_Control_Point(cp(k).t,FRAME<TV>(cp(k).value.t+d,r));
+                c++;}}
             for(int i=0;i<spikes_per_side;i++){
               for(int j=0;j<spikes_per_side;j++){
                 RIGID_BODY<TV>& spike=tests.Add_Analytic_Box(TV(1,1,1)*spike_scale*m);
-                TV d((i-spikes_per_side/2+0.25)*0.3*m,(j-spikes_per_side/2+0.25)*0.3*m,-0.5);
+                TV d((i-spikes_per_side/2+0.2)*0.3*m,(j-spikes_per_side/2+0.2)*0.3*m,(-0.5+spike_scale/3)*m);
+                ROTATION<TV> r(MATRIX<T,3>(sqrt(2)/2,sqrt(6)/6,sqrt(3)/3,-sqrt(2)/2,sqrt(6)/6,sqrt(3)/3,0,-sqrt(6)/3,sqrt(3)/3));
                 spike.Frame().t=box2.Frame().t+d;
-                spike.Frame().r=ROTATION<TV>(pi/4,TV(1,1,1));
+                spike.Frame().r=r;
                 spike.is_static=false;
                 kinematic_ids.Append(spike.particle_index);
                 rigid_body_collection.rigid_body_particles.kinematic(spike.particle_index)=true;
-                curves(c).Add_Control_Point(0,FRAME<TV>(TV(0,0.5,1)+d,ROTATION<TV>(pi/4,TV(1,1,1))));
-                curves(c).Add_Control_Point(1,FRAME<TV>(TV(0,0.5,0.6)+d,ROTATION<TV>(pi/4,TV(1,1,1))));
-                curves(c).Add_Control_Point(2,FRAME<TV>(TV(1,0.5,0.6)+d,ROTATION<TV>(pi/4,TV(1,1,1))));
-                c++;
-              }}
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0)*m)),true,true,density,.005*m);
+                spike.coefficient_of_friction=input_friction;
+                const ARRAY<typename INTERPOLATION_CURVE<T,FRAME<TV> >::CONTROL_POINT>& cp=curves(1).control_points;
+                for(int k=0;k<cp.m;k++)
+                  curves(c).Add_Control_Point(cp(k).t,FRAME<TV>(cp(k).value.t+d,r));
+                c++;}}
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.522,(T)0)*m)),true,true,density,.007*m);
             tests.Add_Ground();
             break;}
         case 77: {
