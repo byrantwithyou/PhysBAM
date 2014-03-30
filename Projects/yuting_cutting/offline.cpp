@@ -701,7 +701,7 @@ int main(int argc, char** argv) {
             T xx = -0.3;
             T xxx = 0.01;
             T yy = 0.8;
-            T yyy = 0.01;
+            T yyy = 0.015;
             T x1 = 0, y1 = 0;
             int f1=30,f2=90,f3=105,f4=165,f5=200,f6=260;
             while (frame < 300) {
@@ -764,6 +764,11 @@ int main(int argc, char** argv) {
                     }
                 }
                 else if (frame > f5 && frame <= f6) {
+                    if (frame == f5 + 1) {
+                        for (int i = 0; i < mcut->cutting_particle_material_space.m; ++i) {
+                            mcut->cutting_particle_material_space(i) = mcut->volume->particles.X(i);
+                        }
+                    }
                     x1=0;
                     y1=yy-(frame-f5-1)*yyy;
                     laserZ2=10;
