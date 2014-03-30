@@ -232,6 +232,7 @@ Set_Tol()
     T L=L_tv+L_ts;
     
     T eps=std::numeric_limits<T>::epsilon(),sqrt_sqrt_eps=sqrt(sqrt(eps));
+    std::cout << sqrt_sqrt_eps << "****************************" << std::endl;
     L*=(1+5*eps)/(1-7*sqrt_sqrt_eps);
     T sqrt_sqrt_eps_L=sqrt_sqrt_eps*L;
 
@@ -246,6 +247,8 @@ Set_Tol()
         tol[i][test]=test_scales[i]*sqrt_sqrt_eps_L;
         tol[i][prune]=prune_scales[i]*sqrt_sqrt_eps_L;
         tol[i][assume]=assume_scales[i]*sqrt_sqrt_eps_L;}
+    
+    std::cout << "L_tv: " << L_tv << ", L_ts: " << L_ts << ", L:" << L << ", tol_vv: " << tol[0][test] << std::endl;
 }
 //#####################################################################
 // Function Compute_VV

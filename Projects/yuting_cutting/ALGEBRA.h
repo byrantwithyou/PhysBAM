@@ -1261,7 +1261,11 @@ std::ostream& operator<<(std::ostream & os, const VECTOR_2D<T>& v){
     os<<"["<<v.x()<<" "<<v.y()<<"]";
     return os;
 }
-
+template <class T>
+std::ostream& operator<<(std::ostream & os, const VECTOR_3D<T>& v){
+    os<<"["<<v.x()<<" "<<v.y()<<" "<<v.z()<<"]";
+    return os;
+}
 template<class T>
 class SPARSE_ROW{
     const int n;

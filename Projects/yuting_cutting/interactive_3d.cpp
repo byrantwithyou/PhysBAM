@@ -990,7 +990,7 @@ void Initialize(bool reinitialize_cutting_mesh)
                 string interaction_file_name = "interactions/interaction2.txt";
                 interaction_file.open(interaction_file_name.c_str());
             }
-            if (1) {//check whether cutting result is correct
+            if (0) {//check whether cutting result is correct
                 T vo = sim_volume->Total_Volume();
                 int ii;
                 T mvo = sim_volume->Minimum_Volume(&ii);

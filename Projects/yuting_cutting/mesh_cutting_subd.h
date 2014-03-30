@@ -55,6 +55,7 @@ public:
     typedef VECTOR<int,5> I5;
     typedef VECTOR<int,7> I7;
     typedef HASHTABLE<I4,T4> H;
+    typedef float ST;//simulation type
     
     struct SMOOTH_NORMAL{
         TV normal;
@@ -164,21 +165,21 @@ public:
     ARRAY<VECTOR<int,2> > faces_to_draw;
     ARRAY<VECTOR<int,2> > interfaces_to_draw;
     HASHTABLE<VECTOR<int, 3> > cuttingFaces;
+    ARRAY<TV> cutting_particle_material_space;
     
     //for simulation
     //elasticity
-    ARRAY<TV> cutting_particle_material_space;
-    DEFORMABLE_OBJECT_3D<T>* deformable_object;
+    DEFORMABLE_OBJECT_3D<ST>* deformable_object;
     GEOMETRY::TETRAHEDRON_MESH* our_mesh;
-    BACKWARD_EULER_TIME_STEPPING_3D<T>* be;
-    HYPERELASTICITY_CONSTITUTIVE_MODEL_3D<T>* le; 
-    FEM_HYPERELASTICITY_3D<T>* fem;
+    BACKWARD_EULER_TIME_STEPPING_3D<ST>* be;
+    HYPERELASTICITY_CONSTITUTIVE_MODEL_3D<ST>* le;
+    FEM_HYPERELASTICITY_3D<ST>* fem;
     HASHTABLE<int> diri_nodes;
-    ALGEBRA::VECTOR<T>* nodal_volumes;
+    ALGEBRA::VECTOR<ST>* nodal_volumes;
     ALGEBRA::VECTOR<int>* my_constrained;
-    ALGEBRA::VECTOR<T>* my_constrained_locations;
+    ALGEBRA::VECTOR<ST>* my_constrained_locations;
     T timestep; int ratio;
-    ARRAY<ALGEBRA::MATRIX_3X3<T> > undeformed_config_copy;
+    ARRAY<ALGEBRA::MATRIX_3X3<ST> > undeformed_config_copy;
     void Initialize_Elasticity();
     void Reinitialize_Elasticity();
     

@@ -54,6 +54,7 @@ using namespace std;
 typedef double T;
 typedef PhysBAM::VECTOR<T, 3> TV;
 typedef PhysBAM::MATRIX<T, 3> TM;
+typedef PhysBAM::VECTOR<int, 3> I3;
 
 MESH_CUTTING<T> *mcut;
 TETRAHEDRALIZED_VOLUME<T> *sim_volume;
@@ -454,69 +455,69 @@ void Write_Volume_To_File(const string& writing_directory, const string& filenam
     FILE_UTILITIES::Write_To_File<T>(writing_directory+"/"+filename+ss.str()+string(".tet.gz"), *volume);
 }
 
-void energyTest() {
-    ofstream fs, fs1, fs2;
-    fs.open("results.txt");
-    fs1.open("results_hessian.txt");
-    fs2.open("scale.txt");
-    RANDOM_NUMBERS<T> rn;
-    ALGEBRA::VECTOR<T> perturbation1(mcut->sim_volume->particles.X.m*3);
-    for (int i = 0; i < perturbation1.Size(); i++){
-        perturbation1(i) = rn.Get_Number();
-        //cout << perturbation1(i) << endl;
-    }
-
-    for (int j = 1; j < 100; j++){
-        T eps = 1e-6*pow<T>(10, 0.03*j);//(T)j;
-        fs2 << -6 + j * 0.03 << endl;
-        
-        mcut->fem->Update_Position_Based_State();
-        ALGEBRA::VECTOR<T> f1(mcut->fem->Forces().Size());
-        for (int i = 0; i < f1.Size(); i++){f1(i) = mcut->fem->Forces()(i); }
-        
-        double e1 = 0;
-        for (int i = 0; i < mcut->deformable_object->Tetrahedron_Mesh().Number_Of_Tetrahedra(); i++){
-            e1 += mcut->le->Psi(i) / mcut->fem->Dm_inverse(i).Determinant() / 6;
-            //cout << mcut->le->Psi(i) << ", ";
-        }
-        //cout << "\n e1: " << e1 << endl;
-        
-        ALGEBRA::VECTOR<T> perturbation(mcut->sim_volume->particles.X.m*3);
-        for (int i = 0; i < perturbation.Size(); i++){
-            perturbation(i) = perturbation1(i) * eps;
-        }
-        ALGEBRA::VECTOR<T> df1(mcut->fem->Forces().Size());
-        mcut->fem->Stiffness_Matrix().Multiply(perturbation,df1);
-        
-        mcut->deformable_object->Perturb_Positions(perturbation);
-        mcut->fem->Update_Position_Based_State();
-        
-        ALGEBRA::VECTOR<T> df2(mcut->fem->Forces().Size());
-        mcut->fem->Stiffness_Matrix().Multiply(perturbation,df2);
-        
-        T e2 = 0;
-        for (int i = 0; i < mcut->deformable_object->Tetrahedron_Mesh().Number_Of_Tetrahedra(); i++){
-            e2 += mcut->le->Psi(i) / mcut->fem->Dm_inverse(i).Determinant() / 6.;
-        }
-        ALGEBRA::VECTOR<T> df(mcut->fem->Forces().Size());
-        for (int i = 0; i < df.Size(); i++){
-            //            cout << "df: " << mcut->fem->Forces()(i) - f1(i) << endl;
-            //            cout << "df12: " << (df1(i) + df2(i))/2 << endl;
-            df(i) = mcut->fem->Forces()(i) - f1(i) - (df1(i) + df2(i))/2;
-            
-        }
-        f1 += mcut->fem->Forces();
-        cout << (e2-e1) << ", " << f1.Dot(perturbation)/2. << endl;
-        //    cout << f1.Dot(perturbation)/2. << endl;
-        fs1 << log10(df.two_norm()/perturbation.two_norm()) << endl;
-        fs << log10(fabs((e2-e1+f1.Dot(perturbation)/2.)/perturbation.two_norm())) << endl;
-        
-        mcut->deformable_object->Perturb_Positions_Negative(perturbation);
-    }
-    fs.close();
-    fs1.close();
-    fs2.close();
-}
+//void energyTest() {
+//    ofstream fs, fs1, fs2;
+//    fs.open("results.txt");
+//    fs1.open("results_hessian.txt");
+//    fs2.open("scale.txt");
+//    RANDOM_NUMBERS<T> rn;
+//    ALGEBRA::VECTOR<T> perturbation1(mcut->sim_volume->particles.X.m*3);
+//    for (int i = 0; i < perturbation1.Size(); i++){
+//        perturbation1(i) = rn.Get_Number();
+//        //cout << perturbation1(i) << endl;
+//    }
+//
+//    for (int j = 1; j < 100; j++){
+//        T eps = 1e-6*pow<T>(10, 0.03*j);//(T)j;
+//        fs2 << -6 + j * 0.03 << endl;
+//        
+//        mcut->fem->Update_Position_Based_State();
+//        ALGEBRA::VECTOR<T> f1(mcut->fem->Forces().Size());
+//        for (int i = 0; i < f1.Size(); i++){f1(i) = mcut->fem->Forces()(i); }
+//        
+//        double e1 = 0;
+//        for (int i = 0; i < mcut->deformable_object->Tetrahedron_Mesh().Number_Of_Tetrahedra(); i++){
+//            e1 += mcut->le->Psi(i) / mcut->fem->Dm_inverse(i).Determinant() / 6;
+//            //cout << mcut->le->Psi(i) << ", ";
+//        }
+//        //cout << "\n e1: " << e1 << endl;
+//        
+//        ALGEBRA::VECTOR<T> perturbation(mcut->sim_volume->particles.X.m*3);
+//        for (int i = 0; i < perturbation.Size(); i++){
+//            perturbation(i) = perturbation1(i) * eps;
+//        }
+//        ALGEBRA::VECTOR<T> df1(mcut->fem->Forces().Size());
+//        mcut->fem->Stiffness_Matrix().Multiply(perturbation,df1);
+//        
+//        mcut->deformable_object->Perturb_Positions(perturbation);
+//        mcut->fem->Update_Position_Based_State();
+//        
+//        ALGEBRA::VECTOR<T> df2(mcut->fem->Forces().Size());
+//        mcut->fem->Stiffness_Matrix().Multiply(perturbation,df2);
+//        
+//        T e2 = 0;
+//        for (int i = 0; i < mcut->deformable_object->Tetrahedron_Mesh().Number_Of_Tetrahedra(); i++){
+//            e2 += mcut->le->Psi(i) / mcut->fem->Dm_inverse(i).Determinant() / 6.;
+//        }
+//        ALGEBRA::VECTOR<T> df(mcut->fem->Forces().Size());
+//        for (int i = 0; i < df.Size(); i++){
+//            //            cout << "df: " << mcut->fem->Forces()(i) - f1(i) << endl;
+//            //            cout << "df12: " << (df1(i) + df2(i))/2 << endl;
+//            df(i) = mcut->fem->Forces()(i) - f1(i) - (df1(i) + df2(i))/2;
+//            
+//        }
+//        f1 += mcut->fem->Forces();
+//        cout << (e2-e1) << ", " << f1.Dot(perturbation)/2. << endl;
+//        //    cout << f1.Dot(perturbation)/2. << endl;
+//        fs1 << log10(df.two_norm()/perturbation.two_norm()) << endl;
+//        fs << log10(fabs((e2-e1+f1.Dot(perturbation)/2.)/perturbation.two_norm())) << endl;
+//        
+//        mcut->deformable_object->Perturb_Positions_Negative(perturbation);
+//    }
+//    fs.close();
+//    fs1.close();
+//    fs2.close();
+//}
 
 template<typename T>
 void generateAndSaveRefinedVolume(TETRAHEDRALIZED_VOLUME<T>* refined_volume, int frame, const string& outputDir, const string& prefix) {
@@ -674,10 +675,13 @@ int main(int argc, char** argv) {
             string volumeFile(argv[2]);
             string outputDir(argv[3]);
             Initialize(volumeFile);
-            cutting_tri_mesh->particles.Add_Elements(4);
+            int n = 200;
+            cutting_tri_mesh->particles.Add_Elements(2*(n+1));
             cutting_tri_mesh->Update_Number_Nodes();
-            cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(0, 1, 2));
-            cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(1, 2, 3));
+            for (int i = 0; i < n; ++i) {
+                cutting_tri_mesh->mesh.elements.Append(I3(2*i, 2*i+1, 2*i+2));
+                cutting_tri_mesh->mesh.elements.Append(I3(2*i+1, 2*i+2, 2*i+3));
+            }
             
             //simulation setup: dirichlet, initial configuration
             for (int i = 0; i < mcut->sim_volume->particles.X.m; i++) {
@@ -697,7 +701,7 @@ int main(int argc, char** argv) {
             T xx = -0.3;
             T xxx = 0.01;
             T yy = 0.8;
-            T yyy = 0.02;
+            T yyy = 0.01;
             T x1 = 0, y1 = 0;
             int f1=30,f2=90,f3=105,f4=165,f5=200,f6=260;
             while (frame < 300) {
@@ -711,30 +715,37 @@ int main(int argc, char** argv) {
                     laserZ2=0.1;
                     T mid=(f2-f1)/2;
                     T m=mid*4./3;
+                    T intv = 1.1 / n;
                     if (i < mid) {
                         x1=cos(2*pi*i/m)*x-xshift;
                         y1=y+sin(2*pi*i/m)*y+yshift;
-                        cutting_tri_mesh->particles.X(0) = TV(x1, y1, -1);
-                        cutting_tri_mesh->particles.X(1) = TV(x1, y1, 0.1);
+                        for (int j = 0; j < n+1; ++j) {
+                            cutting_tri_mesh->particles.X(2*j) = TV(x1, y1, -1+j*intv);
+                        }
+                        
                         ++i;
                         x1=cos(2*pi*i/m)*x-xshift;
                         y1=y+sin(2*pi*i/m)*y+yshift;
-                        cutting_tri_mesh->particles.X(2) = TV(x1, y1, -1);
-                        cutting_tri_mesh->particles.X(3) = TV(x1, y1, 0.1);
+                        for (int j = 0; j < n+1; ++j) {
+                            cutting_tri_mesh->particles.X(2*j+1) = TV(x1, y1, -1+j*intv);
+                        }
                         
                     }
                     else {
                         T theta = pi/2-2*pi*(i-mid)/m;
                         x1=cos(theta)*x-xshift;
                         y1=-y+sin(theta)*y+yshift;
-                        cutting_tri_mesh->particles.X(0) = TV(x1, y1, -1);
-                        cutting_tri_mesh->particles.X(1) = TV(x1, y1, 0.1);
+                        for (int j = 0; j < n+1; ++j) {
+                            cutting_tri_mesh->particles.X(2*j) = TV(x1, y1, -1+j*intv);
+                        }
+                        
                         ++i;
                         theta -= (2*pi/m);
                         x1=cos(theta)*x-xshift;
                         y1=-y+sin(theta)*y+yshift;
-                        cutting_tri_mesh->particles.X(2) = TV(x1, y1, -1);
-                        cutting_tri_mesh->particles.X(3) = TV(x1, y1, 0.1);
+                        for (int j = 0; j < n+1; ++j) {
+                            cutting_tri_mesh->particles.X(2*j+1) = TV(x1, y1, -1+j*intv);
+                        }
                     }
                     mcut->Cut(*cutting_tri_mesh, frame == f2, true);
                 }
@@ -742,20 +753,25 @@ int main(int argc, char** argv) {
                     x1=xx+(frame-f3-1)*xxx;
                     y1=0;
                     laserZ2=10;
-                    cutting_tri_mesh->particles.X(0) = TV(x1, y1, -1);
-                    cutting_tri_mesh->particles.X(1) = TV(x1, y1, 1);
-                    cutting_tri_mesh->particles.X(2) = TV(x1+xxx, y1, -1);
-                    cutting_tri_mesh->particles.X(3) = TV(x1+xxx, y1, 1);
+                    T intv = 2.0 / n;
+                    for (int j = 0; j < n+1; ++j) {
+                        cutting_tri_mesh->particles.X(2*j) = TV(x1, y1, -1+j*intv);
+                        cutting_tri_mesh->particles.X(2*j+1) = TV(x1+xxx, y1, -1+j*intv);
+                    }
                     mcut->Cut(*cutting_tri_mesh, frame == f4, true);
+                    if (frame == f4) {
+                        Write_Volume_To_File(outputDir, "check", f4, mcut->volume);
+                    }
                 }
                 else if (frame > f5 && frame <= f6) {
                     x1=0;
                     y1=yy-(frame-f5-1)*yyy;
                     laserZ2=10;
-                    cutting_tri_mesh->particles.X(0) = TV(x1, y1, -1);
-                    cutting_tri_mesh->particles.X(1) = TV(x1, y1, 1);
-                    cutting_tri_mesh->particles.X(2) = TV(x1, y1-yyy, -1);
-                    cutting_tri_mesh->particles.X(3) = TV(x1, y1-yyy, 1);
+                    T intv = 2.0 / n;
+                    for (int j = 0; j < n+1; ++j) {
+                        cutting_tri_mesh->particles.X(2*j) = TV(x1, y1, -1+j*intv);
+                        cutting_tri_mesh->particles.X(2*j+1) = TV(x1, y1-yyy, -1+j*intv);
+                    }
                     mcut->Cut(*cutting_tri_mesh, frame == f6, true);
                 }
                 else {
