@@ -36,8 +36,7 @@ public:
     HASHTABLE<I4,TV> hash_ee;
     HASHTABLE<I4,T3> hash_fv;
 
-    T tol_vv[4];
-    T tol_ev[4];
+    T sigma,tau,sigma_hat,kappa;
 
     CONSISTENT_INTERSECTIONS(TRIANGULATED_AREA<T>& ta_,SEGMENTED_CURVE<TV>& sc_)
         :ta(ta_),sc(sc_)
@@ -81,10 +80,8 @@ public:
     HASHTABLE<I5,T4> hash_fe,hash_ef;
     HASHTABLE<I5,T4> hash_tv;
 
-    T tol_vv[4];
-    T tol_ev[4];
-    T tol_ee[4];
-    T tol_fv[4];
+    T sigma,tau,delta,gamma;
+    T sigma_hat,lambda,mu,nu,rho,xi,zeta;
 
     CONSISTENT_INTERSECTIONS(TETRAHEDRALIZED_VOLUME<T>& tv_,TRIANGULATED_SURFACE<T>& ts_)
         :tv(tv_),ts(ts_)
