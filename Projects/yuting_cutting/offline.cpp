@@ -712,7 +712,7 @@ int main(int argc, char** argv) {
             T yy = 0.8;
             T yyy = 0.015;
             T x1 = 0, y1 = 0;
-            int f1=30,f2=90,f3=105,f4=165,f5=200,f6=260;
+            int f1=0,f2=60,f3=105,f4=165,f5=200,f6=260;
             while (frame < 300) {
                 ++frame;
 //                if (frame == 2) {
@@ -1289,7 +1289,8 @@ int main(int argc, char** argv) {
             }
             break;
         }
-        case 10://peel a ball: initial configuration = 1
+
+        case 10://peel a ball: initial configuration = 1 , gai le use_gravity he gravity de fang xiang
         {
             string volumeFile(argv[2]);
             string outputDir(argv[3]);
@@ -1304,7 +1305,11 @@ int main(int argc, char** argv) {
             
             //dirichlet and peel nodes
             for (int i = 0; i < mcut->sim_volume->particles.X.m; i++) {
-                mcut->diri_nodes.Set(i);
+                // if in cylinder
+                T myx=mcut->sim_volume->particles.X(i)(0);
+                T myz=mcut->sim_volume->particles.X(i)(2);
+                T myr=sqrt(sqr(myx)+sqr(myz));
+                if(myr<0.4) mcut->diri_nodes.Set(i);
             }
             sim_volume->Update_Number_Nodes();
             sim_volume->mesh.Initialize_Boundary_Mesh();
@@ -1358,6 +1363,22 @@ int main(int argc, char** argv) {
                     mcut->Cut(*cutting_tri_mesh, true, true);
                 }
                 
+                int i = 0;
+                for (HASHTABLE_ITERATOR<int> it(mcut->diri_nodes); it.Valid(); it.Next()) {
+                    int fixed_node = it.Key();
+                    T oldx=mcut->sim_volume->particles.X(fixed_node)(0);
+                    // T oldy=mcut->sim_volume->particles.X(fixed_node)(1);
+                    T oldz=mcut->sim_volume->particles.X(fixed_node)(2);
+                    PhysBAM::VECTOR<double,2> old(oldx,oldz);
+                    T theta=0.1;
+                    PhysBAM::MATRIX<double,2> rotation(cos(theta),sin(theta),-sin(theta),cos(theta));
+                    PhysBAM::VECTOR<double,2> newp=rotation*old;
+                    mcut->my_constrained_locations->Set_Value(3*i,newp(0));
+                    mcut->my_constrained_locations->Set_Value(3*i+2,newp(1));
+                    i++;
+                }
+                // mcut->be->Set_Boundary_Conditions(*(mcut->my_constrained), *(mcut->my_constrained_locations));
+
                 VS::start_timer();
                 for (int i = 0; i < ratio; i++) {
                     mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
@@ -1374,6 +1395,8 @@ int main(int argc, char** argv) {
                 
                 generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "cutting_volume");
                 WriteToPovRay(refined_volume, outputDir, frame);
+
+                
             }
             break;
         }
