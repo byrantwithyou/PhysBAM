@@ -206,9 +206,6 @@ void Translate_Volume(const TV& translation)
 {
     for (int i = 0; i < sim_volume->particles.X.m; i++) {
         sim_volume->particles.X(i) += translation;
-        for (int k = 0; k < 3; k++){
-            mcut->deformable_object->Positions()(i*3+k) = mcut->sim_volume->particles.X(i)(k);
-        }
     }
     mcut->Update_Cutting_Particles();
     
@@ -224,9 +221,6 @@ void Translate_Volume(const TV& translation)
 void Scale_Volume(T scale) {
     for (int i = 0; i < sim_volume->particles.X.m; i++) {
         sim_volume->particles.X(i) *= scale;
-        for (int k = 0; k < 3; k++){
-            mcut->deformable_object->Positions()(i*3+k) = mcut->sim_volume->particles.X(i)(k);
-        }
     }
     mcut->Update_Cutting_Particles();
     
@@ -436,25 +430,12 @@ void rotate_meshes(T xx, T yy)
     for (int i = 0; i < sim_volume->particles.X.m; i++) {
         sim_volume->particles.X(i) = r * sim_volume->particles.X(i);
         sim_volume->particles.V(i) = r * sim_volume->particles.V(i);
-        
-        for (int k = 0; k < 3; k++){
-            mcut->deformable_object->Positions()(i*3+k) = mcut->sim_volume->particles.X(i)(k);
-            mcut->deformable_object->Velocities()(i*3+k) = mcut->sim_volume->particles.V(i)(k);
-        }
     }
     mcut->Update_Cutting_Particles();
 
     for (int i = 0; i < mcut->dragging_targets.m; i++) {
         mcut->dragging_targets(i) = r * mcut->dragging_targets(i);
     }
-
-    for (int i = 0; i < mcut->my_constrained->n/3; i++){
-        int fixed_node = mcut->my_constrained->operator()(3*i)/3;
-        for (int k = 0; k < 3; k++){
-            mcut->my_constrained_locations->operator()(3*i+k) = sim_volume->particles.X(fixed_node)(k);
-        }
-    }
-    mcut->be->Set_Boundary_Conditions(*(mcut->my_constrained), *(mcut->my_constrained_locations));
 
     for (int i = 0; i < cutting_tri_mesh->particles.X.m; i++) {
         cutting_tri_mesh->particles.X(i) = r * cutting_tri_mesh->particles.X(i);
@@ -597,7 +578,6 @@ void initialize_volume3()
             delete mcut;
         }
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
-        mcut->Initialize_Elasticity();
         
         T rr = (r.Get_Number() - 0.5) * 2;
         cout << "rr" << i << ":" << rr << endl;
@@ -673,7 +653,6 @@ void initialize_volume5()
             delete mcut;
         }
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
-        mcut->Initialize_Elasticity();
         
         T rr = (r.Get_Number() - 0.5) * 2;
         cout << "rr" << i << ":" << rr << endl;
@@ -739,7 +718,6 @@ void initialize_volume7()
             delete mcut;
         }
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
-        mcut->Initialize_Elasticity();
     
         T rr = (r.Get_Number() - 0.5) * 2;
         cout << "rr" << i << ":" << rr << endl;
@@ -795,7 +773,6 @@ void initialize_volume8()
             delete mcut;
         }
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
-        mcut->Initialize_Elasticity();
         
         T rr = (r.Get_Number() - 0.5) * 2;
         cout << "rr" << i << ":" << rr << endl;
@@ -851,7 +828,6 @@ void initialize_volume9()//cubes
             delete mcut;
         }
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
-        mcut->Initialize_Elasticity();
         
         T rr = (r.Get_Number() - 0.5) * 2;
         cout << "rr" << i << ":" << rr << endl;
@@ -976,15 +952,20 @@ void Initialize(bool reinitialize_cutting_mesh)
         sim_volume_float = TETRAHEDRALIZED_VOLUME<float>::Create();
         FILE_UTILITIES::Read_From_File<float>(filename, *sim_volume_float);
         sim_volume->particles.Add_Elements(sim_volume_float->particles.X.m);
+        sim_volume->Update_Number_Nodes();
         for (int i = 0; i < sim_volume_float->particles.X.m; ++i) {
             for (int j = 0; j < 3; ++j) {
                 sim_volume->particles.X(i)(j) = sim_volume_float->particles.X(i)(j);
             }
         }
         sim_volume->mesh.elements = sim_volume_float->mesh.elements;
+        {
+            ARRAY<int> ll;
+            sim_volume->mesh.Identify_Face_Connected_Components(ll);
+            cout << ll.Max() << " CCs\n";
+        }
         Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
-        mcut->Initialize_Elasticity();
         if(argc1 == 2) {
             if (writing_interaction_to_file){
                 string interaction_file_name = "interactions/interaction2.txt";
@@ -1009,7 +990,6 @@ void Initialize(bool reinitialize_cutting_mesh)
                         delete mcut;
                     }
                     mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
-                    mcut->Initialize_Elasticity();
                     
                     T rr = (r.Get_Number() - 0.5) * 20;
                     cout << "rr" << i << ":" << rr << endl;

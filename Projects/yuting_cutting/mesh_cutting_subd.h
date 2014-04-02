@@ -132,15 +132,6 @@ public:
     
     typedef VECTOR<CUT_FACE, NumMaterialsPerFace> TV_TV_INT;
     
-    typedef VECTOR<int,3> CS;
-    struct FLAG
-    {
-        CS cs;
-        int m0,m1,m2;
-        TV color;
-    };
-    ARRAY<FLAG> flags;
-    
 public:
     //meshes
     TETRAHEDRALIZED_VOLUME<T>* sim_volume;
@@ -174,7 +165,7 @@ public:
     BACKWARD_EULER_TIME_STEPPING_3D<ST>* be;
     HYPERELASTICITY_CONSTITUTIVE_MODEL_3D<ST>* le;
     FEM_HYPERELASTICITY_3D<ST>* fem;
-    HASHTABLE<int> diri_nodes;
+    HASHTABLE<int> diri_nodes, peel_nodes;
     ALGEBRA::VECTOR<ST>* nodal_volumes;
     ALGEBRA::VECTOR<int>* my_constrained;
     ALGEBRA::VECTOR<ST>* my_constrained_locations;

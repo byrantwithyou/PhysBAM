@@ -6,7 +6,6 @@
 //  Copyright (c) 2012 __Yuting Wang__. All rights reserved.
 //
 
-//1. procedure cutting?
 //2. high res sim explosion: tune parameter or find bug in sim code...
 
 #include <Tools/Matrices/MATRIX.h>
@@ -442,7 +441,6 @@ void Write_Boundary_Mesh_To_File(const string& writing_directory, const string& 
     stringstream ss;
     ss << frame;
     volume->mesh.Initialize_Boundary_Mesh();
-    volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
     FILE_UTILITIES::Write_To_File<T>(writing_directory+"/"+filename+ss.str()+string(".tet.gz"), volume->particles, volume->mesh.boundary_mesh);
 }
 
@@ -523,11 +521,22 @@ template<typename T>
 void generateAndSaveRefinedVolume(TETRAHEDRALIZED_VOLUME<T>* refined_volume, int frame, const string& outputDir, const string& prefix) {
     mcut->Refine_And_Save_To(refined_volume);
     Fix_Orientation(refined_volume);
-    refined_volume->Update_Number_Nodes();
+    
+    TETRAHEDRALIZED_VOLUME<float> *f = TETRAHEDRALIZED_VOLUME<float>::Create();
+    f->particles.Add_Elements(refined_volume->particles.X.m);
+    f->Update_Number_Nodes();
+    for (int i = 0; i < refined_volume->particles.X.m; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            f->particles.X(i)(j) = refined_volume->particles.X(i)(j);
+        }
+    }
+    f->mesh.elements = refined_volume->mesh.elements;
+    ARRAY<int> l;
     refined_volume->mesh.Initialize_Boundary_Mesh();
-    refined_volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
-    Write_Boundary_Mesh_To_File(outputDir, prefix + "_boundary", frame, refined_volume);
-    Write_Volume_To_File(outputDir, prefix, frame, refined_volume);
+    refined_volume->mesh.boundary_mesh->Identify_Connected_Components(l);
+    cout << "refined volume has " << l.Max() << " CCs\n";
+    Write_Boundary_Mesh_To_File(outputDir, prefix + "_boundary", frame, f);
+    Write_Volume_To_File(outputDir, prefix, frame, f);
 }
 
 int main(int argc, char** argv) {
@@ -1132,7 +1141,6 @@ int main(int argc, char** argv) {
                 Fix_Orientation(refined_volume);
                 refined_volume->Update_Number_Nodes();
                 refined_volume->mesh.Initialize_Boundary_Mesh();
-                refined_volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
                 Write_Boundary_Mesh_To_File(outputDir, "refined_volume_boundary", frame, refined_volume);
                 Write_Volume_To_File(outputDir, "refined_volume", frame, refined_volume);
                 
@@ -1273,12 +1281,99 @@ int main(int argc, char** argv) {
                 Fix_Orientation(refined_volume);
                 refined_volume->Update_Number_Nodes();
                 refined_volume->mesh.Initialize_Boundary_Mesh();
-                refined_volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
                 Write_Boundary_Mesh_To_File(outputDir, "refined_volume_boundary", frame, refined_volume);
                 Write_Volume_To_File(outputDir, "refined_volume", frame, refined_volume);
                 
                 WriteToPovRay(refined_volume, outputDir, frame);
                 Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);
+            }
+            break;
+        }
+        case 10://peel a ball: initial configuration = 1
+        {
+            string volumeFile(argv[2]);
+            string outputDir(argv[3]);
+            Initialize(volumeFile);
+            int n = 6;
+            cutting_tri_mesh->particles.Add_Elements(2*(n+1));
+            cutting_tri_mesh->Update_Number_Nodes();
+            for (int i = 0; i < n; ++i) {
+                cutting_tri_mesh->mesh.elements.Append(I3(2*i, 2*i+1, 2*i+2));
+                cutting_tri_mesh->mesh.elements.Append(I3(2*i+1, 2*i+2, 2*i+3));
+            }
+            
+            //dirichlet and peel nodes
+            for (int i = 0; i < mcut->sim_volume->particles.X.m; i++) {
+                mcut->diri_nodes.Set(i);
+            }
+            sim_volume->Update_Number_Nodes();
+            sim_volume->mesh.Initialize_Boundary_Mesh();
+            for (int i = 0; i < sim_volume->mesh.boundary_mesh->elements.m; ++i) {
+                for (int j = 0; j < 3; ++j) {
+                    mcut->peel_nodes.Set(sim_volume->mesh.boundary_mesh->elements(i)(j));
+                }
+            }
+            
+            mcut->Initialize_Elasticity();
+            TETRAHEDRALIZED_VOLUME<T> *refined_volume = new TETRAHEDRALIZED_VOLUME<T>();
+            
+            int frame = 0;
+
+            int f1=1,f2=31;
+            int f = f2 - f1;
+            T dtheta = 1.5 * pi / f;
+            T r = 0.55;
+            T y1 = 0.3;
+            T y2 = -0.3;
+            T dy = (y1 - y2) / n;
+            while (frame < 50) {
+                ++frame;
+                if (frame == f1) {
+                    for (int j = 0; j < n+1; ++j) {
+                        T y = y1-dy*j;
+                        cutting_tri_mesh->particles.X(2*j) = TV(-0.3, y, -r);
+                        cutting_tri_mesh->particles.X(2*j+1) = TV(0, y, -r);
+                    }
+                    mcut->Cut(*cutting_tri_mesh, frame == false, true);
+                }
+                else if (frame > f1 && frame <= f2) {
+                    T theta = -pi / 2 + (frame - f1 - 1) * dtheta;
+                    T x1 = r * cos(theta);
+                    T z1 = r * sin(theta);
+                    T x2 = r * cos(theta + dtheta);
+                    T z2 = r * sin(theta + dtheta);
+                    for (int j = 0; j < n+1; ++j) {
+                        T y = y1-dy*j;
+                        cutting_tri_mesh->particles.X(2*j) = TV(x1, y, z1);
+                        cutting_tri_mesh->particles.X(2*j+1) = TV(x2, y, z2);
+                    }
+                    mcut->Cut(*cutting_tri_mesh, false, true);
+                }
+                if (frame == f2 + 1) {
+                    for (int j = 0; j < n+1; ++j) {
+                        T y = y1-dy*j;
+                        cutting_tri_mesh->particles.X(2*j) = TV(-r, y, 0);
+                        cutting_tri_mesh->particles.X(2*j+1) = TV(-r, y, -0.3);
+                    }
+                    mcut->Cut(*cutting_tri_mesh, true, true);
+                }
+                
+                VS::start_timer();
+                for (int i = 0; i < ratio; i++) {
+                    mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
+                }
+                VS::stop_timer();
+                printf("frame %d time:    %f\n", frame, VS::get_time());
+                for (int i = 0; i<mcut->sim_volume->particles.X.m; i++){
+                    for (int k = 0; k<3; k++){
+                        mcut->sim_volume->particles.X(i)(k) = mcut->deformable_object->X(i)(k);
+                        mcut->sim_volume->particles.V(i)(k) = mcut->deformable_object->V(i)(k);
+                    }
+                }
+                mcut->Update_Cutting_Particles();
+                
+                generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "cutting_volume");
+                WriteToPovRay(refined_volume, outputDir, frame);
             }
             break;
         }

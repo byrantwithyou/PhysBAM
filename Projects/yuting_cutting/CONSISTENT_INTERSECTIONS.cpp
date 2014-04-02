@@ -230,6 +230,7 @@ Set_Tol()
     T sqrt_sqrt_eps_L=sqrt_sqrt_eps*L,L2=L*L,L3=L*L2,L4=L2*L2,eps_3_4_L3=eps_3_4*L3,eps_L4=eps*L4;
 
     sigma=(T)6.5*sqrt_sqrt_eps_L;
+    std::cout << "segma: " << sigma << std::endl;
     tau=(T)4.5*sqrt_sqrt_eps_L;
     delta=(T)2.25*sqrt_sqrt_eps_L;
     gamma=(T)2.25*sqrt_sqrt_eps_L;

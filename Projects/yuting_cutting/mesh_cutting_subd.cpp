@@ -212,29 +212,7 @@ template<class T>
 MESH_CUTTING<T>::MESH_CUTTING(TETRAHEDRALIZED_VOLUME<T>* sim_volume_input, T timestep_input, int ratio_input, bool interactive_input): sim_volume(sim_volume_input), interactive(interactive_input), timestep(timestep_input), ratio(ratio_input)
 {
     Initialize_Cutting_Volume();
-    
-    for(int i=0;i<4;i++)
-        for(int j=0;j<4;j++)
-            for(int k=0;k<4;k++)
-                if(i!=j && i!=k && j!=k){
-                    int I=1<<i,J=1<<j,K=1<<k;
-                    flags.Append({CS(I,I|J,I|J|K),1<<I,(1<<J)|(1<<(I|J)),(1<<(J|K))|(1<<(I|J|K))|(1<<K)|(1<<(I|K)),TV(1,0,0)});}
-    
-    for(int i=0;i<4;i++)
-        for(int j=0;j<4;j++)
-            for(int k=j+1;k<4;k++)
-                if(i!=j && i!=k){
-                    int I=1<<i,J=1<<j,K=1<<k,M=15^I^J^K;
-                    int s=0;
-                    for(int m=0;m<16;m++) if(m&M) s|=1<<m;
-                    flags.Append({CS(J|K,I|J|K,15),1<<(J|K),(1<<I)|(1<<(I|J|K))|(1<<(I|K))|(1<<(I|J)),s,TV(0,1,0)});
-                    flags.Append({CS(I,I|J|K,15),1<<I,(1<<(J|K))|(1<<(I|J|K)),s,TV(0,0,1)});}
-    
-    for(int i=0;i<4;i++)
-        for(int j=0;j<4;j++)
-            if(i!=j){
-                int I=1<<i,J=1<<j,M=15^I^J;
-                flags.Append({CS(I,I|J,15),1<<I,(1<<(I|J))|(1<<J),(1<<M)|(1<<15)|(1<<(M|I))|(1<<(M|J)),TV(1,0,1)});}
+    undeformed_config_copy.Resize(sim_volume->mesh.elements.m);
 }
 
 template<class T>
@@ -360,16 +338,6 @@ void MESH_CUTTING<T>::Subdivide_Cutting_Mesh_Into_Eyeball()
 }
 
 template<class T>
-void MESH_CUTTING<T>::Set_Dirichlet_Nodes_For_Eyeball()
-{
-    for (int i = 0; i < sim_volume->particles.X.m; i++) {
-        if (sim_volume->particles.X(i)(2) > 0 && sim_volume->particles.X(i).Magnitude_Squared() < 0.25) {
-            diri_nodes.Set(i);
-        }
-    }
-}
-
-template<class T>
 void MESH_CUTTING<T>::Initialize_Cutting_Volume()
 {    
     //create cutting volume, initially copied from sim_volume
@@ -403,7 +371,6 @@ void MESH_CUTTING<T>::Initialize_Cutting_Volume()
     //subdevide cutting volume so it can be an eyeball...
     is_blue.Resize(volume->mesh.elements.m);
 //    Subdivide_Cutting_Mesh_Into_Eyeball();
-//    Set_Dirichlet_Nodes_For_Eyeball();
     
 }
 
@@ -1696,19 +1663,14 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
     volume->mesh.Initialize_Boundary_Mesh(); //cout << "cutting boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
     volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
     
-    //print statistics after cut
-//    cout << volume->mesh.elements.m << " elements after cut\n";
-//    cout << "weights_in_sim: ";
-//    for (int i = 0; i < weights_in_sim.m; ++i) {
-//        cout << weights_in_sim(i).weight << " ";
-//    }
-//    cout << endl;
-
     //reinitialize elasticity
-    start_timer();
-    Reinitialize_Elasticity();
-    stop_timer();
-    printf("elasticity reinitialization time:    %f\n",get_time());
+    if (!interactive) {
+        start_timer();
+        Reinitialize_Elasticity();
+        stop_timer();
+        printf("elasticity reinitialization time:    %f\n",get_time());
+    }
+    
 }
 
 template<class T>

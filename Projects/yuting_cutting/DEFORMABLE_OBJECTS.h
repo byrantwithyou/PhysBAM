@@ -402,8 +402,8 @@ public:
                 VECTOR_4D<int>& indices=tet_mesh->Nodes_Of_Element(t);
                 VECTOR_3D<T> x0=X(indices(0));VECTOR_3D<T> x1=X(indices(1));
                 VECTOR_3D<T> x2=X(indices(2));VECTOR_3D<T> x3=X(indices(3));
-                Dm_inverse(t)=MATRIX_3X3<T>((x1-x0)*0.7,(x2-x0)*0.7,(x3-x0)*0.7);
-                //Dm_inverse(t)=MATRIX_3X3<T>(x1-x0,x2-x0,x3-x0);
+                //Dm_inverse(t)=MATRIX_3X3<T>((x1-x0)*0.7,(x2-x0)*0.7,(x3-x0)*0.7);
+                Dm_inverse(t)=MATRIX_3X3<T>(x1-x0,x2-x0,x3-x0);
 //                VECTOR_3D<T> x10=x1-x0;
 //                VECTOR_3D<T> x20=x2-x0;
 //                VECTOR_3D<T> x30=x3-x0;
