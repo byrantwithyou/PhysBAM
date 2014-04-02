@@ -35,14 +35,22 @@ typedef VECTOR<T, 2> TV;
 typedef VECTOR<int,2> I2;
 typedef VECTOR<int,3> I3;
 
+namespace VS{
+    void read_tsc(){__asm__("rdtsc");}
+    struct timeval starttime,stoptime;
+    void start_timer(){gettimeofday(&starttime,NULL);read_tsc();}
+    void stop_timer(){gettimeofday(&stoptime,NULL);read_tsc();}
+    double get_time(){return ((double)stoptime.tv_sec-(double)starttime.tv_sec)*1000+(double)1e-3*(double)stoptime.tv_usec-(double)1e-3*(double)starttime.tv_usec;}
+}
+
 //global variables
 int argc1;
 char **argv1;
 int window_width=600;
 int window_height=600;
 TV starting_position;
-T trans_speed=0.1;
-T scale_speed=1.4;
+T trans_speed=0.05;
+T scale_speed=1.2;
 TRIANGULATED_AREA<T>* sim_ta=NULL;
 SEGMENTED_CURVE_2D<T>* sc=NULL;
 CUTTING<TV>* cutter=NULL;
@@ -50,8 +58,47 @@ ARRAY<int> labels;
 HASHTABLE<int> dragging_particles;
 bool dragging=false,cutting=false,draw_sim=true,draw_cutting_edge=false;
 
+bool recording = true;
+T timestamp = 0;
+int fi = 0;
+string writing_directory = "demo_recording";
+void Write_Recording_Info(bool cut = false, bool new_time = true) {
+    stringstream ss;
+    ss << fi;
+    string fis = ss.str();
+    while (fis.length() < 6) {
+        fis = "0" + fis;
+    }
+    
+    if (new_time) {
+        VS::stop_timer();
+        timestamp = VS::get_time();
+    }
+    
+    ofstream fs;
+    fs.open(writing_directory+"/info-"+string(fis)+string(".txt"));
+    fs << "TR " << 1 << " " << 1 << endl;
+    fs << "BL " << -1 << " " << -1 << endl;
+    fs << "TIME(millisec) " << timestamp << endl;
+    fs << "CUT " << cut << endl;
+    fs.close();
+    
+    FILE_UTILITIES::Write_To_File<T>(writing_directory+"/parent-"+fis+string(".tri2d.gz"), *sim_ta);
+    FILE_UTILITIES::Write_To_File<T>(writing_directory+"/child-"+fis+string(".tri2d.gz"), *(cutter->ta));
+    
+    if (cut) {
+        FILE_UTILITIES::Write_To_File<T>(writing_directory+"/curve-"+fis+string(".curve2d.gz"), *sc);
+    }
+    
+    ++fi;
+}
+
 void Run_Cutter()
 {
+    if (recording) {
+        Write_Recording_Info(true);
+    }
+    
     if(sc->mesh.elements.m>0){
         cutter->Run(.1);
         cutting=false;
@@ -67,6 +114,10 @@ void Run_Cutter()
         cutter->ta=nta;
     }
     cutter->ta->mesh.Identify_Connected_Components(labels);
+    
+    if (recording) {
+        Write_Recording_Info(false, false);
+    }
 }
 
 void Mouse(int button, int state, int x, int y)
@@ -145,6 +196,9 @@ void Motion(int x, int y)
         sc->particles.X(p)=location;
         sc->mesh.elements.Append(I2(p-1,p));
         sc->Update_Number_Nodes();
+        if (recording) {
+            return;
+        }
     }
     else if(dragging){
         for(typename HASHTABLE<int>::ITERATOR it(dragging_particles);it.Valid();it.Next())
@@ -156,6 +210,10 @@ void Motion(int x, int y)
 }
 
 void Render(){
+    if (recording) {
+        Write_Recording_Info();
+    }
+    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnableClientState(GL_VERTEX_ARRAY);
     
@@ -406,6 +464,7 @@ void Step8()
     if(sc) delete sc;
     sc=SEGMENTED_CURVE_2D<T>::Create();
     sc->particles.Add_Elements(4);
+    sc->Update_Number_Nodes();
     sc->particles.X(0)=TV(-0.5,0);
     sc->particles.X(1)=TV(0.5,0);
     sc->particles.X(2)=TV(0,0.5);
@@ -415,7 +474,7 @@ void Step8()
     
     if(cutter) delete cutter;
     cutter=new CUTTING<TV>(sim_ta,sc);
-    Run_Cutter();
+    //Run_Cutter();
 }
 void Step9()
 {
@@ -510,7 +569,14 @@ int main(int argc, char **argv)
     argc1 = argc;
     argv1 = argv;
     
-    Step1();
+    if (!recording) {
+        Step1();
+    }
+    
+    if (recording) {
+        Step8();
+        VS::start_timer();
+    }
     
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);

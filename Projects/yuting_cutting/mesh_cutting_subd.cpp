@@ -27,12 +27,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <set>
-
-//need modiry:
-//Translate_cc: translate sim_mesh first, than update cutting particles.
-//split and cut
-//dragging
-    
     
 void read_tsc(){__asm__("rdtsc");}
 struct timeval starttime,stoptime;

@@ -36,7 +36,7 @@ Set_Tol()
     T L=L_ta+L_sc;
     T eps=std::numeric_limits<T>::epsilon(),sqrt_eps=sqrt(eps);
     L*=(1+5*eps)/(1-7*sqrt_eps);
-    L*=1e6;
+
     T sqrt_eps_L=sqrt_eps*L;
 
     sigma=(T)6.5*sqrt_eps_L;

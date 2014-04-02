@@ -526,6 +526,8 @@ Run(T tol)
 //        cout << "tri in sim: " << tri_in_sim << endl;
 //        cout << "sim elements: " << sim_ta->mesh.elements << endl;
 //        cout << "sim particles: " << sim_ta->particles.X << endl;
+        sim_ta->Update_Number_Nodes();
+        ta->Update_Number_Nodes();
     }
     cout<<"*********cutting done**************"<<endl;
 }
