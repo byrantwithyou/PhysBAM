@@ -358,9 +358,8 @@ void MESH_CUTTING<T>::Initialize_Cutting_Volume()
     }
     Fix_Orientation();
     
-    cutting_particle_material_space.Resize(volume->particles.X.m);
     for(int i=0;i<volume->particles.X.m;++i)
-        cutting_particle_material_space(i)=volume->particles.X(i);
+        cutting_particle_material_space.Append(volume->particles.X(i));
         
     //subdevide cutting volume so it can be an eyeball...
     is_blue.Resize(volume->mesh.elements.m);
@@ -1255,7 +1254,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
     delete volume;
     volume = tv;
     
-    //do this if doing incremental cutting in material space!!!
+    //do this if doing incremental cutting in material space
     if (material_space) {
         for(int i=0;i<volume->particles.X.m;++i)
             volume->particles.X(i)=cutting_particle_material_space(i);
@@ -1298,7 +1297,8 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
         for (int j = 0; j < 3; ++j) {
             tri_from_edge.Get_Or_Insert(e.Remove_Index(j)).Append(i);
         }
-        for(int j=0;j<3;j++) tri_from_vertex(e(j)).Append(i);}
+        for(int j=0;j<3;j++) tri_from_vertex(e(j)).Append(i);
+    }
 
     HASHTABLE<int,HASHTABLE<int,H> > components;
     
@@ -1410,7 +1410,6 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
         sim_tet_from.Append(i);
     }
     
-    
     //split: data to take care of: sim_node_from, weights_in_sim, sim_volume->mesh.elements(always completely newly created, because each child tet(split or not) gets a new parent tet), volume->mesh.elements, ctet2stet
     for(typename HASHTABLE<int,HASHTABLE<int,H> >::ITERATOR it(components);it.Valid();it.Next()){
         int i=it.Key();
@@ -1442,6 +1441,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
                     elements(i)(j) = weights_in_sim.m;
                     CENTER c; c[j] = 1;
                     CENTER w = Weight_In_Sim_Tet(c, tet_element, parent_sim_tet_id, original_sim_elements);
+                    PHYSBAM_ASSERT(cutting_particle_material_space.m == weights_in_sim.m);
                     if (!sim_tet_split(parent_sim_tet_id)){   
                         weights_in_sim.Append(PARENT(parent_sim_tet_id, w));
                         material_node_from.Append(original_elements(i)(j));

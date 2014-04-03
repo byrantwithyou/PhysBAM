@@ -117,7 +117,7 @@ public:
         int id;
         CENTER weight;
         
-        PARENT(){}
+        PARENT(){id = 0;}
         PARENT(const int id_input, const CENTER& weight_input):id(id_input), weight(weight_input){}
     };
     

@@ -971,7 +971,7 @@ void Initialize(bool reinitialize_cutting_mesh)
                 string interaction_file_name = "interactions/interaction2.txt";
                 interaction_file.open(interaction_file_name.c_str());
             }
-            if (0) {//check whether cutting result is correct
+            if (0) {//test whether cutting result is correct
                 T vo = sim_volume->Total_Volume();
                 int ii;
                 T mvo = sim_volume->Minimum_Volume(&ii);
@@ -1031,7 +1031,17 @@ void Initialize(bool reinitialize_cutting_mesh)
         }
         if(argc1 == 3) {
             const std::string surface_filename(argv1[2]);
-            FILE_UTILITIES::Read_From_File<T>(surface_filename,*cutting_tri_mesh);  
+            TRIANGULATED_SURFACE<float> *ts_float = TRIANGULATED_SURFACE<float>::Create();
+            FILE_UTILITIES::Read_From_File<float>(surface_filename, *ts_float);
+            
+            cutting_tri_mesh->particles.Add_Elements(ts_float->particles.X.m);
+            cutting_tri_mesh->Update_Number_Nodes();
+            for (int i = 0; i < ts_float->particles.X.m; ++i) {
+                for (int j = 0; j < 3; ++j) {
+                    cutting_tri_mesh->particles.X(i)(j) = ts_float->particles.X(i)(j);
+                }
+            }
+            cutting_tri_mesh->mesh.elements = ts_float->mesh.elements;
             Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-0.8,-0.8,-0.8),TV(0.8,0.8,0.8)));
             mcut->Cut(*cutting_tri_mesh);
         }
