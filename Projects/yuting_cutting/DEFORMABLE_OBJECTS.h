@@ -750,7 +750,7 @@ public:
     dt(dt_input),final_time(final_time_input),start_time(start_time_input),deformable_object(object_input),elastic_forces(0),cg(0),minres(0),bc_dofs(0),
     be_matrix(deformable_object.Positions().Size(),deformable_object.Positions().Size()),
     mass(deformable_object.Positions().Size()),be_rhs(deformable_object.Positions().Size()),old_positions(deformable_object.Positions().Size()),
-    rho((T)1000),matrix_intialized(false),use_gravity(false),linear_solver_type(-1), alpha_damping(0.3){
+    rho((T)1000),matrix_intialized(false),use_gravity(true),linear_solver_type(-1), alpha_damping(0.3){
         time=start_time;
     }
     
@@ -861,7 +861,7 @@ public:
 //        rr.Scale(alpha_damping*dt);
 //        be_rhs += rr;
         
-        if(use_gravity) for(int i=0;i<be_rhs.Size()/3;i++) be_rhs(3*i)-=dt*dt*mass(3*i)*9.8;
+        if(use_gravity) for(int i=0;i<be_rhs.Size()/3;i++) be_rhs(3*i+1)-=dt*dt*mass(3*i+1)*9.8;
 
         
         //now update the BE matrix
@@ -914,7 +914,7 @@ public:
                 VECTOR<T> residual(vn.Size());
                 for(int i=0;i<be_rhs.Size();i++) residual(i)=mass(i)*(deformable_object.Positions()(i)-old_positions(i)-dt*vn(i))-dt*dt*f_xn(i);
 
-                if(use_gravity) for(int i=0;i<be_rhs.Size()/3;i++) residual(3*i)+=dt*dt*mass(3*i)*(T)9.8;
+                if(use_gravity) for(int i=0;i<be_rhs.Size()/3;i++) residual(3*i+1)+=dt*dt*mass(3*i+1)*(T)9.8;
             
                 if(bc_dofs){for(int i=0;i<bc_dofs->Size();i++) residual((*bc_dofs)(i))=(T)0;}
             

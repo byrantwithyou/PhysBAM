@@ -1308,8 +1308,8 @@ int main(int argc, char** argv) {
             for (int i = 0; i < mcut->sim_volume->particles.X.m; i++) {
                 // if in cylinder
                 T myx=mcut->sim_volume->particles.X(i)(0);
-                T myz=mcut->sim_volume->particles.X(i)(2);
-                T myr=sqrt(sqr(myx)+sqr(myz));
+                T myy=mcut->sim_volume->particles.X(i)(1);
+                T myr=sqrt(sqr(myx)+sqr(myy));
                 if(myr<0.5) mcut->diri_nodes.Set(i);
             }
             sim_volume->Update_Number_Nodes();
@@ -1320,42 +1320,42 @@ int main(int argc, char** argv) {
             
             int frame = 0;
 
-            int f1=1,f2=31;
+            int f1=1,f2=61;
             int f = f2 - f1;
             T dtheta = 1.5 * pi / f;
             T r = 0.55;
-            T y1 = 0.3;
-            T y2 = -0.3;
-            T dy = (y1 - y2) / n;
-            while (frame < 50) {
+            T z1 = 0.3;
+            T z2 = -0.3;
+            T dz = (z1 - z2) / n;
+            while (frame < 70) {
                 ++frame;
                 if (1) {
                     if (frame == f1) {
                         for (int j = 0; j < n+1; ++j) {
-                            T y = y1-dy*j;
-                            cutting_tri_mesh->particles.X(2*j) = TV(-0.3, y, -r);
-                            cutting_tri_mesh->particles.X(2*j+1) = TV(0, y, -r);
+                            T z = z1-dz*j;
+                            cutting_tri_mesh->particles.X(2*j) = TV(-0.3, -r, z);
+                            cutting_tri_mesh->particles.X(2*j+1) = TV(0, -r, z);
                         }
                         mcut->Cut(*cutting_tri_mesh, false, true);
                     }
                     else if (frame > f1 && frame <= f2) {
                         T theta = -pi / 2 + (frame - f1 - 1) * dtheta;
                         T x1 = r * cos(theta);
-                        T z1 = r * sin(theta);
+                        T y1 = r * sin(theta);
                         T x2 = r * cos(theta + dtheta);
-                        T z2 = r * sin(theta + dtheta);
+                        T y2 = r * sin(theta + dtheta);
                         for (int j = 0; j < n+1; ++j) {
-                            T y = y1-dy*j;
-                            cutting_tri_mesh->particles.X(2*j) = TV(x1, y, z1);
-                            cutting_tri_mesh->particles.X(2*j+1) = TV(x2, y, z2);
+                            T z = z1-dz*j;
+                            cutting_tri_mesh->particles.X(2*j) = TV(x1, y1, z);
+                            cutting_tri_mesh->particles.X(2*j+1) = TV(x2, y2, z);
                         }
                         mcut->Cut(*cutting_tri_mesh, false, true);
                     }
                     else if (frame == f2 + 1) {
                         for (int j = 0; j < n+1; ++j) {
-                            T y = y1-dy*j;
-                            cutting_tri_mesh->particles.X(2*j) = TV(-r, y, 0);
-                            cutting_tri_mesh->particles.X(2*j+1) = TV(-r, y, -0.3);
+                            T z = z1-dz*j;
+                            cutting_tri_mesh->particles.X(2*j) = TV(-r, 0, z);
+                            cutting_tri_mesh->particles.X(2*j+1) = TV(-r, -0.3, z);
                         }
                         mcut->Cut(*cutting_tri_mesh, true, true);
                     }
@@ -1363,6 +1363,8 @@ int main(int argc, char** argv) {
                 
                 if (1) {
                     VS::start_timer();
+                    T theta = -pi/f/ratio;
+                    PhysBAM::MATRIX<double,2> rotation(cos(theta),sin(theta),-sin(theta),cos(theta));
                     for (int r = 0; r < ratio; r++) {
                         int i = 0;
                         for (HASHTABLE_ITERATOR<int> it(mcut->diri_nodes); it.Valid(); it.Next()) {
@@ -1370,16 +1372,14 @@ int main(int argc, char** argv) {
                             T oldx=mcut->deformable_object->X(fixed_node)(0);
                             T oldy=mcut->deformable_object->X(fixed_node)(1);
                             T oldz=mcut->deformable_object->X(fixed_node)(2);
-                            PhysBAM::VECTOR<double,2> old(oldx,oldz);
-                            T theta=-0.1/10;
-                            PhysBAM::MATRIX<double,2> rotation(cos(theta),sin(theta),-sin(theta),cos(theta));
+                            PhysBAM::VECTOR<double,2> old(oldx,oldy);
                             PhysBAM::VECTOR<double,2> newp=rotation*old;
                             mcut->my_constrained->Set_Value(3*i,3*fixed_node);
                             mcut->my_constrained->Set_Value(3*i+1,3*fixed_node+1);
                             mcut->my_constrained->Set_Value(3*i+2,3*fixed_node+2);
                             mcut->my_constrained_locations->Set_Value(3*i,newp(0));
-                            mcut->my_constrained_locations->Set_Value(3*i+1,oldy);
-                            mcut->my_constrained_locations->Set_Value(3*i+2,newp(1));
+                            mcut->my_constrained_locations->Set_Value(3*i+1,newp(1));
+                            mcut->my_constrained_locations->Set_Value(3*i+2,oldz);
                             i++;
                         }
                         mcut->be->Set_Boundary_Conditions(*(mcut->my_constrained), *(mcut->my_constrained_locations));
