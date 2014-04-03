@@ -294,7 +294,8 @@ void MESH_CUTTING<T>::Subdivide_Cutting_Mesh_Into_Eyeball()
                     }
                 }
                 volume->mesh.elements.Append(t2);
-                ctet2stet.Append(ctet2stet(tets(i)));
+                int c2s = ctet2stet(tets(i));
+                ctet2stet.Append(c2s);
                 int new_element_id = volume->mesh.elements.m-1;
                 
                 //update edge2tet
@@ -910,7 +911,7 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
                     for (int j = 0; j < NumNodesPerTet; j++){
                         weights_in_sim.Append(PARENT(parent_sim_tet_id, wei[j]));
                         material_node_from.Append(tet_element(j));
-                        cutting_particle_material_space.Append(cutting_particle_material_space(tet_element(j)));
+                        cutting_particle_material_space.Append((TV)cutting_particle_material_space(tet_element(j)));
                     }
                     sim_volume->mesh.elements(parent_sim_tet_id) = VECTOR<int, NumNodesPerTet>(sim_size-4, sim_size-3, sim_size-2, sim_size-1);
                     sim_tet_split(parent_sim_tet_id) = 1;
@@ -921,7 +922,7 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
                     for (int j = 0; j < NumNodesPerTet; j++){
                         weights_in_sim.Append(PARENT(sim_volume->mesh.elements.m, wei[j]));
                         material_node_from.Append(tet_element(j));
-                        cutting_particle_material_space.Append(cutting_particle_material_space(tet_element(j)));
+                        cutting_particle_material_space.Append((TV)cutting_particle_material_space(tet_element(j)));
                     }
                     if (i == 0) {
                         ctet2stet(tet_id) = sim_volume->mesh.elements.m;
@@ -930,7 +931,8 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
                         ctet2stet.Append(sim_volume->mesh.elements.m);
                     }
                     sim_volume->mesh.elements.Append(VECTOR<int, NumNodesPerTet>(sim_size-4, sim_size-3, sim_size-2, sim_size-1));
-                    sim_tet_from.Append(sim_tet_from(parent_sim_tet_id));
+                    int stf = sim_tet_from(parent_sim_tet_id);
+                    sim_tet_from.Append(stf);
                 }
                 
                 //cutting mesh related
@@ -942,7 +944,8 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
                 else { 
                     tet_cuttings.Append(tc.Generate_Sub_Tet(cc)); 
                     volume->mesh.elements.Append(VECTOR<int, NumNodesPerTet>(size-4, size-3, size-2, size-1));
-                    is_blue.Append(is_blue(tet_id));
+                    bool ib = is_blue(tet_id);
+                    is_blue.Append(ib);
                 }
             }
             else {
@@ -1187,7 +1190,7 @@ void MESH_CUTTING<T>::Split2(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARR
                     for (int j = 0; j < NumNodesPerTet; j++){
                         weights_in_sim.Append(PARENT(parent_sim_tet_id, wei[j]));
                         material_node_from.Append(tet_element(j));
-                        cutting_particle_material_space.Append(cutting_particle_material_space(tet_element(j)));
+                        cutting_particle_material_space.Append((TV)cutting_particle_material_space(tet_element(j)));
                     }
                     sim_volume->mesh.elements(parent_sim_tet_id) = VECTOR<int, NumNodesPerTet>(sim_size-4, sim_size-3, sim_size-2, sim_size-1);
                     sim_tet_split(parent_sim_tet_id) = 1;
@@ -1198,7 +1201,7 @@ void MESH_CUTTING<T>::Split2(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARR
                     for (int j = 0; j < NumNodesPerTet; j++){
                         weights_in_sim.Append(PARENT(sim_volume->mesh.elements.m, wei[j]));
                         material_node_from.Append(tet_element(j));
-                        cutting_particle_material_space.Append(cutting_particle_material_space(tet_element(j)));
+                        cutting_particle_material_space.Append((TV)cutting_particle_material_space(tet_element(j)));
                     }
                     if (i == 0) {
                         ctet2stet(tet_id) = sim_volume->mesh.elements.m;
@@ -1207,7 +1210,8 @@ void MESH_CUTTING<T>::Split2(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARR
                         ctet2stet.Append(sim_volume->mesh.elements.m);
                     }
                     sim_volume->mesh.elements.Append(VECTOR<int, NumNodesPerTet>(sim_size-4, sim_size-3, sim_size-2, sim_size-1));
-                    sim_tet_from.Append(sim_tet_from(parent_sim_tet_id));
+                    int stf = sim_tet_from(parent_sim_tet_id);
+                    sim_tet_from.Append(stf);
                 }
                 
                 //cutting mesh related
@@ -1219,7 +1223,8 @@ void MESH_CUTTING<T>::Split2(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARR
                 else {
                     tet_cuttings.Append(tc.Generate_Sub_Tet(cc));
                     volume->mesh.elements.Append(VECTOR<int, NumNodesPerTet>(size-4, size-3, size-2, size-1));
-                    is_blue.Append(is_blue(tet_id));
+                    bool ib = is_blue(tet_id);
+                    is_blue.Append(ib);
                 }
             }
             else {
@@ -1449,12 +1454,12 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
                     if (!sim_tet_split(parent_sim_tet_id)){   
                         weights_in_sim.Append(PARENT(parent_sim_tet_id, w));
                         material_node_from.Append(original_elements(i)(j));
-                        cutting_particle_material_space.Append(cutting_particle_material_space(tet_element(j)));
+                        cutting_particle_material_space.Append((TV)cutting_particle_material_space(tet_element(j)));
                     }
                     else {
                         weights_in_sim.Append(PARENT(sim_volume->mesh.elements.m, w));
                         material_node_from.Append(original_elements(i)(j));
-                        cutting_particle_material_space.Append(cutting_particle_material_space(tet_element(j)));
+                        cutting_particle_material_space.Append((TV)cutting_particle_material_space(tet_element(j)));
                     }
                 }
                 int sim_size = sim_node_from.m;
@@ -1466,7 +1471,8 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
                     ctet2stet(i) = sim_volume->mesh.elements.m;
                     sim_volume->mesh.elements.Append(VECTOR<int, NumNodesPerTet>(sim_size-4, sim_size-3, sim_size-2, sim_size-1));
                     sim_tet_from.Append(i);
-                    undeformed_config_copy.Append(undeformed_config_copy(parent_sim_tet_id));
+                    ALGEBRA::MATRIX_3X3<ST> ucc = undeformed_config_copy(parent_sim_tet_id);
+                    undeformed_config_copy.Append(ucc);
                 }
             }
         }
@@ -1765,8 +1771,10 @@ void MESH_CUTTING<T>::Partial_Refine()
             element = ne(0);
             for (int j = 1; j < ne.m; ++j) {
                 volume->mesh.elements.Append(ne(j));
-                is_blue.Append(is_blue(i));
-                ctet2stet.Append(ctet2stet(i));
+                bool ib = is_blue(i);
+                is_blue.Append(ib);
+                int c2s = ctet2stet(i);
+                ctet2stet.Append(c2s);
             }
         }
     }
@@ -1846,8 +1854,10 @@ void MESH_CUTTING<T>::Partial_Refine()
             }
 
             new_elements.Append(TET(n1, n2, nn, e2));
-            new_ctet2stet.Append(new_ctet2stet(tid));
-            new_is_blue.Append(new_is_blue(tid));
+            int nc2s = new_ctet2stet(tid);
+            new_ctet2stet.Append(nc2s);
+            int nib = new_is_blue(tid);
+            new_is_blue.Append(nib);
             new_elements(tid) = TET(n1, n2, nn, e1);
             
             VECTOR<int, 2> ee = VECTOR<int, 2>(n1, n2).Sorted();

@@ -1296,13 +1296,6 @@ int main(int argc, char** argv) {
             string volumeFile(argv[2]);
             string outputDir(argv[3]);
             Initialize(volumeFile);
-            int n = 6;
-            cutting_tri_mesh->particles.Add_Elements(2*(n+1));
-            cutting_tri_mesh->Update_Number_Nodes();
-            for (int i = 0; i < n; ++i) {
-                cutting_tri_mesh->mesh.elements.Append(I3(2*i, 2*i+1, 2*i+2));
-                cutting_tri_mesh->mesh.elements.Append(I3(2*i+1, 2*i+2, 2*i+3));
-            }
             
             //dirichlet and peel nodes
             for (int i = 0; i < mcut->sim_volume->particles.X.m; i++) {
@@ -1323,17 +1316,28 @@ int main(int argc, char** argv) {
             int f1=1,f2=61;
             int f = f2 - f1;
             T dtheta = 1.5 * pi / f;
-            T r = 0.55;
-            T z1 = 0.3;
-            T z2 = -0.3;
+            T r = 0.59;
+            T w = sqrt(sqr(0.6)-sqr(r))*1.1;
+            cout << "half width " << w / 1.1 << endl;
+            T z1 = w;
+            T z2 = -w;
+            
+            int n = 2;
             T dz = (z1 - z2) / n;
+            cutting_tri_mesh->particles.Add_Elements(2*(n+1));
+            cutting_tri_mesh->Update_Number_Nodes();
+            for (int i = 0; i < n; ++i) {
+                cutting_tri_mesh->mesh.elements.Append(I3(2*i, 2*i+1, 2*i+2));
+                cutting_tri_mesh->mesh.elements.Append(I3(2*i+1, 2*i+2, 2*i+3));
+            }
+            
             while (frame < 70) {
                 ++frame;
                 if (1) {
                     if (frame == f1) {
                         for (int j = 0; j < n+1; ++j) {
                             T z = z1-dz*j;
-                            cutting_tri_mesh->particles.X(2*j) = TV(-0.3, -r, z);
+                            cutting_tri_mesh->particles.X(2*j) = TV(-w, -r, z);
                             cutting_tri_mesh->particles.X(2*j+1) = TV(0, -r, z);
                         }
                         mcut->Cut(*cutting_tri_mesh, false, true);
@@ -1355,7 +1359,7 @@ int main(int argc, char** argv) {
                         for (int j = 0; j < n+1; ++j) {
                             T z = z1-dz*j;
                             cutting_tri_mesh->particles.X(2*j) = TV(-r, 0, z);
-                            cutting_tri_mesh->particles.X(2*j+1) = TV(-r, -0.3, z);
+                            cutting_tri_mesh->particles.X(2*j+1) = TV(-r, -w, z);
                         }
                         mcut->Cut(*cutting_tri_mesh, true, true);
                     }
