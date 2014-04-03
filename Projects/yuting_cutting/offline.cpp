@@ -1314,11 +1314,6 @@ int main(int argc, char** argv) {
             }
             sim_volume->Update_Number_Nodes();
             sim_volume->mesh.Initialize_Boundary_Mesh();
-            for (int i = 0; i < sim_volume->mesh.boundary_mesh->elements.m; ++i) {
-                for (int j = 0; j < 3; ++j) {
-                    mcut->peel_nodes.Set(sim_volume->mesh.boundary_mesh->elements(i)(j));
-                }
-            }
             
             mcut->Initialize_Elasticity();
             TETRAHEDRALIZED_VOLUME<T> *refined_volume = new TETRAHEDRALIZED_VOLUME<T>();
@@ -1341,7 +1336,7 @@ int main(int argc, char** argv) {
                             cutting_tri_mesh->particles.X(2*j) = TV(-0.3, y, -r);
                             cutting_tri_mesh->particles.X(2*j+1) = TV(0, y, -r);
                         }
-                        mcut->Cut(*cutting_tri_mesh, frame == false, true);
+                        mcut->Cut(*cutting_tri_mesh, false, true);
                     }
                     else if (frame > f1 && frame <= f2) {
                         T theta = -pi / 2 + (frame - f1 - 1) * dtheta;
@@ -1356,7 +1351,7 @@ int main(int argc, char** argv) {
                         }
                         mcut->Cut(*cutting_tri_mesh, false, true);
                     }
-                    if (frame == f2 + 1) {
+                    else if (frame == f2 + 1) {
                         for (int j = 0; j < n+1; ++j) {
                             T y = y1-dy*j;
                             cutting_tri_mesh->particles.X(2*j) = TV(-r, y, 0);
@@ -1366,7 +1361,7 @@ int main(int argc, char** argv) {
                     }
                 }
                 
-                if (0) {
+                if (1) {
                     VS::start_timer();
                     for (int r = 0; r < ratio; r++) {
                         int i = 0;
@@ -1400,7 +1395,6 @@ int main(int argc, char** argv) {
                     }
                     mcut->Update_Cutting_Particles();    
                 }
-                
                 generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "cutting_volume");
                 WriteToPovRay(refined_volume, outputDir, frame);
             }

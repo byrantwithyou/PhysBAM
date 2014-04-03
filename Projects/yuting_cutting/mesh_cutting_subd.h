@@ -165,7 +165,7 @@ public:
     BACKWARD_EULER_TIME_STEPPING_3D<ST>* be;
     HYPERELASTICITY_CONSTITUTIVE_MODEL_3D<ST>* le;
     FEM_HYPERELASTICITY_3D<ST>* fem;
-    HASHTABLE<int> diri_nodes, peel_nodes;
+    HASHTABLE<int> diri_nodes;
     ALGEBRA::VECTOR<ST>* nodal_volumes;
     ALGEBRA::VECTOR<int>* my_constrained;
     ALGEBRA::VECTOR<ST>* my_constrained_locations;

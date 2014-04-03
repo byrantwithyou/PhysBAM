@@ -655,7 +655,7 @@ void MESH_CUTTING<T>::Reinitialize_Elasticity()
     delete my_constrained;
     delete my_constrained_locations;
     
-    if (interactive) {
+    if (1) {
         my_constrained = new ALGEBRA::VECTOR<int>(3*diri_nodes.Size());
         my_constrained_locations = new ALGEBRA::VECTOR<ST>(3*diri_nodes.Size());
         int i = 0;
@@ -881,6 +881,10 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
         if (!picked[tc.material_ids(i)]) {
             ARRAY<int> cc = tc.Find_CC(tc.material_ids(i), picked);
             //cout << cc << endl;
+//            if (cc.m == NumMaterials) {
+//                cout << tri2inter << endl;
+//                cout << tc.turned_on << " not split " << NumMaterials << endl;
+//            }
             if (1){//cc.m != NumMaterials || face_cut) {
                 //cout << cc << endl;
                 //find parent sim tet_cc and split it
