@@ -1421,7 +1421,7 @@ int main(int argc, char** argv) {
             mcut->Initialize_Elasticity();
             TETRAHEDRALIZED_VOLUME<T> *refined_volume = new TETRAHEDRALIZED_VOLUME<T>();
             
-            int f1=1,f2=181;
+            int f1 = 1, f2 = 181, f3 = 200, f4 = 290;
             int f = f2 - f1;
             int n = 5;//refine curve
             
@@ -1489,7 +1489,56 @@ int main(int argc, char** argv) {
                         cutting_tri_mesh->particles.X(3*j+1) = p + t * w * j;
                         cutting_tri_mesh->particles.X(3*j+2) = p + dp + t * w * j;
                     }
+                    mcut->Cut(*cutting_tri_mesh, true, true);
+                }
+                else if (frame == f3) {
+                    init_theta = -pi * 3 / 4;
+                    dtheta = -2 * pi / f / ratio;
+                    dtheta_cut = 2 * pi / f / n;
+                    theta = init_theta;
+                    
+                    init_phi = atan(-0.2 / 0.6);
+                    final_phi = atan(0.2 / 0.6);
+                    dphi_cut = (final_phi - init_phi) / f / n;
+                    phi = init_phi;
+                    
+                    pt = (final_phi - init_phi) / 2 / pi;
+                    
+                    TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                    TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
+                    TV dp = p.Cross(t).Normalized() * w;
+                    for (int j = 0; j < n+1; ++j) {
+                        cutting_tri_mesh->particles.X(3*j) = p - dp - t * w * (n - j);
+                        cutting_tri_mesh->particles.X(3*j+1) = p - t * w * (n - j);
+                        cutting_tri_mesh->particles.X(3*j+2) = p + dp - t * w * (n - j);
+                    }
                     mcut->Cut(*cutting_tri_mesh, false, true);
+                }
+                else if (frame > f3 && frame <= f4) {
+                    for (int j = 0; j < n+1; ++j) {
+                        TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                        TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt);
+                        TV dp = p.Cross(t).Normalized() * w;
+                        cutting_tri_mesh->particles.X(3*j) = p - dp;
+                        cutting_tri_mesh->particles.X(3*j+1) = p;
+                        cutting_tri_mesh->particles.X(3*j+2) = p + dp;
+                        if (j != n) {
+                            theta += dtheta_cut;
+                            phi += dphi_cut;
+                        }
+                    }
+                    mcut->Cut(*cutting_tri_mesh, false, true);
+                }
+                else if (frame == f4 + 1) {
+                    TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                    TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
+                    TV dp = p.Cross(t).Normalized() * w;
+                    for (int j = 0; j < n+1; ++j) {
+                        cutting_tri_mesh->particles.X(3*j) = p - dp + t * w * j;
+                        cutting_tri_mesh->particles.X(3*j+1) = p + t * w * j;
+                        cutting_tri_mesh->particles.X(3*j+2) = p + dp + t * w * j;
+                    }
+                    mcut->Cut(*cutting_tri_mesh, true, true);
                 }
                 
                 VS::start_timer();
