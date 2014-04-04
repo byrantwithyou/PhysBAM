@@ -1421,7 +1421,7 @@ int main(int argc, char** argv) {
             mcut->Initialize_Elasticity();
             TETRAHEDRALIZED_VOLUME<T> *refined_volume = new TETRAHEDRALIZED_VOLUME<T>();
             
-            int f1 = 1, f2 = 181, f3 = 200, f4 = 290;
+            int f1 = 1, f2 = 181, f3 = 183, f4 = 273;
             int f = f2 - f1;
             int n = 5;//refine curve
             
@@ -1452,7 +1452,7 @@ int main(int argc, char** argv) {
             }
 
             int frame = 0;
-            while (frame < 300) {
+            while (frame < 280) {
                 ++frame;
                 if (frame == f1) {
                     TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
@@ -1492,8 +1492,8 @@ int main(int argc, char** argv) {
                     mcut->Cut(*cutting_tri_mesh, true, true);
                 }
                 else if (frame == f3) {
+                    f = f4 - f3;
                     init_theta = -pi * 3 / 4;
-                    dtheta = -2 * pi / f / ratio;
                     dtheta_cut = 2 * pi / f / n;
                     theta = init_theta;
                     
