@@ -2,5 +2,6 @@
 
 Import('env Automatic_Program')
 env=env.Copy(USE_OPENGL=1)
+env.Append(LIBS=['X11'])
 Automatic_Program(env)
 

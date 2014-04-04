@@ -678,7 +678,7 @@ int main(int argc, char** argv) {
             break;
         }
 
-        //incrementally cut armadillo: change DEFORMABLE_OBJECT.h's Dm_inverse, change mesh_cutting_subd.cpp's dirichlet constraints and mesh_cutting_subd's cut() to copy material space nodes into volume
+        //incrementally cut armadillo: change DEFORMABLE_OBJECT.h's Dm_inverse, use damping, no gravity
         case 2:
         {
             cout << "incremental\n";
@@ -713,7 +713,7 @@ int main(int argc, char** argv) {
             T yy = 0.8;
             T yyy = 0.015;
             T x1 = 0, y1 = 0;
-            int f1=0,f2=60,f3=105,f4=165,f5=200,f6=260;
+            int f1=30,f2=90,f3=105,f4=165,f5=200,f6=260;
             while (frame < 300) {
                 ++frame;
 //                if (frame == 2) {
@@ -1291,7 +1291,7 @@ int main(int argc, char** argv) {
             break;
         }
 
-        case 10://peel a ball: initial configuration = 1 , change gravity to x direction, get rid of damping
+        case 10://peel a ball: Dm_inverse = 1, use gravity, no damping
         {
             string volumeFile(argv[2]);
             string outputDir(argv[3]);

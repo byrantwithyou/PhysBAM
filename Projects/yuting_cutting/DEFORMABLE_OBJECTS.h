@@ -745,12 +745,13 @@ public:
     bool use_gravity;
     int linear_solver_type;//0=cg, 1=minres
     T alpha_damping;
+    bool damping;
 
     BACKWARD_EULER_TIME_STEPPING_3D(const T dt_input,const T final_time_input, const T start_time_input,DEFORMABLE_OBJECT_3D<T>& object_input):
     dt(dt_input),final_time(final_time_input),start_time(start_time_input),deformable_object(object_input),elastic_forces(0),cg(0),minres(0),bc_dofs(0),
     be_matrix(deformable_object.Positions().Size(),deformable_object.Positions().Size()),
     mass(deformable_object.Positions().Size()),be_rhs(deformable_object.Positions().Size()),old_positions(deformable_object.Positions().Size()),
-    rho((T)1000),matrix_intialized(false),use_gravity(true),linear_solver_type(-1), alpha_damping(0.3){
+    rho((T)1000),matrix_intialized(false),use_gravity(true),linear_solver_type(-1), alpha_damping(0.1), damping(false){
         time=start_time;
     }
     
@@ -851,15 +852,17 @@ public:
         for(int i=0;i<be_rhs.Size();i++) be_rhs(i)=dt*dt*f_xn(i)+dt*mass(i)*vn(i);
         
         //add damping terms
-//        for(int i=0;i<be_rhs.Size();i++) be_rhs(i)=dt*dt*f_xn(i)+dt*mass(i)*vn(i)-mass(i)*(deformable_object.Positions()(i)-old_positions(i));//with damping
-//        VECTOR<T> rrr(be_rhs.Size());
-//        for(int i = 0; i < be_rhs.Size(); i++){
-//            rrr(i) = deformable_object.Positions()(i)-old_positions(i);
-//        }
-//        VECTOR<T> rr(be_rhs.Size());
-//        elasticity_stiffness_matrix.Multiply(rrr, rr);
-//        rr.Scale(alpha_damping*dt);
-//        be_rhs += rr;
+        if (damping) {
+            for(int i=0;i<be_rhs.Size();i++) be_rhs(i)=dt*dt*f_xn(i)+dt*mass(i)*vn(i)-mass(i)*(deformable_object.Positions()(i)-old_positions(i));//with damping
+            VECTOR<T> rrr(be_rhs.Size());
+            for(int i = 0; i < be_rhs.Size(); i++){
+                rrr(i) = deformable_object.Positions()(i)-old_positions(i);
+            }
+            VECTOR<T> rr(be_rhs.Size());
+            elasticity_stiffness_matrix.Multiply(rrr, rr);
+            rr.Scale(alpha_damping*dt);
+            be_rhs += rr;
+        }
         
         if(use_gravity) for(int i=0;i<be_rhs.Size()/3;i++) be_rhs(3*i+1)-=dt*dt*mass(3*i+1)*9.8;
 
@@ -876,7 +879,9 @@ public:
             for(int j=0;j<k_row.Number_Nonzero();j++){
                 T kij=k_row.Value_At_Sparse_Index(j);
                 be_row(k_row.Index(j))=-dt*dt*kij;
-                //be_row(k_row.Index(j)) -= dt*alpha_damping*kij; //damping force
+                if (damping) {
+                    be_row(k_row.Index(j)) -= dt*alpha_damping*kij; //damping force
+                }
             }
         }
         //be_matrix.Write_DAT_File("be_matrix111.txt", 1);
