@@ -1404,6 +1404,131 @@ int main(int argc, char** argv) {
             }
             break;
         }
+            
+        case 11://better peel a ball: Dm_inverse = 1, use gravity, no damping
+        {
+            string volumeFile(argv[2]);
+            string outputDir(argv[3]);
+            Initialize(volumeFile);
+            
+            //dirichlet and peel nodes
+            for (int i = 0; i < mcut->sim_volume->particles.X.m; i++) {
+                if(mcut->sim_volume->particles.X(i).Magnitude() < 0.55) mcut->diri_nodes.Set(i);
+            }
+            sim_volume->Update_Number_Nodes();
+            sim_volume->mesh.Initialize_Boundary_Mesh();
+            
+            mcut->Initialize_Elasticity();
+            TETRAHEDRALIZED_VOLUME<T> *refined_volume = new TETRAHEDRALIZED_VOLUME<T>();
+            
+            int f1=1,f2=181;
+            int f = f2 - f1;
+            int n = 5;//refine curve
+            
+            T r = 0.59;
+            T w = sqrt(sqr(0.6)-sqr(r))*1.1;
+            cout << "half width " << w / 1.1 << endl;
+            
+            T init_theta = -pi * 3 / 4;
+            T dtheta = -4 * pi / f / ratio;
+            T dtheta_cut = 4 * pi / f / n;
+            T theta = init_theta;
+            
+            T init_phi = atan(-0.4 / 0.6);
+            T final_phi = atan(0.4 / 0.6);
+            T dphi_cut = (final_phi - init_phi) / f / n;
+            T phi = init_phi;
+            
+            T pt = (final_phi - init_phi) / 4 / pi;
+            
+            cutting_tri_mesh->particles.Add_Elements((n+1)*3);
+            cutting_tri_mesh->Update_Number_Nodes();
+            for (int j = 0; j < n; ++j) {
+                for (int k = 0; k < 2; ++k) {
+                    int s = 3 * j + k;
+                    cutting_tri_mesh->mesh.elements.Append(I3(s, s+3, s+1));
+                    cutting_tri_mesh->mesh.elements.Append(I3(s+1, s+3, s+4));
+                }
+            }
+
+            int frame = 0;
+            while (frame < 300) {
+                ++frame;
+                if (frame == f1) {
+                    TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                    TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
+                    TV dp = p.Cross(t).Normalized() * w;
+                    for (int j = 0; j < n+1; ++j) {
+                        cutting_tri_mesh->particles.X(3*j) = p - dp - t * w * (n - j);
+                        cutting_tri_mesh->particles.X(3*j+1) = p - t * w * (n - j);
+                        cutting_tri_mesh->particles.X(3*j+2) = p + dp - t * w * (n - j);
+                    }
+                    mcut->Cut(*cutting_tri_mesh, false, true);
+                }
+                else if (frame > f1 && frame <= f2) {
+                    for (int j = 0; j < n+1; ++j) {
+                        TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                        TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt);
+                        TV dp = p.Cross(t).Normalized() * w;
+                        cutting_tri_mesh->particles.X(3*j) = p - dp;
+                        cutting_tri_mesh->particles.X(3*j+1) = p;
+                        cutting_tri_mesh->particles.X(3*j+2) = p + dp;
+                        if (j != n) {
+                            theta += dtheta_cut;
+                            phi += dphi_cut;
+                        }
+                    }
+                    mcut->Cut(*cutting_tri_mesh, false, true);
+                }
+                else if (frame == f2 + 1) {
+                    TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                    TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
+                    TV dp = p.Cross(t).Normalized() * w;
+                    for (int j = 0; j < n+1; ++j) {
+                        cutting_tri_mesh->particles.X(3*j) = p - dp + t * w * j;
+                        cutting_tri_mesh->particles.X(3*j+1) = p + t * w * j;
+                        cutting_tri_mesh->particles.X(3*j+2) = p + dp + t * w * j;
+                    }
+                    mcut->Cut(*cutting_tri_mesh, false, true);
+                }
+                
+                VS::start_timer();
+                PhysBAM::MATRIX<double,2> rotation(cos(dtheta),sin(dtheta),-sin(dtheta),cos(dtheta));
+                for (int r = 0; r < ratio; r++) {
+                    int i = 0;
+                    for (HASHTABLE_ITERATOR<int> it(mcut->diri_nodes); it.Valid(); it.Next()) {
+                        int fixed_node = it.Key();
+                        T oldx=mcut->deformable_object->X(fixed_node)(0);
+                        T oldy=mcut->deformable_object->X(fixed_node)(1);
+                        T oldz=mcut->deformable_object->X(fixed_node)(2);
+                        PhysBAM::VECTOR<double,2> old(oldy,oldz);
+                        PhysBAM::VECTOR<double,2> newp=rotation*old;
+                        mcut->my_constrained->Set_Value(3*i,3*fixed_node);
+                        mcut->my_constrained->Set_Value(3*i+1,3*fixed_node+1);
+                        mcut->my_constrained->Set_Value(3*i+2,3*fixed_node+2);
+                        mcut->my_constrained_locations->Set_Value(3*i,oldx);
+                        mcut->my_constrained_locations->Set_Value(3*i+1,newp(0));
+                        mcut->my_constrained_locations->Set_Value(3*i+2,newp(1));
+                        i++;
+                    }
+                    mcut->be->Set_Boundary_Conditions(*(mcut->my_constrained), *(mcut->my_constrained_locations));
+                    mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
+                }
+                VS::stop_timer();
+                printf("frame %d time:    %f\n", frame, VS::get_time());
+                for (int i = 0; i<mcut->sim_volume->particles.X.m; i++){
+                    for (int k = 0; k<3; k++){
+                        mcut->sim_volume->particles.X(i)(k) = mcut->deformable_object->X(i)(k);
+                        mcut->sim_volume->particles.V(i)(k) = mcut->deformable_object->V(i)(k);
+                    }
+                }
+                mcut->Update_Cutting_Particles();
+                
+                generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "cutting_volume");
+                WriteToPovRay(refined_volume, outputDir, frame);
+            }
+            break;
+        }
         default:
             break;
     }
