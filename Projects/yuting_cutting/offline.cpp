@@ -1492,6 +1492,10 @@ int main(int argc, char** argv) {
                     mcut->Cut(*cutting_tri_mesh, true, true);
                 }
                 else if (frame == f3) {
+                    for (int i = 0; i < mcut->cutting_particle_material_space.m; ++i) {
+                        mcut->cutting_particle_material_space(i) = mcut->volume->particles.X(i);
+                    }
+                    
                     f = f4 - f3;
                     init_theta = -pi * 3 / 4;
                     dtheta_cut = 2 * pi / f / n;
