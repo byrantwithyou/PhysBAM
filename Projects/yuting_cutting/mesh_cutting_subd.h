@@ -199,7 +199,7 @@ public:
     void Write_To_File(const std::string& writing_directory, int frame) const;
     void Write_Boundary_Mesh_To_File(const std::string& writing_directory, int frame) const;
     void Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume);
-    void Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume, HASHTABLE<I3>& cutting_faces);
+    void Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume, HASHTABLE<I3>& cutting_faces, HASHTABLE<I3>& new_cutting_faces);
     int Sorted_Id(const I3& sorted_tri, const I3& tri, int material_id);
 private:
     ARRAY<VECTOR<int, NumNodesPerTet> > original_elements,original_sim_elements;

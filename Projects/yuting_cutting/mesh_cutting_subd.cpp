@@ -2089,7 +2089,7 @@ void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volu
 }
 
 template<class T>
-void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume, HASHTABLE<I3>& cutting_faces)
+void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume, HASHTABLE<I3>& cutting_faces, HASHTABLE<I3>& new_cutting_faces)
 {
     refined_volume->mesh.elements = volume->mesh.elements;
     
@@ -2098,6 +2098,7 @@ void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volu
     HASHTABLE<VECTOR<int,3>,int> new_nodes2;
     ARRAY<TET> new_elements;
     ARRAY<PARENT> new_weights_in_sim = weights_in_sim;
+    new_cutting_faces.Remove_All();
     
     int n = refined_volume->mesh.elements.m;
     for (int i = 0; i < n; i++) {
@@ -2260,10 +2261,31 @@ void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volu
         }
     }
     
+    //delete unused nodes in volume
+    HASHTABLE<int,int> new_pids;
+    int new_pid=0;
+    ARRAY<PARENT> new_weights_in_sim2;
+    for(int i=0;i<new_elements.m;++i)
+        for(int j=0;j<4;++j){
+            int& id=new_elements(i)(j);
+            if(!new_pids.Get(id,id)){
+                new_weights_in_sim2.Append(new_weights_in_sim(id));
+                new_pids.Set(id,new_pid);
+                id=new_pid;
+                ++new_pid;}}
+    
+    //reset indices in cutting_faces
+//    for (HASHTABLE_ITERATOR<I3> it(new_cutting_faces); it.Valid(); it.Next()) {
+//        I3& f = it.Key();
+//        for (int i = 0; i < 3; ++i) {
+//            new_pids.Get(f(i), f(i));
+//        }
+//    }
+    
     refined_volume->mesh.elements = new_elements;
-    refined_volume->particles.Resize(new_weights_in_sim.m);
-    for (int i = 0; i < new_weights_in_sim.m; i++){
-        refined_volume->particles.X(i) = weight2vec_sim(new_weights_in_sim(i).id, new_weights_in_sim(i).weight);
+    refined_volume->particles.Resize(new_weights_in_sim2.m);
+    for (int i = 0; i < new_weights_in_sim2.m; i++){
+        refined_volume->particles.X(i) = weight2vec_sim(new_weights_in_sim2(i).id, new_weights_in_sim2(i).weight);
     }
     refined_volume->Update_Number_Nodes();
 }

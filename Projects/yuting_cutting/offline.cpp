@@ -540,6 +540,29 @@ void generateAndSaveRefinedVolume(TETRAHEDRALIZED_VOLUME<T>* refined_volume, int
     cout << "refined volume has " << l.Max() << " CCs\n";
 }
 
+template<typename T>
+void generateAndSaveRefinedVolume(TETRAHEDRALIZED_VOLUME<T>* refined_volume, int frame, const string& outputDir, const string& prefix, HASHTABLE<I3>& cutting_faces, HASHTABLE<I3>& new_cutting_faces) {
+    mcut->Refine_And_Save_To(refined_volume, cutting_faces, new_cutting_faces);
+    Fix_Orientation(refined_volume);
+    
+    TETRAHEDRALIZED_VOLUME<float> *f = TETRAHEDRALIZED_VOLUME<float>::Create();
+    f->particles.Add_Elements(refined_volume->particles.X.m);
+    f->Update_Number_Nodes();
+    for (int i = 0; i < refined_volume->particles.X.m; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            f->particles.X(i)(j) = refined_volume->particles.X(i)(j);
+        }
+    }
+    f->mesh.elements = refined_volume->mesh.elements;
+    Write_Boundary_Mesh_To_File(outputDir, prefix + "_boundary", frame, f);
+    Write_Volume_To_File(outputDir, prefix, frame, f);
+    
+    ARRAY<int> l;
+    refined_volume->mesh.Initialize_Boundary_Mesh();
+    refined_volume->mesh.boundary_mesh->Identify_Connected_Components(l);
+    cout << "refined volume has " << l.Max() << " CCs\n";
+}
+
 int main(int argc, char** argv) {
     stringstream caseString(argv[1]);
     int caseN;
@@ -898,12 +921,55 @@ int main(int argc, char** argv) {
             int frame = 0;
             T xshift = 0;
             T yshift = 0.001;
+            if (1) {
+                ofstream fs;
+                fs.open("sca_laser.txt");
+                while (frame < 120) {
+                    ++frame;
+                    if (frame <= 15) {
+                        T x = 0.2167;
+                        T y = x / 1.4;
+                        xshift = 0.7;
+                        T theta = 2*pi*frame/20;
+                        fs << cos(theta)*x-xshift << " " << y+sin(theta)*y+yshift << endl;
+                    }
+                    else if (frame <= 30) {
+                        T x = 0.2167;
+                        T y = x / 1.4;
+                        xshift = 0.7;
+                        T theta = pi / 2 - 2 * pi * (frame - 15) / 20;
+                        fs << cos(theta)*x-xshift << " " << -y+sin(theta)*y+yshift << endl;
+                    }
+                    else if (frame <= 60) {
+                        T x = 0.2567;
+                        T y = 0.3;
+                        xshift = 0;
+                        T theta = 2 * pi * ((frame - 30) / 36. + 1. / 12.);
+                        fs << cos(theta)*x-xshift << " " << sin(theta)*y+yshift << endl;
+                    }
+                    else if (frame <= 90) {
+                        T x = 0.2567;
+                        T y = 0.64;
+                        yshift = -y / 2;
+                        xshift = 0.6534;
+                        T theta = pi * (frame - 60) / 30;
+                        fs << cos(theta)*x+xshift << " " << sin(theta)*y+yshift << endl;;
+                    }
+                    else if (frame <= 105) {
+                        T x = 0.249;
+                        T dx = 2 * x / 15;
+                        yshift = 0.003;
+                        xshift = 0.6234;
+                        fs << xshift - x + dx * (frame - 90) << " " << yshift << endl;;
+                    }
+                }
+                fs.close();
+                exit(1);
+            }
+            
+            
             while (frame < 120) {
                 ++frame;
-                //                if (frame == 20) {
-                //                    energyTest();
-                //                    exit(1);
-                //                }
                 if (frame == 30) {
                     TRIANGULATED_SURFACE<T> *ts = new TRIANGULATED_SURFACE<T>();
                     T x = 0.2167;
@@ -930,6 +996,7 @@ int main(int argc, char** argv) {
                             ts->mesh.elements.Append(PhysBAM::VECTOR<int,3>(2*i-2, 2*i-1, 2*i));
                             ts->mesh.elements.Append(PhysBAM::VECTOR<int,3>(2*i-1, 2*i, 2*i+1));
                         }
+                        
                     }
                     mcut->Cut(*ts, 1);
                 }
@@ -1407,6 +1474,7 @@ int main(int argc, char** argv) {
             
         case 11://better peel a ball: Dm_inverse = 1, use gravity, no damping
         {
+            HASHTABLE<I3> cutting_faces;
             string volumeFile(argv[2]);
             string outputDir(argv[3]);
             Initialize(volumeFile);
@@ -1577,7 +1645,11 @@ int main(int argc, char** argv) {
                 }
                 mcut->Update_Cutting_Particles();
                 
-                generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "cutting_volume");
+                HASHTABLE<I3> new_cutting_faces;
+                generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "cutting_volume", cutting_faces, new_cutting_faces);
+                if (frame == f2 + 1) {
+                    cutting_faces = new_cutting_faces;
+                }
                 WriteToPovRay(refined_volume, outputDir, frame);
             }
             break;

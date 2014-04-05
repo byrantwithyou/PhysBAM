@@ -21,6 +21,7 @@
 #endif  // __APPLE__
 
 #include "CUTTING_2D.h"
+#include "CONSISTENT_INTERSECTIONS.h"
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
@@ -61,7 +62,7 @@ bool dragging=false,cutting=false,draw_sim=true,draw_cutting_edge=false;
 bool recording = true;
 T timestamp = 0;
 int fi = 0;
-string writing_directory = "demo_recording";
+string writing_directory = "zoom_in_degeneracy";
 void Write_Recording_Info(bool cut = false, bool new_time = true) {
     stringstream ss;
     ss << fi;
@@ -87,6 +88,32 @@ void Write_Recording_Info(bool cut = false, bool new_time = true) {
     FILE_UTILITIES::Write_To_File<T>(writing_directory+"/child-"+fis+string(".tri2d.gz"), *(cutter->ta));
     
     if (cut) {
+        //write degeneracy
+        CONSISTENT_INTERSECTIONS<TV> intersections(*(cutter->ta),*sc);
+        intersections.Set_Tol();
+        intersections.Compute();
+        FILE_UTILITIES::Write_To_File<T>(writing_directory+"/hash-"+fis+string(".data"),intersections.hash_vv,intersections.hash_ve,intersections.hash_ev,intersections.hash_ee,intersections.hash_fv);
+        
+        //reinitialize ta
+        TRIANGULATED_AREA<T>* nta=TRIANGULATED_AREA<T>::Create();
+        nta->particles.Resize(cutter->ta->particles.X.m);
+        for(int i=0;i<cutter->ta->particles.X.m;++i)
+            nta->particles.X(i)=cutter->ta->particles.X(i);
+        nta->mesh.elements=cutter->ta->mesh.elements;
+        nta->Update_Number_Nodes();
+        delete cutter->ta;
+        cutter->ta=nta;
+        //reinitialize sc
+        SEGMENTED_CURVE_2D<T>* nsc=SEGMENTED_CURVE_2D<T>::Create();
+        nsc->particles.Resize(sc->particles.X.m);
+        for(int i=0;i<sc->particles.X.m;++i)
+            nsc->particles.X(i)=sc->particles.X(i);
+        nsc->mesh.elements=sc->mesh.elements;
+        nsc->Update_Number_Nodes();
+        delete sc;
+        sc=nsc;
+        cutter->sc = sc;
+        
         FILE_UTILITIES::Write_To_File<T>(writing_directory+"/curve-"+fis+string(".curve2d.gz"), *sc);
     }
     
