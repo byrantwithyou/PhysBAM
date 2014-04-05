@@ -324,7 +324,7 @@ void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, i
 }
 
 template<class T>
-void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, int frame, HASHTABLE<PhysBAM::VECTOR<int, 3> >& cuttingFaces)
+void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, int frame, HASHTABLE<I3>& cuttingFaces)
 {
     TRIANGULATED_SURFACE<T> *ts = TRIANGULATED_SURFACE<T>::Create();
     ts->Use_Vertex_Normals();
@@ -429,9 +429,6 @@ void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, i
         fs << endl << "}" << endl;
         fs << "}" << endl;
     }
-    
-    
-    
     fs.close();
 }
 
@@ -670,7 +667,7 @@ int main(int argc, char** argv) {
 
                 generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "refined_volume");
                 
-                WriteToPovRay(mcut->volume, outputDir, frame, mcut->cuttingFaces);
+                WriteToPovRay(mcut->volume, outputDir, frame, mcut->boundary_faces);
                 Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);
                 //Write_Volume_To_File(outputDir, "sim_volume", frame, mcut->sim_volume);
                 Write_Volume_To_File(outputDir, "cutting_volume", frame, mcut->volume);
@@ -775,9 +772,7 @@ int main(int argc, char** argv) {
                 }
                 else if (frame > f5 && frame <= f6) {
                     if (frame == f5 + 1) {
-                        for (int i = 0; i < mcut->cutting_particle_material_space.m; ++i) {
-                            mcut->cutting_particle_material_space(i) = mcut->volume->particles.X(i);
-                        }
+                        mcut->Set_Material_Space_Particles_To_Current_World_Space_Positions();
                     }
                     x1=0;
                     y1=yy-(frame-f5-1)*yyy;
@@ -1051,7 +1046,7 @@ int main(int argc, char** argv) {
                 }
                 mcut->Update_Cutting_Particles();
                 
-                WriteToPovRay(mcut->volume, outputDir, frame, mcut->cuttingFaces);
+                WriteToPovRay(mcut->volume, outputDir, frame, mcut->boundary_faces);
                 Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);
                 //Write_Volume_To_File(outputDir, "sim_volume", frame, mcut->sim_volume);
                 Write_Volume_To_File(outputDir, "cutting_volume", frame, mcut->volume);
@@ -1116,7 +1111,7 @@ int main(int argc, char** argv) {
                 }
                 mcut->Update_Cutting_Particles();
 
-                WriteToPovRay(mcut->volume, outputDir, frame, mcut->cuttingFaces);
+                WriteToPovRay(mcut->volume, outputDir, frame, mcut->boundary_faces);
                 Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);
                 //Write_Volume_To_File(outputDir, "sim_volume", frame, mcut->sim_volume);
                 Write_Volume_To_File(outputDir, "cutting_volume", frame, mcut->volume);
@@ -1269,7 +1264,7 @@ int main(int argc, char** argv) {
                 
                 generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "refined_volume");
                 
-                WriteToPovRay(mcut->volume, outputDir, frame, mcut->cuttingFaces);
+                WriteToPovRay(mcut->volume, outputDir, frame, mcut->boundary_faces);
                 Write_Boundary_Mesh_To_File(outputDir, "cutting_volume_boundary", frame, mcut->volume);
                 //Write_Volume_To_File(outputDir, "sim_volume", frame, mcut->sim_volume);
                 Write_Volume_To_File(outputDir, "cutting_volume", frame, mcut->volume);
@@ -1622,7 +1617,7 @@ int main(int argc, char** argv) {
                 mcut->Update_Cutting_Particles();
                 
                 generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "cutting_volume");
-                WriteToPovRay(refined_volume, outputDir, frame);
+                WriteToPovRay(refined_volume, outputDir, frame, mcut->boundary_faces);
             }
             break;
         }

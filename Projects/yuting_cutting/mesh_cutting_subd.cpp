@@ -363,6 +363,7 @@ void MESH_CUTTING<T>::Initialize_Cutting_Volume()
         cutting_particle_material_space.Append(volume->particles.X(i));
     
     volume->mesh.Initialize_Boundary_Mesh();
+    boundary_particles.Remove_All();
     ARRAY<I3>& bm = volume->mesh.boundary_mesh->elements;
     for (int i = 0; i < bm.m; ++i) {
         for (int j = 0; j < 3; ++j) {
@@ -1711,6 +1712,12 @@ void MESH_CUTTING<T>::Partial_Refine()
     ARRAY<bool> new_is_blue;
     int n = volume->mesh.elements.m;
     
+    HASHTABLE<int> bi;
+    for (int i = 0; i < cutting_particle_material_space.m; ++i) {
+        if (boundary_particles.Contains(cutting_particle_material_space(i))) {
+            bi.Set(i);
+        }
+    }
     for (int i = 0; i < n; i++) {
         if (tet_cuttings(i).material_ids.m < MaxPieces){
             const int parent_sim_tet = ctet2stet(i);
@@ -1740,7 +1747,11 @@ void MESH_CUTTING<T>::Partial_Refine()
                         if (!new_nodes2.Get(face, fc)) {
                             new_nodes2.Set(face, fc);
                             weights_in_sim.Append(PARENT(parent_sim_tet, c));
-                            cutting_particle_material_space.Append(weight2vec_material_space(i, c));
+                            TV pm = weight2vec_material_space(i, c);
+                            cutting_particle_material_space.Append(pm);
+                            if (bi.Contains(n1) && bi.Contains(n2) && bi.Contains(n3)) {
+                                boundary_particles.Set(pm);
+                            }
                         }
                         break;
                     }
@@ -1761,7 +1772,11 @@ void MESH_CUTTING<T>::Partial_Refine()
                                 CENTER c = Weight_In_Sim_Tet(tc.edge_centers[face2edge[j][k]].Value(), element, parent_sim_tet);
                                 new_nodes.Set(edge,eid);
                                 weights_in_sim.Append(PARENT(parent_sim_tet, c));
-                                cutting_particle_material_space.Append(weight2vec_material_space(i, c));
+                                TV pm = weight2vec_material_space(i, c);
+                                cutting_particle_material_space.Append(pm);
+                                if (bi.Contains(fn1) && bi.Contains(fn2)) {
+                                    boundary_particles.Set(pm);
+                                }
                             }
                             if (tet_cuttings(i).has_material(m1)) {
                                 ne.Append(I4(cid, fc, fn1, eid));
@@ -1911,13 +1926,14 @@ void MESH_CUTTING<T>::Partial_Refine()
     Update_Cutting_Particles();
     
     cutting_particle_material_space = new_cutting_particles_material_space;
+
 //    cutting_particle_material_space.Resize(volume->particles.X.m);
 //    for(int i=0;i<volume->particles.X.m;++i)
 //        cutting_particle_material_space(i)=volume->particles.X(i);
 }
 
 template<class T>
-void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume, bool update_boundary_particles)
+void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume)
 {
     refined_volume->mesh.elements = volume->mesh.elements;
     
@@ -1928,6 +1944,15 @@ void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volu
     ARRAY<PARENT> new_weights_in_sim = weights_in_sim;
     
     int n = refined_volume->mesh.elements.m;
+    
+    HASHTABLE<int> new_boundary_indices;
+    for (int i = 0; i < cutting_particle_material_space.m; ++i) {
+        if (boundary_particles.Contains(cutting_particle_material_space(i))) {
+            new_boundary_indices.Set(i);
+        }
+    }
+    
+    //add new particles
     for (int i = 0; i < n; i++) {
         if (tet_cuttings(i).material_ids.m < MaxPieces){
             const int parent_sim_tet = ctet2stet(i);
@@ -1954,6 +1979,9 @@ void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volu
                         add = 1;
                         I3 face = I3(n1, n2, n3).Sorted();
                         if (!new_nodes2.Get(face, fc)) {
+                            if (new_boundary_indices.Contains(n1) && new_boundary_indices.Contains(n2) && new_boundary_indices.Contains(n3)) {
+                                new_boundary_indices.Set(fc);
+                            }
                             new_nodes2.Set(face, fc);
                             new_weights_in_sim.Append(PARENT(parent_sim_tet, c));
                         }
@@ -1973,6 +2001,9 @@ void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volu
                             int eid = new_weights_in_sim.m;
                             I2 edge = I2(fn1, fn2).Sorted();
                             if (!new_nodes.Get(edge, eid)) {
+                                if (new_boundary_indices.Contains(fn1) && new_boundary_indices.Contains(fn2)) {
+                                    new_boundary_indices.Set(eid);
+                                }
                                 CENTER c = Weight_In_Sim_Tet(tc.edge_centers[face2edge[j][k]].Value(), element, parent_sim_tet);
                                 new_nodes.Set(edge,eid);
                                 new_weights_in_sim.Append(PARENT(parent_sim_tet, c));
@@ -1996,6 +2027,7 @@ void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volu
             }
         }
     }
+    boundary_indices = new_boundary_indices;
     
     //subdivide by face intersections
     for (int i = 0; i < refined_volume->mesh.elements.m; i++) {
@@ -2094,9 +2126,33 @@ void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volu
         refined_volume->particles.X(i) = weight2vec_sim(new_weights_in_sim(i).id, new_weights_in_sim(i).weight);
     }
     refined_volume->Update_Number_Nodes();
+    
+    //update boundary faces
+    boundary_faces.Remove_All();
+    refined_volume->mesh.Initialize_Boundary_Mesh();
+    ARRAY<I3>& bf = refined_volume->mesh.boundary_mesh->elements;
+    for (int i = 0; i < bf.m; ++i) {
+        if (boundary_indices.Contains(bf(i)(0)) && boundary_indices.Contains(bf(i)(1)) && boundary_indices.Contains(bf(i)(2))) {
+            boundary_faces.Set(bf(i).Sorted());
+        }
+    }
 }
 
-template<typename T> 
+template<typename T>
+void MESH_CUTTING<T>::Set_Material_Space_Particles_To_Current_World_Space_Positions() {
+    PHYSBAM_ASSERT(volume->particles.X.m == cutting_particle_material_space.m);
+    HASHTABLE<TV> new_boundary_particles;
+    for (int i = 0; i < cutting_particle_material_space.m; ++i) {
+        if (boundary_particles.Contains(cutting_particle_material_space(i))) {
+            new_boundary_particles.Set(volume->particles.X(i));
+        }
+        cutting_particle_material_space(i) = volume->particles.X(i);
+    }
+    boundary_particles = new_boundary_particles;
+}
+
+
+template<typename T>
 inline typename MESH_CUTTING<T>::TV& MESH_CUTTING<T>::Position(const int element_id, const int node_id) const
 {
     return volume->particles.X(volume->mesh.elements(element_id)(node_id));

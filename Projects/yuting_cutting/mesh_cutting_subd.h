@@ -155,9 +155,10 @@ public:
     ARRAY<TV> dragging_targets;
     ARRAY<VECTOR<int,2> > faces_to_draw;
     ARRAY<VECTOR<int,2> > interfaces_to_draw;
-    HASHTABLE<VECTOR<int, 3> > cuttingFaces;
+    
     ARRAY<TV> cutting_particle_material_space;
     HASHTABLE<TV> boundary_particles;
+    HASHTABLE<int> boundary_indices;
     HASHTABLE<I3> boundary_faces;
     
     //for simulation
@@ -200,8 +201,10 @@ public:
     void Draw(bool drawing_cutting_mesh, const DRAWING_MODE& mode = normal) const;
     void Write_To_File(const std::string& writing_directory, int frame) const;
     void Write_Boundary_Mesh_To_File(const std::string& writing_directory, int frame) const;
-    void Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume, bool update_boundary_particles = false);
+    void Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume);
     int Sorted_Id(const I3& sorted_tri, const I3& tri, int material_id);
+    void Set_Material_Space_Particles_To_Current_World_Space_Positions();
+    
 private:
     ARRAY<VECTOR<int, NumNodesPerTet> > original_elements,original_sim_elements;
     HASHTABLE<VECTOR<int,3> > cutFaces;
