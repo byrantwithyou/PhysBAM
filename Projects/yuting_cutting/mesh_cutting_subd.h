@@ -157,6 +157,8 @@ public:
     ARRAY<VECTOR<int,2> > interfaces_to_draw;
     HASHTABLE<VECTOR<int, 3> > cuttingFaces;
     ARRAY<TV> cutting_particle_material_space;
+    HASHTABLE<TV> boundary_particles;
+    HASHTABLE<I3> boundary_faces;
     
     //for simulation
     //elasticity
@@ -198,8 +200,7 @@ public:
     void Draw(bool drawing_cutting_mesh, const DRAWING_MODE& mode = normal) const;
     void Write_To_File(const std::string& writing_directory, int frame) const;
     void Write_Boundary_Mesh_To_File(const std::string& writing_directory, int frame) const;
-    void Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume);
-    void Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume, HASHTABLE<I3>& cutting_faces, HASHTABLE<I3>& new_cutting_faces);
+    void Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume, bool update_boundary_particles = false);
     int Sorted_Id(const I3& sorted_tri, const I3& tri, int material_id);
 private:
     ARRAY<VECTOR<int, NumNodesPerTet> > original_elements,original_sim_elements;
