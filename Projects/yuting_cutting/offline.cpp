@@ -1496,7 +1496,7 @@ int main(int argc, char** argv) {
             }
 
             int frame = 0;
-            while (frame < 280) {
+            while (frame < 300) {
                 ++frame;
                 if (frame == f1) {
                     TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;

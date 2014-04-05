@@ -1917,7 +1917,7 @@ void MESH_CUTTING<T>::Partial_Refine()
 }
 
 template<class T>
-void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume, bool update_boundary_particles = false)
+void MESH_CUTTING<T>::Refine_And_Save_To(TETRAHEDRALIZED_VOLUME<T>* refined_volume, bool update_boundary_particles)
 {
     refined_volume->mesh.elements = volume->mesh.elements;
     
