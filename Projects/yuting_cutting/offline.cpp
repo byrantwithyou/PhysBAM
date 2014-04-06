@@ -1460,7 +1460,7 @@ int main(int argc, char** argv) {
             mcut->Initialize_Elasticity();
             TETRAHEDRALIZED_VOLUME<T> *refined_volume = new TETRAHEDRALIZED_VOLUME<T>();
             
-            int f1 = 1, f2 = 11, f3 = f2 + 2, f4 = f3 + 90;
+            int f1 = 1, f2 = 181, f3 = f2 + 2, f4 = f3 + 90;
             int f = f2 - f1;
             int n = 5;//refine curve
             
@@ -1468,14 +1468,14 @@ int main(int argc, char** argv) {
             T w = sqrt(sqr(0.6)-sqr(r))*1.1;
             cout << "half width " << w / 1.1 << endl;
             
-            T total_theta = pi / 8;
+            T total_theta = 4 * pi;
             T init_theta = -pi * 3 / 4;
             T dtheta = -total_theta / f / ratio;
             T dtheta_cut = total_theta / f / n;
             T theta = init_theta;
             
             T init_phi = asin(-0.5 / 0.6);
-            T final_phi = asin(-0.25 / 0.6);
+            T final_phi = asin(0.5 / 0.6);
             T dphi_cut = (final_phi - init_phi) / f / n;
             T phi = init_phi;
             
