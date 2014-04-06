@@ -805,7 +805,7 @@ int main(int argc, char** argv) {
                 mcut->Update_Cutting_Particles();
                 
                 generateAndSaveRefinedVolume(refined_volume, frame, outputDir, "cutting_volume");
-                WriteToPovRay(refined_volume, outputDir, frame);
+                WriteToPovRay(refined_volume, outputDir, frame, mcut->boundary_faces);
             }
             break;
         }
