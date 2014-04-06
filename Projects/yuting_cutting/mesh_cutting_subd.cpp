@@ -1926,10 +1926,6 @@ void MESH_CUTTING<T>::Partial_Refine()
     Update_Cutting_Particles();
     
     cutting_particle_material_space = new_cutting_particles_material_space;
-
-//    cutting_particle_material_space.Resize(volume->particles.X.m);
-//    for(int i=0;i<volume->particles.X.m;++i)
-//        cutting_particle_material_space(i)=volume->particles.X(i);
 }
 
 template<class T>

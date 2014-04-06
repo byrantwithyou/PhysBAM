@@ -324,7 +324,7 @@ void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, i
 }
 
 template<class T>
-void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, int frame, HASHTABLE<I3>& cuttingFaces)
+void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, int frame, HASHTABLE<I3>& boundary_faces)
 {
     TRIANGULATED_SURFACE<T> *ts = TRIANGULATED_SURFACE<T>::Create();
     ts->Use_Vertex_Normals();
@@ -351,7 +351,7 @@ void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, i
     const char* div = "";
     int total = ts->mesh.elements.m;
     for (int i = 0; i < ts->mesh.elements.m; ++i) {
-        if (cuttingFaces.Contains(ts->mesh.elements(i).Sorted())) {
+        if (boundary_faces.Contains(ts->mesh.elements(i).Sorted())) {
             --total;
         }
     }
@@ -383,7 +383,7 @@ void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, i
     fs << total << ", " << endl;
     div = "";
     for (int i = 0; i < ts->mesh.elements.m; ++i) {
-        if (cuttingFaces.Contains(ts->mesh.elements(i).Sorted())) {
+        if (boundary_faces.Contains(ts->mesh.elements(i).Sorted())) {
             continue;
         }
         fs << div << "<" << 3*i << ", " << 3*i+1 << ", " << 3*i+2 << ">";
@@ -394,7 +394,7 @@ void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, i
     
     if (total != ts->mesh.elements.m) {
         //cutting faces
-        fs << "#declare cuttingFaces = mesh2 {" << endl;
+        fs << "#declare boundary_faces = mesh2 {" << endl;
         fs << "vertex_vectors {" << endl;
         fs << ts->mesh.elements.m*3 << ", " << endl;
         div = "";
@@ -421,7 +421,7 @@ void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, i
         fs << ts->mesh.elements.m-total << ", " << endl;
         div = "";
         for (int i = 0; i < ts->mesh.elements.m; ++i) {
-            if (cuttingFaces.Contains(ts->mesh.elements(i).Sorted())) {
+            if (boundary_faces.Contains(ts->mesh.elements(i).Sorted())) {
                 fs << div << "<" << 3*i << ", " << 3*i+1 << ", " << 3*i+2 << ">";
                 div = ", ";
             }
@@ -1460,7 +1460,7 @@ int main(int argc, char** argv) {
             mcut->Initialize_Elasticity();
             TETRAHEDRALIZED_VOLUME<T> *refined_volume = new TETRAHEDRALIZED_VOLUME<T>();
             
-            int f1 = 1, f2 = 181, f3 = 183, f4 = 273;
+            int f1 = 1, f2 = 11, f3 = f2 + 2, f4 = f3 + 90;
             int f = f2 - f1;
             int n = 5;//refine curve
             
@@ -1468,17 +1468,18 @@ int main(int argc, char** argv) {
             T w = sqrt(sqr(0.6)-sqr(r))*1.1;
             cout << "half width " << w / 1.1 << endl;
             
+            T total_theta = pi / 8;
             T init_theta = -pi * 3 / 4;
-            T dtheta = -4 * pi / f / ratio;
-            T dtheta_cut = 4 * pi / f / n;
+            T dtheta = -total_theta / f / ratio;
+            T dtheta_cut = total_theta / f / n;
             T theta = init_theta;
             
             T init_phi = asin(-0.5 / 0.6);
-            T final_phi = asin(0.5 / 0.6);
+            T final_phi = asin(-0.25 / 0.6);
             T dphi_cut = (final_phi - init_phi) / f / n;
             T phi = init_phi;
             
-            T pt = (final_phi - init_phi) / 4 / pi;
+            T pt = (final_phi - init_phi) / total_theta;
             
             cutting_tri_mesh->particles.Add_Elements((n+1)*3);
             cutting_tri_mesh->Update_Number_Nodes();
@@ -1531,9 +1532,7 @@ int main(int argc, char** argv) {
                     mcut->Cut(*cutting_tri_mesh, true, true);
                 }
                 else if (frame == f3) {
-                    for (int i = 0; i < mcut->cutting_particle_material_space.m; ++i) {
-                        mcut->cutting_particle_material_space(i) = mcut->volume->particles.X(i);
-                    }
+                    mcut->Set_Material_Space_Particles_To_Current_World_Space_Positions();
                     
                     f = f4 - f3;
                     init_theta = -pi * 3 / 4;
