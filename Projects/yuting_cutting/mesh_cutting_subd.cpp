@@ -1457,7 +1457,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
         TET tet_element = original_elements(i);
         if (!need_merge.Contains(i)) {//only nodes on need_merge(i.e. split) elements are duplicated
             int parent_sim_tet_id = original_ctet2stet(i);
-            if (need_dup(elements(i)(0)) || need_dup(elements(i)(1)) || need_dup(elements(i)(2)) || need_dup(elements(i)(3))) {
+            if (need_dup(original_elements(i)(0)) || need_dup(original_elements(i)(1)) || need_dup(original_elements(i)(2)) || need_dup(original_elements(i)(3))) {
                 need_merge.Set(i);
                 for (int j = 0; j < 4; ++j) {
                     new_need_dup(original_elements(i)(j)) = true;
@@ -1492,19 +1492,17 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
                     ALGEBRA::MATRIX_3X3<ST> ucc = undeformed_config_copy(parent_sim_tet_id);
                     undeformed_config_copy.Append(ucc);
                 }
-                break;
             }
         }
     }
     
+    
     for (int i = 0; i < num_elements; i++) {
         TET tet_element = original_elements(i);
         int parent_sim_tet_id = original_ctet2stet(i);
-        if ((!need_merge.Contains(i)) && sim_tet_split(parent_sim_tet_id)) {//only nodes on need_merge(i.e. split)
+        if ((!need_merge.Contains(i))) {// && sim_tet_split(parent_sim_tet_id)) {//only nodes on need_merge(i.e. split)
             need_merge.Set(i);
-            for (int j = 0; j < 4; ++j) {
-                need_dup(original_elements(i)(j)) = true;
-            }
+            new_need_dup.Subset(original_elements(i)).Fill(1);
             //split its parent sim tet
             for (int j = 0; j < NumNodesPerTet; j++){
                 sim_node_from.Append(original_sim_elements(parent_sim_tet_id)(j));
@@ -1541,7 +1539,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
     for (int i = 0; i < num_elements; i++) {
         if (!need_merge.Contains(i)) {//only nodes on need_merge(i.e. split) elements are duplicated
             for (int j = 0; j < NumNodesPerTet; j++) {
-                if (new_need_dup(elements(i)(j))) {
+                if (new_need_dup(original_elements(i)(j))) {
                     need_merge.Set(i);
                     break;}}}}
     
