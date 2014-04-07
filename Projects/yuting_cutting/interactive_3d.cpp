@@ -452,7 +452,7 @@ void motion(int x, int y)
     end_position = TV( xx, yy, intrude/2);
 
     if (cutting) {
-        if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude() > 1e-2)
+        if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude() > 1e-3)
             cutting_curve.Append(end_position);
     }
     else if(dragging) {

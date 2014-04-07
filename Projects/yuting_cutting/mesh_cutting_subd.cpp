@@ -1425,7 +1425,9 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
     HASHTABLE<int> need_merge;//whether the element needs to be merged
     
     ARRAY<int> sim_node_from(sim_volume->particles.X.m);
-    ARRAY<bool> sim_tet_split(sim_volume->mesh.elements.m);
+    ARRAY<int> sim_node_need_dup(sim_volume->particles.X.m);
+    int num_original_sim_elements = sim_volume->mesh.elements.m;
+    ARRAY<bool> sim_tet_split(num_original_sim_elements);
     
     for (int i = 0; i < sim_volume->particles.X.m; i++){
         sim_node_from(i) = i;
@@ -1445,64 +1447,34 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
         for (int j = oe; j < ce; ++j) {
             need_merge.Set(j);
         }
+        int pid = original_ctet2stet(i);
         for (int j = 0; j < 4; ++j) {
-            need_dup(original_elements(i)(j)) = true;
+            need_dup(original_elements(i)(j)) = 1;
+            sim_node_need_dup(original_sim_elements(pid)(j)) = 1;
         }
     }
     cout << components.Size() << " tets touched\n";
     
-    ARRAY<bool> new_need_dup = need_dup;
-    //duplicated all touched nodes and split all sim tets that are cut
-    for (int i = 0; i < num_elements; i++) {
-        TET tet_element = original_elements(i);
-        if (!need_merge.Contains(i)) {//only nodes on need_merge(i.e. split) elements are duplicated
-            int parent_sim_tet_id = original_ctet2stet(i);
-            if (need_dup(original_elements(i)(0)) || need_dup(original_elements(i)(1)) || need_dup(original_elements(i)(2)) || need_dup(original_elements(i)(3))) {
-                need_merge.Set(i);
-                for (int j = 0; j < 4; ++j) {
-                    new_need_dup(original_elements(i)(j)) = true;
-                }
-                //split itself and parent sim element
-                for (int j = 0; j < NumNodesPerTet; j++){
-                    sim_node_from.Append(original_sim_elements(parent_sim_tet_id)(j));
-                    elements(i)(j) = weights_in_sim.m;
-                    CENTER c; c[j] = 1;
-                    CENTER w = Weight_In_Sim_Tet(c, tet_element, parent_sim_tet_id, original_sim_elements);
-                    PHYSBAM_ASSERT(cutting_particle_material_space.m == weights_in_sim.m);
-                    if (!sim_tet_split(parent_sim_tet_id)){
-                        weights_in_sim.Append(PARENT(parent_sim_tet_id, w));
-                        material_node_from.Append(original_elements(i)(j));
-                        cutting_particle_material_space.Append((TV)cutting_particle_material_space(tet_element(j)));
-                    }
-                    else {
-                        weights_in_sim.Append(PARENT(sim_volume->mesh.elements.m, w));
-                        material_node_from.Append(original_elements(i)(j));
-                        cutting_particle_material_space.Append((TV)cutting_particle_material_space(tet_element(j)));
-                    }
-                }
-                int sim_size = sim_node_from.m;
-                if (!sim_tet_split(parent_sim_tet_id)){//no sim tet to be appended
-                    sim_volume->mesh.elements(parent_sim_tet_id) = VECTOR<int, NumNodesPerTet>(sim_size-4, sim_size-3, sim_size-2, sim_size-1);
-                    sim_tet_split(parent_sim_tet_id) = 1;
-                }
-                else {
-                    ctet2stet(i) = sim_volume->mesh.elements.m;
-                    sim_volume->mesh.elements.Append(VECTOR<int, NumNodesPerTet>(sim_size-4, sim_size-3, sim_size-2, sim_size-1));
-                    sim_tet_from.Append(parent_sim_tet_id);
-                    ALGEBRA::MATRIX_3X3<ST> ucc = undeformed_config_copy(parent_sim_tet_id);
-                    undeformed_config_copy.Append(ucc);
+    //which sim tets need duplication
+    ARRAY<bool> new_sim_tet_split = sim_tet_split;
+    for (int i = 0; i < num_original_sim_elements; ++i) {
+        if (!sim_tet_split(i)) {
+            for (int j = 0; j < 4; ++j) {
+                if (sim_node_need_dup(original_sim_elements(i)(j))) {
+                    new_sim_tet_split(i) = 1;
+                    break;
                 }
             }
         }
     }
     
-    
+    //split all tets whose parent sim tet should be split
     for (int i = 0; i < num_elements; i++) {
         TET tet_element = original_elements(i);
         int parent_sim_tet_id = original_ctet2stet(i);
-        if ((!need_merge.Contains(i))) {// && sim_tet_split(parent_sim_tet_id)) {//only nodes on need_merge(i.e. split)
+        if ((!need_merge.Contains(i)) && new_sim_tet_split(parent_sim_tet_id)) {//only nodes on need_merge(i.e. split)
             need_merge.Set(i);
-            new_need_dup.Subset(original_elements(i)).Fill(1);
+            need_dup.Subset(original_elements(i)).Fill(1);
             //split its parent sim tet
             for (int j = 0; j < NumNodesPerTet; j++){
                 sim_node_from.Append(original_sim_elements(parent_sim_tet_id)(j));
@@ -1539,7 +1511,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
     for (int i = 0; i < num_elements; i++) {
         if (!need_merge.Contains(i)) {//only nodes on need_merge(i.e. split) elements are duplicated
             for (int j = 0; j < NumNodesPerTet; j++) {
-                if (new_need_dup(original_elements(i)(j))) {
+                if (need_dup(original_elements(i)(j))) {
                     need_merge.Set(i);
                     break;}}}}
     
