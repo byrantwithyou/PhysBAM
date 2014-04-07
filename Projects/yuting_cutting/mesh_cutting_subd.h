@@ -174,6 +174,8 @@ public:
     ALGEBRA::VECTOR<ST>* my_constrained_locations;
     T timestep; int ratio;
     ARRAY<ALGEBRA::MATRIX_3X3<ST> > undeformed_config_copy;
+    ARRAY<VECTOR<ST,3> > sim_particles_original_positions;
+    
     void Initialize_Elasticity();
     void Reinitialize_Elasticity();
     
