@@ -13,6 +13,7 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Matrices/ROTATION.h>
+#include <Tools/Grids_Uniform/GRID.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 
 #include <fstream>
@@ -521,17 +522,15 @@ void initialize_cutting_mesh()
 
 void initialize_volume1()
 {       
-    sim_volume->particles.Add_Elements(5);
+    sim_volume->particles.Add_Elements(4);
     sim_volume->Update_Number_Nodes();
     sim_volume->particles.X(0) = TV(0.5, 0.0, 0.0);
     sim_volume->particles.X(1) = TV(0.0, 0, -0.5);
     sim_volume->particles.X(2) = TV(-0.5, 0.0, 0.0);
-    sim_volume->particles.X(3) = TV(0.0, 0.0, 0.5);
-    sim_volume->particles.X(4) = TV(0.0, 0.5, 0);
+    sim_volume->particles.X(3) = TV(0.0, 0.5, 0);
     sim_volume->Update_Number_Nodes();
     
-    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 3, 4));
-    //sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 3, 4));
+    sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0,1,2,3));
 }
 
 void initialize_volume2()
@@ -944,32 +943,254 @@ void Initialize(bool reinitialize_cutting_mesh)
     }
     
     if(argc1 == 1) {
-        initialize_volume7();
+        initialize_volume1();
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
     }
     else {
         const std::string filename(argv1[1]);
-        TETRAHEDRALIZED_VOLUME<float> *sim_volume_float;
-        sim_volume_float = TETRAHEDRALIZED_VOLUME<float>::Create();
-        FILE_UTILITIES::Read_From_File<float>(filename, *sim_volume_float);
-        sim_volume->particles.Add_Elements(sim_volume_float->particles.X.m);
-        sim_volume->Update_Number_Nodes();
-        for (int i = 0; i < sim_volume_float->particles.X.m; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                sim_volume->particles.X(i)(j) = sim_volume_float->particles.X(i)(j);
-            }
-        }
-        sim_volume->mesh.elements = sim_volume_float->mesh.elements;
-        {
-            ARRAY<int> ll;
-            sim_volume->mesh.Identify_Face_Connected_Components(ll);
-            cout << ll.Max() << " CCs\n";
-        }
-        Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
+//        TETRAHEDRALIZED_VOLUME<float> *sim_volume_float;
+//        sim_volume_float = TETRAHEDRALIZED_VOLUME<float>::Create();
+//        FILE_UTILITIES::Read_From_File<float>(filename, *sim_volume_float);
+//        sim_volume->particles.Add_Elements(sim_volume_float->particles.X.m);
+//        sim_volume->Update_Number_Nodes();
+//        for (int i = 0; i < sim_volume_float->particles.X.m; ++i) {
+//            for (int j = 0; j < 3; ++j) {
+//                sim_volume->particles.X(i)(j) = sim_volume_float->particles.X(i)(j);
+//            }
+//        }
+//        sim_volume->mesh.elements = sim_volume_float->mesh.elements;
+//        {
+//            ARRAY<int> ll;
+//            sim_volume->mesh.Identify_Face_Connected_Components(ll);
+//            cout << ll.Max() << " CCs\n";
+//        }
+//        Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
+        
+        sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(156, 96, 50),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
+        
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
         if(argc1 == 2) {
             if (writing_interaction_to_file){
                 string interaction_file_name = "interactions/interaction2.txt";
                 interaction_file.open(interaction_file_name.c_str());
+            }
+            
+            if (0) {
+                if (1) {
+                    int l = 11;//number of cuts
+                    int n = 5;//refine curve
+                    int f1 = 1, f2 = 181;
+                    int f = f2 - f1;
+                    
+                    T r = 0.58;
+                    T w = sqrt(sqr(0.6)-sqr(r))*1.1;
+                    cout << "half width " << w / 1.1 << endl;
+                    
+                    T total_theta = 4 * pi;
+                    T init_theta = -pi * 3 / 4;
+                    T dtheta_cut = total_theta / f / n;
+                    T theta = init_theta;
+                    
+                    T init_phi = asin(-0.5 / 0.6);
+                    T final_phi = asin(0.5 / 0.6);
+                    T dphi_cut = (final_phi - init_phi) / f / n;
+                    T phi = init_phi;
+                    
+                    T pt = (final_phi - init_phi) / total_theta;
+                    int i = 0;
+                    
+                    //get L_input from complete cutting mesh
+                    T L=-1;
+                    bool uniform_L = 0;
+                    if (uniform_L) {
+                        TRIANGULATED_SURFACE<T>* ts = TRIANGULATED_SURFACE<T>::Create();
+                        ts->particles.Add_Elements((n+1)*3*l);
+                        ts->Update_Number_Nodes();
+                        while (i < l) {
+                            if (i == 0) {
+                                TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                                TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
+                                TV dp = p.Cross(t).Normalized() * w;
+                                for (int j = 0; j < n+1; ++j) {
+                                    ts->particles.X(3*j) = p - dp - t * w * (n - j) / n;
+                                    ts->particles.X(3*j+1) = p - t * w * (n - j) / n;
+                                    ts->particles.X(3*j+2) = p + dp - t * w * (n - j) / n;
+                                }
+                            }
+                            else if (i < l - 1) {
+                                for (int j = 0; j < n+1; ++j) {
+                                    TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                                    TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt);
+                                    TV dp = p.Cross(t).Normalized() * w;
+                                    ts->particles.X(3*j+(n + 1) * 3 * i) = p - dp;
+                                    ts->particles.X(3*j+1+(n + 1) * 3 * i) = p;
+                                    ts->particles.X(3*j+2+(n + 1) * 3 * i) = p + dp;
+                                    if (j != n) {
+                                        theta += dtheta_cut;
+                                        phi += dphi_cut;
+                                    }
+                                }
+                            }
+                            else if (i == l - 1) {
+                                TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                                TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
+                                TV dp = p.Cross(t).Normalized() * w;
+                                for (int j = 0; j < n+1; ++j) {
+                                    ts->particles.X(3*j+(n + 1) * 3 * i) = p - dp + t * w * j / n;
+                                    ts->particles.X(3*j+1+(n + 1) * 3 * i) = p + t * w * j / n;
+                                    ts->particles.X(3*j+2+(n + 1) * 3 * i) = p + dp + t * w * j / n;
+                                }
+                            }
+                            ++i;
+                        }
+                        for (int i = 0; i < l; ++i) {
+                            for (int j = 0; j < n; ++j) {
+                                for (int k = 0; k < 2; ++k) {
+                                    int s = 3 * j + k + (n + 1) * 3 * i;
+                                    ts->mesh.elements.Append(I3(s, s+3, s+1));
+                                    ts->mesh.elements.Append(I3(s+1, s+3, s+4));
+                                }
+                            }
+                        }
+                        
+                        T L_tv=0,L_ts=0;
+                        for(int i=0;i<sim_volume->mesh.elements.m;i++)
+                            L_tv=std::max(L_tv, RANGE<TV>::Bounding_Box(sim_volume->particles.X.Subset(sim_volume->mesh.elements(i))).Edge_Lengths().Max());
+                        for(int i=0;i<ts->mesh.elements.m;i++)
+                            L_ts=std::max(L_ts, RANGE<TV>::Bounding_Box(ts->particles.X.Subset(ts->mesh.elements(i))).Edge_Lengths().Max());
+                        L=L_tv+L_ts;
+                    }
+                    
+                    
+                    
+                    cutting_tri_mesh->particles.Add_Elements((n+1)*3);
+                    cutting_tri_mesh->Update_Number_Nodes();
+                    for (int j = 0; j < n; ++j) {
+                        for (int k = 0; k < 2; ++k) {
+                            int s = 3 * j + k;
+                            cutting_tri_mesh->mesh.elements.Append(I3(s, s+3, s+1));
+                            cutting_tri_mesh->mesh.elements.Append(I3(s+1, s+3, s+4));
+                        }
+                    }
+                    
+                    i = 0;
+                    theta = init_theta;
+                    phi = init_phi;
+                    while (i < l) {
+                        if (i == 0) {
+                            TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                            TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
+                            TV dp = p.Cross(t).Normalized() * w;
+                            for (int j = 0; j < n+1; ++j) {
+                                cutting_tri_mesh->particles.X(3*j) = p - dp - t * w * (n - j) / n;
+                                cutting_tri_mesh->particles.X(3*j+1) = p - t * w * (n - j) / n;
+                                cutting_tri_mesh->particles.X(3*j+2) = p + dp - t * w * (n - j) / n;
+                            }
+                            mcut->Cut(*cutting_tri_mesh, false, true, L);
+                        }
+                        else if (i < l - 1) {
+                            for (int j = 0; j < n+1; ++j) {
+                                TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                                TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt);
+                                TV dp = p.Cross(t).Normalized() * w;
+                                cutting_tri_mesh->particles.X(3*j) = p - dp;
+                                cutting_tri_mesh->particles.X(3*j+1) = p;
+                                cutting_tri_mesh->particles.X(3*j+2) = p + dp;
+                                if (j != n) {
+                                    theta += dtheta_cut;
+                                    phi += dphi_cut;
+                                }
+                            }
+                            mcut->Cut(*cutting_tri_mesh, false, true, L);
+                        }
+                        else if (i == l - 1) {
+                            TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                            TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
+                            TV dp = p.Cross(t).Normalized() * w;
+                            for (int j = 0; j < n+1; ++j) {
+                                cutting_tri_mesh->particles.X(3*j) = p - dp + t * w * j / n;
+                                cutting_tri_mesh->particles.X(3*j+1) = p + t * w * j / n;
+                                cutting_tri_mesh->particles.X(3*j+2) = p + dp + t * w * j / n;
+                            }
+                            mcut->Cut(*cutting_tri_mesh, true, true, L);
+                        }
+                        ++i;
+                    }
+                }
+                else {
+                    int f1 = 1, f2 = 181;
+                    int f = f2 - f1;
+                    int n = 5;//refine curve
+                    
+                    T r = 0.58;
+                    T w = sqrt(sqr(0.6)-sqr(r))*1.1;
+                    cout << "half width " << w / 1.1 << endl;
+                    
+                    T total_theta = 4 * pi;
+                    T init_theta = -pi * 3 / 4;
+                    T dtheta_cut = total_theta / f / n;
+                    T theta = init_theta;
+                    
+                    T init_phi = asin(-0.5 / 0.6);
+                    T final_phi = asin(0.5 / 0.6);
+                    T dphi_cut = (final_phi - init_phi) / f / n;
+                    T phi = init_phi;
+                    
+                    T pt = (final_phi - init_phi) / total_theta;
+                    
+                    int l = 11;
+                    cutting_tri_mesh->particles.Add_Elements((n+1)*3*l);
+                    cutting_tri_mesh->Update_Number_Nodes();
+                    for (int i = 0; i < l; ++i) {
+                        for (int j = 0; j < n; ++j) {
+                            for (int k = 0; k < 2; ++k) {
+                                int s = 3 * j + k + (n + 1) * 3 * i;
+                                cutting_tri_mesh->mesh.elements.Append(I3(s, s+3, s+1));
+                                cutting_tri_mesh->mesh.elements.Append(I3(s+1, s+3, s+4));
+                            }
+                        }
+                    }
+                    
+                    int i = 0;
+                    while (i < l) {
+                        if (i == 0) {
+                            TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                            TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
+                            TV dp = p.Cross(t).Normalized() * w;
+                            for (int j = 0; j < n+1; ++j) {
+                                cutting_tri_mesh->particles.X(3*j) = p - dp - t * w * (n - j) / n;
+                                cutting_tri_mesh->particles.X(3*j+1) = p - t * w * (n - j) / n;
+                                cutting_tri_mesh->particles.X(3*j+2) = p + dp - t * w * (n - j) / n;
+                            }
+                        }
+                        else if (i < l - 1) {
+                            for (int j = 0; j < n+1; ++j) {
+                                TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                                TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt);
+                                TV dp = p.Cross(t).Normalized() * w;
+                                cutting_tri_mesh->particles.X(3*j+(n + 1) * 3 * i) = p - dp;
+                                cutting_tri_mesh->particles.X(3*j+1+(n + 1) * 3 * i) = p;
+                                cutting_tri_mesh->particles.X(3*j+2+(n + 1) * 3 * i) = p + dp;
+                                if (j != n) {
+                                    theta += dtheta_cut;
+                                    phi += dphi_cut;
+                                }
+                            }
+                        }
+                        else if (i == l - 1) {
+                            TV p = TV(sin(phi), cos(phi) * cos(theta), cos(phi) * sin(theta)) * r;
+                            TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
+                            TV dp = p.Cross(t).Normalized() * w;
+                            for (int j = 0; j < n+1; ++j) {
+                                cutting_tri_mesh->particles.X(3*j+(n + 1) * 3 * i) = p - dp + t * w * j / n;
+                                cutting_tri_mesh->particles.X(3*j+1+(n + 1) * 3 * i) = p + t * w * j / n;
+                                cutting_tri_mesh->particles.X(3*j+2+(n + 1) * 3 * i) = p + dp + t * w * j / n;
+                            }
+                            mcut->Cut(*cutting_tri_mesh, true, true);
+                        }
+                        ++i;
+                    }
+                }
             }
             if (0) {//test whether cutting result is correct
                 T vo = sim_volume->Total_Volume();
@@ -1042,8 +1263,22 @@ void Initialize(bool reinitialize_cutting_mesh)
                 }
             }
             cutting_tri_mesh->mesh.elements = ts_float->mesh.elements;
-            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-0.8,-0.8,-0.8),TV(0.8,0.8,0.8)));
+            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17)));
             mcut->Cut(*cutting_tri_mesh);
+            
+            //writing out the cow
+            mcut->volume->Update_Number_Nodes();
+            mcut->volume->mesh.Initialize_Boundary_Mesh(); //cout << "cutting boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
+            mcut->volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
+            mcut->volume->mesh.Identify_Face_Connected_Components(labels);
+            ARRAY<I4> new_mesh;
+            for (int i = 0; i < mcut->volume->mesh.elements.m; ++i) {
+                if (labels(i) != 1) {
+                    new_mesh.Append(mcut->volume->mesh.elements(i));
+                }
+            }
+            mcut->volume->mesh.elements = new_mesh;
+            FILE_UTILITIES::Write_To_File<T>("cow.tet.gz", *(mcut->volume));
         }
     }
     sim_volume->Update_Number_Nodes();

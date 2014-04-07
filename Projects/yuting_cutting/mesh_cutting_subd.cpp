@@ -896,11 +896,11 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
     for (int i = 0; i < NumMaterials; i++) {
         if (!picked[tc.material_ids(i)]) {
             ARRAY<int> cc = tc.Find_CC(tc.material_ids(i), picked);
-            //cout << cc << endl;
-            //            if (cc.m == NumMaterials) {
-            //                cout << tri2inter << endl;
-            //                cout << tc.turned_on << " not split " << NumMaterials << endl;
-            //            }
+//            cout << cc << endl;
+//            if (cc.m == NumMaterials) {
+//                cout << tri2inter << endl;
+//                cout << tc.turned_on << " not split " << NumMaterials << endl;
+//            }
             if (1){//cc.m != NumMaterials || face_cut) {
                 //cout << cc << endl;
                 //find parent sim tet_cc and split it
@@ -974,9 +974,8 @@ void MESH_CUTTING<T>::Split(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRA
 template<class T>
 void MESH_CUTTING<T>::Split2(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARRAY<int>& sim_node_from, ARRAY<bool>& sim_tet_split, ARRAY<int>& material_node_from)
 {
-    //    cout << endl << tet_cuttings(tet_id).turned_on << endl;
-    
     TET_CUTTING tc = tet_cuttings(tet_id);
+    TET_CUTTING otc = tc;
     VECTOR<bool, NumSplitTurnOns> can_split;
     for (int i = 0; i < NumSplitTurnOns; i++){
         if(tc.has_material(face2material[i][0]) && tc.has_material(face2material[i][1])) {
@@ -1175,12 +1174,12 @@ void MESH_CUTTING<T>::Split2(const int& tet_id, HASHTABLE<int,H>& tri2inter, ARR
     for (int i = 0; i < NumMaterials; i++) {
         if (!picked[tc.material_ids(i)]) {
             ARRAY<int> cc = tc.Find_CC(tc.material_ids(i), picked);
-            //cout << cc << endl;
-            //            if (cc.m == NumMaterials) {
-            //                cout << endl << "hit but not split tet " << tet_id << ": " << volume->mesh.elements(tet_id) << "    " << volume->particles.X.Subset(volume->mesh.elements(tet_id)) << endl;
-            //                cout <<  tri2inter << endl;
-            //                cout << "turned on: " << tc.turned_on << endl;
-            //            }
+//            if (cc.m == NumMaterials) {
+//                cout << endl << "hit but not split tet " << tet_id << ": " << volume->mesh.elements(tet_id) << "    " << volume->particles.X.Subset(volume->mesh.elements(tet_id)) << endl;
+//                cout <<  tri2inter << endl;
+//                cout << "turned on before cut: " << otc.turned_on << endl;
+//                cout << "turned on: " << tc.turned_on << endl;
+//            }
             if (1){//cc.m != NumMaterials || face_cut) {
                 //cout << cc << endl;
                 //find parent sim tet_cc and split it
@@ -1259,7 +1258,7 @@ int MESH_CUTTING<T>::Sorted_Id(const I3& sorted_tri, const I3& tri, int material
 }
 
 template<class T>
-void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine, bool material_space)
+void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine, bool material_space, T L_input)
 {
     cout << "cutting*************************************" << endl;
     
@@ -1293,7 +1292,12 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
     //intersections
     volume->Update_Number_Nodes();
     CONSISTENT_INTERSECTIONS<TV> intersections(*volume,cutting_surface);
-    intersections.Compute();
+    if (L_input > 0) {
+        intersections.Compute(L_input);
+    }
+    else {
+        intersections.Compute();
+    }
     
     HASHTABLE<I4,int> tet_from_tet;
     HASHTABLE<I3,ARRAY<int>> tet_from_face;
@@ -1509,7 +1513,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
     }
     
     for (int i = 0; i < num_elements; i++) {
-        if (!need_merge.Contains(i)) {//only nodes on need_merge(i.e. split) elements are duplicated
+        if (!need_merge.Contains(i)) {
             for (int j = 0; j < NumNodesPerTet; j++) {
                 if (need_dup(original_elements(i)(j))) {
                     need_merge.Set(i);

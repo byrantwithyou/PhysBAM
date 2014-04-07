@@ -195,7 +195,7 @@ public:
     void Keep_CC(int cc_id);
     void Connected_Components(TETRAHEDRALIZED_VOLUME<T>* v, ARRAY<int>& labels);
         
-    void Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine = true, bool material_space = false);
+    void Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine = true, bool material_space = false, T L_input = -1);
     int Compute_Intersection(const T& x, const T& y);
     void Update_For_Draw();
     void Draw_For_Picking();

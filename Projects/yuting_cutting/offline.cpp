@@ -1499,9 +1499,9 @@ int main(int argc, char** argv) {
                     TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
                     TV dp = p.Cross(t).Normalized() * w;
                     for (int j = 0; j < n+1; ++j) {
-                        cutting_tri_mesh->particles.X(3*j) = p - dp - t * w * (n - j);
-                        cutting_tri_mesh->particles.X(3*j+1) = p - t * w * (n - j);
-                        cutting_tri_mesh->particles.X(3*j+2) = p + dp - t * w * (n - j);
+                        cutting_tri_mesh->particles.X(3*j) = p - dp - t * w * (n - j) / n;
+                        cutting_tri_mesh->particles.X(3*j+1) = p - t * w * (n - j) / n;
+                        cutting_tri_mesh->particles.X(3*j+2) = p + dp - t * w * (n - j) / n;
                     }
                     mcut->Cut(*cutting_tri_mesh, false, true);
                 }
@@ -1525,9 +1525,9 @@ int main(int argc, char** argv) {
                     TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
                     TV dp = p.Cross(t).Normalized() * w;
                     for (int j = 0; j < n+1; ++j) {
-                        cutting_tri_mesh->particles.X(3*j) = p - dp + t * w * j;
-                        cutting_tri_mesh->particles.X(3*j+1) = p + t * w * j;
-                        cutting_tri_mesh->particles.X(3*j+2) = p + dp + t * w * j;
+                        cutting_tri_mesh->particles.X(3*j) = p - dp + t * w * j / n;
+                        cutting_tri_mesh->particles.X(3*j+1) = p + t * w * j / n;
+                        cutting_tri_mesh->particles.X(3*j+2) = p + dp + t * w * j / n;
                     }
                     mcut->Cut(*cutting_tri_mesh, true, true);
                 }
@@ -1550,9 +1550,9 @@ int main(int argc, char** argv) {
                     TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
                     TV dp = p.Cross(t).Normalized() * w;
                     for (int j = 0; j < n+1; ++j) {
-                        cutting_tri_mesh->particles.X(3*j) = p - dp - t * w * (n - j);
-                        cutting_tri_mesh->particles.X(3*j+1) = p - t * w * (n - j);
-                        cutting_tri_mesh->particles.X(3*j+2) = p + dp - t * w * (n - j);
+                        cutting_tri_mesh->particles.X(3*j) = p - dp - t * w * (n - j) / n;
+                        cutting_tri_mesh->particles.X(3*j+1) = p - t * w * (n - j) / n;
+                        cutting_tri_mesh->particles.X(3*j+2) = p + dp - t * w * (n - j) / n;
                     }
                     mcut->Cut(*cutting_tri_mesh, false, true);
                 }
@@ -1576,9 +1576,9 @@ int main(int argc, char** argv) {
                     TV t = TV(cos(phi), -sin(phi) * cos(theta) - cos(phi) * sin(theta) / pt, -sin(phi) * sin(theta) + cos(phi) * cos(theta) / pt).Normalized();
                     TV dp = p.Cross(t).Normalized() * w;
                     for (int j = 0; j < n+1; ++j) {
-                        cutting_tri_mesh->particles.X(3*j) = p - dp + t * w * j;
-                        cutting_tri_mesh->particles.X(3*j+1) = p + t * w * j;
-                        cutting_tri_mesh->particles.X(3*j+2) = p + dp + t * w * j;
+                        cutting_tri_mesh->particles.X(3*j) = p - dp + t * w * j / n;
+                        cutting_tri_mesh->particles.X(3*j+1) = p + t * w * j / n;
+                        cutting_tri_mesh->particles.X(3*j+2) = p + dp + t * w * j / n;
                     }
                     mcut->Cut(*cutting_tri_mesh, true, true);
                 }
