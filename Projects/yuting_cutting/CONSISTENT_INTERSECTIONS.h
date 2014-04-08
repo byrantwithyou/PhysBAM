@@ -81,7 +81,7 @@ public:
     HASHTABLE<I5,T4> hash_tv;
 
     T sigma,tau,delta,gamma;
-    T sigma_hat,lambda,mu,nu,rho,xi,zeta;
+    T sigma_hat,lambda,mu,nu,rho,xi,zeta,phi;
 
     CONSISTENT_INTERSECTIONS(TETRAHEDRALIZED_VOLUME<T>& tv_,TRIANGULATED_SURFACE<T>& ts_)
         :tv(tv_),ts(ts_)

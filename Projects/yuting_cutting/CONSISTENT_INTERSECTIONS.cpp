@@ -267,6 +267,7 @@ Set_Tol(T L_input)
     xi=56*eps_3_4_L3;
     
     lambda=1215*eps_L4;
+    phi=470*eps_L4;
     nu=(T)6844.5*eps_L4;
     zeta=1317*eps_L4;
 }
@@ -353,7 +354,7 @@ Compute_EE(I2 e,I2 g)
     if(sqr(d_hat)>sqr(gamma)*m2) return false;
     TV n=r.Cross(w);
     T a_hat=n.Dot(v),b_hat=n.Dot(u),a_bar=m2-a_hat,b_bar=m2-b_hat;
-    if(a_hat<=lambda || a_bar<=lambda || b_hat<=lambda || b_bar<=lambda) return false;
+    if(a_hat<=phi || a_bar<=phi || b_hat<=phi || b_bar<=phi) return false;
     hash_ee.Set(e.Append_Elements(g),T2(a_hat,b_hat)/m2);
     return true;
 }

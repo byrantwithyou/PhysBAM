@@ -15,6 +15,7 @@
 #include <Tools/Matrices/ROTATION.h>
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include "CONSISTENT_INTERSECTIONS.h"
 
 #include <fstream>
 #include <sstream>
@@ -44,7 +45,7 @@ void read_tsc(){__asm__("rdtsc");}
 struct timeval starttime,stoptime;
 void start_timer(){gettimeofday(&starttime,NULL);read_tsc();}
 void stop_timer(){gettimeofday(&stoptime,NULL);read_tsc();}
-double get_time(){return (double)stoptime.tv_sec-(double)starttime.tv_sec+(double)1e-6*(double)stoptime.tv_usec-(double)1e-6*(double)starttime.tv_usec;}
+double get_time(){return ((double)stoptime.tv_sec-(double)starttime.tv_sec)*1000+(double)1e-3*(double)stoptime.tv_usec-(double)1e-3*(double)starttime.tv_usec;}
 }
 
 using namespace PhysBAM;
@@ -81,7 +82,7 @@ int picked_cc_id = -1;
 TV starting_position, end_position;
 T timestep = 30;
 T rotate_speed = 10/57.;
-T intrude = -2;
+T intrude = 2;
 
 int cutting_surface_id = 0;
 fstream interaction_file;
@@ -102,6 +103,67 @@ int window_height = 600;
 int window_width = 600;
 
 #define DE cout<<"file "<<__FILE__<<"   line "<<__LINE__<<"  "<<&mcut->volume->particles.X<<"   "<<mcut->volume->particles.X<<endl;
+
+bool recording = true;
+T timestamp = 0;
+int fi = 0;
+string writing_directory = "zoom_in_3d";
+void Write_Recording_Info(bool cut = false, bool new_time = true) {
+    stringstream ss;
+    ss << fi;
+    string fis = ss.str();
+    while (fis.length() < 6) {
+        fis = "0" + fis;
+    }
+    
+    if (new_time) {
+        VS::stop_timer();
+        timestamp = VS::get_time();
+    }
+    
+    ofstream fs;
+    fs.open(writing_directory+"/info-"+string(fis)+string(".txt"));
+    fs << "TR " << 1 << " " << 1 << endl;
+    fs << "BL " << -1 << " " << -1 << endl;
+    fs << "TIME(millisec) " << timestamp << endl;
+    fs << "CUT " << cut << endl;
+    fs.close();
+    
+    FILE_UTILITIES::Write_To_File<T>(writing_directory+"/parent-"+fis+string(".tri2d.gz"), *sim_volume);
+    FILE_UTILITIES::Write_To_File<T>(writing_directory+"/child-"+fis+string(".tri2d.gz"), *(mcut->volume));
+    
+    if (cut) {
+        //write degeneracy
+        CONSISTENT_INTERSECTIONS<TV> intersections(*(mcut->volume),*cutting_tri_mesh);
+        intersections.Compute();
+        FILE_UTILITIES::Write_To_File<T>(writing_directory+"/hash1-"+fis+string(".data"),intersections.hash_vv,intersections.hash_ve,intersections.hash_ev,intersections.hash_ee);
+        FILE_UTILITIES::Write_To_File<T>(writing_directory+"/hash2-"+fis+string(".data"),intersections.hash_fv,intersections.hash_vf,intersections.hash_fe,intersections.hash_ef,intersections.hash_tv);
+
+        //reinitialize tv
+        TETRAHEDRALIZED_VOLUME<T>* ntv=TETRAHEDRALIZED_VOLUME<T>::Create();
+        ntv->particles.Resize(mcut->volume->particles.X.m);
+        for(int i=0;i<mcut->volume->particles.X.m;++i)
+            ntv->particles.X(i)=mcut->volume->particles.X(i);
+        ntv->mesh.elements=mcut->volume->mesh.elements;
+        ntv->Update_Number_Nodes();
+        delete mcut->volume;
+        mcut->volume=ntv;
+        
+        //reinitialize ts
+        TRIANGULATED_SURFACE<T>* nts=TRIANGULATED_SURFACE<T>::Create();
+        nts->particles.Resize(cutting_tri_mesh->particles.X.m);
+        for(int i=0;i<cutting_tri_mesh->particles.X.m;++i)
+            nts->particles.X(i)=cutting_tri_mesh->particles.X(i);
+        nts->mesh.elements=cutting_tri_mesh->mesh.elements;
+        nts->Update_Number_Nodes();
+        delete cutting_tri_mesh;
+        cutting_tri_mesh = nts;
+        
+        FILE_UTILITIES::Write_To_File<T>(writing_directory+"/surface-"+fis+string(".tri3d.gz"), *cutting_tri_mesh);
+    }
+    
+    ++fi;
+}
 
 void copy(TETRAHEDRALIZED_VOLUME<T>*& vt, TETRAHEDRALIZED_VOLUME<T> *vf)
 {
@@ -125,6 +187,10 @@ void Reshape(GLint newWidth,GLint newHeight) {
 
 bool draw_sim = 1, draw_material_edges = 1, drawing_cutting = 1;
 void Render(){
+    if (recording) {
+        Write_Recording_Info();
+    }
+    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnableClientState(GL_VERTEX_ARRAY);
     ARRAY<TV> vertices;
@@ -322,11 +388,11 @@ void mouse(int button, int state, int x, int y)
                 delete cutting_tri_mesh;
                 cutting_tri_mesh = new TRIANGULATED_SURFACE<T>();
                 cutting_curve.Remove_All();
-                starting_position = TV( xcoor, ycoor, intrude/2);
+                starting_position = TV( xcoor, ycoor, -intrude/2);
                 cutting_curve.Append(starting_position);
             }
             else {
-                starting_position = TV( xcoor, ycoor, intrude/2);
+                starting_position = TV( xcoor, ycoor, -intrude/2);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 glBegin(GL_TRIANGLES);
                 ARRAY<I4>& tets = mcut->volume->mesh.elements;
@@ -384,22 +450,26 @@ void mouse(int button, int state, int x, int y)
             else if (cutting) {     
                 int n = cutting_curve.m;
                 if (n>1){
+                    int n_in = 20;
+                    T d_in = intrude / n_in;
                     int pid1 = cutting_tri_mesh->particles.X.m;
-                    cutting_tri_mesh->particles.Add_Elements(2*n);
+                    cutting_tri_mesh->particles.Add_Elements((n_in + 1) * n);
                     for (int i = 0; i < n; i++) {
-                        cutting_tri_mesh->particles.X(pid1) = cutting_curve(i);
-                        pid1++;
-                        cutting_tri_mesh->particles.X(pid1) = cutting_curve(i) - TV(0,0,intrude);
-                        pid1++;
-                    }        
-                    pid1-=2*n;
+                        for (int j = 0; j < n_in+1; ++j) {
+                            cutting_tri_mesh->particles.X(pid1) = cutting_curve(i) + TV(0,0,j * d_in);
+                            pid1++;
+                        }
+                    }
                     cutting_tri_mesh->Update_Number_Nodes();
                     
                     n--;
+                    int np = n_in + 1;
                     for (int i = 0; i < n; i++) {
-                        cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(pid1,pid1+1,pid1+2));
-                        cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(pid1+1,pid1+3,pid1+2));  
-                        pid1+=2;
+                        for (int j = 0; j < n_in; ++j) {
+                            int p = i * np + j;
+                            cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(p,p+1,p+np));
+                            cutting_tri_mesh->mesh.elements.Append(PhysBAM::VECTOR<int,3>(p+1,p+np,p+np+1));
+                        }
                     }
                     cutting_tri_mesh->mesh.Initialize_Boundary_Mesh();
                     
@@ -410,11 +480,15 @@ void mouse(int button, int state, int x, int y)
                         FILE_UTILITIES::Write_To_File<T>(string("cutting_surfaces/")+ss.str()+string(".tet.gz"), cutting_tri_mesh->particles, cutting_tri_mesh->mesh);
                         cutting_surface_id++;
                     }
-                    FILE_UTILITIES::Write_To_File<T>("cutting_surface.tet.gz", cutting_tri_mesh->particles, cutting_tri_mesh->mesh);
+                    if (recording) {
+                        Write_Recording_Info(true);
+                    }
                     mcut->Cut(*cutting_tri_mesh);
                     mcut->Connected_Components(mcut->volume, labels);
                     cout << labels.m << " labels max: " << labels.Max() << ", " << mcut->volume->mesh.elements.m << endl;
-                    
+                    if (recording) {
+                        Write_Recording_Info(false, false);
+                    }
                 }
                 glutPostRedisplay();
             } 
@@ -450,7 +524,7 @@ void motion(int x, int y)
 {
     T xx = 2 * x / T(window_width) - 1;
     T yy = 1 - 2 * y / T(window_height);
-    end_position = TV( xx, yy, intrude/2);
+    end_position = TV( xx, yy, -intrude/2);
 
     if (cutting) {
         if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude() > 1e-3)
@@ -948,25 +1022,26 @@ void Initialize(bool reinitialize_cutting_mesh)
     }
     else {
         const std::string filename(argv1[1]);
-//        TETRAHEDRALIZED_VOLUME<float> *sim_volume_float;
-//        sim_volume_float = TETRAHEDRALIZED_VOLUME<float>::Create();
-//        FILE_UTILITIES::Read_From_File<float>(filename, *sim_volume_float);
-//        sim_volume->particles.Add_Elements(sim_volume_float->particles.X.m);
-//        sim_volume->Update_Number_Nodes();
-//        for (int i = 0; i < sim_volume_float->particles.X.m; ++i) {
-//            for (int j = 0; j < 3; ++j) {
-//                sim_volume->particles.X(i)(j) = sim_volume_float->particles.X(i)(j);
-//            }
-//        }
-//        sim_volume->mesh.elements = sim_volume_float->mesh.elements;
-//        {
-//            ARRAY<int> ll;
-//            sim_volume->mesh.Identify_Face_Connected_Components(ll);
-//            cout << ll.Max() << " CCs\n";
-//        }
-//        Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
+        TETRAHEDRALIZED_VOLUME<float> *sim_volume_float;
+        sim_volume_float = TETRAHEDRALIZED_VOLUME<float>::Create();
+        FILE_UTILITIES::Read_From_File<float>(filename, *sim_volume_float);
+        sim_volume->particles.Add_Elements(sim_volume_float->particles.X.m);
+        sim_volume->Update_Number_Nodes();
+        for (int i = 0; i < sim_volume_float->particles.X.m; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                sim_volume->particles.X(i)(j) = sim_volume_float->particles.X(i)(j);
+            }
+        }
+        sim_volume->mesh.elements = sim_volume_float->mesh.elements;
+        {
+            ARRAY<int> ll;
+            sim_volume->mesh.Identify_Face_Connected_Components(ll);
+            cout << ll.Max() << " CCs\n";
+        }
+        Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
         
-        sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(156, 96, 50),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
+        //back ground grid for csg
+//        sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(208, 128, 68),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
         
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
         if(argc1 == 2) {
@@ -1267,18 +1342,18 @@ void Initialize(bool reinitialize_cutting_mesh)
             mcut->Cut(*cutting_tri_mesh);
             
             //writing out the cow
-            mcut->volume->Update_Number_Nodes();
-            mcut->volume->mesh.Initialize_Boundary_Mesh(); //cout << "cutting boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
-            mcut->volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
-            mcut->volume->mesh.Identify_Face_Connected_Components(labels);
-            ARRAY<I4> new_mesh;
-            for (int i = 0; i < mcut->volume->mesh.elements.m; ++i) {
-                if (labels(i) != 1) {
-                    new_mesh.Append(mcut->volume->mesh.elements(i));
-                }
-            }
-            mcut->volume->mesh.elements = new_mesh;
-            FILE_UTILITIES::Write_To_File<T>("cow.tet.gz", *(mcut->volume));
+//            mcut->volume->Update_Number_Nodes();
+//            mcut->volume->mesh.Initialize_Boundary_Mesh();
+//            mcut->volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
+//            mcut->volume->mesh.Identify_Face_Connected_Components(labels);
+//            ARRAY<I4> new_mesh;
+//            for (int i = 0; i < mcut->volume->mesh.elements.m; ++i) {
+//                if (labels(i) != 1) {
+//                    new_mesh.Append(mcut->volume->mesh.elements(i));
+//                }
+//            }
+//            mcut->volume->mesh.elements = new_mesh;
+//            FILE_UTILITIES::Write_To_File<T>("cow.tet.gz", *(mcut->volume));
         }
     }
     sim_volume->Update_Number_Nodes();
