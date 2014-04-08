@@ -225,24 +225,7 @@ Set_Tol()
     for(int i=0;i<ts.mesh.elements.m;i++)
         L_ts=max(L_ts,RANGE<TV>::Bounding_Box(ts.particles.X.Subset(ts.mesh.elements(i))).Edge_Lengths().Max());
     T L=L_tv+L_ts;
-    T eps=std::numeric_limits<T>::epsilon(),sqrt_eps=sqrt(eps),sqrt_sqrt_eps=sqrt(sqrt_eps),eps_3_4=sqrt_eps*sqrt_sqrt_eps;
-    L*=(1+5*eps)/(1-7*sqrt_sqrt_eps);
-    T sqrt_sqrt_eps_L=sqrt_sqrt_eps*L,L2=L*L,L3=L*L2,L4=L2*L2,eps_3_4_L3=eps_3_4*L3,eps_L4=eps*L4;
-
-    sigma=(T)6.5*sqrt_sqrt_eps_L;
-    std::cout << "segma: " << sigma << std::endl;
-    tau=(T)4.5*sqrt_sqrt_eps_L;
-    delta=(T)2.25*sqrt_sqrt_eps_L;
-    gamma=(T)2.25*sqrt_sqrt_eps_L;
-    sigma_hat=(T)5.5*sqrt_sqrt_eps_L;
-
-    mu=24*eps_3_4_L3;
-    rho=56*eps_3_4_L3;
-    xi=56*eps_3_4_L3;
-
-    lambda=1215*eps_L4;
-    nu=(T)6844.5*eps_L4;
-    zeta=1317*eps_L4;
+    Set_Tol(L);
 }
 //#####################################################################
 // Function Set_Tol
@@ -254,24 +237,23 @@ Set_Tol(T L_input)
     T eps=std::numeric_limits<T>::epsilon(),sqrt_eps=sqrt(eps),sqrt_sqrt_eps=sqrt(sqrt_eps),eps_3_4=sqrt_eps*sqrt_sqrt_eps;
     L*=(1+5*eps)/(1-7*sqrt_sqrt_eps);
     T sqrt_sqrt_eps_L=sqrt_sqrt_eps*L,L2=L*L,L3=L*L2,L4=L2*L2,eps_3_4_L3=eps_3_4*L3,eps_L4=eps*L4;
-    
+
     sigma=(T)6.5*sqrt_sqrt_eps_L;
-    std::cout << "segma: " << sigma << std::endl;
+    LOG::cout<<"sigma: "<<sigma<<std::endl;
     tau=(T)4.5*sqrt_sqrt_eps_L;
     delta=(T)2.25*sqrt_sqrt_eps_L;
     gamma=(T)2.25*sqrt_sqrt_eps_L;
     sigma_hat=(T)5.5*sqrt_sqrt_eps_L;
-    
+
     mu=24*eps_3_4_L3;
     rho=56*eps_3_4_L3;
     xi=56*eps_3_4_L3;
-    
+
     lambda=1215*eps_L4;
     phi=470*eps_L4;
     nu=(T)6844.5*eps_L4;
     zeta=1317*eps_L4;
 }
-
 //#####################################################################
 // Function Compute_VV
 //#####################################################################
