@@ -10,7 +10,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> VECTOR_IMAGE<T>::FORMATTING::
 FORMATTING()
-    :line_width(1),point_radius(3),line_opacity(1),fill_opacity(1),line_style(1),fill_style(0),arrow_style(0)
+    :line_width(1),point_radius(3),line_opacity(1),fill_opacity(1),line_style(1),fill_style(0),line_join(1),arrow_style(0)
 {
 }
 //#####################################################################

@@ -29,6 +29,7 @@ public:
         T line_width,point_radius,line_opacity,fill_opacity;
         int line_style; // 0=none, 1=solid, 2=dotted, 3=dashed
         int fill_style; // 0=none, 1=solid
+        int line_join;
         const char* arrow_style; // LaTeX
         std::string misc; // LaTeX
 

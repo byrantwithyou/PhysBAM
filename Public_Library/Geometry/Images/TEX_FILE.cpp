@@ -77,6 +77,7 @@ Emit_Options(bool line,bool fill)
     if(!split && line && cur_format.line_style && cur_format.line_opacity){
         stream<<"linewidth="<<cur_format.line_width;
         stream<<",linecolor=lc";
+        stream<<",linejoin="<<cur_format.line_join;
         if(cur_format.line_style>1) stream<<",linestyle="<<line_style_str[cur_format.line_style];
         if(cur_format.line_opacity!=1) stream<<",opacity="<<cur_format.line_opacity;
         if(cur_format.arrow_style) stream<<",arrows="<<cur_format.arrow_style;}
