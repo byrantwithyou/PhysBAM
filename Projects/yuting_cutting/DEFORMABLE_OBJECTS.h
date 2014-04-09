@@ -402,8 +402,13 @@ public:
                 VECTOR_4D<int>& indices=tet_mesh->Nodes_Of_Element(t);
                 VECTOR_3D<T> x0=X(indices(0));VECTOR_3D<T> x1=X(indices(1));
                 VECTOR_3D<T> x2=X(indices(2));VECTOR_3D<T> x3=X(indices(3));
+                //for amadillo
                 //Dm_inverse(t)=MATRIX_3X3<T>((x1-x0)*0.7,(x2-x0)*0.7,(x3-x0)*0.7);
+                
+                //for peeling
                 Dm_inverse(t)=MATRIX_3X3<T>(x1-x0,x2-x0,x3-x0);
+                
+                //for letters
 //                VECTOR_3D<T> x10=x1-x0;
 //                VECTOR_3D<T> x20=x2-x0;
 //                VECTOR_3D<T> x30=x3-x0;
@@ -411,6 +416,8 @@ public:
 //                x20(0)*=0.9; x20(1)*=0.9;
 //                x10(0)*=0.9; x10(1)*=0.9;
 //                Dm_inverse(t)=MATRIX_3X3<T>(x10,x20,x30);
+                
+                
                 Dm_inverse(t).Invert();}}
         if(tri_mesh){
             for(int t=0;t<tri_mesh->Number_Of_Triangles();t++){
@@ -864,7 +871,7 @@ public:
             be_rhs += rr;
         }
         
-        if(use_gravity) for(int i=0;i<be_rhs.Size()/3;i++) be_rhs(3*i+1)-=dt*dt*mass(3*i+1)*9.8;
+        if(use_gravity) for(int i=0;i<be_rhs.Size()/3;i++) be_rhs(3*i+1)-=dt*dt*mass(3*i+1)*19.8;
 
         
         //now update the BE matrix
@@ -919,7 +926,7 @@ public:
                 VECTOR<T> residual(vn.Size());
                 for(int i=0;i<be_rhs.Size();i++) residual(i)=mass(i)*(deformable_object.Positions()(i)-old_positions(i)-dt*vn(i))-dt*dt*f_xn(i);
 
-                if(use_gravity) for(int i=0;i<be_rhs.Size()/3;i++) residual(3*i+1)+=dt*dt*mass(3*i+1)*(T)9.8;
+                if(use_gravity) for(int i=0;i<be_rhs.Size()/3;i++) residual(3*i+1)+=dt*dt*mass(3*i+1)*(T)19.8;
             
                 if(bc_dofs){for(int i=0;i<bc_dofs->Size();i++) residual((*bc_dofs)(i))=(T)0;}
             

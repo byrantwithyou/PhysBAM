@@ -1633,28 +1633,28 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
     }
     
     //check undeformed configuration
-    if (!interactive) {
-        for (int i = 0; i < sim_element_becomes.m; ++i) {
-            ALGEBRA::VECTOR_3D<ST> x[4];
-            for (int j = 0; j < 4; ++j) {
-                VECTOR<ST,3> p = sim_particles_original_positions(sim_node_from(sim_elements(i)(j)));
-                for (int k = 0; k < 3; ++k) {
-                    x[j](k) = p(k);
-                }
-            }
-            ALGEBRA::MATRIX_3X3<ST> old(x[1]-x[0],x[2]-x[0],x[3]-x[0]);
-            old.Invert();
-            for (int j = 0; j < 9; ++j) {
-                if(new_undeformed_config_copy(sim_element_becomes(i)).x[j] != old.x[j]) {
-                    cout << i << " becomes " << sim_element_becomes(i) << " is from " << sim_tet_from(i) << endl;
-                    new_undeformed_config_copy(sim_element_becomes(i)).Print();
-                    old.Print();
-                    exit(1);
-                }
-            }
-        }
-        sim_particles_original_positions = new_sim_particle_original_positions;
-    }
+//    if (!interactive) {
+//        for (int i = 0; i < sim_element_becomes.m; ++i) {
+//            ALGEBRA::VECTOR_3D<ST> x[4];
+//            for (int j = 0; j < 4; ++j) {
+//                VECTOR<ST,3> p = sim_particles_original_positions(sim_node_from(sim_elements(i)(j)));
+//                for (int k = 0; k < 3; ++k) {
+//                    x[j](k) = p(k);
+//                }
+//            }
+//            ALGEBRA::MATRIX_3X3<ST> old(x[1]-x[0],x[2]-x[0],x[3]-x[0]);
+//            old.Invert();
+//            for (int j = 0; j < 9; ++j) {
+//                if(new_undeformed_config_copy(sim_element_becomes(i)).x[j] != old.x[j]) {
+//                    cout << i << " becomes " << sim_element_becomes(i) << " is from " << sim_tet_from(i) << endl;
+//                    new_undeformed_config_copy(sim_element_becomes(i)).Print();
+//                    old.Print();
+//                    exit(1);
+//                }
+//            }
+//        }
+//        sim_particles_original_positions = new_sim_particle_original_positions;
+//    }
     
     //reset the particles and mesh indices for cutting mesh
     ARRAY<int> new_node_id(weights_in_sim.m);//node becomes which node in the new particles

@@ -104,10 +104,10 @@ int window_width = 600;
 
 #define DE cout<<"file "<<__FILE__<<"   line "<<__LINE__<<"  "<<&mcut->volume->particles.X<<"   "<<mcut->volume->particles.X<<endl;
 
-bool recording = true;
+bool recording = false;
 T timestamp = 0;
 int fi = 0;
-string writing_directory = "zoom_in_3d";
+string writing_directory = "/home/cutting-2014/zoom_in_3d";
 void Write_Recording_Info(bool cut = false, bool new_time = true) {
     stringstream ss;
     ss << fi;
@@ -123,14 +123,14 @@ void Write_Recording_Info(bool cut = false, bool new_time = true) {
     
     ofstream fs;
     fs.open(writing_directory+"/info-"+string(fis)+string(".txt"));
-    fs << "TR " << 1 << " " << 1 << endl;
-    fs << "BL " << -1 << " " << -1 << endl;
+    fs << "TR " << 1 << " " << 1 << " " << 1 << endl;
+    fs << "BL " << -1 << " " << -1 << " " << -1 << endl;
     fs << "TIME(millisec) " << timestamp << endl;
     fs << "CUT " << cut << endl;
     fs.close();
     
-    FILE_UTILITIES::Write_To_File<T>(writing_directory+"/parent-"+fis+string(".tri2d.gz"), *sim_volume);
-    FILE_UTILITIES::Write_To_File<T>(writing_directory+"/child-"+fis+string(".tri2d.gz"), *(mcut->volume));
+    FILE_UTILITIES::Write_To_File<T>(writing_directory+"/parent-"+fis+string(".tet.gz"), *sim_volume);
+    FILE_UTILITIES::Write_To_File<T>(writing_directory+"/child-"+fis+string(".tet.gz"), *(mcut->volume));
     
     if (cut) {
         //write degeneracy
@@ -487,7 +487,7 @@ void mouse(int button, int state, int x, int y)
                     mcut->Connected_Components(mcut->volume, labels);
                     cout << labels.m << " labels max: " << labels.Max() << ", " << mcut->volume->mesh.elements.m << endl;
                     if (recording) {
-                        Write_Recording_Info(false, false);
+                        Write_Recording_Info(false);
                     }
                 }
                 glutPostRedisplay();
@@ -529,6 +529,7 @@ void motion(int x, int y)
     if (cutting) {
         if ((end_position - cutting_curve(cutting_curve.m-1)).Magnitude() > 1e-3)
             cutting_curve.Append(end_position);
+        return;
     }
     else if(dragging) {
         if(dragging_id >= 0){
@@ -1021,29 +1022,93 @@ void Initialize(bool reinitialize_cutting_mesh)
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
     }
     else {
-        const std::string filename(argv1[1]);
-        TETRAHEDRALIZED_VOLUME<float> *sim_volume_float;
-        sim_volume_float = TETRAHEDRALIZED_VOLUME<float>::Create();
-        FILE_UTILITIES::Read_From_File<float>(filename, *sim_volume_float);
-        sim_volume->particles.Add_Elements(sim_volume_float->particles.X.m);
-        sim_volume->Update_Number_Nodes();
-        for (int i = 0; i < sim_volume_float->particles.X.m; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                sim_volume->particles.X(i)(j) = sim_volume_float->particles.X(i)(j);
+        //csg
+        if (1) {
+            const std::string filename(argv1[1]);
+            FILE_UTILITIES::Read_From_File<T>(filename, *sim_volume);
+            //sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(208, 128, 68),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
+            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+            
+            const std::string surface_filename(argv1[2]);
+            TRIANGULATED_SURFACE<float> *ts_float = TRIANGULATED_SURFACE<float>::Create();
+            FILE_UTILITIES::Read_From_File<float>(surface_filename, *ts_float);
+            
+            cutting_tri_mesh->particles.Add_Elements(ts_float->particles.X.m);
+            cutting_tri_mesh->Update_Number_Nodes();
+            for (int i = 0; i < ts_float->particles.X.m; ++i) {
+                for (int j = 0; j < 3; ++j) {
+                    cutting_tri_mesh->particles.X(i)(j) = ts_float->particles.X(i)(j);
+                }
             }
+            cutting_tri_mesh->mesh.elements = ts_float->mesh.elements;
+            T w = 0.14;
+            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-w,-w,-w),TV(w,w,w)));
+            for (int i = 0; i < ts_float->particles.X.m; ++i) {
+                cutting_tri_mesh->particles.X(i)(0) = -cutting_tri_mesh->particles.X(i)(0)-0.1;
+                cutting_tri_mesh->particles.X(i)(1) = cutting_tri_mesh->particles.X(i)(1)+0.05;
+                cutting_tri_mesh->particles.X(i)(2) = cutting_tri_mesh->particles.X(i)(2)+0.1;
+            }
+            
+            mcut->Cut(*cutting_tri_mesh);
+            FILE_UTILITIES::Write_To_File<T>("cow_cut_by_bunny.tet.gz", *(mcut->volume));
+            
+            mcut->volume->Update_Number_Nodes();
+            mcut->volume->mesh.Identify_Face_Connected_Components(labels);
+            ARRAY<I4> old_mesh, new_mesh;
+            old_mesh = mcut->volume->mesh.elements;
+            int b = 5;
+            for (int i = 0; i < old_mesh.m; ++i) {
+                if (labels(i) != b) {
+                    new_mesh.Append(old_mesh(i));
+                }
+            }
+            mcut->volume->mesh.elements = new_mesh;
+            FILE_UTILITIES::Write_To_File<T>("cow_without_bunny.tet.gz", *(mcut->volume));
+            
+            new_mesh.Remove_All();
+            for (int i = 0; i < old_mesh.m; ++i) {
+                if (labels(i) == b) {
+                    new_mesh.Append(old_mesh(i));
+                }
+            }
+            mcut->volume->mesh.elements = new_mesh;
+            FILE_UTILITIES::Write_To_File<T>("bunny.tet.gz", *(mcut->volume));
+
+            sim_volume->Update_Number_Nodes();
+            sim_volume->mesh.Initialize_Boundary_Mesh(); //cout << "sim boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
+            sim_volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
+            
+            mcut->volume->mesh.elements = old_mesh;
+            mcut->volume->Update_Number_Nodes();
+            mcut->volume->mesh.Initialize_Boundary_Mesh(); //cout << "cutting boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
+            mcut->volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
+            mcut->volume->mesh.Identify_Face_Connected_Components(labels);
+            return;
         }
-        sim_volume->mesh.elements = sim_volume_float->mesh.elements;
-        {
-            ARRAY<int> ll;
-            sim_volume->mesh.Identify_Face_Connected_Components(ll);
-            cout << ll.Max() << " CCs\n";
-        }
-        Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
         
-        //back ground grid for csg
-//        sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(208, 128, 68),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
         
+        const std::string filename(argv1[1]);
+//        TETRAHEDRALIZED_VOLUME<float> *sim_volume_float;
+//        sim_volume_float = TETRAHEDRALIZED_VOLUME<float>::Create();
+//        FILE_UTILITIES::Read_From_File<float>(filename, *sim_volume_float);
+//        sim_volume->particles.Add_Elements(sim_volume_float->particles.X.m);
+//        sim_volume->Update_Number_Nodes();
+//        for (int i = 0; i < sim_volume_float->particles.X.m; ++i) {
+//            for (int j = 0; j < 3; ++j) {
+//                sim_volume->particles.X(i)(j) = sim_volume_float->particles.X(i)(j);
+//            }
+//        }
+//        sim_volume->mesh.elements = sim_volume_float->mesh.elements;
+//        {
+//            ARRAY<int> ll;
+//            sim_volume->mesh.Identify_Face_Connected_Components(ll);
+//            cout << ll.Max() << " CCs\n";
+//        }
+        //Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
+        
+        FILE_UTILITIES::Read_From_File<T>(filename, *sim_volume);
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        
         if(argc1 == 2) {
             if (writing_interaction_to_file){
                 string interaction_file_name = "interactions/interaction2.txt";
@@ -1076,7 +1141,7 @@ void Initialize(bool reinitialize_cutting_mesh)
                     
                     //get L_input from complete cutting mesh
                     T L=-1;
-                    bool uniform_L = 0;
+                    bool uniform_L = 1;
                     if (uniform_L) {
                         TRIANGULATED_SURFACE<T>* ts = TRIANGULATED_SURFACE<T>::Create();
                         ts->particles.Add_Elements((n+1)*3*l);
@@ -1338,22 +1403,8 @@ void Initialize(bool reinitialize_cutting_mesh)
                 }
             }
             cutting_tri_mesh->mesh.elements = ts_float->mesh.elements;
-            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17)));
+            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-0.4,-0.4,-0.4),TV(0.4,0.4,0.4)));
             mcut->Cut(*cutting_tri_mesh);
-            
-            //writing out the cow
-//            mcut->volume->Update_Number_Nodes();
-//            mcut->volume->mesh.Initialize_Boundary_Mesh();
-//            mcut->volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
-//            mcut->volume->mesh.Identify_Face_Connected_Components(labels);
-//            ARRAY<I4> new_mesh;
-//            for (int i = 0; i < mcut->volume->mesh.elements.m; ++i) {
-//                if (labels(i) != 1) {
-//                    new_mesh.Append(mcut->volume->mesh.elements(i));
-//                }
-//            }
-//            mcut->volume->mesh.elements = new_mesh;
-//            FILE_UTILITIES::Write_To_File<T>("cow.tet.gz", *(mcut->volume));
         }
     }
     sim_volume->Update_Number_Nodes();
@@ -1365,6 +1416,8 @@ void Initialize(bool reinitialize_cutting_mesh)
     mcut->volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
     mcut->volume->mesh.Identify_Face_Connected_Components(labels);
     
+    if (recording)
+        VS::start_timer();
 }
 
 void display(){}
