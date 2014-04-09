@@ -391,7 +391,7 @@ void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, i
     //ts->Loop_Subdivide();//subd or go high res sim volume
     
     ts->avoid_normal_interpolation_across_sharp_edges = true;
-    ts->normal_variance_threshold = 1;
+    ts->normal_variance_threshold = 10;
     ts->Update_Vertex_Normals();
     
     stringstream ss;
@@ -1351,18 +1351,28 @@ int main(int argc, char** argv) {
         
         case 10://csg
         {
-            const std::string filename(argv[2]);
-            string outputDir(argv[3]);
-            FILE_UTILITIES::Read_From_File<T>(filename, *sim_volume);
-            WriteToPovRay(sim_volume, outputDir, 0);
+            //read exiting mesh and generate povray
+            string outputDir(argv[2]);
+            sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
+            FILE_UTILITIES::Read_From_File<T>("cow_without_bunny.tet.gz", *sim_volume);
+            WriteToPovRay(sim_volume, outputDir, 1);
+            
             exit(1);
             
-            //sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(208, 128, 68),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
+//            const std::string dataDir(argv[2]);
+//            string outputDir(argv[3]);
+//            
+//            cutting_tri_mesh = TRIANGULATED_SURFACE<T>::Create();
+//            sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
+//            sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(208, 128, 68),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
+//            sim_volume->mesh.Initialize_Boundary_Mesh();
+//            WriteToPovRay(sim_volume, outputDir, 0);
+//            
 //            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
 //            
-//            const std::string surface_filename(argv1[2]);
 //            TRIANGULATED_SURFACE<float> *ts_float = TRIANGULATED_SURFACE<float>::Create();
-//            FILE_UTILITIES::Read_From_File<float>(surface_filename, *ts_float);
+//            FILE_UTILITIES::Read_From_File<float>(dataDir+"/cow_20k.tri.gz", *ts_float);
+//            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17)));
 //            
 //            cutting_tri_mesh->particles.Add_Elements(ts_float->particles.X.m);
 //            cutting_tri_mesh->Update_Number_Nodes();
@@ -1372,6 +1382,9 @@ int main(int argc, char** argv) {
 //                }
 //            }
 //            cutting_tri_mesh->mesh.elements = ts_float->mesh.elements;
+//            mcut->Cut(*cutting_tri_mesh);
+//            FILE_UTILITIES::Write_To_File<T>("cow_cut_by_bunny.tet.gz", *(mcut->volume));
+//            
 //            T w = 0.14;
 //            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-w,-w,-w),TV(w,w,w)));
 //            for (int i = 0; i < ts_float->particles.X.m; ++i) {
