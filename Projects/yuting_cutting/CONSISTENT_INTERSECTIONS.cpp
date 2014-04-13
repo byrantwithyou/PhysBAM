@@ -166,8 +166,8 @@ Compute()
     PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > > sc_ph(sc.particles.X.Subset(sc_particles),true,0);
 
     ta.Initialize_Hierarchy();
-    ta.Initialize_Segment_Mesh();
-    SEGMENTED_CURVE<TV> ta_sc(*ta.segment_mesh,ta.particles);
+    ta.mesh.Initialize_Segment_Mesh();
+    SEGMENTED_CURVE<TV> ta_sc(*ta.mesh.segment_mesh,ta.particles);
     ta_sc.Initialize_Hierarchy();
     ARRAY<int> ta_particles(ta.mesh.elements.Flattened());
     ta_particles.Prune_Duplicates();
@@ -491,8 +491,8 @@ Compute(T L)
     Set_Tol(L);
     
     ts.Initialize_Hierarchy();
-    ts.Initialize_Segment_Mesh();
-    SEGMENTED_CURVE<TV> ts_sc(*ts.segment_mesh,ts.particles);
+    ts.mesh.Initialize_Segment_Mesh();
+    SEGMENTED_CURVE<TV> ts_sc(*ts.mesh.segment_mesh,ts.particles);
     ts_sc.Initialize_Hierarchy();
     ARRAY<int> ts_particles(ts.mesh.elements.Flattened());
     ts_particles.Prune_Duplicates();
@@ -502,8 +502,8 @@ Compute(T L)
     tv.mesh.Initialize_Triangle_Mesh();
     TRIANGULATED_SURFACE<T> tv_ts(*tv.mesh.triangle_mesh,tv.particles);
     tv_ts.Initialize_Hierarchy();
-    tv.Initialize_Segment_Mesh();
-    SEGMENTED_CURVE<TV> tv_sc(*tv.segment_mesh,tv.particles);
+    tv.mesh.Initialize_Segment_Mesh();
+    SEGMENTED_CURVE<TV> tv_sc(*tv.mesh.segment_mesh,tv.particles);
     tv_sc.Initialize_Hierarchy();
     ARRAY<int> tv_particles(tv.mesh.elements.Flattened());
     tv_particles.Prune_Duplicates();
