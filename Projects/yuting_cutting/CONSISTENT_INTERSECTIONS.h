@@ -89,8 +89,7 @@ public:
 
     ~CONSISTENT_INTERSECTIONS(){}
 
-    void Set_Tol();
-    void Set_Tol(T L_input);
+    void Set_Tol(T L=-1);
     bool Compute_VV(int p,int q);
     bool Compute_VE_Helper(int p,I2 e,ARRAY_VIEW<TV> Xp,ARRAY_VIEW<TV> Xe,T& gamma);
     bool Compute_VE(int p,I2 e);
@@ -103,8 +102,7 @@ public:
     bool Compute_FE(I3 f,I2 e);
     bool Compute_EF(I2 e,I3 f);
     bool Compute_TV(I4 t,int p);
-    void Compute();
-    void Compute(T L_input);
+    void Compute(T L=-1);
 
 //#####################################################################
 };   

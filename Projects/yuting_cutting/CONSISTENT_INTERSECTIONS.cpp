@@ -166,7 +166,8 @@ Compute()
     PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > > sc_ph(sc.particles.X.Subset(sc_particles),true,0);
 
     ta.Initialize_Hierarchy();
-    SEGMENTED_CURVE<TV> ta_sc(ta.Get_Segment_Mesh(),ta.particles);
+    ta.Initialize_Segment_Mesh();
+    SEGMENTED_CURVE<TV> ta_sc(*ta.segment_mesh,ta.particles);
     ta_sc.Initialize_Hierarchy();
     ARRAY<int> ta_particles(ta.mesh.elements.Flattened());
     ta_particles.Prune_Duplicates();
@@ -217,23 +218,16 @@ Compute()
 // Function Set_Tol
 //#####################################################################
 template<class T> void CONSISTENT_INTERSECTIONS<VECTOR<T,3> >::
-Set_Tol()
+Set_Tol(T L)
 {
-    T L_tv=0,L_ts=0;
-    for(int i=0;i<tv.mesh.elements.m;i++)
-        L_tv=max(L_tv,RANGE<TV>::Bounding_Box(tv.particles.X.Subset(tv.mesh.elements(i))).Edge_Lengths().Max());
-    for(int i=0;i<ts.mesh.elements.m;i++)
-        L_ts=max(L_ts,RANGE<TV>::Bounding_Box(ts.particles.X.Subset(ts.mesh.elements(i))).Edge_Lengths().Max());
-    T L=L_tv+L_ts;
-    Set_Tol(L);
-}
-//#####################################################################
-// Function Set_Tol
-//#####################################################################
-template<class T> void CONSISTENT_INTERSECTIONS<VECTOR<T,3> >::
-Set_Tol(T L_input)
-{
-    T L=L_input;
+    if(L<0){
+        T L_tv=0,L_ts=0;
+        for(int i=0;i<tv.mesh.elements.m;i++)
+            L_tv=max(L_tv,RANGE<TV>::Bounding_Box(tv.particles.X.Subset(tv.mesh.elements(i))).Edge_Lengths().Max());
+        for(int i=0;i<ts.mesh.elements.m;i++)
+            L_ts=max(L_ts,RANGE<TV>::Bounding_Box(ts.particles.X.Subset(ts.mesh.elements(i))).Edge_Lengths().Max());
+        L=L_tv+L_ts;}
+
     T eps=std::numeric_limits<T>::epsilon(),sqrt_eps=sqrt(eps),sqrt_sqrt_eps=sqrt(sqrt_eps),eps_3_4=sqrt_eps*sqrt_sqrt_eps;
     L*=(1+5*eps)/(1-7*sqrt_sqrt_eps);
     T sqrt_sqrt_eps_L=sqrt_sqrt_eps*L,L2=L*L,L3=L*L2,L4=L2*L2,eps_3_4_L3=eps_3_4*L3,eps_L4=eps*L4;
@@ -492,12 +486,13 @@ Compute_TV(I4 t,int p)
 // Function Compute
 //#####################################################################
 template<class T> void CONSISTENT_INTERSECTIONS<VECTOR<T,3> >::
-Compute(T L_input)
+Compute(T L)
 {
-    Set_Tol(L_input);
+    Set_Tol(L);
     
     ts.Initialize_Hierarchy();
-    SEGMENTED_CURVE<TV> ts_sc(ts.Get_Segment_Mesh(),ts.particles);
+    ts.Initialize_Segment_Mesh();
+    SEGMENTED_CURVE<TV> ts_sc(*ts.segment_mesh,ts.particles);
     ts_sc.Initialize_Hierarchy();
     ARRAY<int> ts_particles(ts.mesh.elements.Flattened());
     ts_particles.Prune_Duplicates();
@@ -507,7 +502,8 @@ Compute(T L_input)
     tv.mesh.Initialize_Triangle_Mesh();
     TRIANGULATED_SURFACE<T> tv_ts(*tv.mesh.triangle_mesh,tv.particles);
     tv_ts.Initialize_Hierarchy();
-    SEGMENTED_CURVE<TV> tv_sc(tv.Get_Segment_Mesh(),tv.particles);
+    tv.Initialize_Segment_Mesh();
+    SEGMENTED_CURVE<TV> tv_sc(*tv.segment_mesh,tv.particles);
     tv_sc.Initialize_Hierarchy();
     ARRAY<int> tv_particles(tv.mesh.elements.Flattened());
     tv_particles.Prune_Duplicates();
@@ -578,103 +574,6 @@ Compute(T L_input)
         for(int j=0;j<a(i).m;j++)
             Compute_FE(f,ts_sc.mesh.elements(a(i)(j)));}
     
-    a.Remove_All();
-    a.Resize(tv.mesh.elements.m);
-    tv.hierarchy->Intersection_List(ts_ph,v,0);
-    for(int i=0;i<a.m;i++){
-        I4 t=tv.mesh.elements(i);
-        for(int j=0;j<a(i).m;j++)
-            Compute_TV(t,ts_particles(a(i)(j)));}
-}
-//#####################################################################
-// Function Compute
-//#####################################################################
-template<class T> void CONSISTENT_INTERSECTIONS<VECTOR<T,3> >::
-Compute()
-{
-    Set_Tol();
-    ts.Initialize_Hierarchy();
-    SEGMENTED_CURVE<TV> ts_sc(ts.Get_Segment_Mesh(),ts.particles);
-    ts_sc.Initialize_Hierarchy();
-    ARRAY<int> ts_particles(ts.mesh.elements.Flattened());
-    ts_particles.Prune_Duplicates();
-    PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > > ts_ph(ts.particles.X.Subset(ts_particles),true,0);
-
-    tv.Initialize_Hierarchy();
-    tv.mesh.Initialize_Triangle_Mesh();
-    TRIANGULATED_SURFACE<T> tv_ts(*tv.mesh.triangle_mesh,tv.particles);
-    tv_ts.Initialize_Hierarchy();
-    SEGMENTED_CURVE<TV> tv_sc(tv.Get_Segment_Mesh(),tv.particles);
-    tv_sc.Initialize_Hierarchy();
-    ARRAY<int> tv_particles(tv.mesh.elements.Flattened());
-    tv_particles.Prune_Duplicates();
-    PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > > tv_ph(tv.particles.X.Subset(tv_particles),true,0);
-
-    ARRAY<ARRAY<int> > a;
-    BOX_VISITOR_TRIVIAL v(a);
-    a.Resize(tv_particles.m);
-    tv_ph.Intersection_List(ts_ph,v,sigma);
-    for(int i=0;i<a.m;i++){
-        int p=tv_particles(i);
-        for(int j=0;j<a(i).m;j++)
-            Compute_VV(p,ts_particles(a(i)(j)));}
-
-    a.Remove_All();
-    a.Resize(tv_particles.m);
-    tv_ph.Intersection_List(*ts_sc.hierarchy,v,tau);
-    for(int i=0;i<a.m;i++){
-        int p=tv_particles(i);
-        for(int j=0;j<a(i).m;j++)
-            Compute_VE(p,ts_sc.mesh.elements(a(i)(j)));}
-
-    a.Remove_All();
-    a.Resize(tv_particles.m);
-    tv_ph.Intersection_List(*ts.hierarchy,v,delta);
-    for(int i=0;i<a.m;i++){
-        int p=tv_particles(i);
-        for(int j=0;j<a(i).m;j++)
-            Compute_VF(p,ts.mesh.elements(a(i)(j)));}
-
-    a.Remove_All();
-    a.Resize(tv_sc.mesh.elements.m);
-    tv_sc.hierarchy->Intersection_List(ts_ph,v,tau);
-    for(int i=0;i<a.m;i++){
-        I2 e=tv_sc.mesh.elements(i);
-        for(int j=0;j<a(i).m;j++)
-            Compute_EV(e,ts_particles(a(i)(j)));}
-
-    a.Remove_All();
-    a.Resize(tv_sc.mesh.elements.m);
-    tv_sc.hierarchy->Intersection_List(*ts_sc.hierarchy,v,gamma);
-    for(int i=0;i<a.m;i++){
-        I2 e=tv_sc.mesh.elements(i);
-        for(int j=0;j<a(i).m;j++)
-            Compute_EE(e,ts_sc.mesh.elements(a(i)(j)));}
-
-    a.Remove_All();
-    a.Resize(tv_sc.mesh.elements.m);
-    tv_sc.hierarchy->Intersection_List(*ts.hierarchy,v,0);
-    for(int i=0;i<a.m;i++){
-        I2 e=tv_sc.mesh.elements(i);
-        for(int j=0;j<a(i).m;j++)
-            Compute_EF(e,ts.mesh.elements(a(i)(j)));}
-
-    a.Remove_All();
-    a.Resize(tv_ts.mesh.elements.m);
-    tv_ts.hierarchy->Intersection_List(ts_ph,v,delta);
-    for(int i=0;i<a.m;i++){
-        I3 f=tv_ts.mesh.elements(i);
-        for(int j=0;j<a(i).m;j++)
-            Compute_FV(f,ts_particles(a(i)(j)));}
-
-    a.Remove_All();
-    a.Resize(tv_ts.mesh.elements.m);
-    tv_ts.hierarchy->Intersection_List(*ts_sc.hierarchy,v,0);
-    for(int i=0;i<a.m;i++){
-        I3 f=tv_ts.mesh.elements(i);
-        for(int j=0;j<a(i).m;j++)
-            Compute_FE(f,ts_sc.mesh.elements(a(i)(j)));}
-
     a.Remove_All();
     a.Resize(tv.mesh.elements.m);
     tv.hierarchy->Intersection_List(ts_ph,v,0);
