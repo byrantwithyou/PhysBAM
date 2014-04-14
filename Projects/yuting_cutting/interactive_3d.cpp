@@ -104,10 +104,10 @@ int window_width = 600;
 
 #define DE cout<<"file "<<__FILE__<<"   line "<<__LINE__<<"  "<<&mcut->volume->particles.X<<"   "<<mcut->volume->particles.X<<endl;
 
-bool recording = false;
+bool recording = true;
 T timestamp = 0;
 int fi = 0;
-string writing_directory = "/home/cutting-2014/zoom_in_3d";
+string writing_directory = "zoom_in_3d_new";
 void Write_Recording_Info(bool cut = false, bool new_time = true) {
     stringstream ss;
     ss << fi;
@@ -134,7 +134,17 @@ void Write_Recording_Info(bool cut = false, bool new_time = true) {
     
     if (cut) {
         //write degeneracy
-        CONSISTENT_INTERSECTIONS<TV> intersections(*(mcut->volume),*cutting_tri_mesh);
+        
+        //have to clear boundary and hierarchy information in the volume before computing intersections
+        TETRAHEDRALIZED_VOLUME<T> *tv = TETRAHEDRALIZED_VOLUME<T>::Create();
+        tv->mesh.elements = mcut->volume->mesh.elements;
+        tv->particles.Add_Elements(mcut->volume->particles.X.m);
+        tv->Update_Number_Nodes();
+        for (int i = 0; i < mcut->volume->particles.X.m; ++i) {
+            tv->particles.X(i) = mcut->volume->particles.X(i);
+        }
+        
+        CONSISTENT_INTERSECTIONS<TV> intersections(*tv,*cutting_tri_mesh);
         intersections.Compute();
         FILE_UTILITIES::Write_To_File<T>(writing_directory+"/hash1-"+fis+string(".data"),intersections.hash_vv,intersections.hash_ve,intersections.hash_ev,intersections.hash_ee);
         FILE_UTILITIES::Write_To_File<T>(writing_directory+"/hash2-"+fis+string(".data"),intersections.hash_fv,intersections.hash_vf,intersections.hash_fe,intersections.hash_ef,intersections.hash_tv);
@@ -1023,7 +1033,7 @@ void Initialize(bool reinitialize_cutting_mesh)
     }
     else {
         //csg
-        if (1) {
+        if (0) {
             const std::string filename(argv1[1]);
             FILE_UTILITIES::Read_From_File<T>(filename, *sim_volume);
             //sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(208, 128, 68),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
@@ -1088,25 +1098,28 @@ void Initialize(bool reinitialize_cutting_mesh)
         
         
         const std::string filename(argv1[1]);
-//        TETRAHEDRALIZED_VOLUME<float> *sim_volume_float;
-//        sim_volume_float = TETRAHEDRALIZED_VOLUME<float>::Create();
-//        FILE_UTILITIES::Read_From_File<float>(filename, *sim_volume_float);
-//        sim_volume->particles.Add_Elements(sim_volume_float->particles.X.m);
-//        sim_volume->Update_Number_Nodes();
-//        for (int i = 0; i < sim_volume_float->particles.X.m; ++i) {
-//            for (int j = 0; j < 3; ++j) {
-//                sim_volume->particles.X(i)(j) = sim_volume_float->particles.X(i)(j);
-//            }
-//        }
-//        sim_volume->mesh.elements = sim_volume_float->mesh.elements;
-//        {
-//            ARRAY<int> ll;
-//            sim_volume->mesh.Identify_Face_Connected_Components(ll);
-//            cout << ll.Max() << " CCs\n";
-//        }
-        //Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
+        TETRAHEDRALIZED_VOLUME<float> *sim_volume_float;
+        sim_volume_float = TETRAHEDRALIZED_VOLUME<float>::Create();
+        FILE_UTILITIES::Read_From_File<float>(filename, *sim_volume_float);
+        sim_volume->particles.Add_Elements(sim_volume_float->particles.X.m);
+        sim_volume->Update_Number_Nodes();
+        for (int i = 0; i < sim_volume_float->particles.X.m; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                sim_volume->particles.X(i)(j) = sim_volume_float->particles.X(i)(j);
+            }
+        }
+        sim_volume->mesh.elements = sim_volume_float->mesh.elements;
+        {
+            ARRAY<int> ll;
+            sim_volume->mesh.Identify_Face_Connected_Components(ll);
+            cout << ll.Max() << " CCs\n";
+        }
+        Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
         
-        FILE_UTILITIES::Read_From_File<T>(filename, *sim_volume);
+        //for reading mesh in double
+//        FILE_UTILITIES::Read_From_File<T>(filename, *sim_volume);
+        
+        
         mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
         
         if(argc1 == 2) {
@@ -1392,18 +1405,21 @@ void Initialize(bool reinitialize_cutting_mesh)
         }
         if(argc1 == 3) {
             const std::string surface_filename(argv1[2]);
-            TRIANGULATED_SURFACE<float> *ts_float = TRIANGULATED_SURFACE<float>::Create();
-            FILE_UTILITIES::Read_From_File<float>(surface_filename, *ts_float);
+//            TRIANGULATED_SURFACE<float> *ts_float = TRIANGULATED_SURFACE<float>::Create();
+//            FILE_UTILITIES::Read_From_File<float>(surface_filename, *ts_float);
             
-            cutting_tri_mesh->particles.Add_Elements(ts_float->particles.X.m);
-            cutting_tri_mesh->Update_Number_Nodes();
-            for (int i = 0; i < ts_float->particles.X.m; ++i) {
-                for (int j = 0; j < 3; ++j) {
-                    cutting_tri_mesh->particles.X(i)(j) = ts_float->particles.X(i)(j);
-                }
-            }
-            cutting_tri_mesh->mesh.elements = ts_float->mesh.elements;
-            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-0.4,-0.4,-0.4),TV(0.4,0.4,0.4)));
+            
+//            cutting_tri_mesh->particles.Add_Elements(ts_float->particles.X.m);
+//            cutting_tri_mesh->Update_Number_Nodes();
+//            for (int i = 0; i < ts_float->particles.X.m; ++i) {
+//                for (int j = 0; j < 3; ++j) {
+//                    cutting_tri_mesh->particles.X(i)(j) = ts_float->particles.X(i)(j);
+//                }
+//            }
+//            cutting_tri_mesh->mesh.elements = ts_float->mesh.elements;
+//            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-0.4,-0.4,-0.4),TV(0.4,0.4,0.4)));
+            
+            FILE_UTILITIES::Read_From_File<T>(surface_filename, *cutting_tri_mesh);
             mcut->Cut(*cutting_tri_mesh);
         }
     }

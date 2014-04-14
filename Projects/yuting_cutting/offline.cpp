@@ -15,6 +15,7 @@
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Matrices/ROTATION.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Tools/Grids_Uniform/GRID.h>
 
 #include <fstream>
 #include <sstream>
@@ -52,6 +53,7 @@ using namespace std;
 
 typedef double T;
 typedef PhysBAM::VECTOR<T, 3> TV;
+typedef PhysBAM::VECTOR<float, 3> FV;
 typedef PhysBAM::MATRIX<T, 3> TM;
 typedef PhysBAM::VECTOR<int, 3> I3;
 
@@ -78,6 +80,7 @@ void Initialize(const string& filename)
             sim_volume->particles.X(i)(j) = sim_volume_float->particles.X(i)(j);
         }
     }
+    sim_volume->Update_Number_Nodes();
     sim_volume->particles.Store_Velocity();
     sim_volume->mesh.elements = sim_volume_float->mesh.elements;
     
@@ -155,6 +158,7 @@ void initialize_cubes(int width, int height, int depth, T low, T high, T left, T
 template<class T>
 void WriteToPovRaySmooth(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, int frame)
 {
+    volume->mesh.Initialize_Boundary_Mesh();
     TRIANGULATED_SURFACE<T> *ts = TRIANGULATED_SURFACE<T>::Create();
     ts->Use_Vertex_Normals();
     int np = volume->particles.X.m;
@@ -164,54 +168,57 @@ void WriteToPovRaySmooth(TETRAHEDRALIZED_VOLUME<T>* volume, const string& output
     }
     ts->Update_Number_Nodes();
     ts->mesh.elements = volume->mesh.boundary_mesh->elements;
-    ts->avoid_normal_interpolation_across_sharp_edges = true;
+    //ts->Loop_Subdivide();//subd or go high res sim volume
+    
+    ts->avoid_normal_interpolation_across_sharp_edges = false;
     ts->Update_Vertex_Normals();
     
     stringstream ss;
     ss << frame;
     string filename = outputDir + "/povray" + ss.str() + ".pov";
-    //cout << filename << endl;
+    cout << filename << endl;
     ofstream fs;
     fs.open(filename);
+
     fs << "#declare mesh = mesh2 {" << endl;
     fs << "vertex_vectors {" << endl;
-    fs << ts->particles.X.m << ", " << endl;
-    for (int i = 0; i < ts->particles.X.m; ++i) {
-        fs << "<" << ts->particles.X(i)(0) << ", " << ts->particles.X(i)(1) << ", " << ts->particles.X(i)(2) << ">";
-        if (i != ts->particles.X.m-1) {
-            fs << ", ";
+    fs << ts->mesh.elements.m*3 << ", " << endl;
+    for (int i = 0; i < ts->mesh.elements.m; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            fs << "<" << ts->particles.X(ts->mesh.elements(i)(j))(0) << ", " << ts->particles.X(ts->mesh.elements(i)(j))(1) << ", " << ts->particles.X(ts->mesh.elements(i)(j))(2) << ">";
+            if (i != ts->mesh.elements.m-1 || j != 2) {
+                fs << ", ";
+            }
         }
     }
     fs << endl << "}" << endl;
     
-//    ARRAY<TV> normals(volume->particles.X.m);
-//    ARRAY<int> faceCount(volume->particles.X.m);
-//    for (int i = 0; i < volume->mesh.boundary_mesh->elements.m; ++i) {
-//        int n1 = volume->mesh.boundary_mesh->elements(i)(0);
-//        int n2 = volume->mesh.boundary_mesh->elements(i)(1);
-//        int n3 = volume->mesh.boundary_mesh->elements(i)(2);
-//        TV e1 = volume->particles.X(n2) - volume->particles.X(n1);
-//        TV e2 = volume->particles.X(n3) - volume->particles.X(n2);
-//        TV normal = e1.Cross(e2);
-//        normal.Normalize();
-//        for (int j = 0; j < 3; ++j) {
-//            normals(volume->mesh.boundary_mesh->elements(i)(j)) += normal;
-//            ++faceCount(volume->mesh.boundary_mesh->elements(i)(j));
-//        }
-//    }
-//    for (int i = 0; i < normals.m; ++i) {
-//        if (faceCount(i) != 0) {
-//            normals(i) /= faceCount(i);
-//            normals(i).Normalize();
-//        }
-//    }
+    ARRAY<TV> normals(volume->particles.X.m);
+    ARRAY<int> faceCount(volume->particles.X.m);
+    for (int i = 0; i < volume->mesh.boundary_mesh->elements.m; ++i) {
+        int n1 = volume->mesh.boundary_mesh->elements(i)(0);
+        int n2 = volume->mesh.boundary_mesh->elements(i)(1);
+        int n3 = volume->mesh.boundary_mesh->elements(i)(2);
+        TV e1 = volume->particles.X(n2) - volume->particles.X(n1);
+        TV e2 = volume->particles.X(n3) - volume->particles.X(n2);
+        TV normal = e1.Cross(e2);
+        normal.Normalize();
+        for (int j = 0; j < 3; ++j) {
+            normals(volume->mesh.boundary_mesh->elements(i)(j)) += normal;
+        }
+    }
+    for (int i = 0; i < normals.m; ++i) {
+        normals(i).Normalize();
+    }
     
     fs << "normal_vectors {" << endl;
-    fs << np << ", " << endl;
-    for (int i = 0; i < np; ++i) {
-        fs << "<" << (*(ts->vertex_normals))(i)(0) << ", " << (*(ts->vertex_normals))(i)(1) << ", " << (*(ts->vertex_normals))(i)(2) << ">";
-        if (i != np-1) {
-            fs << ", ";
+    fs << ts->mesh.elements.m*3 << ", " << endl;
+    for (int i = 0; i < ts->mesh.elements.m; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            fs << "<" << normals(ts->mesh.elements(i)(j))(0) << ", " << normals(ts->mesh.elements(i)(j))(1) << ", " << normals(ts->mesh.elements(i)(j))(2) << ">";
+            if (i != ts->mesh.elements.m-1 || j != 2) {
+                fs << ", ";
+            }
         }
     }
     fs << endl << "}" << endl;
@@ -219,7 +226,7 @@ void WriteToPovRaySmooth(TETRAHEDRALIZED_VOLUME<T>* volume, const string& output
     fs << "face_indices {" << endl;
     fs << ts->mesh.elements.m << ", " << endl;
     for (int i = 0; i < ts->mesh.elements.m; ++i) {
-        fs << "<" << ts->mesh.elements(i)(0) << ", " << ts->mesh.elements(i)(1) << ", " << ts->mesh.elements(i)(2) << ">";
+        fs << "<" << 3*i << ", " << 3*i+1 << ", " << 3*i+2 << ">";
         if (i != ts->mesh.elements.m-1) {
             fs << ", ";
         }
@@ -228,7 +235,9 @@ void WriteToPovRaySmooth(TETRAHEDRALIZED_VOLUME<T>* volume, const string& output
     
     fs << "}" << endl;
     fs.close();
+    cout << "finished smooth\n";
 }
+
 
 T laserZ1=-10;
 T laserZ2=-9;
@@ -237,6 +246,7 @@ T laserX=0,laserY=0;
 template<class T>
 void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, int frame)
 {
+    volume->mesh.Initialize_Boundary_Mesh();
     TRIANGULATED_SURFACE<T> *ts = TRIANGULATED_SURFACE<T>::Create();
     ts->Use_Vertex_Normals();
     int np = volume->particles.X.m;
@@ -268,7 +278,7 @@ void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, i
     for (int i = 0; i < ts->mesh.elements.m; ++i) {
         for (int j = 0; j < 3; ++j) {
             fs << "<" << ts->particles.X(ts->mesh.elements(i)(j))(0) << ", " << ts->particles.X(ts->mesh.elements(i)(j))(1) << ", " << ts->particles.X(ts->mesh.elements(i)(j))(2) << ">";
-            if (i != ts->mesh.elements.m-1 && j != 2) {
+            if (i != ts->mesh.elements.m-1 || j != 2) {
                 fs << ", ";
             }
         }
@@ -302,7 +312,7 @@ void WriteToPovRay(TETRAHEDRALIZED_VOLUME<T>* volume, const string& outputDir, i
     for (int i = 0; i < ts->mesh.elements.m; ++i) {
         for (int j = 0; j < 3; ++j) {
             fs << "<" << (*(ts->face_vertex_normals))(i)(j)(0) << ", " << (*(ts->face_vertex_normals))(i)(j)(1) << ", " << (*(ts->face_vertex_normals))(i)(j)(2) << ">";
-            if (i != ts->mesh.elements.m-1 && j != 2) {
+            if (i != ts->mesh.elements.m-1 || j != 2) {
                 fs << ", ";
             }
         }
@@ -327,7 +337,7 @@ template<class T>
 void TriSurfaceToPovray(TRIANGULATED_SURFACE<T>* ts, const string& outputDir, int frame)
 {   
     ts->avoid_normal_interpolation_across_sharp_edges = true;
-    ts->normal_variance_threshold = 1;
+    ts->normal_variance_threshold = 0;
     ts->Update_Vertex_Normals();
     
     stringstream ss;
@@ -343,7 +353,7 @@ void TriSurfaceToPovray(TRIANGULATED_SURFACE<T>* ts, const string& outputDir, in
     for (int i = 0; i < ts->mesh.elements.m; ++i) {
         for (int j = 0; j < 3; ++j) {
             fs << "<" << ts->particles.X(ts->mesh.elements(i)(j))(0) << ", " << ts->particles.X(ts->mesh.elements(i)(j))(1) << ", " << ts->particles.X(ts->mesh.elements(i)(j))(2) << ">";
-            if (i != ts->mesh.elements.m-1 && j != 2) {
+            if (i != ts->mesh.elements.m-1 || j != 2) {
                 fs << ", ";
             }
         }
@@ -355,7 +365,7 @@ void TriSurfaceToPovray(TRIANGULATED_SURFACE<T>* ts, const string& outputDir, in
     for (int i = 0; i < ts->mesh.elements.m; ++i) {
         for (int j = 0; j < 3; ++j) {
             fs << "<" << (*(ts->face_vertex_normals))(i)(j)(0) << ", " << (*(ts->face_vertex_normals))(i)(j)(1) << ", " << (*(ts->face_vertex_normals))(i)(j)(2) << ">";
-            if (i != ts->mesh.elements.m-1 && j != 2) {
+            if (i != ts->mesh.elements.m-1 || j != 2) {
                 fs << ", ";
             }
         }
@@ -1351,40 +1361,36 @@ int main(int argc, char** argv) {
         
         case 10://csg
         {
-            //read exiting mesh and generate povray
-            string outputDir(argv[2]);
+            //csg cut
+            const std::string dataDir(argv[2]);
+            string outputDir(argv[3]);
+            
+            //grid cut by cow
             sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
-            FILE_UTILITIES::Read_From_File<T>("cow_without_bunny.tet.gz", *sim_volume);
-            WriteToPovRay(sim_volume, outputDir, 1);
+            sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(208, 128, 68),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
             
-            exit(1);
+            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
             
-//            const std::string dataDir(argv[2]);
-//            string outputDir(argv[3]);
-//            
-//            cutting_tri_mesh = TRIANGULATED_SURFACE<T>::Create();
-//            sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
-//            sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(208, 128, 68),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
-//            sim_volume->mesh.Initialize_Boundary_Mesh();
-//            WriteToPovRay(sim_volume, outputDir, 0);
-//            
-//            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
-//            
-//            TRIANGULATED_SURFACE<float> *ts_float = TRIANGULATED_SURFACE<float>::Create();
-//            FILE_UTILITIES::Read_From_File<float>(dataDir+"/cow_20k.tri.gz", *ts_float);
-//            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17)));
-//            
-//            cutting_tri_mesh->particles.Add_Elements(ts_float->particles.X.m);
-//            cutting_tri_mesh->Update_Number_Nodes();
-//            for (int i = 0; i < ts_float->particles.X.m; ++i) {
-//                for (int j = 0; j < 3; ++j) {
-//                    cutting_tri_mesh->particles.X(i)(j) = ts_float->particles.X(i)(j);
-//                }
-//            }
-//            cutting_tri_mesh->mesh.elements = ts_float->mesh.elements;
-//            mcut->Cut(*cutting_tri_mesh);
-//            FILE_UTILITIES::Write_To_File<T>("cow_cut_by_bunny.tet.gz", *(mcut->volume));
-//            
+            TRIANGULATED_SURFACE<float> *ts_float = TRIANGULATED_SURFACE<float>::Create();
+            FILE_UTILITIES::Read_From_File<float>(dataDir+"/cow_20k.tri.gz", *ts_float);
+            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17)));
+            cutting_tri_mesh = TRIANGULATED_SURFACE<T>::Create();
+            cutting_tri_mesh->particles.Add_Elements(ts_float->particles.X.m);
+            cutting_tri_mesh->Update_Number_Nodes();
+            for (int i = 0; i < ts_float->particles.X.m; ++i) {
+                for (int j = 0; j < 3; ++j) {
+                    cutting_tri_mesh->particles.X(i)(j) = ts_float->particles.X(i)(j);
+                }
+            }
+            cutting_tri_mesh->mesh.elements = ts_float->mesh.elements;
+            mcut->Cut(*cutting_tri_mesh, false);
+
+            ARRAY<int> labels;
+            mcut->volume->mesh.Identify_Face_Connected_Components(labels);
+            FILE_UTILITIES::Write_To_File<T>("cow_embedding.tet.gz", *(mcut->volume));
+            
+            
+//            //cow cut by bunny
 //            T w = 0.14;
 //            Fit_In_Box<TV>(cutting_tri_mesh->particles.X, RANGE<TV>(TV(-w,-w,-w),TV(w,w,w)));
 //            for (int i = 0; i < ts_float->particles.X.m; ++i) {
@@ -1427,10 +1433,35 @@ int main(int argc, char** argv) {
 //            mcut->volume->mesh.Initialize_Boundary_Mesh(); //cout << "cutting boundary elements:" << sim_volume->mesh.boundary_mesh->elements.m << endl;
 //            mcut->volume->mesh.boundary_mesh->Initialize_Segment_Mesh();
 //            mcut->volume->mesh.Identify_Face_Connected_Components(labels);
+            
+            
             break;
         }
+        case 11://csg povray
+        {
+            //read exiting mesh and generate povray
+            string meshFile(argv[2]);
+            string outputDir(argv[3]);
+//            sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
+//            FILE_UTILITIES::Read_From_File<T>(meshFile, *sim_volume);
+//            Initialize(meshFile);
+//            WriteToPovRaySmooth(sim_volume, outputDir, 3);
             
-        case 11://better peel a ball: Dm_inverse = 1, use gravity = 19.8, no damping, in mesh_cutting_subd, change the way dirichlet is set to the first case
+            //write out bunny surface
+            TRIANGULATED_SURFACE<float>* ts = TRIANGULATED_SURFACE<float>::Create();
+            FILE_UTILITIES::Read_From_File<float>(meshFile, *ts);
+            T w = 0.14;
+            Fit_In_Box<FV>(ts->particles.X, RANGE<FV>(FV(-w,-w,-w),FV(w,w,w)));
+            for (int i = 0; i < ts->particles.X.m; ++i) {
+                ts->particles.X(i)(0) = -ts->particles.X(i)(0)-0.1;
+                ts->particles.X(i)(1) = ts->particles.X(i)(1)+0.05;
+                ts->particles.X(i)(2) = ts->particles.X(i)(2)+0.1;
+            }
+            TriSurfaceToPovray(ts, outputDir, 0);
+            exit(1);
+            break;
+        }
+        case 12://better peel a ball: Dm_inverse = 1, use gravity = 19.8, no damping, in mesh_cutting_subd, change the way dirichlet is set to the first case
         {
             string volumeFile(argv[2]);
             string outputDir(argv[3]);
