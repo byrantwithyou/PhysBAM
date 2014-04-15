@@ -189,6 +189,8 @@ public:
     T save_dt;
     bool self_collide_surface_only;
     bool use_vanilla_newton;
+    T collision_height;
+    T collision_speed;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),test_forces(false),
@@ -204,7 +206,7 @@ public:
         use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
         penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),
         use_penalty_self_collisions(true),use_distance_based_self_collisions(false),rod_length(4),rod_radius(.3),attachment_length(.6),self_collide_surface_only(false),
-        use_vanilla_newton(false)
+        use_vanilla_newton(false),collision_height(5),collision_speed(4)
     {
         this->fixed_dt=1./240;
     }
@@ -336,6 +338,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-use_tri_col",&solids_parameters.triangle_collision_parameters.perform_self_collision,"use triangle collisions");
     parse_args->Add("-no_self_interior",&self_collide_surface_only,"do not process penalty self collisions against interior particles");
     parse_args->Add("-use_vanilla_newton",&use_vanilla_newton,"use triangle collisions");
+    parse_args->Add("-collision_height",&collision_height,"height","height of collision body in test 68");
+    parse_args->Add("-collision_speed",&collision_speed,"speed","speed of collision body in test 68");
 }
 //#####################################################################
 // Function Parse_Options
@@ -1629,13 +1633,27 @@ void Get_Initial_Data()
               RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,1.001+2.001*i,0)*m));
               tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             }
-            tests.Add_Ground();
+            RIGID_BODY<TV>& spike=tests.Add_Analytic_Box(TV(2.5,2.5,2.5)*m);
+            ROTATION<TV> r(MATRIX<T,3>(sqrt(2)/2,sqrt(6)/6,sqrt(3)/3,-sqrt(2)/2,sqrt(6)/6,sqrt(3)/3,0,-sqrt(6)/3,sqrt(3)/3));
+            TV start(0,collision_height*m,collision_speed*3*m);
+            TV end(0,collision_height*m,-collision_speed*30*m);
+            spike.Frame().t=start;
+            spike.Frame().r=r;
+            spike.is_static=false;
+            kinematic_ids.Append(spike.particle_index);
+            rigid_body_collection.rigid_body_particles.kinematic(spike.particle_index)=true;
+            spike.coefficient_of_friction=input_friction;
+            curves.Resize(1);
+            curves(0).Add_Control_Point(0,FRAME<TV>(start,r));
+            curves(0).Add_Control_Point(60,FRAME<TV>(end,r));
+            tests.Add_Ground(input_friction);
             break;}
         case 69:{
-            int spikes_per_side=3;
+            int spikes_per_side=4;
             T spike_scale=0.18;
-            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(1,1.1,1)*m);
-            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(1,1.1,1)*m);
+            T spike_spacing=sqrt(3)*spike_scale;
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(0.0001,0.0001,0.0001)*m);
+            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(0.0001,0.0001,0.0001)*m);
             box1.Frame().t=TV(0,0.5,-1)*m;
             box2.Frame().t=TV(0,0.5,1)*m;
             box1.is_static=false;
@@ -1648,20 +1666,25 @@ void Get_Initial_Data()
             box2.coefficient_of_friction=input_friction;
             curves.Resize(2+2*spikes_per_side*spikes_per_side);
             int c=0;
-            curves(c).Add_Control_Point(0,FRAME<TV>(TV(0,0.5,-1)));
-            curves(c).Add_Control_Point(1,FRAME<TV>(TV(0,0.5,-0.57)));
-            curves(c).Add_Control_Point(2,FRAME<TV>(TV(0,0.75,-0.57)));
-            curves(c).Add_Control_Point(3,FRAME<TV>(TV(1,0.75,-0.57)));
+            T final_x = 1;
+            T y = 0.78;
+            T final_z = 0.55;
+            curves(c).Add_Control_Point(0,FRAME<TV>(TV(0,y,-1)*m));
+            curves(c).Add_Control_Point(1,FRAME<TV>(TV(0,y,-final_z)*m));
+            curves(c).Add_Control_Point(2,FRAME<TV>(TV(0,y+spike_spacing,-final_z)*m));
+            curves(c).Add_Control_Point(3,FRAME<TV>(TV(spike_spacing,y+spike_spacing,-final_z)*m));
+            curves(c).Add_Control_Point(4,FRAME<TV>(TV(spike_spacing,y,-final_z)*m));
+            curves(c).Add_Control_Point(8,FRAME<TV>(TV(final_x,y,-final_z)*m));
             c++;
-            curves(c).Add_Control_Point(0,FRAME<TV>(TV(0,0.5,1)));
-            curves(c).Add_Control_Point(1,FRAME<TV>(TV(0,0.5,0.57)));
-            curves(c).Add_Control_Point(2,FRAME<TV>(TV(0,0.5,0.57)));
-            curves(c).Add_Control_Point(3,FRAME<TV>(TV(-1,0.5,0.57)));
+            curves(c).Add_Control_Point(0,FRAME<TV>(TV(0,y,1)*m));
+            curves(c).Add_Control_Point(1,FRAME<TV>(TV(0,y,final_z)*m));
+            curves(c).Add_Control_Point(4,FRAME<TV>(TV(0,y,final_z)*m));
+            curves(c).Add_Control_Point(8,FRAME<TV>(TV(-final_x,y,final_z)*m));
             c++;
             for(int i=0;i<spikes_per_side;i++){
               for(int j=0;j<spikes_per_side;j++){
                 RIGID_BODY<TV>& spike=tests.Add_Analytic_Box(TV(1,1,1)*spike_scale*m);
-                TV d((i-spikes_per_side/2-0.2)*0.3*m,(j-spikes_per_side/2-0.2)*0.3*m,(0.5-spike_scale/3)*m);
+                TV d((i-spikes_per_side/2)*spike_spacing*m,(j-spikes_per_side/2)*spike_spacing*m,(0.5-spike_spacing/6)*m);
                 ROTATION<TV> r(MATRIX<T,3>(sqrt(2)/2,sqrt(6)/6,sqrt(3)/3,-sqrt(2)/2,sqrt(6)/6,sqrt(3)/3,0,-sqrt(6)/3,sqrt(3)/3));
                 spike.Frame().t=box1.Frame().t+d;
                 spike.Frame().r=r;
@@ -1676,7 +1699,7 @@ void Get_Initial_Data()
             for(int i=0;i<spikes_per_side;i++){
               for(int j=0;j<spikes_per_side;j++){
                 RIGID_BODY<TV>& spike=tests.Add_Analytic_Box(TV(1,1,1)*spike_scale*m);
-                TV d((i-spikes_per_side/2+0.2)*0.3*m,(j-spikes_per_side/2+0.2)*0.3*m,(-0.5+spike_scale/3)*m);
+                TV d((i-spikes_per_side/2+0.5)*spike_spacing*m,(j-spikes_per_side/2+0.5)*spike_spacing*m,(-0.5+spike_spacing/6)*m);
                 ROTATION<TV> r(MATRIX<T,3>(sqrt(2)/2,sqrt(6)/6,sqrt(3)/3,-sqrt(2)/2,sqrt(6)/6,sqrt(3)/3,0,-sqrt(6)/3,sqrt(3)/3));
                 spike.Frame().t=box2.Frame().t+d;
                 spike.Frame().r=r;
@@ -1689,7 +1712,7 @@ void Get_Initial_Data()
                   curves(c).Add_Control_Point(cp(k).t,FRAME<TV>(cp(k).value.t+d,r));
                 c++;}}
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.522,(T)0)*m)),true,true,density,.007*m);
-            tests.Add_Ground();
+            tests.Add_Ground(10000);
             break;}
         case 77: {
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)*m));
