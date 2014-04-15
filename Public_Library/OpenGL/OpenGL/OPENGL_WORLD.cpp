@@ -89,7 +89,7 @@ OPENGL_WORLD()
     Bind_Key("^t",Toggle_Background_CB("Toggle Background"));
     Bind_Key("|",Resize_To_Standard_Size_CB("Resize Window to 640x480"));
     Bind_Key('?',Toggle_Help_CB("Display Help"));
-    Bind_Key("<F01>",new OPENGL_CALLBACK_TOGGLE(&display_strings,"Toggle display strings"));
+    Bind_Key("<F1>",new OPENGL_CALLBACK_TOGGLE(&display_strings,"Toggle display strings"));
     Set_Key_Binding_Category("User-Defined Keys");
     Set_Key_Binding_Category_Priority(1);
     Set_View_Target_Timer(1);
