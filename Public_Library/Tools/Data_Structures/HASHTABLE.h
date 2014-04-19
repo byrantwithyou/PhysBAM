@@ -194,8 +194,11 @@ public:
     void Exchange(const TK& x,const TK& y) // Exchange values at entries x and y; valid if x or y (or both) are not present; efficient for array values
     {bool a=Contains(x),b=Contains(y);if(a || b){exchange(Get_Or_Insert(x),Get_Or_Insert(y));if(!a || !b){Delete(a?x:y);}}}
 
+    void Exchange(HASHTABLE& hash)
+    {table.Exchange(hash.table);exchange(number_of_entries,hash.number_of_entries);exchange(next_resize,hash.next_resize);}
+
     static void Exchange_Hashtables(HASHTABLE& hash1,HASHTABLE& hash2)
-    {hash1.table.Exchange(hash2.table);exchange(hash1.number_of_entries,hash2.number_of_entries);exchange(hash1.next_resize,hash2.next_resize);}
+    {hash1.Exchange(hash2);}
 
     void Print_Table(std::ostream& output) const
     {output<<"Entry Count: "<<number_of_entries<<" Elements to resize at: "<<next_resize<<std::endl;
