@@ -417,7 +417,7 @@ Make_Orientations_Consistent()
                 component.Append(t2);orientation(t2)=(j==k2||k==j2)?orientation(t):-orientation(t);}}
         int correct=positive>negative?1:-1;
         for(int a=0;a<component.m;a++)if(orientation(component(a))!=correct)
-            exchange(elements(component(a))(2),elements(component(a))(3));}
+            exchange(elements(component(a))(1),elements(component(a))(2));}
     if(!adjacent_elements_defined){delete adjacent_elements;adjacent_elements=0;}
 }
 //#####################################################################
