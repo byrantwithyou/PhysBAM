@@ -254,5 +254,11 @@ template int fprintf_formatted_item_builtin<char>(std::ostream&,char const*,int,
 template int fprintf_formatted_item_builtin<long>(std::ostream&,char const*,int,long);
 template int fprintf_formatted_item_builtin<long long>(std::ostream&,char const*,int,long long);
 template int fprintf_formatted_item_builtin<short>(std::ostream&,char const*,int,short);
+template int fprintf_formatted_item_builtin<unsigned int>(std::ostream&,char const*,int,unsigned int);
+template int fprintf_formatted_item_builtin<unsigned char>(std::ostream&,char const*,int,unsigned char);
+template int fprintf_formatted_item_builtin<unsigned long>(std::ostream&,char const*,int,unsigned long);
+template int fprintf_formatted_item_builtin<unsigned long long>(std::ostream&,char const*,int,unsigned long long);
+template int fprintf_formatted_item_builtin<unsigned short>(std::ostream&,char const*,int,unsigned short);
+template int fprintf_formatted_item_builtin<bool>(std::ostream&,char const*,int,bool);
 }
 }
