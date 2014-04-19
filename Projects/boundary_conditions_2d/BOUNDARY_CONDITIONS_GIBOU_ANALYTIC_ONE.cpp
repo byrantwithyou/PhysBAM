@@ -26,7 +26,7 @@ Theta(const TV& X) const
         T cx=cos(z.x),cy=cos(z.y),sx=sin(z.x),sy=sin(z.y);
         VECTOR<T,3> G(-2*X.x+2*z.x+z.z*cx*sy,-2*X.y+2*z.y+z.z*sx*cy,-k+sx*sy);
         MATRIX<T,3> H(2-z.z*sx*sy,z.z*cx*cy,cx*sy,z.z*cx*cy,2-z.z*sx*sy,sx*cy,cx*sy,sx*cy,0);
-        z-=H.Solve_Linear_System(G);
+        z-=H.Inverse_Times(G);
         if(G.Magnitude_Squared()<1e-25) break;}
     T sign=((T).2-sin(X.x)*sin(X.y))>0?1:-1;
     if(!bounding_box.Lazy_Inside(X)) sign=1;

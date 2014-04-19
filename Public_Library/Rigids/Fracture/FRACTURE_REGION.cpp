@@ -99,12 +99,12 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
 
         particle_intersection_thickness=implicit_object->levelset.grid.dX.Min();
         MATRIX<T,3> o2bl_RS=body.levelset_RS.Inverse()*object_RS;
-        TV o2bl_T=body.levelset_RS.Solve_Linear_System(object_T-body.levelset_T);
+        TV o2bl_T=body.levelset_RS.Inverse_Times(object_T-body.levelset_T);
 
         MATRIX<T,3> bo2l_RS=levelset_RS.Inverse()*body.object_RS;
-        TV bo2l_T=levelset_RS.Solve_Linear_System(body.object_T-levelset_T);
+        TV bo2l_T=levelset_RS.Inverse_Times(body.object_T-levelset_T);
         MATRIX<T,3> bo2o_RS=object_RS.Inverse()*body.object_RS;
-        TV bo2o_T=object_RS.Solve_Linear_System(body.object_T-object_T);
+        TV bo2o_T=object_RS.Inverse_Times(body.object_T-object_T);
 
         if(!use_particle_optimization){
             for(int p=0;p<triangulated_surface->particles.Size();p++){ // clamp our particles

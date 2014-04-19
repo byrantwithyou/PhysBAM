@@ -107,7 +107,7 @@ public:
     {return 2*Area(x0,x1,x2)/Maximum_Edge_Length(x0,x1,x2);}
 
     static TV First_Two_Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1,const TV& x2)
-    {return MATRIX<T,2>(x0-x2,x1-x2).Robust_Solve_Linear_System(location-x2);}
+    {return MATRIX<T,2>(x0-x2,x1-x2).Robust_Inverse_Times(location-x2);}
 
     VECTOR<T,3> Barycentric_Coordinates(const TV& location) const
     {return Barycentric_Coordinates(location,X[0],X[1],X[2]);}

@@ -45,15 +45,15 @@ public:
     VECTOR<T,0> World_Space_Inertia_Tensor_Times(const ROTATION<VECTOR<T,1> > orientation,const VECTOR<T,0> angular_velocity) const
     {return VECTOR<T,0>();}
     VECTOR<T,0> World_Space_Inertia_Tensor_Inverse_Times(const ROTATION<VECTOR<T,1> > orientation,const VECTOR<T,0> angular_velocity) const
-    {return inertia_tensor.Solve_Linear_System(angular_velocity);}
+    {return inertia_tensor.Inverse_Times(angular_velocity);}
     VECTOR<T,1> World_Space_Inertia_Tensor_Times(const ROTATION<VECTOR<T,2> >& orientation,const VECTOR<T,1> angular_velocity) const
     {return inertia_tensor*angular_velocity;}
     VECTOR<T,1> World_Space_Inertia_Tensor_Inverse_Times(const ROTATION<VECTOR<T,2> >& orientation,const VECTOR<T,1> angular_momentum) const
-    {return inertia_tensor.Solve_Linear_System(angular_momentum);}
+    {return inertia_tensor.Inverse_Times(angular_momentum);}
     VECTOR<T,3> World_Space_Inertia_Tensor_Times(const ROTATION<VECTOR<T,3> >& orientation,const VECTOR<T,3>& angular_velocity) const
     {return orientation.Rotate(inertia_tensor*orientation.Inverse_Rotate(angular_velocity));}
     VECTOR<T,3> World_Space_Inertia_Tensor_Inverse_Times(const ROTATION<VECTOR<T,3> >& orientation,const VECTOR<T,3>& angular_momentum) const
-    {return orientation.Rotate(inertia_tensor.Solve_Linear_System(orientation.Inverse_Rotate(angular_momentum)));}
+    {return orientation.Rotate(inertia_tensor.Inverse_Times(orientation.Inverse_Rotate(angular_momentum)));}
     TWIST<TV> World_Space_Mass_Inverse_Times(const TWIST<TV>& momentum) const
     {
         TWIST<TV> velocity;

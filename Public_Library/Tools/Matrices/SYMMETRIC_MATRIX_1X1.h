@@ -171,10 +171,10 @@ public:
     MATRIX<T,0,1> Cross_Product_Matrix_Times(const VECTOR<T,1>& v) const
     {return MATRIX<T,0,1>();}
 
-    VECTOR<T,1> Solve_Linear_System(const VECTOR<T,1>& b) const
+    VECTOR<T,1> Inverse_Times(const VECTOR<T,1>& b) const
     {return Inverse()*b;}
 
-    VECTOR<T,1> Robust_Solve_Linear_System(const VECTOR<T,1>& b) const
+    VECTOR<T,1> Robust_Inverse_Times(const VECTOR<T,1>& b) const
     {return Inverse()*b;}
 
     T Trace() const

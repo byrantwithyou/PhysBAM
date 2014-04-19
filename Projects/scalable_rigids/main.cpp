@@ -159,7 +159,7 @@ ARRAY<T> Residual(const SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<T>& b,const ARR
 }
 
 template<class T>
-void Solve_Linear_System(const SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x)
+void Inverse_Times(const SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x)
 {
     LOG::cout << "Solver_Linear_System " << A.m << std::endl;
     //LOG::cout << "A = " << A << std::endl;
@@ -191,7 +191,7 @@ void Solve_Linear_System(const SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<T>& b,AR
     e2.Fill(0);
 
     //Gauss_Seidel(A2,r2,e2,100);
-    Solve_Linear_System(A2,r2,e2);
+    Inverse_Times(A2,r2,e2);
 
     //LOG::cout << "coarse_residual = " << Residual(A2,r2,e2).Maximum_Magnitude() << std::endl;
 
@@ -290,9 +290,9 @@ int main(int argc,char* argv[])
     
     LOG::cout << "before residual " << Residual(A,b,x).Maximum_Magnitude() << std::endl;
     
-    Solve_Linear_System(A,b,x);
-    Solve_Linear_System(A,b,x);
-    Solve_Linear_System(A,b,x);
+    Inverse_Times(A,b,x);
+    Inverse_Times(A,b,x);
+    Inverse_Times(A,b,x);
     
     LOG::cout << "after residual " << Residual(A,b,x).Maximum_Magnitude() << std::endl;
     

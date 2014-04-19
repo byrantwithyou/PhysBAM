@@ -55,7 +55,7 @@ template<class T> void ROBUST_SIMPLEX_INTERACTIONS<VECTOR<T,3> >::
 Triangle_Segment_Intersection_Weights(const VECTOR<TV,3>& triangle,const VECTOR<TV,2>& segment,VECTOR<T,2>& triangle_weights,T& segment_weight,bool *is_robust_input)
 {
     MATRIX<T,3> matrix(triangle(0)-triangle(2),triangle(1)-triangle(2),segment(1)-segment(0));
-    VECTOR<T,3> weights=matrix.Robust_Solve_Linear_System(segment(1)-triangle(2));
+    VECTOR<T,3> weights=matrix.Robust_Inverse_Times(segment(1)-triangle(2));
     for(int i=0;i<2;i++) triangle_weights(i)=weights(i);segment_weight=weights(2);
 }
 //#####################################################################

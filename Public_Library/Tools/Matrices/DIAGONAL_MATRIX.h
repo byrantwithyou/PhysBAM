@@ -160,10 +160,10 @@ public:
     DIAGONAL_MATRIX Inverse() const
     {return DIAGONAL_MATRIX(PhysBAM::Inverse(x));}
 
-    VECTOR<T,d> Solve_Linear_System(const VECTOR<T,d>& v) const
+    VECTOR<T,d> Inverse_Times(const VECTOR<T,d>& v) const
     {return v/x;}
 
-    VECTOR<T,d> Robust_Solve_Linear_System(const VECTOR<T,d>& v) const
+    VECTOR<T,d> Robust_Inverse_Times(const VECTOR<T,d>& v) const
     {VECTOR<T,d> r;for(int i=0;i<d;i++) r(i)=Robust_Divide(v(i),x(i));return r;}
 
     template<class T_MATRIX>

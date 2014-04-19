@@ -113,13 +113,13 @@ public:
     {STATIC_ASSERT((!world_space && TV::m==2));return inertia_tensor*angular_velocity;}
 
     VECTOR<T,1> World_Space_Inertia_Tensor_Inverse_Times(const ROTATION<VECTOR<T,2> >& orientation,const VECTOR<T,1> angular_momentum) const
-    {STATIC_ASSERT((!world_space && TV::m==2));return inertia_tensor.Solve_Linear_System(angular_momentum);}
+    {STATIC_ASSERT((!world_space && TV::m==2));return inertia_tensor.Inverse_Times(angular_momentum);}
 
     VECTOR<T,3> World_Space_Inertia_Tensor_Times(const ROTATION<VECTOR<T,3> >& orientation,const VECTOR<T,3>& angular_velocity) const
     {STATIC_ASSERT((!world_space && TV::m==3));return orientation.Rotate(inertia_tensor*orientation.Inverse_Rotate(angular_velocity));}
 
     VECTOR<T,3> World_Space_Inertia_Tensor_Inverse_Times(const ROTATION<VECTOR<T,3> >& orientation,const VECTOR<T,3>& angular_momentum) const
-    {STATIC_ASSERT((!world_space && TV::m==3));return orientation.Rotate(inertia_tensor.Solve_Linear_System(orientation.Inverse_Rotate(angular_momentum)));}
+    {STATIC_ASSERT((!world_space && TV::m==3));return orientation.Rotate(inertia_tensor.Inverse_Times(orientation.Inverse_Rotate(angular_momentum)));}
 
     T Rotational_Kinetic_Energy(const ROTATION<VECTOR<T,1> > orientation,const VECTOR<T,0> angular_momentum) const
     {STATIC_ASSERT((!world_space && TV::m==1));return 0;}

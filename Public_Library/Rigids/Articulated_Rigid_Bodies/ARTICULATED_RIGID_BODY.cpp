@@ -261,7 +261,7 @@ Compute_Constraint_Correcting_Impulse(T_CONSTRAINT_FUNCTION& constraint_error_fu
     for(iterations=0;iterations<max_iterations;iterations++){
         if(f_of_j_norm<=iterative_tolerance_squared) break;
 
-        T_IMPULSE delta_j=constraint_error_function.Jacobian(j).Solve_Linear_System(-f_of_j);
+        T_IMPULSE delta_j=constraint_error_function.Jacobian(j).Inverse_Times(-f_of_j);
         if(iterations==0) impulse_bound=constraint_error_function.epsilon_scale*constraint_error_function.Magnitude(delta_j);
 
         // determine the step size z

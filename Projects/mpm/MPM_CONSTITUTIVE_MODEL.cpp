@@ -91,7 +91,7 @@ template<class T> static MATRIX<T,3> Compute_dR(const MATRIX<T,3>& R,const MATRI
     MATRIX<T,3> H=(R.Transpose_Times(dF))-(dF.Transpose_Times(R));
     VECTOR<T,3> b(H(0,1),H(0,2),H(1,2));
     MATRIX<T,3> A(S(0,0)+S(1,1),S(1,2),-S(0,2),S(1,2),S(0,0)+S(2,2),S(1,0),-S(0,2),S(0,1),S(1,1)+S(2,2));
-    VECTOR<T,3> x=A.Solve_Linear_System(b);
+    VECTOR<T,3> x=A.Inverse_Times(b);
     return R*MATRIX<T,3>(0,-x(0),-x(1),x(0),0,-x(2),x(1),x(2),0);
 }
 //#####################################################################

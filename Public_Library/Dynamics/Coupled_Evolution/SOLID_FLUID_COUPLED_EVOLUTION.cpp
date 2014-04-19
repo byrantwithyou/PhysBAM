@@ -986,7 +986,7 @@ Compute_Coupling_Terms_Rigid(const ARRAY<int,TV_INT>& cell_index_to_matrix_index
         for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i));
             if(fluids_parameters.compressible) rigid_body_updated_center_of_mass(i)=rigid_body.Frame().t;
-            else rigid_body_updated_center_of_mass(i)=(rigid_body_fluid_mass(i)+rigid_body.Mass()).Solve_Linear_System(
+            else rigid_body_updated_center_of_mass(i)=(rigid_body_fluid_mass(i)+rigid_body.Mass()).Inverse_Times(
                     rigid_body_updated_center_of_mass(i)+rigid_body.Frame().t*rigid_body.Mass());}
         rigid_body_fluid_inertia.Fill(SYMMETRIC_MATRIX<T,TV::SPIN::m>());}
 

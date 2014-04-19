@@ -173,7 +173,7 @@ public:
     {assert(x00!=0 && x11!=0);T one_over_x11=1/x00,one_over_x22=1/x11;
     return UPPER_TRIANGULAR_MATRIX(one_over_x11,-x01*one_over_x11*one_over_x22,one_over_x22);}
 
-    VECTOR<T,2> Solve_Linear_System(const VECTOR<T,2>& b) const
+    VECTOR<T,2> Inverse_Times(const VECTOR<T,2>& b) const
     {return Inverse()*b;}
 
     UPPER_TRIANGULAR_MATRIX Cofactor_Matrix() const

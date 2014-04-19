@@ -931,7 +931,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         // compute impulse as delta twist
         VECTOR<T,TV::dimension+T_SPIN::dimension> delta_twist;
         if(equation_type==0 || equation_type==3) delta_twist=A.In_Place_Cholesky_Solve(b);
-        else delta_twist=A.Solve_Linear_System(b);
+        else delta_twist=A.Inverse_Times(b);
         delta_twist.Extract(velocity,angular_velocity);}
 
     // apply push to particles
@@ -1022,8 +1022,8 @@ Push_Out_From_Particle(const int particle)
         K_inverse_sum+=K_inverse(i);ms+=K_inverse(i)*rigid_body_distances(i);}
 
     TV velocity;
-    if(have_static_bodies) velocity=K_inverse_sum.Solve_Linear_System(ms);
-    else velocity=(K_inverse_sum+m+particles.mass(particle)).Solve_Linear_System(ms);
+    if(have_static_bodies) velocity=K_inverse_sum.Inverse_Times(ms);
+    else velocity=(K_inverse_sum+m+particles.mass(particle)).Inverse_Times(ms);
 
     // apply push to elements
     for(int i=0;i<elements.m;i++){

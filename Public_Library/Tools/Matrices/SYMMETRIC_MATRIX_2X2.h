@@ -170,10 +170,10 @@ public:
     MATRIX<T,1,2> Cross_Product_Matrix_Times(const VECTOR<T,2>& v) const
     {return MATRIX<T,1,2>::Cross_Product_Matrix(v)*(*this);}
 
-    VECTOR<T,2> Solve_Linear_System(const VECTOR<T,2>& b) const
+    VECTOR<T,2> Inverse_Times(const VECTOR<T,2>& b) const
     {return SYMMETRIC_MATRIX(x11,-x10,x00)*b/Determinant();}
 
-    VECTOR<T,2> Robust_Solve_Linear_System(const VECTOR<T,2>& b) const
+    VECTOR<T,2> Robust_Inverse_Times(const VECTOR<T,2>& b) const
     {T determinant=Determinant();
     VECTOR<T,2> unscaled_result=SYMMETRIC_MATRIX(x11,-x10,x00)*b;
     T relative_tolerance=(T)FLT_MIN*unscaled_result.Max_Abs();

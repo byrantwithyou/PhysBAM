@@ -45,7 +45,7 @@ public:
     {return Barycentric_Coordinates(location,X[0],X[1],X[2],X[3]);}
 
     static TV First_Three_Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1,const TV& x2,const TV& x3)
-    {return MATRIX<T,3>(x0-x3,x1-x3,x2-x3).Robust_Solve_Linear_System(location-x3);}
+    {return MATRIX<T,3>(x0-x3,x1-x3,x2-x3).Robust_Inverse_Times(location-x3);}
 
     static VECTOR<T,4> Barycentric_Coordinates(const TV& location,const TV& x0,const TV& x1,const TV& x2,const TV& x3)
     {TV w=First_Three_Barycentric_Coordinates(location,x0,x1,x2,x3);return VECTOR<T,4>(w.x,w.y,w.z,1-w.x-w.y-w.z);}

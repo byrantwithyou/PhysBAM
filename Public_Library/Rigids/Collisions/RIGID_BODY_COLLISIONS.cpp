@@ -787,7 +787,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         // compute impulse as delta twist
         VECTOR<T,TV::dimension+T_SPIN::dimension> delta_twist;
         if(equation_type==0 || equation_type==3) delta_twist=A.In_Place_Cholesky_Solve(b);
-        else delta_twist=A.Solve_Linear_System(b);
+        else delta_twist=A.Inverse_Times(b);
         delta_twist.Extract(velocity,angular_velocity);}
 
     // apply push to other rigid bodies

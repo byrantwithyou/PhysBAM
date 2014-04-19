@@ -22,7 +22,7 @@ T Approx_Exact(const ARRAY<int>& n,const ARRAY<T>& x,int order)
             A(i,j)=p;
             p*=w;}}
 
-    ARRAY<T> coeffs=(A.Transpose_Times(A)).Solve_Linear_System(A.Transpose_Times(x));
+    ARRAY<T> coeffs=(A.Transpose_Times(A)).Inverse_Times(A.Transpose_Times(x));
     return coeffs(0);
 }
 

@@ -17,8 +17,8 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const ELLIPSOID<T>& ell
 { // TODO(jontg): everything else takes thickness_over_two; this should be made consistent...
     typedef VECTOR<T,3> TV;
     // Apply inverse transformation to ray
-    TV ray_endpoint=ellipsoid.radii.Solve_Linear_System(ellipsoid.orientation.Inverse_Rotate(ray.endpoint-ellipsoid.center));
-    TV ray_direction=ellipsoid.radii.Solve_Linear_System(ellipsoid.orientation.Inverse_Rotate(ray.direction)).Normalized();
+    TV ray_endpoint=ellipsoid.radii.Inverse_Times(ellipsoid.orientation.Inverse_Rotate(ray.endpoint-ellipsoid.center));
+    TV ray_direction=ellipsoid.radii.Inverse_Times(ellipsoid.orientation.Inverse_Rotate(ray.direction)).Normalized();
     
     // sphere intersection routine
     T thickness_over_two=(T).5*thickness;

@@ -181,11 +181,11 @@ public:
     MATRIX Inverse_Transposed() const
     {return Inverse().Transposed();}
 
-    VECTOR<T,2> Solve_Linear_System(const VECTOR<T,2>& b) const
+    VECTOR<T,2> Inverse_Times(const VECTOR<T,2>& b) const
     {T one_over_determinant=1/(x[0]*x[3]-x[1]*x[2]);
     return one_over_determinant*VECTOR<T,2>(x[3]*b.x-x[2]*b.y,x[0]*b.y-x[1]*b.x);}
 
-    VECTOR<T,2> Robust_Solve_Linear_System(const VECTOR<T,2>& b) const
+    VECTOR<T,2> Robust_Inverse_Times(const VECTOR<T,2>& b) const
     {T determinant=Determinant();
     VECTOR<T,2> unscaled_result=VECTOR<T,2>(x[3]*b.x-x[2]*b.y,x[0]*b.y-x[1]*b.x);
     T relative_tolerance=(T)FLT_MIN*unscaled_result.Max_Abs();

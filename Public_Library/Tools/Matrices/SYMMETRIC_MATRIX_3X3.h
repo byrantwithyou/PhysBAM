@@ -194,11 +194,11 @@ public:
     SYMMETRIC_MATRIX Deviatoric() const
     {return *this-Dilational();}
 
-    VECTOR<T,3> Solve_Linear_System(const VECTOR<T,3>& b) const // 18 mults, 8 adds
+    VECTOR<T,3> Inverse_Times(const VECTOR<T,3>& b) const // 18 mults, 8 adds
     {T cofactor00=x11*x22-x21*x21,cofactor01=x21*x20-x10*x22,cofactor02=x10*x21-x11*x20;
     return SYMMETRIC_MATRIX(cofactor00,cofactor01,cofactor02,x00*x22-x20*x20,x10*x20-x00*x21,x00*x11-x10*x10)*b/(x00*cofactor00+x10*cofactor01+x20*cofactor02);}
 
-    VECTOR<T,3> Robust_Solve_Linear_System(const VECTOR<T,3>& b) const
+    VECTOR<T,3> Robust_Inverse_Times(const VECTOR<T,3>& b) const
     {T cofactor00=x11*x22-x21*x21,cofactor01=x21*x20-x10*x22,cofactor02=x10*x21-x11*x20;
     T determinant=x00*cofactor00+x10*cofactor01+x20*cofactor02;
     VECTOR<T,3> unscaled_result=SYMMETRIC_MATRIX(cofactor00,cofactor01,cofactor02,x00*x22-x20*x20,x10*x20-x00*x21,x00*x11-x10*x10)*b;

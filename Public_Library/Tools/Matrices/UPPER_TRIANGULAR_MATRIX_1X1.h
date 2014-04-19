@@ -167,7 +167,7 @@ public:
     UPPER_TRIANGULAR_MATRIX Inverse() const
     {assert(x00!=0);return UPPER_TRIANGULAR_MATRIX(1/x00);}
 
-    VECTOR<T,1> Solve_Linear_System(const VECTOR<T,1>& b) const
+    VECTOR<T,1> Inverse_Times(const VECTOR<T,1>& b) const
     {return Inverse()*b;}
 
     UPPER_TRIANGULAR_MATRIX Cofactor_Matrix() const

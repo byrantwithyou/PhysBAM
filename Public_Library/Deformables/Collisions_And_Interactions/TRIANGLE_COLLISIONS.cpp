@@ -733,7 +733,7 @@ Apply_Rigid_Body_Motions(const T dt,const SPARSE_UNION_FIND<>& union_find)
             L+=TV::Cross_Product(radial_vector,full_particles.mass(p)*(full_particles.X(p)-X_self_collision_free(p)));
             inertia+=full_particles.mass(p)*MATRIX<T,TV::SPIN::m,TV::m>::Cross_Product_Matrix(radial_vector).Transposed().Cross_Product_Matrix_Times_With_Symmetric_Result(radial_vector);}
         L*=one_over_dt;
-        typename TV::SPIN omega=inertia.Solve_Linear_System(L);
+        typename TV::SPIN omega=inertia.Inverse_Times(L);
         ROTATION<TV> R=ROTATION<TV>::From_Rotation_Vector(dt*omega);
         for(int k=0;k<flat_indices.m;k++){int p=flat_indices(k);
             TV new_position=center_of_mass+dt*average_velocity+R.Rotate(X_self_collision_free(p)-center_of_mass);

@@ -43,7 +43,7 @@ template<class T> bool SIMPLEX_INTERACTIONS<T>::
 Two_Segment_Intersection_Barycentric_Coordinates(const VECTOR<VECTOR<T,2>,2>& segment1,const VECTOR<VECTOR<T,2>,2>& segment2,VECTOR<T,1>& weights1,VECTOR<T,1>& weights2)
 {
     MATRIX<T,2> A(segment1[1]-segment1[0],segment2[0]-segment2[1]);if(A.Determinant()==0) return false;
-    VECTOR<T,2> weights=A.Solve_Linear_System(segment2[0]-segment1[0]);
+    VECTOR<T,2> weights=A.Inverse_Times(segment2[0]-segment1[0]);
     weights1.x=weights[0];weights2.x=weights[1];
     return weights1.x>=0 && weights2.x>=0 && weights1.x<2 && weights2.x<2;
 }
@@ -336,7 +336,7 @@ Three_Triangle_Intersection_Barycentric_Coordinates_Helper(const VECTOR<VECTOR<T
     T vol_x3=VECTOR<T,3>::Triple_Product(triangle3.x-triangle1.x,triangle3.y-triangle1.x,triangle3.z-triangle1.x);
     T vol_y2=VECTOR<T,3>::Triple_Product(triangle3.x-triangle1.y,triangle3.y-triangle1.y,triangle3.z-triangle1.y);
     T vol_z2=VECTOR<T,3>::Triple_Product(triangle3.x-triangle1.z,triangle3.y-triangle1.z,triangle3.z-triangle1.z);
-    return MATRIX<T,2>(vol_z1-vol_x2,vol_z2-vol_x3,vol_z1-vol_y1,vol_z2-vol_y2).Solve_Linear_System(VECTOR<T,2>(vol_z1,vol_z2));
+    return MATRIX<T,2>(vol_z1-vol_x2,vol_z2-vol_x3,vol_z1-vol_y1,vol_z2-vol_y2).Inverse_Times(VECTOR<T,2>(vol_z1,vol_z2));
 }
 template <class T> bool SIMPLEX_INTERACTIONS<T>::
 Three_Triangle_Intersection_Barycentric_Coordinates(const VECTOR<VECTOR<T,3>,3>& triangle1,const VECTOR<VECTOR<T,3>,3>& triangle2,const VECTOR<VECTOR<T,3>,3>& triangle3,
@@ -356,7 +356,7 @@ Three_Triangle_Intersection_Barycentric_Coordinates(const VECTOR<VECTOR<T,3>,3>&
 template <class T> void SIMPLEX_INTERACTIONS<T>::
 Triangle_Segment_Intersection_Barycentric_Coordinates(const VECTOR<VECTOR<T,3>,3>& triangle,const VECTOR<VECTOR<T,3>,2>& segment,VECTOR<T,2>& triangle_weights,T& segment_weight)
 {
-    VECTOR<T,3> weights=MATRIX<T,3>(triangle.x-triangle.z,triangle.y-triangle.z,segment.y-segment.x).Robust_Solve_Linear_System(VECTOR<T,3>(segment.y-triangle.z));
+    VECTOR<T,3> weights=MATRIX<T,3>(triangle.x-triangle.z,triangle.y-triangle.z,segment.y-segment.x).Robust_Inverse_Times(VECTOR<T,3>(segment.y-triangle.z));
     triangle_weights=VECTOR<T,2>(weights.x,weights.y);segment_weight=weights.z;
 }
 //####################################################################

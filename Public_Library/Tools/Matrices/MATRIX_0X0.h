@@ -86,10 +86,10 @@ public:
     MATRIX Inverse() const
     {return *this;}
 
-    VECTOR<T,0> Solve_Linear_System(const VECTOR<T,0>& b) const
+    VECTOR<T,0> Inverse_Times(const VECTOR<T,0>& b) const
     {return b;}
 
-    VECTOR<T,0> Robust_Solve_Linear_System(const VECTOR<T,0>& b) const
+    VECTOR<T,0> Robust_Inverse_Times(const VECTOR<T,0>& b) const
     {return b;}
 
     MATRIX Cofactor_Matrix() const

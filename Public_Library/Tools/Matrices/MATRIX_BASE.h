@@ -541,7 +541,7 @@ public:
     {(T_MATRIX1(Derived())).In_Place_LU_Inverse(inverse);}
 
     template<class T_VECTOR>
-    RIGHT_VECTOR Solve_Linear_System(const ARRAY_BASE<T,T_VECTOR>& b)
+    RIGHT_VECTOR Inverse_Times(const ARRAY_BASE<T,T_VECTOR>& b)
     {return PLU_Solve(b);}
 
 //#####################################################################

@@ -164,7 +164,7 @@ public:
     {T determinant=x00*x11*x22;assert(determinant!=0);T s=1/determinant;
     return s*UPPER_TRIANGULAR_MATRIX(x11*x22,-x01*x22,x00*x22,x01*x12-x11*x02,-x00*x12,x00*x11);}
 
-    VECTOR<T,3> Solve_Linear_System(const VECTOR<T,3>& b) const
+    VECTOR<T,3> Inverse_Times(const VECTOR<T,3>& b) const
     {return Cofactor_Matrix()*(b/Determinant());}
 
     UPPER_TRIANGULAR_MATRIX Cofactor_Matrix() const

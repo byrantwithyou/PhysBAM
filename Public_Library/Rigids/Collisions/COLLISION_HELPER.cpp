@@ -22,7 +22,7 @@ template<class TV,class T,int d> TV PhysBAM::Compute_Collision_Impulse(const TV&
 
     // friction case
     // see if friction stops sliding
-    TV sticking_acceleration=-coefficient_of_restitution*relative_normal_velocity*normal-relative_velocity,sticking_impulse=impulse_factor.Solve_Linear_System(sticking_acceleration);
+    TV sticking_acceleration=-coefficient_of_restitution*relative_normal_velocity*normal-relative_velocity,sticking_impulse=impulse_factor.Inverse_Times(sticking_acceleration);
     T normal_component=sticking_impulse.Dot(normal);
     if((sticking_impulse-normal_component*normal).Magnitude()<=coefficient_of_friction*normal_component){
         if(sticking_impulse.Dot(relative_velocity+(T).5*sticking_acceleration)<=0){

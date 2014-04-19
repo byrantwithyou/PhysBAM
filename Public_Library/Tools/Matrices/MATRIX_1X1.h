@@ -110,10 +110,10 @@ public:
     MATRIX Inverse() const
     {assert(x00);return MATRIX(1/x00);}
 
-    VECTOR<T,1> Solve_Linear_System(const VECTOR<T,1>& b) const
+    VECTOR<T,1> Inverse_Times(const VECTOR<T,1>& b) const
     {return VECTOR<T,1>(b.x/x00);}
 
-    VECTOR<T,1> Robust_Solve_Linear_System(const VECTOR<T,1>& b) const
+    VECTOR<T,1> Robust_Inverse_Times(const VECTOR<T,1>& b) const
     {return VECTOR<T,1>(Robust_Divide(b.x,x00));}
 
     MATRIX Cofactor_Matrix() const

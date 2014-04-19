@@ -70,10 +70,10 @@ public:
     {STATIC_ASSERT(TV::m==1);}
 
     void Update_Angular_Velocity(const DIAGONAL_MATRIX<T,1> moment_of_inertia) // needs to be called to keep the angular velocity valid
-    {STATIC_ASSERT(TV::m==2);twist.angular=moment_of_inertia.Solve_Linear_System(angular_momentum);}
+    {STATIC_ASSERT(TV::m==2);twist.angular=moment_of_inertia.Inverse_Times(angular_momentum);}
 
     void Update_Angular_Velocity(const DIAGONAL_MATRIX<T,3>& inertia_tensor) // needs to be called to keep the angular velocity valid
-    {STATIC_ASSERT(TV::m==3);twist.angular=World_Space_Vector(inertia_tensor.Solve_Linear_System(Object_Space_Vector(angular_momentum)));}
+    {STATIC_ASSERT(TV::m==3);twist.angular=World_Space_Vector(inertia_tensor.Inverse_Times(Object_Space_Vector(angular_momentum)));}
 
     void Update_Angular_Momentum(const DIAGONAL_MATRIX<T,0> inertia_tensor) // needs to be called to keep the angular velocity valid
     {STATIC_ASSERT(TV::m==1);}

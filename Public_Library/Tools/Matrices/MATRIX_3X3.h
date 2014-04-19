@@ -367,8 +367,8 @@ public:
     static MATRIX Componentwise_Max(const MATRIX& v1,const MATRIX& v2);
     MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const;
     MATRIX Inverse() const;
-    VECTOR<T,3> Solve_Linear_System(const VECTOR<T,3>& b) const; // 33 mults, 17 adds, 1 div
-    VECTOR<T,3> Robust_Solve_Linear_System(const VECTOR<T,3>& b) const; // 34 mults, 17 adds, 1 div
+    VECTOR<T,3> Inverse_Times(const VECTOR<T,3>& b) const; // 33 mults, 17 adds, 1 div
+    VECTOR<T,3> Robust_Inverse_Times(const VECTOR<T,3>& b) const; // 34 mults, 17 adds, 1 div
     MATRIX Q_From_QR_Factorization() const; // Gram Schmidt
     UPPER_TRIANGULAR_MATRIX<T,3> R_From_QR_Factorization() const; // Gram Schmidt
 //#####################################################################

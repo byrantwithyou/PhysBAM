@@ -13,7 +13,7 @@ using namespace PhysBAM;
 template<class T> VECTOR<T,3> ELLIPSOID<T>::
 Normal(const TV& location) const   
 {
-    return orientation.Rotate(sqr(radii).Solve_Linear_System(orientation.Inverse_Rotate(location-center))).Normalized();
+    return orientation.Rotate(sqr(radii).Inverse_Times(orientation.Inverse_Rotate(location-center))).Normalized();
 }
 //#####################################################################
 // Function Inside
@@ -21,7 +21,7 @@ Normal(const TV& location) const
 template<class T> bool ELLIPSOID<T>::
 Inside(const TV& location,const T thickness_over_two) const
 {
-    TV scaled_offset=radii.Solve_Linear_System(orientation.Inverse_Rotate(location-center));
+    TV scaled_offset=radii.Inverse_Times(orientation.Inverse_Rotate(location-center));
     return scaled_offset.Magnitude_Squared() <= sqr(1-thickness_over_two);
 }
 //#####################################################################
@@ -30,7 +30,7 @@ Inside(const TV& location,const T thickness_over_two) const
 template<class T> bool ELLIPSOID<T>::
 Outside(const TV& location,const T thickness_over_two) const
 {
-    TV scaled_offset=radii.Solve_Linear_System(orientation.Inverse_Rotate(location-center));
+    TV scaled_offset=radii.Inverse_Times(orientation.Inverse_Rotate(location-center));
     return scaled_offset.Magnitude_Squared() >= sqr(1+thickness_over_two);
 }
 //#####################################################################
@@ -48,7 +48,7 @@ Boundary(const TV& location,const T thickness_over_two) const
 template<class T> VECTOR<T,3> ELLIPSOID<T>::
 Approximate_Surface(const TV& location) const 
 {
-    TV scaled_offset=radii.Solve_Linear_System(orientation.Inverse_Rotate(location-center));
+    TV scaled_offset=radii.Inverse_Times(orientation.Inverse_Rotate(location-center));
     return orientation.Rotate(radii*scaled_offset.Normalized())+center;
 }
 //#####################################################################
@@ -57,7 +57,7 @@ Approximate_Surface(const TV& location) const
 template<class T> T ELLIPSOID<T>::
 Approximate_Signed_Distance(const TV& location) const       
 {
-    TV offset=orientation.Inverse_Rotate(location-center),scaled_offset=radii.Solve_Linear_System(offset);
+    TV offset=orientation.Inverse_Rotate(location-center),scaled_offset=radii.Inverse_Times(offset);
     T scaled_magnitude=scaled_offset.Normalize();
     TV closest_offset=radii*scaled_offset;
     T distance=(closest_offset-offset).Magnitude();

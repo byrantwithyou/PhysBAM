@@ -128,10 +128,10 @@ Inverse() const
     return s*MATRIX(cofactor00,cofactor01,cofactor02,x[6]*x[5]-x[3]*x[8],x[0]*x[8]-x[6]*x[2],x[3]*x[2]-x[0]*x[5],x[3]*x[7]-x[6]*x[4],x[6]*x[1]-x[0]*x[7],x[0]*x[4]-x[3]*x[1]);
 }
 //#####################################################################
-// Function Solve_Linear_System
+// Function Inverse_Times
 //#####################################################################
 template<class T> VECTOR<T,3> MATRIX<T,3>::
-Solve_Linear_System(const VECTOR<T,3>& b) const // 33 mults, 17 adds, 1 div
+Inverse_Times(const VECTOR<T,3>& b) const // 33 mults, 17 adds, 1 div
 {
     T cofactor00=x[4]*x[8]-x[7]*x[5],cofactor01=x[7]*x[2]-x[1]*x[8],cofactor02=x[1]*x[5]-x[4]*x[2];
     T determinant=x[0]*cofactor00+x[3]*cofactor01+x[6]*cofactor02;
@@ -139,10 +139,10 @@ Solve_Linear_System(const VECTOR<T,3>& b) const // 33 mults, 17 adds, 1 div
     return MATRIX(cofactor00,cofactor01,cofactor02,x[6]*x[5]-x[3]*x[8],x[0]*x[8]-x[6]*x[2],x[3]*x[2]-x[0]*x[5],x[3]*x[7]-x[6]*x[4],x[6]*x[1]-x[0]*x[7],x[0]*x[4]-x[3]*x[1])*b/determinant;
 }
 //#####################################################################
-// Function Robust_Solve_Linear_System
+// Function Robust_Inverse_Times
 //#####################################################################
 template<class T> VECTOR<T,3> MATRIX<T,3>::
-Robust_Solve_Linear_System(const VECTOR<T,3>& b) const // 34 mults, 17 adds, 1 div
+Robust_Inverse_Times(const VECTOR<T,3>& b) const // 34 mults, 17 adds, 1 div
 {
     T cofactor00=x[4]*x[8]-x[7]*x[5],cofactor01=x[7]*x[2]-x[1]*x[8],cofactor02=x[1]*x[5]-x[4]*x[2];
     T determinant=x[0]*cofactor00+x[3]*cofactor01+x[6]*cofactor02;

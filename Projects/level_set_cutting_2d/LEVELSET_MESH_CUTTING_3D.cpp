@@ -232,7 +232,7 @@ void LEVELSET_MESH_CUTTING_3D::Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& ph
             if(!not_inside && corner0<2 && corner1<2 && (ring==0x1212 || ring==0x2121)){
                 TV p0(phi0.Subset(st)),p1(phi1.Subset(st));
                 MATRIX<T,2> M(p0(0)-p0(2),p1(0)-p1(2),p0(1)-p0(2),p1(1)-p1(2));
-                VECTOR<T,2> R(-p0(2),-p1(2)),L(M.Solve_Linear_System(R));
+                VECTOR<T,2> R(-p0(2),-p1(2)),L(M.Inverse_Times(R));
                 tri_hash.Set(st,phi0.Append(0));
                 phi1.Append(0);
                 weights.Append(PAIR<TV_INT,TV>(st,L.Append(1-L.Sum())));}
