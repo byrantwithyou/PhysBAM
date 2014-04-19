@@ -68,7 +68,7 @@ public:
 //#####################################################################
     virtual void Add_Gravity();
     template<class T_STRUCTURE>
-    T_STRUCTURE& Copy_And_Add_Structure(T_STRUCTURE& structure,ARRAY<int>* particle_indices=0);
+    T_STRUCTURE& Copy_And_Add_Structure(T_STRUCTURE& structure,ARRAY<int>* particle_indices=0,bool delete_structure=true);
     void Set_Initial_Particle_Configuration(GEOMETRY_PARTICLES<TV>& particles,const RIGID_BODY_STATE<TV>& state,const bool relative_to_box_center);
     T_SEGMENTED_CURVE& Create_Segmented_Curve(const GRID<VECTOR<T,1> >& square_grid,const RIGID_BODY_STATE<TV>& initial_state,const T density);
     T_SEGMENTED_CURVE& Create_Segmented_Curve(const int m,const RIGID_BODY_STATE<TV>& initial_state,const T initial_radius,const T density);

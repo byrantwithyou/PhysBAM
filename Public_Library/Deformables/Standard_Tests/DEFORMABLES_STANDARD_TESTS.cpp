@@ -63,11 +63,11 @@ Add_Gravity()
 // Function Copy_And_Add_Structure
 //#####################################################################
 template<class TV> template<class T_STRUCTURE> T_STRUCTURE& DEFORMABLES_STANDARD_TESTS<TV>::
-Copy_And_Add_Structure(T_STRUCTURE& structure,ARRAY<int>* particle_indices)
+Copy_And_Add_Structure(T_STRUCTURE& structure,ARRAY<int>* particle_indices,bool delete_structure)
 {
     deformable_body_collection.Add_Structure(structure.Append_Particles_And_Create_Copy(deformable_body_collection.particles,particle_indices));
     deformable_body_collection.structures.Last()->Update_Number_Nodes();
-    delete &structure;
+    if(delete_structure) delete &structure;
     return dynamic_cast<T_STRUCTURE&>(*deformable_body_collection.structures.Last());
 }
 //#####################################################################
@@ -644,17 +644,17 @@ Mark_Hard_Bindings_With_Free_Particles()
     template TRIANGULATED_SURFACE<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Drifted_Surface(const TRIANGULATED_SURFACE<T>&,SOFT_BINDINGS<VECTOR<T,3> >&,const bool) const; \
     template EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Embedded_Tetrahedralized_Volume(const SPHERE<VECTOR<T,3> >&,const RIGID_BODY_STATE<VECTOR<T,3> >&,const bool); \
     template EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Embedded_Tetrahedralized_Volume(const TORUS<T>&,const RIGID_BODY_STATE<VECTOR<T,3> >&,const bool); \
-    template TETRAHEDRALIZED_VOLUME<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Copy_And_Add_Structure(TETRAHEDRALIZED_VOLUME<T>&,ARRAY<int>*); \
-    template TRIANGULATED_SURFACE<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Copy_And_Add_Structure(TRIANGULATED_SURFACE<T>&,ARRAY<int>*); \
-    template TRIANGULATED_AREA<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Copy_And_Add_Structure(TRIANGULATED_AREA<T>&,ARRAY<int>*); \
-    template SEGMENTED_CURVE<VECTOR<T,2> >& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Copy_And_Add_Structure(SEGMENTED_CURVE<VECTOR<T,2> >&,ARRAY<int>*); \
+    template TETRAHEDRALIZED_VOLUME<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Copy_And_Add_Structure(TETRAHEDRALIZED_VOLUME<T>&,ARRAY<int>*,bool); \
+    template TRIANGULATED_SURFACE<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Copy_And_Add_Structure(TRIANGULATED_SURFACE<T>&,ARRAY<int>*,bool); \
+    template TRIANGULATED_AREA<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Copy_And_Add_Structure(TRIANGULATED_AREA<T>&,ARRAY<int>*,bool); \
+    template SEGMENTED_CURVE<VECTOR<T,2> >& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Copy_And_Add_Structure(SEGMENTED_CURVE<VECTOR<T,2> >&,ARRAY<int>*,bool); \
     template TRIANGULATED_SURFACE<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Cloth_Panel(const int,const T,const T,const RIGID_BODY_STATE<VECTOR<T,3> >*, \
         TRIANGULATED_SURFACE_CLIPPING_HELPER<T>*,ARRAY<int>*); \
     template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Set_Mass_Of_Particles<SEGMENTED_CURVE<VECTOR<T,2> > >(SEGMENTED_CURVE<VECTOR<T,2> > const&,T,bool);
 
 INSTANTIATION_HELPER(float);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Mark_Hard_Bindings_With_Free_Particles();
-template SEGMENTED_CURVE_2D<float>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Copy_And_Add_Structure<SEGMENTED_CURVE_2D<float> >(SEGMENTED_CURVE_2D<float>&,ARRAY<int,int>*);
+template SEGMENTED_CURVE_2D<float>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Copy_And_Add_Structure<SEGMENTED_CURVE_2D<float> >(SEGMENTED_CURVE_2D<float>&,ARRAY<int,int>*,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Set_Mass_Of_Particles<TRIANGULATED_SURFACE<float> >(TRIANGULATED_SURFACE<float> const&,float,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,1> >::Set_Mass_Of_Particles<SEGMENTED_CURVE<VECTOR<float,1> > >(SEGMENTED_CURVE<VECTOR<float,1> > const&,float,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<float,3> >&,SOFT_BINDINGS<VECTOR<float,3> >&,
@@ -665,7 +665,7 @@ template DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::~DEFORMABLES_STANDARD_TES
 template DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::~DEFORMABLES_STANDARD_TESTS();
 INSTANTIATION_HELPER(double);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Mark_Hard_Bindings_With_Free_Particles();
-template SEGMENTED_CURVE_2D<double>& DEFORMABLES_STANDARD_TESTS<VECTOR<double,2> >::Copy_And_Add_Structure<SEGMENTED_CURVE_2D<double> >(SEGMENTED_CURVE_2D<double>&,ARRAY<int,int>*);
+template SEGMENTED_CURVE_2D<double>& DEFORMABLES_STANDARD_TESTS<VECTOR<double,2> >::Copy_And_Add_Structure<SEGMENTED_CURVE_2D<double> >(SEGMENTED_CURVE_2D<double>&,ARRAY<int,int>*,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Set_Mass_Of_Particles<TRIANGULATED_SURFACE<double> >(TRIANGULATED_SURFACE<double> const&,double,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,1> >::Set_Mass_Of_Particles<SEGMENTED_CURVE<VECTOR<double,1> > >(SEGMENTED_CURVE<VECTOR<double,1> > const&,double,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<double,3> >&,SOFT_BINDINGS<VECTOR<double,3> >&,
