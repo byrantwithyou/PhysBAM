@@ -625,4 +625,5 @@ template<class T_ARRAY> struct HASH_REDUCE<T_ARRAY,typename ENABLE_IF<(IS_ARRAY<
 #include <Tools/Arrays/ARRAY_SUM.h>
 #include <Tools/Arrays/ARRAY_VIEW.h>
 #include <Tools/Arrays/IDENTITY_ARRAY.h>
+#include <Tools/Arrays/INDIRECT_ARRAY.h>
 #endif
