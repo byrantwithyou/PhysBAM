@@ -1367,7 +1367,7 @@ int main(int argc, char** argv) {
             
             //grid cut by cow
             sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
-            sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(208, 128, 68),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
+            sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(52, 32, 17),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
             
             mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
             
@@ -1385,8 +1385,8 @@ int main(int argc, char** argv) {
             cutting_tri_mesh->mesh.elements = ts_float->mesh.elements;
             mcut->Cut(*cutting_tri_mesh, false);
 
-            ARRAY<int> labels;
-            mcut->volume->mesh.Identify_Face_Connected_Components(labels);
+//            ARRAY<int> labels;
+//            mcut->volume->mesh.Identify_Face_Connected_Components(labels);
             FILE_UTILITIES::Write_To_File<T>("cow_embedding.tet.gz", *(mcut->volume));
             
             

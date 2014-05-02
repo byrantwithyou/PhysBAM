@@ -71,6 +71,21 @@ Run(T tol)
     CONSISTENT_INTERSECTIONS<TV> intersections(*ta,*sc);
     intersections.Set_Tol();
     intersections.Compute();
+    if (intersections.hash_vv.Size()<20) {
+        cout<<"hash_vv:"<<intersections.hash_vv<<endl;
+    }
+    if (intersections.hash_ve.Size()<20) {
+        cout<<"hash_ve:"<<intersections.hash_ve<<endl;
+    }
+    if (intersections.hash_ev.Size()<20) {
+        cout<<"hash_ev:"<<intersections.hash_ev<<endl;
+    }
+    if (intersections.hash_ee.Size()<20) {
+        cout<<"hash_ee:"<<intersections.hash_ee<<endl;
+    }
+    if (intersections.hash_fv.Size()<20) {
+        cout<<"hash_fv:"<<intersections.hash_fv<<endl;
+    }
     
     HASHTABLE<I3,int> tri_from_face;
     HASHTABLE<I2,ARRAY<int> > tri_from_edge;
@@ -553,3 +568,4 @@ Update_Material_Particles()
 }
 //#####################################################################
 template class CUTTING<VECTOR<double,2> >;
+template class CUTTING<VECTOR<float,2> >;

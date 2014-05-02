@@ -24,3 +24,5 @@ Automatic_Program(env_gl,"offline",["offline.cpp","CONSISTENT_INTERSECTIONS.cpp"
 #Automatic_Program(env_geo,"proof_2d",["proof_2d.cpp","CUTTING_2D.cpp"])
 #Automatic_Program(env_geo,"proof_3d",["proof_3d.cpp"])
 Automatic_Program(env_gl,"demo",["demo.cpp","CUTTING_2D.cpp","CONSISTENT_INTERSECTIONS.cpp"])
+Automatic_Program(env_gl,"demo2",["demo.cpp","CUTTING_2D.cpp","NON_CONSISTENT_INTERSECTIONS.cpp"])
+Automatic_Program(env_gl,"demo1",["demo.cpp","CUTTING_2D.cpp","NON_CONSISTENT_INTERSECTIONS1.cpp"])

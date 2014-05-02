@@ -1292,7 +1292,7 @@ void MESH_CUTTING<T>::Cut(TRIANGULATED_SURFACE<T>& cutting_surface, bool refine,
     //intersections
     volume->Update_Number_Nodes();
     CONSISTENT_INTERSECTIONS<TV> intersections(*volume,cutting_surface);
-    if (L_input > 0) {
+    if (L_input >= 0) {
         intersections.Compute(L_input);
     }
     else {

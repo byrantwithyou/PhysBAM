@@ -104,7 +104,7 @@ int window_width = 600;
 
 #define DE cout<<"file "<<__FILE__<<"   line "<<__LINE__<<"  "<<&mcut->volume->particles.X<<"   "<<mcut->volume->particles.X<<endl;
 
-bool recording = true;
+bool recording = false;
 T timestamp = 0;
 int fi = 0;
 string writing_directory = "zoom_in_3d_new";
@@ -493,7 +493,7 @@ void mouse(int button, int state, int x, int y)
                     if (recording) {
                         Write_Recording_Info(true);
                     }
-                    mcut->Cut(*cutting_tri_mesh);
+                    mcut->Cut(*cutting_tri_mesh, true, false, 0);
                     mcut->Connected_Components(mcut->volume, labels);
                     cout << labels.m << " labels max: " << labels.Max() << ", " << mcut->volume->mesh.elements.m << endl;
                     if (recording) {
