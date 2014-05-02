@@ -8,7 +8,7 @@ env_gl.Append(LIBS=['X11'])
 
 env_gl['FRAMEWORKS'] = ['OpenGL', 'GLUT']
 
-env_gl.Append(LIBS=['GLEW'])
+#env_gl.Append(LIBS=['GLEW'])
 
 #Automatic_Program(env_gl,"cutting",["offline.cpp", "mesh_cutting_subd.cpp","CONSISTENT_INTERSECTIONS.cpp"])
 

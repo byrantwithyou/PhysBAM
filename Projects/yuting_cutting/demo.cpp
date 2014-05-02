@@ -764,103 +764,146 @@ void Step12()
 {
     int t = 0;
     RANDOM_NUMBERS<T> rn;
-    //cout << rn.Get_Uniform_Number(-1,1) << endl;
-    while (t++ < 1e6) {
-        if (0) {
+    //deleteing nodes
+    if (0) {
+        if(sc) delete sc;
+        sc=SEGMENTED_CURVE_2D<T>::Create();
+        FILE_UTILITIES::Read_From_File<T>("fail.seg2d.gz",*sc);
+        int np = sc->particles.X.m;
+        HASHTABLE<int> s;
+        for (int i = 0; i < np; ++i) {
+            s.Insert(i);
+        }
+        for (int i = 1; i < np-1; ++i) {
             if(sim_ta) delete sim_ta;
             sim_ta=TRIANGULATED_AREA<T>::Create();
             FILE_UTILITIES::Read_From_File<T>("fail.tri2d.gz",*sim_ta);
+
+            SEGMENTED_CURVE_2D<T>* sc2=SEGMENTED_CURVE_2D<T>::Create();
+            for (int j = 0; j < np; ++j) {
+                if (j != i && s.Contains(j)) {
+                    sc2->particles.Add_Elements(1);
+                    sc2->particles.X(sc2->particles.X.m-1)=sc->particles.X(j);
+                }
+            }
+            sc2->Update_Number_Nodes();
             
-            if(sc) delete sc;
-            sc=SEGMENTED_CURVE_2D<T>::Create();
-            FILE_UTILITIES::Read_From_File<T>("fail.seg2d.gz",*sc);
+            for (int j = 0; j < sc2->particles.X.m-1; ++j) {
+                sc2->mesh.elements.Append(I2(j,j+1));
+            }
             
             if(cutter) delete cutter;
-            cutter=new CUTTING<TV>(sim_ta,sc);
+            cutter=new CUTTING<TV>(sim_ta,sc2);
             Run_Cutter();
-            
-            if(labels.Max()<2) {
-                return;
+            cout << "*************************************CCs: " << labels.Max() << endl;
+            if(labels.Max()==1) {
+                s.Delete(i);
             }
         }
-        else {
-            if(sim_ta) delete sim_ta;
-            sim_ta=TRIANGULATED_AREA<T>::Create();
-            sim_ta->particles.Add_Elements(9);
-            sim_ta->Update_Number_Nodes();
-            sim_ta->particles.X(0)=TV();
-            sim_ta->particles.X(1)=TV(0.25,0);
-            sim_ta->particles.X(2)=TV(0.5,0);
-            sim_ta->particles.X(3)=TV(0.125,0.25);
-            sim_ta->particles.X(4)=TV(0.375,0.25);
-            sim_ta->particles.X(5)=TV(0.625,0.25);
-            sim_ta->particles.X(6)=TV(0.25,0.5);
-            sim_ta->particles.X(7)=TV(0.5,0.5);
-            sim_ta->particles.X(8)=TV(0.75,0.5);
-            sim_ta->mesh.elements.Append(I3(0,1,3));
-            sim_ta->mesh.elements.Append(I3(3,1,4));
-            sim_ta->mesh.elements.Append(I3(4,1,2));
-            sim_ta->mesh.elements.Append(I3(4,2,5));
-            sim_ta->mesh.elements.Append(I3(6,3,4));
-            sim_ta->mesh.elements.Append(I3(6,4,7));
-            sim_ta->mesh.elements.Append(I3(7,4,5));
-            sim_ta->mesh.elements.Append(I3(7,5,8));
-            
-            //perturb mesh
-            cout << "ta particles: " ;
-            for (int i = 0; i < sim_ta->particles.X.m; ++i) {
-                sim_ta->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-18,-6)), pow(10,rn.Get_Uniform_Number(-18,-6)));
-            }
-            cout << endl;
-            
-            //make a copy
-            TRIANGULATED_AREA<T> *tac = TRIANGULATED_AREA<T>::Create();
-            tac->particles.Add_Elements(sim_ta->particles.X.m);
-            tac->Update_Number_Nodes();
-            for (int i = 0; i < sim_ta->particles.X.m; ++i) {
-                tac->particles.X(i) = sim_ta->particles.X(i);
-            }
-            tac->mesh.elements = sim_ta->mesh.elements;
-            
-            //curve
-            if(sc) delete sc;
-            sc=SEGMENTED_CURVE_2D<T>::Create();
-            T x1=0.125,x2=0.625,y1=0.75,y2=-0.25;
-            int n=rn.Get_Uniform_Integer(1,1e4);
-            T dx=(x2-x1)/n, dy=(y2-y1)/n;
-            sc->particles.Add_Elements(n+1);
-            sc->Update_Number_Nodes();
-            sc->particles.X(0)=TV(x1,y1);
-            sc->particles.X(n)=TV(x2,y2);
-            for (int i = 1; i < n; ++i) {
-                sc->particles.X(i)=TV(x1+i*dx,y1+i*dy);
-            }
-            for (int i = 0; i < n; ++i) {
-                sc->mesh.elements.Append(I2(i,i+1));
-            }
-            
-            cout << sc->particles.X.m << " sc particles: " ;
-            //shift curve
-            T shift=pow(10,rn.Get_Uniform_Number(-20,-6));
-            cout << "shift: " << shift << endl;
-            for (int i = 0; i < sc->particles.X.m; ++i) {
-                sc->particles.X(i) += TV(shift,0);
-            }
-            //jitter curve
-            for (int i = 0; i < sc->particles.X.m; ++i) {
-                sc->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-18,-6)), pow(10,rn.Get_Uniform_Number(-18,-6)));
-            }
-            cout << endl;
-            
-            if(cutter) delete cutter;
-            cutter=new CUTTING<TV>(sim_ta,sc);
-            Run_Cutter();
-            cout << t << " " << labels.Max() << endl;
-            if(labels.Max()!=2) {
-                FILE_UTILITIES::Write_To_File<T>("fail.tri2d.gz",*tac);
-                FILE_UTILITIES::Write_To_File<T>("fail.seg2d.gz",*sc);
-                return;
-            }
+        cout << s << endl;
+        return;
+    }
+    if (1) {
+        if(sc) delete sc;
+        sc=SEGMENTED_CURVE_2D<T>::Create();
+        FILE_UTILITIES::Read_From_File<T>("fail.seg2d.gz",*sc);
+        if(sim_ta) delete sim_ta;
+        sim_ta=TRIANGULATED_AREA<T>::Create();
+        FILE_UTILITIES::Read_From_File<T>("fail.tri2d.gz",*sim_ta);
+
+        SEGMENTED_CURVE_2D<T>* sc2=SEGMENTED_CURVE_2D<T>::Create();
+        sc2->particles.Add_Elements(4);
+        sc2->particles.X(0)=sc->particles.X(0);
+        sc2->particles.X(1)=sc->particles.X(4289);
+        sc2->particles.X(2)=sc->particles.X(4290);
+        sc2->particles.X(3)=sc->particles.X(8579);
+        sc2->Update_Number_Nodes();
+        for (int j = 0; j < sc2->particles.X.m-1; ++j) {
+            sc2->mesh.elements.Append(I2(j,j+1));
+        }
+        
+        if(cutter) delete cutter;
+        cutter=new CUTTING<TV>(sim_ta,sc2);
+        Run_Cutter();
+        return;
+    }
+    while (t++ < 1e9) {
+        if(sim_ta) delete sim_ta;
+        sim_ta=TRIANGULATED_AREA<T>::Create();
+        sim_ta->particles.Add_Elements(9);
+        sim_ta->Update_Number_Nodes();
+        sim_ta->particles.X(0)=TV();
+        sim_ta->particles.X(1)=TV(0.25,0);
+        sim_ta->particles.X(2)=TV(0.5,0);
+        sim_ta->particles.X(3)=TV(0.125,0.25);
+        sim_ta->particles.X(4)=TV(0.375,0.25);
+        sim_ta->particles.X(5)=TV(0.625,0.25);
+        sim_ta->particles.X(6)=TV(0.25,0.5);
+        sim_ta->particles.X(7)=TV(0.5,0.5);
+        sim_ta->particles.X(8)=TV(0.75,0.5);
+        sim_ta->mesh.elements.Append(I3(0,1,3));
+        sim_ta->mesh.elements.Append(I3(3,1,4));
+        sim_ta->mesh.elements.Append(I3(4,1,2));
+        sim_ta->mesh.elements.Append(I3(4,2,5));
+        sim_ta->mesh.elements.Append(I3(6,3,4));
+        sim_ta->mesh.elements.Append(I3(6,4,7));
+        sim_ta->mesh.elements.Append(I3(7,4,5));
+        sim_ta->mesh.elements.Append(I3(7,5,8));
+        
+        //perturb mesh
+        cout << "ta particles: " ;
+        for (int i = 0; i < sim_ta->particles.X.m; ++i) {
+            sim_ta->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-18,-12)), pow(10,rn.Get_Uniform_Number(-18,-12)));
+        }
+        cout << endl;
+        
+        //make a copy
+        TRIANGULATED_AREA<T> *tac = TRIANGULATED_AREA<T>::Create();
+        tac->particles.Add_Elements(sim_ta->particles.X.m);
+        tac->Update_Number_Nodes();
+        for (int i = 0; i < sim_ta->particles.X.m; ++i) {
+            tac->particles.X(i) = sim_ta->particles.X(i);
+        }
+        tac->mesh.elements = sim_ta->mesh.elements;
+        
+        //curve
+        if(sc) delete sc;
+        sc=SEGMENTED_CURVE_2D<T>::Create();
+        T x1=0.125,x2=0.625,y1=0.75,y2=-0.25;
+        int n=rn.Get_Uniform_Integer(1,1e4);
+        T dx=(x2-x1)/n, dy=(y2-y1)/n;
+        sc->particles.Add_Elements(n+1);
+        sc->Update_Number_Nodes();
+        sc->particles.X(0)=TV(x1,y1);
+        sc->particles.X(n)=TV(x2,y2);
+        for (int i = 1; i < n; ++i) {
+            sc->particles.X(i)=TV(x1+i*dx,y1+i*dy);
+        }
+        for (int i = 0; i < n; ++i) {
+            sc->mesh.elements.Append(I2(i,i+1));
+        }
+        
+        cout << sc->particles.X.m << " sc particles: " ;
+        //shift curve
+        T shift=pow(10,rn.Get_Uniform_Number(-20,-12));
+        cout << "shift: " << shift << endl;
+        for (int i = 0; i < sc->particles.X.m; ++i) {
+            sc->particles.X(i) += TV(shift,0);
+        }
+        //jitter curve
+        for (int i = 0; i < sc->particles.X.m; ++i) {
+            sc->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-18,-12)), pow(10,rn.Get_Uniform_Number(-18,-12)));
+        }
+        cout << endl;
+        
+        if(cutter) delete cutter;
+        cutter=new CUTTING<TV>(sim_ta,sc);
+        Run_Cutter();
+        cout << t << " " << labels.Max() << endl;
+        if(labels.Max()<2) {
+            FILE_UTILITIES::Write_To_File<T>("fail.tri2d.gz",*tac);
+            FILE_UTILITIES::Write_To_File<T>("fail.seg2d.gz",*sc);
+            return;
         }
     }
 }
