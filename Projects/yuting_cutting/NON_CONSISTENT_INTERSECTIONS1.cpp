@@ -162,19 +162,63 @@ Compute_EE(I2 e,I2 g)
     if((a_A<0 && a_B<0) || (a_A>0 && a_B>0)) return false;
     bool r=1;
     if (a_P==0) {
-        Compute_EV(e,g.x);
+        bool rr = 1;
+        if(a_A==0) {
+            hash_vv.Set(I2(e.x,g.x));
+            rr = 0;
+        }
+        if(a_B==0) {
+            hash_vv.Set(I2(e.y,g.x));
+            rr = 0;
+        }
+        if (rr) {
+            hash_ev.Set(e.Append(g.x),a_A/(a_A-a_B));
+        }
         r=0;
     }
     if (a_Q==0) {
-        Compute_EV(e,g.y);
+        bool rr = 1;
+        if(a_A==0) {
+            hash_vv.Set(I2(e.x,g.y));
+            rr = 0;
+        }
+        if(a_B==0) {
+            hash_vv.Set(I2(e.y,g.y));
+            rr = 0;
+        }
+        if (rr) {
+            hash_ev.Set(e.Append(g.y),a_A/(a_A-a_B));
+        }
         r=0;
     }
     if (a_A==0) {
-        Compute_VE(e.x,g);
+        bool rr = 1;
+        if(a_P==0) {
+            hash_vv.Set(I2(e.x,g.x));
+            rr = 0;
+        }
+        if(a_Q==0) {
+            hash_vv.Set(I2(e.x,g.y));
+            rr = 0;
+        }
+        if (rr) {
+            hash_ve.Set(g.Insert(e.x,0),a_P/(a_P-a_Q));
+        }
         r=0;
     }
     if (a_B==0) {
-        Compute_VE(e.y,g);
+        bool rr = 1;
+        if(a_P==0) {
+            hash_vv.Set(I2(e.y,g.x));
+            rr = 0;
+        }
+        if(a_Q==0) {
+            hash_vv.Set(I2(e.y,g.y));
+            rr = 0;
+        }
+        if (rr) {
+            hash_ve.Set(g.Insert(e.y,0),a_P/(a_P-a_Q));
+        }
         r=0;
     }
     //PHYSBAM_ASSERT(a_A-a_B!=0 && a_P-a_Q!=0);

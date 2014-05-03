@@ -899,7 +899,8 @@ void Step12()
         
         cout << sc->particles.X.m << " sc particles: " ;
         //shift curve
-        T shift=pow(10,rn.Get_Uniform_Number(-20,-12));
+        T shift = pow(10,rn.Get_Uniform_Number(-20,-12));
+        shift = 0;
         cout << "shift: " << shift << endl;
         for (int i = 0; i < sc->particles.X.m; ++i) {
             sc->particles.X(i) += TV(shift,0);
@@ -915,8 +916,8 @@ void Step12()
         Run_Cutter();
         cout << t << " " << labels.Max() << endl;
         if(labels.Max()<2) {
-            FILE_UTILITIES::Write_To_File<T>("fail7.tri2d.gz",*tac);
-            FILE_UTILITIES::Write_To_File<T>("fail7.seg2d.gz",*sc);
+            FILE_UTILITIES::Write_To_File<T>("fail8.tri2d.gz",*tac);
+            FILE_UTILITIES::Write_To_File<T>("fail8.seg2d.gz",*sc);
             return;
         }
     }
