@@ -768,7 +768,7 @@ void Step12()
     if (0) {
         if(sc) delete sc;
         sc=SEGMENTED_CURVE_2D<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>("fail3.seg2d.gz",*sc);
+        FILE_UTILITIES::Read_From_File<T>("fail9.seg.gz",*sc);
         int np = sc->particles.X.m;
         HASHTABLE<int> s;
         for (int i = 0; i < np; ++i) {
@@ -777,7 +777,7 @@ void Step12()
         for (int i = 1; i < np-1; ++i) {
             if(sim_ta) delete sim_ta;
             sim_ta=TRIANGULATED_AREA<T>::Create();
-            FILE_UTILITIES::Read_From_File<T>("fail3.tri2d.gz",*sim_ta);
+            FILE_UTILITIES::Read_From_File<T>("fail9.tri.gz",*sim_ta);
 
             SEGMENTED_CURVE_2D<T>* sc2=SEGMENTED_CURVE_2D<T>::Create();
             for (int j = 0; j < np; ++j) {
@@ -806,10 +806,10 @@ void Step12()
     if (0) {
         if(sc) delete sc;
         sc=SEGMENTED_CURVE_2D<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>("fail3.seg2d.gz",*sc);
+        FILE_UTILITIES::Read_From_File<T>("fail9.seg.gz",*sc);
         if(sim_ta) delete sim_ta;
         sim_ta=TRIANGULATED_AREA<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>("fail3.tri2d.gz",*sim_ta);
+        FILE_UTILITIES::Read_From_File<T>("fail9.tri.gz",*sim_ta);
 
         SEGMENTED_CURVE_2D<T>* sc2=SEGMENTED_CURVE_2D<T>::Create();
         sc2->particles.Add_Elements(4);
@@ -833,10 +833,10 @@ void Step12()
         for (int j = 0; j < sc2->particles.X.m-1; ++j) {
             sc2->mesh.elements.Append(I2(j,j+1));
         }
-        FILE_UTILITIES::Write_To_File<T>("fail3_small.seg2d.gz",*sc2);
+        FILE_UTILITIES::Write_To_File<T>("fail9_small.seg2d.gz",*sc2);
         
         if(cutter) delete cutter;
-        cutter=new CUTTING<TV>(sim_ta,sc2);
+        cutter=new CUTTING<TV>(sim_ta,sc);
         Run_Cutter();
         cout << "*************************************CCs: " << labels.Max() << endl;
         return;
@@ -900,7 +900,7 @@ void Step12()
         cout << sc->particles.X.m << " sc particles: " ;
         //shift curve
         T shift = pow(10,rn.Get_Uniform_Number(-20,-12));
-        shift = 0;
+        shift = 0;//fail11,12,13 has this, 8,9,10 don't
         cout << "shift: " << shift << endl;
         for (int i = 0; i < sc->particles.X.m; ++i) {
             sc->particles.X(i) += TV(shift,0);
@@ -916,8 +916,8 @@ void Step12()
         Run_Cutter();
         cout << t << " " << labels.Max() << endl;
         if(labels.Max()<2) {
-            FILE_UTILITIES::Write_To_File<T>("fail8.tri2d.gz",*tac);
-            FILE_UTILITIES::Write_To_File<T>("fail8.seg2d.gz",*sc);
+            FILE_UTILITIES::Write_To_File<T>(argv1[1],*tac);
+            FILE_UTILITIES::Write_To_File<T>(argv1[2],*sc);
             return;
         }
     }
