@@ -768,7 +768,7 @@ void Step12()
     if (0) {
         if(sc) delete sc;
         sc=SEGMENTED_CURVE_2D<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>("fail.seg2d.gz",*sc);
+        FILE_UTILITIES::Read_From_File<T>("fail3.seg2d.gz",*sc);
         int np = sc->particles.X.m;
         HASHTABLE<int> s;
         for (int i = 0; i < np; ++i) {
@@ -777,7 +777,7 @@ void Step12()
         for (int i = 1; i < np-1; ++i) {
             if(sim_ta) delete sim_ta;
             sim_ta=TRIANGULATED_AREA<T>::Create();
-            FILE_UTILITIES::Read_From_File<T>("fail.tri2d.gz",*sim_ta);
+            FILE_UTILITIES::Read_From_File<T>("fail3.tri2d.gz",*sim_ta);
 
             SEGMENTED_CURVE_2D<T>* sc2=SEGMENTED_CURVE_2D<T>::Create();
             for (int j = 0; j < np; ++j) {
@@ -803,28 +803,42 @@ void Step12()
         cout << s << endl;
         return;
     }
-    if (1) {
+    if (0) {
         if(sc) delete sc;
         sc=SEGMENTED_CURVE_2D<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>("fail.seg2d.gz",*sc);
+        FILE_UTILITIES::Read_From_File<T>("fail3.seg2d.gz",*sc);
         if(sim_ta) delete sim_ta;
         sim_ta=TRIANGULATED_AREA<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>("fail.tri2d.gz",*sim_ta);
+        FILE_UTILITIES::Read_From_File<T>("fail3.tri2d.gz",*sim_ta);
 
         SEGMENTED_CURVE_2D<T>* sc2=SEGMENTED_CURVE_2D<T>::Create();
         sc2->particles.Add_Elements(4);
         sc2->particles.X(0)=sc->particles.X(0);
-        sc2->particles.X(1)=sc->particles.X(4289);
-        sc2->particles.X(2)=sc->particles.X(4290);
-        sc2->particles.X(3)=sc->particles.X(8579);
+        sc2->particles.X(1)=sc->particles.X(4768);
+        sc2->particles.X(2)=sc->particles.X(4769);
+        sc2->particles.X(3)=sc->particles.X(6358);
+        
+        cout.precision(20);
+        cout << "ta particles: ";
+        for (int i = 0; i < sim_ta->particles.X.m; ++i) {
+            cout << sim_ta->particles.X(i) << " ";
+        }
+        cout << endl;
+        cout << "sc2 particles: ";
+        for (int i = 0; i < sc2->particles.X.m; ++i) {
+            cout << sc2->particles.X(i) << " ";
+        }
+        cout << endl;
         sc2->Update_Number_Nodes();
         for (int j = 0; j < sc2->particles.X.m-1; ++j) {
             sc2->mesh.elements.Append(I2(j,j+1));
         }
+        FILE_UTILITIES::Write_To_File<T>("fail3_small.seg2d.gz",*sc2);
         
         if(cutter) delete cutter;
         cutter=new CUTTING<TV>(sim_ta,sc2);
         Run_Cutter();
+        cout << "*************************************CCs: " << labels.Max() << endl;
         return;
     }
     while (t++ < 1e9) {
@@ -901,8 +915,8 @@ void Step12()
         Run_Cutter();
         cout << t << " " << labels.Max() << endl;
         if(labels.Max()<2) {
-            FILE_UTILITIES::Write_To_File<T>("fail.tri2d.gz",*tac);
-            FILE_UTILITIES::Write_To_File<T>("fail.seg2d.gz",*sc);
+            FILE_UTILITIES::Write_To_File<T>("fail7.tri2d.gz",*tac);
+            FILE_UTILITIES::Write_To_File<T>("fail7.seg2d.gz",*sc);
             return;
         }
     }
