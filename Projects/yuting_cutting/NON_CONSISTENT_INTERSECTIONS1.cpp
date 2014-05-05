@@ -151,14 +151,14 @@ Compute_EE(I2 e,I2 g)
 //    T a_Q=(Q-A).Cross(B-A).x;
     T a_P=(P-A).Cross(P-B).x;
     T a_Q=(Q-A).Cross(Q-B).x;
-//    std::cout << e << g << ": " << std::endl;
-//    std::cout << a_P << ", " << a_Q << std::endl;
+    std::cout << e << g << ": " << std::endl;
+    std::cout << a_P << ", " << a_Q << std::endl;
     if((a_P<0 && a_Q<0) || (a_P>0 && a_Q>0)) return false;
 //    T a_A=(A-P).Cross(Q-P).x;
 //    T a_B=(B-P).Cross(Q-P).x;
     T a_A=(A-P).Cross(A-Q).x;
     T a_B=(B-P).Cross(B-Q).x;
-//    std::cout << a_A << ", " << a_B << std::endl;
+    std::cout << a_A << ", " << a_B << std::endl;
     if((a_A<0 && a_B<0) || (a_A>0 && a_B>0)) return false;
     bool r=1;
     if (a_P==0) {

@@ -764,11 +764,26 @@ void Step12()
 {
     int t = 0;
     RANDOM_NUMBERS<T> rn;
+    if (0) {
+        if(sc) delete sc;
+        sc=SEGMENTED_CURVE_2D<T>::Create();
+        FILE_UTILITIES::Read_From_File<T>(argv1[2],*sc);
+        
+        if(sim_ta) delete sim_ta;
+        sim_ta=TRIANGULATED_AREA<T>::Create();
+        FILE_UTILITIES::Read_From_File<T>(argv1[1],*sim_ta);
+
+        if(cutter) delete cutter;
+        cutter=new CUTTING<TV>(sim_ta,sc);
+        Run_Cutter();
+        cout << "*************************************CCs: " << labels.Max() << endl;
+        return;
+    }
     //deleteing nodes
     if (0) {
         if(sc) delete sc;
         sc=SEGMENTED_CURVE_2D<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>("fail9.seg.gz",*sc);
+        FILE_UTILITIES::Read_From_File<T>(argv1[2],*sc);
         int np = sc->particles.X.m;
         HASHTABLE<int> s;
         for (int i = 0; i < np; ++i) {
@@ -777,7 +792,7 @@ void Step12()
         for (int i = 1; i < np-1; ++i) {
             if(sim_ta) delete sim_ta;
             sim_ta=TRIANGULATED_AREA<T>::Create();
-            FILE_UTILITIES::Read_From_File<T>("fail9.tri.gz",*sim_ta);
+            FILE_UTILITIES::Read_From_File<T>(argv1[1],*sim_ta);
 
             SEGMENTED_CURVE_2D<T>* sc2=SEGMENTED_CURVE_2D<T>::Create();
             for (int j = 0; j < np; ++j) {
@@ -803,20 +818,20 @@ void Step12()
         cout << s << endl;
         return;
     }
-    if (0) {
+    if (1) {
         if(sc) delete sc;
         sc=SEGMENTED_CURVE_2D<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>("fail9.seg.gz",*sc);
+        FILE_UTILITIES::Read_From_File<T>(argv1[2],*sc);
         if(sim_ta) delete sim_ta;
         sim_ta=TRIANGULATED_AREA<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>("fail9.tri.gz",*sim_ta);
+        FILE_UTILITIES::Read_From_File<T>(argv1[1],*sim_ta);
 
         SEGMENTED_CURVE_2D<T>* sc2=SEGMENTED_CURVE_2D<T>::Create();
         sc2->particles.Add_Elements(4);
         sc2->particles.X(0)=sc->particles.X(0);
-        sc2->particles.X(1)=sc->particles.X(4768);
-        sc2->particles.X(2)=sc->particles.X(4769);
-        sc2->particles.X(3)=sc->particles.X(6358);
+        sc2->particles.X(1)=sc->particles.X(2424);
+        sc2->particles.X(2)=sc->particles.X(2425);
+        sc2->particles.X(3)=sc->particles.X(3233);
         
         cout.precision(20);
         cout << "ta particles: ";
@@ -833,7 +848,10 @@ void Step12()
         for (int j = 0; j < sc2->particles.X.m-1; ++j) {
             sc2->mesh.elements.Append(I2(j,j+1));
         }
-        FILE_UTILITIES::Write_To_File<T>("fail9_small.seg2d.gz",*sc2);
+        FILE_UTILITIES::Write_To_File<T>("fail103_small.seg2d.gz",*sc2);
+        
+        delete sc;
+        sc=sc2;
         
         if(cutter) delete cutter;
         cutter=new CUTTING<TV>(sim_ta,sc);
@@ -867,7 +885,7 @@ void Step12()
         //perturb mesh
         cout << "ta particles: " ;
         for (int i = 0; i < sim_ta->particles.X.m; ++i) {
-            sim_ta->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-18,-12)), pow(10,rn.Get_Uniform_Number(-18,-12)));
+            sim_ta->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-18,-12))*(rn.Get_Uniform_Integer(0,1)?1:-1), pow(10,rn.Get_Uniform_Number(-18,-12))*(rn.Get_Uniform_Integer(0,1)?1:-1));
         }
         cout << endl;
         
@@ -900,14 +918,13 @@ void Step12()
         cout << sc->particles.X.m << " sc particles: " ;
         //shift curve
         T shift = pow(10,rn.Get_Uniform_Number(-20,-12));
-        shift = 0;//fail11,12,13 has this, 8,9,10 don't
         cout << "shift: " << shift << endl;
         for (int i = 0; i < sc->particles.X.m; ++i) {
             sc->particles.X(i) += TV(shift,0);
         }
         //jitter curve
         for (int i = 0; i < sc->particles.X.m; ++i) {
-            sc->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-18,-12)), pow(10,rn.Get_Uniform_Number(-18,-12)));
+            sc->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-18,-12))*(rn.Get_Uniform_Integer(0,1)?1:-1), pow(10,rn.Get_Uniform_Number(-18,-12))*(rn.Get_Uniform_Integer(0,1)?1:-1));
         }
         cout << endl;
         
@@ -923,6 +940,51 @@ void Step12()
     }
 }
 
+void Step13()
+{
+    int t = 0;
+    RANDOM_NUMBERS<T> rn;
+    while (t++ < 1e9) {
+        if(sc) delete sc;
+        sc=SEGMENTED_CURVE_2D<T>::Create();
+        FILE_UTILITIES::Read_From_File<T>(argv1[2],*sc);
+        if(sim_ta) delete sim_ta;
+        sim_ta=TRIANGULATED_AREA<T>::Create();
+        FILE_UTILITIES::Read_From_File<T>(argv1[1],*sim_ta);
+        
+        //perturb mesh
+        cout << "ta particles: " ;
+        for (int i = 0; i < sim_ta->particles.X.m; ++i) {
+            sim_ta->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-8,-6))*(rn.Get_Uniform_Integer(0,1)?1:-1), pow(10,rn.Get_Uniform_Number(-8,-6))*(rn.Get_Uniform_Integer(0,1)?1:-1));
+        }
+        cout << endl;
+        
+        //make a copy
+        TRIANGULATED_AREA<T> *tac = TRIANGULATED_AREA<T>::Create();
+        tac->particles.Add_Elements(sim_ta->particles.X.m);
+        tac->Update_Number_Nodes();
+        for (int i = 0; i < sim_ta->particles.X.m; ++i) {
+            tac->particles.X(i) = sim_ta->particles.X(i);
+        }
+        tac->mesh.elements = sim_ta->mesh.elements;
+        
+        //jitter curve
+        for (int i = 0; i < sc->particles.X.m; ++i) {
+            sc->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-8,-6))*(rn.Get_Uniform_Integer(0,1)?1:-1), pow(10,rn.Get_Uniform_Number(-8,-6))*(rn.Get_Uniform_Integer(0,1)?1:-1));
+        }
+        cout << endl;
+        
+        if(cutter) delete cutter;
+        cutter=new CUTTING<TV>(sim_ta,sc);
+        Run_Cutter();
+        cout << t << " " << labels.Max() << endl;
+        if(labels.Max()<2) {
+            FILE_UTILITIES::Write_To_File<T>(argv1[3],*tac);
+            FILE_UTILITIES::Write_To_File<T>(argv1[4],*sc);
+            return;
+        }
+    }
+}
 static void Key(unsigned char key, int x, int y)
 {
     switch( key ) {
@@ -1008,14 +1070,13 @@ static void Key(unsigned char key, int x, int y)
     glutPostRedisplay();
 }
 
-
 int main(int argc, char **argv)
 {
     argc1 = argc;
     argv1 = argv;
     
     if (!recording) {
-        Step12();
+        Step13();
     }
     else {
         Step8();

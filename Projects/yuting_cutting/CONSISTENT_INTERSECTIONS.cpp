@@ -43,6 +43,7 @@ Set_Tol()
     tau=(T)4.5*sqrt_eps_L;
     sigma_hat=(T)5.5*sqrt_eps_L;
     kappa=21*eps*sqr(L);
+    //std::cout<<sigma<<" "<<tau<<" "<<sigma_hat<<" "<<kappa<<std::endl;
 }
 //#####################################################################
 // Function Compute_VV
