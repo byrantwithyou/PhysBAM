@@ -255,7 +255,7 @@ struct AUTO_HESS<TV,TV>
     }
 
     static AUTO_HESS From_Var(TV v)
-    {return AUTO_HESS(v,MATRIX<T,TV::m>()+1);}
+    {return AUTO_HESS(v,MATRIX<T,TV::m>::Identity_Matrix());}
 
     AUTO_HESS<T,TV> operator()(int i) const
     {return AUTO_HESS<T,TV>(x(i),dx.Row(i),ddx(i));}

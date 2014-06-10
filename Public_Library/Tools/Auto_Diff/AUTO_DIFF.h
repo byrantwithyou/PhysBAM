@@ -231,7 +231,7 @@ struct AUTO_DIFF<TV,TV>
     }
 
     static AUTO_DIFF From_Var(TV v)
-    {return AUTO_DIFF(v,MATRIX<T,TV::m>()+1);}
+    {return AUTO_DIFF(v,MATRIX<T,TV::m>::Identity_Matrix());}
 
     static AUTO_DIFF From_Const(T a)
     {return AUTO_DIFF(a,TV());}

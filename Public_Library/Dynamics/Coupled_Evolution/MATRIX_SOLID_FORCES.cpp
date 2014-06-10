@@ -158,7 +158,7 @@ Test_Matrix() const
     solid_body_collection.Add_Velocity_Dependent_Forces(V,twist,V3,twist4,0);
     solid_body_collection.Add_Velocity_Dependent_Forces(V1,twist2,V4,twist5,0);
 
-    CONSTANT_ARRAY<RIGID_BODY_MASS<TV,true> > rigid_mass(twist.m,RIGID_BODY_MASS<TV,true>(1,DIAGONAL_MATRIX<T,TV::SPIN::m>()+1));
+    CONSTANT_ARRAY<RIGID_BODY_MASS<TV,true> > rigid_mass(twist.m,RIGID_BODY_MASS<TV,true>(1,DIAGONAL_MATRIX<T,TV::SPIN::m>::Identity_Matrix()));
     T inner_solids=V.Dot(V1)+twist.Inner_Product(rigid_mass,twist2);
     T inner_aggregate=aggregate.Dot(aggregate2);
     LOG::cout<<"MATRIX_SOLID_FORCES Symmetry Test: "<<inner_solids<<"  vs  "<<inner_aggregate<<"  relative  "<<abs(inner_solids-inner_aggregate)/maxabs((T)1e-30,inner_solids,inner_aggregate)<<std::endl;

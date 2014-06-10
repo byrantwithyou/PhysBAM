@@ -261,17 +261,17 @@ template<class T,int d> SYMMETRIC_MATRIX<T,d> operator*(const SYMMETRIC_MATRIX<T
 
 template<class T,int d> inline SYMMETRIC_MATRIX<T,d> Cast_Helper(ZERO_MAT<VECTOR<T,d> > z){return SYMMETRIC_MATRIX<T,d>();}
 template<class T,int d> inline SYMMETRIC_MATRIX<T,d> Cast_Helper(SCALE_MAT<VECTOR<T,d> > z){return SYMMETRIC_MATRIX<T,d>()+z.x;}
-template<class T,int d> inline SYMMETRIC_MATRIX<T,d> Cast_Helper(ID_MAT<VECTOR<T,d> > z){return SYMMETRIC_MATRIX<T,d>()+1;}
+template<class T,int d> inline SYMMETRIC_MATRIX<T,d> Cast_Helper(ID_MAT<VECTOR<T,d> > z){return SYMMETRIC_MATRIX<T,d>::Identity_Matrix();}
 template<class T,int d> inline SYMMETRIC_MATRIX<T,d> Cast_Helper(SYMMETRIC_MATRIX<T,d> z){return z;}
 template<class T,int d> inline MATRIX<T,d> Cast_Helper(const MATRIX<T,d>& z){return z;}
 
 template<class T> typename ENABLE_IF<IS_MATRIX<T>::value>::TYPE Fill_From(T& a,const T& b){a=b;}
 template<class T,int d> void Fill_From(MATRIX<T,d>& m,const SYMMETRIC_MATRIX<T,d>& z){m=z;}
 template<class T,int d> void Fill_From(MATRIX<T,d>& m,const ZERO_MAT<VECTOR<T,d> >& z){m=MATRIX<T,d>();}
-template<class T,int d> void Fill_From(MATRIX<T,d>& m,const ID_MAT<VECTOR<T,d> >& i){m=MATRIX<T,d>()+1;}
+template<class T,int d> void Fill_From(MATRIX<T,d>& m,const ID_MAT<VECTOR<T,d> >& i){m=MATRIX<T,d>::Identity_Matrix();}
 template<class T,int d> void Fill_From(MATRIX<T,d>& m,const SCALE_MAT<VECTOR<T,d> >& s){m=MATRIX<T,d>()+s.x;}
 template<class T,int d> void Fill_From(SYMMETRIC_MATRIX<T,d>& m,const ZERO_MAT<VECTOR<T,d> >& z){m=SYMMETRIC_MATRIX<T,d>();}
-template<class T,int d> void Fill_From(SYMMETRIC_MATRIX<T,d>& m,const ID_MAT<VECTOR<T,d> >& i){m=SYMMETRIC_MATRIX<T,d>()+1;}
+template<class T,int d> void Fill_From(SYMMETRIC_MATRIX<T,d>& m,const ID_MAT<VECTOR<T,d> >& i){m=SYMMETRIC_MATRIX<T,d>::Identity_Matrix();}
 template<class T,int d> void Fill_From(SYMMETRIC_MATRIX<T,d>& m,const SCALE_MAT<VECTOR<T,d> >& s){m=SYMMETRIC_MATRIX<T,d>()+s.x;}
 template<class T,int d> void Fill_From(SCALE_MAT<VECTOR<T,d> >& s,const ZERO_MAT<VECTOR<T,d> >& z) {s.x=0;}
 template<class T,int d> void Fill_From(SCALE_MAT<VECTOR<T,d> >& s,const ID_MAT<VECTOR<T,d> >& i) {s.x=1;}
