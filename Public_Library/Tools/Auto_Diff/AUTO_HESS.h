@@ -405,5 +405,12 @@ template<class T>
 inline AUTO_HESS<T,VECTOR<T,3> > min(const AUTO_HESS<VECTOR<T,3>,VECTOR<T,3> >& a)
 {return min(a(0),min(a(1),a(2)));}
 
+template<class T> inline VECTOR<T,0> Principal_Curvatures(const AUTO_HESS<T,VECTOR<T,1> >& h)
+{return VECTOR<T,0>();}
+
+template<class T> inline VECTOR<T,1> Principal_Curvatures(const AUTO_HESS<T,VECTOR<T,2> >& h)
+{VECTOR<T,2> t=h.dx.Perpendicular();return VECTOR<T,1>(t.Dot(h.ddx*t));}
+
+template<class T> VECTOR<T,2> Principal_Curvatures(const AUTO_HESS<T,VECTOR<T,3> >& h);
 }
 #endif
