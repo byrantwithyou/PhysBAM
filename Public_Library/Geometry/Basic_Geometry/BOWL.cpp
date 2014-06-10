@@ -112,33 +112,13 @@ Hessian(const TV& X) const
 {
     return Compute_Hess_Helper(*this,X).ddx;
 }
-template<class T> inline VECTOR<T,0> Principal_Curvatures_Helper(const VECTOR<T,1>& N,const SYMMETRIC_MATRIX<T,1>& H)
-{
-    return VECTOR<T,0>();
-}
-template<class T> inline VECTOR<T,1> Principal_Curvatures_Helper(const VECTOR<T,2>& N,const SYMMETRIC_MATRIX<T,2>& H)
-{
-    VECTOR<T,2> tangent=N.Perpendicular();
-    return VECTOR<T,1>(tangent.Dot(H*tangent));
-}
-template<class T> inline VECTOR<T,2> Principal_Curvatures_Helper(const VECTOR<T,3>& N,const SYMMETRIC_MATRIX<T,3>& H)
-{
-    SYMMETRIC_MATRIX<T,3> P=(T)1-SYMMETRIC_MATRIX<T,3>::Outer_Product(N),M=SYMMETRIC_MATRIX<T,3>::Conjugate(P,H);
-    T trace=M.Trace();
-    QUADRATIC<T> quadratic(-1,trace,sqr(M(1,1))-M(0,1)*M(1,2)+sqr(M(2,1))-M(0,1)*M(2,3)+sqr(M(2,2))-M(1,2)*M(2,3));
-    quadratic.Compute_Roots();
-    if(quadratic.roots == 0) (T).5*VECTOR<T,2>(trace,trace);
-    else if(quadratic.roots == 1) return VECTOR<T,2>(quadratic.root1,quadratic.root1);
-    return VECTOR<T,2>(quadratic.root1,quadratic.root2);
-}
 //#####################################################################
 // Function Principal_Curvatures
 //#####################################################################
 template<class T> VECTOR<T,2> BOWL<T>::
 Principal_Curvatures(const TV& X) const
 {
-    AUTO_HESS<T,TV> phi=Compute_Hess_Helper(*this,X);
-    return Principal_Curvatures_Helper(phi.dx,phi.ddx);
+    return ::PhysBAM::Principal_Curvatures(Compute_Hess_Helper(*this,X));
 }
 //#####################################################################
 // Function Lazy_Inside
