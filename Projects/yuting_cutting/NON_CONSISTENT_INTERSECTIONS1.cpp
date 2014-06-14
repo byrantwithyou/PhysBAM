@@ -249,7 +249,7 @@ Compute_FV(I3 f,int p)
     T a_A=(P-B).Cross(P-C).x;
     T a_B=(P-C).Cross(P-A).x;
     T a_C=(P-A).Cross(P-B).x;
-    //std::cout<<"fv area for "<<f<<" "<<A<<B<<C<<" and "<<p<<" "<<P<<": "<<a_A<<" "<<a_B<<" "<<a_C<<std::endl;
+    std::cout<<"fv area for "<<f<<" "<<A<<B<<C<<" and "<<p<<" "<<P<<": "<<a_A<<" "<<a_B<<" "<<a_C<<std::endl;
     if(!((a_A>=0 && a_B>=0 && a_C>=0) || (a_A<=0 && a_B<=0 && a_C<=0))) return false;
     bool r=1;
     if (a_A==0) {

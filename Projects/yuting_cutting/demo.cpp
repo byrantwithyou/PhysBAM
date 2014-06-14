@@ -829,9 +829,9 @@ void Step12()
         SEGMENTED_CURVE_2D<T>* sc2=SEGMENTED_CURVE_2D<T>::Create();
         sc2->particles.Add_Elements(4);
         sc2->particles.X(0)=sc->particles.X(0);
-        sc2->particles.X(1)=sc->particles.X(2424);
-        sc2->particles.X(2)=sc->particles.X(2425);
-        sc2->particles.X(3)=sc->particles.X(3233);
+        sc2->particles.X(1)=sc->particles.X(1414);
+        sc2->particles.X(2)=sc->particles.X(1415);
+        sc2->particles.X(3)=sc->particles.X(1886);
         
         cout.precision(20);
         cout << "ta particles: ";
@@ -852,7 +852,6 @@ void Step12()
         
         delete sc;
         sc=sc2;
-        
         if(cutter) delete cutter;
         cutter=new CUTTING<TV>(sim_ta,sc);
         Run_Cutter();
@@ -942,49 +941,54 @@ void Step12()
 
 void Step13()
 {
-    int t = 0;
-    RANDOM_NUMBERS<T> rn;
-    while (t++ < 1e9) {
-        if(sc) delete sc;
-        sc=SEGMENTED_CURVE_2D<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>(argv1[2],*sc);
-        if(sim_ta) delete sim_ta;
-        sim_ta=TRIANGULATED_AREA<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>(argv1[1],*sim_ta);
-        
-        //perturb mesh
-        cout << "ta particles: " ;
-        for (int i = 0; i < sim_ta->particles.X.m; ++i) {
-            sim_ta->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-8,-6))*(rn.Get_Uniform_Integer(0,1)?1:-1), pow(10,rn.Get_Uniform_Number(-8,-6))*(rn.Get_Uniform_Integer(0,1)?1:-1));
-        }
-        cout << endl;
-        
-        //make a copy
-        TRIANGULATED_AREA<T> *tac = TRIANGULATED_AREA<T>::Create();
-        tac->particles.Add_Elements(sim_ta->particles.X.m);
-        tac->Update_Number_Nodes();
-        for (int i = 0; i < sim_ta->particles.X.m; ++i) {
-            tac->particles.X(i) = sim_ta->particles.X(i);
-        }
-        tac->mesh.elements = sim_ta->mesh.elements;
-        
-        //jitter curve
-        for (int i = 0; i < sc->particles.X.m; ++i) {
-            sc->particles.X(i) += TV(pow(10, rn.Get_Uniform_Number(-8,-6))*(rn.Get_Uniform_Integer(0,1)?1:-1), pow(10,rn.Get_Uniform_Number(-8,-6))*(rn.Get_Uniform_Integer(0,1)?1:-1));
-        }
-        cout << endl;
-        
-        if(cutter) delete cutter;
-        cutter=new CUTTING<TV>(sim_ta,sc);
-        Run_Cutter();
-        cout << t << " " << labels.Max() << endl;
-        if(labels.Max()<2) {
-            FILE_UTILITIES::Write_To_File<T>(argv1[3],*tac);
-            FILE_UTILITIES::Write_To_File<T>(argv1[4],*sc);
-            return;
-        }
+    //rot5:3.6068799222150076389
+    if(sc) delete sc;
+    sc=SEGMENTED_CURVE_2D<T>::Create();
+    FILE_UTILITIES::Read_From_File<T>(argv1[2],*sc);
+    if(sim_ta) delete sim_ta;
+    sim_ta=TRIANGULATED_AREA<T>::Create();
+    FILE_UTILITIES::Read_From_File<T>(argv1[1],*sim_ta);
+
+//    if(sim_ta) delete sim_ta;
+//    sim_ta=TRIANGULATED_AREA<T>::Create();
+//     sim_ta->particles.Resize(4);
+//     sim_ta->Update_Number_Nodes();
+//     sim_ta->particles.X(0) = TV(0,0);
+//     sim_ta->particles.X(1) = TV(0.5,0);
+//     sim_ta->particles.X(2) = TV(0.25,0.5);
+//     sim_ta->particles.X(3) = TV(0.75,0.5);
+//     sim_ta->mesh.elements.Append(I3(0,1,2));
+//     sim_ta->mesh.elements.Append(I3(2,1,3));
+//
+//     if(sc) delete sc;
+//     sc=SEGMENTED_CURVE_2D<T>::Create();
+//     sc->particles.Resize(3);
+//     sc->Update_Number_Nodes();
+//     sc->particles.X(0) = TV(0.125,0.75);
+//     sc->particles.X(2) = TV(0.625,-0.25);
+//     sc->particles.X(1) = (sc->particles.X(0)+sc->particles.X(2))/2;
+//
+//     sc->mesh.elements.Append(I2(0,1));
+//     sc->mesh.elements.Append(I2(1,2));
+    
+    cout.precision(20);
+    cout << "ta particles: ";
+    for (int i = 0; i < sim_ta->particles.X.m; ++i) {
+        cout << sim_ta->particles.X(i) << " ";
     }
+    cout << endl;
+    cout << "sc particles: ";
+    for (int i = 0; i < sc->particles.X.m; ++i) {
+        cout << sc->particles.X(i) << " ";
+    }
+    cout << endl;
+    
+    if(cutter) delete cutter;
+    cutter=new CUTTING<TV>(sim_ta,sc);
+    Run_Cutter();
+    cout << "*************************************CCs: " << labels.Max() << endl;
 }
+
 static void Key(unsigned char key, int x, int y)
 {
     switch( key ) {
