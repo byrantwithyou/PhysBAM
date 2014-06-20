@@ -11,7 +11,7 @@ using namespace PhysBAM;
 int main(int argc,char* argv[])
 {
     const int dimension=2;
-    const int order=2;
+    const int order=1;
 
     typedef float T;
     typedef VECTOR<T,dimension> TV;

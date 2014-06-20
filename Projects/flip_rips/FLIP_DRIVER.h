@@ -52,7 +52,7 @@ public:
     const int threads;
 
     std::string output_directory;
-    TV gravity;
+    const TV gravity;
     
     T cfl;
     T flip;
@@ -85,7 +85,7 @@ public:
     FLIP_DRIVER(const T_GRID grid_input,const int threads_input)
         :mass_threshold(1e-4),dx(grid_input.dX.x),
         one_over_dx((T)1/dx),grid(grid_input),threads(threads_input),
-        output_directory("output"),gravity(TV::Axis_Vector(2)*(T)(-9.8)),
+        output_directory("output"),gravity(TV::Axis_Vector(1)*(T)(-9.8)),
         cfl((T).2),flip(0.95),frames(100),frame_dt((T)1/24),
         time(0),min_dt(1e-5),max_dt(1e-3),output_number(0),
         system(one_over_dx,threads,interior_cells,cell_type,mass),
@@ -361,7 +361,7 @@ public:
 
             particles(i).V=V_flip*flip+V_pic*(1-flip);
             Perform_Particle_Collision(particles(i));
-            particles(i).X+=particles(i).V*dt;
+            particles(i).X+=V_pic*dt;
         }
     }
  
