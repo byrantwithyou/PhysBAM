@@ -758,10 +758,10 @@ In_Place_Incomplete_Cholesky_Factorization(const bool modified_version,const T m
         else A(row_diagonal_index).a=1/denominator;} // finally, store the diagonal element in inverted form
 }
 //#####################################################################
-// Function Gauss_Jacobi_Single_Iteration
+// Function Gauss_Seidel_Single_Iteration
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Gauss_Jacobi_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b)
+Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b)
 {
     assert(x.m==b.m && x.m==n);
     for(int i=0;i<n;i++){
@@ -772,15 +772,15 @@ Gauss_Jacobi_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b)
         x(i)=(b(i)-rho)/diagonal_entry;}
 }
 //#####################################################################
-// Function Gauss_Jacobi_Solve
+// Function Gauss_Seidel_Solve
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Gauss_Jacobi_Solve(ARRAY<T>& x,const ARRAY<T>& b,const T tolerance,const int max_iterations)
+Gauss_Seidel_Solve(ARRAY<T>& x,const ARRAY<T>& b,const T tolerance,const int max_iterations)
 {
     assert(x.m==b.m && x.m==n);
     ARRAY<T> last_x(x);
     for(int k=0;k<max_iterations;k++){
-        Gauss_Jacobi_Single_Iteration(x,b);
+        Gauss_Seidel_Single_Iteration(x,b);
         T residual=0;for(int j=0;j<n;j++){residual+=sqr(last_x(j)-x(j));last_x(j)=x(j);}if(residual < tolerance) return;}
 }
 //#####################################################################
