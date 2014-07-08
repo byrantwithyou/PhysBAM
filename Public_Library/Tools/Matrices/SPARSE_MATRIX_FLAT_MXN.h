@@ -114,8 +114,8 @@ public:
     void Construct_Incomplete_Cholesky_Factorization(const bool modified_version=true,const T modified_coefficient=.97,const T zero_tolerance=1e-8,const T zero_replacement=1e-8);
     // actually an LU saving square roots, with an inverted diagonal saving divides
     void In_Place_Incomplete_Cholesky_Factorization(const bool modified_version=true,const T modified_coefficient=.97,const T zero_tolerance=1e-8,const T zero_replacement=1e-8);
-    void Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b);
-    void Gauss_Seidel_Solve(ARRAY<T>& x,const ARRAY<T>& b,const T tolerance=1e-12,const int max_iterations=1000000);
+    void Gauss_Jacobi_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b);
+    void Gauss_Jacobi_Solve(ARRAY<T>& x,const ARRAY<T>& b,const T tolerance=1e-12,const int max_iterations=1000000);
     bool Positive_Diagonal_And_Nonnegative_Row_Sum(const T tolerance=1e-7) const;
     void Conjugate_With_Diagonal_Matrix(ARRAY<T>& x);
 //#####################################################################
