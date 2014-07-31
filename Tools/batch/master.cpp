@@ -27,6 +27,8 @@ struct job
     vector<string> argv_data;
     string in,out,err;
     int append_out,append_err;
+    string cwd;
+    vector<string> env_data;
 };
 
 multimap<int,job*> jobs;
@@ -125,10 +127,15 @@ void* run_jobs(void*)
         for(size_t i = 0; i < argv.size(); i++) std::cout<<argv[i]<<" ";
         std::cout<<std::endl;
         argv.push_back(0);
+        vector<char*> env;
+        for(size_t i=0;i<j->env_data.size();i++)
+            env.push_back(const_cast<char*>(j->env_data[i].c_str()));
+        env.push_back(0);
 
         pid_t pid = fork();
         if(!pid)
         {
+            if(j->cwd.size()) chdir(j->cwd.c_str());
             close(0);
             close(1);
             close(2);
@@ -136,7 +143,8 @@ void* run_jobs(void*)
             int out = open(j->out.c_str(),O_WRONLY|O_CREAT|(j->append_out?O_APPEND:0),0755);
             int err = open(j->err.c_str(),O_WRONLY|O_CREAT|(j->append_err?O_APPEND:0),0755);
             if(in<0 || out<0 || err<0) exit(1);
-            execvp(argv[0], &argv[0]);
+            if(env.size()>1) execvpe(argv[0], &argv[0], &env[0]);
+            else execvp(argv[0], &argv[0]);
             exit(1);
         }
 
@@ -168,7 +176,7 @@ void* listen_for_jobs(void*)
     while(!die)
     {
         sockaddr_un addr;
-        socklen_t addrlen;
+        socklen_t addrlen = sizeof(addr);
         int new_sock = accept(sock, (sockaddr *)&addr, &addrlen);
         if(new_sock<0) continue;
 
@@ -218,6 +226,8 @@ void* listen_for_jobs(void*)
                     k += unpack(&buffer[k], message_size - k, j->append_out);
                     k += unpack(&buffer[k], message_size - k, j->append_err);
                     k += unpack(&buffer[k], message_size - k, j->priority);
+                    k += unpack(&buffer[k], message_size - k, j->cwd);
+                    k += unpack(&buffer[k], message_size - k, j->env_data);
                     if(k != message_size) cout<<"only used "<<k<<" of "<<message_size<<std::endl;
 
                     pthread_mutex_lock(&mutex);

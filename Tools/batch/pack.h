@@ -1,11 +1,41 @@
 #ifndef __pack__
 #define __pack__
 #include <cstring>
+#include <string>
 #include <exception>
 #include <stdexcept>
 #include <vector>
 
 using namespace std;
+
+size_t pack_size(unsigned char c)
+{
+    return 1;
+}
+
+size_t pack_size(int i)
+{
+    return sizeof(int);
+}
+
+size_t pack_size(size_t i)
+{
+    return sizeof(size_t);
+}
+
+size_t pack_size(const string& s)
+{
+    return pack_size(s.size())+s.size();
+}
+
+template<class T>
+size_t pack_size(const vector<T>& v)
+{
+    size_t k = pack_size(v.size());
+    for(size_t i = 0; i < v.size(); i++)
+        k += pack_size(v[i]);
+    return k;
+}
 
 size_t pack(unsigned char * buff, unsigned char c)
 {

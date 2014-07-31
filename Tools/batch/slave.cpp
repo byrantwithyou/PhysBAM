@@ -8,6 +8,7 @@
 #include <boost/program_options.hpp>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <unistd.h>
 
 namespace ip = boost::interprocess;
 namespace po = boost::program_options;
@@ -33,6 +34,8 @@ int main(int argc,char* argv[])
         ("append-stdout,a","append stdout")
         ("append-stderr,A","append stderr")
         ("kill,k","kill master")
+        ("cwd,c","run command from the current working directory")
+        ("env,E","set environment before running command")
         ("kill-now,K","kill master immediately");
 
     po::positional_options_description pod;
@@ -83,17 +86,27 @@ int main(int argc,char* argv[])
 
     int append_out=vm.count("append-stdout")>0;
     int append_err=vm.count("append-stderr")>0;
+    bool save_env=vm.count("env")>0;
+    bool save_cwd=vm.count("cwd")>0 || save_env;
 
-    size_t size = 2 * sizeof(size);
-    for(size_t i = 0; i < tokens.size(); i++)
-        size += sizeof(size_t) + tokens[i].size();
-    size += sizeof(size_t) + sizeof(deps[0]) * deps.size();
-    size += sizeof(size_t) + in.size();
-    size += sizeof(size_t) + out.size();
-    size += sizeof(size_t) + err.size();
-    size += sizeof(append_out);
-    size += sizeof(append_err);
-    size += sizeof(priority);
+    const char* cwd = "";
+    if(save_cwd) cwd = get_current_dir_name();
+
+    vector<string> env;
+    if(save_env) for(int i=0;environ[i];i++) env.push_back(environ[i]);
+
+    size_t size = 0;
+    size += pack_size(size);
+    size += pack_size(tokens);
+    size += pack_size(deps);
+    size += pack_size(in);
+    size += pack_size(out);
+    size += pack_size(err);
+    size += pack_size(append_out);
+    size += pack_size(append_err);
+    size += pack_size(priority);
+    size += pack_size(cwd);
+    size += pack_size(env);
 
     unsigned char * buff = new unsigned char[size];
     size_t k = 0;
@@ -106,6 +119,8 @@ int main(int argc,char* argv[])
     k += pack(buff + k, append_out);
     k += pack(buff + k, append_err);
     k += pack(buff + k, priority);
+    k += pack(buff + k, cwd);
+    k += pack(buff + k, env);
     assert(k == size);
 
     int w = write(sock, buff, k);
@@ -113,6 +128,8 @@ int main(int argc,char* argv[])
     int job_id = -1;
     if(read(sock, &job_id, sizeof(job_id)) == sizeof(job_id))
         printf("%i\n", job_id);
+
+    if(save_cwd) free((char*)cwd);
 
     close(sock);
 
