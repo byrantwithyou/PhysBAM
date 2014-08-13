@@ -8,6 +8,7 @@
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Math_Tools/INTERVAL.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
@@ -16,6 +17,30 @@
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <climits>
 using namespace PhysBAM;
+static void set_if_abs_less(float a,float b,float& x,float y,float z){if(abs(a)<abs(b)) x=y;else x=z;}
+static void set_if_abs_less(double a,double b,double& x,double y,double z){if(abs(a)<abs(b)) x=y;else x=z;}
+template<class T>
+static void set_if_abs_less(const SYMMETRIC_MATRIX<T,3>& a,const SYMMETRIC_MATRIX<T,3>& b,SYMMETRIC_MATRIX<T,3>& x,const SYMMETRIC_MATRIX<T,3>& y,const SYMMETRIC_MATRIX<T,3>& z)
+{
+    set_if_abs_less(a.x00,b.x00,x.x00,y.x00,z.x00);
+    set_if_abs_less(a.x10,b.x10,x.x10,y.x10,z.x10);
+    set_if_abs_less(a.x20,b.x20,x.x20,y.x20,z.x20);
+    set_if_abs_less(a.x11,b.x11,x.x11,y.x11,z.x11);
+    set_if_abs_less(a.x21,b.x21,x.x21,y.x21,z.x21);
+    set_if_abs_less(a.x22,b.x22,x.x22,y.x22,z.x22);
+}
+template<class T>
+static void set_if_abs_less(const SYMMETRIC_MATRIX<T,2>& a,const SYMMETRIC_MATRIX<T,2>& b,SYMMETRIC_MATRIX<T,2>& x,const SYMMETRIC_MATRIX<T,2>& y,const SYMMETRIC_MATRIX<T,2>& z)
+{
+    set_if_abs_less(a.x00,b.x00,x.x00,y.x00,z.x00);
+    set_if_abs_less(a.x10,b.x10,x.x10,y.x10,z.x10);
+    set_if_abs_less(a.x11,b.x11,x.x11,y.x11,z.x11);
+}
+template<class T>
+static void set_if_abs_less(const SYMMETRIC_MATRIX<T,1>& a,const SYMMETRIC_MATRIX<T,1>& b,SYMMETRIC_MATRIX<T,1>& x,const SYMMETRIC_MATRIX<T,1>& y,const SYMMETRIC_MATRIX<T,1>& z)
+{
+    set_if_abs_less(a.x00,b.x00,x.x00,y.x00,z.x00);
+}
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -145,7 +170,7 @@ Fill_un(const TV& one_over_dx,const ARRAY<T2>& x,ARRAY<T2>& xn,int o,int mo)
     xn.Resize(fill_indices(o).max_corner);
     for(int i=fill_indices(o).min_corner;i<fill_indices(o).max_corner;i++){
         const TV_INT& index=index_to_node(i);
-        T2 v=0;
+        T2 v=T2();
         for(int d=0;d<TV::m;d++){
             TV_INT a=index,b=index;
             a(d)--;
@@ -162,15 +187,14 @@ template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
 Extrapolate_FE(const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,const ARRAY<T2>& u,ARRAY<T2>& y,const ARRAY<T2>* z,int o,T dt,T alpha)
 {
     for(int i=solve_indices(o).min_corner;i<solve_indices(o).max_corner;i++){
-        T2 dot=0,zi=z?(*z)(i):0,a=0;
+        T2 dot=T2(),zi=z?(*z)(i):T2(),a=T2();
         for(int d=0;d<TV::m;d++){
             // Second order ENO.
             const STENCIL& s=stencil(i)(d);
             VECTOR<T2,4> f(u(s.nodes(0)),u(s.nodes(1)),u(s.nodes(2)),u(s.nodes(3)));
             VECTOR<T2,3> df(f(1)-f(0),f(2)-f(1),f(3)-f(2));
             VECTOR<T2,2> ddf(df(1)-df(0),df(2)-df(1));
-            if(abs(ddf(0))<abs(ddf(1))) a=(T).5*(f(2)-f(0));
-            else a=df(1)-(T).5*ddf(1);
+            set_if_abs_less(ddf(0),ddf(1),a,(T).5*(f(2)-f(0)),df(1)-(T).5*ddf(1));
             dot+=a*s.scale;}
         y(i)+=alpha*(u(i)-y(i)-dt*(dot-zi));}
 }
@@ -201,8 +225,8 @@ Extrapolate_Node(boost::function<bool(const TV_INT& index)> inside_mask,ARRAYS_N
     du[0].Resize(num_indices);
     for(int i=fill_indices(0).min_corner;i<fill_indices(0).max_corner;i++) du[0](i)=u(index_to_node(i));
     for(int o=1;o<order;o++) Fill_un(grid.one_over_dX,du[o-1],du[o],o,order);
-    for(int i=0;i<order;i++) du[i](0)=FLT_MAX/100; // Sentinal values for ENO.
-    tmp(0)=FLT_MAX/100;
+    for(int i=0;i<order;i++) du[i](0)=T2()+FLT_MAX/100; // Sentinal values for ENO.
+    tmp(0)=T2()+FLT_MAX/100;
     for(int o=order-1;o>=0;o--) for(int i=0;i<iterations;i++) Extrapolate_RK2(stencil,du[o],(o!=order-1?&du[o+1]:0),tmp,o,dt);
     for(int i=solve_indices(0).min_corner;i<solve_indices(0).max_corner;i++) u(index_to_node(i))=du[0](i);
     if(periodic)
@@ -283,4 +307,10 @@ template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,3>,float>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,1>,double>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,2>,double>;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,3>,double>;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,1>,SYMMETRIC_MATRIX<float,1> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,2>,SYMMETRIC_MATRIX<float,2> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,3>,SYMMETRIC_MATRIX<float,3> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,1>,SYMMETRIC_MATRIX<double,1> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,2>,SYMMETRIC_MATRIX<double,2> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,3>,SYMMETRIC_MATRIX<double,3> >;
 }
