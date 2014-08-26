@@ -494,9 +494,9 @@ template<> int TRIANGLE_REPULSIONS<VECTOR<float,1> >::Get_Edges_Near_Edges(STRUC
 template<> int TRIANGLE_REPULSIONS<VECTOR<double,1> >::Get_Edges_Near_Edges(STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,1> >&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,1> >&,
     ARRAY_VIEW<const VECTOR<T,1> >,const bool){PHYSBAM_NOT_IMPLEMENTED();}
 template<> int TRIANGLE_REPULSIONS<VECTOR<float,2> >::Get_Edges_Near_Edges(STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,2> >&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,2> >&,
-    ARRAY_VIEW<const VECTOR<T,2> >,const bool){PHYSBAM_NOT_IMPLEMENTED();}
+    ARRAY_VIEW<const VECTOR<T,2> >,const bool){return 0;}
 template<> int TRIANGLE_REPULSIONS<VECTOR<double,2> >::Get_Edges_Near_Edges(STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,2> >&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,2> >&,
-    ARRAY_VIEW<const VECTOR<T,2> >,const bool){PHYSBAM_NOT_IMPLEMENTED();}
+    ARRAY_VIEW<const VECTOR<T,2> >,const bool){return 0;}
 //#####################################################################
 // Function Repulsion_Impulse
 //#####################################################################
