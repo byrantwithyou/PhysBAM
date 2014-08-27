@@ -14,7 +14,7 @@
 namespace PhysBAM{
 
 template<class T>
-constexpr inline T cube(const T a)
+inline T cube(const T a)
 {return a*a*a;}
 
 }

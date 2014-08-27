@@ -8,6 +8,6 @@
 #define __COUNT_BITS__
 
 namespace PhysBAM{
-constexpr int count_bits(unsigned d) {return d==0?0:1+count_bits(d&(d-1));}
+inline int count_bits(unsigned d) {return d==0?0:1+count_bits(d&(d-1));}
 }
 #endif
