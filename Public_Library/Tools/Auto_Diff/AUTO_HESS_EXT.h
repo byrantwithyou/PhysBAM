@@ -386,7 +386,7 @@ struct AUTO_HESS_EXT_VEC
     Dot(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1>& a) const
     {return Make_Hess(x.Dot(a.x),dx.Transpose_Times(a.x)+a.dx.Transpose_Times(x),Contract_0(ddx,a.x)+Contract_0(a.ddx,x)+Symmetric_Transpose_Times(dx,a.dx));}
 
-    decltype(Make_Hess_Vec(x.Cross(TV()),-MATRIX<T,TV::m>()*dx,Contract_0(ddx,MATRIX<T,TV::m>())))
+    decltype(Make_Hess_Vec(TV(),-MATRIX<T,TV::m>()*dx,Contract_0(ddx,MATRIX<T,TV::m>())))
     Cross(const TV& a) const
     {
         MATRIX<T,TV::m> cp_a=MATRIX<T,TV::m>::Cross_Product_Matrix(a);
@@ -446,6 +446,11 @@ template<class TV,class VEC1,class MAT1>
 decltype(TV()*(SC/AUTO_HESS_EXT<TV,VEC1,MAT1>()))
 operator/(TV u,const AUTO_HESS_EXT<TV,VEC1,MAT1>& a)
 {return u*((typename TV::SCALAR)1/a);}
+
+template<class TV,class VEC,class MAT>
+decltype(Make_Hess_Vec(MATRIX<typename TV::SCALAR,TV::m>()*TV(),MATRIX<typename TV::SCALAR,TV::m>()*VDX,Contract_0(VDDX,MATRIX<typename TV::SCALAR,TV::m>())))
+operator*(const MATRIX<typename TV::SCALAR,TV::m>& m,const AUTO_HESS_EXT_VEC<TV,VEC,MAT>& v)
+{return Make_Hess_Vec(m*v.x,m*v.dx,Contract_0(v.ddx,m.Transposed()));}
 }
 using HETERO_DIFF::AUTO_HESS_EXT;
 using HETERO_DIFF::AUTO_HESS_EXT_VEC;
