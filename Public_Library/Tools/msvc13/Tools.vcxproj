@@ -46,7 +46,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>D:\ucla\PhysBAM\Public_Library;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
-      <DisableSpecificWarnings>4258</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4258;4244;4305</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

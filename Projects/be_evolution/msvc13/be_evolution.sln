@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test.vcxproj", "{BE6CBAEF-1A12-44C0-885E-2D8946DD1831}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "be_evolution", "be_evolution.vcxproj", "{BE6CBAEF-1A12-44C0-885E-2D8946DD1831}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tools", "..\..\..\Public_Library\Tools\Tools\Tools.vcxproj", "{FFA8CB9E-8521-4C4F-8B6F-91EE1D16D88B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tools", "..\..\..\Public_Library\Tools\msvc13\Tools.vcxproj", "{FFA8CB9E-8521-4C4F-8B6F-91EE1D16D88B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
