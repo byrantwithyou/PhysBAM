@@ -26,7 +26,7 @@ public:
 
 //#####################################################################
     bool Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
-        ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,const int min_iterations,const int max_iterations);
+        ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,T tolerance,const int min_iterations,const int max_iterations) PHYSBAM_OVERRIDE;
     void Print_Diagnostics(int iterations);
 //#####################################################################
 };
