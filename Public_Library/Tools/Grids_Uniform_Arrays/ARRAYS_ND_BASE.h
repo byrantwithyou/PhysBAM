@@ -17,8 +17,8 @@ namespace PhysBAM{
 template<class T,class T_ARRAY,int dimension>
 class ARRAY_BASE<T,T_ARRAY,VECTOR<int,dimension> >
 {
-    typedef VECTOR<int,dimension> TV_INT;
 public:
+    typedef VECTOR<int,dimension> TV_INT;
 
     T_ARRAY& Derived()
     {return static_cast<T_ARRAY&>(*this);}

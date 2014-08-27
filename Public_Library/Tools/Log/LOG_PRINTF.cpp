@@ -92,7 +92,7 @@ int fprintf_formatted_item_builtin(std::ostream& out,const char *format,int len,
     char buff[buff_size];
     int r=snprintf(buff,buff_size,format,value);
     if(r>=buff_size){
-        char buff2[r+1];
+        char buff2[buff_size+1];
         int s=snprintf(buff2,r+1,format,value);
         assert(s<=r);
         out<<buff2;

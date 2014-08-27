@@ -10,7 +10,8 @@
 #include <cmath>
 namespace PhysBAM{
 
-#ifdef _WIN32
+//#ifdef _WIN32
+#if 0
 inline float rint(const float x){return floorf(x+(x>0?.5f:-.5f));}
 inline double rint(const double x){return floor(x+(x>0?.5:-.5));}
 #else
