@@ -1,5 +1,0 @@
-- Create an environment variable %ZLIB_ROOT% referencing the root zlib folder
-(e.g., C:\zlib-1.2.5).
-- Copy zlib.vcproj and zlib.sln to %ZLIB_ROOT%\msvc9\zlib.
-- If necessary, modify the zlib project (e.g., add and/or remove source files).
-- Build zlib.
