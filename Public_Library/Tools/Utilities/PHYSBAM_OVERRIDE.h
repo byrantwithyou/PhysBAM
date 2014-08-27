@@ -13,7 +13,7 @@
 #  define PHYSBAM_ALWAYS_INLINE
 #  define PHYSBAM_FLATTEN
 #else
-#  define PHYSBAM_OVERRIDE
+#  define PHYSBAM_OVERRIDE override
 #  define PHYSBAM_SEALED
 #  define PHYSBAM_UNUSED __attribute__ ((unused))
 #  define PHYSBAM_NORETURN(declaration) declaration __attribute__ ((noreturn))
