@@ -4,8 +4,6 @@
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Deformables/Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h>
 
-#include <boost/numeric/interval.hpp>
-
 //extern PhysBAM::ARRAY<int> trap_cases;
 using namespace PhysBAM;
 using namespace ORIGIN_AREAS;
