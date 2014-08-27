@@ -318,8 +318,6 @@ Diff(int diff_expr,int diff_var)
     return var_out.m+extra_out++;
 }
 
-double operator_definitions_consts[]={};
-
 struct FUNCTION_DEFINITION
 {
     int num_args;
