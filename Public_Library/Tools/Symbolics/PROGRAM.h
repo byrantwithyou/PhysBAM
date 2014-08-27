@@ -91,8 +91,6 @@ protected:
     void Make_SSA();
     void Make_SSA_Relabel(int& count,ARRAY<ARRAY<int> >& S,HASHTABLE<int>& V_used,const ARRAY<ARRAY<int> >& idom_tree_children,int bl);
     void Leave_SSA();
-    void Compute_In_Out(CODE_BLOCK* block);
-    void Compute_In_Out();
     void Relabel_Registers(ARRAY<int>& var_map);
     void Update_Use_Def();
     void Copy_Propagation();
@@ -105,7 +103,6 @@ protected:
     void Propagate_Copy(int old_var,int new_var);
     void Local_Common_Expresssion_Elimination(CODE_BLOCK* B);
     void Local_Common_Expresssion_Elimination();
-    void Local_Arithmatic_Optimizations();
     void Reduce_In_Place(CODE_BLOCK_NODE* N);
     void Compress_Registers();
     void Eliminate_Unused_Register(int var);

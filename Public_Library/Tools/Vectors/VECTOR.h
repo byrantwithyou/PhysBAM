@@ -549,21 +549,9 @@ template<class T> VECTOR<T,0>
 Vector()
 {return VECTOR<T,0>();}
 
-template<class T> VECTOR<T,1>
-Vector(const T& d1)
-{return VECTOR<T,1>(d1);}
-
-template<class T> VECTOR<T,2>
-Vector(const T& d1,const T& d2)
-{return VECTOR<T,2>(d1,d2);}
-
-template<class T> VECTOR<T,3>
-Vector(const T& d1,const T& d2,const T& d3)
-{return VECTOR<T,3>(d1,d2,d3);}
-
-template<class T,class ...Args> VECTOR<T,sizeof...(Args)>
+template<class T,class ...Args> VECTOR<T,1+sizeof...(Args)>
 Vector(const T& d1,const Args&... d2)
-{return VECTOR<T,sizeof...(Args)>(d1,d2...);}
+{return VECTOR<T,1+sizeof...(Args)>(d1,d2...);}
 
 //#####################################################################
 template<class T,int d> struct SUM<VECTOR<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};

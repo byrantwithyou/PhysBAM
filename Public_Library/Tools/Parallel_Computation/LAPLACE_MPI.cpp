@@ -14,8 +14,9 @@
 #include <Tools/Parallel_Computation/PCG_SPARSE_MPI_THREADED.h>
 #endif
 using namespace PhysBAM;
+namespace PhysBAM{
 template<class T> class MPI_UNIFORM_GRID;
-
+}
 #ifdef USE_MPI
 
 //#####################################################################
