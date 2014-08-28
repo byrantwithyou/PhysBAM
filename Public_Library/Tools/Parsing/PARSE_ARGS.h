@@ -54,7 +54,7 @@ public:
     ~PARSE_ARGS();
 
     template<class T> static bool store_impl(void* store,const std::string& s)
-    {std::stringstream ss(s);ss>>*(T*)store;return ss;}
+    {std::stringstream ss(s);ss>>*(T*)store;return !ss.fail();}
 
     template<class T,int d> static bool store_vec_impl(void* store,const std::string& s)
     {std::stringstream ss(s);VECTOR<T,d>& v=*(VECTOR<T,d>*)store;for(int i=0;i<d;i++) ss>>v(i);return !ss.fail();}

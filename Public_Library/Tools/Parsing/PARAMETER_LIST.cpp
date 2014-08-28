@@ -141,7 +141,7 @@ template<class T> struct PARAMETER_LIST_PARSER<RANGE<VECTOR<T,2> > >
     static bool String_To_Value(const std::string& value_string,RANGE<VECTOR<T,2> >& value,bool commandline_style)
     {
         std::istringstream value_string_stream(value_string);value_string_stream>>value.min_corner.x>>value.max_corner.x>>value.min_corner.y>>value.max_corner.y;
-        return value_string_stream!=0;
+        return !value_string_stream.fail();
     }
 };
 DEFINE_PARSER_PARAMETER(RANGE<VECTOR<int,2> >);
