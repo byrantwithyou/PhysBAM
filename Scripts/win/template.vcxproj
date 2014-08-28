@@ -11,19 +11,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A87CA670-4B06-057C-FD67-A945AD1B8B29}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-    <RootNamespace>be_evolution</RootNamespace>
+@s1@    <ProjectGuid>{#1}</ProjectGuid>
+@l0@    <Keyword>Win32Proj</Keyword>
+@s0@    <RootNamespace>#1</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+@l1@    <ConfigurationType>StaticLibrary</ConfigurationType>
+@l0@    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+@l1@    <ConfigurationType>StaticLibrary</ConfigurationType>
+@l0@    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -39,24 +41,26 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
+@l0@  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+@l0@    <LinkIncremental>true</LinkIncremental>
+@l0@  </PropertyGroup>
+@l0@  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+@l0@    <LinkIncremental>false</LinkIncremental>
+@l0@  </PropertyGroup>
+@l1@  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>D:\ucla\PhysBAM\Public_Library;%(AdditionalIncludeDirectories);C:\local\boost_1_56_0;D:\ucla\Summer 2014\downloads\zlib128-dll\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
+@f2@      <AdditionalIncludeDirectories>#1</AdditionalIncludeDirectories>
+@l1@      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
+@l0@      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
       <DisableSpecificWarnings>4258;4244;4305</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+@l0@      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:/ucla/Summer 2014/downloads/zlib128-dll/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+@f3@      <AdditionalLibraryDirectories>#1</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -65,25 +69,25 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
+@l1@      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
+@l0@      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+@l0@      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>D:/ucla/Summer 2014/downloads/zlib128-dll/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+@f3@      <AdditionalLibraryDirectories>#1</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="../main.cpp" />
+@f0@    <ClCompile Include="../#1" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="../STANDARD_TESTS.h" />
-    <ClInclude Include="../STANDARD_TESTS_2D.h" />
+@f1@    <ClInclude Include="../#1" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\..\..\Summer 2014\downloads\zlib128-dll\lib\zdll.lib" />
+@f4@    <Library Include="#1" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

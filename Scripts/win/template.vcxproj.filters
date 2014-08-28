@@ -15,17 +15,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="../main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+@f0@    <ClCompile Include="../#1">
+@f0@      <Filter>Source Files</Filter>
+@f0@    </ClCompile>
    </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="../STANDARD_TESTS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="../STANDARD_TESTS_2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+@f1@    <ClInclude Include="../#1">
+@f1@      <Filter>Header Files</Filter>
+@f1@    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\..\..\Summer 2014\downloads\zlib128-dll\lib\zdll.lib" />

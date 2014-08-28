@@ -44,3 +44,7 @@ Projects/integration_test/quad
 Public_Library/Tools/Symbolics/PROGRAM_LEX.hpp
 Public_Library/Tools/Symbolics/PROGRAM_YACC.hpp
 .DS_Store
+*.sdf
+*.opensdf
+*.suo
+*.vcxproj.user
