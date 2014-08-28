@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -52,12 +52,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\ucla\PhysBAM\Public_Library;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4258</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>D:\ucla\PhysBAM\Public_Library;%(AdditionalIncludeDirectories);C:\local\boost_1_56_0;D:\ucla\Summer 2014\downloads\zlib128-dll\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4258;4244;4305</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\ucla\Summer 2014\downloads\zlib128-dll\lib;%(AdditionalLibraryDirectories);D:\ucla\PhysBAM\Projects\be_evolution\msvc13\Debug</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -81,8 +82,17 @@
     <ClCompile Include="..\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\STANDARD_TESTS.h" />
-    <ClInclude Include="..\STANDARD_TESTS_2D.h" />
+    <ProjectReference Include="..\..\..\Public_Library\Tools\msvc13\Tools.vcxproj">
+      <Project>{ffa8cb9e-8521-4c4f-8b6f-91ee1d16d88b}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Debug\Tools.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

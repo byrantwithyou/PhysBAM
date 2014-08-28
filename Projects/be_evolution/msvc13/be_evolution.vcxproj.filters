@@ -20,11 +20,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\STANDARD_TESTS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\STANDARD_TESTS_2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <Library Include="Debug\Tools.lib">
+      <Filter>Source Files</Filter>
+    </Library>
   </ItemGroup>
 </Project>
