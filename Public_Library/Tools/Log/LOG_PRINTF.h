@@ -119,23 +119,23 @@ template<typename T,typename... Args>
 int fprintf(std::ostream& out,const char *format,T&& value,Args&&... args)
 {
     int n=0;
-    while(*format){
-        if(*format=='%'){
-            if(format[1]=='%') format++;
-            else{
-                int option_len=strspn(format+1,"0123456789#-+ 'I*.hlLqjzt")+2;
-                PRINTF_FORMAT_FLAGS flags;
-                fprintf_parse_flags(format,option_len,flags);
-                if(flags.width>=0 && flags.precision>=0){
-                    char term_format[option_len+3];
-                    memcpy(term_format,format,option_len);
-                    term_format[option_len]=0;
-                    n+=fprintf_with_format(out,term_format,option_len,flags,value);
-                    return n+fprintf(out,format+option_len,args...);}
-                else
-                    return n+fprintf_fill_format(out,format,option_len,flags,value,args...);}}
-        n++;
-        out<<*format++;}
+    //while(*format){
+    //    if(*format=='%'){
+    //        if(format[1]=='%') format++;
+    //        else{
+    //            int option_len=strspn(format+1,"0123456789#-+ 'I*.hlLqjzt")+2;
+    //            PRINTF_FORMAT_FLAGS flags;
+    //            fprintf_parse_flags(format,option_len,flags);
+    //            if(flags.width>=0 && flags.precision>=0){
+    //                char term_format[option_len+3];
+    //                memcpy(term_format,format,option_len);
+    //                term_format[option_len]=0;
+    //                n+=fprintf_with_format(out,term_format,option_len,flags,value);
+    //                return n+fprintf(out,format+option_len,args...);}
+    //            else
+    //                return n+fprintf_fill_format(out,format,option_len,flags,value,args...);}}
+    //    n++;
+    //    out<<*format++;}
     return n;
 }
 

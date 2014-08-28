@@ -111,7 +111,7 @@ namespace PhysBAM{
     template class SCATTERED_INTERPOLATION<VECTOR<T,1> >;   \
     template class SCATTERED_INTERPOLATION<VECTOR<T,3> >;
 INSTANTIATION_HELPER(float)
-template void SCATTERED_INTERPOLATION<VECTOR<float,3> >::Transfer_To_Grid_Helper<ARRAY<VECTOR<float,3>,VECTOR<int,3> > >(ARRAY_VIEW<VECTOR<float,3> const,int>,ARRAY_VIEW<ARRAY<VECTOR<float,3>,VECTOR<int,3> >::ELEMENT const,int>,GRID<VECTOR<float,3> > const&,ARRAY<VECTOR<float,3>,VECTOR<int,3> >&) const;
+//template void SCATTERED_INTERPOLATION<VECTOR<float,3> >::Transfer_To_Grid_Helper<ARRAY<VECTOR<float,3>,VECTOR<int,3> > >(ARRAY_VIEW<VECTOR<float,3> const,int>,ARRAY_VIEW<ARRAY<VECTOR<float,3>,VECTOR<int,3> >::ELEMENT const,int>,GRID<VECTOR<float,3> > const&,ARRAY<VECTOR<float,3>,VECTOR<int,3> >&) const;
 INSTANTIATION_HELPER(double)
-template void SCATTERED_INTERPOLATION<VECTOR<double,3> >::Transfer_To_Grid_Helper<ARRAY<VECTOR<double,3>,VECTOR<int,3> > >(ARRAY_VIEW<VECTOR<double,3> const,int>,ARRAY_VIEW<ARRAY<VECTOR<double,3>,VECTOR<int,3> >::ELEMENT const,int>,GRID<VECTOR<double,3> > const&,ARRAY<VECTOR<double,3>,VECTOR<int,3> >&) const;
+//template void SCATTERED_INTERPOLATION<VECTOR<double,3> >::Transfer_To_Grid_Helper<ARRAY<VECTOR<double,3>,VECTOR<int,3> > >(ARRAY_VIEW<VECTOR<double,3> const,int>,ARRAY_VIEW<ARRAY<VECTOR<double,3>,VECTOR<int,3> >::ELEMENT const,int>,GRID<VECTOR<double,3> > const&,ARRAY<VECTOR<double,3>,VECTOR<int,3> >&) const;
 }
