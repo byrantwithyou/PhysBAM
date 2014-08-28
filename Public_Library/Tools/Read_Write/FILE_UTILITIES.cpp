@@ -174,18 +174,18 @@ int Compare_File_Times(const std::string& filename1,const std::string& filename2
 // Function File_Exists_Ignoring_Compression_Suffix
 //###################################################################
 bool File_Exists_Ignoring_Compression_Suffix(const std::string& filename)
-{return std::ifstream(filename.c_str())!=0;}
+{return !std::ifstream(filename.c_str()).fail();}
 //###################################################################
 // Function File_Writable_Ignoring_Compression_Suffix
 //###################################################################
 bool File_Writable_Ignoring_Compression_Suffix(const std::string& filename)
-{return std::ofstream(filename.c_str(),std::ios::out)!=0;} // TODO: make this not create the file
+{return !std::ofstream(filename.c_str(),std::ios::out).fail();} // TODO: make this not create the file
 //###################################################################
 // Function Directory_Writable
 //###################################################################
 bool Directory_Writable(const std::string& dirname) // TODO: make this nicer
 {static const char* dummy_filename="_PHYSBAM_FILE_UTILITIES_DUMMY_";
-std::string filename=dirname+"/"+dummy_filename;bool success=(std::ofstream(filename.c_str())!=0);remove(filename.c_str());return success;}
+std::string filename=dirname+"/"+dummy_filename;bool success=!std::ofstream(filename.c_str()).fail();remove(filename.c_str());return success;}
 //###################################################################
 // Function Find_First_Nonexistent_File_In_Sequence
 //###################################################################
