@@ -38,7 +38,7 @@ bool Test(AUTO_HESS_EXT<TV,VEC,MAT>(*func)(const VECTOR<TV,n>&,EXTRA),EXTRA e)
         tb0+=(g2(i)+g(i)).Dot(dx(i));
     tb0/=2;
 
-    printf("first diff test %g (%g %g)\n",abs(ta0-tb0)/maxabs(ta0,tb0,1e-30),ta0,tb0);
+    printf("first diff test %g (%g %g)\n",abs(ta0-tb0)/maxabs(ta0,tb0,1e-30),ta0/eps,tb0/eps);
 
     T ta1=0,tb1=0,tc1=0;
     for(int i=0;i<n;i++){
@@ -53,7 +53,7 @@ bool Test(AUTO_HESS_EXT<TV,VEC,MAT>(*func)(const VECTOR<TV,n>&,EXTRA),EXTRA e)
     tb1=sqrt(tb1);
     tc1=sqrt(tc1);
 
-    printf("second diff test %g (%g %g)\n",tc1/maxabs(ta1,tb1,1e-30),ta1,tb1);
+    printf("second diff test %g (%g %g)\n",tc1/maxabs(ta1,tb1,1e-30),ta1/eps,tb1/eps);
     return true;
 }
 template<class TV,class VEC,class MAT,class EXTRA,int n>
