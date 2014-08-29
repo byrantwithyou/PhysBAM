@@ -15,1554 +15,1554 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="../Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_PDE_Linear\PROJECTION_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_PDE_Linear\LAPLACE_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_PDE_Linear/POISSON_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_PDE_Linear\POISSON_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Particles/PARTICLES.cpp">
+    <ClCompile Include="..\Particles\PARTICLES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Particles/ARRAY_COLLECTION_ELEMENT_BASE.cpp">
+    <ClCompile Include="..\Particles\ARRAY_COLLECTION_ELEMENT_BASE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Utilities/TEST_BASE.cpp">
+    <ClCompile Include="..\Utilities\TEST_BASE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Utilities/INTERRUPTS.cpp">
+    <ClCompile Include="..\Utilities\INTERRUPTS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Utilities/TIMER.cpp">
+    <ClCompile Include="..\Utilities\TIMER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Utilities/EXCEPTIONS.cpp">
+    <ClCompile Include="..\Utilities\EXCEPTIONS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Utilities/PROCESS_UTILITIES.cpp">
+    <ClCompile Include="..\Utilities\PROCESS_UTILITIES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Arrays/FLOOD_FILL.cpp">
+    <ClCompile Include="..\Grids_Uniform_Arrays\FLOOD_FILL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Arrays/ARRAYS_UTILITIES.cpp">
+    <ClCompile Include="..\Grids_Uniform_Arrays\ARRAYS_UTILITIES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Arrays/FACE_ARRAYS.cpp">
+    <ClCompile Include="..\Grids_Uniform_Arrays\FACE_ARRAYS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform/FACE_ITERATOR.cpp">
+    <ClCompile Include="..\Grids_Uniform\FACE_ITERATOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform/CELL_ITERATOR.cpp">
+    <ClCompile Include="..\Grids_Uniform\CELL_ITERATOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform/GRID.cpp">
+    <ClCompile Include="..\Grids_Uniform\GRID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform/EDGE_ITERATOR.cpp">
+    <ClCompile Include="..\Grids_Uniform\EDGE_ITERATOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform/GRID_ITERATOR_BASE.cpp">
+    <ClCompile Include="..\Grids_Uniform\GRID_ITERATOR_BASE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform/NODE_ITERATOR.cpp">
+    <ClCompile Include="..\Grids_Uniform\NODE_ITERATOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/KRYLOV_VECTOR_BASE.cpp">
+    <ClCompile Include="..\Krylov_Solvers\KRYLOV_VECTOR_BASE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/CONJUGATE_GRADIENT.cpp">
+    <ClCompile Include="..\Krylov_Solvers\CONJUGATE_GRADIENT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.cpp">
+    <ClCompile Include="..\Krylov_Solvers\KRYLOV_VECTOR_WRAPPER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/KRYLOV_SOLVER.cpp">
+    <ClCompile Include="..\Krylov_Solvers\KRYLOV_SOLVER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/PCG_SPARSE.cpp">
+    <ClCompile Include="..\Krylov_Solvers\PCG_SPARSE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/MINRES.cpp">
+    <ClCompile Include="..\Krylov_Solvers\MINRES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/GMRES.cpp">
+    <ClCompile Include="..\Krylov_Solvers\GMRES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/CONJUGATE_RESIDUAL.cpp">
+    <ClCompile Include="..\Krylov_Solvers\CONJUGATE_RESIDUAL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/MATRIX_SYSTEM.cpp">
+    <ClCompile Include="..\Krylov_Solvers\MATRIX_SYSTEM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.cpp">
+    <ClCompile Include="..\Krylov_Solvers\IMPLICIT_SOLVE_PARAMETERS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/SYMMQMR.cpp">
+    <ClCompile Include="..\Krylov_Solvers\SYMMQMR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/KRYLOV_SYSTEM_BASE.cpp">
+    <ClCompile Include="..\Krylov_Solvers\KRYLOV_SYSTEM_BASE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/LANCZOS_ITERATION.cpp">
+    <ClCompile Include="..\Krylov_Solvers\LANCZOS_ITERATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Krylov_Solvers/LANCZOS_CONJUGATE_GRADIENT.cpp">
+    <ClCompile Include="..\Krylov_Solvers\LANCZOS_CONJUGATE_GRADIENT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Interpolation/LINEAR_INTERPOLATION.cpp">
+    <ClCompile Include="..\Interpolation\LINEAR_INTERPOLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Interpolation/INTERPOLATED_COLOR_MAP.cpp">
+    <ClCompile Include="..\Interpolation\INTERPOLATED_COLOR_MAP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Interpolation/BSPLINE_QUATERNION.cpp">
+    <ClCompile Include="..\Interpolation\BSPLINE_QUATERNION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Interpolation/CUBIC_MN_INTERPOLATION.cpp">
+    <ClCompile Include="..\Interpolation\CUBIC_MN_INTERPOLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Interpolation/BSPLINE.cpp">
+    <ClCompile Include="..\Interpolation\BSPLINE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Nonlinear_Equations/NEWTONS_METHOD.cpp">
+    <ClCompile Include="..\Nonlinear_Equations\NEWTONS_METHOD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Nonlinear_Equations/ITERATIVE_SOLVER.cpp">
+    <ClCompile Include="..\Nonlinear_Equations\ITERATIVE_SOLVER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Nonlinear_Equations/NONLINEAR_FUNCTION.cpp">
+    <ClCompile Include="..\Nonlinear_Equations\NONLINEAR_FUNCTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Nonlinear_Equations/LINE_SEARCH.cpp">
+    <ClCompile Include="..\Nonlinear_Equations\LINE_SEARCH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Nonlinear_Equations/PARAMETRIC_LINE.cpp">
+    <ClCompile Include="..\Nonlinear_Equations\PARAMETRIC_LINE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Optimization/LINEAR_PROGRAMMING.cpp">
+    <ClCompile Include="..\Optimization\LINEAR_PROGRAMMING.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Optimization/QUADRATIC_PROGRAMMING.cpp">
+    <ClCompile Include="..\Optimization\QUADRATIC_PROGRAMMING.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Auto_Diff/AUTO_HESS.cpp">
+    <ClCompile Include="..\Auto_Diff\AUTO_HESS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_2D_HELPER.cpp">
+    <ClCompile Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_MAC_2D_HELPER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Interpolation/CUBIC_MN_INTERPOLATION_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_Interpolation\CUBIC_MN_INTERPOLATION_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_3D_HELPER.cpp">
+    <ClCompile Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_MAC_3D_HELPER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_Interpolation\QUADRATIC_INTERPOLATION_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Interpolation/CUBIC_SPLINE_INTERPOLATION_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_Interpolation\CUBIC_SPLINE_INTERPOLATION_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Read_Write/MATLAB_OUTPUT.cpp">
+    <ClCompile Include="..\Read_Write\MATLAB_OUTPUT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Read_Write/ZIP.cpp">
+    <ClCompile Include="..\Read_Write\ZIP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Read_Write/OCTAVE_OUTPUT.cpp">
+    <ClCompile Include="..\Read_Write\OCTAVE_OUTPUT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Read_Write/FILE_UTILITIES.cpp">
+    <ClCompile Include="..\Read_Write\FILE_UTILITIES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Read_Write/GNUPLOT_OUTPUT.cpp">
+    <ClCompile Include="..\Read_Write\GNUPLOT_OUTPUT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Ordinary_Differential_Equations/EXAMPLE.cpp">
+    <ClCompile Include="..\Ordinary_Differential_Equations\EXAMPLE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Ordinary_Differential_Equations/EULER_STEP_PARTICLES.cpp">
+    <ClCompile Include="..\Ordinary_Differential_Equations\EULER_STEP_PARTICLES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Ordinary_Differential_Equations/DRIVER.cpp">
+    <ClCompile Include="..\Ordinary_Differential_Equations\DRIVER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Particles_Interpolation/SCATTERED_INTERPOLATION.cpp">
+    <ClCompile Include="..\Particles_Interpolation\SCATTERED_INTERPOLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fourier_Transforms/FFT.cpp">
+    <ClCompile Include="..\Fourier_Transforms\FFT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fourier_Transforms/FFT_2D.cpp">
+    <ClCompile Include="..\Fourier_Transforms\FFT_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fourier_Transforms/FFT_3D.cpp">
+    <ClCompile Include="..\Fourier_Transforms\FFT_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fourier_Transforms/FFT_1D.cpp">
+    <ClCompile Include="..\Fourier_Transforms\FFT_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Data_Structures/RED_BLACK_TREE.cpp">
+    <ClCompile Include="..\Data_Structures\RED_BLACK_TREE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Data_Structures/KD_TREE.cpp">
+    <ClCompile Include="..\Data_Structures\KD_TREE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Data_Structures/UNDIRECTED_GRAPH.cpp">
+    <ClCompile Include="..\Data_Structures\UNDIRECTED_GRAPH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Data_Structures/FLOOD_FILL_GRAPH.cpp">
+    <ClCompile Include="..\Data_Structures\FLOOD_FILL_GRAPH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Data_Structures/FORCE_ELEMENTS.cpp">
+    <ClCompile Include="..\Data_Structures\FORCE_ELEMENTS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Data_Structures/DYNAMIC_LIST.cpp">
+    <ClCompile Include="..\Data_Structures\DYNAMIC_LIST.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Data_Structures/DIRECTED_GRAPH.cpp">
+    <ClCompile Include="..\Data_Structures\DIRECTED_GRAPH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Math_Tools/RANGE.cpp">
+    <ClCompile Include="..\Math_Tools\RANGE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Arrays/ARRAY.cpp">
+    <ClCompile Include="..\Arrays\ARRAY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Matrices/SYMMETRIC_MATRIX_NXN.cpp">
+    <ClCompile Include="..\Matrices\SYMMETRIC_MATRIX_NXN.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Matrices/BANDED_SYMMETRIC_MATRIX.cpp">
+    <ClCompile Include="..\Matrices\BANDED_SYMMETRIC_MATRIX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Matrices/SPARSE_MATRIX_FLAT_MXN.cpp">
+    <ClCompile Include="..\Matrices\SPARSE_MATRIX_FLAT_MXN.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Matrices/MATRIX_3X3.cpp">
+    <ClCompile Include="..\Matrices\MATRIX_3X3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Matrices/ROTATION.cpp">
+    <ClCompile Include="..\Matrices\ROTATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Matrices/MATRIX_3X2.cpp">
+    <ClCompile Include="..\Matrices\MATRIX_3X2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Matrices/SYSTEM_MATRIX_HELPER.cpp">
+    <ClCompile Include="..\Matrices\SYSTEM_MATRIX_HELPER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Matrices/SYMMETRIC_MATRIX_3X3.cpp">
+    <ClCompile Include="..\Matrices\SYMMETRIC_MATRIX_3X3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Matrices/MATRIX_BASE.cpp">
+    <ClCompile Include="..\Matrices\MATRIX_BASE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Matrices/MATRIX_4X4.cpp">
+    <ClCompile Include="..\Matrices\MATRIX_4X4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.cpp">
+    <ClCompile Include="..\Grids_Uniform_Advection\ADVECTION_HAMILTON_JACOBI_ENO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Advection/ADVECTION_MACCORMACK_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_Advection\ADVECTION_MACCORMACK_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Advection/ADVECTION_CONSERVATIVE_ENO.cpp">
+    <ClCompile Include="..\Grids_Uniform_Advection\ADVECTION_CONSERVATIVE_ENO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_Advection\ADVECTION_SEMI_LAGRANGIAN_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_Advection\ADVECTION_SEPARABLE_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_WENO.cpp">
+    <ClCompile Include="..\Grids_Uniform_Advection\ADVECTION_HAMILTON_JACOBI_WENO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA.cpp">
+    <ClCompile Include="..\Grids_Uniform_Advection\ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/MPI_GRID.cpp">
+    <ClCompile Include="..\Parallel_Computation\MPI_GRID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/LOCAL_GRID.cpp">
+    <ClCompile Include="..\Parallel_Computation\LOCAL_GRID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/BOUNDARY_MPI.cpp">
+    <ClCompile Include="..\Parallel_Computation\BOUNDARY_MPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/LAPLACE_MPI.cpp">
+    <ClCompile Include="..\Parallel_Computation\LAPLACE_MPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/MPI_UNIFORM_GRID.cpp">
+    <ClCompile Include="..\Parallel_Computation\MPI_UNIFORM_GRID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/MPI_WORLD.cpp">
+    <ClCompile Include="..\Parallel_Computation\MPI_WORLD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/PCG_SPARSE_MPI_THREADED.cpp">
+    <ClCompile Include="..\Parallel_Computation\PCG_SPARSE_MPI_THREADED.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/FLOOD_FILL_MPI.cpp">
+    <ClCompile Include="..\Parallel_Computation\FLOOD_FILL_MPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/PCG_SPARSE_THREADED.cpp">
+    <ClCompile Include="..\Parallel_Computation\PCG_SPARSE_THREADED.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/LAPLACE_UNIFORM_MPI.cpp">
+    <ClCompile Include="..\Parallel_Computation\LAPLACE_UNIFORM_MPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/THREAD_QUEUE.cpp">
+    <ClCompile Include="..\Parallel_Computation\THREAD_QUEUE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/THREADED_UNIFORM_GRID.cpp">
+    <ClCompile Include="..\Parallel_Computation\THREADED_UNIFORM_GRID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/MPI_UTILITIES.cpp">
+    <ClCompile Include="..\Parallel_Computation\MPI_UTILITIES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/THREADED_ADVECTION_SEMI_LAGRANGIAN_UNIFORM.cpp">
+    <ClCompile Include="..\Parallel_Computation\THREADED_ADVECTION_SEMI_LAGRANGIAN_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parallel_Computation/PCG_SPARSE_MPI.cpp">
+    <ClCompile Include="..\Parallel_Computation\PCG_SPARSE_MPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Log/DEBUG_SUBSTEPS.cpp">
+    <ClCompile Include="..\Log\DEBUG_SUBSTEPS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Log/LOG_PRINTF.cpp">
+    <ClCompile Include="..\Log\LOG_PRINTF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Log/LOG_ENTRY.cpp">
+    <ClCompile Include="..\Log\LOG_ENTRY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Log/DEBUG_UTILITIES.cpp">
+    <ClCompile Include="..\Log\DEBUG_UTILITIES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Log/LOG.cpp">
+    <ClCompile Include="..\Log\LOG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Log/DEBUG_PRINT.cpp">
+    <ClCompile Include="..\Log\DEBUG_PRINT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parsing/STRING_UTILITIES.cpp">
+    <ClCompile Include="..\Parsing\STRING_UTILITIES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parsing/GENERIC_PARSER.cpp">
+    <ClCompile Include="..\Parsing\GENERIC_PARSER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parsing/PARSE_ARGS.cpp">
+    <ClCompile Include="..\Parsing\PARSE_ARGS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Parsing/PARAMETER_LIST.cpp">
+    <ClCompile Include="..\Parsing\PARAMETER_LIST.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Random_Numbers/RANDOM_NUMBERS.cpp">
+    <ClCompile Include="..\Random_Numbers\RANDOM_NUMBERS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Random_Numbers/NOISE.cpp">
+    <ClCompile Include="..\Random_Numbers\NOISE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Random_Numbers/MT19937.cpp">
+    <ClCompile Include="..\Random_Numbers\MT19937.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Clone/CLONE_ARRAY.cpp">
+    <ClCompile Include="..\Clone\CLONE_ARRAY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Symbolics/DOMINATORS.cpp">
+    <ClCompile Include="..\Symbolics\DOMINATORS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Symbolics/CODE_BLOCK.cpp">
+    <ClCompile Include="..\Symbolics\CODE_BLOCK.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Symbolics/CODE_BLOCK_NODE.cpp">
+    <ClCompile Include="..\Symbolics\CODE_BLOCK_NODE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Symbolics/MULTIVARIATE_POLYNOMIAL.cpp">
+    <ClCompile Include="..\Symbolics\MULTIVARIATE_POLYNOMIAL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Symbolics/PROGRAM.cpp">
+    <ClCompile Include="..\Symbolics\PROGRAM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Symbolics/PROGRAM_CONTEXT.cpp">
+    <ClCompile Include="..\Symbolics\PROGRAM_CONTEXT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.cpp">
+    <ClCompile Include="..\Grids_Uniform_Boundaries\BOUNDARY_MAC_GRID_PERIODIC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_Boundaries\BOUNDARY_REFLECTION_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Boundaries/BOUNDARY_PERIODIC.cpp">
+    <ClCompile Include="..\Grids_Uniform_Boundaries\BOUNDARY_PERIODIC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Boundaries/BOUNDARY_EXTRAPOLATE_CELL.cpp">
+    <ClCompile Include="..\Grids_Uniform_Boundaries\BOUNDARY_EXTRAPOLATE_CELL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_ATTENUATION.cpp">
+    <ClCompile Include="..\Grids_Uniform_Boundaries\BOUNDARY_REFLECTION_ATTENUATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/PNG_FILE.cpp">
+    <ClCompile Include="..\Images\PNG_FILE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/MOV_FILE.cpp">
+    <ClCompile Include="..\Images\MOV_FILE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/RGB_FILE.cpp">
+    <ClCompile Include="..\Images\RGB_FILE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/IMAGE.cpp">
+    <ClCompile Include="..\Images\IMAGE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/PPM_FILE.cpp">
+    <ClCompile Include="..\Images\PPM_FILE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/JPG_FILE.cpp">
+    <ClCompile Include="..\Images\JPG_FILE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/BMP_FILE.cpp">
+    <ClCompile Include="..\Images\BMP_FILE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Boundaries/BOUNDARY.cpp">
+    <ClCompile Include="..\Boundaries\BOUNDARY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fourier_Transforms_Calculations/TURBULENCE.cpp">
+    <ClCompile Include="..\Fourier_Transforms_Calculations\TURBULENCE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Polynomials/QUADRATIC.cpp">
+    <ClCompile Include="..\Polynomials\QUADRATIC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Polynomials/CUBIC.cpp">
+    <ClCompile Include="..\Polynomials\CUBIC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Extrapolation/EXTRAPOLATION_HIGHER_ORDER_POLY.cpp">
+    <ClCompile Include="..\Extrapolation\EXTRAPOLATION_HIGHER_ORDER_POLY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Adaptive_Arithmetic/EXACT_FLOAT.cpp">
+    <ClCompile Include="..\Adaptive_Arithmetic\EXACT_FLOAT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Adaptive_Arithmetic/EXACT_RATIONAL.cpp">
+    <ClCompile Include="..\Adaptive_Arithmetic\EXACT_RATIONAL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Adaptive_Arithmetic/EXPANSION_ARITHMETIC.cpp">
+    <ClCompile Include="..\Adaptive_Arithmetic\EXPANSION_ARITHMETIC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
    </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="../Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_PDE_Linear\LAPLACE_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_PDE_Linear/POISSON_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_PDE_Linear\POISSON_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_PDE_Linear\PROJECTION_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/GRADIENT_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\GRADIENT_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/VORTICITY_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\VORTICITY_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/SMOOTH_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\SMOOTH_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Particles/PARTICLES_FORWARD.h">
+    <ClInclude Include="..\Particles\PARTICLES_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Particles/PARTICLES.h">
+    <ClInclude Include="..\Particles\PARTICLES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Particles/PARTICLES_SUBSET.h">
+    <ClInclude Include="..\Particles\PARTICLES_SUBSET.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Particles/ARRAY_COLLECTION_ELEMENT.h">
+    <ClInclude Include="..\Particles\ARRAY_COLLECTION_ELEMENT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Particles/ARRAY_COLLECTION_ELEMENT_BASE.h">
+    <ClInclude Include="..\Particles\ARRAY_COLLECTION_ELEMENT_BASE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Particles/POINTS_POOL.h">
+    <ClInclude Include="..\Particles\POINTS_POOL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/STATIC_ASSERT.h">
+    <ClInclude Include="..\Utilities\STATIC_ASSERT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/TEST_BASE.h">
+    <ClInclude Include="..\Utilities\TEST_BASE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/Find_Type.h">
+    <ClInclude Include="..\Utilities\Find_Type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/NONCOPYABLE.h">
+    <ClInclude Include="..\Utilities\NONCOPYABLE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/TIMER.h">
+    <ClInclude Include="..\Utilities\TIMER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/DEBUG_CAST.h">
+    <ClInclude Include="..\Utilities\DEBUG_CAST.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/INTERRUPTS.h">
+    <ClInclude Include="..\Utilities\INTERRUPTS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/EXCEPTIONS.h">
+    <ClInclude Include="..\Utilities\EXCEPTIONS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/PROCESS_UTILITIES.h">
+    <ClInclude Include="..\Utilities\PROCESS_UTILITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/PHYSBAM_OVERRIDE.h">
+    <ClInclude Include="..\Utilities\PHYSBAM_OVERRIDE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/TYPE_UTILITIES.h">
+    <ClInclude Include="..\Utilities\TYPE_UTILITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Utilities/POINTER_POOL.h">
+    <ClInclude Include="..\Utilities\POINTER_POOL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Arrays/GRIDS_UNIFORM_ARRAYS_FORWARD.h">
+    <ClInclude Include="..\Grids_Uniform_Arrays\GRIDS_UNIFORM_ARRAYS_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Arrays/ARRAYS_UTILITIES.h">
+    <ClInclude Include="..\Grids_Uniform_Arrays\ARRAYS_UTILITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Arrays/FACE_ARRAYS_BINARY_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Arrays\FACE_ARRAYS_BINARY_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Arrays/ARRAYS_ND_VIEW.h">
+    <ClInclude Include="..\Grids_Uniform_Arrays\ARRAYS_ND_VIEW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Arrays/ARRAYS_ND_BASE.h">
+    <ClInclude Include="..\Grids_Uniform_Arrays\ARRAYS_ND_BASE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Arrays/ARRAYS_ND.h">
+    <ClInclude Include="..\Grids_Uniform_Arrays\ARRAYS_ND.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Arrays/FACE_ARRAYS.h">
+    <ClInclude Include="..\Grids_Uniform_Arrays\FACE_ARRAYS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h">
+    <ClInclude Include="..\Grids_Uniform_Arrays\ARRAYS_UNIFORM_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Arrays/FLOOD_FILL.h">
+    <ClInclude Include="..\Grids_Uniform_Arrays\FLOOD_FILL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform/FACE_ITERATOR.h">
+    <ClInclude Include="..\Grids_Uniform\FACE_ITERATOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform/FACE_INDEX.h">
+    <ClInclude Include="..\Grids_Uniform\FACE_INDEX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform/EDGE_ITERATOR.h">
+    <ClInclude Include="..\Grids_Uniform\EDGE_ITERATOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform/UNIFORM_GRID_FORWARD.h">
+    <ClInclude Include="..\Grids_Uniform\UNIFORM_GRID_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform/GRID.h">
+    <ClInclude Include="..\Grids_Uniform\GRID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform/NODE_ITERATOR.h">
+    <ClInclude Include="..\Grids_Uniform\NODE_ITERATOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform/SIDED_FACE_INDEX.h">
+    <ClInclude Include="..\Grids_Uniform\SIDED_FACE_INDEX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform/BLOCK_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform\BLOCK_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform/EDGE_INDEX.h">
+    <ClInclude Include="..\Grids_Uniform\EDGE_INDEX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform/CELL_ITERATOR.h">
+    <ClInclude Include="..\Grids_Uniform\CELL_ITERATOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform/GRID_ITERATOR_BASE.h">
+    <ClInclude Include="..\Grids_Uniform\GRID_ITERATOR_BASE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/KRYLOV_VECTOR_BASE.h">
+    <ClInclude Include="..\Krylov_Solvers\KRYLOV_VECTOR_BASE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/PCG_SPARSE.h">
+    <ClInclude Include="..\Krylov_Solvers\PCG_SPARSE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/LANCZOS_ITERATION.h">
+    <ClInclude Include="..\Krylov_Solvers\LANCZOS_ITERATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h">
+    <ClInclude Include="..\Krylov_Solvers\IMPLICIT_SOLVE_PARAMETERS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/MATRIX_SYSTEM.h">
+    <ClInclude Include="..\Krylov_Solvers\MATRIX_SYSTEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/GMRES.h">
+    <ClInclude Include="..\Krylov_Solvers\GMRES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/PCG_SPARSE_SYSTEM.h">
+    <ClInclude Include="..\Krylov_Solvers\PCG_SPARSE_SYSTEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/LANCZOS_CONJUGATE_GRADIENT.h">
+    <ClInclude Include="..\Krylov_Solvers\LANCZOS_CONJUGATE_GRADIENT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h">
+    <ClInclude Include="..\Krylov_Solvers\KRYLOV_VECTOR_WRAPPER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/CONJUGATE_GRADIENT.h">
+    <ClInclude Include="..\Krylov_Solvers\CONJUGATE_GRADIENT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/MINRES.h">
+    <ClInclude Include="..\Krylov_Solvers\MINRES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/CONJUGATE_RESIDUAL.h">
+    <ClInclude Include="..\Krylov_Solvers\CONJUGATE_RESIDUAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/KRYLOV_SOLVER.h">
+    <ClInclude Include="..\Krylov_Solvers\KRYLOV_SOLVER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/KRYLOV_SYSTEM_BASE.h">
+    <ClInclude Include="..\Krylov_Solvers\KRYLOV_SYSTEM_BASE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Krylov_Solvers/SYMMQMR.h">
+    <ClInclude Include="..\Krylov_Solvers\SYMMQMR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Interpolation/INTERPOLATION_CURVE.h">
+    <ClInclude Include="..\Interpolation\INTERPOLATION_CURVE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Interpolation/BSPLINE.h">
+    <ClInclude Include="..\Interpolation\BSPLINE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Interpolation/INTERPOLATED_COLOR_MAP.h">
+    <ClInclude Include="..\Interpolation\INTERPOLATED_COLOR_MAP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Interpolation/BSPLINE_QUATERNION.h">
+    <ClInclude Include="..\Interpolation\BSPLINE_QUATERNION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Interpolation/CUBIC_INTERPOLATION_CURVE.h">
+    <ClInclude Include="..\Interpolation\CUBIC_INTERPOLATION_CURVE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Interpolation/CUBIC_MN_INTERPOLATION.h">
+    <ClInclude Include="..\Interpolation\CUBIC_MN_INTERPOLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Interpolation/LINEAR_INTERPOLATION.h">
+    <ClInclude Include="..\Interpolation\LINEAR_INTERPOLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Interpolation/INTERPOLATION_FORWARD.h">
+    <ClInclude Include="..\Interpolation\INTERPOLATION_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Nonlinear_Equations/INTEGRATION.h">
+    <ClInclude Include="..\Nonlinear_Equations\INTEGRATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Nonlinear_Equations/PARAMETER_SPACE.h">
+    <ClInclude Include="..\Nonlinear_Equations\PARAMETER_SPACE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Nonlinear_Equations/ITERATIVE_SOLVER.h">
+    <ClInclude Include="..\Nonlinear_Equations\ITERATIVE_SOLVER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Nonlinear_Equations/NONLINEAR_FUNCTION.h">
+    <ClInclude Include="..\Nonlinear_Equations\NONLINEAR_FUNCTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Nonlinear_Equations/PARAMETRIC_LINE.h">
+    <ClInclude Include="..\Nonlinear_Equations\PARAMETRIC_LINE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Nonlinear_Equations/NEWTONS_METHOD.h">
+    <ClInclude Include="..\Nonlinear_Equations\NEWTONS_METHOD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Nonlinear_Equations/LINE_SEARCH.h">
+    <ClInclude Include="..\Nonlinear_Equations\LINE_SEARCH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Optimization/LINEAR_PROGRAMMING.h">
+    <ClInclude Include="..\Optimization\LINEAR_PROGRAMMING.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Optimization/QUADRATIC_PROGRAMMING.h">
+    <ClInclude Include="..\Optimization\QUADRATIC_PROGRAMMING.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/AUTO_DIFF.h">
+    <ClInclude Include="..\Auto_Diff\AUTO_DIFF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/MAT_HOLDER.h">
+    <ClInclude Include="..\Auto_Diff\MAT_HOLDER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/PRIMITIVE_VECTORS.h">
+    <ClInclude Include="..\Auto_Diff\PRIMITIVE_VECTORS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/GRADIENT_VEC.h">
+    <ClInclude Include="..\Auto_Diff\GRADIENT_VEC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/PRIMITIVE_TENSORS.h">
+    <ClInclude Include="..\Auto_Diff\PRIMITIVE_TENSORS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/AUTO_NO_DIFF.h">
+    <ClInclude Include="..\Auto_Diff\AUTO_NO_DIFF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/HESSIAN.h">
+    <ClInclude Include="..\Auto_Diff\HESSIAN.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/AUTO_HESS_EXT_TEST.h">
+    <ClInclude Include="..\Auto_Diff\AUTO_HESS_EXT_TEST.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/HESSIAN_VEC.h">
+    <ClInclude Include="..\Auto_Diff\HESSIAN_VEC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/VEC_HOLDER.h">
+    <ClInclude Include="..\Auto_Diff\VEC_HOLDER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/AUTO_HESS.h">
+    <ClInclude Include="..\Auto_Diff\AUTO_HESS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/GRADIENT.h">
+    <ClInclude Include="..\Auto_Diff\GRADIENT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/AUTO_HESS_EXT.h">
+    <ClInclude Include="..\Auto_Diff\AUTO_HESS_EXT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Auto_Diff/PRIMITIVE_MATRICES.h">
+    <ClInclude Include="..\Auto_Diff\PRIMITIVE_MATRICES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\QUADRATIC_INTERPOLATION_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/CUBIC_MN_INTERPOLATION_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\CUBIC_MN_INTERPOLATION_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_MAC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/CATMULL_ROM_SPLINE_INTERPOLATION.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\CATMULL_ROM_SPLINE_INTERPOLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_2D_HELPER_DEFINITIONS.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_MAC_2D_HELPER_DEFINITIONS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_1D_HELPER.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_MAC_1D_HELPER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_3D_HELPER_DEFINITIONS.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_MAC_3D_HELPER_DEFINITIONS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM_FORWARD.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\INTERPOLATION_UNIFORM_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\INTERPOLATION_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM_DEFINITIONS.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_UNIFORM_DEFINITIONS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/CUBIC_SPLINE_INTERPOLATION_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\CUBIC_SPLINE_INTERPOLATION_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_3D_HELPER.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_MAC_3D_HELPER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_HELPER.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_MAC_HELPER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\AVERAGING_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_2D_HELPER.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\LINEAR_INTERPOLATION_MAC_2D_HELPER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Interpolation\FACE_LOOKUP_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Read_Write/OCTAVE_OUTPUT.h">
+    <ClInclude Include="..\Read_Write\OCTAVE_OUTPUT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Read_Write/READ_WRITE_FORWARD.h">
+    <ClInclude Include="..\Read_Write\READ_WRITE_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Read_Write/FILE_UTILITIES.h">
+    <ClInclude Include="..\Read_Write\FILE_UTILITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Read_Write/TYPED_STREAM.h">
+    <ClInclude Include="..\Read_Write\TYPED_STREAM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Read_Write/MATLAB_OUTPUT.h">
+    <ClInclude Include="..\Read_Write\MATLAB_OUTPUT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Read_Write/ZIP.h">
+    <ClInclude Include="..\Read_Write\ZIP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Read_Write/READ_WRITE_FUNCTIONS.h">
+    <ClInclude Include="..\Read_Write\READ_WRITE_FUNCTIONS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Read_Write/READ_WRITE.h">
+    <ClInclude Include="..\Read_Write\READ_WRITE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Read_Write/GNUPLOT_OUTPUT.h">
+    <ClInclude Include="..\Read_Write\GNUPLOT_OUTPUT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/SCALAR_POLICY.h">
+    <ClInclude Include="..\Vectors\SCALAR_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/STATIC_TENSOR.h">
+    <ClInclude Include="..\Vectors\STATIC_TENSOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/TWIST.h">
+    <ClInclude Include="..\Vectors\TWIST.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/VECTOR_3D.h">
+    <ClInclude Include="..\Vectors\VECTOR_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/Normalize.h">
+    <ClInclude Include="..\Vectors\Normalize.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/VECTOR_FORWARD.h">
+    <ClInclude Include="..\Vectors\VECTOR_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/VECTOR_1D.h">
+    <ClInclude Include="..\Vectors\VECTOR_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/ARITHMETIC_POLICY.h">
+    <ClInclude Include="..\Vectors\ARITHMETIC_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/VECTOR_2D.h">
+    <ClInclude Include="..\Vectors\VECTOR_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/VECTOR_UTILITIES.h">
+    <ClInclude Include="..\Vectors\VECTOR_UTILITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/COMPLEX.h">
+    <ClInclude Include="..\Vectors\COMPLEX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/VECTOR.h">
+    <ClInclude Include="..\Vectors\VECTOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/VECTOR_0D.h">
+    <ClInclude Include="..\Vectors\VECTOR_0D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Vectors/Dot_Product.h">
+    <ClInclude Include="..\Vectors\Dot_Product.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Ordinary_Differential_Equations/DRIVER.h">
+    <ClInclude Include="..\Ordinary_Differential_Equations\DRIVER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Ordinary_Differential_Equations/RUNGEKUTTA.h">
+    <ClInclude Include="..\Ordinary_Differential_Equations\RUNGEKUTTA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Ordinary_Differential_Equations/EXAMPLE.h">
+    <ClInclude Include="..\Ordinary_Differential_Equations\EXAMPLE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Ordinary_Differential_Equations/ODE_SOLVER.h">
+    <ClInclude Include="..\Ordinary_Differential_Equations\ODE_SOLVER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Ordinary_Differential_Equations/EULER_STEP_PARTICLES.h">
+    <ClInclude Include="..\Ordinary_Differential_Equations\EULER_STEP_PARTICLES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Particles_Interpolation/SCATTERED_INTERPOLATION.h">
+    <ClInclude Include="..\Particles_Interpolation\SCATTERED_INTERPOLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_PDE_Linear/PROJECTION.h">
+    <ClInclude Include="..\Grids_PDE_Linear\PROJECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_PDE_Linear/POISSON.h">
+    <ClInclude Include="..\Grids_PDE_Linear\POISSON.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_PDE_Linear/LAPLACE.h">
+    <ClInclude Include="..\Grids_PDE_Linear\LAPLACE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fourier_Transforms/FFT_3D.h">
+    <ClInclude Include="..\Fourier_Transforms\FFT_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fourier_Transforms/FFT_1D.h">
+    <ClInclude Include="..\Fourier_Transforms\FFT_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fourier_Transforms/FFTW.h">
+    <ClInclude Include="..\Fourier_Transforms\FFTW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fourier_Transforms/FFT_POLICY.h">
+    <ClInclude Include="..\Fourier_Transforms\FFT_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fourier_Transforms/FFT_2D.h">
+    <ClInclude Include="..\Fourier_Transforms\FFT_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fourier_Transforms/FFT.h">
+    <ClInclude Include="..\Fourier_Transforms\FFT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/HASHTABLE.h">
+    <ClInclude Include="..\Data_Structures\HASHTABLE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/SPARSE_UNION_FIND.h">
+    <ClInclude Include="..\Data_Structures\SPARSE_UNION_FIND.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/UNION_FIND.h">
+    <ClInclude Include="..\Data_Structures\UNION_FIND.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/OPERATION_HASH.h">
+    <ClInclude Include="..\Data_Structures\OPERATION_HASH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/PAIR.h">
+    <ClInclude Include="..\Data_Structures\PAIR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/KD_TREE.h">
+    <ClInclude Include="..\Data_Structures\KD_TREE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/UNDIRECTED_GRAPH.h">
+    <ClInclude Include="..\Data_Structures\UNDIRECTED_GRAPH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/DIRECTED_GRAPH.h">
+    <ClInclude Include="..\Data_Structures\DIRECTED_GRAPH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/FLOOD_FILL_GRAPH.h">
+    <ClInclude Include="..\Data_Structures\FLOOD_FILL_GRAPH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/GRAPH.h">
+    <ClInclude Include="..\Data_Structures\GRAPH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/RED_BLACK_TREE.h">
+    <ClInclude Include="..\Data_Structures\RED_BLACK_TREE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/TRIPLE.h">
+    <ClInclude Include="..\Data_Structures\TRIPLE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/QUEUE.h">
+    <ClInclude Include="..\Data_Structures\QUEUE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/ELEMENT_ID.h">
+    <ClInclude Include="..\Data_Structures\ELEMENT_ID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/STACK.h">
+    <ClInclude Include="..\Data_Structures\STACK.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/KD_TREE_NODE.h">
+    <ClInclude Include="..\Data_Structures\KD_TREE_NODE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/DATA_STRUCTURES_FORWARD.h">
+    <ClInclude Include="..\Data_Structures\DATA_STRUCTURES_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/HASHTABLE_ITERATOR.h">
+    <ClInclude Include="..\Data_Structures\HASHTABLE_ITERATOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/HASH_REDUCE.h">
+    <ClInclude Include="..\Data_Structures\HASH_REDUCE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/HEAPIFY.h">
+    <ClInclude Include="..\Data_Structures\HEAPIFY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/DYNAMIC_LIST.h">
+    <ClInclude Include="..\Data_Structures\DYNAMIC_LIST.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Data_Structures/FORCE_ELEMENTS.h">
+    <ClInclude Include="..\Data_Structures\FORCE_ELEMENTS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/exchange.h">
+    <ClInclude Include="..\Math_Tools\exchange.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/Robust_Arithmetic.h">
+    <ClInclude Include="..\Math_Tools\Robust_Arithmetic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/sqr.h">
+    <ClInclude Include="..\Math_Tools\sqr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/minabs.h">
+    <ClInclude Include="..\Math_Tools\minabs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/FACTORIAL.h">
+    <ClInclude Include="..\Math_Tools\FACTORIAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/COUNT_BITS.h">
+    <ClInclude Include="..\Math_Tools\COUNT_BITS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/ONE.h">
+    <ClInclude Include="..\Math_Tools\ONE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/maxabs.h">
+    <ClInclude Include="..\Math_Tools\maxabs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/argmax.h">
+    <ClInclude Include="..\Math_Tools\argmax.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/cyclic_shift.h">
+    <ClInclude Include="..\Math_Tools\cyclic_shift.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/argmin.h">
+    <ClInclude Include="..\Math_Tools\argmin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/sign.h">
+    <ClInclude Include="..\Math_Tools\sign.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/max.h">
+    <ClInclude Include="..\Math_Tools\max.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/clamp.h">
+    <ClInclude Include="..\Math_Tools\clamp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/Inverse.h">
+    <ClInclude Include="..\Math_Tools\Inverse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/cube.h">
+    <ClInclude Include="..\Math_Tools\cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/rint.h">
+    <ClInclude Include="..\Math_Tools\rint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/Robust_Functions.h">
+    <ClInclude Include="..\Math_Tools\Robust_Functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/permutation.h">
+    <ClInclude Include="..\Math_Tools\permutation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/RANGE.h">
+    <ClInclude Include="..\Math_Tools\RANGE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/wrap.h">
+    <ClInclude Include="..\Math_Tools\wrap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/Is_NaN.h">
+    <ClInclude Include="..\Math_Tools\Is_NaN.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/constants.h">
+    <ClInclude Include="..\Math_Tools\constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/givens_rotate.h">
+    <ClInclude Include="..\Math_Tools\givens_rotate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/choice.h">
+    <ClInclude Include="..\Math_Tools\choice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/INTERVAL.h">
+    <ClInclude Include="..\Math_Tools\INTERVAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/minmag.h">
+    <ClInclude Include="..\Math_Tools\minmag.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/RANGE_ITERATOR.h">
+    <ClInclude Include="..\Math_Tools\RANGE_ITERATOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/ulp.h">
+    <ClInclude Include="..\Math_Tools\ulp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/Componentwise_Min_Max.h">
+    <ClInclude Include="..\Math_Tools\Componentwise_Min_Max.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/integer_log.h">
+    <ClInclude Include="..\Math_Tools\integer_log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/min.h">
+    <ClInclude Include="..\Math_Tools\min.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/ZERO.h">
+    <ClInclude Include="..\Math_Tools\ZERO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/maxmag.h">
+    <ClInclude Include="..\Math_Tools\maxmag.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/Minmod.h">
+    <ClInclude Include="..\Math_Tools\Minmod.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/exchange_sort.h">
+    <ClInclude Include="..\Math_Tools\exchange_sort.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/cbrt.h">
+    <ClInclude Include="..\Math_Tools\cbrt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Math_Tools/pow.h">
+    <ClInclude Include="..\Math_Tools\pow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tensors/STATIC_TENSOR2.h">
+    <ClInclude Include="..\Tensors\STATIC_TENSOR2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Advection/ADVECTION.h">
+    <ClInclude Include="..\Advection\ADVECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Advection/ADVECTION_FORWARD.h">
+    <ClInclude Include="..\Advection\ADVECTION_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAY_NEGATION.h">
+    <ClInclude Include="..\Arrays\ARRAY_NEGATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/SORT.h">
+    <ClInclude Include="..\Arrays\SORT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/PROJECTED_ARRAY.h">
+    <ClInclude Include="..\Arrays\PROJECTED_ARRAY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAY_SUM.h">
+    <ClInclude Include="..\Arrays\ARRAY_SUM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAY_BASE.h">
+    <ClInclude Include="..\Arrays\ARRAY_BASE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAY.h">
+    <ClInclude Include="..\Arrays\ARRAY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAY_VIEW.h">
+    <ClInclude Include="..\Arrays\ARRAY_VIEW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAYS_FORWARD.h">
+    <ClInclude Include="..\Arrays\ARRAYS_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAY_EXPRESSION.h">
+    <ClInclude Include="..\Arrays\ARRAY_EXPRESSION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ATTRIBUTE_ID.h">
+    <ClInclude Include="..\Arrays\ATTRIBUTE_ID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/INDIRECT_ARRAY.h">
+    <ClInclude Include="..\Arrays\INDIRECT_ARRAY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAY_PRODUCT.h">
+    <ClInclude Include="..\Arrays\ARRAY_PRODUCT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/IDENTITY_ARRAY.h">
+    <ClInclude Include="..\Arrays\IDENTITY_ARRAY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAY_DIFFERENCE.h">
+    <ClInclude Include="..\Arrays\ARRAY_DIFFERENCE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAY_LEFT_MULTIPLE.h">
+    <ClInclude Include="..\Arrays\ARRAY_LEFT_MULTIPLE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAY_QUOTIENT.h">
+    <ClInclude Include="..\Arrays\ARRAY_QUOTIENT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/ARRAY_PLUS_SCALAR.h">
+    <ClInclude Include="..\Arrays\ARRAY_PLUS_SCALAR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Arrays/CONSTANT_ARRAY.h">
+    <ClInclude Include="..\Arrays\CONSTANT_ARRAY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/SYMMETRIC_MATRIX_2X2.h">
+    <ClInclude Include="..\Matrices\SYMMETRIC_MATRIX_2X2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/ROTATION.h">
+    <ClInclude Include="..\Matrices\ROTATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_4X4.h">
+    <ClInclude Include="..\Matrices\MATRIX_4X4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/SYMMETRIC_MATRIX_NXN.h">
+    <ClInclude Include="..\Matrices\SYMMETRIC_MATRIX_NXN.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_1X1.h">
+    <ClInclude Include="..\Matrices\MATRIX_1X1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/QUATERNION.h">
+    <ClInclude Include="..\Matrices\QUATERNION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_3X3.h">
+    <ClInclude Include="..\Matrices\MATRIX_3X3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/FRAME.h">
+    <ClInclude Include="..\Matrices\FRAME.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/SYMMETRIC_MATRIX.h">
+    <ClInclude Include="..\Matrices\SYMMETRIC_MATRIX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h">
+    <ClInclude Include="..\Matrices\UPPER_TRIANGULAR_MATRIX_2X2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/SPARSE_MATRIX_FLAT_MXN.h">
+    <ClInclude Include="..\Matrices\SPARSE_MATRIX_FLAT_MXN.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/SYSTEM_MATRIX_HELPER.h">
+    <ClInclude Include="..\Matrices\SYSTEM_MATRIX_HELPER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/SYMMETRIC_MATRIX_1X1.h">
+    <ClInclude Include="..\Matrices\SYMMETRIC_MATRIX_1X1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_0X0.h">
+    <ClInclude Include="..\Matrices\MATRIX_0X0.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_FORWARD.h">
+    <ClInclude Include="..\Matrices\MATRIX_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_MXN.h">
+    <ClInclude Include="..\Matrices\MATRIX_MXN.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/UPPER_TRIANGULAR_MATRIX_0X0.h">
+    <ClInclude Include="..\Matrices\UPPER_TRIANGULAR_MATRIX_0X0.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_2X2.h">
+    <ClInclude Include="..\Matrices\MATRIX_2X2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/TRANSPOSE_MATRIX.h">
+    <ClInclude Include="..\Matrices\TRANSPOSE_MATRIX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/SYMMETRIC_MATRIX_0X0.h">
+    <ClInclude Include="..\Matrices\SYMMETRIC_MATRIX_0X0.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/DIAGONAL_MATRIX.h">
+    <ClInclude Include="..\Matrices\DIAGONAL_MATRIX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_2X3.h">
+    <ClInclude Include="..\Matrices\MATRIX_2X3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/SPARSE_MATRIX_ROW.h">
+    <ClInclude Include="..\Matrices\SPARSE_MATRIX_ROW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_BASE.h">
+    <ClInclude Include="..\Matrices\MATRIX_BASE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/UPPER_TRIANGULAR_MATRIX_1X1.h">
+    <ClInclude Include="..\Matrices\UPPER_TRIANGULAR_MATRIX_1X1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/BANDED_SYMMETRIC_MATRIX.h">
+    <ClInclude Include="..\Matrices\BANDED_SYMMETRIC_MATRIX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/SYMMETRIC_MATRIX_3X3.h">
+    <ClInclude Include="..\Matrices\SYMMETRIC_MATRIX_3X3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX.h">
+    <ClInclude Include="..\Matrices\MATRIX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_POLICY.h">
+    <ClInclude Include="..\Matrices\MATRIX_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h">
+    <ClInclude Include="..\Matrices\UPPER_TRIANGULAR_MATRIX_3X3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_3X2.h">
+    <ClInclude Include="..\Matrices\MATRIX_3X2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Matrices/MATRIX_ARITHMETIC_POLICY.h">
+    <ClInclude Include="..\Matrices\MATRIX_ARITHMETIC_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_CONSERVATIVE_WENO.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_CONSERVATIVE_WENO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_UNIFORM_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_SEPARABLE_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_CENTRAL.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_CENTRAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_NONCONSERVATIVE_FLUX_FORM_ENO.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_NONCONSERVATIVE_FLUX_FORM_ENO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_MACCORMACK_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_MACCORMACK_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_CONSERVATIVE_ENO.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_CONSERVATIVE_ENO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_POLICY_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_HAMILTON_JACOBI_ENO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_NONCONSERVATIVE_FLUX_FORM_WENO.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_NONCONSERVATIVE_FLUX_FORM_WENO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM_DEFINITION.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_SEMI_LAGRANGIAN_UNIFORM_DEFINITION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_WENO.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_HAMILTON_JACOBI_WENO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM_DEFINITION_BETA.h">
+    <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_SEMI_LAGRANGIAN_UNIFORM_DEFINITION_BETA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/LOCAL_GRID.h">
+    <ClInclude Include="..\Parallel_Computation\LOCAL_GRID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/THREAD_QUEUE.h">
+    <ClInclude Include="..\Parallel_Computation\THREAD_QUEUE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/LAPLACE_MPI.h">
+    <ClInclude Include="..\Parallel_Computation\LAPLACE_MPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/THREADED_ADVECTION_SEMI_LAGRANGIAN_TASK.h">
+    <ClInclude Include="..\Parallel_Computation\THREADED_ADVECTION_SEMI_LAGRANGIAN_TASK.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/INT_ITERATOR_THREADED.h">
+    <ClInclude Include="..\Parallel_Computation\INT_ITERATOR_THREADED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/THREADED_ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h">
+    <ClInclude Include="..\Parallel_Computation\THREADED_ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/THREADED_ADVECTION_SEMI_LAGRANGIAN_UNIFORM_DEFINITION.h">
+    <ClInclude Include="..\Parallel_Computation\THREADED_ADVECTION_SEMI_LAGRANGIAN_UNIFORM_DEFINITION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/THREADED_UNIFORM_GRID.h">
+    <ClInclude Include="..\Parallel_Computation\THREADED_UNIFORM_GRID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/DOMAIN_ITERATOR_THREADED.h">
+    <ClInclude Include="..\Parallel_Computation\DOMAIN_ITERATOR_THREADED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/ITERATOR_TASK.h">
+    <ClInclude Include="..\Parallel_Computation\ITERATOR_TASK.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/LAPLACE_UNIFORM_MPI.h">
+    <ClInclude Include="..\Parallel_Computation\LAPLACE_UNIFORM_MPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/MPI_UTILITIES.h">
+    <ClInclude Include="..\Parallel_Computation\MPI_UTILITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/PCG_SPARSE_MPI.h">
+    <ClInclude Include="..\Parallel_Computation\PCG_SPARSE_MPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/MPI_UNIFORM_GRID.h">
+    <ClInclude Include="..\Parallel_Computation\MPI_UNIFORM_GRID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/BOUNDARY_THREADED.h">
+    <ClInclude Include="..\Parallel_Computation\BOUNDARY_THREADED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/PTHREAD.h">
+    <ClInclude Include="..\Parallel_Computation\PTHREAD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/PCG_SPARSE_THREADED.h">
+    <ClInclude Include="..\Parallel_Computation\PCG_SPARSE_THREADED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/SPARSE_MATRIX_PARTITION.h">
+    <ClInclude Include="..\Parallel_Computation\SPARSE_MATRIX_PARTITION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/FLOOD_FILL_MPI.h">
+    <ClInclude Include="..\Parallel_Computation\FLOOD_FILL_MPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/MPI_GRID.h">
+    <ClInclude Include="..\Parallel_Computation\MPI_GRID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/MPI_WORLD.h">
+    <ClInclude Include="..\Parallel_Computation\MPI_WORLD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/MPI_PACKAGE.h">
+    <ClInclude Include="..\Parallel_Computation\MPI_PACKAGE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/PARTITION_ID.h">
+    <ClInclude Include="..\Parallel_Computation\PARTITION_ID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/THREAD_PACKAGE.h">
+    <ClInclude Include="..\Parallel_Computation\THREAD_PACKAGE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/BOUNDARY_MPI.h">
+    <ClInclude Include="..\Parallel_Computation\BOUNDARY_MPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parallel_Computation/PCG_SPARSE_MPI_THREADED.h">
+    <ClInclude Include="..\Parallel_Computation\PCG_SPARSE_MPI_THREADED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Log/DEBUG_UTILITIES.h">
+    <ClInclude Include="..\Log\DEBUG_UTILITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Log/LOG_SCOPE.h">
+    <ClInclude Include="..\Log\LOG_SCOPE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Log/PROGRESS_INDICATOR.h">
+    <ClInclude Include="..\Log\PROGRESS_INDICATOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Log/LOG_PRINTF.h">
+    <ClInclude Include="..\Log\LOG_PRINTF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Log/DEBUG_PRINT.h">
+    <ClInclude Include="..\Log\DEBUG_PRINT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Log/DEBUG_SUBSTEPS.h">
+    <ClInclude Include="..\Log\DEBUG_SUBSTEPS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Log/LOG.h">
+    <ClInclude Include="..\Log\LOG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Log/LOG_ENTRY.h">
+    <ClInclude Include="..\Log\LOG_ENTRY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parsing/PARSE_ARGS.h">
+    <ClInclude Include="..\Parsing\PARSE_ARGS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parsing/GENERIC_PARSER.h">
+    <ClInclude Include="..\Parsing\GENERIC_PARSER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parsing/PARAMETER_LIST.h">
+    <ClInclude Include="..\Parsing\PARAMETER_LIST.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Parsing/STRING_UTILITIES.h">
+    <ClInclude Include="..\Parsing\STRING_UTILITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Random_Numbers/MT19937.h">
+    <ClInclude Include="..\Random_Numbers\MT19937.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Random_Numbers/PIECEWISE_CONSTANT_PDF.h">
+    <ClInclude Include="..\Random_Numbers\PIECEWISE_CONSTANT_PDF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Random_Numbers/NOISE.h">
+    <ClInclude Include="..\Random_Numbers\NOISE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Random_Numbers/RANDOM_NUMBERS.h">
+    <ClInclude Include="..\Random_Numbers\RANDOM_NUMBERS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Clone/CLONEABLE.h">
+    <ClInclude Include="..\Clone\CLONEABLE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Clone/CLONE_ARRAY.h">
+    <ClInclude Include="..\Clone\CLONE_ARRAY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Symbolics/MULTIVARIATE_POLYNOMIAL.h">
+    <ClInclude Include="..\Symbolics\MULTIVARIATE_POLYNOMIAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Symbolics/INSTRUCTION.h">
+    <ClInclude Include="..\Symbolics\INSTRUCTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Symbolics/CODE_BLOCK.h">
+    <ClInclude Include="..\Symbolics\CODE_BLOCK.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Symbolics/CODE_BLOCK_NODE.h">
+    <ClInclude Include="..\Symbolics\CODE_BLOCK_NODE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Symbolics/PROGRAM_DEFINITIONS.h">
+    <ClInclude Include="..\Symbolics\PROGRAM_DEFINITIONS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Symbolics/DOMINATORS.h">
+    <ClInclude Include="..\Symbolics\DOMINATORS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Symbolics/PROGRAM.h">
+    <ClInclude Include="..\Symbolics\PROGRAM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Symbolics/STATIC_POLYNOMIAL.h">
+    <ClInclude Include="..\Symbolics\STATIC_POLYNOMIAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Symbolics/PROGRAM_CONTEXT.h">
+    <ClInclude Include="..\Symbolics\PROGRAM_CONTEXT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Boundaries/BOUNDARY_MULTIPLE_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Boundaries\BOUNDARY_MULTIPLE_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Boundaries\BOUNDARY_REFLECTION_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h">
+    <ClInclude Include="..\Grids_Uniform_Boundaries\BOUNDARY_MAC_GRID_PERIODIC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Boundaries/BOUNDARY_PERIODIC.h">
+    <ClInclude Include="..\Grids_Uniform_Boundaries\BOUNDARY_PERIODIC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Boundaries/BOUNDARY_EXTRAPOLATE_CELL.h">
+    <ClInclude Include="..\Grids_Uniform_Boundaries\BOUNDARY_EXTRAPOLATE_CELL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_ATTENUATION.h">
+    <ClInclude Include="..\Grids_Uniform_Boundaries\BOUNDARY_REFLECTION_ATTENUATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/PNG_FILE.h">
+    <ClInclude Include="..\Images\PNG_FILE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/RGB_FILE.h">
+    <ClInclude Include="..\Images\RGB_FILE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/RGB_HEADER.h">
+    <ClInclude Include="..\Images\RGB_HEADER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/PPM_FILE.h">
+    <ClInclude Include="..\Images\PPM_FILE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/JPG_FILE.h">
+    <ClInclude Include="..\Images\JPG_FILE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/BMP_HEADER.h">
+    <ClInclude Include="..\Images\BMP_HEADER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/MOV_FILE.h">
+    <ClInclude Include="..\Images\MOV_FILE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/IMAGE.h">
+    <ClInclude Include="..\Images\IMAGE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/BMP_FILE.h">
+    <ClInclude Include="..\Images\BMP_FILE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Boundaries/BOUNDARY.h">
+    <ClInclude Include="..\Boundaries\BOUNDARY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fourier_Transforms_Calculations/TURBULENCE.h">
+    <ClInclude Include="..\Fourier_Transforms_Calculations\TURBULENCE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Polynomials/NEWTON_POLYNOMIAL.h">
+    <ClInclude Include="..\Polynomials\NEWTON_POLYNOMIAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Polynomials/QUADRATIC.h">
+    <ClInclude Include="..\Polynomials\QUADRATIC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Polynomials/LAGRANGE_POLYNOMIAL.h">
+    <ClInclude Include="..\Polynomials\LAGRANGE_POLYNOMIAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Polynomials/CUBIC.h">
+    <ClInclude Include="..\Polynomials\CUBIC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Polynomials/POLYNOMIAL.h">
+    <ClInclude Include="..\Polynomials\POLYNOMIAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Extrapolation/EXTRAPOLATION_HIGHER_ORDER_POLY.h">
+    <ClInclude Include="..\Extrapolation\EXTRAPOLATION_HIGHER_ORDER_POLY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_QUOTIENT.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_QUOTIENT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_OBJECT_BODY.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_OBJECT_BODY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_PRODUCT.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_PRODUCT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/EXACT_FLOAT.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\EXACT_FLOAT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_SUM.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_SUM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_ATOM.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_ATOM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_VECTOR_OPERATION_POLICY.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_VECTOR_OPERATION_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_OP.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_OP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_SIGNED_VOLUME.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_SIGNED_VOLUME.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_OBJECT.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_BASE.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_BASE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_DETERMINANT.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_DETERMINANT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_DIFFERENCE.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_DIFFERENCE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/EXACT_RATIONAL.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\EXACT_RATIONAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/EXACT_ARITHMETIC_POLICY.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\EXACT_ARITHMETIC_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_FORWARD.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_NEGATION.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_NEGATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_WRAPPER_BASE.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_WRAPPER_BASE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/ADAPTIVE_DYNAMIC_BASE.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\ADAPTIVE_DYNAMIC_BASE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Adaptive_Arithmetic/EXPANSION_ARITHMETIC.h">
+    <ClInclude Include="..\Adaptive_Arithmetic\EXPANSION_ARITHMETIC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

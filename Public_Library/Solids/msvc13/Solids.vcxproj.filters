@@ -15,243 +15,243 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="../Collisions/RIGID_DEFORMABLE_COLLISIONS.cpp">
+    <ClCompile Include="..\Collisions\RIGID_DEFORMABLE_COLLISIONS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Collisions/BW_COLLISIONS.cpp">
+    <ClCompile Include="..\Collisions\BW_COLLISIONS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Collisions/RIGIDS_NEWMARK_COLLISION_CALLBACKS.cpp">
+    <ClCompile Include="..\Collisions\RIGIDS_NEWMARK_COLLISION_CALLBACKS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.cpp">
+    <ClCompile Include="..\Forces_And_Torques\EXAMPLE_FORCES_AND_VELOCITIES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Forces_And_Torques/POINTWISE_FORCE.cpp">
+    <ClCompile Include="..\Forces_And_Torques\POINTWISE_FORCE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Forces_And_Torques/WIND_DRAG_3D.cpp">
+    <ClCompile Include="..\Forces_And_Torques\WIND_DRAG_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Forces_And_Torques/ETHER_DRAG.cpp">
+    <ClCompile Include="..\Forces_And_Torques\ETHER_DRAG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Forces_And_Torques/WIND_DRAG.cpp">
+    <ClCompile Include="..\Forces_And_Torques\WIND_DRAG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Forces_And_Torques/ROTATION_SPRINGS.cpp">
+    <ClCompile Include="..\Forces_And_Torques\ROTATION_SPRINGS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Forces_And_Torques/SOLIDS_FORCES.cpp">
+    <ClCompile Include="..\Forces_And_Torques\SOLIDS_FORCES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Forces_And_Torques/GRAVITY.cpp">
+    <ClCompile Include="..\Forces_And_Torques\GRAVITY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fracture/FRACTURE_TETRAHEDRALIZED_VOLUME.cpp">
+    <ClCompile Include="..\Fracture\FRACTURE_TETRAHEDRALIZED_VOLUME.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fracture/HYPOTHETICAL_CUT_TRIANGLES.cpp">
+    <ClCompile Include="..\Fracture\HYPOTHETICAL_CUT_TRIANGLES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fracture/HYPOTHETICAL_CUT_TETRAHEDRONS.cpp">
+    <ClCompile Include="..\Fracture\HYPOTHETICAL_CUT_TETRAHEDRONS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fracture/FRACTURE_OBJECT.cpp">
+    <ClCompile Include="..\Fracture\FRACTURE_OBJECT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fracture/HYPOTHETICAL_CUT.cpp">
+    <ClCompile Include="..\Fracture\HYPOTHETICAL_CUT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fracture/VIRTUAL_NODE_ALGORITHM.cpp">
+    <ClCompile Include="..\Fracture\VIRTUAL_NODE_ALGORITHM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fracture/FRACTURE_TRIANGULATED_OBJECT.cpp">
+    <ClCompile Include="..\Fracture\FRACTURE_TRIANGULATED_OBJECT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Meshing/TETRAHEDRAL_MESHING.cpp">
+    <ClCompile Include="..\Meshing\TETRAHEDRAL_MESHING.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Meshing/RED_GREEN_TRIANGLES.cpp">
+    <ClCompile Include="..\Meshing\RED_GREEN_TRIANGLES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Meshing/RED_GREEN_TETRAHEDRA.cpp">
+    <ClCompile Include="..\Meshing\RED_GREEN_TETRAHEDRA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids_Evolution/GENERALIZED_VELOCITY.cpp">
+    <ClCompile Include="..\Solids_Evolution\GENERALIZED_VELOCITY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids_Evolution/BACKWARD_EULER_SYSTEM.cpp">
+    <ClCompile Include="..\Solids_Evolution\BACKWARD_EULER_SYSTEM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.cpp">
+    <ClCompile Include="..\Solids_Evolution\BACKWARD_EULER_MINIMIZATION_OBJECTIVE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids_Evolution/NEWMARK_EVOLUTION.cpp">
+    <ClCompile Include="..\Solids_Evolution\NEWMARK_EVOLUTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids_Evolution/SOLIDS_EVOLUTION_CALLBACKS.cpp">
+    <ClCompile Include="..\Solids_Evolution\SOLIDS_EVOLUTION_CALLBACKS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids_Evolution/BW_BACKWARD_EULER_SYSTEM.cpp">
+    <ClCompile Include="..\Solids_Evolution\BW_BACKWARD_EULER_SYSTEM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.cpp">
+    <ClCompile Include="..\Solids_Evolution\BACKWARD_EULER_MINIMIZATION_SYSTEM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids_Evolution/QUASISTATIC_EVOLUTION.cpp">
+    <ClCompile Include="..\Solids_Evolution\QUASISTATIC_EVOLUTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids_Evolution/BACKWARD_EULER_EVOLUTION.cpp">
+    <ClCompile Include="..\Solids_Evolution\BACKWARD_EULER_EVOLUTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids_Evolution/SOLIDS_EVOLUTION.cpp">
+    <ClCompile Include="..\Solids_Evolution\SOLIDS_EVOLUTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids/SOLID_BODY_COLLECTION.cpp">
+    <ClCompile Include="..\Solids\SOLID_BODY_COLLECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Solids/SOLIDS_PARAMETERS.cpp">
+    <ClCompile Include="..\Solids\SOLIDS_PARAMETERS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Examples_And_Drivers/SOLIDS_DRIVER.cpp">
+    <ClCompile Include="..\Examples_And_Drivers\SOLIDS_DRIVER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Examples_And_Drivers/SOLIDS_EXAMPLE.cpp">
+    <ClCompile Include="..\Examples_And_Drivers\SOLIDS_EXAMPLE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Standard_Tests/SOLIDS_STANDARD_TESTS.cpp">
+    <ClCompile Include="..\Standard_Tests\SOLIDS_STANDARD_TESTS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
    </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="../Collisions/SOLIDS_COLLISIONS_FORWARD.h">
+    <ClInclude Include="..\Collisions\SOLIDS_COLLISIONS_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Collisions/BW_COLLISIONS.h">
+    <ClInclude Include="..\Collisions\BW_COLLISIONS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Collisions/RIGID_DEFORMABLE_COLLISIONS.h">
+    <ClInclude Include="..\Collisions\RIGID_DEFORMABLE_COLLISIONS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Collisions/RIGIDS_NEWMARK_COLLISION_CALLBACKS.h">
+    <ClInclude Include="..\Collisions\RIGIDS_NEWMARK_COLLISION_CALLBACKS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Forces_And_Torques/GRAVITY.h">
+    <ClInclude Include="..\Forces_And_Torques\GRAVITY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Forces_And_Torques/SOLIDS_FORCES.h">
+    <ClInclude Include="..\Forces_And_Torques\SOLIDS_FORCES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Forces_And_Torques/POINTWISE_FORCE.h">
+    <ClInclude Include="..\Forces_And_Torques\POINTWISE_FORCE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Forces_And_Torques/WIND_DRAG_3D.h">
+    <ClInclude Include="..\Forces_And_Torques\WIND_DRAG_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Forces_And_Torques/ETHER_DRAG.h">
+    <ClInclude Include="..\Forces_And_Torques\ETHER_DRAG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Forces_And_Torques/ROTATION_SPRINGS.h">
+    <ClInclude Include="..\Forces_And_Torques\ROTATION_SPRINGS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h">
+    <ClInclude Include="..\Forces_And_Torques\EXAMPLE_FORCES_AND_VELOCITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Forces_And_Torques/WIND_DRAG.h">
+    <ClInclude Include="..\Forces_And_Torques\WIND_DRAG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fracture/HYPOTHETICAL_CUT.h">
+    <ClInclude Include="..\Fracture\HYPOTHETICAL_CUT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fracture/HYPOTHETICAL_NODE.h">
+    <ClInclude Include="..\Fracture\HYPOTHETICAL_NODE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fracture/FRACTURE_TETRAHEDRALIZED_VOLUME.h">
+    <ClInclude Include="..\Fracture\FRACTURE_TETRAHEDRALIZED_VOLUME.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fracture/VIRTUAL_NODE_ALGORITHM.h">
+    <ClInclude Include="..\Fracture\VIRTUAL_NODE_ALGORITHM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fracture/HYPOTHETICAL_CUT_TRIANGLES.h">
+    <ClInclude Include="..\Fracture\HYPOTHETICAL_CUT_TRIANGLES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fracture/FRACTURE_CALLBACKS.h">
+    <ClInclude Include="..\Fracture\FRACTURE_CALLBACKS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fracture/HYPOTHETICAL_CUT_TETRAHEDRONS.h">
+    <ClInclude Include="..\Fracture\HYPOTHETICAL_CUT_TETRAHEDRONS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fracture/FRACTURE_OBJECT.h">
+    <ClInclude Include="..\Fracture\FRACTURE_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fracture/VIRTUAL_NODES.h">
+    <ClInclude Include="..\Fracture\VIRTUAL_NODES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fracture/VIRTUAL_NODE.h">
+    <ClInclude Include="..\Fracture\VIRTUAL_NODE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fracture/FRACTURE_TRIANGULATED_OBJECT.h">
+    <ClInclude Include="..\Fracture\FRACTURE_TRIANGULATED_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Meshing/TETRAHEDRAL_MESHING.h">
+    <ClInclude Include="..\Meshing\TETRAHEDRAL_MESHING.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Meshing/RED_GREEN_TETRAHEDRA.h">
+    <ClInclude Include="..\Meshing\RED_GREEN_TETRAHEDRA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Meshing/RED_GREEN_TRIANGLES.h">
+    <ClInclude Include="..\Meshing\RED_GREEN_TRIANGLES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Meshing/LEVEL_SET_FORCES_AND_VELOCITIES.h">
+    <ClInclude Include="..\Meshing\LEVEL_SET_FORCES_AND_VELOCITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids_Evolution/GENERALIZED_VELOCITY.h">
+    <ClInclude Include="..\Solids_Evolution\GENERALIZED_VELOCITY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h">
+    <ClInclude Include="..\Solids_Evolution\BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids_Evolution/SOLIDS_EVOLUTION.h">
+    <ClInclude Include="..\Solids_Evolution\SOLIDS_EVOLUTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids_Evolution/QUASISTATIC_EVOLUTION.h">
+    <ClInclude Include="..\Solids_Evolution\QUASISTATIC_EVOLUTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids_Evolution/BACKWARD_EULER_EVOLUTION.h">
+    <ClInclude Include="..\Solids_Evolution\BACKWARD_EULER_EVOLUTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids_Evolution/SOLIDS_EVOLUTION_CALLBACKS.h">
+    <ClInclude Include="..\Solids_Evolution\SOLIDS_EVOLUTION_CALLBACKS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids_Evolution/BW_BACKWARD_EULER_SYSTEM.h">
+    <ClInclude Include="..\Solids_Evolution\BW_BACKWARD_EULER_SYSTEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h">
+    <ClInclude Include="..\Solids_Evolution\BACKWARD_EULER_MINIMIZATION_SYSTEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids_Evolution/NEWMARK_EVOLUTION.h">
+    <ClInclude Include="..\Solids_Evolution\NEWMARK_EVOLUTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids_Evolution/BACKWARD_EULER_SYSTEM.h">
+    <ClInclude Include="..\Solids_Evolution\BACKWARD_EULER_SYSTEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids/SOLID_BODY_COLLECTION.h">
+    <ClInclude Include="..\Solids\SOLID_BODY_COLLECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Solids/SOLIDS_PARAMETERS.h">
+    <ClInclude Include="..\Solids\SOLIDS_PARAMETERS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Muscles/ELLIPSOID_MUSCLE.h">
+    <ClInclude Include="..\Muscles\ELLIPSOID_MUSCLE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Examples_And_Drivers/SOLIDS_EXAMPLE.h">
+    <ClInclude Include="..\Examples_And_Drivers\SOLIDS_EXAMPLE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Examples_And_Drivers/SOLIDS_DRIVER.h">
+    <ClInclude Include="..\Examples_And_Drivers\SOLIDS_DRIVER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Standard_Tests/SOLIDS_STANDARD_TESTS.h">
+    <ClInclude Include="..\Standard_Tests\SOLIDS_STANDARD_TESTS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

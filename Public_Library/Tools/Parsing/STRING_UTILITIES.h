@@ -35,7 +35,7 @@ void Split(const std::string& str,const std::string& separator,ARRAY<std::string
 std::string string_sprintf(const char *format_string,...); // Assumes a max string length of 2048, since Windows doesn't support safety
 
 template<class T> inline bool String_To_Value(const std::string& str,T& value) // requires operator>>
-{std::istringstream string_stream(str);return (string_stream>>value)!=0;}
+{std::istringstream string_stream(str);string_stream>>value;return !string_stream.fail();}
 
 template<> inline bool String_To_Value<std::string>(const std::string& str,std::string& value)
 {value=str;return true;}

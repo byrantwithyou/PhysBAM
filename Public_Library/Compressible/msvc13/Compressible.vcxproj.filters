@@ -15,402 +15,402 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="../Spherical_Euler_Equations/SPHERICAL.cpp">
+    <ClCompile Include="..\Spherical_Euler_Equations\SPHERICAL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Reactive_Euler_Equations/REACTIVE_EULER.cpp">
+    <ClCompile Include="..\Reactive_Euler_Equations\REACTIVE_EULER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Reactive_Euler_Equations/REACTIVE_EULER_2D_EIGENSYSTEM_F.cpp">
+    <ClCompile Include="..\Reactive_Euler_Equations\REACTIVE_EULER_2D_EIGENSYSTEM_F.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Reactive_Euler_Equations/REACTIVE_EULER_1D_EIGENSYSTEM_F.cpp">
+    <ClCompile Include="..\Reactive_Euler_Equations\REACTIVE_EULER_1D_EIGENSYSTEM_F.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Reactive_Euler_Equations/REACTIVE_EULER_2D_EIGENSYSTEM_G.cpp">
+    <ClCompile Include="..\Reactive_Euler_Equations\REACTIVE_EULER_2D_EIGENSYSTEM_G.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Reactive_Euler_Equations/REACTIVE_EULER_2D.cpp">
+    <ClCompile Include="..\Reactive_Euler_Equations\REACTIVE_EULER_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Reactive_Euler_Equations/REACTIVE_EULER_1D.cpp">
+    <ClCompile Include="..\Reactive_Euler_Equations\REACTIVE_EULER_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Shallow_Water_Equations/SHALLOW_WATER_2D.cpp">
+    <ClCompile Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Shallow_Water_Equations/SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G.cpp">
+    <ClCompile Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Shallow_Water_Equations/SHALLOW_WATER_1D.cpp">
+    <ClCompile Include="..\Shallow_Water_Equations\SHALLOW_WATER_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Shallow_Water_Equations/SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F.cpp">
+    <ClCompile Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Shallow_Water_Equations/SHALLOW_WATER_2D_EIGENSYSTEM_F.cpp">
+    <ClCompile Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D_EIGENSYSTEM_F.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Shallow_Water_Equations/SHALLOW_WATER_1D_SPECIALIZED.cpp">
+    <ClCompile Include="..\Shallow_Water_Equations\SHALLOW_WATER_1D_SPECIALIZED.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Shallow_Water_Equations/SHALLOW_WATER_2D_SPECIALIZED.cpp">
+    <ClCompile Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D_SPECIALIZED.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Shallow_Water_Equations/SHALLOW_WATER_2D_EIGENSYSTEM_G.cpp">
+    <ClCompile Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D_EIGENSYSTEM_G.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Shallow_Water_Equations/SHALLOW_WATER_1D_EIGENSYSTEM_F.cpp">
+    <ClCompile Include="..\Shallow_Water_Equations\SHALLOW_WATER_1D_EIGENSYSTEM_F.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Shallow_Water_Equations/SHALLOW_WATER_1D_SPECIALIZED_EIGENSYSTEM_F.cpp">
+    <ClCompile Include="..\Shallow_Water_Equations\SHALLOW_WATER_1D_SPECIALIZED_EIGENSYSTEM_F.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.cpp">
+    <ClCompile Include="..\Boundaries\BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Burgers_Equation/BURGERS_1D.cpp">
+    <ClCompile Include="..\Burgers_Equation\BURGERS_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Burgers_Equation/BURGERS_1D_EIGENSYSTEM_F.cpp">
+    <ClCompile Include="..\Burgers_Equation\BURGERS_1D_EIGENSYSTEM_F.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Lagrange_Equations/ARTIFICIAL_VISCOSITY_WILKINS_1D.cpp">
+    <ClCompile Include="..\Lagrange_Equations\ARTIFICIAL_VISCOSITY_WILKINS_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Lagrange_Equations/LAGRANGE_1D.cpp">
+    <ClCompile Include="..\Lagrange_Equations\LAGRANGE_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Lagrange_Equations/LAGRANGE_2D.cpp">
+    <ClCompile Include="..\Lagrange_Equations\LAGRANGE_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Lagrange_Equations/ARTIFICIAL_VISCOSITY_VNR_1D.cpp">
+    <ClCompile Include="..\Lagrange_Equations\ARTIFICIAL_VISCOSITY_VNR_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Lagrange_Equations/GRID_LAGRANGE_2D.cpp">
+    <ClCompile Include="..\Lagrange_Equations\GRID_LAGRANGE_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Lagrange_Equations/ARTIFICIAL_VISCOSITY_VNR_2D.cpp">
+    <ClCompile Include="..\Lagrange_Equations\ARTIFICIAL_VISCOSITY_VNR_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Lagrange_Equations/GRID_LAGRANGE_1D.cpp">
+    <ClCompile Include="..\Lagrange_Equations\GRID_LAGRANGE_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Lagrange_Equations/ARTIFICIAL_VISCOSITY_WILKINS_2D.cpp">
+    <ClCompile Include="..\Lagrange_Equations\ARTIFICIAL_VISCOSITY_WILKINS_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Conservation_Law_Solvers/CONSERVATION_CENTRAL_ENO.cpp">
+    <ClCompile Include="..\Conservation_Law_Solvers\CONSERVATION_CENTRAL_ENO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Conservation_Law_Solvers/CONSERVATION_ENO_RF.cpp">
+    <ClCompile Include="..\Conservation_Law_Solvers\CONSERVATION_ENO_RF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Conservation_Law_Solvers/CONSERVATION_ENO_LLF.cpp">
+    <ClCompile Include="..\Conservation_Law_Solvers\CONSERVATION_ENO_LLF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Conservation_Law_Solvers/CONSERVATION.cpp">
+    <ClCompile Include="..\Conservation_Law_Solvers\CONSERVATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Conservation_Law_Solvers/BOUNDARY_OBJECT.cpp">
+    <ClCompile Include="..\Conservation_Law_Solvers\BOUNDARY_OBJECT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Conservation_Law_Solvers/HYBRID_SL_ENO_CONSERVATION.cpp">
+    <ClCompile Include="..\Conservation_Law_Solvers\HYBRID_SL_ENO_CONSERVATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Conservation_Law_Solvers/CONSERVATION_ENO_LLF_AND_CENTRAL.cpp">
+    <ClCompile Include="..\Conservation_Law_Solvers\CONSERVATION_ENO_LLF_AND_CENTRAL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Compressible_Fluids/COMPRESSIBLE_AUXILIARY_DATA.cpp">
+    <ClCompile Include="..\Compressible_Fluids\COMPRESSIBLE_AUXILIARY_DATA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Compressible_Fluids/COMPRESSIBLE_FLUID_COLLECTION.cpp">
+    <ClCompile Include="..\Compressible_Fluids\COMPRESSIBLE_FLUID_COLLECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Euler_Equations/EULER_PROJECTION_UNIFORM.cpp">
+    <ClCompile Include="..\Euler_Equations\EULER_PROJECTION_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Euler_Equations/BOUNDARY_OBJECT_EULER.cpp">
+    <ClCompile Include="..\Euler_Equations\BOUNDARY_OBJECT_EULER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Euler_Equations/EULER_3D_EIGENSYSTEM_G.cpp">
+    <ClCompile Include="..\Euler_Equations\EULER_3D_EIGENSYSTEM_G.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Euler_Equations/EULER_CAVITATION_UNIFORM.cpp">
+    <ClCompile Include="..\Euler_Equations\EULER_CAVITATION_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Euler_Equations/EULER_3D_EIGENSYSTEM_H.cpp">
+    <ClCompile Include="..\Euler_Equations\EULER_3D_EIGENSYSTEM_H.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Euler_Equations/CYLINDRICAL.cpp">
+    <ClCompile Include="..\Euler_Equations\CYLINDRICAL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Euler_Equations/BOUNDARY_OBJECT_SOLID_VELOCITY.cpp">
+    <ClCompile Include="..\Euler_Equations\BOUNDARY_OBJECT_SOLID_VELOCITY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Euler_Equations/EULER_3D_EIGENSYSTEM_F.cpp">
+    <ClCompile Include="..\Euler_Equations\EULER_3D_EIGENSYSTEM_F.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Euler_Equations/EULER_UNIFORM.cpp">
+    <ClCompile Include="..\Euler_Equations\EULER_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Euler_Equations/EULER.cpp">
+    <ClCompile Include="..\Euler_Equations\EULER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Euler_Equations/EULER_3D.cpp">
+    <ClCompile Include="..\Euler_Equations\EULER_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
    </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="../Spherical_Euler_Equations/SPHERICAL.h">
+    <ClInclude Include="..\Spherical_Euler_Equations\SPHERICAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Equations_Of_State/EOS_TAIT.h">
+    <ClInclude Include="..\Equations_Of_State\EOS_TAIT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Equations_Of_State/EOS_JWL.h">
+    <ClInclude Include="..\Equations_Of_State\EOS_JWL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Equations_Of_State/EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE.h">
+    <ClInclude Include="..\Equations_Of_State\EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Equations_Of_State/REACTIVE_EOS.h">
+    <ClInclude Include="..\Equations_Of_State\REACTIVE_EOS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Equations_Of_State/EOS_CLAMPED_INTERNAL_ENERGY.h">
+    <ClInclude Include="..\Equations_Of_State\EOS_CLAMPED_INTERNAL_ENERGY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Equations_Of_State/EOS_MG.h">
+    <ClInclude Include="..\Equations_Of_State\EOS_MG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Equations_Of_State/EOS.h">
+    <ClInclude Include="..\Equations_Of_State\EOS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Equations_Of_State/REACTIVE_EOS_GAMMA.h">
+    <ClInclude Include="..\Equations_Of_State\REACTIVE_EOS_GAMMA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Equations_Of_State/EOS_GAMMA.h">
+    <ClInclude Include="..\Equations_Of_State\EOS_GAMMA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Reactive_Euler_Equations/REACTIVE_EULER_2D_EIGENSYSTEM_F.h">
+    <ClInclude Include="..\Reactive_Euler_Equations\REACTIVE_EULER_2D_EIGENSYSTEM_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Reactive_Euler_Equations/REACTIVE_EULER.h">
+    <ClInclude Include="..\Reactive_Euler_Equations\REACTIVE_EULER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Reactive_Euler_Equations/REACTIVE_EULER_2D_EIGENSYSTEM_G.h">
+    <ClInclude Include="..\Reactive_Euler_Equations\REACTIVE_EULER_2D_EIGENSYSTEM_G.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Reactive_Euler_Equations/REACTIVE_EULER_1D_EIGENSYSTEM_F.h">
+    <ClInclude Include="..\Reactive_Euler_Equations\REACTIVE_EULER_1D_EIGENSYSTEM_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Reactive_Euler_Equations/REACTIVE_EULER_2D.h">
+    <ClInclude Include="..\Reactive_Euler_Equations\REACTIVE_EULER_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Reactive_Euler_Equations/REACTIVE_EULER_1D.h">
+    <ClInclude Include="..\Reactive_Euler_Equations\REACTIVE_EULER_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Shallow_Water_Equations/SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F.h">
+    <ClInclude Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Shallow_Water_Equations/SHALLOW_WATER.h">
+    <ClInclude Include="..\Shallow_Water_Equations\SHALLOW_WATER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Shallow_Water_Equations/SHALLOW_WATER_1D_EIGENSYSTEM_F.h">
+    <ClInclude Include="..\Shallow_Water_Equations\SHALLOW_WATER_1D_EIGENSYSTEM_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Shallow_Water_Equations/SHALLOW_WATER_1D.h">
+    <ClInclude Include="..\Shallow_Water_Equations\SHALLOW_WATER_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Shallow_Water_Equations/SHALLOW_WATER_2D.h">
+    <ClInclude Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Shallow_Water_Equations/SHALLOW_WATER_1D_SPECIALIZED.h">
+    <ClInclude Include="..\Shallow_Water_Equations\SHALLOW_WATER_1D_SPECIALIZED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Shallow_Water_Equations/SHALLOW_WATER_1D_SPECIALIZED_EIGENSYSTEM_F.h">
+    <ClInclude Include="..\Shallow_Water_Equations\SHALLOW_WATER_1D_SPECIALIZED_EIGENSYSTEM_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Shallow_Water_Equations/SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G.h">
+    <ClInclude Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Shallow_Water_Equations/SHALLOW_WATER_2D_SPECIALIZED.h">
+    <ClInclude Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D_SPECIALIZED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Shallow_Water_Equations/SHALLOW_WATER_2D_EIGENSYSTEM_G.h">
+    <ClInclude Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D_EIGENSYSTEM_G.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Shallow_Water_Equations/SHALLOW_WATER_2D_EIGENSYSTEM_F.h">
+    <ClInclude Include="..\Shallow_Water_Equations\SHALLOW_WATER_2D_EIGENSYSTEM_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Boundaries/BOUNDARY_EULER_EQUATIONS_CYLINDRICAL.h">
+    <ClInclude Include="..\Boundaries\BOUNDARY_EULER_EQUATIONS_CYLINDRICAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.h">
+    <ClInclude Include="..\Boundaries\BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Boundaries/BOUNDARY_EULER_EQUATIONS_SPHERICAL.h">
+    <ClInclude Include="..\Boundaries\BOUNDARY_EULER_EQUATIONS_SPHERICAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC.h">
+    <ClInclude Include="..\Boundaries\BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Burgers_Equation/BURGERS_1D.h">
+    <ClInclude Include="..\Burgers_Equation\BURGERS_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Burgers_Equation/BURGERS_1D_EIGENSYSTEM_F.h">
+    <ClInclude Include="..\Burgers_Equation\BURGERS_1D_EIGENSYSTEM_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/LAGRANGE.h">
+    <ClInclude Include="..\Lagrange_Equations\LAGRANGE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/LAGRANGE_2D.h">
+    <ClInclude Include="..\Lagrange_Equations\LAGRANGE_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/ARTIFICIAL_VISCOSITY_VNR_2D.h">
+    <ClInclude Include="..\Lagrange_Equations\ARTIFICIAL_VISCOSITY_VNR_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/ARTIFICIAL_VISCOSITY_1D.h">
+    <ClInclude Include="..\Lagrange_Equations\ARTIFICIAL_VISCOSITY_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/ARTIFICIAL_VISCOSITY_2D.h">
+    <ClInclude Include="..\Lagrange_Equations\ARTIFICIAL_VISCOSITY_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/ARTIFICIAL_VISCOSITY_WILKINS_1D.h">
+    <ClInclude Include="..\Lagrange_Equations\ARTIFICIAL_VISCOSITY_WILKINS_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/ARTIFICIAL_VISCOSITY_VNR_1D.h">
+    <ClInclude Include="..\Lagrange_Equations\ARTIFICIAL_VISCOSITY_VNR_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/GRID_LAGRANGE.h">
+    <ClInclude Include="..\Lagrange_Equations\GRID_LAGRANGE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/GRID_LAGRANGE_1D.h">
+    <ClInclude Include="..\Lagrange_Equations\GRID_LAGRANGE_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/ARTIFICIAL_VISCOSITY_WILKINS_2D.h">
+    <ClInclude Include="..\Lagrange_Equations\ARTIFICIAL_VISCOSITY_WILKINS_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/LAGRANGE_1D.h">
+    <ClInclude Include="..\Lagrange_Equations\LAGRANGE_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/ARTIFICIAL_VISCOSITY.h">
+    <ClInclude Include="..\Lagrange_Equations\ARTIFICIAL_VISCOSITY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Lagrange_Equations/GRID_LAGRANGE_2D.h">
+    <ClInclude Include="..\Lagrange_Equations\GRID_LAGRANGE_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Conservation_Law_Solvers/EIGENSYSTEM.h">
+    <ClInclude Include="..\Conservation_Law_Solvers\EIGENSYSTEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Conservation_Law_Solvers/CONSERVATION_ENO_RF.h">
+    <ClInclude Include="..\Conservation_Law_Solvers\CONSERVATION_ENO_RF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Conservation_Law_Solvers/CONSERVATION_ENO_LLF_AND_CENTRAL.h">
+    <ClInclude Include="..\Conservation_Law_Solvers\CONSERVATION_ENO_LLF_AND_CENTRAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Conservation_Law_Solvers/CONSERVATION_CENTRAL_ENO.h">
+    <ClInclude Include="..\Conservation_Law_Solvers\CONSERVATION_CENTRAL_ENO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Conservation_Law_Solvers/CONSERVATION_CALLBACKS.h">
+    <ClInclude Include="..\Conservation_Law_Solvers\CONSERVATION_CALLBACKS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Conservation_Law_Solvers/HYBRID_SL_ENO_CONSERVATION.h">
+    <ClInclude Include="..\Conservation_Law_Solvers\HYBRID_SL_ENO_CONSERVATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h">
+    <ClInclude Include="..\Conservation_Law_Solvers\CONSERVATION_ENO_LLF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Conservation_Law_Solvers/CONSERVATION.h">
+    <ClInclude Include="..\Conservation_Law_Solvers\CONSERVATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Conservation_Law_Solvers/BOUNDARY_OBJECT.h">
+    <ClInclude Include="..\Conservation_Law_Solvers\BOUNDARY_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Compressible_Fluids/COMPRESSIBLE_FLUID_COLLECTION.h">
+    <ClInclude Include="..\Compressible_Fluids\COMPRESSIBLE_FLUID_COLLECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Compressible_Fluids/COMPRESSIBLE_AUXILIARY_DATA.h">
+    <ClInclude Include="..\Compressible_Fluids\COMPRESSIBLE_AUXILIARY_DATA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/CYLINDRICAL.h">
+    <ClInclude Include="..\Euler_Equations\CYLINDRICAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_CAVITATION_UNIFORM.h">
+    <ClInclude Include="..\Euler_Equations\EULER_CAVITATION_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/BOUNDARY_OBJECT_SOLID_VELOCITY.h">
+    <ClInclude Include="..\Euler_Equations\BOUNDARY_OBJECT_SOLID_VELOCITY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_UNIFORM.h">
+    <ClInclude Include="..\Euler_Equations\EULER_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_3D.h">
+    <ClInclude Include="..\Euler_Equations\EULER_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_2D_EIGENSYSTEM_F.h">
+    <ClInclude Include="..\Euler_Equations\EULER_2D_EIGENSYSTEM_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_1D.h">
+    <ClInclude Include="..\Euler_Equations\EULER_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_PROJECTION_UNIFORM.h">
+    <ClInclude Include="..\Euler_Equations\EULER_PROJECTION_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_2D_EIGENSYSTEM_G.h">
+    <ClInclude Include="..\Euler_Equations\EULER_2D_EIGENSYSTEM_G.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_LAPLACE.h">
+    <ClInclude Include="..\Euler_Equations\EULER_LAPLACE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_2D.h">
+    <ClInclude Include="..\Euler_Equations\EULER_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_3D_EIGENSYSTEM_H_ADVECTION_ONLY.h">
+    <ClInclude Include="..\Euler_Equations\EULER_3D_EIGENSYSTEM_H_ADVECTION_ONLY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_PROJECTION.h">
+    <ClInclude Include="..\Euler_Equations\EULER_PROJECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY.h">
+    <ClInclude Include="..\Euler_Equations\EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_3D_EIGENSYSTEM_F_ADVECTION_ONLY.h">
+    <ClInclude Include="..\Euler_Equations\EULER_3D_EIGENSYSTEM_F_ADVECTION_ONLY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_3D_EIGENSYSTEM_H.h">
+    <ClInclude Include="..\Euler_Equations\EULER_3D_EIGENSYSTEM_H.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY.h">
+    <ClInclude Include="..\Euler_Equations\EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/BOUNDARY_OBJECT_EULER.h">
+    <ClInclude Include="..\Euler_Equations\BOUNDARY_OBJECT_EULER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_2D_EIGENSYSTEM_G_ADVECTION_ONLY.h">
+    <ClInclude Include="..\Euler_Equations\EULER_2D_EIGENSYSTEM_G_ADVECTION_ONLY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_3D_EIGENSYSTEM_F.h">
+    <ClInclude Include="..\Euler_Equations\EULER_3D_EIGENSYSTEM_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER.h">
+    <ClInclude Include="..\Euler_Equations\EULER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS.h">
+    <ClInclude Include="..\Euler_Equations\INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_1D_EIGENSYSTEM_F.h">
+    <ClInclude Include="..\Euler_Equations\EULER_1D_EIGENSYSTEM_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/BOUNDARY_OBJECT_REFLECTION.h">
+    <ClInclude Include="..\Euler_Equations\BOUNDARY_OBJECT_REFLECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_EIGENSYSTEM.h">
+    <ClInclude Include="..\Euler_Equations\EULER_EIGENSYSTEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_3D_EIGENSYSTEM_G.h">
+    <ClInclude Include="..\Euler_Equations\EULER_3D_EIGENSYSTEM_G.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Euler_Equations/EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY.h">
+    <ClInclude Include="..\Euler_Equations\EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

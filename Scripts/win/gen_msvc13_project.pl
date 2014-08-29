@@ -10,7 +10,7 @@ my $name = $ARGV[$argi++];
 my $lib = $ARGV[$argi++];
 
 use Digest::MD5 qw(md5_hex);
-my $gid = md5_hex("$dir/msvc13/$name");
+my $gid = md5_hex("$dir\\msvc13\\$name");
 $gid=uc($gid);
 $gid=~s/(.{8})(.{4})(.{4})(.{4})(.{12})/$1-$2-$3-$4-$5/;
 
@@ -93,7 +93,7 @@ sub flush_accum
             /(\S+) (\S+)/ or die "failed to parse project info: $_";
             my $proj_name = $1;
             my $proj_dir = $2;
-            my $proj_gid = md5_hex("$proj_dir/msvc13/$proj_name");
+            my $proj_gid = md5_hex("$proj_dir\\msvc13\\$proj_name");
             $proj_gid=uc($proj_gid);
             $proj_gid=~s/(.{8})(.{4})(.{4})(.{4})(.{12})/$1-$2-$3-$4-$5/;
             my $a = $accum;

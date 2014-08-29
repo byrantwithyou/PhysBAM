@@ -55,7 +55,7 @@
 @f2@      <AdditionalIncludeDirectories>#1</AdditionalIncludeDirectories>
 @l1@      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
 @l0@      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
-      <DisableSpecificWarnings>4258;4244;4305</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4258;4244;4305;4800</DisableSpecificWarnings>
     </ClCompile>
     <Link>
 @l0@      <SubSystem>Console</SubSystem>
@@ -81,10 +81,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-@f0@    <ClCompile Include="../#1" />
+@f0@    <ClCompile Include="..\#1" />
   </ItemGroup>
   <ItemGroup>
-@f1@    <ClInclude Include="../#1" />
+@f1@    <ClInclude Include="..\#1" />
   </ItemGroup>
   <ItemGroup>
 @f4@    <Library Include="#1" />

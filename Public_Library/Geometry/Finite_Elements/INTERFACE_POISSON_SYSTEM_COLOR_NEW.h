@@ -97,8 +97,6 @@ public:
     bool print_rhs;
     bool eliminate_nullspace;
 
-    static int solve_id;
-
     CELL_MANAGER_COLOR<TV> *cm_u;
     CELL_DOMAIN_INTERFACE_COLOR<TV> *cdi;
 

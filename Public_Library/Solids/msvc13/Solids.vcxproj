@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8C254EA6-5D16-B5F4-5CEF-487B8CA953B8}</ProjectGuid>
+    <ProjectGuid>{1A20737B-2073-33F9-A793-77E3A3F1FDBD}</ProjectGuid>
     <RootNamespace>Solids</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -45,7 +45,7 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>D:\ucla\PhysBAM\Public_Library;%(AdditionalIncludeDirectories);C:\local\boost_1_56_0;D:\ucla\Summer 2014\downloads\zlib128-dll\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
-      <DisableSpecificWarnings>4258;4244;4305</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4258;4244;4305;4800</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -68,87 +68,87 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="../Collisions/RIGID_DEFORMABLE_COLLISIONS.cpp" />
-    <ClCompile Include="../Collisions/BW_COLLISIONS.cpp" />
-    <ClCompile Include="../Collisions/RIGIDS_NEWMARK_COLLISION_CALLBACKS.cpp" />
-    <ClCompile Include="../Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.cpp" />
-    <ClCompile Include="../Forces_And_Torques/POINTWISE_FORCE.cpp" />
-    <ClCompile Include="../Forces_And_Torques/WIND_DRAG_3D.cpp" />
-    <ClCompile Include="../Forces_And_Torques/ETHER_DRAG.cpp" />
-    <ClCompile Include="../Forces_And_Torques/WIND_DRAG.cpp" />
-    <ClCompile Include="../Forces_And_Torques/ROTATION_SPRINGS.cpp" />
-    <ClCompile Include="../Forces_And_Torques/SOLIDS_FORCES.cpp" />
-    <ClCompile Include="../Forces_And_Torques/GRAVITY.cpp" />
-    <ClCompile Include="../Fracture/FRACTURE_TETRAHEDRALIZED_VOLUME.cpp" />
-    <ClCompile Include="../Fracture/HYPOTHETICAL_CUT_TRIANGLES.cpp" />
-    <ClCompile Include="../Fracture/HYPOTHETICAL_CUT_TETRAHEDRONS.cpp" />
-    <ClCompile Include="../Fracture/FRACTURE_OBJECT.cpp" />
-    <ClCompile Include="../Fracture/HYPOTHETICAL_CUT.cpp" />
-    <ClCompile Include="../Fracture/VIRTUAL_NODE_ALGORITHM.cpp" />
-    <ClCompile Include="../Fracture/FRACTURE_TRIANGULATED_OBJECT.cpp" />
-    <ClCompile Include="../Meshing/TETRAHEDRAL_MESHING.cpp" />
-    <ClCompile Include="../Meshing/RED_GREEN_TRIANGLES.cpp" />
-    <ClCompile Include="../Meshing/RED_GREEN_TETRAHEDRA.cpp" />
-    <ClCompile Include="../Solids_Evolution/GENERALIZED_VELOCITY.cpp" />
-    <ClCompile Include="../Solids_Evolution/BACKWARD_EULER_SYSTEM.cpp" />
-    <ClCompile Include="../Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.cpp" />
-    <ClCompile Include="../Solids_Evolution/NEWMARK_EVOLUTION.cpp" />
-    <ClCompile Include="../Solids_Evolution/SOLIDS_EVOLUTION_CALLBACKS.cpp" />
-    <ClCompile Include="../Solids_Evolution/BW_BACKWARD_EULER_SYSTEM.cpp" />
-    <ClCompile Include="../Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.cpp" />
-    <ClCompile Include="../Solids_Evolution/QUASISTATIC_EVOLUTION.cpp" />
-    <ClCompile Include="../Solids_Evolution/BACKWARD_EULER_EVOLUTION.cpp" />
-    <ClCompile Include="../Solids_Evolution/SOLIDS_EVOLUTION.cpp" />
-    <ClCompile Include="../Solids/SOLID_BODY_COLLECTION.cpp" />
-    <ClCompile Include="../Solids/SOLIDS_PARAMETERS.cpp" />
-    <ClCompile Include="../Examples_And_Drivers/SOLIDS_DRIVER.cpp" />
-    <ClCompile Include="../Examples_And_Drivers/SOLIDS_EXAMPLE.cpp" />
-    <ClCompile Include="../Standard_Tests/SOLIDS_STANDARD_TESTS.cpp" />
+    <ClCompile Include="..\Collisions\RIGID_DEFORMABLE_COLLISIONS.cpp" />
+    <ClCompile Include="..\Collisions\BW_COLLISIONS.cpp" />
+    <ClCompile Include="..\Collisions\RIGIDS_NEWMARK_COLLISION_CALLBACKS.cpp" />
+    <ClCompile Include="..\Forces_And_Torques\EXAMPLE_FORCES_AND_VELOCITIES.cpp" />
+    <ClCompile Include="..\Forces_And_Torques\POINTWISE_FORCE.cpp" />
+    <ClCompile Include="..\Forces_And_Torques\WIND_DRAG_3D.cpp" />
+    <ClCompile Include="..\Forces_And_Torques\ETHER_DRAG.cpp" />
+    <ClCompile Include="..\Forces_And_Torques\WIND_DRAG.cpp" />
+    <ClCompile Include="..\Forces_And_Torques\ROTATION_SPRINGS.cpp" />
+    <ClCompile Include="..\Forces_And_Torques\SOLIDS_FORCES.cpp" />
+    <ClCompile Include="..\Forces_And_Torques\GRAVITY.cpp" />
+    <ClCompile Include="..\Fracture\FRACTURE_TETRAHEDRALIZED_VOLUME.cpp" />
+    <ClCompile Include="..\Fracture\HYPOTHETICAL_CUT_TRIANGLES.cpp" />
+    <ClCompile Include="..\Fracture\HYPOTHETICAL_CUT_TETRAHEDRONS.cpp" />
+    <ClCompile Include="..\Fracture\FRACTURE_OBJECT.cpp" />
+    <ClCompile Include="..\Fracture\HYPOTHETICAL_CUT.cpp" />
+    <ClCompile Include="..\Fracture\VIRTUAL_NODE_ALGORITHM.cpp" />
+    <ClCompile Include="..\Fracture\FRACTURE_TRIANGULATED_OBJECT.cpp" />
+    <ClCompile Include="..\Meshing\TETRAHEDRAL_MESHING.cpp" />
+    <ClCompile Include="..\Meshing\RED_GREEN_TRIANGLES.cpp" />
+    <ClCompile Include="..\Meshing\RED_GREEN_TETRAHEDRA.cpp" />
+    <ClCompile Include="..\Solids_Evolution\GENERALIZED_VELOCITY.cpp" />
+    <ClCompile Include="..\Solids_Evolution\BACKWARD_EULER_SYSTEM.cpp" />
+    <ClCompile Include="..\Solids_Evolution\BACKWARD_EULER_MINIMIZATION_OBJECTIVE.cpp" />
+    <ClCompile Include="..\Solids_Evolution\NEWMARK_EVOLUTION.cpp" />
+    <ClCompile Include="..\Solids_Evolution\SOLIDS_EVOLUTION_CALLBACKS.cpp" />
+    <ClCompile Include="..\Solids_Evolution\BW_BACKWARD_EULER_SYSTEM.cpp" />
+    <ClCompile Include="..\Solids_Evolution\BACKWARD_EULER_MINIMIZATION_SYSTEM.cpp" />
+    <ClCompile Include="..\Solids_Evolution\QUASISTATIC_EVOLUTION.cpp" />
+    <ClCompile Include="..\Solids_Evolution\BACKWARD_EULER_EVOLUTION.cpp" />
+    <ClCompile Include="..\Solids_Evolution\SOLIDS_EVOLUTION.cpp" />
+    <ClCompile Include="..\Solids\SOLID_BODY_COLLECTION.cpp" />
+    <ClCompile Include="..\Solids\SOLIDS_PARAMETERS.cpp" />
+    <ClCompile Include="..\Examples_And_Drivers\SOLIDS_DRIVER.cpp" />
+    <ClCompile Include="..\Examples_And_Drivers\SOLIDS_EXAMPLE.cpp" />
+    <ClCompile Include="..\Standard_Tests\SOLIDS_STANDARD_TESTS.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="../Collisions/SOLIDS_COLLISIONS_FORWARD.h" />
-    <ClInclude Include="../Collisions/BW_COLLISIONS.h" />
-    <ClInclude Include="../Collisions/RIGID_DEFORMABLE_COLLISIONS.h" />
-    <ClInclude Include="../Collisions/RIGIDS_NEWMARK_COLLISION_CALLBACKS.h" />
-    <ClInclude Include="../Forces_And_Torques/GRAVITY.h" />
-    <ClInclude Include="../Forces_And_Torques/SOLIDS_FORCES.h" />
-    <ClInclude Include="../Forces_And_Torques/POINTWISE_FORCE.h" />
-    <ClInclude Include="../Forces_And_Torques/WIND_DRAG_3D.h" />
-    <ClInclude Include="../Forces_And_Torques/ETHER_DRAG.h" />
-    <ClInclude Include="../Forces_And_Torques/ROTATION_SPRINGS.h" />
-    <ClInclude Include="../Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h" />
-    <ClInclude Include="../Forces_And_Torques/WIND_DRAG.h" />
-    <ClInclude Include="../Fracture/HYPOTHETICAL_CUT.h" />
-    <ClInclude Include="../Fracture/HYPOTHETICAL_NODE.h" />
-    <ClInclude Include="../Fracture/FRACTURE_TETRAHEDRALIZED_VOLUME.h" />
-    <ClInclude Include="../Fracture/VIRTUAL_NODE_ALGORITHM.h" />
-    <ClInclude Include="../Fracture/HYPOTHETICAL_CUT_TRIANGLES.h" />
-    <ClInclude Include="../Fracture/FRACTURE_CALLBACKS.h" />
-    <ClInclude Include="../Fracture/HYPOTHETICAL_CUT_TETRAHEDRONS.h" />
-    <ClInclude Include="../Fracture/FRACTURE_OBJECT.h" />
-    <ClInclude Include="../Fracture/VIRTUAL_NODES.h" />
-    <ClInclude Include="../Fracture/VIRTUAL_NODE.h" />
-    <ClInclude Include="../Fracture/FRACTURE_TRIANGULATED_OBJECT.h" />
-    <ClInclude Include="../Meshing/TETRAHEDRAL_MESHING.h" />
-    <ClInclude Include="../Meshing/RED_GREEN_TETRAHEDRA.h" />
-    <ClInclude Include="../Meshing/RED_GREEN_TRIANGLES.h" />
-    <ClInclude Include="../Meshing/LEVEL_SET_FORCES_AND_VELOCITIES.h" />
-    <ClInclude Include="../Solids_Evolution/GENERALIZED_VELOCITY.h" />
-    <ClInclude Include="../Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h" />
-    <ClInclude Include="../Solids_Evolution/SOLIDS_EVOLUTION.h" />
-    <ClInclude Include="../Solids_Evolution/QUASISTATIC_EVOLUTION.h" />
-    <ClInclude Include="../Solids_Evolution/BACKWARD_EULER_EVOLUTION.h" />
-    <ClInclude Include="../Solids_Evolution/SOLIDS_EVOLUTION_CALLBACKS.h" />
-    <ClInclude Include="../Solids_Evolution/BW_BACKWARD_EULER_SYSTEM.h" />
-    <ClInclude Include="../Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h" />
-    <ClInclude Include="../Solids_Evolution/NEWMARK_EVOLUTION.h" />
-    <ClInclude Include="../Solids_Evolution/BACKWARD_EULER_SYSTEM.h" />
-    <ClInclude Include="../Solids/SOLID_BODY_COLLECTION.h" />
-    <ClInclude Include="../Solids/SOLIDS_PARAMETERS.h" />
-    <ClInclude Include="../Muscles/ELLIPSOID_MUSCLE.h" />
-    <ClInclude Include="../Examples_And_Drivers/SOLIDS_EXAMPLE.h" />
-    <ClInclude Include="../Examples_And_Drivers/SOLIDS_DRIVER.h" />
-    <ClInclude Include="../Standard_Tests/SOLIDS_STANDARD_TESTS.h" />
+    <ClInclude Include="..\Collisions\SOLIDS_COLLISIONS_FORWARD.h" />
+    <ClInclude Include="..\Collisions\BW_COLLISIONS.h" />
+    <ClInclude Include="..\Collisions\RIGID_DEFORMABLE_COLLISIONS.h" />
+    <ClInclude Include="..\Collisions\RIGIDS_NEWMARK_COLLISION_CALLBACKS.h" />
+    <ClInclude Include="..\Forces_And_Torques\GRAVITY.h" />
+    <ClInclude Include="..\Forces_And_Torques\SOLIDS_FORCES.h" />
+    <ClInclude Include="..\Forces_And_Torques\POINTWISE_FORCE.h" />
+    <ClInclude Include="..\Forces_And_Torques\WIND_DRAG_3D.h" />
+    <ClInclude Include="..\Forces_And_Torques\ETHER_DRAG.h" />
+    <ClInclude Include="..\Forces_And_Torques\ROTATION_SPRINGS.h" />
+    <ClInclude Include="..\Forces_And_Torques\EXAMPLE_FORCES_AND_VELOCITIES.h" />
+    <ClInclude Include="..\Forces_And_Torques\WIND_DRAG.h" />
+    <ClInclude Include="..\Fracture\HYPOTHETICAL_CUT.h" />
+    <ClInclude Include="..\Fracture\HYPOTHETICAL_NODE.h" />
+    <ClInclude Include="..\Fracture\FRACTURE_TETRAHEDRALIZED_VOLUME.h" />
+    <ClInclude Include="..\Fracture\VIRTUAL_NODE_ALGORITHM.h" />
+    <ClInclude Include="..\Fracture\HYPOTHETICAL_CUT_TRIANGLES.h" />
+    <ClInclude Include="..\Fracture\FRACTURE_CALLBACKS.h" />
+    <ClInclude Include="..\Fracture\HYPOTHETICAL_CUT_TETRAHEDRONS.h" />
+    <ClInclude Include="..\Fracture\FRACTURE_OBJECT.h" />
+    <ClInclude Include="..\Fracture\VIRTUAL_NODES.h" />
+    <ClInclude Include="..\Fracture\VIRTUAL_NODE.h" />
+    <ClInclude Include="..\Fracture\FRACTURE_TRIANGULATED_OBJECT.h" />
+    <ClInclude Include="..\Meshing\TETRAHEDRAL_MESHING.h" />
+    <ClInclude Include="..\Meshing\RED_GREEN_TETRAHEDRA.h" />
+    <ClInclude Include="..\Meshing\RED_GREEN_TRIANGLES.h" />
+    <ClInclude Include="..\Meshing\LEVEL_SET_FORCES_AND_VELOCITIES.h" />
+    <ClInclude Include="..\Solids_Evolution\GENERALIZED_VELOCITY.h" />
+    <ClInclude Include="..\Solids_Evolution\BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h" />
+    <ClInclude Include="..\Solids_Evolution\SOLIDS_EVOLUTION.h" />
+    <ClInclude Include="..\Solids_Evolution\QUASISTATIC_EVOLUTION.h" />
+    <ClInclude Include="..\Solids_Evolution\BACKWARD_EULER_EVOLUTION.h" />
+    <ClInclude Include="..\Solids_Evolution\SOLIDS_EVOLUTION_CALLBACKS.h" />
+    <ClInclude Include="..\Solids_Evolution\BW_BACKWARD_EULER_SYSTEM.h" />
+    <ClInclude Include="..\Solids_Evolution\BACKWARD_EULER_MINIMIZATION_SYSTEM.h" />
+    <ClInclude Include="..\Solids_Evolution\NEWMARK_EVOLUTION.h" />
+    <ClInclude Include="..\Solids_Evolution\BACKWARD_EULER_SYSTEM.h" />
+    <ClInclude Include="..\Solids\SOLID_BODY_COLLECTION.h" />
+    <ClInclude Include="..\Solids\SOLIDS_PARAMETERS.h" />
+    <ClInclude Include="..\Muscles\ELLIPSOID_MUSCLE.h" />
+    <ClInclude Include="..\Examples_And_Drivers\SOLIDS_EXAMPLE.h" />
+    <ClInclude Include="..\Examples_And_Drivers\SOLIDS_DRIVER.h" />
+    <ClInclude Include="..\Standard_Tests\SOLIDS_STANDARD_TESTS.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\..\..\Summer 2014\downloads\zlib128-dll\lib\zdll.lib" />

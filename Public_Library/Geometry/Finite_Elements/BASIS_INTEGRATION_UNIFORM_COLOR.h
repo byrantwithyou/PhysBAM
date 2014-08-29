@@ -59,7 +59,6 @@ public:
 
     void Compute_Entries();
     void Compute_Open_Entries();
-    void Add_Uncut_Cell(const TV_INT& cell,int color);
     void Add_Uncut_Fine_Cell(const TV_INT& cell,int subcell,int color);
     void Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const CELL_ELEMENTS& cell_elements,
         const ARRAY<MATRIX<T,TV::m> >& base_orientation,const ARRAY<int>& constraint_offsets,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs);

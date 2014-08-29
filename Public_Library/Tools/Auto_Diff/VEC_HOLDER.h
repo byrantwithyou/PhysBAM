@@ -166,13 +166,13 @@ template<class OP> struct VEC_MAP_2
     };
 };
 
-template<class A> struct TRANSPOSE {template<class ...Args> auto operator()(Args&&... args) const -> decltype(A()(args...).Transposed()) {return A()(args...).Transposed();}};
+template<class A> struct HOLDER_TRANSPOSE {template<class ...Args> auto operator()(Args&&... args) const -> decltype(A()(args...).Transposed()) {return A()(args...).Transposed();}};
 typedef VEC_MAP_1<NEG<ARG<0> > > VEC_NEG;
 typedef VEC_MAP_2<ADD<ARG<0>,ARG<1> > > VEC_ADD;
 typedef VEC_MAP_2<SUB<ARG<0>,ARG<1> > > VEC_SUB;
 typedef VEC_MAP_1<MUL<ARG<0>,ARG<1> > > VEC_SCALE;
 typedef VEC_MAP_1<DIV<ARG<0>,ARG<1> > > VEC_SCALE_DIV;
-typedef VEC_MAP_1<MUL<TRANSPOSE<ARG<0> >,ARG<1> > > VEC_TRANSPOSE_TIMES;
+typedef VEC_MAP_1<MUL<HOLDER_TRANSPOSE<ARG<0> >,ARG<1> > > VEC_TRANSPOSE_TIMES;
 typedef VEC_MAP_1<MUL<ARG<1>,ARG<0> > > VEC_SCALE_REV;
 
 MK_FUN_2(TENSOR_PRODUCT_0,Tensor_Product_0);
@@ -192,11 +192,11 @@ typedef VEC_MAP_1<TENSOR_PRODUCT_1<ARG<0>,ARG<1> > > TENSOR_PRODUCT_1_VM_V;
 
 typedef VEC_MAP_1<TENSOR_PRODUCT_2<ARG<1>,ARG<0> > > TENSOR_PRODUCT_2_VV_M;
 typedef VEC_MAP_1<TENSOR_PRODUCT_2<ARG<0>,ARG<1> > > TENSOR_PRODUCT_2_VM_V;
-typedef VEC_MAP_1<TENSOR_PRODUCT_2<TRANSPOSE<ARG<0> >,ARG<1> > > TRANSPOSE_TENSOR_PRODUCT_2_VM_V;
+typedef VEC_MAP_1<TENSOR_PRODUCT_2<HOLDER_TRANSPOSE<ARG<0> >,ARG<1> > > TRANSPOSE_TENSOR_PRODUCT_2_VM_V;
 
 typedef VEC_MAP_1<CONTRACT_0<ARG<0>,ARG<1> > > CONTRACT_0_VT_X;
 typedef VEC_MAP_1<CONTRACT_0<ARG<1>,ARG<0> > > CONTRACT_0_VX_T;
-typedef VEC_MAP_1<CONTRACT_0<ARG<1>,TRANSPOSE<ARG<0> > > > TRANSPOSE_CONTRACT_0_VX_T;
+typedef VEC_MAP_1<CONTRACT_0<ARG<1>,HOLDER_TRANSPOSE<ARG<0> > > > TRANSPOSE_CONTRACT_0_VX_T;
 
 typedef VEC_MAP_1<OUTER_PRODUCT_HELPER<ARG<0>,ARG<1> > > VEC_OUTER_PRODUCT;
 typedef VEC_MAP_1<OUTER_PRODUCT_HELPER<ARG<1>,ARG<0> > > VEC_OUTER_PRODUCT_REV;

@@ -15,681 +15,681 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="../OpenGL/OPENGL_GRID_1D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_GRID_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_POINT_SIMPLICES_1D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_POINT_SIMPLICES_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_WINDOW_GLUT.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_WINDOW_GLUT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/ANIMATED_VISUALIZATION.cpp">
+    <ClCompile Include="..\OpenGL\ANIMATED_VISUALIZATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_SCALAR_FIELD_1D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_SCALAR_FIELD_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_SEGMENTED_CURVE_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_SEGMENTED_CURVE_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_GLX_PBUFFER.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_GLX_PBUFFER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_SELECTION.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_SELECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_WGL_PBUFFER.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_WGL_PBUFFER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_GRID_BASED_VECTOR_FIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_GRID_BASED_VECTOR_FIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_GRID_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_GRID_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_FREE_PARTICLES.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_FREE_PARTICLES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_DEBUG_PARTICLES_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_DEBUG_PARTICLES_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_SEGMENTED_CURVE_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_SEGMENTED_CURVE_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_FACE_SCALAR_FIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_FACE_SCALAR_FIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_VECTOR_FIELD_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_VECTOR_FIELD_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_SCALAR_FIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_SCALAR_FIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_HEXAHEDRALIZED_VOLUME.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_HEXAHEDRALIZED_VOLUME.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_BOX_HIERARCHY_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_BOX_HIERARCHY_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_COLOR_RAMP.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_COLOR_RAMP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/BASIC_VISUALIZATION.cpp">
+    <ClCompile Include="..\OpenGL\BASIC_VISUALIZATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_TEXTURED_RECT.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_TEXTURED_RECT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_MAC_VELOCITY_FIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_MAC_VELOCITY_FIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_GRID_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_GRID_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_AGL_PBUFFER.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_AGL_PBUFFER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_AXES.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_AXES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_TETRAHEDRALIZED_VOLUME.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_TETRAHEDRALIZED_VOLUME.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_WORLD.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_WORLD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_LEVELSET_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_LEVELSET_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_KEY.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_KEY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_INDEXED_COLOR_MAP.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_INDEXED_COLOR_MAP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_FACE_SCALAR_FIELD_1D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_FACE_SCALAR_FIELD_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_EPS_OUTPUT.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_EPS_OUTPUT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_SCALAR_FIELD_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_SCALAR_FIELD_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_WINDOW_PBUFFER.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_WINDOW_PBUFFER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_TRIANGULATED_SURFACE.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_TRIANGULATED_SURFACE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_POINTS_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_POINTS_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_LEVELSET_MULTIVIEW.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_LEVELSET_MULTIVIEW.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_POINTS_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_POINTS_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_VECTOR_FIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_VECTOR_FIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_CALLBACK.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_CALLBACK.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_SYMMETRIC_MATRIX_FIELD_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_SYMMETRIC_MATRIX_FIELD_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_SHAPES.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_SHAPES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_WINDOW_ANDROID.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_WINDOW_ANDROID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_MAC_VELOCITY_FIELD_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_MAC_VELOCITY_FIELD_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_GRID_BASED_VECTOR_FIELD_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_GRID_BASED_VECTOR_FIELD_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_OBJECT.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_OBJECT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_UNIFORM_SLICE.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_UNIFORM_SLICE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_DEBUG_PARTICLES_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_DEBUG_PARTICLES_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_PREFERENCES.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_PREFERENCES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_SYMMETRIC_MATRIX_FIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_SYMMETRIC_MATRIX_FIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_IMPLICIT_SURFACE.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_IMPLICIT_SURFACE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_PARAMETER_LIST.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_PARAMETER_LIST.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_TRIANGULATED_AREA.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_TRIANGULATED_AREA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_TEXTURE.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_TEXTURE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_BOX_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_BOX_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL/OPENGL_FACE_SCALAR_FIELD_3D.cpp">
+    <ClCompile Include="..\OpenGL\OPENGL_FACE_SCALAR_FIELD_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_LEVELSET_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_LEVELSET_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_SCALAR_FIELD_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_CURVE_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_CURVE_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_HEIGHTFIELD_1D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_HEIGHTFIELD_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_LEVELSET_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_LEVELSET_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_RIGID_BODIES_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_RIGID_BODIES_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_RIGID_BODIES_1D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_RIGID_BODIES_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_1D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_SCALAR_FIELD_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_PARTICLES_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_PARTICLES_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_SURFACE.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_TRIANGULATED_SURFACE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_DEBUG_PARTICLES_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_DEBUG_PARTICLES_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_HEIGHTFIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_HEIGHTFIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_DEBUG_PARTICLES_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_DEBUG_PARTICLES_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_VORTICITY_PARTICLES_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_VORTICITY_PARTICLES_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_LEVELSET_1D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_LEVELSET_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_AREA.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_TRIANGULATED_AREA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_SCALAR_FIELD_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_DIAGNOSTICS.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_DIAGNOSTICS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_PARTICLES_2D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_PARTICLES_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../OpenGL_Components/OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D.cpp">
+    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
    </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="../OpenGL/OPENGL_MAC_VELOCITY_FIELD_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_MAC_VELOCITY_FIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/ANIMATED_VISUALIZATION.h">
+    <ClInclude Include="..\OpenGL\ANIMATED_VISUALIZATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_FREE_PARTICLES.h">
+    <ClInclude Include="..\OpenGL\OPENGL_FREE_PARTICLES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_BOX_HIERARCHY_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_BOX_HIERARCHY_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_LEVELSET_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_LEVELSET_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_GRID_BASED_VECTOR_FIELD_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_GRID_BASED_VECTOR_FIELD_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_FACE_SCALAR_FIELD_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_FACE_SCALAR_FIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_SEGMENTED_CURVE_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_SEGMENTED_CURVE_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_UNIFORM_SLICE.h">
+    <ClInclude Include="..\OpenGL\OPENGL_UNIFORM_SLICE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_KEY.h">
+    <ClInclude Include="..\OpenGL\OPENGL_KEY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_WINDOW.h">
+    <ClInclude Include="..\OpenGL\OPENGL_WINDOW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_DEBUG_PARTICLES_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_DEBUG_PARTICLES_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_WINDOW_GLUT.h">
+    <ClInclude Include="..\OpenGL\OPENGL_WINDOW_GLUT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_CALLBACK.h">
+    <ClInclude Include="..\OpenGL\OPENGL_CALLBACK.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_SYMMETRIC_MATRIX_FIELD_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_SYMMETRIC_MATRIX_FIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_TETRAHEDRALIZED_VOLUME.h">
+    <ClInclude Include="..\OpenGL\OPENGL_TETRAHEDRALIZED_VOLUME.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_RIGID_BODY_HINTS.h">
+    <ClInclude Include="..\OpenGL\OPENGL_RIGID_BODY_HINTS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_GRID_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_GRID_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_VECTOR_FIELD_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_VECTOR_FIELD_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/BASIC_VISUALIZATION.h">
+    <ClInclude Include="..\OpenGL\BASIC_VISUALIZATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_WGL_PBUFFER.h">
+    <ClInclude Include="..\OpenGL\OPENGL_WGL_PBUFFER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_WORLD.h">
+    <ClInclude Include="..\OpenGL\OPENGL_WORLD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_WINDOW_PBUFFER.h">
+    <ClInclude Include="..\OpenGL\OPENGL_WINDOW_PBUFFER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_FACE_SCALAR_FIELD_1D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_FACE_SCALAR_FIELD_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_SELECTION.h">
+    <ClInclude Include="..\OpenGL\OPENGL_SELECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_SLICE_MANAGER.h">
+    <ClInclude Include="..\OpenGL\OPENGL_SLICE_MANAGER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_LIGHT.h">
+    <ClInclude Include="..\OpenGL\OPENGL_LIGHT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_BOX_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_BOX_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_GRID_1D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_GRID_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_GRID_BASED_VECTOR_FIELD_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_GRID_BASED_VECTOR_FIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/Convert_2d_To_3d.h">
+    <ClInclude Include="..\OpenGL\Convert_2d_To_3d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_COLOR_RAMP.h">
+    <ClInclude Include="..\OpenGL\OPENGL_COLOR_RAMP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_SEGMENTED_CURVE_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_SEGMENTED_CURVE_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_COLOR.h">
+    <ClInclude Include="..\OpenGL\OPENGL_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_SCALAR_FIELD_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_SCALAR_FIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_ARCBALL.h">
+    <ClInclude Include="..\OpenGL\OPENGL_ARCBALL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_LEVELSET_MULTIVIEW.h">
+    <ClInclude Include="..\OpenGL\OPENGL_LEVELSET_MULTIVIEW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_PRIMITIVES.h">
+    <ClInclude Include="..\OpenGL\OPENGL_PRIMITIVES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_GLX_PBUFFER.h">
+    <ClInclude Include="..\OpenGL\OPENGL_GLX_PBUFFER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_SCALAR_FIELD_1D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_SCALAR_FIELD_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_FACE_SCALAR_FIELD_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_FACE_SCALAR_FIELD_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_DEBUG_PARTICLES_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_DEBUG_PARTICLES_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_LEVELSET_COLOR_MAP.h">
+    <ClInclude Include="..\OpenGL\OPENGL_LEVELSET_COLOR_MAP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_SYMMETRIC_MATRIX_FIELD_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_SYMMETRIC_MATRIX_FIELD_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_OBJECT.h">
+    <ClInclude Include="..\OpenGL\OPENGL_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_EPS_OUTPUT.h">
+    <ClInclude Include="..\OpenGL\OPENGL_EPS_OUTPUT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_MOUSE_HANDLER.h">
+    <ClInclude Include="..\OpenGL\OPENGL_MOUSE_HANDLER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_GRID_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_GRID_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_TEXTURED_RECT.h">
+    <ClInclude Include="..\OpenGL\OPENGL_TEXTURED_RECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/Convert_1d_To_3d.h">
+    <ClInclude Include="..\OpenGL\Convert_1d_To_3d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_WINDOW_ANDROID.h">
+    <ClInclude Include="..\OpenGL\OPENGL_WINDOW_ANDROID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_SCALAR_FIELD_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_SCALAR_FIELD_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_TRIANGULATED_AREA.h">
+    <ClInclude Include="..\OpenGL\OPENGL_TRIANGULATED_AREA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/RGB.h">
+    <ClInclude Include="..\OpenGL\RGB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_AGL_PBUFFER.h">
+    <ClInclude Include="..\OpenGL\OPENGL_AGL_PBUFFER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_POINTS_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_POINTS_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_MATERIAL.h">
+    <ClInclude Include="..\OpenGL\OPENGL_MATERIAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_TEXTURE.h">
+    <ClInclude Include="..\OpenGL\OPENGL_TEXTURE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_SHAPES.h">
+    <ClInclude Include="..\OpenGL\OPENGL_SHAPES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_IMPLICIT_SURFACE.h">
+    <ClInclude Include="..\OpenGL\OPENGL_IMPLICIT_SURFACE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_LEVELSET_1D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_LEVELSET_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_TRIANGULATED_SURFACE.h">
+    <ClInclude Include="..\OpenGL\OPENGL_TRIANGULATED_SURFACE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_CONSTANT_COLOR_MAP.h">
+    <ClInclude Include="..\OpenGL\OPENGL_CONSTANT_COLOR_MAP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_VECTOR_FIELD_2D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_VECTOR_FIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_MAC_VELOCITY_FIELD_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_MAC_VELOCITY_FIELD_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/glues.h">
+    <ClInclude Include="..\OpenGL\glues.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_POINT_SIMPLICES_1D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_POINT_SIMPLICES_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_AXES.h">
+    <ClInclude Include="..\OpenGL\OPENGL_AXES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_HEXAHEDRALIZED_VOLUME.h">
+    <ClInclude Include="..\OpenGL\OPENGL_HEXAHEDRALIZED_VOLUME.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_POLICY.h">
+    <ClInclude Include="..\OpenGL\OPENGL_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD.h">
+    <ClInclude Include="..\OpenGL\OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_COLOR_MAP.h">
+    <ClInclude Include="..\OpenGL\OPENGL_COLOR_MAP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/RGBA.h">
+    <ClInclude Include="..\OpenGL\RGBA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_SLICE.h">
+    <ClInclude Include="..\OpenGL\OPENGL_SLICE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_INDEXED_COLOR_MAP.h">
+    <ClInclude Include="..\OpenGL\OPENGL_INDEXED_COLOR_MAP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD.h">
+    <ClInclude Include="..\OpenGL\OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_PREFERENCES.h">
+    <ClInclude Include="..\OpenGL\OPENGL_PREFERENCES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_POINTS_3D.h">
+    <ClInclude Include="..\OpenGL\OPENGL_POINTS_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL/OPENGL_BASIC_CALLBACKS.h">
+    <ClInclude Include="..\OpenGL\OPENGL_BASIC_CALLBACKS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_SCALAR_FIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_RIGID_BODIES_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_RIGID_BODIES_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_PARTICLES_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_PARTICLES_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_DEBUG_PARTICLES_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_DEBUG_PARTICLES_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_CURVE_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_CURVE_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_LEVELSET_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_LEVELSET_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_BASIC.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_BASIC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_1D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_SCALAR_FIELD_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_LEVELSET_1D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_LEVELSET_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_DEBUG_PARTICLES_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_DEBUG_PARTICLES_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_HEIGHTFIELD_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_HEIGHTFIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_DIAGNOSTICS.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_DIAGNOSTICS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_SCALAR_FIELD_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_VORTICITY_PARTICLES_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_VORTICITY_PARTICLES_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_LEVELSET_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_LEVELSET_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_AREA.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_TRIANGULATED_AREA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_RIGID_BODIES_1D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_RIGID_BODIES_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_HEIGHTFIELD_1D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_HEIGHTFIELD_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_SURFACE.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_TRIANGULATED_SURFACE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../OpenGL_Components/OPENGL_COMPONENT_PARTICLES_3D.h">
+    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_PARTICLES_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

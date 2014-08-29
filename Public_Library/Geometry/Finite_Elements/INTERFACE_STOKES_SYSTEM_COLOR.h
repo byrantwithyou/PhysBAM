@@ -85,8 +85,6 @@ public:
     bool use_u_null_mode;
     bool use_polymer_stress;
 
-    static int solve_id;
-
     VECTOR<CELL_MANAGER_COLOR<TV>*,TV::m> cm_u;
     CELL_MANAGER_COLOR<TV> *cm_p;
     CELL_MANAGER_COLOR<TV> *cm_ps;

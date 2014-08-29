@@ -15,12 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-@f0@    <ClCompile Include="../#1">
+@f0@    <ClCompile Include="..\#1">
 @f0@      <Filter>Source Files</Filter>
 @f0@    </ClCompile>
    </ItemGroup>
   <ItemGroup>
-@f1@    <ClInclude Include="../#1">
+@f1@    <ClInclude Include="..\#1">
 @f1@      <Filter>Header Files</Filter>
 @f1@    </ClInclude>
   </ItemGroup>

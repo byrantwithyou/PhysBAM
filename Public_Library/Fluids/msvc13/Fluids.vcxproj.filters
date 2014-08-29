@@ -15,18 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="../Coupled_Evolution/COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES.cpp">
+    <ClCompile Include="..\Coupled_Evolution\COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Fluids/FLUID_COLLECTION.cpp">
+    <ClCompile Include="..\Fluids\FLUID_COLLECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
    </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="../Coupled_Evolution/COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES.h">
+    <ClInclude Include="..\Coupled_Evolution\COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Fluids/FLUID_COLLECTION.h">
+    <ClInclude Include="..\Fluids\FLUID_COLLECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

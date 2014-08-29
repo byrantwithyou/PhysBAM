@@ -95,7 +95,6 @@ public:
     void Compute_Energy(const T time,T& kinetic_energy,T& potential_energy) const;
     TV Compute_Momentum() const;
     void Print_Energy(const T time,const int step) const;
-    void Adjust_Mesh_For_Self_Collision(const T time);
     void Read(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_rigid_body,
         const bool read_deformable_body,const bool read_from_every_process,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
     void Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int first_frame,const bool include_static_variables,const bool write_rigid_body,

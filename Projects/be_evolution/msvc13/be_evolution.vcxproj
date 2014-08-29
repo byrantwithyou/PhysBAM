@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A87CA670-4B06-057C-FD67-A945AD1B8B29}</ProjectGuid>
+    <ProjectGuid>{381583F3-D092-46C2-B3EF-DDD2F68362CB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>be_evolution</RootNamespace>
   </PropertyGroup>
@@ -51,7 +51,7 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>D:\ucla\PhysBAM\Public_Library;%(AdditionalIncludeDirectories);C:\local\boost_1_56_0;D:\ucla\Summer 2014\downloads\zlib128-dll\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
-      <DisableSpecificWarnings>4258;4244;4305</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4258;4244;4305;4800</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -76,11 +76,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="../main.cpp" />
+    <ClCompile Include="..\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="../STANDARD_TESTS.h" />
-    <ClInclude Include="../STANDARD_TESTS_2D.h" />
+    <ClInclude Include="..\STANDARD_TESTS.h" />
+    <ClInclude Include="..\STANDARD_TESTS_2D.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\..\..\Summer 2014\downloads\zlib128-dll\lib\zdll.lib" />

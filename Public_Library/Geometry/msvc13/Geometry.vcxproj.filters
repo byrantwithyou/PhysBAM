@@ -15,963 +15,963 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="../Grids_Uniform_Computations/MARCHING_CUBES.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\MARCHING_CUBES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Computations/DUALCONTOUR_3D.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\DUALCONTOUR_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Computations/SEGMENTED_CURVE_2D_SIGNED_DISTANCE.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\SEGMENTED_CURVE_2D_SIGNED_DISTANCE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Computations/MARCHING_CUBES_COLOR.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\MARCHING_CUBES_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Computations/REINITIALIZATION.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\REINITIALIZATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Computations/SPHERE_SIGNED_DISTANCE.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\SPHERE_SIGNED_DISTANCE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Computations/CYLINDER_SIGNED_DISTANCE.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\CYLINDER_SIGNED_DISTANCE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Computations/MARCHING_TETRAHEDRA.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\MARCHING_TETRAHEDRA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Computations/MARCHING_CUBES_SYSTEM.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\MARCHING_CUBES_SYSTEM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM_2D.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\LEVELSET_MAKER_UNIFORM_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Computations/TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Grids_Uniform_Computations/DUALCONTOUR_2D.cpp">
+    <ClCompile Include="..\Grids_Uniform_Computations\DUALCONTOUR_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/RAY_TETRAHEDRON_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\RAY_TETRAHEDRON_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/RAY_ORIENTED_BOX_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\RAY_ORIENTED_BOX_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\SEGMENT_3D_TRIANGLE_3D_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/RAY_POINT_SIMPLEX_1D_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\RAY_POINT_SIMPLEX_1D_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/RAY_SEGMENT_2D_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\RAY_SEGMENT_2D_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/BOX_LINE_2D_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\BOX_LINE_2D_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/SEGMENT_2D_SEGMENT_2D_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\SEGMENT_2D_SEGMENT_2D_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/RAY_CYLINDER_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\RAY_CYLINDER_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/BOX_SPHERE_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\BOX_SPHERE_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/BOX_POINT_SIMPLEX_1D_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\BOX_POINT_SIMPLEX_1D_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\RAY_TRIANGLE_3D_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\RAY_BOX_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/RAY_SPHERE_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\RAY_SPHERE_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/RAY_ELLIPSOID_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\RAY_ELLIPSOID_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/BOX_SEGMENT_2D_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\BOX_SEGMENT_2D_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/BOX_TRIANGLE_3D_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\BOX_TRIANGLE_3D_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/BOX_PLANE_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\BOX_PLANE_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/RAY_RING_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\RAY_RING_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Intersections/RAY_PLANE_INTERSECTION.cpp">
+    <ClCompile Include="..\Basic_Geometry_Intersections\RAY_PLANE_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Spatial_Acceleration/BOX_PARTITION.cpp">
+    <ClCompile Include="..\Spatial_Acceleration\BOX_PARTITION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Spatial_Acceleration/TETRAHEDRON_HIERARCHY.cpp">
+    <ClCompile Include="..\Spatial_Acceleration\TETRAHEDRON_HIERARCHY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Spatial_Acceleration/TRIANGLE_HIERARCHY_2D.cpp">
+    <ClCompile Include="..\Spatial_Acceleration\TRIANGLE_HIERARCHY_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Spatial_Acceleration/BOX_HIERARCHY.cpp">
+    <ClCompile Include="..\Spatial_Acceleration\BOX_HIERARCHY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Spatial_Acceleration/SPHERE_PARTITION.cpp">
+    <ClCompile Include="..\Spatial_Acceleration\SPHERE_PARTITION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Spatial_Acceleration/PARTICLE_HIERARCHY.cpp">
+    <ClCompile Include="..\Spatial_Acceleration\PARTICLE_HIERARCHY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Spatial_Acceleration/TRIANGLE_HIERARCHY.cpp">
+    <ClCompile Include="..\Spatial_Acceleration\TRIANGLE_HIERARCHY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Spatial_Acceleration/SEGMENT_HIERARCHY.cpp">
+    <ClCompile Include="..\Spatial_Acceleration\SEGMENT_HIERARCHY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry_Computations/BOX_POLYGON_INTERSECTION_AREA.cpp">
+    <ClCompile Include="..\Basic_Geometry_Computations\BOX_POLYGON_INTERSECTION_AREA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Implicit_Objects_Uniform/SMOOTH_LEVELSET_IMPLICIT_OBJECT.cpp">
+    <ClCompile Include="..\Implicit_Objects_Uniform\SMOOTH_LEVELSET_IMPLICIT_OBJECT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Implicit_Objects_Uniform/IMPLICIT_OBJECT_INTERSECTOR.cpp">
+    <ClCompile Include="..\Implicit_Objects_Uniform\IMPLICIT_OBJECT_INTERSECTOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.cpp">
+    <ClCompile Include="..\Implicit_Objects_Uniform\MULTIBODY_LEVELSET_IMPLICIT_OBJECT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.cpp">
+    <ClCompile Include="..\Implicit_Objects_Uniform\LEVELSET_IMPLICIT_OBJECT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.cpp">
+    <ClCompile Include="..\Implicit_Objects\IMPLICIT_OBJECT_TRANSFORMED.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Implicit_Objects/IMPLICIT_OBJECT.cpp">
+    <ClCompile Include="..\Implicit_Objects\IMPLICIT_OBJECT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Analytic_Tests/ANALYTIC_POISSON_SOLUTION.cpp">
+    <ClCompile Include="..\Analytic_Tests\ANALYTIC_POISSON_SOLUTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Analytic_Tests/ANALYTIC_LEVELSET_NEST.cpp">
+    <ClCompile Include="..\Analytic_Tests\ANALYTIC_LEVELSET_NEST.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Analytic_Tests/ANALYTIC_LEVELSET_SIGNED.cpp">
+    <ClCompile Include="..\Analytic_Tests\ANALYTIC_LEVELSET_SIGNED.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Analytic_Tests/ANALYTIC_POISSON_TEST.cpp">
+    <ClCompile Include="..\Analytic_Tests\ANALYTIC_POISSON_TEST.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Analytic_Tests/ANALYTIC_LEVELSET.cpp">
+    <ClCompile Include="..\Analytic_Tests\ANALYTIC_LEVELSET.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Analytic_Tests/ANALYTIC_IMPLICIT_SURFACE_LEVELSET.cpp">
+    <ClCompile Include="..\Analytic_Tests\ANALYTIC_IMPLICIT_SURFACE_LEVELSET.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry_Intersections\RAY_TRIANGULATED_SURFACE_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry_Intersections/RAY_SEGMENTED_CURVE_2D_INTERSECTION.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry_Intersections\RAY_SEGMENTED_CURVE_2D_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry_Intersections/RAY_POINT_SIMPLICES_1D_INTERSECTION.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry_Intersections\RAY_POINT_SIMPLICES_1D_INTERSECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/SYSTEM_SURFACE_BLOCK_HELPER_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\SYSTEM_SURFACE_BLOCK_HELPER_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/TRIPLE_JUNCTION_CORRECTION.cpp">
+    <ClCompile Include="..\Finite_Elements\TRIPLE_JUNCTION_CORRECTION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\CELL_DOMAIN_INTERFACE_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\INTERFACE_STOKES_SYSTEM_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/LEVELSET_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\LEVELSET_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/CELL_MANAGER_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\CELL_MANAGER_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/SYSTEM_VOLUME_BLOCK_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\SYSTEM_VOLUME_BLOCK_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/INTERFACE_STOKES_MULTIGRID.cpp">
+    <ClCompile Include="..\Finite_Elements\INTERFACE_STOKES_MULTIGRID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/KRYLOV_VECTOR_CONDENSED_POISSON.cpp">
+    <ClCompile Include="..\Finite_Elements\KRYLOV_VECTOR_CONDENSED_POISSON.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/BASIS_STENCIL_UNIFORM.cpp">
+    <ClCompile Include="..\Finite_Elements\BASIS_STENCIL_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\SYSTEM_VOLUME_BLOCK_HELPER_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/CONSTRAINT_AGGREGATION_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\CONSTRAINT_AGGREGATION_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/BASIS_INTEGRATION_UNIFORM_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\BASIS_INTEGRATION_UNIFORM_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/SYSTEM_SURFACE_BLOCK_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\SYSTEM_SURFACE_BLOCK_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/INTERFACE_POISSON_SYSTEM_COLOR_NEW.cpp">
+    <ClCompile Include="..\Finite_Elements\INTERFACE_POISSON_SYSTEM_COLOR_NEW.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/INTERFACE_POISSON_SYSTEM_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\INTERFACE_POISSON_SYSTEM_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\SYSTEM_SURFACE_BLOCK_SCALAR_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.cpp">
+    <ClCompile Include="..\Finite_Elements\INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/TORUS.cpp">
+    <ClCompile Include="..\Basic_Geometry\TORUS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/SEGMENT_3D.cpp">
+    <ClCompile Include="..\Basic_Geometry\SEGMENT_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/RAY.cpp">
+    <ClCompile Include="..\Basic_Geometry\RAY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/SMOOTH_GEAR.cpp">
+    <ClCompile Include="..\Basic_Geometry\SMOOTH_GEAR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/ORIENTED_BOX.cpp">
+    <ClCompile Include="..\Basic_Geometry\ORIENTED_BOX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/TETRAHEDRON.cpp">
+    <ClCompile Include="..\Basic_Geometry\TETRAHEDRON.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/RING.cpp">
+    <ClCompile Include="..\Basic_Geometry\RING.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/HEXAHEDRON.cpp">
+    <ClCompile Include="..\Basic_Geometry\HEXAHEDRON.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/ELLIPSOID.cpp">
+    <ClCompile Include="..\Basic_Geometry\ELLIPSOID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/BOWL.cpp">
+    <ClCompile Include="..\Basic_Geometry\BOWL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/TRIANGLE_3D.cpp">
+    <ClCompile Include="..\Basic_Geometry\TRIANGLE_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/SPHERE.cpp">
+    <ClCompile Include="..\Basic_Geometry\SPHERE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/CYLINDER.cpp">
+    <ClCompile Include="..\Basic_Geometry\CYLINDER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/TRIANGLE_2D.cpp">
+    <ClCompile Include="..\Basic_Geometry\TRIANGLE_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/CONE.cpp">
+    <ClCompile Include="..\Basic_Geometry\CONE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.cpp">
+    <ClCompile Include="..\Basic_Geometry\BOUNDED_HORIZONTAL_PLANE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/PLANE.cpp">
+    <ClCompile Include="..\Basic_Geometry\PLANE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/POLYGON.cpp">
+    <ClCompile Include="..\Basic_Geometry\POLYGON.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Basic_Geometry/SEGMENT_2D.cpp">
+    <ClCompile Include="..\Basic_Geometry\SEGMENT_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology/SEGMENT_MESH.cpp">
+    <ClCompile Include="..\Topology\SEGMENT_MESH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology/POINT_SIMPLEX_MESH.cpp">
+    <ClCompile Include="..\Topology\POINT_SIMPLEX_MESH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology/TETRAHEDRON_MESH.cpp">
+    <ClCompile Include="..\Topology\TETRAHEDRON_MESH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology/SIMPLEX_MESH.cpp">
+    <ClCompile Include="..\Topology\SIMPLEX_MESH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology/TRIANGLE_MESH.cpp">
+    <ClCompile Include="..\Topology\TRIANGLE_MESH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology/HEXAHEDRON_MESH.cpp">
+    <ClCompile Include="..\Topology\HEXAHEDRON_MESH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/VECTOR_IMAGE.cpp">
+    <ClCompile Include="..\Images\VECTOR_IMAGE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/HIDDEN_SURFACE.cpp">
+    <ClCompile Include="..\Images\HIDDEN_SURFACE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/EPS_FILE.cpp">
+    <ClCompile Include="..\Images\EPS_FILE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/TEX_FILE.cpp">
+    <ClCompile Include="..\Images\TEX_FILE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/HIDDEN_SURFACE_PRIMITIVES.cpp">
+    <ClCompile Include="..\Images\HIDDEN_SURFACE_PRIMITIVES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Images/DEPTH_BUFFERING.cpp">
+    <ClCompile Include="..\Images\DEPTH_BUFFERING.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Registry/STRUCTURE_REGISTRY.cpp">
+    <ClCompile Include="..\Registry\STRUCTURE_REGISTRY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Tessellation/RANGE_TESSELLATION.cpp">
+    <ClCompile Include="..\Tessellation\RANGE_TESSELLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Tessellation/BOWL_TESSELLATION.cpp">
+    <ClCompile Include="..\Tessellation\BOWL_TESSELLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Tessellation/RING_TESSELLATION.cpp">
+    <ClCompile Include="..\Tessellation\RING_TESSELLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Tessellation/IMPLICIT_OBJECT_TESSELLATION.cpp">
+    <ClCompile Include="..\Tessellation\IMPLICIT_OBJECT_TESSELLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Tessellation/CYLINDER_TESSELLATION.cpp">
+    <ClCompile Include="..\Tessellation\CYLINDER_TESSELLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Tessellation/BOUNDED_HORIZONTAL_PLANE_TESSELLATION.cpp">
+    <ClCompile Include="..\Tessellation\BOUNDED_HORIZONTAL_PLANE_TESSELLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Tessellation/PLANE_TESSELLATION.cpp">
+    <ClCompile Include="..\Tessellation\PLANE_TESSELLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Tessellation/ORIENTED_BOX_TESSELLATION.cpp">
+    <ClCompile Include="..\Tessellation\ORIENTED_BOX_TESSELLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Tessellation/TORUS_TESSELLATION.cpp">
+    <ClCompile Include="..\Tessellation\TORUS_TESSELLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Tessellation/SPHERE_TESSELLATION.cpp">
+    <ClCompile Include="..\Tessellation\SPHERE_TESSELLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Tessellation/GEAR_TESSELLATION.cpp">
+    <ClCompile Include="..\Tessellation\GEAR_TESSELLATION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Constitutive_Models/STRAIN_MEASURE.cpp">
+    <ClCompile Include="..\Constitutive_Models\STRAIN_MEASURE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Level_Sets/LEVELSET.cpp">
+    <ClCompile Include="..\Level_Sets\LEVELSET.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Level_Sets/LEVELSET_UTILITIES.cpp">
+    <ClCompile Include="..\Level_Sets\LEVELSET_UTILITIES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Level_Sets/EXTRAPOLATION_HIGHER_ORDER.cpp">
+    <ClCompile Include="..\Level_Sets\EXTRAPOLATION_HIGHER_ORDER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Level_Sets/EXTRAPOLATION_UNIFORM.cpp">
+    <ClCompile Include="..\Level_Sets\EXTRAPOLATION_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Level_Sets/FAST_MARCHING_METHOD_UNIFORM.cpp">
+    <ClCompile Include="..\Level_Sets\FAST_MARCHING_METHOD_UNIFORM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Level_Sets/LEVELSET_MAKER.cpp">
+    <ClCompile Include="..\Level_Sets\LEVELSET_MAKER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry/TRIANGULATED_SURFACE.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry\TRIANGULATED_SURFACE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry/POINT_SIMPLICES_1D.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry\POINT_SIMPLICES_1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry/MESH_OBJECT.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry\MESH_OBJECT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry/STRUCTURE.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry\STRUCTURE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry\HEXAHEDRALIZED_VOLUME.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry/TRIANGLE_SUBDIVISION.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry\TRIANGLE_SUBDIVISION.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry/SEGMENTED_CURVE_2D.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry\SEGMENTED_CURVE_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry/SEGMENTED_CURVE.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry\SEGMENTED_CURVE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry\TETRAHEDRALIZED_VOLUME.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Topology_Based_Geometry/TRIANGULATED_AREA.cpp">
+    <ClCompile Include="..\Topology_Based_Geometry\TRIANGULATED_AREA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Geometry_Particles/DEBUG_PARTICLES.cpp">
+    <ClCompile Include="..\Geometry_Particles\DEBUG_PARTICLES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Geometry_Particles/VIEWER_OUTPUT.cpp">
+    <ClCompile Include="..\Geometry_Particles\VIEWER_OUTPUT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../Geometry_Particles/GEOMETRY_PARTICLES.cpp">
+    <ClCompile Include="..\Geometry_Particles\GEOMETRY_PARTICLES.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
    </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="../Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_CUBES_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/MARCHING_CUBES_VECTOR.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_CUBES_VECTOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/MARCHING_CUBES_SYSTEM.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_CUBES_SYSTEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/CYLINDER_SIGNED_DISTANCE.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\CYLINDER_SIGNED_DISTANCE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/SEGMENTED_CURVE_2D_SIGNED_DISTANCE.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\SEGMENTED_CURVE_2D_SIGNED_DISTANCE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/DUALCONTOUR_3D.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\DUALCONTOUR_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/REINITIALIZATION.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\REINITIALIZATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/SPHERE_SIGNED_DISTANCE.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\SPHERE_SIGNED_DISTANCE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/MARCHING_CUBES.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_CUBES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/MARCHING_TETRAHEDRA.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_TETRAHEDRA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM_2D.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\LEVELSET_MAKER_UNIFORM_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/SIGNED_DISTANCE.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\SIGNED_DISTANCE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/DUALCONTOUR_2D.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\DUALCONTOUR_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Grids_Uniform_Computations/TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h">
+    <ClInclude Include="..\Grids_Uniform_Computations\TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/BOX_SEGMENT_2D_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\BOX_SEGMENT_2D_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/RAY_SEGMENT_2D_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\RAY_SEGMENT_2D_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/BOX_LINE_2D_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\BOX_LINE_2D_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/BOX_SPHERE_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\BOX_SPHERE_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/SEGMENT_2D_SEGMENT_2D_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\SEGMENT_2D_SEGMENT_2D_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/BOX_TRIANGLE_3D_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\BOX_TRIANGLE_3D_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/RAY_ORIENTED_BOX_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\RAY_ORIENTED_BOX_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/RAY_RING_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\RAY_RING_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/RAY_SPHERE_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\RAY_SPHERE_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/RAY_PLANE_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\RAY_PLANE_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/RAY_TETRAHEDRON_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\RAY_TETRAHEDRON_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\RAY_TRIANGLE_3D_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\RAY_BOX_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/BOX_POINT_SIMPLEX_1D_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\BOX_POINT_SIMPLEX_1D_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/RAY_POINT_SIMPLEX_1D_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\RAY_POINT_SIMPLEX_1D_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/RAY_CYLINDER_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\RAY_CYLINDER_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/BOX_PLANE_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\BOX_PLANE_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Intersections/RAY_ELLIPSOID_INTERSECTION.h">
+    <ClInclude Include="..\Basic_Geometry_Intersections\RAY_ELLIPSOID_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/PARTICLE_PARTITION.h">
+    <ClInclude Include="..\Spatial_Acceleration\PARTICLE_PARTITION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/PARTICLE_HIERARCHY.h">
+    <ClInclude Include="..\Spatial_Acceleration\PARTICLE_HIERARCHY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/BOX_HIERARCHY.h">
+    <ClInclude Include="..\Spatial_Acceleration\BOX_HIERARCHY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h">
+    <ClInclude Include="..\Spatial_Acceleration\TETRAHEDRON_HIERARCHY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/TRIANGLE_HIERARCHY.h">
+    <ClInclude Include="..\Spatial_Acceleration\TRIANGLE_HIERARCHY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h">
+    <ClInclude Include="..\Spatial_Acceleration\BOX_HIERARCHY_DEFINITION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/SEGMENT_HIERARCHY.h">
+    <ClInclude Include="..\Spatial_Acceleration\SEGMENT_HIERARCHY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/SPHERE_PARTITION.h">
+    <ClInclude Include="..\Spatial_Acceleration\SPHERE_PARTITION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/UNIFORM_BOX_PARTITION.h">
+    <ClInclude Include="..\Spatial_Acceleration\UNIFORM_BOX_PARTITION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/BOX_PARTITION.h">
+    <ClInclude Include="..\Spatial_Acceleration\BOX_PARTITION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/TRIANGLE_HIERARCHY_2D.h">
+    <ClInclude Include="..\Spatial_Acceleration\TRIANGLE_HIERARCHY_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Spatial_Acceleration/SPATIAL_ACCELERATION_FORWARD.h">
+    <ClInclude Include="..\Spatial_Acceleration\SPATIAL_ACCELERATION_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry_Computations/BOX_POLYGON_INTERSECTION_AREA.h">
+    <ClInclude Include="..\Basic_Geometry_Computations\BOX_POLYGON_INTERSECTION_AREA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Implicit_Objects_Uniform/SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT.h">
+    <ClInclude Include="..\Implicit_Objects_Uniform\SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h">
+    <ClInclude Include="..\Implicit_Objects_Uniform\MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h">
+    <ClInclude Include="..\Implicit_Objects_Uniform\LEVELSET_IMPLICIT_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Implicit_Objects_Uniform/IMPLICIT_OBJECT_INTERSECTOR.h">
+    <ClInclude Include="..\Implicit_Objects_Uniform\IMPLICIT_OBJECT_INTERSECTOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED.h">
+    <ClInclude Include="..\Implicit_Objects_Uniform\IMPLICIT_OBJECT_COMBINED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Implicit_Objects_Uniform/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h">
+    <ClInclude Include="..\Implicit_Objects_Uniform\SMOOTH_LEVELSET_IMPLICIT_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED_EULERIAN.h">
+    <ClInclude Include="..\Implicit_Objects_Uniform\IMPLICIT_OBJECT_COMBINED_EULERIAN.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h">
+    <ClInclude Include="..\Implicit_Objects\IMPLICIT_OBJECT_TRANSFORMED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Implicit_Objects/IMPLICIT_OBJECT.h">
+    <ClInclude Include="..\Implicit_Objects\IMPLICIT_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h">
+    <ClInclude Include="..\Implicit_Objects\ANALYTIC_IMPLICIT_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_MOVING_ELLIPSOID.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_MOVING_ELLIPSOID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_IMPLICIT_SURFACE_LEVELSET.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_IMPLICIT_SURFACE_LEVELSET.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_POISSON_SOLUTION_QUADRATIC.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_POISSON_SOLUTION_QUADRATIC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_LINE.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_LINE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_VORTEX.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_VORTEX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_ELLIPSOID.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_ELLIPSOID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_NEST.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_NEST.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_ROTATE.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_ROTATE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_SIGNED.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_SIGNED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_POISSON_SOLUTION_AFFINE.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_POISSON_SOLUTION_AFFINE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_SCALE.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_SCALE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_POISSON_TEST.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_POISSON_TEST.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_TRANSLATE.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_TRANSLATE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_SPHERE.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_SPHERE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_POISSON_SOLUTION.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_POISSON_SOLUTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_CONST.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_CONST.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Analytic_Tests/ANALYTIC_LEVELSET_BOX.h">
+    <ClInclude Include="..\Analytic_Tests\ANALYTIC_LEVELSET_BOX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h">
+    <ClInclude Include="..\Topology_Based_Geometry_Intersections\RAY_TRIANGULATED_SURFACE_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry_Intersections/RAY_POINT_SIMPLICES_1D_INTERSECTION.h">
+    <ClInclude Include="..\Topology_Based_Geometry_Intersections\RAY_POINT_SIMPLICES_1D_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry_Intersections/RAY_SEGMENTED_CURVE_2D_INTERSECTION.h">
+    <ClInclude Include="..\Topology_Based_Geometry_Intersections\RAY_SEGMENTED_CURVE_2D_INTERSECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/INTERFACE_POISSON_SYSTEM_COLOR_NEW.h">
+    <ClInclude Include="..\Finite_Elements\INTERFACE_POISSON_SYSTEM_COLOR_NEW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\INTERFACE_STOKES_SYSTEM_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/INTERFACE_POISSON_SYSTEM_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\INTERFACE_POISSON_SYSTEM_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/BASIS_STENCIL_BOUNDARY_UNIFORM.h">
+    <ClInclude Include="..\Finite_Elements\BASIS_STENCIL_BOUNDARY_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/SYSTEM_SURFACE_BLOCK_HELPER_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\SYSTEM_SURFACE_BLOCK_HELPER_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/TRIPLE_JUNCTION_CORRECTION.h">
+    <ClInclude Include="..\Finite_Elements\TRIPLE_JUNCTION_CORRECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/INTERFACE_STOKES_MULTIGRID.h">
+    <ClInclude Include="..\Finite_Elements\INTERFACE_STOKES_MULTIGRID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/SYSTEM_SURFACE_BLOCK_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\SYSTEM_SURFACE_BLOCK_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/CELL_MANAGER_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\CELL_MANAGER_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\SYSTEM_SURFACE_BLOCK_SCALAR_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/CONSTRAINT_AGGREGATION_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\CONSTRAINT_AGGREGATION_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/LEVELSET_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\LEVELSET_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\CELL_DOMAIN_INTERFACE_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/BASIS_STENCIL_UNIFORM.h">
+    <ClInclude Include="..\Finite_Elements\BASIS_STENCIL_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/CELL_MAPPING.h">
+    <ClInclude Include="..\Finite_Elements\CELL_MAPPING.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/BASIS_INTEGRATION_UNIFORM_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\BASIS_INTEGRATION_UNIFORM_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/SYSTEM_VOLUME_BLOCK_COLOR.h">
+    <ClInclude Include="..\Finite_Elements\SYSTEM_VOLUME_BLOCK_COLOR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Finite_Elements/KRYLOV_VECTOR_CONDENSED_POISSON.h">
+    <ClInclude Include="..\Finite_Elements\KRYLOV_VECTOR_CONDENSED_POISSON.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/SEGMENT_1D.h">
+    <ClInclude Include="..\Basic_Geometry\SEGMENT_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/POLYGON.h">
+    <ClInclude Include="..\Basic_Geometry\POLYGON.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/BASIC_GEOMETRY_POLICY.h">
+    <ClInclude Include="..\Basic_Geometry\BASIC_GEOMETRY_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/TRIANGLE_3D.h">
+    <ClInclude Include="..\Basic_Geometry\TRIANGLE_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/CONE.h">
+    <ClInclude Include="..\Basic_Geometry\CONE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/SPHERE.h">
+    <ClInclude Include="..\Basic_Geometry\SPHERE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/ELLIPSOID.h">
+    <ClInclude Include="..\Basic_Geometry\ELLIPSOID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/BOWL.h">
+    <ClInclude Include="..\Basic_Geometry\BOWL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/BASIC_SIMPLEX_POLICY.h">
+    <ClInclude Include="..\Basic_Geometry\BASIC_SIMPLEX_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/SEGMENT_2D.h">
+    <ClInclude Include="..\Basic_Geometry\SEGMENT_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/SEGMENT_3D.h">
+    <ClInclude Include="..\Basic_Geometry\SEGMENT_3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/ORIENTED_BOX.h">
+    <ClInclude Include="..\Basic_Geometry\ORIENTED_BOX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/LINE_2D.h">
+    <ClInclude Include="..\Basic_Geometry\LINE_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/TORUS.h">
+    <ClInclude Include="..\Basic_Geometry\TORUS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/POINT_SIMPLEX_1D.h">
+    <ClInclude Include="..\Basic_Geometry\POINT_SIMPLEX_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/BASIC_GEOMETRY_FORWARD.h">
+    <ClInclude Include="..\Basic_Geometry\BASIC_GEOMETRY_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/SMOOTH_GEAR.h">
+    <ClInclude Include="..\Basic_Geometry\SMOOTH_GEAR.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/RING.h">
+    <ClInclude Include="..\Basic_Geometry\RING.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/TETRAHEDRON.h">
+    <ClInclude Include="..\Basic_Geometry\TETRAHEDRON.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/HEXAHEDRON.h">
+    <ClInclude Include="..\Basic_Geometry\HEXAHEDRON.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/TRIANGLE_2D.h">
+    <ClInclude Include="..\Basic_Geometry\TRIANGLE_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/CYLINDER.h">
+    <ClInclude Include="..\Basic_Geometry\CYLINDER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/RAY.h">
+    <ClInclude Include="..\Basic_Geometry\RAY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h">
+    <ClInclude Include="..\Basic_Geometry\BOUNDED_HORIZONTAL_PLANE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/POINT_2D.h">
+    <ClInclude Include="..\Basic_Geometry\POINT_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Basic_Geometry/PLANE.h">
+    <ClInclude Include="..\Basic_Geometry\PLANE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology/SIMPLEX_MESH.h">
+    <ClInclude Include="..\Topology\SIMPLEX_MESH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology/TETRAHEDRON_MESH.h">
+    <ClInclude Include="..\Topology\TETRAHEDRON_MESH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology/SEGMENT_MESH.h">
+    <ClInclude Include="..\Topology\SEGMENT_MESH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology/HEXAHEDRON_MESH.h">
+    <ClInclude Include="..\Topology\HEXAHEDRON_MESH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology/POINT_SIMPLEX_MESH.h">
+    <ClInclude Include="..\Topology\POINT_SIMPLEX_MESH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology/TOPOLOGY_POLICY.h">
+    <ClInclude Include="..\Topology\TOPOLOGY_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology/TRIANGLE_MESH.h">
+    <ClInclude Include="..\Topology\TRIANGLE_MESH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/EPS_FILE.h">
+    <ClInclude Include="..\Images\EPS_FILE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/VECTOR_IMAGE.h">
+    <ClInclude Include="..\Images\VECTOR_IMAGE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/HIDDEN_SURFACE_PRIMITIVES.h">
+    <ClInclude Include="..\Images\HIDDEN_SURFACE_PRIMITIVES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/DEPTH_BUFFERING.h">
+    <ClInclude Include="..\Images\DEPTH_BUFFERING.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/TEX_FILE.h">
+    <ClInclude Include="..\Images\TEX_FILE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Images/HIDDEN_SURFACE.h">
+    <ClInclude Include="..\Images\HIDDEN_SURFACE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Registry/REGISTRY.h">
+    <ClInclude Include="..\Registry\REGISTRY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Registry/STRUCTURE_REGISTRY.h">
+    <ClInclude Include="..\Registry\STRUCTURE_REGISTRY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tessellation/BOUNDED_HORIZONTAL_PLANE_TESSELLATION.h">
+    <ClInclude Include="..\Tessellation\BOUNDED_HORIZONTAL_PLANE_TESSELLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tessellation/TORUS_TESSELLATION.h">
+    <ClInclude Include="..\Tessellation\TORUS_TESSELLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tessellation/SPHERE_TESSELLATION.h">
+    <ClInclude Include="..\Tessellation\SPHERE_TESSELLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tessellation/ORIENTED_BOX_TESSELLATION.h">
+    <ClInclude Include="..\Tessellation\ORIENTED_BOX_TESSELLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tessellation/GEAR_TESSELLATION.h">
+    <ClInclude Include="..\Tessellation\GEAR_TESSELLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tessellation/RING_TESSELLATION.h">
+    <ClInclude Include="..\Tessellation\RING_TESSELLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tessellation/BOWL_TESSELLATION.h">
+    <ClInclude Include="..\Tessellation\BOWL_TESSELLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tessellation/RANGE_TESSELLATION.h">
+    <ClInclude Include="..\Tessellation\RANGE_TESSELLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tessellation/IMPLICIT_OBJECT_TESSELLATION.h">
+    <ClInclude Include="..\Tessellation\IMPLICIT_OBJECT_TESSELLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tessellation/PLANE_TESSELLATION.h">
+    <ClInclude Include="..\Tessellation\PLANE_TESSELLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Tessellation/CYLINDER_TESSELLATION.h">
+    <ClInclude Include="..\Tessellation\CYLINDER_TESSELLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Constitutive_Models/STRAIN_MEASURE.h">
+    <ClInclude Include="..\Constitutive_Models\STRAIN_MEASURE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Level_Sets/EXTRAPOLATION_UNIFORM.h">
+    <ClInclude Include="..\Level_Sets\EXTRAPOLATION_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Level_Sets/IMPLICIT_OBJECT_ON_A_RAY_SECONDARY_INTERPOLATION.h">
+    <ClInclude Include="..\Level_Sets\IMPLICIT_OBJECT_ON_A_RAY_SECONDARY_INTERPOLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h">
+    <ClInclude Include="..\Level_Sets\IMPLICIT_OBJECT_ON_A_RAY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h">
+    <ClInclude Include="..\Level_Sets\EXTRAPOLATION_HIGHER_ORDER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Level_Sets/FAST_MARCHING.h">
+    <ClInclude Include="..\Level_Sets\FAST_MARCHING.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Level_Sets/EXTRAPOLATION.h">
+    <ClInclude Include="..\Level_Sets\EXTRAPOLATION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h">
+    <ClInclude Include="..\Level_Sets\FAST_MARCHING_METHOD_UNIFORM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Level_Sets/LEVELSET_MAKER.h">
+    <ClInclude Include="..\Level_Sets\LEVELSET_MAKER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Level_Sets/LEVELSET_UTILITIES.h">
+    <ClInclude Include="..\Level_Sets\LEVELSET_UTILITIES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Level_Sets/LEVELSET.h">
+    <ClInclude Include="..\Level_Sets\LEVELSET.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Level_Sets/LEVELSET_POLICY.h">
+    <ClInclude Include="..\Level_Sets\LEVELSET_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h">
+    <ClInclude Include="..\Topology_Based_Geometry\HEXAHEDRALIZED_VOLUME.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/MESH_OBJECT.h">
+    <ClInclude Include="..\Topology_Based_Geometry\MESH_OBJECT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/POINT_SIMPLICES_1D.h">
+    <ClInclude Include="..\Topology_Based_Geometry\POINT_SIMPLICES_1D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/SEGMENTED_CURVE_2D.h">
+    <ClInclude Include="..\Topology_Based_Geometry\SEGMENTED_CURVE_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_POLICY.h">
+    <ClInclude Include="..\Topology_Based_Geometry\TOPOLOGY_BASED_GEOMETRY_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h">
+    <ClInclude Include="..\Topology_Based_Geometry\TETRAHEDRALIZED_VOLUME.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/TRIANGULATED_SURFACE.h">
+    <ClInclude Include="..\Topology_Based_Geometry\TRIANGULATED_SURFACE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/STRUCTURE.h">
+    <ClInclude Include="..\Topology_Based_Geometry\STRUCTURE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h">
+    <ClInclude Include="..\Topology_Based_Geometry\TOPOLOGY_BASED_GEOMETRY_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/TRIANGULATED_AREA.h">
+    <ClInclude Include="..\Topology_Based_Geometry\TRIANGULATED_AREA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/TRIANGLE_SUBDIVISION.h">
+    <ClInclude Include="..\Topology_Based_Geometry\TRIANGLE_SUBDIVISION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/STRUCTURE_LIST.h">
+    <ClInclude Include="..\Topology_Based_Geometry\STRUCTURE_LIST.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h">
+    <ClInclude Include="..\Topology_Based_Geometry\TOPOLOGY_BASED_SIMPLEX_POLICY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Topology_Based_Geometry/SEGMENTED_CURVE.h">
+    <ClInclude Include="..\Topology_Based_Geometry\SEGMENTED_CURVE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Geometry_Particles/VIEWER_OUTPUT.h">
+    <ClInclude Include="..\Geometry_Particles\VIEWER_OUTPUT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Geometry_Particles/GEOMETRY_PARTICLES.h">
+    <ClInclude Include="..\Geometry_Particles\GEOMETRY_PARTICLES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h">
+    <ClInclude Include="..\Geometry_Particles\GEOMETRY_PARTICLES_FORWARD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../Geometry_Particles/DEBUG_PARTICLES.h">
+    <ClInclude Include="..\Geometry_Particles\DEBUG_PARTICLES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

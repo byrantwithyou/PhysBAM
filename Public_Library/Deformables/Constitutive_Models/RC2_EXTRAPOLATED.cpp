@@ -456,7 +456,7 @@ static void Test_Model_Helper(const char* str,const MATRIX<T,d>& a0, const MATRI
         LOG::cout<<buff;}
 }
 //#####################################################################
-// Function Test_Model_Helper
+// Function Test_it
 //#####################################################################
 template<class T> static void
 Test_it(const char* str, const VECTOR<T,3>& f, const VECTOR<T,3>& w, const VECTOR<T,3>& w_it)
@@ -466,7 +466,7 @@ Test_it(const char* str, const VECTOR<T,3>& f, const VECTOR<T,3>& w, const VECTO
     Print_Helper(str, (w.x-w.y)/(f.x-f.y), w_it.z);
 }
 //#####################################################################
-// Function Test_Model_Helper
+// Function Test_it
 //#####################################################################
 template<class T> static void
 Test_it(const char* str, const VECTOR<T,2>& f, const VECTOR<T,2>& w, const VECTOR<T,1>& w_it)
@@ -474,7 +474,7 @@ Test_it(const char* str, const VECTOR<T,2>& f, const VECTOR<T,2>& w, const VECTO
     Print_Helper(str, (w.x-w.y)/(f.x-f.y), w_it.x);
 }
 //#####################################################################
-// Function Test_Model_Helper
+// Function Test_it
 //#####################################################################
 template<class T> static void
 Test_it(const char* str, const VECTOR<T,3>& f, const MATRIX<T,3>& w, const MATRIX<T,3>& w_it)
@@ -484,7 +484,7 @@ Test_it(const char* str, const VECTOR<T,3>& f, const MATRIX<T,3>& w, const MATRI
     Print_Helper(str, (w.Column(0)-w.Column(1))/(f.x-f.y), w_it.Column(2));
 }
 //#####################################################################
-// Function Test_Model_Helper
+// Function Test_it
 //#####################################################################
 template<class T> static void
 Test_it(const char* str, const VECTOR<T,2>& f, const MATRIX<T,2>& w, MATRIX<T,2,1> w_it)

@@ -6,6 +6,7 @@
 #define __AVERAGING_UNIFORM__
 
 #include <Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
+#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<TV>

@@ -39,7 +39,6 @@ protected:
     virtual void Emit_Object(ARRAY_VIEW<TV> pts,ARRAY_VIEW<ARRAY_VIEW<TV> > holes); // polygon with holes
     virtual void Emit_Object(const TV &pt,T radius); // circle
     virtual void Emit_Object(const RANGE<TV>& box);
-    void Compute_Transform(T& scale,TV& shift);
 //#####################################################################
 };
 }

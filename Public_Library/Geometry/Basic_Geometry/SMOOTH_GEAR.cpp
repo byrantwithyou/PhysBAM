@@ -298,7 +298,7 @@ Hessian(const TV& X) const
     T k=floor(a.x/g.den);
     AUTO_HESS<T,TV> b=a-k*g.den;
     if(2*b.x>g.den) b=g.den-b;
-    AUTO_HESS<TV,TV> Y=AUTO_HESS<TV,TV>(cos(b)*d,sin(b)*d,AUTO_HESS<T,TV>::From_Const(0));
+    AUTO_HESS<TV,TV> Y(cos(b)*d,sin(b)*d,AUTO_HESS<T,TV>::From_Const(0));
     bool ui=g.Co.y*(Y(0).x-g.ci)>Y(1).x*(g.Co.x-g.ci);
     TV P(ui?g.Ci:g.Co);
     AUTO_HESS<TV,TV> dY=Y-P;

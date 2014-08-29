@@ -3,29 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Compressible", "../Public_Library/Compressible/msvc13/Compressible.vcxproj", "{9AA0E46D-C5AE-0960-3763-ECCF28729307}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Compressible", "..\Public_Library\Compressible\msvc13\Compressible.vcxproj", "{6816B33D-E295-2B56-FD29-D7F7910180ED}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Deformables", "../Public_Library/Deformables/msvc13/Deformables.vcxproj", "{616BCD90-5032-4FC7-F644-041C90E11622}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Deformables", "..\Public_Library\Deformables\msvc13\Deformables.vcxproj", "{F48B463F-86ED-CF7B-F527-69C3F0ABFF93}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dynamics", "../Public_Library/Dynamics/msvc13/Dynamics.vcxproj", "{1C827FAD-B34E-627A-4D87-1C19335D2035}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dynamics", "..\Public_Library\Dynamics\msvc13\Dynamics.vcxproj", "{89C8BAC5-BE62-34A8-3CE2-18AA93F12B59}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Fluids", "../Public_Library/Fluids/msvc13/Fluids.vcxproj", "{7FCAC0FD-6EBB-6E91-3E15-43B1F900DDF7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Fluids", "..\Public_Library\Fluids\msvc13\Fluids.vcxproj", "{FA2C5529-43CF-8871-B80F-FDCC72C3CD3F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Geometry", "../Public_Library/Geometry/msvc13/Geometry.vcxproj", "{86BAEC4F-9544-0861-C15A-E1863E404AE3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Geometry", "..\Public_Library\Geometry\msvc13\Geometry.vcxproj", "{A28136C9-7EF6-22B4-DBDE-FAF230EA44AF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Incompressible", "../Public_Library/Incompressible/msvc13/Incompressible.vcxproj", "{DC2919C3-DB24-5371-9DA9-165D9A35AB43}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Incompressible", "..\Public_Library\Incompressible\msvc13\Incompressible.vcxproj", "{98C923A4-707F-9543-1748-D929A39AA09C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL", "../Public_Library/OpenGL/msvc13/OpenGL.vcxproj", "{D84A9EDD-A881-4FA6-BE9B-E4CA488A0ECF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL", "..\Public_Library\OpenGL\msvc13\OpenGL.vcxproj", "{A12BE0AE-94EA-FD54-A210-632A66A32DA1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ray_Tracing", "../Public_Library/Ray_Tracing/msvc13/Ray_Tracing.vcxproj", "{974827EF-C9DB-B70A-173B-DA59502B6D85}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ray_Tracing", "..\Public_Library\Ray_Tracing\msvc13\Ray_Tracing.vcxproj", "{8A50B627-0CC2-5000-5B9C-E40961CD3CB5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Rigids", "../Public_Library/Rigids/msvc13/Rigids.vcxproj", "{BD1C491F-6851-6E93-E163-291E75FD0930}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Rigids", "..\Public_Library\Rigids\msvc13\Rigids.vcxproj", "{AAC62290-A567-ECF8-4D0A-B693DCBAA6FD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Solids", "../Public_Library/Solids/msvc13/Solids.vcxproj", "{8C254EA6-5D16-B5F4-5CEF-487B8CA953B8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Solids", "..\Public_Library\Solids\msvc13\Solids.vcxproj", "{1A20737B-2073-33F9-A793-77E3A3F1FDBD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tools", "../Public_Library/Tools/msvc13/Tools.vcxproj", "{4725E098-7259-8AE9-FFDF-EF0805C55E66}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tools", "..\Public_Library\Tools\msvc13\Tools.vcxproj", "{8FED0236-9B2D-55CD-CEFA-C15D097D2C61}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "be_evolution", "../Projects/be_evolution/msvc13/be_evolution.vcxproj", "{A87CA670-4B06-057C-FD67-A945AD1B8B29}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "be_evolution", "..\Projects\be_evolution\msvc13\be_evolution.vcxproj", "{381583F3-D092-46C2-B3EF-DDD2F68362CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
