@@ -22,7 +22,7 @@ echo '..\..\..\..\Summer 2014\downloads\zlib128-dll\lib\zdll.lib' > libs.txt
 
 rm -f projs.txt
 
-for p in Tools ; do
+for p in Compressible Deformables Dynamics Fluids Geometry Incompressible OpenGL Ray_Tracing Rigids Solids Tools ; do
     mkdir -p ../../Public_Library/$p/msvc13
     all_cpp ../../Public_Library/$p > all-cpp.txt
     all_h ../../Public_Library/$p > all-h.txt

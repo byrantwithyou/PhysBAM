@@ -1,0 +1,699 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="../Particles/SPH_PARTICLES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Particles/PARTICLE_LEVELSET_PARTICLES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Fluids_Color_Driver/PLS_FC_EXAMPLE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Fluids_Color_Driver/PLS_FC_DRIVER.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Forces_And_Torques/EULER_FLUID_FORCES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Solids_And_Fluids/FLUIDS_PARAMETERS_CALLBACKS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Solids_And_Fluids/FLUIDS_PARAMETERS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Interpolation/FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Interpolation/LINEAR_INTERPOLATION_DYNAMICS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_SOLID_FORCES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION_BASE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_SOURCES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/SURFACE_TENSION_BOUNDARY_CONDITION.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_CUT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/COMPRESSIBLE_BOUNDARY_CONDITION_WALLS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/PRESSURE_VELOCITY_VECTOR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/EXAMPLE_BOUNDARY_CONDITION.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/SOLID_FLUID_SYSTEM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLECTION.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/GENERALIZED_FLUID_MASS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLISIONS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION_BASE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION_SLIP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT_BASE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_PHI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_VISCOUS_FORCES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT_CUT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_POISSON.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/UNIFORM_INTERIOR_ITERATOR_CELL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/COUPLED_SYSTEM_VECTOR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_BASE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Driver/PLS_FSI_EXAMPLE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Coupled_Driver/PLS_FSI_DRIVER.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Drivers/PLS_REFINEMENT_EXAMPLE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Drivers/COMPRESSIBLE_EXAMPLE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Drivers/PLS_DRIVER.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Drivers/COMPRESSIBLE_DRIVER.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Drivers/PLS_EXAMPLE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Parallel_Computation/CONJUGATE_RESIDUAL_SPARSE_MPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Parallel_Computation/SOLID_SYSTEM_MPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Parallel_Computation/MPI_UNIFORM_PARTICLES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Parallel_Computation/FLUID_SYSTEM_MPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Parallel_Computation/REFINEMENT_THREADS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Parallel_Computation/FLUID_SYSTEM_MPI_SLIP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Parallel_Computation/MPI_SOLID_FLUID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Parallel_Computation/MPI_SOLID_FLUID_SLIP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Parallel_Computation/SYMMQMR_SPARSE_MPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Parallel_Computation/SOLID_SYSTEM_MPI_SLIP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Motion/ACTIVATION_CONTROL_SET.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Heat_Flows/HEAT_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Kang/KANG_POISSON_VISCOSITY.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/REMOVED_PARTICLES_BLENDER_3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_1D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/HAMILTONIAN_NORMAL_VELOCITY_2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/PARTICLE_LEVELSET_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/LEVELSET_CALLBACKS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/REMOVED_PARTICLES_PROCESSING.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/UNIFORM_REMOVED_PARTICLES_PROCESSING.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/PARTICLE_LEVELSET.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Level_Sets/LEVELSET_ADVECTION.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Geometry/REMOVED_PARTICLES_IMPLICIT_OBJECT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Standard_Tests/WATER_STANDARD_TESTS_3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Standard_Tests/WATER_STANDARD_TESTS_2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Standard_Tests/SMOKE_STANDARD_TESTS_2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Standard_Tests/SMOKE_STANDARD_TESTS_3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Incompressible_Flows/SPH_EVOLUTION_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Incompressible_Flows/FAST_PROJECTION_DYNAMICS_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Incompressible_Flows/IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="../Particles/PARTICLE_LEVELSET_PARTICLES.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Particles/DYNAMICS_PARTICLES_FORWARD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Particles/SPH_PARTICLES.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Fluids_Color_Driver/PLS_FC_DRIVER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Fluids_Color_Driver/PLS_FC_EXAMPLE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Forces_And_Torques/EULER_FLUID_FORCES.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Solids_And_Fluids/FLUIDS_PARAMETERS_CALLBACKS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Solids_And_Fluids/SPH_CALLBACKS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_CALLBACKS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Solids_And_Fluids/FLUIDS_PARAMETERS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Interpolation/FIRE_INTERPOLATION_FORWARD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Interpolation/FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/FORCE_AGGREGATE_ID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION_SLIP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_VISCOUS_FORCES.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/EXAMPLE_BOUNDARY_CONDITION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION_BASE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_POISSON.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/PRESSURE_VELOCITY_VECTOR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_CUT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_BASE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/COMPRESSIBLE_BOUNDARY_CONDITION_WALLS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/COUPLED_SYSTEM_VECTOR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/VISCOUS_FORCE_ID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/SURFACE_TENSION_BOUNDARY_CONDITION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION_BASE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/SOLID_FLUID_SYSTEM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/UNIFORM_INTERIOR_ITERATOR_CELL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/COUPLING_CONSTRAINT_ID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLISIONS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/GENERALIZED_FLUID_MASS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/BOUNDARY_CONDITION_INFO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_PHI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_SOURCES.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLECTION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_SOLID_FORCES.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT_BASE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT_CUT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Driver/PLS_FSI_DRIVER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Coupled_Driver/PLS_FSI_EXAMPLE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Drivers/PLS_REFINEMENT_EXAMPLE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Drivers/PLS_EXAMPLE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Drivers/COMPRESSIBLE_DRIVER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Drivers/COMPRESSIBLE_EXAMPLE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Drivers/PLS_DRIVER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Parallel_Computation/FLUID_SYSTEM_MPI_SLIP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Parallel_Computation/SOLID_SYSTEM_MPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Parallel_Computation/SYMMQMR_SPARSE_MPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Parallel_Computation/MPI_SOLID_FLUID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Parallel_Computation/CONJUGATE_RESIDUAL_SPARSE_MPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Parallel_Computation/FLUID_SYSTEM_MPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Parallel_Computation/SOLID_SYSTEM_MPI_SLIP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Parallel_Computation/REFINEMENT_THREADS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Parallel_Computation/MPI_SOLID_FLUID_SLIP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Parallel_Computation/MPI_UNIFORM_PARTICLES.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Motion/FACE_CONTROL_SET.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Motion/PHONEME.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Motion/ACTIVATION_CONTROL_SET.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Advection_Equations/FIRE_ADVECTION_POLICY.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Advection_Equations/FIRE_ADVECTION_FORWARD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Advection_Equations/ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Boundaries/BOUNDARY_OPEN_WATER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Boundaries/BOUNDARY_REFLECTION_WATER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Heat_Flows/HEAT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Heat_Flows/HEAT_LAPLACE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Heat_Flows/HEAT_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Kang/KANG_POISSON_VISCOSITY.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_1D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/REMOVED_PARTICLES_PROCESSING.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_1D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_NORMAL_VELOCITY_2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/REMOVED_PARTICLES_BLENDER_3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/LEVELSET_CALLBACKS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET_EVOLUTION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/LEVELSET_ADVECTION_MULTIPLE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/LEVELSET_ADVECTION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET_MULTIPLE_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/UNIFORM_REMOVED_PARTICLES_PROCESSING.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Geometry/REMOVED_PARTICLES_IMPLICIT_OBJECT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE_2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE_3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Standard_Tests/WATER_STANDARD_TESTS_2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Standard_Tests/WATER_STANDARD_TESTS_3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Standard_Tests/SMOKE_STANDARD_TESTS_3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Standard_Tests/SMOKE_STANDARD_TESTS_2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Incompressible_Flows/FAST_PROJECTION_DYNAMICS_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Incompressible_Flows/IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Incompressible_Flows/PROJECTION_DYNAMICS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\..\..\Summer 2014\downloads\zlib128-dll\lib\zdll.lib" />
+  </ItemGroup>
+</Project>

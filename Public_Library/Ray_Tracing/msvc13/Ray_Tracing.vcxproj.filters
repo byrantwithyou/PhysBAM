@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="../Rendering_Shaders/RENDERING_TEXTURE_IMAGE_SHADER.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Rendering_Shaders/RENDERING_VOXEL_SHADER.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Rendering_Objects/RENDERING_UNIFORM_GRID_ACCELERATOR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Rendering_Objects/RENDERING_OBJECT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Rendering_Objects/RENDERING_UNIFORM_VOXELS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Rendering_Objects/RENDERING_VOXELS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Rendering/RENDER_WORLD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Rendering/FILM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Rendering/BLACKBODY.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Rendering/CIE_XYZ.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="../Rendering/PHOTON_MAP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_ABSORPTION_SPECTRUM_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_SUBDIVISION_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_NOISE_TEXTURE_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_SHELL_EMISSION_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_HOMOGENEOUS_VOLUME_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_VOXEL_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BUMP_MAP_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TWO_SIDE_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_CHECKERBOARD_TEXTURE_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_INFINITE_REFLECTION_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_FIXED_BLEND_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BLEND_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_REFLECTION_MAP_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TRANSPARENT_MATERIAL_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/MATERIAL_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_COLOR_BLEND_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_KAJIYA_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BUMP_MAP_NORMAL_IMAGE_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/VOLUMETRIC_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_MARBLE_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TEXTURE_IMAGE_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TRANSLUCENCY_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_REFLECTION_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_WOOD_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_PHOTON_SINK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_SUM_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BLEND_IMPLICIT_SURFACE_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_NORMAL_ILLUSTRATION_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_UNIFORM_COLOR_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_FOG_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_PHONG_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_LIGHT_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BUMP_MAP_IMAGE_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_VOXEL_FIRE_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_MASKED_BLEND_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TORRANCE_SPARROW_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BLEND_TRIANGULATED_SURFACE_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TRANSPARENT_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_CAMERA_ORIENTED_NORMAL_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TRIANGULATED_SURFACE_VERTEX_COLOR_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_LAMBERTIAN_SHADER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Shaders/SUBSURFACE_SCATTERING_IRRADIANCE_SAMPLE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Lights/RENDERING_VOXEL_FIRE_LIGHT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Lights/RENDERING_DIRECTIONAL_LIGHT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Lights/RENDERING_SPOTLIGHT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Lights/RENDERING_LIGHT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Lights/RENDERING_POINT_LIGHT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Lights/RENDERING_RECTANGLE_LIGHT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_ETHER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_REGION_OBJECT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_KD_TREE_ACCELERATOR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_OBJECT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_SEGMENTED_CURVE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_TETRAHEDRON.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_PLANE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_IMPLICIT_SURFACE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_UNIFORM_VOXELS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_CYLINDER.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_VOXELS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_BOX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_OBJECT_ACCELERATION_PRIMITIVE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_RING.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_TRIANGLE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_PARTICLES.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_SPHERE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_TRIANGULATED_SURFACE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_UNIFORM_GRID_ACCELERATOR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_ELLIPSOID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_SHOCKS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering_Objects/RENDERING_WALL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/CAMERA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/PHOTON_MAP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/RENDER_WORLD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/RGB_COLORS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/RENDERING_RAY.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/CIE_XYZ.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/RENDERING_RAY_DEBUG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/IRRADIANCE_SAMPLE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/PHOTON.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/FILM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/RAY_TRACER_DEBUG_DATA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/BLACKBODY.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/FRESNEL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="../Rendering/RENDERING_SPHERE_PARTITION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\..\..\Summer 2014\downloads\zlib128-dll\lib\zdll.lib" />
+  </ItemGroup>
+</Project>

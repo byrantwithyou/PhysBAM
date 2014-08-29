@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{974827EF-C9DB-B70A-173B-DA59502B6D85}</ProjectGuid>
+    <RootNamespace>Ray_Tracing</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>D:\ucla\PhysBAM\Public_Library;%(AdditionalIncludeDirectories);C:\local\boost_1_56_0;D:\ucla\Summer 2014\downloads\zlib128-dll\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4258;4244;4305</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:/ucla/Summer 2014/downloads/zlib128-dll/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>D:/ucla/Summer 2014/downloads/zlib128-dll/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="../Rendering_Shaders/RENDERING_TEXTURE_IMAGE_SHADER.cpp" />
+    <ClCompile Include="../Rendering_Shaders/RENDERING_VOXEL_SHADER.cpp" />
+    <ClCompile Include="../Rendering_Objects/RENDERING_UNIFORM_GRID_ACCELERATOR.cpp" />
+    <ClCompile Include="../Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.cpp" />
+    <ClCompile Include="../Rendering_Objects/RENDERING_OBJECT.cpp" />
+    <ClCompile Include="../Rendering_Objects/RENDERING_UNIFORM_VOXELS.cpp" />
+    <ClCompile Include="../Rendering_Objects/RENDERING_VOXELS.cpp" />
+    <ClCompile Include="../Rendering/RENDER_WORLD.cpp" />
+    <ClCompile Include="../Rendering/FILM.cpp" />
+    <ClCompile Include="../Rendering/BLACKBODY.cpp" />
+    <ClCompile Include="../Rendering/CIE_XYZ.cpp" />
+    <ClCompile Include="../Rendering/PHOTON_MAP.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="../Rendering_Shaders/RENDERING_ABSORPTION_SPECTRUM_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_SUBDIVISION_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_NOISE_TEXTURE_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_SHELL_EMISSION_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_HOMOGENEOUS_VOLUME_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_VOXEL_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BUMP_MAP_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TWO_SIDE_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_CHECKERBOARD_TEXTURE_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_INFINITE_REFLECTION_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_FIXED_BLEND_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BLEND_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_REFLECTION_MAP_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TRANSPARENT_MATERIAL_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/MATERIAL_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_COLOR_BLEND_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_KAJIYA_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BUMP_MAP_NORMAL_IMAGE_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/VOLUMETRIC_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_MARBLE_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TEXTURE_IMAGE_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TRANSLUCENCY_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_REFLECTION_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_WOOD_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_PHOTON_SINK.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_SUM_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BLEND_IMPLICIT_SURFACE_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_NORMAL_ILLUSTRATION_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_UNIFORM_COLOR_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_FOG_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_PHONG_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_LIGHT_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BUMP_MAP_IMAGE_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_VOXEL_FIRE_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_MASKED_BLEND_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TORRANCE_SPARROW_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_BLEND_TRIANGULATED_SURFACE_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TRANSPARENT_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_CAMERA_ORIENTED_NORMAL_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_TRIANGULATED_SURFACE_VERTEX_COLOR_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/RENDERING_LAMBERTIAN_SHADER.h" />
+    <ClInclude Include="../Rendering_Shaders/SUBSURFACE_SCATTERING_IRRADIANCE_SAMPLE.h" />
+    <ClInclude Include="../Rendering_Lights/RENDERING_VOXEL_FIRE_LIGHT.h" />
+    <ClInclude Include="../Rendering_Lights/RENDERING_DIRECTIONAL_LIGHT.h" />
+    <ClInclude Include="../Rendering_Lights/RENDERING_SPOTLIGHT.h" />
+    <ClInclude Include="../Rendering_Lights/RENDERING_LIGHT.h" />
+    <ClInclude Include="../Rendering_Lights/RENDERING_POINT_LIGHT.h" />
+    <ClInclude Include="../Rendering_Lights/RENDERING_RECTANGLE_LIGHT.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_ETHER.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_REGION_OBJECT.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_KD_TREE_ACCELERATOR.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_OBJECT.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_SEGMENTED_CURVE.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_TETRAHEDRON.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_PLANE.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_IMPLICIT_SURFACE.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_UNIFORM_VOXELS.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_CYLINDER.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_VOXELS.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_BOX.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_OBJECT_ACCELERATION_PRIMITIVE.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_RING.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_TRIANGLE.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_PARTICLES.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_SPHERE.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_TRIANGULATED_SURFACE.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_UNIFORM_GRID_ACCELERATOR.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_ELLIPSOID.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_SHOCKS.h" />
+    <ClInclude Include="../Rendering_Objects/RENDERING_WALL.h" />
+    <ClInclude Include="../Rendering/CAMERA.h" />
+    <ClInclude Include="../Rendering/PHOTON_MAP.h" />
+    <ClInclude Include="../Rendering/RENDER_WORLD.h" />
+    <ClInclude Include="../Rendering/RGB_COLORS.h" />
+    <ClInclude Include="../Rendering/RENDERING_RAY.h" />
+    <ClInclude Include="../Rendering/CIE_XYZ.h" />
+    <ClInclude Include="../Rendering/RENDERING_RAY_DEBUG.h" />
+    <ClInclude Include="../Rendering/IRRADIANCE_SAMPLE.h" />
+    <ClInclude Include="../Rendering/PHOTON.h" />
+    <ClInclude Include="../Rendering/FILM.h" />
+    <ClInclude Include="../Rendering/RAY_TRACER_DEBUG_DATA.h" />
+    <ClInclude Include="../Rendering/BLACKBODY.h" />
+    <ClInclude Include="../Rendering/FRESNEL.h" />
+    <ClInclude Include="../Rendering/RENDERING_SPHERE_PARTITION.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\..\..\Summer 2014\downloads\zlib128-dll\lib\zdll.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

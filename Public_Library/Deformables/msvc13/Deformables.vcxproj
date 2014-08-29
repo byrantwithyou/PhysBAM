@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{616BCD90-5032-4FC7-F644-041C90E11622}</ProjectGuid>
+    <RootNamespace>Deformables</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>D:\ucla\PhysBAM\Public_Library;%(AdditionalIncludeDirectories);C:\local\boost_1_56_0;D:\ucla\Summer 2014\downloads\zlib128-dll\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4258;4244;4305</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:/ucla/Summer 2014/downloads/zlib128-dll/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>D:/ucla/Summer 2014/downloads/zlib128-dll/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="../Particles/DEFORMABLE_PARTICLES.cpp" />
+    <ClCompile Include="../Particles/FREE_PARTICLES.cpp" />
+    <ClCompile Include="../Forces/LINEAR_ALTITUDE_SPRINGS_S3D.cpp" />
+    <ClCompile Include="../Forces/LINEAR_POINT_ATTRACTION.cpp" />
+    <ClCompile Include="../Forces/AXIAL_BENDING_SPRINGS.cpp" />
+    <ClCompile Include="../Forces/FINITE_VOLUME.cpp" />
+    <ClCompile Include="../Forces/BW_FORCES.cpp" />
+    <ClCompile Include="../Forces/MULTILINEAR_SPRINGS.cpp" />
+    <ClCompile Include="../Forces/BW_STRETCH_FORCES.cpp" />
+    <ClCompile Include="../Forces/LINEAR_FINITE_VOLUME.cpp" />
+    <ClCompile Include="../Forces/RALEIGH_DAMPING_FORCE.cpp" />
+    <ClCompile Include="../Forces/SURFACE_TENSION_FORCE.cpp" />
+    <ClCompile Include="../Forces/COLLISION_AREA_PENALTY_FORCE.cpp" />
+    <ClCompile Include="../Forces/ELASTIC_ETHER_DRAG.cpp" />
+    <ClCompile Include="../Forces/SEGMENT_ADHESION.cpp" />
+    <ClCompile Include="../Forces/BW_BENDING_FORCES.cpp" />
+    <ClCompile Include="../Forces/DEFORMABLE_WIND_DRAG_3D.cpp" />
+    <ClCompile Include="../Forces/DEFORMABLE_GRAVITY.cpp" />
+    <ClCompile Include="../Forces/LINEAR_ALTITUDE_SPRINGS_2D.cpp" />
+    <ClCompile Include="../Forces/BW_GRAVITY.cpp" />
+    <ClCompile Include="../Forces/LINEAR_BENDING_ELEMENTS.cpp" />
+    <ClCompile Include="../Forces/FINITE_VOLUME_HEXAHEDRONS.cpp" />
+    <ClCompile Include="../Forces/SEGMENT_BENDING_ELEMENTS.cpp" />
+    <ClCompile Include="../Forces/DEFORMABLE_ETHER_DRAG.cpp" />
+    <ClCompile Include="../Forces/DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES.cpp" />
+    <ClCompile Include="../Forces/BW_SHEAR_FORCES.cpp" />
+    <ClCompile Include="../Forces/POINTWISE_DEFORMABLE_FORCE.cpp" />
+    <ClCompile Include="../Forces/IMPLICIT_ZERO_LENGTH_SPRINGS.cpp" />
+    <ClCompile Include="../Forces/LINEAR_TET_SPRINGS.cpp" />
+    <ClCompile Include="../Forces/BW_MATERIAL_SPACE_FORCES.cpp" />
+    <ClCompile Include="../Forces/SIMPLE_TRIANGLE_BENDING_ELEMENTS.cpp" />
+    <ClCompile Include="../Forces/INCOMPRESSIBLE_FINITE_VOLUME.cpp" />
+    <ClCompile Include="../Forces/TRIANGLE_BENDING_SPRINGS.cpp" />
+    <ClCompile Include="../Forces/LINEAR_ALTITUDE_SPRINGS_3D.cpp" />
+    <ClCompile Include="../Forces/LINEAR_SPRINGS.cpp" />
+    <ClCompile Include="../Forces/SEGMENT_BENDING_SPRINGS.cpp" />
+    <ClCompile Include="../Forces/GUIDE_ADHESION.cpp" />
+    <ClCompile Include="../Forces/LINEAR_ALTITUDE_SPRINGS.cpp" />
+    <ClCompile Include="../Forces/DEFORMABLES_FORCES.cpp" />
+    <ClCompile Include="../Forces/TRIANGLE_BENDING_ELEMENTS.cpp" />
+    <ClCompile Include="../Bindings/RIGID_BODY_BINDING.cpp" />
+    <ClCompile Include="../Bindings/BINDING.cpp" />
+    <ClCompile Include="../Bindings/SOFT_BINDINGS.cpp" />
+    <ClCompile Include="../Bindings/BINDING_LIST.cpp" />
+    <ClCompile Include="../Bindings/LINEAR_BINDING.cpp" />
+    <ClCompile Include="../Fracture/EMBEDDED_TRIANGULATED_OBJECT.cpp" />
+    <ClCompile Include="../Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.cpp" />
+    <ClCompile Include="../Fracture/EMBEDDED_MATERIAL_SURFACE.cpp" />
+    <ClCompile Include="../Fracture/EMBEDDING.cpp" />
+    <ClCompile Include="../Fracture/EMBEDDED_OBJECT.cpp" />
+    <ClCompile Include="../Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.cpp" />
+    <ClCompile Include="../Fracture/TRIANGLES_OF_MATERIAL.cpp" />
+    <ClCompile Include="../Parallel_Computation/MPI_SOLIDS.cpp" />
+    <ClCompile Include="../Parallel_Computation/MPI_REPULSION_UTILITIES.cpp" />
+    <ClCompile Include="../Deformable_Objects/DEFORMABLE_BODY_COLLECTION.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/VOLUME_COLLISIONS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/ROBUST_SIMPLEX_INTERACTIONS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TRIANGLE_ORIGIN_AREAS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TRIANGLE_COLLISIONS_EDGE_EDGE_VISITOR.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/INTERSECTING_PAIRS_VISITOR.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TRIANGLE_COLLISIONS_POINT_FACE_VISITOR.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/EXACT_SIMPLEX_INTERACTIONS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/LEVELSET_VOLUME_COLLISIONS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TRIANGLE_REPULSIONS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TRIANGLE_INTERSECTION.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/SIMPLEX_INTERACTIONS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TRIANGLE_REPULSIONS_POINT_FACE_VISITOR.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/EDGE_EDGE_INITIAL_CULL_VISITOR.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TRIANGLE_COLLISIONS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/EDGE_EDGE_ADHESION_VISITOR.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR.cpp" />
+    <ClCompile Include="../Collisions_And_Interactions/TRIANGLE_REPULSIONS_PENALTY.cpp" />
+    <ClCompile Include="../Constitutive_Models/COROTATED.cpp" />
+    <ClCompile Include="../Constitutive_Models/GENERAL_EXTRAPOLATED.cpp" />
+    <ClCompile Include="../Constitutive_Models/CONSTITUTIVE_MODEL.cpp" />
+    <ClCompile Include="../Constitutive_Models/NEO_HOOKEAN.cpp" />
+    <ClCompile Include="../Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.cpp" />
+    <ClCompile Include="../Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.cpp" />
+    <ClCompile Include="../Constitutive_Models/RC_EXTRAPOLATED.cpp" />
+    <ClCompile Include="../Constitutive_Models/RC2_EXTRAPOLATED.cpp" />
+    <ClCompile Include="../Constitutive_Models/COROTATED_FIXED.cpp" />
+    <ClCompile Include="../Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.cpp" />
+    <ClCompile Include="../Constitutive_Models/ANISOTROPIC_CONSTITUTIVE_MODEL.cpp" />
+    <ClCompile Include="../Constitutive_Models/GENERAL_ENERGY.cpp" />
+    <ClCompile Include="../Constitutive_Models/ST_VENANT_KIRCHHOFF.cpp" />
+    <ClCompile Include="../Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.cpp" />
+    <ClCompile Include="../Standard_Tests/DEFORMABLES_STANDARD_TESTS.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="../Particles/DEFORMABLES_PARTICLES_FORWARD.h" />
+    <ClInclude Include="../Particles/FREE_PARTICLES.h" />
+    <ClInclude Include="../Particles/DEFORMABLE_PARTICLES.h" />
+    <ClInclude Include="../Forces/LINEAR_BENDING_ELEMENTS.h" />
+    <ClInclude Include="../Forces/INCOMPRESSIBLE_FINITE_VOLUME.h" />
+    <ClInclude Include="../Forces/IMPLICIT_ZERO_LENGTH_SPRINGS.h" />
+    <ClInclude Include="../Forces/BW_MATERIAL_SPACE_FORCES.h" />
+    <ClInclude Include="../Forces/TRIANGLE_BENDING_ELEMENTS.h" />
+    <ClInclude Include="../Forces/COLLISION_FORCE.h" />
+    <ClInclude Include="../Forces/LINEAR_ALTITUDE_SPRINGS_3D.h" />
+    <ClInclude Include="../Forces/LINEAR_TET_SPRINGS.h" />
+    <ClInclude Include="../Forces/BW_BENDING_FORCES.h" />
+    <ClInclude Include="../Forces/BW_FORCES.h" />
+    <ClInclude Include="../Forces/LINEAR_POINT_ATTRACTION.h" />
+    <ClInclude Include="../Forces/SURFACE_TENSION_FORCE.h" />
+    <ClInclude Include="../Forces/LINEAR_SPRINGS.h" />
+    <ClInclude Include="../Forces/SEGMENT_ADHESION.h" />
+    <ClInclude Include="../Forces/SIMPLE_TRIANGLE_BENDING_ELEMENTS.h" />
+    <ClInclude Include="../Forces/SOLIDS_FORCES_POLICY.h" />
+    <ClInclude Include="../Forces/MULTILINEAR_SPRINGS.h" />
+    <ClInclude Include="../Forces/COLLISION_AREA_PENALTY_FORCE.h" />
+    <ClInclude Include="../Forces/GUIDE_ADHESION.h" />
+    <ClInclude Include="../Forces/ELASTIC_ETHER_DRAG.h" />
+    <ClInclude Include="../Forces/POINTWISE_DEFORMABLE_FORCE.h" />
+    <ClInclude Include="../Forces/FINITE_VOLUME.h" />
+    <ClInclude Include="../Forces/BW_SHEAR_FORCES.h" />
+    <ClInclude Include="../Forces/DEFORMABLE_ETHER_DRAG.h" />
+    <ClInclude Include="../Forces/LAGGED_FORCE.h" />
+    <ClInclude Include="../Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h" />
+    <ClInclude Include="../Forces/LINEAR_ALTITUDE_SPRINGS.h" />
+    <ClInclude Include="../Forces/BW_STRETCH_FORCES.h" />
+    <ClInclude Include="../Forces/SEGMENT_BENDING_SPRINGS.h" />
+    <ClInclude Include="../Forces/DEFORMABLE_WIND_DRAG_3D.h" />
+    <ClInclude Include="../Forces/FORCE_KINK_HELPER.h" />
+    <ClInclude Include="../Forces/LINEAR_ALTITUDE_SPRINGS_2D.h" />
+    <ClInclude Include="../Forces/BW_GRAVITY.h" />
+    <ClInclude Include="../Forces/DIAGONALIZED_SEMI_IMPLICIT_ELEMENT.h" />
+    <ClInclude Include="../Forces/BINDING_SPRINGS.h" />
+    <ClInclude Include="../Forces/SEGMENT_BENDING_ELEMENTS.h" />
+    <ClInclude Include="../Forces/DEFORMABLES_FORCES.h" />
+    <ClInclude Include="../Forces/DEFORMABLE_GRAVITY.h" />
+    <ClInclude Include="../Forces/RALEIGH_DAMPING_FORCE.h" />
+    <ClInclude Include="../Forces/DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES.h" />
+    <ClInclude Include="../Forces/LINEAR_FINITE_VOLUME.h" />
+    <ClInclude Include="../Forces/TRIANGLE_BENDING_SPRINGS.h" />
+    <ClInclude Include="../Forces/AXIAL_BENDING_SPRINGS.h" />
+    <ClInclude Include="../Forces/FINITE_VOLUME_HEXAHEDRONS.h" />
+    <ClInclude Include="../Bindings/BINDING.h" />
+    <ClInclude Include="../Bindings/SOFT_BINDINGS.h" />
+    <ClInclude Include="../Bindings/LINEAR_BINDING.h" />
+    <ClInclude Include="../Bindings/RIGID_BODY_BINDING.h" />
+    <ClInclude Include="../Bindings/BINDING_LIST.h" />
+    <ClInclude Include="../Bindings/PARTICLE_BINDING.h" />
+    <ClInclude Include="../Bindings/LINEAR_BINDING_DYNAMIC.h" />
+    <ClInclude Include="../Fracture/EMBEDDED_TRIANGULATED_OBJECT.h" />
+    <ClInclude Include="../Fracture/TRIANGLES_OF_MATERIAL.h" />
+    <ClInclude Include="../Fracture/EMBEDDED_MATERIAL_SURFACE.h" />
+    <ClInclude Include="../Fracture/EMBEDDED_OBJECT.h" />
+    <ClInclude Include="../Fracture/EMBEDDING.h" />
+    <ClInclude Include="../Fracture/EMBEDDING_POLICY.h" />
+    <ClInclude Include="../Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h" />
+    <ClInclude Include="../Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h" />
+    <ClInclude Include="../Parallel_Computation/MPI_SOLIDS.h" />
+    <ClInclude Include="../Parallel_Computation/MPI_REPULSION_UTILITIES.h" />
+    <ClInclude Include="../Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h" />
+    <ClInclude Include="../Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h" />
+    <ClInclude Include="../Deformable_Objects/HAIR_ID.h" />
+    <ClInclude Include="../Collisions_And_Interactions/EDGE_EDGE_INITIAL_CULL_VISITOR.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TRIANGLE_INTERSECTION.h" />
+    <ClInclude Include="../Collisions_And_Interactions/INTERSECTING_PAIRS_VISITOR.h" />
+    <ClInclude Include="../Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h" />
+    <ClInclude Include="../Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h" />
+    <ClInclude Include="../Collisions_And_Interactions/SIMPLEX_INTERACTIONS.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR.h" />
+    <ClInclude Include="../Collisions_And_Interactions/VOLUME_COLLISIONS.h" />
+    <ClInclude Include="../Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h" />
+    <ClInclude Include="../Collisions_And_Interactions/EDGE_EDGE_ADHESION_VISITOR.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TRIANGLE_COLLISIONS.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TRIANGLE_ORIGIN_AREAS.h" />
+    <ClInclude Include="../Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TRIANGLE_REPULSIONS.h" />
+    <ClInclude Include="../Collisions_And_Interactions/DEFORMABLES_COLLISIONS_FORWARD.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TRIANGLE_REPULSIONS_POINT_FACE_VISITOR.h" />
+    <ClInclude Include="../Collisions_And_Interactions/ROBUST_SIMPLEX_INTERACTIONS.h" />
+    <ClInclude Include="../Collisions_And_Interactions/COLLISION_PENALTY_FORCES.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TRIANGLE_REPULSIONS_PENALTY.h" />
+    <ClInclude Include="../Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES.h" />
+    <ClInclude Include="../Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TRIANGLE_COLLISIONS_EDGE_EDGE_VISITOR.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TRIANGLE_COLLISIONS_POINT_FACE_VISITOR.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h" />
+    <ClInclude Include="../Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h" />
+    <ClInclude Include="../Collisions_And_Interactions/LEVELSET_VOLUME_COLLISIONS.h" />
+    <ClInclude Include="../Collisions_And_Interactions/EXACT_SIMPLEX_INTERACTIONS.h" />
+    <ClInclude Include="../Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h" />
+    <ClInclude Include="../Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h" />
+    <ClInclude Include="../Constitutive_Models/PLASTICITY_CONTROL_3D.h" />
+    <ClInclude Include="../Constitutive_Models/DIAGONALIZED_STRESS_DERIVATIVE.h" />
+    <ClInclude Include="../Constitutive_Models/RC_EXTRAPOLATED.h" />
+    <ClInclude Include="../Constitutive_Models/FACE_3D.h" />
+    <ClInclude Include="../Constitutive_Models/MOONEY_RIVLIN_3D.h" />
+    <ClInclude Include="../Constitutive_Models/ROTATED_LINEAR.h" />
+    <ClInclude Include="../Constitutive_Models/RC2_EXTRAPOLATED.h" />
+    <ClInclude Include="../Constitutive_Models/COROTATED_FIXED.h" />
+    <ClInclude Include="../Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h" />
+    <ClInclude Include="../Constitutive_Models/GENERAL_ENERGY.h" />
+    <ClInclude Include="../Constitutive_Models/TRANSVERSE_ISOTROPY_3D.h" />
+    <ClInclude Include="../Constitutive_Models/COROTATED.h" />
+    <ClInclude Include="../Constitutive_Models/STRAIN_MEASURE_HEXAHEDRONS.h" />
+    <ClInclude Include="../Constitutive_Models/NEO_HOOKEAN.h" />
+    <ClInclude Include="../Constitutive_Models/NEO_HOOKEAN_ENERGY.h" />
+    <ClInclude Include="../Constitutive_Models/CONSTITUTIVE_MODELS_FORWARD.h" />
+    <ClInclude Include="../Constitutive_Models/GEN_NEO_HOOKEAN_ENERGY.h" />
+    <ClInclude Include="../Constitutive_Models/ANISOTROPIC_CONSTITUTIVE_MODEL.h" />
+    <ClInclude Include="../Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h" />
+    <ClInclude Include="../Constitutive_Models/SIMPLE_PLASTICITY.h" />
+    <ClInclude Include="../Constitutive_Models/MOONEY_RIVLIN_3D2.h" />
+    <ClInclude Include="../Constitutive_Models/PLASTICITY_MODEL.h" />
+    <ClInclude Include="../Constitutive_Models/CONSTITUTIVE_MODEL.h" />
+    <ClInclude Include="../Constitutive_Models/GENERAL_EXTRAPOLATED.h" />
+    <ClInclude Include="../Constitutive_Models/ST_VENANT_KIRCHHOFF.h" />
+    <ClInclude Include="../Constitutive_Models/SPLINE_MODEL.h" />
+    <ClInclude Include="../Standard_Tests/DEFORMABLES_STANDARD_TESTS.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\..\..\Summer 2014\downloads\zlib128-dll\lib\zdll.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

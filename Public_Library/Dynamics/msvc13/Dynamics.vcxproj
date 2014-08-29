@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1C827FAD-B34E-627A-4D87-1C19335D2035}</ProjectGuid>
+    <RootNamespace>Dynamics</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>D:\ucla\PhysBAM\Public_Library;%(AdditionalIncludeDirectories);C:\local\boost_1_56_0;D:\ucla\Summer 2014\downloads\zlib128-dll\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4258;4244;4305</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:/ucla/Summer 2014/downloads/zlib128-dll/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;snprintf=_snprintf</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>D:/ucla/Summer 2014/downloads/zlib128-dll/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="../Particles/SPH_PARTICLES.cpp" />
+    <ClCompile Include="../Particles/PARTICLE_LEVELSET_PARTICLES.cpp" />
+    <ClCompile Include="../Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.cpp" />
+    <ClCompile Include="../Fluids_Color_Driver/PLS_FC_EXAMPLE.cpp" />
+    <ClCompile Include="../Fluids_Color_Driver/PLS_FC_DRIVER.cpp" />
+    <ClCompile Include="../Forces_And_Torques/EULER_FLUID_FORCES.cpp" />
+    <ClCompile Include="../Solids_And_Fluids/FLUIDS_PARAMETERS_CALLBACKS.cpp" />
+    <ClCompile Include="../Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.cpp" />
+    <ClCompile Include="../Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.cpp" />
+    <ClCompile Include="../Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE.cpp" />
+    <ClCompile Include="../Solids_And_Fluids/FLUIDS_PARAMETERS.cpp" />
+    <ClCompile Include="../Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.cpp" />
+    <ClCompile Include="../Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.cpp" />
+    <ClCompile Include="../Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER.cpp" />
+    <ClCompile Include="../Interpolation/FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM.cpp" />
+    <ClCompile Include="../Interpolation/LINEAR_INTERPOLATION_DYNAMICS.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_SOLID_FORCES.cpp" />
+    <ClCompile Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION_BASE.cpp" />
+    <ClCompile Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_SOURCES.cpp" />
+    <ClCompile Include="../Coupled_Evolution/SURFACE_TENSION_BOUNDARY_CONDITION.cpp" />
+    <ClCompile Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED.cpp" />
+    <ClCompile Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_CUT.cpp" />
+    <ClCompile Include="../Coupled_Evolution/SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM.cpp" />
+    <ClCompile Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION.cpp" />
+    <ClCompile Include="../Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.cpp" />
+    <ClCompile Include="../Coupled_Evolution/COMPRESSIBLE_BOUNDARY_CONDITION_WALLS.cpp" />
+    <ClCompile Include="../Coupled_Evolution/PRESSURE_VELOCITY_VECTOR.cpp" />
+    <ClCompile Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION.cpp" />
+    <ClCompile Include="../Coupled_Evolution/EXAMPLE_BOUNDARY_CONDITION.cpp" />
+    <ClCompile Include="../Coupled_Evolution/SOLID_FLUID_SYSTEM.cpp" />
+    <ClCompile Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLECTION.cpp" />
+    <ClCompile Include="../Coupled_Evolution/GENERALIZED_FLUID_MASS.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED.cpp" />
+    <ClCompile Include="../Coupled_Evolution/INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS.cpp" />
+    <ClCompile Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLISIONS.cpp" />
+    <ClCompile Include="../Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION_BASE.cpp" />
+    <ClCompile Include="../Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION_SLIP.cpp" />
+    <ClCompile Include="../Coupled_Evolution/INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE.cpp" />
+    <ClCompile Include="../Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT_BASE.cpp" />
+    <ClCompile Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_PHI.cpp" />
+    <ClCompile Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_VISCOUS_FORCES.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT_CUT.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_POISSON.cpp" />
+    <ClCompile Include="../Coupled_Evolution/UNIFORM_INTERIOR_ITERATOR_CELL.cpp" />
+    <ClCompile Include="../Coupled_Evolution/COUPLED_SYSTEM_VECTOR.cpp" />
+    <ClCompile Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_BASE.cpp" />
+    <ClCompile Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT.cpp" />
+    <ClCompile Include="../Coupled_Driver/PLS_FSI_EXAMPLE.cpp" />
+    <ClCompile Include="../Coupled_Driver/PLS_FSI_DRIVER.cpp" />
+    <ClCompile Include="../Drivers/PLS_REFINEMENT_EXAMPLE.cpp" />
+    <ClCompile Include="../Drivers/COMPRESSIBLE_EXAMPLE.cpp" />
+    <ClCompile Include="../Drivers/PLS_DRIVER.cpp" />
+    <ClCompile Include="../Drivers/COMPRESSIBLE_DRIVER.cpp" />
+    <ClCompile Include="../Drivers/PLS_EXAMPLE.cpp" />
+    <ClCompile Include="../Parallel_Computation/CONJUGATE_RESIDUAL_SPARSE_MPI.cpp" />
+    <ClCompile Include="../Parallel_Computation/SOLID_SYSTEM_MPI.cpp" />
+    <ClCompile Include="../Parallel_Computation/MPI_UNIFORM_PARTICLES.cpp" />
+    <ClCompile Include="../Parallel_Computation/FLUID_SYSTEM_MPI.cpp" />
+    <ClCompile Include="../Parallel_Computation/REFINEMENT_THREADS.cpp" />
+    <ClCompile Include="../Parallel_Computation/FLUID_SYSTEM_MPI_SLIP.cpp" />
+    <ClCompile Include="../Parallel_Computation/MPI_SOLID_FLUID.cpp" />
+    <ClCompile Include="../Parallel_Computation/MPI_SOLID_FLUID_SLIP.cpp" />
+    <ClCompile Include="../Parallel_Computation/SYMMQMR_SPARSE_MPI.cpp" />
+    <ClCompile Include="../Parallel_Computation/SOLID_SYSTEM_MPI_SLIP.cpp" />
+    <ClCompile Include="../Motion/ACTIVATION_CONTROL_SET.cpp" />
+    <ClCompile Include="../Heat_Flows/HEAT_UNIFORM.cpp" />
+    <ClCompile Include="../Kang/KANG_POISSON_VISCOSITY.cpp" />
+    <ClCompile Include="../Level_Sets/REMOVED_PARTICLES_BLENDER_3D.cpp" />
+    <ClCompile Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_1D.cpp" />
+    <ClCompile Include="../Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.cpp" />
+    <ClCompile Include="../Level_Sets/HAMILTONIAN_NORMAL_VELOCITY_2D.cpp" />
+    <ClCompile Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_2D.cpp" />
+    <ClCompile Include="../Level_Sets/PARTICLE_LEVELSET_UNIFORM.cpp" />
+    <ClCompile Include="../Level_Sets/LEVELSET_CALLBACKS.cpp" />
+    <ClCompile Include="../Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.cpp" />
+    <ClCompile Include="../Level_Sets/REMOVED_PARTICLES_PROCESSING.cpp" />
+    <ClCompile Include="../Level_Sets/UNIFORM_REMOVED_PARTICLES_PROCESSING.cpp" />
+    <ClCompile Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_3D.cpp" />
+    <ClCompile Include="../Level_Sets/PARTICLE_LEVELSET.cpp" />
+    <ClCompile Include="../Level_Sets/LEVELSET_ADVECTION.cpp" />
+    <ClCompile Include="../Geometry/REMOVED_PARTICLES_IMPLICIT_OBJECT.cpp" />
+    <ClCompile Include="../Standard_Tests/WATER_STANDARD_TESTS_3D.cpp" />
+    <ClCompile Include="../Standard_Tests/WATER_STANDARD_TESTS_2D.cpp" />
+    <ClCompile Include="../Standard_Tests/SMOKE_STANDARD_TESTS_2D.cpp" />
+    <ClCompile Include="../Standard_Tests/SMOKE_STANDARD_TESTS_3D.cpp" />
+    <ClCompile Include="../Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.cpp" />
+    <ClCompile Include="../Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE.cpp" />
+    <ClCompile Include="../Incompressible_Flows/SPH_EVOLUTION_UNIFORM.cpp" />
+    <ClCompile Include="../Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.cpp" />
+    <ClCompile Include="../Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.cpp" />
+    <ClCompile Include="../Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.cpp" />
+    <ClCompile Include="../Incompressible_Flows/FAST_PROJECTION_DYNAMICS_UNIFORM.cpp" />
+    <ClCompile Include="../Incompressible_Flows/IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="../Particles/PARTICLE_LEVELSET_PARTICLES.h" />
+    <ClInclude Include="../Particles/DYNAMICS_PARTICLES_FORWARD.h" />
+    <ClInclude Include="../Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h" />
+    <ClInclude Include="../Particles/SPH_PARTICLES.h" />
+    <ClInclude Include="../Fluids_Color_Driver/PLS_FC_DRIVER.h" />
+    <ClInclude Include="../Fluids_Color_Driver/PLS_FC_EXAMPLE.h" />
+    <ClInclude Include="../Forces_And_Torques/EULER_FLUID_FORCES.h" />
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE.h" />
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h" />
+    <ClInclude Include="../Solids_And_Fluids/FLUIDS_PARAMETERS_CALLBACKS.h" />
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h" />
+    <ClInclude Include="../Solids_And_Fluids/SPH_CALLBACKS.h" />
+    <ClInclude Include="../Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h" />
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_CALLBACKS.h" />
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER.h" />
+    <ClInclude Include="../Solids_And_Fluids/FLUIDS_PARAMETERS.h" />
+    <ClInclude Include="../Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h" />
+    <ClInclude Include="../Interpolation/FIRE_INTERPOLATION_FORWARD.h" />
+    <ClInclude Include="../Interpolation/FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM.h" />
+    <ClInclude Include="../Coupled_Evolution/FORCE_AGGREGATE_ID.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION.h" />
+    <ClInclude Include="../Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION_SLIP.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_VISCOUS_FORCES.h" />
+    <ClInclude Include="../Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h" />
+    <ClInclude Include="../Coupled_Evolution/EXAMPLE_BOUNDARY_CONDITION.h" />
+    <ClInclude Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION_BASE.h" />
+    <ClInclude Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_POISSON.h" />
+    <ClInclude Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h" />
+    <ClInclude Include="../Coupled_Evolution/PRESSURE_VELOCITY_VECTOR.h" />
+    <ClInclude Include="../Coupled_Evolution/SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM.h" />
+    <ClInclude Include="../Coupled_Evolution/INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE.h" />
+    <ClInclude Include="../Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED.h" />
+    <ClInclude Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_CUT.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED.h" />
+    <ClInclude Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_BASE.h" />
+    <ClInclude Include="../Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h" />
+    <ClInclude Include="../Coupled_Evolution/COMPRESSIBLE_BOUNDARY_CONDITION_WALLS.h" />
+    <ClInclude Include="../Coupled_Evolution/COUPLED_SYSTEM_VECTOR.h" />
+    <ClInclude Include="../Coupled_Evolution/VISCOUS_FORCE_ID.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED.h" />
+    <ClInclude Include="../Coupled_Evolution/SURFACE_TENSION_BOUNDARY_CONDITION.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION_BASE.h" />
+    <ClInclude Include="../Coupled_Evolution/SOLID_FLUID_SYSTEM.h" />
+    <ClInclude Include="../Coupled_Evolution/UNIFORM_INTERIOR_ITERATOR_CELL.h" />
+    <ClInclude Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.h" />
+    <ClInclude Include="../Coupled_Evolution/COUPLING_CONSTRAINT_ID.h" />
+    <ClInclude Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLISIONS.h" />
+    <ClInclude Include="../Coupled_Evolution/GENERALIZED_FLUID_MASS.h" />
+    <ClInclude Include="../Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION.h" />
+    <ClInclude Include="../Coupled_Evolution/BOUNDARY_CONDITION_INFO.h" />
+    <ClInclude Include="../Coupled_Evolution/INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS.h" />
+    <ClInclude Include="../Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_PHI.h" />
+    <ClInclude Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_SOURCES.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT.h" />
+    <ClInclude Include="../Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLECTION.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_SOLID_FORCES.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT_BASE.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_INTERPOLATION.h" />
+    <ClInclude Include="../Coupled_Evolution/MATRIX_FLUID_GRADIENT_CUT.h" />
+    <ClInclude Include="../Coupled_Driver/PLS_FSI_DRIVER.h" />
+    <ClInclude Include="../Coupled_Driver/PLS_FSI_EXAMPLE.h" />
+    <ClInclude Include="../Drivers/PLS_REFINEMENT_EXAMPLE.h" />
+    <ClInclude Include="../Drivers/PLS_EXAMPLE.h" />
+    <ClInclude Include="../Drivers/COMPRESSIBLE_DRIVER.h" />
+    <ClInclude Include="../Drivers/COMPRESSIBLE_EXAMPLE.h" />
+    <ClInclude Include="../Drivers/PLS_DRIVER.h" />
+    <ClInclude Include="../Parallel_Computation/FLUID_SYSTEM_MPI_SLIP.h" />
+    <ClInclude Include="../Parallel_Computation/SOLID_SYSTEM_MPI.h" />
+    <ClInclude Include="../Parallel_Computation/SYMMQMR_SPARSE_MPI.h" />
+    <ClInclude Include="../Parallel_Computation/MPI_SOLID_FLUID.h" />
+    <ClInclude Include="../Parallel_Computation/CONJUGATE_RESIDUAL_SPARSE_MPI.h" />
+    <ClInclude Include="../Parallel_Computation/FLUID_SYSTEM_MPI.h" />
+    <ClInclude Include="../Parallel_Computation/SOLID_SYSTEM_MPI_SLIP.h" />
+    <ClInclude Include="../Parallel_Computation/REFINEMENT_THREADS.h" />
+    <ClInclude Include="../Parallel_Computation/MPI_SOLID_FLUID_SLIP.h" />
+    <ClInclude Include="../Parallel_Computation/MPI_UNIFORM_PARTICLES.h" />
+    <ClInclude Include="../Motion/FACE_CONTROL_SET.h" />
+    <ClInclude Include="../Motion/PHONEME.h" />
+    <ClInclude Include="../Motion/ACTIVATION_CONTROL_SET.h" />
+    <ClInclude Include="../Advection_Equations/FIRE_ADVECTION_POLICY.h" />
+    <ClInclude Include="../Advection_Equations/FIRE_ADVECTION_FORWARD.h" />
+    <ClInclude Include="../Advection_Equations/ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM.h" />
+    <ClInclude Include="../Boundaries/BOUNDARY_OPEN_WATER.h" />
+    <ClInclude Include="../Boundaries/BOUNDARY_REFLECTION_WATER.h" />
+    <ClInclude Include="../Heat_Flows/HEAT.h" />
+    <ClInclude Include="../Heat_Flows/HEAT_LAPLACE.h" />
+    <ClInclude Include="../Heat_Flows/HEAT_UNIFORM.h" />
+    <ClInclude Include="../Kang/KANG_POISSON_VISCOSITY.h" />
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_1D.h" />
+    <ClInclude Include="../Level_Sets/REMOVED_PARTICLES_PROCESSING.h" />
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_1D.h" />
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET_UNIFORM.h" />
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_NORMAL_VELOCITY_2D.h" />
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h" />
+    <ClInclude Include="../Level_Sets/REMOVED_PARTICLES_BLENDER_3D.h" />
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_2D.h" />
+    <ClInclude Include="../Level_Sets/LEVELSET_CALLBACKS.h" />
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h" />
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET_EVOLUTION.h" />
+    <ClInclude Include="../Level_Sets/LEVELSET_ADVECTION_MULTIPLE.h" />
+    <ClInclude Include="../Level_Sets/LEVELSET_ADVECTION.h" />
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_3D.h" />
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET_MULTIPLE_UNIFORM.h" />
+    <ClInclude Include="../Level_Sets/UNIFORM_REMOVED_PARTICLES_PROCESSING.h" />
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_NORMAL_ADVECTION_3D.h" />
+    <ClInclude Include="../Level_Sets/PARTICLE_LEVELSET.h" />
+    <ClInclude Include="../Level_Sets/HAMILTONIAN_2D.h" />
+    <ClInclude Include="../Geometry/REMOVED_PARTICLES_IMPLICIT_OBJECT.h" />
+    <ClInclude Include="../Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE_2D.h" />
+    <ClInclude Include="../Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE_3D.h" />
+    <ClInclude Include="../Standard_Tests/WATER_STANDARD_TESTS_2D.h" />
+    <ClInclude Include="../Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE.h" />
+    <ClInclude Include="../Standard_Tests/WATER_STANDARD_TESTS_3D.h" />
+    <ClInclude Include="../Standard_Tests/SMOKE_STANDARD_TESTS_3D.h" />
+    <ClInclude Include="../Standard_Tests/SMOKE_STANDARD_TESTS_2D.h" />
+    <ClInclude Include="../Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.h" />
+    <ClInclude Include="../Incompressible_Flows/FAST_PROJECTION_DYNAMICS_UNIFORM.h" />
+    <ClInclude Include="../Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h" />
+    <ClInclude Include="../Incompressible_Flows/IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM.h" />
+    <ClInclude Include="../Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h" />
+    <ClInclude Include="../Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h" />
+    <ClInclude Include="../Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h" />
+    <ClInclude Include="../Incompressible_Flows/PROJECTION_DYNAMICS.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\..\..\Summer 2014\downloads\zlib128-dll\lib\zdll.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
