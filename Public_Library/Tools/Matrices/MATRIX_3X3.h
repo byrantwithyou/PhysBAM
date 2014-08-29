@@ -28,23 +28,29 @@ public:
 
     explicit MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(3),INITIAL_SIZE nn=INITIAL_SIZE(3))
     {
-        assert(mm==INITIAL_SIZE(3) && nn==INITIAL_SIZE(3));for(int i=0;i<9;i++) x[i]=T();
+        assert(mm==INITIAL_SIZE(3) && nn==INITIAL_SIZE(3));
+        x[0]=T();x[1]=T();x[2]=T();x[3]=T();x[4]=T();x[5]=T();x[6]=T();x[7]=T();x[8]=T();
     }
 
     MATRIX(const MATRIX& matrix_input)
     {
-        for(int i=0;i<9;i++) x[i]=matrix_input.x[i];
+        x[0]=matrix_input.x[0];x[1]=matrix_input.x[1];x[2]=matrix_input.x[2];
+        x[3]=matrix_input.x[3];x[4]=matrix_input.x[4];x[5]=matrix_input.x[5];
+        x[6]=matrix_input.x[6];x[7]=matrix_input.x[7];x[8]=matrix_input.x[8];
     }
 
     template<class T2> explicit
     MATRIX(const MATRIX<T2,3>& matrix_input)
     {
-        for(int i=0;i<9;i++) x[i]=(T)matrix_input.x[i];
+        x[0]=(T)matrix_input.x[0];x[1]=(T)matrix_input.x[1];x[2]=(T)matrix_input.x[2];
+        x[3]=(T)matrix_input.x[3];x[4]=(T)matrix_input.x[4];x[5]=(T)matrix_input.x[5];
+        x[6]=(T)matrix_input.x[6];x[7]=(T)matrix_input.x[7];x[8]=(T)matrix_input.x[8];
     }
 
     MATRIX(const DIAGONAL_MATRIX<T,3>& matrix_input)
     {
-        x[0]=matrix_input.x.x;x[4]=matrix_input.x.y;x[8]=matrix_input.x.z;x[1]=x[2]=x[3]=x[5]=x[6]=x[7]=T();
+        x[0]=matrix_input.x.x;x[4]=matrix_input.x.y;x[8]=matrix_input.x.z;
+        x[1]=T();x[2]=T();x[3]=T();x[5]=T();x[6]=T();x[7]=T();
     }
 
     MATRIX(const SYMMETRIC_MATRIX<T,3>& matrix_input)
@@ -70,12 +76,18 @@ public:
     template<class T_MATRIX>
     explicit MATRIX(const MATRIX_BASE<T,T_MATRIX>& A)
     {
-        assert(A.Rows()==3 && A.Columns()==3);for(int j=0;j<3;j++) for(int i=0;i<3;i++) (*this)(i,j)=A(i,j);
+        assert(A.Rows()==3 && A.Columns()==3);
+        x[0]=A(0,0);x[1]=A(1,0);x[2]=A(2,0);
+        x[3]=A(0,1);x[4]=A(1,1);x[5]=A(2,1);
+        x[6]=A(0,2);x[7]=A(1,2);x[8]=A(2,2);
     }
 
     MATRIX& operator=(const MATRIX& matrix_input)
     {
-        for(int i=0;i<9;i++) x[i]=matrix_input.x[i];return *this;
+        x[0]=matrix_input.x[0];x[1]=matrix_input.x[1];x[2]=matrix_input.x[2];
+        x[3]=matrix_input.x[3];x[4]=matrix_input.x[4];x[5]=matrix_input.x[5];
+        x[6]=matrix_input.x[6];x[7]=matrix_input.x[7];x[8]=matrix_input.x[8];
+        return *this;
     }
 
     int Rows() const
@@ -106,7 +118,9 @@ public:
     {assert((unsigned)j<3);x[j]=v(0);x[j+3]=v(1);x[j+6]=v(2);}
 
     bool operator==(const MATRIX& A) const
-    {for(int i=0;i<9;i++) if(x[i]!=A.x[i]) return false;return true;}
+    {return x[0]==A.x[0] && x[1]==A.x[1] && x[2]==A.x[2] &&
+            x[3]==A.x[3] && x[4]==A.x[4] && x[5]==A.x[5] &&
+            x[6]==A.x[6] && x[7]==A.x[7] && x[8]==A.x[8];}
 
     bool operator!=(const MATRIX& A) const
     {return !(*this==A);}
@@ -118,13 +132,13 @@ public:
     {return MATRIX(-x[0],-x[1],-x[2],-x[3],-x[4],-x[5],-x[6],-x[7],-x[8]);}
 
     MATRIX& operator+=(const MATRIX& A)
-    {for(int i=0;i<9;i++) x[i]+=A.x[i];return *this;}
+    {x[0]+=A.x[0];x[1]+=A.x[1];x[2]+=A.x[2];x[3]+=A.x[3];x[4]+=A.x[4];x[5]+=A.x[5];x[6]+=A.x[6];x[7]+=A.x[7];x[8]+=A.x[8];return *this;}
 
     MATRIX& operator+=(const T& a)
     {x[0]+=a;x[4]+=a;x[8]+=a;return *this;}
 
     MATRIX& operator-=(const MATRIX& A)
-    {for(int i=0;i<9;i++) x[i]-=A.x[i];return *this;}
+    {x[0]-=A.x[0];x[1]-=A.x[1];x[2]-=A.x[2];x[3]-=A.x[3];x[4]-=A.x[4];x[5]-=A.x[5];x[6]-=A.x[6];x[7]-=A.x[7];x[8]-=A.x[8];return *this;}
 
     MATRIX& operator-=(const T& a)
     {x[0]-=a;x[4]-=a;x[8]-=a;return *this;}
@@ -133,10 +147,10 @@ public:
     {return *this=*this*A;}
 
     MATRIX& operator*=(const T a)
-    {for(int i=0;i<9;i++) x[i]*=a;return *this;}
+    {x[0]*=a;x[1]*=a;x[2]*=a;x[3]*=a;x[4]*=a;x[5]*=a;x[6]*=a;x[7]*=a;x[8]*=a;return *this;}
 
     MATRIX& operator/=(const T a)
-    {assert(a!=0);T s=1/a;for(int i=0;i<9;i++) x[i]*=s;return *this;}
+    {assert(a!=0);return *this*=(1/a);}
 
     MATRIX operator+(const MATRIX& A) const
     {return MATRIX(x[0]+A.x[0],x[1]+A.x[1],x[2]+A.x[2],x[3]+A.x[3],x[4]+A.x[4],x[5]+A.x[5],x[6]+A.x[6],x[7]+A.x[7],x[8]+A.x[8]);}

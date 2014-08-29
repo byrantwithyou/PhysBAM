@@ -28,18 +28,19 @@ public:
 
     explicit MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(2),INITIAL_SIZE nn=INITIAL_SIZE(2))
     {
-        assert(mm==INITIAL_SIZE(2) && nn==INITIAL_SIZE(2));for(int i=0;i<4;i++) x[i]=T();
+        assert(mm==INITIAL_SIZE(2) && nn==INITIAL_SIZE(2));
+        x[0]=T();x[1]=T();x[2]=T();x[3]=T();
     }
 
     MATRIX(const MATRIX& matrix_input)
     {
-        for(int i=0;i<4;i++) x[i]=matrix_input.x[i];
+        x[0]=matrix_input.x[0];x[1]=matrix_input.x[1];x[2]=matrix_input.x[2];x[3]=matrix_input.x[3];
     }
 
     template<class T2> explicit
     MATRIX(const MATRIX<T2,2>& matrix_input)
     {
-        for(int i=0;i<4;i++) x[i]=(T)matrix_input.x[i];
+        x[0]=(T)matrix_input.x[0];x[1]=(T)matrix_input.x[1];x[2]=(T)matrix_input.x[2];x[3]=(T)matrix_input.x[3];
     }
 
     MATRIX(const SYMMETRIC_MATRIX<T,2>& matrix_input)
@@ -70,12 +71,13 @@ public:
     template<class T_MATRIX>
     explicit MATRIX(const MATRIX_BASE<T,T_MATRIX>& A)
     {
-        assert(A.Rows()==2 && A.Columns()==2);for(int j=0;j<2;j++) for(int i=0;i<2;i++) (*this)(i,j)=A(i,j);
+        assert(A.Rows()==2 && A.Columns()==2);
+        x[0]=A(0,0);x[1]=A(1,0);x[2]=A(0,1);x[3]=A(1,1);
     }
 
     MATRIX& operator=(const MATRIX& matrix_input)
     {
-        for(int i=0;i<4;i++) x[i]=matrix_input.x[i];return *this;
+        x[0]=matrix_input.x[0];x[1]=matrix_input.x[1];x[2]=matrix_input.x[2];x[3]=matrix_input.x[3];return *this;
     }
 
     int Rows() const
@@ -106,7 +108,7 @@ public:
     {assert((unsigned)j<2);x[j]=v(0);x[j+2]=v(1);}
 
     bool operator==(const MATRIX& A) const
-    {for(int i=0;i<4;i++) if(x[i]!=A.x[i]) return false;return true;}
+    {return x[0]==A.x[0] && x[1]==A.x[1] && x[2]==A.x[2] && x[3]==A.x[3];}
 
     bool operator!=(const MATRIX& A) const
     {return !(*this==A);}
@@ -121,13 +123,13 @@ public:
     {return MATRIX(-x[0],-x[1],-x[2],-x[3]);}
 
     MATRIX& operator+=(const MATRIX& A)
-    {for(int i=0;i<4;i++) x[i]+=A.x[i];return *this;}
+    {x[0]+=A.x[0];x[1]+=A.x[1];x[2]+=A.x[2];x[3]+=A.x[3];return *this;}
 
     MATRIX& operator+=(const T a)
     {x[0]+=a;x[3]+=a;return *this;}
 
     MATRIX& operator-=(const MATRIX& A)
-    {for(int i=0;i<4;i++) x[i]-=A.x[i];return *this;}
+    {x[0]-=A.x[0];x[1]-=A.x[1];x[2]-=A.x[2];x[3]-=A.x[3];return *this;}
 
     MATRIX& operator-=(const T a)
     {x[0]-=a;x[3]-=a;return *this;}
@@ -136,10 +138,10 @@ public:
     {return *this=*this*A;}
 
     MATRIX& operator*=(const T a)
-    {for(int i=0;i<4;i++) x[i]*=a;return *this;}
+    {x[0]*=a;x[1]*=a;x[2]*=a;x[3]*=a;return *this;}
 
     MATRIX& operator/=(const T a)
-    {assert(a!=0);T s=1/a;for(int i=0;i<4;i++) x[i]*=s;return *this;}
+    {assert(a!=0);return *this*=(1/a);}
 
     MATRIX operator+(const MATRIX& A) const
     {return MATRIX(x[0]+A.x[0],x[1]+A.x[1],x[2]+A.x[2],x[3]+A.x[3]);}
