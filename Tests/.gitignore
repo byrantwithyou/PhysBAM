@@ -1,2 +1,5 @@
+*_debug
+*_optdebug
+*_profile
 core_tests
-core_tests_debug
+
