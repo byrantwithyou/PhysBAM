@@ -10,11 +10,11 @@
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
+#include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <Geometry/Grids_Uniform_Computations/SEGMENTED_CURVE_2D_SIGNED_DISTANCE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <Geometry/Level_Sets/LEVELSET_MAKER.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <Geometry/Tessellation/RANGE_TESSELLATION.h>
@@ -295,19 +295,17 @@ Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bind
 // Function Read_Or_Initialize_Implicit_Surface
 //#####################################################################
 template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>* DEFORMABLES_STANDARD_TESTS<TV>::
-Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface,int max_res) const
+Initialize_Implicit_Surface(T_SURFACE& surface,int max_res) const
 {
     // undeformed levelset
     LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-    undeformed_triangulated_surface.Update_Bounding_Box();RANGE<TV>& box=*undeformed_triangulated_surface.bounding_box;
-    GRID<TV>& grid=undeformed_levelset.levelset.grid;ARRAY<T,VECTOR<int,3> >& phi=undeformed_levelset.levelset.phi;
+    surface.Update_Bounding_Box();
+    RANGE<TV>& box=*surface.bounding_box;
+    GRID<TV>& grid=undeformed_levelset.levelset.grid;
+    ARRAY<T,TV_INT>& phi=undeformed_levelset.levelset.phi;
     grid=GRID<TV>::Create_Grid_Given_Cell_Size(box,box.Edge_Lengths().Max()/max_res,false,5);
     phi.Resize(grid.Domain_Indices());
-    LEVELSET_MAKER<T> levelset_maker;
-    levelset_maker.Verbose_Mode();
-    levelset_maker.Set_Surface_Padding_For_Flood_Fill((T)1e-3);
-    levelset_maker.Use_Fast_Marching_Method(true,0);
-    levelset_maker.Compute_Level_Set(undeformed_triangulated_surface,grid,phi);
+    LEVELSET_MAKER_UNIFORM<TV>::Compute_Level_Set(surface,grid,0,phi);
     undeformed_levelset.Update_Box();
     return &undeformed_levelset;
 }
@@ -684,3 +682,5 @@ template DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::DEFORMABLES_STANDARD_TEST
 template TETRAHEDRALIZED_VOLUME<double>& DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Create_Cylinder(CYLINDER<double> const&,int,int,bool,RIGID_BODY_STATE<VECTOR<double,3> > const*,double);
 template TETRAHEDRALIZED_VOLUME<float>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Create_Cylinder(CYLINDER<float> const&,int,int,bool,RIGID_BODY_STATE<VECTOR<float,3> > const*,float);
 template BEZIER_SPLINE<VECTOR<float,2>,3>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Copy_And_Add_Structure<BEZIER_SPLINE<VECTOR<float,2>,3> >(BEZIER_SPLINE<VECTOR<float,2>,3>&,ARRAY<int,int>*,bool);
+template LEVELSET_IMPLICIT_OBJECT<VECTOR<double,2> >* DEFORMABLES_STANDARD_TESTS<VECTOR<double,2> >::Initialize_Implicit_Surface(SEGMENTED_CURVE_2D<double>&,int) const;
+template LEVELSET_IMPLICIT_OBJECT<VECTOR<float,2> >* DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Initialize_Implicit_Surface(SEGMENTED_CURVE_2D<float>&,int) const;

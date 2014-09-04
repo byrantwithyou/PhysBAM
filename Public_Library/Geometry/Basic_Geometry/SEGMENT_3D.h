@@ -73,6 +73,9 @@ public:
         TV& normal,VECTOR<T,TV::m+1>& weights,const T small_number=0,const bool exit_early=false) const
     {return Edge_Edge_Collision(segment,V_edges(0),V_edges(1),V_edges(2),V_edges(3),dt,collision_thickness,collision_time,normal,weights,small_number,exit_early);}
 
+    T Distance_To_Element(const TV& location) const
+    {return Distance_From_Point_To_Segment(location);}
+
 //#####################################################################
     TV Closest_Point_On_Segment(const TV& point) const;
     T Distance_From_Point_To_Segment(const TV& point) const;

@@ -19,7 +19,8 @@ class TRIANGLE_HIERARCHY_2D:public BOX_HIERARCHY<VECTOR<T_input,2> >
     typedef VECTOR<T,2> TV;
 public:
     typedef BOX_HIERARCHY<TV> BASE;
-    using BASE::leaves;using BASE::root;using BASE::parents;using BASE::children;using BASE::box_hierarchy;using BASE::box_radius;using BASE::Update_Nonleaf_Boxes;
+    using BASE::leaves;using BASE::root;using BASE::parents;using BASE::children;using BASE::box_hierarchy;
+    using BASE::box_radius;using BASE::Update_Nonleaf_Boxes;using BASE::Thicken_Leaf_Boxes;
     using BASE::Initialize_Hierarchy_Using_KD_Tree_Helper;
 
     TRIANGLE_MESH& triangle_mesh;
@@ -44,8 +45,8 @@ public:
     virtual ~TRIANGLE_HIERARCHY_2D()
     {}
 
-    void Update_Boxes()
-    {Update_Leaf_Boxes();Update_Nonleaf_Boxes();}
+    void Update_Boxes(const T extra_thickness=0)
+    {Update_Leaf_Boxes(extra_thickness);Update_Nonleaf_Boxes();}
 
     template<class T_ARRAY_TV>
     void Update_Boxes(const T_ARRAY_TV& X) // use X instead of the current particle positions
@@ -55,8 +56,8 @@ public:
     void Update_Boxes(const T_ARRAY_TV& start_X,const T_ARRAY_TV& end_X) // bound triangles moving from start_X to end_X
     {Update_Leaf_Boxes(start_X,end_X);Update_Nonleaf_Boxes();}
 
-    void Update_Leaf_Boxes()
-    {Calculate_Bounding_Boxes(box_hierarchy);}
+    void Update_Leaf_Boxes(const T extra_thickness=0)
+    {Calculate_Bounding_Boxes(box_hierarchy);if(extra_thickness) Thicken_Leaf_Boxes(extra_thickness);}
 
     template<class T_ARRAY_TV>
     void Update_Leaf_Boxes(const T_ARRAY_TV& X) // use X instead of the current particle positions

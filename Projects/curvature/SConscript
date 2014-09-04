@@ -2,4 +2,4 @@
 
 Import('env Automatic_Program')
 env=env.Copy(USE_SOLIDS=1)
-Automatic_Program(env,"curvature",["main.cpp"])
+Automatic_Program(env,"curvature",["main.cpp","STANDARD_TESTS_BASE.cpp"])

@@ -55,9 +55,11 @@ template void GRID<VECTOR<float,0> >::Initialize(VECTOR<int,0> const&,RANGE<VECT
 template void GRID<VECTOR<float,1> >::Initialize(VECTOR<int,1> const&,RANGE<VECTOR<float,1> > const&,bool);
 template void GRID<VECTOR<float,2> >::Initialize(VECTOR<int,2> const&,RANGE<VECTOR<float,2> > const&,bool);
 template void GRID<VECTOR<float,3> >::Initialize(VECTOR<int,3> const&,RANGE<VECTOR<float,3> > const&,bool);
+template GRID<VECTOR<float,2> > GRID<VECTOR<float,2> >::Create_Grid_Given_Cell_Size(RANGE<VECTOR<float,2> > const&,float,bool,int);
 template GRID<VECTOR<float,3> > GRID<VECTOR<float,3> >::Create_Grid_Given_Cell_Size(RANGE<VECTOR<float,3> > const&,float,bool,int);
 template void GRID<VECTOR<double,0> >::Initialize(VECTOR<int,0> const&,RANGE<VECTOR<double,0> > const&,bool);
 template void GRID<VECTOR<double,1> >::Initialize(VECTOR<int,1> const&,RANGE<VECTOR<double,1> > const&,bool);
 template void GRID<VECTOR<double,2> >::Initialize(VECTOR<int,2> const&,RANGE<VECTOR<double,2> > const&,bool);
 template void GRID<VECTOR<double,3> >::Initialize(VECTOR<int,3> const&,RANGE<VECTOR<double,3> > const&,bool);
+template GRID<VECTOR<double,2> > GRID<VECTOR<double,2> >::Create_Grid_Given_Cell_Size(RANGE<VECTOR<double,2> > const&,double,bool,int);
 template GRID<VECTOR<double,3> > GRID<VECTOR<double,3> >::Create_Grid_Given_Cell_Size(RANGE<VECTOR<double,3> > const&,double,bool,int);

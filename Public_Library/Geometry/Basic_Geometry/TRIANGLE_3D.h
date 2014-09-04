@@ -148,6 +148,12 @@ public:
     bool Outside_Plane(const TV& location,const T thickness_over_two) const
     {return !Inside_Plane(location,-thickness_over_two);}
 
+    T Distance_To_Element(const TV& location) const
+    {return Distance_To_Triangle(location);}
+
+    TV Closest_Point(const TV& location) const
+    {TV weights;return Closest_Point(location,weights);}
+
 //#####################################################################
     void Change_Size(const T delta);
     bool Inside(const TV& point,const T thickness_over_two=0) const;

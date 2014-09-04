@@ -72,6 +72,7 @@ public:
     static void Union_Mesh_Objects_Relatively(T_DERIVED_OBJECT* object,const ARRAY<T_DERIVED_OBJECT*>& object_list,const ARRAY<FRAME<TV> >& relative_frames);
     void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const PHYSBAM_OVERRIDE;
     T Volumetric_Volume();
+    
 private:
     virtual void Refresh_Auxiliary_Structures_Helper()=0;
 //#####################################################################

@@ -41,6 +41,7 @@ protected:
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::TRIANGULATED_OBJECT T_TRIANGULATED_OBJECT;
     typedef typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::SEGMENTED_CURVE T_SEGMENTED_CURVE;
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
 public:
     STREAM_TYPE stream_type;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
@@ -87,7 +88,7 @@ public:
     template<class T_OBJECT> void
     Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bindings,HASHTABLE<int,int>* persistent_soft_bindings=0,const bool embedded_only=false,
         const bool use_impulses_for_collisions=true);
-    LEVELSET_IMPLICIT_OBJECT<TV>* Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface,int max_res) const;
+    LEVELSET_IMPLICIT_OBJECT<TV>* Initialize_Implicit_Surface(T_SURFACE& surface,int max_res) const;
     LEVELSET_IMPLICIT_OBJECT<TV>* Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,const std::string& output_directory,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const;
     void Initialize_Tetrahedron_Collisions(const int id_number,const std::string& output_directory,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,
         TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters,TRIANGULATED_SURFACE<T>* triangulated_surface=0);

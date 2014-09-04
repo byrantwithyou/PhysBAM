@@ -60,6 +60,9 @@ public:
     TV Normal() const
     {return SEGMENT_2D<T>::Normal(X.x,X.y);}
 
+    T Signed_Distance(const TV& location) const
+    {return Normal().Dot(location-X.x);}
+
     template<class T_ARRAY>
     static TV Normal(const T_ARRAY& X)
     {STATIC_ASSERT(T_ARRAY::m==2);return Normal(X(0),X(1));}
@@ -117,6 +120,12 @@ public:
 
     RANGE<TV> Bounding_Box() const
     {return RANGE<TV>::Bounding_Box(X.x,X.y);}
+
+    T Distance_To_Element(const TV& location) const
+    {return Distance_From_Point_To_Segment(location);}
+
+    TV Closest_Point(const TV& point) const
+    {return Closest_Point_On_Segment(point);}
 
 //#####################################################################
     bool Segment_Line_Intersection(const TV& point_on_line,const TV& normal_of_line,T &interpolation_fraction) const;
