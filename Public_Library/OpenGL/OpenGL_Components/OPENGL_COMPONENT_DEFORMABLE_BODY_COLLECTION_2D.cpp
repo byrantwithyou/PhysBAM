@@ -76,15 +76,6 @@ Reinitialize(bool force)
         int color_map_index=15;
         for(int i=0;i<m;i++){
             STRUCTURE<TV>* structure=deformable_body_collection.structures(i);
-            if(SEGMENTED_CURVE_2D<T>* segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>*>(structure)){
-                if(first_time) LOG::cout<<"object "<<i<<": segmented curve\n";
-                segmented_curve_objects(i)=new OPENGL_SEGMENTED_CURVE_2D<T>(*segmented_curve,color_map->Lookup(color_map_index--));
-                segmented_curve_objects(i)->draw_velocities=draw_velocities;
-                segmented_curve_objects(i)->velocity_scale=velocity_scale;} // apply current parameters
-            else if(TRIANGULATED_AREA<T>* triangulated_area=dynamic_cast<TRIANGULATED_AREA<T>*>(structure)){
-                if(first_time) LOG::cout<<"object "<<i<<": triangulated area\n";
-                triangulated_area->mesh.Initialize_Segment_Mesh(); // to enable segment selection
-                triangulated_area_objects(i)=new OPENGL_TRIANGULATED_AREA<T>(*triangulated_area,true);}
             if(EMBEDDED_MATERIAL_SURFACE<TV,2>* embedding=dynamic_cast<EMBEDDED_MATERIAL_SURFACE<TV,2>*>(structure)){
                 has_embedded_objects=true;
                 if(first_time) LOG::cout<<"object "<<i<<": embedded triangulated area\n";
