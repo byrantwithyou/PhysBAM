@@ -7,7 +7,7 @@
 #ifndef __ANIMATED_VISUALIZATION__
 #define __ANIMATED_VISUALIZATION__
 
-#include <OpenGL/OpenGL/BASIC_VISUALIZATION<T>.h>
+#include <OpenGL/OpenGL/BASIC_VISUALIZATION.h>
 #include <climits>
 
 namespace PhysBAM

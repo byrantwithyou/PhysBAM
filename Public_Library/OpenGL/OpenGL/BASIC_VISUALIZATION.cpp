@@ -4,7 +4,7 @@
 //#####################################################################
 #include <Tools/Log/LOG.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <OpenGL/OpenGL/BASIC_VISUALIZATION<T>.h>
+#include <OpenGL/OpenGL/BASIC_VISUALIZATION.h>
 #include <OpenGL/OpenGL/OPENGL_AXES.h>
 #include <OpenGL/OpenGL/OPENGL_BASIC_CALLBACKS.h>
 #include <OpenGL/OpenGL/OPENGL_LIGHT.h>

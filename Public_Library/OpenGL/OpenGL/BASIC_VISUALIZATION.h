@@ -2,10 +2,10 @@
 // Copyright 2004-2009, Eran Guendelman, Andrew Selle, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class BASIC_VISUALIZATION<T>
+// Class BASIC_VISUALIZATION
 //#####################################################################
-#ifndef __BASIC_VISUALIZATION<T>__
-#define __BASIC_VISUALIZATION<T>__
+#ifndef __BASIC_VISUALIZATION__
+#define __BASIC_VISUALIZATION__
 
 #include <Tools/Arrays/ARRAY.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
@@ -33,7 +33,7 @@ public:
 
     virtual void Process_Hits(GLint hits, GLuint buffer[]);
 
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION<T>, Draw_All_Objects);
+    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION, Draw_All_Objects);
 protected:
     virtual void Add_Arguments(PARSE_ARGS &parse_args);
     virtual void Parse_Arguments(PARSE_ARGS &parse_args);
@@ -63,9 +63,9 @@ private:
     void Toggle_Axes();
     void Draw_All_Objects();
 
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION<T>,Reset_View);
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION<T>,Reset_Up);
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION<T>,Toggle_Axes);
+    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Reset_View);
+    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Reset_Up);
+    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Toggle_Axes);
 
 public:
     ARRAY<OPENGL_COMPONENT<T>*> component_list;
