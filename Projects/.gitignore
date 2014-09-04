@@ -118,3 +118,4 @@ texture_map_gen/texture_map_gen
 volume_collisions/make_tree
 volume_collisions/test_proj
 volume_test/volume_test
+curvature/curvature
