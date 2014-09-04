@@ -90,11 +90,11 @@ Display() const
         if(current_selection){
             if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_3D){
                 int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T> *)current_selection)->index;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(VECTOR<T,3>(curve.particles.X(index)));} 
+                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(curve.particles.X(index),index);} 
             else if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_3D){
                 int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T> *)current_selection)->index;
                 int node1,node2;curve.mesh.elements(index).Get(node1,node2);
-                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(VECTOR<T,3>(curve.particles.X(node1)),VECTOR<T,3>(curve.particles.X(node2)));} 
+                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(curve.particles.X(node1),curve.particles.X(node2),index);} 
             else if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_3D) {
                 int node1,node2;
                 ARRAY<VECTOR<TV,2> > lines;

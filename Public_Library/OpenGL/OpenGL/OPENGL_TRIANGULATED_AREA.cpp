@@ -72,15 +72,15 @@ Display() const
             glDisable(GL_DEPTH_TEST);
             if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_AREA_VERTEX){
                 int index=((OPENGL_SELECTION_TRIANGULATED_AREA_VERTEX<T> *)current_selection)->index;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(triangulated_area.particles.X(index));}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(triangulated_area.particles.X(index),index);}
             else if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_AREA_SEGMENT && triangulated_area.mesh.segment_mesh){
                 int index=((OPENGL_SELECTION_TRIANGULATED_AREA_SEGMENT<T> *)current_selection)->index;
                 int node1,node2;triangulated_area.mesh.segment_mesh->elements(index).Get(node1,node2);
-                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2));}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),index);}
             else if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_AREA_TRIANGLE){
                 int index=((OPENGL_SELECTION_TRIANGULATED_AREA_TRIANGLE<T> *)current_selection)->index;
                 int node1,node2,node3;triangulated_area.mesh.elements(index).Get(node1,node2,node3);
-                OPENGL_SELECTION<T>::Draw_Highlighted_Triangle_Boundary(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3));}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Triangle_Boundary(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3),index);}
             glPopAttrib();
         }
     }

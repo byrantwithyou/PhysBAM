@@ -208,15 +208,15 @@ Display() const
         if(current_selection){
             if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX){
                 int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>*)current_selection)->index;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(surface.particles.X(index));}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(surface.particles.X(index),index);}
             else if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT && surface.mesh.segment_mesh){
                 int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>*)current_selection)->index;
                 int node1,node2;surface.mesh.segment_mesh->elements(index).Get(node1,node2);
-                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(surface.particles.X(node1),surface.particles.X(node2));}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(surface.particles.X(node1),surface.particles.X(node2),index);}
             else if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE){
                 int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>*)current_selection)->index;
                 int node1,node2,node3;surface.mesh.elements(index).Get(node1,node2,node3);
-                OPENGL_SELECTION<T>::Draw_Highlighted_Triangle_Boundary(surface.particles.X(node1),surface.particles.X(node2),surface.particles.X(node3));}}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Triangle_Boundary(surface.particles.X(node1),surface.particles.X(node2),surface.particles.X(node3),index);}}
 
         if(highlight_current_node){
             Highlight_Current_Node();

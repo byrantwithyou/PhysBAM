@@ -55,11 +55,11 @@ Display() const
         if(current_selection) {
             if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_2D) {
                 int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_2D<T> *)current_selection)->index;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(curve.particles.X(index));}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(curve.particles.X(index),index);}
             else if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_2D) {
                 int index=((OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_2D<T> *)current_selection)->index;
                 int node1,node2;curve.mesh.elements(index).Get(node1,node2);
-                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(curve.particles.X(node1),curve.particles.X(node2));}}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(curve.particles.X(node1),curve.particles.X(node2),index);}}
     }
 
     if(draw_vertices) {
