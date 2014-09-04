@@ -856,7 +856,7 @@ Update_Articulation_Points()
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(!draw) return;
     GLint mode=0;
@@ -872,12 +872,12 @@ Display(const int in_color) const
     if(draw_triangulated_surface){
         glPushName(1);
         for(int i=0;i<opengl_triangulated_surface.Size();i++) if(draw_object(i) && opengl_triangulated_surface(i)){
-            glPushName(Value(i));opengl_triangulated_surface(i)->Display(in_color);glPopName();}
+            glPushName(Value(i));opengl_triangulated_surface(i)->Display();glPopName();}
         glPopName();}
     if(draw_tetrahedralized_volume){
         glPushName(2);
         for(int i=0;i<opengl_tetrahedralized_volume.Size();i++) if(draw_object(i) && opengl_tetrahedralized_volume(i)){
-            glPushName(Value(i));opengl_tetrahedralized_volume(i)->Display(in_color);glPopName();}
+            glPushName(Value(i));opengl_tetrahedralized_volume(i)->Display();glPopName();}
         glPopName();}
     if(draw_implicit_surface){
         glPushName(3);
@@ -890,15 +890,15 @@ Display(const int in_color) const
                     OPENGL_WORLD::Singleton()->Add_String("WARNING: Refusing to draw more than 10 levelsets to save memory.");
                     break;}
                 opengl_levelset(i)->Update();
-                opengl_levelset(i)->Display(in_color);}
-            if(opengl_octree_levelset_surface(i)) opengl_octree_levelset_surface(i)->Display(in_color);
+                opengl_levelset(i)->Display();}
+            if(opengl_octree_levelset_surface(i)) opengl_octree_levelset_surface(i)->Display();
             glPopName();}
         glPopName();}
 #else
     if(draw_triangulated_surface) for(int i=0;i<opengl_triangulated_surface.Size();i++) if(draw_object(i) && opengl_triangulated_surface(i)){
-        opengl_triangulated_surface(i)->Display(in_color);}
+        opengl_triangulated_surface(i)->Display();}
     if(draw_tetrahedralized_volume) for(int i=0;i<opengl_tetrahedralized_volume.Size();i++) if(draw_object(i) && opengl_tetrahedralized_volume(i)){
-        opengl_tetrahedralized_volume(i)->Display(in_color);}
+        opengl_tetrahedralized_volume(i)->Display();}
     if(draw_implicit_surface){
         int levelset_count=0;
         for(int i=0;i<opengl_levelset.Size();i++) if(draw_object(i)){
@@ -908,16 +908,16 @@ Display(const int in_color) const
                     OPENGL_WORLD::Singleton()->Add_String("WARNING: Refusing to draw more than 10 levelsets to save memory.");
                     break;}
                 opengl_levelset(i)->Update();
-                opengl_levelset(i)->Display(in_color);}
-            if(opengl_octree_levelset_surface(i)) opengl_octree_levelset_surface(i)->Display(in_color);}}
+                opengl_levelset(i)->Display();}
+            if(opengl_octree_levelset_surface(i)) opengl_octree_levelset_surface(i)->Display();}}
 #endif
     if(draw_individual_axes)
         for(int i=0;i<opengl_axes.Size();i++){
             if(draw_object(i) && opengl_axes(i)){
                 opengl_axes(i)->box.max_corner.x=opengl_axes(i)->box.max_corner.y=opengl_axes(i)->box.max_corner.z=2*rigid_body_collection.Rigid_Body(i).Object_Space_Bounding_Box().Edge_Lengths().Min();
-                opengl_axes(i)->Display(in_color);}}
-    if(draw_velocity_vectors) velocity_field.Display(in_color);
-    if(draw_angular_velocity_vectors) angular_velocity_field.Display(in_color);
+                opengl_axes(i)->Display();}}
+    if(draw_velocity_vectors) velocity_field.Display();
+    if(draw_angular_velocity_vectors) angular_velocity_field.Display();
 
 #ifndef USE_OPENGLES
     if(show_object_names){

@@ -76,11 +76,11 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(valid && draw){
-        if(draw_multiple_levelsets) for(int j=0;j<opengl_levelsets.m;j++) opengl_levelsets(j)->Display(in_color);
-        else opengl_levelsets(set)->Display(in_color);}
+        if(draw_multiple_levelsets) for(int j=0;j<opengl_levelsets.m;j++) opengl_levelsets(j)->Display();
+        else opengl_levelsets(set)->Display();}
 }
 //#####################################################################
 // Function Bounding_Box

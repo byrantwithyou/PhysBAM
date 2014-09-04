@@ -59,9 +59,9 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_1D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
-    opengl_levelset->Display(in_color);
+    opengl_levelset->Display();
 }
 //#####################################################################
 // Function Bounding_Box

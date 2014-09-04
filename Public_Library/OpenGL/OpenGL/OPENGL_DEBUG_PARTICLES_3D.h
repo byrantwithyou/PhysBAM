@@ -36,7 +36,7 @@ public:
 
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
 
     OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size) PHYSBAM_OVERRIDE;
     void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;

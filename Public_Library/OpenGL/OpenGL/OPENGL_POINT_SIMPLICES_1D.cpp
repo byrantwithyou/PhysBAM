@@ -14,21 +14,20 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_POINT_SIMPLICES_1D<T>::
 OPENGL_POINT_SIMPLICES_1D(const POINT_SIMPLICES_1D<T>& simplices_input,const OPENGL_COLOR &color_input)
-    :simplices(simplices_input),color(color_input),color_gray(color_input.Grayscale()),
+    :simplices(simplices_input),color(color_input),
     vertex_color(OPENGL_COLOR::Green(0.9)),segment_color(OPENGL_COLOR::Blue(0.9)),vertex_position_color(OPENGL_COLOR::Magenta()),
-    draw_vertices(false),draw_vertex_positions(false)
+    draw_vertices(false)
 {}
 //#####################################################################
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_POINT_SIMPLICES_1D<T>::
-Display(const int in_color) const
+Display() const
 {
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
-    if(in_color) color.Send_To_GL_Pipeline();
-    else color_gray.Send_To_GL_Pipeline();
+    color.Send_To_GL_Pipeline();
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -47,14 +46,6 @@ Display(const int in_color) const
         for(int t=0;t<simplices.particles.Size();t++){
             OpenGL_Vertex(simplices.particles.X(t),vertices);}
         OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}
-
-#ifndef USE_OPENGLES
-    if (draw_vertex_positions) {
-        vertex_position_color.Send_To_GL_Pipeline();
-        for(int t=0;t<simplices.particles.Size();t++){
-            VECTOR<float,3> world_space_pos=World_Space_Point(VECTOR<float,2>(simplices.particles.X(t)));
-            OpenGL_String(simplices.particles.X(t),STRING_UTILITIES::string_sprintf("<%f>",world_space_pos.x));}}
-#endif
 
     glPopAttrib();
     glPopMatrix();

@@ -23,7 +23,7 @@ OPENGL_OBJECT::
 // Function Display
 //#####################################################################
 void OPENGL_OBJECT::
-Display(const int in_color) const
+Display() const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }

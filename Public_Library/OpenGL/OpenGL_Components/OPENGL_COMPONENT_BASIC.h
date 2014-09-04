@@ -33,10 +33,10 @@ public:
     void Use_Clip_Planes(bool use=true) 
     {use_clip_planes=use;}
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE
+    void Display() const PHYSBAM_OVERRIDE
     {if(draw){
         if(use_clip_planes){glEnable(GL_CLIP_PLANE0);glEnable(GL_CLIP_PLANE1);}
-        object.Display(in_color);
+        object.Display();
         if(use_clip_planes){glDisable(GL_CLIP_PLANE0);glDisable(GL_CLIP_PLANE1);}}}
 
     bool Use_Bounding_Box() const  PHYSBAM_OVERRIDE

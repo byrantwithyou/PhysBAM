@@ -33,7 +33,7 @@ public:
 //#####################################################################
     OPENGL_FACE_SCALAR_FIELD_1D(const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<1> > &face_values_input,OPENGL_COLOR point_color_input,OPENGL_COLOR line_color_input);
     virtual ~OPENGL_FACE_SCALAR_FIELD_1D();
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
 //#####################################################################

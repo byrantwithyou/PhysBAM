@@ -16,8 +16,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
 OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,const OPENGL_MATERIAL& material_input)
-    :surface(surface_input),two_sided(false),front_material(material_input),front_material_gray(material_input.Grayscale()),
-    back_material(material_input),back_material_gray(material_input.Grayscale()),vertex_normals(0),vertex_colors(0),smooth_normals(smooth_normals_input),use_display_list(false),
+    :surface(surface_input),two_sided(false),front_material(material_input),
+    back_material(material_input),vertex_normals(0),vertex_colors(0),smooth_normals(smooth_normals_input),use_display_list(false),
     owns_display_list(false),current_selection(0),current_node(1),highlight_current_node(false),highlight_neighbors_of_current_node(true),highlight_boundary(false),
     wireframe_only(false),draw_subsets(false),draw_velocities(false),draw_particles(false),velocity_scale((T).025)
 {
@@ -28,8 +28,8 @@ OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,bool smooth_n
 //#####################################################################
 template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
 OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input)
-    :surface(surface_input),two_sided(true),front_material(front_material_input),front_material_gray(front_material_input.Grayscale()),
-    back_material(back_material_input),back_material_gray(back_material_input.Grayscale()),vertex_normals(0),vertex_colors(0),smooth_normals(smooth_normals_input),use_display_list(false),
+    :surface(surface_input),two_sided(true),front_material(front_material_input),
+    back_material(back_material_input),vertex_normals(0),vertex_colors(0),smooth_normals(smooth_normals_input),use_display_list(false),
     owns_display_list(false),current_selection(0),current_node(1),highlight_current_node(false),highlight_neighbors_of_current_node(true),highlight_boundary(false),wireframe_only(false),
     draw_subsets(false),draw_velocities(false),draw_particles(false),velocity_scale((T).025)
 {
@@ -157,17 +157,15 @@ Delete_Vertex_Normals()
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
-Display(const int in_color) const
+Display() const
 {
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     if(two_sided){
         glDisable(GL_CULL_FACE);
         glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
-        if(in_color){front_material.Send_To_GL_Pipeline(GL_FRONT);back_material.Send_To_GL_Pipeline(GL_BACK);}
-        else{front_material_gray.Send_To_GL_Pipeline(GL_FRONT);back_material_gray.Send_To_GL_Pipeline(GL_BACK);}}
-    else{
-        if(in_color) front_material.Send_To_GL_Pipeline();
-        else front_material_gray.Send_To_GL_Pipeline();}
+        front_material.Send_To_GL_Pipeline(GL_FRONT);
+        back_material.Send_To_GL_Pipeline(GL_BACK);}
+    else front_material.Send_To_GL_Pipeline();
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -393,7 +391,6 @@ template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Set_Front_Material(const OPENGL_MATERIAL& material_input)
 {
     front_material=material_input;
-    front_material_gray=material_input.Grayscale();
 }
 //#####################################################################
 // Function Set_Back_Material
@@ -402,7 +399,6 @@ template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Set_Back_Material(const OPENGL_MATERIAL& material_input)
 {
     back_material=material_input;
-    back_material_gray=material_input.Grayscale();
 }
 //#####################################################################
 // Function

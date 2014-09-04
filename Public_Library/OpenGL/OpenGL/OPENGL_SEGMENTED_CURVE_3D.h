@@ -25,16 +25,16 @@ public:
     const OPENGL_SEGMENTED_CURVE_3D<T>* parent_curve;
     mutable ARRAY<int> segment_nodes;
     mutable HASHTABLE<int,TV> vertex_normals;
-    OPENGL_COLOR color,color_gray;
+    OPENGL_COLOR color;
     OPENGL_COLOR vertex_color,vertex_position_color;
-    bool draw_vertices, draw_vertex_positions, use_solid_color,hide_unselected;
+    bool draw_vertices,use_solid_color,hide_unselected;
 
     OPENGL_SEGMENTED_CURVE_3D(const SEGMENTED_CURVE<TV>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan())
-        :curve(curve_input),parent_curve(0),color(color_input),color_gray(color_input.Grayscale()),vertex_color(OPENGL_COLOR::Green(0.9)),
-        vertex_position_color(OPENGL_COLOR::Magenta()),draw_vertices(false),draw_vertex_positions(false),use_solid_color(true),smooth_normals(false),current_selection(0)
+        :curve(curve_input),parent_curve(0),color(color_input),vertex_color(OPENGL_COLOR::Green(0.9)),
+        vertex_position_color(OPENGL_COLOR::Magenta()),draw_vertices(false),use_solid_color(true),smooth_normals(false),current_selection(0)
     {}
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer,int buffer_size);

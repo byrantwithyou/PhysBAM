@@ -55,7 +55,7 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     OPENGL_COLOR node_neighbor_not_visible_color=OPENGL_COLOR::Magenta(0.5,0.5);
     OPENGL_COLOR face_corners_not_visible_from_face_center_color=OPENGL_COLOR::Magenta(1);
@@ -88,9 +88,9 @@ Display(const int in_color) const
         }
 
         if(draw_density_valid_mask && density_valid_mask.Size().x) 
-            opengl_density_valid_mask.Display(in_color);
+            opengl_density_valid_mask.Display();
         if(draw_phi_valid_mask && phi_valid_mask.Size().x) 
-            opengl_phi_valid_mask.Display(in_color);
+            opengl_phi_valid_mask.Display();
     }
 }
 //#####################################################################

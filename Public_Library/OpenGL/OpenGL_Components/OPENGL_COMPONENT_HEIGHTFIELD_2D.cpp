@@ -97,7 +97,7 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_2D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(valid && draw)
     {
@@ -130,9 +130,9 @@ Display(const int in_color) const
             }
         }
         else
-            opengl_triangulated_surface.Display(in_color);
+            opengl_triangulated_surface.Display();
 
-        if(draw_velocities) opengl_vector_field.Display(in_color);
+        if(draw_velocities) opengl_vector_field.Display();
     }
 }
 //#####################################################################

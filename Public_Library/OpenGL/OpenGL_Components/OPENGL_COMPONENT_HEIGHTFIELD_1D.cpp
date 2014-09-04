@@ -74,7 +74,7 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     OPENGL_COLOR water_color(0,0,1);
@@ -190,9 +190,9 @@ Display(const int in_color) const
         glEnable(GL_DEPTH_TEST);
 
 #ifndef USE_OPENGLES
-        if(mode != GL_SELECT && draw_velocities) opengl_vector_field.Display(in_color);
+        if(mode != GL_SELECT && draw_velocities) opengl_vector_field.Display();
 #else
-        if(draw_velocities) opengl_vector_field.Display(in_color);
+        if(draw_velocities) opengl_vector_field.Display();
 #endif
     }
 }

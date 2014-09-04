@@ -31,8 +31,8 @@ class OPENGL_IMPLICIT_SURFACE:public OPENGL_OBJECT
 public:
     IMPLICIT_OBJECT<TV>& surface;
     bool two_sided;
-    OPENGL_MATERIAL front_material, front_material_gray;
-    OPENGL_MATERIAL back_material, back_material_gray;
+    OPENGL_MATERIAL front_material;
+    OPENGL_MATERIAL back_material;
     int nx,ny,nz; // resolution of grid in eye space
     mutable float *slice1,*slice2;
     mutable unsigned int *up_to_date1,*up_to_date2,up_to_date_counter;
@@ -48,16 +48,16 @@ public:
     {two_sided=two_sided_input;}
 
     void Set_Front_Material(const OPENGL_MATERIAL &front_material_input)
-    {front_material=front_material_input;front_material_gray=front_material_input.Grayscale();}
+    {front_material=front_material_input;}
 
     void Set_Back_Material(const OPENGL_MATERIAL &back_material_input)
-    {back_material=back_material_input;back_material_gray=back_material_input.Grayscale();}
+    {back_material=back_material_input;}
 
 //#####################################################################
     void Set_Resolution(const int nx_input,const int ny_input,const int nz_input);
     void Initialize_Slices();
     float inline Phi(VECTOR<T,3> x) const;
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     void Display_Tetrahedron(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3, 
         const float phi1,const float phi2,const float phi3,const float phi4,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices,ARRAY<GLfloat>& normals) const;
     void Display_Brick(const VECTOR<T,3>& x0,float p1,const VECTOR<T,3>& x1,float p2,const VECTOR<T,3>& x2,float p3,const VECTOR<T,3>& x3,

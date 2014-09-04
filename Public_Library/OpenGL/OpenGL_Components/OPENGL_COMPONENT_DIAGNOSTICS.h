@@ -27,7 +27,7 @@ private:
     void Set_Frame(int frame) PHYSBAM_OVERRIDE;
     //virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Display(const int in_color=1) const;
+    void Display() const;
 //#####################################################################
 };
 }

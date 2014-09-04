@@ -64,7 +64,7 @@ template<class T> OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 // Function Display_In_Color
 //#####################################################################
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Display(const int in_color) const
+Display() const
 {
     glPushMatrix();
     Send_Transform_To_GL_Pipeline();

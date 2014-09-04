@@ -66,9 +66,9 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class T2,class RW> void OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2,RW>::
-Display(const int in_color) const
+Display() const
 {
-    if (valid && draw) opengl_scalar_field.Display(in_color);
+    if(valid && draw) opengl_scalar_field.Display();
 }
 //#####################################################################
 // Function Bounding_Box

@@ -64,11 +64,11 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(valid && draw){
-        opengl_mac_velocity_field.Display(in_color);
-        if(draw_vorticity) opengl_vorticity_magnitude.Display(in_color);}
+        opengl_mac_velocity_field.Display();
+        if(draw_vorticity) opengl_vorticity_magnitude.Display();}
 }
 //#####################################################################
 // Function Bounding_Box

@@ -60,7 +60,7 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(valid && draw) 
     {
@@ -68,7 +68,7 @@ Display(const int in_color) const
             glPushAttrib(GL_ENABLE_BIT);
             slice->Enable_Clip_Planes();
         }
-        opengl_triangulated_surface.Display(in_color);
+        opengl_triangulated_surface.Display();
         if(slice && slice->Is_Slice_Mode()) {
             glPopAttrib();
         }

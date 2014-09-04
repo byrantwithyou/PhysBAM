@@ -34,12 +34,12 @@ template<class T> OPENGL_LEVELSET_2D<T>::
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_LEVELSET_2D<T>::
-Display(const int in_color) const
+Display() const
 {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     Send_Transform_To_GL_Pipeline();
-    if(draw_cells) OPENGL_SCALAR_FIELD_2D<T,T>::Display(in_color);
+    if(draw_cells) OPENGL_SCALAR_FIELD_2D<T,T>::Display();
     if(draw_normals){
         levelset.Compute_Normals();
         glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT);
@@ -54,9 +54,9 @@ Display(const int in_color) const
         glPopAttrib();}
     if(draw_area && opengl_triangulated_area){
         glDepthMask(GL_FALSE);
-        opengl_triangulated_area->Display(in_color);
+        opengl_triangulated_area->Display();
         glDepthMask(GL_TRUE);}
-    if(draw_curve && opengl_segmented_curve_2d) opengl_segmented_curve_2d->Display(in_color);
+    if(draw_curve && opengl_segmented_curve_2d) opengl_segmented_curve_2d->Display();
     glPopMatrix();
 }
 //#####################################################################

@@ -135,15 +135,15 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(valid){
         if(draw){
-            if(draw_all_levels) for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Display(in_color);
-            else opengl_adaptive_mac_velocity_fields(level)->Display(in_color);}
-        if(draw_divergence) opengl_divergence_field->Display(in_color);
-        if(draw_vorticity) opengl_vorticity_magnitude->Display(in_color);
-        if(draw_streamlines) opengl_streamlines.Display(in_color);}
+            if(draw_all_levels) for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Display();
+            else opengl_adaptive_mac_velocity_fields(level)->Display();}
+        if(draw_divergence) opengl_divergence_field->Display();
+        if(draw_vorticity) opengl_vorticity_magnitude->Display();
+        if(draw_streamlines) opengl_streamlines.Display();}
 }
 //#####################################################################
 // Function Bounding_Box

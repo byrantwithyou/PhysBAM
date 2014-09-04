@@ -185,7 +185,7 @@ Do_Color(const TV_INT& index) const
 // Function Display
 //#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
-Display(const int in_color) const
+Display() const
 {
     if(values.domain.Empty()) return;
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
@@ -198,7 +198,7 @@ Display(const int in_color) const
         if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE) Display_3D();
         else if(opengl_textured_rect)
 #ifndef USE_OPENGLES
-        opengl_textured_rect->Display(in_color);
+        opengl_textured_rect->Display();
 #else
         Display_3D_Slice();
 #endif
@@ -208,7 +208,7 @@ Display(const int in_color) const
         if(slice && slice->Is_Slice_Mode()){
             glPushAttrib(GL_ENABLE_BIT);
             slice->Enable_Clip_Planes();}
-        opengl_points->Display(in_color);
+        opengl_points->Display();
         if(slice && slice->Is_Slice_Mode()){
             glPopAttrib();}}
 

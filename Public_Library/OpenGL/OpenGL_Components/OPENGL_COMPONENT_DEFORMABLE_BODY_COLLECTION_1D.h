@@ -51,7 +51,7 @@ public:
     void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE;
     void Draw_All_Objects() PHYSBAM_OVERRIDE;
 
-    virtual void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    virtual void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 

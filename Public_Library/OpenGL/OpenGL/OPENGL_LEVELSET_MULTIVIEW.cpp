@@ -295,17 +295,17 @@ Toggle_Smooth_Slice_Texture()
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     Send_Transform_To_GL_Pipeline();
     if(implicit_object_transform) {OpenGL_Translate(implicit_object_transform->t);OpenGL_Rotate(implicit_object_transform->r);}
-    if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE){if(opengl_triangulated_surface) opengl_triangulated_surface->Display(in_color);}
+    if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE){if(opengl_triangulated_surface) opengl_triangulated_surface->Display();}
     else{
-        if(opengl_scalar_field) opengl_scalar_field->Display(in_color);
-        if(display_overlay && opengl_triangulated_surface) opengl_triangulated_surface->Display(in_color);}
+        if(opengl_scalar_field) opengl_scalar_field->Display();
+        if(display_overlay && opengl_triangulated_surface) opengl_triangulated_surface->Display();}
     glPopMatrix();
 }
 //#####################################################################

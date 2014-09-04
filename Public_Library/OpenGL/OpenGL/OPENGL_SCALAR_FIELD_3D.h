@@ -38,7 +38,7 @@ public:
     void Reset_Scale_Range();
     T2 Pre_Map_Value(const T2 value) const;
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Slice_Has_Changed() PHYSBAM_OVERRIDE;    
 

@@ -177,7 +177,7 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(draw){
         glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -186,7 +186,7 @@ Display(const int in_color) const
 
         if(draw_point_simplices){
             for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
-                if(draw_object(i) && opengl_point_simplices(i)) opengl_point_simplices(i)->Display(in_color);}}
+                if(draw_object(i) && opengl_point_simplices(i)) opengl_point_simplices(i)->Display();}}
 
 #ifndef USE_OPENGLES
         if(show_object_names){
@@ -243,7 +243,6 @@ Set_Object_Color(int i,const OPENGL_COLOR &color_input)
 {
     if(!opengl_point_simplices(i)) return;
     opengl_point_simplices(i)->color=color_input;
-    opengl_point_simplices(i)->color_gray=color_input.Grayscale();
 }
 //#####################################################################
 // Function Get_Draw_Object

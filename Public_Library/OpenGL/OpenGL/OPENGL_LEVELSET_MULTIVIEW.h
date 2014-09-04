@@ -88,7 +88,7 @@ public:
     void Toggle_Slice_Color_Mode();
     void Toggle_Display_Overlay();
     void Toggle_Smooth_Slice_Texture();
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;

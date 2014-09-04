@@ -45,7 +45,7 @@ public:
     {use_inverted_material=!use_inverted_material;return use_inverted_material;}
 
 //#####################################################################
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     void Draw_Subset_Particles() const;
     void Draw_Vector_At_Hex_Center() const;
     void Draw_Wireframe_Mesh(const HEXAHEDRON_MESH& hexahedron_mesh) const;

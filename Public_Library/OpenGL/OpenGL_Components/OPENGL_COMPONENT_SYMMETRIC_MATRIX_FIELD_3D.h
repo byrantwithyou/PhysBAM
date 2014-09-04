@@ -45,8 +45,8 @@ public:
     void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE
     {OPENGL_COMPONENT::Set_Draw(draw_input);Reinitialize();}
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE
-    {if(valid&&draw)opengl_symmetric_matrix_field.Display(in_color);}
+    void Display() const PHYSBAM_OVERRIDE
+    {if(valid&&draw)opengl_symmetric_matrix_field.Display();}
     
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE
     {return draw&&valid;}

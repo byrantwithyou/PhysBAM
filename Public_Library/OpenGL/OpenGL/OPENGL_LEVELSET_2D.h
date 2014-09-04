@@ -45,7 +45,7 @@ public:
     void Set_Inside_And_Outside_Colors(const OPENGL_COLOR& inside_color_input,const OPENGL_COLOR& outside_color_input);
     void Toggle_Normals();
     void Update() PHYSBAM_OVERRIDE;
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
 private:
 //#####################################################################
 };

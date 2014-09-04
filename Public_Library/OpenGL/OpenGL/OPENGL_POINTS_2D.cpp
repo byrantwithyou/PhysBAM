@@ -34,7 +34,7 @@ Bounding_Box() const
 // Function Display
 //#####################################################################
 template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
-Display(const int in_color) const
+Display() const
 {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();

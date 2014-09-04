@@ -43,7 +43,7 @@ Bounding_Box() const
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_DEBUG_PARTICLES_3D<T>::
-Display(const int in_color) const
+Display() const
 {
     if(slice && slice->Is_Slice_Mode()){
         glPushAttrib(GL_ENABLE_BIT);

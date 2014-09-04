@@ -49,7 +49,7 @@ public:
     void Enslave_Transform_To(OPENGL_OBJECT& object)
     {frame=object.frame;}
 
-    virtual void Display(const int in_color=1) const;
+    virtual void Display() const;
     virtual bool Use_Bounding_Box() const;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const;
     virtual bool Is_Transparent() const;

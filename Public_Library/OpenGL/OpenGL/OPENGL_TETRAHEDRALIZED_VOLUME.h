@@ -54,7 +54,7 @@ public:
     {if(!mesh->boundary_mesh) mesh->Initialize_Boundary_Mesh(); // Neighboring nodes is no longer initialized here to conserve memory.
     if(!mesh->node_on_boundary) mesh->Initialize_Node_On_Boundary();minimum_valence=mesh->Minimum_Valence();mesh->Initialize_Boundary_Nodes();}
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     virtual OPENGL_SELECTION* Get_Selection(GLuint* buffer,int buffer_size);

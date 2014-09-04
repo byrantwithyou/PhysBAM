@@ -63,9 +63,9 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
-    if(valid && draw) opengl_particles.Display(in_color);
+    if(valid && draw) opengl_particles.Display();
 }
 //#####################################################################
 // Function Use_Bounding_Box

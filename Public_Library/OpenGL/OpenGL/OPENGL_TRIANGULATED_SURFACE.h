@@ -29,7 +29,7 @@ public:
                                 const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input);
     virtual ~OPENGL_TRIANGULATED_SURFACE();
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
@@ -81,8 +81,8 @@ public:
     TRIANGULATED_SURFACE<T>& surface;
     bool two_sided;
 public:
-    OPENGL_MATERIAL front_material, front_material_gray;
-    OPENGL_MATERIAL back_material, back_material_gray;
+    OPENGL_MATERIAL front_material;
+    OPENGL_MATERIAL back_material;
 
     ARRAY<VECTOR<T,3> >* vertex_normals;
     ARRAY<OPENGL_COLOR>* vertex_colors;

@@ -143,7 +143,7 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(!draw||!valid) return;
     bool draw_triangulated_areas=false,draw_triangles_of_material=false,draw_embedded_curves=false;
@@ -157,25 +157,25 @@ Display(const int in_color) const
     for(int i=0;i<segmented_curve_objects.m;i++){
         glPushName(i);
         glPushName(1);
-        if(segmented_curve_objects(i)) segmented_curve_objects(i)->Display(in_color);
+        if(segmented_curve_objects(i)) segmented_curve_objects(i)->Display();
         glPopName();
         if(draw_triangulated_areas && triangulated_area_objects(i)){
-            glPushName(2);triangulated_area_objects(i)->Display(in_color);glPopName();}
+            glPushName(2);triangulated_area_objects(i)->Display();glPopName();}
         if(draw_triangles_of_material && triangles_of_material_objects(i)){
-            glPushName(3);triangles_of_material_objects(i)->Display(in_color);glPopName();}
+            glPushName(3);triangles_of_material_objects(i)->Display();glPopName();}
         if(draw_embedded_curves && embedded_curve_objects(i)){
-            glPushName(5);embedded_curve_objects(i)->Display(in_color);glPopName();}
+            glPushName(5);embedded_curve_objects(i)->Display();glPopName();}
         if(free_particles_objects(i) && display_mode!=1){
-            glPushName(6);free_particles_objects(i)->Display(in_color);glPopName();}
+            glPushName(6);free_particles_objects(i)->Display();glPopName();}
         glPopName();}
 #else
     for(int i=0;i<segmented_curve_objects.m;i++){
-        if(segmented_curve_objects(i)) segmented_curve_objects(i)->Display(in_color);
-        if(draw_triangulated_areas && triangulated_area_objects(i)) triangulated_area_objects(i)->Display(in_color);
-        if(draw_triangles_of_material && triangles_of_material_objects(i)) triangles_of_material_objects(i)->Display(in_color);
-        if(free_particles_objects(i) && display_mode!=1) free_particles_objects(i)->Display(in_color);}
+        if(segmented_curve_objects(i)) segmented_curve_objects(i)->Display();
+        if(draw_triangulated_areas && triangulated_area_objects(i)) triangulated_area_objects(i)->Display();
+        if(draw_triangles_of_material && triangles_of_material_objects(i)) triangles_of_material_objects(i)->Display();
+        if(free_particles_objects(i) && display_mode!=1) free_particles_objects(i)->Display();}
 #endif
-    if(draw_velocities && deformable_body_collection.particles.store_velocity) velocity_field.Display(in_color);
+    if(draw_velocities && deformable_body_collection.particles.store_velocity) velocity_field.Display();
 }
 //#####################################################################
 // Function Set_Vector_Size

@@ -13,24 +13,24 @@ using namespace PhysBAM;
 // Function Display
 //##################################################################### 
 template<class T> void OPENGL_BOX_HIERARCHY_3D<T>::
-Display(const int in_color) const
+Display() const
 {
-    if(hierarchy) Display_Helper(hierarchy->root,1,in_color);
+    if(hierarchy) Display_Helper(hierarchy->root,1);
 }
 //#####################################################################
 // Function Display_Helper
 //##################################################################### 
 template<class T> void OPENGL_BOX_HIERARCHY_3D<T>::
-Display_Helper(const int cell,const int height,const int in_color) const
+Display_Helper(const int cell,const int height) const
 {
     if(height>=min_height && height<=max_height){
         OPENGL_BOX_3D<T> opengl_box(hierarchy->box_hierarchy(cell),color);
-        opengl_box.Display(in_color);}
+        opengl_box.Display();}
     if(!hierarchy->Leaf(cell)){
         int left_cell,right_cell;
         hierarchy->children(cell-hierarchy->leaves).Get(left_cell,right_cell);
-        Display_Helper(left_cell,height+1,in_color);
-        Display_Helper(right_cell,height+1,in_color);}
+        Display_Helper(left_cell,height+1);
+        Display_Helper(right_cell,height+1);}
 }
 //#####################################################################
 // Function Bounding_Box

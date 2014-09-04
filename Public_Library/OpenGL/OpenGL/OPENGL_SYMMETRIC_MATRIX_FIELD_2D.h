@@ -33,7 +33,7 @@ public:
         if(grid.Is_MAC_Grid())grid=grid.Get_Regular_Grid_At_MAC_Positions();
     }
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual void Update();
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 //##################################################################### 

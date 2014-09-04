@@ -72,9 +72,9 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA<T,RW>::
-Display(const int in_color) const
+Display() const
 {
-    if(valid && draw) opengl_triangulated_area.Display(in_color);
+    if(valid && draw) opengl_triangulated_area.Display();
 }
 //#####################################################################
 // Function Bounding_Box

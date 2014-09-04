@@ -52,11 +52,10 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
-    if (valid && draw) {
-        opengl_two_phase_velocity_magnitude.Display(in_color);
-    }
+    if(valid && draw)
+        opengl_two_phase_velocity_magnitude.Display();
 }
 //#####################################################################
 // Function Bounding_Box

@@ -14,20 +14,19 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_SEGMENTED_CURVE_2D<T>::
 OPENGL_SEGMENTED_CURVE_2D(const SEGMENTED_CURVE_2D<T>& curve_input,const OPENGL_COLOR &color_input)
-    :curve(curve_input),color(color_input),color_gray(color_input.Grayscale()),
+    :curve(curve_input),color(color_input),
     vertex_color(OPENGL_COLOR::Green(0.9)),vertex_position_color(OPENGL_COLOR::Magenta()),velocity_color(OPENGL_COLOR::Cyan()),
-    draw_vertices(false),draw_vertex_positions(false),draw_velocities(false),velocity_scale(0.025),current_selection(0)
+    draw_vertices(false),draw_velocities(false),velocity_scale(0.025),current_selection(0)
 {}
 //#####################################################################
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_SEGMENTED_CURVE_2D<T>::
-Display(const int in_color) const
+Display() const
 {
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
-    if(in_color) color.Send_To_GL_Pipeline();
-    else color_gray.Send_To_GL_Pipeline();
+    color.Send_To_GL_Pipeline();
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -70,16 +69,6 @@ Display(const int in_color) const
         for(int t=0;t<curve.particles.Size();t++)
             OpenGL_Vertex(curve.particles.X(t),vertices);
         OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}
-
-#ifndef USE_OPENGLES
-    if (draw_vertex_positions) {
-        vertex_position_color.Send_To_GL_Pipeline();
-        for(int t=0;t<curve.particles.Size();t++){
-            VECTOR<float,3> world_space_pos=World_Space_Point(VECTOR<float,2>(curve.particles.X(t)));
-            OpenGL_String(curve.particles.X(t),STRING_UTILITIES::string_sprintf("<%f %f>",world_space_pos.x,world_space_pos.y));
-        }
-    }
-#endif
 
     if(draw_velocities && curve.particles.store_velocity){
         velocity_color.Send_To_GL_Pipeline();

@@ -35,7 +35,7 @@ public:
                              const OPENGL_COLOR& triangle_inverted_color_input=OPENGL_COLOR::Violet(0.75),
                              ARRAY<OPENGL_COLOR>* color_map_input=0);
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     virtual OPENGL_SELECTION* Get_Selection(GLuint* buffer, int buffer_size);

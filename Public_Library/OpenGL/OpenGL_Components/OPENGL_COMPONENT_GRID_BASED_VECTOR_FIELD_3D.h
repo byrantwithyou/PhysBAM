@@ -25,7 +25,7 @@ public:
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     virtual void Set_Slice(OPENGL_SLICE *slice_input) PHYSBAM_OVERRIDE { slice=slice_input; opengl_grid_based_vector_field.Set_Slice(slice_input); }
     virtual void Slice_Has_Changed() PHYSBAM_OVERRIDE { opengl_grid_based_vector_field.Slice_Has_Changed(); }

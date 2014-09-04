@@ -35,7 +35,7 @@ public:
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;

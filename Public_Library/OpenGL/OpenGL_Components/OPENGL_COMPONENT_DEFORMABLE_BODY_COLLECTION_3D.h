@@ -80,7 +80,7 @@ public:
     void Set_Display_Modes(bool& display_triangulated_surface_objects,bool& display_tetrahedralized_volume_objects,
             bool& display_hexahedralized_volume_objects,bool& display_free_particles_objects,bool& display_boundary_surface_objects,
         bool& display_hard_bound_boundary_surface_objects) const;
-    virtual void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    virtual void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 

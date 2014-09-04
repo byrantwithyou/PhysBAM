@@ -60,7 +60,7 @@ namespace
             GLX_PRESERVED_CONTENTS, False,
             None};
         GLXPbuffer pBuffer;
-        int bufferSize, level, doubleBuffer, stereo, auxBuffers;
+        int bufferSize, level, doubleBuffer, auxBuffers;
         int redSize, greenSize, blueSize, alphaSize;
         int depthSize, stencilSize;
         int accumRedSize, accumBlueSize, accumGreenSize, accumAlphaSize;
@@ -70,7 +70,6 @@ namespace
         glXGetFBConfigAttrib(dpy, fbConfig, GLX_BUFFER_SIZE, &bufferSize);
         glXGetFBConfigAttrib(dpy, fbConfig, GLX_LEVEL, &level);
         glXGetFBConfigAttrib(dpy, fbConfig, GLX_DOUBLEBUFFER, &doubleBuffer);
-        glXGetFBConfigAttrib(dpy, fbConfig, GLX_STEREO, &stereo);
         glXGetFBConfigAttrib(dpy, fbConfig, GLX_AUX_BUFFERS, &auxBuffers);
         glXGetFBConfigAttrib(dpy, fbConfig, GLX_RED_SIZE, &redSize);
         glXGetFBConfigAttrib(dpy, fbConfig, GLX_GREEN_SIZE, &greenSize);
@@ -86,7 +85,7 @@ namespace
         glXGetFBConfigAttrib(dpy, fbConfig, GLX_RENDER_TYPE, &renderType);
         glXGetFBConfigAttrib(dpy, fbConfig, GLX_X_RENDERABLE, &xRenderable);
         glXGetFBConfigAttrib(dpy, fbConfig, GLX_X_VISUAL_TYPE_EXT, &xVisual);
-        if (!xRenderable || !(drawableType & GLX_WINDOW_BIT)) xVisual = -1;
+        if(!xRenderable || !(drawableType & GLX_WINDOW_BIT)) xVisual = -1;
         glXGetFBConfigAttrib(dpy, fbConfig, GLX_FBCONFIG_ID, &id);
 
         glXGetFBConfigAttrib(dpy, fbConfig, GLX_MAX_PBUFFER_WIDTH, &maxWidth);
@@ -104,7 +103,7 @@ namespace
             else if(xVisual==GLX_TRUE_COLOR) LOG::cout<<"TrueColor   ";
             else if(xVisual==GLX_DIRECT_COLOR) LOG::cout<<"DirectColor ";
             else LOG::cout<<"  -none-    ";
-            LOG::cout<<" "<<bufferSize<<" "<<level<<" "<<(renderType&GLX_RGBA_BIT?'y':'n')<<(renderType&GLX_COLOR_INDEX_BIT?'y':'n')<<(doubleBuffer?"y":"n")<<(stereo?"y":"n")<<"  ";
+            LOG::cout<<" "<<bufferSize<<" "<<level<<" "<<(renderType&GLX_RGBA_BIT?'y':'n')<<(renderType&GLX_COLOR_INDEX_BIT?'y':'n')<<(doubleBuffer?"y":"n")<<"  ";
             LOG::cout<<redSize<<" "<<greenSize<<" "<<blueSize<<" "<<alphaSize<<"  ";
             LOG::cout<<depthSize<<" "<<stencilSize<<"  ";
             LOG::cout<<accumRedSize<<" "<<accumGreenSize<<" "<<accumBlueSize<<" "<<accumAlphaSize;
@@ -114,7 +113,6 @@ namespace
             LOG::cout<<"  Buffer Size: "<<bufferSize<<std::endl;
             LOG::cout<<"  Level: "<<level<<std::endl;
             LOG::cout<<"  Double Buffer: "<<(doubleBuffer?"yes":"no")<<std::endl;
-            LOG::cout<<"  Stereo: "<<(stereo?"yes":"no")<<std::endl;
             LOG::cout<<"  Aux Buffers: "<<auxBuffers<<std::endl;
             LOG::cout<<"  Red Size: "<<redSize<<std::endl;
             LOG::cout<<"  Green Size: "<<greenSize<<std::endl;

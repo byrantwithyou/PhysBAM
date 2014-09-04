@@ -49,7 +49,7 @@ static OPENGL_WORLD* opengl_world=0;
 OPENGL_WORLD::
 OPENGL_WORLD()
     :initialized(false),ambient_light(OPENGL_COLOR::White()),fovy(50),mode_2d(false),load_names_for_selection(false),window(0),
-    stereo_mode(false),stereo_offset(.02),fill_mode(DRAW_FILLED),enable_lighting_for_wireframe(false),white_background(false),
+    fill_mode(DRAW_FILLED),enable_lighting_for_wireframe(false),white_background(false),
     display_strings(true),show_object_names(false),display_object_names_in_corner(false),view_auto_help(false),
     idle_callback(0),timer_id(0),idle_delay(0),idle_timer(0),view_target_timer(0),frame_counter_timer(0),frames_rendered(0),frames_per_second(0),show_frames_per_second(true),
     left_handed_coordinate_system(false),nearclip_factor(.0625),farclip_factor(4),nearclip(nearclip_factor),farclip(farclip_factor),
@@ -68,7 +68,6 @@ OPENGL_WORLD()
     Set_Key_Binding_Category("Default Keys (OPENGL_WORLD)");
     Set_Key_Binding_Category_Priority(1000);
     Bind_Key("^q",Quit_CB("Quit"));
-    Bind_Key("<F10>",new OPENGL_CALLBACK_TOGGLE(&stereo_mode,"Toggle stereo mode"));
     Bind_Key("^w",new OPENGL_CALLBACK_CYCLE(&fill_mode,0,2,"Toggle wireframe mode"));
     // TODO: fix full screen
     //Bind_Key("^f",new OPENGL_CALLBACK_FULLSCREEN(&width,&height));
@@ -457,31 +456,13 @@ void OPENGL_WORLD::Render_World(bool selecting,bool swap_buffers)
         if(!enable_lighting_for_wireframe){
             glDisable(GL_LIGHTING);wireframe_color.Send_To_GL_Pipeline();}}
 
-    if(stereo_mode){
-        glColorMask(GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE); // draw only to green, blue and alpha
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glTranslatef(-stereo_offset*camera_distance,0,0);
-        for(int i=0;i<object_list.m;i++) if((!selecting && object_list(i)->visible) || object_list(i)->selectable) object_list(i)->Display(0); // draw everything in greyscale
-        if(view_target_timer>0) opengl_world->Display_Target(0);
-        glPopMatrix();
-        glClear(GL_DEPTH_BUFFER_BIT); // leave the blue image but clear Z (NOTE: may need to clear alpha as well for transparency effects!)
-        glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_TRUE); // draw only to red and alpha
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glTranslatef(stereo_offset*camera_distance,0,0);
-        for(int i=0;i<object_list.m;i++) if((!selecting && object_list(i)->visible) || object_list(i)->selectable) object_list(i)->Display(0); // draw everything in greyscale
-        if(view_target_timer>0) opengl_world->Display_Target(0);
-        glPopMatrix();
-        glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);}
-    else{
-        for(int i=0;i<object_list.m;i++)
-            if((!selecting && object_list(i)->visible) || object_list(i)->selectable){
+    for(int i=0;i<object_list.m;i++)
+        if((!selecting && object_list(i)->visible) || object_list(i)->selectable){
 #ifndef USE_OPENGLES
-                if(load_names_for_selection) glLoadName(i);
+            if(load_names_for_selection) glLoadName(i);
 #endif
-                object_list(i)->Display();} // draw everything in color
-        if(view_target_timer>0) opengl_world->Display_Target();}
+            object_list(i)->Display();}
+    if(view_target_timer>0) opengl_world->Display_Target();
     glEnable(GL_LIGHTING);
 
     if(!selecting){
@@ -840,7 +821,7 @@ Prepare_For_Target_XY_Drag()
 // Function Display_Target
 //#####################################################################
 void OPENGL_WORLD::
-Display_Target(const int in_color)
+Display_Target()
 {
 #ifndef USE_OPENGLES
     glPushAttrib(GL_LIGHTING_BIT);

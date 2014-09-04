@@ -295,7 +295,7 @@ Set_Display_Modes(bool& display_triangulated_surface_objects,bool& display_tetra
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(!draw || !valid) return;
     if(slice && slice->Is_Slice_Mode()){
@@ -316,36 +316,36 @@ Display(const int in_color) const
             segmented_curve_objects(i)->hide_unselected=hide_unselected;
             if(real_selection) segmented_curve_objects(i)->parent_curve=dynamic_cast<OPENGL_SEGMENTED_CURVE_3D<T>*>(real_selection->subobject);
             else segmented_curve_objects(i)->parent_curve=0;
-            segmented_curve_objects(i)->Display(in_color);
+            segmented_curve_objects(i)->Display();
             glPopName();}
         if(triangulated_surface_objects(i) && display_triangulated_surface_objects){
-            glPushName(2);triangulated_surface_objects(i)->Display(in_color);glPopName();}
+            glPushName(2);triangulated_surface_objects(i)->Display();glPopName();}
         if(tetrahedralized_volume_objects(i) && display_tetrahedralized_volume_objects){
-            glPushName(3);tetrahedralized_volume_objects(i)->Display(in_color);glPopName();}
+            glPushName(3);tetrahedralized_volume_objects(i)->Display();glPopName();}
         if(hexahedralized_volume_objects(i) && display_hexahedralized_volume_objects){
-            glPushName(3);hexahedralized_volume_objects(i)->Display(in_color);glPopName();}
-        if(free_particles_objects(i) && display_free_particles_objects){glPushName(6);free_particles_objects(i)->Display(in_color);glPopName();}
+            glPushName(3);hexahedralized_volume_objects(i)->Display();glPopName();}
+        if(free_particles_objects(i) && display_free_particles_objects){glPushName(6);free_particles_objects(i)->Display();glPopName();}
         glPopName();}
 #else
     for(int i=0;i<segmented_curve_objects.m;i++){
         if(!active_list(i)) continue;
         if(segmented_curve_objects(i)){
             segmented_curve_objects(i)->parent_curve=0;
-            segmented_curve_objects(i)->Display(in_color);}
+            segmented_curve_objects(i)->Display();}
         if(triangulated_surface_objects(i) && display_triangulated_surface_objects){
-            triangulated_surface_objects(i)->Display(in_color);}
+            triangulated_surface_objects(i)->Display();}
         if(tetrahedralized_volume_objects(i) && display_tetrahedralized_volume_objects){
-            tetrahedralized_volume_objects(i)->Display(in_color);}
+            tetrahedralized_volume_objects(i)->Display();}
         if(hexahedralized_volume_objects(i) && display_hexahedralized_volume_objects){
-            hexahedralized_volume_objects(i)->Display(in_color);}
-        if(free_particles_objects(i) && display_free_particles_objects){free_particles_objects(i)->Display(in_color);}}
+            hexahedralized_volume_objects(i)->Display();}
+        if(free_particles_objects(i) && display_free_particles_objects){free_particles_objects(i)->Display();}}
 #endif
 
     if(slice && slice->Is_Slice_Mode()) glPopAttrib();
 
     if(selected_vertex>=0) OPENGL_SELECTION::Draw_Highlighted_Vertex(deformable_body_collection.particles.X(selected_vertex),selected_vertex);
 
-    if(draw_velocity_vectors) velocity_field.Display(in_color);
+    if(draw_velocity_vectors) velocity_field.Display();
 
     // Visualize relative velocity on edges
     if(display_relative_velocity_mode){
@@ -368,11 +368,11 @@ Display(const int in_color) const
     for(int i=0;i<boundary_surface_objects.m;i++){
         if(!active_list(i)) continue;
         glPushName(i);
-        //if(embedded_surface_objects(i) && display_mode==3){glPushName(3);embedded_surface_objects(i)->Display(in_color);glPopName();}
+        //if(embedded_surface_objects(i) && display_mode==3){glPushName(3);embedded_surface_objects(i)->Display();glPopName();}
         if(boundary_surface_objects(i) && display_boundary_surface_objects){
-          boundary_surface_objects(i)->wireframe_only=(display_mode==3);glPushName(5);boundary_surface_objects(i)->Display(in_color);glPopName();}
+          boundary_surface_objects(i)->wireframe_only=(display_mode==3);glPushName(5);boundary_surface_objects(i)->Display();glPopName();}
         if(hard_bound_boundary_surface_objects(i) && display_hard_bound_boundary_surface_objects){
-            hard_bound_boundary_surface_objects(i)->wireframe_only=(display_mode==3);glPushName(5);hard_bound_boundary_surface_objects(i)->Display(in_color);glPopName();}
+            hard_bound_boundary_surface_objects(i)->wireframe_only=(display_mode==3);glPushName(5);hard_bound_boundary_surface_objects(i)->Display();glPopName();}
         glPopName();}
     if(slice && slice->Is_Slice_Mode()) glPopAttrib();
 

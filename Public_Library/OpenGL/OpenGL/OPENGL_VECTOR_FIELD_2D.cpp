@@ -24,7 +24,7 @@ template<class T_ARRAY> OPENGL_VECTOR_FIELD_2D<T_ARRAY>::
 // Function Display
 //#####################################################################
 template<class T_ARRAY> void OPENGL_VECTOR_FIELD_2D<T_ARRAY>::
-Display(const int in_color) const
+Display() const
 {
     if(!draw)return;
     glMatrixMode(GL_MODELVIEW);

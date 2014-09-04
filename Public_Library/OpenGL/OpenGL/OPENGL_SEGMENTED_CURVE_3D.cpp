@@ -28,13 +28,11 @@ TV Camera_Oriented_Normal(const TV& camera_direction,const VECTOR<TV,2>& Xs)
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_SEGMENTED_CURVE_3D<T>::
-Display(const int in_color) const
+Display() const
 {   
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
-    if(in_color)
-        if(use_solid_color){glPushAttrib(GL_LIGHTING_BIT);glDisable(GL_LIGHTING);color.Send_To_GL_Pipeline();}
-        else OPENGL_MATERIAL::Plastic(color).Send_To_GL_Pipeline();
-    else color_gray.Send_To_GL_Pipeline();
+    if(use_solid_color){glPushAttrib(GL_LIGHTING_BIT);glDisable(GL_LIGHTING);color.Send_To_GL_Pipeline();}
+    else OPENGL_MATERIAL::Plastic(color).Send_To_GL_Pipeline();
 
     int edge,node1,node2,len;
     ARRAY<int> selected_edges=Get_Selected_Edges();
@@ -113,15 +111,7 @@ Display(const int in_color) const
         for(int t=0;t<curve.particles.Size();t++) OpenGL_Vertex(curve.particles.X(t),vertices);
         OpenGL_Draw_Arrays(GL_POINTS,3,vertices);}
 
-#ifndef USE_OPENGLES
-    if(draw_vertex_positions){
-        vertex_position_color.Send_To_GL_Pipeline();
-        for(int t=0;t<curve.particles.Size();t++){
-            VECTOR<float,3> world_space_pos=World_Space_Point(VECTOR<float,3>(curve.particles.X(t)));
-            OpenGL_String(curve.particles.X(t),STRING_UTILITIES::string_sprintf("<%f %f>",world_space_pos.x,world_space_pos.y));}}
-#endif
-
-    if(in_color && use_solid_color) glPopAttrib();
+    if(use_solid_color) glPopAttrib();
 
     glPopMatrix();
 }

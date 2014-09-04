@@ -28,7 +28,7 @@ Set_Texture(OPENGL_TEXTURE *texture_input)
 // Function Display
 //#####################################################################
 void OPENGL_TEXTURED_RECT::
-Display(const int in_color) const
+Display() const
 {
     if(!texture) return;
 

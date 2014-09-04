@@ -52,7 +52,7 @@ public:
 
     void Set_Uniform_Contour_Values(const T2 min_avlue,const T2 max_value,const T2 increment);
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     void Display_2D() const;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 

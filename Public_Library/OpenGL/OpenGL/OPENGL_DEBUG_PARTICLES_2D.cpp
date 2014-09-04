@@ -42,7 +42,7 @@ Bounding_Box() const
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_DEBUG_PARTICLES_2D<T>::
-Display(const int in_color) const
+Display() const
 {
     for(int i=0;i<debug_objects.m;i++)
         if(debug_objects(i).draw_vertices)

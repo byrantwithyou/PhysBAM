@@ -40,7 +40,7 @@ Bounding_Box() const
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_VECTOR_FIELD_3D<T>::
-Display(const int in_color) const
+Display() const
 {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();

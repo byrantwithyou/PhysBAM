@@ -11,7 +11,7 @@ using namespace PhysBAM;
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_SYMMETRIC_MATRIX_FIELD_3D<T>::
-Display(const int in_color) const
+Display() const
 {
     glPushAttrib(GL_LIGHTING_BIT|GL_TEXTURE_BIT|GL_LINE_BIT);
     glLineWidth(1);glDisable(GL_LIGHTING);glDisable(GL_TEXTURE_2D);

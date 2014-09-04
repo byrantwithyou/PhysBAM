@@ -23,7 +23,7 @@ public:
     OPENGL_TEXTURED_RECT();
 
     void Set_Texture(OPENGL_TEXTURE *texture_input);
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 

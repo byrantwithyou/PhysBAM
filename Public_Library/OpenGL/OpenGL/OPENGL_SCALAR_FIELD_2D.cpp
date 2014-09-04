@@ -174,18 +174,18 @@ Pre_Map_Value(const T2 value) const
 // Function Display
 //#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
-Display(const int in_color) const
+Display() const
 {
     if(draw_mode==DRAW_TEXTURE) {
         PHYSBAM_ASSERT(opengl_textured_rect);
 #ifndef USE_OPENGLES
-        opengl_textured_rect->Display(in_color);
+        opengl_textured_rect->Display();
 #else
         Display_2D();
 #endif
     } else if(draw_mode==DRAW_POINTS) {
         PHYSBAM_ASSERT(opengl_points);
-        opengl_points->Display(in_color);
+        opengl_points->Display();
     } else {
         for(int i=0;i<contour_curves.m;i++) contour_curves(i)->Display();
     }

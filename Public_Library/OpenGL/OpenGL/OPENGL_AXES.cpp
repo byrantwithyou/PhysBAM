@@ -28,7 +28,7 @@ template<class T> OPENGL_AXES<T>::
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_AXES<T>::
-Display(const int in_color) const
+Display() const
 {
     typedef VECTOR<T,3> TV;
 
@@ -42,8 +42,7 @@ Display(const int in_color) const
 
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
 
-    if(in_color) glColor3f(1,.25,.25);
-    else glColor3f(1,1,1);
+    glColor3f(1,.25,.25);
     // draw all lines parallel to x axis
     if(draw_box){
         OpenGL_Vertex(box.min_corner,vertices);
@@ -69,7 +68,7 @@ Display(const int in_color) const
     OpenGL_Draw_Arrays(GL_LINES,TV::dimension,vertices);
     vertices.Resize(0);
 
-    if(in_color) glColor3f(.25f,1,.25f);
+    glColor3f(.25f,1,.25f);
     // draw all lines parallel to y axis
     if(draw_box){
         OpenGL_Vertex(TV(box.min_corner.x,box.min_corner.y,box.min_corner.z),vertices);
@@ -95,7 +94,7 @@ Display(const int in_color) const
     OpenGL_Draw_Arrays(GL_LINES,TV::dimension,vertices);
     vertices.Resize(0);
 
-    if(in_color) glColor3f(.25f,.25f,1);
+    glColor3f(.25f,.25f,1);
     // draw all lines parallel to z axis
     if(draw_box){
         OpenGL_Vertex(TV(box.min_corner.x,box.min_corner.y,box.min_corner.z),vertices);

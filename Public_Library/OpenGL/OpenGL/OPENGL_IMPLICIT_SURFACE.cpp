@@ -11,7 +11,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_IMPLICIT_SURFACE<T>::
 OPENGL_IMPLICIT_SURFACE(IMPLICIT_OBJECT<TV>& surface_input,const OPENGL_MATERIAL& material_input)
-    :surface(surface_input),two_sided(false),front_material(material_input),front_material_gray(material_input.Grayscale()),nx(32),ny(24),nz(100),slice1(0),slice2(0),up_to_date1(0),
+    :surface(surface_input),two_sided(false),front_material(material_input),nx(32),ny(24),nz(100),slice1(0),slice2(0),up_to_date1(0),
     up_to_date2(0)
 {
     Initialize_Slices();
@@ -21,8 +21,8 @@ OPENGL_IMPLICIT_SURFACE(IMPLICIT_OBJECT<TV>& surface_input,const OPENGL_MATERIAL
 //#####################################################################
 template<class T> OPENGL_IMPLICIT_SURFACE<T>::
 OPENGL_IMPLICIT_SURFACE(IMPLICIT_OBJECT<TV>& surface_input,const OPENGL_MATERIAL &front_material_input,const OPENGL_MATERIAL& back_material_input)
-    :surface(surface_input),two_sided(true),front_material(front_material_input),front_material_gray(front_material_input.Grayscale()),back_material(back_material_input),
-    back_material_gray(back_material_input.Grayscale()),nx(32),ny(24),nz(100),slice1(0),slice2(0),up_to_date1(0),up_to_date2(0)
+    :surface(surface_input),two_sided(true),front_material(front_material_input),back_material(back_material_input),
+    nx(32),ny(24),nz(100),slice1(0),slice2(0),up_to_date1(0),up_to_date2(0)
 {
     Initialize_Slices();
 }
@@ -197,16 +197,14 @@ Display_Brick(const VECTOR<T,3>& x0,float p1,const VECTOR<T,3>& x1,float p2,cons
 //#####################################################################
 template<class T>
 void OPENGL_IMPLICIT_SURFACE<T>::
-Display(const int in_color) const
+Display() const
 {
     if(two_sided){
         glDisable(GL_CULL_FACE);
         glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,1);
-        if(in_color) {front_material.Send_To_GL_Pipeline(GL_FRONT);back_material.Send_To_GL_Pipeline(GL_BACK);}
-        else {front_material_gray.Send_To_GL_Pipeline(GL_FRONT);back_material_gray.Send_To_GL_Pipeline(GL_BACK);}}
-    else{
-        if(in_color) front_material.Send_To_GL_Pipeline();
-        else front_material_gray.Send_To_GL_Pipeline();}
+        front_material.Send_To_GL_Pipeline(GL_FRONT);
+        back_material.Send_To_GL_Pipeline(GL_BACK);}
+    else front_material.Send_To_GL_Pipeline();
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();

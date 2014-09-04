@@ -11,7 +11,7 @@ using namespace PhysBAM;
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_BOX_3D<T>::
-Display(const int in_color) const
+Display() const
 {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();

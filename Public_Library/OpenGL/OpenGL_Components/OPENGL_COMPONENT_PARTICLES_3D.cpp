@@ -85,7 +85,7 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(!valid || !draw) return;
     if(slice && slice->Is_Slice_Mode()){glPushAttrib(GL_ENABLE_BIT);slice->Enable_Clip_Planes();}
@@ -97,14 +97,14 @@ Display(const int in_color) const
             glPushName(0);
             for(int i=0;i<number_of_sets;i++){
                 glLoadName(i);
-                opengl_points_multiple(i)->Display(in_color);}
+                opengl_points_multiple(i)->Display();}
             glPopName();}
-        else opengl_points->Display(in_color);
-        if(draw_velocities && have_velocities) opengl_vector_field.Display(in_color);}
+        else opengl_points->Display();
+        if(draw_velocities && have_velocities) opengl_vector_field.Display();}
     else{
-        if(draw_multiple_particle_sets) for(int i=0;i<number_of_sets;i++)opengl_points_multiple(i)->Display(in_color);
-        else opengl_points->Display(in_color);
-        if(draw_velocities && have_velocities) opengl_vector_field.Display(in_color);}
+        if(draw_multiple_particle_sets) for(int i=0;i<number_of_sets;i++)opengl_points_multiple(i)->Display();
+        else opengl_points->Display();
+        if(draw_velocities && have_velocities) opengl_vector_field.Display();}
 
     if(slice && slice->Is_Slice_Mode())glPopAttrib();
 }

@@ -28,9 +28,9 @@ public:
     ~OPENGL_LEVELSET_1D()
     {}
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE
+    void Display() const PHYSBAM_OVERRIDE
     {
-        OPENGL_SCALAR_FIELD_1D<T,T>::Display(in_color);
+        OPENGL_SCALAR_FIELD_1D<T,T>::Display();
     }
 //#####################################################################
 };

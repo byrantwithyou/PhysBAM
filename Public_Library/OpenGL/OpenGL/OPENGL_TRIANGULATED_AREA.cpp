@@ -24,7 +24,7 @@ OPENGL_TRIANGULATED_AREA(TRIANGULATED_AREA<T>& triangulated_area_input,const boo
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_TRIANGULATED_AREA<T>::
-Display(const int in_color) const
+Display() const
 {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();

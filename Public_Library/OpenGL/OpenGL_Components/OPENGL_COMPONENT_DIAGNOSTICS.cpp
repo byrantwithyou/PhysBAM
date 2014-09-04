@@ -75,7 +75,7 @@ Use_Bounding_Box() const
 // Display
 //#####################################################################
 void OPENGL_COMPONENT_DIAGNOSTICS::
-Display(const int in_color) const
+Display() const
 {
 }
 //#####################################################################

@@ -33,7 +33,7 @@ public:
     {box*=scale;}
 
 //#####################################################################
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     bool Is_Transparent() const PHYSBAM_OVERRIDE {return false;}
 //#####################################################################

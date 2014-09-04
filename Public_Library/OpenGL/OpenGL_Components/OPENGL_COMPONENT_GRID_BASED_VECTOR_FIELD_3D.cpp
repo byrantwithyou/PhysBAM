@@ -57,9 +57,9 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
-    if(valid && draw) opengl_grid_based_vector_field.Display(in_color);
+    if(valid && draw) opengl_grid_based_vector_field.Display();
 }
 //#####################################################################
 // Function Bounding_Box

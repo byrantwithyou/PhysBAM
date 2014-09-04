@@ -53,9 +53,9 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
-Display(const int in_color) const
+Display() const
 {
-    if (valid && draw) opengl_vector_field.Display(in_color);
+    if(valid && draw) opengl_vector_field.Display();
 }
 //#####################################################################
 // Function Bounding_Box

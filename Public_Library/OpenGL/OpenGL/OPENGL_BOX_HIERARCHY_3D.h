@@ -25,8 +25,8 @@ public:
         :hierarchy(hierarchy_in),color(color_input),min_height(1),max_height(1)
     {}
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
-    void Display_Helper(const int cell,const int height,const int in_color=1) const;
+    void Display() const PHYSBAM_OVERRIDE;
+    void Display_Helper(const int cell,const int height) const;
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     void Increment_Height();

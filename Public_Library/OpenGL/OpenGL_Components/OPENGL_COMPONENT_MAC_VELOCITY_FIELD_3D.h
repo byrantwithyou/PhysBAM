@@ -29,7 +29,7 @@ public:
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
     void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     virtual void Set_Slice(OPENGL_SLICE *slice_input) PHYSBAM_OVERRIDE {slice=slice_input;opengl_mac_velocity_field.Set_Slice(slice_input);opengl_vorticity_magnitude.Set_Slice(slice_input);}

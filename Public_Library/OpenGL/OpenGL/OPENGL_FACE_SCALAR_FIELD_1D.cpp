@@ -28,7 +28,7 @@ template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_1D<T,T2>::
 // Display
 //#####################################################################
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_1D<T,T2>::
-Display(const int in_color) const
+Display() const
 {
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
@@ -47,7 +47,7 @@ Display(const int in_color) const
     glPopAttrib();
 }
 template<class T> void
-Display_Bool_Helper(const OPENGL_FACE_SCALAR_FIELD_1D<T,bool>& self,const int in_color)
+Display_Bool_Helper(const OPENGL_FACE_SCALAR_FIELD_1D<T,bool>& self)
 {
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
@@ -60,14 +60,14 @@ Display_Bool_Helper(const OPENGL_FACE_SCALAR_FIELD_1D<T,bool>& self,const int in
     glPopAttrib();
 }
 template<> void OPENGL_FACE_SCALAR_FIELD_1D<float,bool>::
-Display(const int in_color) const
+Display() const
 {
-    Display_Bool_Helper(*this,in_color);
+    Display_Bool_Helper(*this);
 }
 template<> void OPENGL_FACE_SCALAR_FIELD_1D<double,bool>::
-Display(const int in_color) const
+Display() const
 {
-    Display_Bool_Helper(*this,in_color);
+    Display_Bool_Helper(*this);
 }
 //#####################################################################
 // Bounding_Box

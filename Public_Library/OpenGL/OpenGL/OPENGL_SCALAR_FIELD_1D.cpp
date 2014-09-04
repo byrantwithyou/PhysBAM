@@ -24,7 +24,7 @@ template<class T,class T2> OPENGL_SCALAR_FIELD_1D<T,T2>::
 // Function Display
 //#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_1D<T,T2>::
-Display(const int in_color) const
+Display() const
 {
     int min_corner=values.Domain_Indices().min_corner.x;
     int max_corner=values.Domain_Indices().max_corner.x;
@@ -44,7 +44,7 @@ Display(const int in_color) const
     glPopAttrib();
 }
 template<class T>
-void Display_Bool_Helper(const OPENGL_SCALAR_FIELD_1D<T,bool>& self,const int in_color)
+void Display_Bool_Helper(const OPENGL_SCALAR_FIELD_1D<T,bool>& self)
 {
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
@@ -58,14 +58,14 @@ void Display_Bool_Helper(const OPENGL_SCALAR_FIELD_1D<T,bool>& self,const int in
 }
 namespace PhysBAM{
 template<> void OPENGL_SCALAR_FIELD_1D<float,bool>::
-Display(const int in_color) const
+Display() const
 {
-    Display_Bool_Helper(*this,in_color);
+    Display_Bool_Helper(*this);
 }
 template<> void OPENGL_SCALAR_FIELD_1D<double,bool>::
-Display(const int in_color) const
+Display() const
 {
-    Display_Bool_Helper(*this,in_color);
+    Display_Bool_Helper(*this);
 }
 }
 //#####################################################################

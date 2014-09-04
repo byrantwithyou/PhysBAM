@@ -10,7 +10,7 @@ using namespace PhysBAM;
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_GRID_2D<T>::
-Display(const int in_color) const
+Display() const
 {
     if(!draw)return;
     glMatrixMode(GL_MODELVIEW);

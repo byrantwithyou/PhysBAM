@@ -35,14 +35,14 @@ template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 // Display
 //#####################################################################
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
-Display(const int in_color) const
+Display() const
 {
     if(x_face_values.domain.Empty()) return;
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     Send_Transform_To_GL_Pipeline();
-    opengl_points.Display(in_color);
+    opengl_points.Display();
     glPopMatrix();
 }
 //#####################################################################

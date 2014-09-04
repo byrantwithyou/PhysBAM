@@ -40,7 +40,7 @@ template<class T> OPENGL_HEXAHEDRALIZED_VOLUME<T>::
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_HEXAHEDRALIZED_VOLUME<T>::
-Display(const int in_color) const
+Display() const
 {
     if(boundary_only) Draw_Boundary_Triangles(*hexahedron_mesh);
     else Draw_Wireframe_Mesh(*hexahedron_mesh);

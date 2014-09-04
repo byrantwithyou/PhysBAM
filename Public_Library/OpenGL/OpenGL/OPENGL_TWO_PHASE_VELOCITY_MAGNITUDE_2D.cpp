@@ -31,9 +31,9 @@ template<class T> OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>::
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>::
-Display(const int in_color) const
+Display() const
 {
-    minus.Display(in_color);plus.Display(in_color);
+    minus.Display();plus.Display();
 }
 //#####################################################################
 // Function Update

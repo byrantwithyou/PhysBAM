@@ -46,7 +46,7 @@ Set_Draw(bool draw_input)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     OPENGL_COLOR point_color=OPENGL_COLOR::White();
     OPENGL_COLOR velocity_color=OPENGL_COLOR::Yellow();

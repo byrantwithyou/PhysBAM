@@ -93,7 +93,7 @@ public:
     void End_Drag(const VECTOR<T,2> &vNow)
     {dragging=false;Update(vNow);qDown=qNow;mDown=mNow;rotation_axis=-1;}
     
-    void Display(const int color) const
+    void Display() const
     {glDisable(GL_LIGHTING);DrawOuterRing();DrawResultArc();DrawDragArc();glEnable(GL_LIGHTING);}
     
 private:

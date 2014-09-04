@@ -495,7 +495,6 @@ Set_Object_Color(int i,const OPENGL_COLOR &color_input)
     if(!opengl_segmented_curve(i)) return;
     opengl_segmented_curve(i)->color=color_input;
     opengl_segmented_curve(i)->vertex_color=color_input;
-    opengl_segmented_curve(i)->color_gray=color_input.Grayscale();
 }
 //#####################################################################
 // Function Get_Draw_Object
@@ -619,7 +618,7 @@ Read_Articulated_Information(const std::string& filename)
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(draw){
         glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -634,34 +633,34 @@ Display(const int in_color) const
             glPushName(1);
             for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
                 glPushName(Value(i));
-                if(draw_object(i) && opengl_segmented_curve(i)) opengl_segmented_curve(i)->Display(in_color);
+                if(draw_object(i) && opengl_segmented_curve(i)) opengl_segmented_curve(i)->Display();
                 glPopName();}
             glPopName();}
         if(draw_triangulated_area){
             glPushName(2);
             for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
                 glPushName(Value(i));
-                if(draw_object(i) && opengl_triangulated_area(i)) opengl_triangulated_area(i)->Display(in_color);
+                if(draw_object(i) && opengl_triangulated_area(i)) opengl_triangulated_area(i)->Display();
                 glPopName();}
             glPopName();}
         if(draw_implicit_curve){
             glPushName(3);
             for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
                 glPushName(Value(i));
-                if(draw_object(i) && opengl_levelset(i)) opengl_levelset(i)->Display(in_color);
+                if(draw_object(i) && opengl_levelset(i)) opengl_levelset(i)->Display();
                 glPopName();}
             glPopName();}
 #else
         if(draw_segmented_curve) for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
-            if(draw_object(i) && opengl_segmented_curve(i)) opengl_segmented_curve(i)->Display(in_color);
+            if(draw_object(i) && opengl_segmented_curve(i)) opengl_segmented_curve(i)->Display();
         if(draw_triangulated_area) for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
-            if(draw_object(i) && opengl_triangulated_area(i)) opengl_triangulated_area(i)->Display(in_color);
+            if(draw_object(i) && opengl_triangulated_area(i)) opengl_triangulated_area(i)->Display();
         if(draw_implicit_curve) for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
-            if(draw_object(i) && opengl_levelset(i)) opengl_levelset(i)->Display(in_color);
+            if(draw_object(i) && opengl_levelset(i)) opengl_levelset(i)->Display();
 #endif
         if(draw_individual_axes)
             for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
-                if(draw_object(i) && opengl_axes(i)) opengl_axes(i)->Display(in_color);
+                if(draw_object(i) && opengl_axes(i)) opengl_axes(i)->Display();
 
         // Articulated rigid bodies
         if(articulated_rigid_body){
@@ -710,8 +709,8 @@ Display(const int in_color) const
         if(mode!=GL_SELECT)
 #endif        
         {
-            if(draw_velocity_vectors) velocity_field.Display(in_color);
-            if(draw_node_velocity_vectors) node_velocity_field.Display(in_color);
+            if(draw_velocity_vectors) velocity_field.Display();
+            if(draw_node_velocity_vectors) node_velocity_field.Display();
 
             if(draw_forces_and_torques && forces_and_torques.Size()==rigid_body_collection.rigid_body_particles.Size()){
                 T scale=(T)velocity_field.size/24;
@@ -726,7 +725,7 @@ Display(const int in_color) const
 
             for(int i=0;i<extra_components.Size();i++)
                 for(int j=0;j<extra_components(i).m;j++)
-                    extra_components(i)(j)->Display(in_color);
+                    extra_components(i)(j)->Display();
 
 #ifndef USE_OPENGLES
             if(show_object_names){

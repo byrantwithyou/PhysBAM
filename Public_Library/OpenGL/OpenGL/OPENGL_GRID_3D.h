@@ -31,7 +31,7 @@ public:
 //##################################################################### 
     OPENGL_GRID_3D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White());
     virtual ~OPENGL_GRID_3D();
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
     virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);

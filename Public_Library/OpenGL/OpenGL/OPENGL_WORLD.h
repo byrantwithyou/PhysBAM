@@ -86,8 +86,6 @@ public:
 private:
 
     // display parameters
-    bool stereo_mode;
-    float stereo_offset;
     int fill_mode;
     bool enable_lighting_for_wireframe;
     bool white_background;
@@ -215,7 +213,7 @@ public:
     void Handle_Keypress_Prompt(unsigned char raw_key);
     void Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_pressed);
     void Handle_Drag_Main(int x,int y);
-    void Display_Target(const int in_color=1);
+    void Display_Target();
     void Display_Auto_Help();
     static void Draw_Transparent_Text_Box(const ARRAY<std::string> &strings,const VECTOR<int,2> &top_left_corner,int vspace,void* font,const OPENGL_COLOR &color);
 #ifndef USE_OPENGLES

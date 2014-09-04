@@ -119,7 +119,7 @@ Draw_All_Objects()
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(!draw || !valid) return;
 
@@ -129,18 +129,18 @@ Display(const int in_color) const
         glPushName(i);
         if(point_simplices_1d_objects(i)){
             glPushName(1);
-            point_simplices_1d_objects(i)->Display(in_color);
+            point_simplices_1d_objects(i)->Display();
             glPopName();}
         glPopName();}
 #else
     for(int i=0;i<point_simplices_1d_objects.m;i++){
         if(!active_list(i)) continue;
-        if(point_simplices_1d_objects(i)) point_simplices_1d_objects(i)->Display(in_color);}
+        if(point_simplices_1d_objects(i)) point_simplices_1d_objects(i)->Display();}
 #endif
 
     if(selected_vertex>=0) OPENGL_SELECTION::Draw_Highlighted_Vertex(deformable_body_collection.particles.X(selected_vertex),selected_vertex);
 
-    //if(draw_velocity_vectors) velocity_field.Display(in_color);
+    //if(draw_velocity_vectors) velocity_field.Display();
 }
 //#####################################################################
 // Function Cycle_Display_Mode

@@ -103,11 +103,11 @@ Valid_Frame(int frame_input) const
 // Function Display
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
-Display(const int in_color) const
+Display() const
 {
     if(draw){
-        if(draw_multiple_levelsets) for(int i=0;i<opengl_levelset_multiviews.m;i++) opengl_levelset_multiviews(i)->Display(in_color);
-        else opengl_levelset_multiview->Display(in_color);}
+        if(draw_multiple_levelsets) for(int i=0;i<opengl_levelset_multiviews.m;i++) opengl_levelset_multiviews(i)->Display();
+        else opengl_levelset_multiview->Display();}
 }
 //#####################################################################
 // Function Bounding_Box

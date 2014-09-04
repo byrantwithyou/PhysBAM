@@ -34,7 +34,7 @@ public:
     void Slice_Has_Changed() PHYSBAM_OVERRIDE
     {Update();}
 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual void Update();
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 //##################################################################### 

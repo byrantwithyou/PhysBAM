@@ -33,7 +33,7 @@ public:
     virtual ~OPENGL_VECTOR_FIELD_2D();
 
 //##################################################################### 
-    void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
+    void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Scale_Vector_Size(const T scale);
 //##################################################################### 
