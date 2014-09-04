@@ -7,6 +7,7 @@
 #include <Tools/Arrays/CONSTANT_ARRAY.h>
 #include <Tools/Arrays/PROJECTED_ARRAY.h>
 #include <Tools/Utilities/Find_Type.h>
+#include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
@@ -73,6 +74,7 @@ Initialize_Object_Collisions(const bool collide_with_interior,const T collision_
             else Add_Collision_Mesh(embedding->material_surface_mesh,true);
         else if(FREE_PARTICLES<TV>* free_particles=dynamic_cast<FREE_PARTICLES<TV>*>(collision_structures(c))){
             check_collision.Subset(free_particles->nodes).Fill(true);}
+        else if(BEZIER_SPLINE<TV,3>* spline=dynamic_cast<BEZIER_SPLINE<TV,3>*>(collision_structures(c))){}
         else PHYSBAM_NOT_IMPLEMENTED(STRING_UTILITIES::string_sprintf("Collisions with %s",typeid(*collision_structures(c)).name()));}
     check_collision.Subset(ignored_nodes).Fill(false);
 }

@@ -19,6 +19,7 @@
 #include <Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <Geometry/Tessellation/RANGE_TESSELLATION.h>
 #include <Geometry/Tessellation/TORUS_TESSELLATION.h>
+#include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
@@ -682,3 +683,4 @@ template DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::DEFORMABLES_STANDARD_TEST
 template DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::DEFORMABLES_STANDARD_TESTS(STREAM_TYPE,DEFORMABLE_BODY_COLLECTION<VECTOR<float,3> >&);
 template TETRAHEDRALIZED_VOLUME<double>& DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Create_Cylinder(CYLINDER<double> const&,int,int,bool,RIGID_BODY_STATE<VECTOR<double,3> > const*,double);
 template TETRAHEDRALIZED_VOLUME<float>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Create_Cylinder(CYLINDER<float> const&,int,int,bool,RIGID_BODY_STATE<VECTOR<float,3> > const*,float);
+template BEZIER_SPLINE<VECTOR<float,2>,3>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Copy_And_Add_Structure<BEZIER_SPLINE<VECTOR<float,2>,3> >(BEZIER_SPLINE<VECTOR<float,2>,3>&,ARRAY<int,int>*,bool);

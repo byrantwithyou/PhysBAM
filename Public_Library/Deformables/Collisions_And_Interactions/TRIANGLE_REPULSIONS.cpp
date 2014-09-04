@@ -85,6 +85,7 @@ template<class TV> void TRIANGLE_REPULSIONS<TV>::
 Clamp_Repulsion_Thickness_With_Meshes(ARRAY_VIEW<const TV> X,const T scale)
 {
     for(int k=0;k<geometry.structure_geometries.m;k++){
+        if(!geometry.structure_geometries(k)) continue;
         STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(k);
         if(structure.segmented_curve) for(int s=0;s<structure.segmented_curve->mesh.elements.m;s++){
             int i,j;structure.segmented_curve->mesh.elements(s).Get(i,j);T d=scale*(X(i)-X(j)).Magnitude();
@@ -116,6 +117,7 @@ Turn_Off_Repulsions_Based_On_Current_Proximity(const T extra_factor_on_distance)
     // TODO: consider checking cross-structure interactions as well
     for(int a=0;a<geometry.interacting_structure_pairs.m;a++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(a);
         if(pair[0]!=pair[1]) continue;
+        if(!geometry.structure_geometries(pair[0])) continue;
         STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(pair[0]);
         Get_Faces_Near_Points(structure,structure,X_self_collision_free,false);
         Get_Edges_Near_Edges(structure,structure,X_self_collision_free,false);}
@@ -145,7 +147,8 @@ Update_Faces_And_Hierarchies_With_Collision_Free_Positions(const ARRAY_VIEW<TV>*
     const ARRAY_VIEW<TV>& X=X_other?*X_other:geometry.X_self_collision_free;
     T multiplier=repulsion_thickness_detection_multiplier*hierarchy_repulsion_thickness_multiplier;
     for(int k=0;k<geometry.structure_geometries.m;k++)
-        geometry.structure_geometries(k)->Update_Faces_And_Hierarchies_With_Collision_Free_Positions(repulsion_thickness,multiplier,X);
+        if(geometry.structure_geometries(k))
+            geometry.structure_geometries(k)->Update_Faces_And_Hierarchies_With_Collision_Free_Positions(repulsion_thickness,multiplier,X);
 }
 //#####################################################################
 // Function Compute_Interaction_Pairs

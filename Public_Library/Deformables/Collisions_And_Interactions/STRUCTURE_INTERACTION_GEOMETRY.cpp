@@ -10,6 +10,7 @@
 #include <Tools/Math_Tools/RANGE.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
+#include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h>
@@ -47,7 +48,7 @@ Triangulated_Surface(STRUCTURE<TV>* structure)
 //#####################################################################
 // Function Build_Collision_Geometry
 //#####################################################################
-template<class TV> void STRUCTURE_INTERACTION_GEOMETRY<TV>::
+template<class TV> bool STRUCTURE_INTERACTION_GEOMETRY<TV>::
 Build_Collision_Geometry(STRUCTURE<TV>& structure)
 {
     Clean_Memory();
@@ -62,9 +63,11 @@ Build_Collision_Geometry(STRUCTURE<TV>& structure)
         need_destroy_segmented_curve=true;}
     else if(FREE_PARTICLES<TV>* free_particles=dynamic_cast<FREE_PARTICLES<TV>*>(&structure))
         active_indices=free_particles->nodes;
+    else if(BEZIER_SPLINE<TV,3>* spline=dynamic_cast<BEZIER_SPLINE<TV,3>*>(&structure)) return false;
     else PHYSBAM_FATAL_ERROR();
     if(segmented_curve && !segmented_curve->mesh.incident_elements) segmented_curve->mesh.Initialize_Incident_Elements();
     Build_Topological_Structure_Of_Hierarchies();
+    return true;
 }
 //#####################################################################
 // Function Update_Faces_And_Hierarchies_With_Collision_Free_Positions

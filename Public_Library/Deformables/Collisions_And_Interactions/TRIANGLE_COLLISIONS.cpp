@@ -75,6 +75,7 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
     // Update swept hierarchies
     LOG::SCOPE scope("updating swept hierarchies","updating swept hierarchies");
     for(int structure_index=0;structure_index<geometry.structure_geometries.m;structure_index++){
+        if(!geometry.structure_geometries(structure_index)) continue;
         STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(structure_index);
         if(d==3 && structure.triangulated_surface){
             BOX_HIERARCHY<TV>& hierarchy=structure.Face_Hierarchy();

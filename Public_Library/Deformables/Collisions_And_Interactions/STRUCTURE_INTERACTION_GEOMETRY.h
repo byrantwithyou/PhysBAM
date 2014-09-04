@@ -91,7 +91,7 @@ public:
 //#####################################################################
     static TRIANGULATED_SURFACE<T>* Triangulated_Surface(STRUCTURE<TV>* structure);
     static T_SEGMENTED_CURVE* Segmented_Curve(STRUCTURE<TV>* structure);
-    void Build_Collision_Geometry(STRUCTURE<TV>& structure);
+    bool Build_Collision_Geometry(STRUCTURE<TV>& structure);
     void Update_Faces_And_Hierarchies_With_Collision_Free_Positions(ARRAY_VIEW<const T> node_thickness,const T node_thickness_multiplier,ARRAY_VIEW<const TV> X_old_full);
     void Update_Processor_Masks(const PARTITION_ID processor,const ARRAY<PARTITION_ID>& partition_id_from_particle_index);
 private:

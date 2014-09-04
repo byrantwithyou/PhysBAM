@@ -9,6 +9,7 @@
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_LEVELSET_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>
+#include <OpenGL/OpenGL/OPENGL_BEZIER_SPLINE_2D.h>
 #include <OpenGL/OpenGL/OPENGL_TRIANGULATED_AREA.h>
 #include <OpenGL/OpenGL/OPENGL_WORLD.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D.h>
@@ -66,6 +67,7 @@ Reinitialize(bool force)
         int m=deformable_body_collection.structures.m;
         embedded_curve_objects.Delete_Pointers_And_Clean_Memory();embedded_curve_objects.Resize(m);
         segmented_curve_objects.Delete_Pointers_And_Clean_Memory();segmented_curve_objects.Resize(m);
+        bezier_spline_objects.Delete_Pointers_And_Clean_Memory();bezier_spline_objects.Resize(m);
         triangulated_area_objects.Delete_Pointers_And_Clean_Memory();triangulated_area_objects.Resize(m);
         triangles_of_material_objects.Delete_Pointers_And_Clean_Memory();triangles_of_material_objects.Resize(m);
         free_particles_objects.Delete_Pointers_And_Clean_Memory();free_particles_objects.Resize(m);
@@ -98,6 +100,11 @@ Reinitialize(bool force)
                 segmented_curve_objects(i)=new OPENGL_SEGMENTED_CURVE_2D<T>(*segmented_curve,color_map->Lookup(color_map_index--));
                 segmented_curve_objects(i)->draw_velocities=draw_velocities;
                 segmented_curve_objects(i)->velocity_scale=velocity_scale;} // apply current parameters
+            else if(BEZIER_SPLINE<TV,3>* bezier_spline=dynamic_cast<BEZIER_SPLINE<TV,3>*>(structure)){
+                if(first_time) LOG::cout<<"object "<<i<<": bezier spline\n";
+                bezier_spline_objects(i)=new OPENGL_BEZIER_SPLINE_2D<T,3>(*bezier_spline,color_map->Lookup(color_map_index--));
+                bezier_spline_objects(i)->draw_velocities=draw_velocities;
+                bezier_spline_objects(i)->velocity_scale=velocity_scale;} // apply current parameters
             else if(TRIANGULATED_AREA<T>* triangulated_area=dynamic_cast<TRIANGULATED_AREA<T>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": triangulated area\n";
                 triangulated_area->mesh.Initialize_Segment_Mesh(); // to enable segment selection
@@ -163,6 +170,9 @@ Display() const
             glPushName(2);triangulated_area_objects(i)->Display();glPopName();}
         if(draw_triangles_of_material && triangles_of_material_objects(i)){
             glPushName(3);triangles_of_material_objects(i)->Display();glPopName();}
+        glPushName(4);
+        if(bezier_spline_objects(i)) bezier_spline_objects(i)->Display();
+        glPopName();
         if(draw_embedded_curves && embedded_curve_objects(i)){
             glPushName(5);embedded_curve_objects(i)->Display();glPopName();}
         if(free_particles_objects(i) && display_mode!=1){
@@ -171,6 +181,7 @@ Display() const
 #else
     for(int i=0;i<segmented_curve_objects.m;i++){
         if(segmented_curve_objects(i)) segmented_curve_objects(i)->Display();
+        if(bezier_spline_objects(i)) bezier_spline_objects(i)->Display();
         if(draw_triangulated_areas && triangulated_area_objects(i)) triangulated_area_objects(i)->Display();
         if(draw_triangles_of_material && triangles_of_material_objects(i)) triangles_of_material_objects(i)->Display();
         if(free_particles_objects(i) && display_mode!=1) free_particles_objects(i)->Display();}
@@ -185,6 +196,7 @@ Set_Vector_Size(const T vector_size)
 {
     velocity_scale=vector_size;
     for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<bezier_spline_objects.m;i++) if(bezier_spline_objects(i)) bezier_spline_objects(i)->velocity_scale=velocity_scale;
     for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
     for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
 }
@@ -197,6 +209,7 @@ Increase_Vector_Size()
     T magnitude_adjustment=(T)1.1;
     velocity_scale*=magnitude_adjustment;
     for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<bezier_spline_objects.m;i++) if(bezier_spline_objects(i)) bezier_spline_objects(i)->velocity_scale=velocity_scale;
     for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
     velocity_field.Scale_Vector_Size(magnitude_adjustment);
     for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
@@ -210,6 +223,7 @@ Decrease_Vector_Size()
     T magnitude_adjustment=(T)1/(T)1.1;
     velocity_scale*=magnitude_adjustment;
     for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<bezier_spline_objects.m;i++) if(bezier_spline_objects(i)) bezier_spline_objects(i)->velocity_scale=velocity_scale;
     for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
     velocity_field.Scale_Vector_Size(magnitude_adjustment);
     for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
@@ -222,6 +236,7 @@ Toggle_Draw_Velocities()
 {
     draw_velocities=!draw_velocities;
     for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->draw_velocities=draw_velocities;
+    for(int i=0;i<bezier_spline_objects.m;i++) if(bezier_spline_objects(i)) bezier_spline_objects(i)->draw_velocities=draw_velocities;
     for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->draw_velocities=draw_velocities;
     for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->draw_velocities=draw_velocities;
 }
@@ -250,6 +265,7 @@ Bounding_Box() const
     RANGE<VECTOR<T,3> > box;
     if(draw && valid && deformable_body_collection.structures.m>0){
         for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) box.Enlarge_To_Include_Box(segmented_curve_objects(i)->Bounding_Box());
+        for(int i=0;i<bezier_spline_objects.m;i++) if(bezier_spline_objects(i)) box.Enlarge_To_Include_Box(bezier_spline_objects(i)->Bounding_Box());
         for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) box.Enlarge_To_Include_Box(triangulated_area_objects(i)->Bounding_Box());
         for(int i=0;i<triangles_of_material_objects.m;i++) if(triangles_of_material_objects(i)) box.Enlarge_To_Include_Box(triangles_of_material_objects(i)->Bounding_Box());}
     return box;
@@ -268,6 +284,7 @@ Get_Selection(GLuint* buffer,int buffer_size)
             case 1:selection->subobject=segmented_curve_objects(buffer[0]);break;
             case 2:selection->subobject=triangulated_area_objects(buffer[0]);break;
             case 3:selection->subobject=triangles_of_material_objects(buffer[0]);break;
+            case 4:selection->subobject=bezier_spline_objects(buffer[0]);break;
             case 5:selection->subobject=embedded_curve_objects(buffer[0]);break;
             case 6:selection->subobject=free_particles_objects(buffer[0]);break;
             default:delete selection;return 0;}

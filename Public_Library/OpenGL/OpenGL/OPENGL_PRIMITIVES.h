@@ -104,6 +104,29 @@ inline void OpenGL_Draw_Arrays(GLenum mode,int dimension,const ARRAY<GLshort>& v
 {OpenGL_Draw_Arrays(mode,GL_SHORT,dimension,vertices.m/dimension,vertices.base_pointer);}
 
 #ifndef USE_OPENGLES
+template<int d1>
+inline void OpenGL_Draw_Spline(GLenum mode,int resolution,const VECTOR<VECTOR<GLfloat,3>,d1>& control_points)
+{
+    glMap1f(GL_MAP1_VERTEX_3,0.0,1.0,3,d1,&control_points(0)(0));
+    glEnable(GL_MAP1_VERTEX_3);
+    glMapGrid1d(resolution,0.0,1.0);
+    glEvalMesh1(mode,0,resolution);
+}
+template<int d1>
+inline void OpenGL_Draw_Spline(GLenum mode,int resolution,const VECTOR<VECTOR<GLdouble,3>,d1>& control_points)
+{
+    glMap1d(GL_MAP1_VERTEX_3,0.0,1.0,3,d1,&control_points(0)(0));
+    glEnable(GL_MAP1_VERTEX_3);
+    glMapGrid1d(resolution,0.0,1.0);
+    glEvalMesh1(mode,0,resolution);
+}
+template<class T,int d1,int m>
+inline void OpenGL_Draw_Spline(GLenum mode,int resolution,const VECTOR<VECTOR<T,m>,d1>& control_points)
+{
+    VECTOR<VECTOR<T,3>,d1> pts(control_points);
+    OpenGL_Draw_Spline(mode,resolution,pts);
+}
+
 inline void OpenGL_Begin(GLenum mode)
 {glBegin(mode);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Begin(mode));}
 
