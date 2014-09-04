@@ -219,7 +219,7 @@ GRID<VECTOR<T,3> > Padded_Bounding_Grid_By_Size(T dx,T dy,T dz,const RANGE<VECTO
     n = (int)divy;
     mn = (int)divz;
     //add a padding per side
-    RANGE<VECTOR<float,3> > bbox(-pad,divx+pad,-pad,divy+pad,-pad,divz+pad);
+    RANGE<VECTOR<T,3> > bbox(-pad,divx+pad,-pad,divy+pad,-pad,divz+pad);
     bbox.min_corner.x*=dx; bbox.max_corner.x*=dx;
     bbox.min_corner.y*=dy; bbox.max_corner.y*=dy;
     bbox.min_corner.z*=dz; bbox.max_corner.z*=dz;
