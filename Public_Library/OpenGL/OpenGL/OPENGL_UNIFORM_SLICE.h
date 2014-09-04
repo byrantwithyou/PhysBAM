@@ -20,7 +20,7 @@ class OPENGL_UNIFORM_SLICE:public OPENGL_SLICE
 {
     typedef VECTOR<float,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    OPENGL_WORLD &world;
+    OPENGL_WORLD& world;
     GRID<VECTOR<float,3> > grid;
 
     OPENGL_SLICE::SLICE_MODE mode;
@@ -28,10 +28,10 @@ public:
     int axis;
     int index;
 
-    GLenum clip_plane_id1, clip_plane_id2;
+    GLenum clip_plane_id1,clip_plane_id2;
 
-    OPENGL_UNIFORM_SLICE(OPENGL_WORLD &world_input)
-        : world(world_input), clip_plane_id1(0), clip_plane_id2(0)
+    OPENGL_UNIFORM_SLICE(OPENGL_WORLD& world_input)
+        : world(world_input),clip_plane_id1(0),clip_plane_id2(0)
     {
         Initialize(GRID<VECTOR<float,3> >(TV_INT()+2,RANGE<TV>::Unit_Box()));
     }
@@ -106,7 +106,7 @@ public:
     }
 
     template<class T>
-    static void Get_Face_Index_Range(const OPENGL_UNIFORM_SLICE *slice, const ARRAYS_ND_BASE<T,VECTOR<int,3> >& array, int face, VECTOR<int,3> &index_start, VECTOR<int,3> &index_end, int scale=1)
+    static void Get_Face_Index_Range(const OPENGL_UNIFORM_SLICE* slice,const ARRAYS_ND_BASE<T,VECTOR<int,3> >& array,int face,VECTOR<int,3> &index_start,VECTOR<int,3> &index_end,int scale=1)
     {
         index_start=VECTOR<int,3>(array.domain.min_corner.x,array.domain.min_corner.y,array.domain.min_corner.z);
         index_end=VECTOR<int,3>(array.domain.max_corner.x,array.domain.max_corner.y,array.domain.max_corner.z);

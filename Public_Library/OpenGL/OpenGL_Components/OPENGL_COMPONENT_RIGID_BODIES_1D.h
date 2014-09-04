@@ -18,7 +18,7 @@ template<class T> class OPENGL_AXES;
 template<class TV> class RIGID_BODY_COLLECTION;
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_RIGID_BODIES_1D : public OPENGL_COMPONENT
+class OPENGL_COMPONENT_RIGID_BODIES_1D:public OPENGL_COMPONENT
 {
 private:
     typedef VECTOR<T,1> TV;

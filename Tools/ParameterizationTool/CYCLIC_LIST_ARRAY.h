@@ -4,7 +4,7 @@ using namespace PhysBAM;
 //ARRAY, the array can be used as a cycle.
 
 template<class T>
-class CYCLIC_ARRAY: public ARRAY <T>
+class CYCLIC_ARRAY:public ARRAY <T>
 {
 public:
     T& operator()(const int i)

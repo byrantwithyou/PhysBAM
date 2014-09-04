@@ -84,7 +84,7 @@ Display(const int in_color) const
             glPopAttrib();
         }
     }
-    if (draw_velocities && triangulated_area.particles.store_velocity){
+    if(draw_velocities && triangulated_area.particles.store_velocity){
         glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);
         velocity_color.Send_To_GL_Pipeline();
@@ -286,9 +286,9 @@ Draw_Triangles(const bool use_color_map) const
         int node1,node2,node3;triangulated_area.mesh.elements(i).Get(node1,node2,node3);
         OpenGL_Triangle(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3),vertices);
         OpenGL_Triangle(triangulated_area.particles.X(node2),triangulated_area.particles.X(node1),triangulated_area.particles.X(node3),inverted_vertices);}
-    if (use_color_map) triangle_color.Send_To_GL_Pipeline();
+    if(use_color_map) triangle_color.Send_To_GL_Pipeline();
     OpenGL_Draw_Arrays(GL_TRIANGLES,2,vertices);
-    if (use_color_map) triangle_inverted_color.Send_To_GL_Pipeline();
+    if(use_color_map) triangle_inverted_color.Send_To_GL_Pipeline();
     OpenGL_Draw_Arrays(GL_TRIANGLES,2,inverted_vertices);
 }
 //#####################################################################
@@ -319,6 +319,9 @@ Bounding_Box() const
     RANGE<VECTOR<T,2> > box(triangulated_area.particles.X(index));
     return object->World_Space_Box(RANGE<VECTOR<float,2> >(box));
 }
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_TRIANGULATED_AREA_SEGMENT<T>::
 Bounding_Box() const
 {
@@ -327,6 +330,9 @@ Bounding_Box() const
     PHYSBAM_ASSERT(triangulated_area.mesh.segment_mesh);
     return object->World_Space_Box(RANGE<VECTOR<T,2> >::Bounding_Box(triangulated_area.particles.X.Subset(triangulated_area.mesh.segment_mesh->elements(index))));
 }
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_TRIANGULATED_AREA_TRIANGLE<T>::
 Bounding_Box() const
 {

@@ -10,7 +10,7 @@
 namespace PhysBAM{
 
 template<class T,class RW=T>
-class FILLING_BOX : public SOLIDS_FLUIDS_EXAMPLE_3D<RW>
+class FILLING_BOX:public SOLIDS_FLUIDS_EXAMPLE_3D<RW>
 {
 public:
 using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::first_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::frame_rate;

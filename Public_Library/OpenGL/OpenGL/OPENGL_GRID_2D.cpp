@@ -177,7 +177,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION *OPENGL_GRID_2D<T>::
+template<class T> OPENGL_SELECTION* OPENGL_GRID_2D<T>::
 Get_Selection(GLuint* buffer,int buffer_size)
 {
     OPENGL_SELECTION* selection=0;
@@ -190,10 +190,10 @@ Get_Selection(GLuint* buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T> void OPENGL_GRID_2D<T>::
-Highlight_Selection(OPENGL_SELECTION *selection)
+Highlight_Selection(OPENGL_SELECTION* selection)
 {
     delete current_selection;current_selection=0;
-    if (selection->type == OPENGL_SELECTION::GRID_CELL_2D){
+    if(selection->type == OPENGL_SELECTION::GRID_CELL_2D){
         OPENGL_SELECTION_GRID_CELL_2D<T>* real_selection=(OPENGL_SELECTION_GRID_CELL_2D<T>*)selection;
         current_selection=new OPENGL_SELECTION_GRID_CELL_2D<T>(this,real_selection->index);}
     else if(selection->type == OPENGL_SELECTION::GRID_NODE_2D){

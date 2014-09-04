@@ -17,7 +17,7 @@ namespace PhysBAM{
 class OPENGL_SELECTION;
 
 template<class T>
-class OPENGL_SEGMENTED_CURVE_3D: public OPENGL_OBJECT
+class OPENGL_SEGMENTED_CURVE_3D:public OPENGL_OBJECT
 {
     typedef VECTOR<T,3> TV;
 public:
@@ -37,14 +37,14 @@ public:
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer,int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
     void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
 
-    OPENGL_SELECTION *Get_Vertex_Selection(int index);
-    OPENGL_SELECTION *Get_Segment_Selection(int index);
-    OPENGL_SELECTION *Get_Curve_Selection(int index);
+    OPENGL_SELECTION* Get_Vertex_Selection(int index);
+    OPENGL_SELECTION* Get_Segment_Selection(int index);
+    OPENGL_SELECTION* Get_Curve_Selection(int index);
 
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
@@ -58,38 +58,38 @@ private:
 
     bool smooth_normals;
 
-    OPENGL_SELECTION *current_selection;
+    OPENGL_SELECTION* current_selection;
 };
 
 template<class T>
-class OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D : public OPENGL_SELECTION
+class OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D:public OPENGL_SELECTION
 {
 public:
     int index;
-    OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D(OPENGL_OBJECT *object, int index=0) 
-        : OPENGL_SELECTION(OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_3D, object), index(index) {}
+    OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D(OPENGL_OBJECT* object,int index=0) 
+        :OPENGL_SELECTION(OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_3D,object),index(index) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D : public OPENGL_SELECTION
+class OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D:public OPENGL_SELECTION
 {
 public:
     int index;
-    OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D(OPENGL_OBJECT *object, int index=0) 
-        : OPENGL_SELECTION(OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_3D, object), index(index) {}
+    OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D(OPENGL_OBJECT* object,int index=0) 
+        :OPENGL_SELECTION(OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_3D,object),index(index) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_SEGMENTED_CURVE_3D : public OPENGL_SELECTION
+class OPENGL_SELECTION_SEGMENTED_CURVE_3D:public OPENGL_SELECTION
 {
 public:
     int index;
-    OPENGL_SELECTION_SEGMENTED_CURVE_3D(OPENGL_OBJECT *object, int index=0) 
-        : OPENGL_SELECTION(OPENGL_SELECTION::SEGMENTED_CURVE_3D, object), index(index) {}
+    OPENGL_SELECTION_SEGMENTED_CURVE_3D(OPENGL_OBJECT* object,int index=0) 
+        :OPENGL_SELECTION(OPENGL_SELECTION::SEGMENTED_CURVE_3D,object),index(index) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };

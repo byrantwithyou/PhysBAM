@@ -12,7 +12,7 @@
 namespace PhysBAM
 {
 template<class T>
-class OPENGL_COMPONENT_BASIC : public OPENGL_COMPONENT
+class OPENGL_COMPONENT_BASIC:public OPENGL_COMPONENT
 {
 public:
     T  &object;
@@ -54,10 +54,10 @@ public:
     virtual void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE
     {object.Turn_Smooth_Shading_On();}
 
-    virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer,int buffer_size)
+    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer,int buffer_size)
     {return object.Get_Selection(buffer,buffer_size);}
 
-    virtual void Highlight_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE
+    virtual void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE
     {object.Highlight_Selection(selection);}
 
     virtual void Clear_Highlight() PHYSBAM_OVERRIDE

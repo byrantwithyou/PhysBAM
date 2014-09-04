@@ -63,7 +63,7 @@ Display(const int in_color) const
 template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
 Bounding_Box() const
 {
-    if (valid && draw) return opengl_vector_field.Bounding_Box();
+    if(valid && draw) return opengl_vector_field.Bounding_Box();
     else return RANGE<VECTOR<float,3> >::Centered_Box();
 }
 //#####################################################################
@@ -72,16 +72,16 @@ Bounding_Box() const
 template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
 Reinitialize(bool force_load_even_if_not_drawn)
 {
-    if (draw||force_load_even_if_not_drawn)
+    if(draw||force_load_even_if_not_drawn)
     {
-        if (!valid ||
+        if(!valid ||
             (is_animation && frame_loaded != frame) ||
             (!is_animation && frame_loaded < 0))
         {
             valid = false;
 
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(vector_field_filename, frame);
-            if (FILE_UTILITIES::File_Exists(tmp_filename))
+            if(FILE_UTILITIES::File_Exists(tmp_filename))
                 FILE_UTILITIES::Read_From_File<RW>(tmp_filename,opengl_vector_field.V);
             else
                 return;

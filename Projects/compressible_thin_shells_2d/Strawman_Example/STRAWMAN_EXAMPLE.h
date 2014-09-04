@@ -30,7 +30,7 @@
 namespace PhysBAM{
 
 template<class TV>
-class STRAWMAN_EXAMPLE : public EXAMPLE<TV>,LEVELSET_CALLBACKS<TV>
+class STRAWMAN_EXAMPLE:public EXAMPLE<TV>,LEVELSET_CALLBACKS<TV>
 {
     typedef EXAMPLE<TV> BASE;
     typedef typename TV::SCALAR T;

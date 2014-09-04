@@ -7,7 +7,7 @@
 
 struct Fl_Pixmap;
 
-class Fl_ToggleNode : public Fl_Node {
+class Fl_ToggleNode:public Fl_Node {
 
   friend class Fl_ToggleTree;
 

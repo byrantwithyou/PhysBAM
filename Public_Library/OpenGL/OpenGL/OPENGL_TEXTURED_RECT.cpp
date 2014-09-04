@@ -9,21 +9,28 @@
 
 using namespace PhysBAM;
 using namespace std;
-
-OPENGL_TEXTURED_RECT::OPENGL_TEXTURED_RECT() : texture(0)
+//#####################################################################
+// Constructor
+//#####################################################################
+OPENGL_TEXTURED_RECT::
+OPENGL_TEXTURED_RECT() : texture(0)
 {
 }
-
-void
-OPENGL_TEXTURED_RECT::Set_Texture(OPENGL_TEXTURE *texture_input)
+//#####################################################################
+// Function Set_Texture
+//#####################################################################
+void OPENGL_TEXTURED_RECT::
+Set_Texture(OPENGL_TEXTURE *texture_input)
 {
     texture = texture_input;
 }
-
-void
-OPENGL_TEXTURED_RECT::Display(const int in_color) const
+//#####################################################################
+// Function Display
+//#####################################################################
+void OPENGL_TEXTURED_RECT::
+Display(const int in_color) const
 {
-    if (!texture) return;
+    if(!texture) return;
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -66,9 +73,11 @@ OPENGL_TEXTURED_RECT::Display(const int in_color) const
 
     glPopMatrix();
 }
-
-RANGE<VECTOR<float,3> >
-OPENGL_TEXTURED_RECT::Bounding_Box() const
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
+RANGE<VECTOR<float,3> > OPENGL_TEXTURED_RECT::
+Bounding_Box() const
 {
     return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(-0.5*width,-0.5*height,0),VECTOR<float,3>(0.5*width,0.5*height,0)));
 }

@@ -12,11 +12,11 @@
 #include <string>
 
 #define DEFINE_COMPONENT_CALLBACK(classname, func, str) \
-    class classname##func : public OPENGL_CALLBACK { \
+    class classname##func:public OPENGL_CALLBACK { \
         public: \
             classname##func(classname *obj) : obj(obj) {} \
             void operator() () { obj->func(); } \
-            void Print(std::ostream &out) { if (!obj->component_name.empty()) out << obj->component_name << ": " << str; else out << str; } \
+            void Print(std::ostream &out) { if(!obj->component_name.empty()) out << obj->component_name << ": " << str; else out << str; } \
         private: \
              classname *obj;}; \
     OPENGL_CALLBACK *func##_CB() \

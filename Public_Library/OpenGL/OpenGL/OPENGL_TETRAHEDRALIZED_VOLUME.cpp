@@ -551,7 +551,7 @@ Clear_Highlight()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const
 {
     Print_Selection_Info(output_stream,selection,0);
 }
@@ -601,7 +601,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
 //#####################################################################
 // Function Get_Vertex_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION *OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+template<class T> OPENGL_SELECTION* OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Get_Vertex_Selection(int index)
 {
     return new OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>(this,index);
@@ -609,7 +609,7 @@ Get_Vertex_Selection(int index)
 //#####################################################################
 // Function Get_Tetrahedron_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION *OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+template<class T> OPENGL_SELECTION* OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Get_Tetrahedron_Selection(int index)
 {
     return new OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>(this,index);

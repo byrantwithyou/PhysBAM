@@ -432,7 +432,7 @@ Update_Aggregate_Geometry(const int parent)
         if(child_body.simplicial_object){
             objects.Append(child_body.simplicial_object);
             relative_frames.Append(cluster.child_to_parent(i));}}
-    if (objects.m>0){
+    if(objects.m>0){
         T_SIMPLICIAL_OBJECT::Union_Mesh_Objects_Relatively(rigid_body_collection.Rigid_Body(parent).simplicial_object,objects,relative_frames);
         rigid_body_collection.Rigid_Body(parent).simplicial_object->Clean_Memory();
         rigid_body_collection.Rigid_Body(parent).simplicial_object->Update_Bounding_Box();

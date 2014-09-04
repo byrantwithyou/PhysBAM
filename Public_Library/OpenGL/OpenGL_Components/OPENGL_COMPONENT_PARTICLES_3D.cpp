@@ -100,11 +100,11 @@ Display(const int in_color) const
                 opengl_points_multiple(i)->Display(in_color);}
             glPopName();}
         else opengl_points->Display(in_color);
-        if (draw_velocities && have_velocities) opengl_vector_field.Display(in_color);}
+        if(draw_velocities && have_velocities) opengl_vector_field.Display(in_color);}
     else{
         if(draw_multiple_particle_sets) for(int i=0;i<number_of_sets;i++)opengl_points_multiple(i)->Display(in_color);
         else opengl_points->Display(in_color);
-        if (draw_velocities && have_velocities) opengl_vector_field.Display(in_color);}
+        if(draw_velocities && have_velocities) opengl_vector_field.Display(in_color);}
 
     if(slice && slice->Is_Slice_Mode())glPopAttrib();
 }
@@ -120,7 +120,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION *OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Get_Selection(GLuint* buffer,int buffer_size)
 {
     if(buffer_size==1){}
@@ -142,7 +142,7 @@ Get_Selection(GLuint* buffer,int buffer_size)
 //#####################################################################
 // Function Get_Selection_By_Id
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION *OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Get_Selection_By_Id(int id)
 {
     OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *selection = 0;
@@ -451,7 +451,7 @@ Toggle_Arrowhead()
     opengl_vector_field.Toggle_Arrowhead_Mode();
 }
 //#####################################################################
-// Selection object functions
+// Function Bounding_Box
 //#####################################################################
 template<class T>
 RANGE<VECTOR<float,3> > OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>::

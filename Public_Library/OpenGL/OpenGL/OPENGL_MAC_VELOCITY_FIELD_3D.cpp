@@ -14,6 +14,8 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_3D.h>
 using namespace PhysBAM;
 //#####################################################################
+// Constructor
+//#####################################################################
 template<class T> OPENGL_MAC_VELOCITY_FIELD_3D<T>::
 OPENGL_MAC_VELOCITY_FIELD_3D(GRID<TV> &grid)
     :OPENGL_VECTOR_FIELD_3D<T>(*(new ARRAY<TV>),*(new ARRAY<TV>),OPENGL_COLOR::Gray(0.8f),.25,false,false,true),scale(1),grid(grid),
@@ -23,7 +25,9 @@ OPENGL_MAC_VELOCITY_FIELD_3D(GRID<TV> &grid)
     PHYSBAM_ASSERT(grid.Is_MAC_Grid());
     Set_Velocity_Mode(CELL_CENTERED);
 }
-
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T> OPENGL_MAC_VELOCITY_FIELD_3D<T>::
 ~OPENGL_MAC_VELOCITY_FIELD_3D()
 {
@@ -31,20 +35,26 @@ template<class T> OPENGL_MAC_VELOCITY_FIELD_3D<T>::
     delete &vector_locations;
     delete &face_velocities;
 }
-
+//#####################################################################
+// Function Set_Velocity_Mode
+//#####################################################################
 template<class T> void OPENGL_MAC_VELOCITY_FIELD_3D<T>::
 Set_Velocity_Mode(VELOCITY_MODE velocity_mode_input)
 {
     velocity_mode = velocity_mode_input;
     Update();
 }
-
-template<class T> RANGE<VECTOR<float,3> > OPENGL_MAC_VELOCITY_FIELD_3D<T>::
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
+template<class T> RANGE<VECTOR<T,3> > OPENGL_MAC_VELOCITY_FIELD_3D<T>::
 Bounding_Box() const
 {
     return RANGE<VECTOR<float,3> >(grid.domain);
 }
-
+//#####################################################################
+// Function Update
+//#####################################################################
 template<class T> void OPENGL_MAC_VELOCITY_FIELD_3D<T>::
 Update()
 {
@@ -85,12 +95,12 @@ Update()
             if(vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(vel,0,0);vector_locations(idx)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j,k)));}}
 
         // v velocities
-        for (int i=cell_start.x;i<cell_end.x;i++) for (int j=cell_start.y;j<cell_end.y+1;j++) for (int k=cell_start.z;k<cell_end.z;k++){
+        for(int i=cell_start.x;i<cell_end.x;i++) for(int j=cell_start.y;j<cell_end.y+1;j++) for(int k=cell_start.z;k<cell_end.z;k++){
             T vel = v(VECTOR<int,3>(i,j,k));
             if (vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(0,vel,0);vector_locations(idx)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j,k)));}}
 
         // w velocities
-        for (int i=cell_start.x;i<cell_end.x;i++) for (int j=cell_start.y;j<cell_end.y;j++) for (int k=cell_start.z;k<cell_end.z+1;k++){
+        for(int i=cell_start.x;i<cell_end.x;i++) for(int j=cell_start.y;j<cell_end.y;j++) for(int k=cell_start.z;k<cell_end.z+1;k++){
             T vel = w(VECTOR<int,3>(i,j,k));
             if (vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(0,0,vel);vector_locations(idx)=grid.Face(FACE_INDEX<TV::m>(2,TV_INT(i,j,k)));}}
 

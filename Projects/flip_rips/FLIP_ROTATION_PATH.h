@@ -22,7 +22,7 @@ struct FLIP_ROTATION_PATH
 };
 
 template<class TV>
-struct FLIP_ROTATION_PATH_UNIFORM: public FLIP_ROTATION_PATH<TV>
+struct FLIP_ROTATION_PATH_UNIFORM:public FLIP_ROTATION_PATH<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
@@ -38,7 +38,7 @@ struct FLIP_ROTATION_PATH_UNIFORM: public FLIP_ROTATION_PATH<TV>
 };
 
 template<class TV>
-struct FLIP_ROTATION_PATH_STATIC: public FLIP_ROTATION_PATH<TV>
+struct FLIP_ROTATION_PATH_STATIC:public FLIP_ROTATION_PATH<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;

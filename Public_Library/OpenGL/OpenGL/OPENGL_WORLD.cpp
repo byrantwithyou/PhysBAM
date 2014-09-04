@@ -598,7 +598,7 @@ int OPENGL_WORLD::Get_Number_Of_Valid_Hits(GLint hits,GLuint buffer[],int buff_s
 //#####################################################################
 // Function Get_Selections
 //#####################################################################
-void OPENGL_WORLD::Get_Selections(ARRAY<OPENGL_SELECTION *> &selections,GLint hits,GLuint buffer[])
+void OPENGL_WORLD::Get_Selections(ARRAY<OPENGL_SELECTION* > &selections,GLint hits,GLuint buffer[])
 {
     selections.Remove_All();
     int idx=0;
@@ -606,7 +606,7 @@ void OPENGL_WORLD::Get_Selections(ARRAY<OPENGL_SELECTION *> &selections,GLint hi
         GLint names=buffer[idx];
         int object_id=buffer[idx+3];
         PHYSBAM_ASSERT(0<=object_id && object_id<object_list.m && object_list(object_id)->selectable);
-        OPENGL_SELECTION *selection=object_list(object_id)->Get_Selection(&buffer[idx+4],names-1);
+        OPENGL_SELECTION* selection=object_list(object_id)->Get_Selection(&buffer[idx+4],names-1);
         if(selection){
             unsigned int denom=0xffffffff;
             selection->min_depth=(float)buffer[idx+1]/denom;

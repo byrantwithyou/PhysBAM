@@ -53,7 +53,7 @@ Update()
     plus.vector_field.Resize(plus_count);plus.vector_locations.Resize(plus_count);
     
     levelset.Compute_Normals();
-    for (int i=V_minus.domain.min_corner.x;i<V_minus.domain.max_corner.x;i++) for(int j=V_minus.domain.min_corner.y;j<V_minus.domain.max_corner.y;j++){
+    for(int i=V_minus.domain.min_corner.x;i<V_minus.domain.max_corner.x;i++) for(int j=V_minus.domain.min_corner.y;j<V_minus.domain.max_corner.y;j++){
             VECTOR<T,2> velocity_2d;
             if(levelset.phi(i,j)<=0){
                 velocity_2d=V_minus(i,j);

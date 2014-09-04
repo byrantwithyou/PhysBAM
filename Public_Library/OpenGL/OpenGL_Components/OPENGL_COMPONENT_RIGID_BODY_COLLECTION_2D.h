@@ -82,10 +82,10 @@ public:
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
 
     void Read_Hints(const std::string& filename);
 
@@ -133,13 +133,13 @@ protected:
 };
 
 template<class T>
-class OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D : public OPENGL_SELECTION
+class OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D:public OPENGL_SELECTION
 {
 public:
     int body_id;
-    OPENGL_SELECTION *body_selection;
+    OPENGL_SELECTION* body_selection;
 
-    OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D(OPENGL_OBJECT *object,const int body_id,OPENGL_SELECTION* body_selection)
+    OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D(OPENGL_OBJECT* object,const int body_id,OPENGL_SELECTION* body_selection)
         :OPENGL_SELECTION(OPENGL_SELECTION::COMPONENT_RIGID_BODIES_2D,object),body_id(body_id),body_selection(body_selection)
     {}
 
@@ -150,12 +150,12 @@ public:
 };
 
 template<class T>
-class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D : public OPENGL_SELECTION
+class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D:public OPENGL_SELECTION
 {
 public:
     int joint_id;
 
-    OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D(OPENGL_OBJECT *object,const int joint_id)
+    OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D(OPENGL_OBJECT* object,const int joint_id)
         :OPENGL_SELECTION(OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_2D,object),joint_id(joint_id)
     {}
 
@@ -163,11 +163,11 @@ public:
 };
 
 template<class T>
-class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D : public OPENGL_SELECTION
+class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D:public OPENGL_SELECTION
 {
 public:
     int muscle_id;
-    OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D(OPENGL_OBJECT *object,const int muscle_id)
+    OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D(OPENGL_OBJECT* object,const int muscle_id)
         :OPENGL_SELECTION(OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_MUSCLE_2D,object),muscle_id(muscle_id)
     {}
 

@@ -13,6 +13,8 @@
 using namespace PhysBAM;
 using namespace std;
 //#####################################################################
+// Constructor
+//#####################################################################
 template<class T> OPENGL_MAC_VELOCITY_FIELD_2D<T>::
 OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid, ARRAY<T,FACE_INDEX<2> > &face_velocities_input,ARRAY<bool,TV_INT> *active_cells_input,ARRAY<bool,FACE_INDEX<TV::m> > *active_faces_input)
     : OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(vector_field,vector_locations),
@@ -21,24 +23,32 @@ OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid, ARRAY<T,FACE_INDEX<2> > &face_veloc
     PHYSBAM_ASSERT(grid.Is_MAC_Grid());
     Set_Velocity_Mode(CELL_CENTERED);
 }
-
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T> OPENGL_MAC_VELOCITY_FIELD_2D<T>::
 ~OPENGL_MAC_VELOCITY_FIELD_2D()
 {}
-
+//#####################################################################
+// Function Set_Velocity_Mode
+//#####################################################################
 template<class T> void OPENGL_MAC_VELOCITY_FIELD_2D<T>::
 Set_Velocity_Mode(VELOCITY_MODE velocity_mode_input)
 {
     velocity_mode = velocity_mode_input;
     Update();
 }
-
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_MAC_VELOCITY_FIELD_2D<T>::
 Bounding_Box() const
 {
     return RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.Append(0)),VECTOR<float,3>(grid.domain.max_corner.Append(0)));
 }
-
+//#####################################################################
+// Function Update
+//#####################################################################
 template<class T> void OPENGL_MAC_VELOCITY_FIELD_2D<T>::
 Update()
 {

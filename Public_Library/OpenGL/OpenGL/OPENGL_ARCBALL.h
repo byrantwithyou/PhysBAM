@@ -25,7 +25,7 @@ namespace PhysBAM{
 #define NSEGS (1<<LG_NSEGS)
 
 template<class T>
-class OPENGL_ARCBALL: public OPENGL_OBJECT
+class OPENGL_ARCBALL:public OPENGL_OBJECT
 {
     typedef VECTOR<T,3> TV;
 public:
@@ -37,7 +37,7 @@ public:
     TV vFrom,vTo,vrFrom,vrTo;
     MATRIX<T,4> mNow,mDown,mDeltaNow; //note that these only work in world space
     bool dragging,use_sphere_center,use_object_space;
-    OPENGL_WORLD *world;
+    OPENGL_WORLD* world;
     int rotation_axis;
     OPENGL_COLOR x_axis,y_axis,z_axis,outer_rim,highlight;
 
@@ -67,7 +67,7 @@ public:
         gluProject((GLdouble)sphere.center.x,(GLdouble)sphere.center.y,(GLdouble)sphere.center.z,model_view,projection,viewport,&project_x,&project_y,&project_z);
         center.x=(T)project_x;center.y=(T)project_y;}
     vFrom=MouseOnSphere(vDown,center,sphere.radius);vTo=MouseOnSphere(vNow,center,sphere.radius);
-    if (dragging){qDrag=Qt_FromBallPoints(vFrom,vTo);qNow=qDrag*qDown;}
+    if(dragging){qDrag=Qt_FromBallPoints(vFrom,vTo);qNow=qDrag*qDown;}
     Qt_ToBallPoints(qDown,vrFrom,vrTo);
     mNow=MATRIX<T,4>::From_Linear(qNow.Rotation_Matrix());
     mDeltaNow=MATRIX<T,4>::From_Linear(qDrag.Rotation_Matrix());}
@@ -81,7 +81,7 @@ public:
         gluProject((GLdouble)center.x,(GLdouble)center.y,(GLdouble)0,model_view,projection,viewport,&unproject_x,&unproject_y,&unproject_z);
         sphere.center.x=(T)unproject_x;sphere.center.y=(T)unproject_y;sphere.center.z=(T)unproject_z;}
     vFrom=MouseOnSphere(vDown,sphere,vFrom);vTo=MouseOnSphere(vNow,sphere,vTo);
-    if (dragging){qDrag=Qt_FromBallPoints(vFrom,vTo);qNow=qDrag*qDown;}
+    if(dragging){qDrag=Qt_FromBallPoints(vFrom,vTo);qNow=qDrag*qDown;}
     Qt_ToBallPoints(qDown,vrFrom,vrTo);}
 
     MATRIX<T,4> Value()
@@ -118,14 +118,14 @@ private:
     double dot;
     pts[0]=vFrom;
     pts[1]=pts[NSEGS]=vTo;
-    for (i=0;i<LG_NSEGS;i++) pts[1]=Bisect_Vectors(pts[0],pts[1]);
+    for(i=0;i<LG_NSEGS;i++) pts[1]=Bisect_Vectors(pts[0],pts[1]);
     dot=2.0*TV::Dot_Product(pts[0],pts[1]);
-    for (i=2;i<NSEGS;i++) pts[i]=(pts[i-1]*dot)-pts[i-2];
+    for(i=2;i<NSEGS;i++) pts[i]=(pts[i-1]*dot)-pts[i-2];
     glMatrixMode(GL_MODELVIEW);glPushMatrix();glLoadIdentity();
     glMatrixMode(GL_PROJECTION);glPushMatrix();glLoadIdentity();
     glDepthMask(0);glDisable(GL_DEPTH_TEST);
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for (i=0;i<NSEGS;i++){pts[i].y*=(T)world->window->Width()/(T)world->window->Height();OpenGL_Vertex(sphere_center+(T)4.8*sphere.radius*pts[i],vertices);}
+    for(i=0;i<NSEGS;i++){pts[i].y*=(T)world->window->Width()/(T)world->window->Height();OpenGL_Vertex(sphere_center+(T)4.8*sphere.radius*pts[i],vertices);}
     OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices); 
     glPopMatrix();glMatrixMode(GL_MODELVIEW);glPopMatrix();
     glDepthMask(1);glEnable(GL_DEPTH_TEST);}
@@ -138,13 +138,13 @@ private:
     double dot;
     pts[0]=vFrom;
     pts[1]=pts[NSEGS]=vTo;
-    for (i=0;i<LG_NSEGS;i++) pts[1]=Bisect_Vectors(pts[0],pts[1]);
+    for(i=0;i<LG_NSEGS;i++) pts[1]=Bisect_Vectors(pts[0],pts[1]);
     dot=2.0*TV::Dot_Product(pts[0],pts[1]);
-    for (i=2;i<NSEGS;i++) pts[i]=(pts[i-1]*dot)-pts[i-2];
+    for(i=2;i<NSEGS;i++) pts[i]=(pts[i-1]*dot)-pts[i-2];
     glDepthMask(0);glDisable(GL_DEPTH_TEST);
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     TV camera=TV(world->Get_Camera_Position()-world->Get_Target_Position()).Normalized();
-    for (i=0;i<NSEGS;i++){
+    for(i=0;i<NSEGS;i++){
         if(TV::Dot_Product(qDown.Rotate(pts[i]),camera)>-1e-8||TV::Dot_Product(qNow.Rotate(pts[i]),camera)>1e-8) OpenGL_Vertex(sphere_center+qNow.Rotate(radius*pts[i]),vertices);
         else{OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices);vertices.Resize(0);}}
     OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices); 
@@ -182,7 +182,7 @@ private:
     ballMouse.x=T((mouse.x-ballCenter.x)/ballRadius);
     ballMouse.y=T((mouse.y-ballCenter.y)/ballRadius);
     mag=ballMouse.Magnitude_Squared();
-    if (mag>1.0){T scale=T(1.0/sqrt(mag));ballMouse.x*=scale;ballMouse.y*=scale;ballMouse.z=0.0;}
+    if(mag>1.0){T scale=T(1.0/sqrt(mag));ballMouse.x*=scale;ballMouse.y*=scale;ballMouse.z=0.0;}
     else ballMouse.z=T(sqrt(1-mag));
     return ballMouse;}
 
@@ -230,14 +230,14 @@ private:
             T magnitude=(point-sphere.center).Magnitude();
             if(magnitude<visual_radius+thickness&&magnitude>visual_radius-thickness&&TV::Dot_Product(point-sphere.center,world->Get_Camera_Position()-sphere.center)>-1e-8){
                 TV closest=x_plane.Surface(point);return (closest-sphere.center).Normalized()*visual_radius;}}
-        else if (INTERSECTION::Intersects(ray,y_circ)){
+        else if(INTERSECTION::Intersects(ray,y_circ)){
             LOG::cout<<"Y axis init"<<std::endl;rotation_axis=1;
             rotation_axis=1;
             TV point=ray.Point(ray.t_max);
             T magnitude=(point-sphere.center).Magnitude();
             if(magnitude<visual_radius+thickness&&magnitude>visual_radius-thickness&&TV::Dot_Product(point-sphere.center,world->Get_Camera_Position()-sphere.center)>-1e-8){
                 TV closest=y_plane.Surface(point);return (closest-sphere.center).Normalized()*visual_radius;}}
-        else if (INTERSECTION::Intersects(ray,z_circ)){
+        else if(INTERSECTION::Intersects(ray,z_circ)){
             LOG::cout<<"Z axis init"<<std::endl;rotation_axis=2;
             rotation_axis=2;
             TV point=ray.Point(ray.t_max);

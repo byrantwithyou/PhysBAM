@@ -50,7 +50,7 @@ Latest_Simplex_Crossover(const VECTOR<T,2>& start_X,const VECTOR<T,2>& end_X,con
     returned_collision_type=POINT_SIMPLEX_NO_COLLISION;
     T max_time=-FLT_MAX;bool collision=false;T current_hit_time;VECTOR<T,TV::m+1> current_weights;
     TV normal;
-    for (int segment_number=0;segment_number<rigid_body.simplicial_object->mesh.elements.m;segment_number++){
+    for(int segment_number=0;segment_number<rigid_body.simplicial_object->mesh.elements.m;segment_number++){
         SEGMENT_2D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
             SEGMENT_2D<T>::Robust_Point_Face_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weights);

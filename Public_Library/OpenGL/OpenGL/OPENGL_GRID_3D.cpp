@@ -96,13 +96,13 @@ Display(const int in_color) const
             VECTOR<T,3> pos_start=grid.Node(TV_INT(i_start,j_start,k_start));
 
             glPushName(1);
-            for (i=i_start, x=pos_start.x; i<i_end; i++, x+=grid.dX.x)
+            for(i=i_start, x=pos_start.x; i<i_end; i++, x+=grid.dX.x)
             {
                 glPushName(i);
-                for (j=j_start, y=pos_start.y; j<j_end; j++, y+=grid.dX.y)
+                for(j=j_start, y=pos_start.y; j<j_end; j++, y+=grid.dX.y)
                 {
                     glPushName(j);
-                    for (k=k_start, z=pos_start.z; k<k_end; k++, z+=grid.dX.z)
+                    for(k=k_start, z=pos_start.z; k<k_end; k++, z+=grid.dX.z)
                     {
                         VECTOR<T,3> min_corner(x,y,z);
                         glPushName(k);
@@ -203,22 +203,22 @@ Draw_Subgrid(const VECTOR<int,3> &node_start,const VECTOR<int,3> &node_end) cons
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
 
     if(node_start.z!=node_end.z)
-        for (i=node_start.x, x=start_position.x; i<node_end.x; i++, x+=grid.dX.x)
-            for (j=node_start.y, y=start_position.y; j<node_end.y; j++, y+=grid.dX.y)
+        for(i=node_start.x, x=start_position.x; i<node_end.x; i++, x+=grid.dX.x)
+            for(j=node_start.y, y=start_position.y; j<node_end.y; j++, y+=grid.dX.y)
             {
                 OpenGL_Line(VECTOR<T,3>(x,y,start_position.z),VECTOR<T,3>(x,y,end_position.z),vertices);
             }
 
     if(node_start.y!=node_end.y)
-        for (i=node_start.x, x=start_position.x; i<node_end.x; i++, x+=grid.dX.x)
-            for (k=node_start.z, z=start_position.z; k<node_end.z; k++, z+=grid.dX.z)
+        for(i=node_start.x, x=start_position.x; i<node_end.x; i++, x+=grid.dX.x)
+            for(k=node_start.z, z=start_position.z; k<node_end.z; k++, z+=grid.dX.z)
             {
                 OpenGL_Line(VECTOR<T,3>(x,start_position.y,z),VECTOR<T,3>(x,end_position.y,z),vertices);
             }
 
     if(node_start.x!=node_end.x)
-        for (j=node_start.y, y=start_position.y; j<node_end.y; j++, y+=grid.dX.y)
-            for (k=node_start.z, z=start_position.z; k<node_end.z; k++, z+=grid.dX.z)
+        for(j=node_start.y, y=start_position.y; j<node_end.y; j++, y+=grid.dX.y)
+            for(k=node_start.z, z=start_position.z; k<node_end.z; k++, z+=grid.dX.z)
             {
                 OpenGL_Line(VECTOR<T,3>(start_position.x,y,z),VECTOR<T,3>(end_position.x,y,z),vertices);
             }
@@ -273,10 +273,10 @@ Bounding_Box() const
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION *OPENGL_GRID_3D<T>::
+template<class T> OPENGL_SELECTION* OPENGL_GRID_3D<T>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
-    OPENGL_SELECTION *selection=0;
+    OPENGL_SELECTION* selection=0;
     if(buffer_size==4)
     {
         if(buffer[0]==1)
@@ -298,7 +298,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T> void OPENGL_GRID_3D<T>::
-Highlight_Selection(OPENGL_SELECTION *selection)
+Highlight_Selection(OPENGL_SELECTION* selection)
 {
     delete current_selection; current_selection=0;
     if(selection->type==OPENGL_SELECTION::GRID_CELL_3D)

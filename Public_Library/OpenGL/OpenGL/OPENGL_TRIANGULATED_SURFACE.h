@@ -32,15 +32,15 @@ public:
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
     void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MATRIX<T,4>* transform) const;
 
-    OPENGL_SELECTION *Get_Vertex_Selection(int index);
-    OPENGL_SELECTION *Get_Segment_Selection(int index);
-    OPENGL_SELECTION *Get_Triangle_Selection(int index);
+    OPENGL_SELECTION* Get_Vertex_Selection(int index);
+    OPENGL_SELECTION* Get_Segment_Selection(int index);
+    OPENGL_SELECTION* Get_Triangle_Selection(int index);
 
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
@@ -65,7 +65,7 @@ public:
     void Rescale(const T scaling_x,const T scaling_y,const T scaling_z)
     {
         surface.Rescale(scaling_x,scaling_y,scaling_z);        
-        if (owns_display_list) Reinitialize_Display_List();
+        if(owns_display_list) Reinitialize_Display_List();
     }
     
 public:
@@ -94,7 +94,7 @@ protected:
     int display_list_id;
 
 public:
-    OPENGL_SELECTION *current_selection;
+    OPENGL_SELECTION* current_selection;
     int current_node;
     bool highlight_current_node;
     bool highlight_neighbors_of_current_node;
@@ -114,34 +114,34 @@ public:
 };
 
 template<class T>
-class OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX : public OPENGL_SELECTION
+class OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX:public OPENGL_SELECTION
 {
 public:
     int index;
-    OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX(OPENGL_OBJECT *object, int index=0) 
-        : OPENGL_SELECTION(OPENGL_SELECTION::TRIANGULATED_SURFACE_VERTEX, object), index(index) {}
+    OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX(OPENGL_OBJECT* object, int index=0) 
+        :OPENGL_SELECTION(OPENGL_SELECTION::TRIANGULATED_SURFACE_VERTEX, object), index(index) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT : public OPENGL_SELECTION
+class OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT:public OPENGL_SELECTION
 {
 public:
     int index;
-    OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT(OPENGL_OBJECT *object, int index=0) 
-        : OPENGL_SELECTION(OPENGL_SELECTION::TRIANGULATED_SURFACE_SEGMENT, object), index(index) {}
+    OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT(OPENGL_OBJECT* object, int index=0) 
+        :OPENGL_SELECTION(OPENGL_SELECTION::TRIANGULATED_SURFACE_SEGMENT, object), index(index) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE : public OPENGL_SELECTION
+class OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE:public OPENGL_SELECTION
 {
 public:
     int index;
-    OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE(OPENGL_OBJECT *object, int index=0) 
-        : OPENGL_SELECTION(OPENGL_SELECTION::TRIANGULATED_SURFACE_TRIANGLE, object), index(index) {}
+    OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE(OPENGL_OBJECT* object, int index=0) 
+        :OPENGL_SELECTION(OPENGL_SELECTION::TRIANGULATED_SURFACE_TRIANGLE, object), index(index) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };

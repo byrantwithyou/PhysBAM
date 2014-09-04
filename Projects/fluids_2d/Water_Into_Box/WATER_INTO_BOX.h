@@ -21,7 +21,7 @@
 
 namespace PhysBAM{
 
-class WATER_INTO_BOX : public EXAMPLE
+class WATER_INTO_BOX:public EXAMPLE
 {
 public:
     WATER_INTO_BOX() {

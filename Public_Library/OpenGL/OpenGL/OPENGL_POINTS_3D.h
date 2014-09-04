@@ -49,7 +49,7 @@ public:
     virtual OPENGL_SELECTION* Get_Selection(GLuint* buffer,int buffer_size);
     void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
 
     void Store_Point_Colors(const bool store_point_colors=true);
     void Store_Point_Ids(bool store_ids=true);

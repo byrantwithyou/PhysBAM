@@ -66,7 +66,7 @@ Update()
             vector_field(index)=V(i,j,ij);vector_locations(index++)=grid.X(TV_INT(i,j,ij));}}
     else{
         VECTOR<int,3> domain_start(V.domain.min_corner.x,V.domain.min_corner.y,V.domain.min_corner.z),domain_end(V.domain.max_corner.x,V.domain.max_corner.y,V.domain.max_corner.z);
-        if ((slice->mode == OPENGL_SLICE::CELL_SLICE && (!grid.Is_MAC_Grid() || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis])) ||
+        if((slice->mode == OPENGL_SLICE::CELL_SLICE && (!grid.Is_MAC_Grid() || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis])) ||
             (slice->mode == OPENGL_SLICE::NODE_SLICE && (grid.Is_MAC_Grid() || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis]))) {
             // Currently we don't draw anything if the slice doesn't match where the vector field lives
             return;}

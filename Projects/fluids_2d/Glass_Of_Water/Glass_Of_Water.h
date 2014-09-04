@@ -21,7 +21,7 @@
 
 namespace PhysBAM{
 
-class GLASS_OF_WATER : public EXAMPLE
+class GLASS_OF_WATER:public EXAMPLE
 {
 public:
     GLASS_OF_WATER() {

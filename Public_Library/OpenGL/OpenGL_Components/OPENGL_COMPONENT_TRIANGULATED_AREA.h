@@ -15,7 +15,7 @@ namespace PhysBAM
 {
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_TRIANGULATED_AREA : public OPENGL_COMPONENT
+class OPENGL_COMPONENT_TRIANGULATED_AREA:public OPENGL_COMPONENT
 {
 public:
     OPENGL_COMPONENT_TRIANGULATED_AREA(const std::string &filename);

@@ -30,7 +30,7 @@ Exact_Segment_Intersection(const VECTOR<float,2>& p1,const VECTOR<float,2>& p2,c
         for(unsigned int k=i+1;k<2;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
         for(unsigned int k=2;k<j;k++)    if(psa[(1<<k)|mask]) plus++;  else minus++;
         for(unsigned int k=j+1;k<4;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
-        if (plus==0||minus==0) return false;}
+        if(plus==0||minus==0) return false;}
     // No separator line found, objects are intersecting
     return true;
 }
@@ -56,7 +56,7 @@ Exact_Segment_Intersection(const VECTOR<float,2>& p1,const VECTOR<float,2>& p2,c
         for(unsigned int k=i+1;k<2;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
         for(unsigned int k=2;k<j;k++)    if(psa[(1<<k)|mask]) plus++;  else minus++;
         for(unsigned int k=j+1;k<4;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
-        if (plus==0||minus==0) return false;}
+        if(plus==0||minus==0) return false;}
     // No separator line found, objects are intersecting
     return true;
 }
@@ -73,9 +73,9 @@ Positive_Signed_Area(VECTOR<float,2> x0,VECTOR<float,2> x1,VECTOR<float,2> x2,in
     if(rank2>rank3){exchange(rank2,rank3);exchange(x1,x2);positive=!positive;}
     double area=Exact_Signed_Area(x0,x1,x2);
     if(area!=0) return (area<0)^positive; // works with area=-0
-    else if (x2.x!=x1.x) return (x2.x<x1.x)^positive;
-    else if (x1.y!=x2.y) return (x1.y<x2.y)^positive;
-    else if (x0.x!=x2.x) return (x0.x<x2.x)^positive;
+    else if(x2.x!=x1.x) return (x2.x<x1.x)^positive;
+    else if(x1.y!=x2.y) return (x1.y<x2.y)^positive;
+    else if(x0.x!=x2.x) return (x0.x<x2.x)^positive;
     return positive;
 }
 //#####################################################################
@@ -91,7 +91,7 @@ Positive_Signed_Area(VECTOR<float,2> x0,VECTOR<float,2> x1,VECTOR<float,2> x2)
     if(x1.x>x2.x || (x1.x==x2.x && x1.y>x2.y)){exchange(x1,x2);positive=!positive;}
     double area=Exact_Signed_Area(x0,x1,x2);
     if(area!=0) return (area<0)^positive; // works with area=-0
-    if (x2.x!=x1.x) return !positive;
+    if(x2.x!=x1.x) return !positive;
     return positive;
 }
 //#####################################################################

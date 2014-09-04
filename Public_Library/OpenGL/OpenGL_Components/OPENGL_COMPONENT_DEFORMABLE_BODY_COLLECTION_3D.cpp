@@ -583,12 +583,12 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T
 Toggle_Selection_Mode()
 {
 #ifndef USE_OPENGLES
-    if (!real_selection) return;
+    if(!real_selection) return;
     assert(real_selection->body_selection);
-    if (real_selection->body_selection->type == OPENGL_SELECTION::SEGMENTED_CURVE_3D){
+    if(real_selection->body_selection->type == OPENGL_SELECTION::SEGMENTED_CURVE_3D){
         delete real_selection->body_selection;
         real_selection->body_selection=real_selection->saved_selection;}
-    else if (real_selection->body_selection->type == OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_3D){
+    else if(real_selection->body_selection->type == OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_3D){
         real_selection->saved_selection=real_selection->body_selection;
         real_selection->body_selection=((OPENGL_SEGMENTED_CURVE_3D<T>*)real_selection->subobject)->Get_Curve_Selection(
                 ((OPENGL_SELECTION_SEGMENTED_CURVE_3D<T>*)real_selection->body_selection)->index);}
@@ -635,7 +635,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Set_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
-Set_Selection(OPENGL_SELECTION *selection)
+Set_Selection(OPENGL_SELECTION* selection)
 {
     if(selection->type!=OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D) return;
     real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>*)selection;
@@ -644,7 +644,7 @@ Set_Selection(OPENGL_SELECTION *selection)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION *selection)
+Highlight_Selection(OPENGL_SELECTION* selection)
 {
     if(selection->type!=OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D) return;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>*)selection;
@@ -674,7 +674,7 @@ Clear_Highlight()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
-Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) const
+Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const
 {
     if(selection && selection->type==OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D && selection->object==this){
         OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>*)selection;

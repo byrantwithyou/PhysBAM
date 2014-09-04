@@ -18,7 +18,7 @@ using namespace PhysBAM;
 using namespace std;
 
 template<class T> 
-class VISUALIZATION : public ANIMATED_VISUALIZATION
+class VISUALIZATION:public ANIMATED_VISUALIZATION
 {
 public:
     VISUALIZATION();

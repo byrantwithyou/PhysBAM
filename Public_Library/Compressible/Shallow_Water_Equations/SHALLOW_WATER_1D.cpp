@@ -19,7 +19,7 @@ Euler_Step(const T dt,const T time)
     ARRAY<TV_DIMENSION,VECTOR<int,1> > U_ghost(-ghost_cells,m+ghost_cells);boundary->Fill_Ghost_Cells(grid,U,U_ghost,dt,time,ghost_cells);
 
     // make sure things'll work in conservation law solver
-    for(int i=0;i<grid.counts.x;i++) if (U(i)(0) < min_height){U(i)(0)=min_height;U(i)(1)=0;}
+    for(int i=0;i<grid.counts.x;i++) if(U(i)(0) < min_height){U(i)(0)=min_height;U(i)(1)=0;}
     for(int i=-ghost_cells;i<m+ghost_cells;i++) if(U_ghost(i)(0) < min_height){U_ghost(i)(0)=min_height;U_ghost(i)(1)=0;}
 
     ARRAY<bool,VECTOR<int,1> > psi(0,m);psi.Fill(true); // no cut out grids

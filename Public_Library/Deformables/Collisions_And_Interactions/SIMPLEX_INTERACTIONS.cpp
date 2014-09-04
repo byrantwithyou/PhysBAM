@@ -32,7 +32,7 @@ Intersection(const VECTOR<VECTOR<T,2>,2>& segment_1,const VECTOR<VECTOR<T,2>,2>&
         for(unsigned int k=i+1;k<2;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
         for(unsigned int k=2;k<j;k++)    if(d3p[(1<<k)|mask]>(T)0) plus++;  else if(d3p[(1<<k)|mask]<(T)0) minus++;
         for(unsigned int k=j+1;k<4;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
-        if (plus==0||minus==0) return false;}
+        if(plus==0||minus==0) return false;}
     // No separator line found, objects are intersecting
     return true;
 }
@@ -68,7 +68,7 @@ Intersection(const VECTOR<VECTOR<T,2>,3>& triangle,const VECTOR<T,2>& point)
         plus=minus=0;mask=(1<<i|1<<3);
         for(unsigned int k=0;k<i;k++)    if(d3p[(1<<k)|mask]>(T)0) plus++;  else if(d3p[(1<<k)|mask]<(T)0) minus++;
         for(unsigned int k=i+1;k<3;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
-        if (plus==0||minus==0) return false;}
+        if(plus==0||minus==0) return false;}
     // No separator line found, objects are intersecting
     return true;
 }
@@ -95,7 +95,7 @@ Intersection(const VECTOR<VECTOR<T,2>,3>& triangle,const VECTOR<VECTOR<T,2>,2>& 
         for(unsigned int k=i+1;k<2;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
         for(unsigned int k=3;k<j;k++)    if(d3p[(1<<k)|mask]>(T)0) plus++;  else if(d3p[(1<<k)|mask]<(T)0) minus++;
         for(unsigned int k=j+1;k<4;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
-        if (plus==0||minus==0) return false;}
+        if(plus==0||minus==0) return false;}
     // No separator line found, objects are intersecting
     return true;
 }
@@ -122,7 +122,7 @@ Intersection(const VECTOR<VECTOR<T,2>,3>& triangle_1,const VECTOR<VECTOR<T,2>,3>
         for(unsigned int k=i+1;k<3;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
         for(unsigned int k=3;k<j;k++)    if(d3p[(1<<k)|mask]>(T)0) plus++;  else if(d3p[(1<<k)|mask]<(T)0) minus++;
         for(unsigned int k=j+1;k<6;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
-        if (plus==0||minus==0) return false;}
+        if(plus==0||minus==0) return false;}
     // No separator line found, objects are intersecting
     return true;
 }
@@ -140,37 +140,37 @@ Intersection(const VECTOR<VECTOR<T,3>,3>& triangle_1,const VECTOR<VECTOR<T,3>,3>
     points[2][0]=triangle_1[2].x;points[2][1]=triangle_1[2].y;points[2][2]=triangle_1[2].z;
     points[3][0]=triangle_2[0].x;points[3][1]=triangle_2[0].y;points[3][2]=triangle_2[0].z;points[4][0]=triangle_2[1].x;points[4][1]=triangle_2[1].y;points[4][2]=triangle_2[1].z;
     points[5][0]=triangle_2[2].x;points[5][1]=triangle_2[2].y;points[5][2]=triangle_2[2].z;
-    for (unsigned int i=0;i<4;i++) for (unsigned int j=i+1;j<5;j++) for (unsigned int k=j+1;k<6;k++)
+    for(unsigned int i=0;i<4;i++) for(unsigned int j=i+1;j<5;j++) for(unsigned int k=j+1;k<6;k++)
         m3p[(1<<i)|(1<<j)|(1<<k)]=
             +points[i][0]*points[j][1]*points[k][2]+points[i][1]*points[j][2]*points[k][0]+points[i][2]*points[j][0]*points[k][1]
             -points[i][0]*points[j][2]*points[k][1]-points[i][1]*points[j][0]*points[k][2]-points[i][2]*points[j][1]*points[k][0];
     // Compute signed volumes for all tetrahedra formed by four input points
-    for (unsigned int i=0;i<3;i++) for (unsigned int j=i+1;j<4;j++) for (unsigned int k=j+1;k<5;k++) for (unsigned int l=k+1;l<6;l++)
+    for(unsigned int i=0;i<3;i++) for(unsigned int j=i+1;j<4;j++) for(unsigned int k=j+1;k<5;k++) for(unsigned int l=k+1;l<6;l++)
         d4p[(1<<i)|(1<<j)|(1<<k)|(1<<l)]=
             -m3p[(1<<j)|(1<<k)|(1<<l)]+m3p[(1<<i)|(1<<k)|(1<<l)]
             -m3p[(1<<i)|(1<<j)|(1<<l)]+m3p[(1<<i)|(1<<j)|(1<<k)];
     // Case 1 : Separator plane contains two vertices on first triangle
-    for (unsigned int i=0;i<3;i++)             // The vertex of the 1st triangle not on the plane
-        for (unsigned int j=3;j<6;j++) {       // The vertex of the 2nd triangle on the plane
+    for(unsigned int i=0;i<3;i++)             // The vertex of the 1st triangle not on the plane
+        for(unsigned int j=3;j<6;j++) {       // The vertex of the 2nd triangle on the plane
             plus=minus=0;
             mask=((1<<j)|0x7)&(~(1<<i));
-            switch(i) { case 0: if (d4p[0x01|mask]>(T)0) plus++;  else if (d4p[0x01|mask]<(T)0) minus++; break;
-                        case 1: if (d4p[0x02|mask]>(T)0) minus++; else if (d4p[0x02|mask]<(T)0) plus++; break;
-                        case 2: if (d4p[0x04|mask]>(T)0) plus++;  else if (d4p[0x04|mask]<(T)0) minus++; break; }    
-            for(unsigned int k=3;k<j;k++)    if (d4p[(1<<k)|mask]>(T)0) minus++; else if (d4p[(1<<k)|mask]<(T)0) plus++;
-            for(unsigned int k=j+1;k<6;k++) if (d4p[(1<<k)|mask]>(T)0) plus++;  else if (d4p[(1<<k)|mask]<(T)0) minus++;
-            if (plus==0||minus==0) return false; }
+            switch(i) { case 0: if(d4p[0x01|mask]>(T)0) plus++;  else if(d4p[0x01|mask]<(T)0) minus++; break;
+                        case 1: if(d4p[0x02|mask]>(T)0) minus++; else if(d4p[0x02|mask]<(T)0) plus++; break;
+                        case 2: if(d4p[0x04|mask]>(T)0) plus++;  else if(d4p[0x04|mask]<(T)0) minus++; break; }    
+            for(unsigned int k=3;k<j;k++)    if(d4p[(1<<k)|mask]>(T)0) minus++; else if(d4p[(1<<k)|mask]<(T)0) plus++;
+            for(unsigned int k=j+1;k<6;k++) if(d4p[(1<<k)|mask]>(T)0) plus++;  else if(d4p[(1<<k)|mask]<(T)0) minus++;
+            if(plus==0||minus==0) return false; }
     // Case 2 : Separator plane contains two vertices on the second triangle
-    for (unsigned int i=0;i<3;i++)             // The vertex of the 1st triangle on the plane
-        for (unsigned int j=3;j<6;j++) {       // The vertex of the 2nd triangle not on the plane
+    for(unsigned int i=0;i<3;i++)             // The vertex of the 1st triangle on the plane
+        for(unsigned int j=3;j<6;j++) {       // The vertex of the 2nd triangle not on the plane
             plus=minus=0;
             mask=((1<<i)|0x38)&(~(1<<j));
-            for(unsigned int k=0;k<i;k++)    if (d4p[(1<<k)|mask]>(T)0) plus++;  else if (d4p[(1<<k)|mask]<(T)0) minus++;
-            for(unsigned int k=i+1;k<3;k++) if (d4p[(1<<k)|mask]>(T)0) minus++; else if (d4p[(1<<k)|mask]<(T)0) plus++;
-            switch(j) { case 3: if (d4p[0x08|mask]>(T)0) plus++;  else if (d4p[0x08|mask]<(T)0) minus++; break;
-                        case 4: if (d4p[0x10|mask]>(T)0) minus++; else if (d4p[0x10|mask]<(T)0) plus++; break;
-                        case 5: if (d4p[0x20|mask]>(T)0) plus++;  else if (d4p[0x20|mask]<(T)0) minus++; break; }    
-            if (plus==0||minus==0) return false; }
+            for(unsigned int k=0;k<i;k++)    if(d4p[(1<<k)|mask]>(T)0) plus++;  else if(d4p[(1<<k)|mask]<(T)0) minus++;
+            for(unsigned int k=i+1;k<3;k++) if(d4p[(1<<k)|mask]>(T)0) minus++; else if(d4p[(1<<k)|mask]<(T)0) plus++;
+            switch(j) { case 3: if(d4p[0x08|mask]>(T)0) plus++;  else if(d4p[0x08|mask]<(T)0) minus++; break;
+                        case 4: if(d4p[0x10|mask]>(T)0) minus++; else if(d4p[0x10|mask]<(T)0) plus++; break;
+                        case 5: if(d4p[0x20|mask]>(T)0) plus++;  else if(d4p[0x20|mask]<(T)0) minus++; break; }    
+            if(plus==0||minus==0) return false; }
     // No separator plane found, objects are intersecting
     return true;
 }
@@ -187,27 +187,27 @@ Intersection(const VECTOR<VECTOR<T,3>,3>& triangle,const VECTOR<VECTOR<T,3>,2>& 
     points[0][0]=triangle[0].x;points[0][1]=triangle[0].y;points[0][2]=triangle[0].z;points[1][0]=triangle[1].x;points[1][1]=triangle[1].y;points[1][2]=triangle[1].z;
     points[2][0]=triangle[2].x;points[2][1]=triangle[2].y;points[2][2]=triangle[2].z;
     points[3][0]=segment[0].x;points[3][1]=segment[0].y;points[3][2]=segment[0].z;points[4][0]=segment[1].x;points[4][1]=segment[1].y;points[4][2]=segment[1].z;
-    for (unsigned int i=0;i<3;i++) for (unsigned int j=i+1;j<4;j++) for (unsigned int k=j+1;k<5;k++)
+    for(unsigned int i=0;i<3;i++) for(unsigned int j=i+1;j<4;j++) for(unsigned int k=j+1;k<5;k++)
         m3p[(1<<i)|(1<<j)|(1<<k)]=
             +points[i][0]*points[j][1]*points[k][2]+points[i][1]*points[j][2]*points[k][0]+points[i][2]*points[j][0]*points[k][1]
             -points[i][0]*points[j][2]*points[k][1]-points[i][1]*points[j][0]*points[k][2]-points[i][2]*points[j][1]*points[k][0];
     // Compute signed volumes for all tetrahedra formed by four input points
-    for (unsigned int i=0;i<2;i++) for (unsigned int j=i+1;j<3;j++) for (unsigned int k=j+1;k<4;k++) for (unsigned int l=k+1;l<5;l++)
+    for(unsigned int i=0;i<2;i++) for(unsigned int j=i+1;j<3;j++) for(unsigned int k=j+1;k<4;k++) for(unsigned int l=k+1;l<5;l++)
         d4p[(1<<i)|(1<<j)|(1<<k)|(1<<l)]=
             -m3p[(1<<j)|(1<<k)|(1<<l)]+m3p[(1<<i)|(1<<k)|(1<<l)]
             -m3p[(1<<i)|(1<<j)|(1<<l)]+m3p[(1<<i)|(1<<j)|(1<<k)];
     // Separator plane must contain two triangle vertices and one segment vertex 
-    for (unsigned int i=0;i<2;i++)             // 1st triangle vertex on plane
-        for (unsigned int j=i+1;j<3;j++)       // 2nd triangle vertex on plane
-            for (unsigned int k=3;k<5;k++) {   // Segment vertex on plane
+    for(unsigned int i=0;i<2;i++)             // 1st triangle vertex on plane
+        for(unsigned int j=i+1;j<3;j++)       // 2nd triangle vertex on plane
+            for(unsigned int k=3;k<5;k++) {   // Segment vertex on plane
                 plus=minus=0;
                 mask=(1<<i)|(1<<j)|(1<<k);
-                for (unsigned int l=0;l<i;l++)    if (d4p[(1<<l)|mask]>(T)0) plus++;  else if (d4p[(1<<l)|mask]<(T)0) minus++;
-                for (unsigned int l=i+1;l<j;l++)  if (d4p[(1<<l)|mask]>(T)0) minus++; else if (d4p[(1<<l)|mask]<(T)0) plus++;
-                for (unsigned int l=j+1;l<3;l++) if (d4p[(1<<l)|mask]>(T)0) plus++;  else if (d4p[(1<<l)|mask]<(T)0) minus++;
-                for (unsigned int l=3;l<k;l++)    if (d4p[(1<<l)|mask]>(T)0) minus++; else if (d4p[(1<<l)|mask]<(T)0) plus++;
-                for (unsigned int l=k+1;l<5;l++) if (d4p[(1<<l)|mask]>(T)0) plus++;  else if (d4p[(1<<l)|mask]<(T)0) minus++;
-                if (plus==0||minus==0) return false; }
+                for(unsigned int l=0;l<i;l++)    if(d4p[(1<<l)|mask]>(T)0) plus++;  else if(d4p[(1<<l)|mask]<(T)0) minus++;
+                for(unsigned int l=i+1;l<j;l++)  if(d4p[(1<<l)|mask]>(T)0) minus++; else if(d4p[(1<<l)|mask]<(T)0) plus++;
+                for(unsigned int l=j+1;l<3;l++) if(d4p[(1<<l)|mask]>(T)0) plus++;  else if(d4p[(1<<l)|mask]<(T)0) minus++;
+                for(unsigned int l=3;l<k;l++)    if(d4p[(1<<l)|mask]>(T)0) minus++; else if(d4p[(1<<l)|mask]<(T)0) plus++;
+                for(unsigned int l=k+1;l<5;l++) if(d4p[(1<<l)|mask]>(T)0) plus++;  else if(d4p[(1<<l)|mask]<(T)0) minus++;
+                if(plus==0||minus==0) return false; }
     // No separator plane found, objects are intersecting
     return true;
 }
@@ -234,27 +234,27 @@ Intersection(const VECTOR<VECTOR<T,3>,4>& tet,const VECTOR<VECTOR<T,3>,2>& segme
     points[0][0]=tet[0].x;points[0][1]=tet[0].y;points[0][2]=tet[0].z;points[1][0]=tet[1].x;points[1][1]=tet[1].y;points[1][2]=tet[1].z;
     points[2][0]=tet[2].x;points[2][1]=tet[2].y;points[2][2]=tet[2].z;points[3][0]=tet[3].x;points[3][1]=tet[3].y;points[3][2]=tet[3].z;
     points[4][0]=segment[0].x;points[4][1]=segment[0].y;points[4][2]=segment[0].z;points[5][0]=segment[1].x;points[5][1]=segment[1].y;points[5][2]=segment[1].z;
-    for (unsigned int i=0;i<4;i++) for (unsigned int j=i+1;j<5;j++) for (unsigned int k=j+1;k<6;k++)
+    for(unsigned int i=0;i<4;i++) for(unsigned int j=i+1;j<5;j++) for(unsigned int k=j+1;k<6;k++)
         m3p[(1<<i)|(1<<j)|(1<<k)]=
             +points[i][0]*points[j][1]*points[k][2]+points[i][1]*points[j][2]*points[k][0]+points[i][2]*points[j][0]*points[k][1]
             -points[i][0]*points[j][2]*points[k][1]-points[i][1]*points[j][0]*points[k][2]-points[i][2]*points[j][1]*points[k][0];
     // Compute signed volumes for all tetrahedra formed by four input points
-    for (unsigned int i=0;i<3;i++) for (unsigned int j=i+1;j<4;j++) for (unsigned int k=j+1;k<5;k++) for (unsigned int l=k+1;l<6;l++)
+    for(unsigned int i=0;i<3;i++) for(unsigned int j=i+1;j<4;j++) for(unsigned int k=j+1;k<5;k++) for(unsigned int l=k+1;l<6;l++)
         d4p[(1<<i)|(1<<j)|(1<<k)|(1<<l)]=
             -m3p[(1<<j)|(1<<k)|(1<<l)]+m3p[(1<<i)|(1<<k)|(1<<l)]
             -m3p[(1<<i)|(1<<j)|(1<<l)]+m3p[(1<<i)|(1<<j)|(1<<k)];
     // Separator plane must contain two tetrahedron vertices and one segment vertex 
-    for (unsigned int i=0;i<3;i++)             // 1st tetrahedron vertex on plane
-        for (unsigned int j=i+1;j<4;j++)       // 2nd tetrahedron vertex on plane
-            for (unsigned int k=4;k<6;k++) {   // Segment vertex on plane
+    for(unsigned int i=0;i<3;i++)             // 1st tetrahedron vertex on plane
+        for(unsigned int j=i+1;j<4;j++)       // 2nd tetrahedron vertex on plane
+            for(unsigned int k=4;k<6;k++) {   // Segment vertex on plane
                 plus=minus=0;
                 mask=(1<<i)|(1<<j)|(1<<k);
-                for (unsigned int l=0;l<i;l++)    if (d4p[(1<<l)|mask]>(T)0) plus++;  else if (d4p[(1<<l)|mask]<(T)0) minus++;
-                for (unsigned int l=i+1;l<j;l++)  if (d4p[(1<<l)|mask]>(T)0) minus++; else if (d4p[(1<<l)|mask]<(T)0) plus++;
-                for (unsigned int l=j+1;l<4;l++) if (d4p[(1<<l)|mask]>(T)0) plus++;  else if (d4p[(1<<l)|mask]<(T)0) minus++;
-                for (unsigned int l=4;l<k;l++)    if (d4p[(1<<l)|mask]>(T)0) minus++; else if (d4p[(1<<l)|mask]<(T)0) plus++;
-                for (unsigned int l=k+1;l<6;l++) if (d4p[(1<<l)|mask]>(T)0) plus++;  else if (d4p[(1<<l)|mask]<(T)0) minus++;
-                if (plus==0||minus==0) return false; }
+                for(unsigned int l=0;l<i;l++)    if(d4p[(1<<l)|mask]>(T)0) plus++;  else if(d4p[(1<<l)|mask]<(T)0) minus++;
+                for(unsigned int l=i+1;l<j;l++)  if(d4p[(1<<l)|mask]>(T)0) minus++; else if(d4p[(1<<l)|mask]<(T)0) plus++;
+                for(unsigned int l=j+1;l<4;l++) if(d4p[(1<<l)|mask]>(T)0) plus++;  else if(d4p[(1<<l)|mask]<(T)0) minus++;
+                for(unsigned int l=4;l<k;l++)    if(d4p[(1<<l)|mask]>(T)0) minus++; else if(d4p[(1<<l)|mask]<(T)0) plus++;
+                for(unsigned int l=k+1;l<6;l++) if(d4p[(1<<l)|mask]>(T)0) plus++;  else if(d4p[(1<<l)|mask]<(T)0) minus++;
+                if(plus==0||minus==0) return false; }
     // No separator plane found, objects are intersecting
     return true;
 }
@@ -272,42 +272,42 @@ Intersection(const VECTOR<VECTOR<T,3>,4>& tet,const VECTOR<VECTOR<T,3>,3>& trian
     points[2][0]=tet[2].x;points[2][1]=tet[2].y;points[2][2]=tet[2].z;points[3][0]=tet[3].x;points[3][1]=tet[3].y;points[3][2]=tet[3].z;
     points[4][0]=triangle[0].x;points[4][1]=triangle[0].y;points[4][2]=triangle[0].z;points[5][0]=triangle[1].x;points[5][1]=triangle[1].y;points[5][2]=triangle[1].z;
     points[6][0]=triangle[2].x;points[6][1]=triangle[2].y;points[6][2]=triangle[2].z;
-    for (unsigned int i=0;i<5;i++) for (unsigned int j=i+1;j<6;j++) for (unsigned int k=j+1;k<7;k++)
+    for(unsigned int i=0;i<5;i++) for(unsigned int j=i+1;j<6;j++) for(unsigned int k=j+1;k<7;k++)
         m3p[(1<<i)|(1<<j)|(1<<k)]=
             +points[i][0]*points[j][1]*points[k][2]+points[i][1]*points[j][2]*points[k][0]+points[i][2]*points[j][0]*points[k][1]
             -points[i][0]*points[j][2]*points[k][1]-points[i][1]*points[j][0]*points[k][2]-points[i][2]*points[j][1]*points[k][0];
     // Compute signed volumes for all tetrahedra formed by four input points
-    for (unsigned int i=0;i<4;i++) for (unsigned int j=i+1;j<5;j++) for (unsigned int k=j+1;k<6;k++) for (unsigned int l=k+1;l<7;l++)
+    for(unsigned int i=0;i<4;i++) for(unsigned int j=i+1;j<5;j++) for(unsigned int k=j+1;k<6;k++) for(unsigned int l=k+1;l<7;l++)
         d4p[(1<<i)|(1<<j)|(1<<k)|(1<<l)]=
             -m3p[(1<<j)|(1<<k)|(1<<l)]+m3p[(1<<i)|(1<<k)|(1<<l)]
             -m3p[(1<<i)|(1<<j)|(1<<l)]+m3p[(1<<i)|(1<<j)|(1<<k)];
     // Case 1 : Entire tetrahedron on same half-space of triangle plane
     plus=minus=0;mask=0x70;
-    for (unsigned int i=0;i<4;i++) if (d4p[(1<<i)|mask]>(T)0) plus++; else if (d4p[(1<<i)|mask]<(T)0) minus++;
-    if (plus==0||minus==0) return false;
+    for(unsigned int i=0;i<4;i++) if(d4p[(1<<i)|mask]>(T)0) plus++; else if(d4p[(1<<i)|mask]<(T)0) minus++;
+    if(plus==0||minus==0) return false;
     // Case 2 : Separator plane contains two triangle vertices
-    for (unsigned int i=4;i<7;i++)             // The 3rd triangle vertex
-        for (unsigned int j=0;j<4;j++) {       // The tetrahedron vertex on the plane
+    for(unsigned int i=4;i<7;i++)             // The 3rd triangle vertex
+        for(unsigned int j=0;j<4;j++) {       // The tetrahedron vertex on the plane
             plus=minus=0;
             mask=((1<<j)|0x70)&(~(1<<i));
-            for (unsigned int k=0;k<j;k++)    if (d4p[(1<<k)|mask]>(T)0) plus++;  else if (d4p[(1<<k)|mask]<(T)0) minus++;
-            for (unsigned int k=j+1;k<4;k++) if (d4p[(1<<k)|mask]>(T)0) minus++; else if (d4p[(1<<k)|mask]<(T)0) plus++;
-            switch(i) { case 4: if (d4p[0x10|mask]>(T)0) plus++;  else if (d4p[0x10|mask]<(T)0) minus++; break;
-                        case 5: if (d4p[0x20|mask]>(T)0) minus++; else if (d4p[0x20|mask]<(T)0) plus++; break;
-                        case 6: if (d4p[0x40|mask]>(T)0) plus++;  else if (d4p[0x40|mask]<(T)0) minus++; break; } 
-            if (plus==0||minus==0) return false; }
+            for(unsigned int k=0;k<j;k++)    if(d4p[(1<<k)|mask]>(T)0) plus++;  else if(d4p[(1<<k)|mask]<(T)0) minus++;
+            for(unsigned int k=j+1;k<4;k++) if(d4p[(1<<k)|mask]>(T)0) minus++; else if(d4p[(1<<k)|mask]<(T)0) plus++;
+            switch(i) { case 4: if(d4p[0x10|mask]>(T)0) plus++;  else if(d4p[0x10|mask]<(T)0) minus++; break;
+                        case 5: if(d4p[0x20|mask]>(T)0) minus++; else if(d4p[0x20|mask]<(T)0) plus++; break;
+                        case 6: if(d4p[0x40|mask]>(T)0) plus++;  else if(d4p[0x40|mask]<(T)0) minus++; break; } 
+            if(plus==0||minus==0) return false; }
     // Case 3 : Separator plane contains two tetraherdon vertices
-    for (unsigned int i=0;i<3;i++)             // 1st tetrahedron vertex on plane
-        for (unsigned int j=i+1;j<4;j++)       // 2nd tetrahedron vertex on plane
-            for (unsigned int k=4;k<7;k++) {   // Triangle vertex on plane
+    for(unsigned int i=0;i<3;i++)             // 1st tetrahedron vertex on plane
+        for(unsigned int j=i+1;j<4;j++)       // 2nd tetrahedron vertex on plane
+            for(unsigned int k=4;k<7;k++) {   // Triangle vertex on plane
                 plus=minus=0;
                 mask=(1<<i)|(1<<j)|(1<<k);
-                for (unsigned int l=0;l<i;l++)    if (d4p[(1<<l)|mask]>(T)0) plus++;  else if (d4p[(1<<l)|mask]<(T)0) minus++;
-                for (unsigned int l=i+1;l<j;l++)  if (d4p[(1<<l)|mask]>(T)0) minus++; else if (d4p[(1<<l)|mask]<(T)0) plus++;
-                for (unsigned int l=j+1;l<4;l++) if (d4p[(1<<l)|mask]>(T)0) plus++;  else if (d4p[(1<<l)|mask]<(T)0) minus++;
-                for (unsigned int l=4;l<k;l++)    if (d4p[(1<<l)|mask]>(T)0) minus++; else if (d4p[(1<<l)|mask]<(T)0) plus++;
-                for (unsigned int l=k+1;l<7;l++) if (d4p[(1<<l)|mask]>(T)0) plus++;  else if (d4p[(1<<l)|mask]<(T)0) minus++;
-                if (plus==0||minus==0) return false; }
+                for(unsigned int l=0;l<i;l++)    if(d4p[(1<<l)|mask]>(T)0) plus++;  else if(d4p[(1<<l)|mask]<(T)0) minus++;
+                for(unsigned int l=i+1;l<j;l++)  if(d4p[(1<<l)|mask]>(T)0) minus++; else if(d4p[(1<<l)|mask]<(T)0) plus++;
+                for(unsigned int l=j+1;l<4;l++) if(d4p[(1<<l)|mask]>(T)0) plus++;  else if(d4p[(1<<l)|mask]<(T)0) minus++;
+                for(unsigned int l=4;l<k;l++)    if(d4p[(1<<l)|mask]>(T)0) minus++; else if(d4p[(1<<l)|mask]<(T)0) plus++;
+                for(unsigned int l=k+1;l<7;l++) if(d4p[(1<<l)|mask]>(T)0) plus++;  else if(d4p[(1<<l)|mask]<(T)0) minus++;
+                if(plus==0||minus==0) return false; }
     // No separator plane found, objects are intersecting
     return true;
 }
@@ -318,8 +318,8 @@ template <class T> bool SIMPLEX_INTERACTIONS<T>::
 Intersection(const VECTOR<VECTOR<T,3>,4>& tetrahedron_1,const VECTOR<VECTOR<T,3>,4>& tetrahedron_2)
 {
     TETRAHEDRON<T> tet(tetrahedron_1);
-    if (tet.Inside(tetrahedron_2[0])||tet.Inside(tetrahedron_2[1])||tet.Inside(tetrahedron_2[2])||tet.Inside(tetrahedron_2[3])) return true;
-    if (Intersection(tetrahedron_2,tetrahedron_1.Remove_Index(3)) || Intersection(tetrahedron_2,tetrahedron_1.Remove_Index(0)) 
+    if(tet.Inside(tetrahedron_2[0])||tet.Inside(tetrahedron_2[1])||tet.Inside(tetrahedron_2[2])||tet.Inside(tetrahedron_2[3])) return true;
+    if(Intersection(tetrahedron_2,tetrahedron_1.Remove_Index(3)) || Intersection(tetrahedron_2,tetrahedron_1.Remove_Index(0)) 
         || Intersection(tetrahedron_2,VECTOR<VECTOR<T,3>,3>(tetrahedron_1[2],tetrahedron_1[3],tetrahedron_1[0])) 
         || Intersection(tetrahedron_2,VECTOR<VECTOR<T,3>,3>(tetrahedron_1[3],tetrahedron_1[0],tetrahedron_1[1]))) return true;
     return false;

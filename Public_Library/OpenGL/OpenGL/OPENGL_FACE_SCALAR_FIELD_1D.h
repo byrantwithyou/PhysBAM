@@ -14,7 +14,7 @@
 namespace PhysBAM{
 
 template<class T,class T2=T>
-class OPENGL_FACE_SCALAR_FIELD_1D : public OPENGL_OBJECT
+class OPENGL_FACE_SCALAR_FIELD_1D:public OPENGL_OBJECT
 {
     typedef VECTOR<T,1> TV;
 public:

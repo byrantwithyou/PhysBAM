@@ -24,7 +24,7 @@
 // opengl_world.Bind('d', foo->Toggle_Draw_CB());
 //
 #define DEFINE_CALLBACK_CREATOR(classname, func) \
-    class classname##func : public PhysBAM::OPENGL_CALLBACK { \
+    class classname##func:public PhysBAM::OPENGL_CALLBACK { \
         public: \
             classname##func(classname *obj, const std::string &help_string) : obj(obj), help_string(help_string) {} \
             void operator() () { obj->func(); } \

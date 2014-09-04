@@ -18,7 +18,7 @@ namespace PhysBAM
 {
 
 template<class T>
-class OPENGL_GRID_1D : public OPENGL_OBJECT
+class OPENGL_GRID_1D:public OPENGL_OBJECT
 {
 public:
     typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
@@ -45,13 +45,13 @@ public:
 };
 
 template<class T>
-class OPENGL_SELECTION_GRID_CELL_1D : public OPENGL_SELECTION
+class OPENGL_SELECTION_GRID_CELL_1D:public OPENGL_SELECTION
 {
 private:
     typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
 public:
     TV_INT index;
-    OPENGL_SELECTION_GRID_CELL_1D(OPENGL_OBJECT *object,const TV_INT& index=TV_INT()) 
+    OPENGL_SELECTION_GRID_CELL_1D(OPENGL_OBJECT* object,const TV_INT& index=TV_INT()) 
         :OPENGL_SELECTION(OPENGL_SELECTION::GRID_CELL_1D,object),index(index)
     {}
 

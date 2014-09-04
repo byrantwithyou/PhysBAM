@@ -65,7 +65,7 @@ public:
         TV_INT padded_cells;for(int i=0;i<TV::m;i++)padded_cells(i)=2*cdi->padding;padded_cells+=grid.numbers_of_cells;
         TV_INT a;
         
-        a(TV::m-1)=1;for (int i=TV::m-2;i>=0;i--)a(i)=a(i+1)*padded_cells(i+1);
+        a(TV::m-1)=1;for(int i=TV::m-2;i>=0;i--)a(i)=a(i+1)*padded_cells(i+1);
         
         for(int k=0;k<j;k++){
             int cell_temp=k;

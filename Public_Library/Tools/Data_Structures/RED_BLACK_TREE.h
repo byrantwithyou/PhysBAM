@@ -179,7 +179,7 @@ public:
         void Right() {node=static_cast<NODE*>(node->R);}
     };
 
-    struct PREORDER_ITERATOR : public ITERATOR
+    struct PREORDER_ITERATOR:public ITERATOR
     {
         using ITERATOR::node;
         PREORDER_ITERATOR(ITERATOR it): ITERATOR(it) {}
@@ -189,7 +189,7 @@ public:
         void Prev() {node=static_cast<NODE*>(node->Preorder_Prev());}
     };
 
-    struct POSTORDER_ITERATOR : public ITERATOR
+    struct POSTORDER_ITERATOR:public ITERATOR
     {
         using ITERATOR::node;
         POSTORDER_ITERATOR(ITERATOR it): ITERATOR(it) {}
@@ -199,7 +199,7 @@ public:
         void Prev() {node=static_cast<NODE*>(node->Postorder_Prev());}
     };
 
-    struct INORDER_ITERATOR : public ITERATOR
+    struct INORDER_ITERATOR:public ITERATOR
     {
         using ITERATOR::node;
         INORDER_ITERATOR(ITERATOR it): ITERATOR(it) {}

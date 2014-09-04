@@ -77,7 +77,7 @@ public:
     void Get_Object_Space_Tangent_And_Bitangent(const VECTOR<T,3>& object_space_point,const VECTOR<T,3>& object_space_normal,const int aggregate,VECTOR<T,3>& object_tangent,VECTOR<T,3>& object_bitangent) const PHYSBAM_OVERRIDE
     {T x=object_space_point.x-sphere.center.x;T y=object_space_point.y-sphere.center.y;T z=object_space_point.z-sphere.center.z;
     T theta=asin(z/sphere.radius);T phi=asin(y/sqrt(x*x+y*y));
-    if ((T)cos(phi)*(T)sqrt(sqr(x)+sqr(y))-x > (T)1e-3) phi=(T)pi-phi;
+    if((T)cos(phi)*(T)sqrt(sqr(x)+sqr(y))-x > (T)1e-3) phi=(T)pi-phi;
     object_tangent.Set(-sphere.radius*sin(phi)*cos(theta),sphere.radius*cos(theta)*cos(phi),0);object_tangent.Normalize();
     object_bitangent=VECTOR<T,3>::Cross_Product(object_tangent,object_space_normal);object_bitangent.Normalize();}
 

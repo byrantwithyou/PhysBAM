@@ -195,7 +195,7 @@ Clear_Selection()
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class T_ARRAY> OPENGL_SELECTION *OPENGL_POINTS_2D<T,T_ARRAY>::
+template<class T,class T_ARRAY> OPENGL_SELECTION* OPENGL_POINTS_2D<T,T_ARRAY>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     if(buffer_size==1){
@@ -212,7 +212,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
-Highlight_Selection(OPENGL_SELECTION *selection)
+Highlight_Selection(OPENGL_SELECTION* selection)
 {
     if(selection->type!=OPENGL_SELECTION::POINTS_2D) return;
     OPENGL_SELECTION_POINTS_2D<T> *real_selection=(OPENGL_SELECTION_POINTS_2D<T>*)selection;
@@ -243,7 +243,7 @@ Bounding_Box() const
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const
 {
     if(selection->type!=OPENGL_SELECTION::POINTS_2D) return;
     OPENGL_SELECTION_POINTS_2D<T>* selection_points=dynamic_cast<OPENGL_SELECTION_POINTS_2D<T>*>(selection);

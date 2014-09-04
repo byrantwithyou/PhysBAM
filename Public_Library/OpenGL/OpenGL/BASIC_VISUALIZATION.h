@@ -28,9 +28,9 @@ public:
              BASIC_VISUALIZATION();
     virtual ~BASIC_VISUALIZATION();
 
-    void    Initialize(PARSE_ARGS &parse_args);
-    void    Run();
-    void    Initialize_And_Run(PARSE_ARGS &parse_args);
+    void Initialize(PARSE_ARGS &parse_args);
+    void Run();
+    void Initialize_And_Run(PARSE_ARGS &parse_args);
 
     virtual void Process_Hits(GLint hits, GLuint buffer[]);
 
@@ -46,10 +46,10 @@ protected:
     virtual void Render_Offscreen() {}
     virtual void Selection_Callback();
 
-    void Add_Component(OPENGL_COMPONENT *component, const std::string &name,const char toggle_draw_key,const int flags);
+    void Add_Component(OPENGL_COMPONENT* component,const std::string &name,const char toggle_draw_key,const int flags);
     const OPENGL_COMPONENT* Find_Component(const std::string& name) const;
     OPENGL_COMPONENT* Find_Component(const std::string& name);
-    void Set_Current_Selection(OPENGL_SELECTION *selection);
+    void Set_Current_Selection(OPENGL_SELECTION* selection);
     int &Selection_Priority(OPENGL_SELECTION::TYPE selection_type);
 
 private:
@@ -64,9 +64,9 @@ private:
     void Toggle_Axes();
     void Draw_All_Objects();
 
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION, Reset_View);
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION, Reset_Up);
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION, Toggle_Axes);
+    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Reset_View);
+    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Reset_Up);
+    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Toggle_Axes);
 
 public:
     ARRAY<OPENGL_COMPONENT*> component_list;
@@ -74,22 +74,22 @@ public:
     HASHTABLE<std::string,OPENGL_COMPONENT*> component_by_name;
     OPENGL_AXES<float> * opengl_axes;
 
-    OPENGL_WORLD            opengl_world;
-    int                     width, height;
-    bool                    set_window_position;
-    VECTOR<int,2>          window_position;
-    float                   fovy;
-    std::string             opengl_window_title;
-    bool                    add_axes;
-    bool                    render_offscreen;
-    std::string             camera_script_filename;
-    std::string             initialization_key_sequence;
+    OPENGL_WORLD opengl_world;
+    int width,height;
+    bool set_window_position;
+    VECTOR<int,2> window_position;
+    float fovy;
+    std::string opengl_window_title;
+    bool add_axes;
+    bool render_offscreen;
+    std::string camera_script_filename;
+    std::string initialization_key_sequence;
     bool opt_left_handed,opt_smooth;
 
     // Selection stuff
-    bool                                selection_enabled;
-    OPENGL_SELECTION                    *current_selection;
-    ARRAY<int>                     selection_priority;     // higher priority takes precedence; priority=0 is unselectable
+    bool selection_enabled;
+    OPENGL_SELECTION* current_selection;
+    ARRAY<int> selection_priority;     // higher priority takes precedence; priority=0 is unselectable
 };
 
 }

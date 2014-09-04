@@ -23,12 +23,14 @@ Display(const int in_color) const
 template<class T> void OPENGL_BOX_HIERARCHY_3D<T>::
 Display_Helper(const int cell,const int height,const int in_color) const
 {
-    if(height>=min_height&&height<=max_height){
+    if(height>=min_height && height<=max_height){
         OPENGL_BOX_3D<T> opengl_box(hierarchy->box_hierarchy(cell),color);
         opengl_box.Display(in_color);}
     if(!hierarchy->Leaf(cell)){
-        int left_cell,right_cell;hierarchy->children(cell-hierarchy->leaves).Get(left_cell,right_cell);
-        Display_Helper(left_cell,height+1,in_color);Display_Helper(right_cell,height+1,in_color);}
+        int left_cell,right_cell;
+        hierarchy->children(cell-hierarchy->leaves).Get(left_cell,right_cell);
+        Display_Helper(left_cell,height+1,in_color);
+        Display_Helper(right_cell,height+1,in_color);}
 }
 //#####################################################################
 // Function Bounding_Box
@@ -45,7 +47,8 @@ Bounding_Box() const
 template<class T> void OPENGL_BOX_HIERARCHY_3D<T>::
 Decrement_Height()
 {
-    min_height--;max_height--;
+    min_height--;
+    max_height--;
 }
 //#####################################################################
 // Function Increment_Height
@@ -53,7 +56,8 @@ Decrement_Height()
 template<class T> void OPENGL_BOX_HIERARCHY_3D<T>::
 Increment_Height()
 {
-    min_height++;max_height++;
+    min_height++;
+    max_height++;
 }
 //#####################################################################
 namespace PhysBAM{

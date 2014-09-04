@@ -429,7 +429,7 @@ Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const
     ARRAY<int> row_entries(size),&next_entry=row_entries;
 
     for(int i=0;i<TV::m;i++)
-        for (int k=0;k<colors;k++){
+        for(int k=0;k<colors;k++){
             const SPARSE_MATRIX_FLAT_MXN<T>& mat=iss->matrix_pu(i)(k);
             int first_row=first_row_p(k);
             int first_col=first_row_u(i)(k);

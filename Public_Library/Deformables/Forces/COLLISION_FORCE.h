@@ -11,7 +11,7 @@
 namespace PhysBAM{
 
 template<class TV>
-class COLLISION_FORCE: public DEFORMABLES_FORCES<TV>
+class COLLISION_FORCE:public DEFORMABLES_FORCES<TV>
 {
     typedef typename TV::SCALAR T;
 public:

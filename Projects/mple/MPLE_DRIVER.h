@@ -61,7 +61,7 @@ int omp_get_num_threads_helper()
 namespace PhysBAM{
 
 template<class TV,int w>
-class MPLE_DRIVER: public NONCOPYABLE
+class MPLE_DRIVER:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;

@@ -21,7 +21,7 @@
 
 namespace PhysBAM{
 
-class WAVE : public EXAMPLE
+class WAVE:public EXAMPLE
 {
 public:
     WAVE() {

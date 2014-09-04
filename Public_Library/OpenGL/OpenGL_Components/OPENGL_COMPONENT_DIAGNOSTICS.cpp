@@ -58,7 +58,7 @@ Reinitialize()
             lines.Remove_All();
             valid=false;
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(filename, frame);
-            if (FILE_UTILITIES::File_Exists(tmp_filename)){
+            if(FILE_UTILITIES::File_Exists(tmp_filename)){
                 std::istream* input=FILE_UTILITIES::Safe_Open_Input(tmp_filename,false);
                 std::string line;while(std::getline(*input,line)) lines.Append(line);
                 delete input;frame_loaded=frame;valid=true;}}}

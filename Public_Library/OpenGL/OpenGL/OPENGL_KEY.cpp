@@ -19,8 +19,8 @@ std::string OPENGL_KEY::Name() const
     if(modifiers&ALT)  name+="Alt-";
     if(modifiers&CTRL) name+="^";
     if(key>=256) name+=std::string(special_names[(int)key-256]);
-    else if (isprint(key)) name.append(1,(char)key);
-    else if (key=='\t') name+="Tab";
+    else if(isprint(key)) name.append(1,(char)key);
+    else if(key=='\t') name+="Tab";
     else name+="?";
     return name;
 }

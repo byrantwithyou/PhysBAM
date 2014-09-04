@@ -73,7 +73,7 @@ protected:
 };
 
 template<class TV>
-class FLIP_COLLIDABLE_OBJECT_STATIC: public FLIP_COLLIDABLE_OBJECT<TV>
+class FLIP_COLLIDABLE_OBJECT_STATIC:public FLIP_COLLIDABLE_OBJECT<TV>
 {
     typedef FLIP_COLLIDABLE_OBJECT<TV> BASE;
     typedef typename TV::SCALAR T;

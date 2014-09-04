@@ -234,7 +234,6 @@ Set_Object_Color(int i,const OPENGL_COLOR &color_input)
 {
     if(!opengl_point_simplices(i)) return;
     opengl_point_simplices(i)->color=color_input;
-    opengl_point_simplices(i)->color_gray=color_input.Grayscale();
 }
 //#####################################################################
 // Function Get_Draw_Object

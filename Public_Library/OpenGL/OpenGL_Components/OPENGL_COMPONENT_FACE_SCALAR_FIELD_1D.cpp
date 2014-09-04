@@ -58,7 +58,7 @@ Set_Draw(bool draw_input)
 template<class T,class T2,class RW> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T2,RW>::
 Display(const int in_color) const
 {
-    if (valid && draw) opengl_face_scalar_field.Display(in_color);
+    if(valid && draw) opengl_face_scalar_field.Display(in_color);
 }
 //#####################################################################
 // Function Print_Selection_Info
@@ -76,7 +76,7 @@ Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const
 template<class T,class T2,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T2,RW>::
 Bounding_Box() const
 {
-    if (valid && draw) return opengl_face_scalar_field.Bounding_Box();
+    if(valid && draw) return opengl_face_scalar_field.Bounding_Box();
     else return RANGE<VECTOR<float,3> >::Centered_Box();
 }
 //#####################################################################

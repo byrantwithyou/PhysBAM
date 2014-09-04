@@ -64,7 +64,7 @@ public:
     if(a2_sign==ADAPTIVE_SIGN_UNKNOWN)return ADAPTIVE_SIGN_UNKNOWN;
     int sign=a1_sign+a2_sign;
     if(sign>0) return ADAPTIVE_SIGN_POSITIVE;
-    else if (sign<0) return ADAPTIVE_SIGN_NEGATIVE;
+    else if(sign<0) return ADAPTIVE_SIGN_NEGATIVE;
     else if(a1_sign==0) return ADAPTIVE_SIGN_ZERO;
     else return ADAPTIVE_SIGN_UNKNOWN;}
 //#####################################################################

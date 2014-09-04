@@ -15,7 +15,9 @@
 #include <OpenGL/OpenGL/OPENGL_TEXTURED_RECT.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_2D.h>
 namespace PhysBAM{
-
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
 OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,DRAW_MODE draw_mode_input)
     : grid(grid_input),values(values_input),active_cells(0),draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),scale_range(false)
@@ -24,7 +26,9 @@ OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_inp
     Initialize_Color_Maps(color_map_input);
     Set_Draw_Mode(draw_mode_input);
 }
-
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
 OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,ARRAY<bool,VECTOR<int,2> >* active_cells_input,DRAW_MODE draw_mode_input)
     : grid(grid_input),values(values_input),active_cells(active_cells_input),draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),scale_range(false)
@@ -33,7 +37,9 @@ OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_inp
     Initialize_Color_Maps(color_map_input);
     Set_Draw_Mode(draw_mode_input);
 }
-
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
 ~OPENGL_SCALAR_FIELD_2D()
 {
@@ -44,7 +50,9 @@ template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
     color_maps.Delete_Pointers_And_Clean_Memory();
     contour_curves.Delete_Pointers_And_Clean_Memory();
 }
-
+//#####################################################################
+// Function Set_Uniform_Contour_Values
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Set_Uniform_Contour_Values(const T2 min_value,const T2 max_value,const T2 increment)
 {
@@ -52,31 +60,41 @@ Set_Uniform_Contour_Values(const T2 min_value,const T2 max_value,const T2 increm
     for(T2 value=min_value;value<max_value;value+=increment) contour_values.Append(value);
     if(draw_mode==DRAW_CONTOURS) Update_Contour_Curves();
 }
-
+//#####################################################################
+// Function Initialize_Color_Maps
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<float,bool>::
 Initialize_Color_Maps(OPENGL_COLOR_MAP<bool>* color_map_input)
 {
     color_maps.Append(color_map_input);
 }
-
+//#####################################################################
+// Function Initialize_Color_Maps
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<double,bool>::
 Initialize_Color_Maps(OPENGL_COLOR_MAP<bool>* color_map_input)
 {
     color_maps.Append(color_map_input);
 }
-
+//#####################################################################
+// Function Initialize_Color_Maps
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<float,int>::
 Initialize_Color_Maps(OPENGL_COLOR_MAP<int>* color_map_input)
 {
     color_maps.Append(color_map_input);
 }
-
+//#####################################################################
+// Function Initialize_Color_Maps
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<double,int>::
 Initialize_Color_Maps(OPENGL_COLOR_MAP<int>* color_map_input)
 {
     color_maps.Append(color_map_input);
 }
-
+//#####################################################################
+// Function Initialize_Color_Maps
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Initialize_Color_Maps(OPENGL_COLOR_MAP<T2>* color_map_input)
 {
@@ -84,23 +102,33 @@ Initialize_Color_Maps(OPENGL_COLOR_MAP<T2>* color_map_input)
     color_maps.Append(OPENGL_COLOR_RAMP<T2>::Matlab_Jet(0,1));
     color_maps.Append(OPENGL_COLOR_RAMP<T2>::Matlab_Hot(0,1));
 }
-
+//#####################################################################
+// Function Set_Scale_Range
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<float,bool>::
 Set_Scale_Range(const bool range_min,const bool range_max)
 {PHYSBAM_FATAL_ERROR();}
-
+//#####################################################################
+// Function Set_Scale_Range
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<double,bool>::
 Set_Scale_Range(const bool range_min,const bool range_max)
 {PHYSBAM_FATAL_ERROR();}
-
+//#####################################################################
+// Function Set_Scale_Range
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<float,int>::
 Set_Scale_Range(const int range_min,const int range_max)
 {PHYSBAM_FATAL_ERROR();}
-
+//#####################################################################
+// Function Set_Scale_Range
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<double,int>::
 Set_Scale_Range(const int range_min,const int range_max)
 {PHYSBAM_FATAL_ERROR();}
-
+//#####################################################################
+// Function Set_Scale_Range
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Set_Scale_Range(const T2 range_min,const T2 range_max)
 {
@@ -109,33 +137,42 @@ Set_Scale_Range(const T2 range_min,const T2 range_max)
     T2 range_length=(range_max-range_min);
     scale_range_dx=range_length>1e-10?(T2)1/range_length:(T2)0;
 }
-
+//#####################################################################
+// Function Reset_Scale_Range
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Reset_Scale_Range()
 {
     scale_range=false;
 }
-
+//#####################################################################
+// Function Pre_Map_Value
+//#####################################################################
 template<> bool OPENGL_SCALAR_FIELD_2D<float,bool>::
 Pre_Map_Value(const bool value) const
 {
     return value;
 }
-
+//#####################################################################
+// Function Pre_Map_Value
+//#####################################################################
 template<> bool OPENGL_SCALAR_FIELD_2D<double,bool>::
 Pre_Map_Value(const bool value) const
 {
     return value;
 }
-
-
+//#####################################################################
+// Function Pre_Map_Value
+//#####################################################################
 template<class T,class T2> T2 OPENGL_SCALAR_FIELD_2D<T,T2>::
 Pre_Map_Value(const T2 value) const
 {
     if(!scale_range) return value;
     else return (value-scale_range_min)*scale_range_dx; 
 }
-
+//#####################################################################
+// Function Display
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Display(const int in_color) const
 {
@@ -153,7 +190,9 @@ Display(const int in_color) const
         for(int i=0;i<contour_curves.m;i++) contour_curves(i)->Display();
     }
 }
-
+//#####################################################################
+// Function Display_2D
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Display_2D() const
 {
@@ -183,14 +222,18 @@ Display_2D() const
 #endif
     glPopAttrib();
 }
-
-template<class T,class T2> RANGE<VECTOR<float,3> > OPENGL_SCALAR_FIELD_2D<T,T2>::
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
+template<class T,class T2> RANGE<VECTOR<T,3> > OPENGL_SCALAR_FIELD_2D<T,T2>::
 Bounding_Box() const
 {
     // May not be the exact bounds, but close enough...
     return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.Append(0)),VECTOR<float,3>(grid.domain.max_corner.Append(0))));
 }
-
+//#####################################################################
+// Function Set_Draw_Mode
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Set_Draw_Mode(DRAW_MODE draw_mode_input)
 {
@@ -211,7 +254,9 @@ Set_Draw_Mode(DRAW_MODE draw_mode_input)
 
     Update();
 }
-
+//#####################################################################
+// Function Update
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Update()
 {
@@ -221,16 +266,28 @@ Update()
     else if(draw_mode==DRAW_POINTS) Update_Points(start_index,end_index);
     else Update_Contour_Curves();
 }
-
-
-template<class T2,class T> static void Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>* selection,const GRID<VECTOR<T,2> >& grid,ARRAY<T2,VECTOR<int,2> >& values)
+//#####################################################################
+// Function Print_Selection_Info_Helper
+//#####################################################################
+template<class T2,class T> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>* selection,const GRID<VECTOR<T,2> >& grid,ARRAY<T2,VECTOR<int,2> >& values)
 {
     output_stream<<" @ particle = "<<LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,2>,T2>().Clamped_To_Array(grid,values,selection->location);
 }
+//#####################################################################
+// Function Print_Selection_Info_Helper
+//#####################################################################
 // no interpolation for bool's and int's
-template<class T> static void Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>* selection,const GRID<VECTOR<T,2> >&,ARRAY<bool,VECTOR<int,2> >& values){}
-template<class T> static void Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>* selection,const GRID<VECTOR<T,2> >&,ARRAY<int,VECTOR<int,2> >& values){}
-
+template<class T> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>* selection,const GRID<VECTOR<T,2> >&,ARRAY<bool,VECTOR<int,2> >& values){}
+//#####################################################################
+// Function Print_Selection_Info_Helper
+//#####################################################################
+template<class T> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>* selection,const GRID<VECTOR<T,2> >&,ARRAY<int,VECTOR<int,2> >& values){}
+//#####################################################################
+// Function Print_Selection_Info
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const
 {
@@ -245,7 +302,9 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selec
         Print_Selection_Info_Helper(output_stream,selection,grid,values);}
     output_stream<<std::endl;
 }
-
+//#####################################################################
+// Function Update_Texture
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Update_Texture(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
 {
@@ -296,7 +355,9 @@ Update_Texture(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
 
     delete[] bitmap;
 }
-
+//#####################################################################
+// Function Update_Points
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
 {
@@ -312,7 +373,9 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
                 index++;}
     opengl_points->points.Resize(index);
 }
-
+//#####################################################################
+// Function Update_Contour_Curves
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Update_Contour_Curves()
 {
@@ -320,7 +383,9 @@ Update_Contour_Curves()
     PHYSBAM_WARNING(std::string("MARCHING_CUBES is not supported for scalar fields of type ")+typeid(T).name());
     contour_curves.Delete_Pointers_And_Clean_Memory();
 }
-
+//#####################################################################
+// Function Update_Contour_Curves
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<float,float>::
 Update_Contour_Curves()
 {
@@ -335,7 +400,9 @@ Update_Contour_Curves()
             contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<float>(sc,color_map->Lookup(Pre_Map_Value(contour_values(i))));}}
     else contour_curves.Delete_Pointers_And_Clean_Memory();
 }
-
+//#####################################################################
+// Function Update_Contour_Curves
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<double,double>::
 Update_Contour_Curves()
 {
@@ -366,7 +433,9 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
         if(values(i,j)) opengl_points->points(index++)=grid.X(TV_INT(i,j));
     opengl_points->points.Resize(index);
 }
-
+//#####################################################################
+// Function Update_Points
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<double,bool>::
 Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
 {
@@ -379,43 +448,54 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
         if(values(i,j)) opengl_points->points(index++)=grid.X(TV_INT(i,j));
     opengl_points->points.Resize(index);
 }
-
+//#####################################################################
+// Function Set_Uniform_Contour_Values
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<float,bool>::
 Set_Uniform_Contour_Values(const bool min_value,const bool max_value,const bool increment)
 {}
-
+//#####################################################################
+// Function Set_Uniform_Contour_Values
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_2D<double,bool>::
 Set_Uniform_Contour_Values(const bool min_value,const bool max_value,const bool increment)
 {}
-
+//#####################################################################
+// Function Toggle_Draw_Mode
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Toggle_Draw_Mode()
 {
     DRAW_MODE new_draw_mode=(DRAW_MODE)(((int)draw_mode+1)%3);
     Set_Draw_Mode(new_draw_mode);
 }
-
+//#####################################################################
+// Function Toggle_Smooth_Texture
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Toggle_Smooth_Texture()
 {
     if(draw_mode==DRAW_TEXTURE && opengl_textured_rect && opengl_textured_rect->texture)
         opengl_textured_rect->texture->Toggle_Smooth_Shading();
 }
-
+//#####################################################################
+// Function Toggle_Draw_Ghost_Values
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Toggle_Draw_Ghost_Values()
 {
     draw_ghost_values=!draw_ghost_values;
     Update();
 }
-
+//#####################################################################
+// Function Toggle_Color_Map
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Toggle_Color_Map()
 {
     current_color_map=(current_color_map+1)%color_maps.m;
     Update();
 }
-
 template class OPENGL_SCALAR_FIELD_2D<float,int>;
 template class OPENGL_SCALAR_FIELD_2D<float,bool>;
 template class OPENGL_SCALAR_FIELD_2D<float,float>;

@@ -41,7 +41,7 @@ namespace
         (void) XSetErrorHandler( oldHandler );
 
         /* Return pbuffer (may be None) */
-        if (!XErrorFlag && pBuffer!=None) return pBuffer;
+        if(!XErrorFlag && pBuffer!=None) return pBuffer;
         else return None;
     }
 
@@ -186,39 +186,39 @@ namespace
         int i;
         int attempt;
 
-        for (attempt=0; attempt<NUM_FB_CONFIGS; attempt++) {
+        for(attempt=0; attempt<NUM_FB_CONFIGS; attempt++) {
 
             /* Get list of possible frame buffer configurations */
             fbConfigs = glXChooseFBConfig(dpy, screen, fbAttribs[attempt], &nConfigs);
-            if (nConfigs==0 || !fbConfigs) {
+            if(nConfigs==0 || !fbConfigs) {
                 LOG::cout<<"Error: glxChooseFBConfig failed"<<std::endl;
                 XCloseDisplay(dpy);
                 return 0;
             }
 
-            if (verbose) 
-                for (i=0;i<nConfigs;i++) {
+            if(verbose) 
+                for(i=0;i<nConfigs;i++) {
                     LOG::cout<<"Config "<<i<<std::endl;
                     PrintFBConfigInfo(dpy, fbConfigs[i], width, height, 0);
                 }
 
             /* Create the pbuffer using first fbConfig in the list that works. */
-            for (i=0;i<nConfigs;i++) {
+            for(i=0;i<nConfigs;i++) {
                 int alphaSize;
                 glXGetFBConfigAttrib(dpy, fbConfigs[i], GLX_ALPHA_SIZE, &alphaSize);
                 if(alphaSize<8) continue; // need alpha buffer
                 pBuffer = CreatePbuffer(dpy, fbConfigs[i], pbAttribs);
-                if (pBuffer) {
+                if(pBuffer) {
                     fbconfig = fbConfigs[i];
-                    if (verbose) LOG::cout<<"Picked config "<<i<<std::endl;
+                    if(verbose) LOG::cout<<"Picked config "<<i<<std::endl;
                     break;
                 }
             }
 
-            if (pBuffer!=None) break;
+            if(pBuffer!=None) break;
         }
 
-        if (pBuffer) LOG::cout<<"Using: "<<fbString[attempt]<<std::endl;
+        if(pBuffer) LOG::cout<<"Using: "<<fbString[attempt]<<std::endl;
 
         XFree(fbConfigs);
 
@@ -238,14 +238,14 @@ OPENGL_PBUFFER::~OPENGL_PBUFFER()
 bool OPENGL_PBUFFER::
 Create(int width, int height)
 {
-    if (pbuffer) {
+    if(pbuffer) {
         LOG::cerr << "Destroying old pbuffer before creating new one" << std::endl;
         Destroy();
     }
 
     /* Open the X display */
     display = XOpenDisplay(0);
-    if (!display) { 
+    if(!display) { 
         LOG::cout<<"Error: couldn't open default X display."<<std::endl; 
         return false; 
     }
@@ -256,7 +256,7 @@ Create(int width, int height)
     /* Test that pbuffers are available */
     char *extensions;
     extensions = (char *)glXQueryServerString(display, screen, GLX_EXTENSIONS);
-    if (!strstr(extensions,"GLX_SGIX_fbconfig") || !strstr(extensions,"GLX_SGIX_pbuffer")) {
+    if(!strstr(extensions,"GLX_SGIX_fbconfig") || !strstr(extensions,"GLX_SGIX_pbuffer")) {
         LOG::cout<<"Error: pbuffers not available on this screen"<<std::endl;
         XCloseDisplay(display);
         return false;
@@ -264,7 +264,7 @@ Create(int width, int height)
 
     /* Create Pbuffer */
     pbuffer = MakePbuffer(display, screen, width, height, verbose, fbconfig);
-    if (pbuffer == None) {
+    if(pbuffer == None) {
         LOG::cout<<"Error: couldn't create pbuffer"<<std::endl;
         XCloseDisplay(display);
         return false;
@@ -272,7 +272,7 @@ Create(int width, int height)
 
     /* Get corresponding XVisualInfo */
     XVisualInfo *vis_info = glXGetVisualFromFBConfig(display, fbconfig);
-    if (!vis_info) {
+    if(!vis_info) {
         LOG::cout<<"Error: can't get XVisualInfo from FBconfig"<<std::endl;
         XCloseDisplay(display);
         return false;
@@ -280,10 +280,10 @@ Create(int width, int height)
 
     /* Create GLX context */
     GLXContext glx_context = glXCreateContext(display, vis_info, 0, True);
-    if (!glx_context) {
+    if(!glx_context) {
         /* try indirect */
         glx_context = glXCreateContext(display, vis_info, 0, False);
-        if (!glx_context) {
+        if(!glx_context) {
             LOG::cout<<"Error: Couldn't create GLXContext"<<std::endl;
             XFree(vis_info);
             XCloseDisplay(display);
@@ -295,7 +295,7 @@ Create(int width, int height)
     }
 
     /* Bind context to pbuffer */
-    if (!glXMakeCurrent(display, pbuffer, glx_context)) {
+    if(!glXMakeCurrent(display, pbuffer, glx_context)) {
         LOG::cout<<"Error: glXMakeCurrent failed"<<std::endl;
         XFree(vis_info);
         XCloseDisplay(display);

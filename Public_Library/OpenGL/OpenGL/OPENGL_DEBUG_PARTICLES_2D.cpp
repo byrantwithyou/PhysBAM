@@ -171,7 +171,7 @@ Clear_Selection()
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION *OPENGL_DEBUG_PARTICLES_2D<T>::
+template<class T> OPENGL_SELECTION* OPENGL_DEBUG_PARTICLES_2D<T>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     LOG::cout<<"Get_Selection "<<buffer_size<<std::endl;
@@ -185,7 +185,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T> void OPENGL_DEBUG_PARTICLES_2D<T>::
-Highlight_Selection(OPENGL_SELECTION *selection)
+Highlight_Selection(OPENGL_SELECTION* selection)
 {
     if(selection->type!=OPENGL_SELECTION::DEBUG_PARTICLES_2D) return;
     OPENGL_SELECTION_DEBUG_PARTICLES_2D<T> *real_selection=(OPENGL_SELECTION_DEBUG_PARTICLES_2D<T>*)selection;
@@ -212,7 +212,7 @@ Bounding_Box() const
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_DEBUG_PARTICLES_2D<T>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const
 {
     if(selection->type!=OPENGL_SELECTION::DEBUG_PARTICLES_2D) return;
     output_stream<<"Particle "<<dynamic_cast<OPENGL_SELECTION_DEBUG_PARTICLES_2D<T>&>(*selection).index<<std::endl;

@@ -25,9 +25,9 @@ template<class T> bool Intersects(RAY<VECTOR<T,2> >& ray,const SEGMENT_2D<T>& se
     if((ray.semi_infinite && abs_cross_product>0) || (!ray.semi_infinite && ray.t_max*abs_cross_product>thickness_over_two)){
         T cross_recip=((T)1)/cross_product;
         T ray_t=cross_recip*VECTOR<T,2>::Cross_Product(from_start_to_start,segment_direction).x;
-        if (ray_t<0||(ray_t>ray.t_max&&!ray.semi_infinite))return false;
+        if(ray_t<0||(ray_t>ray.t_max&&!ray.semi_infinite))return false;
         T segment_t=cross_recip*VECTOR<T,2>::Cross_Product(from_start_to_start,ray.direction).x;
-        if (segment_t<-thickness_over_two||segment_t>segment_length+thickness_over_two)return false;
+        if(segment_t<-thickness_over_two||segment_t>segment_length+thickness_over_two)return false;
         ray.t_max=ray_t;ray.semi_infinite=false;return true;}
     return false;
 }
@@ -39,11 +39,11 @@ template<class T> bool Fuzzy_Intersects(RAY<VECTOR<T,2> >& ray,const SEGMENT_2D<
     // The order of these checks is important -- in particular we want to check 
     // intersection with lengthened segment before we try the endpoint in thickened box.
     ORIENTED_BOX<VECTOR<T,2> > thickened_oriented_box=segment.Thickened_Oriented_Box(thickness_over_two);
-    if (thickened_oriented_box.Lazy_Inside(ray.endpoint)){
+    if(thickened_oriented_box.Lazy_Inside(ray.endpoint)){
         ray.semi_infinite=false; ray.t_max=0;ray.intersection_location=RAY<VECTOR<T,2> >::START_POINT; return true;}
-    else if (INTERSECTION::Intersects(ray,segment,thickness_over_two)){
+    else if(INTERSECTION::Intersects(ray,segment,thickness_over_two)){
         ray.intersection_location=RAY<VECTOR<T,2> >::INTERIOR_POINT; return true;}
-    else if (!ray.semi_infinite && thickened_oriented_box.Lazy_Inside(ray.Point(ray.t_max))){
+    else if(!ray.semi_infinite && thickened_oriented_box.Lazy_Inside(ray.Point(ray.t_max))){
         ray.intersection_location=RAY<VECTOR<T,2> >::END_POINT; return true;}
     else
         return false;
@@ -75,9 +75,9 @@ template<class T> bool Intersection_X_Segment(RAY<VECTOR<T,2> >& ray,const T x0,
     if((ray.semi_infinite && abs_cross_product>0) || (!ray.semi_infinite && ray.t_max*abs_cross_product>thickness_over_two)){
         T cross_recip=((T)1)/cross_product;
         T ray_t=-cross_recip*from_start_to_start.y;
-        if (ray_t<0||(ray_t>ray.t_max&&!ray.semi_infinite))return false;
+        if(ray_t<0||(ray_t>ray.t_max&&!ray.semi_infinite))return false;
         T t=cross_recip*VECTOR<T,2>::Cross_Product(from_start_to_start,ray.direction).x;
-        if (t<-thickness_over_two||t>length+thickness_over_two)return false;
+        if(t<-thickness_over_two||t>length+thickness_over_two)return false;
         ray.t_max=ray_t;ray.semi_infinite=false;return true;}
     return false;
 }
@@ -94,9 +94,9 @@ template<class T> bool Intersection_Y_Segment(RAY<VECTOR<T,2> >& ray,const T x,c
     if((ray.semi_infinite && abs_cross_product>0) || (!ray.semi_infinite && ray.t_max*abs_cross_product>thickness_over_two)){
         T cross_recip=((T)1)/cross_product;
         T ray_t=cross_recip*from_start_to_start.x;
-        if (ray_t<0||(ray_t>ray.t_max&&!ray.semi_infinite))return false;
+        if(ray_t<0||(ray_t>ray.t_max&&!ray.semi_infinite))return false;
         T segment_t=cross_recip*VECTOR<T,2>::Cross_Product(from_start_to_start,ray.direction).x;
-        if (segment_t<-thickness_over_two||segment_t>segment_length+thickness_over_two)return false;
+        if(segment_t<-thickness_over_two||segment_t>segment_length+thickness_over_two)return false;
         ray.t_max=ray_t;ray.semi_infinite=false;return true;}
     return false;
 }

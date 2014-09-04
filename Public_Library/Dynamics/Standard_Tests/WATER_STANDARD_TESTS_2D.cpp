@@ -276,7 +276,7 @@ Initialize_Bodies()
         sphere=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/circle",(T).1,true,true,false);
         rigid_body_collection.rigid_body_particles.frame(sphere).t=TV((T)1.25,(T).55);
         rigid_body_collection.rigid_body_particles.kinematic(sphere)=true;}
-    else if (test_number==20){
+    else if(test_number==20){
         sphere=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/circle",(T).1,true,true,false);
         rigid_body_collection.rigid_body_particles.frame(sphere).t=TV((T).8,(T).1);
         rigid_body_collection.rigid_body_particles.kinematic(sphere)=true;}

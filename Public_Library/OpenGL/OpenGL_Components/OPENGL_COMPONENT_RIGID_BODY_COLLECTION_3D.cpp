@@ -197,12 +197,12 @@ Reinitialize(const bool force,const bool read_geometry)
         else for(int i=0;i<max_number_of_bodies;i++){if(rigid_body_collection.Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
 
         // Only display real bodies (not ghost bodies)
-        if (FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame))) {
+        if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame))) {
             ARRAY<int> particles_of_this_partition;
             FILE_UTILITIES::template Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
-            for (int i=0;i<max_number_of_bodies;i++)
+            for(int i=0;i<max_number_of_bodies;i++)
                 draw_object(i)=false;
-            for (int i=0;i<particles_of_this_partition.Size();i++)
+            for(int i=0;i<particles_of_this_partition.Size();i++)
                 draw_object(particles_of_this_partition(i))=true;}
 
         // Update active bodies / remove inactive bodies
@@ -531,7 +531,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION *OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     OPENGL_SELECTION* selection=0;
@@ -553,7 +553,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION *selection)
+Highlight_Selection(OPENGL_SELECTION* selection)
 {
     if(selection->type==OPENGL_SELECTION::COMPONENT_RIGID_BODIES_3D){
         OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T>*)selection;
@@ -974,7 +974,7 @@ Display(const int in_color) const
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const
 {
     if(!selection || selection->object!=this) return;
 
@@ -1072,6 +1072,9 @@ Toggle_Forces_And_Torques()
 {
     draw_forces_and_torques=!draw_forces_and_torques;
 }
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>::
 Bounding_Box() const
 {

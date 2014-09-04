@@ -105,13 +105,13 @@ Reinitialize(bool force)
 
         if(draw_grid_visibility){
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/thin_shells_grid_visibility",frame);
-            if (FILE_UTILITIES::File_Exists(tmp_filename))
+            if(FILE_UTILITIES::File_Exists(tmp_filename))
                 FILE_UTILITIES::Read_From_File<RW>(tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v);
         }
 
         if(draw_density_valid_mask){
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/density_valid_mask",frame);
-            if (FILE_UTILITIES::File_Exists(tmp_filename)){
+            if(FILE_UTILITIES::File_Exists(tmp_filename)){
                 FILE_UTILITIES::Read_From_File<RW>(tmp_filename,density_valid_mask);
                 for(int i=density_valid_mask.domain.min_corner.x;i<density_valid_mask.domain.max_corner.x;i++) for(int j=density_valid_mask.domain.min_corner.y;j<density_valid_mask.domain.max_corner.y;j++) 
                     density_valid_mask(i,j)=!density_valid_mask(i,j); // negate
@@ -121,7 +121,7 @@ Reinitialize(bool force)
 
         if(draw_phi_valid_mask){
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/phi_valid_mask",frame);
-            if (FILE_UTILITIES::File_Exists(tmp_filename)){
+            if(FILE_UTILITIES::File_Exists(tmp_filename)){
                 FILE_UTILITIES::Read_From_File<RW>(tmp_filename,phi_valid_mask);
                 for(int i=phi_valid_mask.domain.min_corner.x;i<phi_valid_mask.domain.max_corner.x;i++) for(int j=phi_valid_mask.domain.min_corner.y;j<phi_valid_mask.domain.max_corner.y;j++) 
                     phi_valid_mask(i,j)=!phi_valid_mask(i,j); // negate

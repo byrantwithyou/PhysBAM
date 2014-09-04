@@ -33,7 +33,7 @@ OPENGL_WINDOW_GLUT(OPENGL_WORLD& opengl_world_input,const std::string& window_ti
     glutMotionFunc(Handle_Drag_Glut);
 }
 //#####################################################################
-// ~OPENGL_WINDOW_GLUT
+// Destructor
 //#####################################################################
 OPENGL_WINDOW_GLUT::
 ~OPENGL_WINDOW_GLUT()

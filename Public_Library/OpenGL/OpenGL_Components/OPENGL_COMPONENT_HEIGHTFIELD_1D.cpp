@@ -7,14 +7,15 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_HEIGHTFIELD_1D.h>
 using namespace PhysBAM;
 //#####################################################################
-
+// Constructor
+//#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid_input, 
                                 const std::string& height_filename_input,
                                 const std::string& x_filename_input,
                                 const std::string& ground_filename_input,
                                 const std::string& u_filename_input)
-    : OPENGL_COMPONENT("Heightfield 1D"), grid(grid_input), opengl_vector_field(vector_field,vector_locations), scale(1), displacement_scale(1), valid(false), 
+    :OPENGL_COMPONENT("Heightfield 1D"), grid(grid_input), opengl_vector_field(vector_field,vector_locations), scale(1), displacement_scale(1), valid(false), 
       draw_velocities(true), draw_points(true), selected_index(0)
 {
     height_filename=height_filename_input;
@@ -33,7 +34,9 @@ OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid_input,
 
     Reinitialize();
 }
-
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 ~OPENGL_COMPONENT_HEIGHTFIELD_1D()
 {
@@ -41,27 +44,35 @@ template<class T,class RW> OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
     delete ground;
     delete u;
 }
-
+//#####################################################################
+// Function Valid_Frame
+//#####################################################################
 template<class T,class RW> bool OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::File_Exists(is_animation?STRING_UTILITIES::string_sprintf(height_filename.c_str(),frame_input):height_filename);
 }
-
+//#####################################################################
+// Function Set_Frame
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT::Set_Frame(frame_input);
     Reinitialize();
 }
-
+//#####################################################################
+// Function Set_Draw
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT::Set_Draw(draw_input);
     Reinitialize();
 }
-
+//#####################################################################
+// Function Display
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Display(const int in_color) const
 {
@@ -185,7 +196,9 @@ Display(const int in_color) const
 #endif
     }
 }
-
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Bounding_Box() const
 {
@@ -204,7 +217,9 @@ Bounding_Box() const
     }
     else return RANGE<VECTOR<float,3> >::Centered_Box();
 }
-
+//#####################################################################
+// Function Reinitialize
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Reinitialize(bool force)
 {
@@ -249,8 +264,10 @@ Reinitialize(bool force)
                 frame_loaded=frame;
                 valid=true;}}}
 }
-
-template<class T,class RW> OPENGL_SELECTION *OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+//#####################################################################
+// Function Get_Selection
+//#####################################################################
+template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     if(buffer_size == 1)
@@ -261,79 +278,103 @@ Get_Selection(GLuint *buffer,int buffer_size)
     }
     else return 0;
 }
-
+//#####################################################################
+// Function Highlight_Selection
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION *selection)
+Highlight_Selection(OPENGL_SELECTION* selection)
 {
     if(selection->type != OPENGL_SELECTION::COMPONENT_HEIGHTFIELD_1D) return;
     OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>*)selection;
     selected_index=real_selection->index;
 }
-
+//#####################################################################
+// Function Clear_Highlight
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Clear_Highlight()
 {
     selected_index=-1;
 }
-
+//#####################################################################
+// Function Set_Scale
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Set_Scale(T scale_input)
 {
     scale=scale_input;
     Reinitialize(true);// To recompute velocity vector positions correctly
 }
-
+//#####################################################################
+// Function Increase_Scale
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Increase_Scale()
 {
     scale *= 1.1;
     Reinitialize(true);// To recompute velocity vector positions correctly
 }
-
+//#####################################################################
+// Function Decrease_Scale
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Decrease_Scale()
 {
     scale *= 1/1.1;
     Reinitialize(true);// To recompute velcity vector positions correctly
 }
-
+//#####################################################################
+// Function Increase_Displacement_Scale
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Increase_Displacement_Scale()
 {
     displacement_scale *= 1.1;
 }
-
+//#####################################################################
+// Function Decrease_Displacement_Scale
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Decrease_Displacement_Scale()
 {
     displacement_scale *= 1/1.1;
 }
-
+//#####################################################################
+// Function Increase_Velocity_Scale
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Increase_Velocity_Scale()
 {
     opengl_vector_field.size *= 1.1;
 }
-
+//#####################################################################
+// Function Decrease_Velocity_Scale
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Decrease_Velocity_Scale()
 {
     opengl_vector_field.size *= 1/1.1;
 }
-
+//#####################################################################
+// Function Toggle_Draw_Velocities
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Toggle_Draw_Velocities()
 {
     draw_velocities=!draw_velocities;
     Reinitialize(true);
 }
-
+//#####################################################################
+// Function Toggle_Draw_Points
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Toggle_Draw_Points()
 {
     draw_points=!draw_points;
 }
-
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>::
 Bounding_Box() const
 {

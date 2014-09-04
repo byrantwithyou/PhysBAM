@@ -112,7 +112,7 @@ public:
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
     void Display_Subset();
     void Update_Cutaway_Plane();
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
     void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MATRIX<T,4>* transform) const;
     void Initialize_Vertex_Normals();
 protected:

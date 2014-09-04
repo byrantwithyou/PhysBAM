@@ -20,7 +20,7 @@ namespace PhysBAM
 {
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_HEIGHTFIELD_2D : public OPENGL_COMPONENT
+class OPENGL_COMPONENT_HEIGHTFIELD_2D:public OPENGL_COMPONENT
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
@@ -41,8 +41,8 @@ public:
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
 
     void Set_Scale(T scale_input);
@@ -111,12 +111,12 @@ private:
 };
 
 template<class T>
-class OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D : public OPENGL_SELECTION
+class OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D:public OPENGL_SELECTION
 {
 public:
     VECTOR<int,2> index;
 
-    OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D(OPENGL_OBJECT *object) : OPENGL_SELECTION(OPENGL_SELECTION::COMPONENT_HEIGHTFIELD_2D, object) {}
+    OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D(OPENGL_OBJECT* object) :OPENGL_SELECTION(OPENGL_SELECTION::COMPONENT_HEIGHTFIELD_2D, object) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };

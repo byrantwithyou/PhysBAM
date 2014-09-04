@@ -10,7 +10,8 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_2D.h>
 using namespace PhysBAM;
 //#####################################################################
-
+// Constructor
+//#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input)
     :OPENGL_COMPONENT("Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
@@ -33,7 +34,9 @@ OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const st
     is_animation=FILE_UTILITIES::Is_Animated(levelset_filename);
     Reinitialize();
 }
-
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 ~OPENGL_COMPONENT_LEVELSET_2D()
 {
@@ -42,28 +45,36 @@ template<class T,class RW> OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
         delete &opengl_levelsets(j)->levelset.phi;
         delete &opengl_levelsets(j)->levelset;}
 }
-
+//#####################################################################
+// Function Valid_Frame
+//#####################################################################
 template<class T,class RW> bool OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Valid_Frame(int frame_input) const
 {
     if(use_sets) return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame_input,set));
     else return FILE_UTILITIES::Frame_File_Exists(levelset_filename,frame_input);
 }
-
+//#####################################################################
+// Function Set_Frame
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT::Set_Frame(frame_input);
     Reinitialize();
 }
-
+//#####################################################################
+// Function Set_Draw
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT::Set_Draw(draw_input);
     Reinitialize();
 }
-
+//#####################################################################
+// Function Display
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Display(const int in_color) const
 {
@@ -71,14 +82,18 @@ Display(const int in_color) const
         if(draw_multiple_levelsets) for(int j=0;j<opengl_levelsets.m;j++) opengl_levelsets(j)->Display(in_color);
         else opengl_levelsets(set)->Display(in_color);}
 }
-
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Bounding_Box() const
 {
-    if (valid && draw) return opengl_levelset->Bounding_Box();
+    if(valid && draw) return opengl_levelset->Bounding_Box();
     else return RANGE<VECTOR<float,3> >::Centered_Box();
 }
-
+//#####################################################################
+// Function Print_Selection_Info
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const
 {
@@ -99,12 +114,14 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selec
                 output_stream<<component_name<<": phi["<<i<<"] @ particle="<<opengl_levelsets(i)->levelset.Phi(location)<<std::endl;}}
 }
 
-
+//#####################################################################
+// Function Reinitialize
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Reinitialize(const bool force_even_if_not_drawn)
 {
-    if (draw||force_even_if_not_drawn){
-        if ((is_animation && (frame_loaded!=frame || set_loaded!=set)) || (!is_animation && frame_loaded<0)){
+    if(draw||force_even_if_not_drawn){
+        if((is_animation && (frame_loaded!=frame || set_loaded!=set)) || (!is_animation && frame_loaded<0)){
             valid=false;std::string filename;
             if(use_sets)
                 for(int i=0;i<opengl_levelsets.m;i++){
@@ -119,25 +136,33 @@ Reinitialize(const bool force_even_if_not_drawn)
                 opengl_levelset->Update();}
             frame_loaded=frame;set_loaded=set;valid=true;}}
 }
-
+//#####################################################################
+// Function Toggle_Color_Mode
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Toggle_Color_Mode()
 {
     for(int j=0;j<opengl_levelsets.m;j++) opengl_levelsets(j)->Toggle_Color_Map();
 }
-
+//#####################################################################
+// Function Toggle_Smooth
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Toggle_Smooth()
 {
     for(int j=0;j<opengl_levelsets.m;j++) opengl_levelsets(j)->Toggle_Smooth_Texture();
 }
-
+//#####################################################################
+// Function Toggle_Normals
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Toggle_Normals()
 {
     for(int j=0;j<opengl_levelsets.m;j++) opengl_levelsets(j)->Toggle_Normals();
 }
-
+//#####################################################################
+// Function Toggle_Draw_Mode
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Toggle_Draw_Mode()
 {
@@ -149,6 +174,9 @@ Toggle_Draw_Mode()
         opengl_levelsets(j)->draw_cells=(newmask/2)==2;
         opengl_levelsets(j)->Update();}
 }
+//#####################################################################
+// Function Toggle_Draw_Sign
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Toggle_Draw_Sign()
 {
@@ -156,6 +184,9 @@ Toggle_Draw_Sign()
         opengl_levelsets(j)->dominant_sign=(opengl_levelsets(j)->dominant_sign==1)?-1:1;
         opengl_levelsets(j)->Update();}
 }
+//#####################################################################
+// Function Next_Set
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Next_Set()
 {
@@ -164,6 +195,9 @@ Next_Set()
     opengl_levelset=opengl_levelsets(set);
     Reinitialize();
 }
+//#####################################################################
+// Function Previous_Set
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Previous_Set()
 {
@@ -172,11 +206,17 @@ Previous_Set()
     opengl_levelset=opengl_levelsets(set);
     Reinitialize();
 }
+//#####################################################################
+// Function Toggle_Draw_Multiple_Levelsets
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Toggle_Draw_Multiple_Levelsets()
 {
     draw_multiple_levelsets=!draw_multiple_levelsets;
 }
+//#####################################################################
+// Function Toggle_Draw_Ghost_Values
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Toggle_Draw_Ghost_Values()
 {

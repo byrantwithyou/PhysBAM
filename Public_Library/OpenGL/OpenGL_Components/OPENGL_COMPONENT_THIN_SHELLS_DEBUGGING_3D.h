@@ -18,7 +18,7 @@ namespace PhysBAM
 {
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D : public OPENGL_COMPONENT
+class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D:public OPENGL_COMPONENT
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:

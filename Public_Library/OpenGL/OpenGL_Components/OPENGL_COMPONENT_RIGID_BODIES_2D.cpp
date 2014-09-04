@@ -452,7 +452,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION *selection)
+Highlight_Selection(OPENGL_SELECTION* selection)
 {
     delete current_selection;current_selection=0;
     if(selection->type==OPENGL_SELECTION::COMPONENT_RIGID_BODIES_2D){
@@ -487,7 +487,7 @@ Clear_Highlight()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const
 {
     if(!selection) return;
     if(selection->type==OPENGL_SELECTION::COMPONENT_RIGID_BODIES_2D){
@@ -726,12 +726,18 @@ Bounding_Box() const
     PHYSBAM_ASSERT(object && body_selection);
     return object->World_Space_Box(body_selection->Bounding_Box());
 }
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D<T>::
 Bounding_Box() const
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
     return RANGE<VECTOR<float,3> >::Empty_Box();
 }
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D<T>::
 Bounding_Box() const
 {

@@ -15,7 +15,7 @@
 namespace PhysBAM{
 
 template<class T,class T2=T>
-class OPENGL_FACE_SCALAR_FIELD_2D : public OPENGL_OBJECT
+class OPENGL_FACE_SCALAR_FIELD_2D:public OPENGL_OBJECT
 {
 public:
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;GRID<TV> grid;

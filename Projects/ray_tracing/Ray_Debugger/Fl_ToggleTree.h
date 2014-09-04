@@ -18,7 +18,7 @@ enum Fl_ToggleState {
 
 class Fl_Input;
 
-class Fl_ToggleTree : public Fl_Tree {
+class Fl_ToggleTree:public Fl_Tree {
 
 public:
 

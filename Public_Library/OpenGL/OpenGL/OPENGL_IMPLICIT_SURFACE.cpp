@@ -68,7 +68,7 @@ Initialize_Slices()
 template<class T> float OPENGL_IMPLICIT_SURFACE<T>::
 Phi(VECTOR<T,3> x) const
 {
-    if (surface.box.Outside(x)) return max(x.x-surface.box.xmax,surface.box.xmin-x.x,x.y-surface.box.ymax,surface.box.ymin-x.y,x.z-surface.box.zmax,surface.box.zmin-x.z);
+    if(surface.box.Outside(x)) return max(x.x-surface.box.xmax,surface.box.xmin-x.x,x.y-surface.box.ymax,surface.box.ymin-x.y,x.z-surface.box.zmax,surface.box.zmin-x.z);
     else return surface(x);
 }
 //#####################################################################
@@ -177,7 +177,7 @@ void OPENGL_IMPLICIT_SURFACE<T>::
 Display_Brick(const VECTOR<T,3>& x0,float p1,const VECTOR<T,3>& x1,float p2,const VECTOR<T,3>& x2,float p3,const VECTOR<T,3>& x3,float p4,const VECTOR<T,3>& x4,float p5,const VECTOR<T,3>& x5,float p6,const VECTOR<T,3>& x6,float p7,const VECTOR<T,3>& x7,float p8,const int parity,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices,ARRAY<GLfloat>& normals) const
 {
     // is there a way to avoid computing normals redundantly (but not compute unnecessary ones as well)?
-    if (!parity) { //means (i+j+k)%2==0
+    if(!parity) { //means (i+j+k)%2==0
         Display_Tetrahedron(x0,x1,x2,x4,p1,p2,p3,p5,vertices,normals);  //bottom left
         Display_Tetrahedron(x1,x4,x5,x7,p2,p5,p6,p8,vertices,normals);  //bottom right
         Display_Tetrahedron(x1,x2,x7,x3,p2,p3,p8,p4,vertices,normals);  //top towards

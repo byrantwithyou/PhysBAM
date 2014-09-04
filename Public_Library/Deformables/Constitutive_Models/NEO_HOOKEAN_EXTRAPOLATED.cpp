@@ -71,17 +71,17 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
     T a = extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
     
-    if ((dx >= 0) && (dy >= 0))
+    if((dx >= 0) && (dy >= 0))
     {
         T I1=(F*F.Transposed()).Trace(),J=F.Determinant();
         T log_J=log(J);
         return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
     }
-    else if ((dx < 0) && (dy >= 0))
+    else if((dx < 0) && (dy >= 0))
     {
         return base.E(a,y) + base.Ex(a,y)*dx + k*dx*dx;
     }
-    else if ((dx >= 0) && (dy < 0))
+    else if((dx >= 0) && (dy < 0))
     {
         return base.E(x,a) + base.Ey(x,a)*dy + k*dy*dy;
     }
@@ -111,33 +111,33 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
     T k = extra_force_coefficient*youngs_modulus;
 
     
-    if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
+    if((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
     {
         T I1=(F*F.Transposed()).Trace(),J=F.Determinant();
         T log_J=log(J);
         return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
     }
-    else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
+    else if((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
         return (T)0.5*(-mu*cube(a)+mu*a*sqr(y)+mu*a*sqr(z)-mu*a-2*mu*a*log(a*y*z)+la*sqr(log(a*y*z))*a+2*mu*sqr(a)*x-2*mu*x+2*la*log(a*y*z)*x-2*la*log(a*y*z)*a+2*k*a*sqr(x)-4*k*sqr(a)*x+2*k*cube(a))/a;
     }
-    else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
+    else if((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
         return (T)0.5*(mu*a*sqr(x)-mu*cube(a)+mu*a*sqr(z)-mu*a-2*mu*a*log(x*a*z)+la*sqr(log(x*a*z))*a+2*y*mu*sqr(a)-2*mu*y+2*la*log(x*a*z)*y-2*la*log(x*a*z)*a+2*sqr(y)*k*a-4*y*k*sqr(a)+2*k*cube(a))/a;
     }
-    else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
+    else if((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
         return (T)0.5*(mu*a*sqr(x)+mu*a*sqr(y)-mu*cube(a)-mu*a-2*mu*a*log(x*y*a)+la*sqr(log(x*y*a))*a+2*z*mu*sqr(a)-2*mu*z+2*la*log(x*y*a)*z-2*la*log(x*y*a)*a+2*sqr(z)*k*a-4*z*k*sqr(a)+2*k*cube(a))/a;
     }
-    else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
+    else if((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
         return (T)0.5*(mu*sqr(a)-2*x*mu*a-2*x*la*a+2*sqr(y)*k*sqr(a)-2*mu*a*y+sqr(z)*mu*sqr(a)+2*sqr(x)*k*sqr(a)-2*y*la*a+2*a*la*log(sqr(a)*z)*x+2*a*la*log(sqr(a)*z)*y+la*sqr(log(sqr(a)*z))*sqr(a)-2*mu*sqr(a)*log(sqr(a)*z)+2*mu*cube(a)*x-4*la*log(sqr(a)*z)*sqr(a)+2*y*mu*cube(a)+2*la*x*y-4*k*cube(a)*x-4*k*cube(a)*y-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a))/sqr(a);
     }
-    else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
+    else if((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
     {
         return (T)0.5*(mu*sqr(a)-2*x*mu*a-2*x*la*a+sqr(y)*mu*sqr(a)+2*sqr(z)*k*sqr(a)-2*mu*a*z+2*sqr(x)*k*sqr(a)-2*z*la*a+2*mu*cube(a)*x-4*k*cube(a)*x-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a)+2*z*mu*cube(a)-4*z*k*cube(a)+2*z*la*x+la*sqr(log(sqr(a)*y))*sqr(a)-2*mu*sqr(a)*log(sqr(a)*y)-4*la*log(sqr(a)*y)*sqr(a)+2*a*la*log(sqr(a)*y)*z+2*a*la*log(sqr(a)*y)*x)/sqr(a);
     }
-    else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
+    else if((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
     {
         return (T)0.5*(mu*sqr(a)+2*sqr(y)*k*sqr(a)-2*mu*a*y+2*sqr(z)*k*sqr(a)-2*mu*a*z+sqr(x)*mu*sqr(a)-2*y*la*a-2*z*la*a+2*y*mu*cube(a)-4*k*cube(a)*y-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a)+2*z*mu*cube(a)+2*z*la*y-4*z*k*cube(a)+2*a*la*log(x*sqr(a))*y+2*a*la*log(x*sqr(a))*z+la*sqr(log(x*sqr(a)))*sqr(a)-2*mu*sqr(a)*log(x*sqr(a))-4*la*log(x*sqr(a))*sqr(a))/sqr(a);
     }
@@ -169,19 +169,19 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simpl
     T a = extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
     
-    if ((dx >= 0) && (dy >= 0))
+    if((dx >= 0) && (dy >= 0))
     {  
         T scale_mu=scale*constant_mu,scale_lambda=scale*constant_lambda,J=F.Determinant();
         return scale_mu*F-(scale_mu-scale_lambda*log(J))*F.Inverse();
     }
-    else if ((dx < 0) && (dy >= 0))
+    else if((dx < 0) && (dy >= 0))
     {//[ -(la*(a - s2)^2*(2*a - 2*s1))/a, -(la*(a - s1)^2*(2*a - 2*s2))/a, 0, 0]
         DIAGONAL_MATRIX<T,2> result;
         result.x.x = base.Ex(a,y) + 2*k*dx;
         result.x.y = base.Ey(a,y) + base.Exy(a,y)*dx;
         return scale*result;
     }
-    else if ((dx >= 0) && (dy < 0))
+    else if((dx >= 0) && (dy < 0))
     {
         DIAGONAL_MATRIX<T,2> result;
         result.x.x = base.Ex(x,a) + base.Exy(x,a)*dy;
@@ -216,12 +216,12 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
     T a = extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
      
-    if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
+    if((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
     {
         T scale_mu=scale*constant_mu,scale_lambda=scale*constant_lambda,J=F.Determinant();
         return scale_mu*F-(scale_mu-scale_lambda*log(J))*F.Inverse();
     }
-    else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
+    else if((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
         DIAGONAL_MATRIX<T,3> result;
         result.x.x=(mu*sqr(a)-mu+la*log(a*y*z)+2*k*a*x-2*k*sqr(a))/a;
@@ -229,7 +229,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.z=(mu*a*sqr(z)-mu*a+la*log(a*y*z)*a+la*x-la*a)/a/z;
         return scale*result;
     }
-    else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
+    else if((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
         DIAGONAL_MATRIX<T,3> result;
         result.x.x=(mu*a*sqr(x)-mu*a+la*log(x*a*z)*a+la*y-la*a)/x/a;
@@ -237,7 +237,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.z=(mu*a*sqr(z)-mu*a+la*log(x*a*z)*a+la*y-la*a)/a/z;
         return scale*result;
     }
-    else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
+    else if((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
         DIAGONAL_MATRIX<T,3> result;
         result.x.x=(mu*a*sqr(x)-mu*a+la*log(x*y*a)*a+la*z-la*a)/x/a;
@@ -245,7 +245,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.z=(mu*sqr(a)-mu+la*log(x*y*a)+2*k*a*z-2*k*sqr(a))/a;
         return scale*result;
     }
-    else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
+    else if((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
         DIAGONAL_MATRIX<T,3> result;
         result.x.x=(mu*cube(a)-mu*a+la*log(sqr(a)*z)*a+la*y-la*a+2*k*sqr(a)*x-2*k*cube(a))/sqr(a);
@@ -253,7 +253,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.z=(mu*a*sqr(z)-mu*a+la*log(sqr(a)*z)*a+la*x-2*la*a+la*y)/a/z;
         return scale*result;
     }
-    else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
+    else if((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
     {
         DIAGONAL_MATRIX<T,3> result;
         result.x.x=(mu*cube(a)-mu*a+la*log(sqr(a)*y)*a+la*z-la*a+2*k*sqr(a)*x-2*k*cube(a))/sqr(a);
@@ -261,7 +261,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.z=(mu*cube(a)-mu*a+la*log(sqr(a)*y)*a+la*x-la*a+2*z*k*sqr(a)-2*k*cube(a))/sqr(a);
         return scale*result;
     }
-    else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
+    else if((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
     {
         DIAGONAL_MATRIX<T,3> result;
         result.x.x=(mu*a*sqr(x)-mu*a+la*log(x*sqr(a))*a+la*y-2*la*a+la*z)/x/a;
@@ -301,7 +301,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     T a = extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
     
-    if ((dx >= 0) && (dy >= 0))
+    if((dx >= 0) && (dy >= 0))
     {     
         DIAGONAL_MATRIX<T,2> F_inverse=F.Inverse();
         T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
@@ -312,7 +312,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
         dP_dF.x1010=constant_mu;//alpha
         dP_dF.x1001=mu_minus_lambda_logJ*F_inverse_outer.x10;//beta
     }
-    else if ((dx < 0) && (dy >= 0))
+    else if((dx < 0) && (dy >= 0))
     { /* (2*la*(a - s2)^2)/a, (4*la*(a - s1)*(a - s2))/a,                                                     0,                                                     0]
        [ (4*la*(a - s1)*(a - s2))/a,        (2*la*(a - s1)^2)/a,*/
         
@@ -324,13 +324,13 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
         T Ex = base.Ex(a,y)+2*k*dx;
         T Ey = base.Ey(a,y)+base.Exy(a,y)*dx;
 
-        T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
-        T xmy = x-y; if (fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
+        T xpy = x+y; if(fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
+        T xmy = x-y; if(fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
 
         dP_dF.x1001=(-Ey*x+Ex*y)/(xpy*xmy);
         dP_dF.x1010=(-Ey*y+Ex*x)/(xpy*xmy); 
     }
-    else if ((dx >= 0) && (dy < 0))
+    else if((dx >= 0) && (dy < 0))
     {
         dP_dF.x0000=base.Exx(x,a)+base.Exxy(x,a)*dy;
         dP_dF.x1111=2*k;
@@ -339,8 +339,8 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
         T Ex = base.Ex(x,a)+base.Exy(x,a)*dy;
         T Ey = base.Ey(x,a)+2*k*dy;
 
-        T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
-        T xmy = x-y; if (fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
+        T xpy = x+y; if(fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
+        T xmy = x-y; if(fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
 
         dP_dF.x1001=(-Ey*x+Ex*y)/(xpy*xmy);
         dP_dF.x1010=(-Ey*y+Ex*x)/(xpy*xmy); 
@@ -351,7 +351,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
         dP_dF.x1111=2*k;
         dP_dF.x1100=base.Exy(a,a);
 
-        T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
+        T xpy = x+y; if(fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
         T cmn = (base.Ex(a,a)-base.Exy(a,a)*a-2*k*a)/xpy;
 
         dP_dF.x1001=-cmn-base.Exy(a,a);
@@ -380,14 +380,14 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
     T a = extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
 
-    T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
-    T xmy = x-y; if (fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
-    T xpz = x+z; if (fabs(xpz)<panic_threshold) xpz=xpz<0?-panic_threshold:panic_threshold;
-    T xmz = x-z; if (fabs(xmz)<panic_threshold) xmz=xmz<0?-panic_threshold:panic_threshold;
-    T ypz = y+z; if (fabs(ypz)<panic_threshold) ypz=ypz<0?-panic_threshold:panic_threshold;
-    T ymz = y-z; if (fabs(ymz)<panic_threshold) ymz=ymz<0?-panic_threshold:panic_threshold;
+    T xpy = x+y; if(fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
+    T xmy = x-y; if(fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
+    T xpz = x+z; if(fabs(xpz)<panic_threshold) xpz=xpz<0?-panic_threshold:panic_threshold;
+    T xmz = x-z; if(fabs(xmz)<panic_threshold) xmz=xmz<0?-panic_threshold:panic_threshold;
+    T ypz = y+z; if(fabs(ypz)<panic_threshold) ypz=ypz<0?-panic_threshold:panic_threshold;
+    T ymz = y-z; if(fabs(ymz)<panic_threshold) ymz=ymz<0?-panic_threshold:panic_threshold;
 
-    if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
+    if((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
     {
         DIAGONAL_MATRIX<T,3> F_inverse=F.Inverse();
         T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
@@ -405,7 +405,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
         dP_dF.x2002=mu_minus_lambda_logJ*F_inverse_outer.x20;
         dP_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;
     }
-    else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
+    else if((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
         dP_dF.x0000=2*k;
         dP_dF.x1100=la/y/a;
@@ -420,7 +420,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
         dP_dF.x2112=-(-mu*a+la*log(a*y*z)*a+la*x-la*a)/a/y/z;
         dP_dF.x2121=mu;
     }
-    else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
+    else if((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
         dP_dF.x0000=-(-mu*a*sqr(x)-mu*a-2*la*a+la*log(x*a*z)*a+la*y)/a/sqr(x);
         dP_dF.x1100=la/x/a;
@@ -435,7 +435,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
         dP_dF.x2112=-(y*mu*a*sqr(z)-mu*a*y+y*la*log(x*a*z)*a+sqr(y)*la-y*la*a-sqr(z)*mu*sqr(a)+mu*sqr(z)-sqr(z)*la*log(x*a*z)-2*sqr(z)*k*a*y+2*sqr(z)*k*sqr(a))/a/z/(ymz*ypz);
         dP_dF.x2121=-(mu*a*sqr(z)-mu*a+la*log(x*a*z)*a+la*y-la*a-y*mu*sqr(a)+mu*y-la*log(x*a*z)*y-2*sqr(y)*k*a+2*y*k*sqr(a))/a/(ymz*ypz);
     }
-    else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
+    else if((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
         dP_dF.x0000=-(-mu*a*sqr(x)-mu*a-2*la*a+la*log(x*y*a)*a+la*z)/a/sqr(x);
         dP_dF.x1100=la/y/x;
@@ -451,7 +451,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
         dP_dF.x2121=(-z*mu*sqr(a)+mu*z-la*log(x*y*a)*z-2*sqr(z)*k*a+2*z*k*sqr(a)+mu*a*sqr(y)-mu*a+la*log(x*y*a)*a+la*z-la*a)/a/(ymz*ypz);
         
     }
-    else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
+    else if((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
         dP_dF.x0000=2*k;
         dP_dF.x1100=la/sqr(a);
@@ -466,7 +466,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
         dP_dF.x2112=-(sqr(a)*y*mu*sqr(z)-y*mu*sqr(a)+sqr(a)*y*la*log(sqr(a)*z)+x*a*la*y-2*sqr(a)*y*la+sqr(y)*la*a-sqr(z)*mu*cube(a)+mu*a*sqr(z)-sqr(z)*la*log(sqr(a)*z)*a-sqr(z)*la*x+sqr(z)*la*a-2*sqr(z)*y*k*sqr(a)+2*sqr(z)*k*cube(a))/sqr(a)/z/(ymz*ypz);
         dP_dF.x2121=-(sqr(z)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*z)*sqr(a)+x*la*a-2*la*sqr(a)+2*y*la*a-y*mu*cube(a)+mu*a*y-a*la*log(sqr(a)*z)*y-la*x*y-2*sqr(y)*k*sqr(a)+2*k*cube(a)*y)/sqr(a)/(ymz*ypz);
     }
-    else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
+    else if((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
     {
         dP_dF.x0000=2*k;
         dP_dF.x1100=la/y/a;
@@ -481,7 +481,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
         dP_dF.x2112=(-sqr(y)*mu*cube(a)+mu*a*sqr(y)-sqr(y)*la*log(sqr(a)*y)*a-sqr(y)*la*x+sqr(y)*la*a-2*sqr(y)*z*k*sqr(a)+2*sqr(y)*k*cube(a)+sqr(a)*z*mu*sqr(y)-z*mu*sqr(a)+sqr(a)*z*la*log(sqr(a)*y)+sqr(z)*la*a-2*sqr(a)*z*la+x*a*la*z)/sqr(a)/y/(ymz*ypz);
         dP_dF.x2121=(-z*mu*cube(a)+mu*a*z-a*la*log(sqr(a)*y)*z-z*la*x+2*z*la*a-2*sqr(z)*k*sqr(a)+2*z*k*cube(a)+sqr(y)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*y)*sqr(a)-2*la*sqr(a)+x*la*a)/sqr(a)/(ymz*ypz);
     }
-    else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
+    else if((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
     {
         dP_dF.x0000=-(-mu*a*sqr(x)-mu*a-3*la*a+la*log(x*sqr(a))*a+la*y+la*z)/a/sqr(x);
         dP_dF.x1100=la/x/a;

@@ -17,7 +17,7 @@ namespace PhysBAM{
 class OPENGL_SELECTION;
 
 template<class T>
-class OPENGL_POINT_SIMPLICES_1D: public OPENGL_OBJECT
+class OPENGL_POINT_SIMPLICES_1D:public OPENGL_OBJECT
 {
 public:
     const POINT_SIMPLICES_1D<T>& simplices;

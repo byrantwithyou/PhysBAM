@@ -16,7 +16,7 @@ namespace PhysBAM
 template<class TV> class GRID;
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D : public OPENGL_COMPONENT
+class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D:public OPENGL_COMPONENT
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:

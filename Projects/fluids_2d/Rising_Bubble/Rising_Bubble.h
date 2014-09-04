@@ -21,7 +21,7 @@
 
 namespace PhysBAM{
 
-class RISING_BUBBLE : public EXAMPLE
+class RISING_BUBBLE:public EXAMPLE
 {
 public:
     RISING_BUBBLE() {

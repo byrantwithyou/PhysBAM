@@ -50,7 +50,7 @@ static bool print_statistics=true;
 // Class OPENGL_CALLBACK_TOGGLE_TWO_SIDED
 //#################################################################
 template<class T>
-class OPENGL_CALLBACK_TOGGLE_TWO_SIDED: public OPENGL_CALLBACK
+class OPENGL_CALLBACK_TOGGLE_TWO_SIDED:public OPENGL_CALLBACK
 {
 public:
     OPENGL_TRIANGULATED_SURFACE<T>& surface;
@@ -70,7 +70,7 @@ public:
 // Class OPENGL_CALLBACK_CROSS_SECTION
 //#################################################################
 template<class T>
-class OPENGL_CALLBACK_CROSS_SECTION: public OPENGL_CALLBACK
+class OPENGL_CALLBACK_CROSS_SECTION:public OPENGL_CALLBACK
 {
 public:
     OPENGL_TETRAHEDRALIZED_VOLUME<T>& tets;

@@ -11,7 +11,7 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_LEVELSET_COLOR_MAP : public OPENGL_COLOR_MAP<T>
+class OPENGL_LEVELSET_COLOR_MAP:public OPENGL_COLOR_MAP<T>
 {
 public:
     OPENGL_COLOR negative_color;

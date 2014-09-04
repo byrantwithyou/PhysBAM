@@ -83,7 +83,7 @@ template<class T> void NOISE<T>::
 Noise3(const VECTOR<T,3>& p_input,VECTOR<T,3>& v,const int octaves,const T persistance)
 {
     VECTOR<T,3> p=p_input;
-    if (!initialized) Initialize_Noise();VECTOR<T,3> c;T factor=1;v.x=v.y=v.z=0;
+    if(!initialized) Initialize_Noise();VECTOR<T,3> c;T factor=1;v.x=v.y=v.z=0;
     for(int i=0;i<octaves;i++,factor*=persistance){v=Noise_Function3(p);c*=factor;v+=c;p*=2;}
 }
 //#####################################################################

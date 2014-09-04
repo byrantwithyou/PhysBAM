@@ -18,7 +18,7 @@
 namespace PhysBAM{
 template<class T> class TRIANGULATED_SURFACE;
 template<class T> 
-class SCENE_WINDOW : public Fl_Gl_Window
+class SCENE_WINDOW:public Fl_Gl_Window
 {
 public:
     RENDER_WORLD<T>& world;

@@ -55,11 +55,11 @@ public:
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE;
-    void Set_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
+    void Set_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
     
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE
     {smooth_shading=true;
@@ -107,7 +107,7 @@ private:
 };
 
 template<class T>
-class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D : public OPENGL_SELECTION
+class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D:public OPENGL_SELECTION
 {
 public:
     int body_index;
@@ -116,7 +116,7 @@ public:
     OPENGL_SELECTION* body_selection;
     OPENGL_SELECTION* saved_selection;
 
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D(OPENGL_OBJECT *object) : OPENGL_SELECTION(OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D,object) {}
+    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D(OPENGL_OBJECT* object) :OPENGL_SELECTION(OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D,object) {}
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     virtual OPENGL_SELECTION::TYPE Actual_Type() const {return body_selection->Actual_Type();}
 };

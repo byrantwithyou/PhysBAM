@@ -29,7 +29,7 @@ OPENGL_PBUFFER::~OPENGL_PBUFFER()
 bool OPENGL_PBUFFER::
 Create(int width, int height)
 {
-    if (pbuffer) {
+    if(pbuffer) {
         LOG::cerr << "Destroying old pbuffer before creating new one" << std::endl;
         Destroy();
     }

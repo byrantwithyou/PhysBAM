@@ -26,7 +26,7 @@ template<class TV> void CONSTRAINT_AGGREGATION_COLOR<TV>::
     TV_INT padded_cells;for(int i=0;i<TV::m;i++)padded_cells(i)=2*cdi->padding;padded_cells+=grid.numbers_of_cells;
     TV_INT node_index=Index_Of_Uncompressed_Node(node),a;
     
-    a(TV::m-1)=1;for (int i=TV::m-2;i>=0;i--)a(i)=a(i+1)*grid.numbers_of_cells(i+1);
+    a(TV::m-1)=1;for(int i=TV::m-2;i>=0;i--)a(i)=a(i+1)*grid.numbers_of_cells(i+1);
     
     int this_neighbor=0;
     TV_INT counts=TV_INT()+2*cube_radius;
@@ -52,7 +52,7 @@ Distance_Between_Node_And_Cell(int node,int cell)
     TV_INT padded_cells;for(int i=0;i<TV::m;i++)padded_cells(i)=2*cdi->padding;padded_cells+=grid.numbers_of_cells;
     TV_INT node_index=Index_Of_Uncompressed_Node(node),a;
     
-    a(TV::m-1)=1;for (int i=TV::m-2;i>=0;i--)a(i)=a(i+1)*grid.numbers_of_cells(i+1);
+    a(TV::m-1)=1;for(int i=TV::m-2;i>=0;i--)a(i)=a(i+1)*grid.numbers_of_cells(i+1);
     
     int cell_temp=cell;
     TV_INT cell_index;for(int i=TV::m-1;i>=0;i--){cell_index(i)=cell_temp % grid.numbers_of_cells(i);cell_temp-=cell_index(i);cell_temp/=grid.numbers_of_cells(i);}
@@ -74,7 +74,7 @@ Index_Of_Uncompressed_Node(int node)
     int node_temp=node; TV_INT padded_cells;for(int i=0;i<TV::m;i++)padded_cells(i)=2*cdi->padding;padded_cells+=grid.numbers_of_cells;
     TV_INT node_index;for(int i=TV::m-1;i>=0;i--){node_index(i)=node_temp % padded_cells(i);node_temp-=node_index(i);node_temp/=padded_cells(i);}
     //Remove the rest of the padding
-    for (int i=0;i<TV::m;i++)node_index(i)--;
+    for(int i=0;i<TV::m;i++)node_index(i)--;
     return node_index;
 }
 //#####################################################################
@@ -148,8 +148,8 @@ Aggregate_Constraints(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix_uu,const ARRAY<i
     for(int i=0;i<all_dofs;i++){ indices(i)=(int)(weights_and_indices(i)(1));weights(i)=weights_and_indices(i)(0);}
     
     // Loop through the virtual nodes
-    for (int i=all_dofs-1;i>=0;i--){
-        if (weights(i)<=1e-8) break; //We should no longer get to the point of dealing with zero weight nodes
+    for(int i=all_dofs-1;i>=0;i--){
+        if(weights(i)<=1e-8) break; //We should no longer get to the point of dealing with zero weight nodes
         if(!dof_adj_to_an_idof(indices(i))){
             idofs.Append(indices(i)); //Add the next independent degree of freedom
             is_idof(indices_represent(indices(i))(0))(indices_represent(indices(i))(1))=idofs.m-1;
@@ -167,7 +167,7 @@ Aggregate_Constraints(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix_uu,const ARRAY<i
             //Fill in the cells within a 4x4x4 block of this dof
             Get_Neighboring_Cells_From_Padded_Node(this_uncompressed_index,2,neighboring_nodes);
             //Check to see if all the cells are in the 4x4x4 block yet
-            for(int j=0;j<neighboring_nodes.m;j++){if (cell_checker(neighboring_nodes(j))>0){cell_checker(neighboring_nodes(j))*=-1;hit_cells--;}}
+            for(int j=0;j<neighboring_nodes.m;j++){if(cell_checker(neighboring_nodes(j))>0){cell_checker(neighboring_nodes(j))*=-1;hit_cells--;}}
             if(hit_cells<0)PHYSBAM_FATAL_ERROR(); if(hit_cells==0)break;
         }
         
@@ -300,7 +300,7 @@ Build_Nullspace_And_Specific_Constraint_Solution(ARRAY<SPARSE_MATRIX_FLAT_MXN<T>
                     SPARSE_MATRIX_FLAT_MXN<T>& M_constraints_c0=condensed_constraint_matrix(c0);
                     ARRAY<SPARSE_MATRIX_ENTRY<T> >this_row;
                     M_constraints_c0.Get_Row(this_row,is_idof(c)(i));
-                    for (int j=0;j<this_row.m;j++){
+                    for(int j=0;j<this_row.m;j++){
                         if(is_non_idof(c0)(this_row(j).j)<0){this_row.Remove_Index(j);j--;}
                         else{this_row(j).j=is_non_idof(c0)(this_row(j).j);
                         this_row(j).a/=-diagonal_term;//Left multiply by -Bm(inverse), equation 20 of Jeff's paper

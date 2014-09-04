@@ -249,9 +249,9 @@ Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
     if(draw && valid && deformable_body_collection.structures.m>0){
-        for(int i=0;i<segmented_curve_objects.m;i++)if(segmented_curve_objects(i))box.Enlarge_To_Include_Box(segmented_curve_objects(i)->Bounding_Box());
-        for(int i=0;i<triangulated_area_objects.m;i++)if(triangulated_area_objects(i))box.Enlarge_To_Include_Box(triangulated_area_objects(i)->Bounding_Box());
-        for(int i=0;i<triangles_of_material_objects.m;i++)if(triangles_of_material_objects(i))box.Enlarge_To_Include_Box(triangles_of_material_objects(i)->Bounding_Box());}
+        for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) box.Enlarge_To_Include_Box(segmented_curve_objects(i)->Bounding_Box());
+        for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) box.Enlarge_To_Include_Box(triangulated_area_objects(i)->Bounding_Box());
+        for(int i=0;i<triangles_of_material_objects.m;i++) if(triangles_of_material_objects(i)) box.Enlarge_To_Include_Box(triangles_of_material_objects(i)->Bounding_Box());}
     return box;
 }
 //#####################################################################

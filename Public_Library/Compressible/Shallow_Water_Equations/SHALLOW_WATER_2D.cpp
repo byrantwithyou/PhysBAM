@@ -18,7 +18,7 @@ Euler_Step(const T dt,const T time)
     int ghost_cells=3;
 
     // make sure things'll work in conservation law solver
-    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) if (U(i,j)(0) < min_height){U(i,j)(0)=min_height;U(i,j)(1)=U(i,j)(2)=0;}
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) if(U(i,j)(0) < min_height){U(i,j)(0)=min_height;U(i,j)(1)=U(i,j)(2)=0;}
 
     ARRAY<TV_DIMENSION,VECTOR<int,2> > U_ghost(-ghost_cells,m+ghost_cells,-ghost_cells,n+ghost_cells);boundary->Fill_Ghost_Cells(grid,U,U_ghost,dt,time,ghost_cells);
 

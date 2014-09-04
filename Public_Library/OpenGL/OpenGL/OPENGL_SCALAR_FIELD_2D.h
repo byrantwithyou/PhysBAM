@@ -20,7 +20,7 @@ template<class T,class T_ARRAY> class OPENGL_POINTS_2D;
 template<class T> class OPENGL_SEGMENTED_CURVE_2D;
 
 template<class T,class T2=T>
-class OPENGL_SCALAR_FIELD_2D : public OPENGL_OBJECT
+class OPENGL_SCALAR_FIELD_2D:public OPENGL_OBJECT
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
@@ -34,7 +34,7 @@ public:
     ARRAY<OPENGL_COLOR_MAP<T2>*> color_maps; // all owned by us
     int current_color_map;
 private: 
-    OPENGL_TEXTURED_RECT *opengl_textured_rect;
+    OPENGL_TEXTURED_RECT* opengl_textured_rect;
     OPENGL_POINTS_2D<T,ARRAY<VECTOR<T,2> > > *opengl_points;
     ARRAY<T2> contour_values;
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> contour_curves;

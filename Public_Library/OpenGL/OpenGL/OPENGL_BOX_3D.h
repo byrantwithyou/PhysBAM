@@ -15,14 +15,14 @@ namespace PhysBAM
 {
 
 template<class T>
-class OPENGL_BOX_3D : public OPENGL_OBJECT
+class OPENGL_BOX_3D:public OPENGL_OBJECT
 {
 public:
-    RANGE<VECTOR<T,3> >       &box;
-    OPENGL_COLOR    color;
+    RANGE<VECTOR<T,3> >& box;
+    OPENGL_COLOR color;
 
-    OPENGL_BOX_3D(RANGE<VECTOR<T,3> > &box_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White()) 
-        : box(box_input), color(color_input)
+    OPENGL_BOX_3D(RANGE<VECTOR<T,3> >& box_input,const OPENGL_COLOR& color_input=OPENGL_COLOR::White()) 
+        :box(box_input),color(color_input)
     {}
 
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;

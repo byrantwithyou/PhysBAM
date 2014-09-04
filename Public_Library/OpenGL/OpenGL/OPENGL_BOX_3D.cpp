@@ -7,7 +7,9 @@
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 
 using namespace PhysBAM;
-
+//#####################################################################
+// Function Display
+//#####################################################################
 template<class T> void OPENGL_BOX_3D<T>::
 Display(const int in_color) const
 {
@@ -41,7 +43,9 @@ Display(const int in_color) const
     glPopAttrib();
     glPopMatrix();
 }
-
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_BOX_3D<T>::
 Bounding_Box() const
 {

@@ -81,7 +81,7 @@ public:
     {
         ARRAY<int> touching_particle_indices;
         VECTOR<T,3> curr_position;
-        for (int i=0;i<tet_vol->particles.Size();i++){
+        for(int i=0;i<tet_vol->particles.Size();i++){
             curr_position=tet_vol->particles.X(i);
             if(Inside_Ellipsoid_Test(curr_position))touching_particle_indices.Append(i);}
 
@@ -128,7 +128,7 @@ public:
         volume_list.Resize(ellipsoid_list_size);
         T radius_x,four_thirds_pi_times_shorter_radii_squared=(4/3)*pi*sqr(shorter_radii);
 
-        if (!via_points.m){
+        if(!via_points.m){
             radius_x=((attachment_point_1->Position()-attachment_point_2->Position()).Magnitude())/2.0;
             volume_list(0)=four_thirds_pi_times_shorter_radii_squared*radius_x;}
         else{

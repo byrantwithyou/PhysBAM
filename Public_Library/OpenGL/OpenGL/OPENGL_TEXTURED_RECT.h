@@ -13,8 +13,8 @@
 
 namespace PhysBAM
 {
-
-class OPENGL_TEXTURED_RECT : public OPENGL_OBJECT
+template<class T>
+class OPENGL_TEXTURED_RECT:public OPENGL_OBJECT
 {
 public:
     double width, height;

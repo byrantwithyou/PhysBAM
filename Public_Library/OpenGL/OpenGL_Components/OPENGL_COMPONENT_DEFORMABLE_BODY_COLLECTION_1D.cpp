@@ -175,7 +175,7 @@ Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
     if(draw && valid && deformable_body_collection.structures.m>0){
-        for(int i=0;i<point_simplices_1d_objects.m;i++) if(point_simplices_1d_objects(i))box.Enlarge_To_Include_Box(point_simplices_1d_objects(i)->Bounding_Box());}
+        for(int i=0;i<point_simplices_1d_objects.m;i++) if(point_simplices_1d_objects(i)) box.Enlarge_To_Include_Box(point_simplices_1d_objects(i)->Bounding_Box());}
     return box;
 }
 //#####################################################################
@@ -211,9 +211,9 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T
 Toggle_Selection_Mode()
 {
 #ifndef USE_OPENGLES
-    if (!real_selection) return;
+    if(!real_selection) return;
     assert(real_selection->body_selection);
-    if (real_selection->body_selection->type == OPENGL_SELECTION::POINT_SIMPLICES_1D){
+    if(real_selection->body_selection->type == OPENGL_SELECTION::POINT_SIMPLICES_1D){
         delete real_selection->body_selection;
         real_selection->body_selection=real_selection->saved_selection;}
     else return;
@@ -253,7 +253,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Set_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
-Set_Selection(OPENGL_SELECTION *selection)
+Set_Selection(OPENGL_SELECTION* selection)
 {
     if(selection->type!=OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_1D) return;
     real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>*)selection;
@@ -262,7 +262,7 @@ Set_Selection(OPENGL_SELECTION *selection)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION *selection)
+Highlight_Selection(OPENGL_SELECTION* selection)
 {
     if(selection->type!=OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_1D) return;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>*)selection;
@@ -282,7 +282,7 @@ Clear_Highlight()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
-Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) const
+Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const
 {
     if(selection && selection->type==OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_1D && selection->object==this){
         OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>*)selection;

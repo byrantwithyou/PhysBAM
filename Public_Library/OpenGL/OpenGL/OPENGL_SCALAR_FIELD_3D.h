@@ -18,7 +18,7 @@ class OPENGL_TEXTURED_RECT;
 template<class T,class T_ARRAY> class OPENGL_POINTS_3D;
 
 template<class T,class T2=T>
-class OPENGL_SCALAR_FIELD_3D : public OPENGL_OBJECT
+class OPENGL_SCALAR_FIELD_3D:public OPENGL_OBJECT
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -63,7 +63,7 @@ private:
     void Delete_Points();
 
 public:
-    OPENGL_TEXTURED_RECT *opengl_textured_rect;
+    OPENGL_TEXTURED_RECT* opengl_textured_rect;
     OPENGL_POINTS_3D<T,ARRAY<VECTOR<T,3> > > *opengl_points;
     bool smooth_slice_texture;
     bool scale_range;

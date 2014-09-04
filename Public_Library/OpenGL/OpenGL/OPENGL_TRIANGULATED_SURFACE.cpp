@@ -280,7 +280,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION *OPENGL_TRIANGULATED_SURFACE<T>::
+template<class T> OPENGL_SELECTION* OPENGL_TRIANGULATED_SURFACE<T>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     OPENGL_SELECTION* selection=0;
@@ -590,7 +590,9 @@ Bounding_Box() const
     RANGE<VECTOR<float,3> > box(VECTOR<float,3>(surface.particles.X(index)));
     return object->World_Space_Box(box);
 }
-
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>::
 Bounding_Box() const
 {
@@ -602,7 +604,9 @@ Bounding_Box() const
     box.Enlarge_To_Include_Point(VECTOR<float,3>(surface.particles.X(node2)));
     return object->World_Space_Box(box);
 }
-
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>::
 Bounding_Box() const
 {

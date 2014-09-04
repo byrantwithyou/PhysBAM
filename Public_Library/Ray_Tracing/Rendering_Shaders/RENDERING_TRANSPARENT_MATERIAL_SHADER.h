@@ -61,7 +61,7 @@ public:
           else final_color+=world.Cast_Ray(reflected_ray,ray);}
       else{
           TV other_side_position;
-          if (ray_direction){other_side_position=intersection_point+ray.ray.direction*intersection_object.small_number*4;}
+          if(ray_direction){other_side_position=intersection_point+ray.ray.direction*intersection_object.small_number*4;}
           else {other_side_position=intersection_point-same_side_normal*intersection_object.small_number*4;}
           RENDERING_RAY<T> refracted_ray; 
           if(Create_Refraction_Ray(refracted_ray,exiting_object,entering_object,ray,same_side_normal,other_side_position)) reflection_coefficient=1;
@@ -69,7 +69,7 @@ public:
     else{
       if(transmission_coefficient>0){
           TV other_side_position;
-          if (ray_direction){other_side_position=intersection_point+ray.ray.direction*intersection_object.small_number*4;}
+          if(ray_direction){other_side_position=intersection_point+ray.ray.direction*intersection_object.small_number*4;}
           else {other_side_position=intersection_point-same_side_normal*intersection_object.small_number*4;}
           RENDERING_RAY<T> refracted_ray; 
           if(Create_Refraction_Ray(refracted_ray,exiting_object,entering_object,ray,same_side_normal,other_side_position)) reflection_coefficient=1;
@@ -90,7 +90,7 @@ public:
     {if(world.global_photon_map.photons.m || world.caustic_photon_map.photons.m) return TV();
     T reflection_coefficient,transmission_coefficient;Compute_Coefficients(reflection_coefficient,transmission_coefficient,ray,same_side_normal);
     RENDERING_RAY<T> transmitted_ray;
-    if (ray_direction){transmitted_ray=RENDERING_RAY<T>(RAY<TV>(SEGMENT_3D<T>(intersection_point+ray.ray.direction*intersection_object.small_number*10,full_ray.ray.Point(full_ray.ray.t_max))),ray.ray_contribution*transmission_coefficient,&entering_object);}
+    if(ray_direction){transmitted_ray=RENDERING_RAY<T>(RAY<TV>(SEGMENT_3D<T>(intersection_point+ray.ray.direction*intersection_object.small_number*10,full_ray.ray.Point(full_ray.ray.t_max))),ray.ray_contribution*transmission_coefficient,&entering_object);}
     else{transmitted_ray=RENDERING_RAY<T>(RAY<TV>(SEGMENT_3D<T>(intersection_point-same_side_normal*intersection_object.small_number*10,full_ray.ray.Point(full_ray.ray.t_max))),ray.ray_contribution*transmission_coefficient,&entering_object);}
     return transmission_coefficient*world.Incident_Light(transmitted_ray,light,full_ray,ray);}
 

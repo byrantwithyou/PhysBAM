@@ -14,7 +14,7 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_VECTOR_FIELD_3D : public OPENGL_OBJECT
+class OPENGL_VECTOR_FIELD_3D:public OPENGL_OBJECT
 {
 public:
     ARRAY<VECTOR<T,3> >& vector_field;

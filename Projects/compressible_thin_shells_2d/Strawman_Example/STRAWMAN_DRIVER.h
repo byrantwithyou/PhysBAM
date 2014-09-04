@@ -10,7 +10,7 @@ namespace PhysBAM{
 template<class TV> class STRAWMAN_EXAMPLE;
 
 template<class TV>
-class STRAWMAN_DRIVER : public DRIVER<TV>
+class STRAWMAN_DRIVER:public DRIVER<TV>
 {
     typedef DRIVER<TV> BASE;
     typedef typename TV::SCALAR T;

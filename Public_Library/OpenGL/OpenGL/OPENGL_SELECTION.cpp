@@ -4,20 +4,32 @@
 //#####################################################################
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 using namespace PhysBAM;
+//#####################################################################
+// Constructor
+//#####################################################################
 OPENGL_SELECTION::
 OPENGL_SELECTION(TYPE type,OPENGL_OBJECT* object)
     :type(type),object(object),hide(false)
 {
 }
+//#####################################################################
+// Destructor
+//#####################################################################
 OPENGL_SELECTION::
 ~OPENGL_SELECTION()
 {
 }
+//#####################################################################
+// Function Actual_Type
+//#####################################################################
 OPENGL_SELECTION::TYPE OPENGL_SELECTION::
 Actual_Type() const
 {
     return type;
 }
+//#####################################################################
+// Function Draw_Highlighted_Vertex
+//#####################################################################
 template<class TV> void OPENGL_SELECTION::
 Draw_Highlighted_Vertex(const TV& position,int id,const OPENGL_COLOR& color)
 {
@@ -33,6 +45,9 @@ Draw_Highlighted_Vertex(const TV& position,int id,const OPENGL_COLOR& color)
 #endif
     glPopAttrib();
 }
+//#####################################################################
+// Function Draw_Highlighted_Segment
+//#####################################################################
 template<class TV> void OPENGL_SELECTION::
 Draw_Highlighted_Segment(const TV& x0,const TV& x1,int id,const OPENGL_COLOR& color)
 {
@@ -48,6 +63,9 @@ Draw_Highlighted_Segment(const TV& x0,const TV& x1,int id,const OPENGL_COLOR& co
 #endif
     glPopAttrib();
 }
+//#####################################################################
+// Function Draw_Highlighted_Curve
+//#####################################################################
 template<class TV> void OPENGL_SELECTION::
 Draw_Highlighted_Curve(const ARRAY<VECTOR<TV,2> >& X,int id,const OPENGL_COLOR& color)
 {
@@ -64,6 +82,9 @@ Draw_Highlighted_Curve(const ARRAY<VECTOR<TV,2> >& X,int id,const OPENGL_COLOR& 
 #endif
     glPopAttrib();
 }
+//#####################################################################
+// Function Draw_Highlighted_Triangle_Boundary
+//#####################################################################
 template<class TV> void OPENGL_SELECTION::
 Draw_Highlighted_Triangle_Boundary(const TV& x0,const TV& x1,const TV& x2,int id,const OPENGL_COLOR& color)
 {
@@ -81,6 +102,9 @@ Draw_Highlighted_Triangle_Boundary(const TV& x0,const TV& x1,const TV& x2,int id
 #endif
     glPopAttrib();
 }
+//#####################################################################
+// Function Draw_Highlighted_Tetrahedron_Boundary
+//#####################################################################
 template<class T> void OPENGL_SELECTION::
 Draw_Highlighted_Tetrahedron_Boundary(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3,int id,const OPENGL_COLOR& color)
 {
@@ -105,6 +129,9 @@ Draw_Highlighted_Tetrahedron_Boundary(const VECTOR<T,3>& x0,const VECTOR<T,3>& x
 #endif
     glPopAttrib();
 }
+//#####################################################################
+// Function Draw_Highlighted_Quad
+//#####################################################################
 template<class T> void OPENGL_SELECTION::
 Draw_Highlighted_Quad(const VECTOR<T,2>& x00,const VECTOR<T,2>& x11,const OPENGL_COLOR& color)
 {
@@ -117,6 +144,9 @@ Draw_Highlighted_Quad(const VECTOR<T,2>& x00,const VECTOR<T,2>& x11,const OPENGL
     OpenGL_Draw_Arrays(GL_LINE_LOOP,2,vertices);
     glPopAttrib();
 }
+//#####################################################################
+// Function Draw_Highlighted_Quad
+//#####################################################################
 template<class T> void OPENGL_SELECTION::
 Draw_Highlighted_Quad(const VECTOR<T,3>& node1,const VECTOR<T,3>& node2,const VECTOR<T,3>& node3,const VECTOR<T,3>& node4,const OPENGL_COLOR& color)
 {
@@ -129,6 +159,9 @@ Draw_Highlighted_Quad(const VECTOR<T,3>& node1,const VECTOR<T,3>& node2,const VE
     OpenGL_Draw_Arrays(GL_LINE_LOOP,3,vertices);
     glPopAttrib();
 }
+//#####################################################################
+// Function Draw_Highlighted_Box
+//#####################################################################
 template<class T> void OPENGL_SELECTION::
 Draw_Highlighted_Box(const VECTOR<T,3>& x000,const VECTOR<T,3>& x111,const OPENGL_COLOR& color)
 {
@@ -152,6 +185,9 @@ Draw_Highlighted_Box(const VECTOR<T,3>& x000,const VECTOR<T,3>& x111,const OPENG
     OpenGL_Draw_Arrays(GL_LINES,3,vertices);
     glPopAttrib();
 }
+//#####################################################################
+// Function Draw_Vertices_For_Selection
+//#####################################################################
 template<class TV,int d> void OPENGL_SELECTION::
 Draw_Vertices_For_Selection(const SIMPLEX_MESH<d>& mesh,const GEOMETRY_PARTICLES<TV>& particles)
 {

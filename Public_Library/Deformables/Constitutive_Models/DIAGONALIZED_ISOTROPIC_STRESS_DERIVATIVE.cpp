@@ -41,15 +41,15 @@ Enforce_Definiteness(const T eigenvalue_clamp_percentage,const T epsilon)
     eigenvalues(3)=abs(D1.x.x);eigenvalues(4)=abs(D1.x.y);eigenvalues(5)=abs(D2.x.x);eigenvalues(6)=abs(D2.x.y);eigenvalues(7)=abs(D3.x.x);eigenvalues(8)=abs(D3.x.y);
     eigenvalues.Sort();
     T min_nonzero_absolute_eigenvalue=epsilon;for(int i=0;i<9;i++) if(min_nonzero_absolute_eigenvalue<eigenvalues(i)){min_nonzero_absolute_eigenvalue=eigenvalues(i);break;}
-    if(D0.x.x<-epsilon) D0.x.x=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D0.x.x<(T)0) D0.x.x=(T)0;
-    if(D0.x.y<-epsilon) D0.x.y=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D0.x.y<(T)0) D0.x.y=(T)0;
-    if(D0.x.z<-epsilon) D0.x.z=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D0.x.z<(T)0) D0.x.z=(T)0;
-    if(D1.x.x<-epsilon) D1.x.x=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D1.x.x<(T)0) D1.x.x=(T)0;
-    if(D1.x.y<-epsilon) D1.x.y=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D1.x.y<(T)0) D1.x.y=(T)0;
-    if(D2.x.x<-epsilon) D2.x.x=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D2.x.x<(T)0) D2.x.x=(T)0;
-    if(D2.x.y<-epsilon) D2.x.y=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D2.x.y<(T)0) D2.x.y=(T)0;
-    if(D3.x.x<-epsilon) D3.x.x=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D3.x.x<(T)0) D3.x.x=(T)0;
-    if(D3.x.y<-epsilon) D3.x.y=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D3.x.y<(T)0) D3.x.y=(T)0;
+    if(D0.x.x<-epsilon) D0.x.x=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if(D0.x.x<(T)0) D0.x.x=(T)0;
+    if(D0.x.y<-epsilon) D0.x.y=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if(D0.x.y<(T)0) D0.x.y=(T)0;
+    if(D0.x.z<-epsilon) D0.x.z=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if(D0.x.z<(T)0) D0.x.z=(T)0;
+    if(D1.x.x<-epsilon) D1.x.x=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if(D1.x.x<(T)0) D1.x.x=(T)0;
+    if(D1.x.y<-epsilon) D1.x.y=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if(D1.x.y<(T)0) D1.x.y=(T)0;
+    if(D2.x.x<-epsilon) D2.x.x=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if(D2.x.x<(T)0) D2.x.x=(T)0;
+    if(D2.x.y<-epsilon) D2.x.y=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if(D2.x.y<(T)0) D2.x.y=(T)0;
+    if(D3.x.x<-epsilon) D3.x.x=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if(D3.x.x<(T)0) D3.x.x=(T)0;
+    if(D3.x.y<-epsilon) D3.x.y=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if(D3.x.y<(T)0) D3.x.y=(T)0;
     A0=SYMMETRIC_MATRIX<T,3>::Conjugate(V0,D0);x0000=A0.x00;x1100=A0.x10;x2200=A0.x20;x1111=A0.x11;x2211=A0.x21;x2222=A0.x22;
     A1=SYMMETRIC_MATRIX<T,2>::Conjugate(V1,D1);x1010=A1.x00;x1001=A1.x10;
     A2=SYMMETRIC_MATRIX<T,2>::Conjugate(V2,D2);x2020=A2.x00;x2002=A2.x10;

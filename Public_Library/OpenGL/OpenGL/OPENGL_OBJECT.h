@@ -56,12 +56,12 @@ public:
     virtual void Turn_Smooth_Shading_On();
     virtual void Turn_Smooth_Shading_Off();
 
-    virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer,int buffer_size);
-    virtual void Set_Selection(OPENGL_SELECTION *selection);
-    virtual void Highlight_Selection(OPENGL_SELECTION *selection);
+    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer,int buffer_size);
+    virtual void Set_Selection(OPENGL_SELECTION* selection);
+    virtual void Highlight_Selection(OPENGL_SELECTION* selection);
     virtual void Clear_Highlight();
-    virtual void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) const;
-    virtual RANGE<VECTOR<float,3> > Selection_Bounding_Box(OPENGL_SELECTION *selection) const;
+    virtual void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const;
+    virtual RANGE<VECTOR<float,3> > Selection_Bounding_Box(OPENGL_SELECTION* selection) const;
     virtual OPENGL_SELECTION* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection);
 
     virtual void Set_Slice(OPENGL_SLICE *slice_input);

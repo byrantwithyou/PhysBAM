@@ -115,7 +115,7 @@ bool OPENGL_PBUFFER::Create(int width, int height)
     
 #define INIT_ENTRY_POINT( funcname, type )\
     funcname = (type) wglGetProcAddress(#funcname);\
-    if ( !funcname )\
+    if( !funcname )\
     LOG::cerr<<"#funcname() not initialized"<<std::endl;
 
     // Initialize WGL_ARB_pbuffer entry points. 

@@ -19,7 +19,7 @@ class OPENGL_GRID_3D:public OPENGL_OBJECT
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 
-    OPENGL_SELECTION *current_selection;
+    OPENGL_SELECTION* current_selection;
 public:
     GRID<TV> &grid;
     OPENGL_COLOR color;
@@ -34,8 +34,8 @@ public:
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
-    virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
     void Toggle_Draw_Ghost_Values();
     DEFINE_CALLBACK_CREATOR(OPENGL_GRID_3D,Toggle_Draw_Ghost_Values);
@@ -46,53 +46,53 @@ private:
 };
 
 template<class T>
-class OPENGL_SELECTION_GRID_CELL_3D : public OPENGL_SELECTION
+class OPENGL_SELECTION_GRID_CELL_3D:public OPENGL_SELECTION
 {
 private:
     typedef VECTOR<int,3> TV_INT;typedef VECTOR<T,3> TV;
 public:
     TV_INT index;
-    OPENGL_SELECTION_GRID_CELL_3D(OPENGL_OBJECT *object, const TV_INT &index=TV_INT()) 
-        : OPENGL_SELECTION(OPENGL_SELECTION::GRID_CELL_3D, object), index(index) {}
+    OPENGL_SELECTION_GRID_CELL_3D(OPENGL_OBJECT* object, const TV_INT &index=TV_INT()) 
+        :OPENGL_SELECTION(OPENGL_SELECTION::GRID_CELL_3D, object), index(index) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_GRID_NODE_3D : public OPENGL_SELECTION
+class OPENGL_SELECTION_GRID_NODE_3D:public OPENGL_SELECTION
 {
 private:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     TV_INT index;
-    OPENGL_SELECTION_GRID_NODE_3D(OPENGL_OBJECT *object, const TV_INT &index=TV_INT())
-        : OPENGL_SELECTION(OPENGL_SELECTION::GRID_NODE_3D, object), index(index) {}
+    OPENGL_SELECTION_GRID_NODE_3D(OPENGL_OBJECT* object, const TV_INT &index=TV_INT())
+        :OPENGL_SELECTION(OPENGL_SELECTION::GRID_NODE_3D, object), index(index) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_GRID_CELL_LIST_3D : public OPENGL_SELECTION
+class OPENGL_SELECTION_GRID_CELL_LIST_3D:public OPENGL_SELECTION
 {
 private:
     typedef VECTOR<int,3> TV_INT;typedef VECTOR<T,3> TV;
 public:
     ARRAY<TV_INT> indicies;
-    OPENGL_SELECTION_GRID_CELL_LIST_3D(OPENGL_OBJECT *object, const ARRAY<TV_INT> &indicies=ARRAY<TV_INT>()) 
-        : OPENGL_SELECTION(OPENGL_SELECTION::GRID_CELL_LIST_3D, object), indicies(indicies) {}
+    OPENGL_SELECTION_GRID_CELL_LIST_3D(OPENGL_OBJECT* object, const ARRAY<TV_INT> &indicies=ARRAY<TV_INT>()) 
+        :OPENGL_SELECTION(OPENGL_SELECTION::GRID_CELL_LIST_3D, object), indicies(indicies) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_GRID_NODE_LIST_3D : public OPENGL_SELECTION
+class OPENGL_SELECTION_GRID_NODE_LIST_3D:public OPENGL_SELECTION
 {
 private:
     typedef VECTOR<int,3> TV_INT;typedef VECTOR<T,3> TV;
 public:
     ARRAY<TV_INT> indicies;
-    OPENGL_SELECTION_GRID_NODE_LIST_3D(OPENGL_OBJECT *object, const ARRAY<TV_INT> &indicies=ARRAY<TV_INT>())
-        : OPENGL_SELECTION(OPENGL_SELECTION::GRID_NODE_LIST_3D, object), indicies(indicies) {}
+    OPENGL_SELECTION_GRID_NODE_LIST_3D(OPENGL_OBJECT* object, const ARRAY<TV_INT> &indicies=ARRAY<TV_INT>())
+        :OPENGL_SELECTION(OPENGL_SELECTION::GRID_NODE_LIST_3D, object), indicies(indicies) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };

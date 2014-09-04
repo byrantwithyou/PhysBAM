@@ -60,7 +60,7 @@ class OPENGL_CALLBACK_CYCLE:public OPENGL_CALLBACK
 public:
     OPENGL_CALLBACK_CYCLE(int *state, int min_value, int max_value, const std::string &help_string_input="Cycle state") 
         : state(state), min_value(min_value), max_value(max_value), help_string(help_string_input) {}
-    void operator() () PHYSBAM_OVERRIDE { if (++(*state) > max_value) *state = min_value; }
+    void operator() () PHYSBAM_OVERRIDE { if(++(*state) > max_value) *state = min_value; }
     void Print(std::ostream& out) { out << help_string << " (" << *state << ")"; }
 };
 //#####################################################################
@@ -103,11 +103,11 @@ public:
 //#####################################################################
 class OPENGL_CALLBACK_SAVE_SCREEN:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD &world;
+    OPENGL_WORLD& world;
     const std::string basename;
     int counter;
 public:
-    OPENGL_CALLBACK_SAVE_SCREEN(OPENGL_WORLD &world_input,const std::string& basename_input="opengl",int counter_start=0)
+    OPENGL_CALLBACK_SAVE_SCREEN(OPENGL_WORLD& world_input,const std::string& basename_input="opengl",int counter_start=0)
         : world(world_input),basename(basename_input),counter(counter_start)
     {}
 
@@ -133,18 +133,18 @@ public:
 //#####################################################################
 class OPENGL_CALLBACK_SAVE_TO_EPS:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD &world;
+    OPENGL_WORLD& world;
     const std::string basename;
     int counter;
 public:
-    OPENGL_CALLBACK_SAVE_TO_EPS(OPENGL_WORLD &world_input,const std::string& basename_input="opengl",int counter_start=0)
+    OPENGL_CALLBACK_SAVE_TO_EPS(OPENGL_WORLD& world_input,const std::string& basename_input="opengl",int counter_start=0)
         : world(world_input),basename(basename_input),counter(counter_start)
     {}
 
     void operator() () PHYSBAM_OVERRIDE
     {
         std::string filename=STRING_UTILITIES::string_sprintf("%s%03d.eps",basename.c_str(),counter);
-        opengl_eps_output = new OPENGL_EPS_OUTPUT<float>(filename);
+        opengl_eps_output=new OPENGL_EPS_OUTPUT<float>(filename);
 
         LOG::cout<<"saving to %s..."<<filename<<std::endl;
 
@@ -161,7 +161,7 @@ public:
 //#####################################################################
 class OPENGL_CALLBACK_MOVE_TARGET:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD &world;
+    OPENGL_WORLD& world;
     const VECTOR<float,3> motion_step;
     const float *motion_factor;
     VECTOR<float,3> *target;
@@ -210,11 +210,11 @@ public:
 //#####################################################################
 class OPENGL_CALLBACK_SAVE_VIEW:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD &world;
+    OPENGL_WORLD& world;
     std::string filename;
     bool verbose;
 public:
-    OPENGL_CALLBACK_SAVE_VIEW(OPENGL_WORLD &world_input, const std::string& filename_input,bool verbose_input=false)
+    OPENGL_CALLBACK_SAVE_VIEW(OPENGL_WORLD& world_input, const std::string& filename_input,bool verbose_input=false)
         :world(world_input),filename(filename_input),verbose(verbose_input)
     {}
 
@@ -229,11 +229,11 @@ public:
 //#####################################################################
 class OPENGL_CALLBACK_LOAD_VIEW:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD &world;
+    OPENGL_WORLD& world;
     std::string filename;
     bool verbose;
 public:
-    OPENGL_CALLBACK_LOAD_VIEW(OPENGL_WORLD &world_input,const std::string& filename_input,bool verbose_input=false)
+    OPENGL_CALLBACK_LOAD_VIEW(OPENGL_WORLD& world_input,const std::string& filename_input,bool verbose_input=false)
         :world(world_input),filename(filename_input),verbose(verbose_input)
     {}
 
@@ -249,10 +249,10 @@ public:
 // GL-specific
 class OPENGL_CALLBACK_STANDARD_SIZE:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD &world;
+    OPENGL_WORLD& world;
 public:
 
-    OPENGL_CALLBACK_STANDARD_SIZE(OPENGL_WORLD &world)
+    OPENGL_CALLBACK_STANDARD_SIZE(OPENGL_WORLD& world)
         :world(world)
     {}
 

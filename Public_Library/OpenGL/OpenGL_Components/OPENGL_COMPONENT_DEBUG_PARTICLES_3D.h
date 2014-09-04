@@ -32,12 +32,12 @@ public:
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
     OPENGL_SELECTION* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Selection_Bounding_Box(OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<float,3> > Selection_Bounding_Box(OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
     void Show_Colored_Wireframe();
     void Toggle_Draw_Velocities();
     void Increase_Vector_Size();
@@ -71,13 +71,13 @@ private:
 };
 
 template<class T>
-class OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D : public OPENGL_SELECTION
+class OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D:public OPENGL_SELECTION
 {
 public:
     int index;  // index into particles array
     VECTOR<T,3> location;
 
-    OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D(OPENGL_OBJECT *object) : OPENGL_SELECTION(OPENGL_SELECTION::DEBUG_PARTICLES_3D, object) {}
+    OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D(OPENGL_OBJECT* object) :OPENGL_SELECTION(OPENGL_SELECTION::DEBUG_PARTICLES_3D, object) {}
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 

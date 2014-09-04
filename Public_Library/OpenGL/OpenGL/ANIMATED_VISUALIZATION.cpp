@@ -14,8 +14,11 @@
 #include <cstdlib>
 #include <fstream>
 using namespace PhysBAM;
-
-ANIMATED_VISUALIZATION::ANIMATED_VISUALIZATION()
+//#####################################################################
+// Constructor
+//#####################################################################
+ANIMATED_VISUALIZATION::
+ANIMATED_VISUALIZATION()
     :animation_enabled(true),play(false),loop(false),fixed_frame_rate(false),start_frame(0),stop_frame(INT_MAX),
     frame(0),frame_rate(24),frame_increment(1),last_frame_filename(""),jpeg_quality(95)
 {
@@ -24,7 +27,9 @@ ANIMATED_VISUALIZATION::ANIMATED_VISUALIZATION()
     else if(IMAGE<float>::Is_Supported(".jpg")) saved_frame_filename="capture.%05d.jpg";
     else saved_frame_filename="capture.%05d.ppm";
 }
-
+//#####################################################################
+// Function Add_Arguments
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Add_Arguments(PARSE_ARGS& parse_args)
 {
@@ -36,13 +41,17 @@ Add_Arguments(PARSE_ARGS& parse_args)
     parse_args.Add("-stop_frame",&stop_frame,"frame","stop frame");
     parse_args.Add("-fps",&frame_rate,"rate","frames per second");
 }
-
+//#####################################################################
+// Function Parse_Arguments
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Parse_Arguments(PARSE_ARGS& parse_args)
 {
     BASIC_VISUALIZATION::Parse_Arguments(parse_args);
 }
-
+//#####################################################################
+// Function Add_OpenGL_Initialization
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Add_OpenGL_Initialization()
 {
@@ -50,7 +59,9 @@ Add_OpenGL_Initialization()
 
     Update_OpenGL_Strings();
 }
-
+//#####################################################################
+// Function Initialize_Components_And_Key_Bindings
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Initialize_Components_And_Key_Bindings()
 {
@@ -73,7 +84,9 @@ Initialize_Components_And_Key_Bindings()
     opengl_world.Set_Key_Binding_Category("User-Defined Keys");
     opengl_world.Set_Key_Binding_Category_Priority(1);
 }
-
+//#####################################################################
+// Function Valid_Frame
+//#####################################################################
 bool ANIMATED_VISUALIZATION::
 Valid_Frame(int frame_input)
 {
@@ -87,13 +100,17 @@ Valid_Frame(int frame_input)
         if(component_list(i)->Is_Animated() && component_list(i)->Valid_Frame(frame_input)) return true;
     return false;
 }
-
+//#####################################################################
+// Function Goto_Start_Frame
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Goto_Start_Frame()
 {
     Set_Frame(start_frame);
 }
-
+//#####################################################################
+// Function Goto_Last_Frame
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Goto_Last_Frame()
 {
@@ -103,15 +120,18 @@ Goto_Last_Frame()
         if(last_frame_file && (last_frame_file>>last_frame))
             Set_Frame(last_frame);}
 }
-
+//#####################################################################
+// Function Render_Offscreen
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Render_Offscreen()
 {
     Capture_Frames(saved_frame_filename,start_frame,stop_frame,jpeg_quality,false);
 }
-
-OPENGL_EPS_OUTPUT<float>* PhysBAM::opengl_eps_output = 0;
-
+OPENGL_EPS_OUTPUT<float>* PhysBAM::opengl_eps_output=0;
+//#####################################################################
+// Function Capture_Frames
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Capture_Frames(const std::string& filename_pattern,int capture_start_frame,int capture_end_frame,int jpeg_quality,bool swap_buffers)
 {
@@ -129,7 +149,7 @@ Capture_Frames(const std::string& filename_pattern,int capture_start_frame,int c
     for(;;){
         if(use_eps){
             std::string filename=STRING_UTILITIES::string_sprintf(filename_pattern.c_str(),frame);
-            opengl_eps_output = new OPENGL_EPS_OUTPUT<float>(filename);}
+            opengl_eps_output=new OPENGL_EPS_OUTPUT<float>(filename);}
         opengl_world.Render_World(false,swap_buffers);
         glFinish();
         if(mov){
@@ -146,11 +166,9 @@ Capture_Frames(const std::string& filename_pattern,int capture_start_frame,int c
         Set_Frame(frame+1);}
     delete mov;
 }
-
 //#####################################################################
-// CALLBACKS
+// Function Set_Frame
 //#####################################################################
-
 void ANIMATED_VISUALIZATION::
 Set_Frame(int frame_input)
 {
@@ -187,7 +205,9 @@ Set_Frame(int frame_input)
     Set_Frame_Extra();
     Update_OpenGL_Strings();
 }
-
+//#####################################################################
+// Function Update_OpenGL_Strings
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Update_OpenGL_Strings()
 {
@@ -195,7 +215,9 @@ Update_OpenGL_Strings()
     if(animation_enabled) opengl_world.Add_String(STRING_UTILITIES::string_sprintf("frame %d",frame)+(frame_title.empty()?"":": "+frame_title));
     BASIC_VISUALIZATION::Update_OpenGL_Strings();
 }
-
+//#####################################################################
+// Function Next_Frame
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Next_Frame()
 {
@@ -206,7 +228,9 @@ Next_Frame()
         opengl_world.Set_Idle_Callback(play?Next_Frame_CB():0,fixed_frame_rate?(float)1/frame_rate:0);}
     else if(play) opengl_world.Set_Idle_Callback(Next_Frame_CB(),.2);
 }
-
+//#####################################################################
+// Function Prev_Frame
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Prev_Frame()
 {
@@ -214,7 +238,9 @@ Prev_Frame()
     if(Valid_Frame(frame-frame_increment))
         Set_Frame(frame-frame_increment);
 }
-
+//#####################################################################
+// Function Goto_Frame_Prompt
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Goto_Frame_Prompt()
 {
@@ -223,14 +249,18 @@ Goto_Frame_Prompt()
         STRING_UTILITIES::String_To_Value(opengl_world.prompt_response,input_frame);
         if(Valid_Frame(input_frame)) Set_Frame(input_frame);}
 }
-
+//#####################################################################
+// Function Goto_Frame
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Goto_Frame()
 {
     if(!animation_enabled) return;
     opengl_world.Prompt_User("Goto frame: ",Goto_Frame_Prompt_CB(),"");
 }
-
+//#####################################################################
+// Function Reset
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Reset()
 {
@@ -238,7 +268,9 @@ Reset()
     Set_Frame(start_frame);
     if(play) Toggle_Play(); // Stop playing
 }
-
+//#####################################################################
+// Function Toggle_Play
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Toggle_Play()
 {
@@ -246,13 +278,17 @@ Toggle_Play()
     play=!play;
     opengl_world.Set_Idle_Callback(play?Next_Frame_CB():0,fixed_frame_rate?(float)1/frame_rate:0);
 }
-
+//#####################################################################
+// Function Toggle_Loop
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Toggle_Loop()
 {
     loop=!loop;
 }
-
+//#####################################################################
+// Function Toggle_Fixed_Frame_Rate
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Toggle_Fixed_Frame_Rate()
 {
@@ -260,7 +296,9 @@ Toggle_Fixed_Frame_Rate()
     if(fixed_frame_rate) last_frame_time=0;
     opengl_world.Set_Idle_Callback(play?Next_Frame_CB():0,fixed_frame_rate?(float)1/frame_rate:0);
 }
-
+//#####################################################################
+// Function Capture_Frames_Prompt
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Capture_Frames_Prompt()
 {
@@ -290,7 +328,9 @@ Capture_Frames_Prompt()
             capture_frames_prompt_state.jpeg_quality);
         if(system(STRING_UTILITIES::string_sprintf("pbp %s &",capture_frames_prompt_state.filename_pattern.c_str()).c_str())){};}
 }
-
+//#####################################################################
+// Function Capture_Frames
+//#####################################################################
 void ANIMATED_VISUALIZATION::
 Capture_Frames()
 {

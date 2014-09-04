@@ -15,6 +15,9 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_3D.h>
 namespace PhysBAM{
 
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_3D<T,T2>::
 OPENGL_SCALAR_FIELD_3D(const GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,3> > &values_input,OPENGL_COLOR_MAP<T2> *color_map_input,DRAW_MODE draw_mode_input)
     :grid(grid_input),values(values_input),current_color_map(0),opengl_textured_rect(0),opengl_points(0),smooth_slice_texture(false),scale_range(false)
@@ -23,7 +26,9 @@ OPENGL_SCALAR_FIELD_3D(const GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,3> > &valu
     Initialize_Color_Maps(color_map_input);
     Set_Draw_Mode(draw_mode_input);
 }
-
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_3D<T,T2>::
 ~OPENGL_SCALAR_FIELD_3D()
 {
@@ -31,31 +36,41 @@ template<class T,class T2> OPENGL_SCALAR_FIELD_3D<T,T2>::
     Delete_Points();
     color_maps.Delete_Pointers_And_Clean_Memory();
 }
-
+//#####################################################################
+// Function Initialize_Color_Maps
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_3D<float,bool>::
 Initialize_Color_Maps(OPENGL_COLOR_MAP<bool>* color_map_input)
 {
     color_maps.Append(color_map_input);
 }
-
+//#####################################################################
+// Function Initialize_Color_Maps
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_3D<double,bool>::
 Initialize_Color_Maps(OPENGL_COLOR_MAP<bool>* color_map_input)
 {
     color_maps.Append(color_map_input);
 }
-
+//#####################################################################
+// Function Initialize_Color_Maps
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_3D<float,int>::
 Initialize_Color_Maps(OPENGL_COLOR_MAP<int>* color_map_input)
 {
     color_maps.Append(color_map_input);
 }
-
+//#####################################################################
+// Function Initialize_Color_Maps
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_3D<double,int>::
 Initialize_Color_Maps(OPENGL_COLOR_MAP<int>* color_map_input)
 {
     color_maps.Append(color_map_input);
 }
-
+//#####################################################################
+// Function Initialize_Color_Maps
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Initialize_Color_Maps(OPENGL_COLOR_MAP<T2>* color_map_input)
 {
@@ -63,37 +78,51 @@ Initialize_Color_Maps(OPENGL_COLOR_MAP<T2>* color_map_input)
     color_maps.Append(OPENGL_COLOR_RAMP<T2>::Matlab_Jet(8e4,1e6));
     color_maps.Append(OPENGL_COLOR_RAMP<T2>::Matlab_Hot(8e4,1e6));
 }
-
+//#####################################################################
+// Function Delete_Textured_Rect
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Delete_Textured_Rect()
 {
     if(opengl_textured_rect){delete opengl_textured_rect->texture;}
     delete opengl_textured_rect;opengl_textured_rect=0;
 }
-
+//#####################################################################
+// Function Delete_Points
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Delete_Points()
 {
     if(opengl_points) delete &opengl_points->points;
     delete opengl_points;opengl_points=0;
 }
-
+//#####################################################################
+// Function Set_Scale_Range
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_3D<float,bool>::
 Set_Scale_Range(const bool range_min,const bool range_max)
 {PHYSBAM_FATAL_ERROR();}
-
+//#####################################################################
+// Function Set_Scale_Range
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_3D<double,bool>::
 Set_Scale_Range(const bool range_min,const bool range_max)
 {PHYSBAM_FATAL_ERROR();}
-
+//#####################################################################
+// Function Set_Scale_Range
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_3D<float,int>::
 Set_Scale_Range(const int range_min,const int range_max)
 {PHYSBAM_FATAL_ERROR();}
-
+//#####################################################################
+// Function Set_Scale_Range
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_3D<double,int>::
 Set_Scale_Range(const int range_min,const int range_max)
 {PHYSBAM_FATAL_ERROR();}
-
+//#####################################################################
+// Function Set_Scale_Range
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Set_Scale_Range(const T2 range_min,const T2 range_max)
 {
@@ -102,45 +131,59 @@ Set_Scale_Range(const T2 range_min,const T2 range_max)
     T2 range_length=(range_max-range_min);
     scale_range_dx=range_length>0?(T2)1/range_length:(T2)0;
 }
-
+//#####################################################################
+// Function Reset_Scale_Range
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Reset_Scale_Range()
 {
     scale_range=false;
 }
-
+//#####################################################################
+// Function Pre_Map_Value
+//#####################################################################
 template<> bool OPENGL_SCALAR_FIELD_3D<float,bool>::
 Pre_Map_Value(const bool value) const
 {
     return value;
 }
-
+//#####################################################################
+// Function Pre_Map_Value
+//#####################################################################
 template<> bool OPENGL_SCALAR_FIELD_3D<double,bool>::
 Pre_Map_Value(const bool value) const
 {
     return value;
 }
 
-
+//#####################################################################
+// Function Pre_Map_Value
+//#####################################################################
 template<class T,class T2> T2 OPENGL_SCALAR_FIELD_3D<T,T2>::
 Pre_Map_Value(const T2 value) const
 {
     if(!scale_range) return value;
     else return (value-scale_range_min)*scale_range_dx; 
 }
-
+//#####################################################################
+// Function Do_Color
+//#####################################################################
 template<class T,class T2> OPENGL_COLOR OPENGL_SCALAR_FIELD_3D<T,T2>::
 Do_Color(const int i, const int j, const int k) const
 {
     return color_maps(current_color_map)->Lookup(Pre_Map_Value(values(i,j,k)));
 }
-
+//#####################################################################
+// Function Do_Color
+//#####################################################################
 template<class T,class T2> OPENGL_COLOR OPENGL_SCALAR_FIELD_3D<T,T2>::
 Do_Color(const TV_INT& index) const
 {
     return color_maps(current_color_map)->Lookup(Pre_Map_Value(values(index)));
 }
-
+//#####################################################################
+// Function Display
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Display(const int in_color) const
 {
@@ -171,7 +214,9 @@ Display(const int in_color) const
 
     glPopMatrix();
 }
-
+//#####################################################################
+// Function Display_3D
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Display_3D() const
 {
@@ -258,7 +303,9 @@ Display_3D() const
 
     glPopAttrib();
 }
-
+//#####################################################################
+// Function Display_3D_Slice
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Display_3D_Slice() const
 {
@@ -313,14 +360,18 @@ Display_3D_Slice() const
 
     glPopAttrib();
 }
-
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T,class T2> RANGE<VECTOR<float,3> > OPENGL_SCALAR_FIELD_3D<T,T2>::
 Bounding_Box() const
 {
     if(slice && slice->Is_Slice_Mode() && opengl_textured_rect) return opengl_textured_rect->Bounding_Box();
     else return World_Space_Box((RANGE<VECTOR<float,3> >)grid.domain);
 }
-
+//#####################################################################
+// Function Set_Draw_Mode
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Set_Draw_Mode(DRAW_MODE draw_mode_input)
 {
@@ -335,22 +386,37 @@ Set_Draw_Mode(DRAW_MODE draw_mode_input)
 
     Update();
 }
-
+//#####################################################################
+// Function Update
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Update()
 {
     if(draw_mode==DRAW_TEXTURE){if(slice && slice->Is_Slice_Mode()) Update_Slice();}
     else Update_Points();
 }
-
-template<class T2,class T> static void Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* selection,const GRID<VECTOR<T,3> >& grid,ARRAY<T2,VECTOR<int,3> >& values)
+//#####################################################################
+// Function Print_Selection_Info_Helper
+//#####################################################################
+template<class T2,class T> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* selection,const GRID<VECTOR<T,3> >& grid,ARRAY<T2,VECTOR<int,3> >& values)
 {
-    output_stream<<" @ particle = "<<LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,3>,T2>().Clamped_To_Array(grid,values,selection->location);
+    output_stream<<" @ particle = "<<LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,3> ,T2>().Clamped_To_Array(grid,values,selection->location);
 }
+//#####################################################################
+// Function Print_Selection_Info_Helper
+//#####################################################################
 // no interpolation for bool's and int's
-template<class T> static void Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* selection,const GRID<VECTOR<T,3> >&,ARRAY<bool,VECTOR<int,3> >& values){}
-template<class T> static void Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* selection,const GRID<VECTOR<T,3> >&,ARRAY<int,VECTOR<int,3> >& values){}
-
+template<class T> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* selection,const GRID<VECTOR<T,3> >&,ARRAY<bool,VECTOR<int,3> >& values){}
+//#####################################################################
+// Function Print_Selection_Info_Helper
+//#####################################################################
+template<class T> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* selection,const GRID<VECTOR<T,3> >&,ARRAY<int,VECTOR<int,3> >& values){}
+//#####################################################################
+// Function Print_Selection_Info
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const
 {
@@ -367,8 +433,11 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selec
 }
 
 namespace{
-template<class T>
-void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,bool>* self,int tex_width,int tex_height){
+//#####################################################################
+// Function Update_Slice_Helper
+//#####################################################################
+template<class T> void
+Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,bool>* self,int tex_width,int tex_height){
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)self->slice;
     VECTOR<int,3> domain_start(self->values.domain.min_corner.x,self->values.domain.min_corner.y,self->values.domain.min_corner.z),domain_end(self->values.domain.max_corner.x,self->values.domain.max_corner.y,self->values.domain.max_corner.z);
     if(!self->opengl_textured_rect->texture || self->opengl_textured_rect->texture->width!=tex_width || self->opengl_textured_rect->texture->height!=tex_height){
@@ -393,9 +462,11 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,bool>* self,int tex_width,int 
 
     delete[]bitmap;
 }
-
-template<class T>
-void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,int>* self,int tex_width,int tex_height){
+//#####################################################################
+// Function Update_Slice_Helper
+//#####################################################################
+template<class T> void
+Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,int>* self,int tex_width,int tex_height){
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)self->slice;
     VECTOR<int,3> domain_start(self->values.domain.min_corner.x,self->values.domain.min_corner.y,self->values.domain.min_corner.z),domain_end(self->values.domain.max_corner.x,self->values.domain.max_corner.y,self->values.domain.max_corner.z);
     if(!self->opengl_textured_rect->texture || self->opengl_textured_rect->texture->width!=tex_width || self->opengl_textured_rect->texture->height!=tex_height){
@@ -420,9 +491,11 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,int>* self,int tex_width,int t
 
     delete[]bitmap;
 }
-
-template<class T,class T2>
-void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,T2>* self,int tex_width,int tex_height){
+//#####################################################################
+// Function Update_Slice_Helper
+//#####################################################################
+template<class T,class T2> void
+Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,T2>* self,int tex_width,int tex_height){
     typedef VECTOR<T,3> TV;
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)self->slice;
     int k=1;
@@ -464,7 +537,9 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,T2>* self,int tex_width,int te
     delete []bitmap;
 }
 }
-
+//#####################################################################
+// Function Update_Slice
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Update_Slice()
 {
@@ -517,7 +592,9 @@ Update_Slice()
 
     Update_Slice_Helper(this,tex_width,tex_height);
 }
-
+//#####################################################################
+// Function Slice_Has_Changed
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Slice_Has_Changed()
 {
@@ -526,7 +603,9 @@ Slice_Has_Changed()
         Delete_Textured_Rect();
     Update();
 }
-
+//#####################################################################
+// Function Update_Points
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Update_Points()
 {
@@ -538,7 +617,6 @@ Update_Points()
         opengl_points->Set_Point_Color(index,color_maps(current_color_map)->Lookup(values(i,j,k)));
         index++;}
 }
-
 //#####################################################################
 // Specialization for bool scalars: only draw point if value is "true"
 //#####################################################################
@@ -553,7 +631,9 @@ Update_Points()
         if(values(i,j,k)) opengl_points->points(index++)=grid.X(TV_INT(i,j,k));
     opengl_points->points.Resize(index);
 }
-
+//#####################################################################
+// Function Update_Points
+//#####################################################################
 template<> void OPENGL_SCALAR_FIELD_3D<double,bool>::
 Update_Points()
 {
@@ -565,34 +645,41 @@ Update_Points()
         if(values(i,j,k)) opengl_points->points(index++)=grid.X(TV_INT(i,j,k));
     opengl_points->points.Resize(index);
 }
-
+//#####################################################################
+// Function Toggle_Draw_Mode
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Toggle_Draw_Mode()
 {
     DRAW_MODE new_draw_mode=(DRAW_MODE)(((int)draw_mode+1)%2);
     Set_Draw_Mode(new_draw_mode);
 }
-
+//#####################################################################
+// Function Set_Smooth_Slice_Texture
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Set_Smooth_Slice_Texture(bool smooth_slice_texture_input)
 {
     smooth_slice_texture=smooth_slice_texture_input;
     if(draw_mode==DRAW_TEXTURE && opengl_textured_rect && opengl_textured_rect->texture) opengl_textured_rect->texture->Set_Smooth_Shading(smooth_slice_texture);
 }
-
+//#####################################################################
+// Function Toggle_Smooth_Slice_Texture
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Toggle_Smooth_Slice_Texture()
 {
     Set_Smooth_Slice_Texture(!smooth_slice_texture);
 }
-
+//#####################################################################
+// Function Toggle_Color_Map
+//#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Toggle_Color_Map()
 {
     current_color_map=(current_color_map+1)%color_maps.m;
     Update();
 }
-
 template class OPENGL_SCALAR_FIELD_3D<float,int>;
 template class OPENGL_SCALAR_FIELD_3D<float,bool>;
 template class OPENGL_SCALAR_FIELD_3D<float,float>;

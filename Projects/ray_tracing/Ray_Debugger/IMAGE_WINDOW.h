@@ -13,7 +13,7 @@
 namespace PhysBAM{
 
 template<class T> 
-class IMAGE_WINDOW : public Fl_Gl_Window
+class IMAGE_WINDOW:public Fl_Gl_Window
 {
 private:
     // camera setup

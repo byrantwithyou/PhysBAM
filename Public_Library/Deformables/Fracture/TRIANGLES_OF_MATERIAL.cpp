@@ -117,8 +117,8 @@ Add_To_Material_Surface_Mesh_Subquadrilateral_Containg_Diamond_Node(const int tr
     assert(embedded_object.Number_Of_Embedded_Subelements_In_Element(triangle)==2);
     int ij=embedded_object.Particle_Embedded_On_Segment(i,j),ik=embedded_object.Particle_Embedded_On_Segment(i,k),jk=embedded_object.Particle_Embedded_On_Segment(j,k);
     if(diamond_node==i) Add_To_Material_Surface_Mesh_Diamond_Quad(i,ij,jk,ik);
-    else if (diamond_node==j) Add_To_Material_Surface_Mesh_Diamond_Quad(j,jk,ik,ij);
-    else if (diamond_node==k) Add_To_Material_Surface_Mesh_Diamond_Quad(k,ik,ij,jk);
+    else if(diamond_node==j) Add_To_Material_Surface_Mesh_Diamond_Quad(j,jk,ik,ij);
+    else if(diamond_node==k) Add_To_Material_Surface_Mesh_Diamond_Quad(k,ik,ij,jk);
 }
 //#####################################################################
 // Function Add_To_Material_Surface_Mesh_Diamond_Quad
@@ -141,10 +141,10 @@ Add_To_Material_Surface_Mesh_Corner_Triangles(const int triangle)
     if(diamond_node==i){
         if(embedded_object.Node_In_Simplex_Is_Material(j,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(ij,j,jk);
         if(embedded_object.Node_In_Simplex_Is_Material(k,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(jk,k,ik);}
-    else if (diamond_node==j){
+    else if(diamond_node==j){
         if(embedded_object.Node_In_Simplex_Is_Material(i,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(ik,i,ij);
         if(embedded_object.Node_In_Simplex_Is_Material(k,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(jk,k,ik);} 
-    else if (diamond_node==k){
+    else if(diamond_node==k){
         if(embedded_object.Node_In_Simplex_Is_Material(i,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(ik,i,ij);
         if(embedded_object.Node_In_Simplex_Is_Material(j,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(ij,j,jk);}
 }

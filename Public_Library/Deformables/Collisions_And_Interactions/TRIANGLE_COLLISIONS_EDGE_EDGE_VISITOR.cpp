@@ -45,9 +45,9 @@ Store_Helper(const int point1,const int point2,VECTOR<T,2>)
     if(!box1.Intersection(box2,collision_thickness)) return;
     VECTOR<int,2> nodes(p1,p2);
     if(intersecting_edge_edge_pairs.Size() && intersecting_edge_edge_pairs.Contains(nodes)) return;
-    if (mpi_solids){
+    if(mpi_solids){
         VECTOR<PARTITION_ID,2> processors(mpi_solids->partition_id_from_particle_index.Subset(nodes));
-        if (processors(0)!=processors(1)) pairs_external.Append(nodes);
+        if(processors(0)!=processors(1)) pairs_external.Append(nodes);
         else pairs_internal.Append(nodes);}
     else pairs_internal.Append(nodes);
 }
@@ -68,9 +68,9 @@ Store_Helper_Helper(const int segment1,const int segment2)
     if(!box1.Intersection(box2,collision_thickness)) return;
     VECTOR<int,4> nodes(segment1_nodes[0],segment1_nodes[1],segment2_nodes[0],segment2_nodes[1]);
     if(intersecting_edge_edge_pairs.Size() && intersecting_edge_edge_pairs.Contains(nodes)) return;
-    if (mpi_solids){
+    if(mpi_solids){
         VECTOR<PARTITION_ID,4> processors(mpi_solids->partition_id_from_particle_index.Subset(nodes));
-        for(int i=0;i<3;i++) if (processors(i)!=processors(4)) {pairs_external.Append(nodes);return;}
+        for(int i=0;i<3;i++) if(processors(i)!=processors(4)) {pairs_external.Append(nodes);return;}
         pairs_internal.Append(nodes);}
     else pairs_internal.Append(nodes);
 }

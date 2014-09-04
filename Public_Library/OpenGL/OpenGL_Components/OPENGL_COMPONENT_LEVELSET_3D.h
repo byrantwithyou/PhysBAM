@@ -14,7 +14,7 @@
 namespace PhysBAM{
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_LEVELSET_3D : public OPENGL_COMPONENT
+class OPENGL_COMPONENT_LEVELSET_3D:public OPENGL_COMPONENT
 {
     typedef VECTOR<T,3> TV;
 public:

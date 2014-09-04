@@ -13,7 +13,7 @@ enum sort_order {
   REVERSE_SORT = 1
 };
 
-class Fl_Tree : public Fl_Widget {
+class Fl_Tree:public Fl_Widget {
 
 public:
 

@@ -341,7 +341,7 @@ public:
 };
 
 template <class T>
-class FEM_HYPERELASTICITY_3D: public LAGRANGIAN_FORCES_3D<T>{
+class FEM_HYPERELASTICITY_3D:public LAGRANGIAN_FORCES_3D<T>{
 public:
     TETRAHEDRON_MESH* tet_mesh;//Currently you can only have either a tet mesh or a tri mesh. TODO: Add support for both.
     TRIANGLE_MESH* tri_mesh;

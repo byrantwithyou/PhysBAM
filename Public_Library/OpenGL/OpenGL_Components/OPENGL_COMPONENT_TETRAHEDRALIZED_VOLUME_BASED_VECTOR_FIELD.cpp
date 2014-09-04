@@ -72,16 +72,16 @@ Bounding_Box() const
 template<class T,class RW> void OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T,RW>::
 Reinitialize(bool force_load_even_if_not_drawn)
 {
-    if (draw||force_load_even_if_not_drawn)
+    if(draw||force_load_even_if_not_drawn)
     {
-        if (!valid ||
+        if(!valid ||
             (is_animation && frame_loaded != frame) ||
             (!is_animation && frame_loaded < 0))
         {
             valid = false;
 
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(vector_field_filename, frame);
-            if (FILE_UTILITIES::File_Exists(tmp_filename))
+            if(FILE_UTILITIES::File_Exists(tmp_filename))
                 FILE_UTILITIES::Read_From_File<RW>(tmp_filename,opengl_vector_field.V);
             else
                 return;

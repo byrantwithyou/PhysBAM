@@ -50,7 +50,7 @@ Display(const int in_color) const
 {
     OPENGL_COLOR point_color=OPENGL_COLOR::White();
     OPENGL_COLOR velocity_color=OPENGL_COLOR::Yellow();
-    if (valid && draw){
+    if(valid && draw){
         glPushAttrib(GL_LIGHTING_BIT | GL_TEXTURE_BIT | GL_LINE_BIT);
         glDisable(GL_LIGHTING);glPointSize(5.0);
         T x_offset=0.4*mac_grid.dX.x,y_offset=0.4*mac_grid.dX.y;
@@ -80,14 +80,14 @@ Display(const int in_color) const
 template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<T,RW>::
 Reinitialize(bool force)
 {
-    if (draw||force)
+    if(draw||force)
     {
-        if (!valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0))
+        if(!valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0))
         {
             valid = false;
 
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(filename, frame);
-            if (FILE_UTILITIES::File_Exists(tmp_filename))
+            if(FILE_UTILITIES::File_Exists(tmp_filename))
                 FILE_UTILITIES::Read_From_File<RW>(tmp_filename,pseudo_dirichlet_cells);
             else
                 return;

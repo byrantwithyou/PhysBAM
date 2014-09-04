@@ -119,7 +119,7 @@ Update_Springs(const bool search_hierarchy)
         TV X1=(1-state.weights[1])*segment2.X.x+state.weights[1]*segment2.X.y;
         state.normal=X0-X1;
         state.distance=state.normal.Normalize();
-        //if (off_distance>=state.distance){
+        //if(off_distance>=state.distance){
         //    LOG::cout<<"ADH: Deleting and Setting"<<min_elem<<std::endl;
         //    if(first) first=false; else deletion_list.Append(min_elem);
         //    min_elem=i.Key();off_distance=state.distance;}

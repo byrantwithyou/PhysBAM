@@ -48,7 +48,7 @@ struct COMMAND_BASE
 
 
 
-struct COMMAND_AUTO : public COMMAND_BASE
+struct COMMAND_AUTO:public COMMAND_BASE
 {
     const std::string name;
     const std::string desc;
@@ -61,7 +61,7 @@ struct COMMAND_AUTO : public COMMAND_BASE
 
 //T is assumed to have istream >> defined
 template <class T>
-struct COMMAND_INPUT_VALUE : public COMMAND_AUTO
+struct COMMAND_INPUT_VALUE:public COMMAND_AUTO
 {
     T* target;
 
@@ -82,7 +82,7 @@ struct COMMAND_INPUT_VALUE : public COMMAND_AUTO
 };
 
 template <class T>
-struct COMMAND_SET_VALUE : public COMMAND_AUTO
+struct COMMAND_SET_VALUE:public COMMAND_AUTO
 {
     T* target;
     const T& val;

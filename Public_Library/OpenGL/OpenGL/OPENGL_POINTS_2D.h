@@ -56,10 +56,10 @@ public:
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
 
     void Store_Point_Colors(bool store_point_colors = true);
     void Store_Point_Ids(bool store_ids=true);
@@ -76,14 +76,14 @@ public:
 };
 
 template<class T>
-class OPENGL_SELECTION_POINTS_2D : public OPENGL_SELECTION
+class OPENGL_SELECTION_POINTS_2D:public OPENGL_SELECTION
 {
 public:
     int index;
     bool has_id;
     int id;
 
-    OPENGL_SELECTION_POINTS_2D(OPENGL_OBJECT *object) : OPENGL_SELECTION(OPENGL_SELECTION::POINTS_2D, object) {}
+    OPENGL_SELECTION_POINTS_2D(OPENGL_OBJECT* object):OPENGL_SELECTION(OPENGL_SELECTION::POINTS_2D, object) {}
 
     RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };

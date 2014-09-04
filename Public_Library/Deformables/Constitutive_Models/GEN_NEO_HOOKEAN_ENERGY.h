@@ -12,7 +12,7 @@
 namespace PhysBAM{
 
 template<class T>
-class GEN_NEO_HOOKEAN_ENERGY: public GENERAL_ENERGY<T>
+class GEN_NEO_HOOKEAN_ENERGY:public GENERAL_ENERGY<T>
 {
 public:
     T mu;

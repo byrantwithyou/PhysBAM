@@ -44,7 +44,7 @@ using namespace std;
 // OPENGL_2D_VISUALIZATION
 //#####################################################################
 template<class T,class RW=T>
-class OPENGL_2D_VISUALIZATION : public ANIMATED_VISUALIZATION
+class OPENGL_2D_VISUALIZATION:public ANIMATED_VISUALIZATION
 {
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,2> TV_INT;

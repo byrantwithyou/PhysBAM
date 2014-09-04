@@ -9,9 +9,10 @@
 #include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_3D.h>
-
 using namespace PhysBAM;
-
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename_input,
                              const std::string& triangulated_surface_filename_input,
@@ -19,7 +20,7 @@ OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename_input,
                              const std::string& filename_triangulated_surface_set_input,
                              bool write_generated_triangulated_surface_input,
                              bool check_triangulated_surface_file_time_input)
-    : OPENGL_COMPONENT("Levelset 3D"), opengl_levelset_multiview(0), 
+    :OPENGL_COMPONENT("Levelset 3D"), opengl_levelset_multiview(0), 
       levelset_filename(levelset_filename_input),triangulated_surface_filename(triangulated_surface_filename_input),
       filename_set(filename_set_input),filename_triangulated_surface_set(filename_triangulated_surface_set_input),
       write_generated_triangulated_surface(write_generated_triangulated_surface_input),
@@ -48,17 +49,22 @@ OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename_input,
     opengl_levelset_multiview=opengl_levelset_multiviews(0);
     delete color_map;
 
-    if (triangulated_surface_filename.length()==0) triangulated_surface_filename="";
+    if(triangulated_surface_filename.length()==0) triangulated_surface_filename="";
 
     is_animation=levelset_filename.find("%d")!=std::string::npos;
     Reinitialize();
 }
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 ~OPENGL_COMPONENT_LEVELSET_3D()
 {
     opengl_levelset_multiviews.Delete_Pointers_And_Clean_Memory();
 }
-
+//#####################################################################
+// Function Set_Surface_Material
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Set_Surface_Material(const OPENGL_MATERIAL &front_surface_mat,
                      const OPENGL_MATERIAL &back_surface_mat)
@@ -66,28 +72,36 @@ Set_Surface_Material(const OPENGL_MATERIAL &front_surface_mat,
     for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Set_Surface_Material(front_surface_mat, back_surface_mat);
 }
-
+//#####################################################################
+// Function Set_Overlayed_Surface_Material
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Set_Overlayed_Surface_Material(const OPENGL_MATERIAL &overlayed_surface_mat)
 {
     for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Set_Overlayed_Surface_Material(overlayed_surface_mat);
 }
-
+//#####################################################################
+// Function Set_Slice_Color
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Set_Slice_Color(const OPENGL_COLOR &inside_slice_color, const OPENGL_COLOR &outside_slice_color)
 {
     for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Set_Slice_Color(inside_slice_color, outside_slice_color);
 }
-
+//#####################################################################
+// Function Valid_Frame
+//#####################################################################
 template<class T,class RW> bool OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Valid_Frame(int frame_input) const
 {
     if(use_sets) return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,set));
     else return FILE_UTILITIES::File_Exists(is_animation?STRING_UTILITIES::string_sprintf(levelset_filename.c_str(),frame_input):levelset_filename);
 }
-
+//#####################################################################
+// Function Display
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Display(const int in_color) const
 {
@@ -95,14 +109,18 @@ Display(const int in_color) const
         if(draw_multiple_levelsets) for(int i=0;i<opengl_levelset_multiviews.m;i++) opengl_levelset_multiviews(i)->Display(in_color);
         else opengl_levelset_multiview->Display(in_color);}
 }
-
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Bounding_Box() const
 {
-    if (draw) return opengl_levelset_multiview->Bounding_Box();
+    if(draw) return opengl_levelset_multiview->Bounding_Box();
     else return RANGE<VECTOR<float,3> >::Centered_Box();
 }
-
+//#####################################################################
+// Function Print_Selection_Info
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const
 {
@@ -127,21 +145,27 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selec
             for(int i=0;i<opengl_levelset_multiviews.m;i++) if(opengl_levelset_multiviews(i)->Levelset())
                 output_stream<<component_name<<": phi["<<i<<"] @ particle="<<opengl_levelset_multiviews(i)->Levelset()->Phi(location)<<std::endl;}}
 }
-
+//#####################################################################
+// Function Turn_Smooth_Shading_On
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Turn_Smooth_Shading_On()
 {
     for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Turn_Smooth_Shading_On();
 }
-
+//#####################################################################
+// Function Turn_Smooth_Shading_Off
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Turn_Smooth_Shading_Off()
 {
     for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Turn_Smooth_Shading_Off();
 }
-
+//#####################################################################
+// Function Reinitialize
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Reinitialize()
 {
@@ -156,7 +180,9 @@ Reinitialize()
         }
     }
 }
-
+//#####################################################################
+// Function Reinitialize_Levelset
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Reinitialize_Levelset(const std::string& levelset_filename, const std::string& triangulated_surface_filename, OPENGL_LEVELSET_MULTIVIEW<T,RW>* levelset_multiview)
 {
@@ -168,42 +194,54 @@ Reinitialize_Levelset(const std::string& levelset_filename, const std::string& t
     else levelset_multiview->Generate_Triangulated_Surface(write_generated_triangulated_surface,triangulated_surface_filename);
     levelset_multiview->Initialize();
 }
-
+//#####################################################################
+// Function Set_Frame
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT::Set_Frame(frame_input);
     Reinitialize();
 }
-
+//#####################################################################
+// Function Set_Draw
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT::Set_Draw(draw_input);
     Reinitialize();
 }
-
+//#####################################################################
+// Function Toggle_Display_Overlay
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Toggle_Display_Overlay()
 {
     for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Toggle_Display_Overlay();
 }
-
+//#####################################################################
+// Function Toggle_Slice_Color_Mode
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Toggle_Slice_Color_Mode()
 {
     for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Toggle_Slice_Color_Mode();
 }
-
+//#####################################################################
+// Function Toggle_Smooth_Slice
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Toggle_Smooth_Slice()
 {
     for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Toggle_Smooth_Slice_Texture();
 }
-
+//#####################################################################
+// Function Next_Set
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Next_Set()
 {
@@ -212,7 +250,9 @@ Next_Set()
     opengl_levelset_multiview=opengl_levelset_multiviews(set);
     Reinitialize();
 }
-
+//#####################################################################
+// Function Previous_Set
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Previous_Set()
 {
@@ -221,7 +261,9 @@ Previous_Set()
     opengl_levelset_multiview=opengl_levelset_multiviews(set);
     Reinitialize();
 }
-
+//#####################################################################
+// Function Toggle_Draw_Multiple_Levelsets
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Toggle_Draw_Multiple_Levelsets()
 {
