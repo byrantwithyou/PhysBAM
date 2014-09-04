@@ -18,10 +18,12 @@ namespace PhysBAM
 {
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::World_Space_Box;
     GRID<TV> grid,mac_grid,u_grid,v_grid,w_grid;
     ARRAY<VECTOR<bool,3>,VECTOR<int,3> > node_neighbors_visible;
     ARRAY<VECTOR<PAIR<bool,T>,4>,VECTOR<int,3> > face_corners_visible_from_face_center_u; // length 4, order is front bottom, front top, back bottom, back top
@@ -49,7 +51,7 @@ public:
     void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
     void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Set_Slice(OPENGL_SLICE *slice_input) PHYSBAM_OVERRIDE;
     void Slice_Has_Changed() PHYSBAM_OVERRIDE;    
 

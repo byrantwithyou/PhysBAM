@@ -12,7 +12,7 @@
 namespace PhysBAM{
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_LEVELSET_1D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_LEVELSET_1D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,1> TV;typedef VECTOR<int,TV::m> TV_INT;
 private:
@@ -20,6 +20,7 @@ private:
     int frame_loaded;
     bool valid;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
     OPENGL_LEVELSET_1D<T>* opengl_levelset;
 
 //##################################################################### 
@@ -29,7 +30,7 @@ public:
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
     void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE;
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 private:
     void Reinitialize();
 //##################################################################### 

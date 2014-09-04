@@ -50,7 +50,7 @@ Set_Velocity_Mode(VELOCITY_MODE velocity_mode_input)
 template<class T> RANGE<VECTOR<T,3> > OPENGL_MAC_VELOCITY_FIELD_3D<T>::
 Bounding_Box() const
 {
-    return RANGE<VECTOR<float,3> >(grid.domain);
+    return World_Space_Box(grid.domain);
 }
 //#####################################################################
 // Function Update
@@ -67,7 +67,7 @@ Update()
 
     // Make sure the slice is good
     VECTOR<int,3> domain_start(1,1,1),domain_end(grid.counts);
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
     if(slice && ((slice->mode == OPENGL_SLICE::CELL_SLICE && (slice->index/scale<domain_start[slice->axis] || slice->index/scale>=domain_end[slice->axis])) || (slice->mode == OPENGL_SLICE::NODE_SLICE)))
         return; // Currently we don't draw anything if the slice doesn't match where the velocity field lives
 
@@ -92,17 +92,17 @@ Update()
         // u velocities
         for(int i=cell_start.x;i<cell_end.x+1;i++)for(int j=cell_start.y;j<cell_end.y;j++)for(int k=cell_start.z;k<cell_end.z;k++){
             T vel=u(VECTOR<int,3>(i,j,k));
-            if(vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(vel,0,0);vector_locations(idx)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j,k)));}}
+            if(vel != 0){idx++;vector_field(idx)=TV(vel,0,0);vector_locations(idx)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j,k)));}}
 
         // v velocities
         for(int i=cell_start.x;i<cell_end.x;i++) for(int j=cell_start.y;j<cell_end.y+1;j++) for(int k=cell_start.z;k<cell_end.z;k++){
             T vel = v(VECTOR<int,3>(i,j,k));
-            if (vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(0,vel,0);vector_locations(idx)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j,k)));}}
+            if(vel != 0){idx++;vector_field(idx)=TV(0,vel,0);vector_locations(idx)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j,k)));}}
 
         // w velocities
         for(int i=cell_start.x;i<cell_end.x;i++) for(int j=cell_start.y;j<cell_end.y;j++) for(int k=cell_start.z;k<cell_end.z+1;k++){
             T vel = w(VECTOR<int,3>(i,j,k));
-            if (vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(0,0,vel);vector_locations(idx)=grid.Face(FACE_INDEX<TV::m>(2,TV_INT(i,j,k)));}}
+            if(vel != 0){idx++;vector_field(idx)=TV(0,0,vel);vector_locations(idx)=grid.Face(FACE_INDEX<TV::m>(2,TV_INT(i,j,k)));}}
 
         vector_field.Resize(idx);
         vector_locations.Resize(idx);
@@ -122,7 +122,7 @@ Update()
         int idx=0;VECTOR<int,3> index;
         for(index.x=cell_start.x;index.x<cell_end.x;index.x+=inc)for(index.y=cell_start.y;index.y<cell_end.y;index.y+=inc)for(index.z=cell_start.z;index.z<cell_end.z;index.z+=inc){
             idx++;
-            vector_field(idx) = (T)0.5*VECTOR<T,3>(u(index)+u(index+VECTOR<int,3>(1,0,0)),
+            vector_field(idx) = (T)0.5*TV(u(index)+u(index+VECTOR<int,3>(1,0,0)),
                                                     v(index)+v(index+VECTOR<int,3>(0,1,0)),
                                                     w(index)+w(index+VECTOR<int,3>(0,0,1)));
             vector_locations(idx) = grid.X(index);}
@@ -132,9 +132,9 @@ Update()
 // Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_MAC_VELOCITY_FIELD_3D<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
 {
-    if(selection && selection->type==OPENGL_SELECTION::GRID_CELL_3D && grid.Is_MAC_Grid()){
+    if(selection && selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && grid.Is_MAC_Grid()){
         VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)selection)->index;
         T u_left=u(index.x,index.y,index.z),u_right=u(index.x+1,index.y,index.z),
             v_bottom=v(index.x,index.y,index.z),v_top=v(index.x,index.y+1,index.z),
@@ -146,7 +146,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
         output_stream<<"    w back = "<<w_back<<",front = "<<w_front<<" avg="<<center_velocity.z<<std::endl;
         T ux=(u_right-u_left)*grid.one_over_dX.x,vy=(v_top-v_bottom)*grid.one_over_dX.y,wz=(w_front-w_back)*grid.one_over_dX.z;
         output_stream<<"    divergence = "<<ux+vy+wz<<" (ux="<<ux<<", vy="<<vy<<", wz="<<wz<<")"<<std::endl;}
-    if(selection && selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_3D){
+    if(selection && selection->type==OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D){
         OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *particle_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)selection;
         LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
         TV interp(interpolation.Clamped_To_Array(grid.Get_Face_Grid(0),u,particle_selection->location),

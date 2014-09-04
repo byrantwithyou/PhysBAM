@@ -35,22 +35,22 @@ Update()
 //#####################################################################
 // Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_GRID_BASED_VECTOR_FIELD_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_GRID_BASED_VECTOR_FIELD_2D<T>::
 Bounding_Box() const
 {
-    return RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.Append(0)),VECTOR<float,3>(grid.domain.max_corner.Append(0)));
+    return World_Space_Box(grid.domain);
 }
 //#####################################################################
 // Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_GRID_BASED_VECTOR_FIELD_2D<T>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* current_selection) const
+Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* current_selection) const
 {
     // TODO: interpolate to particles
-    if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_2D && !grid.Is_MAC_Grid()){
+    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_2D && !grid.Is_MAC_Grid()){
         VECTOR<int,2> index=((OPENGL_SELECTION_GRID_NODE_2D<T>*)current_selection)->index;
         if(V.Valid_Index(index)) stream<<V(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_2D && grid.Is_MAC_Grid()){
+    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_2D && grid.Is_MAC_Grid()){
         VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)current_selection)->index;
         if(V.Valid_Index(index)) stream<<V(index);}
     stream<<std::endl;

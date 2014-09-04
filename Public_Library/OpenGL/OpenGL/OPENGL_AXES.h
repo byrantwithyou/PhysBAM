@@ -14,17 +14,18 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_AXES:public OPENGL_OBJECT
+class OPENGL_AXES:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;
-    typedef FRAME<TV> T_FRAME;
 public:
-    RANGE<VECTOR<T,3> > box; // extents of axes with respect to local frame
+    using OPENGL_OBJECT<T>::frame;using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;
+    using OPENGL_OBJECT<T>::World_Space_Box;
+    RANGE<TV> box; // extents of axes with respect to local frame
     bool draw_box; // whether to draw a bounding box or axis vectors
     bool draw_xz_grid,draw_xy_grid,draw_yz_grid; // whether to draw grids on each plane
     T grid_spacing;
 
-    OPENGL_AXES(const FRAME<VECTOR<T,3> >& frame_input=T_FRAME(),const RANGE<VECTOR<T,3> >& box_input=RANGE<TV>::Unit_Box(),
+    OPENGL_AXES(const FRAME<TV>& frame_input=FRAME<TV>(),const RANGE<TV>& box_input=RANGE<TV>::Unit_Box(),
         bool draw_box_input=false,bool draw_xz_grid_input=false,bool draw_xy_grid_input=false,bool draw_yz_grid_input=false,T grid_spacing_input=.1);
 
     virtual ~OPENGL_AXES();
@@ -34,7 +35,7 @@ public:
 
 //#####################################################################
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<TV> Bounding_Box() const PHYSBAM_OVERRIDE;
     bool Is_Transparent() const PHYSBAM_OVERRIDE {return false;}
 //#####################################################################
 };

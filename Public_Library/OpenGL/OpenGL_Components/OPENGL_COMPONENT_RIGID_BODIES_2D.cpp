@@ -29,7 +29,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
 OPENGL_COMPONENT_RIGID_BODIES_2D(const std::string& basedir_input)
-    :OPENGL_COMPONENT("Rigid Bodies 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
+    :OPENGL_COMPONENT<T>("Rigid Bodies 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_individual_axes(false),draw_node_velocity_vectors(false),draw_articulation_points(false),draw_segmented_curve(true),draw_triangulated_area(false),draw_implicit_curve(false),
     draw_forces_and_torques(false),draw_linear_muscles(false),rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),articulated_rigid_body(0),
     velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true),
@@ -42,7 +42,7 @@ OPENGL_COMPONENT_RIGID_BODIES_2D(const std::string& basedir_input)
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
 OPENGL_COMPONENT_RIGID_BODIES_2D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input)
-    :OPENGL_COMPONENT("Rigid Bodies 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
+    :OPENGL_COMPONENT<T>("Rigid Bodies 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_individual_axes(false),draw_node_velocity_vectors(false),draw_articulation_points(false),draw_segmented_curve(true),draw_triangulated_area(false),draw_implicit_curve(false),
     draw_forces_and_torques(false),draw_linear_muscles(false),rigid_body_collection(rigid_body_collection),articulated_rigid_body(0),
     velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true),
@@ -199,7 +199,7 @@ Create_Geometry(const int id)
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
 Update_Geometry(const int id)
 {
-    if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<float,3> >(Convert_2d_To_3d(rigid_body_collection.Rigid_Body(id).Frame()));
+    if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<T,3> >(Convert_2d_To_3d(rigid_body_collection.Rigid_Body(id).Frame()));
     if(opengl_triangulated_area(id)){
         std::string color_map_filename=STRING_UTILITIES::string_sprintf("%s/%d/stress_map_of_triangulated_area_%d",basedir.c_str(),frame,id);
         if(FILE_UTILITIES::File_Exists(color_map_filename)){
@@ -277,7 +277,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -286,7 +286,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
 }
 //#####################################################################
 // Function Display
@@ -339,9 +339,9 @@ Display() const
                 if(mode!=GL_SELECT) for(int i=0;i<articulation_points.m;i+=2){
                     OPENGL_SHAPES::Draw_Segment(articulation_points(i),articulation_points(i+1),segment_color,5);}
                 if(mode==GL_SELECT){glPopName();glPopAttrib();}
-                if(mode!=GL_SELECT && current_selection && current_selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_2D){
+                if(mode!=GL_SELECT && current_selection && current_selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_2D){
                     int joint_id=((OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D<T>*)current_selection)->joint_id;
-                    OPENGL_SELECTION::Draw_Highlighted_Vertex(articulation_points(joint_id));}}
+                    OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(articulation_points(joint_id));}}
 
             if(draw_linear_muscles){
                 glPushAttrib(GL_LINE_BIT|GL_ENABLE_BIT|GL_CURRENT_BIT);
@@ -358,7 +358,7 @@ Display() const
                     OpenGL_End();}
                 glPopName();glPopName();
                 // highligh selected one
-                if(mode!=GL_SELECT && current_selection && current_selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_MUSCLE_2D){
+                if(mode!=GL_SELECT && current_selection && current_selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_MUSCLE_2D){
                     int muscle_id=((OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D<T>*)current_selection)->muscle_id;
                     MUSCLE<TV>& muscle=*articulated_rigid_body->muscle_list->muscles(muscle_id);
                     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);OPENGL_PREFERENCES::selection_highlight_color.Send_To_GL_Pipeline();
@@ -410,31 +410,27 @@ Use_Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
 Bounding_Box() const
 {
-    RANGE<VECTOR<float,3> > box;
-    if(draw){
-        bool first=true;
+    RANGE<VECTOR<T,3> > box;
+    if(draw)
         for(int i=0;i<opengl_segmented_curve.Size();i++)
             if(draw_object(i) && use_object_bounding_box(i) && opengl_segmented_curve(i)){
-                if(first){
-                    box=opengl_segmented_curve(i)->Bounding_Box();
-                    first=false;}
-                else{box=RANGE<VECTOR<float,3> >::Combine(box,opengl_segmented_curve(i)->Bounding_Box());}}}
+                box=RANGE<VECTOR<T,3> >::Combine(box,opengl_segmented_curve(i)->Bounding_Box());}
     return box;
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION *OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
-    OPENGL_SELECTION* selection=0;
+    OPENGL_SELECTION<T>* selection=0;
     if(buffer_size>=2){
         if(buffer[0]==1 || buffer[0]==2){
             int body_id(buffer[1]);
-            OPENGL_SELECTION* body_selection=0;
+            OPENGL_SELECTION<T>* body_selection=0;
             if(buffer[0]==1){ // segmented curve
                 PHYSBAM_ASSERT(opengl_segmented_curve(body_id));
                 body_selection=opengl_segmented_curve(body_id)->Get_Selection(&buffer[2],buffer_size-2);}
@@ -452,23 +448,23 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
     delete current_selection;current_selection=0;
-    if(selection->type==OPENGL_SELECTION::COMPONENT_RIGID_BODIES_2D){
+    if(selection->type==OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_2D){
         OPENGL_SELECTION_COMPONENT_RIGID_BODIES_2D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_RIGID_BODIES_2D<T>*)selection;
-        if(real_selection->body_selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_2D ||
-           real_selection->body_selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_2D){ // segmented curve
+        if(real_selection->body_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_2D ||
+           real_selection->body_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_2D){ // segmented curve
             if(opengl_segmented_curve(real_selection->body_id)) // might have become inactive
                 opengl_segmented_curve(real_selection->body_id)->Highlight_Selection(real_selection->body_selection);}
-        else if(real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_AREA_VERTEX ||
-                real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_AREA_SEGMENT ||
-                real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_AREA_TRIANGLE){ // triangulated area
+        else if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_AREA_VERTEX ||
+                real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_AREA_SEGMENT ||
+                real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_AREA_TRIANGLE){ // triangulated area
             if(opengl_triangulated_area(real_selection->body_id)) // might have become inactive
                 opengl_triangulated_area(real_selection->body_id)->Highlight_Selection(real_selection->body_selection);}}
-    else if(selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_2D){
+    else if(selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_2D){
         current_selection=new OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D<T>(this,((OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D<T>*)selection)->joint_id);}
-    else if(selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_MUSCLE_2D){
+    else if(selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_MUSCLE_2D){
         current_selection=new OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D<T>(this,((OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D<T>*)selection)->muscle_id);}
 }
 //#####################################################################
@@ -487,10 +483,10 @@ Clear_Highlight()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODIES_2D<T,RW>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
 {
     if(!selection) return;
-    if(selection->type==OPENGL_SELECTION::COMPONENT_RIGID_BODIES_2D){
+    if(selection->type==OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_2D){
         OPENGL_SELECTION_COMPONENT_RIGID_BODIES_2D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_RIGID_BODIES_2D<T>*)selection;
 
         output_stream<<"Rigid body "<<real_selection->body_id<<std::endl;
@@ -515,25 +511,25 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) co
         MATRIX<T,3> body_transform=body->Frame().Matrix();
 
         // Have to do this ourselves here because we need to transform particle positions to world space
-        if(real_selection->body_selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_2D ||
-           real_selection->body_selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_2D){ // segmented curve
+        if(real_selection->body_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_2D ||
+           real_selection->body_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_2D){ // segmented curve
             if(opengl_segmented_curve(real_selection->body_id))
                 opengl_segmented_curve(real_selection->body_id)->Print_Selection_Info(output_stream,real_selection->body_selection,&body_transform);
 
-            if(real_selection->body_selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_2D){
+            if(real_selection->body_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_2D){
                 int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_2D<T> *)real_selection->body_selection)->index;
                 output_stream<<"Pointwise object velocity "<<body->Pointwise_Object_Velocity(body->World_Space_Point(body->simplicial_object->particles.X(index)))<<std::endl;}
-            else if(real_selection->body_selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_2D){
+            else if(real_selection->body_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_2D){
                 int index=((OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_2D<T> *)real_selection->body_selection)->index;
                 int node1,node2;body->simplicial_object->mesh.elements(index).Get(node1,node2);
                 output_stream<<"Pointwise object velocity "<<body->Pointwise_Object_Velocity(body->World_Space_Point(body->simplicial_object->particles.X(node1)))<<std::endl;
                 output_stream<<"Pointwise object velocity "<<body->Pointwise_Object_Velocity(body->World_Space_Point(body->simplicial_object->particles.X(node2)))<<std::endl;}}
-        else if(real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_AREA_VERTEX ||
-                real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_AREA_SEGMENT ||
-                real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_AREA_TRIANGLE){
+        else if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_AREA_VERTEX ||
+                real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_AREA_SEGMENT ||
+                real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_AREA_TRIANGLE){
             if(opengl_triangulated_area(real_selection->body_id))
                 opengl_triangulated_area(real_selection->body_id)->Print_Selection_Info(output_stream,real_selection->body_selection,&body_transform);}}
-    else if(selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_2D){
+    else if(selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_2D){
         PHYSBAM_ASSERT(articulated_rigid_body);
         OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D<T> *real_selection=(OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D<T>*)selection;
         JOINT_ID joint_id(real_selection->joint_id/2);
@@ -553,7 +549,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) co
         VECTOR<T,1> current_relative_angular_velocity=-RIGID_BODY<TV>::Relative_Angular_Velocity(*parent,*child); // child w.r.t. parent!
         output_stream<<"Relative velocity at joint = "<<current_relative_velocity<<std::endl;
         output_stream<<"Relative angular velocity = "<<current_relative_angular_velocity<<std::endl;}
-    else if(selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_MUSCLE_2D){
+    else if(selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_MUSCLE_2D){
         PHYSBAM_ASSERT(articulated_rigid_body);
         OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D<T> *real_selection=(OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D<T>*)selection;
         int muscle_id=real_selection->muscle_id;MUSCLE<TV>& muscle=*articulated_rigid_body->muscle_list->muscles(muscle_id);
@@ -719,7 +715,7 @@ Toggle_Draw_Mode()
 //#####################################################################
 // Selection object functions
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_COMPONENT_RIGID_BODIES_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_RIGID_BODIES_2D<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object && body_selection);
@@ -728,20 +724,20 @@ Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D<T>::
 Bounding_Box() const
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-    return RANGE<VECTOR<float,3> >::Empty_Box();
+    return RANGE<VECTOR<T,3> >::Empty_Box();
 }
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D<T>::
 Bounding_Box() const
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-    return RANGE<VECTOR<float,3> >::Empty_Box();
+    return RANGE<VECTOR<T,3> >::Empty_Box();
 }
 //#####################################################################
 namespace PhysBAM{

@@ -17,10 +17,13 @@ namespace PhysBAM
 template<class TV> class GRID;
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::Toggle_Draw;
     typedef LINEAR_INTERPOLATION_UNIFORM<TV,T> T_LINEAR_INTERPOLATION_VECTOR;
     OPENGL_MAC_VELOCITY_FIELD_2D<T>* opengl_mac_velocity_field;
     ARRAY<OPENGL_MAC_VELOCITY_FIELD_2D<T>* > opengl_adaptive_mac_velocity_fields;
@@ -59,9 +62,9 @@ public:
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
     void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
     void Display() const PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     void Set_Psi_N_Psi_D_Basedir_For_Divergence(std::string psi_N_psi_D_basedir_input)
     {psi_N_psi_D_basedir=psi_N_psi_D_basedir_input;}

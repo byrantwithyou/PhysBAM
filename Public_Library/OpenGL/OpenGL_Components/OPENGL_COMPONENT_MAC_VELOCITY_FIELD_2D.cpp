@@ -21,7 +21,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &velocity_filename_input,const std::string directory_adaptive_input,const std::string filename_active_cells_input,const std::string filename_active_faces_input)
-    :OPENGL_COMPONENT("MAC Velocity Field 2D"),draw_vorticity(false),
+    :OPENGL_COMPONENT<T>("MAC Velocity Field 2D"),draw_vorticity(false),
     velocity_filename(velocity_filename_input),directory_adaptive(directory_adaptive_input),filename_active_cells(filename_active_cells_input),filename_active_faces(filename_active_faces_input),level(1),
     use_levels(true),level_loaded(-1),valid(false),draw_divergence(false),draw_all_levels(true),draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),
     streamlines(*new SEGMENT_MESH(),*new GEOMETRY_PARTICLES<TV>()),opengl_streamlines(streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
@@ -36,7 +36,7 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &v
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &velocity_filename_input,const std::string directory_adaptive_input,const std::string filename_active_cells_input,const std::string filename_active_faces_input,const ARRAY<GRID<TV>*> grid_array_input)
-    :OPENGL_COMPONENT("MAC Velocity Field 2D"),draw_vorticity(false),velocity_filename(velocity_filename_input),directory_adaptive(directory_adaptive_input),filename_active_cells(filename_active_cells_input),filename_active_faces(filename_active_faces_input),level(1),use_levels(true),level_loaded(-1),
+    :OPENGL_COMPONENT<T>("MAC Velocity Field 2D"),draw_vorticity(false),velocity_filename(velocity_filename_input),directory_adaptive(directory_adaptive_input),filename_active_cells(filename_active_cells_input),filename_active_faces(filename_active_faces_input),level(1),use_levels(true),level_loaded(-1),
     valid(false),draw_divergence(false),draw_all_levels(true),draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),streamlines(*new SEGMENT_MESH(),*new GEOMETRY_PARTICLES<TV>()),opengl_streamlines(streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
 {
     Initialize(grid_array_input);
@@ -104,7 +104,7 @@ Valid_Frame(int frame_input) const
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
 {
     if(Is_Up_To_Date(frame)){
         stream<<component_name<<": "<<std::endl;
@@ -119,7 +119,7 @@ Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -128,7 +128,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -148,11 +148,11 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_mac_velocity_field->Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Reinitialize

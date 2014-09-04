@@ -14,12 +14,13 @@
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 namespace PhysBAM{
 
-class OPENGL_SELECTION;
+template<class T> class OPENGL_SELECTION;
 
 template<class T>
-class OPENGL_POINT_SIMPLICES_1D:public OPENGL_OBJECT
+class OPENGL_POINT_SIMPLICES_1D:public OPENGL_OBJECT<T>
 {
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
     const POINT_SIMPLICES_1D<T>& simplices;
     OPENGL_COLOR color;
     OPENGL_COLOR vertex_color,segment_color,vertex_position_color,velocity_color;
@@ -29,7 +30,7 @@ public:
 
 //#####################################################################
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

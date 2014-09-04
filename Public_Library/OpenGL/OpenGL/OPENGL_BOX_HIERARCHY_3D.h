@@ -14,20 +14,22 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_BOX_HIERARCHY_3D:public OPENGL_OBJECT
+class OPENGL_BOX_HIERARCHY_3D:public OPENGL_OBJECT<T>
 {
+    typedef VECTOR<T,3> TV;
 public:
-    BOX_HIERARCHY<VECTOR<T,3> >* hierarchy;
+    using OPENGL_OBJECT<T>::World_Space_Box;
+    BOX_HIERARCHY<TV>* hierarchy;
     OPENGL_COLOR color;
     int min_height,max_height;
 
-    OPENGL_BOX_HIERARCHY_3D(BOX_HIERARCHY<VECTOR<T,3> > *hierarchy_in,const OPENGL_COLOR &color_input = OPENGL_COLOR::White()) 
+    OPENGL_BOX_HIERARCHY_3D(BOX_HIERARCHY<TV> *hierarchy_in,const OPENGL_COLOR &color_input = OPENGL_COLOR::White()) 
         :hierarchy(hierarchy_in),color(color_input),min_height(1),max_height(1)
     {}
 
     void Display() const PHYSBAM_OVERRIDE;
     void Display_Helper(const int cell,const int height) const;
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<TV> Bounding_Box() const PHYSBAM_OVERRIDE;
 
     void Increment_Height();
     void Decrement_Height();

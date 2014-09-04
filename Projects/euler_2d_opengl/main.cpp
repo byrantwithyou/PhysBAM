@@ -23,10 +23,13 @@ using namespace PhysBAM;
 using namespace std;
 
 template<class T>
-class VISUALIZATION:public ANIMATED_VISUALIZATION
+class VISUALIZATION:public ANIMATED_VISUALIZATION<T>
 {
     typedef VECTOR<T,2> TV;
 public:
+    using ANIMATED_VISUALIZATION<T>::last_frame_filename;using ANIMATED_VISUALIZATION<T>::camera_script_filename;
+    using ANIMATED_VISUALIZATION<T>::opengl_window_title;using ANIMATED_VISUALIZATION<T>::opengl_world;
+    using ANIMATED_VISUALIZATION<T>::Add_Component;using ANIMATED_VISUALIZATION<T>::Selection_Priority;
     VISUALIZATION();
     ~VISUALIZATION();
 
@@ -41,7 +44,7 @@ private:
     // Components
     OPENGL_COMPONENT_HEIGHTFIELD_2D<T> *density_component;
     OPENGL_COMPONENT_HEIGHTFIELD_2D<T> *pressure_component;
-    OPENGL_COMPONENT_BASIC<OPENGL_TRIANGULATED_SURFACE<T> > *world_geometry_component;
+    OPENGL_COMPONENT_BASIC<T,OPENGL_TRIANGULATED_SURFACE<T> > *world_geometry_component;
 
     GRID<TV> grid;
 
@@ -51,7 +54,7 @@ private:
 
 template<class T> VISUALIZATION<T>::
 VISUALIZATION()
-    : ANIMATED_VISUALIZATION(),density_component(0),pressure_component(0),world_geometry_component(0)
+    : ANIMATED_VISUALIZATION<T>(),density_component(0),pressure_component(0),world_geometry_component(0)
 {}
 
 template<class T> VISUALIZATION<T>::
@@ -66,14 +69,14 @@ template<class T> void VISUALIZATION<T>::
 Add_Arguments(PARSE_ARGS &parse_args)
 {
     basedir=".";   // default basedir
-    ANIMATED_VISUALIZATION::Add_Arguments(parse_args);
+    ANIMATED_VISUALIZATION<T>::Add_Arguments(parse_args);
     parse_args.Extra_Optional(&basedir,"basedir","base directory");
 }
 
 template<class T> void VISUALIZATION<T>::
 Parse_Arguments(PARSE_ARGS &parse_args)
 {
-    ANIMATED_VISUALIZATION::Parse_Arguments(parse_args);
+    ANIMATED_VISUALIZATION<T>::Parse_Arguments(parse_args);
     if(parse_args.unclaimed_arguments) parse_args.Print_Usage(true);
     last_frame_filename = std::string(basedir)+"/common/last_frame";
     
@@ -93,7 +96,7 @@ Read_Grid()
 template<class T> void VISUALIZATION<T>::
 Initialize_Components_And_Key_Bindings()
 {
-    ANIMATED_VISUALIZATION::Initialize_Components_And_Key_Bindings();
+    ANIMATED_VISUALIZATION<T>::Initialize_Components_And_Key_Bindings();
     opengl_world.Unbind_Keys("12");
     if (!Read_Grid()){
         std::cerr << "Error reading grid" << std::endl;
@@ -116,7 +119,7 @@ Initialize_Components_And_Key_Bindings()
     Add_Component(pressure_component, "pressure",'2',0);
 
     // Initialize priority ordering for selections
-    Selection_Priority(OPENGL_SELECTION::COMPONENT_HEIGHTFIELD_2D);
+    Selection_Priority(OPENGL_SELECTION<T>::COMPONENT_HEIGHTFIELD_2D);
 }
 
 int main(int argc, char *argv[])
@@ -127,11 +130,18 @@ int main(int argc, char *argv[])
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Parse(true);
 
-    ANIMATED_VISUALIZATION *visualization = 0;
-    if(!type_double) visualization=new VISUALIZATION<float>;
-    else visualization=new VISUALIZATION<double>;
-    visualization->Initialize_And_Run(parse_args);
+    if(!type_double)
+    {
+        ANIMATED_VISUALIZATION<float> *visualization=new VISUALIZATION<float>;
+        visualization->Initialize_And_Run(parse_args);
+        delete visualization;
+    }
+    else
+    {
+        ANIMATED_VISUALIZATION<double> *visualization=new VISUALIZATION<double>;
+        visualization->Initialize_And_Run(parse_args);
+        delete visualization;
+    }
 
-    delete visualization;
     return 0;
 }

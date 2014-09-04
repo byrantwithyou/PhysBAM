@@ -12,7 +12,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
 OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D(const GRID<TV> &grid,const std::string& directory)
-    :OPENGL_COMPONENT("Thin Shells Debugging"),grid(grid),
+    :OPENGL_COMPONENT<T>("Thin Shells Debugging"),grid(grid),
     invalid_color_map(OPENGL_COLOR::Red()),
     opengl_density_valid_mask(grid,density_valid_mask,&invalid_color_map,OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS),
     directory(directory),frame_loaded(-1),valid(false),
@@ -39,7 +39,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -48,7 +48,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -166,11 +166,11 @@ Toggle_Draw_Density_Valid_Mask()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
 Bounding_Box() const
 {
-    if (valid && draw) return RANGE<VECTOR<float,3> >(grid.domain);
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    if(valid && draw) return World_Space_Box(grid.domain);
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Set_Slice

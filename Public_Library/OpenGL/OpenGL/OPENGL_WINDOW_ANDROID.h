@@ -19,7 +19,7 @@ class OPENGL_WINDOW_ANDROID:public OPENGL_WINDOW
 
 //#####################################################################
 public:
-    OPENGL_WINDOW_ANDROID(OPENGL_WORLD& world_input,const std::string& window_title_input,const int width_input,const int height_input);
+    OPENGL_WINDOW_ANDROID(OPENGL_WORLD<T>& world_input,const std::string& window_title_input,const int width_input,const int height_input);
     virtual ~OPENGL_WINDOW_ANDROID();
     void Setup_Idle(const bool use) PHYSBAM_OVERRIDE;
     void Setup_Timer(const float wait_milliseconds) PHYSBAM_OVERRIDE;

@@ -18,9 +18,10 @@ namespace PhysBAM
 {
 
 template<class T>
-class OPENGL_GRID_2D:public OPENGL_OBJECT
+class OPENGL_GRID_2D:public OPENGL_OBJECT<T>
 {
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
     GRID<TV>      &grid;
     ARRAY<bool,TV_INT> *active_cell_mask,*ghost_cell_mask;
@@ -31,7 +32,7 @@ public:
     bool draw_ghost_values;
     int draw_mask_type;
 private:
-    OPENGL_SELECTION* current_selection;
+    OPENGL_SELECTION<T>* current_selection;
     std::string basedir;
     int frame;
 
@@ -42,43 +43,45 @@ public:
 
     void Display() const PHYSBAM_OVERRIDE;
     virtual void Set_Frame(int frame_input);
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
 
     void Toggle_Draw_Ghost_Values();
     void Reinitialize();
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
 
     DEFINE_CALLBACK_CREATOR(OPENGL_GRID_2D, Toggle_Draw_Ghost_Values);
 };
 
 template<class T>
-class OPENGL_SELECTION_GRID_CELL_2D:public OPENGL_SELECTION
+class OPENGL_SELECTION_GRID_CELL_2D:public OPENGL_SELECTION<T>
 {
 private:
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
+    using OPENGL_SELECTION<T>::object;
     VECTOR<int,2> index;
-    OPENGL_SELECTION_GRID_CELL_2D(OPENGL_OBJECT* object, const VECTOR<int,2> &index=TV_INT()) 
-        :OPENGL_SELECTION(OPENGL_SELECTION::GRID_CELL_2D, object), index(index) {}
+    OPENGL_SELECTION_GRID_CELL_2D(OPENGL_OBJECT<T>* object, const VECTOR<int,2> &index=TV_INT()) 
+        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::GRID_CELL_2D, object), index(index) {}
 
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_GRID_NODE_2D:public OPENGL_SELECTION
+class OPENGL_SELECTION_GRID_NODE_2D:public OPENGL_SELECTION<T>
 {
 private:
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
+    using OPENGL_SELECTION<T>::object;
     VECTOR<int,2> index;
-    OPENGL_SELECTION_GRID_NODE_2D(OPENGL_OBJECT* object, const VECTOR<int,2> &index=TV_INT()) 
-        :OPENGL_SELECTION(OPENGL_SELECTION::GRID_NODE_2D, object), index(index) {}
+    OPENGL_SELECTION_GRID_NODE_2D(OPENGL_OBJECT<T>* object, const VECTOR<int,2> &index=TV_INT()) 
+        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::GRID_NODE_2D, object), index(index) {}
 
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 }

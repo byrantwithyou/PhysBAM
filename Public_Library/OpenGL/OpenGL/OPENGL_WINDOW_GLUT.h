@@ -10,16 +10,16 @@
 #include <OpenGL/OpenGL/OPENGL_WINDOW.h>
 namespace PhysBAM{
 
-class OPENGL_WINDOW_GLUT:public OPENGL_WINDOW
+template<class T>
+class OPENGL_WINDOW_GLUT:public OPENGL_WINDOW<T>
 {
-    using OPENGL_WINDOW::opengl_world;
-    static OPENGL_WINDOW_GLUT* single;
+    using OPENGL_WINDOW<T>::opengl_world;
     int main_window;
     int width,height;
 
 //#####################################################################
 public:
-    OPENGL_WINDOW_GLUT(OPENGL_WORLD& world_input,const std::string& window_title_input,const int width_input,const int height_input);
+    OPENGL_WINDOW_GLUT(OPENGL_WORLD<T>& world_input,const std::string& window_title_input,const int width_input,const int height_input);
     virtual ~OPENGL_WINDOW_GLUT();
     void Setup_Idle(const bool use) PHYSBAM_OVERRIDE;
     void Setup_Timer(const float wait_milliseconds) PHYSBAM_OVERRIDE;
@@ -30,6 +30,7 @@ public:
     int Width() const PHYSBAM_OVERRIDE;
     int Height() const PHYSBAM_OVERRIDE;
 private:
+    static OPENGL_WINDOW_GLUT<T>*& Single();
     static void Handle_Idle_Glut();
     static void Handle_Timer_Glut(int value);
     static void Handle_Display_Glut();

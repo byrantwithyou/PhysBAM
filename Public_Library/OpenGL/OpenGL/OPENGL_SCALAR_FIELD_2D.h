@@ -15,15 +15,16 @@
 
 namespace PhysBAM
 {
-class OPENGL_TEXTURED_RECT;
+template<class T> class OPENGL_TEXTURED_RECT;
 template<class T,class T_ARRAY> class OPENGL_POINTS_2D;
 template<class T> class OPENGL_SEGMENTED_CURVE_2D;
 
 template<class T,class T2=T>
-class OPENGL_SCALAR_FIELD_2D:public OPENGL_OBJECT
+class OPENGL_SCALAR_FIELD_2D:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
+    using OPENGL_OBJECT<T>::World_Space_Box;
     GRID<TV>& grid;
     ARRAY<T2,VECTOR<int,2> > &values;
     ARRAY<bool,VECTOR<int,2> > *active_cells;
@@ -34,7 +35,7 @@ public:
     ARRAY<OPENGL_COLOR_MAP<T2>*> color_maps; // all owned by us
     int current_color_map;
 private: 
-    OPENGL_TEXTURED_RECT* opengl_textured_rect;
+    OPENGL_TEXTURED_RECT<T>* opengl_textured_rect;
     OPENGL_POINTS_2D<T,ARRAY<VECTOR<T,2> > > *opengl_points;
     ARRAY<T2> contour_values;
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> contour_curves;
@@ -54,12 +55,12 @@ public:
 
     void Display() const PHYSBAM_OVERRIDE;
     void Display_2D() const;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     void Set_Draw_Mode(DRAW_MODE draw_mode);
     virtual void Update();  // Call when values or other attributes have changed
 
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const PHYSBAM_OVERRIDE;
 
     // convenience functions
     void Toggle_Draw_Mode();

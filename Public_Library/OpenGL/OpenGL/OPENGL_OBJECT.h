@@ -25,19 +25,21 @@ namespace PhysBAM{
 #define glLightModeli(model,x)        glLightModelf(model,(GLfloat)x)
 #endif
 
-class OPENGL_SELECTION;
+template<class T> class OPENGL_SELECTION;
 
+template<class T>
 class OPENGL_OBJECT:public NONCOPYABLE
 {
+    typedef VECTOR<T,3> TV;
 public:
-    FRAME<VECTOR<float,3> >* frame; // pointer so you can enslave this body to another's motion
+    FRAME<TV>* frame; // pointer so you can enslave this body to another's motion
     std::string name;
     bool selectable;
     bool visible;
     bool show_name;
     OPENGL_SLICE *slice;
 private:
-    FRAME<VECTOR<float,3> > default_frame;
+    FRAME<TV> default_frame;
 
 public:
     OPENGL_OBJECT();
@@ -51,48 +53,39 @@ public:
 
     virtual void Display() const;
     virtual bool Use_Bounding_Box() const;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const;
+    virtual RANGE<TV> Bounding_Box() const;
     virtual bool Is_Transparent() const;
     virtual void Turn_Smooth_Shading_On();
     virtual void Turn_Smooth_Shading_Off();
 
-    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer,int buffer_size);
-    virtual void Set_Selection(OPENGL_SELECTION* selection);
-    virtual void Highlight_Selection(OPENGL_SELECTION* selection);
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer,int buffer_size);
+    virtual void Set_Selection(OPENGL_SELECTION<T>* selection);
+    virtual void Highlight_Selection(OPENGL_SELECTION<T>* selection);
     virtual void Clear_Highlight();
-    virtual void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const;
-    virtual RANGE<VECTOR<float,3> > Selection_Bounding_Box(OPENGL_SELECTION* selection) const;
-    virtual OPENGL_SELECTION* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection);
+    virtual void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const;
+    virtual RANGE<TV> Selection_Bounding_Box(OPENGL_SELECTION<T>* selection) const;
+    virtual OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection);
 
     virtual void Set_Slice(OPENGL_SLICE *slice_input);
     virtual void Slice_Has_Changed();
 
-    VECTOR<float,3> World_Space_Point(const VECTOR<float,1>& object_space_point) const
+    TV World_Space_Point(const VECTOR<T,1>& object_space_point) const
     {return World_Space_Point(Convert_1d_To_3d(object_space_point));}
 
-    VECTOR<float,3> World_Space_Point(const VECTOR<float,2>& object_space_point) const
+    TV World_Space_Point(const VECTOR<T,2>& object_space_point) const
     {return World_Space_Point(Convert_2d_To_3d(object_space_point));}
 
-    VECTOR<float,3> World_Space_Point(const VECTOR<float,3>& object_space_point) const
+    TV World_Space_Point(const TV& object_space_point) const
     {return *frame*object_space_point;}
 
-    RANGE<VECTOR<float,3> > World_Space_Box(const RANGE<VECTOR<float,1> >& object_space_box) const
-    {return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(object_space_box.min_corner.x,0,0),VECTOR<float,3>(object_space_box.max_corner.x,0,0)));}
+    RANGE<TV> World_Space_Box(const RANGE<VECTOR<T,1> >& object_space_box) const
+    {return World_Space_Box(RANGE<TV>(TV(object_space_box.min_corner.x,0,0),TV(object_space_box.max_corner.x,0,0)));}
 
-    RANGE<VECTOR<float,3> > World_Space_Box(const RANGE<VECTOR<float,2> >& object_space_box) const
+    RANGE<TV> World_Space_Box(const RANGE<VECTOR<T,2> >& object_space_box) const
     {return World_Space_Box(Convert_2d_To_3d(object_space_box));}
 
-    RANGE<VECTOR<float,3> > World_Space_Box(const RANGE<VECTOR<float,3> >& object_space_box) const
-    {return ORIENTED_BOX<VECTOR<float,3> >(object_space_box,*frame).Axis_Aligned_Bounding_Box();}
-
-    RANGE<VECTOR<float,3> > World_Space_Box(const RANGE<VECTOR<double,1> >& object_space_box) const
-    {return World_Space_Box(RANGE<VECTOR<float,1> >(object_space_box));}
-
-    RANGE<VECTOR<float,3> > World_Space_Box(const RANGE<VECTOR<double,2> >& object_space_box) const
-    {return World_Space_Box(RANGE<VECTOR<float,2> >(object_space_box));}
-
-    RANGE<VECTOR<float,3> > World_Space_Box(const RANGE<VECTOR<double,3> >& object_space_box) const
-    {return World_Space_Box(RANGE<VECTOR<float,3> >(object_space_box));}
+    RANGE<TV> World_Space_Box(const RANGE<TV>& object_space_box) const
+    {return ORIENTED_BOX<TV>(object_space_box,*frame).Axis_Aligned_Bounding_Box();}
 
     void Send_Transform_To_GL_Pipeline() const
     {OpenGL_Translate(frame->t);OpenGL_Rotate(frame->r);}

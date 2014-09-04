@@ -17,7 +17,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename_input, const std::string &filename_set_input, bool use_ids_input, bool particles_stored_per_cell_uniform_input, bool particles_stored_per_cell_adaptive_input)
-    :OPENGL_COMPONENT("Particles 3D"), particles(new GEOMETRY_PARTICLES<TV>),opengl_points(new OPENGL_POINTS_3D<T>(*(new ARRAY<VECTOR<T,3> >))),
+    :OPENGL_COMPONENT<T>("Particles 3D"), particles(new GEOMETRY_PARTICLES<TV>),opengl_points(new OPENGL_POINTS_3D<T>(*(new ARRAY<VECTOR<T,3> >))),
     opengl_vector_field(*(new ARRAY<VECTOR<T,3> >),opengl_points->points,OPENGL_COLOR::Cyan()),
     filename(filename_input), filename_set(filename_set_input),frame_loaded(-1), set(0), set_loaded(-1),number_of_sets(0),use_sets(false),valid(false),
     draw_velocities(false),have_velocities(false),use_ids(use_ids_input),
@@ -69,7 +69,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -78,7 +78,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -111,16 +111,16 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_points->Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Get_Selection(GLuint* buffer,int buffer_size)
 {
     if(buffer_size==1){}
@@ -142,7 +142,7 @@ Get_Selection(GLuint* buffer,int buffer_size)
 //#####################################################################
 // Function Get_Selection_By_Id
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Get_Selection_By_Id(int id)
 {
     OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *selection = 0;
@@ -161,9 +161,9 @@ Get_Selection_By_Id(int id)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
-    if(selection->type != OPENGL_SELECTION::COMPONENT_PARTICLES_3D) return;
+    if(selection->type != OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D) return;
     OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)selection;
     int particle_index=real_selection->index;
     ARRAY_VIEW<int>* ids=0;
@@ -183,9 +183,9 @@ Clear_Highlight()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
 {
-    if(selection && selection->type == OPENGL_SELECTION::COMPONENT_PARTICLES_3D && selection->object == this){
+    if(selection && selection->type == OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D && selection->object == this){
         OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)selection;
         output_stream<<component_name<<": "<<std::endl;
         int current_index=-2;
@@ -206,14 +206,14 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
 //#####################################################################
 // Create_Or_Destroy_Selection_After_Frame_Change
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
-Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection)
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
+Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
 {
     // TODO: reimplement transfering particles between objects.
     if(old_selection && old_selection->object == this){
         OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *real_selection = (OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)old_selection;
         if(real_selection->has_id){
-            OPENGL_SELECTION* new_selection=Get_Selection_By_Id(real_selection->id); // TODO: should use sets
+            OPENGL_SELECTION<T>* new_selection=Get_Selection_By_Id(real_selection->id); // TODO: should use sets
             return new_selection;}
         else delete_selection=true;
     }
@@ -222,20 +222,20 @@ Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,b
 //#####################################################################
 // Function Selection_Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
-Selection_Bounding_Box(OPENGL_SELECTION* selection) const
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
+Selection_Bounding_Box(OPENGL_SELECTION<T>* selection) const
 {
     int current_index = Get_Current_Index_Of_Selection(selection);
-    if(current_index != -1) return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(particles->X(current_index))));
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    if(current_index != -1) return World_Space_Box(RANGE<TV>(particles->X(current_index)));
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Get_Current_Index_Of_Selection
 //#####################################################################
 template<class T,class RW> int OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
-Get_Current_Index_Of_Selection(OPENGL_SELECTION* selection) const
+Get_Current_Index_Of_Selection(OPENGL_SELECTION<T>* selection) const
 {
-    PHYSBAM_ASSERT(selection->type == OPENGL_SELECTION::COMPONENT_PARTICLES_3D && selection->object == this);
+    PHYSBAM_ASSERT(selection->type == OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D && selection->object == this);
     OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)selection;
 
     int current_index=-2;
@@ -314,9 +314,9 @@ Toggle_Draw_Velocities()
 template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Command_Prompt_Response()
 {
-    if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
+    if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
         std::string command;
-        std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);
+        std::istringstream sstream(OPENGL_WORLD<T>::Singleton()->prompt_response);
         sstream>>command;
         if(command == "s"){
             ARRAY<int> indices;
@@ -335,7 +335,7 @@ Command_Prompt_Response()
 template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Command_Prompt()
 {
-    OPENGL_WORLD::Singleton()->Prompt_User("Command: ",Command_Prompt_Response_CB(),"");
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Command: ",Command_Prompt_Response_CB(),"");
 }
 //#####################################################################
 // Function Next_Set
@@ -453,11 +453,10 @@ Toggle_Arrowhead()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T>
-RANGE<VECTOR<float,3> > OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>::
 Bounding_Box() const
 {
-    return object->Selection_Bounding_Box((OPENGL_SELECTION*)this);
+    return object->Selection_Bounding_Box((OPENGL_SELECTION<T>*)this);
 }
 //#####################################################################
 namespace PhysBAM{

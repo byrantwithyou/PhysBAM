@@ -60,10 +60,10 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_GRID_1D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_GRID_1D<T>::
 Bounding_Box() const
 {
-    return World_Space_Box(RANGE<VECTOR<float,1> >(grid.domain));
+    return World_Space_Box(grid.domain);
 }
 //#####################################################################
 // Function Toggle_Draw_Ghost_Values
@@ -76,13 +76,13 @@ Toggle_Draw_Ghost_Values()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_GRID_CELL_1D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_GRID_CELL_1D<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const GRID<TV>& grid=((OPENGL_GRID_1D<T>*)object)->grid;
     RANGE<VECTOR<T,1> > box(grid.Node(index),grid.Node(index.x+1));
-    return object->World_Space_Box(RANGE<VECTOR<float,1> >(box));
+    return object->World_Space_Box(RANGE<VECTOR<T,1> >(box));
 }
 //#####################################################################
 namespace PhysBAM{

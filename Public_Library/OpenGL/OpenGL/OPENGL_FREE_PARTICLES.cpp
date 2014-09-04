@@ -16,10 +16,10 @@ OPENGL_FREE_PARTICLES(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection
 // Function Print_Selection_Info
 //##################################################################### 
 template<class TV> void OPENGL_FREE_PARTICLES<TV>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
 {
     BASE::Print_Selection_Info(output_stream,selection);
-    if(selection->type!=OPENGL_SELECTION::POINTS_3D) return;
+    if(selection->type!=OPENGL_SELECTION<T>::POINTS_3D) return;
     int particle_index=points.indices(dynamic_cast<OPENGL_SELECTION_POINTS_3D<T>*>(selection)->index);
     deformable_body_collection.particles.Print(output_stream,particle_index);
 }

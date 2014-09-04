@@ -10,7 +10,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
 OPENGL_COMPONENT_TRIANGULATED_SURFACE(const std::string &filename, bool use_display_list)
-    :OPENGL_COMPONENT("Triangulated Surface"), 
+    :OPENGL_COMPONENT<T>("Triangulated Surface"), 
       triangulated_surface(*TRIANGULATED_SURFACE<T>::Create()),
       opengl_triangulated_surface(triangulated_surface, false,
                                   OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Red()),
@@ -44,7 +44,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -53,7 +53,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -77,11 +77,11 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_triangulated_surface.Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Reinitialize

@@ -17,7 +17,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-ANIMATED_VISUALIZATION::
+template<class T> ANIMATED_VISUALIZATION<T>::
 ANIMATED_VISUALIZATION()
     :animation_enabled(true),play(false),loop(false),fixed_frame_rate(false),start_frame(0),stop_frame(INT_MAX),
     frame(0),frame_rate(24),frame_increment(1),last_frame_filename(""),jpeg_quality(95)
@@ -30,10 +30,10 @@ ANIMATED_VISUALIZATION()
 //#####################################################################
 // Function Add_Arguments
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Add_Arguments(PARSE_ARGS& parse_args)
 {
-    BASIC_VISUALIZATION::Add_Arguments(parse_args);
+    BASIC_VISUALIZATION<T>::Add_Arguments(parse_args);
 
     parse_args.Add("-jpeg_quality",&jpeg_quality,"quality","jpeg quality settings");
     parse_args.Add("-so",&saved_frame_filename,"file","save frames output");
@@ -44,28 +44,28 @@ Add_Arguments(PARSE_ARGS& parse_args)
 //#####################################################################
 // Function Parse_Arguments
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Parse_Arguments(PARSE_ARGS& parse_args)
 {
-    BASIC_VISUALIZATION::Parse_Arguments(parse_args);
+    BASIC_VISUALIZATION<T>::Parse_Arguments(parse_args);
 }
 //#####################################################################
 // Function Add_OpenGL_Initialization
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Add_OpenGL_Initialization()
 {
-    BASIC_VISUALIZATION::Add_OpenGL_Initialization();
+    BASIC_VISUALIZATION<T>::Add_OpenGL_Initialization();
 
     Update_OpenGL_Strings();
 }
 //#####################################################################
 // Function Initialize_Components_And_Key_Bindings
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Initialize_Components_And_Key_Bindings()
 {
-    BASIC_VISUALIZATION::Initialize_Components_And_Key_Bindings();
+    BASIC_VISUALIZATION<T>::Initialize_Components_And_Key_Bindings();
 
     opengl_world.Set_Key_Binding_Category("Default Keys (ANIMATED_VISUALIZATION)");
     opengl_world.Set_Key_Binding_Category_Priority(100);
@@ -87,7 +87,7 @@ Initialize_Components_And_Key_Bindings()
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-bool ANIMATED_VISUALIZATION::
+template<class T> bool ANIMATED_VISUALIZATION<T>::
 Valid_Frame(int frame_input)
 {
     if(last_frame_filename!=""){
@@ -103,7 +103,7 @@ Valid_Frame(int frame_input)
 //#####################################################################
 // Function Goto_Start_Frame
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Goto_Start_Frame()
 {
     Set_Frame(start_frame);
@@ -111,7 +111,7 @@ Goto_Start_Frame()
 //#####################################################################
 // Function Goto_Last_Frame
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Goto_Last_Frame()
 {
     if(last_frame_filename!=""){
@@ -123,7 +123,7 @@ Goto_Last_Frame()
 //#####################################################################
 // Function Render_Offscreen
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Render_Offscreen()
 {
     Capture_Frames(saved_frame_filename,start_frame,stop_frame,jpeg_quality,false);
@@ -132,14 +132,14 @@ OPENGL_EPS_OUTPUT<float>* PhysBAM::opengl_eps_output=0;
 //#####################################################################
 // Function Capture_Frames
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Capture_Frames(const std::string& filename_pattern,int capture_start_frame,int capture_end_frame,int jpeg_quality,bool swap_buffers)
 {
     bool use_eps=STRING_UTILITIES::IEnds_With(filename_pattern,".eps");
     bool movie=STRING_UTILITIES::IEnds_With(filename_pattern,".mov");
-    MOV_WRITER<float>* mov=0;
-    if(movie && MOV_WRITER<float>::Enabled()){
-        mov=new MOV_WRITER<float>(filename_pattern,24);
+    MOV_WRITER<T>* mov=0;
+    if(movie && MOV_WRITER<T>::Enabled()){
+        mov=new MOV_WRITER<T>(filename_pattern,24);
         LOG::cout<<"Capturing to quicktime '"<<filename_pattern<<"'"<<std::endl;}
 
     LOG::cout<<"Capturing frames "<<capture_start_frame<<" to ";
@@ -154,7 +154,7 @@ Capture_Frames(const std::string& filename_pattern,int capture_start_frame,int c
         glFinish();
         if(mov){
             LOG::cout<<"  Frame "<<frame<<std::endl;
-            ARRAY<VECTOR<float,3> ,VECTOR<int,2> > image;
+            ARRAY<VECTOR<T,3>,VECTOR<int,2> > image;
             opengl_world.Get_Image(image,swap_buffers);
             if(mov) mov->Add_Frame(image);}
         else if(!use_eps){
@@ -169,7 +169,7 @@ Capture_Frames(const std::string& filename_pattern,int capture_start_frame,int c
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Set_Frame(int frame_input)
 {
     if(!animation_enabled) return;
@@ -198,7 +198,7 @@ Set_Frame(int frame_input)
     // Update/Invalidate selections
     for(int i=0;i<component_list.m;i++){
         bool delete_selection=false;
-        OPENGL_SELECTION* new_selection=component_list(i)->Create_Or_Destroy_Selection_After_Frame_Change(current_selection,delete_selection);
+        OPENGL_SELECTION<T>* new_selection=component_list(i)->Create_Or_Destroy_Selection_After_Frame_Change(current_selection,delete_selection);
         if(new_selection){Set_Current_Selection(new_selection);break;}
         else if(delete_selection){Set_Current_Selection(0);break;}}
 
@@ -208,17 +208,17 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Update_OpenGL_Strings
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Update_OpenGL_Strings()
 {
     opengl_world.Clear_Strings();
     if(animation_enabled) opengl_world.Add_String(STRING_UTILITIES::string_sprintf("frame %d",frame)+(frame_title.empty()?"":": "+frame_title));
-    BASIC_VISUALIZATION::Update_OpenGL_Strings();
+    BASIC_VISUALIZATION<T>::Update_OpenGL_Strings();
 }
 //#####################################################################
 // Function Next_Frame
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Next_Frame()
 {
     if(!animation_enabled) return;
@@ -231,7 +231,7 @@ Next_Frame()
 //#####################################################################
 // Function Prev_Frame
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Prev_Frame()
 {
     if(!animation_enabled) return;
@@ -241,7 +241,7 @@ Prev_Frame()
 //#####################################################################
 // Function Goto_Frame_Prompt
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Goto_Frame_Prompt()
 {
     if(!opengl_world.prompt_response.empty()){
@@ -252,7 +252,7 @@ Goto_Frame_Prompt()
 //#####################################################################
 // Function Goto_Frame
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Goto_Frame()
 {
     if(!animation_enabled) return;
@@ -261,7 +261,7 @@ Goto_Frame()
 //#####################################################################
 // Function Reset
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Reset()
 {
     if(!animation_enabled) return;
@@ -271,7 +271,7 @@ Reset()
 //#####################################################################
 // Function Toggle_Play
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Toggle_Play()
 {
     if(!animation_enabled) return;
@@ -281,7 +281,7 @@ Toggle_Play()
 //#####################################################################
 // Function Toggle_Loop
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Toggle_Loop()
 {
     loop=!loop;
@@ -289,7 +289,7 @@ Toggle_Loop()
 //#####################################################################
 // Function Toggle_Fixed_Frame_Rate
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Toggle_Fixed_Frame_Rate()
 {
     fixed_frame_rate=!fixed_frame_rate;
@@ -299,7 +299,7 @@ Toggle_Fixed_Frame_Rate()
 //#####################################################################
 // Function Capture_Frames_Prompt
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Capture_Frames_Prompt()
 {
     if(!opengl_world.prompt_response_success) return;
@@ -331,7 +331,7 @@ Capture_Frames_Prompt()
 //#####################################################################
 // Function Capture_Frames
 //#####################################################################
-void ANIMATED_VISUALIZATION::
+template<class T> void ANIMATED_VISUALIZATION<T>::
 Capture_Frames()
 {
     // Fill with defaults
@@ -341,4 +341,8 @@ Capture_Frames()
     capture_frames_prompt_state.jpeg_quality=jpeg_quality;
     capture_frames_prompt_state.step=1;
     opengl_world.Prompt_User("Capture filename [" + saved_frame_filename + "]: ",Capture_Frames_Prompt_CB(),"");
+}
+namespace PhysBAM{
+template class ANIMATED_VISUALIZATION<double>;
+template class ANIMATED_VISUALIZATION<float>;
 }

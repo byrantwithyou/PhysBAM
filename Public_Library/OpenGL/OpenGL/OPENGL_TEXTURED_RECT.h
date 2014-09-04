@@ -14,9 +14,10 @@
 namespace PhysBAM
 {
 template<class T>
-class OPENGL_TEXTURED_RECT:public OPENGL_OBJECT
+class OPENGL_TEXTURED_RECT:public OPENGL_OBJECT<T>
 {
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
     double width, height;
     OPENGL_TEXTURE *texture;
 
@@ -24,7 +25,7 @@ public:
 
     void Set_Texture(OPENGL_TEXTURE *texture_input);
     void Display() const PHYSBAM_OVERRIDE;
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 }

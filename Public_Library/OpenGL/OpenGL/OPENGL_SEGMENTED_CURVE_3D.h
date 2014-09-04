@@ -14,13 +14,14 @@
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 namespace PhysBAM{
 
-class OPENGL_SELECTION;
+template<class T> class OPENGL_SELECTION;
 
 template<class T>
-class OPENGL_SEGMENTED_CURVE_3D:public OPENGL_OBJECT
+class OPENGL_SEGMENTED_CURVE_3D:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
     const SEGMENTED_CURVE<TV>& curve;
     const OPENGL_SEGMENTED_CURVE_3D<T>* parent_curve;
     mutable ARRAY<int> segment_nodes;
@@ -35,16 +36,16 @@ public:
     {}
 
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer,int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer,int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
 
-    OPENGL_SELECTION* Get_Vertex_Selection(int index);
-    OPENGL_SELECTION* Get_Segment_Selection(int index);
-    OPENGL_SELECTION* Get_Curve_Selection(int index);
+    OPENGL_SELECTION<T>* Get_Vertex_Selection(int index);
+    OPENGL_SELECTION<T>* Get_Segment_Selection(int index);
+    OPENGL_SELECTION<T>* Get_Curve_Selection(int index);
 
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
@@ -58,40 +59,43 @@ private:
 
     bool smooth_normals;
 
-    OPENGL_SELECTION* current_selection;
+    OPENGL_SELECTION<T>* current_selection;
 };
 
 template<class T>
-class OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D:public OPENGL_SELECTION
+class OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int index;
-    OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D(OPENGL_OBJECT* object,int index=0) 
-        :OPENGL_SELECTION(OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_3D,object),index(index) {}
+    OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D(OPENGL_OBJECT<T>* object,int index=0) 
+        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_3D,object),index(index) {}
 
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D:public OPENGL_SELECTION
+class OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int index;
-    OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D(OPENGL_OBJECT* object,int index=0) 
-        :OPENGL_SELECTION(OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_3D,object),index(index) {}
+    OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D(OPENGL_OBJECT<T>* object,int index=0) 
+        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_3D,object),index(index) {}
 
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_SEGMENTED_CURVE_3D:public OPENGL_SELECTION
+class OPENGL_SELECTION_SEGMENTED_CURVE_3D:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int index;
-    OPENGL_SELECTION_SEGMENTED_CURVE_3D(OPENGL_OBJECT* object,int index=0) 
-        :OPENGL_SELECTION(OPENGL_SELECTION::SEGMENTED_CURVE_3D,object),index(index) {}
+    OPENGL_SELECTION_SEGMENTED_CURVE_3D(OPENGL_OBJECT<T>* object,int index=0) 
+        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::SEGMENTED_CURVE_3D,object),index(index) {}
 
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 }

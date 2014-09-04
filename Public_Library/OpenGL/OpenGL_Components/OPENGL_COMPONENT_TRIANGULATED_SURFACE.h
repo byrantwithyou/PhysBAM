@@ -15,9 +15,11 @@ namespace PhysBAM
 {
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_TRIANGULATED_SURFACE:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_TRIANGULATED_SURFACE:public OPENGL_COMPONENT<T>
 {
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::is_animation;
     OPENGL_COMPONENT_TRIANGULATED_SURFACE(const std::string &filename, bool use_display_list = true);
     virtual ~OPENGL_COMPONENT_TRIANGULATED_SURFACE();
     
@@ -27,10 +29,10 @@ public:
 
     void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size) { return opengl_triangulated_surface.Get_Selection(buffer,buffer_size); }
-    virtual void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE { opengl_triangulated_surface.Highlight_Selection(selection); }
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) { return opengl_triangulated_surface.Get_Selection(buffer,buffer_size); }
+    virtual void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE { opengl_triangulated_surface.Highlight_Selection(selection); }
     virtual void Clear_Highlight() PHYSBAM_OVERRIDE { opengl_triangulated_surface.Clear_Highlight(); }
 
 private:

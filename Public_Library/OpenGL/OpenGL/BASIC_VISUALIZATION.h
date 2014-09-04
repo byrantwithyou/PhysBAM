@@ -2,10 +2,10 @@
 // Copyright 2004-2009, Eran Guendelman, Andrew Selle, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class BASIC_VISUALIZATION
+// Class BASIC_VISUALIZATION<T>
 //#####################################################################
-#ifndef __BASIC_VISUALIZATION__
-#define __BASIC_VISUALIZATION__
+#ifndef __BASIC_VISUALIZATION<T>__
+#define __BASIC_VISUALIZATION<T>__
 
 #include <Tools/Arrays/ARRAY.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
@@ -15,17 +15,16 @@
 namespace PhysBAM
 {
 class PARSE_ARGS;
-class OPENGL_COMPONENT;
+template<class T> class OPENGL_COMPONENT;
 template<class T> class OPENGL_AXES;
 
+template<class T>
 class BASIC_VISUALIZATION
 {
 public:
-    static const int OWNED;
-    static const int SELECTABLE;
-    static const int START_HIDDEN;
-    
-             BASIC_VISUALIZATION();
+    enum WORKAROUND{OWNED=1,SELECTABLE=2,START_HIDDEN=4};
+
+    BASIC_VISUALIZATION();
     virtual ~BASIC_VISUALIZATION();
 
     void Initialize(PARSE_ARGS &parse_args);
@@ -34,7 +33,7 @@ public:
 
     virtual void Process_Hits(GLint hits, GLuint buffer[]);
 
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION, Draw_All_Objects);
+    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION<T>, Draw_All_Objects);
 protected:
     virtual void Add_Arguments(PARSE_ARGS &parse_args);
     virtual void Parse_Arguments(PARSE_ARGS &parse_args);
@@ -46,11 +45,11 @@ protected:
     virtual void Render_Offscreen() {}
     virtual void Selection_Callback();
 
-    void Add_Component(OPENGL_COMPONENT* component,const std::string &name,const char toggle_draw_key,const int flags);
-    const OPENGL_COMPONENT* Find_Component(const std::string& name) const;
-    OPENGL_COMPONENT* Find_Component(const std::string& name);
-    void Set_Current_Selection(OPENGL_SELECTION* selection);
-    int &Selection_Priority(OPENGL_SELECTION::TYPE selection_type);
+    void Add_Component(OPENGL_COMPONENT<T>* component,const std::string &name,const char toggle_draw_key,const int flags);
+    const OPENGL_COMPONENT<T>* Find_Component(const std::string& name) const;
+    OPENGL_COMPONENT<T>* Find_Component(const std::string& name);
+    void Set_Current_Selection(OPENGL_SELECTION<T>* selection);
+    int &Selection_Priority(typename OPENGL_SELECTION<T>::TYPE selection_type);
 
 private:
     void Parse_Args(PARSE_ARGS &parse_args);
@@ -64,21 +63,21 @@ private:
     void Toggle_Axes();
     void Draw_All_Objects();
 
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Reset_View);
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Reset_Up);
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Toggle_Axes);
+    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION<T>,Reset_View);
+    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION<T>,Reset_Up);
+    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION<T>,Toggle_Axes);
 
 public:
-    ARRAY<OPENGL_COMPONENT*> component_list;
-    ARRAY<OPENGL_COMPONENT*> owned_components;
-    HASHTABLE<std::string,OPENGL_COMPONENT*> component_by_name;
-    OPENGL_AXES<float> * opengl_axes;
+    ARRAY<OPENGL_COMPONENT<T>*> component_list;
+    ARRAY<OPENGL_COMPONENT<T>*> owned_components;
+    HASHTABLE<std::string,OPENGL_COMPONENT<T>*> component_by_name;
+    OPENGL_AXES<T> * opengl_axes;
 
-    OPENGL_WORLD opengl_world;
+    OPENGL_WORLD<T> opengl_world;
     int width,height;
     bool set_window_position;
     VECTOR<int,2> window_position;
-    float fovy;
+    T fovy;
     std::string opengl_window_title;
     bool add_axes;
     bool render_offscreen;
@@ -88,7 +87,7 @@ public:
 
     // Selection stuff
     bool selection_enabled;
-    OPENGL_SELECTION* current_selection;
+    OPENGL_SELECTION<T>* current_selection;
     ARRAY<int> selection_priority;     // higher priority takes precedence; priority=0 is unselectable
 };
 

@@ -19,7 +19,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T,RW>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const std::string& basedir_input)
-    :OPENGL_COMPONENT("Rigid Geometry Collection 1D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
+    :OPENGL_COMPONENT<T>("Rigid Geometry Collection 1D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_node_velocity_vectors(false),draw_point_simplices(true),
     rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),current_selection(0),need_destroy_rigid_body_collection(true)
 {
@@ -31,7 +31,7 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const std::string& basedir_input)
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T,RW>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input)
-    :OPENGL_COMPONENT("Rigid Geometry Collection 1D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
+    :OPENGL_COMPONENT<T>("Rigid Geometry Collection 1D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_node_velocity_vectors(false),draw_point_simplices(true),rigid_body_collection(rigid_body_collection),current_selection(0),need_destroy_rigid_body_collection(false)
 {
     is_animation=true;
@@ -117,7 +117,7 @@ Create_Geometry(const int id)
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T,RW>::
 Update_Geometry(const int id)
 {
-    if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<float,3> >(Convert_1d_To_3d(rigid_body_collection.Rigid_Body(id).Frame()));
+    if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<T,3> >(Convert_1d_To_3d(rigid_body_collection.Rigid_Body(id).Frame()));
 }
 //#####################################################################
 // Function Destroy_Geometry
@@ -162,7 +162,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -171,7 +171,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
 }
 //#####################################################################
 // Function Display
@@ -212,18 +212,14 @@ Use_Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T,RW>::
 Bounding_Box() const
 {
-    RANGE<VECTOR<float,3> > box;
-    if(draw){
-        bool first=true;
+    RANGE<VECTOR<T,3> > box;
+    if(draw)
         for(int i=0;i<opengl_point_simplices.Size();i++)
             if(draw_object(i) && use_object_bounding_box(i) && opengl_point_simplices(i)){
-                if(first){
-                    box=opengl_point_simplices(i)->Bounding_Box();
-                    first=false;}
-                else{box=RANGE<VECTOR<float,3> >::Combine(box,opengl_point_simplices(i)->Bounding_Box());}}}
+                box=RANGE<VECTOR<T,3> >::Combine(box,opengl_point_simplices(i)->Bounding_Box());}
     return box;
 }
 //#####################################################################

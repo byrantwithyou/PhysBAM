@@ -20,7 +20,7 @@ OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename_input,
                              const std::string& filename_triangulated_surface_set_input,
                              bool write_generated_triangulated_surface_input,
                              bool check_triangulated_surface_file_time_input)
-    :OPENGL_COMPONENT("Levelset 3D"), opengl_levelset_multiview(0), 
+    :OPENGL_COMPONENT<T>("Levelset 3D"), opengl_levelset_multiview(0), 
       levelset_filename(levelset_filename_input),triangulated_surface_filename(triangulated_surface_filename_input),
       filename_set(filename_set_input),filename_triangulated_surface_set(filename_triangulated_surface_set_input),
       write_generated_triangulated_surface(write_generated_triangulated_surface_input),
@@ -112,34 +112,34 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Bounding_Box() const
 {
     if(draw) return opengl_levelset_multiview->Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const
 {
     if(Is_Up_To_Date(frame)){
         bool is_MAC=true;
         if(opengl_levelset_multiviews.Size() && opengl_levelset_multiviews(0)->Levelset() && !opengl_levelset_multiviews(0)->Levelset()->grid.Is_MAC_Grid()) is_MAC=false;
-        if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_3D && is_MAC){
+        if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && is_MAC){
             VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
             opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
             for(int i=0;i<opengl_levelset_multiviews.m;i++){
                 const LEVELSET<TV>& levelset=*opengl_levelset_multiviews(i)->Levelset();
                 output_stream<<component_name<<": phi["<<i<<"]="<<levelset.phi(index)
                              <<" curvature["<<i<<"]="<<levelset.Compute_Curvature(levelset.grid.Center(index))<<std::endl;}}
-        if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_3D && !is_MAC){
+        if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_3D && !is_MAC){
             VECTOR<int,3> index=((OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection)->index;
             opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
             for(int i=0;i<opengl_levelset_multiviews.m;i++)  if(opengl_levelset_multiviews(i)->Levelset())
                 output_stream<<component_name<<": phi["<<i<<"]="<<(*opengl_levelset_multiviews(i)->Levelset()).phi(index)<<std::endl;}
-        if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_3D){
+        if(current_selection && current_selection->type==OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D){
             OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)current_selection;
             VECTOR<T,3> location=selection->location;
             for(int i=0;i<opengl_levelset_multiviews.m;i++) if(opengl_levelset_multiviews(i)->Levelset())
@@ -200,7 +200,7 @@ Reinitialize_Levelset(const std::string& levelset_filename, const std::string& t
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -209,7 +209,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################

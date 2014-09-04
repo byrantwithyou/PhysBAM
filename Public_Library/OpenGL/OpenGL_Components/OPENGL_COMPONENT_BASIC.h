@@ -11,15 +11,16 @@
 
 namespace PhysBAM
 {
-template<class T>
-class OPENGL_COMPONENT_BASIC:public OPENGL_COMPONENT
+template<class T,class T2>
+class OPENGL_COMPONENT_BASIC:public OPENGL_COMPONENT<T>
 {
 public:
-    T  &object;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;
+    T2  &object;
     bool own_object;
     bool use_clip_planes;
 
-    OPENGL_COMPONENT_BASIC(T &object)
+    OPENGL_COMPONENT_BASIC(T2 &object)
         :object(object),own_object(true)
     {
         Use_Clip_Planes(false);
@@ -42,8 +43,8 @@ public:
     bool Use_Bounding_Box() const  PHYSBAM_OVERRIDE
     {if(draw) return object.Use_Bounding_Box();else return false;}
 
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE
-    {if(draw) return object.Bounding_Box();else return RANGE<VECTOR<float,3> >::Centered_Box();}
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE
+    {if(draw) return object.Bounding_Box();return RANGE<VECTOR<T,3> >::Centered_Box();}
 
     bool Is_Transparent() const PHYSBAM_OVERRIDE
     {return object.Is_Transparent();}
@@ -54,10 +55,10 @@ public:
     virtual void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE
     {object.Turn_Smooth_Shading_On();}
 
-    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer,int buffer_size)
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer,int buffer_size)
     {return object.Get_Selection(buffer,buffer_size);}
 
-    virtual void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE
+    virtual void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE
     {object.Highlight_Selection(selection);}
 
     virtual void Clear_Highlight() PHYSBAM_OVERRIDE
@@ -69,7 +70,7 @@ public:
     virtual void Slice_Has_Changed() PHYSBAM_OVERRIDE
     {object.Slice_Has_Changed();}
 
-    void Print_Selection_Info(std::ostream& ostream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE
+    void Print_Selection_Info(std::ostream& ostream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE
     {object.Print_Selection_Info(ostream,selection);}
 };
 }

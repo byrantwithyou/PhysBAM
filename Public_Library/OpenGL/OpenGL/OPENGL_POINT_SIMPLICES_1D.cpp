@@ -53,14 +53,10 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_POINT_SIMPLICES_1D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_POINT_SIMPLICES_1D<T>::
 Bounding_Box() const
 {
-    float xmin,xmax;
-    xmin=xmax=simplices.particles.X(1).x;
-    for(int i=0;i<simplices.particles.Size();i++){
-        xmin=min(xmin,(float)simplices.particles.X(i).x);xmax=max(xmax,(float)simplices.particles.X(i).x);}
-    return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(xmin,0,0),VECTOR<float,3>(xmax,0,0)));
+    return World_Space_Box(RANGE<VECTOR<T,1> >::Bounding_Box(simplices.particles.X));
 }
 //#####################################################################
 namespace PhysBAM{

@@ -18,10 +18,11 @@ namespace PhysBAM
 {
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_HEIGHTFIELD_1D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_HEIGHTFIELD_1D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
     OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid, 
                                     const std::string& height_filename,
                                     const std::string& x_filename_input="",
@@ -35,10 +36,10 @@ public:
     void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
 
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
 
     void Set_Scale(T scale_input);
@@ -90,14 +91,15 @@ private:
 };
 
 template<class T>
-class OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D:public OPENGL_SELECTION
+class OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int index;
 
-    OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D(OPENGL_OBJECT* object) :OPENGL_SELECTION(OPENGL_SELECTION::COMPONENT_HEIGHTFIELD_1D, object) {}
+    OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_HEIGHTFIELD_1D, object) {}
 
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 }

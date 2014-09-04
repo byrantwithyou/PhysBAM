@@ -53,13 +53,13 @@ Display() const
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);
 
         if(current_selection) {
-            if(current_selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_2D) {
+            if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_2D) {
                 int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_2D<T> *)current_selection)->index;
-                OPENGL_SELECTION::Draw_Highlighted_Vertex(curve.particles.X(index));}
-            else if(current_selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_2D) {
+                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(curve.particles.X(index));}
+            else if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_2D) {
                 int index=((OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_2D<T> *)current_selection)->index;
                 int node1,node2;curve.mesh.elements(index).Get(node1,node2);
-                OPENGL_SELECTION::Draw_Highlighted_Segment(curve.particles.X(node1),curve.particles.X(node2));}}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(curve.particles.X(node1),curve.particles.X(node2));}}
     }
 
     if(draw_vertices) {
@@ -84,24 +84,18 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SEGMENTED_CURVE_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SEGMENTED_CURVE_2D<T>::
 Bounding_Box() const
 {
-    float xmin,xmax,ymin,ymax;
-    xmin=xmax=curve.particles.X(0).x;
-    ymin=ymax=curve.particles.X(0).y;
-    for(int i=0;i<curve.particles.Size();i++){
-        xmin=min(xmin,(float)curve.particles.X(i).x);xmax=max(xmax,(float)curve.particles.X(i).x);
-        ymin=min(ymin,(float)curve.particles.X(i).y);ymax=max(ymax,(float)curve.particles.X(i).y);}
-    return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(xmin,ymin,0),VECTOR<float,3>(xmax,ymax,0)));
+    return World_Space_Box(RANGE<TV>::Bounding_Box(curve.particles.X));
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION* OPENGL_SEGMENTED_CURVE_2D<T>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_SEGMENTED_CURVE_2D<T>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
-    OPENGL_SELECTION* selection = 0;
+    OPENGL_SELECTION<T>* selection = 0;
     if(buffer_size==2)
     {
         if(buffer[0]==1) selection = Get_Vertex_Selection(buffer[1]);
@@ -113,20 +107,20 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T> void OPENGL_SEGMENTED_CURVE_2D<T>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
     delete current_selection; current_selection = 0;
     // Make a copy of selection
-    if(selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_2D)
+    if(selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_2D)
         current_selection=new OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_2D<T>(this,((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_2D<T> *)selection)->index);
-    else if(selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_2D)
+    else if(selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_2D)
         current_selection=new OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_2D<T>(this,((OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_2D<T> *)selection)->index);
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_SEGMENTED_CURVE_2D<T>::
-Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const
 {
     Print_Selection_Info(output_stream,selection,0);
 }
@@ -134,14 +128,14 @@ Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) c
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_SEGMENTED_CURVE_2D<T>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MATRIX<T,3>* transform) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,3>* transform) const
 {
-    if(selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_2D) {
+    if(selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_2D) {
         int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_2D<T> *)selection)->index;
         output_stream<<"Vertex "<<index<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(curve.particles.X(index))<<std::endl;}
         curve.particles.Print(output_stream,index);}
-    else if(selection->type==OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_2D) {
+    else if(selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_2D) {
         int index=((OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_2D<T> *)selection)->index;
         int node1,node2;curve.mesh.elements(index).Get(node1,node2);
         output_stream<<"Segment "<<index<<" ("<<node1<<", "<<node2<<")"<<std::endl;
@@ -165,7 +159,7 @@ Clear_Highlight()
 //#####################################################################
 // Function Get_Vertex_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION* OPENGL_SEGMENTED_CURVE_2D<T>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_SEGMENTED_CURVE_2D<T>::
 Get_Vertex_Selection(int index)
 {
     return new OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_2D<T>(this, index);
@@ -173,7 +167,7 @@ Get_Vertex_Selection(int index)
 //#####################################################################
 // Function Get_Segment_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION* OPENGL_SEGMENTED_CURVE_2D<T>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_SEGMENTED_CURVE_2D<T>::
 Get_Segment_Selection(int index)
 {
     return new OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_2D<T>(this, index);
@@ -185,7 +179,7 @@ template<class T>
 void OPENGL_SEGMENTED_CURVE_2D<T>::
 Draw_Vertices_For_Selection() const
 {
-    OPENGL_SELECTION::Draw_Vertices_For_Selection(curve.mesh,curve.particles);
+    OPENGL_SELECTION<T>::Draw_Vertices_For_Selection(curve.mesh,curve.particles);
 }
 //#####################################################################
 // Function Draw_Segments_For_Selection
@@ -213,19 +207,18 @@ Draw_Segments_For_Selection() const
 // Function Bounding_Box
 //#####################################################################
 template<class T>
-RANGE<VECTOR<float,3> > OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_2D<T>::
+RANGE<VECTOR<T,3> > OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_2D<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const SEGMENTED_CURVE_2D<T> &curve=((OPENGL_SEGMENTED_CURVE_2D<T> *)object)->curve;
-    RANGE<VECTOR<float,2> > box(VECTOR<float,2>(curve.particles.X(index)));
-    return object->World_Space_Box(box);
+    return object->World_Space_Box(RANGE<VECTOR<T,2> >(curve.particles.X(index)));
 }
 template<class T>
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-RANGE<VECTOR<float,3> > OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_2D<T>::
+RANGE<VECTOR<T,3> > OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_2D<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);

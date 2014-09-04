@@ -15,7 +15,7 @@ OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid_input,
                                 const std::string& x_filename_input,
                                 const std::string& ground_filename_input,
                                 const std::string& u_filename_input)
-    :OPENGL_COMPONENT("Heightfield 1D"), grid(grid_input), opengl_vector_field(vector_field,vector_locations), scale(1), displacement_scale(1), valid(false), 
+    :OPENGL_COMPONENT<T>("Heightfield 1D"), grid(grid_input), opengl_vector_field(vector_field,vector_locations), scale(1), displacement_scale(1), valid(false), 
       draw_velocities(true), draw_points(true), selected_index(0)
 {
     height_filename=height_filename_input;
@@ -58,7 +58,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -67,7 +67,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -199,7 +199,7 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Bounding_Box() const
 {
     if(valid && draw)
@@ -213,9 +213,9 @@ Bounding_Box() const
             max_x=max(max_x,x->Max());
         }
 
-        return RANGE<VECTOR<float,3> >(VECTOR<float,3>(min_x,min_height,0),VECTOR<float,3>(max_x,max_height,0));
+        return RANGE<VECTOR<T,3> >(VECTOR<T,3>(min_x,min_height,0),VECTOR<T,3>(max_x,max_height,0));
     }
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Reinitialize
@@ -267,7 +267,7 @@ Reinitialize(bool force)
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     if(buffer_size == 1)
@@ -282,9 +282,9 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
-    if(selection->type != OPENGL_SELECTION::COMPONENT_HEIGHTFIELD_1D) return;
+    if(selection->type != OPENGL_SELECTION<T>::COMPONENT_HEIGHTFIELD_1D) return;
     OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>*)selection;
     selected_index=real_selection->index;
 }
@@ -375,11 +375,11 @@ Toggle_Draw_Points()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>::
 Bounding_Box() const
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-    return RANGE<VECTOR<float,3> >::Empty_Box();
+    return RANGE<VECTOR<T,3> >::Empty_Box();
 }
 
 namespace PhysBAM{

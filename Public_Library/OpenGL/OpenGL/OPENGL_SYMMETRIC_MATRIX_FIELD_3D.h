@@ -16,7 +16,7 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_SYMMETRIC_MATRIX_FIELD_3D:public OPENGL_OBJECT
+class OPENGL_SYMMETRIC_MATRIX_FIELD_3D:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
@@ -36,7 +36,7 @@ public:
 
     void Display() const PHYSBAM_OVERRIDE;
     virtual void Update();
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 //##################################################################### 
 };
 }

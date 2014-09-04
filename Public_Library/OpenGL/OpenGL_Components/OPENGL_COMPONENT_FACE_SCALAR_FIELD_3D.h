@@ -12,7 +12,7 @@
 namespace PhysBAM{
 
 template<class T,class T2=T,class RW=T>
-class OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
@@ -25,6 +25,8 @@ private:
     bool valid;
 
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
     OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
     OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input,const std::string &x_face_values_filename_input,
                                           const std::string &y_face_values_filename_input,const std::string &z_face_values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
@@ -47,8 +49,8 @@ public:
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
     void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE;
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
 private:
     void Reinitialize();
 //##################################################################### 

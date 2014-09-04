@@ -19,9 +19,10 @@ template<class T,class RW> class OPENGL_COMPONENT_LEVELSET_2D;
 template<class T,class RW> class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D;
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D:public OPENGL_COMPONENT<T>
 {
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
     OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D(OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>& V_minus_component,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>& V_plus_component,OPENGL_COMPONENT_LEVELSET_2D<T,RW>& levelset_component);
     virtual ~OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D();
 
@@ -33,7 +34,7 @@ public:
 
     void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     void Toggle_3D_Mode();
     void Increase_Point_Size();

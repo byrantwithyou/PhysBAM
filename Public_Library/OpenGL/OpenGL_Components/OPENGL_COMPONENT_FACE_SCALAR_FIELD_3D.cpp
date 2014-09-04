@@ -12,7 +12,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class T2,class RW> OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2,RW>::
 OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input, const std::string &values_filename_input, OPENGL_COLOR_MAP<T2>* color_map_input)
-    :OPENGL_COMPONENT("Face Scalar Field 3D"), opengl_scalar_field(grid_input,internal_scalar_field,color_map_input),
+    :OPENGL_COMPONENT<T>("Face Scalar Field 3D"), opengl_scalar_field(grid_input,internal_scalar_field,color_map_input),
       values_filename(values_filename_input), x_face_values_filename(""), y_face_values_filename(""), z_face_values_filename(""), frame_loaded(-1), valid(false)
 {
     is_animation = FILE_UTILITIES::Is_Animated(values_filename);
@@ -24,7 +24,7 @@ OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input, const std::str
 template<class T,class T2,class RW> OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2,RW>::
 OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input, const std::string &x_face_values_filename_input, const std::string &y_face_values_filename_input,
                                       const std::string &z_face_values_filename_input, OPENGL_COLOR_MAP<T2>* color_map_input)
-    :OPENGL_COMPONENT("Face Scalar Field 3D"), opengl_scalar_field(grid_input,internal_scalar_field,color_map_input),
+    :OPENGL_COMPONENT<T>("Face Scalar Field 3D"), opengl_scalar_field(grid_input,internal_scalar_field,color_map_input),
       values_filename(), x_face_values_filename(x_face_values_filename_input), y_face_values_filename(y_face_values_filename_input), z_face_values_filename(z_face_values_filename_input), 
       frame_loaded(-1), valid(false)
 {
@@ -57,7 +57,7 @@ Valid_Frame(int frame_input) const
 template<class T,class T2,class RW> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -66,7 +66,7 @@ Set_Frame(int frame_input)
 template<class T,class T2,class RW> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     if(draw_input) opengl_scalar_field.Set_Slice(slice);
     Reinitialize();
 }
@@ -81,17 +81,17 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class T2,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2,RW>::
+template<class T,class T2,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_scalar_field.Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T2,class RW> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2,RW>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
 {
     if(Is_Up_To_Date(frame)){
         stream<<component_name<<": "<<std::endl;

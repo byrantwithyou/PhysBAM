@@ -17,10 +17,11 @@
 namespace PhysBAM{
 
 template<class T,class T_ARRAY=ARRAY<VECTOR<T,2> > >
-class OPENGL_POINTS_2D:public OPENGL_OBJECT
+class OPENGL_POINTS_2D:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,2> TV;
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
     T_ARRAY& points;
     OPENGL_COLOR color;
     float point_size;
@@ -53,13 +54,13 @@ public:
 
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE {return points.Size()>0;}
     virtual int Particle_Index(const int index) const {return index;}
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Display() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
 
     void Store_Point_Colors(bool store_point_colors = true);
     void Store_Point_Ids(bool store_ids=true);
@@ -76,16 +77,17 @@ public:
 };
 
 template<class T>
-class OPENGL_SELECTION_POINTS_2D:public OPENGL_SELECTION
+class OPENGL_SELECTION_POINTS_2D:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int index;
     bool has_id;
     int id;
 
-    OPENGL_SELECTION_POINTS_2D(OPENGL_OBJECT* object):OPENGL_SELECTION(OPENGL_SELECTION::POINTS_2D, object) {}
+    OPENGL_SELECTION_POINTS_2D(OPENGL_OBJECT<T>* object):OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::POINTS_2D, object) {}
 
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 }

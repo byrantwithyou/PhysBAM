@@ -243,7 +243,7 @@ Toggle_Slice_Color_Mode()
 template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
 Update()
 {
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
     if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE){
         Initialize_OpenGL_Triangulated_Surface();
         if(opengl_triangulated_surface){
@@ -297,7 +297,7 @@ Toggle_Smooth_Slice_Texture()
 template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
 Display() const
 {
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     Send_Transform_To_GL_Pipeline();
@@ -311,13 +311,14 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_LEVELSET_MULTIVIEW<T,RW>::
 Bounding_Box() const
 {
-    if(levelset) return (RANGE<VECTOR<float,3> >)levelset->grid.domain;
+    if(levelset) return World_Space_Box(levelset->grid.domain);
     else if(triangulated_surface){
-        triangulated_surface->Update_Bounding_Box();return RANGE<VECTOR<float,3> >(*triangulated_surface->bounding_box);}
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+        triangulated_surface->Update_Bounding_Box();
+        return World_Space_Box(*triangulated_surface->bounding_box);}
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Turn_Smooth_Shading_On

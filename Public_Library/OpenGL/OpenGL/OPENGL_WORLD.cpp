@@ -32,7 +32,11 @@ namespace PhysBAM{
 using ::std::log;
 using ::std::pow;
 
-static OPENGL_WORLD* opengl_world=0;
+template<class T> inline OPENGL_WORLD<T>*& Opengl_World()
+{
+    static OPENGL_WORLD<T>* opengl_world=0;
+    return opengl_world;
+}
 
 #ifdef USE_OPENGLES
 #define GLUT_UP PHYSBAM_MOUSE_UP
@@ -46,22 +50,22 @@ static OPENGL_WORLD* opengl_world=0;
 //#####################################################################
 // Constructor OPENGL_WORLD
 //#####################################################################
-OPENGL_WORLD::
+template<class T> OPENGL_WORLD<T>::
 OPENGL_WORLD()
     :initialized(false),ambient_light(OPENGL_COLOR::White()),fovy(50),mode_2d(false),load_names_for_selection(false),window(0),
     fill_mode(DRAW_FILLED),enable_lighting_for_wireframe(false),white_background(false),
     display_strings(true),show_object_names(false),display_object_names_in_corner(false),view_auto_help(false),
     idle_callback(0),timer_id(0),idle_delay(0),idle_timer(0),view_target_timer(0),frame_counter_timer(0),frames_rendered(0),frames_per_second(0),show_frames_per_second(true),
     left_handed_coordinate_system(false),nearclip_factor(.0625),farclip_factor(4),nearclip(nearclip_factor),farclip(farclip_factor),
-    arcball(new OPENGL_ARCBALL<float>(*this)),camera_distance(1),arcball_matrix(arcball->Value()),rotation_matrix(arcball->Value()),
+    arcball(new OPENGL_ARCBALL<T>(*this)),camera_distance(1),arcball_matrix(arcball->Value()),rotation_matrix(arcball->Value()),
     zoom_direction(1),translation_direction(1),oldmousex(0),oldmousey(0),do_mouse_rotation(false),do_mouse_zoom(false),do_mouse_target_xy(false),
     do_mouse_target_z(false),external_mouse_handler(0),shift_was_pressed(false),ctrl_was_pressed(false),
     current_key_binding_category("User-Defined Keys"),current_key_binding_category_priority(1),prompt_mode(false),prompt_response_cb(0),
     process_hits_cb(0),selection_mode(false),
     current_selection(0)
 {
-    if(opengl_world!=0) PHYSBAM_FATAL_ERROR(); 
-    opengl_world=this;
+    if(Opengl_World<T>()!=0) PHYSBAM_FATAL_ERROR(); 
+    Opengl_World<T>()=this;
 
     key_bindings.Resize(0,OPENGL_KEY::MAX_KEY_INDEX,0,OPENGL_KEY::MAX_MODIFIER_INDEX);
 
@@ -71,19 +75,19 @@ OPENGL_WORLD()
     Bind_Key("^w",new OPENGL_CALLBACK_CYCLE(&fill_mode,0,2,"Toggle wireframe mode"));
     // TODO: fix full screen
     //Bind_Key("^f",new OPENGL_CALLBACK_FULLSCREEN(&width,&height));
-    Bind_Key("^m",new OPENGL_CALLBACK_ZOOM(.75f,&camera_distance,&nearclip,&farclip));
-    Bind_Key("^n",new OPENGL_CALLBACK_ZOOM(4.f/3,&camera_distance,&nearclip,&farclip));
-    Bind_Key("^i",new OPENGL_CALLBACK_MOVE_TARGET(*this,TV(-.05f,0,0),&camera_distance,&target_position));
-    Bind_Key("^o",new OPENGL_CALLBACK_MOVE_TARGET(*this,TV(.05f,0,0),&camera_distance,&target_position));
-    Bind_Key("^j",new OPENGL_CALLBACK_MOVE_TARGET(*this,TV(0,-.05f,0),&camera_distance,&target_position));
-    Bind_Key("^k",new OPENGL_CALLBACK_MOVE_TARGET(*this,TV(0,.05f,0),&camera_distance,&target_position));
-    Bind_Key("^h",new OPENGL_CALLBACK_MOVE_TARGET(*this,TV(0,0,-.05f),&camera_distance,&target_position));
-    Bind_Key("^l",new OPENGL_CALLBACK_MOVE_TARGET(*this,TV(0,0,.05f),&camera_distance,&target_position));
-    Bind_Key("^v",new OPENGL_CALLBACK_MOVE_TARGET(*this,TV(),&camera_distance,&target_position));
-    Bind_Key("^d",new OPENGL_CALLBACK_SAVE_SCREEN(*this));
-    Bind_Key("^p",new OPENGL_CALLBACK_SAVE_TO_EPS(*this));
+    Bind_Key("^m",new OPENGL_CALLBACK_ZOOM<T>(.75f,&camera_distance,&nearclip,&farclip));
+    Bind_Key("^n",new OPENGL_CALLBACK_ZOOM<T>(4.f/3,&camera_distance,&nearclip,&farclip));
+    Bind_Key("^i",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(-.05f,0,0),&camera_distance,&target_position));
+    Bind_Key("^o",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(.05f,0,0),&camera_distance,&target_position));
+    Bind_Key("^j",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(0,-.05f,0),&camera_distance,&target_position));
+    Bind_Key("^k",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(0,.05f,0),&camera_distance,&target_position));
+    Bind_Key("^h",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(0,0,-.05f),&camera_distance,&target_position));
+    Bind_Key("^l",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(0,0,.05f),&camera_distance,&target_position));
+    Bind_Key("^v",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(),&camera_distance,&target_position));
+    Bind_Key("^d",new OPENGL_CALLBACK_SAVE_SCREEN<T>(*this));
+    Bind_Key("^p",new OPENGL_CALLBACK_SAVE_TO_EPS<T>(*this));
     Bind_Key("^|",Toggle_Show_Frames_Per_Second_CB("Toggle Show Frames/Second"));
-    Bind_Key("^g",new OPENGL_CALLBACK_TOGGLE_SMOOTH_SHADING(*this));
+    Bind_Key("^g",new OPENGL_CALLBACK_TOGGLE_SMOOTH_SHADING<T>(*this));
     Bind_Key("^a",new OPENGL_CALLBACK_TOGGLE(&show_object_names,"Toggle object names"));
     Bind_Key("^t",Toggle_Background_CB("Toggle Background"));
     Bind_Key("|",Resize_To_Standard_Size_CB("Resize Window to 640x480"));
@@ -97,7 +101,7 @@ OPENGL_WORLD()
 //#####################################################################
 // ~OPENGL_WORLD
 //#####################################################################
-OPENGL_WORLD::
+template<class T> OPENGL_WORLD<T>::
 ~OPENGL_WORLD()
 {
     for(int index=0;index<key_bindings_by_category.m;index++)
@@ -106,22 +110,22 @@ OPENGL_WORLD::
     Clear_All_Lights();
     delete window;
     delete arcball;
-    opengl_world=0;
+    Opengl_World<T>()=0;
     delete idle_callback;
 }
 //#####################################################################
 // Singleton
 //#####################################################################
-OPENGL_WORLD* OPENGL_WORLD::
+template<class T> OPENGL_WORLD<T>* OPENGL_WORLD<T>::
 Singleton()
 {
-    PHYSBAM_ASSERT(opengl_world);
-    return opengl_world;
+    PHYSBAM_ASSERT(Opengl_World<T>());
+    return Opengl_World<T>();
 }
 //#####################################################################
 // Function Run_Visualization
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Run_Visualization(const std::string& window_title)
 {
     Initialize(window_title);
@@ -130,15 +134,15 @@ Run_Visualization(const std::string& window_title)
 //#####################################################################
 // Function Initialize
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Initialize(const std::string& window_title,const int width,const int height,const bool offscreen)
 {
     if(window) delete window;
     if(offscreen)
-        window=new OPENGL_WINDOW_PBUFFER(*this,window_title,width,height);
+        window=new OPENGL_WINDOW_PBUFFER<T>(*this,window_title,width,height);
     else
 #ifndef USE_OPENGLES
-        window=new OPENGL_WINDOW_GLUT(*this,window_title,width,height);
+        window=new OPENGL_WINDOW_GLUT<T>(*this,window_title,width,height);
 #else
         window=new OPENGL_WINDOW_ANDROID(*this,window_title,width,height);
 #endif
@@ -152,7 +156,7 @@ Initialize(const std::string& window_title,const int width,const int height,cons
 //#####################################################################
 // Should call this after initializing a GL context (using glut or
 // otherwise)
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Initialize_Glut_Independent()
 {
     glEnable(GL_DEPTH_TEST);
@@ -168,7 +172,7 @@ Initialize_Glut_Independent()
 //#####################################################################
 // Function Clear_All_Objects
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Clear_All_Objects()
 {
     object_list.Remove_All();
@@ -176,8 +180,8 @@ Clear_All_Objects()
 //#####################################################################
 // Function Add_Object
 //#####################################################################
-void OPENGL_WORLD::
-Add_Object(OPENGL_OBJECT *object,bool include_bounding_box,bool toggle_smooth_shading)
+template<class T> void OPENGL_WORLD<T>::
+Add_Object(OPENGL_OBJECT<T> *object,bool include_bounding_box,bool toggle_smooth_shading)
 {
     object_list.Append(object);
     use_bounding_box.Append(include_bounding_box);
@@ -186,7 +190,7 @@ Add_Object(OPENGL_OBJECT *object,bool include_bounding_box,bool toggle_smooth_sh
 //#####################################################################
 // Function Clear_All_Lights
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Clear_All_Lights()
 {
     lights.Delete_Pointers_And_Clean_Memory();
@@ -194,7 +198,7 @@ Clear_All_Lights()
 //#####################################################################
 // Function Add_Light
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Add_Light(OPENGL_LIGHT *light)
 {
     lights.Append(light);
@@ -202,15 +206,15 @@ Add_Light(OPENGL_LIGHT *light)
 //#####################################################################
 // Function Set_Ambient_Light
 //#####################################################################
-void OPENGL_WORLD::
-Set_Ambient_Light(float value)
+template<class T> void OPENGL_WORLD<T>::
+Set_Ambient_Light(T value)
 {
     ambient_light=OPENGL_COLOR::Gray(value);
 }
 //#####################################################################
 // Function Set_Ambient_Light
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Set_Ambient_Light(const OPENGL_COLOR& color)
 {
     ambient_light=color;
@@ -218,7 +222,7 @@ Set_Ambient_Light(const OPENGL_COLOR& color)
 //#####################################################################
 // Function Set_Key_Binding_Category
 //####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Set_Key_Binding_Category(const std::string &category)
 {
     current_key_binding_category=category;
@@ -226,7 +230,7 @@ Set_Key_Binding_Category(const std::string &category)
 //#####################################################################
 // Function Set_Key_Binding_Category_Priority
 //####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Set_Key_Binding_Category_Priority(int priority)
 {
     current_key_binding_category_priority=priority;
@@ -234,7 +238,7 @@ Set_Key_Binding_Category_Priority(int priority)
 //#####################################################################
 // Function Bind_Key
 //####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK* callback)
 {
     Unbind_Key(key);Append_Bind_Key(key,callback);
@@ -242,7 +246,7 @@ Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK* callback)
 //#####################################################################
 // Function Bind_Key
 //####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Bind_Key(const std::string& key,OPENGL_CALLBACK* callback)
 {
     Bind_Key(OPENGL_KEY::From_String(key),callback);
@@ -250,7 +254,7 @@ Bind_Key(const std::string& key,OPENGL_CALLBACK* callback)
 //#####################################################################
 // Function Append_Bind_Key
 //####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Append_Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK* callback)
 {
     key_bindings(key.Index()).Append(callback);
@@ -264,7 +268,7 @@ Append_Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK* callback)
 //#####################################################################
 // Function Append_Bind_Key
 //####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Append_Bind_Key(const std::string& key,OPENGL_CALLBACK* callback)
 {
     Append_Bind_Key(OPENGL_KEY::From_String(key),callback);
@@ -272,7 +276,7 @@ Append_Bind_Key(const std::string& key,OPENGL_CALLBACK* callback)
 //#####################################################################
 // Function Unbind_Key
 //####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Unbind_Key(const OPENGL_KEY& key)
 {
     key_bindings(key.Index()).Remove_All();
@@ -286,7 +290,7 @@ Unbind_Key(const OPENGL_KEY& key)
 //#####################################################################
 // Function Unbind_Keys
 //####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Unbind_Keys(const std::string& keys)
 {
     ARRAY<OPENGL_KEY> key_list;OPENGL_KEY::Parse_Key_Sequence(keys,key_list);
@@ -295,8 +299,8 @@ Unbind_Keys(const std::string& keys)
 //#####################################################################
 // Function Set_Idle_Callback
 //#####################################################################
-void OPENGL_WORLD::
-Set_Idle_Callback(OPENGL_CALLBACK* callback,const float delay)
+template<class T> void OPENGL_WORLD<T>::
+Set_Idle_Callback(OPENGL_CALLBACK* callback,const T delay)
 {
     bool need_prepare=!idle_timer || idle_timer>delay;
     delete idle_callback;
@@ -308,8 +312,8 @@ Set_Idle_Callback(OPENGL_CALLBACK* callback,const float delay)
 //#####################################################################
 // Function Set_View_Target_Timer
 //#####################################################################
-void OPENGL_WORLD::
-Set_View_Target_Timer(const float view_target_timer_input)
+template<class T> void OPENGL_WORLD<T>::
+Set_View_Target_Timer(const T view_target_timer_input)
 {
     bool need_prepare=!view_target_timer || view_target_timer>view_target_timer_input;
     view_target_timer=view_target_timer_input;
@@ -318,7 +322,7 @@ Set_View_Target_Timer(const float view_target_timer_input)
 //#####################################################################
 // Function Toggle_Show_Frames_Per_Second
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Toggle_Show_Frames_Per_Second()
 {
     show_frames_per_second=!show_frames_per_second;
@@ -328,7 +332,7 @@ Toggle_Show_Frames_Per_Second()
 //#####################################################################
 // Function Prepare_For_Idle
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Prepare_For_Idle()
 {
     if(!timer_id) timer_id=TIMER::Singleton()->Register_Timer();
@@ -338,13 +342,13 @@ Prepare_For_Idle()
 
     // If not use idle then wait awhile without consuming CPU
     if(!use_idle && (idle_timer || view_target_timer || frame_counter_timer)){
-        float wait=min(idle_timer?idle_timer:FLT_MAX,view_target_timer?view_target_timer:FLT_MAX,frame_counter_timer?frame_counter_timer:FLT_MAX);
+        T wait=min(idle_timer?idle_timer:FLT_MAX,view_target_timer?view_target_timer:FLT_MAX,frame_counter_timer?frame_counter_timer:FLT_MAX);
         window->Setup_Timer(wait);}
 }
 //#####################################################################
 // Function Handle_Idle
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Handle_Idle()
 {
     double delta_time=TIMER::Singleton()->Peek_And_Reset_Time(timer_id)/1000;
@@ -369,7 +373,7 @@ Handle_Idle()
 //#####################################################################
 // Function Handle_Timer
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Handle_Timer()
 {
     if(!idle_callback || idle_delay) Handle_Idle();
@@ -377,7 +381,7 @@ Handle_Timer()
 //#####################################################################
 // Function Handle_Display_Prompt_Only
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Handle_Display_Prompt_Only()
 {
 #ifndef USE_OPENGLES
@@ -395,13 +399,13 @@ Handle_Display_Prompt_Only()
 //#####################################################################
 // Function Render_World()
 //#####################################################################
-void OPENGL_WORLD::Render_World(bool selecting,bool swap_buffers)
+template<class T> void OPENGL_WORLD<T>::Render_World(bool selecting,bool swap_buffers)
 {
     if(prompt_mode){Handle_Display_Prompt_Only();return;}
 
     glMatrixMode(GL_PROJECTION); // probably doesn't need to be reset each time!
     if(!selecting) glLoadIdentity();
-    gluPerspective(fovy,window->Width()/(float)window->Height(),nearclip,farclip);
+    gluPerspective(fovy,window->Width()/(T)window->Height(),nearclip,farclip);
     if(left_handed_coordinate_system){ // convert to a left-handed coordinate system
         glScalef(-1,1,1);
         glFrontFace(GL_CW);}
@@ -424,8 +428,8 @@ void OPENGL_WORLD::Render_World(bool selecting,bool swap_buffers)
     for(int i=0;i<lights.m;i++) lights(i)->Send_To_GL_Pipeline(i);
 
     glTranslatef(0,0,-camera_distance);
-    glMultMatrixf(arcball_matrix.x); // assumes MATRIX_4X4::x is a column-major array
-    glMultMatrixf(rotation_matrix.x); // (as OpenGL expects)
+    glMultMatrix(arcball_matrix.x); // assumes MATRIX_4X4::x is a column-major array
+    glMultMatrix(rotation_matrix.x); // (as OpenGL expects)
     OpenGL_Translate(-target_position);
 
     Update_Clipping_Planes();
@@ -462,7 +466,7 @@ void OPENGL_WORLD::Render_World(bool selecting,bool swap_buffers)
             if(load_names_for_selection) glLoadName(i);
 #endif
             object_list(i)->Display();}
-    if(view_target_timer>0) opengl_world->Display_Target();
+    if(view_target_timer>0) Opengl_World<T>()->Display_Target();
     glEnable(GL_LIGHTING);
 
     if(!selecting){
@@ -488,14 +492,14 @@ void OPENGL_WORLD::Render_World(bool selecting,bool swap_buffers)
 //#####################################################################
 // Function Update_Clipping_Planes
 //#####################################################################
-void OPENGL_WORLD::Set_External_Mouse_Handler(OPENGL_MOUSE_HANDLER* mouse_handler)
+template<class T> void OPENGL_WORLD<T>::Set_External_Mouse_Handler(OPENGL_MOUSE_HANDLER* mouse_handler)
 {
     external_mouse_handler=mouse_handler;
 }
 //#####################################################################
 // Function Update_Clipping_Planes
 //#####################################################################
-void OPENGL_WORLD::Update_Clipping_Planes()
+template<class T> void OPENGL_WORLD<T>::Update_Clipping_Planes()
 {
 #ifndef USE_OPENGLES
     for(int i=0;i<clipping_planes.m;i++)
@@ -505,20 +509,20 @@ void OPENGL_WORLD::Update_Clipping_Planes()
 //#####################################################################
 // Function Add_Clipping_Plane
 //#####################################################################
-GLenum OPENGL_WORLD::Add_Clipping_Plane(const PLANE<float> &plane)
+template<class T> GLenum OPENGL_WORLD<T>::Add_Clipping_Plane(const PLANE<T> &plane)
 {
     int index=-1;
     for(int i=0;i<clipping_planes.m;i++)
         if(!clipping_planes(i)){index=i;break;}
     if(index==-1)
-        index=clipping_planes.Append(new PLANE<float>(plane));
-    else clipping_planes(index)=new PLANE<float>(plane);
+        index=clipping_planes.Append(new PLANE<T>(plane));
+    else clipping_planes(index)=new PLANE<T>(plane);
     return GL_CLIP_PLANE0+(index-1);
 }
 //#####################################################################
 // Function Set_Clipping_Plane
 //#####################################################################
-void OPENGL_WORLD::Set_Clipping_Plane(GLenum id,const PLANE<float> &plane)
+template<class T> void OPENGL_WORLD<T>::Set_Clipping_Plane(GLenum id,const PLANE<T> &plane)
 {
     int index=id-GL_CLIP_PLANE0;
     PHYSBAM_ASSERT(clipping_planes(index));
@@ -527,7 +531,7 @@ void OPENGL_WORLD::Set_Clipping_Plane(GLenum id,const PLANE<float> &plane)
 //#####################################################################
 // Function Remove_Clipping_Plane
 //#####################################################################
-void OPENGL_WORLD::Remove_Clipping_Plane(GLenum id)
+template<class T> void OPENGL_WORLD<T>::Remove_Clipping_Plane(GLenum id)
 {
     int index=id-GL_CLIP_PLANE0;
     PHYSBAM_ASSERT(clipping_planes(index));
@@ -536,7 +540,7 @@ void OPENGL_WORLD::Remove_Clipping_Plane(GLenum id)
 //#####################################################################
 // Function Remove_All_Clipping_Planes
 //#####################################################################
-void OPENGL_WORLD::Remove_All_Clipping_Planes()
+template<class T> void OPENGL_WORLD<T>::Remove_All_Clipping_Planes()
 {
     for(int i=0;i<clipping_planes.m;i++) delete clipping_planes(i);
     clipping_planes.Remove_All();
@@ -546,7 +550,7 @@ void OPENGL_WORLD::Remove_All_Clipping_Planes()
 //#####################################################################
 // This version of the function is useful for debugging purposes
 // to show you the contents of the hits buffer
-void OPENGL_WORLD::Print_Hits(GLint hits,GLuint buffer[])
+template<class T> void OPENGL_WORLD<T>::Print_Hits(GLint hits,GLuint buffer[])
 {
     int idx=0;
     for(int i=0;i<(int)hits;i++){
@@ -566,7 +570,7 @@ void OPENGL_WORLD::Print_Hits(GLint hits,GLuint buffer[])
 //#####################################################################
 // Function Get_Number_Of_Valid_Hits
 //#####################################################################
-int OPENGL_WORLD::Get_Number_Of_Valid_Hits(GLint hits,GLuint buffer[],int buff_size)
+template<class T> int OPENGL_WORLD<T>::Get_Number_Of_Valid_Hits(GLint hits,GLuint buffer[],int buff_size)
 {
     if(hits>=0) return hits; // nothing to do
     int i=0,idx=0;
@@ -579,7 +583,7 @@ int OPENGL_WORLD::Get_Number_Of_Valid_Hits(GLint hits,GLuint buffer[],int buff_s
 //#####################################################################
 // Function Get_Selections
 //#####################################################################
-void OPENGL_WORLD::Get_Selections(ARRAY<OPENGL_SELECTION* > &selections,GLint hits,GLuint buffer[])
+template<class T> void OPENGL_WORLD<T>::Get_Selections(ARRAY<OPENGL_SELECTION<T>* > &selections,GLint hits,GLuint buffer[])
 {
     selections.Remove_All();
     int idx=0;
@@ -587,11 +591,11 @@ void OPENGL_WORLD::Get_Selections(ARRAY<OPENGL_SELECTION* > &selections,GLint hi
         GLint names=buffer[idx];
         int object_id=buffer[idx+3];
         PHYSBAM_ASSERT(0<=object_id && object_id<object_list.m && object_list(object_id)->selectable);
-        OPENGL_SELECTION* selection=object_list(object_id)->Get_Selection(&buffer[idx+4],names-1);
+        OPENGL_SELECTION<T>* selection=object_list(object_id)->Get_Selection(&buffer[idx+4],names-1);
         if(selection){
             unsigned int denom=0xffffffff;
-            selection->min_depth=(float)buffer[idx+1]/denom;
-            selection->max_depth=(float)buffer[idx+2]/denom;
+            selection->min_depth=(T)buffer[idx+1]/denom;
+            selection->max_depth=(T)buffer[idx+2]/denom;
             selection->hide=shift_was_pressed && ctrl_was_pressed;
             selections.Append(selection);
         }
@@ -602,7 +606,7 @@ void OPENGL_WORLD::Get_Selections(ARRAY<OPENGL_SELECTION* > &selections,GLint hi
 // Function Handle_Reshape_Main
 //#####################################################################
 // glut independent
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Handle_Reshape_Main()
 {
     if(window){
@@ -613,7 +617,7 @@ Handle_Reshape_Main()
 //#####################################################################
 // Function Handle_Keypress_Main
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Handle_Keypress_Main(const OPENGL_KEY& key,int x,int y)
 {
     VECTOR<int,2> index=key.Index();
@@ -628,7 +632,7 @@ Handle_Keypress_Main(const OPENGL_KEY& key,int x,int y)
 //#####################################################################
 // Handle_Keypress_Prompt
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Handle_Keypress_Prompt(unsigned char key)
 {
 #ifndef USE_OPENGLES
@@ -647,7 +651,7 @@ Handle_Keypress_Prompt(unsigned char key)
 // Function Handle_Click
 //#####################################################################
 // glut independent, although button and state should be GLUT defines
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_pressed)
 {
     if(external_mouse_handler){
@@ -687,7 +691,7 @@ Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_
             } else
 #endif
             {
-                VECTOR<float,2> mouseVector=Convert_Mouse_Coordinates(x,y);
+                VECTOR<T,2> mouseVector=Convert_Mouse_Coordinates(x,y);
                 if(state==GLUT_UP){
                     shift_was_pressed=false;
                     if(do_mouse_rotation){
@@ -695,7 +699,7 @@ Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_
                         arcball_matrix=arcball->Value(); // extracts the current matrix transform
                         // rotation stored in rotation_matrix.
                         rotation_matrix=arcball_matrix*rotation_matrix;
-                        arcball_matrix=MATRIX<float,4>::Identity_Matrix();
+                        arcball_matrix=MATRIX<T,4>::Identity_Matrix();
                     }
                     do_mouse_rotation=do_mouse_target_xy=false;
                 } else if(state==GLUT_DOWN){
@@ -726,7 +730,7 @@ Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_
 // Function Handle_Drag_Main
 //#####################################################################
 // glut independent
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Handle_Drag_Main(int x,int y)
 {
     if(external_mouse_handler){external_mouse_handler->Handle_Drag(x,y);return;}
@@ -758,22 +762,22 @@ Handle_Drag_Main(int x,int y)
         current_selection->z=wz;}
     else{
         if(do_mouse_rotation){
-            float length=(float (x-oldmousex)*(x-oldmousex)+(y-oldmousey)*(y-oldmousey))/abs(window->Width()*window->Height());
+            T length=(T (x-oldmousex)*(x-oldmousex)+(y-oldmousey)*(y-oldmousey))/abs(window->Width()*window->Height());
             if(length > 0.0000001){
-                VECTOR<float,2> v=Convert_Mouse_Coordinates(x,y);
+                VECTOR<T,2> v=Convert_Mouse_Coordinates(x,y);
                 arcball->Update(v); //Alters the internal state of the arcball
                 arcball_matrix=arcball->Value(); //reads the matrix from the arcball
             }
             Set_View_Target_Timer(.5f);
         }
         if(do_mouse_zoom){
-            float factor=pow(1.01,zoom_direction*(y-oldmousey));
+            T factor=pow(1.01,zoom_direction*(y-oldmousey));
             camera_distance*=factor;
             nearclip=nearclip_factor*camera_distance;
             farclip=farclip_factor*camera_distance;}
         if(do_mouse_target_xy){
-            float dx=oldmousex-x;
-            float dy=y-oldmousey;
+            T dx=oldmousex-x;
+            T dy=y-oldmousey;
             target_position+=dx*target_x_drag_vector+dy*target_y_drag_vector;
             Set_View_Target_Timer(.5f);
         }
@@ -781,7 +785,7 @@ Handle_Drag_Main(int x,int y)
             TV view_forward,view_up,view_right;
             Get_View_Frame(view_forward,view_up,view_right);
 
-            float dy=y-oldmousey;
+            T dy=y-oldmousey;
             target_position +=dy*view_forward*0.001*camera_distance;
             Set_View_Target_Timer(.5f);
         }
@@ -794,7 +798,7 @@ Handle_Drag_Main(int x,int y)
 //#####################################################################
 // Function Prepare_For_Target_XY_Drag
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Prepare_For_Target_XY_Drag()
 {
     do_mouse_target_xy=true;Set_View_Target_Timer(1);
@@ -820,7 +824,7 @@ Prepare_For_Target_XY_Drag()
 //#####################################################################
 // Function Display_Target
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Display_Target()
 {
 #ifndef USE_OPENGLES
@@ -832,8 +836,8 @@ Display_Target()
     GLfloat clear_color[4];
     glGetFloatv(GL_COLOR_CLEAR_VALUE,clear_color);
     glColor3f(1-clear_color[0],1-clear_color[1],1-clear_color[2]);
-    float logcd=log(camera_distance)/log(20.);
-    float smallsize=pow(20.0,floor(logcd-.5));
+    T logcd=log(camera_distance)/log(20.);
+    T smallsize=pow(20.0,floor(logcd-.5));
     glutWireCube(smallsize);
     glutWireCube(20*smallsize);
     glPopMatrix();
@@ -843,7 +847,7 @@ Display_Target()
 //#####################################################################
 // Function Display_Auto_Help
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Display_Auto_Help()
 {
 #ifndef USE_OPENGLES
@@ -869,7 +873,7 @@ Display_Auto_Help()
 //#####################################################################
 // Function Display_Strings
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Draw_Transparent_Text_Box(const ARRAY<std::string> &strings,const VECTOR<int,2> &top_left_corner,int vspace,void *font,const OPENGL_COLOR &color)
 {
 #ifndef USE_OPENGLES
@@ -881,7 +885,7 @@ Draw_Transparent_Text_Box(const ARRAY<std::string> &strings,const VECTOR<int,2> 
 //#####################################################################
 // Function Display_Strings
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Display_Strings(const ARRAY<std::string> &strings,const OPENGL_COLOR &color,bool draw_transparent_box,int horizontal_offset,int vspace,void *font)
 {
 #ifndef USE_OPENGLES
@@ -906,7 +910,7 @@ Display_Strings(const ARRAY<std::string> &strings,const OPENGL_COLOR &color,bool
     g_Height-=vspace;
     color.Send_To_GL_Pipeline();
     for(int i=0;i<strings.m;i++){
-        OpenGL_String(VECTOR<float,2>(horizontal_offset,g_Height),strings(i),font);
+        OpenGL_String(VECTOR<T,2>(horizontal_offset,g_Height),strings(i),font);
         g_Height-=vspace;
     }
 
@@ -921,7 +925,7 @@ Display_Strings(const ARRAY<std::string> &strings,const OPENGL_COLOR &color,bool
 //#####################################################################
 // Function Display_Strings
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Display_Strings(bool draw_transparent_box)
 {
 #ifndef USE_OPENGLES
@@ -939,7 +943,7 @@ Display_Strings(bool draw_transparent_box)
 //#####################################################################
 // Function Display_Object_Names
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Display_Object_Names()
 {
 #ifndef USE_OPENGLES
@@ -958,7 +962,7 @@ Display_Object_Names()
 //#####################################################################
 // Function Display_Object_Names
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Display_Object_Names_In_Corner()
 {
 #ifndef USE_OPENGLES
@@ -974,7 +978,7 @@ Display_Object_Names_In_Corner()
 //#####################################################################
 // Function Add_String
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Add_String(const std::string& s)
 {
     // Separate s into separate lines (in case s contains carriage returns)
@@ -986,7 +990,7 @@ Add_String(const std::string& s)
 //#####################################################################
 // Function Add_String
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Clear_Strings()
 {
     strings_to_print.Remove_All();
@@ -994,7 +998,7 @@ Clear_Strings()
 //#####################################################################
 // Function Set_Zoom_Direction
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Set_Zoom_Direction(bool up_is_zoom_in)
 {
     zoom_direction=(up_is_zoom_in) ? 1 : -1;
@@ -1002,7 +1006,7 @@ Set_Zoom_Direction(bool up_is_zoom_in)
 //#####################################################################
 // Function Set_Translation_Direction
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Set_Translation_Direction(bool up_is_move_in)
 {
     translation_direction=(up_is_move_in) ? 1 : -1;
@@ -1010,7 +1014,7 @@ Set_Translation_Direction(bool up_is_move_in)
 //#####################################################################
 // Function Set_Lighting_For_Wireframe
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Set_Lighting_For_Wireframe(bool enable_flag)
 {
     enable_lighting_for_wireframe=enable_flag;
@@ -1018,7 +1022,7 @@ Set_Lighting_For_Wireframe(bool enable_flag)
 //#####################################################################
 // Function Set_2D_Mode
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Set_2D_Mode(bool mode)
 {
     mode_2d=mode;
@@ -1026,7 +1030,7 @@ Set_2D_Mode(bool mode)
 //#####################################################################
 // Function Set_Process_Hits_Callback
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Set_Process_Hits_Callback(PROCESS_HITS_CB process_hits_cb_input)
 {
     process_hits_cb=process_hits_cb_input;
@@ -1038,10 +1042,10 @@ Set_Process_Hits_Callback(PROCESS_HITS_CB process_hits_cb_input)
 //   appears to point into screen.
 //   view_up appears to point up, and view_right points right.
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Get_View_Frame(TV &view_forward,TV &view_up,TV &view_right)
 {
-    MATRIX<float,4> matrix=arcball_matrix*rotation_matrix;
+    MATRIX<T,4> matrix=arcball_matrix*rotation_matrix;
 
     // We want to find the vector v such that matrix * v = (0,0,-1)
     // (because OpenGL has negative z pointing into screen)
@@ -1061,18 +1065,18 @@ Get_View_Frame(TV &view_forward,TV &view_up,TV &view_right)
 // Function Set_View_Frame
 //   Assumes vectors are normalized!
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Set_View_Frame(const TV &view_forward,const TV &view_up,const TV &view_right)
 {
-    arcball_matrix=MATRIX<float,4>::Identity_Matrix();
-    rotation_matrix=MATRIX<float,4>(-view_right.x,view_up.x,-view_forward.x,0,
+    arcball_matrix=MATRIX<T,4>::Identity_Matrix();
+    rotation_matrix=MATRIX<T,4>(-view_right.x,view_up.x,-view_forward.x,0,
                                     -view_right.y,view_up.y,-view_forward.y,0,
                                     -view_right.z,view_up.z,-view_forward.z,0,0,0,0,1);
 }
 //#####################################################################
 // Function Get_Look_At
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Get_Look_At(TV &camera,TV &target,TV &up)
 {
     TV view_forward,view_right;
@@ -1084,7 +1088,7 @@ Get_Look_At(TV &camera,TV &target,TV &up)
 //#####################################################################
 // Function Get_Look_At
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Set_Look_At(const TV &camera,const TV &target,const TV &up)
 {
     TV view_forward=target-camera;
@@ -1103,7 +1107,7 @@ Set_Look_At(const TV &camera,const TV &target,const TV &up)
 //#####################################################################
 // Function Save_View
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Save_View(const std::string& filename,bool verbose)
 {
     TV camera,target,up;
@@ -1127,13 +1131,13 @@ Save_View(const std::string& filename,bool verbose)
     output<<"\tPseudo_Up=\t"<<up<<std::endl;
     output<<"\tField_Of_View=\t"<<2*180/pi*atan(tan(0.5*fovy*pi/180.0)*window->Width()/window->Height())<<std::endl; // convert fovy to fovx
     output<<"\tFocal_Distance=\t.1"<<std::endl;
-    output<<"\tAspect_Ratio=\t"<<(float)window->Width()/window->Height()<<std::endl;
+    output<<"\tAspect_Ratio=\t"<<(T)window->Width()/window->Height()<<std::endl;
     output.close();
 }
 //#####################################################################
 // Function Load_View
 //#####################################################################
-bool OPENGL_WORLD::
+template<class T> bool OPENGL_WORLD<T>::
 Load_View(const std::string& filename,bool verbose)
 {
     std::ifstream input(filename.c_str());
@@ -1161,30 +1165,30 @@ Load_View(const std::string& filename,bool verbose)
 //#####################################################################
 // Function Ray_Through_Normalized_Image_Coordinate
 //#####################################################################
-RAY<VECTOR<float,3> > OPENGL_WORLD::
-Ray_Through_Normalized_Image_Coordinate(VECTOR<float,2> coordinates)
+template<class T> RAY<VECTOR<T,3> > OPENGL_WORLD<T>::
+Ray_Through_Normalized_Image_Coordinate(VECTOR<T,2> coordinates)
 {
-    MATRIX<float,4> matrix=arcball_matrix*rotation_matrix;
+    MATRIX<T,4> matrix=arcball_matrix*rotation_matrix;
     TV view_forward(-matrix(3,1),-matrix(3,2),-matrix(3,3));
-    TV X(coordinates.x*(float)window->Width()/(float)window->Height(),coordinates.y,-1/tan(.5f*fovy*(float)pi/180));
+    TV X(coordinates.x*(T)window->Width()/(T)window->Height(),coordinates.y,-1/tan(.5f*fovy*(T)pi/180));
     TV position=target_position-camera_distance*view_forward;
-    return RAY<VECTOR<float,3> >(position,matrix.Transposed().Homogeneous_Times(X));
+    return RAY<VECTOR<T,3> >(position,matrix.Transposed().Homogeneous_Times(X));
 }
 //#####################################################################
 // Function Set_Left_Handed
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Set_Left_Handed(const bool left_handed)
 {
     // To get left handed coordinates, we apply a 180 degree rotation here and do glScalef(-1,1,1) in Render_World
     if(left_handed_coordinate_system!=left_handed){
-        rotation_matrix=MATRIX<float,4>::Rotation_Matrix_Y_Axis(pi)*rotation_matrix;
+        rotation_matrix=MATRIX<T,4>::Rotation_Matrix_Y_Axis(pi)*rotation_matrix;
         left_handed_coordinate_system=left_handed;}
 }
 //#####################################################################
 // Function Get_Camera_Position
 //#####################################################################
-VECTOR<float,3> OPENGL_WORLD::
+template<class T> VECTOR<T,3> OPENGL_WORLD<T>::
 Get_Camera_Position()
 {
     TV view_forward,view_up,view_right;
@@ -1195,7 +1199,7 @@ Get_Camera_Position()
 //#####################################################################
 // Function Get_Target_Position
 //#####################################################################
-VECTOR<float,3> OPENGL_WORLD::
+template<class T> VECTOR<T,3> OPENGL_WORLD<T>::
 Get_Target_Position()
 {
     return target_position;
@@ -1203,7 +1207,7 @@ Get_Target_Position()
 //#####################################################################
 // Function Scene_Bounding_Box
 //#####################################################################
-RANGE<VECTOR<float,3> > OPENGL_WORLD::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_WORLD<T>::
 Scene_Bounding_Box()
 {
     RANGE<TV> bounding_box;
@@ -1216,7 +1220,7 @@ Scene_Bounding_Box()
 //#####################################################################
 // Function Center_Camera_On_Box
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Center_Camera_On_Bounding_Box(const RANGE<TV>& bounding_box,const bool adjust_distance)
 {
     target_position=bounding_box.Center();
@@ -1224,11 +1228,11 @@ Center_Camera_On_Bounding_Box(const RANGE<TV>& bounding_box,const bool adjust_di
 
     // Ensure viewing frustum includes bounding box
     if(bounding_box.Edge_Lengths().x*window->Height()/window->Width() > bounding_box.Edge_Lengths().y)
-        camera_distance=.5*bounding_box.Edge_Lengths().x*window->Height()/(window->Width()*tan(.5f*fovy*(float)pi/180)); // wide
+        camera_distance=.5*bounding_box.Edge_Lengths().x*window->Height()/(window->Width()*tan(.5f*fovy*(T)pi/180)); // wide
     else
-        camera_distance=.5*bounding_box.Edge_Lengths().y/tan(.5f*fovy*(float)pi/180); // tall
+        camera_distance=.5*bounding_box.Edge_Lengths().y/tan(.5f*fovy*(T)pi/180); // tall
     camera_distance+=.5*bounding_box.Edge_Lengths().z;
-    camera_distance=max(camera_distance,.1f);
+    camera_distance=max(camera_distance,(T).1);
 
     nearclip=nearclip_factor*camera_distance;
     farclip=farclip_factor*camera_distance;
@@ -1236,18 +1240,18 @@ Center_Camera_On_Bounding_Box(const RANGE<TV>& bounding_box,const bool adjust_di
 //#####################################################################
 // Function Reset_Camera_Orientation
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Reset_Camera_Orientation(const bool reset_up_vector_only)
 {
-    arcball_matrix=MATRIX<float,4>::Identity_Matrix();
+    arcball_matrix=MATRIX<T,4>::Identity_Matrix();
     if(reset_up_vector_only){
         TV camera,target,up;Get_Look_At(camera,target,up);Set_Look_At(camera,target,TV(0,1,0));}
-    else rotation_matrix=MATRIX<float,4>::Rotation_Matrix_Y_Axis(left_handed_coordinate_system?pi:0);
+    else rotation_matrix=MATRIX<T,4>::Rotation_Matrix_Y_Axis(left_handed_coordinate_system?pi:0);
 }
 //#####################################################################
 // Function Center_Camera_On_Scene
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Center_Camera_On_Scene()
 {
     RANGE<TV> bounding_box=Scene_Bounding_Box();
@@ -1258,17 +1262,17 @@ Center_Camera_On_Scene()
 // Function Convert_Mouse_Coordinates
 //#####################################################################
 // This function converts mouse space pixel coordinates to the normalize coordinates the arcball expects
-VECTOR<float,2> OPENGL_WORLD::
+template<class T> VECTOR<T,2> OPENGL_WORLD<T>::
 Convert_Mouse_Coordinates(int x,int y)
 {
     if(left_handed_coordinate_system) x=window->Width()-x-1;
-    VECTOR<float,2> coord;
+    VECTOR<T,2> coord;
     if(window->Width()>=window->Height()) {
-        coord.x=((float)x/window->Width()-0.5)*2*(window->Width()/window->Height());
-        coord.y=-((float)y/window->Height()-0.5)*2;
+        coord.x=((T)x/window->Width()-0.5)*2*(window->Width()/window->Height());
+        coord.y=-((T)y/window->Height()-0.5)*2;
     } else {
-        coord.x=((float)x/window->Width()-0.5)*2;
-        coord.y=-((float)y/window->Height()-0.5)*2*(window->Height()/window->Width());
+        coord.x=((T)x/window->Width()-0.5)*2;
+        coord.y=-((T)y/window->Height()-0.5)*2*(window->Height()/window->Width());
     }
     return coord;
 }
@@ -1276,17 +1280,17 @@ Convert_Mouse_Coordinates(int x,int y)
 //#####################################################################
 // Function Save_Screen
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Save_Screen(const std::string& filename,const bool use_back_buffer,int jpeg_quality)
 {
     ARRAY<VECTOR<T,4> ,VECTOR<int,2> > image;
     Get_Image(image,use_back_buffer);
-    IMAGE<float>::Write(filename,image);
+    IMAGE<T>::Write(filename,image);
 }
 //#####################################################################
 // Function Get_Image
 //#####################################################################
-template<int d> void OPENGL_WORLD::
+template<class T> template<int d> void OPENGL_WORLD<T>::
 Get_Image(ARRAY<VECTOR<T,d> ,VECTOR<int,2> > &image,const bool use_back_buffer)
 {
     // Assuming GLubyte is same type as unsigned char
@@ -1308,7 +1312,7 @@ Get_Image(ARRAY<VECTOR<T,d> ,VECTOR<int,2> > &image,const bool use_back_buffer)
 //#####################################################################
 // Function Display_Prompt_Strings
 //#####################################################################
-void OPENGL_WORLD::Display_Prompt_Strings()
+template<class T> void OPENGL_WORLD<T>::Display_Prompt_Strings()
 {
     static OPENGL_COLOR prompt_color=OPENGL_COLOR::Red();
 
@@ -1319,7 +1323,7 @@ void OPENGL_WORLD::Display_Prompt_Strings()
 //#####################################################################
 // Function Prompt_User
 //#####################################################################
-void OPENGL_WORLD::Prompt_User(const std::string& prompt_input,OPENGL_CALLBACK* prompt_response_cb_input,const std::string& default_response)
+template<class T> void OPENGL_WORLD<T>::Prompt_User(const std::string& prompt_input,OPENGL_CALLBACK* prompt_response_cb_input,const std::string& default_response)
 {
 #ifndef USE_OPENGLES
     prompt=prompt_input;
@@ -1336,7 +1340,7 @@ void OPENGL_WORLD::Prompt_User(const std::string& prompt_input,OPENGL_CALLBACK* 
 //#####################################################################
 // Function Toggle_Background
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Toggle_Background()
 {
     white_background=!white_background;
@@ -1344,7 +1348,7 @@ Toggle_Background()
 //#####################################################################
 // Function Toggle_Background
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Toggle_Help()
 {
     view_auto_help=!view_auto_help;
@@ -1352,7 +1356,7 @@ Toggle_Help()
 //#####################################################################
 // Resize_To_Standard_Size
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Resize_To_Standard_Size()
 {
     window->Request_Resize(640,480);
@@ -1360,12 +1364,18 @@ Resize_To_Standard_Size()
 //#####################################################################
 // Quit
 //#####################################################################
-void OPENGL_WORLD::
+template<class T> void OPENGL_WORLD<T>::
 Quit()
 {
     exit(0);
 }
 //#####################################################################
-template void OPENGL_WORLD::Get_Image(ARRAY<VECTOR<float,3> ,VECTOR<int,2> > &image,const bool use_back_buffer);
-template void OPENGL_WORLD::Get_Image(ARRAY<VECTOR<float,4> ,VECTOR<int,2> > &image,const bool use_back_buffer);
+template void OPENGL_WORLD<float>::Get_Image(ARRAY<VECTOR<float,3>,VECTOR<int,2> > &image,const bool use_back_buffer);
+template void OPENGL_WORLD<float>::Get_Image(ARRAY<VECTOR<float,4>,VECTOR<int,2> > &image,const bool use_back_buffer);
+template void OPENGL_WORLD<double>::Get_Image(ARRAY<VECTOR<double,3>,VECTOR<int,2> > &image,const bool use_back_buffer);
+template void OPENGL_WORLD<double>::Get_Image(ARRAY<VECTOR<double,4>,VECTOR<int,2> > &image,const bool use_back_buffer);
+}
+namespace PhysBAM{
+template class OPENGL_WORLD<double>;
+template class OPENGL_WORLD<float>;
 }

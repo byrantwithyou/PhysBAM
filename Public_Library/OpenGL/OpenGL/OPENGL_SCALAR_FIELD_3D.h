@@ -14,14 +14,16 @@
 
 namespace PhysBAM
 {
-class OPENGL_TEXTURED_RECT;
+template<class T> class OPENGL_TEXTURED_RECT;
 template<class T,class T_ARRAY> class OPENGL_POINTS_3D;
 
 template<class T,class T2=T>
-class OPENGL_SCALAR_FIELD_3D:public OPENGL_OBJECT
+class OPENGL_SCALAR_FIELD_3D:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
+    using OPENGL_OBJECT<T>::slice;
     GRID<TV> grid;
     ARRAY<T2,VECTOR<int,3> > &values;
 
@@ -39,12 +41,12 @@ public:
     T2 Pre_Map_Value(const T2 value) const;
 
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Slice_Has_Changed() PHYSBAM_OVERRIDE;    
 
     void Set_Draw_Mode(DRAW_MODE draw_mode);
     virtual void Update();  // Call when values or other attributes have changed
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const PHYSBAM_OVERRIDE;
 
     // convenience functions
     void Toggle_Draw_Mode();
@@ -63,7 +65,7 @@ private:
     void Delete_Points();
 
 public:
-    OPENGL_TEXTURED_RECT* opengl_textured_rect;
+    OPENGL_TEXTURED_RECT<T>* opengl_textured_rect;
     OPENGL_POINTS_3D<T,ARRAY<VECTOR<T,3> > > *opengl_points;
     bool smooth_slice_texture;
     bool scale_range;

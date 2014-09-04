@@ -10,7 +10,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_TRIANGULATED_AREA<T,RW>::
 OPENGL_COMPONENT_TRIANGULATED_AREA(const std::string &filename)
-    :OPENGL_COMPONENT("Triangulated Surface"),color_map(0), 
+    :OPENGL_COMPONENT<T>("Triangulated Surface"),color_map(0), 
       triangulated_area(*TRIANGULATED_AREA<T>::Create()),
       opengl_triangulated_area(triangulated_area),
       filename(filename),color_map_filename(0),frame_loaded(-1),valid(false)
@@ -23,7 +23,7 @@ OPENGL_COMPONENT_TRIANGULATED_AREA(const std::string &filename)
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_TRIANGULATED_AREA<T,RW>::
 OPENGL_COMPONENT_TRIANGULATED_AREA(const std::string &filename,const std::string &color_map_filename_input)
-    :OPENGL_COMPONENT("Triangulated Surface"),color_map(new ARRAY<OPENGL_COLOR >), 
+    :OPENGL_COMPONENT<T>("Triangulated Surface"),color_map(new ARRAY<OPENGL_COLOR >), 
       triangulated_area(*TRIANGULATED_AREA<T>::Create()),
       opengl_triangulated_area(triangulated_area,false,OPENGL_COLOR::Red(),OPENGL_COLOR::Black()),
       filename(filename),color_map_filename(&color_map_filename_input),frame_loaded(-1),valid(false)
@@ -56,7 +56,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -65,7 +65,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -79,11 +79,11 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_TRIANGULATED_AREA<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_TRIANGULATED_AREA<T,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_triangulated_area.Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Reinitialize

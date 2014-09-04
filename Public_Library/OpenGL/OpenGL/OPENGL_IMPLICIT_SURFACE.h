@@ -25,10 +25,11 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_IMPLICIT_SURFACE:public OPENGL_OBJECT
+class OPENGL_IMPLICIT_SURFACE:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;
     IMPLICIT_OBJECT<TV>& surface;
     bool two_sided;
     OPENGL_MATERIAL front_material;
@@ -41,7 +42,7 @@ public:
     OPENGL_IMPLICIT_SURFACE(IMPLICIT_OBJECT<TV>& surface_input,const OPENGL_MATERIAL &front_material_input,const OPENGL_MATERIAL& back_material_input);
     virtual ~OPENGL_IMPLICIT_SURFACE();
 
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE
     {return surface.box;}
 
     void Set_Two_Sided(bool two_sided_input=true)

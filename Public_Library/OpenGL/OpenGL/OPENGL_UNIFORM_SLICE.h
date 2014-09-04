@@ -15,13 +15,14 @@
 #include <OpenGL/OpenGL/OPENGL_SLICE.h>
 
 namespace PhysBAM{
-class OPENGL_WORLD;
+template<class T> class OPENGL_WORLD;
+template<class T>
 class OPENGL_UNIFORM_SLICE:public OPENGL_SLICE
 {
-    typedef VECTOR<float,3> TV;typedef VECTOR<int,3> TV_INT;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    OPENGL_WORLD& world;
-    GRID<VECTOR<float,3> > grid;
+    OPENGL_WORLD<T>& world;
+    GRID<TV> grid;
 
     OPENGL_SLICE::SLICE_MODE mode;
 
@@ -30,10 +31,10 @@ public:
 
     GLenum clip_plane_id1,clip_plane_id2;
 
-    OPENGL_UNIFORM_SLICE(OPENGL_WORLD& world_input)
+    OPENGL_UNIFORM_SLICE(OPENGL_WORLD<T>& world_input)
         : world(world_input),clip_plane_id1(0),clip_plane_id2(0)
     {
-        Initialize(GRID<VECTOR<float,3> >(TV_INT()+2,RANGE<TV>::Unit_Box()));
+        Initialize(GRID<TV>(TV_INT()+2,RANGE<TV>::Unit_Box()));
     }
 
     bool Is_Slice_Mode() PHYSBAM_OVERRIDE
@@ -49,7 +50,7 @@ public:
         else return -1;
     }
 
-    void Initialize(GRID<VECTOR<float,3> > grid_input)
+    void Initialize(GRID<TV> grid_input)
     {
         grid=grid_input;
         mode=NO_SLICE;
@@ -105,8 +106,8 @@ public:
         glEnable(clip_plane_id2);
     }
 
-    template<class T>
-    static void Get_Face_Index_Range(const OPENGL_UNIFORM_SLICE* slice,const ARRAYS_ND_BASE<T,VECTOR<int,3> >& array,int face,VECTOR<int,3> &index_start,VECTOR<int,3> &index_end,int scale=1)
+    template<class T2>
+    static void Get_Face_Index_Range(const OPENGL_UNIFORM_SLICE<T>* slice,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& array,int face,VECTOR<int,3> &index_start,VECTOR<int,3> &index_end,int scale=1)
     {
         index_start=VECTOR<int,3>(array.domain.min_corner.x,array.domain.min_corner.y,array.domain.min_corner.z);
         index_end=VECTOR<int,3>(array.domain.max_corner.x,array.domain.max_corner.y,array.domain.max_corner.z);

@@ -20,7 +20,7 @@ template<class T> class OPENGL_AXES;
 template<class TV> class RIGID_BODY_COLLECTION;
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D:public OPENGL_COMPONENT<T>
 {
 protected:
     typedef VECTOR<T,1> TV;
@@ -44,10 +44,11 @@ protected:
     ARRAY<bool,int> use_object_bounding_box;
     ARRAY<VECTOR<T,1> > positions;
     ARRAY<VECTOR<T,1> > node_positions;
-    OPENGL_SELECTION* current_selection;
+    OPENGL_SELECTION<T>* current_selection;
     bool need_destroy_rigid_body_collection;
 
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const std::string& basedir);
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D();
@@ -59,7 +60,7 @@ public:
 
     void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     void Read_Hints(const std::string& filename);
 

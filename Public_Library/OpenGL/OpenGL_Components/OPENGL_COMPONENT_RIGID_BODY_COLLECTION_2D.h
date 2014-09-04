@@ -23,7 +23,7 @@ template<class TV> class ARTICULATED_RIGID_BODY;
 template<class TV> class RIGID_BODY_COLLECTION;
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D:public OPENGL_COMPONENT<T>
 {
 protected:
     typedef VECTOR<T,2> TV;
@@ -55,7 +55,7 @@ protected:
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*,int> opengl_segmented_curve;
     ARRAY<OPENGL_TRIANGULATED_AREA<T>*,int> opengl_triangulated_area;
     ARRAY<OPENGL_LEVELSET_2D<T>*,int> opengl_levelset;
-    ARRAY<ARRAY<OPENGL_COMPONENT*>,int> extra_components;
+    ARRAY<ARRAY<OPENGL_COMPONENT<T>*>,int> extra_components;
     ARRAY<OPENGL_AXES<T>*,int> opengl_axes;
     ARRAY<bool,int> draw_object;
     ARRAY<bool,int> use_object_bounding_box;
@@ -65,11 +65,12 @@ protected:
     ARRAY<VECTOR<T,2> > node_velocity_vectors;
     OPENGL_VECTOR_FIELD_2D<ARRAY<TV> > velocity_field;
     OPENGL_VECTOR_FIELD_2D<ARRAY<TV> > node_velocity_field;
-    OPENGL_SELECTION* current_selection;
+    OPENGL_SELECTION<T>* current_selection;
     ARRAY<VECTOR<T,2> > articulation_points;
     ARRAY<PAIR<VECTOR<T,2>,T>,int> forces_and_torques;
 
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const std::string& basedir);
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D();
@@ -80,12 +81,12 @@ public:
 
     void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
 
     void Read_Hints(const std::string& filename);
 
@@ -133,45 +134,48 @@ protected:
 };
 
 template<class T>
-class OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D:public OPENGL_SELECTION
+class OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int body_id;
-    OPENGL_SELECTION* body_selection;
+    OPENGL_SELECTION<T>* body_selection;
 
-    OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D(OPENGL_OBJECT* object,const int body_id,OPENGL_SELECTION* body_selection)
-        :OPENGL_SELECTION(OPENGL_SELECTION::COMPONENT_RIGID_BODIES_2D,object),body_id(body_id),body_selection(body_selection)
+    OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D(OPENGL_OBJECT<T>* object,const int body_id,OPENGL_SELECTION<T>* body_selection)
+        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_2D,object),body_id(body_id),body_selection(body_selection)
     {}
 
-    virtual OPENGL_SELECTION::TYPE Actual_Type() const 
+    virtual typename OPENGL_SELECTION<T>::TYPE Actual_Type() const 
     {return body_selection->Actual_Type();}
 
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D:public OPENGL_SELECTION
+class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int joint_id;
 
-    OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D(OPENGL_OBJECT* object,const int joint_id)
-        :OPENGL_SELECTION(OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_2D,object),joint_id(joint_id)
+    OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D(OPENGL_OBJECT<T>* object,const int joint_id)
+        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_2D,object),joint_id(joint_id)
     {}
 
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D:public OPENGL_SELECTION
+class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int muscle_id;
-    OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D(OPENGL_OBJECT* object,const int muscle_id)
-        :OPENGL_SELECTION(OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_MUSCLE_2D,object),muscle_id(muscle_id)
+    OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D(OPENGL_OBJECT<T>* object,const int muscle_id)
+        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_MUSCLE_2D,object),muscle_id(muscle_id)
     {}
 
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 }
 

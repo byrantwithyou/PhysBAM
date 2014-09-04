@@ -38,7 +38,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir_input,bool use_display_lists)
-    :OPENGL_COMPONENT("Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
+    :OPENGL_COMPONENT<T>("Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
     rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),articulated_rigid_body(0),
     velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
     angular_velocity_field(angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(true),one_sided(false),
@@ -52,7 +52,7 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir_input,bool 
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input,bool use_display_lists)
-    :OPENGL_COMPONENT("Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
+    :OPENGL_COMPONENT<T>("Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
     rigid_body_collection(rigid_body_collection),articulated_rigid_body(0),
     velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
     angular_velocity_field(angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(false),one_sided(false),
@@ -382,7 +382,7 @@ Create_Geometry(const int id)
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 Update_Geometry(const int id)
 {
-    if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<float,3> >(rigid_body_collection.Rigid_Body(id).Frame());
+    if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<T,3> >(rigid_body_collection.Rigid_Body(id).Frame());
     if(opengl_tetrahedralized_volume(id)){
         std::string color_map_filename=STRING_UTILITIES::string_sprintf("%s/%d/stress_map_of_tetrahedralized_volume_%d",basedir.c_str(),frame,id);
         if(FILE_UTILITIES::File_Exists(color_map_filename)){
@@ -482,7 +482,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -491,7 +491,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     if(draw_input) draw_object.Fill(true);
 }
 //#####################################################################
@@ -517,27 +517,27 @@ Use_Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 Bounding_Box() const
 {
-    RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
+    RANGE<VECTOR<T,3> > box;
     if(draw)
         for(int i=0;i<opengl_triangulated_surface.Size();i++)
             if(rigid_body_collection.Is_Active(i) && rigid_body_collection.Rigid_Body(i).name!="ground")
                 if(draw_object(i) && use_object_bounding_box(i) && opengl_triangulated_surface(i))
-                    box=RANGE<VECTOR<float,3> >::Combine(box,opengl_triangulated_surface(i)->Bounding_Box());
+                    box=RANGE<VECTOR<T,3> >::Combine(box,opengl_triangulated_surface(i)->Bounding_Box());
     return box;
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
-    OPENGL_SELECTION* selection=0;
+    OPENGL_SELECTION<T>* selection=0;
     if(buffer_size>=2){
         int body_id(buffer[1]);
-        OPENGL_SELECTION* body_selection=0;
+        OPENGL_SELECTION<T>* body_selection=0;
         if(buffer[0]==1){ // segmented curve
             PHYSBAM_ASSERT(opengl_triangulated_surface(body_id));
             body_selection=opengl_triangulated_surface(body_id)->Get_Selection(&buffer[2],buffer_size-2);}
@@ -553,23 +553,23 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
-    if(selection->type==OPENGL_SELECTION::COMPONENT_RIGID_BODIES_3D){
+    if(selection->type==OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_3D){
         OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T>*)selection;
         if(selection->hide) draw_object(real_selection->body_id)=false;
-        else if(real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_SURFACE_VERTEX ||
-           real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_SURFACE_SEGMENT ||
-           real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_SURFACE_TRIANGLE){ // triangulated surface
+        else if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX ||
+           real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT ||
+           real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE){ // triangulated surface
             if(opengl_triangulated_surface(real_selection->body_id)) // might have become inactive
                 opengl_triangulated_surface(real_selection->body_id)->Highlight_Selection(real_selection->body_selection);}
-        else if(real_selection->body_selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_VERTEX ||
-                real_selection->body_selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){ // tetrahedralized volume
+        else if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX ||
+                real_selection->body_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){ // tetrahedralized volume
             if(opengl_tetrahedralized_volume(real_selection->body_id)) // might have become inactive
                 opengl_tetrahedralized_volume(real_selection->body_id)->Highlight_Selection(real_selection->body_selection);}}
     delete current_selection;
     current_selection=0;
-    if(selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_3D){
+    if(selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_3D){
         current_selection=new OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>(this,((OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>*)selection)->joint_id);}
 }
 //#####################################################################
@@ -774,9 +774,9 @@ Toggle_Draw_Mode()
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 Turn_Off_Individual_Smooth_Shading_Prompt()
 {
-    if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
+    if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
         int object_id;
-        STRING_UTILITIES::String_To_Value(OPENGL_WORLD::Singleton()->prompt_response,object_id);
+        STRING_UTILITIES::String_To_Value(OPENGL_WORLD<T>::Singleton()->prompt_response,object_id);
         if((unsigned)object_id<(unsigned)rigid_body_collection.rigid_body_particles.Size() && opengl_triangulated_surface(object_id))
             opengl_triangulated_surface(object_id)->Turn_Smooth_Shading_Off();}
 }
@@ -786,7 +786,7 @@ Turn_Off_Individual_Smooth_Shading_Prompt()
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 Turn_Off_Individual_Smooth_Shading()
 {
-    OPENGL_WORLD::Singleton()->Prompt_User("Turn off smooth shading for object: ",Turn_Off_Individual_Smooth_Shading_Prompt_CB(),"");
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Turn off smooth shading for object: ",Turn_Off_Individual_Smooth_Shading_Prompt_CB(),"");
 }
 //#####################################################################
 // Function Manipulate_Individual_Body_Prompt
@@ -794,10 +794,10 @@ Turn_Off_Individual_Smooth_Shading()
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 Manipulate_Individual_Body_Prompt()
 {
-    if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
+    if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
         int object_id;
         std::string command;
-        std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);
+        std::istringstream sstream(OPENGL_WORLD<T>::Singleton()->prompt_response);
         sstream>>command;
         sstream>>object_id;
         if((unsigned)object_id<(unsigned)rigid_body_collection.rigid_body_particles.Size() && opengl_triangulated_surface(object_id)){
@@ -813,12 +813,12 @@ Manipulate_Individual_Body_Prompt()
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 Manipulate_Individual_Body()
 {
-    OPENGL_WORLD::Singleton()->Prompt_User("Manipulate: ",Manipulate_Individual_Body_Prompt_CB(),"");
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Manipulate: ",Manipulate_Individual_Body_Prompt_CB(),"");
 }
 //#####################################################################
 // Selection Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object && body_selection);
@@ -887,7 +887,7 @@ Display() const
             if(opengl_levelset(i)){
                 if(++levelset_count>50){
                     PHYSBAM_WARNING("Refusing to draw more than 10 levelsets to save memory.");
-                    OPENGL_WORLD::Singleton()->Add_String("WARNING: Refusing to draw more than 10 levelsets to save memory.");
+                    OPENGL_WORLD<T>::Singleton()->Add_String("WARNING: Refusing to draw more than 10 levelsets to save memory.");
                     break;}
                 opengl_levelset(i)->Update();
                 opengl_levelset(i)->Display();}
@@ -905,7 +905,7 @@ Display() const
             if(opengl_levelset(i)){
                 if(++levelset_count>50){
                     PHYSBAM_WARNING("Refusing to draw more than 10 levelsets to save memory.");
-                    OPENGL_WORLD::Singleton()->Add_String("WARNING: Refusing to draw more than 10 levelsets to save memory.");
+                    OPENGL_WORLD<T>::Singleton()->Add_String("WARNING: Refusing to draw more than 10 levelsets to save memory.");
                     break;}
                 opengl_levelset(i)->Update();
                 opengl_levelset(i)->Display();}
@@ -944,9 +944,9 @@ Display() const
             if(mode!=GL_SELECT) for(int i=0;i<articulation_points.m;i+=2){
                 OPENGL_SHAPES::Draw_Segment(articulation_points(i),articulation_points(i+1),segment_color,5);}
             if(mode==GL_SELECT){glPopName();glPopAttrib();}
-            if(mode!=GL_SELECT && current_selection && current_selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_3D){
+            if(mode!=GL_SELECT && current_selection && current_selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_3D){
                 int joint_id=((OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>*)current_selection)->joint_id;
-                OPENGL_SELECTION::Draw_Highlighted_Vertex(articulation_points(joint_id));}}}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(articulation_points(joint_id));}}}
 
     RANGE<TV> axes_box(RANGE<TV>::Unit_Box()*2);
     //RANGE<TV> axes_box(0,velocity_field.size,0,velocity_field.size,0,velocity_field.size);
@@ -974,11 +974,11 @@ Display() const
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
 {
     if(!selection || selection->object!=this) return;
 
-    if(selection->type==OPENGL_SELECTION::COMPONENT_RIGID_BODIES_3D){
+    if(selection->type==OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_3D){
         OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T>*)selection;
 
         output_stream<<"Rigid body "<<real_selection->body_id<<std::endl;
@@ -1002,19 +1002,19 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) co
 
         MATRIX<T,4> body_transform=body->Frame().Matrix();
 
-        if(real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_SURFACE_VERTEX ||
-            real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_SURFACE_SEGMENT ||
-            real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_SURFACE_TRIANGLE){ // triangulated surface
+        if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX ||
+            real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT ||
+            real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE){ // triangulated surface
             if(opengl_triangulated_surface(real_selection->body_id))
                 opengl_triangulated_surface(real_selection->body_id)->Print_Selection_Info(output_stream,real_selection->body_selection,&body_transform);
-            if(real_selection->body_selection->type==OPENGL_SELECTION::TRIANGULATED_SURFACE_VERTEX){
+            if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX){
                 VECTOR<T,3> position=body->simplicial_object->particles.X(((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>*)real_selection->body_selection)->index);
                 output_stream<<"Pointwise velocity = "<<body->Pointwise_Object_Velocity(body->World_Space_Point(position))<<std::endl;}}
-        else if(real_selection->body_selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_VERTEX ||
-                real_selection->body_selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){
+        else if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX ||
+                real_selection->body_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){
             if(opengl_tetrahedralized_volume(real_selection->body_id))
                 opengl_tetrahedralized_volume(real_selection->body_id)->Print_Selection_Info(output_stream,real_selection->body_selection,&body_transform);}}
-    else if(selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_3D){
+    else if(selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_3D){
         OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T> *real_selection=(OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>*)selection;
         int articulation_id=real_selection->joint_id;int joint_index=(articulation_id+1/2);
         JOINT<TV>& joint=*articulated_rigid_body->joint_mesh.Joints(joint_index);JOINT_ID joint_id=joint.id_number;
@@ -1075,11 +1075,11 @@ Toggle_Forces_And_Torques()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>::
 Bounding_Box() const
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-    return RANGE<VECTOR<float,3> >::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 namespace PhysBAM{

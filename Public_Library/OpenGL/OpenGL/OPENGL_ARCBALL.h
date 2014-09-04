@@ -25,11 +25,11 @@ namespace PhysBAM{
 #define NSEGS (1<<LG_NSEGS)
 
 template<class T>
-class OPENGL_ARCBALL:public OPENGL_OBJECT
+class OPENGL_ARCBALL:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
-    OPENGL_WORLD& opengl_world;
+    OPENGL_WORLD<T>& opengl_world;
 
     SPHERE<TV> sphere;
     ROTATION<TV> qNow,qDown,qDrag;
@@ -37,11 +37,11 @@ public:
     TV vFrom,vTo,vrFrom,vrTo;
     MATRIX<T,4> mNow,mDown,mDeltaNow; //note that these only work in world space
     bool dragging,use_sphere_center,use_object_space;
-    OPENGL_WORLD* world;
+    OPENGL_WORLD<T>* world;
     int rotation_axis;
     OPENGL_COLOR x_axis,y_axis,z_axis,outer_rim,highlight;
 
-    OPENGL_ARCBALL(OPENGL_WORLD& opengl_world_input)
+    OPENGL_ARCBALL(OPENGL_WORLD<T>& opengl_world_input)
         :opengl_world(opengl_world_input),dragging(false),use_sphere_center(false),use_object_space(false),rotation_axis(-1)
     {mNow=mDown=mDeltaNow=MATRIX<T,4>::Identity_Matrix();
     x_axis=OPENGL_COLOR::Red();y_axis=OPENGL_COLOR::Green();z_axis=OPENGL_COLOR::Blue();

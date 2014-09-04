@@ -33,16 +33,16 @@
 #include <fstream>
 using namespace PhysBAM;
 using namespace FILE_UTILITIES;
-template<class T> void Add_File(const std::string& filename,OPENGL_WORLD& world,int number);
-template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD& world,int number);
-template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD& world,int number);
-template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD& world,int number);
-template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD& world,int number);
-template<class T> void Add_Curve_File(const std::string& filename,OPENGL_WORLD& world,int number);
-template<class T> void Add_Curve2D_File(const std::string& filename,OPENGL_WORLD& world,int number);
-template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD& world,int number);
-template<class T> void Add_Hex_File(const std::string& filename,OPENGL_WORLD& world,int number);
-template<class T> void Add_Box_File(const std::string& filename,OPENGL_WORLD& world,int number);
+template<class T> void Add_File(const std::string& filename,int number);
+template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
+template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
+template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
+template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
+template<class T> void Add_Curve_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
+template<class T> void Add_Curve2D_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
+template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
+template<class T> void Add_Hex_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
+template<class T> void Add_Box_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
 //#################################################################
 static bool triangulated_surface_highlight_boundary=false;
 static bool print_statistics=true;
@@ -107,16 +107,6 @@ int main(int argc,char *argv[])
 {
     bool type_double=false;    
 
-    OPENGL_WORLD world;
-    world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(1,1,1),.8));
-    world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(.3,-2,.1),.4));
-    world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(-2,.1,.5),.2));
-    world.Set_Ambient_Light(.2);
-    world.Initialize("PhysBAM geometry viewer");
-
-    world.Bind_Key("^c", new OPENGL_CALLBACK_SAVE_VIEW(world, "camera_script", true));
-    world.Bind_Key('c', new OPENGL_CALLBACK_LOAD_VIEW(world, "camera_script", true));
-
     ARRAY<std::string> files;
     for(int i=1;i<argc;i++){
         if(!strcmp(argv[i],"-float")) type_double=false;
@@ -126,22 +116,30 @@ int main(int argc,char *argv[])
         else files.Append(argv[i]);}
 
     for(int i=0;i<files.m;i++){
-        if(!type_double) Add_File<float>(files(i),world,i);
+        if(!type_double) Add_File<float>(files(i),i);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        else Add_File<double>(files(i),world,i);
+        else Add_File<double>(files(i),i);
 #else
         else{LOG::cerr<<"Double support not enabled."<<std::endl;exit(1);}
 #endif
         }
-    world.Center_Camera_On_Scene();
-    world.window->Main_Loop();
     return 0;
 }
 //#################################################################
 // Function Add_File
 //#################################################################
-template<class T> void Add_File(const std::string& filename,OPENGL_WORLD& world,int number)
+template<class T> void Add_File(const std::string& filename,int number)
 {
+    OPENGL_WORLD<T> world;
+    world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(1,1,1),.8));
+    world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(.3,-2,.1),.4));
+    world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(-2,.1,.5),.2));
+    world.Set_Ambient_Light(.2);
+    world.Initialize("PhysBAM geometry viewer");
+
+    world.Bind_Key("^c", new OPENGL_CALLBACK_SAVE_VIEW<T>(world, "camera_script", true));
+    world.Bind_Key('c', new OPENGL_CALLBACK_LOAD_VIEW<T>(world, "camera_script", true));
+
     FILE_TYPE type=Get_File_Type(filename);
     switch(type){
         case TRI_FILE: Add_Tri_File<T>(filename,world,number);break;
@@ -155,11 +153,13 @@ template<class T> void Add_File(const std::string& filename,OPENGL_WORLD& world,
         case BOX_FILE: Add_Box_File<T>(filename,world,number);break;
         default: LOG::cerr<<"Unrecognized file "<<filename<<std::endl;}
     LOG::cout<<std::flush;
+    world.Center_Camera_On_Scene();
+    world.window->Main_Loop();
 }
 //#################################################################
 // Function Add_Box_File
 //#################################################################
-template<class T> void Add_Box_File(const std::string& filename,OPENGL_WORLD& world,int number)
+template<class T> void Add_Box_File(const std::string& filename,OPENGL_WORLD<T>& world,int number)
 {
 //    typedef VECTOR<T,3> TV;
     try{
@@ -173,7 +173,7 @@ template<class T> void Add_Box_File(const std::string& filename,OPENGL_WORLD& wo
 //#################################################################
 // Function Add_Hex_File
 //#################################################################
-template<class T> void Add_Hex_File(const std::string& filename,OPENGL_WORLD& world,int number)
+template<class T> void Add_Hex_File(const std::string& filename,OPENGL_WORLD<T>& world,int number)
 {
     try{
         HEXAHEDRALIZED_VOLUME<T>* hex_vol;
@@ -186,7 +186,7 @@ template<class T> void Add_Hex_File(const std::string& filename,OPENGL_WORLD& wo
 //#################################################################
 // Function Add_Tri2D_File
 //#################################################################
-template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD& world,int number)
+template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD<T>& world,int number)
 {
     try{
         TRIANGULATED_AREA<T>* area;
@@ -204,7 +204,7 @@ template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD& 
 //#################################################################
 // Function Add_Tri_File
 //#################################################################
-template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD& world,int number)
+template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD<T>& world,int number)
 {
     try{
         TRIANGULATED_SURFACE<T>* surface;
@@ -222,7 +222,7 @@ template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD& wo
 //#################################################################
 // Function Add_Phi_File
 //#################################################################
-template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD& world,int number)
+template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD<T>& world,int number)
 {
     try{
         LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* surface;
@@ -247,7 +247,7 @@ template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD& wo
 //#################################################################
 // Function Add_Phi2D_File
 //#################################################################
-template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD& world,int number)
+template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD<T>& world,int number)
 {
     try{
         LEVELSET_IMPLICIT_OBJECT<VECTOR<T,2> >* area;
@@ -270,7 +270,7 @@ template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD& 
 //#################################################################
 // Function Add_Curve_File
 //#################################################################
-template<class T> void Add_Curve_File(const std::string& filename,OPENGL_WORLD& world,int number)
+template<class T> void Add_Curve_File(const std::string& filename,OPENGL_WORLD<T>& world,int number)
 {
     try{
         SEGMENTED_CURVE<VECTOR<T,3> >* curve;
@@ -284,7 +284,7 @@ template<class T> void Add_Curve_File(const std::string& filename,OPENGL_WORLD& 
 //#################################################################
 // Function Add_Curve2D_File
 //#################################################################
-template<class T> void Add_Curve2D_File(const std::string& filename,OPENGL_WORLD& world,int number)
+template<class T> void Add_Curve2D_File(const std::string& filename,OPENGL_WORLD<T>& world,int number)
 {
     try{
         SEGMENTED_CURVE_2D<T>* curve;
@@ -298,7 +298,7 @@ template<class T> void Add_Curve2D_File(const std::string& filename,OPENGL_WORLD
 //#################################################################
 // Function Add_Tet_File
 //#################################################################
-template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD& world,int number)
+template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD<T>& world,int number)
 {
     try{
         TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume;

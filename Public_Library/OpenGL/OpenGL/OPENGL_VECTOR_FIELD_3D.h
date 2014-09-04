@@ -14,9 +14,10 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_VECTOR_FIELD_3D:public OPENGL_OBJECT
+class OPENGL_VECTOR_FIELD_3D:public OPENGL_OBJECT<T>
 {
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Point;
     ARRAY<VECTOR<T,3> >& vector_field;
     ARRAY<VECTOR<T,3> >& vector_locations;
     OPENGL_COLOR vector_color;
@@ -36,7 +37,7 @@ public:
     virtual ~OPENGL_VECTOR_FIELD_3D();
 
 //#####################################################################
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Display() const PHYSBAM_OVERRIDE;
     void Scale_Vector_Size(const T scale);
     void Toggle_Arrowhead_Mode();

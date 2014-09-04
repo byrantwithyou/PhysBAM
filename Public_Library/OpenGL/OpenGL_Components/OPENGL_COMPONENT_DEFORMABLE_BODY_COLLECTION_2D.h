@@ -23,7 +23,7 @@ template<class T> class OPENGL_TRIANGULATED_AREA;
 template<class TV> class OPENGL_ADAPTIVE_NODE_SCALAR_FIELD;
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
 protected:
@@ -35,6 +35,7 @@ protected:
     T velocity_scale;
     bool invalidate_deformable_objects_selection_each_frame;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> segmented_curve_objects;
     ARRAY<OPENGL_TRIANGULATED_AREA<T>*> triangulated_area_objects;
@@ -57,13 +58,13 @@ public:
 
     virtual void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION* Get_Selection(GLuint* buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint* buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
-    OPENGL_SELECTION* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
 
     void Set_Vector_Size(const T vector_size);
 
@@ -83,17 +84,18 @@ private:
 };
 
 template<class T>
-class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D:public OPENGL_SELECTION
+class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int body_index;
     int subobject_type;
-    OPENGL_OBJECT* subobject;
-    OPENGL_SELECTION* body_selection;
+    OPENGL_OBJECT<T>* subobject;
+    OPENGL_SELECTION<T>* body_selection;
 
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D(OPENGL_OBJECT* object):OPENGL_SELECTION(OPENGL_SELECTION::COMPONENT_DEFORMABLE_OBJECT_2D, object){}
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    OPENGL_SELECTION::TYPE Actual_Type() const PHYSBAM_OVERRIDE {return body_selection->Actual_Type();}
+    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D(OPENGL_OBJECT<T>* object):OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_OBJECT_2D, object){}
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    typename OPENGL_SELECTION<T>::TYPE Actual_Type() const PHYSBAM_OVERRIDE {return body_selection->Actual_Type();}
 };
 
 }

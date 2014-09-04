@@ -34,10 +34,10 @@ Update()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Bounding_Box() const
 {
-    return RANGE<VECTOR<float,3> >(Convert_2d_To_3d(triangulated_area.bounding_box?*triangulated_area.bounding_box:RANGE<TV>::Centered_Box()));
+    return World_Space_Box(triangulated_area.bounding_box?*triangulated_area.bounding_box:RANGE<TV>::Centered_Box());
 }
 //#####################################################################
 namespace PhysBAM{

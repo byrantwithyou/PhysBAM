@@ -46,10 +46,10 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_BOX_3D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_BOX_3D<T>::
 Bounding_Box() const
 {
-    return RANGE<VECTOR<float,3> >(box);
+    return World_Space_Box(box);
 }
 namespace PhysBAM{
 template class OPENGL_BOX_3D<float>;

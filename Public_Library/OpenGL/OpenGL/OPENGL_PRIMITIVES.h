@@ -56,6 +56,9 @@ extern OPENGL_EPS_OUTPUT<float>* opengl_eps_output;
 #define glPopAttrib()
 #endif
 
+inline void glMultMatrix(float* matrix){glMultMatrixf(matrix);}
+inline void glMultMatrix(double* matrix){glMultMatrixd(matrix);}
+
 inline void OpenGL_Draw_Arrays_With_Normals(GLenum mode,GLenum type,int dimension,int length,const GLvoid* vertices,const GLvoid* normals)
 {glEnableClientState(GL_VERTEX_ARRAY);glEnableClientState(GL_NORMAL_ARRAY);glVertexPointer(dimension,type,0,vertices);glNormalPointer(GL_FLOAT,0,normals);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);
 glDisableClientState(GL_NORMAL_ARRAY);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Arrays(mode,dimension,length,vertices));}

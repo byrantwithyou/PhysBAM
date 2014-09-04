@@ -11,7 +11,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T,RW>::
 OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D(const GRID<TV> &grid,const std::string &vector_field_filename)
-    :OPENGL_COMPONENT("Cell Centered Velocity Field"), 
+    :OPENGL_COMPONENT<T>("Cell Centered Velocity Field"), 
       opengl_grid_based_vector_field(*(new GRID<TV>(grid)), *(new ARRAY<VECTOR<T,3> ,VECTOR<int,3> >)), 
       vector_field_filename(vector_field_filename), valid(false)
 {
@@ -41,7 +41,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -50,7 +50,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -64,11 +64,11 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T,RW>::
 Bounding_Box() const
 {
-    if(valid && draw) return opengl_grid_based_vector_field.Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    if(valid && draw) return World_Space_Box(opengl_grid_based_vector_field.Bounding_Box());
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Reinitialize
@@ -100,7 +100,7 @@ Reinitialize()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T,RW>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
 {
     if(Is_Up_To_Date(frame)){
         stream<<component_name<<": ";

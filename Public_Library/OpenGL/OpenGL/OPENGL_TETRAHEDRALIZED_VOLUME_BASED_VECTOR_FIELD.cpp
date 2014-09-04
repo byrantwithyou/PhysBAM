@@ -10,8 +10,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>::
-OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume, ARRAY<VECTOR<T,3> >& V)
-    :OPENGL_VECTOR_FIELD_3D<T>(*(new ARRAY<VECTOR<T,3> >),*(new ARRAY<VECTOR<T,3> >)),tetrahedralized_volume(tetrahedralized_volume),V(V)
+OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume, ARRAY<TV>& V)
+    :OPENGL_VECTOR_FIELD_3D<T>(*(new ARRAY<TV>),*(new ARRAY<TV>)),tetrahedralized_volume(tetrahedralized_volume),V(V)
 {}
 //#####################################################################
 // Destructor
@@ -36,13 +36,13 @@ Update()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>::
 Bounding_Box() const
 {
     if(tetrahedralized_volume.bounding_box)
-        return RANGE<VECTOR<float,3> >(RANGE<VECTOR<T,3> >(*tetrahedralized_volume.bounding_box));
+        return World_Space_Box(*tetrahedralized_volume.bounding_box);
     else
-        return RANGE<VECTOR<float,3> >::Centered_Box();
+        return RANGE<TV>::Centered_Box();
 }
 //#####################################################################
 namespace PhysBAM{

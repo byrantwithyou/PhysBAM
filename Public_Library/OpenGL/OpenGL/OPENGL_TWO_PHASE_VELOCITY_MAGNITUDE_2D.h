@@ -15,10 +15,11 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D:public OPENGL_OBJECT
+class OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,2> TV;
 public:
+    using OPENGL_OBJECT<T>::World_Space_Box;
     T height_scale;
     GRID<TV>& grid;
     ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_minus;
@@ -33,7 +34,7 @@ public:
 //#####################################################################
     void Update();  // Call when grid/V change
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     // convenience functions
     void Scale_Vector_Size(const T scale);
     void Scale_Height(const T height_scale);

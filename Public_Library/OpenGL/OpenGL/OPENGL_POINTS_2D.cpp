@@ -25,7 +25,7 @@ template<class T,class T_ARRAY> OPENGL_POINTS_2D<T,T_ARRAY>::
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class T_ARRAY> RANGE<VECTOR<float,3> > OPENGL_POINTS_2D<T,T_ARRAY>::
+template<class T,class T_ARRAY> RANGE<VECTOR<T,3> > OPENGL_POINTS_2D<T,T_ARRAY>::
 Bounding_Box() const
 {
     return World_Space_Box(RANGE<VECTOR<T,2> >::Bounding_Box(points));
@@ -195,7 +195,7 @@ Clear_Selection()
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class T_ARRAY> OPENGL_SELECTION* OPENGL_POINTS_2D<T,T_ARRAY>::
+template<class T,class T_ARRAY> OPENGL_SELECTION<T>* OPENGL_POINTS_2D<T,T_ARRAY>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     if(buffer_size==1){
@@ -212,9 +212,9 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
-    if(selection->type!=OPENGL_SELECTION::POINTS_2D) return;
+    if(selection->type!=OPENGL_SELECTION<T>::POINTS_2D) return;
     OPENGL_SELECTION_POINTS_2D<T> *real_selection=(OPENGL_SELECTION_POINTS_2D<T>*)selection;
     Select_Point(real_selection->index);
 }
@@ -229,23 +229,23 @@ Clear_Highlight()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_POINTS_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_POINTS_2D<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     if(OPENGL_POINTS_2D<T,ARRAY<VECTOR<T,2> > >* opengl_points=dynamic_cast<OPENGL_POINTS_2D<T,ARRAY<VECTOR<T,2> > >*>(object))
-        return object->World_Space_Box(RANGE<VECTOR<float,2> >(VECTOR<float,2>(opengl_points->points(index))));
+        return object->World_Space_Box(RANGE<VECTOR<T,2> >(opengl_points->points(index)));
     else if(OPENGL_POINTS_2D<T,INDIRECT_ARRAY<ARRAY<VECTOR<T,2> > > >* opengl_points=dynamic_cast<OPENGL_POINTS_2D<T,INDIRECT_ARRAY<ARRAY<VECTOR<T,2> > > >*>(object))
-        return object->World_Space_Box(RANGE<VECTOR<float,2> >(VECTOR<float,2>(opengl_points->points(index))));
+        return object->World_Space_Box(RANGE<VECTOR<T,2> >(opengl_points->points(index)));
     else PHYSBAM_NOT_IMPLEMENTED();
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
 {
-    if(selection->type!=OPENGL_SELECTION::POINTS_2D) return;
+    if(selection->type!=OPENGL_SELECTION<T>::POINTS_2D) return;
     OPENGL_SELECTION_POINTS_2D<T>* selection_points=dynamic_cast<OPENGL_SELECTION_POINTS_2D<T>*>(selection);
     output_stream<<"Free particle "<<Particle_Index(selection_points->index)<<" (id ";
     if(selection_points->has_id) output_stream<<selection_points->id;else output_stream<<"N/A";

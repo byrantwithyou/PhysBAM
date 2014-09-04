@@ -18,7 +18,7 @@ namespace PhysBAM
 template<class TV> class GRID;
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
 public:
@@ -30,6 +30,8 @@ private:
     int frame_loaded;
     bool valid;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::World_Space_Box;
     OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D(const GRID<TV> &grid,const std::string &filename_input);
     
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
@@ -38,7 +40,7 @@ public:
     void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
     void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     void Set_Vector_Size(const T vector_size);
 

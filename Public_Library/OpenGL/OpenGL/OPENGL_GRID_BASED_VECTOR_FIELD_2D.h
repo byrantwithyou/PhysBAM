@@ -19,7 +19,7 @@ class OPENGL_GRID_BASED_VECTOR_FIELD_2D:public OPENGL_VECTOR_FIELD_2D<ARRAY<VECT
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    using OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >::size;
+    using OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >::size;using OPENGL_OBJECT<T>::World_Space_Box;
 
     ARRAY<TV> vector_field,vector_locations;
     GRID<TV>& grid;
@@ -30,8 +30,8 @@ public:
 
     void Update();  // Call when grid/V change
 
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
 
 };
 }

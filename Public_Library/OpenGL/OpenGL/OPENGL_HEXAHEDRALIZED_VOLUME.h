@@ -15,9 +15,10 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_HEXAHEDRALIZED_VOLUME:public OPENGL_OBJECT
+class OPENGL_HEXAHEDRALIZED_VOLUME:public OPENGL_OBJECT<T>
 {
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
     OPENGL_MATERIAL material;
     OPENGL_MATERIAL inverted_material;
     bool use_inverted_material;
@@ -50,7 +51,7 @@ public:
     void Draw_Vector_At_Hex_Center() const;
     void Draw_Wireframe_Mesh(const HEXAHEDRON_MESH& hexahedron_mesh) const;
     void Draw_Boundary_Triangles(const HEXAHEDRON_MESH& hexahedron_mesh) const;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

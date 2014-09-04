@@ -18,7 +18,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
 OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(const std::string& prefix,const int start_frame)
-    :OPENGL_COMPONENT("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),display_mode(0),draw_velocities(false),velocity_scale(0.025),
+    :OPENGL_COMPONENT<T>("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),display_mode(0),draw_velocities(false),velocity_scale(0.025),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),
     velocity_field(deformable_body_collection.particles.V,deformable_body_collection.particles.X),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
     collision_body_list(*new COLLISION_BODY_COLLECTION<TV>)
@@ -129,7 +129,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);Reinitialize();
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);Reinitialize();
 }
 //#####################################################################
 // Function Set_Draw
@@ -137,7 +137,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);Reinitialize();
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);Reinitialize();
 }
 //#####################################################################
 // Function Display
@@ -244,10 +244,10 @@ Use_Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
 Bounding_Box() const
 {
-    RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
+    RANGE<VECTOR<T,3> > box;
     if(draw && valid && deformable_body_collection.structures.m>0){
         for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) box.Enlarge_To_Include_Box(segmented_curve_objects(i)->Bounding_Box());
         for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) box.Enlarge_To_Include_Box(triangulated_area_objects(i)->Bounding_Box());
@@ -257,7 +257,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
 Get_Selection(GLuint* buffer,int buffer_size)
 {
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>* selection=0;
@@ -279,9 +279,9 @@ Get_Selection(GLuint* buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
-    if(selection->type != OPENGL_SELECTION::COMPONENT_DEFORMABLE_OBJECT_2D) return;
+    if(selection->type != OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_OBJECT_2D) return;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>*)selection;
     real_selection->subobject->Highlight_Selection(real_selection->body_selection);
 }
@@ -300,10 +300,10 @@ Clear_Highlight()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
 {
     if(!selection) return;
-    if(selection->type != OPENGL_SELECTION::COMPONENT_DEFORMABLE_OBJECT_2D) return;
+    if(selection->type != OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_OBJECT_2D) return;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>*)selection;
     output_stream << "Deformable object " << real_selection->body_index << std::endl;
     real_selection->subobject->Print_Selection_Info(output_stream,real_selection->body_selection);
@@ -311,8 +311,8 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
-Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection)
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>::
+Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
 {
     if(old_selection && old_selection->object==this && invalidate_deformable_objects_selection_each_frame) delete_selection=true;
     return 0;
@@ -320,7 +320,7 @@ Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,b
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object && body_selection);

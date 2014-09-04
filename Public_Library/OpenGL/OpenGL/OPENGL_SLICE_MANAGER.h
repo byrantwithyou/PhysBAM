@@ -13,11 +13,12 @@
 #include <OpenGL/OpenGL/OPENGL_SLICE.h>
 namespace PhysBAM{
 
+template<class T>
 class OPENGL_SLICE_MANAGER
 {
 public:
     OPENGL_SLICE* slice;
-    ARRAY<OPENGL_OBJECT*> objects;
+    ARRAY<OPENGL_OBJECT<T>*> objects;
 private:
     OPENGL_CALLBACK* slice_has_changed_callback;
    
@@ -37,7 +38,7 @@ public:
         slice_has_changed_callback=slice_has_changed_callback_input;
     }
     
-    void Add_Object(OPENGL_OBJECT* object)
+    void Add_Object(OPENGL_OBJECT<T>* object)
     {
         objects.Append(object);
         object->Set_Slice(slice);

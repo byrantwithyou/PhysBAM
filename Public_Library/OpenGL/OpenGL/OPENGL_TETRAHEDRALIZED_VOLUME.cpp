@@ -101,14 +101,14 @@ Display() const
         //Highlight_Current_Boundary_Triangle();
 
         if(current_selection){
-            if(current_selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_VERTEX){
+            if(current_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX){
                 int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>*)current_selection)->index;
-                OPENGL_SELECTION::Draw_Highlighted_Vertex(particles->X(index),index);}
-            else if(current_selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){
+                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(particles->X(index),index);}
+            else if(current_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){
                 int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>*)current_selection)->index;
                 const VECTOR<int,4>& element_nodes=mesh->elements(index);
                 ARRAY_VIEW<const TV> X(particles->X);
-                OPENGL_SELECTION::Draw_Highlighted_Tetrahedron_Boundary(X(element_nodes[0]),X(element_nodes[1]),X(element_nodes[2]),X(element_nodes[3]),index);
+                OPENGL_SELECTION<T>::Draw_Highlighted_Tetrahedron_Boundary(X(element_nodes[0]),X(element_nodes[1]),X(element_nodes[2]),X(element_nodes[3]),index);
                 T distance;TV min_normal,weights;
                 int spring=Find_Shortest_Spring(element_nodes,distance,min_normal,weights);
                 VECTOR<int,4> spring_nodes;
@@ -427,7 +427,7 @@ Highlight_Current_Boundary_Triangle() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Bounding_Box() const
 {
     return World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(particles->X));
@@ -517,10 +517,10 @@ Display_Subset()
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION* OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Get_Selection(GLuint* buffer,int buffer_size)
 {
-    OPENGL_SELECTION* selection=0;
+    OPENGL_SELECTION<T>* selection=0;
     if(buffer_size==2){
         if(buffer[0]==1)selection=Get_Vertex_Selection(buffer[1]);
         else if(buffer[0]==2)selection=Get_Tetrahedron_Selection(buffer[1]);}
@@ -530,13 +530,13 @@ Get_Selection(GLuint* buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
     delete current_selection;current_selection=0;
     // Make a copy of selection
-    if(selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_VERTEX)
+    if(selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX)
         current_selection=new OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>(this,((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>*)selection)->index);
-    else if(selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_TETRAHEDRON)
+    else if(selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON)
         current_selection=new OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>(this,((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>*)selection)->index);
 }
 //#####################################################################
@@ -551,7 +551,7 @@ Clear_Highlight()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
 {
     Print_Selection_Info(output_stream,selection,0);
 }
@@ -559,14 +559,14 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) co
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MATRIX<T,4>* transform) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,4>* transform) const
 {
-    if(selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_VERTEX){
+    if(selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX){
         int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>*)selection)->index;
         output_stream<<"Vertex "<<index<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(index))<<std::endl;}
         particles->Print(output_stream,index);}
-    else if(selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){
+    else if(selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){
         int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>*)selection)->index;
         const VECTOR<int,4>& nodes=mesh->elements(index);
         output_stream<<"Tetrahedron "<<index<<" ("<<nodes[0]<<", "<<nodes[1]<<", "<<nodes[2]<<", "<<nodes[3]<<")"<<std::endl;
@@ -601,7 +601,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
 //#####################################################################
 // Function Get_Vertex_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION* OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Get_Vertex_Selection(int index)
 {
     return new OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>(this,index);
@@ -609,7 +609,7 @@ Get_Vertex_Selection(int index)
 //#####################################################################
 // Function Get_Tetrahedron_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION* OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Get_Tetrahedron_Selection(int index)
 {
     return new OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>(this,index);
@@ -620,7 +620,7 @@ Get_Tetrahedron_Selection(int index)
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Draw_Vertices_For_Selection() const
 {
-    OPENGL_SELECTION::Draw_Vertices_For_Selection(*mesh,*particles);
+    OPENGL_SELECTION<T>::Draw_Vertices_For_Selection(*mesh,*particles);
 }
 //#####################################################################
 // Function Draw_Tetrahedra_For_Selection
@@ -648,22 +648,22 @@ Draw_Tetrahedra_For_Selection() const
 //#####################################################################
 // Selection object functions
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const OPENGL_TETRAHEDRALIZED_VOLUME<T>& volume=dynamic_cast<OPENGL_TETRAHEDRALIZED_VOLUME<T>&>(*object);
-    return object->World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(volume.particles->X(index))));
+    return object->World_Space_Box(RANGE<VECTOR<T,3> >(volume.particles->X(index)));
 }
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const OPENGL_TETRAHEDRALIZED_VOLUME<T>& volume=dynamic_cast<OPENGL_TETRAHEDRALIZED_VOLUME<T>&>(*object);
-    return object->World_Space_Box(RANGE<VECTOR<float,3> >(RANGE<VECTOR<T,3> >::Bounding_Box(volume.particles->X.Subset(volume.mesh->elements(index)))));
+    return object->World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(volume.particles->X.Subset(volume.mesh->elements(index))));
 }
 //#####################################################################
 namespace PhysBAM{

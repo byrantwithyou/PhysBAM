@@ -17,10 +17,12 @@ namespace PhysBAM
 {
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_DEBUG_PARTICLES_2D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_DEBUG_PARTICLES_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::component_name;
+    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::World_Space_Box;
     OPENGL_COMPONENT_DEBUG_PARTICLES_2D(const std::string &filename);
     virtual ~OPENGL_COMPONENT_DEBUG_PARTICLES_2D();
 
@@ -31,14 +33,14 @@ public:
 
     void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION *Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION *selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
-    OPENGL_SELECTION* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Selection_Bounding_Box(OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Selection_Bounding_Box(OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
     void Toggle_Draw_Velocities();
     void Increase_Vector_Size();
     void Decrease_Vector_Size();
@@ -71,14 +73,15 @@ private:
 };
 
 template<class T>
-class OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D:public OPENGL_SELECTION
+class OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int index;  // index into particles array
     VECTOR<T,2> location;
 
-    OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D(OPENGL_OBJECT* object) :OPENGL_SELECTION(OPENGL_SELECTION::DEBUG_PARTICLES_2D, object) {}
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::DEBUG_PARTICLES_2D, object) {}
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 }

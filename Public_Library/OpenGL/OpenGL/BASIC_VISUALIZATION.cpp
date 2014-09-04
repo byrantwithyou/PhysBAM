@@ -4,7 +4,7 @@
 //#####################################################################
 #include <Tools/Log/LOG.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <OpenGL/OpenGL/BASIC_VISUALIZATION.h>
+#include <OpenGL/OpenGL/BASIC_VISUALIZATION<T>.h>
 #include <OpenGL/OpenGL/OPENGL_AXES.h>
 #include <OpenGL/OpenGL/OPENGL_BASIC_CALLBACKS.h>
 #include <OpenGL/OpenGL/OPENGL_LIGHT.h>
@@ -14,29 +14,29 @@
 #include <sstream>
 
 using namespace PhysBAM;
-
-const int BASIC_VISUALIZATION::OWNED=1;
-const int BASIC_VISUALIZATION::SELECTABLE=2;
-const int BASIC_VISUALIZATION::START_HIDDEN=4;
 //#####################################################################
 namespace{
-    static BASIC_VISUALIZATION* the_visualization=0;
-    static void Process_Hits_CB(GLint hits,GLuint buffer[]){the_visualization->Process_Hits(hits,buffer);}
+    template<class T> BASIC_VISUALIZATION<T>*& The_Visualization()
+    {
+        static BASIC_VISUALIZATION<T>* the_visualization=0;
+        return the_visualization;
+    }
+    template<class T> static void Process_Hits_CB(GLint hits,GLuint buffer[]){The_Visualization<T>()->Process_Hits(hits,buffer);}
 }
 //#####################################################################
 // Constructor
 //#####################################################################
-BASIC_VISUALIZATION::
+template<class T> BASIC_VISUALIZATION<T>::
 BASIC_VISUALIZATION() 
     :opengl_axes(0),set_window_position(false),opengl_window_title("OpenGL Visualization"),add_axes(true),render_offscreen(false),
     opt_left_handed(false),opt_smooth(false),selection_enabled(true),current_selection(0)
 {
-    the_visualization=this;
+    The_Visualization<T>()=this;
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-BASIC_VISUALIZATION::
+template<class T> BASIC_VISUALIZATION<T>::
 ~BASIC_VISUALIZATION() 
 {
     for(int i=owned_components.m-1;i>=0;i--) delete owned_components(i);
@@ -45,7 +45,7 @@ BASIC_VISUALIZATION::
 //#####################################################################
 // Function Initialize
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Initialize(PARSE_ARGS &parse_args)
 {
     Parse_Args(parse_args);
@@ -57,7 +57,7 @@ Initialize(PARSE_ARGS &parse_args)
 //#####################################################################
 // Function Run
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Run()
 {
     opengl_world.window->Main_Loop();
@@ -66,7 +66,7 @@ Run()
 //#####################################################################
 // Function Initialize_And_Run
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Initialize_And_Run(PARSE_ARGS &parse_args)
 {
     Initialize(parse_args);
@@ -75,8 +75,8 @@ Initialize_And_Run(PARSE_ARGS &parse_args)
 //#####################################################################
 // Function Add_Component
 //#####################################################################
-void BASIC_VISUALIZATION::
-Add_Component(OPENGL_COMPONENT* component,const std::string &name,const char toggle_draw_key,const int flags)
+template<class T> void BASIC_VISUALIZATION<T>::
+Add_Component(OPENGL_COMPONENT<T>* component,const std::string &name,const char toggle_draw_key,const int flags)
 {
     LOG::cout<<"Using Component '"<<name<<"'"<<std::endl;
     component->Set_Name(name);
@@ -90,25 +90,25 @@ Add_Component(OPENGL_COMPONENT* component,const std::string &name,const char tog
 //#####################################################################
 // Function Find_Component
 //#####################################################################
-const OPENGL_COMPONENT* BASIC_VISUALIZATION::
+template<class T> const OPENGL_COMPONENT<T>* BASIC_VISUALIZATION<T>::
 Find_Component(const std::string &name) const
 {
-    if(const OPENGL_COMPONENT* const* comp=component_by_name.Get_Pointer(name)) return *comp;
+    if(const OPENGL_COMPONENT<T>* const* comp=component_by_name.Get_Pointer(name)) return *comp;
     return 0;
 }
 //#####################################################################
 // Function Find_Component
 //#####################################################################
-OPENGL_COMPONENT* BASIC_VISUALIZATION::
+template<class T> OPENGL_COMPONENT<T>* BASIC_VISUALIZATION<T>::
 Find_Component(const std::string &name)
 {
-    if(OPENGL_COMPONENT** comp=component_by_name.Get_Pointer(name)) return *comp;
+    if(OPENGL_COMPONENT<T>** comp=component_by_name.Get_Pointer(name)) return *comp;
     return 0;
 }
 //#####################################################################
 // Function Add_Arguments
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Add_Arguments(PARSE_ARGS &parse_args)
 {
     width=1024;
@@ -128,7 +128,7 @@ Add_Arguments(PARSE_ARGS &parse_args)
 //#####################################################################
 // Function Parse_Arguments
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Parse_Arguments(PARSE_ARGS& parse_args)
 {
     if(opt_smooth) OPENGL_PREFERENCES::Set_Smooth_Defaults();
@@ -137,7 +137,7 @@ Parse_Arguments(PARSE_ARGS& parse_args)
 //#####################################################################
 // Function Parse_Args
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Parse_Args(PARSE_ARGS &parse_args)
 {
     Add_Arguments(parse_args);
@@ -147,10 +147,10 @@ Parse_Args(PARSE_ARGS &parse_args)
 //#####################################################################
 // Function Add_Key_Bindings
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Initialize_Components_And_Key_Bindings()
 {
-    opengl_world.Set_Key_Binding_Category("Default Keys (BASIC_VISUALIZATION)");
+    opengl_world.Set_Key_Binding_Category("Default Keys (BASIC_VISUALIZATION<T>)");
     opengl_world.Set_Key_Binding_Category_Priority(100);
 
     // Remove some silly key bindings
@@ -161,8 +161,8 @@ Initialize_Components_And_Key_Bindings()
     opengl_world.Bind_Key("^a",Toggle_Axes_CB("Toggle axes"));
 
     if(!camera_script_filename.empty()){
-        opengl_world.Bind_Key("^c",new OPENGL_CALLBACK_SAVE_VIEW(opengl_world,camera_script_filename,true));
-        opengl_world.Bind_Key('c',new OPENGL_CALLBACK_LOAD_VIEW(opengl_world,camera_script_filename,true));}
+        opengl_world.Bind_Key("^c",new OPENGL_CALLBACK_SAVE_VIEW<T>(opengl_world,camera_script_filename,true));
+        opengl_world.Bind_Key('c',new OPENGL_CALLBACK_LOAD_VIEW<T>(opengl_world,camera_script_filename,true));}
 
     opengl_world.Set_Key_Binding_Category("User-Defined Keys");
     opengl_world.Set_Key_Binding_Category_Priority(1);
@@ -170,7 +170,7 @@ Initialize_Components_And_Key_Bindings()
 //#####################################################################
 // Function Add_OpenGL_Initialization
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Add_OpenGL_Initialization()
 {
     opengl_world.Set_Ambient_Light(0.3);
@@ -191,7 +191,7 @@ Add_OpenGL_Initialization()
 //#####################################################################
 // Function PreInitialize_OpenGL_World
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 PreInitialize_OpenGL_World()
 {
     opengl_world.Initialize(opengl_window_title,width,height,render_offscreen);
@@ -200,7 +200,7 @@ PreInitialize_OpenGL_World()
 //#####################################################################
 // Function PostInitialize_OpenGL_World
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 PostInitialize_OpenGL_World()
 {
     Add_OpenGL_Initialization();
@@ -209,12 +209,12 @@ PostInitialize_OpenGL_World()
     
     if(selection_enabled){
         opengl_world.load_names_for_selection=true;
-        opengl_world.Set_Process_Hits_Callback(Process_Hits_CB);}
+        opengl_world.Set_Process_Hits_Callback(Process_Hits_CB<T>);}
 }
 //#####################################################################
 // Function Initialize_Scene
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Initialize_Scene()
 {
     if(!initialization_key_sequence.empty()){
@@ -228,7 +228,7 @@ Initialize_Scene()
 //#####################################################################
 // Function Update_OpenGL_Strings
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Update_OpenGL_Strings()
 {
     std::ostringstream output_stream;
@@ -238,20 +238,20 @@ Update_OpenGL_Strings()
 //#####################################################################
 // Function Reset_Objects_In_World
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Reset_Objects_In_World()
 {
     opengl_world.Clear_All_Objects();
     // Add components
     for(int i=0;i<component_list.m;i++) opengl_world.Add_Object(component_list(i),true,true);
     if(add_axes){
-        if(!opengl_axes) opengl_axes=new OPENGL_AXES<float>();
+        if(!opengl_axes) opengl_axes=new OPENGL_AXES<T>();
         opengl_world.Add_Object(opengl_axes,false);}
 }
 //#####################################################################
 // Function Reset_View
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Reset_View()
 {
     if(current_selection) opengl_world.Center_Camera_On_Bounding_Box(current_selection->Bounding_Box(),false);
@@ -260,7 +260,7 @@ Reset_View()
 //#####################################################################
 // Function Reset_Up
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Reset_Up()
 {
     opengl_world.Reset_Camera_Orientation(true);
@@ -268,7 +268,7 @@ Reset_Up()
 //#####################################################################
 // Function Toggle_Axes
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Toggle_Axes()
 {
     add_axes=!add_axes;
@@ -277,7 +277,7 @@ Toggle_Axes()
 //#####################################################################
 // Function Draw_All_Objects
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Draw_All_Objects()
 {
     for(int i=0;i<component_list.m;i++) component_list(i)->Draw_All_Objects();
@@ -285,11 +285,11 @@ Draw_All_Objects()
 //#####################################################################
 // Function Process_Hits
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Process_Hits(GLint hits,GLuint buffer[])
 {
-    OPENGL_SELECTION* new_selection=0;
-    ARRAY<OPENGL_SELECTION*> selections;
+    OPENGL_SELECTION<T>* new_selection=0;
+    ARRAY<OPENGL_SELECTION<T>*> selections;
 #ifndef NDEBUG
     opengl_world.Print_Hits(hits,buffer);
 #endif
@@ -322,8 +322,8 @@ Process_Hits(GLint hits,GLuint buffer[])
 //#####################################################################
 // Function Set_Current_Selection
 //#####################################################################
-void BASIC_VISUALIZATION::
-Set_Current_Selection(OPENGL_SELECTION* selection)
+template<class T> void BASIC_VISUALIZATION<T>::
+Set_Current_Selection(OPENGL_SELECTION<T>* selection)
 {
     if(current_selection){
         current_selection->object->Clear_Highlight();
@@ -333,13 +333,13 @@ Set_Current_Selection(OPENGL_SELECTION* selection)
     if(selection){
         current_selection=selection;
         //only have support for deformable objects
-        if(selection->type==OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D) current_selection->object->Set_Selection(current_selection);
+        if(selection->type==OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D) current_selection->object->Set_Selection(current_selection);
         current_selection->object->Highlight_Selection(current_selection);}
 }
 //#####################################################################
 // Function Selection_Callback
 //#####################################################################
-void BASIC_VISUALIZATION::
+template<class T> void BASIC_VISUALIZATION<T>::
 Selection_Callback()
 {
 #ifndef USE_OPENGLES
@@ -350,10 +350,14 @@ Selection_Callback()
 //#####################################################################
 // Function Selection_Priority
 //#####################################################################
-int &BASIC_VISUALIZATION::
-Selection_Priority(OPENGL_SELECTION::TYPE selection_type)
+template<class T> int &BASIC_VISUALIZATION<T>::
+Selection_Priority(typename OPENGL_SELECTION<T>::TYPE selection_type)
 {
     int index=(int)selection_type; // to allow for zero
     if(selection_priority.m<=index) selection_priority.Resize(index+1);
     return selection_priority(index);
+}
+namespace PhysBAM{
+template class BASIC_VISUALIZATION<double>;
+template class BASIC_VISUALIZATION<float>;
 }

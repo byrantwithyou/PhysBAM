@@ -7,7 +7,7 @@
 #ifndef __ANIMATED_VISUALIZATION__
 #define __ANIMATED_VISUALIZATION__
 
-#include <OpenGL/OpenGL/BASIC_VISUALIZATION.h>
+#include <OpenGL/OpenGL/BASIC_VISUALIZATION<T>.h>
 #include <climits>
 
 namespace PhysBAM
@@ -22,9 +22,13 @@ struct CAPTURE_FRAMES_PROMPT_STATE
     int jpeg_quality;
 };
 
-class ANIMATED_VISUALIZATION:public BASIC_VISUALIZATION
+template<class T>
+class ANIMATED_VISUALIZATION:public BASIC_VISUALIZATION<T>
 {
 public:
+    using BASIC_VISUALIZATION<T>::opengl_world;using BASIC_VISUALIZATION<T>::component_list;
+    using BASIC_VISUALIZATION<T>::current_selection;using BASIC_VISUALIZATION<T>::Set_Current_Selection;
+
     ANIMATED_VISUALIZATION();
     virtual ~ANIMATED_VISUALIZATION(){}
 

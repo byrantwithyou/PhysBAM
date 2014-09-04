@@ -50,10 +50,16 @@ using namespace PhysBAM;
 using namespace std;
 
 template<class T,class RW=T>
-class VISUALIZATION:public ANIMATED_VISUALIZATION
+class VISUALIZATION:public ANIMATED_VISUALIZATION<T>
 {
     typedef VECTOR<T,3> TV;
 public:
+    using ANIMATED_VISUALIZATION<T>::last_frame_filename;using ANIMATED_VISUALIZATION<T>::camera_script_filename;
+    using ANIMATED_VISUALIZATION<T>::opengl_window_title;using ANIMATED_VISUALIZATION<T>::opengl_world;
+    using ANIMATED_VISUALIZATION<T>::Add_Component;using ANIMATED_VISUALIZATION<T>::Selection_Priority;
+    using ANIMATED_VISUALIZATION<T>::frame_rate;using ANIMATED_VISUALIZATION<T>::start_frame;
+    using ANIMATED_VISUALIZATION<T>::frame;using ANIMATED_VISUALIZATION<T>::Draw_All_Objects_CB;
+    using ANIMATED_VISUALIZATION<T>::frame_title;using ANIMATED_VISUALIZATION<T>::Set_Current_Selection;
     VISUALIZATION();
     virtual ~VISUALIZATION();
 
@@ -83,8 +89,8 @@ private:
     OPENGL_COMPONENT_PARTICLES_3D<T>* removed_negative_particles_component;
 
     // TODO: need better grid control 
-    OPENGL_COMPONENT_BASIC<OPENGL_GRID_3D<T> >* grid_component;
-    OPENGL_COMPONENT_BASIC<OPENGL_GRID_3D<T> >* coarse_grid_component;
+    OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_3D<T> >* grid_component;
+    OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_3D<T> >* coarse_grid_component;
 
     // Options
     std::string basedir;
@@ -93,9 +99,9 @@ private:
     GRID<TV> grid,mac_grid,regular_grid,coarse_grid,coarse_mac_grid,coarse_regular_grid;
     bool has_valid_grid,has_valid_rle_grid,has_valid_octree_grid,has_valid_coarse_grid;
     bool node_based,coarse_node_based;
-    OPENGL_SLICE_MANAGER slice_manager;
+    OPENGL_SLICE_MANAGER<T> slice_manager;
     OPENGL_BOX_3D<T>* opengl_box;
-    OPENGL_UNIFORM_SLICE* slice;
+    OPENGL_UNIFORM_SLICE<T>* slice;
 
     ARRAY<int> rigid_bodies_no_draw_list;
     ARRAY<int> deformable_no_draw_list;
@@ -108,7 +114,7 @@ private:
 
 template<class T,class RW> VISUALIZATION<T,RW>::
 VISUALIZATION()
-    :ANIMATED_VISUALIZATION(),positive_particles_component(0),negative_particles_component(0),
+    :ANIMATED_VISUALIZATION<T>(),positive_particles_component(0),negative_particles_component(0),
     removed_positive_particles_component(0),removed_negative_particles_component(0),grid_component(0),coarse_grid_component(0),opengl_box(0),slice(0),
     allow_caching(true),always_add_mac_velocities(false)
 {
@@ -126,7 +132,7 @@ Add_Arguments(PARSE_ARGS &parse_args)
 {
     basedir=".";
 
-    ANIMATED_VISUALIZATION::Add_Arguments(parse_args);
+    ANIMATED_VISUALIZATION<T>::Add_Arguments(parse_args);
 
     parse_args.Add_Not("-no_caching",&allow_caching,"Allow caching");
     parse_args.Add("-macvel",&always_add_mac_velocities,"force adding mac velocities component");
@@ -144,7 +150,7 @@ Parse_Arguments(PARSE_ARGS &parse_args)
 
     if(FILE_UTILITIES::File_Exists(basedir+"/common/first_frame")) FILE_UTILITIES::Read_From_Text_File(basedir+"/common/first_frame",start_frame);
 
-    ANIMATED_VISUALIZATION::Parse_Arguments(parse_args);
+    ANIMATED_VISUALIZATION<T>::Parse_Arguments(parse_args);
 
     if(parse_args.unclaimed_arguments)
         parse_args.Print_Usage(true);
@@ -210,7 +216,7 @@ Read_Grid()
 template<class T,class RW> void VISUALIZATION<T,RW>::
 Initialize_Components_And_Key_Bindings()
 {
-    ANIMATED_VISUALIZATION::Initialize_Components_And_Key_Bindings();
+    ANIMATED_VISUALIZATION<T>::Initialize_Components_And_Key_Bindings();
     opengl_world.Set_Key_Binding_Category_Priority(1);
     opengl_world.Unbind_Keys("abBCdDEeFjJjkKlLMotTvV 1!2@3#4$5%67&89 ^=-`{}\b\\[]~\t");
 
@@ -225,11 +231,11 @@ Initialize_Components_And_Key_Bindings()
 
     filename=basedir+"/%d/diagnostics";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
-        Add_Component(new OPENGL_COMPONENT_DIAGNOSTICS(filename),"Diagnostics",'\0',BASIC_VISUALIZATION::OWNED);
+        Add_Component(new OPENGL_COMPONENT_DIAGNOSTICS<T>(filename),"Diagnostics",'\0',BASIC_VISUALIZATION<T>::OWNED);
 
     Read_Grid();
     if(has_valid_grid){
-        slice=new OPENGL_UNIFORM_SLICE(opengl_world);slice->Initialize(grid);
+        slice=new OPENGL_UNIFORM_SLICE<T>(opengl_world);slice->Initialize(grid);
         slice_manager.slice=slice;
         std::cout<<"Using uniform grid slice"<<std::endl;}
 
@@ -237,8 +243,8 @@ Initialize_Components_And_Key_Bindings()
 
     if(has_valid_grid){
         opengl_box=new OPENGL_BOX_3D<T>(*(new RANGE<TV>(grid.Domain())),OPENGL_COLOR::Gray(0.5));
-        OPENGL_COMPONENT_BASIC<OPENGL_BOX_3D<T> >* domain_box_component=new OPENGL_COMPONENT_BASIC<OPENGL_BOX_3D<T> >(*opengl_box);
-        Add_Component(domain_box_component,"Domain box",'6',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);}
+        OPENGL_COMPONENT_BASIC<T,OPENGL_BOX_3D<T> >* domain_box_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_BOX_3D<T> >(*opengl_box);
+        Add_Component(domain_box_component,"Domain box",'6',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
 
     {OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>* deformable_objects_component=0;
     std::string deformable_object_filename=basedir+STRING_UTILITIES::string_sprintf("/%d/deformable_object_structures",start_frame);
@@ -251,7 +257,7 @@ Initialize_Components_And_Key_Bindings()
             deformable_objects_component->active_list.Resize(PhysBAM::max(deformable_objects_component->active_list.m,deformable_no_draw_list.Last()),true,true,true);
             deformable_objects_component->active_list.Subset(deformable_no_draw_list).Fill(false);}
         opengl_world.Set_Key_Binding_Category("Deformable Objects");
-        Add_Component(deformable_objects_component,"Deformable Objects",'8',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(deformable_objects_component,"Deformable Objects",'8',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('9',deformable_objects_component->Toggle_Active_Value_CB());
         opengl_world.Append_Bind_Key('(',deformable_objects_component->Show_Only_First_CB());
         opengl_world.Append_Bind_Key('W',deformable_objects_component->Toggle_Selection_Mode_CB());
@@ -293,7 +299,7 @@ Initialize_Components_And_Key_Bindings()
             rigid_bodies_component->Read_Hints(hints_filename);}
         rigid_bodies_component->Reinitialize();
         opengl_world.Set_Key_Binding_Category("Rigid Bodies");
-        Add_Component(rigid_bodies_component,"Rigid Bodies",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(rigid_bodies_component,"Rigid Bodies",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('5',rigid_bodies_component->Toggle_Draw_Mode_CB());
         opengl_world.Append_Bind_Key('%',rigid_bodies_component->Toggle_Velocity_Vectors_CB());
         opengl_world.Append_Bind_Key('a',rigid_bodies_component->Toggle_Individual_Axes_CB());
@@ -312,7 +318,7 @@ Initialize_Components_And_Key_Bindings()
         || FILE_UTILITIES::File_Exists(soft_constraints_deformable_object_filename+STRING_UTILITIES::string_sprintf(".%d",start_frame))){
         OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>* soft_constraints_deformable_objects_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>(basedir+"/soft_constraints_",start_frame);
         soft_constraints_deformable_objects_component->selectable=true;
-        Add_Component(soft_constraints_deformable_objects_component,"Soft Constraints Deformable Objects",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(soft_constraints_deformable_objects_component,"Soft Constraints Deformable Objects",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         if(slice_manager.slice) slice_manager.Add_Object(soft_constraints_deformable_objects_component);}
 
     filename=basedir+"/%d/levelset";
@@ -325,7 +331,7 @@ Initialize_Components_And_Key_Bindings()
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_0",start_frame)){
         OPENGL_COMPONENT_LEVELSET_3D<T>* levelset_component=new OPENGL_COMPONENT_LEVELSET_3D<T>(filename,filename2,basedir+"/levelset_%d.%d",basedir+"/levelset_tesselated_%d.%d",true);
         opengl_world.Set_Key_Binding_Category("Levelset");
-        Add_Component(levelset_component,"Levelset",'l',BASIC_VISUALIZATION::OWNED);
+        Add_Component(levelset_component,"Levelset",'l',BASIC_VISUALIZATION<T>::OWNED);
 //        levelset_component->Set_Surface_Material(OPENGL_MATERIAL::Plastic(OPENGL_COLOR((T).6,(T).65,1)),OPENGL_MATERIAL::Plastic(OPENGL_COLOR((T).6,(T).65,1)));
         if(slice_manager.slice) slice_manager.Add_Object(levelset_component);
         opengl_world.Append_Bind_Key('L',levelset_component->Toggle_Slice_Color_Mode_CB());
@@ -339,7 +345,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_LEVELSET_3D<T>* levelset_component=new OPENGL_COMPONENT_LEVELSET_3D<T>(coarse_filename,filename2,basedir+"/coarse_levelset_%d.%d",basedir+"/coarse_levelset_tesselated_%d.%d",true);
         levelset_component->ghost_cells=0;
         opengl_world.Set_Key_Binding_Category("Levelset");
-        Add_Component(levelset_component,"Levelset coarse",'.',BASIC_VISUALIZATION::OWNED);
+        Add_Component(levelset_component,"Levelset coarse",'.',BASIC_VISUALIZATION<T>::OWNED);
         levelset_component->Set_Surface_Material(OPENGL_MATERIAL::Plastic(OPENGL_COLOR((T).6,(T)1,(T).65)),OPENGL_MATERIAL::Plastic(OPENGL_COLOR((T).6,(T)1,(T).65)));
         if(slice_manager.slice) slice_manager.Add_Object(levelset_component);
         opengl_world.Append_Bind_Key('>',levelset_component->Toggle_Slice_Color_Mode_CB());
@@ -349,7 +355,7 @@ Initialize_Components_And_Key_Bindings()
     filename2=basedir+"/%d/object_levelset_tesselated";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_LEVELSET_3D<T>* object_levelset_component=new OPENGL_COMPONENT_LEVELSET_3D<T>(filename,filename2,"","",true);
-        Add_Component(object_levelset_component,"Object Levelset",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(object_levelset_component,"Object Levelset",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         if(slice_manager.slice) slice_manager.Add_Object(object_levelset_component);
         opengl_world.Set_Key_Binding_Category("Object Levelset");
         opengl_world.Append_Bind_Key("^l",object_levelset_component->Toggle_Draw_CB());
@@ -361,7 +367,7 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T>* density_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T>(grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)));
         density_component->opengl_scalar_field.Update();
-        Add_Component(density_component,"Density",'d',BASIC_VISUALIZATION::OWNED);
+        Add_Component(density_component,"Density",'d',BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key('D',density_component->Toggle_Color_Map_CB());
         opengl_world.Append_Bind_Key('`',density_component->Toggle_Smooth_Slice_CB());
         slice_manager.Add_Object(density_component);}
@@ -371,7 +377,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T>* density_gradient_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T>(grid,filename,
             OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)));
         density_gradient_component->opengl_scalar_field.Update();
-        Add_Component(density_gradient_component,"Density Gradient",'8',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(density_gradient_component,"Density Gradient",'8',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         slice_manager.Add_Object(density_gradient_component);}
         
     opengl_world.Set_Key_Binding_Category("Soot");
@@ -379,7 +385,7 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T>* soot_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T>(grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,.01,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)));
         soot_component->opengl_scalar_field.Update();
-        Add_Component(soot_component,"Soot",'i',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(soot_component,"Soot",'i',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('D',soot_component->Toggle_Color_Map_CB());
         opengl_world.Append_Bind_Key('`',soot_component->Toggle_Smooth_Slice_CB());
         slice_manager.Add_Object(soot_component);}
@@ -388,7 +394,7 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T>* soot_fuel_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T>(grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,.01,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)));
         soot_fuel_component->opengl_scalar_field.Update();
-        Add_Component(soot_fuel_component,"soot_fuel",'f',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(soot_fuel_component,"soot_fuel",'f',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('D',soot_fuel_component->Toggle_Color_Map_CB());
         opengl_world.Append_Bind_Key('`',soot_fuel_component->Toggle_Smooth_Slice_CB());
         slice_manager.Add_Object(soot_fuel_component);}
@@ -399,13 +405,13 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T>* internal_energy_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T>(grid,filename,
             OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)));
         internal_energy_component->opengl_scalar_field.Update();
-        Add_Component(internal_energy_component,"Internal Energy",'E',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(internal_energy_component,"Internal Energy",'E',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         slice_manager.Add_Object(internal_energy_component);}
 
     filename=basedir+"/%d/debug_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T>* component=new OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T>(filename);
-        Add_Component(component,"Debug particles",'w',BASIC_VISUALIZATION::SELECTABLE|BASIC_VISUALIZATION::OWNED);
+        Add_Component(component,"Debug particles",'w',BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key('W',component->Toggle_Draw_Velocities_CB());
         opengl_world.Append_Bind_Key('q',component->Show_Colored_Wireframe_CB());
         opengl_world.Append_Bind_Key('=',component->Increase_Vector_Size_CB());
@@ -420,7 +426,7 @@ Initialize_Components_And_Key_Bindings()
         std::cout<<"Using temperature: [min="<<min_temp<<" max="<<max_temp<<"]"<<std::endl;
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T>* temperature_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T>(grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Red(1,1)));
         temperature_component->opengl_scalar_field.Set_Scale_Range(temp0.Min(),temp0.Max());
-        Add_Component(temperature_component,"Temperature",'t',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(temperature_component,"Temperature",'t',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('T',temperature_component->Toggle_Color_Map_CB());
         slice_manager.Add_Object(temperature_component);}
 
@@ -429,7 +435,7 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T>* sph_cell_weight_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T>(grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,100,OPENGL_COLOR::Cyan(0,0),OPENGL_COLOR::Cyan(1)));
         sph_cell_weight_component->opengl_scalar_field.Update();
-        Add_Component(sph_cell_weight_component,"SPH Cell Weights",'H',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(sph_cell_weight_component,"SPH Cell Weights",'H',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         slice_manager.Add_Object(sph_cell_weight_component);}
 
     opengl_world.Set_Key_Binding_Category("Pressure");
@@ -437,7 +443,7 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COLOR_MAP<T>* pressure_color_map=OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(101635,1e7,OPENGL_COLOR::Cyan(0,0),OPENGL_COLOR::Cyan(1));
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T>* pressure_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T>(mac_grid,filename,pressure_color_map);
-        Add_Component(pressure_component,"Pressure",'7',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(pressure_component,"Pressure",'7',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('D',pressure_component->Toggle_Color_Map_CB());
         opengl_world.Append_Bind_Key('`',pressure_component->Toggle_Smooth_Slice_CB());
         slice_manager.Add_Object(pressure_component);}
@@ -447,7 +453,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T>* pressure_gradient_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T>(grid,filename,
             OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1000,OPENGL_COLOR::Magenta(0,0),OPENGL_COLOR::Magenta(1)));
         pressure_gradient_component->opengl_scalar_field.Update();
-        Add_Component(pressure_gradient_component,"Pressure Gradient",'1',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(pressure_gradient_component,"Pressure Gradient",'1',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         slice_manager.Add_Object(pressure_gradient_component);}
 
     opengl_world.Set_Key_Binding_Category("Velocity");
@@ -460,13 +466,13 @@ Initialize_Components_And_Key_Bindings()
                 vector_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(regular_grid,filename);
                 vector_velocity_component->opengl_grid_based_vector_field.size=0.01;
                 vector_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
-                Add_Component(vector_velocity_component,"Node velocities",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+                Add_Component(vector_velocity_component,"Node velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
                 slice_manager.Add_Object(vector_velocity_component);}
             else{
                 mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>(mac_grid,filename);
                 mac_velocity_component->opengl_mac_velocity_field.size=0.1;
                 mac_velocity_component->opengl_mac_velocity_field.vector_color=OPENGL_COLOR::Green();
-                Add_Component(mac_velocity_component,"MAC velocities",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+                Add_Component(mac_velocity_component,"MAC velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
                 slice_manager.Add_Object(mac_velocity_component);}}
         
         filename=basedir+"/%d/mac_velocities";
@@ -475,7 +481,7 @@ Initialize_Components_And_Key_Bindings()
             mac_velocity_component->opengl_mac_velocity_field.size=0.01;
             mac_velocity_component->opengl_mac_velocity_field.vector_color=OPENGL_COLOR::Magenta();
             mac_velocity_component->opengl_mac_velocity_field.Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_3D<T>::FACE_CENTERED);
-            Add_Component(mac_velocity_component,"MAC velocities",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+            Add_Component(mac_velocity_component,"MAC velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             slice_manager.Add_Object(mac_velocity_component);}
         
         if(mac_velocity_component){
@@ -501,7 +507,7 @@ Initialize_Components_And_Key_Bindings()
             coarse_mac_velocity_component->opengl_mac_velocity_field.size=.01;
             coarse_mac_velocity_component->opengl_mac_velocity_field.vector_color=OPENGL_COLOR::Blue();
             coarse_mac_velocity_component->opengl_mac_velocity_field.Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_3D<T>::FACE_CENTERED);
-            Add_Component(coarse_mac_velocity_component,"coarse MAC velocities",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+            Add_Component(coarse_mac_velocity_component,"coarse MAC velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             slice_manager.Add_Object(coarse_mac_velocity_component);}
         if(coarse_mac_velocity_component){
             opengl_world.Append_Bind_Key('x',coarse_mac_velocity_component->Toggle_Draw_CB());
@@ -514,7 +520,7 @@ Initialize_Components_And_Key_Bindings()
             OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* center_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(mac_grid,filename);
             center_velocity_component->opengl_grid_based_vector_field.size=0.1;
             center_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
-            Add_Component(center_velocity_component,"Centered velocities",'B',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+            Add_Component(center_velocity_component,"Centered velocities",'B',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             opengl_world.Append_Bind_Key('=',center_velocity_component->Increase_Vector_Size_CB());
             opengl_world.Append_Bind_Key('-',center_velocity_component->Decrease_Vector_Size_CB());
             slice_manager.Add_Object(center_velocity_component);}
@@ -525,7 +531,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* object_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(regular_grid,filename);
         object_velocity_component->opengl_grid_based_vector_field.size=0.01;
         object_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Yellow();
-        Add_Component(object_velocity_component,"Object velocities",'%',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(object_velocity_component,"Object velocities",'%',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',object_velocity_component->Increase_Vector_Size_CB());
         opengl_world.Append_Bind_Key('-',object_velocity_component->Decrease_Vector_Size_CB());
         opengl_world.Append_Bind_Key('h',object_velocity_component->Toggle_Arrowhead_CB());
@@ -537,7 +543,7 @@ Initialize_Components_And_Key_Bindings()
         force_component->opengl_mac_velocity_field.size=0.01;
         force_component->opengl_mac_velocity_field.vector_color=OPENGL_COLOR::Yellow();
         force_component->opengl_mac_velocity_field.Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_3D<T>::FACE_CENTERED);
-        Add_Component(force_component,"fluid control force",'G',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(force_component,"fluid control force",'G',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',force_component->Increase_Vector_Size_CB());
         opengl_world.Append_Bind_Key('-',force_component->Decrease_Vector_Size_CB());
         opengl_world.Append_Bind_Key('h',force_component->Toggle_Arrowhead_CB());
@@ -549,7 +555,7 @@ Initialize_Components_And_Key_Bindings()
             OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* vector_velocity_ghost_plus_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(regular_grid,filename);
             vector_velocity_ghost_plus_component->opengl_grid_based_vector_field.size=0.01;
             vector_velocity_ghost_plus_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
-            Add_Component(vector_velocity_ghost_plus_component,"Node ghost plus velocities",'b',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+            Add_Component(vector_velocity_ghost_plus_component,"Node ghost plus velocities",'b',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             opengl_world.Append_Bind_Key('h',vector_velocity_ghost_plus_component->Toggle_Arrowhead_CB());
             opengl_world.Append_Bind_Key('=',vector_velocity_ghost_plus_component->Increase_Vector_Size_CB());
             opengl_world.Append_Bind_Key('-',vector_velocity_ghost_plus_component->Decrease_Vector_Size_CB());
@@ -562,7 +568,7 @@ Initialize_Components_And_Key_Bindings()
             vector_velocity_ghost_minus_component->opengl_grid_based_vector_field.size=0.01;
             vector_velocity_ghost_minus_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             vector_velocity_ghost_minus_component->Set_Draw(false);
-            Add_Component(vector_velocity_ghost_minus_component,"Node ghost minus velocities",'c',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+            Add_Component(vector_velocity_ghost_minus_component,"Node ghost minus velocities",'c',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             opengl_world.Append_Bind_Key('h',vector_velocity_ghost_minus_component->Toggle_Arrowhead_CB());
             opengl_world.Append_Bind_Key('=',vector_velocity_ghost_minus_component->Increase_Vector_Size_CB());
             opengl_world.Append_Bind_Key('-',vector_velocity_ghost_minus_component->Decrease_Vector_Size_CB());
@@ -573,7 +579,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* center_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(mac_grid,filename);
         center_velocity_component->opengl_grid_based_vector_field.size=0.1;
         center_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
-        Add_Component(center_velocity_component,"Centered velocities",'V',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(center_velocity_component,"Centered velocities",'V',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',center_velocity_component->Increase_Vector_Size_CB());
         opengl_world.Append_Bind_Key('-',center_velocity_component->Decrease_Vector_Size_CB());
         slice_manager.Add_Object(center_velocity_component);}
@@ -584,7 +590,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* pressure_jump_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(grid,filename);
         pressure_jump_component->opengl_grid_based_vector_field.size=0.001;
         pressure_jump_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Magenta();
-        Add_Component(pressure_jump_component,"Pressure jumps",'&',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(pressure_jump_component,"Pressure jumps",'&',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',pressure_jump_component->Increase_Vector_Size_CB());
         opengl_world.Append_Bind_Key('-',pressure_jump_component->Decrease_Vector_Size_CB());
         opengl_world.Append_Bind_Key('h',pressure_jump_component->Toggle_Arrowhead_CB());
@@ -593,7 +599,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/beta_face";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/beta_face",start_frame)){
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T>* beta_face_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T>(mac_grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,(T).002,OPENGL_COLOR::Gray(1),OPENGL_COLOR::Gray(0)));
-        Add_Component(beta_face_component,"Beta Face",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(beta_face_component,"Beta Face",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F6),beta_face_component->Toggle_Draw_CB());
         slice_manager.Add_Object(beta_face_component);}
 
@@ -603,7 +609,7 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>* pseudo_dirichlet_component=new OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>(grid,filename);
         pseudo_dirichlet_component->Set_Vector_Size(0.1);
-        Add_Component(pseudo_dirichlet_component,"pseudo dirichlet",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(pseudo_dirichlet_component,"pseudo dirichlet",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F3),pseudo_dirichlet_component->Toggle_Draw_CB());
         opengl_world.Append_Bind_Key('=',pseudo_dirichlet_component->Increase_Vector_Size_CB());
         opengl_world.Append_Bind_Key('-',pseudo_dirichlet_component->Decrease_Vector_Size_CB());
@@ -612,7 +618,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/thin_shells_grid_visibility";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>* thin_shells_debugging_component=new OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>(grid,basedir);
-        Add_Component(thin_shells_debugging_component,"thin shells debugging",'\0',BASIC_VISUALIZATION::OWNED);
+        Add_Component(thin_shells_debugging_component,"thin shells debugging",'\0',BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F4),thin_shells_debugging_component->Toggle_Draw_Grid_Visibility_Mode_CB());
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),thin_shells_debugging_component->Toggle_Draw_Density_Valid_Mask_CB());
         slice_manager.Add_Object(thin_shells_debugging_component);}
@@ -620,17 +626,17 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid){
         OPENGL_GRID_3D<T>* opengl_grid=new OPENGL_GRID_3D<T>(*(new GRID<TV>(grid)),OPENGL_COLOR::Gray(0.5));
         opengl_grid->owns_grid=true;
-        grid_component=new OPENGL_COMPONENT_BASIC<OPENGL_GRID_3D<T> >(*opengl_grid);
+        grid_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_3D<T> >(*opengl_grid);
         opengl_world.Set_Key_Binding_Category("Grid");
-        Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('^',grid_component->object.Toggle_Draw_Ghost_Values_CB());
         slice_manager.Add_Object(grid_component);}
     if(has_valid_coarse_grid){
         OPENGL_GRID_3D<T>* opengl_grid=new OPENGL_GRID_3D<T>(*(new GRID<TV>(coarse_grid)),OPENGL_COLOR::Ground_Tan(.5));
         opengl_grid->owns_grid=true;
         opengl_grid->scale=grid.Domain_Indices().max_corner(1)/coarse_grid.Domain_Indices().max_corner(1);
-        coarse_grid_component=new OPENGL_COMPONENT_BASIC<OPENGL_GRID_3D<T> >(*opengl_grid);
-        Add_Component(coarse_grid_component,"Coarse Grid",'y',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
+        coarse_grid_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_3D<T> >(*opengl_grid);
+        Add_Component(coarse_grid_component,"Coarse Grid",'y',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('^',coarse_grid_component->object.Toggle_Draw_Ghost_Values_CB());
         slice_manager.Add_Object(coarse_grid_component);}
 
@@ -644,7 +650,7 @@ Initialize_Components_And_Key_Bindings()
         positive_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/positive_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         positive_particles_component->opengl_points->color=OPENGL_COLOR(1,0.5,0);
         positive_particles_component->opengl_points->point_size=2;
-        Add_Component(positive_particles_component,"Positive particles",'1',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(positive_particles_component,"Positive particles",'1',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('!',positive_particles_component->Toggle_Draw_Point_Numbers_CB());
         if(slice_manager.slice) slice_manager.Add_Object(positive_particles_component);}
 
@@ -653,7 +659,7 @@ Initialize_Components_And_Key_Bindings()
         negative_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/negative_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         negative_particles_component->opengl_points->color=OPENGL_COLOR(0,0.5,1);
         negative_particles_component->opengl_points->point_size=2;
-        Add_Component(negative_particles_component,"Negative particles",'2',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(negative_particles_component,"Negative particles",'2',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('@',negative_particles_component->Toggle_Draw_Point_Numbers_CB());
         if(slice_manager.slice) slice_manager.Add_Object(negative_particles_component);}
 
@@ -662,7 +668,7 @@ Initialize_Components_And_Key_Bindings()
         removed_positive_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/removed_positive_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         removed_positive_particles_component->opengl_points->color=OPENGL_COLOR::Green();
         removed_positive_particles_component->opengl_points->point_size=2;
-        Add_Component(removed_positive_particles_component,"Removed positive particles",'3',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(removed_positive_particles_component,"Removed positive particles",'3',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('#',removed_positive_particles_component->Toggle_Draw_Point_Numbers_CB());
         if(slice_manager.slice) slice_manager.Add_Object(removed_positive_particles_component);}
 
@@ -671,7 +677,7 @@ Initialize_Components_And_Key_Bindings()
         removed_negative_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/removed_negative_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         removed_negative_particles_component->opengl_points->color=OPENGL_COLOR::Cyan();
         removed_negative_particles_component->opengl_points->point_size=2;
-        Add_Component(removed_negative_particles_component,"Removed negative particles",'4',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(removed_negative_particles_component,"Removed negative particles",'4',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('$',removed_negative_particles_component->Toggle_Draw_Point_Numbers_CB());
         if(slice_manager.slice) slice_manager.Add_Object(removed_negative_particles_component);}
 
@@ -680,7 +686,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_PARTICLES_3D<T>* spray_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename);
         spray_particles_component->opengl_points->color=OPENGL_COLOR((T).7,(T).8,(T).9);
         spray_particles_component->opengl_points->point_size=1;
-        Add_Component(spray_particles_component,"Spray particles",'5',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(spray_particles_component,"Spray particles",'5',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('%',spray_particles_component->Toggle_Draw_Point_Numbers_CB());
         if(slice_manager.slice) slice_manager.Add_Object(spray_particles_component);}
 
@@ -689,7 +695,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_PARTICLES_3D<T>* foam_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename);
         foam_particles_component->opengl_points->color=OPENGL_COLOR(1,0,0);
         foam_particles_component->opengl_points->point_size=1;
-        Add_Component(foam_particles_component,"foam particles",'$',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(foam_particles_component,"foam particles",'$',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('%',foam_particles_component->Toggle_Draw_Point_Numbers_CB());
         if(slice_manager.slice) slice_manager.Add_Object(foam_particles_component);}
 
@@ -698,7 +704,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T>* vorticity_particles_component=new OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T>(filename,true);
         vorticity_particles_component->opengl_points->color=OPENGL_COLOR(155,155,200);
         vorticity_particles_component->Set_Vector_Size((T).01);
-        Add_Component(vorticity_particles_component,"Vorticity particles",'j',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(vorticity_particles_component,"Vorticity particles",'j',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('J',vorticity_particles_component->Toggle_Draw_Point_Numbers_CB());
         opengl_world.Append_Bind_Key('h',vorticity_particles_component->Toggle_Arrowhead_CB());
         opengl_world.Append_Bind_Key("^j",vorticity_particles_component->Toggle_Draw_Velocities_CB());
@@ -711,7 +717,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_PARTICLES_3D<T>* sph_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,"",false);
         sph_particles_component->opengl_points->color=OPENGL_COLOR::Blue();
         sph_particles_component->opengl_points->point_size=1;
-        Add_Component(sph_particles_component,"SPH particles",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(sph_particles_component,"SPH particles",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         if(slice_manager.slice) slice_manager.Add_Object(sph_particles_component);}
 
     if(has_valid_coarse_grid){
@@ -725,7 +731,7 @@ Initialize_Components_And_Key_Bindings()
             psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(coarse_grid,basedir+"/%d/coarse_psi_N",new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         if(psi_N_component){
             psi_N_component->opengl_scalar_field.scale=grid.Domain_Indices().max_corner(1)/coarse_grid.Domain_Indices().max_corner(1);
-            Add_Component(psi_N_component,"Coarse Psi_N points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+            Add_Component(psi_N_component,"Coarse Psi_N points",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_N_component->Toggle_Draw_CB());
             slice_manager.Add_Object(psi_N_component);}}
     if(has_valid_grid){
@@ -738,34 +744,34 @@ Initialize_Components_And_Key_Bindings()
         else if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N",start_frame))
             psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(grid,basedir+"/%d/psi_N",new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         if(psi_N_component){
-            Add_Component(psi_N_component,"Psi_N points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+            Add_Component(psi_N_component,"Psi_N points",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->Toggle_Draw_CB());
             slice_manager.Add_Object(psi_N_component);}}
 
     filename=basedir+"/%d/coarse_psi_D";
     if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(coarse_mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);
-        Add_Component(psi_D_component,"Psi_D points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(psi_D_component,"Psi_D points",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_D_component->Toggle_Draw_CB());
         slice_manager.Add_Object(psi_D_component);}
     filename=basedir+"/%d/psi_D";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);
-        Add_Component(psi_D_component,"Psi_D points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(psi_D_component,"Psi_D points",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_D_component->Toggle_Draw_CB());
         slice_manager.Add_Object(psi_D_component);}
 
     filename=basedir+"/%d/maccormack_cell_mask";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* maccormack_cell_mask_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);
-        Add_Component(maccormack_cell_mask_component,"Maccormack cell mask points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(maccormack_cell_mask_component,"Maccormack cell mask points",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F9),maccormack_cell_mask_component->Toggle_Draw_CB());
         slice_manager.Add_Object(maccormack_cell_mask_component);}
 
     filename=basedir+"/%d/maccormack_face_mask";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>* maccormack_face_mask_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
-        Add_Component(maccormack_face_mask_component,"Maccormack face mask points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(maccormack_face_mask_component,"Maccormack face mask points",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F10),maccormack_face_mask_component->Toggle_Draw_CB());
         slice_manager.Add_Object(maccormack_face_mask_component);}
 
@@ -773,7 +779,7 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T,int>* psi_colors_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,int>(mac_grid,filename,colors_color_map,OPENGL_SCALAR_FIELD_3D<T,int>::DRAW_POINTS);
-        Add_Component(psi_colors_component,"Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(psi_colors_component,"Psi colors",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_colors_component->Toggle_Draw_CB());
         slice_manager.Add_Object(psi_colors_component);}
 
@@ -781,7 +787,7 @@ Initialize_Components_And_Key_Bindings()
     OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D<T>* strain_component=0; // TODO: make this not a hack for multiphase
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         strain_component=new OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D<T>(grid,filename);
-        Add_Component(strain_component,"Strain",'e',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(strain_component,"Strain",'e',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('+',strain_component->Increase_Size_CB());
         opengl_world.Append_Bind_Key('_',strain_component->Decrease_Size_CB());
         slice_manager.Add_Object(strain_component);}
@@ -789,7 +795,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/strain_0";
     if(!strain_component && has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         strain_component=new OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D<T>(grid,filename);
-        Add_Component(strain_component,"Strain",'e',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
+        Add_Component(strain_component,"Strain",'e',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('+',strain_component->Increase_Size_CB());
         opengl_world.Append_Bind_Key('_',strain_component->Decrease_Size_CB());
         slice_manager.Add_Object(strain_component);}}
@@ -797,7 +803,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/surface.tri";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,T>* triangulated_surface_component=new OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,T>(filename);
-        Add_Component(triangulated_surface_component,"Triangulated Surface",',',BASIC_VISUALIZATION::OWNED);}
+        Add_Component(triangulated_surface_component,"Triangulated Surface",',',BASIC_VISUALIZATION<T>::OWNED);}
 
     if(slice_manager.slice){
         opengl_world.Set_Key_Binding_Category("Slice Control");
@@ -811,27 +817,27 @@ Initialize_Components_And_Key_Bindings()
     opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),Draw_All_Objects_CB());
 
     // initialize selection priority (highest on top)
-    Selection_Priority(OPENGL_SELECTION::DEBUG_PARTICLES_3D)=110;
-    Selection_Priority(OPENGL_SELECTION::POINTS_3D)=100;
-    Selection_Priority(OPENGL_SELECTION::COMPONENT_PARTICLES_3D)=100;
-    Selection_Priority(OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_3D)=95;
-    Selection_Priority(OPENGL_SELECTION::TRIANGULATED_SURFACE_VERTEX)=90;
-    Selection_Priority(OPENGL_SELECTION::TRIANGULATED_SURFACE_SEGMENT)=89;
-    Selection_Priority(OPENGL_SELECTION::TRIANGULATED_SURFACE_TRIANGLE)=88;
-    Selection_Priority(OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_VERTEX)=85;
-    Selection_Priority(OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_TETRAHEDRON)=84;
-    Selection_Priority(OPENGL_SELECTION::COMPONENT_RIGID_BODIES_3D)=80;
-    Selection_Priority(OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D)=80;
-    Selection_Priority(OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_3D)=79;
-    Selection_Priority(OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_3D)=78;
-    Selection_Priority(OPENGL_SELECTION::GRID_NODE_3D)=70;
-    Selection_Priority(OPENGL_SELECTION::GRID_CELL_3D)=60;
+    Selection_Priority(OPENGL_SELECTION<T>::DEBUG_PARTICLES_3D)=110;
+    Selection_Priority(OPENGL_SELECTION<T>::POINTS_3D)=100;
+    Selection_Priority(OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D)=100;
+    Selection_Priority(OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_3D)=95;
+    Selection_Priority(OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX)=90;
+    Selection_Priority(OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT)=89;
+    Selection_Priority(OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE)=88;
+    Selection_Priority(OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX)=85;
+    Selection_Priority(OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON)=84;
+    Selection_Priority(OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_3D)=80;
+    Selection_Priority(OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D)=80;
+    Selection_Priority(OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_3D)=79;
+    Selection_Priority(OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_3D)=78;
+    Selection_Priority(OPENGL_SELECTION<T>::GRID_NODE_3D)=70;
+    Selection_Priority(OPENGL_SELECTION<T>::GRID_CELL_3D)=60;
     }
 
 template<class T,class RW> void VISUALIZATION<T,RW>::
 Update_OpenGL_Strings()
 {
-    ANIMATED_VISUALIZATION::Update_OpenGL_Strings();
+    ANIMATED_VISUALIZATION<T>::Update_OpenGL_Strings();
 
     // TODO: slice manager should be a component
     std::ostringstream output_stream;
@@ -865,7 +871,7 @@ Command_Prompt_Response()
         if(command=="s"){
             int id;
             if(sstream>>id){
-                OPENGL_SELECTION* selection=0;
+                OPENGL_SELECTION<T>* selection=0;
                 if(!selection && positive_particles_component) selection=positive_particles_component->Get_Selection_By_Id(id);
                 if(!selection && negative_particles_component) selection=negative_particles_component->Get_Selection_By_Id(id);
                 if(!selection && removed_positive_particles_component) selection=removed_positive_particles_component->Get_Selection_By_Id(id);
@@ -874,12 +880,12 @@ Command_Prompt_Response()
         else if(command=="n"){
             int id;
             if(sstream>>id){
-                OPENGL_SELECTION* selection=0;
+                OPENGL_SELECTION<T>* selection=0;
                 if(selection){Set_Current_Selection(selection); Update_OpenGL_Strings();}}}
         else if(command=="c"){
             int id;
             if(sstream>>id){
-                OPENGL_SELECTION* selection=0;
+                OPENGL_SELECTION<T>* selection=0;
                 if(selection){Set_Current_Selection(selection); Update_OpenGL_Strings();}}}
     }
 }
@@ -896,30 +902,27 @@ Slice_Has_Changed()
     Update_OpenGL_Strings();
 }
 
-// ==========================================================================
-
-ANIMATED_VISUALIZATION* visualization=0;
-PARSE_ARGS* parse_args=0;
-void cleanup_function(void)
-{
-    delete visualization;
-    TIMER::Destroy_Singleton();
-    delete parse_args;
-}
-
 int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
     PROCESS_UTILITIES::Set_Backtrace(true);
     bool type_double=false; // float by default
-    parse_args=new PARSE_ARGS(argc,argv);
-    parse_args->Add_Not("-float",&type_double,"Use floats");
-    parse_args->Add("-double",&type_double,"Use doubles");
-    parse_args->Parse(true);
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
+    parse_args.Parse(true);
 
-    if(!type_double) visualization=new VISUALIZATION<float>();
-    else visualization=new VISUALIZATION<double>();
-    atexit(cleanup_function);
-    visualization->Initialize_And_Run(*parse_args);
+    if(!type_double)
+    {
+        ANIMATED_VISUALIZATION<float> *visualization=new VISUALIZATION<float>;
+        visualization->Initialize_And_Run(parse_args);
+        delete visualization;
+    }
+    else
+    {
+        ANIMATED_VISUALIZATION<double> *visualization=new VISUALIZATION<double>;
+        visualization->Initialize_And_Run(parse_args);
+        delete visualization;
+    }
     return 0;
 }

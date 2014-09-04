@@ -14,7 +14,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input)
-    :OPENGL_COMPONENT("Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
+    :OPENGL_COMPONENT<T>("Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
     frame_loaded(-1),set(0),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false)
 {
     int number_of_sets=0;
@@ -60,7 +60,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -69,7 +69,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -85,29 +85,29 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_levelset->Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const
 {
     if(Is_Up_To_Date(frame)){
-        if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_2D && opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
+        if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_2D && opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
             VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)current_selection)->index;
             for(int i=0;i<opengl_levelsets.m;i++) 
                 output_stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(index)
                              <<" curvature["<<i<<"]="<<opengl_levelsets(i)->levelset.Compute_Curvature(opengl_levelsets(i)->levelset.grid.Center(index))<<std::endl;}
-        if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_2D && !opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
+        if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_2D && !opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
             VECTOR<int,2> index=((OPENGL_SELECTION_GRID_NODE_2D<T>*)current_selection)->index;
             for(int i=0;i<opengl_levelsets.m;i++) 
                 output_stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(index)<<std::endl;}
-        if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_2D){
+        if(current_selection && current_selection->type==OPENGL_SELECTION<T>::COMPONENT_PARTICLES_2D){
             OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)current_selection;
             VECTOR<T,2> location=selection->location;
             for(int i=0;i<opengl_levelsets.m;i++) 

@@ -17,7 +17,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
 OPENGL_COMPONENT_DEBUG_PARTICLES_2D(const std::string &filename_input)
-    :OPENGL_COMPONENT("Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),debug_objects(*new ARRAY<DEBUG_OBJECT<TV> >),opengl_particles(*new OPENGL_DEBUG_PARTICLES_2D<T>(particles,debug_objects)),
+    :OPENGL_COMPONENT<T>("Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),debug_objects(*new ARRAY<DEBUG_OBJECT<TV> >),opengl_particles(*new OPENGL_DEBUG_PARTICLES_2D<T>(particles,debug_objects)),
     filename(filename_input),frame_loaded(-1),set(0),set_loaded(-1),valid(false),draw_multiple_particle_sets(false)
 {
     is_animation=FILE_UTILITIES::Is_Animated(filename);
@@ -47,7 +47,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -56,7 +56,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -78,16 +78,16 @@ Use_Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_particles.Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     int point_index;
@@ -106,9 +106,9 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
-    if(selection->type != OPENGL_SELECTION::DEBUG_PARTICLES_2D) return;
+    if(selection->type != OPENGL_SELECTION<T>::DEBUG_PARTICLES_2D) return;
     OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T>*)selection;
     int particle_index=real_selection->index;
     int point_index=0;
@@ -128,9 +128,9 @@ Clear_Highlight()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
 {
-    if(selection && selection->type == OPENGL_SELECTION::DEBUG_PARTICLES_2D && selection->object == this){
+    if(selection && selection->type == OPENGL_SELECTION<T>::DEBUG_PARTICLES_2D && selection->object == this){
         OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T>*)selection;
         
         if(!draw_multiple_particle_sets && set!=0) return;
@@ -150,8 +150,8 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) co
 //#####################################################################
 // Function Create_Or_Destroy_Selection_After_Frame_Change
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
-Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection)
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
+Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
 {
     // TODO: reimplement transfering particles between objects.
     if(old_selection && old_selection->object == this){
@@ -162,11 +162,11 @@ Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,b
 //#####################################################################
 // Function Selection_Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
-Selection_Bounding_Box(OPENGL_SELECTION *selection) const
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
+Selection_Bounding_Box(OPENGL_SELECTION<T>* selection) const
 {
     int current_index=dynamic_cast<OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T>&>(*selection).index;
-    return World_Space_Box(RANGE<VECTOR<float,2> >(VECTOR<float,2>(particles.X(current_index))));
+    return World_Space_Box(RANGE<TV>(particles.X(current_index)));
 }
 //#####################################################################
 // Function Reinitialize
@@ -225,9 +225,9 @@ Toggle_Arrowhead()
 template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
 Command_Prompt_Response()
 {
-    if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
+    if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
         std::string command;
-        std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);
+        std::istringstream sstream(OPENGL_WORLD<T>::Singleton()->prompt_response);
         sstream>>command;
         if(command=="s"){
             ARRAY<int> indices;
@@ -242,16 +242,16 @@ Command_Prompt_Response()
 template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
 Command_Prompt()
 {
-    OPENGL_WORLD::Singleton()->Prompt_User("Command: ",Command_Prompt_Response_CB(),"");
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Command: ",Command_Prompt_Response_CB(),"");
 }
 //#####################################################################
 // Selection object functions
 //#####################################################################
 template<class T>
-RANGE<VECTOR<float,3> > OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T>::
+RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Bounding_Box() const
 {
-    return object->Selection_Bounding_Box((OPENGL_SELECTION*)this);
+    return object->Selection_Bounding_Box((OPENGL_SELECTION<T>*)this);
 }
 //#####################################################################
 namespace PhysBAM{

@@ -16,10 +16,13 @@
 namespace PhysBAM{
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_PARTICLES_3D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_PARTICLES_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::World_Space_Box;
     OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename, const std::string &filename_set_input="", bool use_ids_input = true, bool particles_stored_per_cell_input = false, bool particles_stored_per_cell_adaptive_input=false);
     virtual ~OPENGL_COMPONENT_PARTICLES_3D();
 
@@ -30,20 +33,20 @@ public:
 
     void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid && opengl_points->Use_Bounding_Box(); }
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size);
-    virtual OPENGL_SELECTION* Get_Selection_By_Id(int id);
-    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
+    virtual OPENGL_SELECTION<T>* Get_Selection_By_Id(int id);
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Selection_Bounding_Box(OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
-    int Get_Current_Index_Of_Selection(OPENGL_SELECTION* selection) const;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Selection_Bounding_Box(OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    int Get_Current_Index_Of_Selection(OPENGL_SELECTION<T>* selection) const;
 
     void Select_Particle_By_Id(int id);
     void Select_Particles_By_Ids(const ARRAY<int> &ids);
     void Clear_Id_Selection();
-    OPENGL_SELECTION* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
+    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
 
     void Toggle_Draw_Point_Numbers();
     void Toggle_Draw_Velocities();
@@ -98,18 +101,19 @@ protected:
 };
 
 template<class T>
-class OPENGL_SELECTION_COMPONENT_PARTICLES_3D:public OPENGL_SELECTION
+class OPENGL_SELECTION_COMPONENT_PARTICLES_3D:public OPENGL_SELECTION<T>
 {
     typedef VECTOR<T,3> TV;
 public:
+    using OPENGL_SELECTION<T>::object;
     int index;  // index into particles array
     bool has_id;
     int id;
     int particle_set;
     VECTOR<T,3> location;
 
-    OPENGL_SELECTION_COMPONENT_PARTICLES_3D(OPENGL_OBJECT* object) :OPENGL_SELECTION(OPENGL_SELECTION::COMPONENT_PARTICLES_3D, object) {}
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    OPENGL_SELECTION_COMPONENT_PARTICLES_3D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D, object) {}
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 }

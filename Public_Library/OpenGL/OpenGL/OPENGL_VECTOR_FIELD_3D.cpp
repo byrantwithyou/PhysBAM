@@ -29,11 +29,12 @@ template<class T> OPENGL_VECTOR_FIELD_3D<T>::
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_VECTOR_FIELD_3D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_VECTOR_FIELD_3D<T>::
 Bounding_Box() const
 {
-    RANGE<VECTOR<float,3> > box(World_Space_Point(VECTOR<float,3>(vector_locations(0))));
-    for (int i=0;i<vector_locations.m;i++)box.Enlarge_Nonempty_Box_To_Include_Point(World_Space_Point(VECTOR<float,3>(vector_locations(i))));
+    RANGE<VECTOR<T,3> > box(World_Space_Point(vector_locations(0)));
+    for(int i=0;i<vector_locations.m;i++)
+        box.Enlarge_Nonempty_Box_To_Include_Point(World_Space_Point(vector_locations(i)));
     return box;
 }
 //#####################################################################

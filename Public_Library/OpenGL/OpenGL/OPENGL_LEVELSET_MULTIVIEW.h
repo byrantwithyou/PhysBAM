@@ -23,10 +23,12 @@ template<class T> class OPENGL_COLOR_MAP;
 template<class T,class T2> class OPENGL_SCALAR_FIELD_3D;
 
 template<class T,class RW=T>
-class OPENGL_LEVELSET_MULTIVIEW:public OPENGL_OBJECT
+class OPENGL_LEVELSET_MULTIVIEW:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
+    using OPENGL_OBJECT<T>::slice;
     enum COLOR_MODE {COLOR_SOLID,COLOR_GRADIENT}; // currently only used for slice mode
     COLOR_MODE color_mode;
     OPENGL_MATERIAL front_surface_material, back_surface_material;
@@ -89,7 +91,7 @@ public:
     void Toggle_Display_Overlay();
     void Toggle_Smooth_Slice_Texture();
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
     void Slice_Has_Changed() PHYSBAM_OVERRIDE;

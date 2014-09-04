@@ -188,7 +188,7 @@ template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Display() const
 {
     if(values.domain.Empty()) return;
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -227,8 +227,8 @@ Display_3D() const
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     glDepthMask(GL_FALSE);
 
-    VECTOR<float,3> view_forward,view_up,view_right;
-    OPENGL_WORLD::Singleton()->Get_View_Frame(view_forward,view_up,view_right);
+    TV view_forward,view_up,view_right;
+    OPENGL_WORLD<T>::Singleton()->Get_View_Frame(view_forward,view_up,view_right);
     int dominant_axis=1;
 
     if(dominant_axis==0){
@@ -236,63 +236,63 @@ Display_3D() const
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int i=grid.counts.x-1;i>=0;i--) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
-                OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
+                TV pos=grid.X(TV_INT(i,j,k));
+                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
         else{
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(it.index).rgba,colors);
-                VECTOR<T,3> pos=grid.X(it.index);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
+                TV pos=grid.X(it.index);
+                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}}
     else if(dominant_axis==1){
         if(view_forward[1]>0){
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int j=grid.counts.y-1;j>=0;j--) for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
-                OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
+                TV pos=grid.X(TV_INT(i,j,k));
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
         else{
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int j=0;j<grid.counts.y;j++) for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
-                OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
+                TV pos=grid.X(TV_INT(i,j,k));
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}}
     else if(dominant_axis==2){
         if(view_forward[2]>0){
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int k=grid.counts.z-1;k>=0;k--) for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
-                OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
+                TV pos=grid.X(TV_INT(i,j,k));
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
         else{
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int k=0;k<grid.counts.z;k++) for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
-                OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
+                TV pos=grid.X(TV_INT(i,j,k));
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}}
 
 #ifdef USE_OPENGLES
@@ -316,40 +316,40 @@ Display_3D_Slice() const
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     glDepthMask(GL_FALSE);
 
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
 
     if(slice->axis==0){
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
         int i=slice->index;
         for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
             for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-            VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
-            OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
+            TV pos=grid.X(TV_INT(i,j,k));
+            OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
+            OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
+            OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
+            OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
             OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
     else if(slice->axis==1){
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
         int j=slice->index;
         for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
             for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-            VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
-            OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
+            TV pos=grid.X(TV_INT(i,j,k));
+            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
+            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
+            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
+            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
             OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
     else if(slice->axis==2){
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
         int k=slice->index;
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
             for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-            VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
-            OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
-            OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
-            OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
-            OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
+            TV pos=grid.X(TV_INT(i,j,k));
+            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
+            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
+            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
+            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
             OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
 
 #ifdef USE_OPENGLES
@@ -363,11 +363,11 @@ Display_3D_Slice() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class T2> RANGE<VECTOR<float,3> > OPENGL_SCALAR_FIELD_3D<T,T2>::
+template<class T,class T2> RANGE<VECTOR<T,3> > OPENGL_SCALAR_FIELD_3D<T,T2>::
 Bounding_Box() const
 {
     if(slice && slice->Is_Slice_Mode() && opengl_textured_rect) return opengl_textured_rect->Bounding_Box();
-    else return World_Space_Box((RANGE<VECTOR<float,3> >)grid.domain);
+    else return World_Space_Box(grid.domain);
 }
 //#####################################################################
 // Function Set_Draw_Mode
@@ -379,10 +379,10 @@ Set_Draw_Mode(DRAW_MODE draw_mode_input)
 
     if(draw_mode==DRAW_TEXTURE){
         Delete_Points();
-        if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT;}
+        if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT<T>;}
     else{
         Delete_Textured_Rect();
-        if(!opengl_points) opengl_points=new OPENGL_POINTS_3D<T>(*new ARRAY<VECTOR<T,3> >);}
+        if(!opengl_points) opengl_points=new OPENGL_POINTS_3D<T>(*new ARRAY<TV>);}
 
     Update();
 }
@@ -418,15 +418,15 @@ Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONE
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const
 {
-    if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_3D && grid.Is_MAC_Grid()){
+    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && grid.Is_MAC_Grid()){
         VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
         if(values.Valid_Index(index)) output_stream<<values(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_3D && !grid.Is_MAC_Grid()){
+    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_3D && !grid.Is_MAC_Grid()){
         VECTOR<int,3> index=((OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection)->index;
         if(values.Valid_Index(index))output_stream<<values(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_3D){
+    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D){
         OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)current_selection;
         Print_Selection_Info_Helper(output_stream,selection,grid,values);}
     output_stream<<std::endl;
@@ -438,7 +438,7 @@ namespace{
 //#####################################################################
 template<class T> void
 Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,bool>* self,int tex_width,int tex_height){
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)self->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)self->slice;
     VECTOR<int,3> domain_start(self->values.domain.min_corner.x,self->values.domain.min_corner.y,self->values.domain.min_corner.z),domain_end(self->values.domain.max_corner.x,self->values.domain.max_corner.y,self->values.domain.max_corner.z);
     if(!self->opengl_textured_rect->texture || self->opengl_textured_rect->texture->width!=tex_width || self->opengl_textured_rect->texture->height!=tex_height){
         delete self->opengl_textured_rect->texture;
@@ -467,7 +467,7 @@ Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,bool>* self,int tex_width,int tex_h
 //#####################################################################
 template<class T> void
 Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,int>* self,int tex_width,int tex_height){
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)self->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)self->slice;
     VECTOR<int,3> domain_start(self->values.domain.min_corner.x,self->values.domain.min_corner.y,self->values.domain.min_corner.z),domain_end(self->values.domain.max_corner.x,self->values.domain.max_corner.y,self->values.domain.max_corner.z);
     if(!self->opengl_textured_rect->texture || self->opengl_textured_rect->texture->width!=tex_width || self->opengl_textured_rect->texture->height!=tex_height){
         delete self->opengl_textured_rect->texture;
@@ -497,7 +497,7 @@ Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,int>* self,int tex_width,int tex_he
 template<class T,class T2> void
 Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,T2>* self,int tex_width,int tex_height){
     typedef VECTOR<T,3> TV;
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)self->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)self->slice;
     int k=1;
     tex_width=k*tex_width;
     tex_height=k*tex_height;
@@ -544,7 +544,7 @@ template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Update_Slice()
 {
     PHYSBAM_ASSERT(this->slice);
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
     VECTOR<int,3> domain_start(values.domain.min_corner.x,values.domain.min_corner.y,values.domain.min_corner.z),domain_end(values.domain.max_corner.x,values.domain.max_corner.y,values.domain.max_corner.z);
     if((slice->mode==OPENGL_SLICE::CELL_SLICE && (!grid.Is_MAC_Grid() || slice->index<domain_start[slice->axis] || slice->index>=domain_end[slice->axis])) ||
         (slice->mode==OPENGL_SLICE::NODE_SLICE && (grid.Is_MAC_Grid() || slice->index<domain_start[slice->axis] || slice->index>=domain_end[slice->axis]))){
@@ -552,20 +552,20 @@ Update_Slice()
         Delete_Textured_Rect();
         return;}
 
-    if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT();
+    if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT<T>();
 
     // Handle values arrays which are not (1,m)(1,n)
-    VECTOR<T,3> half_dX=(T)0.5*grid.dX;
+    TV half_dX=(T)0.5*grid.dX;
     RANGE<VECTOR<int,3> > domain_indices(values.Domain_Indices());
-    RANGE<VECTOR<T,3> > domain(grid.X(domain_indices.min_corner)-half_dX,grid.X(domain_indices.max_corner)+half_dX);
-    opengl_textured_rect->frame->t=VECTOR<float,3>(domain.Center());
+    RANGE<TV> domain(grid.X(domain_indices.min_corner)-half_dX,grid.X(domain_indices.max_corner)+half_dX);
+    opengl_textured_rect->frame->t=domain.Center();
 
     // rectangle will face you ifyou're looking down the positive axis
     int tex_width=0,tex_height=0; // texture width and height
     switch (slice->axis){
         case 0:
             opengl_textured_rect->frame->t.x=grid.X(TV_INT()+slice->index)(slice->axis);
-            opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >(0.5*pi,VECTOR<float,3>(0,1,0));
+            opengl_textured_rect->frame->r=ROTATION<TV>(0.5*pi,TV(0,1,0));
             opengl_textured_rect->width=domain.Edge_Lengths().z;
             opengl_textured_rect->height=domain.Edge_Lengths().y;
             tex_width=values.Size().z;
@@ -574,7 +574,7 @@ Update_Slice()
 
         case 1:
             opengl_textured_rect->frame->t.y=grid.X(TV_INT()+slice->index)(slice->axis);
-            opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >(-0.5*pi,VECTOR<float,3>(1,0,0));
+            opengl_textured_rect->frame->r=ROTATION<TV>(-0.5*pi,TV(1,0,0));
             opengl_textured_rect->width=domain.Edge_Lengths().x;
             opengl_textured_rect->height=domain.Edge_Lengths().z;
             tex_width=values.Size().x;
@@ -583,7 +583,7 @@ Update_Slice()
 
         case 2:
             opengl_textured_rect->frame->t.z=grid.X(TV_INT()+slice->index)(slice->axis);
-            opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >();
+            opengl_textured_rect->frame->r=ROTATION<TV>();
             opengl_textured_rect->width=domain.Edge_Lengths().x;
             opengl_textured_rect->height=domain.Edge_Lengths().y;
             tex_width=values.Size().x;
@@ -598,7 +598,7 @@ Update_Slice()
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Slice_Has_Changed()
 {
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
     if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE) // In 3D mode now, can erase textured rect
         Delete_Textured_Rect();
     Update();

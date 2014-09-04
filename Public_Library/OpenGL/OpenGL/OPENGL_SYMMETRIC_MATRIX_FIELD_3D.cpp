@@ -36,7 +36,7 @@ Update()
     if(field.domain.Empty()){entries.Clean_Memory();return;}
 
     int m_start=0,m_end=grid.counts.x,n_start=0,n_end=grid.counts.y,mn_start=0,mn_end=grid.counts.z;
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
     if(slice && slice->mode!=OPENGL_SLICE::NO_SLICE){
         VECTOR<int,3> domain_start(m_start,n_start,mn_start),domain_end(m_end,n_end,mn_end);
         if((slice->mode == OPENGL_SLICE::CELL_SLICE && (!grid.Is_MAC_Grid() || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis])) ||
@@ -56,10 +56,10 @@ Update()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SYMMETRIC_MATRIX_FIELD_3D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SYMMETRIC_MATRIX_FIELD_3D<T>::
 Bounding_Box() const
 {
-    return RANGE<VECTOR<float,3> >(grid.domain);
+    return RANGE<VECTOR<T,3> >(grid.domain);
 }
 //#####################################################################
 namespace PhysBAM{

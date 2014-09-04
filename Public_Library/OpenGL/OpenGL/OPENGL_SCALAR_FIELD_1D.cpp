@@ -71,15 +71,15 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class T2> RANGE<VECTOR<float,3> > OPENGL_SCALAR_FIELD_1D<T,T2>::
+template<class T,class T2> RANGE<VECTOR<T,3> > OPENGL_SCALAR_FIELD_1D<T,T2>::
 Bounding_Box() const
 {
     int min_corner=values.Domain_Indices().min_corner.x;
     int max_corner=values.Domain_Indices().max_corner.x;
-    RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
-    for(int i=min_corner;i<max_corner;i++) box.Enlarge_To_Include_Point(VECTOR<float,3>(grid.X(TV_INT(i)).x,values(i),(T)0));
+    RANGE<VECTOR<T,3> > box=RANGE<VECTOR<T,3> >::Empty_Box();
+    for(int i=min_corner;i<max_corner;i++) box.Enlarge_To_Include_Point(VECTOR<T,3>(grid.X(TV_INT(i)).x,values(i),(T)0));
     LOG::cout<<"box is "<<box<<std::endl;
-    return box;
+    return World_Space_Box(box);
 }
 //#####################################################################
 namespace PhysBAM{

@@ -16,7 +16,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class T2,class RW> OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T2,RW>::
 OPENGL_COMPONENT_SCALAR_FIELD_1D(const GRID<TV> &grid,const std::string &scalar_field_filename,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
-    :OPENGL_COMPONENT("Scalar Field 1D"),scalar_field_filename(scalar_field_filename),frame_loaded(INT_MIN),valid(false),opengl_scalar_field(grid,*new ARRAY<T2,VECTOR<int,1> >,point_color,line_color)
+    :OPENGL_COMPONENT<T>("Scalar Field 1D"),scalar_field_filename(scalar_field_filename),frame_loaded(INT_MIN),valid(false),opengl_scalar_field(grid,*new ARRAY<T2,VECTOR<int,1> >,point_color,line_color)
 {
     is_animation=FILE_UTILITIES::Is_Animated(scalar_field_filename);
 }
@@ -42,7 +42,7 @@ Valid_Frame(int frame_input) const
 template<class T,class T2,class RW> void OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T2,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -51,7 +51,7 @@ Set_Frame(int frame_input)
 template<class T,class T2,class RW> void OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T2,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -65,11 +65,11 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class T2,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T2,RW>::
+template<class T,class T2,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T2,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_scalar_field.Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Reinitialize

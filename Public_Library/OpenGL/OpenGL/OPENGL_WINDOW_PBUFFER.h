@@ -10,15 +10,16 @@
 namespace PhysBAM{
 class OPENGL_PBUFFER;
 
-class OPENGL_WINDOW_PBUFFER:public OPENGL_WINDOW
+template<class T>
+class OPENGL_WINDOW_PBUFFER:public OPENGL_WINDOW<T>
 {
-    using OPENGL_WINDOW::opengl_world;
+    using OPENGL_WINDOW<T>::opengl_world;
     int width,height;
     OPENGL_PBUFFER* pbuffer;
 
 //#####################################################################
 public:
-    OPENGL_WINDOW_PBUFFER(OPENGL_WORLD& world_input,const std::string& window_title_input,const int width_input,const int height_input);
+    OPENGL_WINDOW_PBUFFER(OPENGL_WORLD<T>& world_input,const std::string& window_title_input,const int width_input,const int height_input);
     virtual ~OPENGL_WINDOW_PBUFFER();
     void Setup_Idle(const bool use) PHYSBAM_OVERRIDE;
     void Setup_Timer(const float wait_milliseconds) PHYSBAM_OVERRIDE;

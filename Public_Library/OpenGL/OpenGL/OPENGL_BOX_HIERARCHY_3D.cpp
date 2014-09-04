@@ -35,11 +35,11 @@ Display_Helper(const int cell,const int height) const
 //#####################################################################
 // Function Bounding_Box
 //##################################################################### 
-template<class T> RANGE<VECTOR<float,3> > OPENGL_BOX_HIERARCHY_3D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_BOX_HIERARCHY_3D<T>::
 Bounding_Box() const
 {
-    if(hierarchy) return RANGE<VECTOR<float,3> >(hierarchy->box_hierarchy(hierarchy->root));
-    return RANGE<VECTOR<float,3> >(VECTOR<float,3>(),VECTOR<float,3>());
+    if(hierarchy) return World_Space_Box(hierarchy->box_hierarchy(hierarchy->root));
+    return RANGE<TV>(TV(),TV());
 }
 //#####################################################################
 // Function Decrement_Height

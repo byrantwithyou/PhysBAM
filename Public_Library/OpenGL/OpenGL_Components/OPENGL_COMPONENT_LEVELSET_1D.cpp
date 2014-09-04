@@ -15,7 +15,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_LEVELSET_1D<T,RW>::
 OPENGL_COMPONENT_LEVELSET_1D(GRID<TV> &grid,const std::string& levelset_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
-    :OPENGL_COMPONENT("Levelset 1D"),levelset_filename(levelset_filename_input),opengl_levelset(0)
+    :OPENGL_COMPONENT<T>("Levelset 1D"),levelset_filename(levelset_filename_input),opengl_levelset(0)
 {
     is_animation=FILE_UTILITIES::Is_Animated(levelset_filename);
     opengl_levelset=new OPENGL_LEVELSET_1D<T>(*(new LEVELSET<TV>(grid,*(new ARRAY<T,TV_INT>))),point_color,line_color);
@@ -43,7 +43,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_1D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -52,7 +52,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_1D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -66,11 +66,11 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_LEVELSET_1D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_LEVELSET_1D<T,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_levelset->Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Reinitialize

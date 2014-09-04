@@ -9,7 +9,8 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 namespace PhysBAM{
 
-class OPENGL_COMPONENT_DIAGNOSTICS:public OPENGL_COMPONENT
+template<class T>
+class OPENGL_COMPONENT_DIAGNOSTICS:public OPENGL_COMPONENT<T>
 {
     std::string filename;
     int frame_loaded;
@@ -18,14 +19,16 @@ class OPENGL_COMPONENT_DIAGNOSTICS:public OPENGL_COMPONENT
 
 //#####################################################################
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::component_name;
+    using OPENGL_COMPONENT<T>::is_animation;
     OPENGL_COMPONENT_DIAGNOSTICS(const std::string& filename);
     virtual ~OPENGL_COMPONENT_DIAGNOSTICS();
 private:
     void Reinitialize();
-    void Print_Selection_Info(std::ostream& ostream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;    
+    void Print_Selection_Info(std::ostream& ostream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;    
     bool Valid_Frame(int frame) const PHYSBAM_OVERRIDE;
     void Set_Frame(int frame) PHYSBAM_OVERRIDE;
-    //virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    //virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
     void Display() const;
 //#####################################################################

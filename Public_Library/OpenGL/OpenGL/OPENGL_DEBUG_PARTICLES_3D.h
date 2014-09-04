@@ -19,10 +19,12 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_DEBUG_PARTICLES_3D:public OPENGL_OBJECT
+class OPENGL_DEBUG_PARTICLES_3D:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::slice;
+    using OPENGL_OBJECT<T>::World_Space_Box;
     GEOMETRY_PARTICLES<TV>& particles;
     ARRAY<DEBUG_OBJECT<TV> >& debug_objects;
     OPENGL_COLOR default_color;
@@ -35,13 +37,13 @@ public:
     ~OPENGL_DEBUG_PARTICLES_3D();
 
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Display() const PHYSBAM_OVERRIDE;
 
-    OPENGL_SELECTION* Get_Selection(GLuint *buffer, int buffer_size) PHYSBAM_OVERRIDE;
-    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
+    OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) PHYSBAM_OVERRIDE;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
 
     void Select_Point(int index);
     void Select_Points(const ARRAY<int> &indices);
@@ -50,15 +52,16 @@ public:
 };
 
 template<class T>
-class OPENGL_SELECTION_DEBUG_PARTICLES_3D:public OPENGL_SELECTION
+class OPENGL_SELECTION_DEBUG_PARTICLES_3D:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int index;
 
-    OPENGL_SELECTION_DEBUG_PARTICLES_3D(OPENGL_OBJECT* object)
-        :OPENGL_SELECTION(OPENGL_SELECTION::DEBUG_PARTICLES_3D, object) {}
+    OPENGL_SELECTION_DEBUG_PARTICLES_3D(OPENGL_OBJECT<T>* object)
+        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::DEBUG_PARTICLES_3D, object) {}
 
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 }

@@ -7,7 +7,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-OPENGL_COMPONENT::
+template<class T> OPENGL_COMPONENT<T>::
 OPENGL_COMPONENT(const std::string &name)
  : frame(0), draw(true), is_animation(false), component_name(name)
 {
@@ -15,14 +15,14 @@ OPENGL_COMPONENT(const std::string &name)
 //#####################################################################
 // Destructor
 //#####################################################################
-OPENGL_COMPONENT::
+template<class T> OPENGL_COMPONENT<T>::
 ~OPENGL_COMPONENT()
 {
 }
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-bool OPENGL_COMPONENT::
+template<class T> bool OPENGL_COMPONENT<T>::
 Valid_Frame(int frame_input) const
 {
     return false;
@@ -30,7 +30,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Is_Up_To_Date
 //#####################################################################
-bool OPENGL_COMPONENT::
+template<class T> bool OPENGL_COMPONENT<T>::
 Is_Up_To_Date(int frame) const
 {
     return true;
@@ -38,7 +38,7 @@ Is_Up_To_Date(int frame) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-void OPENGL_COMPONENT::
+template<class T> void OPENGL_COMPONENT<T>::
 Set_Frame(int frame_input)
 {
     frame = frame_input;
@@ -46,7 +46,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-void OPENGL_COMPONENT::
+template<class T> void OPENGL_COMPONENT<T>::
 Set_Draw(bool draw_input)
 {
     draw = draw_input;
@@ -54,14 +54,14 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Draw_All_Objects
 //#####################################################################
-void OPENGL_COMPONENT::
+template<class T> void OPENGL_COMPONENT<T>::
 Draw_All_Objects()
 {
 }
 //#####################################################################
 // Function Use_Bounding_Box
 //#####################################################################
-bool OPENGL_COMPONENT::
+template<class T> bool OPENGL_COMPONENT<T>::
 Use_Bounding_Box() const
 {
     return draw;
@@ -69,7 +69,7 @@ Use_Bounding_Box() const
 //#####################################################################
 // Function Next_Frame
 //#####################################################################
-void OPENGL_COMPONENT::
+template<class T> void OPENGL_COMPONENT<T>::
 Next_Frame()
 {
     Set_Frame(frame+1);
@@ -77,8 +77,12 @@ Next_Frame()
 //#####################################################################
 // Function Prev_Frame
 //#####################################################################
-void OPENGL_COMPONENT::
+template<class T> void OPENGL_COMPONENT<T>::
 Prev_Frame()
 {
     Set_Frame(frame-1);
+}
+namespace PhysBAM{
+template class OPENGL_COMPONENT<double>;
+template class OPENGL_COMPONENT<float>;
 }

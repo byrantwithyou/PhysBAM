@@ -11,7 +11,7 @@ using namespace PhysBAM;
 template<class T,class RW> OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T,RW>::
 OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D(OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>& V_minus_component,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>& V_plus_component,
        OPENGL_COMPONENT_LEVELSET_2D<T,RW>& levelset_component)
-    :OPENGL_COMPONENT("Two-Phase Magnitude Velocity Field 2D"),magnitude_height_scale(0),V_minus_component(V_minus_component),V_plus_component(V_plus_component),levelset_component(levelset_component),
+    :OPENGL_COMPONENT<T>("Two-Phase Magnitude Velocity Field 2D"),magnitude_height_scale(0),V_minus_component(V_minus_component),V_plus_component(V_plus_component),levelset_component(levelset_component),
     opengl_two_phase_velocity_magnitude(V_minus_component.opengl_grid_based_vector_field.grid,V_minus_component.opengl_grid_based_vector_field.V,V_plus_component.opengl_grid_based_vector_field.V,levelset_component.opengl_levelset->levelset)
 {
     Reinitialize();
@@ -36,7 +36,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -45,7 +45,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -60,11 +60,11 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_two_phase_velocity_magnitude.Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Toggle_3D_Mode

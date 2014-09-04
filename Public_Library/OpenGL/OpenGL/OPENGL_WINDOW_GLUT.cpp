@@ -8,17 +8,15 @@
 
 using namespace PhysBAM;
 
-OPENGL_WINDOW_GLUT* OPENGL_WINDOW_GLUT::single=0;
-
 //#####################################################################
 // OPENGL_WINDOW_GLUT
 //#####################################################################
-OPENGL_WINDOW_GLUT::
-OPENGL_WINDOW_GLUT(OPENGL_WORLD& opengl_world_input,const std::string& window_title_input,const int width_input,const int height_input)
-    :OPENGL_WINDOW(opengl_world_input),width(width_input),height(height_input)
+template<class T> OPENGL_WINDOW_GLUT<T>::
+OPENGL_WINDOW_GLUT(OPENGL_WORLD<T>& opengl_world_input,const std::string& window_title_input,const int width_input,const int height_input)
+    :OPENGL_WINDOW<T>(opengl_world_input),width(width_input),height(height_input)
 {
-    if(single) PHYSBAM_FATAL_ERROR("Only one glut context allowed");
-    single=this;
+    if(Single()) PHYSBAM_FATAL_ERROR("Only one glut context allowed");
+    Single()=this;
 
     static int argc=1;static const char *(argv[1]);argv[0]="Visualization";
     glutInit(&argc,(char**)argv);
@@ -35,14 +33,13 @@ OPENGL_WINDOW_GLUT(OPENGL_WORLD& opengl_world_input,const std::string& window_ti
 //#####################################################################
 // Destructor
 //#####################################################################
-OPENGL_WINDOW_GLUT::
+template<class T> OPENGL_WINDOW_GLUT<T>::
 ~OPENGL_WINDOW_GLUT()
-{single=0;}
-
+{Single()=0;}
 //#####################################################################
 // Setup_Idle
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Setup_Idle(const bool use)
 {
     glutIdleFunc(use?Handle_Idle_Glut:0);
@@ -50,7 +47,7 @@ Setup_Idle(const bool use)
 //#####################################################################
 // Setup_Timer
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Setup_Timer(const float wait_milliseconds)
 {
     glutTimerFunc((int)(wait_milliseconds*1000)+1,Handle_Timer_Glut,0);
@@ -58,7 +55,7 @@ Setup_Timer(const float wait_milliseconds)
 //#####################################################################
 // Redisplay
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Redisplay()
 {
     glutPostRedisplay();
@@ -66,7 +63,7 @@ Redisplay()
 //#####################################################################
 // Main_Loop
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Main_Loop()
 {
     glutMainLoop();
@@ -74,7 +71,7 @@ Main_Loop()
 //#####################################################################
 // Request_Resize
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Request_Resize(const int width,const int height)
 {
     glutReshapeWindow(width,height);
@@ -82,7 +79,7 @@ Request_Resize(const int width,const int height)
 //#####################################################################
 // Request_Move
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Request_Move(const int x,const int y)
 {
     glutPositionWindow(x,y);
@@ -90,7 +87,7 @@ Request_Move(const int x,const int y)
 //#####################################################################
 // Width
 //#####################################################################
-int OPENGL_WINDOW_GLUT::
+template<class T> int OPENGL_WINDOW_GLUT<T>::
 Width() const
 {
     return width;
@@ -98,7 +95,7 @@ Width() const
 //#####################################################################
 // Height
 //#####################################################################
-int OPENGL_WINDOW_GLUT::
+template<class T> int OPENGL_WINDOW_GLUT<T>::
 Height() const
 {
     return height;
@@ -106,72 +103,85 @@ Height() const
 //#####################################################################
 // Handle_Display_Glut
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Handle_Display_Glut()
 {
-    single->opengl_world.Render_World(false); // render, no selection
+    Single()->opengl_world.Render_World(false); // render, no selection
     glutSwapBuffers();
 }
 //#####################################################################
 // Handle_Reshape_Glut
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Handle_Reshape_Glut(int w,int h)
 {
-    single->width=w;single->height=h;
-    single->opengl_world.Handle_Reshape_Main();
+    Single()->width=w;Single()->height=h;
+    Single()->opengl_world.Handle_Reshape_Main();
 }
 
 //#####################################################################
 // Handle_Special_Keypress_Glut
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Handle_Special_Keypress_Glut(int key,int x,int y)
 {
-    single->opengl_world.Handle_Keypress_Main(OPENGL_KEY::From_Glut_Special_Key(key,(glutGetModifiers()&GLUT_ACTIVE_CTRL)!=0,(glutGetModifiers()&GLUT_ACTIVE_ALT)!=0),x,y);
+    Single()->opengl_world.Handle_Keypress_Main(OPENGL_KEY::From_Glut_Special_Key(key,(glutGetModifiers()&GLUT_ACTIVE_CTRL)!=0,(glutGetModifiers()&GLUT_ACTIVE_ALT)!=0),x,y);
 }
 //#####################################################################
 // Handle_Keypress_Glut
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Handle_Keypress_Glut(unsigned char key,int x,int y)
 {
-    if(single->opengl_world.prompt_mode) single->opengl_world.Handle_Keypress_Prompt(key);
-    else single->opengl_world.Handle_Keypress_Main(OPENGL_KEY::From_Glut_Key(key,(glutGetModifiers()&GLUT_ACTIVE_CTRL)!=0,(glutGetModifiers()&GLUT_ACTIVE_ALT)!=0),x,y);
+    if(Single()->opengl_world.prompt_mode) Single()->opengl_world.Handle_Keypress_Prompt(key);
+    else Single()->opengl_world.Handle_Keypress_Main(OPENGL_KEY::From_Glut_Key(key,(glutGetModifiers()&GLUT_ACTIVE_CTRL)!=0,(glutGetModifiers()&GLUT_ACTIVE_ALT)!=0),x,y);
 }
 //#####################################################################
 // Handle_Click_Glut
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Handle_Click_Glut(int button,int state,int x,int y)
 {
     bool ctrl_pressed=(glutGetModifiers() & GLUT_ACTIVE_CTRL)!=0;
     bool shift_pressed=glutGetModifiers() & GLUT_ACTIVE_SHIFT;
-    single->opengl_world.Handle_Click_Main(button,state,x,y,ctrl_pressed,shift_pressed);
+    Single()->opengl_world.Handle_Click_Main(button,state,x,y,ctrl_pressed,shift_pressed);
 }
 //#####################################################################
 // Handle_Drag_Glut
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Handle_Drag_Glut(int x,int y)
 {
-    single->opengl_world.Handle_Drag_Main(x,y);
+    Single()->opengl_world.Handle_Drag_Main(x,y);
 }
 //#####################################################################
 // Handle_Idle_Glut
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Handle_Idle_Glut()
 {
-    single->opengl_world.Handle_Idle();
+    Single()->opengl_world.Handle_Idle();
 }
 //#####################################################################
 // Handle_Timer_Glut
 //#####################################################################
-void OPENGL_WINDOW_GLUT::
+template<class T> void OPENGL_WINDOW_GLUT<T>::
 Handle_Timer_Glut(int value)
 {
-    single->opengl_world.Handle_Timer();
+    Single()->opengl_world.Handle_Timer();
 }
 //#####################################################################
+// Function Single
+//#####################################################################
+template<class T> OPENGL_WINDOW_GLUT<T>*& OPENGL_WINDOW_GLUT<T>::
+Single()
+{
+    static OPENGL_WINDOW_GLUT<T>* single=0;
+    return single;
+}
+//#####################################################################
+namespace PhysBAM{
+template class OPENGL_WINDOW_GLUT<float>;
+template class OPENGL_WINDOW_GLUT<double>;
+}
 #endif

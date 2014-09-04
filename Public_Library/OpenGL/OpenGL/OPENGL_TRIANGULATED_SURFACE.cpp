@@ -206,17 +206,17 @@ Display() const
     {
 #endif
         if(current_selection){
-            if(current_selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_VERTEX){
+            if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX){
                 int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>*)current_selection)->index;
-                OPENGL_SELECTION::Draw_Highlighted_Vertex(surface.particles.X(index));}
-            else if(current_selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_SEGMENT && surface.mesh.segment_mesh){
+                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(surface.particles.X(index));}
+            else if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT && surface.mesh.segment_mesh){
                 int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>*)current_selection)->index;
                 int node1,node2;surface.mesh.segment_mesh->elements(index).Get(node1,node2);
-                OPENGL_SELECTION::Draw_Highlighted_Segment(surface.particles.X(node1),surface.particles.X(node2));}
-            else if(current_selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_TRIANGLE){
+                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(surface.particles.X(node1),surface.particles.X(node2));}
+            else if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE){
                 int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>*)current_selection)->index;
                 int node1,node2,node3;surface.mesh.elements(index).Get(node1,node2,node3);
-                OPENGL_SELECTION::Draw_Highlighted_Triangle_Boundary(surface.particles.X(node1),surface.particles.X(node2),surface.particles.X(node3));}}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Triangle_Boundary(surface.particles.X(node1),surface.particles.X(node2),surface.particles.X(node3));}}
 
         if(highlight_current_node){
             Highlight_Current_Node();
@@ -268,20 +268,20 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_TRIANGULATED_SURFACE<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_TRIANGULATED_SURFACE<T>::
 Bounding_Box() const
 {
-    RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
-    for(int i=0;i<surface.particles.Size();i++) box.Enlarge_To_Include_Point(World_Space_Point(VECTOR<float,3>(surface.particles.X(i))));
+    RANGE<VECTOR<T,3> > box;
+    for(int i=0;i<surface.particles.Size();i++) box.Enlarge_To_Include_Point(World_Space_Point(surface.particles.X(i)));
     return box;
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION* OPENGL_TRIANGULATED_SURFACE<T>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_TRIANGULATED_SURFACE<T>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
-    OPENGL_SELECTION* selection=0;
+    OPENGL_SELECTION<T>* selection=0;
     if(buffer_size == 2){
         if(buffer[0] == 1) selection=Get_Vertex_Selection(buffer[1]);
         else if(buffer[0] == 2) selection=Get_Segment_Selection(buffer[1]);
@@ -292,15 +292,15 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
     delete current_selection;current_selection=0;
     // Make a copy of selection
-    if(selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_VERTEX)
+    if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX)
         current_selection=new OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>(this,((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>*)selection)->index);
-    else if(selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_SEGMENT)
+    else if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT)
         current_selection=new OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>(this,((OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>*)selection)->index);
-    else if(selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_TRIANGLE)
+    else if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE)
         current_selection=new OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>(this,((OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>*)selection)->index);
 }
 //#####################################################################
@@ -315,7 +315,7 @@ Clear_Highlight()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
 {
     Print_Selection_Info(output_stream,selection,0);
 }
@@ -323,14 +323,14 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection,MATRIX<T,4>* transform) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,4>* transform) const
 {
-    if(selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_VERTEX){
+    if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX){
         int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>*)selection)->index;
         output_stream<<"Vertex "<<index<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(index))<<std::endl;}
         surface.particles.Print(output_stream,index);}
-    else if(selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_SEGMENT){
+    else if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT){
         PHYSBAM_ASSERT(surface.mesh.segment_mesh);
         int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>*)selection)->index;
         int node1,node2;surface.mesh.segment_mesh->elements(index).Get(node1,node2);
@@ -343,7 +343,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection,MAT
         output_stream<<"Vertex "<<node2<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(node2))<<std::endl;}
         surface.particles.Print(output_stream,node2);}
-    else if(selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_TRIANGLE){
+    else if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE){
         int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>*)selection)->index;
         int node1,node2,node3;surface.mesh.elements(index).Get(node1,node2,node3);
         output_stream<<"Triangle "<<index<<" ("<<node1<<", "<<node2<<", "<<node3<<")"<<std::endl;
@@ -363,7 +363,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection,MAT
 //#####################################################################
 // Function Get_Vertex_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION* OPENGL_TRIANGULATED_SURFACE<T>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_TRIANGULATED_SURFACE<T>::
 Get_Vertex_Selection(int index)
 {
     return new OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>(this,index);
@@ -371,7 +371,7 @@ Get_Vertex_Selection(int index)
 //#####################################################################
 // Function Get_Segment_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION* OPENGL_TRIANGULATED_SURFACE<T>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_TRIANGULATED_SURFACE<T>::
 Get_Segment_Selection(int index)
 {
     return new OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>(this,index);
@@ -379,7 +379,7 @@ Get_Segment_Selection(int index)
 //#####################################################################
 // Function Get_Triangle_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION* OPENGL_TRIANGULATED_SURFACE<T>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_TRIANGULATED_SURFACE<T>::
 Get_Triangle_Selection(int index)
 {
     return new OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>(this,index);
@@ -535,7 +535,7 @@ Draw_Subsets() const
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Draw_Vertices_For_Selection() const
 {
-    OPENGL_SELECTION::Draw_Vertices_For_Selection(surface.mesh,surface.particles);
+    OPENGL_SELECTION<T>::Draw_Vertices_For_Selection(surface.mesh,surface.particles);
 }
 //#####################################################################
 // Function Draw_Segments_For_Selection
@@ -578,41 +578,36 @@ Draw_Triangles_For_Selection() const
 //#####################################################################
 //
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const TRIANGULATED_SURFACE<T> &surface=((OPENGL_TRIANGULATED_SURFACE<T> *)object)->surface;
-    RANGE<VECTOR<float,3> > box(VECTOR<float,3>(surface.particles.X(index)));
-    return object->World_Space_Box(box);
+    return object->World_Space_Box(RANGE<VECTOR<T,3> >(surface.particles.X(index)));
 }
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const TRIANGULATED_SURFACE<T> &surface=((OPENGL_TRIANGULATED_SURFACE<T> *)object)->surface;
     PHYSBAM_ASSERT(surface.mesh.segment_mesh);
     int node1,node2;surface.mesh.segment_mesh->elements(index).Get(node1,node2);
-    RANGE<VECTOR<float,3> > box(VECTOR<float,3>(surface.particles.X(node1)));
-    box.Enlarge_To_Include_Point(VECTOR<float,3>(surface.particles.X(node2)));
+    RANGE<VECTOR<T,3> > box(surface.particles.X(node1));
+    box.Enlarge_To_Include_Point(surface.particles.X(node2));
     return object->World_Space_Box(box);
 }
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const TRIANGULATED_SURFACE<T> &surface=((OPENGL_TRIANGULATED_SURFACE<T> *)object)->surface;
-    int node1,node2,node3;surface.mesh.elements(index).Get(node1,node2,node3);
-    RANGE<VECTOR<float,3> > box(VECTOR<float,3>(surface.particles.X(node1)));
-    box.Enlarge_To_Include_Point(VECTOR<float,3>(surface.particles.X(node2)));
-    box.Enlarge_To_Include_Point(VECTOR<float,3>(surface.particles.X(node3)));
-    return object->World_Space_Box(box);
+    return object->World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(surface.particles.X.Subset(surface.mesh.elements(index))));
 }
 //#####################################################################
 namespace PhysBAM{

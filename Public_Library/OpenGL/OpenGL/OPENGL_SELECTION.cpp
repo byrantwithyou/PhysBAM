@@ -7,22 +7,22 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-OPENGL_SELECTION::
-OPENGL_SELECTION(TYPE type,OPENGL_OBJECT* object)
+template<class T> OPENGL_SELECTION<T>::
+OPENGL_SELECTION(TYPE type,OPENGL_OBJECT<T>* object)
     :type(type),object(object),hide(false)
 {
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-OPENGL_SELECTION::
+template<class T> OPENGL_SELECTION<T>::
 ~OPENGL_SELECTION()
 {
 }
 //#####################################################################
 // Function Actual_Type
 //#####################################################################
-OPENGL_SELECTION::TYPE OPENGL_SELECTION::
+template<class T> typename OPENGL_SELECTION<T>::TYPE OPENGL_SELECTION<T>::
 Actual_Type() const
 {
     return type;
@@ -30,7 +30,7 @@ Actual_Type() const
 //#####################################################################
 // Function Draw_Highlighted_Vertex
 //#####################################################################
-template<class TV> void OPENGL_SELECTION::
+template<class T> template<class TV> void OPENGL_SELECTION<T>::
 Draw_Highlighted_Vertex(const TV& position,int id,const OPENGL_COLOR& color)
 {
     glPushAttrib(GL_POINT_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -48,7 +48,7 @@ Draw_Highlighted_Vertex(const TV& position,int id,const OPENGL_COLOR& color)
 //#####################################################################
 // Function Draw_Highlighted_Segment
 //#####################################################################
-template<class TV> void OPENGL_SELECTION::
+template<class T> template<class TV> void OPENGL_SELECTION<T>::
 Draw_Highlighted_Segment(const TV& x0,const TV& x1,int id,const OPENGL_COLOR& color)
 {
     glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -66,7 +66,7 @@ Draw_Highlighted_Segment(const TV& x0,const TV& x1,int id,const OPENGL_COLOR& co
 //#####################################################################
 // Function Draw_Highlighted_Curve
 //#####################################################################
-template<class TV> void OPENGL_SELECTION::
+template<class T> template<class TV> void OPENGL_SELECTION<T>::
 Draw_Highlighted_Curve(const ARRAY<VECTOR<TV,2> >& X,int id,const OPENGL_COLOR& color)
 {
     TV total=TV();
@@ -85,7 +85,7 @@ Draw_Highlighted_Curve(const ARRAY<VECTOR<TV,2> >& X,int id,const OPENGL_COLOR& 
 //#####################################################################
 // Function Draw_Highlighted_Triangle_Boundary
 //#####################################################################
-template<class TV> void OPENGL_SELECTION::
+template<class T> template<class TV> void OPENGL_SELECTION<T>::
 Draw_Highlighted_Triangle_Boundary(const TV& x0,const TV& x1,const TV& x2,int id,const OPENGL_COLOR& color)
 {
     glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -105,7 +105,7 @@ Draw_Highlighted_Triangle_Boundary(const TV& x0,const TV& x1,const TV& x2,int id
 //#####################################################################
 // Function Draw_Highlighted_Tetrahedron_Boundary
 //#####################################################################
-template<class T> void OPENGL_SELECTION::
+template<class T> void OPENGL_SELECTION<T>::
 Draw_Highlighted_Tetrahedron_Boundary(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3,int id,const OPENGL_COLOR& color)
 {
     glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -132,7 +132,7 @@ Draw_Highlighted_Tetrahedron_Boundary(const VECTOR<T,3>& x0,const VECTOR<T,3>& x
 //#####################################################################
 // Function Draw_Highlighted_Quad
 //#####################################################################
-template<class T> void OPENGL_SELECTION::
+template<class T> void OPENGL_SELECTION<T>::
 Draw_Highlighted_Quad(const VECTOR<T,2>& x00,const VECTOR<T,2>& x11,const OPENGL_COLOR& color)
 {
     glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -147,7 +147,7 @@ Draw_Highlighted_Quad(const VECTOR<T,2>& x00,const VECTOR<T,2>& x11,const OPENGL
 //#####################################################################
 // Function Draw_Highlighted_Quad
 //#####################################################################
-template<class T> void OPENGL_SELECTION::
+template<class T> void OPENGL_SELECTION<T>::
 Draw_Highlighted_Quad(const VECTOR<T,3>& node1,const VECTOR<T,3>& node2,const VECTOR<T,3>& node3,const VECTOR<T,3>& node4,const OPENGL_COLOR& color)
 {
     glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -162,7 +162,7 @@ Draw_Highlighted_Quad(const VECTOR<T,3>& node1,const VECTOR<T,3>& node2,const VE
 //#####################################################################
 // Function Draw_Highlighted_Box
 //#####################################################################
-template<class T> void OPENGL_SELECTION::
+template<class T> void OPENGL_SELECTION<T>::
 Draw_Highlighted_Box(const VECTOR<T,3>& x000,const VECTOR<T,3>& x111,const OPENGL_COLOR& color)
 {
     glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -188,7 +188,7 @@ Draw_Highlighted_Box(const VECTOR<T,3>& x000,const VECTOR<T,3>& x111,const OPENG
 //#####################################################################
 // Function Draw_Vertices_For_Selection
 //#####################################################################
-template<class TV,int d> void OPENGL_SELECTION::
+template<class T> template<class TV,int d> void OPENGL_SELECTION<T>::
 Draw_Vertices_For_Selection(const SIMPLEX_MESH<d>& mesh,const GEOMETRY_PARTICLES<TV>& particles)
 {
 #ifndef USE_OPENGLES
@@ -207,35 +207,33 @@ Draw_Vertices_For_Selection(const SIMPLEX_MESH<d>& mesh,const GEOMETRY_PARTICLES
     glPopAttrib();
 #endif
 }
-template void OPENGL_SELECTION::Draw_Highlighted_Segment<VECTOR<float,3> >(VECTOR<float,3> const&,VECTOR<float,3> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Triangle_Boundary<VECTOR<float,3> >(VECTOR<float,3> const&,VECTOR<float,3> const&,VECTOR<float,3> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Vertex<VECTOR<float,3> >(VECTOR<float,3> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<float,3>,2>(SIMPLEX_MESH<2> const&,GEOMETRY_PARTICLES<VECTOR<float,3> > const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Quad<float>(VECTOR<float,2> const&,VECTOR<float,2> const&,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Segment<VECTOR<float,2> >(VECTOR<float,2> const&,VECTOR<float,2> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Triangle_Boundary<VECTOR<float,2> >(VECTOR<float,2> const&,VECTOR<float,2> const&,VECTOR<float,2> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Vertex<VECTOR<float,2> >(VECTOR<float,2> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<float,2>,1>(SIMPLEX_MESH<1> const&,GEOMETRY_PARTICLES<VECTOR<float,2> > const&);
-template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<float,2>,2>(SIMPLEX_MESH<2> const&,GEOMETRY_PARTICLES<VECTOR<float,2> > const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Vertex<VECTOR<float,1> >(VECTOR<float,1> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Box<float>(VECTOR<float,3> const&,VECTOR<float,3> const&,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Curve<VECTOR<float,3> >(ARRAY<VECTOR<VECTOR<float,3>,2>,int> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Tetrahedron_Boundary<float>(VECTOR<float,3> const&,VECTOR<float,3> const&,VECTOR<float,3> const&,VECTOR<float,3> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<float,3>,1>(SIMPLEX_MESH<1> const&,GEOMETRY_PARTICLES<VECTOR<float,3> > const&);
-template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<float,3>,3>(SIMPLEX_MESH<3> const&,GEOMETRY_PARTICLES<VECTOR<float,3> > const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Segment<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Triangle_Boundary<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&,VECTOR<double,3> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Vertex<VECTOR<double,3> >(VECTOR<double,3> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<double,3>,2>(SIMPLEX_MESH<2> const&,GEOMETRY_PARTICLES<VECTOR<double,3> > const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Quad<double>(VECTOR<double,2> const&,VECTOR<double,2> const&,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Segment<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<double,2> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Triangle_Boundary<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<double,2> const&,VECTOR<double,2> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Vertex<VECTOR<double,2> >(VECTOR<double,2> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<double,2>,1>(SIMPLEX_MESH<1> const&,GEOMETRY_PARTICLES<VECTOR<double,2> > const&);
-template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<double,2>,2>(SIMPLEX_MESH<2> const&,GEOMETRY_PARTICLES<VECTOR<double,2> > const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Vertex<VECTOR<double,1> >(VECTOR<double,1> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Box<double>(VECTOR<double,3> const&,VECTOR<double,3> const&,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Curve<VECTOR<double,3> >(ARRAY<VECTOR<VECTOR<double,3>,2>,int> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Highlighted_Tetrahedron_Boundary<double>(VECTOR<double,3> const&,VECTOR<double,3> const&,VECTOR<double,3> const&,VECTOR<double,3> const&,int,OPENGL_COLOR const&);
-template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<double,3>,1>(SIMPLEX_MESH<1> const&,GEOMETRY_PARTICLES<VECTOR<double,3> > const&);
-template void OPENGL_SELECTION::Draw_Vertices_For_Selection<VECTOR<double,3>,3>(SIMPLEX_MESH<3> const&,GEOMETRY_PARTICLES<VECTOR<double,3> > const&);
+namespace PhysBAM{
+template class OPENGL_SELECTION<double>;
+template class OPENGL_SELECTION<float>;
+template void OPENGL_SELECTION<double>::Draw_Highlighted_Curve<VECTOR<double,3> >(ARRAY<VECTOR<VECTOR<double,3>,2>,int> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<double>::Draw_Highlighted_Segment<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<double,2> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<double>::Draw_Highlighted_Segment<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<double>::Draw_Highlighted_Triangle_Boundary<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<double,2> const&,VECTOR<double,2> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<double>::Draw_Highlighted_Triangle_Boundary<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&,VECTOR<double,3> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<double>::Draw_Highlighted_Vertex<VECTOR<double,1> >(VECTOR<double,1> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<double>::Draw_Highlighted_Vertex<VECTOR<double,2> >(VECTOR<double,2> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<double>::Draw_Highlighted_Vertex<VECTOR<double,3> >(VECTOR<double,3> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<double>::Draw_Vertices_For_Selection<VECTOR<double,2>,1>(SIMPLEX_MESH<1> const&,GEOMETRY_PARTICLES<VECTOR<double,2> > const&);
+template void OPENGL_SELECTION<double>::Draw_Vertices_For_Selection<VECTOR<double,2>,2>(SIMPLEX_MESH<2> const&,GEOMETRY_PARTICLES<VECTOR<double,2> > const&);
+template void OPENGL_SELECTION<double>::Draw_Vertices_For_Selection<VECTOR<double,3>,1>(SIMPLEX_MESH<1> const&,GEOMETRY_PARTICLES<VECTOR<double,3> > const&);
+template void OPENGL_SELECTION<double>::Draw_Vertices_For_Selection<VECTOR<double,3>,2>(SIMPLEX_MESH<2> const&,GEOMETRY_PARTICLES<VECTOR<double,3> > const&);
+template void OPENGL_SELECTION<double>::Draw_Vertices_For_Selection<VECTOR<double,3>,3>(SIMPLEX_MESH<3> const&,GEOMETRY_PARTICLES<VECTOR<double,3> > const&);
+template void OPENGL_SELECTION<float>::Draw_Highlighted_Curve<VECTOR<float,3> >(ARRAY<VECTOR<VECTOR<float,3>,2>,int> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<float>::Draw_Highlighted_Segment<VECTOR<float,2> >(VECTOR<float,2> const&,VECTOR<float,2> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<float>::Draw_Highlighted_Segment<VECTOR<float,3> >(VECTOR<float,3> const&,VECTOR<float,3> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<float>::Draw_Highlighted_Triangle_Boundary<VECTOR<float,2> >(VECTOR<float,2> const&,VECTOR<float,2> const&,VECTOR<float,2> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<float>::Draw_Highlighted_Triangle_Boundary<VECTOR<float,3> >(VECTOR<float,3> const&,VECTOR<float,3> const&,VECTOR<float,3> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<float>::Draw_Highlighted_Vertex<VECTOR<float,1> >(VECTOR<float,1> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<float>::Draw_Highlighted_Vertex<VECTOR<float,2> >(VECTOR<float,2> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<float>::Draw_Highlighted_Vertex<VECTOR<float,3> >(VECTOR<float,3> const&,int,OPENGL_COLOR const&);
+template void OPENGL_SELECTION<float>::Draw_Vertices_For_Selection<VECTOR<float,2>,1>(SIMPLEX_MESH<1> const&,GEOMETRY_PARTICLES<VECTOR<float,2> > const&);
+template void OPENGL_SELECTION<float>::Draw_Vertices_For_Selection<VECTOR<float,2>,2>(SIMPLEX_MESH<2> const&,GEOMETRY_PARTICLES<VECTOR<float,2> > const&);
+template void OPENGL_SELECTION<float>::Draw_Vertices_For_Selection<VECTOR<float,3>,1>(SIMPLEX_MESH<1> const&,GEOMETRY_PARTICLES<VECTOR<float,3> > const&);
+template void OPENGL_SELECTION<float>::Draw_Vertices_For_Selection<VECTOR<float,3>,2>(SIMPLEX_MESH<2> const&,GEOMETRY_PARTICLES<VECTOR<float,3> > const&);
+template void OPENGL_SELECTION<float>::Draw_Vertices_For_Selection<VECTOR<float,3>,3>(SIMPLEX_MESH<3> const&,GEOMETRY_PARTICLES<VECTOR<float,3> > const&);
+}

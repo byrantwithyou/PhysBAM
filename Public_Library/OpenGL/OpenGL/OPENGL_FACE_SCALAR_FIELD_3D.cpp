@@ -48,10 +48,10 @@ Display() const
 //#####################################################################
 // Bounding_Box
 //#####################################################################
-template<class T,class T2> RANGE<VECTOR<float,3> > OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
+template<class T,class T2> RANGE<VECTOR<T,3> > OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 Bounding_Box() const
 {
-    return World_Space_Box((RANGE<VECTOR<float,3> >)grid.domain);
+    return World_Space_Box(grid.domain);
 }
 //#####################################################################
 // Update
@@ -62,18 +62,18 @@ Update()
     opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product()+z_face_values.Size().Product());
     int index=0;
     VECTOR<int,3> index_start,index_end;
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice,x_face_values,1,index_start,index_end);
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
+    OPENGL_UNIFORM_SLICE<T>::Get_Face_Index_Range(slice,x_face_values,1,index_start,index_end);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++) {
         opengl_points.points(index)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j,k)));
         opengl_points.Set_Point_Color(index,color_map->Lookup(x_face_values(i,j,k)));
         index++;}
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice,y_face_values,2,index_start,index_end);
+    OPENGL_UNIFORM_SLICE<T>::Get_Face_Index_Range(slice,y_face_values,2,index_start,index_end);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++) {
         opengl_points.points(index)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j,k)));
         opengl_points.Set_Point_Color(index,color_map->Lookup(y_face_values(i,j,k)));
         index++;}
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice,z_face_values,3,index_start,index_end);
+    OPENGL_UNIFORM_SLICE<T>::Get_Face_Index_Range(slice,z_face_values,3,index_start,index_end);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++) {
         opengl_points.points(index)=grid.Face(FACE_INDEX<TV::m>(2,TV_INT(i,j,k)));
         opengl_points.Set_Point_Color(index,color_map->Lookup(z_face_values(i,j,k)));
@@ -86,18 +86,18 @@ Update()
 template<> void OPENGL_FACE_SCALAR_FIELD_3D<float,bool>::
 Update()
 {
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
+    OPENGL_UNIFORM_SLICE<float>* slice=(OPENGL_UNIFORM_SLICE<float>*)this->slice;
     opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product()+z_face_values.Size().Product());
     opengl_points.color=color_map->Lookup(true);
     int index=0;
     VECTOR<int,3> index_start,index_end;
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice,x_face_values,0,index_start,index_end,scale);
+    OPENGL_UNIFORM_SLICE<float>::Get_Face_Index_Range(slice,x_face_values,0,index_start,index_end,scale);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(x_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j,k)));
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice,y_face_values,1,index_start,index_end,scale);
+    OPENGL_UNIFORM_SLICE<float>::Get_Face_Index_Range(slice,y_face_values,1,index_start,index_end,scale);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(y_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j,k)));
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice,z_face_values,2,index_start,index_end,scale);
+    OPENGL_UNIFORM_SLICE<float>::Get_Face_Index_Range(slice,z_face_values,2,index_start,index_end,scale);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(z_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(2,TV_INT(i,j,k)));
     opengl_points.points.Resize(index);
@@ -108,18 +108,18 @@ Update()
 template<> void OPENGL_FACE_SCALAR_FIELD_3D<double,bool>::
 Update()
 {
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
+    OPENGL_UNIFORM_SLICE<double>* slice=(OPENGL_UNIFORM_SLICE<double>*)this->slice;
     opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product()+z_face_values.Size().Product());
     opengl_points.color=color_map->Lookup(true);
     int index=0;
     VECTOR<int,3> index_start,index_end;
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice,x_face_values,0,index_start,index_end);
+    OPENGL_UNIFORM_SLICE<double>::Get_Face_Index_Range(slice,x_face_values,0,index_start,index_end);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(x_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j,k)));
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice,y_face_values,1,index_start,index_end);
+    OPENGL_UNIFORM_SLICE<double>::Get_Face_Index_Range(slice,y_face_values,1,index_start,index_end);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(y_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j,k)));
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice,z_face_values,2,index_start,index_end);
+    OPENGL_UNIFORM_SLICE<double>::Get_Face_Index_Range(slice,z_face_values,2,index_start,index_end);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(z_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(2,TV_INT(i,j,k)));
     opengl_points.points.Resize(index);
@@ -136,10 +136,10 @@ Slice_Has_Changed()
 // Print_Selection_Info
 //#####################################################################
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
 {
     // TODO: this should also interpolate to particles
-    if(selection && selection->type==OPENGL_SELECTION::GRID_CELL_3D && grid.Is_MAC_Grid()){
+    if(selection && selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && grid.Is_MAC_Grid()){
         VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)selection)->index;
         T2 left=x_face_values(index),right=x_face_values(index.x+1,index.y,index.z),
             bottom=y_face_values(index),top=y_face_values(index.x,index.y+1,index.z),

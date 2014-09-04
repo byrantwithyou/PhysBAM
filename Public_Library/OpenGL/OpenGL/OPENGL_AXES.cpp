@@ -10,12 +10,12 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_AXES<T>::
-OPENGL_AXES(const FRAME<VECTOR<T,3> >& frame_input,const RANGE<VECTOR<T,3> >& box_input,bool draw_box_input,
+OPENGL_AXES(const FRAME<TV>& frame_input,const RANGE<TV>& box_input,bool draw_box_input,
     bool draw_xz_grid_input,bool draw_xy_grid_input,bool draw_yz_grid_input,T grid_spacing_input)
     :box(box_input),draw_box(draw_box_input),draw_xz_grid(draw_xz_grid_input),draw_xy_grid(draw_xy_grid_input),
     draw_yz_grid(draw_yz_grid_input),grid_spacing(grid_spacing_input)
 {
-    *frame=FRAME<VECTOR<float,3> >(frame_input);
+    *frame=frame_input;
 }
 //#####################################################################
 // Destructor
@@ -30,8 +30,6 @@ template<class T> OPENGL_AXES<T>::
 template<class T> void OPENGL_AXES<T>::
 Display() const
 {
-    typedef VECTOR<T,3> TV;
-
     GLboolean lighting_enabled;
     glGetBooleanv(GL_LIGHTING,&lighting_enabled);
 
@@ -124,10 +122,10 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_AXES<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_AXES<T>::
 Bounding_Box() const
 {
-    return World_Space_Box(RANGE<VECTOR<float,3> >(box));
+    return World_Space_Box(box);
 }
 //#####################################################################
 namespace PhysBAM{

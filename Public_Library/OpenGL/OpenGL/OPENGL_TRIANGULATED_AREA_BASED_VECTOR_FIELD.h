@@ -20,6 +20,7 @@ class OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD:public OPENGL_VECTOR_FIELD_2D<
     typedef T_input T;
     typedef VECTOR<T,2> TV;
 public:
+    using OPENGL_OBJECT<T>::World_Space_Point;using OPENGL_OBJECT<T>::World_Space_Box;
     typedef OPENGL_VECTOR_FIELD_2D<ARRAY<TV> > BASE;
     using BASE::size;
 
@@ -32,7 +33,7 @@ public:
 
     void Update();  // Call when triangulated area/V change
 
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 }
 #endif

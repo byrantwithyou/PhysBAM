@@ -148,13 +148,13 @@ Display() const
 
         // Highlight current selection
         if(current_selection){
-            if(current_selection->type == OPENGL_SELECTION::GRID_CELL_2D){
+            if(current_selection->type == OPENGL_SELECTION<T>::GRID_CELL_2D){
                 OPENGL_SELECTION_GRID_CELL_2D<T>* real_selection=(OPENGL_SELECTION_GRID_CELL_2D<T>*)current_selection;
                 VECTOR<T,2> min_corner=grid.Node(real_selection->index),max_corner=min_corner+grid.dX;
-                OPENGL_SELECTION::Draw_Highlighted_Quad(min_corner,max_corner);}
-            else if(current_selection->type == OPENGL_SELECTION::GRID_NODE_2D){
+                OPENGL_SELECTION<T>::Draw_Highlighted_Quad(min_corner,max_corner);}
+            else if(current_selection->type == OPENGL_SELECTION<T>::GRID_NODE_2D){
                 OPENGL_SELECTION_GRID_NODE_2D<T>* real_selection=(OPENGL_SELECTION_GRID_NODE_2D<T>*)current_selection;
-                OPENGL_SELECTION::Draw_Highlighted_Vertex(grid.Node(real_selection->index));}}}
+                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(grid.Node(real_selection->index));}}}
 
     glPopAttrib();
     glPopMatrix();
@@ -169,18 +169,18 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_GRID_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_GRID_2D<T>::
 Bounding_Box() const
 {
-    return World_Space_Box(RANGE<VECTOR<float,2> >(grid.domain));
+    return World_Space_Box(grid.domain);
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION* OPENGL_GRID_2D<T>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_GRID_2D<T>::
 Get_Selection(GLuint* buffer,int buffer_size)
 {
-    OPENGL_SELECTION* selection=0;
+    OPENGL_SELECTION<T>* selection=0;
     if(buffer_size == 3){
         if(buffer[0] == 1) selection=new OPENGL_SELECTION_GRID_CELL_2D<T>(this,VECTOR<int,2>(buffer[1],buffer[2]));
         else if(buffer[0] == 2) selection=new OPENGL_SELECTION_GRID_NODE_2D<T>(this,VECTOR<int,2>(buffer[1],buffer[2]));}
@@ -190,13 +190,13 @@ Get_Selection(GLuint* buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T> void OPENGL_GRID_2D<T>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
     delete current_selection;current_selection=0;
-    if(selection->type == OPENGL_SELECTION::GRID_CELL_2D){
+    if(selection->type == OPENGL_SELECTION<T>::GRID_CELL_2D){
         OPENGL_SELECTION_GRID_CELL_2D<T>* real_selection=(OPENGL_SELECTION_GRID_CELL_2D<T>*)selection;
         current_selection=new OPENGL_SELECTION_GRID_CELL_2D<T>(this,real_selection->index);}
-    else if(selection->type == OPENGL_SELECTION::GRID_NODE_2D){
+    else if(selection->type == OPENGL_SELECTION<T>::GRID_NODE_2D){
         OPENGL_SELECTION_GRID_NODE_2D<T>* real_selection=(OPENGL_SELECTION_GRID_NODE_2D<T>*)selection;
         current_selection=new OPENGL_SELECTION_GRID_NODE_2D<T>(this,real_selection->index);}
 }
@@ -262,36 +262,36 @@ Reinitialize()
 // Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_GRID_2D<T>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
 {
-    if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_2D){
+    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_2D){
         VECTOR<int,2> index=((OPENGL_SELECTION_GRID_NODE_2D<T>*)current_selection)->index;
         stream<<"Selected node "<<index<<" ("<<grid.Get_Regular_Grid().X(index)<<")"<<std::endl;}
-    else if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_2D){
+    else if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_2D){
         VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)current_selection)->index;
         stream<<"Selected cell "<<index<<" ("<<grid.Get_MAC_Grid().X(index)<<")"<<std::endl;}
 }
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_GRID_CELL_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_GRID_CELL_2D<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const GRID<TV>& grid=((OPENGL_GRID_2D<T>*)object)->grid;
     RANGE<VECTOR<T,2> > box(grid.Node(index),grid.Node(index+1));
-    return object->World_Space_Box(RANGE<VECTOR<float,2> >(box));
+    return object->World_Space_Box(box);
 }
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_GRID_NODE_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_GRID_NODE_2D<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const GRID<TV>& grid=((OPENGL_GRID_2D<T>*)object)->grid;
     RANGE<VECTOR<T,2> > box(grid.Node(index));
-    return object->World_Space_Box(RANGE<VECTOR<float,2> >(box));
+    return object->World_Space_Box(box);
 }
 //#####################################################################
 namespace PhysBAM{

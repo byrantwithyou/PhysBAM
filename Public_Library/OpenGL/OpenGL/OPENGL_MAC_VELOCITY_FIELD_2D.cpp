@@ -41,10 +41,10 @@ Set_Velocity_Mode(VELOCITY_MODE velocity_mode_input)
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_MAC_VELOCITY_FIELD_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_MAC_VELOCITY_FIELD_2D<T>::
 Bounding_Box() const
 {
-    return RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.Append(0)),VECTOR<float,3>(grid.domain.max_corner.Append(0)));
+    return World_Space_Box(grid.domain);
 }
 //#####################################################################
 // Function Update
@@ -82,9 +82,9 @@ Update()
 // Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_MAC_VELOCITY_FIELD_2D<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
 {
-    if(selection && selection->type==OPENGL_SELECTION::GRID_CELL_2D && grid.Is_MAC_Grid()){
+    if(selection && selection->type==OPENGL_SELECTION<T>::GRID_CELL_2D && grid.Is_MAC_Grid()){
         VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)selection)->index;
         T u_left,u_right,v_bottom,v_top;
         u_left=u(index.x,index.y);
@@ -96,7 +96,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
         output_stream<<"    v bottom = "<<v_bottom<<",top = "<<v_top<<" avg="<<center_velocity.y<<std::endl;
         T ux=(u_right-u_left)*grid.one_over_dX.x,vy=(v_top-v_bottom)*grid.one_over_dX.y;
         output_stream<<"    divergence = "<<ux+vy<<" (ux="<<ux<<", vy="<<vy<<")"<<std::endl;}
-    if(selection && selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_2D){
+    if(selection && selection->type==OPENGL_SELECTION<T>::COMPONENT_PARTICLES_2D){
         OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *particle_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)selection;
         LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
         VECTOR<T,2> interp(interpolation.Clamped_To_Array(grid.Get_Face_Grid(0),u,particle_selection->location),interpolation.Clamped_To_Array(grid.Get_Face_Grid(1),v,particle_selection->location));

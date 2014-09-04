@@ -14,12 +14,13 @@
 namespace PhysBAM{
 
 template<class T_ARRAY>
-class OPENGL_VECTOR_FIELD_2D:public OPENGL_OBJECT
+class OPENGL_VECTOR_FIELD_2D:public OPENGL_OBJECT<typename T_ARRAY::SCALAR>
 {
     typedef typename T_ARRAY::SCALAR T;
     typedef VECTOR<T,2> TV;
     STATIC_ASSERT(IS_SAME<typename T_ARRAY::ELEMENT,TV>::value);
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Point;
     const T_ARRAY& vector_field;
     const T_ARRAY& vector_locations;
     OPENGL_COLOR vector_color;
@@ -34,7 +35,7 @@ public:
 
 //##################################################################### 
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Scale_Vector_Size(const T scale);
 //##################################################################### 
 };

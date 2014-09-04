@@ -12,7 +12,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<T,RW>::
 OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D(const GRID<TV> &grid,const std::string &filename_input)
-    :OPENGL_COMPONENT("Pseudo Dirichlet"),mac_grid(grid.Get_MAC_Grid()),velocity_scale(0.025),filename(filename_input),frame_loaded(-1),valid(false)
+    :OPENGL_COMPONENT<T>("Pseudo Dirichlet"),mac_grid(grid.Get_MAC_Grid()),velocity_scale(0.025),filename(filename_input),frame_loaded(-1),valid(false)
 {
     is_animation = FILE_UTILITIES::Is_Animated(filename);
 }
@@ -30,7 +30,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -39,7 +39,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -100,11 +100,11 @@ Reinitialize(bool force)
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<T,RW>::
 Bounding_Box() const
 {
-    if(valid && draw) return RANGE<VECTOR<float,3> >(VECTOR<float,3>(mac_grid.domain.min_corner.x,0,mac_grid.domain.max_corner.y),VECTOR<float,3>(mac_grid.domain.min_corner.y,mac_grid.domain.max_corner.x,0));
-    return RANGE<VECTOR<float,3> >::Centered_Box();
+    if(valid && draw) return World_Space_Box(mac_grid.domain);
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Set_Vector_Size

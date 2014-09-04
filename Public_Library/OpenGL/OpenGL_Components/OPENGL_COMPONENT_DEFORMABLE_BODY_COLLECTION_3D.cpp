@@ -22,7 +22,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
 OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const std::string& prefix,const int start_frame)
-    :OPENGL_COMPONENT("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),hide_unselected(false),display_mode(0),display_relative_velocity_mode(0),number_of_segmented_curve(1),
+    :OPENGL_COMPONENT<T>("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),hide_unselected(false),display_mode(0),display_relative_velocity_mode(0),number_of_segmented_curve(1),
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
     display_hard_bound_surface_mode(0),display_forces_mode(0),interaction_pair_display_mode(0),
     collision_body_list(*new COLLISION_BODY_COLLECTION<TV>),
@@ -241,7 +241,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);Reinitialize();
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);Reinitialize();
 }
 //#####################################################################
 // Function Set_Draw
@@ -249,7 +249,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     if(draw_input) active_list.Fill(true);
     Update_Velocity_Field();
     Reinitialize();
@@ -343,7 +343,7 @@ Display() const
 
     if(slice && slice->Is_Slice_Mode()) glPopAttrib();
 
-    if(selected_vertex>=0) OPENGL_SELECTION::Draw_Highlighted_Vertex(deformable_body_collection.particles.X(selected_vertex),selected_vertex);
+    if(selected_vertex>=0) OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(deformable_body_collection.particles.X(selected_vertex),selected_vertex);
 
     if(draw_velocity_vectors) velocity_field.Display();
 
@@ -508,10 +508,10 @@ Use_Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
 Bounding_Box() const
 {
-    RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
+    RANGE<VECTOR<T,3> > box=RANGE<VECTOR<T,3> >::Empty_Box();
     if(draw && valid && deformable_body_collection.structures.m>0){
         for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i))box.Enlarge_To_Include_Box(segmented_curve_objects(i)->Bounding_Box());
         for(int i=0;i<triangulated_surface_objects.m;i++) if(triangulated_surface_objects(i))box.Enlarge_To_Include_Box(triangulated_surface_objects(i)->Bounding_Box());
@@ -527,7 +527,7 @@ Bounding_Box() const
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
 Highlight_Particle()
 {
-    OPENGL_WORLD::Singleton()->Prompt_User("Enter Particle Number: ",Highlight_Particle_Response_CB());
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Particle Number: ",Highlight_Particle_Response_CB());
 }
 //#####################################################################
 // Function Toggle_Active_Value
@@ -535,7 +535,7 @@ Highlight_Particle()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
 Toggle_Active_Value()
 {
-    OPENGL_WORLD::Singleton()->Prompt_User("Enter Component Number: ",Toggle_Active_Value_Response_CB());
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Component Number: ",Toggle_Active_Value_Response_CB());
 }
 //#####################################################################
 // Function Toggle_Hide_Unselected
@@ -585,10 +585,10 @@ Toggle_Selection_Mode()
 #ifndef USE_OPENGLES
     if(!real_selection) return;
     assert(real_selection->body_selection);
-    if(real_selection->body_selection->type == OPENGL_SELECTION::SEGMENTED_CURVE_3D){
+    if(real_selection->body_selection->type == OPENGL_SELECTION<T>::SEGMENTED_CURVE_3D){
         delete real_selection->body_selection;
         real_selection->body_selection=real_selection->saved_selection;}
-    else if(real_selection->body_selection->type == OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_3D){
+    else if(real_selection->body_selection->type == OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_3D){
         real_selection->saved_selection=real_selection->body_selection;
         real_selection->body_selection=((OPENGL_SEGMENTED_CURVE_3D<T>*)real_selection->subobject)->Get_Curve_Selection(
                 ((OPENGL_SELECTION_SEGMENTED_CURVE_3D<T>*)real_selection->body_selection)->index);}
@@ -612,7 +612,7 @@ Increment_Active_Object()
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* selection=0;
@@ -635,18 +635,18 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Set_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
-Set_Selection(OPENGL_SELECTION* selection)
+Set_Selection(OPENGL_SELECTION<T>* selection)
 {
-    if(selection->type!=OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D) return;
+    if(selection->type!=OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D) return;
     real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>*)selection;
 }
 //#####################################################################
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
-    if(selection->type!=OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D) return;
+    if(selection->type!=OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D) return;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>*)selection;
     if(selection->hide){
         active_list(real_selection->body_index)=false;
@@ -674,9 +674,9 @@ Clear_Highlight()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
-Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const
 {
-    if(selection && selection->type==OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D && selection->object==this){
+    if(selection && selection->type==OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D && selection->object==this){
         OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>*)selection;
         output_stream<<"Deformable object "<<real_selection->body_index<<std::endl;
         real_selection->subobject->Print_Selection_Info(output_stream,real_selection->body_selection);}
@@ -688,9 +688,9 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T
 Toggle_Active_Value_Response()
 {
     bool start_val=true;
-    if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
+    if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
         int index;
-        std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);
+        std::istringstream sstream(OPENGL_WORLD<T>::Singleton()->prompt_response);
         sstream>>index;
         if(index>=0) {
             if(active_list.m<=index) active_list.Resize(index+1,true,true,start_val);
@@ -703,8 +703,8 @@ Toggle_Active_Value_Response()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
 Highlight_Particle_Response()
 {
-    if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
-        int index=-1;std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);sstream>>index;
+    if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
+        int index=-1;std::istringstream sstream(OPENGL_WORLD<T>::Singleton()->prompt_response);sstream>>index;
         if(index>=0 && index<deformable_body_collection.particles.Size()) selected_vertex=index;}
     Reinitialize(true);
 }
@@ -712,7 +712,7 @@ Highlight_Particle_Response()
 // Function Bounding_Box
 //#####################################################################
 template<class T>
-RANGE<VECTOR<float,3> > OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>::
+RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>::
 Bounding_Box() const
 {
     PHYSBAM_ASSERT(object && body_selection);
@@ -796,8 +796,8 @@ Cycle_Relative_Velocity_Mode()
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
-Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection)
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
 {
     if(old_selection && old_selection->object==this && invalidate_deformable_objects_selection_each_frame) delete_selection=true;
     return 0;

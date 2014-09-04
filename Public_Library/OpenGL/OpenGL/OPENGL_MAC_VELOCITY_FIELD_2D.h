@@ -20,7 +20,7 @@ class OPENGL_MAC_VELOCITY_FIELD_2D:public OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<T_
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
-    using OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >::size;
+    using OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >::size;using OPENGL_OBJECT<T>::World_Space_Box;
 
     enum VELOCITY_MODE { FACE_CENTERED, CELL_CENTERED };
     VELOCITY_MODE velocity_mode;
@@ -36,11 +36,11 @@ public:
     virtual ~OPENGL_MAC_VELOCITY_FIELD_2D();
 
     void Update();  // Call when grid/u/v change
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
 
     void Set_Velocity_Mode(VELOCITY_MODE velocity_mode_input);
 
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     // convenience functions
     void Toggle_Velocity_Mode();

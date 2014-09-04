@@ -81,12 +81,13 @@ public:
 // Class OPENGL_CALLBACK_ZOOM
 //#####################################################################
 // actually a misnomer - this is panning in/out, not zooming in the true sense of the word
+template<class T>
 class OPENGL_CALLBACK_ZOOM:public OPENGL_CALLBACK
 {
-    const float factor;
-    float *camera_distance, *nearclip, *farclip;
+    const T factor;
+    T *camera_distance, *nearclip, *farclip;
 public:
-    OPENGL_CALLBACK_ZOOM(const float factor_input,float *camera_distance_input,float *nearclip_input,float *farclip_input)
+    OPENGL_CALLBACK_ZOOM(const T factor_input,T *camera_distance_input,T *nearclip_input,T *farclip_input)
         : factor(factor_input),camera_distance(camera_distance_input),nearclip(nearclip_input),farclip(farclip_input)
     {}
 
@@ -101,13 +102,14 @@ public:
 //#####################################################################
 // Class OPENGL_CALLBACK_SAVE_SCREEN
 //#####################################################################
+template<class T>
 class OPENGL_CALLBACK_SAVE_SCREEN:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD& world;
+    OPENGL_WORLD<T>& world;
     const std::string basename;
     int counter;
 public:
-    OPENGL_CALLBACK_SAVE_SCREEN(OPENGL_WORLD& world_input,const std::string& basename_input="opengl",int counter_start=0)
+    OPENGL_CALLBACK_SAVE_SCREEN(OPENGL_WORLD<T>& world_input,const std::string& basename_input="opengl",int counter_start=0)
         : world(world_input),basename(basename_input),counter(counter_start)
     {}
 
@@ -131,13 +133,14 @@ public:
 //#####################################################################
 // Class OPENGL_CALLBACK_SAVE_TO_EPS
 //#####################################################################
+template<class T>
 class OPENGL_CALLBACK_SAVE_TO_EPS:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD& world;
+    OPENGL_WORLD<T>& world;
     const std::string basename;
     int counter;
 public:
-    OPENGL_CALLBACK_SAVE_TO_EPS(OPENGL_WORLD& world_input,const std::string& basename_input="opengl",int counter_start=0)
+    OPENGL_CALLBACK_SAVE_TO_EPS(OPENGL_WORLD<T>& world_input,const std::string& basename_input="opengl",int counter_start=0)
         : world(world_input),basename(basename_input),counter(counter_start)
     {}
 
@@ -159,36 +162,38 @@ public:
 //#####################################################################
 // Class OPENGL_CALLBACK_MOVE_TARGET
 //#####################################################################
+template<class T>
 class OPENGL_CALLBACK_MOVE_TARGET:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD& world;
-    const VECTOR<float,3> motion_step;
-    const float *motion_factor;
-    VECTOR<float,3> *target;
+    OPENGL_WORLD<T>& world;
+    const VECTOR<T,3> motion_step;
+    const T *motion_factor;
+    VECTOR<T,3> *target;
 public:
-    OPENGL_CALLBACK_MOVE_TARGET(OPENGL_WORLD& world_input,const VECTOR<float,3>& motion_step_input,const float* motion_factor_input,VECTOR<float,3>* target_input)
+    OPENGL_CALLBACK_MOVE_TARGET(OPENGL_WORLD<T>& world_input,const VECTOR<T,3>& motion_step_input,const T* motion_factor_input,VECTOR<T,3>* target_input)
         :world(world_input),motion_step(motion_step_input),motion_factor(motion_factor_input),target(target_input)
     {}
 
     void operator() ()  PHYSBAM_OVERRIDE
     {
-        VECTOR<float,3> view_forward,view_up,view_right;
+        VECTOR<T,3> view_forward,view_up,view_right;
         world.Get_View_Frame(view_forward,view_up,view_right);
         (*target)+=*motion_factor*(motion_step.x*view_right+motion_step.y*view_up+motion_step.z*view_forward);
         world.Set_View_Target_Timer(1);
     }
     void Print(std::ostream& out) PHYSBAM_OVERRIDE
-    {if(motion_step!=VECTOR<float,3>()) out<<"Move target "<<motion_step;else out<<"View target";}
+    {if(motion_step!=VECTOR<T,3>()) out<<"Move target "<<motion_step;else out<<"View target";}
 };
 //#####################################################################
 // Class OPENGL_CALLBACK_TOGGLE_SMOOTH_SHADING
 //#####################################################################
+template<class T>
 class OPENGL_CALLBACK_TOGGLE_SMOOTH_SHADING:public OPENGL_CALLBACK
 {
     bool smooth_shading;
-    OPENGL_WORLD& world;
+    OPENGL_WORLD<T>& world;
 public:
-    OPENGL_CALLBACK_TOGGLE_SMOOTH_SHADING(OPENGL_WORLD& world_input)
+    OPENGL_CALLBACK_TOGGLE_SMOOTH_SHADING(OPENGL_WORLD<T>& world_input)
         :smooth_shading(false),world(world_input)
     {}
 
@@ -208,13 +213,14 @@ public:
 //#####################################################################
 // Class OPENGL_CALLBACK_SAVE_CAMERA
 //#####################################################################
+template<class T>
 class OPENGL_CALLBACK_SAVE_VIEW:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD& world;
+    OPENGL_WORLD<T>& world;
     std::string filename;
     bool verbose;
 public:
-    OPENGL_CALLBACK_SAVE_VIEW(OPENGL_WORLD& world_input, const std::string& filename_input,bool verbose_input=false)
+    OPENGL_CALLBACK_SAVE_VIEW(OPENGL_WORLD<T>& world_input, const std::string& filename_input,bool verbose_input=false)
         :world(world_input),filename(filename_input),verbose(verbose_input)
     {}
 
@@ -227,13 +233,14 @@ public:
 //#####################################################################
 // Class OPENGL_CALLBACK_LOAD_VIEW
 //#####################################################################
+template<class T>
 class OPENGL_CALLBACK_LOAD_VIEW:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD& world;
+    OPENGL_WORLD<T>& world;
     std::string filename;
     bool verbose;
 public:
-    OPENGL_CALLBACK_LOAD_VIEW(OPENGL_WORLD& world_input,const std::string& filename_input,bool verbose_input=false)
+    OPENGL_CALLBACK_LOAD_VIEW(OPENGL_WORLD<T>& world_input,const std::string& filename_input,bool verbose_input=false)
         :world(world_input),filename(filename_input),verbose(verbose_input)
     {}
 
@@ -247,12 +254,13 @@ public:
 // Class OPENGL_CALLBACK_STANDARD_SIZE
 //#####################################################################
 // GL-specific
+template<class T>
 class OPENGL_CALLBACK_STANDARD_SIZE:public OPENGL_CALLBACK
 {
-    OPENGL_WORLD& world;
+    OPENGL_WORLD<T>& world;
 public:
 
-    OPENGL_CALLBACK_STANDARD_SIZE(OPENGL_WORLD& world)
+    OPENGL_CALLBACK_STANDARD_SIZE(OPENGL_WORLD<T>& world)
         :world(world)
     {}
 

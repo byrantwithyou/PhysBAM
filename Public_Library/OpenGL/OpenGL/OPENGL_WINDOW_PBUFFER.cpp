@@ -17,9 +17,9 @@ using namespace PhysBAM;
 //#####################################################################
 // OPENGL_WINDOW_PBUFFER
 //#####################################################################
-OPENGL_WINDOW_PBUFFER::
-OPENGL_WINDOW_PBUFFER(OPENGL_WORLD& opengl_world_input,const std::string& window_title_input,const int width_input,const int height_input)
-    :OPENGL_WINDOW(opengl_world_input),width(width_input),height(height_input)
+template<class T> OPENGL_WINDOW_PBUFFER<T>::
+OPENGL_WINDOW_PBUFFER(OPENGL_WORLD<T>& opengl_world_input,const std::string& window_title_input,const int width_input,const int height_input)
+    :OPENGL_WINDOW<T>(opengl_world_input),width(width_input),height(height_input)
 {
 #ifndef USE_OPENGLES
     pbuffer=new OPENGL_PBUFFER;
@@ -32,7 +32,7 @@ OPENGL_WINDOW_PBUFFER(OPENGL_WORLD& opengl_world_input,const std::string& window
 //#####################################################################
 // ~OPENGL_WINDOW_PBUFFER
 //#####################################################################
-OPENGL_WINDOW_PBUFFER::
+template<class T> OPENGL_WINDOW_PBUFFER<T>::
 ~OPENGL_WINDOW_PBUFFER()
 {
     delete pbuffer;
@@ -40,43 +40,43 @@ OPENGL_WINDOW_PBUFFER::
 //#####################################################################
 // Function Handle_Idle
 //#####################################################################
-void OPENGL_WINDOW_PBUFFER::
+template<class T> void OPENGL_WINDOW_PBUFFER<T>::
 Setup_Idle(const bool use)
 {}
 //#####################################################################
 // Function Handle_Idle
 //#####################################################################
-void OPENGL_WINDOW_PBUFFER::
+template<class T> void OPENGL_WINDOW_PBUFFER<T>::
 Setup_Timer(const float wait_milliseconds)
 {}
 //#####################################################################
 // Function Handle_Idle
 //#####################################################################
-void OPENGL_WINDOW_PBUFFER::
+template<class T> void OPENGL_WINDOW_PBUFFER<T>::
 Redisplay()
 {}
 //#####################################################################
 // Function Handle_Idle
 //#####################################################################
-void OPENGL_WINDOW_PBUFFER::
+template<class T> void OPENGL_WINDOW_PBUFFER<T>::
 Main_Loop()
 {}
 //#####################################################################
 // Request_Resize
 //#####################################################################
-void OPENGL_WINDOW_PBUFFER::
+template<class T> void OPENGL_WINDOW_PBUFFER<T>::
 Request_Resize(const int width,const int height)
 {}
 //#####################################################################
 // Request_Move
 //#####################################################################
-void OPENGL_WINDOW_PBUFFER::
+template<class T> void OPENGL_WINDOW_PBUFFER<T>::
 Request_Move(const int x,const int y)
 {}
 //#####################################################################
 // Width
 //#####################################################################
-int OPENGL_WINDOW_PBUFFER::
+template<class T> int OPENGL_WINDOW_PBUFFER<T>::
 Width() const
 { 
     return width;
@@ -84,9 +84,14 @@ Width() const
 //#####################################################################
 // Height
 //#####################################################################
-int OPENGL_WINDOW_PBUFFER::
+template<class T> int OPENGL_WINDOW_PBUFFER<T>::
 Height() const
 {
     return height;
 }
 //#####################################################################
+namespace PhysBAM
+{
+template class OPENGL_WINDOW_PBUFFER<float>;
+template class OPENGL_WINDOW_PBUFFER<double>;
+}

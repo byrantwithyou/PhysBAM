@@ -13,10 +13,12 @@
 namespace PhysBAM{
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::is_animation;
     ARRAY<SYMMETRIC_MATRIX<T,3>,VECTOR<int,3> > field;
     OPENGL_SYMMETRIC_MATRIX_FIELD_3D<T> opengl_symmetric_matrix_field;
     std::string field_filename;
@@ -24,7 +26,7 @@ public:
     bool valid;
 
     OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D(const GRID<TV>& grid,const std::string& field_filename_input)
-        :OPENGL_COMPONENT("Symmetric Matrix Field 3D"),opengl_symmetric_matrix_field(grid,field),
+        :OPENGL_COMPONENT<T>("Symmetric Matrix Field 3D"),opengl_symmetric_matrix_field(grid,field),
         field_filename(field_filename_input),frame_loaded(-1),valid(false)
     {
         is_animation=FILE_UTILITIES::Is_Animated(field_filename);Reinitialize();
@@ -40,10 +42,10 @@ public:
     {return valid && frame_loaded==frame;}
 
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE
-    {OPENGL_COMPONENT::Set_Frame(frame_input);Reinitialize();}
+    {OPENGL_COMPONENT<T>::Set_Frame(frame_input);Reinitialize();}
 
     void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE
-    {OPENGL_COMPONENT::Set_Draw(draw_input);Reinitialize();}
+    {OPENGL_COMPONENT<T>::Set_Draw(draw_input);Reinitialize();}
 
     void Display() const PHYSBAM_OVERRIDE
     {if(valid&&draw)opengl_symmetric_matrix_field.Display();}
@@ -51,8 +53,8 @@ public:
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE
     {return draw&&valid;}
 
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE
-    {if(valid&&draw)return opengl_symmetric_matrix_field.Bounding_Box();return RANGE<VECTOR<float,3> >::Centered_Box();}
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE
+    {if(valid&&draw)return opengl_symmetric_matrix_field.Bounding_Box();return RANGE<VECTOR<T,3> >::Centered_Box();}
 
     void Set_Slice(OPENGL_SLICE* slice_input) PHYSBAM_OVERRIDE
     {slice=slice_input;opengl_symmetric_matrix_field.Set_Slice(slice_input);}

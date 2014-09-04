@@ -29,10 +29,10 @@ template<class T> OPENGL_GRID_BASED_VECTOR_FIELD_3D<T>::
 //#####################################################################
 // Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_GRID_BASED_VECTOR_FIELD_3D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_GRID_BASED_VECTOR_FIELD_3D<T>::
 Bounding_Box() const
 {
-    return (RANGE<VECTOR<float,3> >)grid.domain;
+    return World_Space_Box(grid.domain);
 }
 //#####################################################################
 // Update
@@ -45,7 +45,7 @@ Update()
 
     if(V.domain.Empty()) return;
 
-    OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
     if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE){
         int count=0;int index;
         for(index=0;index<V.array.Size();index++)if(V.array(index)!=VECTOR<T,3>()) count++;
@@ -91,13 +91,13 @@ Update()
 // Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_GRID_BASED_VECTOR_FIELD_3D<T>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* current_selection) const
+Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* current_selection) const
 {
     // TODO: interpolate to particles
-    if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_3D && !grid.Is_MAC_Grid()){
+    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_3D && !grid.Is_MAC_Grid()){
         VECTOR<int,3> index=((OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection)->index;
         if(V.Valid_Index(index)) stream<<V(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_3D && grid.Is_MAC_Grid()){
+    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && grid.Is_MAC_Grid()){
         VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
         if(V.Valid_Index(index)) stream<<V(index);}
     stream<<std::endl;

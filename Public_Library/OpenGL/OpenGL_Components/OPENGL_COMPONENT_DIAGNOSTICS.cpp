@@ -9,7 +9,7 @@ using namespace PhysBAM;
 //#####################################################################
 // OPENGL_COMPONENT_DIAGNOSTICS
 //#####################################################################
-OPENGL_COMPONENT_DIAGNOSTICS::
+template<class T> OPENGL_COMPONENT_DIAGNOSTICS<T>::
 OPENGL_COMPONENT_DIAGNOSTICS(const std::string& filename_input)
     :filename(filename_input),frame_loaded(INT_MIN),valid(false)
 {
@@ -17,14 +17,14 @@ OPENGL_COMPONENT_DIAGNOSTICS(const std::string& filename_input)
 //#####################################################################
 // ~OPENGL_COMPONENT_DIAGNOSTICS
 //#####################################################################
-OPENGL_COMPONENT_DIAGNOSTICS::
+template<class T> OPENGL_COMPONENT_DIAGNOSTICS<T>::
 ~OPENGL_COMPONENT_DIAGNOSTICS()
 {
 }
 //#####################################################################
 // Valid_Frame
 //#####################################################################
-bool OPENGL_COMPONENT_DIAGNOSTICS::
+template<class T> bool OPENGL_COMPONENT_DIAGNOSTICS<T>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::Frame_File_Exists(filename,frame_input);
@@ -32,17 +32,17 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Set_Frame
 //#####################################################################
-void OPENGL_COMPONENT_DIAGNOSTICS::
+template<class T> void OPENGL_COMPONENT_DIAGNOSTICS<T>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
 // Print_Selection_Info
 //#####################################################################
-void OPENGL_COMPONENT_DIAGNOSTICS::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) const
+template<class T> void OPENGL_COMPONENT_DIAGNOSTICS<T>::
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
 {
     output_stream<<component_name<<":"<<std::endl;
     for(int i=0;i<lines.m;i++) output_stream<<"   "<<lines(i)<<std::endl;
@@ -50,7 +50,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
 //#####################################################################
 // Reinitialize
 //#####################################################################
-void OPENGL_COMPONENT_DIAGNOSTICS::
+template<class T> void OPENGL_COMPONENT_DIAGNOSTICS<T>::
 Reinitialize()
 {
     if(draw){
@@ -66,7 +66,7 @@ Reinitialize()
 //#####################################################################
 // Use_Bounding_Box
 //#####################################################################
-bool OPENGL_COMPONENT_DIAGNOSTICS::
+template<class T> bool OPENGL_COMPONENT_DIAGNOSTICS<T>::
 Use_Bounding_Box() const
 {
     return false;
@@ -74,8 +74,12 @@ Use_Bounding_Box() const
 //#####################################################################
 // Display
 //#####################################################################
-void OPENGL_COMPONENT_DIAGNOSTICS::
+template<class T> void OPENGL_COMPONENT_DIAGNOSTICS<T>::
 Display() const
 {
 }
 //#####################################################################
+namespace PhysBAM{
+template class OPENGL_COMPONENT_DIAGNOSTICS<double>;
+template class OPENGL_COMPONENT_DIAGNOSTICS<float>;
+}

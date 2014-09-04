@@ -18,10 +18,12 @@ namespace PhysBAM
 {
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::World_Space_Box;
     GRID<TV> grid,mac_grid,u_grid,v_grid;
     ARRAY<VECTOR<bool,2> ,VECTOR<int,2> > node_neighbors_visible;
     ARRAY<VECTOR<PAIR<bool,T>,2>,VECTOR<int,2> > face_corners_visible_from_face_center_u; // length 2, order is bottom, top
@@ -48,7 +50,7 @@ public:
     void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
     void Display() const PHYSBAM_OVERRIDE;
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     void Toggle_Draw_Grid_Visibility();
     void Toggle_Draw_Density_Valid_Mask();

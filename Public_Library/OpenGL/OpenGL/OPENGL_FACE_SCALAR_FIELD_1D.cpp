@@ -72,19 +72,19 @@ Display() const
 //#####################################################################
 // Bounding_Box
 //#####################################################################
-template<class T,class T2> RANGE<VECTOR<float,3> > OPENGL_FACE_SCALAR_FIELD_1D<T,T2>::
+template<class T,class T2> RANGE<VECTOR<T,3> > OPENGL_FACE_SCALAR_FIELD_1D<T,T2>::
 Bounding_Box() const
 {
-    return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.x,0,0),VECTOR<float,3>(grid.domain.max_corner.x,0,0)));
+    return World_Space_Box(grid.domain);
 }
 //#####################################################################
 // Print_Selection_Info
 //#####################################################################
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_1D<T,T2>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
 {
     // TODO: this should also interpolate to particles
-    if(selection && selection->type==OPENGL_SELECTION::GRID_CELL_1D && grid.Is_MAC_Grid()){
+    if(selection && selection->type==OPENGL_SELECTION<T>::GRID_CELL_1D && grid.Is_MAC_Grid()){
         VECTOR<int,1> index=((OPENGL_SELECTION_GRID_CELL_1D<T>*)selection)->index;
         T2 left=x_face_values(index.x);
         T2 right=x_face_values(index.x+1);

@@ -56,11 +56,12 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T_ARRAY> RANGE<VECTOR<float,3> > OPENGL_VECTOR_FIELD_2D<T_ARRAY>::
+template<class T_ARRAY> RANGE<VECTOR<typename T_ARRAY::SCALAR,3> > OPENGL_VECTOR_FIELD_2D<T_ARRAY>::
 Bounding_Box() const
 {
-    RANGE<VECTOR<float,3> > box(World_Space_Point(VECTOR<float,2>(vector_locations(0))));
-    for(int i=0;i<vector_locations.Size();i++) box.Enlarge_Nonempty_Box_To_Include_Point(World_Space_Point(VECTOR<float,2>(vector_locations(i))));
+    RANGE<VECTOR<T,3> > box(World_Space_Point(vector_locations(0)));
+    for(int i=1;i<vector_locations.Size();i++)
+        box.Enlarge_Nonempty_Box_To_Include_Point(World_Space_Point(vector_locations(i)));
     return box;
 }
 //#####################################################################

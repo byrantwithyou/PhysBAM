@@ -37,9 +37,9 @@ namespace PhysBAM{
 enum {PHYSBAM_MOUSE_LEFT_BUTTON,PHYSBAM_MOUSE_RIGHT_BUTTON,PHYSBAM_MOUSE_MIDDLE_BUTTON};
 enum {PHYSBAM_MOUSE_DOWN,PHYSBAM_MOUSE_UP};
 
-class OPENGL_WINDOW;
+template<class T> class OPENGL_WINDOW;
 class OPENGL_CALLBACK;
-class OPENGL_SELECTION;
+template<class T> class OPENGL_SELECTION;
 class OPENGL_LIGHT;
 class OPENGL_MOUSE_HANDLER;
 template<class T> class OPENGL_ARCBALL;
@@ -56,9 +56,9 @@ public:
     ~OPENGL_KEY_BINDING_CATEGORY() {}
 };
 
+template<class T>
 class OPENGL_WORLD
 {
-    typedef float T;
     typedef VECTOR<T,3> TV;
 public:
     enum FILL_MODE { DRAW_FILLED, DRAW_WIREFRAME, DRAW_FILLED_AND_WIREFRAME };
@@ -70,7 +70,7 @@ private:
 public:
 
     // objects
-    ARRAY<OPENGL_OBJECT*> object_list; // does not own objects
+    ARRAY<OPENGL_OBJECT<T>*> object_list; // does not own objects
     ARRAY<bool> can_toggle_smooth_shading;
     ARRAY<bool> use_bounding_box;
 
@@ -79,17 +79,17 @@ public:
     ARRAY<OPENGL_LIGHT*> lights;
 
     // window parameters
-    float fovy;
+    T fovy;
     bool mode_2d;
     bool load_names_for_selection;
-    OPENGL_WINDOW* window;
+    OPENGL_WINDOW<T>* window;
 private:
 
     // display parameters
     int fill_mode;
     bool enable_lighting_for_wireframe;
     bool white_background;
-    ARRAY<PLANE<float>*> clipping_planes;
+    ARRAY<PLANE<T>*> clipping_planes;
 
     // string displays
     ARRAY<std::string> strings_to_print;
@@ -101,21 +101,21 @@ private:
     // Idle/Timer Data
     OPENGL_CALLBACK* idle_callback;
     int timer_id;
-    float idle_delay;
-    float idle_timer;
-    float view_target_timer;
-    float frame_counter_timer;
+    T idle_delay;
+    T idle_timer;
+    T view_target_timer;
+    T frame_counter_timer;
     int frames_rendered,frames_per_second;
     bool show_frames_per_second;
 
     // Camera
     bool left_handed_coordinate_system;
-    float nearclip_factor,farclip_factor,nearclip,farclip;
-    OPENGL_ARCBALL<float>* arcball; // This maintains the arcballs info
-    float camera_distance;
+    T nearclip_factor,farclip_factor,nearclip,farclip;
+    OPENGL_ARCBALL<T>* arcball; // This maintains the arcballs info
+    T camera_distance;
     TV target_position;
-    MATRIX<float,4> arcball_matrix; // This is used to extract the last extracted matrix from the arcball
-    MATRIX<float,4> rotation_matrix; // This stores the current rotation of the ball
+    MATRIX<T,4> arcball_matrix; // This is used to extract the last extracted matrix from the arcball
+    MATRIX<T,4> rotation_matrix; // This stores the current rotation of the ball
 
     // Mouse and Camera Interaction
     int zoom_direction,translation_direction;
@@ -135,10 +135,10 @@ private:
     int current_key_binding_category_priority;
     ARRAY<OPENGL_KEY_BINDING_CATEGORY> key_bindings_by_category;
 
+public:
     // Prompting
     bool prompt_mode;
     std::string prompt;
-public:
     std::string prompt_response;
     bool prompt_response_success;
 private:
@@ -157,9 +157,9 @@ public:
     void Initialize(const std::string& window_title="OpenGL Visualization",const int width=640,const int height=480,const bool offscreen=false);
     void Initialize_Glut_Independent();
     void Clear_All_Objects();
-    void Add_Object(OPENGL_OBJECT* object,bool include_bounding_box=true,bool toggle_smooth_shading=false);
+    void Add_Object(OPENGL_OBJECT<T>* object,bool include_bounding_box=true,bool toggle_smooth_shading=false);
     void Clear_All_Lights();
-    void Set_Ambient_Light(float value);
+    void Set_Ambient_Light(T value);
     void Set_Ambient_Light(const OPENGL_COLOR& color);
     void Add_Light(OPENGL_LIGHT* light);
     void Set_Key_Binding_Category(const std::string &category);
@@ -172,13 +172,11 @@ public:
     void Unbind_Key(const OPENGL_KEY& key);
     void Unbind_Keys(const std::string& keys);
 
-    void Set_Idle_Callback(OPENGL_CALLBACK* callback,const float delay);
-    void Set_View_Target_Timer(const float view_target_timer_input);
-private:
+    void Set_Idle_Callback(OPENGL_CALLBACK* callback,const T delay);
+    void Set_View_Target_Timer(const T view_target_timer_input);
     void Prepare_For_Idle();
     void Handle_Idle();
     void Handle_Timer();
-public:
 
     void Clear_Strings();
     void Add_String(const std::string& s);
@@ -196,7 +194,7 @@ public:
     void Set_Look_At(const TV &camera, const TV &target, const TV &up);
     void Save_View(const std::string& filename, bool verbose = false);
     bool Load_View(const std::string& filename, bool verbose = false);
-    RAY<VECTOR<float,3> > Ray_Through_Normalized_Image_Coordinate(VECTOR<float,2> coordinates);
+    RAY<VECTOR<T,3> > Ray_Through_Normalized_Image_Coordinate(VECTOR<T,2> coordinates);
     void Set_Left_Handed(const bool left_handed=false);
 
     RANGE<TV> Scene_Bounding_Box();
@@ -204,7 +202,7 @@ public:
     void Reset_Camera_Orientation(const bool reset_up_vector_only=false);
     void Center_Camera_On_Scene();
 
-    VECTOR<float,2> Convert_Mouse_Coordinates(int x, int y);
+    VECTOR<T,2> Convert_Mouse_Coordinates(int x, int y);
 
     void Handle_Display_Prompt_Only();
     void Render_World(bool selecting,bool swap_buffers=true);
@@ -231,13 +229,13 @@ public:
     void Set_External_Mouse_Handler(OPENGL_MOUSE_HANDLER* mouse_handler=0);
 
     void Update_Clipping_Planes();
-    GLenum Add_Clipping_Plane(const PLANE<float> &plane);
-    void Set_Clipping_Plane(GLenum id,const PLANE<float> &plane);
+    GLenum Add_Clipping_Plane(const PLANE<T> &plane);
+    void Set_Clipping_Plane(GLenum id,const PLANE<T> &plane);
     void Remove_Clipping_Plane(GLenum id);
     void Remove_All_Clipping_Planes();
 
     // To use this you need to set load_names_for_selection
-    void Get_Selections(ARRAY<OPENGL_SELECTION*> &selections, GLint hits, GLuint buffer[]);
+    void Get_Selections(ARRAY<OPENGL_SELECTION<T>*> &selections, GLint hits, GLuint buffer[]);
 
     void Save_Screen(const std::string& filename,const bool use_back_buffer,int jpeg_quality=90);
     template<int d> void Get_Image(ARRAY<VECTOR<T,d>,VECTOR<int,2> >& image,const bool use_back_buffer);
@@ -259,8 +257,8 @@ public:
     DEFINE_CALLBACK_CREATOR(OPENGL_WORLD,Resize_To_Standard_Size);
     DEFINE_CALLBACK_CREATOR(OPENGL_WORLD,Quit);
 public:
-    friend class OPENGL_WINDOW;
-    friend class OPENGL_WINDOW_GLUT;
+    friend class OPENGL_WINDOW<T>;
+//    friend class OPENGL_WINDOW_GLUT<T>;
     friend class OPENGL_WINDOW_ANDROID;
 //#####################################################################
 };

@@ -20,6 +20,7 @@ class OPENGL_MAC_VELOCITY_FIELD_3D:public OPENGL_VECTOR_FIELD_3D<T_input>
 {
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
+    using OPENGL_OBJECT<T>::World_Space_Box;
     using OPENGL_VECTOR_FIELD_3D<T>::slice;
     using OPENGL_VECTOR_FIELD_3D<T>::vector_field;using OPENGL_VECTOR_FIELD_3D<T>::vector_locations;
     using OPENGL_VECTOR_FIELD_3D<T>::size;
@@ -38,11 +39,11 @@ public:
     virtual ~OPENGL_MAC_VELOCITY_FIELD_3D();
 
     void Update();  // Call when grid/u/v/w change
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
 
     void Set_Velocity_Mode(VELOCITY_MODE velocity_mode_input);
 
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     virtual void Slice_Has_Changed() PHYSBAM_OVERRIDE { Update(); }
 
     // convenience functions

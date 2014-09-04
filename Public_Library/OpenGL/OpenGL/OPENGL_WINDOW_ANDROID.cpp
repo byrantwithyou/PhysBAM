@@ -18,7 +18,7 @@ OPENGL_WINDOW_ANDROID* OPENGL_WINDOW_ANDROID::single=0;
 // OPENGL_WINDOW_ANDROID
 //#####################################################################
 OPENGL_WINDOW_ANDROID::
-OPENGL_WINDOW_ANDROID(OPENGL_WORLD& opengl_world_input,const std::string& window_title_input,const int width_input,const int height_input)
+OPENGL_WINDOW_ANDROID(OPENGL_WORLD<T>& opengl_world_input,const std::string& window_title_input,const int width_input,const int height_input)
     :OPENGL_WINDOW(opengl_world_input),width(width_input),height(height_input)
 {
     if(single) PHYSBAM_FATAL_ERROR("Only one android context allowed");

@@ -14,10 +14,13 @@
 namespace PhysBAM{
 
 template<class T,class RW=T>
-class OPENGL_COMPONENT_LEVELSET_3D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_LEVELSET_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::Is_Up_To_Date;
     OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename,
                                  const std::string& triangulated_surface_filename = "",
                                  const std::string& filename_set_input = "",
@@ -36,8 +39,8 @@ public:
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
 
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
     virtual void Slice_Has_Changed() { for(int i=0;i<opengl_levelset_multiviews.m;i++) opengl_levelset_multiviews(i)->Set_Slice(slice); }

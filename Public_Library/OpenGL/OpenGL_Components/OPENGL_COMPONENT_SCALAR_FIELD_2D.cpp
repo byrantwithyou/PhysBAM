@@ -11,7 +11,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class T2,class RW> OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2,RW>::
 OPENGL_COMPONENT_SCALAR_FIELD_2D(GRID<TV> &grid_input, const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input)
-    :OPENGL_COMPONENT("Scalar Field 2D"), opengl_scalar_field(grid_input,*new ARRAY<T2,VECTOR<int,2> >,color_map_input),
+    :OPENGL_COMPONENT<T>("Scalar Field 2D"), opengl_scalar_field(grid_input,*new ARRAY<T2,VECTOR<int,2> >,color_map_input),
       scalar_field_filename(scalar_field_filename_input), frame_loaded(-1), valid(false)
 {
     is_animation = FILE_UTILITIES::Is_Animated(scalar_field_filename);
@@ -22,7 +22,7 @@ OPENGL_COMPONENT_SCALAR_FIELD_2D(GRID<TV> &grid_input, const std::string &scalar
 template<class T,class T2,class RW> OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2,RW>::
 OPENGL_COMPONENT_SCALAR_FIELD_2D(GRID<TV> &grid_input, const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
                                  typename OPENGL_SCALAR_FIELD_2D<T,T2>::DRAW_MODE draw_mode_input)
-    :OPENGL_COMPONENT("Scalar Field 2D"), opengl_scalar_field(grid_input,*new ARRAY<T2,VECTOR<int,2> >,color_map_input,draw_mode_input),
+    :OPENGL_COMPONENT<T>("Scalar Field 2D"), opengl_scalar_field(grid_input,*new ARRAY<T2,VECTOR<int,2> >,color_map_input,draw_mode_input),
       scalar_field_filename(scalar_field_filename_input), frame_loaded(-1), valid(false)
 {
     is_animation = FILE_UTILITIES::Is_Animated(scalar_field_filename);
@@ -50,7 +50,7 @@ Valid_Frame(int frame_input) const
 template<class T,class T2,class RW> void OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -59,7 +59,7 @@ Set_Frame(int frame_input)
 template<class T,class T2,class RW> void OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -73,17 +73,17 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class T2,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2,RW>::
+template<class T,class T2,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_scalar_field.Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T2,class RW> void OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2,RW>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const
 {
     if(Is_Up_To_Date(frame)){
         output_stream<<component_name<<": ";

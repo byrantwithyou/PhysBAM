@@ -15,7 +15,7 @@ OPENGL_COMPONENT_HEIGHTFIELD_2D(const GRID<TV> &grid_input,
                                 const std::string& xz_filename_input,
                                 const std::string& uv_filename_input,
                                 int m_start_input,int m_end_input,int n_start_input,int n_end_input)
-    :OPENGL_COMPONENT("Heightfield 2D"), 
+    :OPENGL_COMPONENT<T>("Heightfield 2D"), 
     triangulated_surface(*TRIANGULATED_SURFACE<T>::Create()),
     opengl_triangulated_surface(triangulated_surface, false),
     vertical_offset(0), allow_smooth_shading(true), subdivide_surface(false),
@@ -81,7 +81,7 @@ Valid_Frame(int frame_input) const
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_2D<T,RW>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT::Set_Frame(frame_input);
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -90,7 +90,7 @@ Set_Frame(int frame_input)
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_2D<T,RW>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT::Set_Draw(draw_input);
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
@@ -138,11 +138,11 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_HEIGHTFIELD_2D<T,RW>::
+template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_HEIGHTFIELD_2D<T,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_triangulated_surface.Bounding_Box();
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Turn_Smooth_Shading_On
@@ -259,15 +259,15 @@ Update_Surface()
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_HEIGHTFIELD_2D<T,RW>::
+template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_HEIGHTFIELD_2D<T,RW>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     if(use_triangle_strip) return 0;
     OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D<T> *new_selection = 0;
-    OPENGL_SELECTION* selection = opengl_triangulated_surface.Get_Selection(buffer,buffer_size);
+    OPENGL_SELECTION<T>* selection = opengl_triangulated_surface.Get_Selection(buffer,buffer_size);
     if(selection)
     {
-        if(selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_VERTEX)
+        if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX)
         {
             int index = ((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T> *)selection)->index;
             new_selection = new OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D<T>(this);
@@ -281,12 +281,12 @@ Get_Selection(GLuint *buffer,int buffer_size)
 // Function Highlight_Selection
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_2D<T,RW>::
-Highlight_Selection(OPENGL_SELECTION* selection)
+Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
-    if(selection->type != OPENGL_SELECTION::COMPONENT_HEIGHTFIELD_2D) return;
+    if(selection->type != OPENGL_SELECTION<T>::COMPONENT_HEIGHTFIELD_2D) return;
     OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D<T> *real_selection = (OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D<T>*)selection;
     int vertex_index = To_Linear_Index(real_selection->index.x, real_selection->index.y);
-    OPENGL_SELECTION* surface_selection = opengl_triangulated_surface.Get_Vertex_Selection(vertex_index);
+    OPENGL_SELECTION<T>* surface_selection = opengl_triangulated_surface.Get_Vertex_Selection(vertex_index);
     opengl_triangulated_surface.Highlight_Selection(surface_selection);
     delete surface_selection; // Highlight_Selection made a copy of it
 }
@@ -388,11 +388,11 @@ Toggle_Subdivision()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D<T>::
 Bounding_Box() const
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-    return RANGE<VECTOR<float,3> >::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 namespace PhysBAM{
 template class OPENGL_COMPONENT_HEIGHTFIELD_2D<float,float>;

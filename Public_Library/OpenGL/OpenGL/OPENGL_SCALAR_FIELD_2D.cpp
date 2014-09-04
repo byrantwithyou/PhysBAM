@@ -229,7 +229,7 @@ template<class T,class T2> RANGE<VECTOR<T,3> > OPENGL_SCALAR_FIELD_2D<T,T2>::
 Bounding_Box() const
 {
     // May not be the exact bounds, but close enough...
-    return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.Append(0)),VECTOR<float,3>(grid.domain.max_corner.Append(0))));
+    return World_Space_Box(grid.domain);
 }
 //#####################################################################
 // Function Set_Draw_Mode
@@ -247,7 +247,7 @@ Set_Draw_Mode(DRAW_MODE draw_mode_input)
     }
 
     if(draw_mode==DRAW_TEXTURE) {
-        if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT;
+        if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT<T>;
     } else if(draw_mode==DRAW_POINTS) {
         if(!opengl_points) opengl_points=new OPENGL_POINTS_2D<T>(*new ARRAY<VECTOR<T,2> >);
     }
@@ -289,15 +289,15 @@ Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONE
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const
+Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const
 {
-    if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_2D && grid.Is_MAC_Grid()){
+    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_2D && grid.Is_MAC_Grid()){
         VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)current_selection)->index;
         if(values.Valid_Index(index)) output_stream<<values(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_2D && !grid.Is_MAC_Grid()){
+    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_2D && !grid.Is_MAC_Grid()){
         VECTOR<int,2> index=((OPENGL_SELECTION_GRID_NODE_2D<T>*)current_selection)->index;
         if(values.Valid_Index(index))output_stream<<values(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_2D){
+    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::COMPONENT_PARTICLES_2D){
         OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)current_selection;
         Print_Selection_Info_Helper(output_stream,selection,grid,values);}
     output_stream<<std::endl;
@@ -322,7 +322,7 @@ Update_Texture(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     RANGE<VECTOR<T,2> > domain(grid.X(start_index)-half_dX,grid.X(end_index-VECTOR<int,2>::All_Ones_Vector())+half_dX);
 
     // Set underlying OPENGL_OBJECT's transformation
-    opengl_textured_rect->frame->t=VECTOR<float,3>(Convert_2d_To_3d(domain.Center()));
+    opengl_textured_rect->frame->t=Convert_2d_To_3d(domain.Center());
 
     // Set OPENGL_TEXTURED_RECT's dimensions
     opengl_textured_rect->width = domain.Edge_Lengths().x;

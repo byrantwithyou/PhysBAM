@@ -16,10 +16,11 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_TETRAHEDRALIZED_VOLUME:public OPENGL_OBJECT
+class OPENGL_TETRAHEDRALIZED_VOLUME:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
     OPENGL_MATERIAL material;
     OPENGL_MATERIAL inverted_material;
     bool use_inverted_material;
@@ -42,7 +43,7 @@ public:
 protected:
     bool smooth_normals;
     ARRAY<VECTOR<T,3> >* vertex_normals;
-    OPENGL_SELECTION* current_selection;
+    OPENGL_SELECTION<T>* current_selection;
 public:
 
     OPENGL_TETRAHEDRALIZED_VOLUME(const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input);
@@ -55,14 +56,14 @@ public:
     if(!mesh->node_on_boundary) mesh->Initialize_Node_On_Boundary();minimum_valence=mesh->Minimum_Valence();mesh->Initialize_Boundary_Nodes();}
 
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    virtual OPENGL_SELECTION* Get_Selection(GLuint* buffer,int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION* selection) PHYSBAM_OVERRIDE;
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint* buffer,int buffer_size);
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
 
-    OPENGL_SELECTION* Get_Vertex_Selection(int index);
-    OPENGL_SELECTION* Get_Tetrahedron_Selection(int index);
+    OPENGL_SELECTION<T>* Get_Vertex_Selection(int index);
+    OPENGL_SELECTION<T>* Get_Tetrahedron_Selection(int index);
 
     void Set_Boundary_Only(bool boundary_only_input)
     {boundary_only=boundary_only_input;}
@@ -112,8 +113,8 @@ public:
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
     void Display_Subset();
     void Update_Cutaway_Plane();
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MATRIX<T,4>* transform) const;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,4>* transform) const;
     void Initialize_Vertex_Normals();
 protected:
     void Draw_Vertices_For_Selection() const;
@@ -123,27 +124,29 @@ protected:
 };
 
 template<class T>
-class OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX:public OPENGL_SELECTION
+class OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int index;
-    OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX(OPENGL_OBJECT* object,int index=0) 
-        :OPENGL_SELECTION(OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_VERTEX,object),index(index)
+    OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX(OPENGL_OBJECT<T>* object,int index=0) 
+        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX,object),index(index)
     {}
 
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 
 template<class T>
-class OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON:public OPENGL_SELECTION
+class OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON:public OPENGL_SELECTION<T>
 {
 public:
+    using OPENGL_SELECTION<T>::object;
     int index;
-    OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON(OPENGL_OBJECT* object,int index=0) 
-        :OPENGL_SELECTION(OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_TETRAHEDRON,object),index(index)
+    OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON(OPENGL_OBJECT<T>* object,int index=0) 
+        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON,object),index(index)
     {}
 
-    RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 };
 }
 #endif

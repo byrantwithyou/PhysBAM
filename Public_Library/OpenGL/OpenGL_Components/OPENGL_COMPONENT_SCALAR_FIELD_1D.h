@@ -13,7 +13,7 @@
 namespace PhysBAM{
 
 template<class T,class T2=T,class RW=T>
-class OPENGL_COMPONENT_SCALAR_FIELD_1D:public OPENGL_COMPONENT
+class OPENGL_COMPONENT_SCALAR_FIELD_1D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,1> TV;
 private:
@@ -21,6 +21,7 @@ private:
     int frame_loaded;
     bool valid;
 public:
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
     OPENGL_SCALAR_FIELD_1D<T,T2>  opengl_scalar_field;
 
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE
@@ -36,7 +37,7 @@ public:
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
     void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE;
     void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Scale(const T scale);
     void Increase_Scale();
     void Decrease_Scale();

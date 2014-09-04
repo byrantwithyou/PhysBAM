@@ -10,7 +10,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Function Print_Slice_Info
 //#####################################################################
-void OPENGL_UNIFORM_SLICE::
+template<class T> void OPENGL_UNIFORM_SLICE<T>::
 Print_Slice_Info(std::ostream& output_stream)
 {
     const char* axis_name[]={"","x","y","z"};
@@ -20,7 +20,7 @@ Print_Slice_Info(std::ostream& output_stream)
 //#####################################################################
 // Function Update_Clip_Planes
 //#####################################################################
-void OPENGL_UNIFORM_SLICE::
+template<class T> void OPENGL_UNIFORM_SLICE<T>::
 Update_Clip_Planes()
 {
     if(mode==NO_SLICE) {
@@ -29,8 +29,8 @@ Update_Clip_Planes()
         clip_plane_id1=clip_plane_id2=0;
     }
     else {
-        float pos=(mode==NODE_SLICE)?grid.Node(TV_INT()+index)[axis]:grid.Center(TV_INT()+index)[axis];
-        PLANE<float> plane1(VECTOR<float,3>(0,0,0),VECTOR<float,3>(0,0,0)),plane2(VECTOR<float,3>(0,0,0),VECTOR<float,3>(0,0,0));
+        T pos=(mode==NODE_SLICE)?grid.Node(TV_INT()+index)[axis]:grid.Center(TV_INT()+index)[axis];
+        PLANE<T> plane1(VECTOR<T,3>(0,0,0),VECTOR<T,3>(0,0,0)),plane2(VECTOR<T,3>(0,0,0),VECTOR<T,3>(0,0,0));
         plane1.normal[axis]=1;plane1.x0[axis]=pos-grid.dX[axis]/1.9;
         plane2.normal[axis]=-1;plane2.x0[axis]=pos+grid.dX[axis]/1.9;
         if(clip_plane_id1==0) clip_plane_id1=world.Add_Clipping_Plane(plane1);
@@ -40,3 +40,7 @@ Update_Clip_Planes()
     }
 }
 //#####################################################################
+namespace PhysBAM{
+template class OPENGL_UNIFORM_SLICE<double>;
+template class OPENGL_UNIFORM_SLICE<float>;
+}

@@ -23,6 +23,7 @@ public:
     using OPENGL_VECTOR_FIELD_3D<T>::slice;
     using OPENGL_VECTOR_FIELD_3D<T>::vector_field;using OPENGL_VECTOR_FIELD_3D<T>::vector_locations;
     using OPENGL_VECTOR_FIELD_3D<T>::size;
+    using OPENGL_VECTOR_FIELD_3D<T>::World_Space_Box;
 
     GRID<TV>& grid;
     ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& V;
@@ -33,9 +34,9 @@ public:
 
     void Update();  // Call when grid/V change
 
-    virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     virtual void Slice_Has_Changed() PHYSBAM_OVERRIDE { Update(); }
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
 
 };
 }

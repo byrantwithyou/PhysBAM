@@ -126,10 +126,10 @@ Draw_Boundary_Triangles(const HEXAHEDRON_MESH& hexahedron_mesh) const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_HEXAHEDRALIZED_VOLUME<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_HEXAHEDRALIZED_VOLUME<T>::
 Bounding_Box() const
 {
-    return World_Space_Box(RANGE<VECTOR<float,3> >(RANGE<VECTOR<T,3> >::Bounding_Box(particles->X)));
+    return World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(particles->X));
 }
 //#####################################################################
 namespace PhysBAM{

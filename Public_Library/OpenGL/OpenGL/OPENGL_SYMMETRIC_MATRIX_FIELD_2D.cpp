@@ -38,10 +38,10 @@ Update()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<float,3> > OPENGL_SYMMETRIC_MATRIX_FIELD_2D<T>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_SYMMETRIC_MATRIX_FIELD_2D<T>::
 Bounding_Box() const
 {
-    return RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.Append(0)),VECTOR<float,3>(grid.domain.max_corner.Append(0)));
+    return World_Space_Box(grid.domain);
 }
 //#####################################################################
 namespace PhysBAM{
