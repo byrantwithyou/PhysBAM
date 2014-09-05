@@ -35,8 +35,8 @@ public:
     void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
-template<class TV> void Smooth_Fit(BEZIER_SPLINE<TV,3>& bs,const ARRAY_VIEW<TV>& X);
-template<class TV> void Smooth_Fit_Loop(BEZIER_SPLINE<TV,3>& bs,const ARRAY_VIEW<TV>& X);
+template<class TV> void Smooth_Fit(BEZIER_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X);
+template<class TV> void Smooth_Fit_Loop(BEZIER_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X);
 template<class TV,int d> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,1>::OBJECT*
 Create_Segmented_Curve(const BEZIER_SPLINE<TV,d>& spline,bool same_particles);
 }

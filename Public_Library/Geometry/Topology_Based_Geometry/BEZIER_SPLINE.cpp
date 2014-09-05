@@ -72,7 +72,7 @@ Write(TYPED_OSTREAM& output) const
 // Function Smooth_Fit
 //#####################################################################
 template<class TV> void PhysBAM::
-Smooth_Fit(BEZIER_SPLINE<TV,3>& bs,const ARRAY_VIEW<TV>& X)
+Smooth_Fit(BEZIER_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X)
 {
     typedef typename TV::SCALAR T;
     ARRAY<TV> rhs(X.m*2-2);
@@ -101,7 +101,7 @@ Smooth_Fit(BEZIER_SPLINE<TV,3>& bs,const ARRAY_VIEW<TV>& X)
 // Function Smooth_Fit
 //#####################################################################
 template<class TV> void PhysBAM::
-Smooth_Fit_Loop(BEZIER_SPLINE<TV,3>& bs,const ARRAY_VIEW<TV>& X)
+Smooth_Fit_Loop(BEZIER_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X)
 {
     typedef typename TV::SCALAR T;
     T a0=1,a1=0,b0=0,b1=1;
@@ -216,7 +216,8 @@ template class BEZIER_SPLINE<VECTOR<float,2>,3>;
 template class BEZIER_SPLINE<VECTOR<float,3>,3>;
 template class BEZIER_SPLINE<VECTOR<double,2>,3>;
 template class BEZIER_SPLINE<VECTOR<double,3>,3>;
-template void Smooth_Fit<VECTOR<float,2> >(BEZIER_SPLINE<VECTOR<float,2>,3>&,ARRAY_VIEW<VECTOR<float,2>,int> const&);
 template TOPOLOGY_BASED_SIMPLEX_POLICY<VECTOR<float,2>,1>::OBJECT* Create_Segmented_Curve<VECTOR<float,2>,3>(BEZIER_SPLINE<VECTOR<float,2>,3> const&,bool);
 template TOPOLOGY_BASED_SIMPLEX_POLICY<VECTOR<double,2>,1>::OBJECT* Create_Segmented_Curve<VECTOR<double,2>,3>(BEZIER_SPLINE<VECTOR<double,2>,3> const&,bool);
+template void Smooth_Fit<VECTOR<float,2> >(BEZIER_SPLINE<VECTOR<float,2>,3>&,ARRAY_VIEW<VECTOR<float,2>,int>);
+template void Smooth_Fit<VECTOR<double,2> >(BEZIER_SPLINE<VECTOR<double,2>,3>&,ARRAY_VIEW<VECTOR<double,2>,int>);
 }
