@@ -39,11 +39,7 @@ Givens_Shift_Diagonal(ARRAY<T2>& u)
     assert(diagonal_column>0);
     A(0)=A(0).Remove_Index(0).Append(0);
     for(int i=0;i<u.m-1;i++)
-    {
-        LOG::printf("%P %P  ->  ",A(i),A(i+1));
         Givens_Transpose_Times(Givens(A(i),A(i+1)),u(i),u(i+1));
-        LOG::printf("%P %P\n",A(i),A(i+1));
-    }
     diagonal_column--;
 }
 //#####################################################################
@@ -55,7 +51,6 @@ Backsolve(ARRAY<T2>& u) const
     assert(diagonal_column==0);
     VECTOR<T2,w> r;
     for(int i=u.m-1;i>=0;i--){
-        LOG::printf("%P %P\n",A(i),r);
         VECTOR<T2,w-1> q=r.Remove_Index(w-1);
         T2 rhs=u(i);
         const ROW& ar=A(i);
