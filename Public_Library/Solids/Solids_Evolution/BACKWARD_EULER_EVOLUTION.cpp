@@ -11,6 +11,7 @@
 #include <Tools/Vectors/VECTOR.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Deformables/Bindings/BINDING_LIST.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
@@ -76,6 +77,8 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
 
     Set_External_Positions(particles.X,time);
     Set_External_Velocities(particles.V,time,time);
+    solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions(particles.X);
+    solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(particles.V);
 
     minimization_objective.dt=dt;
     minimization_objective.time=time;
@@ -106,7 +109,10 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
 // TODO for rigid bodies    R.Normalize(), update angular momentum
 
     minimization_objective.Adjust_For_Collision(dv);
+    solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(dv.V.array);
     minimization_objective.Compute_Unconstrained(dv,0,&tmp0,0);
+    solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(tmp0.V.array);
+    solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(tmp0.V.array);
     solid_body_collection.Print_Energy(time+dt,1);
     tmp1=tmp0;
     minimization_objective.Project_Gradient_And_Prune_Constraints(tmp1,true);
@@ -131,6 +137,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         solid_body_collection.deformable_body_collection.triangle_collisions.Adjust_Velocity_For_Self_Collisions(dt,time,false);}
 
     T max_velocity_squared=0;
+    solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(particles.V);
     for(int i=0;i<particles.V.m;i++){
         T v=particles.V(i).Magnitude_Squared();
         if(v>max_velocity_squared)

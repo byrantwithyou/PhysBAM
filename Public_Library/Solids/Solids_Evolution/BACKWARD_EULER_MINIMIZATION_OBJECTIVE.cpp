@@ -7,6 +7,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Deformables/Bindings/BINDING_LIST.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
@@ -46,6 +47,7 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
     if(h)
         minimization_system.forced_collisions.Clean_Memory();
     Make_Feasible(tmp1);
+    solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(tmp1.V.array);
     Compute_Unconstrained(tmp1,h,g,e);
     if(h)
         for(int i=0;i<minimization_system.collisions.m;i++)
@@ -55,6 +57,10 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
         for(int i=0;i<minimization_system.collisions.m;i++){
             const COLLISION& c = minimization_system.collisions(i);
             minimization_system.forced_collisions.Insert(c.p,c.object);}}
+    if(g){
+        GENERALIZED_VELOCITY<TV>& gg=debug_cast<GENERALIZED_VELOCITY<TV>&>(*g);
+        solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(gg.V.array);
+        solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(gg.V.array);}
 }
 //#####################################################################
 // Function Compute
@@ -72,6 +78,7 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
         V1=v0.V.array(p)+dV;
         particles.X(p)=X0(p)+dt*V1;
         tmp0.V.array(p)=particles.mass(p)*dV;}
+    solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions(particles.X);
 
     for(int p=0;p<rigid_body_particles.number;p++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
@@ -208,7 +215,8 @@ Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv) const
     T e0=0,e1=0;
     dv*=0;
     Compute(dv,0,&tmp0,&e0);
-    for(int p=0;p<particles.number;p++) dv.V.array(p)=tmp0.V.array(p)/-particles.mass(p);
+    for(int p=0;p<particles.number;p++)
+        dv.V.array(p)=particles.mass(p)?tmp0.V.array(p)/-particles.mass(p):TV();
     for(int p=0;p<rigid_body_particles.number;p++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
         if(rigid_body.Has_Infinite_Inertia()) continue;

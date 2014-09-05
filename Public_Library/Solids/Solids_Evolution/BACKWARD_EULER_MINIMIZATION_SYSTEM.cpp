@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Deformables/Bindings/BINDING_LIST.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
@@ -38,6 +39,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
 
     t=V;
+    solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(t.V.array);
     for(int i=0;i<collisions.m;i++){
         const COLLISION& c=collisions(i);
         t.V.array(c.p).Project_Orthogonal_To_Unit_Direction(c.n);}
@@ -57,6 +59,9 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
         const COLLISION& c=collisions(i);
         TV& v=F.V.array(c.p),tt=t.V.array(c.p);
         v-=c.n*c.n.Dot(v)+dt*c.n_dE*c.H*tt+dt*c.n.Dot(tt)*c.H_dE+dt*c.H_dE.Dot(tt)*c.n;}
+
+    solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(F.V.array);
+    solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(F.V.array);
 }
 //#####################################################################
 // Function Inner_Product
