@@ -23,6 +23,7 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_PENALTY.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
+#include <Deformables/Forces/BEZIER_C2_FORCE.h>
 #include <Deformables/Forces/BEZIER_CURVATURE_FORCE.h>
 #include <Deformables/Forces/ELASTIC_ETHER_DRAG.h>
 #include <Deformables/Forces/RALEIGH_DAMPING_FORCE.h>
@@ -91,8 +92,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Smooth_Fit<TV>(*spline,X);
             deformable_body_collection.Add_Structure(spline);
             deformable_body_collection.Add_Structure(Create_Segmented_Curve(*spline,true));
-            deformable_body_collection.Add_Force(new BEZIER_CURVATURE_FORCE<TV>(particles,*spline,
-                    curvature_stiffness_multiplier,stiffness_multiplier));
+            deformable_body_collection.Add_Force(new BEZIER_C2_FORCE<TV>(particles,*spline,stiffness_multiplier));
             particles.mass.Fill(1);
             kinematic_points.Append(0);
             kinematic_points.Append(resolution*3);
