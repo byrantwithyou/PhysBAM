@@ -216,6 +216,7 @@ Postprocess_Frame(const int frame)
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     for(int i=0;i<constrained_particles.m;i++) Add_Debug_Particle(particles.X(constrained_particles(i)),VECTOR<T,3>(1,0,0));
     for(int i=0;i<externally_forced.m;i++) Add_Debug_Particle(particles.X(externally_forced(i)),VECTOR<T,3>(0,1,0));
+    for(int i=0;i<kinematic_points.m;i++) Add_Debug_Particle(particles.X(kinematic_points(i)),VECTOR<T,3>(0,1,1));
 }
 //#####################################################################
 // Function Register_Options
@@ -243,8 +244,9 @@ Register_Options()
     parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
     parse_args->Add("-print_matrix",&print_matrix,"print Krylov matrix");
     parse_args->Add("-resolution",&resolution,"resolution","resolution used by multiple tests to change the parameters of the test");
-    parse_args->Add("-stiffen",&stiffness_multiplier,"multiplier","stiffness multiplier for various tests");
-    parse_args->Add("-dampen",&damping_multiplier,"multiplier","damping multiplier for various tests");
+    parse_args->Add("-stiffen",&stiffness_multiplier,"multiplier","stiffness multiplier");
+    parse_args->Add("-kappa_stiffen",&curvature_stiffness_multiplier,"multiplier","stiffness multiplier for curvature");
+    parse_args->Add("-dampen",&damping_multiplier,"multiplier","damping multiplier");
     parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
     parse_args->Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"tolerance","CG tolerance for backward Euler");
     parse_args->Add("-use_newmark",&use_newmark,"use newmark");
@@ -390,19 +392,19 @@ Initialize_Bodies_After()
 
     if(use_penalty_self_collisions){
         for(int b=0;b<deformable_body_collection.structures.m;b++){
-            DEFORMABLE_PARTICLES<TV>& undeformed_particles=*particles.Clone();
-            T_OBJECT& object=deformable_body_collection.template Find_Structure<T_OBJECT&>(b);
-            T_SURFACE& surface=object.Get_Boundary_Object();
-            T_SURFACE& undeformed_surface=*new T_SURFACE(surface.mesh,undeformed_particles);
-            LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(undeformed_surface,10);
-            DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>* coll=
-                new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,object,
-                    undeformed_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation);
-            if(self_collide_surface_only){
-                coll->colliding_particles=surface.mesh.elements.Flattened();
-                coll->colliding_particles.Prune_Duplicates();}
-            int force_id=solid_body_collection.Add_Force(coll);
-            if(backward_euler_evolution) backward_euler_evolution->minimization_objective.deformables_forces_lazy.Set(force_id);}}
+            if(T_OBJECT* object=dynamic_cast<T_OBJECT*>(deformable_body_collection.structures(b))){
+                DEFORMABLE_PARTICLES<TV>& undeformed_particles=*particles.Clone();
+                T_SURFACE& surface=object->Get_Boundary_Object();
+                T_SURFACE& undeformed_surface=*new T_SURFACE(surface.mesh,undeformed_particles);
+                LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(undeformed_surface,10);
+                DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>* coll=
+                    new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,*object,
+                        undeformed_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation);
+                if(self_collide_surface_only){
+                    coll->colliding_particles=surface.mesh.elements.Flattened();
+                    coll->colliding_particles.Prune_Duplicates();}
+                int force_id=solid_body_collection.Add_Force(coll);
+                if(backward_euler_evolution) backward_euler_evolution->minimization_objective.deformables_forces_lazy.Set(force_id);}}}
 
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
@@ -424,6 +426,7 @@ template<class TV> void STANDARD_TESTS_BASE<TV>::
 Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
     V.Subset(constrained_particles)=constrained_velocities;
+    for(int i=0;i<kinematic_points.m;i++) V(kinematic_points(i))=point_curves(i).Derivative(velocity_time);
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -431,6 +434,7 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
 {
+    for(int i=0;i<kinematic_points.m;i++) X(kinematic_points(i))=point_curves(i).Value(time);
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -440,6 +444,7 @@ Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T 
 {
     V.Subset(constrained_particles).Fill(TV());
     V.Subset(externally_forced).Fill(TV());
+    V.Subset(kinematic_points).Fill(TV());
 }
 //#####################################################################
 // Function Read_Output_Files_Solids

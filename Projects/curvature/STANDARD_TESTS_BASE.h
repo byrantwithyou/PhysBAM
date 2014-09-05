@@ -27,9 +27,12 @@ public:
     bool test_forces;
     ARRAY<int> kinematic_ids;
     ARRAY<INTERPOLATION_CURVE<T,FRAME<TV> > > curves;
+    ARRAY<int> kinematic_points;
+    ARRAY<INTERPOLATION_CURVE<T,TV> > point_curves;
     bool print_matrix;
     int resolution;
     T stiffness_multiplier;
+    T curvature_stiffness_multiplier;
     T damping_multiplier;
     ARRAY<int> externally_forced;
     ARRAY<int> constrained_particles;
