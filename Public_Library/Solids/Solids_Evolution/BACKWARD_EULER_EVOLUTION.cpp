@@ -94,7 +94,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
             lf->Lagged_Update_Position_Based_State(time);
 
     minimization_objective.Initial_Guess(dv);
-    /* minimization_objective.Test(dv,minimization_system); */
+    if(test_diff) minimization_objective.Test_Diff(dv);
 
     newtons_method.tolerance*=dt;
     bool converged=newtons_method.Newtons_Method(minimization_objective,minimization_system,dv);

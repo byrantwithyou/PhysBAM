@@ -269,7 +269,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
     solids_parameters.triangle_collision_parameters.collisions_output_number_checked=false;
     solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
-    parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
+    parse_args->Add("-test_forces",&test_forces,"test force derivatives");
     parse_args->Add("-with_bunny",&with_bunny,"use bunny");
     parse_args->Add("-with_hand",&with_hand,"use hand");
     parse_args->Add("-with_big_arm",&with_big_arm,"use big arm");
@@ -381,7 +381,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(backward_euler_evolution){
         backward_euler_evolution->newtons_method.tolerance*=unit_N*s;
         backward_euler_evolution->newtons_method.krylov_tolerance/=sqrt(unit_N*s);
-        backward_euler_evolution->minimization_objective.collision_thickness*=m;}
+        backward_euler_evolution->minimization_objective.collision_thickness*=m;
+        backward_euler_evolution->test_diff=test_forces;}
 
     switch(test_number){
       case 17: case 18: case 24: case 25: case 27: case 11: case 23: case 57: case 77: case 80: case 8: case 12: case 13: case 67: case 68:

@@ -323,7 +323,8 @@ Parse_Options()
     if(backward_euler_evolution){
         backward_euler_evolution->newtons_method.tolerance*=unit_N*s;
         backward_euler_evolution->newtons_method.krylov_tolerance/=sqrt(unit_N*s);
-        backward_euler_evolution->minimization_objective.collision_thickness*=m;}
+        backward_euler_evolution->minimization_objective.collision_thickness*=m;
+        backward_euler_evolution->test_diff=test_forces;}
 
     solids_parameters.use_trapezoidal_rule_for_velocities=!use_newmark_be;
 
