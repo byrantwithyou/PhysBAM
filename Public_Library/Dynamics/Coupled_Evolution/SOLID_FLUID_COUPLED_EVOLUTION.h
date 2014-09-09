@@ -26,10 +26,11 @@ template<class TV> class FLUID_COLLECTION;
 template<class TV> class POISSON_COLLIDABLE_UNIFORM;
 template<class TV> class GENERALIZED_VELOCITY;
 
-template<class TV_input>
-class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV_input>
+template<class TV>
+class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV>
 {
-    typedef TV_input TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+public:
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<PAIR<int,T> > FACE_WEIGHT_ELEMENTS;
     typedef typename TV::SPIN T_SPIN;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT T_THIN_SHELL;typedef typename T_THIN_SHELL::MESH T_THIN_SHELL_MESH;
