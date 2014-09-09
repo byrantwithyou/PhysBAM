@@ -8,25 +8,25 @@
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
-#include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include "CONSISTENT_INTERSECTIONS.h"
+#include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 #include <iostream>
-#include "mesh_cutting_subd.h"
+#include "CONSISTENT_INTERSECTIONS.h"
 #include "DEFORMABLE_OBJECTS.h"
+#include "mesh_cutting_subd.h"
 
+#include <set>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <set>
 
 void read_tsc(){__asm__("rdtsc");}
 struct timeval starttime,stoptime;

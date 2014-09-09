@@ -8,20 +8,20 @@
 
 //2. high res sim explosion: tune parameter or find bug in sim code...
 
+#include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/ROTATION.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Matrices/ROTATION.h>
-#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <Tools/Grids_Uniform/GRID.h>
 
 #include <fstream>
 #include <sstream>
 
-#include "mesh_cutting_subd.h"
 #include "DEFORMABLE_OBJECTS.h"
+#include "mesh_cutting_subd.h"
 
 #include <cmath>
 #include <iostream>
@@ -31,13 +31,13 @@
 
 #include <X11/Xlib.h>
 #ifdef __APPLE__  // include Mac OS X verions of headers
-//#  include <GL/glew.h>
-#  include <OpenGL/OpenGL.h>
-#  include <GLUT/glut.h>
+//#include <GL/glew.h>
+#include <GLUT/glut.h>
+#include <OpenGL/OpenGL.h>
 
 #else // non-Mac OS X operating systems
-#  include <GL/freeglut.h>
-#  include <GL/freeglut_ext.h>
+#include <GL/freeglut.h>
+#include <GL/freeglut_ext.h>
 #endif  // __APPLE__
 namespace VS{
 void read_tsc(){__asm__("rdtsc");}

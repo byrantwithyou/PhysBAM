@@ -9,8 +9,8 @@
 #ifndef _mesh_cutting_h
 #define _mesh_cutting_h
 
-#include <set>
 #include <cassert>
+#include <set>
 #include <string>
 
 #include <Tools/Arrays/ARRAY.h>

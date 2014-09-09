@@ -1,5 +1,5 @@
 #include <Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
-#include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM_2D.h>
+#include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -1069,7 +1069,7 @@ Update_Time_Varying_Material_Properties(const T time)
     if(rebuild_curve) Rebuild_Surface();
     if((test_number==3 || test_number==5 || test_number==10 || test_number==7 || test_number==11 || test_number==12) && !use_phi){
         ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Levelset(0).phi;
-        LEVELSET_MAKER_UNIFORM_2D<T>::Compute_Level_Set(*front_tracked_structure,*fluids_parameters.grid,3,phi);}
+        LEVELSET_MAKER_UNIFORM<TV>::Compute_Level_Set(*front_tracked_structure,*fluids_parameters.grid,3,phi);}
 }
 //#####################################################################
 // Function Store_Debug_Particles

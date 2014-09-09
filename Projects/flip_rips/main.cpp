@@ -2,8 +2,8 @@
 // Copyright 2014, Alexey Stomakhin
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include "FLIP_DRIVER.h"
 
 using namespace PhysBAM;

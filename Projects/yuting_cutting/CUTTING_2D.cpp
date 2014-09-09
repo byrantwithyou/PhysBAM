@@ -4,6 +4,7 @@
 //#####################################################################
 // Class CUTTING_2D
 //#####################################################################
+#include <Tools/Data_Structures/UNION_FIND.h>
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
@@ -19,9 +20,8 @@
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include "CUTTING_2D.h"
 #include "CONSISTENT_INTERSECTIONS.h"
+#include "CUTTING_2D.h"
 using namespace PhysBAM;
 using namespace std;
 //#####################################################################

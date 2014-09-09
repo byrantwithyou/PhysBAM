@@ -4,8 +4,8 @@
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
-#include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 #include <OpenGL/OpenGL/OPENGL_BEZIER_SPLINE_2D.h>
+#include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 #include <OpenGL/OpenGL/OPENGL_SHAPES.h>
 using namespace PhysBAM;
 //#####################################################################

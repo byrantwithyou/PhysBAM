@@ -7,9 +7,9 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <OpenGL/OpenGL/OPENGL_BEZIER_SPLINE_2D.h>
 #include <OpenGL/OpenGL/OPENGL_LEVELSET_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>
-#include <OpenGL/OpenGL/OPENGL_BEZIER_SPLINE_2D.h>
 #include <OpenGL/OpenGL/OPENGL_TRIANGULATED_AREA.h>
 #include <OpenGL/OpenGL/OPENGL_WORLD.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D.h>

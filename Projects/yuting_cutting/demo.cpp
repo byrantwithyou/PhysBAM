@@ -1,33 +1,33 @@
 //  Created by Yuting Wang on 2/25/14.
 //  Copyright (c) 2012 __Yuting Wang__. All rights reserved.
 
-#include <fstream>
-#include <sstream>
 #include <cmath>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <X11/Xlib.h>
 
 #ifdef __APPLE__//Mac OS
-//#  include <GL/glew.h>
-#  include <OpenGL/OpenGL.h>
-#  include <GLUT/glut.h>
+//#include <GL/glew.h>
+#include <GLUT/glut.h>
+#include <OpenGL/OpenGL.h>
 #else
-//#  include <GL/glew.h>
-#  include <GL/freeglut.h>
-#  include <GL/freeglut_ext.h>
+#include <GL/freeglut.h>
+#include <GL/freeglut_ext.h>
+//#include <GL/glew.h>
 #endif  // __APPLE__
 
-#include "CUTTING_2D.h"
-#include "CONSISTENT_INTERSECTIONS.h"
-#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
-#include <Geometry/Basic_Geometry/SPHERE.h>
-#include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
+#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include "CONSISTENT_INTERSECTIONS.h"
+#include "CUTTING_2D.h"
 
 using namespace PhysBAM;
 using namespace std;

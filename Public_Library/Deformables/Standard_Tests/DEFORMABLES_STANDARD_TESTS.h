@@ -11,6 +11,7 @@
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_POLICY.h>
+#include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_STATE.h>
 namespace PhysBAM{
 

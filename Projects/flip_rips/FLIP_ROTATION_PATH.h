@@ -5,8 +5,8 @@
 #ifndef __MPM_ROTATION_PATH__
 #define __MPM_ROTATION_PATH__
 
-#include <Tools/Vectors/VECTOR.h>
 #include <Tools/Matrices/ROTATION.h>
+#include <Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM{
 

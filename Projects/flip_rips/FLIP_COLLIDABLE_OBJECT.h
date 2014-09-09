@@ -7,9 +7,9 @@
 
 #include <Tools/Vectors/VECTOR.h>
 
-#include "FLIP_TRANSLATION_PATH.h"
-#include "FLIP_ROTATION_PATH.h"
 #include "FLIP_LEVELSET.h"
+#include "FLIP_ROTATION_PATH.h"
+#include "FLIP_TRANSLATION_PATH.h"
 
 namespace PhysBAM{
 

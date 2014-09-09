@@ -3,9 +3,9 @@
 
 #include "ALGEBRA.h"
 
-#include "GRID.h"
 #include <algorithm>
 #include <map>
+#include "GRID.h"
 
 using namespace GRIDS;
 using namespace ALGEBRA;

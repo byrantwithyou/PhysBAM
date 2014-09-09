@@ -1,13 +1,13 @@
 #ifndef _algebra_
 #define _algebra_
 
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Tools/Matrices/MATRIX_3X3.h>
 #include <cassert>
 #include <iostream>
 #include <string>
 #include "float.h"
 #include <math.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 namespace ALGEBRA{
 class INDEX_2D{
     /* This assumes that we have data at 0 <= i < n, 0 <=j< m. This then maps dofs at these coords to the integer 0 <= i*n+j < m*n

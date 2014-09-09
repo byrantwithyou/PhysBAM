@@ -8,8 +8,8 @@
 #define __CUTTING_2D__
 
 #include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <Tools/Data_Structures/PAIR.h>
+#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class TV> class CONSISTENT_INTERSECTIONS;

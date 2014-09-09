@@ -17,8 +17,8 @@
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include "CONSISTENT_INTERSECTIONS.h"
 #include <sstream>
+#include "CONSISTENT_INTERSECTIONS.h"
 using namespace PhysBAM;
 using namespace std;
 typedef float RW;
