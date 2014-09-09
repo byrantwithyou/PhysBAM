@@ -148,6 +148,7 @@
     <ClCompile Include="..\Matrices\MATRIX_3X3.cpp" />
     <ClCompile Include="..\Matrices\ROTATION.cpp" />
     <ClCompile Include="..\Matrices\MATRIX_3X2.cpp" />
+    <ClCompile Include="..\Matrices\BANDED_MATRIX.cpp" />
     <ClCompile Include="..\Matrices\SYSTEM_MATRIX_HELPER.cpp" />
     <ClCompile Include="..\Matrices\SYMMETRIC_MATRIX_3X3.cpp" />
     <ClCompile Include="..\Matrices\MATRIX_BASE.cpp" />
@@ -422,7 +423,6 @@
     <ClInclude Include="..\Math_Tools\exchange_sort.h" />
     <ClInclude Include="..\Math_Tools\cbrt.h" />
     <ClInclude Include="..\Math_Tools\pow.h" />
-    <ClInclude Include="..\Tensors\STATIC_TENSOR2.h" />
     <ClInclude Include="..\Advection\ADVECTION.h" />
     <ClInclude Include="..\Advection\ADVECTION_FORWARD.h" />
     <ClInclude Include="..\Arrays\ARRAY_NEGATION.h" />
@@ -475,6 +475,7 @@
     <ClInclude Include="..\Matrices\UPPER_TRIANGULAR_MATRIX_3X3.h" />
     <ClInclude Include="..\Matrices\MATRIX_3X2.h" />
     <ClInclude Include="..\Matrices\MATRIX_ARITHMETIC_POLICY.h" />
+    <ClInclude Include="..\Matrices\BANDED_MATRIX.h" />
     <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_CONSERVATIVE_WENO.h" />
     <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_UNIFORM_FORWARD.h" />
     <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA.h" />

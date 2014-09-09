@@ -66,6 +66,9 @@
     <ClCompile Include="..\Forces\DEFORMABLE_WIND_DRAG_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Forces\BEZIER_CURVATURE_FORCE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\Forces\DEFORMABLE_GRAVITY.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -79,6 +82,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Forces\FINITE_VOLUME_HEXAHEDRONS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Forces\BEZIER_C2_FORCE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Forces\SEGMENT_BENDING_ELEMENTS.cpp">
@@ -317,6 +323,9 @@
     <ClInclude Include="..\Forces\LINEAR_BENDING_ELEMENTS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Forces\BEZIER_C2_FORCE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\Forces\INCOMPRESSIBLE_FINITE_VOLUME.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -411,6 +420,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Forces\BW_GRAVITY.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Forces\BEZIER_CURVATURE_FORCE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Forces\DIAGONALIZED_SEMI_IMPLICIT_ELEMENT.h">

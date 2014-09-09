@@ -70,6 +70,7 @@
   <ItemGroup>
     <ClCompile Include="..\Grids_Uniform_Computations\MARCHING_CUBES.cpp" />
     <ClCompile Include="..\Grids_Uniform_Computations\DUALCONTOUR_3D.cpp" />
+    <ClCompile Include="..\Grids_Uniform_Computations\LEVELSET_MAKER_UNIFORM.cpp" />
     <ClCompile Include="..\Grids_Uniform_Computations\SEGMENTED_CURVE_2D_SIGNED_DISTANCE.cpp" />
     <ClCompile Include="..\Grids_Uniform_Computations\MARCHING_CUBES_COLOR.cpp" />
     <ClCompile Include="..\Grids_Uniform_Computations\REINITIALIZATION.cpp" />
@@ -77,7 +78,6 @@
     <ClCompile Include="..\Grids_Uniform_Computations\CYLINDER_SIGNED_DISTANCE.cpp" />
     <ClCompile Include="..\Grids_Uniform_Computations\MARCHING_TETRAHEDRA.cpp" />
     <ClCompile Include="..\Grids_Uniform_Computations\MARCHING_CUBES_SYSTEM.cpp" />
-    <ClCompile Include="..\Grids_Uniform_Computations\LEVELSET_MAKER_UNIFORM_2D.cpp" />
     <ClCompile Include="..\Grids_Uniform_Computations\TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.cpp" />
     <ClCompile Include="..\Grids_Uniform_Computations\DUALCONTOUR_2D.cpp" />
     <ClCompile Include="..\Basic_Geometry_Intersections\RAY_TETRAHEDRON_INTERSECTION.cpp" />
@@ -193,6 +193,7 @@
     <ClCompile Include="..\Level_Sets\EXTRAPOLATION_UNIFORM.cpp" />
     <ClCompile Include="..\Level_Sets\FAST_MARCHING_METHOD_UNIFORM.cpp" />
     <ClCompile Include="..\Level_Sets\LEVELSET_MAKER.cpp" />
+    <ClCompile Include="..\Topology_Based_Geometry\BEZIER_SPLINE.cpp" />
     <ClCompile Include="..\Topology_Based_Geometry\TRIANGULATED_SURFACE.cpp" />
     <ClCompile Include="..\Topology_Based_Geometry\POINT_SIMPLICES_1D.cpp" />
     <ClCompile Include="..\Topology_Based_Geometry\MESH_OBJECT.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_CUBES_COLOR.h" />
     <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_CUBES_VECTOR.h" />
     <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_CUBES_SYSTEM.h" />
+    <ClInclude Include="..\Grids_Uniform_Computations\LEVELSET_MAKER_UNIFORM.h" />
     <ClInclude Include="..\Grids_Uniform_Computations\CYLINDER_SIGNED_DISTANCE.h" />
     <ClInclude Include="..\Grids_Uniform_Computations\SEGMENTED_CURVE_2D_SIGNED_DISTANCE.h" />
     <ClInclude Include="..\Grids_Uniform_Computations\DUALCONTOUR_3D.h" />
@@ -218,7 +220,6 @@
     <ClInclude Include="..\Grids_Uniform_Computations\SPHERE_SIGNED_DISTANCE.h" />
     <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_CUBES.h" />
     <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_TETRAHEDRA.h" />
-    <ClInclude Include="..\Grids_Uniform_Computations\LEVELSET_MAKER_UNIFORM_2D.h" />
     <ClInclude Include="..\Grids_Uniform_Computations\SIGNED_DISTANCE.h" />
     <ClInclude Include="..\Grids_Uniform_Computations\DUALCONTOUR_2D.h" />
     <ClInclude Include="..\Grids_Uniform_Computations\TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h" />
@@ -372,6 +373,7 @@
     <ClInclude Include="..\Level_Sets\LEVELSET.h" />
     <ClInclude Include="..\Level_Sets\LEVELSET_POLICY.h" />
     <ClInclude Include="..\Topology_Based_Geometry\HEXAHEDRALIZED_VOLUME.h" />
+    <ClInclude Include="..\Topology_Based_Geometry\BEZIER_SPLINE.h" />
     <ClInclude Include="..\Topology_Based_Geometry\MESH_OBJECT.h" />
     <ClInclude Include="..\Topology_Based_Geometry\POINT_SIMPLICES_1D.h" />
     <ClInclude Include="..\Topology_Based_Geometry\SEGMENTED_CURVE_2D.h" />

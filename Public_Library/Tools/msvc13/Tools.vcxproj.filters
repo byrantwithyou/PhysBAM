@@ -255,6 +255,9 @@
     <ClCompile Include="..\Matrices\MATRIX_3X2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Matrices\BANDED_MATRIX.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\Matrices\SYSTEM_MATRIX_HELPER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1073,9 +1076,6 @@
     <ClInclude Include="..\Math_Tools\pow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Tensors\STATIC_TENSOR2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Advection\ADVECTION.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1230,6 +1230,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Matrices\MATRIX_ARITHMETIC_POLICY.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Matrices\BANDED_MATRIX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Grids_Uniform_Advection\ADVECTION_CONSERVATIVE_WENO.h">

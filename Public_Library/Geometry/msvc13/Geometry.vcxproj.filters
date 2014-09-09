@@ -21,6 +21,9 @@
     <ClCompile Include="..\Grids_Uniform_Computations\DUALCONTOUR_3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Grids_Uniform_Computations\LEVELSET_MAKER_UNIFORM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\Grids_Uniform_Computations\SEGMENTED_CURVE_2D_SIGNED_DISTANCE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,9 +43,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Grids_Uniform_Computations\MARCHING_CUBES_SYSTEM.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Grids_Uniform_Computations\LEVELSET_MAKER_UNIFORM_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Grids_Uniform_Computations\TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.cpp">
@@ -390,6 +390,9 @@
     <ClCompile Include="..\Level_Sets\LEVELSET_MAKER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Topology_Based_Geometry\BEZIER_SPLINE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\Topology_Based_Geometry\TRIANGULATED_SURFACE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -440,6 +443,9 @@
     <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_CUBES_SYSTEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Grids_Uniform_Computations\LEVELSET_MAKER_UNIFORM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\Grids_Uniform_Computations\CYLINDER_SIGNED_DISTANCE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -459,9 +465,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Grids_Uniform_Computations\MARCHING_TETRAHEDRA.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Grids_Uniform_Computations\LEVELSET_MAKER_UNIFORM_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Grids_Uniform_Computations\SIGNED_DISTANCE.h">
@@ -921,6 +924,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Topology_Based_Geometry\HEXAHEDRALIZED_VOLUME.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Topology_Based_Geometry\BEZIER_SPLINE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Topology_Based_Geometry\MESH_OBJECT.h">

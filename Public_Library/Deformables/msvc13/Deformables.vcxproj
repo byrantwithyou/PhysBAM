@@ -85,11 +85,13 @@
     <ClCompile Include="..\Forces\SEGMENT_ADHESION.cpp" />
     <ClCompile Include="..\Forces\BW_BENDING_FORCES.cpp" />
     <ClCompile Include="..\Forces\DEFORMABLE_WIND_DRAG_3D.cpp" />
+    <ClCompile Include="..\Forces\BEZIER_CURVATURE_FORCE.cpp" />
     <ClCompile Include="..\Forces\DEFORMABLE_GRAVITY.cpp" />
     <ClCompile Include="..\Forces\LINEAR_ALTITUDE_SPRINGS_2D.cpp" />
     <ClCompile Include="..\Forces\BW_GRAVITY.cpp" />
     <ClCompile Include="..\Forces\LINEAR_BENDING_ELEMENTS.cpp" />
     <ClCompile Include="..\Forces\FINITE_VOLUME_HEXAHEDRONS.cpp" />
+    <ClCompile Include="..\Forces\BEZIER_C2_FORCE.cpp" />
     <ClCompile Include="..\Forces\SEGMENT_BENDING_ELEMENTS.cpp" />
     <ClCompile Include="..\Forces\DEFORMABLE_ETHER_DRAG.cpp" />
     <ClCompile Include="..\Forces\DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES.cpp" />
@@ -170,6 +172,7 @@
     <ClInclude Include="..\Particles\FREE_PARTICLES.h" />
     <ClInclude Include="..\Particles\DEFORMABLE_PARTICLES.h" />
     <ClInclude Include="..\Forces\LINEAR_BENDING_ELEMENTS.h" />
+    <ClInclude Include="..\Forces\BEZIER_C2_FORCE.h" />
     <ClInclude Include="..\Forces\INCOMPRESSIBLE_FINITE_VOLUME.h" />
     <ClInclude Include="..\Forces\IMPLICIT_ZERO_LENGTH_SPRINGS.h" />
     <ClInclude Include="..\Forces\BW_MATERIAL_SPACE_FORCES.h" />
@@ -202,6 +205,7 @@
     <ClInclude Include="..\Forces\FORCE_KINK_HELPER.h" />
     <ClInclude Include="..\Forces\LINEAR_ALTITUDE_SPRINGS_2D.h" />
     <ClInclude Include="..\Forces\BW_GRAVITY.h" />
+    <ClInclude Include="..\Forces\BEZIER_CURVATURE_FORCE.h" />
     <ClInclude Include="..\Forces\DIAGONALIZED_SEMI_IMPLICIT_ELEMENT.h" />
     <ClInclude Include="..\Forces\BINDING_SPRINGS.h" />
     <ClInclude Include="..\Forces\SEGMENT_BENDING_ELEMENTS.h" />

@@ -104,6 +104,7 @@
     <ClCompile Include="..\OpenGL\OPENGL_EPS_OUTPUT.cpp" />
     <ClCompile Include="..\OpenGL\OPENGL_SCALAR_FIELD_3D.cpp" />
     <ClCompile Include="..\OpenGL\OPENGL_WINDOW_PBUFFER.cpp" />
+    <ClCompile Include="..\OpenGL\OPENGL_BEZIER_SPLINE_2D.cpp" />
     <ClCompile Include="..\OpenGL\OPENGL_TRIANGULATED_SURFACE.cpp" />
     <ClCompile Include="..\OpenGL\OPENGL_POINTS_3D.cpp" />
     <ClCompile Include="..\OpenGL\OPENGL_LEVELSET_MULTIVIEW.cpp" />
@@ -133,7 +134,6 @@
     <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_LEVELSET_2D.cpp" />
     <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_SCALAR_FIELD_3D.cpp" />
     <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D.cpp" />
-    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_CURVE_2D.cpp" />
     <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D.cpp" />
     <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD.cpp" />
     <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_HEIGHTFIELD_1D.cpp" />
@@ -190,6 +190,7 @@
     <ClInclude Include="..\OpenGL\OPENGL_SYMMETRIC_MATRIX_FIELD_2D.h" />
     <ClInclude Include="..\OpenGL\OPENGL_TETRAHEDRALIZED_VOLUME.h" />
     <ClInclude Include="..\OpenGL\OPENGL_RIGID_BODY_HINTS.h" />
+    <ClInclude Include="..\OpenGL\OPENGL_BEZIER_SPLINE_2D.h" />
     <ClInclude Include="..\OpenGL\OPENGL_GRID_3D.h" />
     <ClInclude Include="..\OpenGL\OPENGL_VECTOR_FIELD_3D.h" />
     <ClInclude Include="..\OpenGL\BASIC_VISUALIZATION.h" />
@@ -257,7 +258,6 @@
     <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_RIGID_BODIES_2D.h" />
     <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_PARTICLES_2D.h" />
     <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_DEBUG_PARTICLES_2D.h" />
-    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_CURVE_2D.h" />
     <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D.h" />
     <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D.h" />
     <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD.h" />

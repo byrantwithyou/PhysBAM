@@ -123,6 +123,9 @@
     <ClCompile Include="..\OpenGL\OPENGL_WINDOW_PBUFFER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\OpenGL\OPENGL_BEZIER_SPLINE_2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\OpenGL\OPENGL_TRIANGULATED_SURFACE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -208,9 +211,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_CURVE_2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\OpenGL_Components\OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D.cpp">
@@ -375,6 +375,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\OpenGL\OPENGL_RIGID_BODY_HINTS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenGL\OPENGL_BEZIER_SPLINE_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\OpenGL\OPENGL_GRID_3D.h">
@@ -576,9 +579,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_DEBUG_PARTICLES_2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_CURVE_2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\OpenGL_Components\OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D.h">
