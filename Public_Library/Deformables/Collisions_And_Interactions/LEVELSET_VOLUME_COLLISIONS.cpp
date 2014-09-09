@@ -400,8 +400,12 @@ Integrate_Simplex(const SIMPLEX_NODES& simplex,const X_VECTOR& X,const PHI_VECTO
             const VECTOR<int,TV::m+2>& npi=non_particle_vertex_nodes(~vdi);
             for(int l=0;l<TV::m+2;l++){
                 df(npi(l))+=non_particle_vertex_jacobian(~vdi)(l).Transpose_Times(dintegral(i));
-                for(int m=0;m<TV::m+2;m++)
-                    ddf(npi(l),npi(m))+=Contract_0(non_particle_vertex_tensor(~vdi)(l,m),dintegral(i));
+                for(int m=0;m<TV::m+2;m++){
+                    const TENSOR<VECTOR<T,TV::m> >& ten=non_particle_vertex_tensor(~vdi)(l,m);
+                    const TV& v=dintegral(i);
+                    MATRIX<T,TV::m>& mat=ddf(npi(l),npi(m));
+                    for(int i=0;i<TV::m;i++)
+                        mat+=ten.x(i)*v(i);}
                 for(int j=0;j<vertex_dependencies.m;j++){
                     int vdj=vertex_dependencies(j);
                     if(vdj>=0)

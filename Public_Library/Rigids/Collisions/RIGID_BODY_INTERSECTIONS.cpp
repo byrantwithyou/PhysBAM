@@ -69,23 +69,23 @@ Find_Any_Intersection(const int id_1,const int id_2,int& particle_body,int& leve
         if(!use_edge_intersection){
             ARRAY<int> triangle_list;triangle_list.Preallocate(50);
             if(body0.simplicial_object && body1.implicit_object){
-                PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices<TV>(body0,body1,triangle_list,rotation,translation,use_triangle_hierarchy_center_phi_test);
-                PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy<TV>(body0,body1,triangle_list,intersection_list,0,true,rotation,translation);
+                PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices(body0,body1,triangle_list,rotation,translation,use_triangle_hierarchy_center_phi_test);
+                PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy(body0,body1,triangle_list,intersection_list,0,true,rotation,translation);
                 if(intersection_list.m){particle_body=id_1;levelset_body=id_2;return true;}}
             if(body0.implicit_object && body1.simplicial_object){
-                Flip_Transformation();PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices<TV>(body1,body0,triangle_list,rotation,translation,use_triangle_hierarchy_center_phi_test);
-                PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy<TV>(body1,body0,triangle_list,intersection_list,0,true,rotation,translation);
+                Flip_Transformation();PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices(body1,body0,triangle_list,rotation,translation,use_triangle_hierarchy_center_phi_test);
+                PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy(body1,body0,triangle_list,intersection_list,0,true,rotation,translation);
                 if(intersection_list.m){particle_body=id_2;levelset_body=id_1;return true;}}}
         else{ // use edge intersection
             ARRAY<int> triangle_list1,triangle_list2;triangle_list1.Preallocate(50);triangle_list2.Preallocate(50);
-            if(body0.simplicial_object) PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices<TV>(body0,body1,triangle_list1,rotation,translation,use_triangle_hierarchy_center_phi_test);
+            if(body0.simplicial_object) PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices(body0,body1,triangle_list1,rotation,translation,use_triangle_hierarchy_center_phi_test);
             Flip_Transformation();
-            if(body1.simplicial_object){PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices<TV>(body1,body0,triangle_list2,rotation,translation,use_triangle_hierarchy_center_phi_test);
-                if(body0.implicit_object){PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy_And_Edges<TV>(body1,body0,triangle_list2,triangle_list1,intersection_list,0,true,rotation,translation);
+            if(body1.simplicial_object){PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices(body1,body0,triangle_list2,rotation,translation,use_triangle_hierarchy_center_phi_test);
+                if(body0.implicit_object){PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy_And_Edges(body1,body0,triangle_list2,triangle_list1,intersection_list,0,true,rotation,translation);
                     if(intersection_list.m){particle_body=id_2;levelset_body=id_1;return true;}}}
             if(body0.simplicial_object && body1.implicit_object){
                 Flip_Transformation();
-                PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy_And_Edges<TV>(body0,body1,triangle_list1,triangle_list2,intersection_list,0,true,rotation,translation);
+                PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy_And_Edges(body0,body1,triangle_list1,triangle_list2,intersection_list,0,true,rotation,translation);
                 if(intersection_list.m){particle_body=id_1;levelset_body=id_2;return true;}}}}
     return false;
 }
