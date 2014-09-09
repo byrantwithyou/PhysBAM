@@ -21,6 +21,7 @@ namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const 
 template<class TV> void LEVELSET_MAKER_UNIFORM<TV>::
 Compute_Level_Set(T_SURFACE& surface,GRID<TV>& grid,int ghost_cells,ARRAY<T,TV_INT>& phi)
 {
+    if(!surface.mesh.adjacent_elements) surface.mesh.Initialize_Adjacent_Elements();
     phi.Fill(FLT_MAX);
     T dx=grid.dX.Max();
 
