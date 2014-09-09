@@ -22,7 +22,7 @@ bool Same_Polynomial(const STATIC_POLYNOMIAL<T,rank,d>& a,const STATIC_POLYNOMIA
 template<class T,int rank,int d,int d2>
 bool Same_Polynomial(const STATIC_POLYNOMIAL<T,rank,d>& a,const STATIC_POLYNOMIAL<T,rank,d2>& b) {return false;}
 
-struct QUADRITURE_RULE_TRI
+struct QUADRATURE_RULE_TRI
 {
     bool use_center;
     double center_weight;
@@ -34,7 +34,7 @@ struct QUADRITURE_RULE_TRI
     double weight6[1];
 };
 
-const QUADRITURE_RULE_TRI quadriture_rule_tri[9]={
+const QUADRATURE_RULE_TRI quadrature_rule_tri[9]={
     {1,1,0},
     {1,1,0},
     {0,0,1,{0.5},{1./3}},
@@ -47,7 +47,7 @@ const QUADRITURE_RULE_TRI quadriture_rule_tri[9]={
      1,{0.0514643354866615260},{0.202706173746087101},{0.0609891857178808940}}
 };
 
-struct QUADRITURE_RULE_SEG
+struct QUADRATURE_RULE_SEG
 {
     bool use_center;
     double center_weight;
@@ -56,7 +56,7 @@ struct QUADRITURE_RULE_SEG
     double weight[3];
 };
 
-const QUADRITURE_RULE_SEG quadriture_rule_seg[12]={
+const QUADRATURE_RULE_SEG quadrature_rule_seg[12]={
     {1,1,0},
     {1,1,0},
     {0,0,1,{0.211324865405187118},{0.5}},
@@ -366,12 +366,12 @@ struct STATIC_POLYNOMIAL
     static T Quadrature_Over_Primitive(const VECTOR<TV,2>& vertices,const TV_INT& p)
     {
         int o=p.Sum();
-        PHYSBAM_ASSERT((unsigned)o<sizeof(quadriture_rule_seg)/sizeof(*quadriture_rule_seg));
+        PHYSBAM_ASSERT((unsigned)o<sizeof(quadrature_rule_seg)/sizeof(*quadrature_rule_seg));
         TV a=vertices(1)-vertices(0);
         if(!o) return a.Magnitude();
         T r=0;
         
-        const QUADRITURE_RULE_SEG& rule=quadriture_rule_seg[o];
+        const QUADRATURE_RULE_SEG& rule=quadrature_rule_seg[o];
         if(rule.use_center) r+=rule.center_weight*Eval(vertices.Sum()/2,p);
         for(int i=0;i<rule.number;i++){
             T s=0;
@@ -384,12 +384,12 @@ struct STATIC_POLYNOMIAL
     T Quadrature_Over_Primitive(const VECTOR<TV,2>& vertices) const
     {
         int o=size.Sum();
-        PHYSBAM_ASSERT((unsigned)o<sizeof(quadriture_rule_seg)/sizeof(*quadriture_rule_seg));
+        PHYSBAM_ASSERT((unsigned)o<sizeof(quadrature_rule_seg)/sizeof(*quadrature_rule_seg));
         TV a=vertices(1)-vertices(0);
         if(!o) return terms(TV_INT())*a.Magnitude();
         T r=0;
         
-        const QUADRITURE_RULE_SEG& rule=quadriture_rule_seg[o];
+        const QUADRATURE_RULE_SEG& rule=quadrature_rule_seg[o];
         if(rule.use_center) r+=rule.center_weight*Value(vertices.Sum()/2);
         for(int i=0;i<rule.number;i++){
             T s=0;
@@ -402,13 +402,13 @@ struct STATIC_POLYNOMIAL
     static T Quadrature_Over_Primitive(const VECTOR<TV,3>& vertices,const TV_INT& p)
     {
         int o=p.Sum();
-        PHYSBAM_ASSERT((unsigned)o<sizeof(quadriture_rule_tri)/sizeof(*quadriture_rule_tri));
+        PHYSBAM_ASSERT((unsigned)o<sizeof(quadrature_rule_tri)/sizeof(*quadrature_rule_tri));
         TV a=vertices(1)-vertices(0);
         TV b=vertices(2)-vertices(0);
         if(!o) return TV::Cross_Product(a,b).Magnitude()/2;
         T r=0;
         
-        const QUADRITURE_RULE_TRI& rule=quadriture_rule_tri[o];
+        const QUADRATURE_RULE_TRI& rule=quadrature_rule_tri[o];
         if(rule.use_center) r+=rule.center_weight*Eval(vertices.Sum()/3,p);
         for(int i=0;i<rule.number3;i++){
             T s=0;
@@ -431,12 +431,12 @@ struct STATIC_POLYNOMIAL
     T Quadrature_Over_Primitive(const VECTOR<TV,3>& vertices) const
     {
         int o=size.Sum();
-        PHYSBAM_ASSERT((unsigned)o<sizeof(quadriture_rule_seg)/sizeof(*quadriture_rule_seg));
+        PHYSBAM_ASSERT((unsigned)o<sizeof(quadrature_rule_seg)/sizeof(*quadrature_rule_seg));
         TV a=vertices(1)-vertices(0);
         TV b=vertices(2)-vertices(0);
         if(!o) return terms(TV_INT())*TV::Cross_Product(a,b).Magnitude()/2;
         T r=0;
-        const QUADRITURE_RULE_TRI& rule=quadriture_rule_tri[o];
+        const QUADRATURE_RULE_TRI& rule=quadrature_rule_tri[o];
         if(rule.use_center) r+=rule.center_weight*Value(vertices.Sum()/3);
         for(int i=0;i<rule.number3;i++){
             T s=0;
