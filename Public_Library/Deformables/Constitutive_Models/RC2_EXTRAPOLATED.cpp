@@ -42,7 +42,7 @@ template<class T,int d> RC2_EXTRAPOLATED<T,d>::
 // Update Lame Constants
 //#####################################################################
 template<class T,int d> void RC2_EXTRAPOLATED<T,d>::
-Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input,const T Rayleigh_coefficient_input)
+Update_Lame_Constants(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient_input)
 {
     assert(poissons_ratio>-1&&poissons_ratio<.5);
     constant_lambda=youngs_modulus_input*poissons_ratio_input/((1+poissons_ratio_input)*(1-2*poissons_ratio_input));
@@ -92,7 +92,7 @@ template<class T> static void
 Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,2>& re,const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int simplex)
 {
     T J=F.To_Vector().Product();
-    T x=F.x.x, y=F.x.y, xpy=x+y;
+    T x=F.x.x,y=F.x.y,xpy=x+y;
     if(fabs(xpy)<re.panic_threshold) xpy=xpy<0?-re.panic_threshold:re.panic_threshold;
     if(J<re.extrapolation_cutoff){
         typename RC2_EXTRAPOLATED<T,2>::HELPER helper;
@@ -398,98 +398,98 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
 // Function Test_Model_Helper
 //#####################################################################
 template<class T>
-static void Print_Helper(const char* str,T a0, T a1)
+static void Print_Helper(const char* str,T a0,T a1)
 {
     char buff[1000];
-    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, a0, a1, fabs(a0-a1));
+    sprintf(buff,"============ test ============ %s %8.5f %8.5f (%8.5f)\n",str,a0,a1,fabs(a0-a1));
     LOG::cout<<buff;
 }
 //#####################################################################
 // Function Test_Model_Helper
 //#####################################################################
 template<class T,class TV>
-static void Test_Model_Helper(const char* str,T a0, T a1, TV da0, TV da1, TV df, T e)
+static void Test_Model_Helper(const char* str,T a0,T a1,TV da0,TV da1,TV df,T e)
 {
     T av=TV::Dot_Product(da1+da0,df)/2/e;
     T dif=(a1-a0)/e;
-    Print_Helper(str, av, dif);
+    Print_Helper(str,av,dif);
 }
 //#####################################################################
 // Function Print_Helper
 //#####################################################################
 template<class T,int d>
-static void Print_Helper(const char* str,const VECTOR<T,d>& a0, const VECTOR<T,d> &a1)
+static void Print_Helper(const char* str,const VECTOR<T,d>& a0,const VECTOR<T,d> &a1)
 {
     char buff[1000];
-    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, a0.Magnitude(), a1.Magnitude(), (a0-a1).Magnitude());
+    sprintf(buff,"============ test ============ %s %8.5f %8.5f (%8.5f)\n",str,a0.Magnitude(),a1.Magnitude(),(a0-a1).Magnitude());
     LOG::cout<<buff;
 }
 //#####################################################################
 // Function Test_Model_Helper
 //#####################################################################
 template<class T,class TV,int d>
-static void Test_Model_Helper(const char* str,TV a0, TV a1, const MATRIX<T,d>& da0, const MATRIX<T,d>& da1, TV df, T e)
+static void Test_Model_Helper(const char* str,TV a0,TV a1,const MATRIX<T,d,d>& da0,const MATRIX<T,d,d>& da1,TV df,T e)
 {
     TV av=(da1+da0)*df/2/e;
     TV dif=(a1-a0)/e;
-    Print_Helper(str, av, dif);
+    Print_Helper(str,av,dif);
 }
 //#####################################################################
 // Function Test_Model_Helper
 //#####################################################################
 template<class T,class TV,int d>
-static void Test_Model_Helper(const char* str,TV a0, TV a1, const SYMMETRIC_MATRIX<T,d>& da0, const SYMMETRIC_MATRIX<T,d>& da1, TV df, T e)
+static void Test_Model_Helper(const char* str,TV a0,TV a1,const SYMMETRIC_MATRIX<T,d>& da0,const SYMMETRIC_MATRIX<T,d>& da1,TV df,T e)
 {
-    Test_Model_Helper(str,a0, a1, MATRIX<T,d>(da0), MATRIX<T,d>(da1), df, e);
+    Test_Model_Helper(str,a0,a1,MATRIX<T,d>(da0),MATRIX<T,d>(da1),df,e);
 }
 //#####################################################################
 // Function Test_Model_Helper
 //#####################################################################
 template<class T,class TV,int d>
-static void Test_Model_Helper(const char* str,const MATRIX<T,d>& a0, const MATRIX<T,d>& a1, const VECTOR<SYMMETRIC_MATRIX<T,d>,d>& da0, const VECTOR<SYMMETRIC_MATRIX<T,d>,d>& da1, TV df, T e)
+static void Test_Model_Helper(const char* str,const MATRIX<T,d,d>& a0,const MATRIX<T,d,d>& a1,const VECTOR<SYMMETRIC_MATRIX<T,d>,d>& da0,const VECTOR<SYMMETRIC_MATRIX<T,d>,d>& da1,TV df,T e)
 {
     for(int i=0;i<TV::m;i++){
         TV av=(da1(i)+da0(i))*df/2/e;
         TV dif=(a1.Row(i)-a0.Row(i))/e;
         char buff[1000];
-        sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());
+        sprintf(buff,"============ test ============ %s %8.5f %8.5f (%8.5f)\n",str,av.Magnitude(),dif.Magnitude(),(av-dif).Magnitude());
         LOG::cout<<buff;}
 }
 //#####################################################################
 // Function Test_it
 //#####################################################################
 template<class T> static void
-Test_it(const char* str, const VECTOR<T,3>& f, const VECTOR<T,3>& w, const VECTOR<T,3>& w_it)
+Test_it(const char* str,const VECTOR<T,3>& f,const VECTOR<T,3>& w,const VECTOR<T,3>& w_it)
 {
-    Print_Helper(str, (w.y-w.z)/(f.y-f.z), w_it.x);
-    Print_Helper(str, (w.x-w.z)/(f.x-f.z), w_it.y);
-    Print_Helper(str, (w.x-w.y)/(f.x-f.y), w_it.z);
+    Print_Helper(str,(w.y-w.z)/(f.y-f.z),w_it.x);
+    Print_Helper(str,(w.x-w.z)/(f.x-f.z),w_it.y);
+    Print_Helper(str,(w.x-w.y)/(f.x-f.y),w_it.z);
 }
 //#####################################################################
 // Function Test_it
 //#####################################################################
 template<class T> static void
-Test_it(const char* str, const VECTOR<T,2>& f, const VECTOR<T,2>& w, const VECTOR<T,1>& w_it)
+Test_it(const char* str,const VECTOR<T,2>& f,const VECTOR<T,2>& w,const VECTOR<T,1>& w_it)
 {
-    Print_Helper(str, (w.x-w.y)/(f.x-f.y), w_it.x);
+    Print_Helper(str,(w.x-w.y)/(f.x-f.y),w_it.x);
 }
 //#####################################################################
 // Function Test_it
 //#####################################################################
 template<class T> static void
-Test_it(const char* str, const VECTOR<T,3>& f, const MATRIX<T,3>& w, const MATRIX<T,3>& w_it)
+Test_it(const char* str,const VECTOR<T,3>& f,const MATRIX<T,3>& w,const MATRIX<T,3>& w_it)
 {
-    Print_Helper(str, (w.Column(1)-w.Column(2))/(f.y-f.z), w_it.Column(0));
-    Print_Helper(str, (w.Column(0)-w.Column(2))/(f.x-f.z), w_it.Column(1));
-    Print_Helper(str, (w.Column(0)-w.Column(1))/(f.x-f.y), w_it.Column(2));
+    Print_Helper(str,(w.Column(1)-w.Column(2))/(f.y-f.z),w_it.Column(0));
+    Print_Helper(str,(w.Column(0)-w.Column(2))/(f.x-f.z),w_it.Column(1));
+    Print_Helper(str,(w.Column(0)-w.Column(1))/(f.x-f.y),w_it.Column(2));
 }
 //#####################################################################
 // Function Test_it
 //#####################################################################
 template<class T> static void
-Test_it(const char* str, const VECTOR<T,2>& f, const MATRIX<T,2>& w, MATRIX<T,2,1> w_it)
+Test_it(const char* str,const VECTOR<T,2>& f,const MATRIX<T,2>& w,MATRIX<T,2,1> w_it)
 {
-    Print_Helper(str, (w.Column(0)-w.Column(1))/(f.x-f.y), w_it.Column(0));
+    Print_Helper(str,(w.Column(0)-w.Column(1))/(f.x-f.y),w_it.Column(0));
 }
 //#####################################################################
 // Function Test_Model
@@ -519,7 +519,7 @@ Test_Model() const
         if(!h1.Compute_E(base,extrapolation_cutoff,f+df,simplex)) continue;
         h1.Compute_dE(base,f+df,simplex);
         h1.Compute_ddE(base,f+df,simplex);
-#define XX(k) Test_Model_Helper(#k,h0.k, h1.k, h0.d##k, h1.d##k, df, e);Test_Model_Helper(#k,h0.d##k, h1.d##k, h0.dd##k, h1.dd##k, df, e);
+#define XX(k) Test_Model_Helper(#k,h0.k,h1.k,h0.d##k,h1.d##k,df,e);Test_Model_Helper(#k,h0.d##k,h1.d##k,h0.dd##k,h1.dd##k,df,e);
         XX(m);
         XX(h);
         XX(phi);
@@ -533,7 +533,7 @@ Test_Model() const
         XX(b);
         XX(c);
 
-#define IT(w) Test_it(#w "_it", f, h0.w, h0.w##_it)
+#define IT(w) Test_it(#w "_it",f,h0.w,h0.w##_it)
         IT(dE);
         IT(g);
         IT(u);
