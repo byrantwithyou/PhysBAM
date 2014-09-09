@@ -23,13 +23,14 @@ public:
     using BASE::particles;
 
     const BEZIER_SPLINE<TV,3>& spline;
+    static const int gauss_order=4;
     ARRAY<TV> X0;
     T curvature_stiffness;
     T length_stiffness;
 
     struct DATA
     {
-        T kappa0,length0;
+        VECTOR<T,gauss_order> kappa0,length0;
         VECTOR<TV,4> ge;
         MATRIX<MATRIX<T,TV::m>,4> he;
     };
