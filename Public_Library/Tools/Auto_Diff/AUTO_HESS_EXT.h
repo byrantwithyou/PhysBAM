@@ -140,6 +140,10 @@ template<class TV,class VEC,class MAT> inline decltype(Make_Hess(sqr(SC),2*SC*DX
 sqr(const AUTO_HESS_EXT<TV,VEC,MAT>& a)
 {return Make_Hess(sqr(a.x),2*a.x*a.dx,2*a.x*a.ddx+Outer_Product(a.dx)*2);}
 
+template<class TV,class VEC,class MAT> inline decltype(Make_Hess(cube(SC),SC*DX,SC*DDX+Outer_Product(DX)*SC))
+cube(const AUTO_HESS_EXT<TV,VEC,MAT>& a)
+{typename TV::SCALAR sq=sqr(a.x);return Make_Hess(a.x*sq,3*sq*a.dx,3*sq*a.ddx+Outer_Product(a.dx)*(6*a.x));}
+
 template<class TV,class VEC,class MAT,class VEC1,class MAT1> inline AUTO_HESS_EXT<TV,decltype(VEC_CHOOSE::Type(VEC(),VEC1())),decltype(MAT_CHOOSE::Type(MAT(),MAT1()))>
 max(const AUTO_HESS_EXT<TV,VEC,MAT>& a,const AUTO_HESS_EXT<TV,VEC1,MAT1>& b)
 {
