@@ -319,7 +319,7 @@ Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv)
     a->Copy(-1,*b,*a);
     T test1=sqrt(minimization_system.Inner_Product(*a,*a))/(eps*max(abs(test1a),(T)1e-20));
 
-    LOG::cout<<"RELATIVE ENERGY "<<-log10(abs(e1-e0)/abs(e0))<<std::endl;
+    LOG::cout<<"RELATIVE ENERGY "<<-log10(abs(e1-e0)/max(abs(e0),(T)1e-20))<<std::endl;
     LOG::cout<<"energy diff test C "<<test0a<<"    "<<test0b<<"    "<<test0<<std::endl;
     LOG::cout<<"force diff test C "<<test1a<<"    "<<test1b<<"    "<<test1<<std::endl;
 
