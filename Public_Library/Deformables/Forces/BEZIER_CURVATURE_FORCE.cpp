@@ -136,7 +136,6 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         pe+=new_pe.x;
         Extract(dat.ge,new_pe.dx);
         Extract(dat.he,new_pe.ddx);}
-    printf("PE: %g\n",pe);
 }
 //#####################################################################
 // Function Potential_Energy
