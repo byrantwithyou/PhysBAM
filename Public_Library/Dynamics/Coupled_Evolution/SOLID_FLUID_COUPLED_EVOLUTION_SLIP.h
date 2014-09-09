@@ -28,10 +28,11 @@ template<class TV> class EULER_PROJECTION_UNIFORM;
 template<class TV> class IMPLICIT_BOUNDARY_CONDITION_COLLECTION;
 template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;
 
-template<class TV_input>
-class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV_input>,public PROJECTION_DYNAMICS_UNIFORM<TV_input>
+template<class TV>
+class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV>,public PROJECTION_DYNAMICS_UNIFORM<TV>
 {
-    typedef TV_input TV;typedef typename TV::SCALAR T;
+public:
+    typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
     typedef ARRAY<int,FACE_INDEX<TV::m> > T_FACE_ARRAYS_INT;
@@ -125,7 +126,7 @@ private:
     void Warn_For_Exposed_Dirichlet_Cell(const ARRAY<bool,TV_INT>& psi_D,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
     void Set_Cached_Psi_N_And_Coupled_Face_Data(const COLLISION_AWARE_INDEX_MAP<TV>& index_map,
         const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const T time);
-    void Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV_input::dimension> >& indexed_faces,
+    void Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV::dimension> >& indexed_faces,
         const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_data,ARRAY<T,FACE_INDEX<TV::m> >& face_data);
     void Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const COLLISION_AWARE_INDEX_MAP<TV>& index_map,
         const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_domain,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,
