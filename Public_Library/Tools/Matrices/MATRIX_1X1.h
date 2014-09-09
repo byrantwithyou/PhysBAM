@@ -140,6 +140,9 @@ public:
     MATRIX operator*(const MATRIX& A) const
     {return MATRIX(x00*A.x00);}
 
+    MATRIX operator*(const DIAGONAL_MATRIX<T,1>& A) const
+    {return MATRIX(x00*A.x);}
+
     MATRIX operator*(const T a) const
     {return MATRIX(a*x00);}
 

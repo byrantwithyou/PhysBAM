@@ -127,10 +127,11 @@ int fprintf(std::ostream& out,const char *format,T&& value,Args&&... args)
                 PRINTF_FORMAT_FLAGS flags;
                 fprintf_parse_flags(format,option_len,flags);
                 if(flags.width>=0 && flags.precision>=0){
-                    char term_format[option_len+3];
+                    char* term_format=new char[option_len+3];
                     memcpy(term_format,format,option_len);
                     term_format[option_len]=0;
                     n+=fprintf_with_format(out,term_format,option_len,flags,value);
+                    delete [] term_format;
                     return n+fprintf(out,format+option_len,args...);}
                 else
                     return n+fprintf_fill_format(out,format,option_len,flags,value,args...);}}
