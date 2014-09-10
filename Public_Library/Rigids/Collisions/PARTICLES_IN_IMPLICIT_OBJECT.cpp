@@ -352,10 +352,11 @@ template<class T,class TV> void
 Instantiation_Workaround(const T&,const TV&)
 {
     // Visual Studio 2013 workaround
-    const RIGID_BODY<TV>* rb=0;
+    RIGID_BODY<TV>* rb=0;
     ARRAY<int> ar;
     MATRIX<T,TV::m,TV::m> mat;
     TV v;
+    ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV>,int> arb;
     Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
     Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
     Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
@@ -364,6 +365,14 @@ Instantiation_Workaround(const T&,const TV&)
     Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
     Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
     Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
+    Intersections_Using_Hierarchy(*rb,*rb,ar,arb,T(),true,mat,v);
+    Intersections_Using_Hierarchy(*rb,*rb,ar,arb,T(),true,mat,v);
+    Intersections_Using_Hierarchy(*rb,*rb,ar,arb,T(),true,mat,v);
+    Intersections_Using_Hierarchy(*rb,*rb,ar,arb,T(),true,mat,v);
+    Intersections_Using_Hierarchy(*rb,*rb,ar,arb,T(),true,mat,v);
+    Intersections_Using_Hierarchy(*rb,*rb,ar,arb,T(),true,mat,v);
+    Intersections_Using_Hierarchy(*rb,*rb,ar,arb,T(),true,mat,v);
+    Intersections_Using_Hierarchy(*rb,*rb,ar,arb,T(),true,mat,v);
 }
 //#####################################################################
 // Function Instantiation_Workaround2
@@ -384,12 +393,6 @@ template void Append_All_Intersections<VECTOR<double,3> >(RIGID_BODY<VECTOR<doub
 template void Append_All_Intersections<VECTOR<float,1> >(RIGID_BODY<VECTOR<float,1> >&,RIGID_BODY<VECTOR<float,1> >&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<float,1> >,int>&,VECTOR<float,1>::SCALAR,bool,bool,bool);
 template void Append_All_Intersections<VECTOR<float,2> >(RIGID_BODY<VECTOR<float,2> >&,RIGID_BODY<VECTOR<float,2> >&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<float,2> >,int>&,VECTOR<float,2>::SCALAR,bool,bool,bool);
 template void Append_All_Intersections<VECTOR<float,3> >(RIGID_BODY<VECTOR<float,3> >&,RIGID_BODY<VECTOR<float,3> >&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<float,3> >,int>&,VECTOR<float,3>::SCALAR,bool,bool,bool);
-template void Intersections_Using_Hierarchy<VECTOR<double,1> >(RIGID_BODY<VECTOR<double,1> >&,RIGID_BODY<VECTOR<double,1> >&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,1> >,int>&,VECTOR<double,1>::SCALAR,bool,MATRIX<VECTOR<double,1>::SCALAR,VECTOR<double,1>::dimension,VECTOR<double,1>::dimension>&,VECTOR<double,1>&);
-template void Intersections_Using_Hierarchy<VECTOR<double,2> >(RIGID_BODY<VECTOR<double,2> >&,RIGID_BODY<VECTOR<double,2> >&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,2> >,int>&,VECTOR<double,2>::SCALAR,bool,MATRIX<VECTOR<double,2>::SCALAR,VECTOR<double,2>::dimension,VECTOR<double,2>::dimension>&,VECTOR<double,2>&);
-template void Intersections_Using_Hierarchy<VECTOR<double,3> >(RIGID_BODY<VECTOR<double,3> >&,RIGID_BODY<VECTOR<double,3> >&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,3> >,int>&,VECTOR<double,3>::SCALAR,bool,MATRIX<VECTOR<double,3>::SCALAR,VECTOR<double,3>::dimension,VECTOR<double,3>::dimension>&,VECTOR<double,3>&);
-template void Intersections_Using_Hierarchy<VECTOR<float,1> >(RIGID_BODY<VECTOR<float,1> >&,RIGID_BODY<VECTOR<float,1> >&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<float,1> >,int>&,VECTOR<float,1>::SCALAR,bool,MATRIX<VECTOR<float,1>::SCALAR,VECTOR<float,1>::dimension,VECTOR<float,1>::dimension>&,VECTOR<float,1>&);
-template void Intersections_Using_Hierarchy<VECTOR<float,2> >(RIGID_BODY<VECTOR<float,2> >&,RIGID_BODY<VECTOR<float,2> >&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<float,2> >,int>&,VECTOR<float,2>::SCALAR,bool,MATRIX<VECTOR<float,2>::SCALAR,VECTOR<float,2>::dimension,VECTOR<float,2>::dimension>&,VECTOR<float,2>&);
-template void Intersections_Using_Hierarchy<VECTOR<float,3> >(RIGID_BODY<VECTOR<float,3> >&,RIGID_BODY<VECTOR<float,3> >&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<float,3> >,int>&,VECTOR<float,3>::SCALAR,bool,MATRIX<VECTOR<float,3>::SCALAR,VECTOR<float,3>::dimension,VECTOR<float,3>::dimension>&,VECTOR<float,3>&);
 template void Intersections_Using_Hierarchy_And_Edges<VECTOR<double,1> >(RIGID_BODY<VECTOR<double,1> >&,RIGID_BODY<VECTOR<double,1> >&,ARRAY<int,int>&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,1> >,int>&,VECTOR<double,1>::SCALAR,bool,MATRIX<VECTOR<double,1>::SCALAR,VECTOR<double,1>::dimension,VECTOR<double,1>::dimension>&,VECTOR<double,1>&);
 template void Intersections_Using_Hierarchy_And_Edges<VECTOR<double,2> >(RIGID_BODY<VECTOR<double,2> >&,RIGID_BODY<VECTOR<double,2> >&,ARRAY<int,int>&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,2> >,int>&,VECTOR<double,2>::SCALAR,bool,MATRIX<VECTOR<double,2>::SCALAR,VECTOR<double,2>::dimension,VECTOR<double,2>::dimension>&,VECTOR<double,2>&);
 template void Intersections_Using_Hierarchy_And_Edges<VECTOR<double,3> >(RIGID_BODY<VECTOR<double,3> >&,RIGID_BODY<VECTOR<double,3> >&,ARRAY<int,int>&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,3> >,int>&,VECTOR<double,3>::SCALAR,bool,MATRIX<VECTOR<double,3>::SCALAR,VECTOR<double,3>::dimension,VECTOR<double,3>::dimension>&,VECTOR<double,3>&);
