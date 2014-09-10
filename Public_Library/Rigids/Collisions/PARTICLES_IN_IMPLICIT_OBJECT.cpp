@@ -263,8 +263,8 @@ void Particles_In_Implicit_Object(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& 
 //#####################################################################
 // Function Particle_Hierarchy
 //#####################################################################
-template<class TV>
-const PARTICLE_HIERARCHY<TV>& Particle_Hierarchy(const RIGID_BODY<TV>& rigid_body,HASHTABLE<const GEOMETRY_PARTICLES<TV>*,const PARTICLE_HIERARCHY<TV>*>& particle_hierarchies)
+template<class TV> const PARTICLE_HIERARCHY<TV>& 
+Particle_Hierarchy(const RIGID_BODY<TV>& rigid_body,HASHTABLE<const GEOMETRY_PARTICLES<TV>*,const PARTICLE_HIERARCHY<TV>*>& particle_hierarchies)
 {
     PHYSBAM_ASSERT(rigid_body.simplicial_object);
     const GEOMETRY_PARTICLES<TV>& particles=rigid_body.simplicial_object->particles;
@@ -277,10 +277,10 @@ const PARTICLE_HIERARCHY<TV>& Particle_Hierarchy(const RIGID_BODY<TV>& rigid_bod
         return *particle_hierarchy;}
 }
 //#####################################################################
-// Function Particles_In_Implicit_Object
+// Function Particles_In_Implicit_Object_Hierarchy
 //#####################################################################
-template<class TV>
-void Particles_In_Implicit_Object_Hierarchy(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,HASHTABLE<const GEOMETRY_PARTICLES<TV>*,const PARTICLE_HIERARCHY<TV>*>& particle_hierarchies)
+template<class TV> void
+Particles_In_Implicit_Object_Hierarchy(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,HASHTABLE<const GEOMETRY_PARTICLES<TV>*,const PARTICLE_HIERARCHY<TV>*>& particle_hierarchies)
 {
     typedef typename TV::SCALAR T;
     static const int d=TV::dimension;
@@ -298,8 +298,8 @@ void Particles_In_Implicit_Object_Hierarchy(RIGID_BODY<TV>& particle_body,RIGID_
 //#####################################################################
 // Function Particle_Partition
 //#####################################################################
-template<class TV>
-const PARTICLE_PARTITION<TV>& Particle_Partition(const RIGID_BODY<TV>& rigid_body,const VECTOR<int,TV::dimension>& particle_partition_size)
+template<class TV> const PARTICLE_PARTITION<TV>&
+Particle_Partition(const RIGID_BODY<TV>& rigid_body,const VECTOR<int,TV::dimension>& particle_partition_size)
 {
     // TODO: regenerate if particle_partition_size changes
     PHYSBAM_ASSERT(rigid_body.simplicial_object);
@@ -308,10 +308,10 @@ const PARTICLE_PARTITION<TV>& Particle_Partition(const RIGID_BODY<TV>& rigid_bod
     return *rigid_body.simplicial_object->particle_partition;
 }
 //#####################################################################
-// Function Particles_In_Implicit_Object
+// Function Particles_In_Implicit_Object_Partition
 //#####################################################################
-template<class TV>
-void Particles_In_Implicit_Object_Partition(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool use_particle_partition_center_phi_test,const VECTOR<int,TV::dimension>& particle_partition_size,const bool exit_early)
+template<class TV> void 
+Particles_In_Implicit_Object_Partition(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool use_particle_partition_center_phi_test,const VECTOR<int,TV::dimension>& particle_partition_size,const bool exit_early)
 {
     typedef typename TV::SCALAR T;
     const int d=TV::dimension;
@@ -346,17 +346,44 @@ void Particles_In_Implicit_Object_Partition(RIGID_BODY<TV>& particle_body,RIGID_
                     if(exit_early) return;}}}}
 }
 //#####################################################################
+// Function Instantiation_Workaround
+//#####################################################################
+template<class T,class TV> void
+Instantiation_Workaround(const T&,const TV&)
+{
+    // Visual Studio 2013 workaround
+    const RIGID_BODY<TV>* rb=0;
+    ARRAY<int> ar;
+    MATRIX<T,TV::m,TV::m> mat;
+    TV v;
+    Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
+    Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
+    Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
+    Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
+    Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
+    Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
+    Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
+    Get_Interfering_Simplices(*rb,*rb,ar,mat,v,true);
+}
+//#####################################################################
+// Function Instantiation_Workaround2
+//#####################################################################
+void Instantiation_Workaround2()
+{
+    Instantiation_Workaround((float)0,VECTOR<float,1>());
+    Instantiation_Workaround((float)0,VECTOR<float,2>());
+    Instantiation_Workaround((float)0,VECTOR<float,3>());
+    Instantiation_Workaround((double)0,VECTOR<double,1>());
+    Instantiation_Workaround((double)0,VECTOR<double,2>());
+    Instantiation_Workaround((double)0,VECTOR<double,3>());
+}
+//#####################################################################
 template void Append_All_Intersections<VECTOR<double,1> >(RIGID_BODY<VECTOR<double,1> >&,RIGID_BODY<VECTOR<double,1> >&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,1> >,int>&,VECTOR<double,1>::SCALAR,bool,bool,bool);
 template void Append_All_Intersections<VECTOR<double,2> >(RIGID_BODY<VECTOR<double,2> >&,RIGID_BODY<VECTOR<double,2> >&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,2> >,int>&,VECTOR<double,2>::SCALAR,bool,bool,bool);
 template void Append_All_Intersections<VECTOR<double,3> >(RIGID_BODY<VECTOR<double,3> >&,RIGID_BODY<VECTOR<double,3> >&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,3> >,int>&,VECTOR<double,3>::SCALAR,bool,bool,bool);
 template void Append_All_Intersections<VECTOR<float,1> >(RIGID_BODY<VECTOR<float,1> >&,RIGID_BODY<VECTOR<float,1> >&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<float,1> >,int>&,VECTOR<float,1>::SCALAR,bool,bool,bool);
 template void Append_All_Intersections<VECTOR<float,2> >(RIGID_BODY<VECTOR<float,2> >&,RIGID_BODY<VECTOR<float,2> >&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<float,2> >,int>&,VECTOR<float,2>::SCALAR,bool,bool,bool);
 template void Append_All_Intersections<VECTOR<float,3> >(RIGID_BODY<VECTOR<float,3> >&,RIGID_BODY<VECTOR<float,3> >&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<float,3> >,int>&,VECTOR<float,3>::SCALAR,bool,bool,bool);
-template void Get_Interfering_Simplices<VECTOR<double,1> >(RIGID_BODY<VECTOR<double,1> > const&,RIGID_BODY<VECTOR<double,1> > const&,ARRAY<int,int>&,MATRIX<VECTOR<double,1>::SCALAR,VECTOR<double,1>::dimension,VECTOR<double,1>::dimension>&,VECTOR<double,1>&,bool);
-template void Get_Interfering_Simplices<VECTOR<double,2> >(RIGID_BODY<VECTOR<double,2> > const&,RIGID_BODY<VECTOR<double,2> > const&,ARRAY<int,int>&,MATRIX<VECTOR<double,2>::SCALAR,VECTOR<double,2>::dimension,VECTOR<double,2>::dimension>&,VECTOR<double,2>&,bool);
-template void Get_Interfering_Simplices<VECTOR<double,3> >(RIGID_BODY<VECTOR<double,3> > const&,RIGID_BODY<VECTOR<double,3> > const&,ARRAY<int,int>&,MATRIX<VECTOR<double,3>::SCALAR,VECTOR<double,3>::dimension,VECTOR<double,3>::dimension>&,VECTOR<double,3>&,bool);
-template void Get_Interfering_Simplices<VECTOR<float,1> >(RIGID_BODY<VECTOR<float,1> > const&,RIGID_BODY<VECTOR<float,1> > const&,ARRAY<int,int>&,MATRIX<VECTOR<float,1>::SCALAR,VECTOR<float,1>::dimension,VECTOR<float,1>::dimension>&,VECTOR<float,1>&,bool);
-template void Get_Interfering_Simplices<VECTOR<float,3> >(RIGID_BODY<VECTOR<float,3> > const&,RIGID_BODY<VECTOR<float,3> > const&,ARRAY<int,int>&,MATRIX<VECTOR<float,3>::SCALAR,VECTOR<float,3>::dimension,VECTOR<float,3>::dimension>&,VECTOR<float,3>&,bool);
 template void Intersections_Using_Hierarchy<VECTOR<double,1> >(RIGID_BODY<VECTOR<double,1> >&,RIGID_BODY<VECTOR<double,1> >&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,1> >,int>&,VECTOR<double,1>::SCALAR,bool,MATRIX<VECTOR<double,1>::SCALAR,VECTOR<double,1>::dimension,VECTOR<double,1>::dimension>&,VECTOR<double,1>&);
 template void Intersections_Using_Hierarchy<VECTOR<double,2> >(RIGID_BODY<VECTOR<double,2> >&,RIGID_BODY<VECTOR<double,2> >&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,2> >,int>&,VECTOR<double,2>::SCALAR,bool,MATRIX<VECTOR<double,2>::SCALAR,VECTOR<double,2>::dimension,VECTOR<double,2>::dimension>&,VECTOR<double,2>&);
 template void Intersections_Using_Hierarchy<VECTOR<double,3> >(RIGID_BODY<VECTOR<double,3> >&,RIGID_BODY<VECTOR<double,3> >&,ARRAY<int,int>&,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<VECTOR<double,3> >,int>&,VECTOR<double,3>::SCALAR,bool,MATRIX<VECTOR<double,3>::SCALAR,VECTOR<double,3>::dimension,VECTOR<double,3>::dimension>&,VECTOR<double,3>&);
