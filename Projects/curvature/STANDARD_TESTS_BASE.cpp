@@ -166,7 +166,7 @@ Self_Collisions_Begin_Callback(const T time,const int substep)
 }
 //#####################################################################
 // Function Filter_Velocities
-//####################################tttiff################################
+//#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Filter_Velocities(const T dt,const T time,const bool velocity_update)
 {
