@@ -132,7 +132,7 @@ Get_Interfering_Simplices(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body
 // Function Transform_From_Body1_To_Body2_Coordinates
 //#####################################################################
 template<class TV> TV
-Transform_From_Body1_To_Body2_Coordinates(TV& v,MATRIX<typename TV::SCALAR,TV::dimension>& rotation,TV& translation)
+Transform_From_Body1_To_Body2_Coordinates(TV& v,MATRIX<typename TV::SCALAR,TV::dimension,TV::dimension>& rotation,TV& translation)
 {return rotation*v+translation;}
 //#####################################################################
 // Function Intersections_Using_Hierarchy
@@ -146,7 +146,7 @@ Intersections_Using_Hierarchy(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& leve
     for(int t=0;t<simplex_list.m;t++){const VECTOR<int,TV::dimension>& nodes=particle_body.simplicial_object->mesh.elements(simplex_list(t));
         for(int i=0;i<nodes.m;i++){
             if(!checked(nodes[i])){checked(nodes[i])=true;
-                if((!collidable || (*collidable)(nodes[i])) && levelset_body.implicit_object->object_space_implicit_object->Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates<TV>(particle_body.simplicial_object->particles.X(nodes[i]),rotation,translation))){
+                if((!collidable || (*collidable)(nodes[i])) && levelset_body.implicit_object->object_space_implicit_object->Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates(particle_body.simplicial_object->particles.X(nodes[i]),rotation,translation))){
                     particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(particle_body.simplicial_object->particles.X(nodes[i]),nodes[i],particle_body.particle_index,levelset_body.particle_index));
                     if(exit_early) return;}}}}
 }
@@ -192,7 +192,7 @@ Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& body0,R
             int node1=mesh.segment_mesh->elements(edge)(0);
             if(!checked(node1) && (!collidable || (*collidable)(node1))){
                 if(!body1.implicit_object->object_space_implicit_object->Lazy_Outside_Extended_Levelset_And_Value(
-                       Transform_From_Body1_To_Body2_Coordinates<TV>(body0.simplicial_object->particles.X(node1),rotation,translation),value,contour_value)){
+                       Transform_From_Body1_To_Body2_Coordinates(body0.simplicial_object->particles.X(node1),rotation,translation),value,contour_value)){
                     particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(body0.simplicial_object->particles.X(node1),node1,id1,id2));
                     if(exit_early) return;
                     for(int j=0;j<(*mesh.segment_mesh->incident_elements)(node1).m;j++) // mark incident edges as checked
@@ -201,7 +201,7 @@ Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& body0,R
             int node2=mesh.segment_mesh->elements(edge)(1);
             if(!checked(node2) && (!collidable || (*collidable)(node1))){
                 if(!body1.implicit_object->object_space_implicit_object->Lazy_Outside_Extended_Levelset_And_Value(
-                       Transform_From_Body1_To_Body2_Coordinates<TV>(body0.simplicial_object->particles.X(node2),rotation,translation),value,contour_value)){
+                       Transform_From_Body1_To_Body2_Coordinates(body0.simplicial_object->particles.X(node2),rotation,translation),value,contour_value)){
                     particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(body0.simplicial_object->particles.X(node2),node2,id1,id2));
                     if(exit_early) return;
                     for(int j=0;j<(*mesh.segment_mesh->incident_elements)(node2).m;j++) // mark incident edges as checked
@@ -210,7 +210,7 @@ Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& body0,R
             if(collidable && !((*collidable)(node1) && (*collidable)(node2))) {checked(node1)=true;checked(node2)=true;segment_checked(edge)=true;continue;}
             if(phi_value(node1) > 0 && phi_value(node2) > 0 && phi_value(node1)+phi_value(node2) <= (*body0.simplicial_object->segment_lengths)(edge) && body1.simplicial_object){
                 TV p1=body0.simplicial_object->particles.X(node1),p2=body0.simplicial_object->particles.X(node2),
-                    x0=Transform_From_Body1_To_Body2_Coordinates<TV>(p1,rotation,translation),x1=Transform_From_Body1_To_Body2_Coordinates<TV>(p2,rotation,translation);
+                    x0=Transform_From_Body1_To_Body2_Coordinates(p1,rotation,translation),x1=Transform_From_Body1_To_Body2_Coordinates(p2,rotation,translation);
                 RAY<VECTOR<T,3> > ray(SEGMENT_3D<T>(x0,x1));T t_max=ray.t_max,one_over_t_max=1/t_max;
                 ARRAY<PAIR<T,bool> > intersections;intersections.Preallocate(10); // pair is (t_intersect, going_in)
                 for(int k=0;k<triangle_list2.m;k++){ray.t_max=t_max;
@@ -254,7 +254,7 @@ Particles_In_Implicit_Object(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& level
     IMPLICIT_OBJECT<VECTOR<T,d> >& object_space_implicit_object=*levelset_body.implicit_object->object_space_implicit_object;
     for(int p=0;p<particles_X.Size();p++)
         if((!collidable || (*collidable)(p)) && bounding_box2_in_body1_coordinates.Lazy_Inside(particles_X(p)) && 
-            object_space_implicit_object.Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates<TV>(particles_X(p),rotation,translation),contour_value)){
+            object_space_implicit_object.Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates(particles_X(p),rotation,translation),contour_value)){
             particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(particles_X(p),p,particle_body.particle_index,levelset_body.particle_index));
             if(exit_early) return;}
 }
@@ -329,7 +329,7 @@ Particles_In_Implicit_Object_Partition(RIGID_BODY<TV>& particle_body,RIGID_BODY<
             const ARRAY<int>& particles_in_cell=particle_partition.partition(iterator.Cell_Index());
             for(int t=0;t<particles_in_cell.m;t++){int p=particles_in_cell(t);
                 if(bounding_box2_in_body1_coordinates.Lazy_Inside(particles_X(p)) &&
-                    object_space_implicit_object.Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates<TV>(particles_X(p),rotation,translation),contour_value)){
+                    object_space_implicit_object.Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates(particles_X(p),rotation,translation),contour_value)){
                     particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(particles_X(p),p,particle_body.particle_index,levelset_body.particle_index));
                     if(exit_early) return;}}}}
     else{ // use particle partition center phi test
@@ -339,7 +339,7 @@ Particles_In_Implicit_Object_Partition(RIGID_BODY<TV>& particle_body,RIGID_BODY<
             const ARRAY<int>& particles_in_cell=particle_partition.partition(intersection_list(i));
             for(int t=0;t<particles_in_cell.m;t++){int p=particles_in_cell(t);
                 if(bounding_box2_in_body1_coordinates.Lazy_Inside(particles_X(p)) && 
-                    object_space_implicit_object.Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates<TV>(particles_X(p),rotation,translation),contour_value)){
+                    object_space_implicit_object.Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates(particles_X(p),rotation,translation),contour_value)){
                     particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(particles_X(p),p,particle_body.particle_index,levelset_body.particle_index));
                     if(exit_early) return;}}}}
 }
