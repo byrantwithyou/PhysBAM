@@ -158,9 +158,9 @@ Update_Position_Based_State(const T time,const bool is_position_update)
             auto kappa=m_hat*xi;
             auto tau=kappa-dat.kappa0(j);
             auto curvature_pe=curvature_stiffness/2*sqr(tau);
-            auto dl=length-dat.length0(j);
+            auto dl=length/dat.length0(j)-1;
             auto length_pe=length_stiffness/2*sqr(dl);
-            auto new_pe=quadrature_weight[gauss_order][j]*(curvature_pe+length_pe);
+            auto new_pe=quadrature_weight[gauss_order][j]/spline.control_points.m*(curvature_pe+length_pe);
             pe+=new_pe.x;
             Extract(ge,new_pe.dx);
             Extract(he,new_pe.ddx);

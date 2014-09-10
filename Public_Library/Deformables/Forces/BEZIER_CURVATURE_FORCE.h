@@ -23,7 +23,7 @@ public:
     using BASE::particles;
 
     const BEZIER_SPLINE<TV,3>& spline;
-    static const int gauss_order=4;
+    static const int gauss_order=7;
     ARRAY<TV> X0;
     T curvature_stiffness;
     T length_stiffness;
