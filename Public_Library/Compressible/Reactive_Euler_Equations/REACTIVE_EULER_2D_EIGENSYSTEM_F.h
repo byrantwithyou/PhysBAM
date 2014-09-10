@@ -18,7 +18,7 @@ class REACTIVE_EULER_2D_EIGENSYSTEM_F:public EIGENSYSTEM<T_input,VECTOR<T_input,
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,5> TV_DIMENSION;
     enum WORKAROUND1 {d=TV_DIMENSION::m};
 public:
-    using REACTIVE_EULER<TV>::eos;
+    using REACTIVE_EULER<TV>::eos;using REACTIVE_EULER<TV>::e;
 
     REACTIVE_EULER_2D_EIGENSYSTEM_F(REACTIVE_EOS<T>& eos_input)
         :REACTIVE_EULER<TV>(eos_input)

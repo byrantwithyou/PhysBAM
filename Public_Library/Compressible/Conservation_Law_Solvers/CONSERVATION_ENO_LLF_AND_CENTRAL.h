@@ -19,10 +19,9 @@ namespace PhysBAM{
 template<class TV,int d>
 class CONSERVATION_ENO_LLF_AND_CENTRAL:public CONSERVATION<TV,d>
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;
 private:
-    typedef CONSERVATION<TV,d> BASE;
-    using BASE::order;using BASE::field_by_field_alpha;using BASE::amplification_factor;
+    typedef CONSERVATION<TV,d> BASE;typedef typename TV::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;
+    using BASE::order;using BASE::field_by_field_alpha;using BASE::amplification_factor;using BASE::Alpha;
 
     int central_order; // 1 or 2, although order=1,2,or 3 for ENO-LLF
     T central_amplification_factor; // for amplifying alpha to increase dissipation
@@ -41,11 +40,12 @@ public:
     {central_amplification_factor=central_amplification_factor_input;}
 
 //#####################################################################
-    void Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
-        const VECTOR<bool,2>& outflow_boundaries,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux=0) PHYSBAM_OVERRIDE;
+    void Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,
+        EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,const VECTOR<bool,2>& outflow_boundaries,
+        ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux=0) PHYSBAM_OVERRIDE;
 private:
-    template<int order> void Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,
-        EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,const VECTOR<bool,2>& outflow_boundaries);
+    template<int order> void Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,
+        ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,const VECTOR<bool,2>& outflow_boundaries);
 //#####################################################################
 };   
 }

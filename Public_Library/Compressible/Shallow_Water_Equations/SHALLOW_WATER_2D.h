@@ -17,7 +17,7 @@
 namespace PhysBAM{
 
 template<class T_input>
-class SHALLOW_WATER_2D:public SHALLOW_WATER<GRID<VECTOR<T_input,2> > >
+class SHALLOW_WATER_2D:public SHALLOW_WATER<VECTOR<T_input,2> >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,3> TV_DIMENSION;
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities;

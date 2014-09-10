@@ -16,7 +16,7 @@ class CONSERVATION_CENTRAL_ENO:public CONSERVATION<TV,d>
     typedef typename TV::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;
 public:
     typedef CONSERVATION<TV,d> BASE;
-    using BASE::order;using BASE::Set_Order;using BASE::Use_Maximum_Alpha;
+    using BASE::order;using BASE::Set_Order;using BASE::Use_Maximum_Alpha;using BASE::Alpha;
 
     CONSERVATION_CENTRAL_ENO()
     {

@@ -17,7 +17,7 @@
 namespace PhysBAM{
 
 template<class T_input>
-class SHALLOW_WATER_1D_SPECIALIZED:public SHALLOW_WATER<GRID<VECTOR<T_input,1> > >
+class SHALLOW_WATER_1D_SPECIALIZED:public SHALLOW_WATER<VECTOR<T_input,1> >
 {
     typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<T,2> TV_DIMENSION;
     enum {d=2};

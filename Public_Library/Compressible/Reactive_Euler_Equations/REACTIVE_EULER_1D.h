@@ -22,12 +22,12 @@
 namespace PhysBAM{
 
 template<class T_input>
-class REACTIVE_EULER_1D:public REACTIVE_EULER<GRID<VECTOR<T_input,1> > >
+class REACTIVE_EULER_1D:public REACTIVE_EULER<VECTOR<T_input,1> >
 {   
     typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<T,4> TV_DIMENSION;
 protected:
     typedef REACTIVE_EULER<TV> BASE;
-    using BASE::cut_out_grid;using BASE::boundary;using BASE::eos;using BASE::conservation;
+    using BASE::cut_out_grid;using BASE::boundary;using BASE::eos;using BASE::conservation;using BASE::e;
 
     GRID<TV>& grid;
     ARRAY<TV_DIMENSION,VECTOR<int,1> >& U;         // mass, momentum, and energy

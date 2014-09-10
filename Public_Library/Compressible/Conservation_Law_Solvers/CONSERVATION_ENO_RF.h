@@ -16,7 +16,7 @@ class CONSERVATION_ENO_RF:public CONSERVATION<TV,d>
     typedef typename TV::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;
 public:
     typedef CONSERVATION<TV,d> BASE;
-    using BASE::order;using BASE::save_fluxes;using BASE::flux_temp;
+    using BASE::order;using BASE::save_fluxes;using BASE::flux_temp;using BASE::Alpha;
 
     CONSERVATION_ENO_RF()
     {}
