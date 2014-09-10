@@ -139,7 +139,7 @@ Transform_From_Body1_To_Body2_Coordinates(TV& v,MATRIX<typename TV::SCALAR,TV::d
 //#####################################################################
 template<class TV> void  PARTICLES_IN_IMPLICIT_OBJECT<TV>::
 Intersections_Using_Hierarchy(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<int>& simplex_list,
-    ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool exit_early,MATRIX<typename TV::SCALAR,TV::dimension>& rotation,TV& translation)
+    ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool exit_early,MATRIX<typename TV::SCALAR,TV::dimension,TV::dimension>& rotation,TV& translation)
 {
     ARRAY<bool> checked(particle_body.simplicial_object->particles.Size());
     ARRAY_VIEW<bool>* collidable=particle_body.simplicial_object->particles.template Get_Array<bool>(ATTRIBUTE_ID_COLLIDABLE);
