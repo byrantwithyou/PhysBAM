@@ -5,6 +5,7 @@
 // Class SYMMETRIC_MATRIX_NXN
 //#####################################################################
 #include <Tools/Arrays/ARRAY.h>
+#include <Tools/Matrices/MATRIX_MXN.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_NXN.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Vectors/VECTOR.h>
@@ -43,8 +44,8 @@ template<class T> SYMMETRIC_MATRIX_NXN<T>::
 template<class T> SYMMETRIC_MATRIX_NXN<T> SYMMETRIC_MATRIX_NXN<T>::
 Outer_Product(const ARRAY<T>& u)
 {
-    SYMMETRIC_MATRIX_NXN<T> result(u.n);
-    for(int i=0;i<u.n;i++) for(int j=0;j<i;j++) result(i,j)=u(i)*u(j);
+    SYMMETRIC_MATRIX_NXN<T> result(u.m);
+    for(int i=0;i<u.m;i++) for(int j=0;j<i;j++) result(i,j)=u(i)*u(j);
     return result;
 }
 //#####################################################################
@@ -212,9 +213,13 @@ operator*(const T a) const
 template<class T> ARRAY<T> SYMMETRIC_MATRIX_NXN<T>::
 operator*(const ARRAY<T>& y) const
 {
-    assert(y.n==n);
+    assert(y.m==n);
     ARRAY<T> result(n);
-    for(int i=0;i<n;i++){for(int j=0;j<=i;j++) result.x[i]+=x[((2*n-j-1)*j>>1)+i]*y.x[j];for(int j=i+1;j<n;j++) result.x[i]+=x[((2*n-i-1)*i>>1)+j]*y.x[j];}
+    for(int i=0;i<n;i++){
+        for(int j=0;j<=i;j++)
+            result(i)+=x[((2*n-j-1)*j>>1)+i]*y(j);
+        for(int j=i+1;j<n;j++)
+            result(i)+=x[((2*n-i-1)*i>>1)+j]*y(j);}
     return result;
 }
 //#####################################################################
@@ -264,3 +269,7 @@ operator<<(std::ostream& output_stream,const SYMMETRIC_MATRIX_NXN<T>& A)
     return output_stream;
 }
 //#####################################################################
+namespace PhysBAM{
+template class SYMMETRIC_MATRIX_NXN<float>;
+template class SYMMETRIC_MATRIX_NXN<double>;
+}

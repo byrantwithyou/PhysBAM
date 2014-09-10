@@ -25,7 +25,7 @@ public:
     T *x; // pointer to the one dimensional data
 
     SYMMETRIC_MATRIX_NXN()
-        :n(0),x(0),size(0)
+        :n(0),size(0),x(0)
     {}
 
     SYMMETRIC_MATRIX_NXN(const int n_input);
