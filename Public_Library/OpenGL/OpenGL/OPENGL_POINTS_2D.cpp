@@ -52,9 +52,9 @@ Display() const
         color.Send_To_GL_Pipeline();
         for(int i=0;i<points.Size();i++){
             glLoadName(i);
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-            OpenGL_Vertex(points(i),vertices);
-            OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}
+            OpenGL_Begin(GL_POINTS);
+            OpenGL_Vertex(points(i));
+            OpenGL_End();}
         glPopName();}
     else
     {
@@ -67,11 +67,11 @@ Display() const
                     OPENGL_SHAPES::Draw_Circle((*point_radii)(i),20);
                     glPopMatrix();}}
             else{
-                ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+                OpenGL_Begin(GL_POINTS);
                 for(int i=0;i<points.Size();i++){
                     (*point_colors)(i).Send_To_GL_Pipeline();
-                    OpenGL_Vertex(points(i),vertices);}
-                OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}}
+                    OpenGL_Vertex(points(i));}
+                OpenGL_End();}}
         else{
             if(point_radii && draw_radii){
                 color.Send_To_GL_Pipeline();
@@ -82,9 +82,9 @@ Display() const
                     glPopMatrix();}}
             else{
                 color.Send_To_GL_Pipeline();
-                ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-                for(int i=0;i<points.Size();i++) OpenGL_Vertex(points(i),vertices);
-                OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}}
+                OpenGL_Begin(GL_POINTS);
+                for(int i=0;i<points.Size();i++) OpenGL_Vertex(points(i));
+                OpenGL_End();}}
         if(draw_point_numbers){
             for(int i=0;i<points.Size();i++){
                 OPENGL_COLOR label_color=(point_colors)?((*point_colors)(i)*0.8):(color*0.8);

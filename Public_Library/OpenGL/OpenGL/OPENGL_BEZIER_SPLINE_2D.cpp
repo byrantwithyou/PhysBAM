@@ -57,17 +57,17 @@ Display() const
     if(draw_vertices){
         vertex_color.Send_To_GL_Pipeline();
         glPointSize(5.0f);
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+        OpenGL_Begin(GL_POINTS);
         for(int t=0;t<curve.particles.Size();t++){
-            OpenGL_Vertex(curve.particles.X(t),vertices);}
-        OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}
+            OpenGL_Vertex(curve.particles.X(t));}
+        OpenGL_End();}
 
     if(draw_velocities && curve.particles.store_velocity){
         velocity_color.Send_To_GL_Pipeline();
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+        OpenGL_Begin(GL_LINES);
         for(int t=0;t<curve.particles.Size();t++)
-            OPENGL_SHAPES::Draw_Arrow(curve.particles.X(t),curve.particles.X(t)+velocity_scale*curve.particles.V(t),vertices);
-        OpenGL_Draw_Arrays(GL_LINES,2,vertices);}
+            OPENGL_SHAPES::Draw_Arrow(curve.particles.X(t),curve.particles.X(t)+velocity_scale*curve.particles.V(t));
+        OpenGL_End();}
 
     glPopAttrib();
 
@@ -176,9 +176,9 @@ Draw_Vertices_For_Selection() const
     ARRAY<typename OPENGL_POLICY<T>::T_GL >vertices;
     for(int i=0;i<particles_in_mesh.m;i++){const int p=particles_in_mesh(i);
         glLoadName(p);
-        vertices.Resize(0);
-        OpenGL_Vertex(curve.particles.X(p),vertices);
-        OpenGL_Draw_Arrays(GL_POINTS,TV::dimension,vertices);
+        OpenGL_Begin(GL_POINTS);
+        OpenGL_Vertex(curve.particles.X(p));
+        OpenGL_End();
     }
     glPopName();
     glPopAttrib();

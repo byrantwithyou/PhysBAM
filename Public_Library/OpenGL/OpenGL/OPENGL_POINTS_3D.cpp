@@ -54,20 +54,20 @@ Display() const
         color.Send_To_GL_Pipeline();
         for(int i=0;i<points.Size();i++)if(!draw_mask || (*draw_mask)(i)){
             glLoadName(i);
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-            OpenGL_Vertex(points(i),vertices);
-            OpenGL_Draw_Arrays(GL_POINTS,3,vertices);}
+            OpenGL_Begin(GL_POINTS);
+            OpenGL_Vertex(points(i));
+            OpenGL_End();}
         glPopName();}
     else
     {
         color.Send_To_GL_Pipeline(); // set color outside OpenGL_Begin/OpenGL_End to work around apparent driver bug
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+        OpenGL_Begin(GL_POINTS);
         if(draw_mask){
-            if(point_colors){for(int i=0;i<points.Size();i++)if((*draw_mask)(i)){(*point_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(points(i), vertices);}}
-            else{color.Send_To_GL_Pipeline();for(int i=0;i<points.Size();i++)if((*draw_mask)(i)) OpenGL_Vertex(points(i), vertices);}}
-        else if(point_colors) for(int i=0;i<points.Size();i++){(*point_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(points(i), vertices);}
-        else{color.Send_To_GL_Pipeline();for(int i=0;i<points.Size();i++)OpenGL_Vertex(points(i),vertices);}
-        OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
+            if(point_colors){for(int i=0;i<points.Size();i++)if((*draw_mask)(i)){(*point_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(points(i));}}
+            else{color.Send_To_GL_Pipeline();for(int i=0;i<points.Size();i++)if((*draw_mask)(i)) OpenGL_Vertex(points(i));}}
+        else if(point_colors) for(int i=0;i<points.Size();i++){(*point_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(points(i));}
+        else{color.Send_To_GL_Pipeline();for(int i=0;i<points.Size();i++) OpenGL_Vertex(points(i));}
+        OpenGL_End();
         if(draw_point_numbers)
             for(int i=0;i<points.Size();i++)if(!draw_mask || (*draw_mask)(i)){
                 OPENGL_COLOR label_color=(point_colors)?((*point_colors)(i)*0.8):(color*0.8);

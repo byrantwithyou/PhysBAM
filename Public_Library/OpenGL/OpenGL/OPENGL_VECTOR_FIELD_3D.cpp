@@ -52,25 +52,25 @@ Display() const
         glPushAttrib(GL_LIGHTING_BIT | GL_TEXTURE_BIT | GL_LINE_BIT | GL_CURRENT_BIT);
         vector_color.Send_To_GL_Pipeline();
         glLineWidth(1);glDisable(GL_LIGHTING);glDisable(GL_TEXTURE_2D);
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+        OpenGL_Begin(GL_LINES);
         for(int i=0;i<vector_locations.m;i++){
             head=vector_locations(i)+(T)size*vector_field(i);
-            OpenGL_Line(vector_locations(i),head,vertices);
+            OpenGL_Line(vector_locations(i),head);
             if(draw_arrowhead){
                 VECTOR<T,3> orth_vect=vector_field(i).Orthogonal_Vector();
                 orth_vect*=.15*size;
-                OpenGL_Line(head,head+orth_vect-(T).15*(T)size*vector_field(i),vertices);
-                OpenGL_Line(head,head-orth_vect-(T).15*(T)size*vector_field(i),vertices);}}
-        OpenGL_Draw_Arrays(GL_LINES,3,vertices);
+                OpenGL_Line(head,head+orth_vect-(T).15*(T)size*vector_field(i));
+                OpenGL_Line(head,head-orth_vect-(T).15*(T)size*vector_field(i));}}
+        OpenGL_End();
         if(draw_basepoint){
             float old_point_size;
             (OPENGL_COLOR::Yellow(0.6)).Send_To_GL_Pipeline();
             glGetFloatv(GL_POINT_SIZE,&old_point_size);
             glPointSize(2.0);
-            vertices.Resize(0);
+            OpenGL_Begin(GL_POINTS);
             for(int i=0;i<vector_locations.m;i++)
-                if(vector_field(i).Magnitude_Squared()>0) OpenGL_Vertex(vector_locations(i),vertices);
-            OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
+                if(vector_field(i).Magnitude_Squared()>0) OpenGL_Vertex(vector_locations(i));
+            OpenGL_End();
             vector_color.Send_To_GL_Pipeline();
             glPointSize(old_point_size);}
         if(draw_value){

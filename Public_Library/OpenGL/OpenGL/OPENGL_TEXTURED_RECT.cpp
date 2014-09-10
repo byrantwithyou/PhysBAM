@@ -49,16 +49,16 @@ Display() const
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
 
-    ARRAY<OPENGL_POLICY<double>::T_GL> vertices;ARRAY<float> textures;
-    OpenGL_Texture(VECTOR<float,2>(texture->min_s,texture->min_t),textures);
-    OpenGL_Vertex(VECTOR<double,2>(-0.5*width,-0.5*height),vertices);
-    OpenGL_Texture(VECTOR<float,2>(texture->min_s,texture->max_t),textures);
-    OpenGL_Vertex(VECTOR<double,2>(-0.5*width,0.5*height),vertices);
-    OpenGL_Texture(VECTOR<float,2>(texture->max_s,texture->min_t),textures);
-    OpenGL_Vertex(VECTOR<double,2>(0.5*width,-0.5*height),vertices);
-    OpenGL_Texture(VECTOR<float,2>(texture->max_s,texture->max_t),textures);
-    OpenGL_Vertex(VECTOR<double,2>(0.5*width,0.5*height),vertices);
-    OpenGL_Draw_Arrays_With_Textures(GL_TRIANGLE_STRIP,2,vertices,textures);
+    OpenGL_Begin(GL_TRIANGLE_STRIP);
+    OpenGL_Texture(VECTOR<float,2>(texture->min_s,texture->min_t));
+    OpenGL_Vertex(VECTOR<double,2>(-0.5*width,-0.5*height));
+    OpenGL_Texture(VECTOR<float,2>(texture->min_s,texture->max_t));
+    OpenGL_Vertex(VECTOR<double,2>(-0.5*width,0.5*height));
+    OpenGL_Texture(VECTOR<float,2>(texture->max_s,texture->min_t));
+    OpenGL_Vertex(VECTOR<double,2>(0.5*width,-0.5*height));
+    OpenGL_Texture(VECTOR<float,2>(texture->max_s,texture->max_t));
+    OpenGL_Vertex(VECTOR<double,2>(0.5*width,0.5*height));
+    OpenGL_End();
 
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_CULL_FACE);

@@ -49,7 +49,6 @@ Display() const
             for(int i=0;i<debug_objects(i).type;i++)
                 OPENGL_SHAPES::Draw_Dot(debug_objects(i).X(i),OPENGL_COLOR(1,0,1),5);
 
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,1);
@@ -61,12 +60,11 @@ Display() const
 
     for(int i=0;i<debug_objects.m;i++)
         if(debug_objects(i).type==DEBUG_OBJECT<TV>::triangle){
-            vertices.Remove_All();
+            OpenGL_Begin(GL_TRIANGLES);
             OPENGL_MATERIAL::Plastic(OPENGL_COLOR(debug_objects(i).color)).Send_To_GL_Pipeline(GL_FRONT);
             OPENGL_MATERIAL::Plastic(OPENGL_COLOR(debug_objects(i).bgcolor)).Send_To_GL_Pipeline(GL_BACK);
-            OpenGL_Triangle(debug_objects(i).X(0),debug_objects(i).X(1),debug_objects(i).X(2),vertices);
-            OpenGL_Draw_Arrays(GL_TRIANGLES,2,vertices);}
-    vertices.Remove_All();
+            OpenGL_Triangle(debug_objects(i).X(0),debug_objects(i).X(1),debug_objects(i).X(2));
+            OpenGL_End();}
 
     for(int i=0;i<debug_objects.m;i++)
         if(debug_objects(i).type==DEBUG_OBJECT<TV>::segment){
@@ -104,13 +102,13 @@ Display() const
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);
         velocity_color.Send_To_GL_Pipeline();
-        vertices.Resize(0);
+        OpenGL_Begin(GL_LINES);
         for(int i=0;i<particles.X.m;i++){
             TV X=particles.X(i);
             TV Y=X+(*V)(i)*scale_velocities;
-            if(draw_arrows) OPENGL_SHAPES::Draw_Arrow(X,Y,vertices);
-            else OpenGL_Line(X,Y,vertices);}
-        OpenGL_Draw_Arrays(GL_LINES,2,vertices);
+            if(draw_arrows) OPENGL_SHAPES::Draw_Arrow(X,Y);
+            else OpenGL_Line(X,Y);}
+        OpenGL_End();
         glPopAttrib();}
 
     if(mode==GL_SELECT) glPushName(0);
@@ -122,9 +120,9 @@ Display() const
 
         if(sizes && (*sizes)(i)) OPENGL_SHAPES::Draw_Circle(particles.X(i),(*sizes)(i)*scale_velocities,20,false);
         else{
-            vertices.Resize(0);
-            OpenGL_Vertex(particles.X(i),vertices);
-            OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}}
+            OpenGL_Begin(GL_POINTS);
+            OpenGL_Vertex(particles.X(i));
+            OpenGL_End();}}
     if(mode==GL_SELECT) glPopName();
 
     glPopAttrib();

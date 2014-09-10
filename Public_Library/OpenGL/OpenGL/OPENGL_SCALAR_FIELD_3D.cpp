@@ -229,67 +229,67 @@ Display_3D() const
 
     if(dominant_axis==0){
         if(view_forward[0]>0){
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int i=grid.counts.x-1;i>=0;i--) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
-                for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
+                OpenGL_Begin(GL_TRIANGLE_STRIP);
+                OpenGL_Color(Do_Color(i,j,k).rgba);
                 TV pos=grid.X(TV_INT(i,j,k));
-                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
+                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z));
+                OpenGL_End();}}
         else{
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()){
-                for(int t=0;t<4;t++) OpenGL_Color(Do_Color(it.index).rgba,colors);
+                OpenGL_Begin(GL_TRIANGLE_STRIP);
+                OpenGL_Color(Do_Color(it.index).rgba);
                 TV pos=grid.X(it.index);
-                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}}
+                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z));
+                OpenGL_End();}}}
     else if(dominant_axis==1){
         if(view_forward[1]>0){
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int j=grid.counts.y-1;j>=0;j--) for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
-                for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
+                OpenGL_Begin(GL_TRIANGLE_STRIP);
+                OpenGL_Color(Do_Color(i,j,k).rgba);
                 TV pos=grid.X(TV_INT(i,j,k));
-                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z));
+                OpenGL_End();}}
         else{
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int j=0;j<grid.counts.y;j++) for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
-                for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
+                OpenGL_Begin(GL_TRIANGLE_STRIP);
+                OpenGL_Color(Do_Color(i,j,k).rgba);
                 TV pos=grid.X(TV_INT(i,j,k));
-                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
-                OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}}
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z));
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z));
+                OpenGL_End();}}}
     else if(dominant_axis==2){
         if(view_forward[2]>0){
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int k=grid.counts.z-1;k>=0;k--) for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
-                for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
+                OpenGL_Begin(GL_TRIANGLE_STRIP);
+                OpenGL_Color(Do_Color(i,j,k).rgba);
                 TV pos=grid.X(TV_INT(i,j,k));
-                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z));
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z));
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z));
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z));
+                OpenGL_End();}}
         else{
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int k=0;k<grid.counts.z;k++) for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
-                for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
+                OpenGL_Begin(GL_TRIANGLE_STRIP);
+                OpenGL_Color(Do_Color(i,j,k).rgba);
                 TV pos=grid.X(TV_INT(i,j,k));
-                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
-                OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}}
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z));
+                OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z));
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z));
+                OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z));
+                OpenGL_End();}}}
 
     glPopAttrib();
 }
@@ -309,38 +309,38 @@ Display_3D_Slice() const
     OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
 
     if(slice->axis==0){
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
         int i=slice->index;
         for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
-            for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
+            OpenGL_Begin(GL_TRIANGLE_STRIP);
+            OpenGL_Color(Do_Color(i,j,k).rgba);
             TV pos=grid.X(TV_INT(i,j,k));
-            OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
-            OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
+            OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z));
+            OpenGL_Vertex(TV(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z));
+            OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z));
+            OpenGL_Vertex(TV(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z));
+            OpenGL_End();}}
     else if(slice->axis==1){
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
         int j=slice->index;
         for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
-            for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
+            OpenGL_Begin(GL_TRIANGLE_STRIP);
+            OpenGL_Color(Do_Color(i,j,k).rgba);
             TV pos=grid.X(TV_INT(i,j,k));
-            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
-            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
-            OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
+            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z));
+            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z));
+            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z));
+            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z));
+            OpenGL_End();}}
     else if(slice->axis==2){
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
         int k=slice->index;
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
-            for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
+            OpenGL_Begin(GL_TRIANGLE_STRIP);
+            OpenGL_Color(Do_Color(i,j,k).rgba);
             TV pos=grid.X(TV_INT(i,j,k));
-            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
-            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
-            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
-            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
-            OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
+            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z));
+            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z));
+            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z));
+            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z));
+            OpenGL_End();}}
 
     glPopAttrib();
 }

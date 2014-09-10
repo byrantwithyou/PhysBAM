@@ -15,16 +15,16 @@ Display() const
 {
     glPushAttrib(GL_LIGHTING_BIT|GL_TEXTURE_BIT|GL_LINE_BIT);
     glLineWidth(1);glDisable(GL_LIGHTING);glDisable(GL_TEXTURE_2D);
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+    OpenGL_Begin(GL_LINES);
     for(int i=0;i<entries.m;i++){
         VECTOR<T,3> node=entries(i).x;MATRIX<T,3> line=size*entries(i).y;VECTOR<bool,3> p=entries(i).z;
         (p.x?positive_color:negative_color).Send_To_GL_Pipeline();
-        OpenGL_Line(node-line.Column(0),node+line.Column(0),vertices);
+        OpenGL_Line(node-line.Column(0),node+line.Column(0));
         (p.y?positive_color:negative_color).Send_To_GL_Pipeline();
-        OpenGL_Line(node-line.Column(1),node+line.Column(1),vertices);
+        OpenGL_Line(node-line.Column(1),node+line.Column(1));
         (p.z?positive_color:negative_color).Send_To_GL_Pipeline();
-        OpenGL_Line(node-line.Column(2),node+line.Column(2),vertices);}
-    OpenGL_Draw_Arrays(GL_LINES,3,vertices);
+        OpenGL_Line(node-line.Column(2),node+line.Column(2));}
+    OpenGL_End();
     glPopAttrib();
 }
 //#####################################################################

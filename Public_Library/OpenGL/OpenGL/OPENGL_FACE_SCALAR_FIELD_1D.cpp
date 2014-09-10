@@ -33,17 +33,17 @@ Display() const
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
     line_color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+    OpenGL_Begin(GL_LINE_STRIP);
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
-        OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,scale*x_face_values(iterator.Face_Index())), vertices);}
-    OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
+        OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,scale*x_face_values(iterator.Face_Index())));}
+    OpenGL_End();
     glColor3f(0,1,1);
     glPointSize(3.0);
     point_color.Send_To_GL_Pipeline();
-    vertices.Resize(0);
+    OpenGL_Begin(GL_POINTS);
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
-        OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,scale*x_face_values(iterator.Face_Index())), vertices);}
-    OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
+        OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,scale*x_face_values(iterator.Face_Index())));}
+    OpenGL_End();
     glPopAttrib();
 }
 template<class T> void
@@ -53,10 +53,10 @@ Display_Bool_Helper(const OPENGL_FACE_SCALAR_FIELD_1D<T,bool>& self)
     glDisable(GL_LIGHTING);
     glPointSize(8.0);
     self.point_color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+    OpenGL_Begin(GL_POINTS);
     for(FACE_ITERATOR<VECTOR<T,1> > iterator(self.grid);iterator.Valid();iterator.Next()) if(self.x_face_values(iterator.Face_Index())){
-        OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,(T)0),vertices);}
-    OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
+        OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,(T)0));}
+    OpenGL_End();
     glPopAttrib();
 }
 template<> void OPENGL_FACE_SCALAR_FIELD_1D<float,bool>::

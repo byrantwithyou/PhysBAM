@@ -34,18 +34,18 @@ Display() const
         glPushAttrib(GL_ALL_ATTRIB_BITS);OPENGL_COLOR(.07,.12,.42).Send_To_GL_Pipeline();
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        OpenGL_Triangle_Strip_2D(VECTOR<T,2>(grid.domain.min_corner.x,(T)-1000.),VECTOR<T,2>(grid.domain.max_corner.x,(T)1000.),vertices);
-        OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,2,vertices);
+        OpenGL_Begin(GL_TRIANGLE_STRIP);
+        OpenGL_Triangle_Strip_2D(VECTOR<T,2>(grid.domain.min_corner.x,(T)-1000.),VECTOR<T,2>(grid.domain.max_corner.x,(T)1000.));
+        OpenGL_End();
         glPopAttrib();}
 
     // Draw grid
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
     glPointSize(3.0);
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for(int i=-ghost_cells;i<grid.counts.x+ghost_cells;i++) OpenGL_Vertex(VECTOR<T,3>(grid.X(TV_INT(i)).x,(T)0,(T)0),vertices);
-    OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
+    OpenGL_Begin(GL_POINTS);
+    for(int i=-ghost_cells;i<grid.counts.x+ghost_cells;i++) OpenGL_Vertex(VECTOR<T,3>(grid.X(TV_INT(i)).x,(T)0,(T)0));
+    OpenGL_End();
     glPopAttrib();
 
     glPopAttrib();

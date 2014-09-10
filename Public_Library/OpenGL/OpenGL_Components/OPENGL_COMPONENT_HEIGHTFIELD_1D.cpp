@@ -76,7 +76,6 @@ Set_Draw(bool draw_input)
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Display() const
 {
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     OPENGL_COLOR water_color(0,0,1);
     OPENGL_COLOR ground_color=OPENGL_COLOR::Gray(0.8);
     OPENGL_COLOR displaced_water(1,0,0);
@@ -101,9 +100,9 @@ Display() const
             for(int i=0;i<grid.counts.x;i++)
             {
                 glLoadName(i);
-                vertices.Resize(0);
-                OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)),vertices);
-                OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
+                OpenGL_Begin(GL_POINTS);
+                OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)));
+                OpenGL_End();
             }
             glPopAttrib();
             glPopName();
@@ -113,37 +112,37 @@ Display() const
             if(x)
             {
                 displaced_water.Send_To_GL_Pipeline();
-                vertices.Resize(0);
+                OpenGL_Begin(GL_LINE_STRIP);
                 if(displacement_scale == 1)
                 {
                     for(int i=0;i<x->Size().x;i++)
-                        OpenGL_Vertex(VECTOR<T,2>((*x)(i), scale*height(i)),vertices);       
+                        OpenGL_Vertex(VECTOR<T,2>((*x)(i), scale*height(i)));       
                 }
                 else
                 {
                     for(int i=0;i<x->Size().x;i++)
                         OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x + displacement_scale*((*x)(i)-grid.X(TV_INT(i)).x),
-                                scale*height(i)),vertices);       
+                                scale*height(i)));       
                 }
-                OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
+                OpenGL_End();
             }
 
             // Water
             water_color.Send_To_GL_Pipeline();
-            vertices.Resize(0);
+            OpenGL_Begin(GL_LINE_STRIP);
             for(int i=0;i<grid.counts.x;i++)
-                OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)),vertices);
-            OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
+                OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)));
+            OpenGL_End();
 
             if(draw_points)
             {
                 glPushAttrib(GL_POINT_BIT);
                 glPointSize(point_size);
                 points_color.Send_To_GL_Pipeline();
-                vertices.Resize(0);
+                OpenGL_Begin(GL_POINTS);
                 for(int i=0;i<grid.counts.x;i++)
-                    OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)),vertices);
-                OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
+                    OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)));
+                OpenGL_End();
 
                 for(int i=0;i<grid.counts.x;i++)
                     OpenGL_String(VECTOR<T,2>(grid.X(TV_INT(i)).x,scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
@@ -151,9 +150,9 @@ Display() const
                 if(selected_index>=0){
                     selected_point_color.Send_To_GL_Pipeline();
                     int i=selected_index;
-                    vertices.Resize(0);
-                    OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)),vertices);
-                    OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
+                    OpenGL_Begin(GL_POINTS);
+                    OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)));
+                    OpenGL_End();
                     OpenGL_String(VECTOR<T,2>(grid.X(TV_INT(i)).x,scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
                 }
 
@@ -164,17 +163,17 @@ Display() const
             ground_color.Send_To_GL_Pipeline();
             if(ground)
             {
-                vertices.Resize(0);
+                OpenGL_Begin(GL_LINE_STRIP);
                 for(int i=0;i<grid.counts.x;i++)
-                    OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*(*ground)(i)),vertices);      
-                OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
+                    OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*(*ground)(i)));      
+                OpenGL_End();
             }
             else
             {
-                vertices.Resize(0);
-                OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT()).x, 0),vertices);
-                OpenGL_Vertex(VECTOR<T,2>(grid.X(grid.counts-1).x, 0),vertices);
-                OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
+                OpenGL_Begin(GL_LINE_STRIP);
+                OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT()).x, 0));
+                OpenGL_Vertex(VECTOR<T,2>(grid.X(grid.counts-1).x, 0));
+                OpenGL_End();
             }
         }
 

@@ -24,7 +24,6 @@ OPENGL_POINT_SIMPLICES_1D(const POINT_SIMPLICES_1D<T>& simplices_input,const OPE
 template<class T> void OPENGL_POINT_SIMPLICES_1D<T>::
 Display() const
 {
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
     color.Send_To_GL_Pipeline();
@@ -36,16 +35,16 @@ Display() const
     if(draw_vertices){
         segment_color.Send_To_GL_Pipeline();
         glPointSize(5.0f);
-        vertices.Resize(0);
+        OpenGL_Begin(GL_LINES);
         for(int t=0;t<simplices.particles.Size();t++){
-            OpenGL_Vertex(simplices.particles.X(t),vertices);}
-        OpenGL_Draw_Arrays(GL_LINES,2,vertices);
+            OpenGL_Vertex(simplices.particles.X(t));}
+        OpenGL_End();
         vertex_color.Send_To_GL_Pipeline();
         glPointSize(10.0f);
-        vertices.Resize(0);
+        OpenGL_Begin(GL_POINTS);
         for(int t=0;t<simplices.particles.Size();t++){
-            OpenGL_Vertex(simplices.particles.X(t),vertices);}
-        OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}
+            OpenGL_Vertex(simplices.particles.X(t));}
+        OpenGL_End();}
 
     glPopAttrib();
     glPopMatrix();

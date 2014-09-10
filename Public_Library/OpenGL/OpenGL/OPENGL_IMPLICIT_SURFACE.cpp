@@ -103,7 +103,7 @@ Display_Tetrahedron(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3
                 p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x0,phi4/(phi4-phi1));
                 p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x1,phi4/(phi4-phi2));
                 p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x2, phi4/(phi4-phi3));} 
-            OpenGL_Normal(surface.Normal(p1),normals);OpenGL_Vertex(p1,vertices);OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2,vertices);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3,vertices);
+            OpenGL_Normal(surface.Normal(p1),normals);OpenGL_Vertex(p1);OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3);
             break;
         case 2:
             // two triangles
@@ -137,8 +137,8 @@ Display_Tetrahedron(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3
                 p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x2,x1,phi3/(phi3-phi2));
                 p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x0,phi4/(phi4-phi1));
                 p4=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x1,phi4/(phi4-phi2));}
-            OpenGL_Normal(surface.Normal(p1),normals);OpenGL_Vertex(p1,vertices);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3,vertices);OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2,vertices);
-            OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2,vertices);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3,vertices);OpenGL_Normal(surface.Normal(p4),normals);OpenGL_Vertex(p4,vertices);
+            OpenGL_Normal(surface.Normal(p1),normals);OpenGL_Vertex(p1);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3);OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2);
+            OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3);OpenGL_Normal(surface.Normal(p4),normals);OpenGL_Vertex(p4);
             break;
         case 3:
             // one triangle
@@ -158,7 +158,7 @@ Display_Tetrahedron(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3
                 p1=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x0,phi4/(phi4-phi1));
                 p2=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x2,phi4/(phi4-phi3));
                 p3=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(x3,x1,phi4/(phi4-phi2));}  
-            OpenGL_Normal(surface.Normal(p1),normals);OpenGL_Vertex(p1,vertices);OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2,vertices);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3,vertices);
+            OpenGL_Normal(surface.Normal(p1),normals);OpenGL_Vertex(p1);OpenGL_Normal(surface.Normal(p2),normals);OpenGL_Vertex(p2);OpenGL_Normal(surface.Normal(p3),normals);OpenGL_Vertex(p3);
             break;
         case 4:
             // no triangles
@@ -178,18 +178,18 @@ Display_Brick(const VECTOR<T,3>& x0,float p1,const VECTOR<T,3>& x1,float p2,cons
 {
     // is there a way to avoid computing normals redundantly (but not compute unnecessary ones as well)?
     if(!parity) { //means (i+j+k)%2==0
-        Display_Tetrahedron(x0,x1,x2,x4,p1,p2,p3,p5,vertices,normals);  //bottom left
-        Display_Tetrahedron(x1,x4,x5,x7,p2,p5,p6,p8,vertices,normals);  //bottom right
-        Display_Tetrahedron(x1,x2,x7,x3,p2,p3,p8,p4,vertices,normals);  //top towards
-        Display_Tetrahedron(x2,x4,x7,x6,p3,p5,p8,p7,vertices,normals);  //top away
-        Display_Tetrahedron(x1,x2,x4,x7,p2,p3,p5,p8,vertices,normals);  //center tetrahedron
+        Display_Tetrahedron(x0,x1,x2,x4,p1,p2,p3,p5,normals);  //bottom left
+        Display_Tetrahedron(x1,x4,x5,x7,p2,p5,p6,p8,normals);  //bottom right
+        Display_Tetrahedron(x1,x2,x7,x3,p2,p3,p8,p4,normals);  //top towards
+        Display_Tetrahedron(x2,x4,x7,x6,p3,p5,p8,p7,normals);  //top away
+        Display_Tetrahedron(x1,x2,x4,x7,p2,p3,p5,p8,normals);  //center tetrahedron
     }
     else { // means (i+j+k)%2==1
-        Display_Tetrahedron(x0,x1,x3,x5,p1,p2,p4,p6,vertices,normals); //bottom towards
-        Display_Tetrahedron(x0,x4,x5,x6,p1,p5,p6,p7,vertices,normals); //bottom away
-        Display_Tetrahedron(x0,x2,x6,x3,p1,p3,p7,p4,vertices,normals); //top left
-        Display_Tetrahedron(x3,x5,x7,x6,p4,p6,p8,p7,vertices,normals); //top right
-        Display_Tetrahedron(x0,x3,x6,x5,p1,p4,p7,p6,vertices,normals); //center tetrahedron
+        Display_Tetrahedron(x0,x1,x3,x5,p1,p2,p4,p6,normals); //bottom towards
+        Display_Tetrahedron(x0,x4,x5,x6,p1,p5,p6,p7,normals); //bottom away
+        Display_Tetrahedron(x0,x2,x6,x3,p1,p3,p7,p4,normals); //top left
+        Display_Tetrahedron(x3,x5,x7,x6,p4,p6,p8,p7,normals); //top right
+        Display_Tetrahedron(x0,x3,x6,x5,p1,p4,p7,p6,normals); //center tetrahedron
     }
 }
 //#####################################################################
@@ -231,7 +231,7 @@ Display() const
         p[3]*m[12]+p[7]*m[13]+p[11]*m[14]+p[15]*m[15]).Inverse(); // the OpenGL eye to world transform
     GRID<TV> eye_grid(nx,ny,nz,-1,1,-1,1,-1,1); // set up a 3d grid in eye space
 
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
+    OpenGL_Begin(GL_TRIANGLES);
     int old_index,index;
     bool seen_outside,seen_inside,old_sign_change,sign_change;
     int i,j,k,skip;
@@ -286,7 +286,7 @@ Display() const
                 else {sign_change=true; skip=1;}
                 if(sign_change || old_sign_change || (seen_inside && seen_outside)){
                     assert(skip==1);
-                    Display_Brick(old_x[0],slice1[old_index],old_x[1],slice2[old_index],old_x[2],slice1[old_index+1],old_x[3],slice2[old_index+1],x[0],slice1[index],x[1],slice2[index],x[2],slice1[index+1],x[3],slice2[index+1],(i+j+k)%2,vertices,normals);
+                    Display_Brick(old_x[0],slice1[old_index],old_x[1],slice2[old_index],old_x[2],slice1[old_index+1],old_x[3],slice2[old_index+1],x[0],slice1[index],x[1],slice2[index],x[2],slice1[index+1],x[3],slice2[index+1],(i+j+k)%2);
                 }
                 if(seen_inside && seen_outside) break; // occlusion culling
                 k+=skip;
@@ -303,7 +303,7 @@ Display() const
             memset(up_to_date2,0,sizeof(float)*(ny+1)*(nz+1));
             up_to_date_counter=1;}
     }
-    OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
+    OpenGL_End();
     ++up_to_date_counter;
     if(up_to_date_counter+1==0){
         memset(up_to_date1,0,sizeof(float)*(ny+1)*(nz+1));

@@ -57,24 +57,24 @@ Display() const
         glDisable(GL_LIGHTING);glPointSize(5.0);
         T x_offset=0.4*mac_grid.dX.x,y_offset=0.4*mac_grid.dX.y,z_offset=0.4*mac_grid.dX.z;
         point_color.Send_To_GL_Pipeline();
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+        OpenGL_Begin(GL_POINTS);
         for(int i=0;i<pseudo_dirichlet_cells.m;i++){
             const VECTOR<int,3>& cell_index=pseudo_dirichlet_cells(i).x;char face_mask=pseudo_dirichlet_cells(i).z;
             VECTOR<T,3> pos=mac_grid.X(cell_index);
-            if(face_mask&0x01) OpenGL_Vertex(VECTOR<T,3>(pos.x-x_offset,pos.y,pos.z),vertices);
-            if(face_mask&0x02) OpenGL_Vertex(VECTOR<T,3>(pos.x+x_offset,pos.y,pos.z),vertices);
-            if(face_mask&0x04) OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-y_offset,pos.z),vertices);
-            if(face_mask&0x08) OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+y_offset,pos.z),vertices);
-            if(face_mask&0x10) OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y,pos.z-z_offset),vertices);
-            if(face_mask&0x20) OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y,pos.z+z_offset),vertices);}
-        OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
+            if(face_mask&0x01) OpenGL_Vertex(VECTOR<T,3>(pos.x-x_offset,pos.y,pos.z));
+            if(face_mask&0x02) OpenGL_Vertex(VECTOR<T,3>(pos.x+x_offset,pos.y,pos.z));
+            if(face_mask&0x04) OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-y_offset,pos.z));
+            if(face_mask&0x08) OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+y_offset,pos.z));
+            if(face_mask&0x10) OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y,pos.z-z_offset));
+            if(face_mask&0x20) OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y,pos.z+z_offset));}
+        OpenGL_End();
         velocity_color.Send_To_GL_Pipeline();
-        vertices.Resize(0);
+        OpenGL_Begin(GL_LINES);
         for(int i=0;i<pseudo_dirichlet_cells.m;i++){
             const VECTOR<int,3>& cell_index=pseudo_dirichlet_cells(i).x;const VECTOR<T,3>& velocity=pseudo_dirichlet_cells(i).y;
             VECTOR<T,3> pos=mac_grid.X(cell_index);
-            OpenGL_Line(pos,pos+velocity_scale*velocity,vertices);}
-        OpenGL_Draw_Arrays(GL_LINES,3,vertices);
+            OpenGL_Line(pos,pos+velocity_scale*velocity);}
+        OpenGL_End();
         glPopAttrib();
     }
 }

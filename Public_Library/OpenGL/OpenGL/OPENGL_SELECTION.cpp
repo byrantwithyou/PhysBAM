@@ -37,9 +37,9 @@ Draw_Highlighted_Vertex(const TV& position,int id,const OPENGL_COLOR& color)
     glDisable(GL_LIGHTING);
     glPointSize(OPENGL_PREFERENCES::highlighted_point_size);
     color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
-    OpenGL_Vertex(position, vertices);
-    OpenGL_Draw_Arrays(GL_POINTS,TV::dimension,vertices);
+    OpenGL_Begin(GL_POINTS);
+    OpenGL_Vertex(position);
+    OpenGL_End();
     if(id>=0) OpenGL_String(position,STRING_UTILITIES::string_sprintf("   %d",id));
     glPopAttrib();
 }
@@ -53,9 +53,9 @@ Draw_Highlighted_Segment(const TV& x0,const TV& x1,int id,const OPENGL_COLOR& co
     glDisable(GL_LIGHTING);
     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);
     color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
-    OpenGL_Line(x0,x1,vertices);
-    OpenGL_Draw_Arrays(GL_LINES,TV::dimension,vertices);
+    OpenGL_Begin(GL_LINES);
+    OpenGL_Line(x0,x1);
+    OpenGL_End();
     if(id>=0) OpenGL_String((typename TV::SCALAR).5*(x0+x1),STRING_UTILITIES::string_sprintf("   %d",id));
     glPopAttrib();
 }
@@ -70,9 +70,9 @@ Draw_Highlighted_Curve(const ARRAY<VECTOR<TV,2> >& X,int id,const OPENGL_COLOR& 
     glDisable(GL_LIGHTING);
     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);
     color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
-    for(int i=0;i<X.m;i++) {OpenGL_Line(X(i).x,X(i).y,vertices);total+=X(i).x;}
-    OpenGL_Draw_Arrays(GL_LINES,TV::dimension,vertices);
+    OpenGL_Begin(GL_LINES);
+    for(int i=0;i<X.m;i++) {OpenGL_Line(X(i).x,X(i).y);total+=X(i).x;}
+    OpenGL_End();
     if(id>=0) OpenGL_String((typename TV::SCALAR)1./X.m*(total),STRING_UTILITIES::string_sprintf("   %d",id));
     glPopAttrib();
 }
@@ -86,11 +86,11 @@ Draw_Highlighted_Triangle_Boundary(const TV& x0,const TV& x1,const TV& x2,int id
     glDisable(GL_LIGHTING);
     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);
     color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
-    OpenGL_Vertex(x0,vertices);
-    OpenGL_Vertex(x1,vertices);
-    OpenGL_Vertex(x2,vertices);
-    OpenGL_Draw_Arrays(GL_LINE_LOOP,TV::dimension,vertices);
+    OpenGL_Begin(GL_LINE_LOOP);
+    OpenGL_Vertex(x0);
+    OpenGL_Vertex(x1);
+    OpenGL_Vertex(x2);
+    OpenGL_End();
     if(id>=0) OpenGL_String(((typename TV::SCALAR)1/3)*(x0+x1+x2),STRING_UTILITIES::string_sprintf("%d",id));
     glPopAttrib();
 }
@@ -104,18 +104,18 @@ Draw_Highlighted_Tetrahedron_Boundary(const VECTOR<T,3>& x0,const VECTOR<T,3>& x
     glDisable(GL_LIGHTING);
     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);
     color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<T>::T_GL >vertices;
-    OpenGL_Vertex(x0,vertices);
-    OpenGL_Vertex(x1,vertices);
-    OpenGL_Vertex(x2,vertices);
-    OpenGL_Vertex(x0,vertices);
-    OpenGL_Vertex(x3,vertices);
-    OpenGL_Vertex(x1,vertices);
-    OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices);
-    vertices.Resize(0);
-    OpenGL_Vertex(x3,vertices);
-    OpenGL_Vertex(x2,vertices);
-    OpenGL_Draw_Arrays(GL_LINES,3,vertices);
+    OpenGL_Begin(GL_LINE_STRIP);
+    OpenGL_Vertex(x0);
+    OpenGL_Vertex(x1);
+    OpenGL_Vertex(x2);
+    OpenGL_Vertex(x0);
+    OpenGL_Vertex(x3);
+    OpenGL_Vertex(x1);
+    OpenGL_End();
+    OpenGL_Begin(GL_LINES);
+    OpenGL_Vertex(x3);
+    OpenGL_Vertex(x2);
+    OpenGL_End();
     if(id>=0) OpenGL_String((T)0.25*(x0+x1+x2+x3),STRING_UTILITIES::string_sprintf("%d",id));
     glPopAttrib();
 }
@@ -129,9 +129,9 @@ Draw_Highlighted_Quad(const VECTOR<T,2>& x00,const VECTOR<T,2>& x11,const OPENGL
     glDisable(GL_LIGHTING);
     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);
     color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    OpenGL_Quad_2D(x00,x11,vertices);
-    OpenGL_Draw_Arrays(GL_LINE_LOOP,2,vertices);
+    OpenGL_Begin(GL_LINE_LOOP);
+    OpenGL_Quad_2D(x00,x11);
+    OpenGL_End();
     glPopAttrib();
 }
 //#####################################################################
@@ -144,9 +144,9 @@ Draw_Highlighted_Quad(const VECTOR<T,3>& node1,const VECTOR<T,3>& node2,const VE
     glDisable(GL_LIGHTING);
     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);
     color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    OpenGL_Vertex(node1,vertices);OpenGL_Vertex(node2,vertices);OpenGL_Vertex(node4,vertices);OpenGL_Vertex(node3,vertices);
-    OpenGL_Draw_Arrays(GL_LINE_LOOP,3,vertices);
+    OpenGL_Begin(GL_LINE_LOOP);
+    OpenGL_Vertex(node1);OpenGL_Vertex(node2);OpenGL_Vertex(node4);OpenGL_Vertex(node3);
+    OpenGL_End();
     glPopAttrib();
 }
 //#####################################################################
@@ -161,18 +161,28 @@ Draw_Highlighted_Box(const VECTOR<T,3>& x000,const VECTOR<T,3>& x111,const OPENG
     color.Send_To_GL_Pipeline();
     VECTOR<T,3> x001(x000.x,x000.y,x111.z),x010(x000.x,x111.y,x000.z),x011(x000.x,x111.y,x111.z),
         x100(x111.x,x000.y,x000.z),x101(x111.x,x000.y,x111.z),x110(x111.x,x111.y,x000.z);
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    OpenGL_Vertex(x000,vertices); OpenGL_Vertex(x010,vertices); OpenGL_Vertex(x011,vertices); OpenGL_Vertex(x001,vertices);
-    OpenGL_Draw_Arrays(GL_LINE_LOOP,3,vertices);
-    vertices.Resize(0);
-    OpenGL_Vertex(x100,vertices); OpenGL_Vertex(x110,vertices); OpenGL_Vertex(x111,vertices); OpenGL_Vertex(x101,vertices);
-    OpenGL_Draw_Arrays(GL_LINE_LOOP,3,vertices);
-    vertices.Resize(0);
-    OpenGL_Vertex(x000,vertices); OpenGL_Vertex(x100,vertices);
-    OpenGL_Vertex(x010,vertices); OpenGL_Vertex(x110,vertices);
-    OpenGL_Vertex(x011,vertices); OpenGL_Vertex(x111,vertices);
-    OpenGL_Vertex(x001,vertices); OpenGL_Vertex(x101,vertices);
-    OpenGL_Draw_Arrays(GL_LINES,3,vertices);
+    OpenGL_Begin(GL_LINE_LOOP);
+    OpenGL_Vertex(x000);
+    OpenGL_Vertex(x010);
+    OpenGL_Vertex(x011);
+    OpenGL_Vertex(x001);
+    OpenGL_End();
+    OpenGL_Begin(GL_LINE_LOOP);
+    OpenGL_Vertex(x100);
+    OpenGL_Vertex(x110);
+    OpenGL_Vertex(x111);
+    OpenGL_Vertex(x101);
+    OpenGL_End();
+    OpenGL_Begin(GL_LINES);
+    OpenGL_Vertex(x000);
+    OpenGL_Vertex(x100);
+    OpenGL_Vertex(x010);
+    OpenGL_Vertex(x110);
+    OpenGL_Vertex(x011);
+    OpenGL_Vertex(x111);
+    OpenGL_Vertex(x001);
+    OpenGL_Vertex(x101);
+    OpenGL_End();
     glPopAttrib();
 }
 //#####################################################################
@@ -188,9 +198,9 @@ Draw_Vertices_For_Selection(const SIMPLEX_MESH<d>& mesh,const GEOMETRY_PARTICLES
     ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
     for(int i=0;i<particles_in_mesh.m;i++){const int p=particles_in_mesh(i);
         glLoadName(p);
-        vertices.Resize(0);
-        OpenGL_Vertex(particles.X(p),vertices);
-        OpenGL_Draw_Arrays(GL_POINTS,TV::dimension,vertices);
+        OpenGL_Begin(GL_POINTS);
+        OpenGL_Vertex(particles.X(p));
+        OpenGL_End();
     }
     glPopName();
     glPopAttrib();

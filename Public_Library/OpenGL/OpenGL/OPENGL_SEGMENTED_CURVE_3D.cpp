@@ -29,7 +29,6 @@ TV Camera_Oriented_Normal(const TV& camera_direction,const VECTOR<TV,2>& Xs)
 template<class T> void OPENGL_SEGMENTED_CURVE_3D<T>::
 Display() const
 {   
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
     if(use_solid_color){glPushAttrib(GL_LIGHTING_BIT);glDisable(GL_LIGHTING);color.Send_To_GL_Pipeline();}
     else OPENGL_MATERIAL::Plastic(color).Send_To_GL_Pipeline();
 
@@ -57,33 +56,33 @@ Display() const
     else
     {
         if(use_solid_color){
-            vertices.Resize(0);
+            OpenGL_Begin(GL_LINES);
             for(int t=0;t<curve.mesh.elements.m;t++){
                 int i=curve.mesh.elements(t)(0),j=curve.mesh.elements(t)(1);
                 if(!hide_unselected || (seen.Contains(i) && seen.Contains(j))){
-                    OpenGL_Vertex(curve.particles.X(i),vertices);OpenGL_Vertex(curve.particles.X(j),vertices);}}
-            OpenGL_Draw_Arrays(GL_LINES,3,vertices);}
+                    OpenGL_Vertex(curve.particles.X(i));OpenGL_Vertex(curve.particles.X(j));}}
+            OpenGL_End();}
         else{
             if(smooth_normals){
                 Initialize_Vertex_Normals();
-                vertices.Resize(0);normals.Resize(0);
+                OpenGL_Begin(GL_LINES);
                 for(int i=0;i<segment_nodes.m;i++){int p=segment_nodes(i);
                     const ARRAY<int>& incident=(*curve.mesh.incident_elements)(p);
                     for(int j=0;j<incident.m;j++){const VECTOR<int,2>& nodes=curve.mesh.elements(incident(j));
                         if(!hide_unselected || (seen.Contains(nodes[0]) && seen.Contains(nodes[1]))){
-                            OpenGL_Normal(vertex_normals.Get(nodes[0]),normals);OpenGL_Vertex(curve.particles.X(nodes[0]),vertices);
-                            OpenGL_Normal(vertex_normals.Get(nodes[1]),normals);OpenGL_Vertex(curve.particles.X(nodes[1]),vertices);}}}
-                OpenGL_Draw_Arrays_With_Normals(GL_LINES,3,vertices,normals);}
+                            OpenGL_Normal(vertex_normals.Get(nodes[0]));OpenGL_Vertex(curve.particles.X(nodes[0]));
+                            OpenGL_Normal(vertex_normals.Get(nodes[1]));OpenGL_Vertex(curve.particles.X(nodes[1]));}}}
+                OpenGL_End();}
             else{
-                vertices.Resize(0);normals.Resize(0);
+                OpenGL_Begin(GL_LINES);
                 TV camera_direction=OPENGL_WORLD<T>::Singleton()->Get_Camera_Position()-OPENGL_WORLD<T>::Singleton()->Get_Target_Position().Normalized();
                 for(int s=0;s<curve.mesh.elements.m;s++){
                     const VECTOR<int,2>& nodes=curve.mesh.elements(s);
                     if(!hide_unselected || (seen.Contains(nodes[0]) && seen.Contains(nodes[1]))){
                         VECTOR<TV,2> Xs(curve.particles.X.Subset(nodes));
-                        for(int line_vertices=0;line_vertices<2;line_vertices++) OpenGL_Normal(Camera_Oriented_Normal(camera_direction,Xs),normals);
-                        OpenGL_Vertex(Xs[0],vertices);OpenGL_Vertex(Xs[1],vertices);}}
-                OpenGL_Draw_Arrays_With_Normals(GL_LINES,3,vertices,normals);}}
+                        for(int line_vertices=0;line_vertices<2;line_vertices++) OpenGL_Normal(Camera_Oriented_Normal(camera_direction,Xs));
+                        OpenGL_Vertex(Xs[0]);OpenGL_Vertex(Xs[1]);}}
+                OpenGL_End();}}
 
         if(current_selection){
             if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_3D){
@@ -104,9 +103,9 @@ Display() const
     if(draw_vertices){
         vertex_color.Send_To_GL_Pipeline();
         glPointSize(5.0f);
-        vertices.Resize(0);
-        for(int t=0;t<curve.particles.Size();t++) OpenGL_Vertex(curve.particles.X(t),vertices);
-        OpenGL_Draw_Arrays(GL_POINTS,3,vertices);}
+        OpenGL_Begin(GL_POINTS);
+        for(int t=0;t<curve.particles.Size();t++) OpenGL_Vertex(curve.particles.X(t));
+        OpenGL_End();}
 
     if(use_solid_color) glPopAttrib();
 
@@ -292,9 +291,9 @@ Draw_Segments_For_Selection() const
     for(int i=0;i<curve.mesh.elements.m;i++){
         int node1,node2;curve.mesh.elements(i).Get(node1,node2);
         glLoadName(i);
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        OpenGL_Line(curve.particles.X(node1),curve.particles.X(node2),vertices);
-        OpenGL_Draw_Arrays(GL_LINES,3,vertices);}
+        OpenGL_Begin(GL_LINES);
+        OpenGL_Line(curve.particles.X(node1),curve.particles.X(node2));
+        OpenGL_End();}
     glPopName();
     glPopAttrib();
 }

@@ -59,7 +59,6 @@ Display() const
 {
     OPENGL_COLOR node_neighbor_not_visible_color=OPENGL_COLOR::Magenta(0.5,0.5);
     OPENGL_COLOR face_corners_not_visible_from_face_center_color=OPENGL_COLOR::Magenta(1);
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     if(valid && draw){
         if(draw_grid_visibility){
             glPushAttrib(GL_LIGHTING_BIT | GL_LINE_BIT | GL_CURRENT_BIT);
@@ -67,22 +66,22 @@ Display() const
 
             face_corners_not_visible_from_face_center_color.Send_To_GL_Pipeline();
             glLineWidth(1);
-            vertices.Resize(0);
+            OpenGL_Begin(GL_LINES);
             for(int i=face_corners_visible_from_face_center_u.domain.min_corner.x;i<face_corners_visible_from_face_center_u.domain.max_corner.x;i++) for(int j=face_corners_visible_from_face_center_u.domain.min_corner.y;j<face_corners_visible_from_face_center_u.domain.max_corner.y;j++){
-                if(!face_corners_visible_from_face_center_u(i,j)(0).x){OpenGL_Line(u_grid.X(TV_INT(i,j)),grid.X(TV_INT(i,j)),vertices);}
-                if(!face_corners_visible_from_face_center_u(i,j)(1).x){OpenGL_Line(u_grid.X(TV_INT(i,j)),grid.X(TV_INT(i,j+1)),vertices);}}
+                if(!face_corners_visible_from_face_center_u(i,j)(0).x){OpenGL_Line(u_grid.X(TV_INT(i,j)),grid.X(TV_INT(i,j)));}
+                if(!face_corners_visible_from_face_center_u(i,j)(1).x){OpenGL_Line(u_grid.X(TV_INT(i,j)),grid.X(TV_INT(i,j+1)));}}
             for(int i=face_corners_visible_from_face_center_v.domain.min_corner.x;i<face_corners_visible_from_face_center_v.domain.max_corner.x;i++) for(int j=face_corners_visible_from_face_center_v.domain.min_corner.y;j<face_corners_visible_from_face_center_v.domain.max_corner.y;j++){
-                if(!face_corners_visible_from_face_center_v(i,j)(0).x){OpenGL_Line(v_grid.X(TV_INT(i,j)),grid.X(TV_INT(i,j)),vertices);}
-                if(!face_corners_visible_from_face_center_v(i,j)(1).x){OpenGL_Line(v_grid.X(TV_INT(i,j)),grid.X(TV_INT(i+1,j)),vertices);}}
-            OpenGL_Draw_Arrays(GL_LINES,2,vertices);
+                if(!face_corners_visible_from_face_center_v(i,j)(0).x){OpenGL_Line(v_grid.X(TV_INT(i,j)),grid.X(TV_INT(i,j)));}
+                if(!face_corners_visible_from_face_center_v(i,j)(1).x){OpenGL_Line(v_grid.X(TV_INT(i,j)),grid.X(TV_INT(i+1,j)));}}
+            OpenGL_End();
 
             node_neighbor_not_visible_color.Send_To_GL_Pipeline();
             glLineWidth(5);
-            vertices.Resize(0);
+            OpenGL_Begin(GL_LINES);
             for(int i=node_neighbors_visible.domain.min_corner.x;i<node_neighbors_visible.domain.max_corner.x;i++) for(int j=node_neighbors_visible.domain.min_corner.y;j<node_neighbors_visible.domain.max_corner.y;j++){
-                if(!node_neighbors_visible(i,j)(0)){OpenGL_Line(grid.X(TV_INT(i,j)),grid.X(TV_INT(i+1,j)),vertices);}
-                if(!node_neighbors_visible(i,j)(1)){OpenGL_Line(grid.X(TV_INT(i,j)),grid.X(TV_INT(i,j+1)),vertices);}}
-            OpenGL_Draw_Arrays(GL_LINES,2,vertices);
+                if(!node_neighbors_visible(i,j)(0)){OpenGL_Line(grid.X(TV_INT(i,j)),grid.X(TV_INT(i+1,j)));}
+                if(!node_neighbors_visible(i,j)(1)){OpenGL_Line(grid.X(TV_INT(i,j)),grid.X(TV_INT(i,j+1)));}}
+            OpenGL_End();
 
             glPopAttrib();
         }

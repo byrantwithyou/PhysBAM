@@ -78,10 +78,10 @@ Display() const
         glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);
         velocity_color.Send_To_GL_Pipeline();
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+        OpenGL_Begin(GL_LINES);
         for(int t=0;t<triangulated_area.particles.Size();t++)
-            OPENGL_SHAPES::Draw_Arrow(triangulated_area.particles.X(t),triangulated_area.particles.X(t)+velocity_scale*triangulated_area.particles.V(t),vertices);
-        OpenGL_Draw_Arrays(GL_LINES,2,vertices);
+            OPENGL_SHAPES::Draw_Arrow(triangulated_area.particles.X(t),triangulated_area.particles.X(t)+velocity_scale*triangulated_area.particles.V(t));
+        OpenGL_End();
         glPopAttrib();}
 
     glPopMatrix();
@@ -214,11 +214,12 @@ Draw_Vertices() const
 {
     if(draw_vertices){
         vertex_color.Send_To_GL_Pipeline();
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+        OpenGL_Begin(GL_POINTS);
         if(!triangulated_area.mesh.neighbor_nodes) triangulated_area.mesh.Initialize_Neighbor_Nodes();
-        for(int i=0;i<triangulated_area.particles.Size();i++) if((*triangulated_area.mesh.neighbor_nodes)(i).m)
-            OpenGL_Vertex(triangulated_area.particles.X(i),vertices);
-        OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}
+        for(int i=0;i<triangulated_area.particles.Size();i++)
+            if((*triangulated_area.mesh.neighbor_nodes)(i).m)
+                OpenGL_Vertex(triangulated_area.particles.X(i));
+        OpenGL_End();}
 }
 //#####################################################################
 // Function Draw_Vertices_For_Selection
@@ -236,11 +237,11 @@ Draw_Segments() const
 {
     PHYSBAM_ASSERT(triangulated_area.mesh.segment_mesh);
     segment_color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+    OpenGL_Begin(GL_LINES);
     for(int i=0;i<triangulated_area.mesh.segment_mesh->elements.m;i++){
         int node1,node2;triangulated_area.mesh.segment_mesh->elements(i).Get(node1,node2);
-        OpenGL_Line(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),vertices);}
-    OpenGL_Draw_Arrays(GL_LINES,2,vertices);
+        OpenGL_Line(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2));}
+    OpenGL_End();
 }
 //#####################################################################
 // Function Draw_Segments_For_Selection
@@ -256,9 +257,9 @@ Draw_Segments_For_Selection() const
         int node1,node2;
         triangulated_area.mesh.segment_mesh->elements(i).Get(node1,node2);
         glLoadName(i);
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        OpenGL_Line(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),vertices);
-        OpenGL_Draw_Arrays(GL_LINES,2,vertices);}
+        OpenGL_Begin(GL_LINES);
+        OpenGL_Line(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2));
+        OpenGL_End();}
     glPopName();
     glPopAttrib();
 }
@@ -268,17 +269,21 @@ Draw_Segments_For_Selection() const
 template<class T> void OPENGL_TRIANGULATED_AREA<T>::
 Draw_Triangles(const bool use_color_map) const
 {
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> inverted_vertices;
+    OpenGL_Begin(GL_TRIANGLES);
     for(int i=0;i<triangulated_area.mesh.elements.m;i++){
         if(color_map && use_color_map) (*color_map)(i).Send_To_GL_Pipeline();
         int node1,node2,node3;triangulated_area.mesh.elements(i).Get(node1,node2,node3);
-        OpenGL_Triangle(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3),vertices);
-        OpenGL_Triangle(triangulated_area.particles.X(node2),triangulated_area.particles.X(node1),triangulated_area.particles.X(node3),inverted_vertices);}
+        OpenGL_Triangle(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3));}
     if(use_color_map) triangle_color.Send_To_GL_Pipeline();
-    OpenGL_Draw_Arrays(GL_TRIANGLES,2,vertices);
+    OpenGL_End();
+
+    OpenGL_Begin(GL_TRIANGLES);
+    for(int i=0;i<triangulated_area.mesh.elements.m;i++){
+        if(color_map && use_color_map) (*color_map)(i).Send_To_GL_Pipeline();
+        int node1,node2,node3;triangulated_area.mesh.elements(i).Get(node1,node2,node3);
+        OpenGL_Triangle(triangulated_area.particles.X(node2),triangulated_area.particles.X(node1),triangulated_area.particles.X(node3));}
     if(use_color_map) triangle_inverted_color.Send_To_GL_Pipeline();
-    OpenGL_Draw_Arrays(GL_TRIANGLES,2,inverted_vertices);
+    OpenGL_End();
 }
 //#####################################################################
 // Function Draw_Triangles_For_Selection
@@ -290,9 +295,9 @@ Draw_Triangles_For_Selection() const
     for(int i=0;i<triangulated_area.mesh.elements.m;i++){
         int node1,node2,node3;triangulated_area.mesh.elements(i).Get(node1,node2,node3);
         glLoadName(i);
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        OpenGL_Triangle(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3),vertices);
-        OpenGL_Draw_Arrays(GL_TRIANGLES,2,vertices);}
+        OpenGL_Begin(GL_TRIANGLES);
+        OpenGL_Triangle(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3));
+        OpenGL_End();}
     glPopName();
 }
 //#####################################################################

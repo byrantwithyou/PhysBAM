@@ -69,18 +69,18 @@ Draw_Vector_At_Hex_Center() const
     glPushAttrib(GL_LIGHTING_BIT | GL_TEXTURE_BIT | GL_LINE_BIT | GL_CURRENT_BIT);
     OPENGL_COLOR(0,1,0).Send_To_GL_Pipeline();
     glLineWidth(1);glDisable(GL_LIGHTING);glDisable(GL_TEXTURE_2D);
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+    OpenGL_Begin(GL_LINES);
     for(int i=0;i<vectors_at_hex_centers.m;i++){
         ARRAY<int> p(8);
         VECTOR<T,3> hex_center=VECTOR<T,3>(0,0,0);hexahedron_mesh->elements(i).Get(p(0),p(1),p(2),p(3),p(4),p(5),p(6),p(7));
         for(int j=0;j<8;j++) hex_center+=particles->X(p(j));hex_center*=(T).125;
         head=hex_center+(T)vector_size*vectors_at_hex_centers(i);
-        OpenGL_Line(hex_center,head,vertices);
+        OpenGL_Line(hex_center,head);
         VECTOR<T,3> orth_vect=vectors_at_hex_centers(i).Orthogonal_Vector();
         orth_vect*=.15*vector_size;
-        OpenGL_Line(head,head+orth_vect-(T).15*(T)vector_size*vectors_at_hex_centers(i),vertices);
-        OpenGL_Line(head,head-orth_vect-(T).15*(T)vector_size*vectors_at_hex_centers(i),vertices);}
-    OpenGL_Draw_Arrays(GL_LINES,3,vertices);
+        OpenGL_Line(head,head+orth_vect-(T).15*(T)vector_size*vectors_at_hex_centers(i));
+        OpenGL_Line(head,head-orth_vect-(T).15*(T)vector_size*vectors_at_hex_centers(i));}
+    OpenGL_End();
     glPopAttrib();
     glPopMatrix();
 }
@@ -92,10 +92,11 @@ Draw_Wireframe_Mesh(const HEXAHEDRON_MESH& hexahedron_mesh) const
 {
     glDisable(GL_LIGHTING);
     material.diffuse.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for(int h=0;h<hexahedron_mesh.elements.m;h++)for(int k=0;k<24;k++)
-        OpenGL_Vertex(particles->X(hexahedron_mesh.elements(h)(HEXAHEDRON_MESH::edge_indices[0][k])),vertices);
-    OpenGL_Draw_Arrays(GL_LINES,3,vertices);
+    OpenGL_Begin(GL_LINES);
+    for(int h=0;h<hexahedron_mesh.elements.m;h++)
+        for(int k=0;k<12;k++)
+            OpenGL_Line(particles->X(hexahedron_mesh.elements(h)(HEXAHEDRON_MESH::edge_indices[k][0])),particles->X(hexahedron_mesh.elements(h)(HEXAHEDRON_MESH::edge_indices[k][1])));
+    OpenGL_End();
     glEnable(GL_LIGHTING);
 }   
 //#####################################################################
@@ -111,14 +112,13 @@ Draw_Boundary_Triangles(const HEXAHEDRON_MESH& hexahedron_mesh) const
         material.Send_To_GL_Pipeline(GL_FRONT);
         inverted_material.Send_To_GL_Pipeline(GL_BACK);}
     else material.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    ARRAY<GLfloat> normals;
+    OpenGL_Begin(GL_TRIANGLES);
     for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(PLANE<T>::Normal(xi,xj,xk),normals);
-        OpenGL_Triangle(xi,xj,xk,vertices);}
-    OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
+        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(PLANE<T>::Normal(xi,xj,xk));
+        OpenGL_Triangle(xi,xj,xk);}
+    OpenGL_End();
     if(use_inverted_material){
         glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
         glEnable(GL_CULL_FACE);}

@@ -124,9 +124,9 @@ private:
     glMatrixMode(GL_MODELVIEW);glPushMatrix();glLoadIdentity();
     glMatrixMode(GL_PROJECTION);glPushMatrix();glLoadIdentity();
     glDepthMask(0);glDisable(GL_DEPTH_TEST);
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for(i=0;i<NSEGS;i++){pts[i].y*=(T)world->window->Width()/(T)world->window->Height();OpenGL_Vertex(sphere_center+(T)4.8*sphere.radius*pts[i],vertices);}
-    OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices); 
+    OpenGL_Begin(GL_LINE_STRIP);
+    for(i=0;i<NSEGS;i++){pts[i].y*=(T)world->window->Width()/(T)world->window->Height();OpenGL_Vertex(sphere_center+(T)4.8*sphere.radius*pts[i]);}
+    OpenGL_End(); 
     glPopMatrix();glMatrixMode(GL_MODELVIEW);glPopMatrix();
     glDepthMask(1);glEnable(GL_DEPTH_TEST);}
 
@@ -142,12 +142,12 @@ private:
     dot=2.0*TV::Dot_Product(pts[0],pts[1]);
     for(i=2;i<NSEGS;i++) pts[i]=(pts[i-1]*dot)-pts[i-2];
     glDepthMask(0);glDisable(GL_DEPTH_TEST);
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+    OpenGL_Begin(GL_LINE_STRIP);
     TV camera=TV(world->Get_Camera_Position()-world->Get_Target_Position()).Normalized();
     for(i=0;i<NSEGS;i++){
-        if(TV::Dot_Product(qDown.Rotate(pts[i]),camera)>-1e-8||TV::Dot_Product(qNow.Rotate(pts[i]),camera)>1e-8) OpenGL_Vertex(sphere_center+qNow.Rotate(radius*pts[i]),vertices);
-        else{OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices);vertices.Resize(0);}}
-    OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices); 
+        if(TV::Dot_Product(qDown.Rotate(pts[i]),camera)>-1e-8||TV::Dot_Product(qNow.Rotate(pts[i]),camera)>1e-8) OpenGL_Vertex(sphere_center+qNow.Rotate(radius*pts[i]));
+        else{OpenGL_End();OpenGL_Begin(GL_LINE_STRIP);}}
+    OpenGL_End(); 
     glDepthMask(1);glEnable(GL_DEPTH_TEST);}
 
     void DrawHalfArc(const TV &n) const
@@ -163,9 +163,12 @@ private:
     void DrawDragArc() const
     {if(dragging&&vFrom!=vTo){
         TV sphere_center;if(use_sphere_center) sphere_center=sphere.center;
-        OPENGL_COLOR::Gray().Send_To_GL_Pipeline();ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        OpenGL_Vertex(sphere_center+vFrom,vertices);OpenGL_Vertex(sphere_center,vertices);OpenGL_Vertex(sphere_center+vTo,vertices);
-        OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices);}}
+        OPENGL_COLOR::Gray().Send_To_GL_Pipeline();
+        OpenGL_Begin(GL_LINE_STRIP);
+        OpenGL_Vertex(sphere_center+vFrom);
+        OpenGL_Vertex(sphere_center);
+        OpenGL_Vertex(sphere_center+vTo);
+        OpenGL_End();}}
 
     void DrawResultArc() const
     {/*RESCOLOR();if(vrFrom!=vrTo) DrawAnyArc(vrFrom,vrTo);*/}

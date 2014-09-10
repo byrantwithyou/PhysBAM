@@ -44,11 +44,11 @@ Display() const
     }
     else
     {
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+        OpenGL_Begin(GL_LINES);
         for(int t=0;t<curve.mesh.elements.m;t++){
             int i=curve.mesh.elements(t)(0),j=curve.mesh.elements(t)(1);
-            OpenGL_Line(curve.particles.X(i),curve.particles.X(j),vertices);}
-        OpenGL_Draw_Arrays(GL_LINES,2,vertices);
+            OpenGL_Line(curve.particles.X(i),curve.particles.X(j));}
+        OpenGL_End();
 
         if(current_selection) {
             if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_2D) {
@@ -63,17 +63,17 @@ Display() const
     if(draw_vertices) {
         vertex_color.Send_To_GL_Pipeline();
         glPointSize(5.0f);
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+        OpenGL_Begin(GL_POINTS);
         for(int t=0;t<curve.particles.Size();t++)
-            OpenGL_Vertex(curve.particles.X(t),vertices);
-        OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}
+            OpenGL_Vertex(curve.particles.X(t));
+        OpenGL_End();}
 
     if(draw_velocities && curve.particles.store_velocity){
         velocity_color.Send_To_GL_Pipeline();
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+        OpenGL_Begin(GL_LINES);
         for(int t=0;t<curve.particles.Size();t++)
-            OPENGL_SHAPES::Draw_Arrow(curve.particles.X(t),curve.particles.X(t)+velocity_scale*curve.particles.V(t),vertices);
-        OpenGL_Draw_Arrays(GL_LINES,2,vertices);}
+            OPENGL_SHAPES::Draw_Arrow(curve.particles.X(t),curve.particles.X(t)+velocity_scale*curve.particles.V(t));
+        OpenGL_End();}
 
     glPopAttrib();
 

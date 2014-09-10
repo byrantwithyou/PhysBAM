@@ -102,10 +102,10 @@ Draw_Triangles_Incident_On_Current_Node() const
     for(int t=0;t<(*surface.mesh.incident_elements)(node).m;t++){
         int triangle=(*surface.mesh.incident_elements)(node)(t);
         int i,j,k;surface.mesh.elements(triangle).Get(i,j,k);
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
-            OpenGL_Normal(PLANE<T>(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)).Normal(),normals);
-            OpenGL_Triangle(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k),vertices);
-        OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);}
+        OpenGL_Begin(GL_TRIANGLES);
+        OpenGL_Normal(PLANE<T>(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)).Normal());
+        OpenGL_Triangle(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k));
+        OpenGL_End();}
 }
 //#####################################################################
 // Function Turn_Smooth_Shading_On
@@ -155,7 +155,6 @@ Delete_Vertex_Normals()
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Display() const
 {
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     if(two_sided){
         glDisable(GL_CULL_FACE);
         glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
@@ -214,21 +213,21 @@ Display() const
             if(!surface.mesh.boundary_mesh) surface.mesh.Initialize_Boundary_Mesh();
             if(!surface.mesh.boundary_mesh->connected_segments) surface.mesh.boundary_mesh->Initialize_Connected_Segments();
 #if 0
-            vertices.Resize(0);
+            OpenGL_Begin(GL_LINES);
             OPENGL_COLOR::Yellow().Send_To_GL_Pipeline();
             for(int i=0;i<surface.mesh.boundary_mesh->elements.m;i++){
                 int node1,node2;surface.mesh.boundary_mesh->elements(i).Get(node1,node2);
-                OpenGL_Line(surface.particles.X(node1),surface.particles.X(node2),vertices);}
-            OpenGL_Draw_Arrays(GL_LINES,3,vertices);
+                OpenGL_Line(surface.particles.X(node1),surface.particles.X(node2));}
+            OpenGL_End();
 #else
             ARRAY<ARRAY<VECTOR<int,2> > >& connected_segments=*surface.mesh.boundary_mesh->connected_segments;
             for(int i=0;i<connected_segments.m;i++){
                 OPENGL_COLOR::Random().Send_To_GL_Pipeline();
-                vertices.Resize(0);
+                OpenGL_Begin(GL_LINES);
                 for(int j=0;j<connected_segments(i).m;j++){
                     int node1,node2;connected_segments(i)(j).Get(node1,node2);
-                    OpenGL_Line(surface.particles.X(node1),surface.particles.X(node2),vertices);}
-                OpenGL_Draw_Arrays(GL_LINES,3,vertices);}
+                    OpenGL_Line(surface.particles.X(node1),surface.particles.X(node2));}
+                OpenGL_End();}
 #endif
             glPopAttrib();}
         if(draw_velocities){
@@ -238,7 +237,7 @@ Display() const
             for(int i=0;i<surface.mesh.elements.m;i++){
                 const VECTOR<int,3>& nodes=surface.mesh.elements(i);
                 for(int j=0;j<nodes.m;j++){
-                    //OPENGL_SHAPES::Draw_Arrow(surface.particles.X(nodes[j]),surface.particles.X(nodes[j])+velocity_scale*surface.particles.V(nodes[j]),vertices);
+                    //OPENGL_SHAPES::Draw_Arrow(surface.particles.X(nodes[j]),surface.particles.X(nodes[j])+velocity_scale*surface.particles.V(nodes[j]));
                 }
             }
             glPopAttrib();
@@ -442,49 +441,48 @@ Reinitialize_Display_List()
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Draw() const
 {
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
     const ARRAY<VECTOR<int,3> > &elements=surface.mesh.elements;
     if(!vertex_colors){
         //glPushAttrib(GL_ENABLE_BIT);
         //glEnable(GL_BLEND);glDisable(GL_DEPTH_TEST);glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        vertices.Resize(0);normals.Resize(0);
+        OpenGL_Begin(GL_TRIANGLES);
         if(smooth_normals)
             for(int t=0;t<elements.m;t++){
                 int i,j,k;elements(t).Get(i,j,k);
-                OpenGL_Normal((*vertex_normals)(i),normals);OpenGL_Vertex(surface.particles.X(i),vertices);
-                OpenGL_Normal((*vertex_normals)(j),normals);OpenGL_Vertex(surface.particles.X(j),vertices);
-                OpenGL_Normal((*vertex_normals)(k),normals);OpenGL_Vertex(surface.particles.X(k),vertices);}
+                OpenGL_Normal((*vertex_normals)(i));OpenGL_Vertex(surface.particles.X(i));
+                OpenGL_Normal((*vertex_normals)(j));OpenGL_Vertex(surface.particles.X(j));
+                OpenGL_Normal((*vertex_normals)(k));OpenGL_Vertex(surface.particles.X(k));}
         else
             for(int t=0;t<elements.m;t++){
                 int i,j,k;elements(t).Get(i,j,k);
                 for(int plane_vertices=0;plane_vertices<3;plane_vertices++)
-                    OpenGL_Normal(PLANE<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)),normals);
-                OpenGL_Triangle(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k),vertices);
+                    OpenGL_Normal(PLANE<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)));
+                OpenGL_Triangle(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k));
             }
-        OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
+        OpenGL_End();
         //glPopAttrib();
     }
     else{
         glPushAttrib(GL_ENABLE_BIT);
         //glEnable(GL_BLEND);glDisable(GL_DEPTH_TEST);glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_COLOR_MATERIAL);
-        vertices.Resize(0);normals.Resize(0);
+        OpenGL_Begin(GL_TRIANGLES);
         if(smooth_normals)
             for(int t=0;t<elements.m;t++){
                 int i,j,k;elements(t).Get(i,j,k);
-                (*vertex_colors)(i).Send_To_GL_Pipeline();OpenGL_Normal((*vertex_normals)(i),normals);OpenGL_Vertex(surface.particles.X(i),vertices);
-                (*vertex_colors)(j).Send_To_GL_Pipeline();OpenGL_Normal((*vertex_normals)(j),normals);OpenGL_Vertex(surface.particles.X(j),vertices);
-                (*vertex_colors)(k).Send_To_GL_Pipeline();OpenGL_Normal((*vertex_normals)(k),normals);OpenGL_Vertex(surface.particles.X(k),vertices);}
+                (*vertex_colors)(i).Send_To_GL_Pipeline();OpenGL_Normal((*vertex_normals)(i));OpenGL_Vertex(surface.particles.X(i));
+                (*vertex_colors)(j).Send_To_GL_Pipeline();OpenGL_Normal((*vertex_normals)(j));OpenGL_Vertex(surface.particles.X(j));
+                (*vertex_colors)(k).Send_To_GL_Pipeline();OpenGL_Normal((*vertex_normals)(k));OpenGL_Vertex(surface.particles.X(k));}
         else
             for(int t=0;t<elements.m;t++){
                 int i,j,k;elements(t).Get(i,j,k);
                 for(int plane_vertices=0;plane_vertices<3;plane_vertices++)
-                    OpenGL_Normal(PLANE<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)),normals);
-                (*vertex_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(surface.particles.X(i),vertices);
-                (*vertex_colors)(j).Send_To_GL_Pipeline();OpenGL_Vertex(surface.particles.X(j),vertices);
-                (*vertex_colors)(k).Send_To_GL_Pipeline();OpenGL_Vertex(surface.particles.X(k),vertices);
+                    OpenGL_Normal(PLANE<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)));
+                (*vertex_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(surface.particles.X(i));
+                (*vertex_colors)(j).Send_To_GL_Pipeline();OpenGL_Vertex(surface.particles.X(j));
+                (*vertex_colors)(k).Send_To_GL_Pipeline();OpenGL_Vertex(surface.particles.X(k));
             }
-        OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
+        OpenGL_End();
         glPopAttrib();}
 }
 //#####################################################################
@@ -493,21 +491,21 @@ Draw() const
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Draw_Subsets() const
 {
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
+    OpenGL_Begin(GL_TRIANGLES);
     const ARRAY<VECTOR<int,3> > &elements=surface.mesh.elements;
     if(smooth_normals)
         for(int t=0;t<subset.m;t++){
             int tri=subset(t),i,j,k;elements(tri).Get(i,j,k);
-            OpenGL_Normal((*vertex_normals)(i),normals);OpenGL_Vertex(surface.particles.X(i),vertices);
-            OpenGL_Normal((*vertex_normals)(j),normals);OpenGL_Vertex(surface.particles.X(j),vertices);
-            OpenGL_Normal((*vertex_normals)(k),normals);OpenGL_Vertex(surface.particles.X(k),vertices);}
+            OpenGL_Normal((*vertex_normals)(i));OpenGL_Vertex(surface.particles.X(i));
+            OpenGL_Normal((*vertex_normals)(j));OpenGL_Vertex(surface.particles.X(j));
+            OpenGL_Normal((*vertex_normals)(k));OpenGL_Vertex(surface.particles.X(k));}
     else
         for(int t=0;t<subset.m;t++){
             int tri=subset(t),i,j,k;elements(tri).Get(i,j,k);
             for(int plane_vertices=0;plane_vertices<3;plane_vertices++)
-                OpenGL_Normal(PLANE<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)),normals);
-            OpenGL_Triangle(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k),vertices);}
-    OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
+                OpenGL_Normal(PLANE<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)));
+            OpenGL_Triangle(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k));}
+    OpenGL_End();
 }
 //#####################################################################
 // Function Draw_Vertices_For_Selection
@@ -530,9 +528,9 @@ Draw_Segments_For_Selection() const
     for(int s=0;s<surface.mesh.segment_mesh->elements.m;s++){
         int i,j;surface.mesh.segment_mesh->elements(s).Get(i,j);
         glLoadName(s);
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        OpenGL_Line(surface.particles.X(i),surface.particles.X(j),vertices);
-        OpenGL_Draw_Arrays(GL_LINES,3,vertices);}
+        OpenGL_Begin(GL_LINES);
+        OpenGL_Line(surface.particles.X(i),surface.particles.X(j));
+        OpenGL_End();}
     glPopName();
     glPopAttrib();
 }
@@ -546,9 +544,9 @@ Draw_Triangles_For_Selection() const
     for(int t=0;t<surface.mesh.elements.m;t++){
         int i,j,k;surface.mesh.elements(t).Get(i,j,k);
         glLoadName(t);
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        OpenGL_Triangle(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k),vertices);
-        OpenGL_Draw_Arrays(GL_TRIANGLES,3,vertices);}
+        OpenGL_Begin(GL_TRIANGLES);
+        OpenGL_Triangle(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k));
+        OpenGL_End();}
     glPopName();
 }
 //#####################################################################

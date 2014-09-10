@@ -32,15 +32,15 @@ Display() const
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
     line_color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for(int i=min_corner;i<max_corner;i++) OpenGL_Vertex(VECTOR<T,3>(grid.X(TV_INT(i)).x,values(i)*scale,(T)0),vertices);
-    OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices);
+    OpenGL_Begin(GL_LINE_STRIP);
+    for(int i=min_corner;i<max_corner;i++) OpenGL_Vertex(VECTOR<T,3>(grid.X(TV_INT(i)).x,values(i)*scale,(T)0));
+    OpenGL_End();
     glColor3f(0,1,1);
     glPointSize(3.0);
     point_color.Send_To_GL_Pipeline();
-    vertices.Resize(0);
-    for(int i=min_corner;i<max_corner;i++) OpenGL_Vertex(VECTOR<T,3>(grid.X(TV_INT(i)).x,values(i)*scale,(T)0),vertices);
-    OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
+    OpenGL_Begin(GL_POINTS);
+    for(int i=min_corner;i<max_corner;i++) OpenGL_Vertex(VECTOR<T,3>(grid.X(TV_INT(i)).x,values(i)*scale,(T)0));
+    OpenGL_End();
     glPopAttrib();
 }
 template<class T>
@@ -51,9 +51,11 @@ void Display_Bool_Helper(const OPENGL_SCALAR_FIELD_1D<T,bool>& self)
     glColor3f(0,1,1);
     glPointSize(8.0);
     self.point_color.Send_To_GL_Pipeline();
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for(int i=self.values.domain.min_corner.x;i<self.values.domain.max_corner.x;i++) if(self.values(i)) OpenGL_Vertex(VECTOR<T,3>(self.grid.X(VECTOR<int,1>(i)).x,(T)0,(T)0),vertices);
-    OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
+    OpenGL_Begin(GL_POINTS);
+    for(int i=self.values.domain.min_corner.x;i<self.values.domain.max_corner.x;i++)
+        if(self.values(i))
+            OpenGL_Vertex(VECTOR<T,3>(self.grid.X(VECTOR<int,1>(i)).x,(T)0,(T)0));
+    OpenGL_End();
     glPopAttrib();
 }
 namespace PhysBAM{

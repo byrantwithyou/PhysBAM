@@ -337,7 +337,7 @@ Display() const
         glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT);
         glEnable(GL_BLEND);
         glDisable(GL_LIGHTING);
-        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+        OpenGL_Begin(GL_LINES);
         SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>*>(display_relative_velocity_mode);
         for(int j=0;j<segmented_curve->mesh.elements.m;j++){int p1=segmented_curve->mesh.elements(j)(0),p2=segmented_curve->mesh.elements(j)(1);
             TV relative_velocity=deformable_body_collection.particles.V(p2)-deformable_body_collection.particles.V(p1);
@@ -346,8 +346,8 @@ Display() const
             if(edge_length>(T)0){
                 OPENGL_COLOR edge_color=color_map_relative_velocity->Lookup(TV::Dot_Product(relative_velocity,edge_vector)/edge_length);
                 edge_color.Send_To_GL_Pipeline();
-                OpenGL_Line(deformable_body_collection.particles.X(p1),deformable_body_collection.particles.X(p2),vertices);}}
-        OpenGL_Draw_Arrays(GL_LINES,3,vertices);
+                OpenGL_Line(deformable_body_collection.particles.X(p1),deformable_body_collection.particles.X(p2));}}
+        OpenGL_End();
         glPopAttrib();}
 
     for(int i=0;i<boundary_surface_objects.m;i++){

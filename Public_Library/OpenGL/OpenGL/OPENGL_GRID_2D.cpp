@@ -38,9 +38,9 @@ Display() const
             glPushName(i);
             for(j=-ghost_cells,X.y=min_corner.y;j<grid.numbers_of_cells.y+ghost_cells;j++,X.y+=grid.dX.y){
                 glPushName(j);
-                ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-                OpenGL_Quad_2D(X,X+grid.dX,vertices);
-                OpenGL_Draw_Arrays(GL_QUADS,2,vertices);
+                OpenGL_Begin(GL_QUADS);
+                OpenGL_Quad_2D(X,X+grid.dX);
+                OpenGL_End();
                 glPopName();}
             glPopName();}
 
@@ -51,9 +51,9 @@ Display() const
             glPushName(i);
             for(j=-ghost_cells,X.y=min_corner.y;j<grid.numbers_of_cells.y+ghost_cells+1;j++,X.y+=grid.dX.y){
                 glPushName(j);
-                ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-                OpenGL_Vertex(X,vertices);
-                OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
+                OpenGL_Begin(GL_POINTS);
+                OpenGL_Vertex(X);
+                OpenGL_End();
                 glPopName();}
             glPopName();}
         glPopName();glPopAttrib();}
@@ -78,36 +78,36 @@ Display() const
         if(cell_mask){
             int mask_m_start=cell_mask->domain.min_corner.x,mask_n_start=cell_mask->domain.min_corner.y;
             glPushAttrib(GL_ALL_ATTRIB_BITS);glLineWidth(4*OPENGL_PREFERENCES::line_width);OPENGL_COLOR::Cyan().Send_To_GL_Pipeline();
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+            OpenGL_Begin(GL_LINES);
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells;j++,y+=grid.dX.y,j_mask++)
-                    if((*cell_mask)(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y+grid.dX.y),vertices);}
-            OpenGL_Draw_Arrays(GL_LINES,2,vertices);
+                    if((*cell_mask)(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y+grid.dX.y));}
+            OpenGL_End();
             glPopAttrib();}
 
         if(face_mask){
             int mask_m_start,mask_n_start;
             glPushAttrib(GL_ALL_ATTRIB_BITS);glLineWidth(4*OPENGL_PREFERENCES::line_width);OPENGL_COLOR::Cyan().Send_To_GL_Pipeline();
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+            OpenGL_Begin(GL_LINES);
             mask_m_start=face_mask->Component(0).domain.min_corner.x,mask_n_start=face_mask->Component(0).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells+1;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(0))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x,y+grid.dX.y),vertices);}
+                    if((face_mask->Component(0))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x,y+grid.dX.y));}
             mask_m_start=face_mask->Component(1).domain.min_corner.x,mask_n_start=face_mask->Component(1).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells+1;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y),vertices);}
-            OpenGL_Draw_Arrays(GL_LINES,2,vertices);
+                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y));}
+            OpenGL_End();
             glPopAttrib();}
 
         if(node_mask){
             int mask_m_start=node_mask->domain.min_corner.x,mask_n_start=node_mask->domain.min_corner.y;
             glPushAttrib(GL_ALL_ATTRIB_BITS);glPointSize(5);OPENGL_COLOR::Cyan().Send_To_GL_Pipeline();
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+            OpenGL_Begin(GL_POINTS);
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells+1;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells+1;j++,y+=grid.dX.y,j_mask++)
-                    if((*node_mask)(mask_m_start+i_mask-1,mask_n_start+j_mask-1)) OpenGL_Vertex(VECTOR<T,2>(x,y),vertices);
-            OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
+                    if((*node_mask)(mask_m_start+i_mask-1,mask_n_start+j_mask-1)) OpenGL_Vertex(VECTOR<T,2>(x,y));
+            OpenGL_End();
             glPopAttrib();}
 
         // Draw grid
@@ -115,31 +115,31 @@ Display() const
             if(draw_mask_type&&ghost_cells==4){ghost_cells=3;min_corner=min_corner+VECTOR<T,2>(grid.dX.x,grid.dX.y);max_corner=max_corner-VECTOR<T,2>(grid.dX.x,grid.dX.y);}
             face_mask=active_face_mask;
             int mask_m_start,mask_n_start;
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+            OpenGL_Begin(GL_LINES);
             mask_m_start=face_mask->Component(0).domain.min_corner.x,mask_n_start=face_mask->Component(0).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells+1;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(0))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x,y+grid.dX.y),vertices);}
+                    if((face_mask->Component(0))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x,y+grid.dX.y));}
             mask_m_start=face_mask->Component(1).domain.min_corner.x,mask_n_start=face_mask->Component(1).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells+1;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y),vertices);}
-            OpenGL_Draw_Arrays(GL_LINES,2,vertices);}
+                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y));}
+            OpenGL_End();}
         else{
             if(draw_mask_type&&ghost_cells==3){ghost_cells=4;min_corner=min_corner-VECTOR<T,2>(grid.dX.x,grid.dX.y);max_corner=max_corner+VECTOR<T,2>(grid.dX.x,grid.dX.y);}
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+            OpenGL_Begin(GL_LINES);
             for(i=-ghost_cells,x=min_corner.x;i<grid.numbers_of_cells.x+ghost_cells+1;i++,x+=grid.dX.x){
-                OpenGL_Line(VECTOR<T,2>(x,min_corner.y),VECTOR<T,2>(x,max_corner.y),vertices);}
+                OpenGL_Line(VECTOR<T,2>(x,min_corner.y),VECTOR<T,2>(x,max_corner.y));}
             for(j=-ghost_cells,y=min_corner.y;j<grid.numbers_of_cells.y+ghost_cells+1;j++,y+=grid.dX.y){
-                OpenGL_Line(VECTOR<T,2>(min_corner.x,y),VECTOR<T,2>(max_corner.x,y),vertices);}
-            OpenGL_Draw_Arrays(GL_LINES,2,vertices);}
+                OpenGL_Line(VECTOR<T,2>(min_corner.x,y),VECTOR<T,2>(max_corner.x,y));}
+            OpenGL_End();}
 
         // Outline boundary of real domain in wider line
         if(ghost_cells>0){
             glPushAttrib(GL_LINE_BIT);glLineWidth(2*OPENGL_PREFERENCES::line_width);
-            ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-            OpenGL_Quad_2D(grid.domain.min_corner,grid.domain.max_corner,vertices);
-            OpenGL_Draw_Arrays(GL_LINE_LOOP,2,vertices);
+            OpenGL_Begin(GL_LINE_LOOP);
+            OpenGL_Quad_2D(grid.domain.min_corner,grid.domain.max_corner);
+            OpenGL_End();
             glPopAttrib();}
 
         // Highlight current selection

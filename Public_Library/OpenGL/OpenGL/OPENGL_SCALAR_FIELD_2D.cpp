@@ -201,15 +201,16 @@ Display_2D() const
 
     OPENGL_COLOR_MAP<T2>* color_map=color_maps(current_color_map);
 
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
-    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) {
-        for(int t=0;t<4;t++) OpenGL_Color(color_map->Lookup(Pre_Map_Value(values(i,j))).rgba,colors);
-        VECTOR<T,2> pos=grid.X(TV_INT(i,j));
-        OpenGL_Vertex(VECTOR<T,2>(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y),vertices);
-        OpenGL_Vertex(VECTOR<T,2>(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y),vertices);
-        OpenGL_Vertex(VECTOR<T,2>(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y),vertices);
-        OpenGL_Vertex(VECTOR<T,2>(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y),vertices);
-        OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,2,vertices,colors);vertices.Resize(0);colors.Resize(0);}
+    for(int i=0;i<grid.counts.x;i++)
+        for(int j=0;j<grid.counts.y;j++){
+            OpenGL_Begin(GL_TRIANGLE_STRIP);
+            VECTOR<T,2> pos=grid.X(TV_INT(i,j));
+            OpenGL_Color(color_map->Lookup(Pre_Map_Value(values(i,j))).rgba);
+            OpenGL_Vertex(VECTOR<T,2>(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y));
+            OpenGL_Vertex(VECTOR<T,2>(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y));
+            OpenGL_Vertex(VECTOR<T,2>(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y));
+            OpenGL_Vertex(VECTOR<T,2>(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y));
+            OpenGL_End();}
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);

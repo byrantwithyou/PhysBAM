@@ -56,7 +56,7 @@ End()
     Transform_Buffer();
     switch(glmode){
         case GL_POINTS: for(int i=0;i<buffer.m;i++) Draw_Point(buffer(i)); break;
-        case GL_LINES: for(int i=0;i<buffer.m;i+=2) Draw_Line(buffer(i),buffer(i)); break;
+        case GL_LINES: for(int i=0;i<buffer.m;i+=2) Draw_Line(buffer(i),buffer(i+1)); break;
         case GL_TRIANGLES: for(int i=0;i<buffer.m;i+=3) Draw_Polygon(i,3); break;
         case GL_QUADS: for(int i=0;i<buffer.m;i+=4) Draw_Polygon(i,4); break;
         case GL_POLYGON: Draw_Polygon(0,buffer.m); break;

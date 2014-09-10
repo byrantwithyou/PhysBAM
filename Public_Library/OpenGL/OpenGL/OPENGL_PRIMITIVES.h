@@ -41,48 +41,6 @@ extern OPENGL_EPS_OUTPUT<float>* opengl_eps_output;
 inline void glMultMatrix(float* matrix){glMultMatrixf(matrix);}
 inline void glMultMatrix(double* matrix){glMultMatrixd(matrix);}
 
-inline void OpenGL_Draw_Arrays_With_Normals(GLenum mode,GLenum type,int dimension,int length,const GLvoid* vertices,const GLvoid* normals)
-{glEnableClientState(GL_VERTEX_ARRAY);glEnableClientState(GL_NORMAL_ARRAY);glVertexPointer(dimension,type,0,vertices);glNormalPointer(GL_FLOAT,0,normals);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);
-glDisableClientState(GL_NORMAL_ARRAY);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Arrays(mode,dimension,length,vertices));}
-
-inline void OpenGL_Draw_Arrays_With_Textures(GLenum mode,GLenum type,int dimension,int length,const GLvoid* vertices,const GLvoid* textures)
-{glEnableClientState(GL_VERTEX_ARRAY);glEnableClientState(GL_TEXTURE_COORD_ARRAY);glVertexPointer(dimension,type,0,vertices);glTexCoordPointer(2,GL_FLOAT,0,textures);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);
-glDisableClientState(GL_TEXTURE_COORD_ARRAY);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Arrays(mode,dimension,length,vertices));}
-
-inline void OpenGL_Draw_Arrays(GLenum mode,GLenum type,int dimension,int length,const GLvoid* vertices,const GLvoid* colors)
-{glEnableClientState(GL_VERTEX_ARRAY);glEnableClientState(GL_COLOR_ARRAY);glVertexPointer(dimension,type,0,vertices);glColorPointer(4,GL_FLOAT,0,colors);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);glDisableClientState(GL_COLOR_ARRAY);
-IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Arrays(mode,dimension,length,vertices));}
-
-inline void OpenGL_Draw_Arrays(GLenum mode,GLenum type,int dimension,int length,const GLvoid* vertices)
-{glEnableClientState(GL_VERTEX_ARRAY);glVertexPointer(dimension,type,0,vertices);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Arrays(mode,dimension,length,vertices));}
-
-inline void OpenGL_Draw_Arrays_With_Normals(GLenum mode,int dimension,const ARRAY<GLdouble>& vertices,const ARRAY<GLfloat>& normals)
-{assert(vertices.m/dimension==normals.m/3);OpenGL_Draw_Arrays_With_Normals(mode,GL_DOUBLE,dimension,vertices.m/dimension,vertices.base_pointer,normals.base_pointer);}
-
-inline void OpenGL_Draw_Arrays_With_Textures(GLenum mode,int dimension,const ARRAY<GLdouble>& vertices,const ARRAY<GLfloat>& textures)
-{assert(vertices.m/dimension==textures.m/2);OpenGL_Draw_Arrays_With_Textures(mode,GL_DOUBLE,dimension,vertices.m/dimension,vertices.base_pointer,textures.base_pointer);}
-
-inline void OpenGL_Draw_Arrays(GLenum mode,int dimension,const ARRAY<GLdouble>& vertices,const ARRAY<GLfloat>& colors)
-{assert(vertices.m/dimension==colors.m/4);OpenGL_Draw_Arrays(mode,GL_DOUBLE,dimension,vertices.m/dimension,vertices.base_pointer,colors.base_pointer);}
-
-inline void OpenGL_Draw_Arrays(GLenum mode,int dimension,const ARRAY<GLdouble>& vertices)
-{OpenGL_Draw_Arrays(mode,GL_DOUBLE,dimension,vertices.m/dimension,vertices.base_pointer);}
-
-inline void OpenGL_Draw_Arrays_With_Normals(GLenum mode,int dimension,const ARRAY<GLfloat>& vertices,const ARRAY<GLfloat>& normals)
-{assert(vertices.m/dimension==normals.m/3);OpenGL_Draw_Arrays_With_Normals(mode,GL_FLOAT,dimension,vertices.m/dimension,vertices.base_pointer,normals.base_pointer);}
-
-inline void OpenGL_Draw_Arrays_With_Textures(GLenum mode,int dimension,const ARRAY<GLfloat>& vertices,const ARRAY<GLfloat>& textures)
-{assert(vertices.m/dimension==textures.m/2);OpenGL_Draw_Arrays_With_Textures(mode,GL_FLOAT,dimension,vertices.m/dimension,vertices.base_pointer,textures.base_pointer);}
-
-inline void OpenGL_Draw_Arrays(GLenum mode,int dimension,const ARRAY<GLfloat>& vertices,const ARRAY<GLfloat>& colors)
-{assert(vertices.m/dimension==colors.m/4);OpenGL_Draw_Arrays(mode,GL_FLOAT,dimension,vertices.m/dimension,vertices.base_pointer,colors.base_pointer);}
-
-inline void OpenGL_Draw_Arrays(GLenum mode,int dimension,const ARRAY<GLfloat>& vertices)
-{OpenGL_Draw_Arrays(mode,GL_FLOAT,dimension,vertices.m/dimension,vertices.base_pointer);}
-
-inline void OpenGL_Draw_Arrays(GLenum mode,int dimension,const ARRAY<GLshort>& vertices)
-{OpenGL_Draw_Arrays(mode,GL_SHORT,dimension,vertices.m/dimension,vertices.base_pointer);}
-
 template<int d1>
 inline void OpenGL_Draw_Spline(GLenum mode,int resolution,const VECTOR<VECTOR<GLfloat,3>,d1>& control_points)
 {
@@ -145,23 +103,17 @@ template<class T>
 inline void OpenGL_Transform(const FRAME<VECTOR<T,3> >& frame)
 {OpenGL_Translate(frame.t);OpenGL_Rotate(frame.r.Normalized());}
 
-inline void OpenGL_Texture(const VECTOR<float,2>& texture,ARRAY<GLfloat>& textures)
-{textures.Append(texture[0]);textures.Append(texture[1]);}
+inline void OpenGL_Texture(const VECTOR<float,2>& texture)
+{glTexCoord2f(texture[0],texture[1]);}
 
-inline void OpenGL_Color(const GLfloat* color,ARRAY<GLfloat>& colors)
-{colors.Append(color[0]);colors.Append(color[1]);colors.Append(color[2]);colors.Append(color[3]);}
+inline void OpenGL_Texture(const VECTOR<double,2>& texture)
+{glTexCoord2d(texture[0],texture[1]);}
 
-template<int d>
-inline void OpenGL_Vertex(const VECTOR<int,d>& v,ARRAY<GLshort>& vertices)
-{for(int i=0;i<d;i++) vertices.Append(v(i));}
+inline void OpenGL_Color(const GLfloat* color)
+{IF_OPENGL_EPS_OUTPUT((VECTOR<float,3>(color[0],color[1],color[2])));glColor4f(color[0],color[1],color[2],color[3]);}
 
-template<int d>
-inline void OpenGL_Vertex(const VECTOR<float,d>& v,ARRAY<GLfloat>& vertices)
-{for(int i=0;i<d;i++) vertices.Append(v(i));}
-
-template<int d>
-inline void OpenGL_Normal(const VECTOR<float,d>& n, ARRAY<GLfloat>& normals)
-{for(int i=0;i<d;i++) normals.Append(n(i));}
+inline void OpenGL_Color(const GLdouble* color)
+{IF_OPENGL_EPS_OUTPUT((VECTOR<double,3>(color[0],color[1],color[2])));glColor4d(color[0],color[1],color[2],color[3]);}
 
 inline void OpenGL_Vertex(const VECTOR<float,3>& v)
 {glVertex3f(v.x,v.y,v.z);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Vertex(v));}
@@ -184,14 +136,6 @@ inline void OpenGL_RasterPos(const VECTOR<float,2>& v)
 inline void OpenGL_RasterPos(const VECTOR<float,3>& v)
 {glRasterPos3f(v.x,v.y,v.z);}
 
-template<int d>
-inline void OpenGL_Vertex(const VECTOR<double,d>& v,ARRAY<OPENGL_POLICY<double>::T_GL>& vertices)
-{for(int i=0;i<d;i++) vertices.Append(v(i));}
-
-template<int d>
-inline void OpenGL_Normal(const VECTOR<double,d>& n, ARRAY<GLfloat>& normals)
-{for(int i=0;i<d;i++) normals.Append(n(i));}
-
 inline void OpenGL_Vertex(const VECTOR<double,3>& v)
 {glVertex3d(v.x,v.y,v.z);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Vertex(v));}
 
@@ -202,24 +146,16 @@ inline void OpenGL_Vertex(const VECTOR<double,1>& v)
 {glVertex2d(v.x,(double)0);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Vertex(VECTOR<double,2>(v.x,0)));}
 
 template<class T,int d>
-inline void OpenGL_Line(const VECTOR<T,d>& a, const VECTOR<T,d>& b,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
-{OpenGL_Vertex(a,vertices);OpenGL_Vertex(b,vertices);}
-
-template<class T,int d>
-inline void OpenGL_Line(const VECTOR<T,d>& a, const VECTOR<T,d>& b)
+inline void OpenGL_Line(const VECTOR<T,d>& a,const VECTOR<T,d>& b)
 {OpenGL_Vertex(a);OpenGL_Vertex(b);}
-
-template<class T,int d>
-inline void OpenGL_Triangle(const VECTOR<T,d>& a, const VECTOR<T,d>& b, const VECTOR<T,d>& c,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
-{OpenGL_Vertex(a,vertices);OpenGL_Vertex(b,vertices);OpenGL_Vertex(c,vertices);}
-
-template<class T,int d>
-inline void OpenGL_Triangle(const VECTOR<VECTOR<T,d>,3>& a,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
-{OpenGL_Vertex(a(0),vertices);OpenGL_Vertex(a(1),vertices);OpenGL_Vertex(a(2),vertices);}
 
 template<class T,int d>
 inline void OpenGL_Triangle(const VECTOR<T,d>& a, const VECTOR<T,d>& b, const VECTOR<T,d>& c)
 {OpenGL_Vertex(a);OpenGL_Vertex(b);OpenGL_Vertex(c);}
+
+template<class T,int d>
+inline void OpenGL_Triangle(const VECTOR<VECTOR<T,d>,3>& a)
+{OpenGL_Vertex(a(0));OpenGL_Vertex(a(1));OpenGL_Vertex(a(2));}
 
 inline void OpenGL_Normal(const VECTOR<double,3>& n)
 {glNormal3d(n.x,n.y,n.z);}
@@ -249,18 +185,9 @@ inline void OpenGL_Quad_2D(const VECTOR<T,2> &bottom_left,const VECTOR<T,2> &top
      opengl_eps_output->Vertex(VECTOR<T,2>(top_right.x,top_right.y));opengl_eps_output->Vertex(VECTOR<T,2>(top_right.x,bottom_left.y)));}
 
 template<class T>
-inline void OpenGL_Triangle_Strip_2D(const VECTOR<T,2> &bottom_left,const VECTOR<T,2> &top_right,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
-{OpenGL_Vertex(bottom_left,vertices);OpenGL_Vertex(VECTOR<T,2>(bottom_left.x,top_right.y),vertices);
- OpenGL_Vertex(VECTOR<T,2>(top_right.x,bottom_left.y),vertices);OpenGL_Vertex(top_right,vertices);}
-
-template<class T>
-inline void OpenGL_Quad_2D(const VECTOR<T,2> &bottom_left,const VECTOR<T,2> &top_right,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
-{OpenGL_Vertex(bottom_left,vertices);OpenGL_Vertex(VECTOR<T,2>(bottom_left.x,top_right.y),vertices);
- OpenGL_Vertex(top_right,vertices);OpenGL_Vertex(VECTOR<T,2>(top_right.x,bottom_left.y),vertices);}
-
-template<class T>
-inline void OpenGL_Quad(const VECTOR<T,3> &bottom_left,const VECTOR<T,3> &right,const VECTOR<T,3>& up,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
-{OpenGL_Vertex(bottom_left,vertices);OpenGL_Vertex(bottom_left+up,vertices);OpenGL_Vertex(bottom_left+up+right,vertices);OpenGL_Vertex(bottom_left+right,vertices);}
+inline void OpenGL_Triangle_Strip_2D(const VECTOR<T,2> &bottom_left,const VECTOR<T,2> &top_right)
+{OpenGL_Vertex(bottom_left);OpenGL_Vertex(VECTOR<T,2>(bottom_left.x,top_right.y));
+ OpenGL_Vertex(VECTOR<T,2>(top_right.x,bottom_left.y));OpenGL_Vertex(top_right);}
 
 template<class T>
 inline void OpenGL_Quad(const VECTOR<T,3> &bottom_left,const VECTOR<T,3> &right,const VECTOR<T,3>& up)
@@ -270,6 +197,5 @@ template<class T>
 inline void OpenGL_Clip_Plane(GLenum id,const PLANE<T> &plane)
 {GLdouble equation[4]={plane.normal.x,plane.normal.y,plane.normal.z,-VECTOR<T,3>::Dot_Product(plane.normal,plane.x0)};
 glClipPlane(id,equation);}
-
 }
 #endif

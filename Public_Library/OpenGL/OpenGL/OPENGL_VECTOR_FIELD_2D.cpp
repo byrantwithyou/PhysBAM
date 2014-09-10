@@ -36,12 +36,12 @@ Display() const
 
     vector_color.Send_To_GL_Pipeline();
 
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+    OpenGL_Begin(GL_LINES);
     if(draw_arrowhead) 
-        for(int i=0;i<vector_locations.Size();i++){OPENGL_SHAPES::Draw_Arrow(vector_locations(i),vector_locations(i)+(T)size*vector_field(i),vertices);}
+        for(int i=0;i<vector_locations.Size();i++){OPENGL_SHAPES::Draw_Arrow(vector_locations(i),vector_locations(i)+(T)size*vector_field(i));}
     else 
-        for(int i=0;i<vector_locations.Size();i++){OpenGL_Line(vector_locations(i),vector_locations(i)+(T)size*vector_field(i),vertices);}
-    OpenGL_Draw_Arrays(GL_LINES,2,vertices);
+        for(int i=0;i<vector_locations.Size();i++){OpenGL_Line(vector_locations(i),vector_locations(i)+(T)size*vector_field(i));}
+    OpenGL_End();
 
     if(draw_value){
         (vector_color+OPENGL_COLOR(.8f,.8f,.8f)).Send_To_GL_Pipeline();

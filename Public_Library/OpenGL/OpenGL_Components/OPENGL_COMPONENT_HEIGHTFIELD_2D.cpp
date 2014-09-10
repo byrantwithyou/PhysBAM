@@ -107,26 +107,26 @@ Display() const
             VECTOR<T,3> v1,v2,v3,v4;
             for(int i = domain.min_corner.x; i <= domain.max_corner.x-1; i++)
             {
-                ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
+                OpenGL_Begin(GL_TRIANGLE_STRIP);
                 TV lo=grid.X(TV_INT(i,1)),hi=grid.X(TV_INT(i+1,1));
                 v1=VECTOR<T,3>(hi.x, scale*(height(i+1,0)+vertical_offset), hi.y);
                 v2=VECTOR<T,3>(lo.x, scale*(height(i,0)+vertical_offset), lo.y);
-                OpenGL_Vertex(v1,vertices);
-                OpenGL_Vertex(v2,vertices);
+                OpenGL_Vertex(v1);
+                OpenGL_Vertex(v2);
                 for(int j = domain.min_corner.y+1; j <= domain.max_corner.y; j++)
                 {
                     TV nx=grid.X(TV_INT(i,j));
                     v3=VECTOR<T,3>(hi.x, scale*(height(i+1,j)+vertical_offset), nx.y);
                     v4=VECTOR<T,3>(lo.x, scale*(height(i,j)+vertical_offset), nx.y);
 
-                    OpenGL_Normal(PLANE<T>(v1,v2,v3).Normal(),normals);
-                    OpenGL_Vertex(v3,vertices);
-                    OpenGL_Normal(PLANE<T>(v3,v2,v4).Normal(),normals);
-                    OpenGL_Vertex(v4,vertices);
+                    OpenGL_Normal(PLANE<T>(v1,v2,v3).Normal());
+                    OpenGL_Vertex(v3);
+                    OpenGL_Normal(PLANE<T>(v3,v2,v4).Normal());
+                    OpenGL_Vertex(v4);
                     v1=v3;
                     v2=v4;
                 }
-                OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLE_STRIP,3,vertices,normals);
+                OpenGL_End();
             }
         }
         else

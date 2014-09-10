@@ -100,10 +100,10 @@ Display() const
                     {
                         TV min_corner(x,y,z);
                         glPushName(k);
-                        ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-                        OpenGL_Quad(min_corner,axis_1,axis_2,vertices);
-                        OpenGL_Quad(min_corner+axis_3,axis_1,axis_2,vertices);
-                        OpenGL_Draw_Arrays(GL_QUADS,3,vertices);
+                        OpenGL_Begin(GL_QUADS);
+                        OpenGL_Quad(min_corner,axis_1,axis_2);
+                        OpenGL_Quad(min_corner+axis_3,axis_1,axis_2);
+                        OpenGL_End();
                         glPopName();
                     }
                     glPopName();
@@ -132,22 +132,22 @@ Display() const
                 TV x001(x000.x,x000.y,x111.z),x010(x000.x,x111.y,x000.z),x011(x000.x,x111.y,x111.z),
                     x100(x111.x,x000.y,x000.z),x101(x111.x,x000.y,x111.z),x110(x111.x,x111.y,x000.z);
                 
-                ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-                OpenGL_Line(x000,x010,vertices);
-                OpenGL_Line(x010,x011,vertices);
-                OpenGL_Line(x011,x001,vertices);
-                OpenGL_Line(x001,x000,vertices);
+                OpenGL_Begin(GL_LINES);
+                OpenGL_Line(x000,x010);
+                OpenGL_Line(x010,x011);
+                OpenGL_Line(x011,x001);
+                OpenGL_Line(x001,x000);
 
-                OpenGL_Line(x100,x110,vertices);
-                OpenGL_Line(x110,x111,vertices);
-                OpenGL_Line(x111,x101,vertices);
-                OpenGL_Line(x101,x100,vertices);
+                OpenGL_Line(x100,x110);
+                OpenGL_Line(x110,x111);
+                OpenGL_Line(x111,x101);
+                OpenGL_Line(x101,x100);
                 
-                OpenGL_Line(x000,x100,vertices);
-                OpenGL_Line(x010,x110,vertices);
-                OpenGL_Line(x011,x111,vertices);
-                OpenGL_Line(x001,x101,vertices);
-                OpenGL_Draw_Arrays(GL_LINES,3,vertices);
+                OpenGL_Line(x000,x100);
+                OpenGL_Line(x010,x110);
+                OpenGL_Line(x011,x111);
+                OpenGL_Line(x001,x101);
+                OpenGL_End();
                 glPopAttrib();}
         }
     }
@@ -193,30 +193,24 @@ Draw_Subgrid(const VECTOR<int,3> &node_start,const VECTOR<int,3> &node_end) cons
 
     TV start_position=grid.Node(node_start),end_position=grid.Node(node_end-1);
 
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+    OpenGL_Begin(GL_LINES);
 
     if(node_start.z!=node_end.z)
         for(i=node_start.x, x=start_position.x; i<node_end.x; i++, x+=grid.dX.x)
             for(j=node_start.y, y=start_position.y; j<node_end.y; j++, y+=grid.dX.y)
-            {
-                OpenGL_Line(TV(x,y,start_position.z),TV(x,y,end_position.z),vertices);
-            }
+                OpenGL_Line(TV(x,y,start_position.z),TV(x,y,end_position.z));
 
     if(node_start.y!=node_end.y)
         for(i=node_start.x, x=start_position.x; i<node_end.x; i++, x+=grid.dX.x)
             for(k=node_start.z, z=start_position.z; k<node_end.z; k++, z+=grid.dX.z)
-            {
-                OpenGL_Line(TV(x,start_position.y,z),TV(x,end_position.y,z),vertices);
-            }
+                OpenGL_Line(TV(x,start_position.y,z),TV(x,end_position.y,z));
 
     if(node_start.x!=node_end.x)
         for(j=node_start.y, y=start_position.y; j<node_end.y; j++, y+=grid.dX.y)
             for(k=node_start.z, z=start_position.z; k<node_end.z; k++, z+=grid.dX.z)
-            {
-                OpenGL_Line(TV(start_position.x,y,z),TV(end_position.x,y,z),vertices);
-            }
+                OpenGL_Line(TV(start_position.x,y,z),TV(end_position.x,y,z));
 
-    OpenGL_Draw_Arrays(GL_LINES,3,vertices);
+    OpenGL_End();
 }
 //#####################################################################
 // Draw_Nodes_For_Selection
@@ -241,9 +235,9 @@ Draw_Nodes_For_Selection(const VECTOR<int,3> &node_start,const VECTOR<int,3> &no
             for(k=node_start.z, z=start_position.z; k<node_end.z; k++, z+=grid.dX.z)
             {
                 glPushName(k);
-                ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-                OpenGL_Vertex(TV(x,y,z),vertices);
-                OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
+                OpenGL_Begin(GL_POINTS);
+                OpenGL_Vertex(TV(x,y,z));
+                OpenGL_End();
                 glPopName();
             }
             glPopName();

@@ -27,11 +27,11 @@ void OPENGL_SHAPES::Draw_Vector(const VECTOR<T,2>& from,const VECTOR<T,2>& v,OPE
     VECTOR<T,2> a1=a+arrow_lateral_length*lateral_direction,
                                     a2=a-arrow_lateral_length*lateral_direction;
     
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    OpenGL_Line(from,to,vertices);
-    OpenGL_Line(a1,to,vertices);
-    OpenGL_Line(a2,to,vertices);
-    OpenGL_Draw_Arrays(GL_LINES, 2, vertices);
+    OpenGL_Begin(GL_LINES);
+    OpenGL_Line(from,to);
+    OpenGL_Line(a1,to);
+    OpenGL_Line(a2,to);
+    OpenGL_End();
     glPopAttrib();
     glPopMatrix();
 }
@@ -56,11 +56,11 @@ void OPENGL_SHAPES::Draw_Vector(const VECTOR<T,3>& from,const VECTOR<T,3>& v,OPE
     VECTOR<T,3> a1=a+arrow_lateral_length*lateral_direction,
                                     a2=a-arrow_lateral_length*lateral_direction;
     
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    OpenGL_Line(from,to,vertices);
-    OpenGL_Line(a1,to,vertices);
-    OpenGL_Line(a2,to,vertices);
-    OpenGL_Draw_Arrays(GL_LINES, 3, vertices);
+    OpenGL_Begin(GL_LINES);
+    OpenGL_Line(from,to);
+    OpenGL_Line(a1,to);
+    OpenGL_Line(a2,to);
+    OpenGL_End();
     glPopAttrib();
     glPopMatrix();
 }
