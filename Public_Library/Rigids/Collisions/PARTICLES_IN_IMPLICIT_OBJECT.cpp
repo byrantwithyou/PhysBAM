@@ -114,7 +114,7 @@ Simplex_Hierarchy(const RIGID_BODY<TV>& rigid_body)
 // Function Get_Interfering_Simplices
 //#####################################################################
 template<class TV> void PARTICLES_IN_IMPLICIT_OBJECT<TV>::
-Get_Interfering_Simplices(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,ARRAY<int>& simplex_list,MATRIX<typename TV::SCALAR,TV::dimension>& rotation,TV& translation,const bool use_triangle_hierarchy_center_phi_test)
+Get_Interfering_Simplices(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,ARRAY<int>& simplex_list,MATRIX<typename TV::SCALAR,TV::dimension,TV::dimension>& rotation,TV& translation,const bool use_triangle_hierarchy_center_phi_test)
 {
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
 
