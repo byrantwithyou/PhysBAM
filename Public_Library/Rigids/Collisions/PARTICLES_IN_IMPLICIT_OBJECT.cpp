@@ -118,9 +118,6 @@ const typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::HIERARCHY& Sim
 template<class TV> void
 Get_Interfering_Simplices(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,ARRAY<int>& simplex_list,MATRIX<typename TV::SCALAR,TV::dimension>& rotation,TV& translation,const bool use_triangle_hierarchy_center_phi_test)
 {
-#if defined(_MSC_VER) && _MSC_VER<=1500
-    PHYSBAM_FATAL_ERROR("ambiguous call to overloaded function \"Simplex_Hierarchy\"");
-#else
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
 
     simplex_list.Remove_All();
@@ -132,7 +129,6 @@ Get_Interfering_Simplices(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body
         FRAME<TV> frame=body0.Frame().Inverse_Times(body0.Frame());
         hierarchy.Intersection_List(T_ORIENTED_BOX(body0.Object_Space_Bounding_Box(),body0.Frame().Inverse_Times(body0.Frame())),simplex_list);
     }
-#endif
 }
 //#####################################################################
 // Function Intersections_Using_Hierarchy
