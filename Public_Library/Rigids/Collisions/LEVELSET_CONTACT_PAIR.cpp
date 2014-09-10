@@ -40,7 +40,7 @@ bool Update_Levelset_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisio
     while(need_another_iteration && iteration++<max_iterations){need_another_iteration=false;
         particle_intersections.Remove_All();
         // bodies in x_{n+1} positions
-        PARTICLES_IN_IMPLICIT_OBJECT::Append_All_Intersections(rigid_body_collection.Rigid_Body(id_1),rigid_body_collection.Rigid_Body(id_2),particle_intersections,thickness,
+        PARTICLES_IN_IMPLICIT_OBJECT<TV>::Append_All_Intersections(rigid_body_collection.Rigid_Body(id_1),rigid_body_collection.Rigid_Body(id_2),particle_intersections,thickness,
             use_triangle_hierarchy,use_edge_intersection,use_triangle_hierarchy_center_phi_test);
         if(!particle_intersections.m){rigid_body_collisions.skip_collision_check.Set_Last_Checked(id_1,id_2);continue;}
         // revert to the saved positions & save the proposed positions in rigid_frame_save - restore rigid_frame_save below

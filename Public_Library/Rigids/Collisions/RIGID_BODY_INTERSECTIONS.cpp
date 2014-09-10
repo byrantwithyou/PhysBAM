@@ -69,23 +69,23 @@ Find_Any_Intersection(const int id_1,const int id_2,int& particle_body,int& leve
         if(!use_edge_intersection){
             ARRAY<int> triangle_list;triangle_list.Preallocate(50);
             if(body0.simplicial_object && body1.implicit_object){
-                PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices(body0,body1,triangle_list,rotation,translation,use_triangle_hierarchy_center_phi_test);
-                PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy(body0,body1,triangle_list,intersection_list,0,true,rotation,translation);
+                PARTICLES_IN_IMPLICIT_OBJECT<TV>::Get_Interfering_Simplices(body0,body1,triangle_list,rotation,translation,use_triangle_hierarchy_center_phi_test);
+                PARTICLES_IN_IMPLICIT_OBJECT<TV>::Intersections_Using_Hierarchy(body0,body1,triangle_list,intersection_list,0,true,rotation,translation);
                 if(intersection_list.m){particle_body=id_1;levelset_body=id_2;return true;}}
             if(body0.implicit_object && body1.simplicial_object){
-                Flip_Transformation();PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices(body1,body0,triangle_list,rotation,translation,use_triangle_hierarchy_center_phi_test);
-                PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy(body1,body0,triangle_list,intersection_list,0,true,rotation,translation);
+                Flip_Transformation();PARTICLES_IN_IMPLICIT_OBJECT<TV>::Get_Interfering_Simplices(body1,body0,triangle_list,rotation,translation,use_triangle_hierarchy_center_phi_test);
+                PARTICLES_IN_IMPLICIT_OBJECT<TV>::Intersections_Using_Hierarchy(body1,body0,triangle_list,intersection_list,0,true,rotation,translation);
                 if(intersection_list.m){particle_body=id_2;levelset_body=id_1;return true;}}}
         else{ // use edge intersection
             ARRAY<int> triangle_list1,triangle_list2;triangle_list1.Preallocate(50);triangle_list2.Preallocate(50);
-            if(body0.simplicial_object) PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices(body0,body1,triangle_list1,rotation,translation,use_triangle_hierarchy_center_phi_test);
+            if(body0.simplicial_object) PARTICLES_IN_IMPLICIT_OBJECT<TV>::Get_Interfering_Simplices(body0,body1,triangle_list1,rotation,translation,use_triangle_hierarchy_center_phi_test);
             Flip_Transformation();
-            if(body1.simplicial_object){PARTICLES_IN_IMPLICIT_OBJECT::Get_Interfering_Simplices(body1,body0,triangle_list2,rotation,translation,use_triangle_hierarchy_center_phi_test);
-                if(body0.implicit_object){PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy_And_Edges(body1,body0,triangle_list2,triangle_list1,intersection_list,0,true,rotation,translation);
+            if(body1.simplicial_object){PARTICLES_IN_IMPLICIT_OBJECT<TV>::Get_Interfering_Simplices(body1,body0,triangle_list2,rotation,translation,use_triangle_hierarchy_center_phi_test);
+                if(body0.implicit_object){PARTICLES_IN_IMPLICIT_OBJECT<TV>::Intersections_Using_Hierarchy_And_Edges(body1,body0,triangle_list2,triangle_list1,intersection_list,0,true,rotation,translation);
                     if(intersection_list.m){particle_body=id_2;levelset_body=id_1;return true;}}}
             if(body0.simplicial_object && body1.implicit_object){
                 Flip_Transformation();
-                PARTICLES_IN_IMPLICIT_OBJECT::Intersections_Using_Hierarchy_And_Edges(body0,body1,triangle_list1,triangle_list2,intersection_list,0,true,rotation,translation);
+                PARTICLES_IN_IMPLICIT_OBJECT<TV>::Intersections_Using_Hierarchy_And_Edges(body0,body1,triangle_list1,triangle_list2,intersection_list,0,true,rotation,translation);
                 if(intersection_list.m){particle_body=id_1;levelset_body=id_2;return true;}}}}
     return false;
 }
@@ -96,7 +96,7 @@ template<class TV> void RIGID_BODY_INTERSECTIONS<TV>::
 Append_All_Intersections(const int id_1,const int id_2,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const T contour_value) const
 {
     RIGID_BODY<TV> &body0=rigid_body_collection.Rigid_Body(id_1),&body1=rigid_body_collection.Rigid_Body(id_2);
-    PARTICLES_IN_IMPLICIT_OBJECT::Append_All_Intersections(body0,body1,particle_intersections,contour_value,use_triangle_hierarchy,use_edge_intersection,use_triangle_hierarchy_center_phi_test);
+    PARTICLES_IN_IMPLICIT_OBJECT<TV>::Append_All_Intersections(body0,body1,particle_intersections,contour_value,use_triangle_hierarchy,use_edge_intersection,use_triangle_hierarchy_center_phi_test);
 }
 //#####################################################################
 // Function Particle_Partition
@@ -135,11 +135,11 @@ Particles_In_Levelset(const int particle_body_id,const int levelset_body_id,ARRA
 {
     RIGID_BODY<TV> &body0=rigid_body_collection.Rigid_Body(particle_body_id),&body1=rigid_body_collection.Rigid_Body(levelset_body_id);
     if(use_particle_hierarchy){
-        PARTICLES_IN_IMPLICIT_OBJECT::Particles_In_Implicit_Object_Hierarchy<TV>(body0,body1,particle_intersections,contour_value,particle_hierarchies);}
+        PARTICLES_IN_IMPLICIT_OBJECT<TV>::Particles_In_Implicit_Object_Hierarchy(body0,body1,particle_intersections,contour_value,particle_hierarchies);}
     else if(!use_particle_partition){
-        PARTICLES_IN_IMPLICIT_OBJECT::Particles_In_Implicit_Object<TV>(body0,body1,particle_intersections,contour_value,exit_early);}
+        PARTICLES_IN_IMPLICIT_OBJECT<TV>::Particles_In_Implicit_Object(body0,body1,particle_intersections,contour_value,exit_early);}
     else{ // use particle partition
-        PARTICLES_IN_IMPLICIT_OBJECT::Particles_In_Implicit_Object_Partition<TV>(body0,body1,particle_intersections,contour_value,use_particle_partition_center_phi_test,particle_partition_size,exit_early);
+        PARTICLES_IN_IMPLICIT_OBJECT<TV>::Particles_In_Implicit_Object_Partition(body0,body1,particle_intersections,contour_value,use_particle_partition_center_phi_test,particle_partition_size,exit_early);
     }
 }
 //#####################################################################
