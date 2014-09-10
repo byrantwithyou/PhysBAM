@@ -231,7 +231,7 @@ Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& body0,R
 // Function Intersections_Using_Hierarchy_And_Edges
 //#####################################################################
 template<class TV> void PARTICLES_IN_IMPLICIT_OBJECT<TV>::
-Intersections_Using_Hierarchy_And_Edges(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,ARRAY<int>& simplex_list1,ARRAY<int>& simplex_list2,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool exit_early,MATRIX<typename TV::SCALAR,TV::dimension>& rotation,TV& translation)
+Intersections_Using_Hierarchy_And_Edges(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,ARRAY<int>& simplex_list1,ARRAY<int>& simplex_list2,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool exit_early,MATRIX<typename TV::SCALAR,TV::dimension,TV::dimension>& rotation,TV& translation)
 {
     Intersections_Using_Hierarchy_And_Edges_Helper(body0,body1,simplex_list1,simplex_list2,particle_intersections,contour_value,exit_early,rotation,translation);
 }
