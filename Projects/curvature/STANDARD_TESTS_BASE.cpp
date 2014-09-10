@@ -40,7 +40,7 @@ namespace PhysBAM{
 template<class TV> STANDARD_TESTS_BASE<TV>::
 STANDARD_TESTS_BASE(const STREAM_TYPE stream_type)
     :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),test_forces(false),print_matrix(false),
-    resolution(0),stiffness_multiplier(1),damping_multiplier(1),input_poissons_ratio(-1),input_youngs_modulus(0),
+    resolution(0),stiffness_multiplier(1),curvature_stiffness_multiplier(1),damping_multiplier(1),input_poissons_ratio(-1),input_youngs_modulus(0),
     input_friction(.3),ether_drag(0),rand_seed(1234),
     use_rand_seed(false),use_newmark(false),use_newmark_be(false),project_nullspace(false),
     backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
@@ -166,7 +166,7 @@ Self_Collisions_Begin_Callback(const T time,const int substep)
 }
 //#####################################################################
 // Function Filter_Velocities
-//#####################################################################
+//####################################tttiff################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Filter_Velocities(const T dt,const T time,const bool velocity_update)
 {
