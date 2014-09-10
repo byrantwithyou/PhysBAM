@@ -17,7 +17,6 @@
 #include <OpenGL/OpenGL/OPENGL_MOUSE_HANDLER.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 #include <OpenGL/OpenGL/OPENGL_SHAPES.h>
-#include <OpenGL/OpenGL/OPENGL_WINDOW_ANDROID.h>
 #include <OpenGL/OpenGL/OPENGL_WINDOW_GLUT.h>
 #include <OpenGL/OpenGL/OPENGL_WINDOW_PBUFFER.h>
 #include <OpenGL/OpenGL/OPENGL_WORLD.h>
@@ -37,15 +36,6 @@ template<class T> inline OPENGL_WORLD<T>*& Opengl_World()
     static OPENGL_WORLD<T>* opengl_world=0;
     return opengl_world;
 }
-
-#ifdef USE_OPENGLES
-#define GLUT_UP PHYSBAM_MOUSE_UP
-#define GLUT_DOWN PHYSBAM_MOUSE_DOWN
-#define GLUT_LEFT_BUTTON PHYSBAM_MOUSE_LEFT_BUTTON
-#define GLUT_MIDDLE_BUTTON PHYSBAM_MOUSE_MIDDLE_BUTTON
-#define GLUT_RIGHT_BUTTON PHYSBAM_MOUSE_RIGHT_BUTTON
-#define glClearDepth glClearDepthf
-#endif
 
 //#####################################################################
 // Constructor OPENGL_WORLD
@@ -141,11 +131,7 @@ Initialize(const std::string& window_title,const int width,const int height,cons
     if(offscreen)
         window=new OPENGL_WINDOW_PBUFFER<T>(*this,window_title,width,height);
     else
-#ifndef USE_OPENGLES
         window=new OPENGL_WINDOW_GLUT<T>(*this,window_title,width,height);
-#else
-        window=new OPENGL_WINDOW_ANDROID(*this,window_title,width,height);
-#endif
     initialized=true;
     Prepare_For_Idle();
     Set_View_Target_Timer(0);
@@ -384,7 +370,6 @@ Handle_Timer()
 template<class T> void OPENGL_WORLD<T>::
 Handle_Display_Prompt_Only()
 {
-#ifndef USE_OPENGLES
     glPushAttrib(GL_ENABLE_BIT);
     glEnable(GL_SCISSOR_TEST);
     glScissor(0,window->Height()-30,window->Width(),30);
@@ -394,7 +379,6 @@ Handle_Display_Prompt_Only()
     glFlush();
     glDisable(GL_SCISSOR_TEST); // workaround for bug in 2.1.2 NVIDIA 177.13
     glPopAttrib();
-#endif
 }
 //#####################################################################
 // Function Render_World()
@@ -435,36 +419,24 @@ template<class T> void OPENGL_WORLD<T>::Render_World(bool selecting,bool swap_bu
     Update_Clipping_Planes();
 
     if(fill_mode==DRAW_FILLED)
-#ifndef USE_OPENGLES
         glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-#else
-        {}
-#endif
     else if(fill_mode==DRAW_WIREFRAME){
-#ifndef USE_OPENGLES
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-#endif
         if(!enable_lighting_for_wireframe){
             glDisable(GL_LIGHTING);wireframe_color.Send_To_GL_Pipeline();}}
     else if(!selecting){
-#ifndef USE_OPENGLES
         glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-#endif
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0,1.0);
         for(int i=0;i<object_list.m;i++) if((!selecting && object_list(i)->visible) || object_list(i)->selectable) object_list(i)->Display();
         glDisable(GL_POLYGON_OFFSET_FILL);
-#ifndef USE_OPENGLES
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-#endif
         if(!enable_lighting_for_wireframe){
             glDisable(GL_LIGHTING);wireframe_color.Send_To_GL_Pipeline();}}
 
     for(int i=0;i<object_list.m;i++)
         if((!selecting && object_list(i)->visible) || object_list(i)->selectable){
-#ifndef USE_OPENGLES
             if(load_names_for_selection) glLoadName(i);
-#endif
             object_list(i)->Display();}
     if(view_target_timer>0) Opengl_World<T>()->Display_Target();
     glEnable(GL_LIGHTING);
@@ -483,11 +455,7 @@ template<class T> void OPENGL_WORLD<T>::Render_World(bool selecting,bool swap_bu
 
     glDisable(GL_LIGHTING);
     GLenum gl_error=glGetError();
-#ifndef USE_OPENGLES
     if(gl_error !=GL_NO_ERROR) LOG::cout<<"OpenGL Error: "<<gluErrorString(gl_error)<<std::endl;
-#else
-    if(gl_error !=GL_NO_ERROR) LOG::cout<<"OpenGL Error: "<<gl_error<<std::endl;
-#endif
 }
 //#####################################################################
 // Function Update_Clipping_Planes
@@ -501,10 +469,8 @@ template<class T> void OPENGL_WORLD<T>::Set_External_Mouse_Handler(OPENGL_MOUSE_
 //#####################################################################
 template<class T> void OPENGL_WORLD<T>::Update_Clipping_Planes()
 {
-#ifndef USE_OPENGLES
     for(int i=0;i<clipping_planes.m;i++)
         if(clipping_planes(i)) OpenGL_Clip_Plane(GL_CLIP_PLANE0+(i-1),*clipping_planes(i));
-#endif
 }
 //#####################################################################
 // Function Add_Clipping_Plane
@@ -635,7 +601,6 @@ Handle_Keypress_Main(const OPENGL_KEY& key,int x,int y)
 template<class T> void OPENGL_WORLD<T>::
 Handle_Keypress_Prompt(unsigned char key)
 {
-#ifndef USE_OPENGLES
     if(isprint(key)) prompt_response.push_back(key);
     else if(key==8 && !prompt_response.empty()) prompt_response.resize(prompt_response.size()-1); // BACKSPACE
     else if(key==13 || key==27) { // ENTER or ESC
@@ -645,7 +610,6 @@ Handle_Keypress_Prompt(unsigned char key)
         prompt_mode=false;
         (*prompt_response_cb)();}
     window->Redisplay();
-#endif
 }
 //#####################################################################
 // Function Handle_Click
@@ -661,7 +625,6 @@ Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_
     switch(button){
         case GLUT_LEFT_BUTTON:
             // Add selection stuff
-#ifndef USE_OPENGLES
             if((shift_pressed && state==GLUT_DOWN) || selection_mode){
                 const int buff_size=512;
                 GLuint selectBuf[buff_size];
@@ -689,7 +652,6 @@ Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_
                 if(hits<0) hits=Get_Number_Of_Valid_Hits(hits,selectBuf,buff_size); // if had buffer overflow, get number of valid hit records
                 if(process_hits_cb) process_hits_cb(hits,selectBuf);
             } else
-#endif
             {
                 VECTOR<T,2> mouseVector=Convert_Mouse_Coordinates(x,y);
                 if(state==GLUT_UP){
@@ -827,7 +789,6 @@ Prepare_For_Target_XY_Drag()
 template<class T> void OPENGL_WORLD<T>::
 Display_Target()
 {
-#ifndef USE_OPENGLES
     glPushAttrib(GL_LIGHTING_BIT);
     glDisable(GL_LIGHTING);
     glMatrixMode(GL_MODELVIEW);
@@ -842,7 +803,6 @@ Display_Target()
     glutWireCube(20*smallsize);
     glPopMatrix();
     glPopAttrib();
-#endif
 }
 //#####################################################################
 // Function Display_Auto_Help
@@ -850,7 +810,6 @@ Display_Target()
 template<class T> void OPENGL_WORLD<T>::
 Display_Auto_Help()
 {
-#ifndef USE_OPENGLES
     ARRAY<std::string> strings1,strings2;
     for(int i=0;i<key_bindings_by_category.m;i++){
         if(key_bindings_by_category(i).key_bindings.m>0){
@@ -868,7 +827,6 @@ Display_Auto_Help()
 
     Display_Strings(strings2,OPENGL_COLOR::Yellow(),true,0,13,GLUT_BITMAP_8_BY_13);
     Display_Strings(strings1,OPENGL_COLOR::White(),false,0,13,GLUT_BITMAP_8_BY_13);
-#endif
 }
 //#####################################################################
 // Function Display_Strings
@@ -876,11 +834,9 @@ Display_Auto_Help()
 template<class T> void OPENGL_WORLD<T>::
 Draw_Transparent_Text_Box(const ARRAY<std::string> &strings,const VECTOR<int,2> &top_left_corner,int vspace,void *font,const OPENGL_COLOR &color)
 {
-#ifndef USE_OPENGLES
     int max_string_length=0;for(int i=0;i<strings.m;i++) max_string_length=max(max_string_length,glutBitmapLength(font,(const unsigned char *)strings(i).c_str()));
     int num_lines=strings.m;
     OPENGL_SHAPES::Draw_Translucent_Stripe(top_left_corner.x,top_left_corner.y,max_string_length+vspace,-(num_lines+1)*vspace,color);
-#endif
 }
 //#####################################################################
 // Function Display_Strings
@@ -888,7 +844,6 @@ Draw_Transparent_Text_Box(const ARRAY<std::string> &strings,const VECTOR<int,2> 
 template<class T> void OPENGL_WORLD<T>::
 Display_Strings(const ARRAY<std::string> &strings,const OPENGL_COLOR &color,bool draw_transparent_box,int horizontal_offset,int vspace,void *font)
 {
-#ifndef USE_OPENGLES
     if(!strings.m || !display_strings) return;
 
     glMatrixMode(GL_MODELVIEW);
@@ -920,7 +875,6 @@ Display_Strings(const ARRAY<std::string> &strings,const OPENGL_COLOR &color,bool
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
-#endif
 }
 //#####################################################################
 // Function Display_Strings
@@ -928,7 +882,6 @@ Display_Strings(const ARRAY<std::string> &strings,const OPENGL_COLOR &color,bool
 template<class T> void OPENGL_WORLD<T>::
 Display_Strings(bool draw_transparent_box)
 {
-#ifndef USE_OPENGLES
     if(!display_strings) return;
     static OPENGL_COLOR text_color=OPENGL_COLOR::White();
     if(show_frames_per_second){
@@ -938,7 +891,6 @@ Display_Strings(bool draw_transparent_box)
         Display_Strings(strings_with_fps,text_color,draw_transparent_box);}
     else
         Display_Strings(strings_to_print,text_color,draw_transparent_box);
-#endif
 }
 //#####################################################################
 // Function Display_Object_Names
@@ -946,7 +898,6 @@ Display_Strings(bool draw_transparent_box)
 template<class T> void OPENGL_WORLD<T>::
 Display_Object_Names()
 {
-#ifndef USE_OPENGLES
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glColor3f(1,1,1);
@@ -957,7 +908,6 @@ Display_Object_Names()
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
-#endif
 }
 //#####################################################################
 // Function Display_Object_Names
@@ -965,7 +915,6 @@ Display_Object_Names()
 template<class T> void OPENGL_WORLD<T>::
 Display_Object_Names_In_Corner()
 {
-#ifndef USE_OPENGLES
     Display_Object_Names();
 
     ARRAY<std::string> strings;
@@ -973,7 +922,6 @@ Display_Object_Names_In_Corner()
     if(show_frames_per_second) strings.Append(STRING_UTILITIES::string_sprintf("%dfps",frames_per_second));
 
     Display_Strings(strings,OPENGL_COLOR::White(),true,0,12,GLUT_BITMAP_HELVETICA_12);
-#endif
 }
 //#####################################################################
 // Function Add_String
@@ -1303,9 +1251,7 @@ Get_Image(ARRAY<VECTOR<T,d> ,VECTOR<int,2> > &image,const bool use_back_buffer)
 
     ARRAY<VECTOR<T,d> ,VECTOR<int,2> > temporary_image(0,window->Height(),0,window->Width());
     image.Resize(0,window->Width(),0,window->Height()); // temporary is row major
-#ifndef USE_OPENGLES
     glReadBuffer(use_back_buffer?GL_BACK:GL_FRONT);
-#endif
     glReadPixels(0,0,window->Width(),window->Height(),d==3?GL_RGB:GL_RGBA,GL_FLOAT,temporary_image.array.Get_Array_Pointer());
     for(int i=0;i<window->Width();i++) for(int j=0;j<window->Height();j++) image(i,j)=temporary_image(j,i); // swap to column major
 }
@@ -1325,7 +1271,6 @@ template<class T> void OPENGL_WORLD<T>::Display_Prompt_Strings()
 //#####################################################################
 template<class T> void OPENGL_WORLD<T>::Prompt_User(const std::string& prompt_input,OPENGL_CALLBACK* prompt_response_cb_input,const std::string& default_response)
 {
-#ifndef USE_OPENGLES
     prompt=prompt_input;
     prompt_response=default_response;
     prompt_response_success=true;
@@ -1335,7 +1280,6 @@ template<class T> void OPENGL_WORLD<T>::Prompt_User(const std::string& prompt_in
     glDrawBuffer(GL_FRONT);
     prompt_mode=true;
     view_auto_help=false; // force it off
-#endif
 }
 //#####################################################################
 // Function Toggle_Background

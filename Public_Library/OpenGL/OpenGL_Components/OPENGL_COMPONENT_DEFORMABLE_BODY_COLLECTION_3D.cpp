@@ -307,7 +307,6 @@ Display() const
     Set_Display_Modes(display_triangulated_surface_objects,display_tetrahedralized_volume_objects,
             display_hexahedralized_volume_objects,display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects);
 
-#ifndef USE_OPENGLES
     for(int i=0;i<segmented_curve_objects.m;i++){
         if(!active_list(i)) continue;
         glPushName(i);
@@ -326,20 +325,6 @@ Display() const
             glPushName(3);hexahedralized_volume_objects(i)->Display();glPopName();}
         if(free_particles_objects(i) && display_free_particles_objects){glPushName(6);free_particles_objects(i)->Display();glPopName();}
         glPopName();}
-#else
-    for(int i=0;i<segmented_curve_objects.m;i++){
-        if(!active_list(i)) continue;
-        if(segmented_curve_objects(i)){
-            segmented_curve_objects(i)->parent_curve=0;
-            segmented_curve_objects(i)->Display();}
-        if(triangulated_surface_objects(i) && display_triangulated_surface_objects){
-            triangulated_surface_objects(i)->Display();}
-        if(tetrahedralized_volume_objects(i) && display_tetrahedralized_volume_objects){
-            tetrahedralized_volume_objects(i)->Display();}
-        if(hexahedralized_volume_objects(i) && display_hexahedralized_volume_objects){
-            hexahedralized_volume_objects(i)->Display();}
-        if(free_particles_objects(i) && display_free_particles_objects){free_particles_objects(i)->Display();}}
-#endif
 
     if(slice && slice->Is_Slice_Mode()) glPopAttrib();
 
@@ -582,7 +567,6 @@ Toggle_Use_Active_List()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
 Toggle_Selection_Mode()
 {
-#ifndef USE_OPENGLES
     if(!real_selection) return;
     assert(real_selection->body_selection);
     if(real_selection->body_selection->type == OPENGL_SELECTION<T>::SEGMENTED_CURVE_3D){
@@ -595,7 +579,6 @@ Toggle_Selection_Mode()
     else return;
     Highlight_Selection(real_selection);
     glutPostRedisplay();
-#endif
 }
 //#####################################################################
 // Function Increment_Active_Object

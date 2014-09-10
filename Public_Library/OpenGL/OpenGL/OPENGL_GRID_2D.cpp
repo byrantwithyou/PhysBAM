@@ -24,13 +24,10 @@ Display() const
     color.Send_To_GL_Pipeline();
 
     GLint mode;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE, &mode);
-#endif
 
     int ghost_cells=draw_ghost_values?3:0;
 
-#ifndef USE_OPENGLES
     if(mode == GL_SELECT){
         glPushAttrib(GL_ENABLE_BIT|GL_POINT_BIT);glDisable(GL_CULL_FACE);
         VECTOR<T,2> min_corner=grid.Node(TV_INT(-ghost_cells,-ghost_cells)),X;int i,j;
@@ -61,7 +58,6 @@ Display() const
             glPopName();}
         glPopName();glPopAttrib();}
     else
-#endif
     {
         // Draw masks
         T x,y;int i,j,i_mask=1,j_mask=1;

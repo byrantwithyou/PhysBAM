@@ -31,7 +31,6 @@ Display() const
     Send_Transform_To_GL_Pipeline();
 
     GLint mode=0;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE,&mode);
 
     if(mode == GL_SELECT){
@@ -44,29 +43,20 @@ Display() const
         Draw_Triangles_For_Selection();
         glPopName();}
     else
-#endif
     {
         glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_POLYGON_BIT);
         glDisable(GL_LIGHTING);
-#ifndef USE_OPENGLES
         glEnable(GL_POLYGON_OFFSET_FILL);glEnable(GL_POLYGON_OFFSET_LINE);
         glPolygonOffset(0,2);
-#endif
         Draw_Triangles();
-#ifndef USE_OPENGLES
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
         glPolygonOffset(0,1);
-#endif
         segment_color.Send_To_GL_Pipeline();
         Draw_Triangles(false);
         Draw_Vertices();
         glPopAttrib();}
 
-#ifndef USE_OPENGLES
     if(mode != GL_SELECT){
-#else
-    {
-#endif
         if(current_selection){
             glPushAttrib(GL_ENABLE_BIT);
             glDisable(GL_DEPTH_TEST);
@@ -258,7 +248,6 @@ Draw_Segments() const
 template<class T> void OPENGL_TRIANGULATED_AREA<T>::
 Draw_Segments_For_Selection() const
 {
-#ifndef USE_OPENGLES
     PHYSBAM_ASSERT(triangulated_area.mesh.segment_mesh);
     glPushAttrib(GL_LINE_BIT);
     glLineWidth(OPENGL_PREFERENCES::selection_line_width);
@@ -272,7 +261,6 @@ Draw_Segments_For_Selection() const
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);}
     glPopName();
     glPopAttrib();
-#endif
 }
 //#####################################################################
 // Function Draw_Triangles
@@ -298,7 +286,6 @@ Draw_Triangles(const bool use_color_map) const
 template<class T> void OPENGL_TRIANGULATED_AREA<T>::
 Draw_Triangles_For_Selection() const
 {
-#ifndef USE_OPENGLES
     glPushName(0);
     for(int i=0;i<triangulated_area.mesh.elements.m;i++){
         int node1,node2,node3;triangulated_area.mesh.elements(i).Get(node1,node2,node3);
@@ -307,7 +294,6 @@ Draw_Triangles_For_Selection() const
         OpenGL_Triangle(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3),vertices);
         OpenGL_Draw_Arrays(GL_TRIANGLES,2,vertices);}
     glPopName();
-#endif
 }
 //#####################################################################
 // Selection object functions

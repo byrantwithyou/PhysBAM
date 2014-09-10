@@ -197,11 +197,7 @@ Display() const
     if(draw_mode==DRAW_TEXTURE){
         if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE) Display_3D();
         else if(opengl_textured_rect)
-#ifndef USE_OPENGLES
         opengl_textured_rect->Display();
-#else
-        Display_3D_Slice();
-#endif
     }
     else{
         PHYSBAM_ASSERT(opengl_points);
@@ -295,12 +291,6 @@ Display_3D() const
                 OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}}
 
-#ifdef USE_OPENGLES
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-    glDepthMask(GL_TRUE);
-#endif
-
     glPopAttrib();
 }
 //#####################################################################
@@ -351,12 +341,6 @@ Display_3D_Slice() const
             OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
             OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
             OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
-
-#ifdef USE_OPENGLES
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-    glDepthMask(GL_TRUE);
-#endif
 
     glPopAttrib();
 }

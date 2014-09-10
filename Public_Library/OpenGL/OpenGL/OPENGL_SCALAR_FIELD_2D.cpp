@@ -178,11 +178,7 @@ Display() const
 {
     if(draw_mode==DRAW_TEXTURE) {
         PHYSBAM_ASSERT(opengl_textured_rect);
-#ifndef USE_OPENGLES
         opengl_textured_rect->Display();
-#else
-        Display_2D();
-#endif
     } else if(draw_mode==DRAW_POINTS) {
         PHYSBAM_ASSERT(opengl_points);
         opengl_points->Display();
@@ -215,11 +211,9 @@ Display_2D() const
         OpenGL_Vertex(VECTOR<T,2>(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y),vertices);
         OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,2,vertices,colors);vertices.Resize(0);colors.Resize(0);}
 
-#ifdef USE_OPENGLES
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
     glDepthMask(GL_TRUE);
-#endif
     glPopAttrib();
 }
 //#####################################################################

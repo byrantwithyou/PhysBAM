@@ -33,7 +33,6 @@ Display() const
     Send_Transform_To_GL_Pipeline();
 
     GLint mode=0;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE, &mode);
     if(mode==GL_SELECT)
     {
@@ -44,7 +43,6 @@ Display() const
         glPopName();
     }
     else
-#endif
     {
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
         for(int t=0;t<curve.mesh.elements.m;t++){
@@ -188,7 +186,6 @@ template<class T>
 void OPENGL_SEGMENTED_CURVE_2D<T>::
 Draw_Segments_For_Selection() const
 {
-#ifndef USE_OPENGLES
     glPushAttrib(GL_LINE_BIT);
     glLineWidth(OPENGL_PREFERENCES::selection_line_width);
     glPushName(0);
@@ -201,7 +198,6 @@ Draw_Segments_For_Selection() const
     }
     glPopName();
     glPopAttrib();
-#endif
 }
 //#####################################################################
 // Function Bounding_Box

@@ -85,16 +85,13 @@ Display() const
     GLfloat point_size=3.0;
 
     GLint mode=0;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE, &mode);
-#endif
 
     if(valid && draw)
     {
         glDisable(GL_LIGHTING);
         glDisable(GL_DEPTH_TEST);
 
-#ifndef USE_OPENGLES
         if(mode == GL_SELECT)
         {
             glPushName(0);
@@ -112,7 +109,6 @@ Display() const
             glPopName();
         }
         else
-#endif
         {
             if(x)
             {
@@ -149,10 +145,8 @@ Display() const
                     OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)),vertices);
                 OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
 
-#ifndef USE_OPENGLES
                 for(int i=0;i<grid.counts.x;i++)
                     OpenGL_String(VECTOR<T,2>(grid.X(TV_INT(i)).x,scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
-#endif
 
                 if(selected_index>=0){
                     selected_point_color.Send_To_GL_Pipeline();
@@ -160,9 +154,7 @@ Display() const
                     vertices.Resize(0);
                     OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)),vertices);
                     OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
-#ifndef USE_OPENGLES
                     OpenGL_String(VECTOR<T,2>(grid.X(TV_INT(i)).x,scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
-#endif
                 }
 
                 glPopAttrib();
@@ -189,11 +181,7 @@ Display() const
         glEnable(GL_LIGHTING);
         glEnable(GL_DEPTH_TEST);
 
-#ifndef USE_OPENGLES
         if(mode != GL_SELECT && draw_velocities) opengl_vector_field.Display();
-#else
-        if(draw_velocities) opengl_vector_field.Display();
-#endif
     }
 }
 //#####################################################################

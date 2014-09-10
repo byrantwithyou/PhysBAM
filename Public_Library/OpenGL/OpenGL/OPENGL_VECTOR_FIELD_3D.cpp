@@ -14,9 +14,7 @@ OPENGL_VECTOR_FIELD_3D(ARRAY<VECTOR<T,3> >& field,ARRAY<VECTOR<T,3> >& locations
     bool draw_arrowhead,bool draw_value,bool draw_basepoint,bool draw_fancy_arrow)
     :vector_field(field),vector_locations(locations),vector_color(color),size(size),
     draw_arrowhead(draw_arrowhead),draw_value(draw_value),draw_basepoint(draw_basepoint),draw_fancy_arrow(draw_fancy_arrow)
-#ifndef USE_OPENGLES
     ,vector_hat(0)
-#endif
 {
 }
 //#####################################################################
@@ -75,7 +73,6 @@ Display() const
             OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
             vector_color.Send_To_GL_Pipeline();
             glPointSize(old_point_size);}
-#ifndef USE_OPENGLES
         if(draw_value){
             glDisable(GL_DEPTH_TEST);
             (vector_color+OPENGL_COLOR(0.8,0.8,0.8)).Send_To_GL_Pipeline();
@@ -83,9 +80,7 @@ Display() const
                 OpenGL_String(vector_locations(i)+(T)1.1*(T)size*vector_field(i),STRING_UTILITIES::string_sprintf("%.3f %.3f %.3f",vector_field(i).x,vector_field(i).y,vector_field(i).z));
             vector_color.Send_To_GL_Pipeline();
             glEnable(GL_DEPTH_TEST);}
-#endif
         glPopAttrib();}
-#ifndef USE_OPENGLES
     else{
         double length;
         if(!vector_hat) vector_hat=gluNewQuadric();
@@ -114,7 +109,6 @@ Display() const
                 gluDisk(vector_hat,0,arrow_head_radius,arrow_subdivisions,1);
                 glPopMatrix();}}
          glEnable(GL_CULL_FACE);}
-#endif
 
     glPopMatrix();
 }

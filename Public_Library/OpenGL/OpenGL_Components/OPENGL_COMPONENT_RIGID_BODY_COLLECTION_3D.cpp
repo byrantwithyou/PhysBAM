@@ -861,14 +861,11 @@ Display() const
     if(!draw) return;
     GLint mode=0;
     
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE,&mode);
-#endif
 
     if(slice && slice->Is_Slice_Mode()){
         glPushAttrib(GL_ENABLE_BIT);
         slice->Enable_Clip_Planes();}
-#ifndef USE_OPENGLES
     if(draw_triangulated_surface){
         glPushName(1);
         for(int i=0;i<opengl_triangulated_surface.Size();i++) if(draw_object(i) && opengl_triangulated_surface(i)){
@@ -894,23 +891,6 @@ Display() const
             if(opengl_octree_levelset_surface(i)) opengl_octree_levelset_surface(i)->Display();
             glPopName();}
         glPopName();}
-#else
-    if(draw_triangulated_surface) for(int i=0;i<opengl_triangulated_surface.Size();i++) if(draw_object(i) && opengl_triangulated_surface(i)){
-        opengl_triangulated_surface(i)->Display();}
-    if(draw_tetrahedralized_volume) for(int i=0;i<opengl_tetrahedralized_volume.Size();i++) if(draw_object(i) && opengl_tetrahedralized_volume(i)){
-        opengl_tetrahedralized_volume(i)->Display();}
-    if(draw_implicit_surface){
-        int levelset_count=0;
-        for(int i=0;i<opengl_levelset.Size();i++) if(draw_object(i)){
-            if(opengl_levelset(i)){
-                if(++levelset_count>50){
-                    PHYSBAM_WARNING("Refusing to draw more than 10 levelsets to save memory.");
-                    OPENGL_WORLD<T>::Singleton()->Add_String("WARNING: Refusing to draw more than 10 levelsets to save memory.");
-                    break;}
-                opengl_levelset(i)->Update();
-                opengl_levelset(i)->Display();}
-            if(opengl_octree_levelset_surface(i)) opengl_octree_levelset_surface(i)->Display();}}
-#endif
     if(draw_individual_axes)
         for(int i=0;i<opengl_axes.Size();i++){
             if(draw_object(i) && opengl_axes(i)){
@@ -919,7 +899,6 @@ Display() const
     if(draw_velocity_vectors) velocity_field.Display();
     if(draw_angular_velocity_vectors) angular_velocity_field.Display();
 
-#ifndef USE_OPENGLES
     if(show_object_names){
         glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
         glDisable(GL_DEPTH_TEST);
@@ -929,7 +908,6 @@ Display() const
             if(draw_object(i) && rigid_body_collection.Rigid_Body(i).name.length())
                 OpenGL_String(rigid_body_collection.rigid_body_particles.frame(i).t,rigid_body_collection.Rigid_Body(i).name);
         glPopAttrib();}
-#endif
 
     // Articulated rigid bodies
     if(articulated_rigid_body){

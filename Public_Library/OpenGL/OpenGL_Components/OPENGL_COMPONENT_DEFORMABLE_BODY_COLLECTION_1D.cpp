@@ -123,7 +123,6 @@ Display() const
 {
     if(!draw || !valid) return;
 
-#ifndef USE_OPENGLES
     for(int i=0;i<point_simplices_1d_objects.m;i++){
         if(!active_list(i)) continue;
         glPushName(i);
@@ -132,11 +131,6 @@ Display() const
             point_simplices_1d_objects(i)->Display();
             glPopName();}
         glPopName();}
-#else
-    for(int i=0;i<point_simplices_1d_objects.m;i++){
-        if(!active_list(i)) continue;
-        if(point_simplices_1d_objects(i)) point_simplices_1d_objects(i)->Display();}
-#endif
 
     if(selected_vertex>=0) OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(deformable_body_collection.particles.X(selected_vertex),selected_vertex);
 
@@ -210,7 +204,6 @@ Toggle_Use_Active_List()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
 Toggle_Selection_Mode()
 {
-#ifndef USE_OPENGLES
     if(!real_selection) return;
     assert(real_selection->body_selection);
     if(real_selection->body_selection->type == OPENGL_SELECTION<T>::POINT_SIMPLICES_1D){
@@ -219,7 +212,6 @@ Toggle_Selection_Mode()
     else return;
     Highlight_Selection(real_selection);
     glutPostRedisplay();
-#endif
 }
 //#####################################################################
 // Function Increment_Active_Object

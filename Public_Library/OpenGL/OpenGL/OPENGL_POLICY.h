@@ -8,11 +8,7 @@
 #define __OPENGL_POLICY__
 
 #ifndef __APPLE__
-#ifndef USE_OPENGLES
 #include <GL/gl.h>
-#else
-#include <GLES/gl.h>
-#endif
 #else
 #include <OpenGL/gl.h>
 #endif
@@ -33,11 +29,7 @@ template<> struct OPENGL_POLICY<float>
 //#####################################################################
 template<> struct OPENGL_POLICY<double>
 {
-#ifndef USE_OPENGLES
     typedef GLdouble T_GL;
-#else
-    typedef GLfloat T_GL;
-#endif
 };
 //#####################################################################
 }

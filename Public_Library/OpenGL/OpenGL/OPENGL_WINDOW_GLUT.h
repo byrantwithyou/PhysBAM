@@ -4,7 +4,6 @@
 //#####################################################################
 #ifndef __OPENGL_WINDOW_GLUT__
 #define __OPENGL_WINDOW_GLUT__
-#ifndef USE_OPENGLES 
 
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <OpenGL/OpenGL/OPENGL_WINDOW.h>
@@ -42,5 +41,4 @@ private:
 //#####################################################################
 };
 }
-#endif
 #endif

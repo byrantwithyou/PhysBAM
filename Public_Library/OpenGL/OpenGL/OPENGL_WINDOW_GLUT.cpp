@@ -2,7 +2,6 @@
 // Copyright 2009, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef USE_OPENGLES
 #include <OpenGL/OpenGL/OPENGL_WINDOW_GLUT.h>
 #include <OpenGL/OpenGL/OPENGL_WORLD.h>
 
@@ -184,4 +183,3 @@ namespace PhysBAM{
 template class OPENGL_WINDOW_GLUT<float>;
 template class OPENGL_WINDOW_GLUT<double>;
 }
-#endif

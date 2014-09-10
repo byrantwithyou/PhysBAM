@@ -12,13 +12,9 @@
 #endif
 
 #ifndef __APPLE__
-#ifndef USE_OPENGLES
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-#else
-#include <GLES/gl.h>
-#endif
 #else
 #include <GLUT/glut.h>
 #include <OpenGL/gl.h>
@@ -57,7 +53,6 @@ Begin(int mode)
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 End()
 {
-#ifndef USE_OPENGLES
     Transform_Buffer();
     switch(glmode){
         case GL_POINTS: for(int i=0;i<buffer.m;i++) Draw_Point(buffer(i)); break;
@@ -70,7 +65,6 @@ End()
         default:LOG::cout<<"Unhandled mode "<<glmode<<std::endl;break;
     }
     buffer.Remove_All();
-#endif
 }
 //#####################################################################
 // Function Vertex
@@ -161,7 +155,6 @@ Draw_Line(const TV& a,const TV& b)
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Draw_Polygon(int i,int n)
 {
-#ifndef USE_OPENGLES
     GLint mode[2]={0};
     glGetIntegerv(GL_POLYGON_MODE,mode);
     const char* str = "closepath stroke\n";
@@ -172,7 +165,6 @@ Draw_Polygon(int i,int n)
         Emit(buffer(j));
         Emit("lineto ");}
     Emit(str);
-#endif
 }
 //#####################################################################
 // Function Set_Color
@@ -205,7 +197,6 @@ Get_Helper(MATRIX<double,4>& proj,MATRIX<double,4>& model,double* view)
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Transform_Buffer()
 {
-#ifndef USE_OPENGLES
     MATRIX<T,4> proj,model;
     T view[4];
     Get_Helper(proj,model,view);
@@ -217,7 +208,6 @@ Transform_Buffer()
         TV device=clip.Remove_Index(3)/clip(3);
         TV window((device.x+1)*(view[2]/2)+view[0],(device.y+1)*(view[3]/2)+view[1],device.z);
         buffer(i)=window;}
-#endif
 }
 //#####################################################################
 // Function Draw_Arrays

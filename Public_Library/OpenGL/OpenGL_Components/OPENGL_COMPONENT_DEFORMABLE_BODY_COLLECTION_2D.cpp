@@ -151,7 +151,6 @@ Display() const
         case 2:draw_triangles_of_material=true;break;
         case 3:draw_triangulated_areas=true;break;
         case 4:draw_triangulated_areas=true;draw_triangles_of_material=true;break;}
-#ifndef USE_OPENGLES
     for(int i=0;i<segmented_curve_objects.m;i++){
         glPushName(i);
         glPushName(1);
@@ -169,14 +168,6 @@ Display() const
         if(free_particles_objects(i) && display_mode!=1){
             glPushName(6);free_particles_objects(i)->Display();glPopName();}
         glPopName();}
-#else
-    for(int i=0;i<segmented_curve_objects.m;i++){
-        if(segmented_curve_objects(i)) segmented_curve_objects(i)->Display();
-        if(bezier_spline_objects(i)) bezier_spline_objects(i)->Display();
-        if(draw_triangulated_areas && triangulated_area_objects(i)) triangulated_area_objects(i)->Display();
-        if(draw_triangles_of_material && triangles_of_material_objects(i)) triangles_of_material_objects(i)->Display();
-        if(free_particles_objects(i) && display_mode!=1) free_particles_objects(i)->Display();}
-#endif
     if(draw_velocities && deformable_body_collection.particles.store_velocity) velocity_field.Display();
 }
 //#####################################################################

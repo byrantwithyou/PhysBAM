@@ -342,10 +342,8 @@ Set_Current_Selection(OPENGL_SELECTION<T>* selection)
 template<class T> void BASIC_VISUALIZATION<T>::
 Selection_Callback()
 {
-#ifndef USE_OPENGLES
     Update_OpenGL_Strings();
     glutPostRedisplay();
-#endif
 }
 //#####################################################################
 // Function Selection_Priority

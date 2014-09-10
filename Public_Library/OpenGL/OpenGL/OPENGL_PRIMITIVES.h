@@ -13,14 +13,9 @@
 #endif
 
 #ifndef __APPLE__
-#ifndef USE_OPENGLES
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-#else
-#include <OpenGL/OpenGL/glues.h>
-#include <GLES/gl.h>
-#endif
 #else
 #include <GLUT/glut.h>
 #include <OpenGL/gl.h>
@@ -43,19 +38,6 @@ extern OPENGL_EPS_OUTPUT<float>* opengl_eps_output;
 #define IF_OPENGL_EPS_OUTPUT(x)
 #endif
 
-#ifdef USE_OPENGLES
-#define glTranslated(x,y,z)     glTranslatef((GLfloat)x,(GLfloat)y,(GLfloat)z)
-#define glScaled(x,y,z)         glScalef((GLfloat)x,(GLfloat)y,(GLfloat)z)
-#define glRotated(angle,x,y,z)  glRotatef((GLfloat)angle,(GLfloat)x,(GLfloat)y,(GLfloat)z)
-#define glNormal3d(x,y,z)       glNormal3f((GLfloat)x,(GLfloat)y,(GLfloat)z)
-#define glColor4fv(v)           glColor4f(((GLfloat*)v)[0], ((GLfloat*)v)[1], ((GLfloat*)v)[2], ((GLfloat*)v)[3])
-#define glColor3f(r,g,b)        glColor4f(r,g,b,1)
-#define GLdouble                GLfloat
-#define glGetDoublev            glGetFloatv
-#define glPushAttrib(x)
-#define glPopAttrib()
-#endif
-
 inline void glMultMatrix(float* matrix){glMultMatrixf(matrix);}
 inline void glMultMatrix(double* matrix){glMultMatrixd(matrix);}
 
@@ -74,7 +56,6 @@ IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Arrays(mode,dimension,length,vertic
 inline void OpenGL_Draw_Arrays(GLenum mode,GLenum type,int dimension,int length,const GLvoid* vertices)
 {glEnableClientState(GL_VERTEX_ARRAY);glVertexPointer(dimension,type,0,vertices);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Arrays(mode,dimension,length,vertices));}
 
-#ifndef USE_OPENGLES
 inline void OpenGL_Draw_Arrays_With_Normals(GLenum mode,int dimension,const ARRAY<GLdouble>& vertices,const ARRAY<GLfloat>& normals)
 {assert(vertices.m/dimension==normals.m/3);OpenGL_Draw_Arrays_With_Normals(mode,GL_DOUBLE,dimension,vertices.m/dimension,vertices.base_pointer,normals.base_pointer);}
 
@@ -86,7 +67,6 @@ inline void OpenGL_Draw_Arrays(GLenum mode,int dimension,const ARRAY<GLdouble>& 
 
 inline void OpenGL_Draw_Arrays(GLenum mode,int dimension,const ARRAY<GLdouble>& vertices)
 {OpenGL_Draw_Arrays(mode,GL_DOUBLE,dimension,vertices.m/dimension,vertices.base_pointer);}
-#endif
 
 inline void OpenGL_Draw_Arrays_With_Normals(GLenum mode,int dimension,const ARRAY<GLfloat>& vertices,const ARRAY<GLfloat>& normals)
 {assert(vertices.m/dimension==normals.m/3);OpenGL_Draw_Arrays_With_Normals(mode,GL_FLOAT,dimension,vertices.m/dimension,vertices.base_pointer,normals.base_pointer);}
@@ -103,7 +83,6 @@ inline void OpenGL_Draw_Arrays(GLenum mode,int dimension,const ARRAY<GLfloat>& v
 inline void OpenGL_Draw_Arrays(GLenum mode,int dimension,const ARRAY<GLshort>& vertices)
 {OpenGL_Draw_Arrays(mode,GL_SHORT,dimension,vertices.m/dimension,vertices.base_pointer);}
 
-#ifndef USE_OPENGLES
 template<int d1>
 inline void OpenGL_Draw_Spline(GLenum mode,int resolution,const VECTOR<VECTOR<GLfloat,3>,d1>& control_points)
 {
@@ -137,7 +116,6 @@ inline void OpenGL_End()
 
 inline void OpenGL_Eps_Emit(const char* str)
 {IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Emit(str));}
-#endif
 
 inline void OpenGL_Rotate(const ROTATION<VECTOR<float,3> >& r)
 {float angle;VECTOR<float,3> axis;r.Get_Angle_Axis(angle,axis);glRotatef(angle*180/(float)pi,axis.x,axis.y,axis.z);}
@@ -185,7 +163,6 @@ template<int d>
 inline void OpenGL_Normal(const VECTOR<float,d>& n, ARRAY<GLfloat>& normals)
 {for(int i=0;i<d;i++) normals.Append(n(i));}
 
-#ifndef USE_OPENGLES
 inline void OpenGL_Vertex(const VECTOR<float,3>& v)
 {glVertex3f(v.x,v.y,v.z);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Vertex(v));}
 
@@ -194,12 +171,10 @@ inline void OpenGL_Vertex(const VECTOR<float,2>& v)
 
 inline void OpenGL_Vertex(const VECTOR<float,1>& v)
 {glVertex2f(v.x,(float)0);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Vertex(VECTOR<float,2>(v.x,0)));}
-#endif
 
 inline void OpenGL_Normal(const VECTOR<float,3>& n)
 {glNormal3f(n.x,n.y,n.z);}
 
-#ifndef USE_OPENGLES
 inline void OpenGL_RasterPos(const VECTOR<float,1>& v)
 {glRasterPos2f(v.x,(float)0);}
 
@@ -208,7 +183,6 @@ inline void OpenGL_RasterPos(const VECTOR<float,2>& v)
 
 inline void OpenGL_RasterPos(const VECTOR<float,3>& v)
 {glRasterPos3f(v.x,v.y,v.z);}
-#endif
 
 template<int d>
 inline void OpenGL_Vertex(const VECTOR<double,d>& v,ARRAY<OPENGL_POLICY<double>::T_GL>& vertices)
@@ -218,7 +192,6 @@ template<int d>
 inline void OpenGL_Normal(const VECTOR<double,d>& n, ARRAY<GLfloat>& normals)
 {for(int i=0;i<d;i++) normals.Append(n(i));}
 
-#ifndef USE_OPENGLES
 inline void OpenGL_Vertex(const VECTOR<double,3>& v)
 {glVertex3d(v.x,v.y,v.z);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Vertex(v));}
 
@@ -227,17 +200,14 @@ inline void OpenGL_Vertex(const VECTOR<double,2>& v)
 
 inline void OpenGL_Vertex(const VECTOR<double,1>& v)
 {glVertex2d(v.x,(double)0);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Vertex(VECTOR<double,2>(v.x,0)));}
-#endif
 
 template<class T,int d>
 inline void OpenGL_Line(const VECTOR<T,d>& a, const VECTOR<T,d>& b,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
 {OpenGL_Vertex(a,vertices);OpenGL_Vertex(b,vertices);}
 
-#ifndef USE_OPENGLES
 template<class T,int d>
 inline void OpenGL_Line(const VECTOR<T,d>& a, const VECTOR<T,d>& b)
 {OpenGL_Vertex(a);OpenGL_Vertex(b);}
-#endif
 
 template<class T,int d>
 inline void OpenGL_Triangle(const VECTOR<T,d>& a, const VECTOR<T,d>& b, const VECTOR<T,d>& c,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
@@ -247,16 +217,13 @@ template<class T,int d>
 inline void OpenGL_Triangle(const VECTOR<VECTOR<T,d>,3>& a,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
 {OpenGL_Vertex(a(0),vertices);OpenGL_Vertex(a(1),vertices);OpenGL_Vertex(a(2),vertices);}
 
-#ifndef USE_OPENGLES
 template<class T,int d>
 inline void OpenGL_Triangle(const VECTOR<T,d>& a, const VECTOR<T,d>& b, const VECTOR<T,d>& c)
 {OpenGL_Vertex(a);OpenGL_Vertex(b);OpenGL_Vertex(c);}
-#endif
 
 inline void OpenGL_Normal(const VECTOR<double,3>& n)
 {glNormal3d(n.x,n.y,n.z);}
 
-#ifndef USE_OPENGLES
 inline void OpenGL_RasterPos(const VECTOR<double,1>& v)
 {glRasterPos2f(v.x,(double)0);}
 
@@ -265,26 +232,21 @@ inline void OpenGL_RasterPos(const VECTOR<double,2>& v)
 
 inline void OpenGL_RasterPos(const VECTOR<double,3>& v)
 {glRasterPos3d(v.x,v.y,v.z);}
-#endif
 
 inline void OpenGL_LookFrom(const FRAME<VECTOR<double,3> >& frame)
 {OpenGL_Rotate(frame.r.Inverse().Normalized());OpenGL_Translate(-frame.t);}
 
-#ifndef USE_OPENGLES
 template<class TV>
 inline void OpenGL_String(const TV& position,const std::string& str,void* font=GLUT_BITMAP_HELVETICA_12)
 {OpenGL_RasterPos(position);
 for(unsigned int j=0;j<str.length();j++) glutBitmapCharacter(font,str[j]);}
-#endif
 
-#ifndef USE_OPENGLES
 template<class T>
 inline void OpenGL_Quad_2D(const VECTOR<T,2> &bottom_left,const VECTOR<T,2> &top_right)
 {OpenGL_Vertex(bottom_left);OpenGL_Vertex(VECTOR<T,2>(bottom_left.x,top_right.y));
  OpenGL_Vertex(top_right);OpenGL_Vertex(VECTOR<T,2>(top_right.x,bottom_left.y));
  IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Vertex(VECTOR<T,2>(bottom_left.x,bottom_left.y));opengl_eps_output->Vertex(VECTOR<T,2>(bottom_left.x,top_right.y));
      opengl_eps_output->Vertex(VECTOR<T,2>(top_right.x,top_right.y));opengl_eps_output->Vertex(VECTOR<T,2>(top_right.x,bottom_left.y)));}
-#endif
 
 template<class T>
 inline void OpenGL_Triangle_Strip_2D(const VECTOR<T,2> &bottom_left,const VECTOR<T,2> &top_right,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
@@ -300,18 +262,14 @@ template<class T>
 inline void OpenGL_Quad(const VECTOR<T,3> &bottom_left,const VECTOR<T,3> &right,const VECTOR<T,3>& up,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
 {OpenGL_Vertex(bottom_left,vertices);OpenGL_Vertex(bottom_left+up,vertices);OpenGL_Vertex(bottom_left+up+right,vertices);OpenGL_Vertex(bottom_left+right,vertices);}
 
-#ifndef USE_OPENGLES
 template<class T>
 inline void OpenGL_Quad(const VECTOR<T,3> &bottom_left,const VECTOR<T,3> &right,const VECTOR<T,3>& up)
 {OpenGL_Vertex(bottom_left);OpenGL_Vertex(bottom_left+up);OpenGL_Vertex(bottom_left+up+right);OpenGL_Vertex(bottom_left+right);}
-#endif
 
-#ifndef USE_OPENGLES
 template<class T>
 inline void OpenGL_Clip_Plane(GLenum id,const PLANE<T> &plane)
 {GLdouble equation[4]={plane.normal.x,plane.normal.y,plane.normal.z,-VECTOR<T,3>::Dot_Product(plane.normal,plane.x0)};
 glClipPlane(id,equation);}
-#endif
 
 }
 #endif

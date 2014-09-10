@@ -40,9 +40,7 @@ Draw_Highlighted_Vertex(const TV& position,int id,const OPENGL_COLOR& color)
     ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
     OpenGL_Vertex(position, vertices);
     OpenGL_Draw_Arrays(GL_POINTS,TV::dimension,vertices);
-#ifndef USE_OPENGLES
     if(id>=0) OpenGL_String(position,STRING_UTILITIES::string_sprintf("   %d",id));
-#endif
     glPopAttrib();
 }
 //#####################################################################
@@ -58,9 +56,7 @@ Draw_Highlighted_Segment(const TV& x0,const TV& x1,int id,const OPENGL_COLOR& co
     ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
     OpenGL_Line(x0,x1,vertices);
     OpenGL_Draw_Arrays(GL_LINES,TV::dimension,vertices);
-#ifndef USE_OPENGLES
     if(id>=0) OpenGL_String((typename TV::SCALAR).5*(x0+x1),STRING_UTILITIES::string_sprintf("   %d",id));
-#endif
     glPopAttrib();
 }
 //#####################################################################
@@ -77,9 +73,7 @@ Draw_Highlighted_Curve(const ARRAY<VECTOR<TV,2> >& X,int id,const OPENGL_COLOR& 
     ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
     for(int i=0;i<X.m;i++) {OpenGL_Line(X(i).x,X(i).y,vertices);total+=X(i).x;}
     OpenGL_Draw_Arrays(GL_LINES,TV::dimension,vertices);
-#ifndef USE_OPENGLES
     if(id>=0) OpenGL_String((typename TV::SCALAR)1./X.m*(total),STRING_UTILITIES::string_sprintf("   %d",id));
-#endif
     glPopAttrib();
 }
 //#####################################################################
@@ -97,9 +91,7 @@ Draw_Highlighted_Triangle_Boundary(const TV& x0,const TV& x1,const TV& x2,int id
     OpenGL_Vertex(x1,vertices);
     OpenGL_Vertex(x2,vertices);
     OpenGL_Draw_Arrays(GL_LINE_LOOP,TV::dimension,vertices);
-#ifndef USE_OPENGLES
     if(id>=0) OpenGL_String(((typename TV::SCALAR)1/3)*(x0+x1+x2),STRING_UTILITIES::string_sprintf("%d",id));
-#endif
     glPopAttrib();
 }
 //#####################################################################
@@ -124,9 +116,7 @@ Draw_Highlighted_Tetrahedron_Boundary(const VECTOR<T,3>& x0,const VECTOR<T,3>& x
     OpenGL_Vertex(x3,vertices);
     OpenGL_Vertex(x2,vertices);
     OpenGL_Draw_Arrays(GL_LINES,3,vertices);
-#ifndef USE_OPENGLES
     if(id>=0) OpenGL_String((T)0.25*(x0+x1+x2+x3),STRING_UTILITIES::string_sprintf("%d",id));
-#endif
     glPopAttrib();
 }
 //#####################################################################
@@ -191,7 +181,6 @@ Draw_Highlighted_Box(const VECTOR<T,3>& x000,const VECTOR<T,3>& x111,const OPENG
 template<class T> template<class TV,int d> void OPENGL_SELECTION<T>::
 Draw_Vertices_For_Selection(const SIMPLEX_MESH<d>& mesh,const GEOMETRY_PARTICLES<TV>& particles)
 {
-#ifndef USE_OPENGLES
     glPushAttrib(GL_POINT_BIT);
     glPointSize(OPENGL_PREFERENCES::selection_point_size);
     glPushName(0);
@@ -205,7 +194,6 @@ Draw_Vertices_For_Selection(const SIMPLEX_MESH<d>& mesh,const GEOMETRY_PARTICLES
     }
     glPopName();
     glPopAttrib();
-#endif
 }
 namespace PhysBAM{
 template class OPENGL_SELECTION<double>;

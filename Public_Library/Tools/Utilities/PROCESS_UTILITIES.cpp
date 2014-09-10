@@ -21,9 +21,7 @@
 #elif defined(__linux__) || defined(__APPLE__)
 #include <csignal>
 #include <unistd.h>
-#ifndef USE_OPENGLES
 #include <execinfo.h>
-#endif
 #include <fenv.h>
 #include <sys/resource.h>
 #include <sys/time.h>
@@ -161,13 +159,8 @@ void Backtrace()
 {
     const int stack_entries=50;
     void *stack_array[stack_entries];
-#ifdef USE_OPENGLES  //TODO: Add Statck trace ability for andoid
-    size_t size=0;
-    char **strings=0;
-#else
     size_t size=backtrace(stack_array,stack_entries);
     char **strings=backtrace_symbols(stack_array,size);
-#endif
     LOG::cerr<<"=================== BEGIN STACK BACKTRACE ==================="<<std::endl;
     int pid=getpid();
     static const unsigned int buf_size=2048;

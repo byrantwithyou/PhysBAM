@@ -26,9 +26,7 @@ public:
     bool draw_value;
     bool draw_basepoint;
     bool draw_fancy_arrow;
-#ifndef USE_OPENGLES
     mutable GLUquadric* vector_hat;
-#endif
 
     OPENGL_VECTOR_FIELD_3D(ARRAY<VECTOR<T,3> >& field,ARRAY<VECTOR<T,3> >& locations, 
         const OPENGL_COLOR& color=OPENGL_COLOR::White(),double size=0.025, 

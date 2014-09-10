@@ -70,11 +70,8 @@ Display() const
     Send_Transform_To_GL_Pipeline();
 
     GLint mode=0;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE,&mode);
-#endif
     glDisable(GL_CULL_FACE);
-#ifndef USE_OPENGLES
     if(mode==GL_SELECT){
         glPushName(1);
         Draw_Vertices_For_Selection();
@@ -82,9 +79,6 @@ Display() const
         Draw_Tetrahedra_For_Selection();
         glPopName();}
     else if(cutaway_mode){
-#else
-    if(cutaway_mode){
-#endif
         if(boundary_only) Draw_Boundary_Triangles(cutaway_mesh);
         else Draw_Wireframe_Mesh(cutaway_mesh);}
     else{
@@ -628,7 +622,6 @@ Draw_Vertices_For_Selection() const
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Draw_Tetrahedra_For_Selection() const
 {
-#ifndef USE_OPENGLES
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_CULL_FACE);
     glPushName(0);
@@ -643,7 +636,6 @@ Draw_Tetrahedra_For_Selection() const
         OpenGL_Draw_Arrays(GL_TRIANGLES,3,vertices);}
     glPopName();
     glPopAttrib();
-#endif
 }
 //#####################################################################
 // Selection object functions

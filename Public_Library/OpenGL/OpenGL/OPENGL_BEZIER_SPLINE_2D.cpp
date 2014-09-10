@@ -32,7 +32,6 @@ Display() const
     Send_Transform_To_GL_Pipeline();
 
     GLint mode=0;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE, &mode);
     if(mode==GL_SELECT){
         glPushName(1);
@@ -41,7 +40,6 @@ Display() const
         Draw_Curves_For_Selection();
         glPopName();}
     else
-#endif
     {
         for(int t=0;t<curve.control_points.m;t++){
             VECTOR<TV,d+1> control_points(curve.particles.X.Subset(curve.control_points(t)));
@@ -170,7 +168,6 @@ template<class T,int d>
 void OPENGL_BEZIER_SPLINE_2D<T,d>::
 Draw_Vertices_For_Selection() const
 {
-#ifndef USE_OPENGLES
     glPushAttrib(GL_POINT_BIT);
     glPointSize(OPENGL_PREFERENCES::selection_point_size);
     glPushName(0);
@@ -185,7 +182,6 @@ Draw_Vertices_For_Selection() const
     }
     glPopName();
     glPopAttrib();
-#endif
 }
 //#####################################################################
 // Function Draw_Curves_For_Selection
@@ -193,7 +189,6 @@ Draw_Vertices_For_Selection() const
 template<class T,int d> void OPENGL_BEZIER_SPLINE_2D<T,d>::
 Draw_Curves_For_Selection() const
 {
-#ifndef USE_OPENGLES
     glPushAttrib(GL_LINE_BIT);
     glLineWidth(OPENGL_PREFERENCES::selection_line_width);
     glPushName(0);
@@ -205,7 +200,6 @@ Draw_Curves_For_Selection() const
     }
     glPopName();
     glPopAttrib();
-#endif
 }
 //#####################################################################
 // Function Draw_Highlighted_Spline
@@ -219,11 +213,9 @@ Draw_Highlighted_Spline(int id) const
     OPENGL_PREFERENCES::selection_highlight_color.Send_To_GL_Pipeline();
     VECTOR<TV,d+1> control_points(curve.particles.X.Subset(curve.control_points(id)));
     OpenGL_Draw_Spline(GL_LINE,20,control_points);
-#ifndef USE_OPENGLES
     if(id>=0) OpenGL_String(curve.Evaluate(id,.25),"a");
     if(id>=0) OpenGL_String(curve.Evaluate(id,.5),STRING_UTILITIES::string_sprintf("   %d",id));
     if(id>=0) OpenGL_String(curve.Evaluate(id,.75),"b");
-#endif
     glPopAttrib();
 }
 //#####################################################################

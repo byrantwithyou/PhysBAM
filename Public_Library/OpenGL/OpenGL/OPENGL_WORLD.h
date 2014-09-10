@@ -214,11 +214,7 @@ public:
     void Display_Target();
     void Display_Auto_Help();
     static void Draw_Transparent_Text_Box(const ARRAY<std::string> &strings,const VECTOR<int,2> &top_left_corner,int vspace,void* font,const OPENGL_COLOR &color);
-#ifndef USE_OPENGLES
     void Display_Strings(const ARRAY<std::string> &strings,const OPENGL_COLOR &color=OPENGL_COLOR::White(),bool draw_transparent_box=true,int horizontal_offset=0,int vspace=18,void* font=GLUT_BITMAP_HELVETICA_18);
-#else
-    void Display_Strings(const ARRAY<std::string> &strings,const OPENGL_COLOR &color=OPENGL_COLOR::White(),bool draw_transparent_box=true,int horizontal_offset=0,int vspace=18,void* font=0);
-#endif
     void Display_Strings(bool draw_transparent_box=true);
     void Display_Object_Names();
     void Display_Object_Names_In_Corner();

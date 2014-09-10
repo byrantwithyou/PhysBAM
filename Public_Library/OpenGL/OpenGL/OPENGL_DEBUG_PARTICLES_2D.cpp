@@ -80,9 +80,7 @@ Display() const
 
 
     GLint mode=0;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE,&mode);
-#endif
 
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
     glEnable(GL_CULL_FACE);
@@ -96,19 +94,13 @@ Display() const
     glPointSize(5);
     glDisable(GL_LIGHTING);
 
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE,&mode);
-#endif
 
     ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     ARRAY_VIEW<T>* sizes=particles.template Get_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
     ARRAY_VIEW<TV>* V=particles.template Get_Array<TV>(ATTRIBUTE_ID_V);
 
-#ifndef USE_OPENGLES
     if(draw_velocities && V && mode!=GL_SELECT){
-#else
-    if(draw_velocities && V){
-#endif
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);
         velocity_color.Send_To_GL_Pipeline();
@@ -121,13 +113,9 @@ Display() const
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);
         glPopAttrib();}
 
-#ifndef USE_OPENGLES
     if(mode==GL_SELECT) glPushName(0);
-#endif
     for(int i=0;i<particles.X.m;i++){
-#ifndef USE_OPENGLES
         if(mode==GL_SELECT) glLoadName(i);
-#endif
 
         if(colors) OPENGL_COLOR((*colors)(i)).Send_To_GL_Pipeline();
         else default_color.Send_To_GL_Pipeline();
@@ -137,9 +125,7 @@ Display() const
             vertices.Resize(0);
             OpenGL_Vertex(particles.X(i),vertices);
             OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}}
-#ifndef USE_OPENGLES
     if(mode==GL_SELECT) glPopName();
-#endif
 
     glPopAttrib();
     glPopMatrix();

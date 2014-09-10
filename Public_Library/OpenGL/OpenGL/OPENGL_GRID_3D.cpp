@@ -39,9 +39,7 @@ Display() const
     color.Send_To_GL_Pipeline();
 
     GLint mode;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE, &mode);
-#endif
 
     OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
 
@@ -59,7 +57,6 @@ Display() const
         else if(slice->axis==1) { node_start.y=node_end.y=slice->index/scale+1; }
         else if(slice->axis==2) { node_start.z=node_end.z=slice->index/scale+1; }
 
-#ifndef USE_OPENGLES
         if(mode==GL_SELECT)
         {
             // Currently only support node selection in this mode
@@ -67,13 +64,10 @@ Display() const
             Draw_Nodes_For_Selection(node_start,node_end);
             glPopName();
         }
-        else
-#endif
-            Draw_Subgrid(node_start,node_end);
+        else Draw_Subgrid(node_start,node_end);
     }
     else if(slice->mode==OPENGL_SLICE::CELL_SLICE)
     {
-#ifndef USE_OPENGLES
         if(mode==GL_SELECT)
         {
             // Currently only support cell selection in this mode
@@ -121,7 +115,6 @@ Display() const
             glPopAttrib();
         }
         else
-#endif
         {
             VECTOR<int,3> node_start(-ghost_cells,-ghost_cells,-ghost_cells),node_end(grid.numbers_of_cells+ghost_cells+1);
             if(slice->axis==0) { node_start.x=slice->index/scale; node_end.x=node_start.x+1; }
@@ -231,7 +224,6 @@ Draw_Subgrid(const VECTOR<int,3> &node_start,const VECTOR<int,3> &node_end) cons
 template<class T> void OPENGL_GRID_3D<T>::
 Draw_Nodes_For_Selection(const VECTOR<int,3> &node_start,const VECTOR<int,3> &node_end) const
 {
-#ifndef USE_OPENGLES
     int i,j,k;
     T x,y,z;
 
@@ -260,7 +252,6 @@ Draw_Nodes_For_Selection(const VECTOR<int,3> &node_start,const VECTOR<int,3> &no
     }
 
     glPopAttrib();
-#endif
 }
 //#####################################################################
 // Function Bounding_Box

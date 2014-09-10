@@ -39,9 +39,7 @@ Display() const
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     // Force it into fill mode (e.g. it's in wireframe mode)
-#ifndef USE_OPENGLES
     glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-#endif
 
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -62,12 +60,10 @@ Display() const
     OpenGL_Vertex(VECTOR<double,2>(0.5*width,0.5*height),vertices);
     OpenGL_Draw_Arrays_With_Textures(GL_TRIANGLE_STRIP,2,vertices,textures);
 
-#ifdef USE_OPENGLES
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
-#endif
 
     glPopAttrib();
 

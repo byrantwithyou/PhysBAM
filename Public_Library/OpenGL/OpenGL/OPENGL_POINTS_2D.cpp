@@ -45,11 +45,8 @@ Display() const
     glDisable(GL_LIGHTING);
 
     GLint mode;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE,&mode);
-#endif
 
-#ifndef USE_OPENGLES
     if(mode==GL_SELECT){
         glPushName(0);
         color.Send_To_GL_Pipeline();
@@ -60,7 +57,6 @@ Display() const
             OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}
         glPopName();}
     else
-#endif
     {
         if(point_colors){
             if(point_radii && draw_radii){
@@ -89,13 +85,11 @@ Display() const
                 ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
                 for(int i=0;i<points.Size();i++) OpenGL_Vertex(points(i),vertices);
                 OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}}
-#ifndef USE_OPENGLES
         if(draw_point_numbers){
             for(int i=0;i<points.Size();i++){
                 OPENGL_COLOR label_color=(point_colors)?((*point_colors)(i)*0.8):(color*0.8);
                 label_color.Send_To_GL_Pipeline();
                 OpenGL_String(points(i),point_ids?STRING_UTILITIES::string_sprintf("%d [id=%d] [%f %f]",i,(*point_ids)(i),points(i).x,points(i).y):STRING_UTILITIES::string_sprintf("%d",i));}}
-#endif
         }
     
     glPopAttrib();

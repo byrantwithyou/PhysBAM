@@ -46,7 +46,6 @@ OPENGL_KEY OPENGL_KEY::From_Glut_Key(unsigned char key,bool ctrl_pressed,bool al
 //#####################################################################
 OPENGL_KEY OPENGL_KEY::From_Glut_Special_Key(int key,bool ctrl_pressed,bool alt_pressed)
 {
-#ifndef USE_OPENGLES
     char modifiers=0x00;if(ctrl_pressed) modifiers|=CTRL;if(alt_pressed) modifiers|=ALT;
     switch(key){
         case GLUT_KEY_F1: return OPENGL_KEY(F1,modifiers);
@@ -71,9 +70,6 @@ OPENGL_KEY OPENGL_KEY::From_Glut_Special_Key(int key,bool ctrl_pressed,bool alt_
         case GLUT_KEY_END: return OPENGL_KEY(END,modifiers);
         case GLUT_KEY_INSERT: return OPENGL_KEY(INSERT,modifiers);
         default: return OPENGL_KEY();}
-#else
-    return OPENGL_KEY();
-#endif
 }
 //#####################################################################
 // Function From_String

@@ -27,10 +27,8 @@ public:
 
     void operator()()
     {
-#ifndef USE_OPENGLES
     if(fullscreen_mode){fullscreen_mode=false;*width=saved_width;*height=saved_height;glutReshapeWindow(saved_width,saved_height);}
     else{fullscreen_mode=true;saved_width=*width;saved_height=*height;glutFullScreen();}
-#endif
     }
 
     void Print(std::ostream& out)

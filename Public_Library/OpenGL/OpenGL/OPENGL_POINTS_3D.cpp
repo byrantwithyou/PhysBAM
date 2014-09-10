@@ -46,12 +46,9 @@ Display() const
     glDisable(GL_LIGHTING);
 
     GLint mode;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE,&mode);
-#endif
     OPENGL_COLOR current_color;
     glGetFloatv(GL_CURRENT_COLOR,current_color.rgba);
-#ifndef USE_OPENGLES
     if(mode==GL_SELECT){
         glPushName(0);
         color.Send_To_GL_Pipeline();
@@ -62,7 +59,6 @@ Display() const
             OpenGL_Draw_Arrays(GL_POINTS,3,vertices);}
         glPopName();}
     else
-#endif  
     {
         color.Send_To_GL_Pipeline(); // set color outside OpenGL_Begin/OpenGL_End to work around apparent driver bug
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
@@ -72,13 +68,11 @@ Display() const
         else if(point_colors) for(int i=0;i<points.Size();i++){(*point_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(points(i), vertices);}
         else{color.Send_To_GL_Pipeline();for(int i=0;i<points.Size();i++)OpenGL_Vertex(points(i),vertices);}
         OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
-#ifndef USE_OPENGLES
         if(draw_point_numbers)
             for(int i=0;i<points.Size();i++)if(!draw_mask || (*draw_mask)(i)){
                 OPENGL_COLOR label_color=(point_colors)?((*point_colors)(i)*0.8):(color*0.8);
                 label_color.Send_To_GL_Pipeline();
                 OpenGL_String(points(i),point_ids?STRING_UTILITIES::string_sprintf("%d [id=%d] [%g %g]",i,(*point_ids)(i),points(i).x,points(i).y):STRING_UTILITIES::string_sprintf("%d",i));}
-#endif
         }
     current_color.Send_To_GL_Pipeline();
 

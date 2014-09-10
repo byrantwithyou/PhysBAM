@@ -188,13 +188,11 @@ Display() const
             for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
                 if(draw_object(i) && opengl_point_simplices(i)) opengl_point_simplices(i)->Display();}}
 
-#ifndef USE_OPENGLES
         if(show_object_names){
             glColor3f(1,1,1);
             for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
                 if(draw_object(i) && rigid_body_collection.Rigid_Body(i).name.length()){
                     OpenGL_String(rigid_body_collection.rigid_body_particles.frame(i).t,STRING_UTILITIES::string_sprintf("%s %f",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particles.twist(i).linear.x));}}}
-#endif
         glPopAttrib();}
 }
 //#####################################################################

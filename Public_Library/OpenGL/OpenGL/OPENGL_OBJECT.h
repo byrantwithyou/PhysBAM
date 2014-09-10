@@ -21,10 +21,6 @@
 #include <OpenGL/OpenGL/OPENGL_SLICE.h>
 namespace PhysBAM{
 
-#ifdef USE_OPENGLES
-#define glLightModeli(model,x)        glLightModelf(model,(GLfloat)x)
-#endif
-
 template<class T> class OPENGL_SELECTION;
 
 template<class T>

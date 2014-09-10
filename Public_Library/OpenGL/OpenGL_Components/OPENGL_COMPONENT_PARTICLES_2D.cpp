@@ -86,7 +86,6 @@ Display() const
 {
     if(valid && draw){
         GLint mode=0;
-#ifndef USE_OPENGLES
         glGetIntegerv(GL_RENDER_MODE, &mode);
         if(mode == GL_SELECT){
             if(draw_multiple_particle_sets){
@@ -98,7 +97,6 @@ Display() const
             else opengl_points->Display();
             if(draw_velocities && have_velocities) opengl_vector_field.Display();}
         else
-#endif
         {
             if(draw_multiple_particle_sets) for(int i=0;i<number_of_sets;i++) opengl_points_multiple(i)->Display();
             else opengl_points->Display();

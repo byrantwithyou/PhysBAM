@@ -11,9 +11,7 @@
 #ifndef GLX_GLXEXT_PROTOTYPES
 #define GLX_GLXEXT_PROTOTYPES
 #endif
-#ifndef USE_OPENGLES
 #include <GL/glx.h>
-#endif
 //#if defined(GLX_VERSION_1_3) && defined(GLX_SGIX_pbuffer)
 #if defined(GLX_VERSION_1_3)
 #define OPENGL_GLX_PBUFFER_SUPPORTED

@@ -43,12 +43,10 @@ Display() const
         for(int i=0;i<vector_locations.Size();i++){OpenGL_Line(vector_locations(i),vector_locations(i)+(T)size*vector_field(i),vertices);}
     OpenGL_Draw_Arrays(GL_LINES,2,vertices);
 
-#ifndef USE_OPENGLES
     if(draw_value){
         (vector_color+OPENGL_COLOR(.8f,.8f,.8f)).Send_To_GL_Pipeline();
         for(int i=0;i<vector_locations.Size();i++)
             OpenGL_String(vector_locations(i)+(T)1.1*(T)size*vector_field(i),STRING_UTILITIES::string_sprintf("%.3f %.3f",vector_field(i).x,vector_field(i).y));}
-#endif
 
     glPopAttrib();
     glPopMatrix();

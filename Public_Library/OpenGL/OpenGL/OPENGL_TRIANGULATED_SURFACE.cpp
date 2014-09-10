@@ -41,9 +41,7 @@ OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,bool smooth_n
 template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
 ~OPENGL_TRIANGULATED_SURFACE()
 {
-#ifndef USE_OPENGLES
     if(owns_display_list) glDeleteLists(display_list_id,1);
-#endif
     delete vertex_normals;delete vertex_colors;delete current_selection;
 }
 //#####################################################################
@@ -96,9 +94,7 @@ Draw_Triangles_Incident_On_Current_Node() const
     int node=current_node%surface.particles.Size();
     if(!surface.mesh.incident_elements) surface.mesh.Initialize_Incident_Elements();
     glDisable(GL_CULL_FACE);
-#ifndef USE_OPENGLES
     glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-#endif
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
     front_material.Send_To_GL_Pipeline();
     back_material.Send_To_GL_Pipeline();
@@ -174,15 +170,12 @@ Display() const
     if(draw_particles) for(int i=0;i<surface.particles.Size();i++) OPENGL_SHAPES::Draw_Dot(surface.particles.X(i),OPENGL_COLOR(1,0,1),7);
 
     GLint mode=0;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE,&mode);
 
     if(wireframe_only){
         glPushAttrib(GL_POLYGON_BIT);
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);}
-#endif
 
-#ifndef USE_OPENGLES
     if(mode == GL_SELECT){
         glPushName(1);
         Draw_Vertices_For_Selection();
@@ -194,17 +187,10 @@ Display() const
         glPopName();}
     else if(use_display_list) glCallList(display_list_id);
     else
-#endif
     {Draw();if(draw_subsets) Draw_Subsets();}
-#ifndef USE_OPENGLES
     if(wireframe_only) glPopAttrib();
-#endif
 
-#ifndef USE_OPENGLES
     if(mode != GL_SELECT){
-#else
-    {
-#endif
         if(current_selection){
             if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX){
                 int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>*)current_selection)->index;
@@ -406,16 +392,12 @@ Set_Back_Material(const OPENGL_MATERIAL& material_input)
 template<class T> int OPENGL_TRIANGULATED_SURFACE<T>::
 Create_Display_List()
 {
-#ifndef USE_OPENGLES
     PHYSBAM_ASSERT(!owns_display_list);
     owns_display_list=true;
     use_display_list=true;
     display_list_id=glGenLists(1);
     Reinitialize_Display_List();
     return display_list_id;
-#else
-    return -1;
-#endif
 }
 //#####################################################################
 // Function
@@ -450,11 +432,9 @@ Set_Vertex_Color(const int i,const OPENGL_COLOR color)
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Reinitialize_Display_List()
 {
-#ifndef USE_OPENGLES
     glNewList(display_list_id,GL_COMPILE);
     Draw();
     glEndList();
-#endif
 }
 //#####################################################################
 // Function Draw
@@ -543,7 +523,6 @@ Draw_Vertices_For_Selection() const
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Draw_Segments_For_Selection() const
 {
-#ifndef USE_OPENGLES
     PHYSBAM_ASSERT(surface.mesh.segment_mesh);
     glPushAttrib(GL_LINE_BIT);
     glLineWidth(OPENGL_PREFERENCES::selection_line_width);
@@ -556,7 +535,6 @@ Draw_Segments_For_Selection() const
         OpenGL_Draw_Arrays(GL_LINES,3,vertices);}
     glPopName();
     glPopAttrib();
-#endif
 }
 //#####################################################################
 // Function Draw_Triangles_For_Selection
@@ -564,7 +542,6 @@ Draw_Segments_For_Selection() const
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Draw_Triangles_For_Selection() const
 {
-#ifndef USE_OPENGLES
     glPushName(0);
     for(int t=0;t<surface.mesh.elements.m;t++){
         int i,j,k;surface.mesh.elements(t).Get(i,j,k);
@@ -573,7 +550,6 @@ Draw_Triangles_For_Selection() const
         OpenGL_Triangle(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k),vertices);
         OpenGL_Draw_Arrays(GL_TRIANGLES,3,vertices);}
     glPopName();
-#endif
 }
 //#####################################################################
 //

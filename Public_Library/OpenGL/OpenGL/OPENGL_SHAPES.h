@@ -131,7 +131,6 @@ inline void Draw_Translucent_Stripe(int x0,int y0,int dx,int dy,const OPENGL_COL
 // Assumes OpenGL_Begin(GL_LINES) and attributes are already set
 // size is length of arrowhead as fraction of length of arrow line length
 // angle is measured from arrow line
-#ifndef USE_OPENGLES
 template<class T>
 inline void Draw_Arrow(const VECTOR<T,2>& startpt,const VECTOR<T,2>& endpt,T arrowhead_size=OPENGL_PREFERENCES::arrowhead_size,
                        T sin_angle=sin(OPENGL_PREFERENCES::arrowhead_angle),T cos_angle=cos(OPENGL_PREFERENCES::arrowhead_angle))
@@ -141,7 +140,6 @@ inline void Draw_Arrow(const VECTOR<T,2>& startpt,const VECTOR<T,2>& endpt,T arr
     OpenGL_Line(p+dp,endpt);
     OpenGL_Line(p-dp,endpt);
 }
-#endif
 
 template<class T>
 inline void Draw_Arrow(const VECTOR<T,2>& startpt,const VECTOR<T,2>& endpt,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices,T arrowhead_size=OPENGL_PREFERENCES::arrowhead_size,

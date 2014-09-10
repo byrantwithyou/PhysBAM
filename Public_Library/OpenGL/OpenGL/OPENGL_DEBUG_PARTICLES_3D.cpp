@@ -62,11 +62,9 @@ Display() const
     glPushMatrix();
     Send_Transform_To_GL_Pipeline();
 
-#ifndef USE_OPENGLES
     if(wireframe_only){
         glPushAttrib(GL_POLYGON_BIT);
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);}
-#endif
 
     for(int i=0;i<debug_objects.m;i++)
         if(debug_objects(i).type==DEBUG_OBJECT<TV>::triangle){
@@ -76,9 +74,7 @@ Display() const
             OpenGL_Triangle(debug_objects(i).X(0),debug_objects(i).X(1),debug_objects(i).X(2),vertices);
             OpenGL_Draw_Arrays(GL_TRIANGLES,3,vertices);}
 
-#ifndef USE_OPENGLES
     if(wireframe_only) glPopAttrib();
-#endif
 
     vertices.Remove_All();
 
@@ -87,9 +83,7 @@ Display() const
             OPENGL_SHAPES::Draw_Segment(debug_objects(i).X(0),debug_objects(i).X(1),OPENGL_COLOR(debug_objects(i).color),2);
 
     GLint mode=0;
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE,&mode);
-#endif
 
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
     glEnable(GL_CULL_FACE);
@@ -103,18 +97,12 @@ Display() const
     glPointSize(5);
     glDisable(GL_LIGHTING);
 
-#ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE,&mode);
-#endif
 
     ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     ARRAY_VIEW<TV>* V=particles.template Get_Array<TV>(ATTRIBUTE_ID_V);
 
-#ifndef USE_OPENGLES
     if(draw_velocities && V && mode!=GL_SELECT){
-#else
-    if(draw_velocities && V){
-#endif
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);
         velocity_color.Send_To_GL_Pipeline();
@@ -126,13 +114,9 @@ Display() const
         OpenGL_Draw_Arrays(GL_LINES,3,vertices);
         glPopAttrib();}
 
-#ifndef USE_OPENGLES
     if(mode==GL_SELECT) glPushName(0);
-#endif
     for(int i=0;i<particles.X.m;i++){
-#ifndef USE_OPENGLES
         if(mode==GL_SELECT) glLoadName(i);
-#endif
 
         if(colors) OPENGL_COLOR((*colors)(i)).Send_To_GL_Pipeline();
         else default_color.Send_To_GL_Pipeline();
@@ -140,9 +124,7 @@ Display() const
         vertices.Resize(0);
         OpenGL_Vertex(particles.X(i),vertices);
         OpenGL_Draw_Arrays(GL_POINTS,3,vertices);}
-#ifndef USE_OPENGLES
     if(mode==GL_SELECT) glPopName();
-#endif
 
     glPopAttrib();
     glPopMatrix();

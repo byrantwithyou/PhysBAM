@@ -622,7 +622,6 @@ Display() const
         glDisable(GL_LIGHTING);
 
         GLint mode=0;
-#ifndef USE_OPENGLES
         glGetIntegerv(GL_RENDER_MODE,&mode);
 
         if(draw_segmented_curve){
@@ -646,14 +645,6 @@ Display() const
                 if(draw_object(i) && opengl_levelset(i)) opengl_levelset(i)->Display();
                 glPopName();}
             glPopName();}
-#else
-        if(draw_segmented_curve) for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
-            if(draw_object(i) && opengl_segmented_curve(i)) opengl_segmented_curve(i)->Display();
-        if(draw_triangulated_area) for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
-            if(draw_object(i) && opengl_triangulated_area(i)) opengl_triangulated_area(i)->Display();
-        if(draw_implicit_curve) for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
-            if(draw_object(i) && opengl_levelset(i)) opengl_levelset(i)->Display();
-#endif
         if(draw_individual_axes)
             for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
                 if(draw_object(i) && opengl_axes(i)) opengl_axes(i)->Display();
@@ -701,9 +692,7 @@ Display() const
                 glPopAttrib();}}
 
 
-#ifndef USE_OPENGLES
         if(mode!=GL_SELECT)
-#endif        
         {
             if(draw_velocity_vectors) velocity_field.Display();
             if(draw_node_velocity_vectors) node_velocity_field.Display();
@@ -723,13 +712,11 @@ Display() const
                 for(int j=0;j<extra_components(i).m;j++)
                     extra_components(i)(j)->Display();
 
-#ifndef USE_OPENGLES
             if(show_object_names){
                 glColor3f(1,1,1);
                 for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++)
                     if(draw_object(i) && rigid_body_collection.Rigid_Body(i).name.length())
                         OpenGL_String(rigid_body_collection.rigid_body_particles.frame(i).t,rigid_body_collection.Rigid_Body(i).name);}
-#endif
         }
         glPopAttrib();}
 }

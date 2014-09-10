@@ -21,13 +21,11 @@ template<class T> OPENGL_WINDOW_PBUFFER<T>::
 OPENGL_WINDOW_PBUFFER(OPENGL_WORLD<T>& opengl_world_input,const std::string& window_title_input,const int width_input,const int height_input)
     :OPENGL_WINDOW<T>(opengl_world_input),width(width_input),height(height_input)
 {
-#ifndef USE_OPENGLES
     pbuffer=new OPENGL_PBUFFER;
     if(!pbuffer->Create(width,height)) PHYSBAM_FATAL_ERROR("Could not set up pbuffer");
     // need glut init to make sure we can run glut functions
     static int argc=1;static const char *(argv[1]);argv[0]="Visualization";
     glutInit(&argc,(char**)argv);
-#endif
 }
 //#####################################################################
 // ~OPENGL_WINDOW_PBUFFER
