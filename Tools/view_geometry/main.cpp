@@ -18,7 +18,6 @@
 #include <OpenGL/OpenGL/OPENGL_BOX_3D.h>
 #include <OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <OpenGL/OpenGL/OPENGL_HEXAHEDRALIZED_VOLUME.h>
-#include <OpenGL/OpenGL/OPENGL_IMPLICIT_SURFACE.h>
 #include <OpenGL/OpenGL/OPENGL_LEVELSET_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_LEVELSET_MULTIVIEW.h>
 #include <OpenGL/OpenGL/OPENGL_LIGHT.h>
