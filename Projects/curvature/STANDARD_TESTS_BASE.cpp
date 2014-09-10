@@ -285,6 +285,7 @@ Register_Options()
     parse_args->Add("-use_tri_col",&solids_parameters.triangle_collision_parameters.perform_self_collision,"use triangle collisions");
     parse_args->Add("-no_self_interior",&self_collide_surface_only,"do not process penalty self collisions against interior particles");
     parse_args->Add("-use_vanilla_newton",&use_vanilla_newton,"use triangle collisions");
+    parse_args->Add("-density",&density,"density","density");
 }
 //#####################################################################
 // Function Parse_Options

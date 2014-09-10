@@ -93,7 +93,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             deformable_body_collection.Add_Structure(spline);
             deformable_body_collection.Add_Structure(Create_Segmented_Curve(*spline,true));
             deformable_body_collection.Add_Force(new BEZIER_CURVATURE_FORCE<TV>(particles,*spline,curvature_stiffness_multiplier,stiffness_multiplier));
-            particles.mass.Fill(1);
+            for(int i=0;i<spline->control_points.m;i++)
+                particles.mass.Subset(spline->control_points(i))+=(T).25*density/spline->control_points.m;
             kinematic_points.Append(0);
             kinematic_points.Append(resolution*3);
             point_curves.Resize(2);
@@ -112,8 +113,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     switch(test_number){
         case 1:
-            for(int i=0;i<particles.mass.m;i++)
-                particles.mass(i)=(i%3==0);
             break;
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
