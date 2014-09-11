@@ -213,9 +213,7 @@ Draw_Highlighted_Spline(int id) const
     OPENGL_PREFERENCES::selection_highlight_color.Send_To_GL_Pipeline();
     VECTOR<TV,d+1> control_points(curve.particles.X.Subset(curve.control_points(id)));
     OpenGL_Draw_Spline(GL_LINE,20,control_points);
-    if(id>=0) OpenGL_String(curve.Evaluate(id,.25),"a");
     if(id>=0) OpenGL_String(curve.Evaluate(id,.5),STRING_UTILITIES::string_sprintf("   %d",id));
-    if(id>=0) OpenGL_String(curve.Evaluate(id,.75),"b");
     glPopAttrib();
 }
 //#####################################################################
