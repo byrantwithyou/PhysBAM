@@ -567,5 +567,7 @@ Update_Material_Particles()
     }
 }
 //#####################################################################
+namespace PhysBAM{
 template class CUTTING<VECTOR<double,2> >;
 template class CUTTING<VECTOR<float,2> >;
+}

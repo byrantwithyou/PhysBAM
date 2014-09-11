@@ -6,6 +6,11 @@
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include "FLIP_DRIVER.h"
 
+#ifndef USE_OPENMP
+inline void omp_set_num_threads(int){}
+inline int omp_get_num_threads(){return 1;}
+#endif
+
 using namespace PhysBAM;
 
 int main(int argc,char* argv[])

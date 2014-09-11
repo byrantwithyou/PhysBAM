@@ -6,7 +6,11 @@
 #define __FLIP_KRYLOV_VECTOR__
 
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
+#ifdef USE_OPENMP
 #include <omp.h>
+#else
+inline int omp_get_thread_num(){return 0;}
+#endif
 
 namespace PhysBAM{
 

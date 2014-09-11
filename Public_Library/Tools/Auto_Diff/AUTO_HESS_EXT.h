@@ -329,6 +329,16 @@ template<class TV,class VEC,class MAT> struct AUTO_HESS_EXT_VEC;
 template<class TV,class VEC,class MAT> AUTO_HESS_EXT_VEC<TV,VEC,MAT>
 Make_Hess_Vec(const TV& x,const GRADIENT_VEC<TV,VEC>& dx,const HESSIAN_VEC<TV,MAT>& ddx);
 
+template<class TV,class VEC,class MAT> struct AUTO_HESS_EXT_VEC;
+
+template<class T,class TV,class VEC1,class MAT1,class VEC2,class MAT2>
+decltype(Make_Hess_Vec(TV(),MATRIX<T,3>()*VDX2-MATRIX<T,3>()*VDX1,Contract_0(VDDX1,MATRIX<T,3>())-Contract_0(VDDX2,MATRIX<T,3>())+Symmetric_Double_Contract_12_With_Tensor(PERM_TENSOR<TV >(1),VDX1,VDX2)))
+Cross_Helper(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2>& b);
+
+template<class TV,class VEC1,class MAT1,class VEC2,class MAT2>
+typename DISABLE_IF<TV::m==3,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1> >::TYPE
+Cross_Helper(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2>& b);
+
 template<class TV,class VEC,class MAT>
 struct AUTO_HESS_EXT_VEC
 {
@@ -398,12 +408,8 @@ struct AUTO_HESS_EXT_VEC
     }
 
     template<class VEC1,class MAT1>
-    decltype(Make_Hess_Vec(x.Cross(TV()),MATRIX<T,TV::m>()*VDX1-MATRIX<T,TV::m>()*dx,Contract_0(ddx,MATRIX<T,TV::m>())-Contract_0(VDDX1,MATRIX<T,TV::m>())+Symmetric_Double_Contract_12_With_Tensor(PERM_TENSOR<TV>(1),dx,VDX1)))
-    Cross(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1>& a) const
-    {
-        MATRIX<T,TV::m> cp_t=MATRIX<T,TV::m>::Cross_Product_Matrix(x),cp_a=MATRIX<T,TV::m>::Cross_Product_Matrix(a.x);
-        return Make_Hess_Vec(x.Cross(a.x),cp_t*a.dx-cp_a*dx,Contract_0(ddx,cp_a)-Contract_0(a.ddx,cp_t)+Symmetric_Double_Contract_12_With_Tensor(PERM_TENSOR<TV>(1),dx,a.dx));
-    }
+    auto Cross(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1>& a) const -> decltype(Cross_Helper(*this,AUTO_HESS_EXT_VEC<TV,VEC1,MAT1>()))
+    {return Cross_Helper(*this,a);}
 
     decltype(Make_Hess(x.Magnitude_Squared(),dx.Transpose_Times(x)*2,(Contract_0(ddx,x)+Transpose_Times_Self(dx))*2)) Magnitude_Squared() const
     {return Make_Hess(x.Magnitude_Squared(),dx.Transpose_Times(x)*2,(Contract_0(ddx,x)+Transpose_Times_Self(dx))*2);}
@@ -411,6 +417,23 @@ struct AUTO_HESS_EXT_VEC
     decltype(Make_Hess(SC,dx.Transpose_Times(x)/SC,(Contract_0(ddx,x)+Transpose_Times_Self(dx))/SC-Outer_Product(dx.Transpose_Times(x)/SC)/SC)) Magnitude() const
     {T s=x.Magnitude();auto t=dx.Transpose_Times(x)/s;return Make_Hess(s,t,(Contract_0(ddx,x)+Transpose_Times_Self(dx))/s-Outer_Product(t)/s);}
 };
+
+
+template<class T,class TV,class VEC1,class MAT1,class VEC2,class MAT2>
+decltype(Make_Hess_Vec(TV(),MATRIX<T,3>()*VDX2-MATRIX<T,3>()*VDX1,Contract_0(VDDX1,MATRIX<T,3>())-Contract_0(VDDX2,MATRIX<T,3>())+Symmetric_Double_Contract_12_With_Tensor(PERM_TENSOR<TV >(1),VDX1,VDX2)))
+Cross_Helper(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2>& b)
+{
+    MATRIX<T,TV::m> cp_t=MATRIX<T,TV::m>::Cross_Product_Matrix(a.x),cp_a=MATRIX<T,TV::m>::Cross_Product_Matrix(b.x);
+    return Make_Hess_Vec(a.x.Cross(b.x),cp_t*b.dx-cp_a*a.dx,Contract_0(a.ddx,cp_a)-Contract_0(b.ddx,cp_t)+Symmetric_Double_Contract_12_With_Tensor(PERM_TENSOR<TV>(1),a.dx,b.dx));
+}
+
+template<class TV,class VEC1,class MAT1,class VEC2,class MAT2>
+typename DISABLE_IF<TV::m==3,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1> >::TYPE
+Cross_Helper(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2>& b)
+{
+    PHYSBAM_FATAL_ERROR("Cross product not defined except in 3D.");
+    return a;
+}
 
 template<class TV,class VEC,class MAT> inline AUTO_HESS_EXT_VEC<TV,VEC,MAT>
 Make_Hess_Vec(const TV& x,const GRADIENT_VEC<TV,VEC>& dx,const HESSIAN_VEC<TV,MAT>& ddx)

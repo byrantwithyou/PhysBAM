@@ -2426,6 +2426,7 @@ typename MESH_CUTTING<T>::TV MESH_CUTTING<T>::weight2vec_material_space(int tet_
     }
     return v;
 }
-
+namespace PhysBAM{
 template class MESH_CUTTING<double>;
 template class MESH_CUTTING<float>;
+}

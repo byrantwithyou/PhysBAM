@@ -99,7 +99,7 @@ public:
     mesh(5*(nodes_in_x_dimension-1)*(nodes_in_y_dimension-1)*(nodes_in_z_dimension-1)),
     number_tets(5*(nodes_in_x_dimension-1)*(nodes_in_y_dimension-1)*(nodes_in_z_dimension-1)),
     number_nodes(nodes_in_x_dimension*nodes_in_y_dimension*nodes_in_z_dimension),
-    boundary_triangle_mesh(0){
+   boundary_triangle_mesh(0){(void)number_nodes;
         //generate tets from cubes
         //*note* this functions assumes the particles have been created with the ordering as in the variable index below
         
