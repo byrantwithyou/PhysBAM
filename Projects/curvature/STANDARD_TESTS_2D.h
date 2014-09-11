@@ -82,7 +82,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     switch(test_number){
-        case 1:{
+        case 1:case 2:{
             if(resolution==0) resolution=10;
             ARRAY<TV> X(resolution+1);
             for(int i=0;i<=resolution;i++){
@@ -101,10 +101,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             point_curves(0).Add_Control_Point(0,particles.X(0));
             point_curves(0).Add_Control_Point(1,particles.X(0));
             point_curves(1).Add_Control_Point(0,particles.X(resolution*3));
-            point_curves(1).Add_Control_Point(1,particles.X(resolution*3)+TV(1,0));
+            point_curves(1).Add_Control_Point(1,particles.X(resolution*3)+TV(test_number==1?1:-.9,0));
             for(int i=4;i<particles.X.m;i+=3)
                 deformable_body_collection.binding_list.Add_Binding(
                     new LINEAR_BINDING<TV,2>(particles,i,VECTOR<int,2>(i-2,i-1),VECTOR<T,2>(-1,2)));
+            particles.mass(0)=FLT_MAX;
+            particles.mass(resolution*3)=FLT_MAX;
             break;}
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
@@ -113,6 +115,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     switch(test_number){
         case 1:
+        case 2:
             break;
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
