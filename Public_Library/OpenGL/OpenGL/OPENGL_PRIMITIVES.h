@@ -107,6 +107,7 @@ inline void OpenGL_Draw_Arrays(GLenum mode,int dimension,const ARRAY<GLshort>& v
 template<int d1>
 inline void OpenGL_Draw_Spline(GLenum mode,int resolution,const VECTOR<VECTOR<GLfloat,3>,d1>& control_points)
 {
+    IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Bezier(control_points));
     glMap1f(GL_MAP1_VERTEX_3,0.0,1.0,3,d1,&control_points(0)(0));
     glEnable(GL_MAP1_VERTEX_3);
     glMapGrid1d(resolution,0.0,1.0);
@@ -115,6 +116,7 @@ inline void OpenGL_Draw_Spline(GLenum mode,int resolution,const VECTOR<VECTOR<GL
 template<int d1>
 inline void OpenGL_Draw_Spline(GLenum mode,int resolution,const VECTOR<VECTOR<GLdouble,3>,d1>& control_points)
 {
+    IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Bezier(control_points));
     glMap1d(GL_MAP1_VERTEX_3,0.0,1.0,3,d1,&control_points(0)(0));
     glEnable(GL_MAP1_VERTEX_3);
     glMapGrid1d(resolution,0.0,1.0);

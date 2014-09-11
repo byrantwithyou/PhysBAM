@@ -29,10 +29,11 @@ public:
     template<class T2> void Vertex(const VECTOR<T2,1>& p);
     void Head();
     void Tail();
-    void Emit(const TV& p);
+    template<class T2> void Emit(const VECTOR<T2,3>& p);
     void Emit(const char* p);
     void Set_Color(const TV& color);
     void Draw_Arrays(int mode,int dimension,int length,const void* vertices);
+    template<class T2,int d> void Draw_Bezier(const VECTOR<VECTOR<T2,d>,4>& pts);
 protected:
     void Draw_Point(const TV& p);
     void Draw_Line(const TV& a,const TV& b);

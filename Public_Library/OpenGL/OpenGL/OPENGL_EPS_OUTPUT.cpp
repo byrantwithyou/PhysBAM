@@ -66,6 +66,7 @@ End()
         case GL_QUADS: for(int i=0;i<buffer.m;i+=4) Draw_Polygon(i,4); break;
         case GL_POLYGON: Draw_Polygon(0,buffer.m); break;
         case GL_LINE_LOOP: for(int i=1;i<buffer.m;i++) Draw_Line(buffer.Last(),buffer(0)); break;
+        case GL_TRIANGLE_STRIP: for(int i=0;i+2<buffer.m;i++) Draw_Polygon(i,3); break;
         default:LOG::cout<<"Unhandled mode "<<glmode<<std::endl;break;
     }
     buffer.Remove_All();
@@ -116,6 +117,7 @@ Head()
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Tail()
 {
+    Emit("showpage\n");
 }
 //#####################################################################
 // Function Emit
@@ -128,8 +130,8 @@ Emit(const char* s)
 //#####################################################################
 // Function Emit
 //#####################################################################
-template<class T> void OPENGL_EPS_OUTPUT<T>::
-Emit(const TV& p)
+template<class T> template<class T2> void OPENGL_EPS_OUTPUT<T>::
+Emit(const VECTOR<T2,3>& p)
 {
     stream<<p.x<<" "<<p.y<<" ";
 }
@@ -230,6 +232,30 @@ Draw_Arrays(int mode,int dimension,int length,const void* vertices)
     else if(dimension==3) for(int i=0;i<3*length;i+=3) buffer.Append(VECTOR<T,3>(p[i],p[i+1],p[i+2]));
     End();
 }
+//#####################################################################
+// Function Draw_Bezier
+//#####################################################################
+template<class T> template<class T2,int d> void OPENGL_EPS_OUTPUT<T>::
+Draw_Bezier(const VECTOR<VECTOR<T2,d>,4>& pts)
+{
+    VECTOR<VECTOR<T,d>,4> new_pts;
+    MATRIX<T,4> proj,model;
+    T view[4];
+    Get_Helper(proj,model,view);
+
+    for(int i=0;i<pts.m;i++){
+        VECTOR<T,4> obj=TV(pts(i)).Append(1);
+        VECTOR<T,4> eye=model*obj;
+        VECTOR<T,4> clip=proj*eye;
+        TV device=clip.Remove_Index(3)/clip(3);
+        TV window((device.x+1)*(view[2]/2)+view[0],(device.y+1)*(view[3]/2)+view[1],device.z);
+        new_pts(i)=window;}
+
+    Emit(new_pts(0));
+    Emit("moveto ");
+    for(int i=1;i<4;i++) Emit(new_pts(i));
+    Emit("curveto stroke\n");
+}
 namespace PhysBAM{
 template class OPENGL_EPS_OUTPUT<float>;
 template void OPENGL_EPS_OUTPUT<float>::Vertex<float>(VECTOR<float,2> const&);
@@ -245,4 +271,6 @@ template void OPENGL_EPS_OUTPUT<double>::Vertex<double>(VECTOR<double,2> const&)
 template void OPENGL_EPS_OUTPUT<double>::Vertex<double>(VECTOR<double,3> const&);
 template void OPENGL_EPS_OUTPUT<double>::Vertex<double>(VECTOR<double,1> const&);
 template void OPENGL_EPS_OUTPUT<double>::Vertex<float>(VECTOR<float,1> const&);
+template void OPENGL_EPS_OUTPUT<float>::Draw_Bezier<double,3>(VECTOR<VECTOR<double,3>,4> const&);
+template void OPENGL_EPS_OUTPUT<float>::Draw_Bezier<float,3>(VECTOR<VECTOR<float,3>,4> const&);
 }
