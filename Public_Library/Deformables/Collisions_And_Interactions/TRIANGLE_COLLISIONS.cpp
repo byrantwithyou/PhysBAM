@@ -158,13 +158,17 @@ void Test(ARRAY_VIEW<VECTOR<T,3> > X,ARRAY_VIEW<TV> V,VECTOR<int,n> ind,T dt,T c
 // Function Adjust_Velocity_For_Self_Collisions
 //#####################################################################
 template<class TV> int TRIANGLE_COLLISIONS<TV>::
-Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_early)
+Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_early,const bool change_positions_only)
 {
     LOG::SCOPE scope("collisions","checking collisions");
     geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions();
     geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
     DEFORMABLE_PARTICLES<TV>& full_particles=geometry.deformable_body_collection.particles;
     ARRAY_VIEW<TV> X(full_particles.X),X_self_collision_free(geometry.X_self_collision_free);ARRAY<bool>& modified_full=geometry.modified_full;
+    ARRAY<TV> V_save;
+    if(change_positions_only){
+        V_save=full_particles.V;
+        full_particles.V=(full_particles.X-X_self_collision_free)/dt;}
     int collisions=0,collisions_in_attempt=0,
         point_face_collisions=0,edge_edge_collisions=0;
     SPARSE_UNION_FIND<> union_find(full_particles.Size());
@@ -269,10 +273,14 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
     if(exit_early && collisions_in_attempt) collisions*=-1; // flag indicating that the collisions were not resolved
 
 //    Test(X_self_collision_free,full_particles.V,VECTOR<int,5>(550,893,1433,1726,1434),dt,collision_thickness,geometry.small_number,full_particles.X);
+
+    if(change_positions_only){
+        full_particles.X=X_self_collision_free+dt*full_particles.V;
+        full_particles.V=V_save;}
     return collisions;
 }
-template<> int TRIANGLE_COLLISIONS<VECTOR<float,1> >::Adjust_Velocity_For_Self_Collisions(const T,const T time,const bool){PHYSBAM_NOT_IMPLEMENTED();}
-template<> int TRIANGLE_COLLISIONS<VECTOR<double,1> >::Adjust_Velocity_For_Self_Collisions(const T,const T time,const bool){PHYSBAM_NOT_IMPLEMENTED();}
+template<> int TRIANGLE_COLLISIONS<VECTOR<float,1> >::Adjust_Velocity_For_Self_Collisions(const T,const T time,const bool,const bool){PHYSBAM_NOT_IMPLEMENTED();}
+template<> int TRIANGLE_COLLISIONS<VECTOR<double,1> >::Adjust_Velocity_For_Self_Collisions(const T,const T time,const bool,const bool){PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
 // Function Scale_And_Apply_Impulses
 //#####################################################################

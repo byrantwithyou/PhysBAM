@@ -136,7 +136,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before repulsions",1,1);
         solid_body_collection.deformable_body_collection.triangle_repulsions.Adjust_Velocity_For_Self_Repulsion(dt,false);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after repulsions",1,1);
-        solid_body_collection.deformable_body_collection.triangle_collisions.Adjust_Velocity_For_Self_Collisions(dt,time,false);
+        solid_body_collection.deformable_body_collection.triangle_collisions.Adjust_Velocity_For_Self_Collisions(dt,time,false,true);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after collisions",1,1);}
 
     T max_velocity_squared=0;

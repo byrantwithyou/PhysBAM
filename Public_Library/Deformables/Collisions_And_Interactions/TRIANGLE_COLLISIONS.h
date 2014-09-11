@@ -91,7 +91,7 @@ public:
     {use_gauss_jacobi=use_gauss_jacobi_input;}
 
 //#####################################################################
-    int Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_early);
+    int Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_early,const bool change_positions_only=false);
     void Initialize(TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters);
     void Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self_collision_free,ARRAY_VIEW<bool> recently_modified,const T detection_thickness);
 private:
