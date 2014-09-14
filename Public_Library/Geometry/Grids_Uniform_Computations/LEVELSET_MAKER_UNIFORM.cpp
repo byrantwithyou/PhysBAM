@@ -40,6 +40,22 @@ Compute_Level_Set(T_SURFACE& surface,GRID<TV>& grid,int ghost_cells,ARRAY<T,TV_I
                 if(abs(dist)<abs(p)) p=dist;
                 p=abs(p)*(new_sign?-1:1);}}}
 
+    ARRAY<TV_INT> todo;
+    for(int i=0;i<seed_indices.m;i++)
+        if(phi(seed_indices(i))<0)
+            todo.Append(seed_indices(i));
+    while(todo.m){
+        ARRAY<TV_INT> next;
+        for(int i=0;i<todo.m;i++)
+            for(int a=0;a<TV::m;a++)
+                for(int s=-1;s<2;s+=2){
+                    TV_INT index=todo(i);
+                    index(a)+=s;
+                    if(phi(index)==FLT_MAX){
+                        phi(index)=-FLT_MAX;
+                        next.Append(index);}}
+        next.Exchange(todo);}
+
     LEVELSET<TV> levelset(grid,phi);
     FAST_MARCHING_METHOD_UNIFORM<TV> fmm(levelset,ghost_cells);
     fmm.Fast_Marching_Method(phi,0,&seed_indices);
