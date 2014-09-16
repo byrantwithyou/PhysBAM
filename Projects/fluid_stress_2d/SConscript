@@ -1,0 +1,5 @@
+# SConscript
+
+Import('env Automatic_Program')
+env=env.Copy(USE_GEOMETRY=1)
+Automatic_Program(env,"fluid_stress_2d",["main.cpp","FLUID_STRESS.cpp","FLUID_STRESS_BASE.cpp","STRESS_EXAMPLE.cpp","STRESS_DRIVER.cpp"])
