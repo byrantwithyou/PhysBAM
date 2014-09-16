@@ -11,6 +11,7 @@
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Apply_Boundary_Condition
@@ -74,4 +75,8 @@ template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,2>,int>;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,3>,int>;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,2>,int>;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,3>,int>;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,2>,SYMMETRIC_MATRIX<double,2> >;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,3>,SYMMETRIC_MATRIX<double,3> >;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,2>,SYMMETRIC_MATRIX<float,2> >;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,3>,SYMMETRIC_MATRIX<float,3> >;
 }
