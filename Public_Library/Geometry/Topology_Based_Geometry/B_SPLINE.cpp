@@ -75,36 +75,64 @@ Write(TYPED_OSTREAM& output) const
 template<class TV> void PhysBAM::
 Smooth_Fit(B_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X)
 {
-    // typedef typename TV::SCALAR T;
-    // ARRAY<TV> rhs(X.m*2-2);
-    // BANDED_MATRIX<T,4> matrix(X.m*2-2);
-    // matrix.diagonal_column=1;
-    // matrix.A(0)=VECTOR<T,4>(0,2,-1,0);
-    // rhs(0)=X(0);
-    // for(int i=1;i<X.m-1;i++){
-    //     matrix.A(2*i-1)=VECTOR<T,4>(-1,2,-2,1);
-    //     matrix.A(2*i)=VECTOR<T,4>(1,1,0,0);
-    //     rhs(2*i)=X(i)*2;}
-    // matrix.A(X.m*2-3)=VECTOR<T,4>(-1,2,0,0);
-    // rhs(X.m*2-3)=X(X.m-1);
-    // matrix.QR_Solve(rhs);
+    // This always uses a uniform knot distribution in parameter space.
+    // Maybe in future add a version that uses some other structure?
+    typedef typename TV::SCALAR T;
+    ARRAY<TV> rhs(X.m); // We have X.m distinct knot points, so X.m+2 control points need to be found. First and last will be automatic though.
+    BANDED_MATRIX<T,3> matrix(X.m);
+    matrix.diagonal_column=1;
+    for(int i=0;i<X.m;i++) rhs(i)=X(i)*12;
 
-    // bs.particles.Add_Elements(X.m*3-2);
-    // VECTOR<int,4> base(0,1,2,3);
-    // for(int i=0;i<X.m-1;i++){
-    //     bs.particles.X(3*i)=X(i);
-    //     bs.particles.X(3*i+1)=rhs(2*i);
-    //     bs.particles.X(3*i+2)=rhs(2*i+1);
-    //     bs.control_points.Append(base+3*i);}
-    // bs.particles.X.Last()=X.Last();
+    matrix.A(0)=VECTOR<T,3>(0,18,-6);
+    if(X.m<=3){
+        PHYSBAM_ASSERT(X.m>=2);
+        if(X.m==3) matrix.A(1)=VECTOR<T,3>(3,6,3);}
+    else{
+        matrix.A(1)=VECTOR<T,3>(3,7,2);
+        for(int i=2;i<X.m-2;i++) matrix.A(i)=VECTOR<T,3>(2,8,2);
+        matrix.A(X.m-2)=VECTOR<T,3>(2,7,3);}
+    matrix.A(X.m-1)=VECTOR<T,3>(-6,18,0);
+
+    matrix.QR_Solve(rhs);
+    bs.knots.Append(0);
+    bs.knots.Append(0);
+    bs.knots.Append(0);
+    bs.knots.Append(0);
+    bs.particles.Add_Elements(X.m+2);
+    bs.control_points=IDENTITY_ARRAY<>(X.m+2);
+    bs.particles.X(0)=X(0);
+    for(int i=1;i<=X.m;i++){
+        bs.particles.X(i)=rhs(i-1);
+        bs.knots.Append((T)i/(X.m-1));}
+    bs.particles.X.Last()=X.Last();
+    bs.knots(X.m+3)=1;
+    bs.knots.Append(1);
+    bs.knots.Append(1);
+
+    // Final knots list: 0, 0, 0, 0, 1/m, 2/m, ..., (m-1)/m, 1, 1, 1, 1.
+    // Final control points list: 0,1,2,...,m+1
 }
 //#####################################################################
-// Function Smooth_Fit
+// Function Smooth_Fit_Loop
 //#####################################################################
 template<class TV> void PhysBAM::
 Smooth_Fit_Loop(B_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X)
 {
-    PHYSBAM_NOT_IMPLEMENTED();
+    // X.m knots, equally spaced
+    // matrix with 2/3 on diagonal, 1/6 above&below and in corners
+    // How do I solve a matrix like that in PhysBAM?
+    // Also: the current Evaluate function will cry if we give it that knot list.
+    typedef typename TV::SCALAR T;
+    ARRAY<TV> rhs(X.m);
+    BANDED_MATRIX<T,3> matrix(X.m);
+    matrix.diagonal_column=1;
+    for(int i=0;i<X.m;i++){matrix.A(i)=VECTOR<T,3>(1,4,1);rhs(i)=X(i)*6;}
+    matrix.QR_Solve(rhs);
+
+    for(int k=-3;k<X.m+3;k++) bs.knots.Append((T)k/(X.m-1));
+    bs.particles.X=rhs;
+    bs.control_points=IDENTITY_ARRAY<>(X.m);
+    for(int j=0;j<3;j++) bs.control_points.Append(j);
 }
 //#####################################################################
 // Function Create_Segmented_Curve
@@ -156,18 +184,59 @@ Create(GEOMETRY_PARTICLES<TV>& particles)
 template<class TV,int d> TV B_SPLINE<TV,d>::
 Evaluate(T t) const
 {
-    t=clamp(t,knots(d),knots.Last());
-    int id=std::upper_bound(knots.begin(),knots.end(),t)-knots.begin()-1;
-    assert(id>=d);
+    t=clamp(t,knots(d),knots(knots.m-d-1));
+    int id=std::upper_bound(knots.begin(),knots.end()-d-1,t)-knots.begin()-1;
+    PHYSBAM_ASSERT(id>=d);
     TV x[d+1][d+1];
-    for(int i=0;i<=d;i++) x[0][i]=particles.X(control_points(i-d+id));
+
+    for(int i=0;i<=d;i++)
+        x[0][i]=particles.X(control_points(i-d+id));
 
     for(int k=0;k<d;k++)
         for(int i=k+1;i<=d;i++){
-            T u0=knots(i-d+id),u1=knots(i-k+id),a=(t-u0)/(u1-u0);
+            T u0=knots(i-d+id),u1=knots(i-k+id),a=u1!=u0?(t-u0)/(u1-u0):0;
             x[k+1][i]=(1-a)*x[k][i-1]+a*x[k][i];}
 
     return x[d][d];
+}
+//#####################################################################
+// Function Fill_Bezier
+//#####################################################################
+template<class TV> void PhysBAM::
+Fill_Bezier(BEZIER_SPLINE<TV,3>& bez,const B_SPLINE<TV,3>& bs)
+{
+}
+//#####################################################################
+// Function Name
+//#####################################################################
+template<class TV, int d> std::string B_SPLINE<TV,d>::
+Name() const
+{
+    return Static_Name();
+}
+//#####################################################################
+// Function Static_Name
+//#####################################################################
+template<class TV, int d> std::string B_SPLINE<TV,d>::
+Static_Name()
+{
+    return STRING_UTILITIES::string_sprintf("B_SPLINE<VECTOR<T,%d> ,%d>",TV::dimension,d);
+}
+//#####################################################################
+// Function Extension
+//#####################################################################
+template<class TV, int d> std::string B_SPLINE<TV,d>::
+Extension() const
+{
+    return Static_Extension();
+}
+//#####################################################################
+// Function Static_Extension
+//#####################################################################
+template<class TV, int d> std::string B_SPLINE<TV,d>::
+Static_Extension()
+{
+    return "";
 }
 namespace PhysBAM{
 template class B_SPLINE<VECTOR<float,2>,3>;

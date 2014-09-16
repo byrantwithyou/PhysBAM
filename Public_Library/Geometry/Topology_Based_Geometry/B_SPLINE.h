@@ -11,6 +11,7 @@
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 namespace PhysBAM{
 template<class TV> class GEOMETRY_PARTICLES;
+template<class TV,int d> class BEZIER_SPLINE;
 
 template<class TV,int d=3>
 class B_SPLINE:public STRUCTURE<TV>
@@ -34,10 +35,15 @@ public:
     B_SPLINE<TV,d>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const;
     void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE;
     void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
+    std::string Name() const PHYSBAM_OVERRIDE;
+    static std::string Static_Name();
+    std::string Extension() const PHYSBAM_OVERRIDE;
+    static std::string Static_Extension();
 //#####################################################################
 };
 template<class TV> void Smooth_Fit(B_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X);
 template<class TV> void Smooth_Fit_Loop(B_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X);
+template<class TV> void Fill_Bezier(BEZIER_SPLINE<TV,3>& bez,const B_SPLINE<TV,3>& bs);
 template<class TV,int d> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,1>::OBJECT*
 Create_Segmented_Curve(const B_SPLINE<TV,d>& spline,bool same_particles);
 }

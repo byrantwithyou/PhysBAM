@@ -74,4 +74,6 @@ template class BANDED_MATRIX<float,4>;
 template class BANDED_MATRIX<double,4>;
 template void BANDED_MATRIX<float,4>::QR_Solve<VECTOR<float,2> >(ARRAY<VECTOR<float,2>,int>&);
 template void BANDED_MATRIX<double,4>::QR_Solve<VECTOR<double,2> >(ARRAY<VECTOR<double,2>,int>&);
+template void BANDED_MATRIX<double,3>::QR_Solve<VECTOR<double,2> >(ARRAY<VECTOR<double,2>,int>&);
+template void BANDED_MATRIX<float,3>::QR_Solve<VECTOR<float,2> >(ARRAY<VECTOR<float,2>,int>&);
 }

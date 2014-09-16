@@ -98,7 +98,7 @@ Smooth_Fit(BEZIER_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X)
     bs.particles.X.Last()=X.Last();
 }
 //#####################################################################
-// Function Smooth_Fit
+// Function Smooth_Fit_Loop
 //#####################################################################
 template<class TV> void PhysBAM::
 Smooth_Fit_Loop(BEZIER_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X)
@@ -210,6 +210,38 @@ Evaluate(int id,T t) const
     for(int i=0;i<d+1;i++)
         z+=comb[d][i]*pow_t[i]*pow_u[d-i]*X(i);
     return z;
+}
+//#####################################################################
+// Function Name
+//#####################################################################
+template<class TV, int d> std::string BEZIER_SPLINE<TV,d>::
+Name() const
+{
+    return Static_Name();
+}
+//#####################################################################
+// Function Static_Name
+//#####################################################################
+template<class TV, int d> std::string BEZIER_SPLINE<TV,d>::
+Static_Name()
+{
+    return STRING_UTILITIES::string_sprintf("BEZIER_SPLINE<VECTOR<T,%d> ,%d>",TV::dimension,d);
+}
+//#####################################################################
+// Function Extension
+//#####################################################################
+template<class TV, int d> std::string BEZIER_SPLINE<TV,d>::
+Extension() const
+{
+    return Static_Extension();
+}
+//#####################################################################
+// Function Static_Extension
+//#####################################################################
+template<class TV, int d> std::string BEZIER_SPLINE<TV,d>::
+Static_Extension()
+{
+    return "";
 }
 namespace PhysBAM{
 template class BEZIER_SPLINE<VECTOR<float,2>,3>;

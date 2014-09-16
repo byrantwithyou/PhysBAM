@@ -74,7 +74,7 @@ Display() const
     glPopMatrix();
 }
 //#####################################################################
-// Function l
+// Function Bounding_Box
 //#####################################################################
 template<class T,int d> RANGE<VECTOR<T,3> > OPENGL_BEZIER_SPLINE_2D<T,d>::
 Bounding_Box() const

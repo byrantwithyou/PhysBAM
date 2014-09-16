@@ -20,6 +20,7 @@ namespace PhysBAM{
 
 template<class T> class OPENGL_SEGMENTED_CURVE_2D;
 template<class T,int d> class OPENGL_BEZIER_SPLINE_2D;
+template<class T,int d> class OPENGL_B_SPLINE_2D;
 template<class T> class OPENGL_TRIANGULATED_AREA;
 template<class TV> class OPENGL_ADAPTIVE_NODE_SCALAR_FIELD;
 
@@ -40,6 +41,7 @@ public:
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> segmented_curve_objects;
     ARRAY<OPENGL_BEZIER_SPLINE_2D<T,3>*> bezier_spline_objects;
+    ARRAY<OPENGL_B_SPLINE_2D<T,3>*> b_spline_objects;
     ARRAY<OPENGL_TRIANGULATED_AREA<T>*> triangulated_area_objects;
     ARRAY<OPENGL_TRIANGULATED_AREA<T>*> triangles_of_material_objects;
     ARRAY<OPENGL_POINTS_2D<T,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >*> free_particles_objects;

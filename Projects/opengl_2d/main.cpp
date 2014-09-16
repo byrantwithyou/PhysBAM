@@ -796,6 +796,8 @@ Initialize_Components_And_Key_Bindings()
     Selection_Priority(OPENGL_SELECTION<T>::TRIANGULATED_AREA_TRIANGLE)=75;
     Selection_Priority(OPENGL_SELECTION<T>::BEZIER_SPLINE_VERTEX_2D)=74;
     Selection_Priority(OPENGL_SELECTION<T>::BEZIER_SPLINE_SEGMENT_2D)=73;
+    Selection_Priority(OPENGL_SELECTION<T>::B_SPLINE_VERTEX_2D)=72;
+    Selection_Priority(OPENGL_SELECTION<T>::B_SPLINE_SEGMENT_2D)=71;
     Selection_Priority(OPENGL_SELECTION<T>::GRID_NODE_2D)=70;
     Selection_Priority(OPENGL_SELECTION<T>::GRID_CELL_2D)=60;
 }

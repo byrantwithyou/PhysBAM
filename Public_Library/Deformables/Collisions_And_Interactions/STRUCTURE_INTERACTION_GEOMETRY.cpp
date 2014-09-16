@@ -10,6 +10,7 @@
 #include <Tools/Math_Tools/RANGE.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
+#include <Geometry/Topology_Based_Geometry/B_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
@@ -64,6 +65,7 @@ Build_Collision_Geometry(STRUCTURE<TV>& structure)
     else if(FREE_PARTICLES<TV>* free_particles=dynamic_cast<FREE_PARTICLES<TV>*>(&structure))
         active_indices=free_particles->nodes;
     else if(BEZIER_SPLINE<TV,3>* spline=dynamic_cast<BEZIER_SPLINE<TV,3>*>(&structure)) return false;
+    else if(B_SPLINE<TV,3>* spline=dynamic_cast<B_SPLINE<TV,3>*>(&structure)) return false;
     else PHYSBAM_FATAL_ERROR();
     if(segmented_curve && !segmented_curve->mesh.incident_elements) segmented_curve->mesh.Initialize_Incident_Elements();
     Build_Topological_Structure_Of_Hierarchies();

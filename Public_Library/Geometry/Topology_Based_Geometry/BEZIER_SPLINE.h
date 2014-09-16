@@ -33,6 +33,10 @@ public:
     BEZIER_SPLINE<TV,d>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const;
     void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE;
     void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
+    std::string Name() const PHYSBAM_OVERRIDE;
+    static std::string Static_Name();
+    std::string Extension() const PHYSBAM_OVERRIDE;
+    static std::string Static_Extension();
 //#####################################################################
 };
 template<class TV> void Smooth_Fit(BEZIER_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X);

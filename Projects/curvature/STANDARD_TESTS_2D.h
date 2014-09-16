@@ -13,6 +13,7 @@
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Implicit_Objects_Uniform/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Topology_Based_Geometry/B_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <Deformables/Bindings/BINDING_LIST.h>
@@ -108,6 +109,64 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             particles.mass(0)=FLT_MAX;
             particles.mass(resolution*3)=FLT_MAX;
             break;}
+        case 3:{
+            int size=6;
+            ARRAY<TV> X(size);
+            X(0)=TV(1,1);
+            X(1)=TV(2,3);
+            X(2)=TV(3,-1);
+            X(3)=TV(4,8);
+            X(4)=TV(5,1);
+            X(5)=TV(0,-2);
+            B_SPLINE<TV,3>* spline=B_SPLINE<TV,3>::Create(particles);
+            Smooth_Fit<TV>(*spline,X);
+            for(int i=0;i<size;i++)
+            {
+                LOG::printf("%P %P\n",(T)i/(T)(size-1),spline->Evaluate((T)i/(T)(size-1)));
+            }
+
+            for(int i=0;i<size;i++)
+            {
+                Add_Debug_Particle(X(i),VECTOR<T,3>(1,0,0));
+            }
+
+            int numpts = 100;
+            for(int i = 0; i < numpts; i++){
+                Add_Debug_Particle(spline->Evaluate((T)i/(T)(numpts-1)),VECTOR<T,3>(0,0,1));
+            }
+            deformable_body_collection.Add_Structure(spline);
+//            deformable_body_collection.Add_Structure(Create_Segmented_Curve(*spline,true));
+//            deformable_body_collection.Add_Force(I hope this isn't necessary for now?);
+            break;
+
+            // Now let's try inserting some knots?!
+            // Let's dump in c copies of a knot at t0.
+            // In real life, we want to add until every knot has multiplicity d+1?
+            // And then the list of control points will give us our Beziers?
+//            int id=std::upper_bound(knots.begin(),knots.end()-d,t0)-knots.begin()-1;
+//            TV x[c+1][d+1];
+//
+//            for(int i=0;i<=d;i++)
+//                x[0][i]=particles.X(control_points(i-d+id));
+//
+//            for(int k=0;k<c;k++)
+//                for(int i=k+1;i<=d;i++){
+//                    T u0=knots(i-d+id),u1=knots(i-k+id),a=(t0-u0)/max((u1-u0),(T)1e-10);
+//                    x[k+1][i]=(1-a)*x[k][i-1]+a*x[k][i];}
+//
+//            knots.(add c extra slots between id and id+1). All get value t0.
+//            particles: add c extra slots between...
+//                should be between the first and last points that affect value at t0.
+//                So between slots id-d and id, right?;
+//            control points: just add c extra slots at the end and continue on with numbering.
+//            for(int i=1;i<=c;i++){
+//                particles.X(id-d+i)=x[i][i];
+//                particles.X(id-c-1+i)=x[i][d];
+//            }
+//            for(int i=1;i<d-c;i++)
+//                particles.X(id-d+c+i)=x[c][c+i];
+
+        }
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -116,6 +175,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     switch(test_number){
         case 1:
         case 2:
+        case 3:
             break;
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
