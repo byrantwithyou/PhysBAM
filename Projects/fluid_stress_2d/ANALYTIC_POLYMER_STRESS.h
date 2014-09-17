@@ -25,14 +25,17 @@ struct ANALYTIC_POLYMER_STRESS
     virtual TV divS(const TV& X,T t) const {TV val;for(int i=0;i<TV::m;i++)for(int j=0;j<TV::m;j++)val(j)+=dSdX(X,t,i)(j,i);return val;}
     virtual void Test(const TV& X) const
     {
-//        RANDOM_NUMBERS<T> rand;
-//        TV dX;
-//        T e=1e-6,t=rand.Get_Uniform_Number(0,1),dt=rand.Get_Uniform_Number(-e,e);
-//        rand.Fill_Uniform(dX,-e,e);
-//        SYMMETRIC_MATRIX<T,TV::m> S0=S(X,t),S1=S((X+dX),t);
-//        SYMMETRIC_MATRIX<T,TV::m> du0=du(X,t),du1=du((X+dX),t);
-//        T erru=((du0+du1)*dX/2-(u1-u0)).Magnitude()/e;
-//        LOG::cout<<"analytic velocity diff test "<<erru<<std::endl;
+        RANDOM_NUMBERS<T> rand;
+        TV dX;
+        T e=1e-6,t=rand.Get_Uniform_Number(e,1),dt=rand.Get_Uniform_Number(-e,e);
+        rand.Fill_Uniform(dX,-e,e);
+        SYMMETRIC_MATRIX<T,TV::m> S0=S(X,t),S1=S(X+dX,t),S2=S(X,t+dt),dS2a=S2-S0,dS2b=(dt/2)*(dSdt(X,t)+dSdt(X,t+dt));
+        T a2=dS2a.Frobenius_Norm(),b2=dS2b.Frobenius_Norm(),d2=(dS2a-dS2b).Frobenius_Norm();
+        LOG::printf("stress diff t %g %g rel %g\n",a2,b2,d2/max(a2,b2,(T)1e-30));
+        SYMMETRIC_MATRIX<T,TV::m> dS1a=S1-S0,dS1b;
+        for(int i=0;i<TV::m;i++) dS1b+=(dSdX(X,t,i)+dSdX(X+dX,t,i))*(dX(i)/2);
+        T a1=dS1a.Frobenius_Norm(),b1=dS1b.Frobenius_Norm(),d1=(dS1a-dS1b).Frobenius_Norm();
+        LOG::printf("stress diff X %g %g rel %g\n",a1,b1,d1/max(a1,b1,(T)1e-30));
     }
 };
 
@@ -139,7 +142,23 @@ struct ANALYTIC_POLYMER_STRESS_QUADRATIC:public ANALYTIC_POLYMER_STRESS<TV>
                 }
         return SYMMETRIC_MATRIX<T,TV::m>(a11,a12,a22);}
 };
-
-
+template<class TV>
+struct ANALYTIC_POLYMER_STRESS_TRANSLATE:public ANALYTIC_POLYMER_STRESS<TV>
+{
+    typedef typename TV::SCALAR T;
+    ANALYTIC_POLYMER_STRESS<TV>* aps;
+    TV vel;
+    ANALYTIC_POLYMER_STRESS_TRANSLATE(ANALYTIC_POLYMER_STRESS<TV>* aps,const TV& vel): aps(aps),vel(vel) {}
+    ~ANALYTIC_POLYMER_STRESS_TRANSLATE() {delete aps;}
+    virtual SYMMETRIC_MATRIX<T,TV::m> S(const TV& X,T t) const {return aps->S(X-vel*t,t);}
+    virtual SYMMETRIC_MATRIX<T,TV::m> dSdX(const TV& X,T t,int i) const {return aps->dSdX(X-vel*t,t,i);}
+    virtual SYMMETRIC_MATRIX<T,TV::m> dSdt(const TV& X,T t) const
+    {
+        TV Z=X-vel*t;
+        SYMMETRIC_MATRIX<T,TV::m> m=aps->dSdt(Z,t);
+        for(int i=0;i<TV::m;i++) m-=aps->dSdX(Z,t,i)*vel(i);
+        return m;
+    }
+};
 }
 #endif
