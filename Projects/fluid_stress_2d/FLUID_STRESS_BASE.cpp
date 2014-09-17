@@ -130,6 +130,12 @@ Initialize_Common_Example()
             analytic_velocity=new ANALYTIC_VELOCITY_CONST<TV>(TV(.3,.3));
             analytic_polymer_stress=new ANALYTIC_POLYMER_STRESS_TRANSLATE<TV>(new ANALYTIC_POLYMER_1,TV(.3,.3));
             break;
+        case 2:
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+            analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),.8,1,0);
+            analytic_velocity=new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),typename TV::SPIN()+1,1);
+            analytic_polymer_stress=new ANALYTIC_POLYMER_STRESS_ROTATION<TV>(new ANALYTIC_POLYMER_1,TV(),typename TV::SPIN()+1);
+            break;
         default: return false;}
     return true;
 }
