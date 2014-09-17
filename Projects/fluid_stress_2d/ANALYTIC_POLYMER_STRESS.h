@@ -22,7 +22,8 @@ struct ANALYTIC_POLYMER_STRESS
     virtual T_MATRIX S(const TV& X,T t) const=0;
     virtual T_MATRIX dSdX(const TV& X,T t,int i) const=0;
     virtual T_MATRIX dSdt(const TV& X,T t) const=0;
-    virtual TV divS(const TV& X,T t) const {TV val;for(int i=0;i<TV::m;i++)for(int j=0;j<TV::m;j++)val(j)+=dSdX(X,t,i)(j,i);return val;}
+    virtual TV divS(const TV& X,T t) const
+    {TV val;for(int i=0;i<TV::m;i++) val+=dSdX(X,t,i).Row(i);return val;}
     virtual void Test(const TV& X) const
     {
         RANDOM_NUMBERS<T> rand;
@@ -157,6 +158,38 @@ struct ANALYTIC_POLYMER_STRESS_TRANSLATE:public ANALYTIC_POLYMER_STRESS<TV>
         TV Z=X-vel*t;
         SYMMETRIC_MATRIX<T,TV::m> m=aps->dSdt(Z,t);
         for(int i=0;i<TV::m;i++) m-=aps->dSdX(Z,t,i)*vel(i);
+        return m;
+    }
+};
+template<class TV>
+struct ANALYTIC_POLYMER_STRESS_ROTATION:public ANALYTIC_POLYMER_STRESS<TV>
+{
+    typedef typename TV::SCALAR T;
+    ANALYTIC_POLYMER_STRESS<TV>* aps;
+    TV c;
+    typename TV::SPIN w;
+    ANALYTIC_POLYMER_STRESS_ROTATION(ANALYTIC_POLYMER_STRESS<TV>* aps,TV cc,typename TV::SPIN ww): aps(aps),c(cc),w(ww) {}
+    ~ANALYTIC_POLYMER_STRESS_ROTATION() {delete aps;}
+    virtual SYMMETRIC_MATRIX<T,TV::m> S(const TV& X,T t) const
+    {
+        TV X0=ROTATION<TV>::From_Rotation_Vector(-t*w).Rotate(X-c)+c;
+        return aps->S(X0,t);
+    }
+    virtual SYMMETRIC_MATRIX<T,TV::m> dSdX(const TV& X,T t,int a) const
+    {
+        ROTATION<TV> rot=ROTATION<TV>::From_Rotation_Vector(-t*w);
+        TV X0=rot.Rotate(X-c)+c;
+        MATRIX<T,TV::m> rot_mat=rot.Rotation_Matrix();
+        SYMMETRIC_MATRIX<T,TV::m> m;
+        for(int i=0;i<TV::m;i++) m+=aps->dSdX(X0,t,i)*rot_mat(i,a);
+        return m;
+    }
+    virtual SYMMETRIC_MATRIX<T,TV::m> dSdt(const TV& X,T t) const
+    {
+        TV Z=ROTATION<TV>::From_Rotation_Vector(-t*w).Rotate(X-c),X0=Z+c;
+        SYMMETRIC_MATRIX<T,TV::m> m=aps->dSdt(X0,t);
+        TV dX0=-w.Cross(Z);
+        for(int i=0;i<TV::m;i++) m+=aps->dSdX(X0,t,i)*dX0(i);
         return m;
     }
 };
