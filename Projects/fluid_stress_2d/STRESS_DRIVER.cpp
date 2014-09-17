@@ -108,16 +108,17 @@ Advance_One_Time_Step(bool first_step)
     example.Begin_Time_Step(time);
     example.Get_Velocities(time+dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before stress evolution",0,1);
-    Update_Polymer_Stress(dt);
+    Update_Polymer_Stress(dt,first_step);
+    example.polymer_stress.Exchange(example.prev_polymer_stress);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after stress evolution",0,1);
     example.time=time+=dt;
     example.End_Time_Step(time);
 }
 //#####################################################################
-// Function Advection_And_BDF
+// Function Advection
 //#####################################################################
 template<class TV> void STRESS_DRIVER<TV>::
-Advection_And_BDF(T dt,bool first_step)
+Advection(T dt,bool first_step)
 {
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m>,AVERAGING_UNIFORM<TV>,QUADRATIC_INTERPOLATION_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m> > > quadratic_advection;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T,AVERAGING_UNIFORM<TV>,LINEAR_INTERPOLATION_UNIFORM<TV,T> > linear_advection;
@@ -127,9 +128,10 @@ Advection_And_BDF(T dt,bool first_step)
     FACE_LOOKUP_UNIFORM<TV> lookup_temp(temp);
     FACE_LOOKUP_UNIFORM<TV> lookup_face_velocities(example.face_velocities),lookup_prev_face_velocities(example.prev_face_velocities);
     if(!first_step){
+        ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> temp_S(example.prev_polymer_stress);
         linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp,lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
-        quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,example.polymer_stress,example.prev_polymer_stress,lookup_temp,boundary_S,2*dt,time+dt);}
-    else quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,example.polymer_stress,example.prev_polymer_stress,lookup_face_velocities,boundary_S,2*dt,time+dt);
+        quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,example.prev_polymer_stress,temp_S,lookup_temp,boundary_S,2*dt,time+dt);}
+    else quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,example.prev_polymer_stress,example.polymer_stress,lookup_face_velocities,boundary_S,dt,time+dt);
 }
 //#####################################################################
 // Function Assert_Advection_CFL
@@ -144,8 +146,9 @@ Assert_Advection_CFL(const ARRAY<T,FACE_INDEX<TV::m> >& u,T dt) const
 // Function Update_Polymer_Stress
 //#####################################################################
 template<class TV> void STRESS_DRIVER<TV>::
-Update_Polymer_Stress(T dt)
+Update_Polymer_Stress(T dt,bool first_step)
 {
+    Advection(dt,first_step);
 }
 //#####################################################################
 // Function Extrapolate_Velocity

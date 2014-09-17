@@ -33,13 +33,11 @@ public:
     void Initialize();
     
     void Advance_One_Time_Step(bool first_step);
-    void Update_Pls(T dt);
     void Simulate_To_Frame(const int frame_input);
     void Write_Output_Files(const int frame);
     void Write_Substep(const std::string& title,const int substep,const int level=0);
-    void Update_Level_Set(T dt,bool first_step);
-    void Advection_And_BDF(T dt,bool first_step);
-    void Update_Polymer_Stress(T dt);
+    void Advection(T dt,bool first_step);
+    void Update_Polymer_Stress(T dt,bool first_step);
     void Extrapolate_Stress(const ARRAY<T,FACE_INDEX<TV::m> >& u,ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S);
     void Assert_Advection_CFL(const ARRAY<T,FACE_INDEX<TV::m> >& u,T dt) const;
 //#####################################################################
