@@ -119,18 +119,17 @@ Advance_One_Time_Step(bool first_step)
 template<class TV> void STRESS_DRIVER<TV>::
 Advection_And_BDF(T dt,bool first_step)
 {
-    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T,AVERAGING_UNIFORM<TV>,QUADRATIC_INTERPOLATION_UNIFORM<TV,T> > quadratic_advection;
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m>,AVERAGING_UNIFORM<TV>,QUADRATIC_INTERPOLATION_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m> > > quadratic_advection;
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T,AVERAGING_UNIFORM<TV>,LINEAR_INTERPOLATION_UNIFORM<TV,T> > linear_advection;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
+    BOUNDARY_MAC_GRID_PERIODIC<TV,SYMMETRIC_MATRIX<T,TV::m> > boundary_S;
+    ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,example.number_of_ghost_cells);
+    FACE_LOOKUP_UNIFORM<TV> lookup_temp(temp);
     FACE_LOOKUP_UNIFORM<TV> lookup_face_velocities(example.face_velocities),lookup_prev_face_velocities(example.prev_face_velocities);
-    PHYSBAM_DEBUG_ONLY(Assert_Advection_CFL(example.face_velocities,dt));
     if(!first_step){
-        PHYSBAM_DEBUG_ONLY(Assert_Advection_CFL(example.prev_face_velocities,dt));
-        ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,example.number_of_ghost_cells);
-        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp,lookup_prev_face_velocities,lookup_prev_face_velocities,boundary,2*dt,time+dt);
-        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities,lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
-        example.prev_face_velocities.Copy((T)2/(T)1.5,example.prev_face_velocities,-(T).5/(T)1.5,temp);}
-    else quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities,lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
-    example.prev_face_velocities.Exchange(example.face_velocities);
+        linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp,lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
+        quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,example.polymer_stress,example.prev_polymer_stress,lookup_temp,boundary_S,2*dt,time+dt);}
+    else quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,example.polymer_stress,example.prev_polymer_stress,lookup_face_velocities,boundary_S,2*dt,time+dt);
 }
 //#####################################################################
 // Function Assert_Advection_CFL
