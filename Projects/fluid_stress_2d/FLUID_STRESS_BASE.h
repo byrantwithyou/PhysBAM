@@ -49,6 +49,7 @@ public:
     using BASE::grid;using BASE::output_directory;using BASE::face_velocities;using BASE::write_substeps_level;
     using BASE::restart;using BASE::last_frame;using BASE::dt;using BASE::levelset;
     using BASE::time_steps_per_frame;using BASE::substeps_delay_frame;using BASE::polymer_stress;
+    using BASE::number_of_ghost_cells;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 

@@ -103,6 +103,7 @@ template<class TV> bool FLUID_STRESS_BASE<TV>::
 Initialize_Common_Example()
 {
     typename TV::SPIN spin_count;
+    typedef SYMMETRIC_MATRIX<T,TV::m> T_MAT;
     TV vector_count;
     for(int i=0;i<TV::SPIN::m;i++) spin_count(i)=i;
     for(int i=0;i<TV::m;i++) vector_count(i)=i;
@@ -119,20 +120,15 @@ Initialize_Common_Example()
             {
                 ANALYTIC_POLYMER_1(){}
                 ~ANALYTIC_POLYMER_1() {}
-                virtual SYMMETRIC_MATRIX<T,TV::m> S(const TV& X,T t) const
-                {
-                    return SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(sin(X));
-                }
-                virtual SYMMETRIC_MATRIX<T,TV::m> dSdX(const TV& X,T t,int a) const
-                {
-                    return SYMMETRIC_MATRIX<T,TV::m>::Symmetric_Outer_Product(sin(X),TV::Axis_Vector(a)*cos(X(a)));
-                }
-                virtual SYMMETRIC_MATRIX<T,TV::m> dSdt(const TV& X,T t) const {return SYMMETRIC_MATRIX<T,TV::m>();}
+                virtual T_MAT S(const TV& X,T t) const {return T_MAT::Outer_Product(sin(X));}
+                virtual T_MAT dSdX(const TV& X,T t,int a) const
+                {return T_MAT::Symmetric_Outer_Product(sin(X),TV::Axis_Vector(a)*cos(X(a)));}
+                virtual T_MAT dSdt(const TV& X,T t) const {return T_MAT();}
             };
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*pi*m),true);
             analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
-            analytic_velocity=new ANALYTIC_VELOCITY_CONST<TV>(TV()+1);
-            analytic_polymer_stress=new ANALYTIC_POLYMER_STRESS_TRANSLATE<TV>(new ANALYTIC_POLYMER_1,TV(.3,.6));
+            analytic_velocity=new ANALYTIC_VELOCITY_CONST<TV>(TV(.3,.3));
+            analytic_polymer_stress=new ANALYTIC_POLYMER_STRESS_TRANSLATE<TV>(new ANALYTIC_POLYMER_1,TV(.3,.3));
             break;
         default: return false;}
     return true;
@@ -188,6 +184,8 @@ Stress_Error(T time)
         b=max(B.Max_Abs(),b);
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,S_max);}
+    if(num_S) S_2/=num_S*TV::m*TV::m;
+    S_2=sqrt(S_2);
     LOG::printf("max_error %-22.16g %-22.16g %-22.16g %-22.16g\n", S_inf, S_2, a, b);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("stress error",0,1);
 }
@@ -197,30 +195,15 @@ Stress_Error(T time)
 template<class TV> void FLUID_STRESS_BASE<TV>::
 Dump_Analytic_Levelset(T time)
 {
-    ARRAY<VECTOR<T,3> > colors;
-    colors.Append(VECTOR<T,3>((T).25,(T).25,(T).25));
-    colors.Append(VECTOR<T,3>((T).5,(T).5,(T).5));
-    colors.Append(VECTOR<T,3>(1,1,1));
-    colors.Append(VECTOR<T,3>(1,0,0));
-    colors.Append(VECTOR<T,3>(0,1,0));
-    colors.Append(VECTOR<T,3>(0,0,1));
-    colors.Append(VECTOR<T,3>(1,1,0));
-    colors.Append(VECTOR<T,3>(0,1,1));
-    colors.Append(VECTOR<T,3>(1,0,1));
     for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
-        int c=-4;
-        T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
-        if(c==-4) c=bc_type;
-        Add_Debug_Particle(it.Location(),colors(c+3));
+        T p=analytic_levelset->phi2(it.Location()/m,time/s)*m;
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(p>0,p<=0,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
     PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (phi)",0,1);
     for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
-        int c=-4;
-        T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
-        (void)p;
-        if(c==-4) c=bc_type;
-        Add_Debug_Particle(it.Location(),colors(c+3));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,analytic_levelset->N(it.Location()/m,time/s,c));}
+        T p=analytic_levelset->phi2(it.Location()/m,time/s)*m;
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(p>0,p<=0,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,analytic_levelset->N2(it.Location()/m,time/s));}
     PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (N)",0,1);
 }
 //#####################################################################
@@ -230,7 +213,7 @@ template<class TV> void FLUID_STRESS_BASE<TV>::
 Get_Velocities(T time)
 {
     if(analytic_levelset && analytic_velocity)
-        for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next())
+        for(FACE_ITERATOR<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next())
             face_velocities(it.Full_Index())=analytic_velocity->u(it.Location()/m,time)(it.Axis())*m/s;
 }
 //#####################################################################
