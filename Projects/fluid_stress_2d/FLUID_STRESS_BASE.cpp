@@ -114,6 +114,26 @@ Initialize_Common_Example()
             analytic_velocity=new ANALYTIC_VELOCITY_CONST<TV>(TV()+1);
             analytic_polymer_stress=new ANALYTIC_POLYMER_STRESS_CONST<TV>();
             break;
+        case 1:
+            struct ANALYTIC_POLYMER_1:public ANALYTIC_POLYMER_STRESS<TV>
+            {
+                ANALYTIC_POLYMER_1(){}
+                ~ANALYTIC_POLYMER_1() {}
+                virtual SYMMETRIC_MATRIX<T,TV::m> S(const TV& X,T t) const
+                {
+                    return SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(sin(X));
+                }
+                virtual SYMMETRIC_MATRIX<T,TV::m> dSdX(const TV& X,T t,int a) const
+                {
+                    return SYMMETRIC_MATRIX<T,TV::m>::Symmetric_Outer_Product(sin(X),TV::Axis_Vector(a)*cos(X(a)));
+                }
+                virtual SYMMETRIC_MATRIX<T,TV::m> dSdt(const TV& X,T t) const {return SYMMETRIC_MATRIX<T,TV::m>();}
+            };
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*pi*m),true);
+            analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
+            analytic_velocity=new ANALYTIC_VELOCITY_CONST<TV>(TV()+1);
+            analytic_polymer_stress=new ANALYTIC_POLYMER_STRESS_TRANSLATE<TV>(new ANALYTIC_POLYMER_1,TV(.3,.6));
+            break;
         default: return false;}
     return true;
 }
@@ -168,7 +188,7 @@ Stress_Error(T time)
         b=max(B.Max_Abs(),b);
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,S_max);}
-    LOG::sprintf("max_error %-22.16g %-22.16g %-22.16g %-22.16g", S_inf, S_2, a, b);
+    LOG::printf("max_error %-22.16g %-22.16g %-22.16g %-22.16g\n", S_inf, S_2, a, b);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("stress error",0,1);
 }
 //#####################################################################
@@ -236,12 +256,10 @@ Analytic_Test()
         analytic_levelset->Test(grid.domain);
         RANDOM_NUMBERS<T> rand;
         TV X;
-        int c=-4;
-        do{
-            X=rand.Get_Uniform_Vector(grid.domain);
-            analytic_levelset->phi(X/m,0,c);}
-        while(c<0);
-        analytic_velocity->Test(X);}
+        do X=rand.Get_Uniform_Vector(grid.domain);
+        while(analytic_levelset->phi2(X/m,0)>0);
+        analytic_velocity->Test(X);
+        analytic_polymer_stress->Test(X);}
 }
 //#####################################################################
 // Function Begin_Time_Step
