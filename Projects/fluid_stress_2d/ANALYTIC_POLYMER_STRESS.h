@@ -151,13 +151,13 @@ struct ANALYTIC_POLYMER_STRESS_TRANSLATE:public ANALYTIC_POLYMER_STRESS<TV>
     TV vel;
     ANALYTIC_POLYMER_STRESS_TRANSLATE(ANALYTIC_POLYMER_STRESS<TV>* aps,const TV& vel): aps(aps),vel(vel) {}
     ~ANALYTIC_POLYMER_STRESS_TRANSLATE() {delete aps;}
-    virtual SYMMETRIC_MATRIX<T,TV::m> S(const TV& X,T t) const {return aps->S(X-vel*t,t);}
-    virtual SYMMETRIC_MATRIX<T,TV::m> dSdX(const TV& X,T t,int i) const {return aps->dSdX(X-vel*t,t,i);}
+    virtual SYMMETRIC_MATRIX<T,TV::m> S(const TV& X,T t) const {return aps->S(X-vel*t,0);}
+    virtual SYMMETRIC_MATRIX<T,TV::m> dSdX(const TV& X,T t,int i) const {return aps->dSdX(X-vel*t,0,i);}
     virtual SYMMETRIC_MATRIX<T,TV::m> dSdt(const TV& X,T t) const
     {
         TV Z=X-vel*t;
-        SYMMETRIC_MATRIX<T,TV::m> m=aps->dSdt(Z,t);
-        for(int i=0;i<TV::m;i++) m-=aps->dSdX(Z,t,i)*vel(i);
+        SYMMETRIC_MATRIX<T,TV::m> m;
+        for(int i=0;i<TV::m;i++) m-=aps->dSdX(Z,0,i)*vel(i);
         return m;
     }
 };
@@ -173,7 +173,7 @@ struct ANALYTIC_POLYMER_STRESS_ROTATION:public ANALYTIC_POLYMER_STRESS<TV>
     virtual SYMMETRIC_MATRIX<T,TV::m> S(const TV& X,T t) const
     {
         TV X0=ROTATION<TV>::From_Rotation_Vector(-t*w).Rotate(X-c)+c;
-        return aps->S(X0,t);
+        return aps->S(X0,0);
     }
     virtual SYMMETRIC_MATRIX<T,TV::m> dSdX(const TV& X,T t,int a) const
     {
@@ -181,15 +181,15 @@ struct ANALYTIC_POLYMER_STRESS_ROTATION:public ANALYTIC_POLYMER_STRESS<TV>
         TV X0=rot.Rotate(X-c)+c;
         MATRIX<T,TV::m> rot_mat=rot.Rotation_Matrix();
         SYMMETRIC_MATRIX<T,TV::m> m;
-        for(int i=0;i<TV::m;i++) m+=aps->dSdX(X0,t,i)*rot_mat(i,a);
+        for(int i=0;i<TV::m;i++) m+=aps->dSdX(X0,0,i)*rot_mat(i,a);
         return m;
     }
     virtual SYMMETRIC_MATRIX<T,TV::m> dSdt(const TV& X,T t) const
     {
         TV Z=ROTATION<TV>::From_Rotation_Vector(-t*w).Rotate(X-c),X0=Z+c;
-        SYMMETRIC_MATRIX<T,TV::m> m=aps->dSdt(X0,t);
+        SYMMETRIC_MATRIX<T,TV::m> m;
         TV dX0=-w.Cross(Z);
-        for(int i=0;i<TV::m;i++) m+=aps->dSdX(X0,t,i)*dX0(i);
+        for(int i=0;i<TV::m;i++) m+=aps->dSdX(X0,0,i)*dX0(i);
         return m;
     }
 };
