@@ -38,7 +38,7 @@ public:
     void Write_Substep(const std::string& title,const int substep,const int level=0);
     void Advection(T dt,bool first_step);
     void Update_Polymer_Stress(T dt,bool first_step);
-    void Extrapolate_Stress(const ARRAY<T,FACE_INDEX<TV::m> >& u,ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S);
+    void Extrapolate_Stress(ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S);
     void Assert_Advection_CFL(const ARRAY<T,FACE_INDEX<TV::m> >& u,T dt) const;
 //#####################################################################
 };

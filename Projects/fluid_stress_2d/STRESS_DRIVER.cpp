@@ -106,6 +106,7 @@ Advance_One_Time_Step(bool first_step)
 {
     T dt=example.dt;
     example.Begin_Time_Step(time);
+    Assert_Advection_CFL(example.face_velocities,dt);
     example.Get_Velocities(time+dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before stress evolution",0,1);
     Update_Polymer_Stress(dt,first_step);
@@ -130,8 +131,11 @@ Advection(T dt,bool first_step)
     if(!first_step){
         ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> temp_S(example.prev_polymer_stress);
         linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp,lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
+        Extrapolate_Stress(example.prev_polymer_stress);
         quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,example.prev_polymer_stress,temp_S,lookup_temp,boundary_S,2*dt,time+dt);}
-    else quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,example.prev_polymer_stress,example.polymer_stress,lookup_face_velocities,boundary_S,dt,time+dt);
+    else{
+        Extrapolate_Stress(example.polymer_stress);
+        quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,example.prev_polymer_stress,example.polymer_stress,lookup_face_velocities,boundary_S,dt,time+dt);}
 }
 //#####################################################################
 // Function Assert_Advection_CFL
@@ -154,7 +158,7 @@ Update_Polymer_Stress(T dt,bool first_step)
 // Function Extrapolate_Velocity
 //#####################################################################
 template<class TV> void STRESS_DRIVER<TV>::
-Extrapolate_Stress(const ARRAY<T,FACE_INDEX<TV::m> >& u,ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S)
+Extrapolate_Stress(ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S)
 {
     for(CELL_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         S(it.index)=SYMMETRIC_MATRIX<T,TV::m>()+1e20;
