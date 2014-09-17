@@ -97,7 +97,6 @@ Smooth_Fit(B_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X)
     bs.knots.Append(0);
     bs.knots.Append(0);
     bs.knots.Append(0);
-    bs.knots.Append(0);
     bs.particles.Add_Elements(X.m+2);
     bs.control_points=IDENTITY_ARRAY<>(X.m+2);
     bs.particles.X(0)=X(0);
@@ -105,12 +104,11 @@ Smooth_Fit(B_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X)
         bs.particles.X(i)=rhs(i-1);
         bs.knots.Append((T)i/(X.m-1));}
     bs.particles.X.Last()=X.Last();
-    bs.knots(X.m+3)=1;
+    bs.knots(X.m+2)=1;
     bs.knots.Append(1);
-    bs.knots.Append(1);
-
-    // Final knots list: 0, 0, 0, 0, 1/m, 2/m, ..., (m-1)/m, 1, 1, 1, 1.
-    // Final control points list: 0,1,2,...,m+1
+    
+    // Final knots list: 0, 0, 0, 1/n, 2/n, ..., (n-2)/(n-1), 1, 1, 1.
+    // Final control points list: 0,1,2,...,n+1
 }
 //#####################################################################
 // Function Smooth_Fit_Loop
@@ -129,7 +127,8 @@ Smooth_Fit_Loop(B_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X)
     for(int i=0;i<X.m;i++){matrix.A(i)=VECTOR<T,3>(1,4,1);rhs(i)=X(i)*6;}
     matrix.QR_Solve(rhs);
 
-    for(int k=-3;k<X.m+3;k++) bs.knots.Append((T)k/(X.m-1));
+    for(int k=-2;k<X.m+3;k++) bs.knots.Append((T)k/(X.m));
+    bs.particles.Add_Elements(rhs.m);
     bs.particles.X=rhs;
     bs.control_points=IDENTITY_ARRAY<>(X.m);
     for(int j=0;j<3;j++) bs.control_points.Append(j);
@@ -184,14 +183,14 @@ Create(GEOMETRY_PARTICLES<TV>& particles)
 template<class TV,int d> TV B_SPLINE<TV,d>::
 Evaluate(T t) const
 {
-    t=clamp(t,knots(d),knots(knots.m-d-1));
-    int id=std::upper_bound(knots.begin(),knots.end()-d-1,t)-knots.begin()-1;
-    PHYSBAM_ASSERT(id>=d);
+    t=clamp(t,knots(d-1),knots(knots.m-d));
+    
+    int id=std::upper_bound(knots.begin(),knots.end()-d,t)-knots.begin();
+//    PHYSBAM_ASSERT(id>=d);
     TV x[d+1][d+1];
-
-    for(int i=0;i<=d;i++)
-        x[0][i]=particles.X(control_points(i-d+id));
-
+    for(int i=0;i<=d;i++){
+        x[0][i]=particles.X(control_points(i-d+id));}
+    id--;
     for(int k=0;k<d;k++)
         for(int i=k+1;i<=d;i++){
             T u0=knots(i-d+id),u1=knots(i-k+id),a=u1!=u0?(t-u0)/(u1-u0):0;
