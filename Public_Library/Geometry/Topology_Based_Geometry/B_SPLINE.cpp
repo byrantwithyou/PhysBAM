@@ -7,8 +7,9 @@
 #include <Tools/Arrays/IDENTITY_ARRAY.h>
 #include <Tools/Matrices/BANDED_MATRIX.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Geometry/Topology_Based_Geometry/B_SPLINE.h>
+#include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <Geometry/Topology_Based_Geometry/B_SPLINE.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -204,6 +205,46 @@ Evaluate(T t) const
 template<class TV> void PhysBAM::
 Fill_Bezier(BEZIER_SPLINE<TV,3>& bez,const B_SPLINE<TV,3>& bs)
 {
+    typedef typename TV::SCALAR T;
+    int m=bs.knots.m-4; // m = number of Bezier segments + 1. (i.e. number of `physical' Bezier points)
+    bez.particles.Resize(m*3-2);
+    if(bez.control_points.m<m-1){
+        for(int i=bez.control_points.m;i<m-1;i++)
+            bez.control_points.Append(VECTOR<int,4>(3*i,3*i+1,3*i+2,3*i+3));}
+    else bez.control_points.Resize(m-1);
+    for(int i=0;i<m-1;i++)
+    {
+        T k23=bs.knots(i+2)-bs.knots(i+1);
+        T k14=bs.knots(i+3)-bs.knots(i);
+        T k24=bs.knots(i+3)-bs.knots(i+1);
+        T k34=bs.knots(i+3)-bs.knots(i+2);
+        T k15=bs.knots(i+4)-bs.knots(i);
+        T k25=bs.knots(i+4)-bs.knots(i+1);
+        T k35=bs.knots(i+4)-bs.knots(i+2);
+        T k45=bs.knots(i+4)-bs.knots(i+3);
+
+        T a11=k34*k34/(k14*k24);
+        T a13=k23*k23/(k25*k24);
+        T a12=1-a11-a13;
+        T a22=k35/k25;
+        T a23=k23/k25;
+        T a32=k45/k25;
+        T a33=k24/k25;
+        bez.particles.X(3*i)=a11*bs.particles.X(bs.control_points(i))
+            +a12*bs.particles.X(bs.control_points(i+1))+a13*bs.particles.X(bs.control_points(i+2));
+        bez.particles.X(3*i+1)=a22*bs.particles.X(bs.control_points(i+1))+a23*bs.particles.X(bs.control_points(i+2));
+        bez.particles.X(3*i+2)=a32*bs.particles.X(bs.control_points(i+1))+a33*bs.particles.X(bs.control_points(i+2));
+    }
+    T k25=bs.knots(m+2)-bs.knots(m-1);
+    T k35=bs.knots(m+2)-bs.knots(m);
+    T k45=bs.knots(m+2)-bs.knots(m+1);
+    T k34=bs.knots(m+1)-bs.knots(m);
+    T k36=bs.knots(m+3)-bs.knots(m);
+    T a42=k45*k45/(k35*k25);
+    T a44=k34*k34/(k36*k35);
+    T a43=1-a42-a44;
+    bez.particles.X.Last()=a42*bs.particles.X(bs.control_points(m-1))
+        +a43*bs.particles.X(bs.control_points(m))+a44*bs.particles.X(bs.control_points(m+1));
 }
 //#####################################################################
 // Function Name
@@ -246,4 +287,8 @@ template TOPOLOGY_BASED_SIMPLEX_POLICY<VECTOR<float,2>,1>::OBJECT* Create_Segmen
 template TOPOLOGY_BASED_SIMPLEX_POLICY<VECTOR<double,2>,1>::OBJECT* Create_Segmented_Curve<VECTOR<double,2>,3>(B_SPLINE<VECTOR<double,2>,3> const&,bool);
 template void Smooth_Fit<VECTOR<float,2> >(B_SPLINE<VECTOR<float,2>,3>&,ARRAY_VIEW<VECTOR<float,2>,int>);
 template void Smooth_Fit<VECTOR<double,2> >(B_SPLINE<VECTOR<double,2>,3>&,ARRAY_VIEW<VECTOR<double,2>,int>);
+template void Smooth_Fit_Loop<VECTOR<float,2> >(B_SPLINE<VECTOR<float,2>,3>&,ARRAY_VIEW<VECTOR<float,2>,int>);
+template void Smooth_Fit_Loop<VECTOR<double,2> >(B_SPLINE<VECTOR<double,2>,3>&,ARRAY_VIEW<VECTOR<double,2>,int>);
+template void Fill_Bezier<VECTOR<float,2> >(BEZIER_SPLINE<VECTOR<float,2>,3>&,B_SPLINE<VECTOR<float,2>,3> const&);
+template void Fill_Bezier<VECTOR<double,2> >(BEZIER_SPLINE<VECTOR<double,2>,3>&,B_SPLINE<VECTOR<double,2>,3> const&);
 }
