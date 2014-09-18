@@ -7,10 +7,10 @@
 #ifndef __VEC_HOLDER__
 #define __VEC_HOLDER__
 
-#include <Tools/Auto_Diff/PRIMITIVE_TENSORS.h>
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Tools/Tensors/PRIMITIVE_TENSORS.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <cmath>
 namespace PhysBAM{
@@ -82,20 +82,20 @@ template<int n,class IN,class OBJ,class BASE> void Set(VEC_HOLDER<OBJ,BASE>& out
 template<int n,class IN,class OBJ,class BASE> void Set_Helper(VEC_HOLDER<OBJ,BASE>& out,const IN& in,VECTOR<int,n>*) {Set_Helper(out.z,in,(VECTOR<int,n-1>*)0);}
 template<class IN,class OBJ,class BASE> void Set_Helper(VEC_HOLDER<OBJ,BASE>& out,const IN& in,VECTOR<int,0>*){out.x=in;}
 
-template<class TV,int n> struct EMPTY_VEC {typedef VEC_HOLDER<ZERO_VEC<TV>,typename EMPTY_VEC<TV,n-1>::TYPE> TYPE;};
+template<class TV,int n> struct EMPTY_VEC {typedef VEC_HOLDER<ZERO_VECTOR<typename TV::SCALAR,TV::m>,typename EMPTY_VEC<TV,n-1>::TYPE> TYPE;};
 template<class TV> struct EMPTY_VEC<TV,0> {typedef VEC_END TYPE;};
 
-template<class TV,int n,int i> struct ONE_NONZERO_VEC {typedef VEC_HOLDER<ZERO_VEC<TV>,typename ONE_NONZERO_VEC<TV,n-1,i-1>::TYPE> TYPE;};
-template<class TV,int n> struct ONE_NONZERO_VEC<TV,n,0> {typedef VEC_HOLDER<TV,typename EMPTY_VEC<TV,n-1>::TYPE> TYPE;};
+template<class TV,int n,int i> struct ONE_NONZERO_VECTOR {typedef VEC_HOLDER<ZERO_VECTOR<typename TV::SCALAR,TV::m>,typename ONE_NONZERO_VECTOR<TV,n-1,i-1>::TYPE> TYPE;};
+template<class TV,int n> struct ONE_NONZERO_VECTOR<TV,n,0> {typedef VEC_HOLDER<TV,typename EMPTY_VEC<TV,n-1>::TYPE> TYPE;};
 
-template<class TV,int n> struct EMPTY_VEC_MAT {typedef VEC_HOLDER<ZERO_MAT<TV>,typename EMPTY_VEC_MAT<TV,n-1>::TYPE> TYPE;};
+template<class TV,int n> struct EMPTY_VEC_MAT {typedef VEC_HOLDER<ZERO_MATRIX<typename TV::SCALAR,TV::m>,typename EMPTY_VEC_MAT<TV,n-1>::TYPE> TYPE;};
 template<class TV> struct EMPTY_VEC_MAT<TV,0> {typedef VEC_END TYPE;};
 
-template<class TV,int n> struct EMPTY_VEC_TEN {typedef VEC_HOLDER<ZERO_TENSOR<TV>,typename EMPTY_VEC_TEN<TV,n-1>::TYPE> TYPE;};
+template<class TV,int n> struct EMPTY_VEC_TEN {typedef VEC_HOLDER<ZERO_TENSOR<typename TV::SCALAR,TV::m>,typename EMPTY_VEC_TEN<TV,n-1>::TYPE> TYPE;};
 template<class TV> struct EMPTY_VEC_TEN<TV,0> {typedef VEC_END TYPE;};
 
-template<class TV,int n,int i> struct ONE_NONZERO_VEC_MAT {typedef VEC_HOLDER<ZERO_MAT<TV>,typename ONE_NONZERO_VEC_MAT<TV,n-1,i-1>::TYPE> TYPE;};
-template<class TV,int n> struct ONE_NONZERO_VEC_MAT<TV,n,0> {typedef VEC_HOLDER<ID_MAT<TV>,typename EMPTY_VEC_MAT<TV,n-1>::TYPE> TYPE;};
+template<class TV,int n,int i> struct ONE_NONZERO_VECTOR_MAT {typedef VEC_HOLDER<ZERO_MATRIX<typename TV::SCALAR,TV::m>,typename ONE_NONZERO_VECTOR_MAT<TV,n-1,i-1>::TYPE> TYPE;};
+template<class TV,int n> struct ONE_NONZERO_VECTOR_MAT<TV,n,0> {typedef VEC_HOLDER<IDENTITY_MATRIX<typename TV::SCALAR,TV::m>,typename EMPTY_VEC_MAT<TV,n-1>::TYPE> TYPE;};
 
 template<class OP,class VEC> struct TYPE_VEC_MAP_1;
 

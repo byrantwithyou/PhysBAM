@@ -183,6 +183,80 @@ template<class T,int d>
 inline SYMMETRIC_MATRIX<T,d> operator-(const T a,const SYMMETRIC_MATRIX<T,d>& A)
 {return -A+a;}
 
+//#####################################################################
+// Function Symmetric_Times_Transpose
+//#####################################################################
+template<class T,int m,int n> SYMMETRIC_MATRIX<T,m>
+Symmetric_Times_Transpose(const MATRIX<T,m,n>& a,const MATRIX<T,m,n>& b)
+{return a.Times_Transpose(b).Twice_Symmetric_Part();}
+
+template<class T,int d> SYMMETRIC_MATRIX<T,d>
+Symmetric_Times_Transpose(const MATRIX<T,d>& a,const SYMMETRIC_MATRIX<T,d>& b)
+{return a.Times_Transpose(b).Twice_Symmetric_Part();}
+
+template<class T,int d> SYMMETRIC_MATRIX<T,d>
+Symmetric_Times_Transpose(const SYMMETRIC_MATRIX<T,d>& a,const MATRIX<T,d>& b)
+{return a.Times_Transpose(b).Twice_Symmetric_Part();}
+
+template<class T,int d> SYMMETRIC_MATRIX<T,d>
+Symmetric_Times_Transpose(const SYMMETRIC_MATRIX<T,d>& a,const SYMMETRIC_MATRIX<T,d>& b)
+{return a.Times_Transpose(b).Twice_Symmetric_Part();}
+
+//#####################################################################
+// Function Symmetric_Transpose_Times
+//#####################################################################
+template<class T,int d> SYMMETRIC_MATRIX<T,d>
+Symmetric_Transpose_Times(const SYMMETRIC_MATRIX<T,d>& a,const MATRIX<T,d>& b)
+{return a.Transpose_Times(b).Twice_Symmetric_Part();}
+
+template<class T,int d> SYMMETRIC_MATRIX<T,d>
+Symmetric_Transpose_Times(const SYMMETRIC_MATRIX<T,d>& a,const SYMMETRIC_MATRIX<T,d>& b)
+{return a.Transpose_Times(b).Twice_Symmetric_Part();}
+
+template<class T,int m,int n> SYMMETRIC_MATRIX<T,n>
+Symmetric_Transpose_Times(const MATRIX<T,m,n>& a,const MATRIX<T,m,n>& b)
+{return a.Transpose_Times(b).Twice_Symmetric_Part();}
+
+template<class T,int d> SYMMETRIC_MATRIX<T,d>
+Symmetric_Transpose_Times(const MATRIX<T,d>& a,const SYMMETRIC_MATRIX<T,d>& b)
+{return a.Transpose_Times(b).Twice_Symmetric_Part();}
+
+//#####################################################################
+// Function Times_Self_Transpose
+//#####################################################################
+template<class T,int m,int n> SYMMETRIC_MATRIX<T,m>
+Times_Self_Transpose(const MATRIX<T,m,n>& a)
+{return a.Outer_Product_Matrix();}
+
+template<class T,int d> SYMMETRIC_MATRIX<T,d>
+Times_Self_Transpose(const SYMMETRIC_MATRIX<T,d>& a)
+{return a*a;}
+
+//#####################################################################
+// Function Transpose_Times_Self
+//#####################################################################
+template<class T,int d> SYMMETRIC_MATRIX<T,d>
+Transpose_Times_Self(const MATRIX<T,d>& a)
+{return a.Normal_Equations_Matrix();}
+
+template<class T,int d> SYMMETRIC_MATRIX<T,d>
+Transpose_Times_Self(const SYMMETRIC_MATRIX<T,d>& a)
+{return a*a;}
+
+//#####################################################################
+// Function Symmetric_Outer_Product_Helper
+//#####################################################################
+template<class T,int d> SYMMETRIC_MATRIX<T,d>
+Symmetric_Outer_Product_Helper(const VECTOR<T,d>& u,const VECTOR<T,d>& v)
+{return SYMMETRIC_MATRIX<T,d>::Symmetric_Outer_Product(u,v);}
+
+//#####################################################################
+// Function Outer_Product_Helper
+//#####################################################################
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m>
+Outer_Product_Helper(const TV& u)
+{return SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m>::Outer_Product(u);}
+
 template<class T,int d> inline std::ostream&
 operator<<(std::ostream& o,const SYMMETRIC_MATRIX<T,d>& A)
 {o<<"[";for(int i=0;i<d;i++){for(int j=0;j<d;j++){o<<A(i,j);if(j<d-1) o<<" ";}if(i<d-1) o<<"; ";}o<<"]";return o;}

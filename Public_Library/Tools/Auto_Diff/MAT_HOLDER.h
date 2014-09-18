@@ -95,11 +95,11 @@ Extract(MATRIX<MATRIX<T,m>,d>& ddx,const MAT_HOLDER<OBJ,COL,BASE>& h)
 {EXTRACT_MAT_HELPER<d,0,0>::f(ddx,h);}
 
 template<class TV,int n> struct EMPTY_MAT
-{typedef MAT_HOLDER<ZERO_MAT<TV>,typename EMPTY_VEC_MAT<TV,n-1>::TYPE,typename EMPTY_MAT<TV,n-1>::TYPE> TYPE;};
+{typedef MAT_HOLDER<ZERO_MATRIX<typename TV::SCALAR,TV::m>,typename EMPTY_VEC_MAT<TV,n-1>::TYPE,typename EMPTY_MAT<TV,n-1>::TYPE> TYPE;};
 template<class TV> struct EMPTY_MAT<TV,0> {typedef MAT_END TYPE;};
 
 template<class TV,int n> struct EMPTY_MAT_TEN
-{typedef MAT_HOLDER<ZERO_TENSOR<TV>,typename EMPTY_VEC_TEN<TV,n-1>::TYPE,typename EMPTY_MAT_TEN<TV,n-1>::TYPE> TYPE;};
+{typedef MAT_HOLDER<ZERO_TENSOR<typename TV::SCALAR,TV::m>,typename EMPTY_VEC_TEN<TV,n-1>::TYPE,typename EMPTY_MAT_TEN<TV,n-1>::TYPE> TYPE;};
 template<class TV> struct EMPTY_MAT_TEN<TV,0> {typedef MAT_END TYPE;};
 
 template<class OP,class VEC_OP,class MAT> struct TYPE_MAT_MAP_1;

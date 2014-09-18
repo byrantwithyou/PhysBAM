@@ -15,14 +15,6 @@
 #include <Tools/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 //#####################################################################
-// Struct IS_MATRIX
-//#####################################################################
-template<class T_MATRIX> struct IS_MATRIX {static const bool value=false;};
-template<class T> struct IS_MATRIX<MATRIX_MXN<T> > {static const bool value=true;};
-template<class T> struct IS_MATRIX<SPARSE_MATRIX_NXN<T> > {static const bool value=true;};
-template<class T> struct IS_MATRIX<SPARSE_MATRIX_FLAT_MXN<T> > {static const bool value=true;};
-
-//#####################################################################
 // Class MATRIX_SYSTEM
 //#####################################################################
 template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON=T_MATRIX>

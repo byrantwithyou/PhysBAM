@@ -213,6 +213,13 @@ public:
     {Write_Binary_Array<RW>(output,x,m*n);}
 };
 
+//#####################################################################
+// Function Outer_Product_Helper
+//#####################################################################
+template<class TV> MATRIX<typename TV::SCALAR,TV::m>
+Outer_Product_Helper(const TV& u,const TV& v)
+{return MATRIX<typename TV::SCALAR,TV::m>::Outer_Product(u,v);}
+
 template<class T,int m,int n>
 inline MATRIX<T,m,n> operator*(const T a,const MATRIX<T,m,n>& A)
 {return A*a;}

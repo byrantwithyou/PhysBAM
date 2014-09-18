@@ -13,6 +13,7 @@
 namespace PhysBAM{
 
 template<class T,int d> class VECTOR;
+template<class T,int d> class ZERO_VECTOR;
 
 struct ZERO;
 template<class T> class INTERVAL;
@@ -44,6 +45,10 @@ template<class T,int d,class SCALAR> struct REPLACE_FLOATING_POINT<VECTOR<T,d>,S
 template<class TV,class SCALAR> struct REPLACE_FLOATING_POINT<TWIST<TV>,SCALAR>{typedef TWIST<typename REPLACE_FLOATING_POINT<TV,SCALAR>::TYPE> TYPE;};
 template<class TV,class SCALAR> struct REPLACE_FLOATING_POINT<FRAME<TV>,SCALAR>{typedef FRAME<typename REPLACE_FLOATING_POINT<TV,SCALAR>::TYPE> TYPE;};
 template<class TV,class SCALAR> struct REPLACE_FLOATING_POINT<ROTATION<TV>,SCALAR>{typedef ROTATION<typename REPLACE_FLOATING_POINT<TV,SCALAR>::TYPE> TYPE;};
+
+template<class T> struct IS_VECTOR{static const int value=0;};
+template<class T,int d> struct IS_VECTOR<ZERO_VECTOR<T,d> > {static const int value=1;};
+template<class T,int d> struct IS_VECTOR<VECTOR<T,d> > {static const int value=1;};
 
 }
 #endif

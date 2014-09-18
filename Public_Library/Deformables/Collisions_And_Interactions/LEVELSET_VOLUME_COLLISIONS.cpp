@@ -7,6 +7,7 @@
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Tools/Tensors/TENSOR.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
@@ -20,7 +21,6 @@
 #include <Deformables/Collisions_And_Interactions/LEVELSET_VOLUME_COLLISIONS.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
-using namespace HETERO_DIFF;
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -141,7 +141,7 @@ Triangulate<1>(int number_of_planes,const LEVELSET_VOLUME_COLLISIONS_POLYTOPE& p
 // Function Add_Plane_Edge_Intersection
 //#####################################################################
 template<class T,class TV_VECTOR> static void
-Add_Plane_Edge_Intersection(const VECTOR<int,5>& nodes, const TV_VECTOR& X, VECTOR<T,3>& v, VECTOR<MATRIX<T,3>,5>& dv, MATRIX<TENSOR<VECTOR<T,3> >,5>& ddv)
+Add_Plane_Edge_Intersection(const VECTOR<int,5>& nodes, const TV_VECTOR& X, VECTOR<T,3>& v, VECTOR<MATRIX<T,3>,5>& dv, MATRIX<TENSOR<T,3>,5>& ddv)
 {
     auto p0=From_Var<5,0>(X(nodes(0)));
     auto p1=From_Var<5,1>(X(nodes(1)));
@@ -164,7 +164,7 @@ Add_Plane_Edge_Intersection(const VECTOR<int,5>& nodes, const TV_VECTOR& X, VECT
 // Function Add_Plane_Edge_Intersection
 //#####################################################################
 template<class T,class TV_VECTOR> static void
-Add_Plane_Edge_Intersection(const VECTOR<int,4>& nodes,const TV_VECTOR& X,VECTOR<T,2>& v,VECTOR<MATRIX<T,2>,4>& dv,MATRIX<TENSOR<VECTOR<T,2> >,4>& ddv)
+Add_Plane_Edge_Intersection(const VECTOR<int,4>& nodes,const TV_VECTOR& X,VECTOR<T,2>& v,VECTOR<MATRIX<T,2>,4>& dv,MATRIX<TENSOR<T,2>,4>& ddv)
 {
     auto p0=From_Var<4,0>(X(nodes(0)));
     auto p1=From_Var<4,1>(X(nodes(1)));
@@ -368,13 +368,13 @@ Integrate_Simplex(const SIMPLEX_NODES& simplex,const X_VECTOR& X,const PHI_VECTO
     Calculate_Vertex_Dependencies(simplex,vertex_dependencies,non_particle_vertex_nodes);
     VECTOR<TV,2*TV::m+2> vertex;
     ARRAY<VECTOR<MATRIX<T,TV::m>,TV::m+2> > non_particle_vertex_jacobian;
-    ARRAY<MATRIX<TENSOR<VECTOR<T,TV::m> >,TV::m+2> > non_particle_vertex_tensor;
+    ARRAY<MATRIX<TENSOR<T,TV::m>,TV::m+2> > non_particle_vertex_tensor;
     for(int i=0;i<vertex_dependencies.m;i++){
         int k=vertex_dependencies(i);
         if(k<0){
             TV v;
             VECTOR<MATRIX<T,TV::m>,TV::m+2> dv;
-            MATRIX<TENSOR<VECTOR<T,TV::m> >,TV::m+2> ddv;
+            MATRIX<TENSOR<T,TV::m>,TV::m+2> ddv;
             Add_Plane_Edge_Intersection(non_particle_vertex_nodes(~k),X,v,dv,ddv);
             vertex(i)=v;
             non_particle_vertex_jacobian.Append(dv);
@@ -401,7 +401,7 @@ Integrate_Simplex(const SIMPLEX_NODES& simplex,const X_VECTOR& X,const PHI_VECTO
             for(int l=0;l<TV::m+2;l++){
                 df(npi(l))+=non_particle_vertex_jacobian(~vdi)(l).Transpose_Times(dintegral(i));
                 for(int m=0;m<TV::m+2;m++){
-                    const TENSOR<VECTOR<T,TV::m> >& ten=non_particle_vertex_tensor(~vdi)(l,m);
+                    const TENSOR<T,TV::m>& ten=non_particle_vertex_tensor(~vdi)(l,m);
                     const TV& v=dintegral(i);
                     MATRIX<T,TV::m>& mat=ddf(npi(l),npi(m));
                     for(int i=0;i<TV::m;i++)

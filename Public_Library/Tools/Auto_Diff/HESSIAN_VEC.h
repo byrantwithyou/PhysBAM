@@ -9,11 +9,11 @@
 
 #include <Tools/Auto_Diff/GRADIENT_VEC.h>
 #include <Tools/Auto_Diff/HESSIAN.h>
-#include <Tools/Auto_Diff/PRIMITIVE_MATRICES.h>
-#include <Tools/Auto_Diff/PRIMITIVE_TENSORS.h>
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/PRIMITIVE_MATRICES.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Tools/Tensors/PRIMITIVE_TENSORS.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <cmath>
 namespace PhysBAM{
@@ -64,9 +64,9 @@ typename ENABLE_IF<IS_MATRIX<T_MAT>::value,HESSIAN_VEC<TV,decltype(MAT_CONTRACT_
 {HESSIAN_VEC<TV,decltype(MAT_CONTRACT_0::Type(MAT(),T_MAT()))> r;MAT_CONTRACT_0()(r.x,h.x,v);return r;}
 
 template<class TV,class VEC,class VEC1>
-HESSIAN_VEC<TV,decltype(MAT_SYM_DOUBLE_CONTRACT_12::Type(VEC(),VEC1(),PERM_TENSOR<TV>()))> 
-Symmetric_Double_Contract_12_With_Tensor(const PERM_TENSOR<TV>& t,const GRADIENT_VEC<TV,VEC>& a,const GRADIENT_VEC<TV,VEC1>& b)
-{HESSIAN_VEC<TV,decltype(MAT_SYM_DOUBLE_CONTRACT_12::Type(VEC(),VEC1(),PERM_TENSOR<TV>()))> r;MAT_SYM_DOUBLE_CONTRACT_12()(r.x,a.x,b.x,t);return r;}
+HESSIAN_VEC<TV,decltype(MAT_SYM_DOUBLE_CONTRACT_12::Type(VEC(),VEC1(),PERMUTATION_TENSOR<typename TV::SCALAR>()))> 
+Symmetric_Double_Contract_12_With_Tensor(const PERMUTATION_TENSOR<typename TV::SCALAR>& t,const GRADIENT_VEC<TV,VEC>& a,const GRADIENT_VEC<TV,VEC1>& b)
+{HESSIAN_VEC<TV,decltype(MAT_SYM_DOUBLE_CONTRACT_12::Type(VEC(),VEC1(),PERMUTATION_TENSOR<typename TV::SCALAR>()))> r;MAT_SYM_DOUBLE_CONTRACT_12()(r.x,a.x,b.x,t);return r;}
 }
 }
 

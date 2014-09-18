@@ -103,10 +103,10 @@ Make_Hess(typename TV::SCALAR x,const GRADIENT<TV,VEC>& dx,const HESSIAN<TV,MAT>
 {return AUTO_HESS_EXT<TV,VEC,MAT>(x,dx,ddx);}
 
 template<int n,int i,class TV>
-AUTO_HESS_EXT<TV,typename ONE_NONZERO_VEC<TV,n,i>::TYPE,typename EMPTY_MAT<TV,n>::TYPE>
+AUTO_HESS_EXT<TV,typename ONE_NONZERO_VECTOR<TV,n,i>::TYPE,typename EMPTY_MAT<TV,n>::TYPE>
 From_Var(TV v,int j)
 {
-    AUTO_HESS_EXT<TV,typename ONE_NONZERO_VEC<TV,n,i>::TYPE,typename EMPTY_MAT<TV,n>::TYPE> r(v(j));
+    AUTO_HESS_EXT<TV,typename ONE_NONZERO_VECTOR<TV,n,i>::TYPE,typename EMPTY_MAT<TV,n>::TYPE> r(v(j));
     Set<i>(r.dx.x,TV::Axis_Vector(j));
     return r;
 }
@@ -332,7 +332,7 @@ Make_Hess_Vec(const TV& x,const GRADIENT_VEC<TV,VEC>& dx,const HESSIAN_VEC<TV,MA
 template<class TV,class VEC,class MAT> struct AUTO_HESS_EXT_VEC;
 
 template<class T,class TV,class VEC1,class MAT1,class VEC2,class MAT2>
-decltype(Make_Hess_Vec(TV(),MATRIX<T,3>()*VDX2-MATRIX<T,3>()*VDX1,Contract_0(VDDX1,MATRIX<T,3>())-Contract_0(VDDX2,MATRIX<T,3>())+Symmetric_Double_Contract_12_With_Tensor(PERM_TENSOR<TV >(1),VDX1,VDX2)))
+decltype(Make_Hess_Vec(TV(),MATRIX<T,3>()*VDX2-MATRIX<T,3>()*VDX1,Contract_0(VDDX1,MATRIX<T,3>())-Contract_0(VDDX2,MATRIX<T,3>())+Symmetric_Double_Contract_12_With_Tensor(PERMUTATION_TENSOR<T>(1),VDX1,VDX2)))
 Cross_Helper(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2>& b);
 
 template<class TV,class VEC1,class MAT1,class VEC2,class MAT2>
@@ -420,11 +420,11 @@ struct AUTO_HESS_EXT_VEC
 
 
 template<class T,class TV,class VEC1,class MAT1,class VEC2,class MAT2>
-decltype(Make_Hess_Vec(TV(),MATRIX<T,3>()*VDX2-MATRIX<T,3>()*VDX1,Contract_0(VDDX1,MATRIX<T,3>())-Contract_0(VDDX2,MATRIX<T,3>())+Symmetric_Double_Contract_12_With_Tensor(PERM_TENSOR<TV >(1),VDX1,VDX2)))
+decltype(Make_Hess_Vec(TV(),MATRIX<T,3>()*VDX2-MATRIX<T,3>()*VDX1,Contract_0(VDDX1,MATRIX<T,3>())-Contract_0(VDDX2,MATRIX<T,3>())+Symmetric_Double_Contract_12_With_Tensor(PERMUTATION_TENSOR<T>(1),VDX1,VDX2)))
 Cross_Helper(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2>& b)
 {
     MATRIX<T,TV::m> cp_t=MATRIX<T,TV::m>::Cross_Product_Matrix(a.x),cp_a=MATRIX<T,TV::m>::Cross_Product_Matrix(b.x);
-    return Make_Hess_Vec(a.x.Cross(b.x),cp_t*b.dx-cp_a*a.dx,Contract_0(a.ddx,cp_a)-Contract_0(b.ddx,cp_t)+Symmetric_Double_Contract_12_With_Tensor(PERM_TENSOR<TV>(1),a.dx,b.dx));
+    return Make_Hess_Vec(a.x.Cross(b.x),cp_t*b.dx-cp_a*a.dx,Contract_0(a.ddx,cp_a)-Contract_0(b.ddx,cp_t)+Symmetric_Double_Contract_12_With_Tensor(PERMUTATION_TENSOR<T>(1),a.dx,b.dx));
 }
 
 template<class TV,class VEC1,class MAT1,class VEC2,class MAT2>
@@ -440,8 +440,8 @@ Make_Hess_Vec(const TV& x,const GRADIENT_VEC<TV,VEC>& dx,const HESSIAN_VEC<TV,MA
 {return AUTO_HESS_EXT_VEC<TV,VEC,MAT>(x,dx,ddx);}
 
 template<int n,int i,class TV> inline
-AUTO_HESS_EXT_VEC<TV,typename ONE_NONZERO_VEC_MAT<TV,n,i>::TYPE,typename EMPTY_MAT_TEN<TV,n>::TYPE> From_Var(TV v)
-{return AUTO_HESS_EXT_VEC<TV,typename ONE_NONZERO_VEC_MAT<TV,n,i>::TYPE,typename EMPTY_MAT_TEN<TV,n>::TYPE>(v);}
+AUTO_HESS_EXT_VEC<TV,typename ONE_NONZERO_VECTOR_MAT<TV,n,i>::TYPE,typename EMPTY_MAT_TEN<TV,n>::TYPE> From_Var(TV v)
+{return AUTO_HESS_EXT_VEC<TV,typename ONE_NONZERO_VECTOR_MAT<TV,n,i>::TYPE,typename EMPTY_MAT_TEN<TV,n>::TYPE>(v);}
 
 template<class TV,class VEC,class MAT> inline decltype(Make_Hess_Vec(TV(),Outer_Product(TV(),DX),Tensor_Product_0(DDX,TV())))
 operator*(const AUTO_HESS_EXT<TV,VEC,MAT>& a,TV v)
