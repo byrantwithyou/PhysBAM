@@ -110,15 +110,34 @@ Advance_One_Time_Step(bool first_step)
     T dt=example.dt;
     example.Begin_Time_Step(time);
     Assert_Advection_CFL(example.face_velocities,dt);
-    example.Get_Velocities(time+dt);
+    example.face_velocities.Exchange(example.prev_face_velocities);
+    example.Get_Velocities(time);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before stress evolution",0,1);
-    Advection(dt,first_step,first_step-1,1);
-    example.polymer_stress.Exchange(example.prev_polymer_stress);
+
+    if(!first_step){
+        example.polymer_stress.Exchange(next_polymer_stress);
+        Advection(dt,first_step,first_step-1,0);
+        example.prev_polymer_stress.Exchange(next_polymer_stress);}
+    else example.prev_polymer_stress=example.polymer_stress;
+
+    Add_Body_Stress(first_step,dt);
+
+    Advection(dt,first_step,0,1);
     example.polymer_stress.Exchange(next_polymer_stress);
+
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after stress evolution",0,1);
     example.time=time+=dt;
     Extrapolate_Stress(example.polymer_stress);
     example.End_Time_Step(time);
+}
+//#####################################################################
+// Function Add_Body_Stress
+//#####################################################################
+template<class TV> void STRESS_DRIVER<TV>::
+Add_Body_Stress(bool first_step,T dt)
+{
+    for(CELL_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next())
+        example.polymer_stress(it.index)+=(2-first_step)*dt*example.Polymer_Stress_Forcing_Term(it.Location(),time);
 }
 //#####################################################################
 // Function Advection
@@ -133,7 +152,7 @@ Advection(T dt,bool one_step,int from_time,int to_time) // -1 = n-1, 0 = n, 1 = 
     FACE_LOOKUP_UNIFORM<TV> lookup_face_velocities(example.face_velocities);
 
     const ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S_src=from_time?example.prev_polymer_stress:example.polymer_stress;
-    ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S_dst=from_time?next_polymer_stress:example.polymer_stress;
+    ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S_dst=to_time?next_polymer_stress:example.polymer_stress;
 
     if(one_step){
         quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,S_dst,S_src,lookup_face_velocities,boundary_S,(to_time-from_time)*dt,time+to_time*dt);

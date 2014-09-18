@@ -41,6 +41,7 @@ public:
     void Advection(T dt,bool one_step,int from_time,int to_time);
     void Extrapolate_Stress(ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S);
     void Assert_Advection_CFL(const ARRAY<T,FACE_INDEX<TV::m> >& u,T dt) const;
+    void Add_Body_Stress(bool first_step,T dt);
 //#####################################################################
 };
 }

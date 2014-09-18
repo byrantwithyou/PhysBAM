@@ -136,6 +136,42 @@ Initialize_Common_Example()
             analytic_velocity=new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),typename TV::SPIN()+1,1);
             analytic_polymer_stress=new ANALYTIC_POLYMER_STRESS_ROTATION<TV>(new ANALYTIC_POLYMER_1,TV(),typename TV::SPIN()+1);
             break;
+        case 3:
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+            analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),.8,1,0);
+            analytic_velocity=new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),typename TV::SPIN()+1,1);
+            analytic_polymer_stress=new ANALYTIC_POLYMER_1;
+            break;
+        case 4:
+            struct ANALYTIC_POLYMER_4:public ANALYTIC_POLYMER_STRESS<TV>
+            {
+                ANALYTIC_POLYMER_4(){}
+                ~ANALYTIC_POLYMER_4() {}
+                virtual T_MAT S(const TV& X,T t) const {return T_MAT::Outer_Product(sin(X))*(2+sin(t));}
+                virtual T_MAT dSdX(const TV& X,T t,int a) const
+                {return T_MAT::Symmetric_Outer_Product(sin(X),TV::Axis_Vector(a)*cos(X(a)))*(2+sin(t));}
+                virtual T_MAT dSdt(const TV& X,T t) const {return T_MAT::Outer_Product(sin(X))*cos(t);}
+            };
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+            analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),.8,1,0);
+            analytic_velocity=new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),typename TV::SPIN()+1,1);
+            analytic_polymer_stress=new ANALYTIC_POLYMER_4;
+            break;
+        case 5:
+            struct ANALYTIC_VELOCITY_5:public ANALYTIC_VELOCITY<TV>
+            {
+                typedef typename TV::SCALAR T;
+                TV c;
+                typename TV::SPIN w;
+                ANALYTIC_VELOCITY_5(TV cc,typename TV::SPIN ww,T rho): c(cc),w(ww){}
+                virtual TV u(const TV& X,T t) const {return w.Cross(X-c)*(1+sin(t));}
+                virtual MATRIX<T,TV::m> du(const TV& X,T t) const {return MATRIX<T,TV::m>::Cross_Product_Matrix(w)*(1+sin(t));}
+            };
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+            analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),.8,1,0);
+            analytic_velocity=new ANALYTIC_VELOCITY_5(TV(),typename TV::SPIN()+1,1);
+            analytic_polymer_stress=new ANALYTIC_POLYMER_4;
+            break;
         default: return false;}
     return true;
 }
@@ -279,7 +315,10 @@ Polymer_Stress(const TV& X,T time)
 template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> FLUID_STRESS_BASE<TV>::
 Polymer_Stress_Forcing_Term(const TV& X,T time)
 {
-    return SYMMETRIC_MATRIX<T,TV::m>();
+    SYMMETRIC_MATRIX<T,TV::m> m;
+    TV u=analytic_velocity->u(X,time);
+    for(int i=0;i<TV::m;i++) m+=u(i)*analytic_polymer_stress->dSdX(X,time,i);
+    return m+analytic_polymer_stress->dSdt(X,time);
 }
 //#####################################################################
 // Function Volume_Force
