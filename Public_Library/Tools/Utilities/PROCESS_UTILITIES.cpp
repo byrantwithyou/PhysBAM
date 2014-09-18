@@ -20,11 +20,11 @@
 #pragma comment(lib,"psapi")
 #elif defined(__linux__) || defined(__APPLE__)
 #include <csignal>
-#include <unistd.h>
 #include <execinfo.h>
 #include <fenv.h>
 #include <sys/resource.h>
 #include <sys/time.h>
+#include <unistd.h>
 #endif
 #ifdef __APPLE__
 #include <xmmintrin.h>
