@@ -117,10 +117,6 @@ Smooth_Fit(B_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X)
 template<class TV> void PhysBAM::
 Smooth_Fit_Loop(B_SPLINE<TV,3>& bs,ARRAY_VIEW<TV> X)
 {
-    // X.m knots, equally spaced
-    // matrix with 2/3 on diagonal, 1/6 above&below and in corners
-    // How do I solve a matrix like that in PhysBAM?
-    // Also: the current Evaluate function will cry if we give it that knot list.
     typedef typename TV::SCALAR T;
     ARRAY<TV> rhs(X.m);
     BANDED_MATRIX<T,3> matrix(X.m);
