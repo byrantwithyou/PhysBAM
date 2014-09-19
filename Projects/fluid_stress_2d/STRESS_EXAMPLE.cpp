@@ -15,7 +15,7 @@ template<class TV> STRESS_EXAMPLE<TV>::
 STRESS_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),initial_time(0),last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     write_output_files(true),output_directory("output"),restart(0),number_of_ghost_cells(5),dt(1),time(0),
-    time_steps_per_frame(1),use_advection(true),use_reduced_advection(true),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
+    time_steps_per_frame(1),use_advection(true),use_reduced_advection(true),inv_Wi(0),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
     levelset(grid,bc_phi,number_of_ghost_cells),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
     debug_particles.debug_particles.template Add_Array<TV>(ATTRIBUTE_ID_V);

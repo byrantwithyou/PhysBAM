@@ -120,7 +120,7 @@ Advance_One_Time_Step(bool first_step)
         example.prev_polymer_stress.Exchange(next_polymer_stress);}
     else example.prev_polymer_stress=example.polymer_stress;
 
-    Add_Body_Stress(first_step,dt);
+    Add_RHS_Terms((2-first_step)*dt);
 
     Advection(dt,first_step,0,1);
     example.polymer_stress.Exchange(next_polymer_stress);
@@ -134,10 +134,23 @@ Advance_One_Time_Step(bool first_step)
 // Function Add_Body_Stress
 //#####################################################################
 template<class TV> void STRESS_DRIVER<TV>::
-Add_Body_Stress(bool first_step,T dt)
+Add_RHS_Terms(T dt)
 {
-    for(CELL_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next())
-        example.polymer_stress(it.index)+=(2-first_step)*dt*example.Polymer_Stress_Forcing_Term(it.Location(),time);
+    for(CELL_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next()){
+        MATRIX<T,TV::m> du;
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> f0=it.Full_First_Face_Index(a),f1=it.Full_Second_Face_Index(a);
+            du(a,a)=(example.face_velocities(f1)-example.face_velocities(f0))*example.grid.one_over_dX(a);
+            for(int b=0;b<TV::m;b++)
+                if(b!=a){
+                    FACE_INDEX<TV::m> f0a(f0),f0b(f0),f1a(f1),f1b(f1);
+                    f0a.index(b)--;
+                    f0b.index(b)++;
+                    f1a.index(b)--;
+                    f1b.index(b)++;
+                    du(a,b)=(example.face_velocities(f0b)-example.face_velocities(f0a)+example.face_velocities(f1b)-example.face_velocities(f1a))*((T).25*example.grid.one_over_dX(b));}}
+        SYMMETRIC_MATRIX<T,TV::m> S=example.prev_polymer_stress(it.index),M=(du*S).Twice_Symmetric_Part()+example.inv_Wi*(S-1);
+        example.polymer_stress(it.index)+=dt*(M+example.Polymer_Stress_Forcing_Term(it.Location(),time));}
 }
 //#####################################################################
 // Function Advection

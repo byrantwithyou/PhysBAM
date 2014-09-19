@@ -171,6 +171,7 @@ Initialize_Common_Example()
             analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),.8,1,0);
             analytic_velocity=new ANALYTIC_VELOCITY_5(TV(),typename TV::SPIN()+1,1);
             analytic_polymer_stress=new ANALYTIC_POLYMER_4;
+            inv_Wi=(T).5;
             break;
         default: return false;}
     return true;
@@ -315,18 +316,11 @@ Polymer_Stress(const TV& X,T time)
 template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> FLUID_STRESS_BASE<TV>::
 Polymer_Stress_Forcing_Term(const TV& X,T time)
 {
-    SYMMETRIC_MATRIX<T,TV::m> m;
+    SYMMETRIC_MATRIX<T,TV::m> m,S=analytic_polymer_stress->S(X,time);
+    MATRIX<T,TV::m> du=analytic_velocity->du(X,time);
     TV u=analytic_velocity->u(X,time);
     for(int i=0;i<TV::m;i++) m+=u(i)*analytic_polymer_stress->dSdX(X,time,i);
-    return m+analytic_polymer_stress->dSdt(X,time);
-}
-//#####################################################################
-// Function Volume_Force
-//#####################################################################
-template<class TV> TV FLUID_STRESS_BASE<TV>::
-Volume_Force(const TV& X,T time)
-{
-    return TV();
+    return m+analytic_polymer_stress->dSdt(X,time)-(du*S).Twice_Symmetric_Part()-inv_Wi*(S-1);
 }
 //#####################################################################
 template class FLUID_STRESS_BASE<VECTOR<float,2> >;

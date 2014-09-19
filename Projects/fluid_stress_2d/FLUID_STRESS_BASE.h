@@ -49,7 +49,7 @@ public:
     using BASE::grid;using BASE::output_directory;using BASE::face_velocities;using BASE::write_substeps_level;
     using BASE::restart;using BASE::last_frame;using BASE::dt;using BASE::levelset;
     using BASE::time_steps_per_frame;using BASE::substeps_delay_frame;using BASE::polymer_stress;
-    using BASE::number_of_ghost_cells;
+    using BASE::number_of_ghost_cells;using BASE::inv_Wi;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -101,7 +101,6 @@ public:
     MATRIX<T,TV::m> Stress(const TV& X,T time);
     SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress(const TV& X,T time);
     SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress_Forcing_Term(const TV& X,T time);
-    TV Volume_Force(const TV& X,T time);
 //#####################################################################
 };
 }

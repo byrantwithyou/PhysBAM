@@ -34,6 +34,7 @@ public:
     bool use_advection;
     bool use_reduced_advection;
     BC_TYPE bc_type;
+    T inv_Wi;
 
     GRID<TV> grid;
     ARRAY<T,TV_INT> bc_phi;
