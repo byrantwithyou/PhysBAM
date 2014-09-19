@@ -55,6 +55,7 @@ public:
 
     int test_number;
     int resolution;
+    int parameter;
     int stored_last_frame;
     bool user_last_frame;
     T unit_mu,unit_rho,unit_st,unit_p;

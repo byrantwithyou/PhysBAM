@@ -31,6 +31,7 @@
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
+#include "ADVECTION_UPWIND.h"
 #include "STRESS_DRIVER.h"
 #include "STRESS_EXAMPLE.h"
 #include <boost/function.hpp>
@@ -120,6 +121,7 @@ Advance_One_Time_Step(bool first_step)
         example.prev_polymer_stress.Exchange(next_polymer_stress);}
     else example.prev_polymer_stress=example.polymer_stress;
 
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("middle",0,1);
     Add_RHS_Terms((2-first_step)*dt);
 
     Advection(dt,first_step,0,1);
@@ -158,7 +160,8 @@ Add_RHS_Terms(T dt)
 template<class TV> void STRESS_DRIVER<TV>::
 Advection(T dt,bool one_step,int from_time,int to_time) // -1 = n-1, 0 = n, 1 = n+1
 {
-    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m>,AVERAGING_UNIFORM<TV>,QUADRATIC_INTERPOLATION_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m> > > quadratic_advection;
+    typedef QUADRATIC_INTERPOLATION_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m> > S_INT;
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m>,AVERAGING_UNIFORM<TV>,S_INT > quadratic_advection;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T,AVERAGING_UNIFORM<TV>,LINEAR_INTERPOLATION_UNIFORM<TV,T> > linear_advection;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
     BOUNDARY_MAC_GRID_PERIODIC<TV,SYMMETRIC_MATRIX<T,TV::m> > boundary_S;
@@ -167,8 +170,12 @@ Advection(T dt,bool one_step,int from_time,int to_time) // -1 = n-1, 0 = n, 1 = 
     const ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S_src=from_time?example.prev_polymer_stress:example.polymer_stress;
     ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S_dst=to_time?next_polymer_stress:example.polymer_stress;
 
+    ADVECTION_UPWIND<TV,SYMMETRIC_MATRIX<T,TV::m>,S_INT> au(example.levelset,example.face_velocities,example.grid.dX.Max()*2,
+        example.grid.dX.Max()*3,[&](const TV& X,T time){return example.Polymer_Stress(X,time);},time+from_time*dt);
+
     if(one_step){
-        quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,S_dst,S_src,lookup_face_velocities,boundary_S,(to_time-from_time)*dt,time+to_time*dt);
+        au.Update_Advection_Equation_Cell_Lookup(example.grid,S_dst,S_src,lookup_face_velocities,boundary_S,
+            (to_time-from_time)*dt,time+to_time*dt);
         return;}
 
     ARRAY<T,FACE_INDEX<TV::dimension> >* u=&temp_face_velocities;
@@ -179,8 +186,10 @@ Advection(T dt,bool one_step,int from_time,int to_time) // -1 = n-1, 0 = n, 1 = 
         temp_face_velocities.Copy(-a,example.prev_face_velocities,1+a,example.face_velocities);}
     FACE_LOOKUP_UNIFORM<TV> lookup_temp(temp_face_velocities2);
 
-    linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp_face_velocities2,*u,lookup_face_velocities,boundary,(to_time-from_time)*dt/2,time+(from_time+to_time)*dt/2);
-    quadratic_advection.Update_Advection_Equation_Cell_Lookup(example.grid,S_dst,S_src,lookup_temp,boundary_S,(to_time-from_time)*dt,time+to_time*dt);
+    linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp_face_velocities2,*u,lookup_face_velocities,
+        boundary,(to_time-from_time)*dt/2,time+(from_time+to_time)*dt/2);
+    au.Update_Advection_Equation_Cell_Lookup(example.grid,S_dst,S_src,lookup_temp,boundary_S,(to_time-from_time)*dt,
+        time+to_time*dt);
 }
 //#####################################################################
 // Function Assert_Advection_CFL

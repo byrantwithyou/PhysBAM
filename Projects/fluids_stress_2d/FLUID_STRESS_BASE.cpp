@@ -37,7 +37,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> FLUID_STRESS_BASE<TV>::
 FLUID_STRESS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-    :STRESS_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),
+    :STRESS_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),parameter(0),stored_last_frame(0),user_last_frame(false),
     unit_mu(0),unit_rho(0),unit_st(0),unit_p(0),weiss(1),weiss_inv(1),m(1),s(1),kg(1),
     bc_n(false),bc_d(false),test_analytic_diff(false),refine(1),analytic_initial_only(false),
     number_of_threads(1),override_output_directory(false)
@@ -61,6 +61,7 @@ FLUID_STRESS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     parse_args.Add("-refine",&refine,"num","Refine space/time by this factor");
     parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
     parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
+    parse_args.Add("-parameter",&parameter,"param","Extra parameter");
     parse_args.Parse(true);
 
     resolution*=refine;
@@ -171,6 +172,40 @@ Initialize_Common_Example()
             analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),.8,1,0);
             analytic_velocity=new ANALYTIC_VELOCITY_5(TV(),typename TV::SPIN()+1,1);
             analytic_polymer_stress=new ANALYTIC_POLYMER_4;
+            inv_Wi=(T).5;
+            break;
+        case 6:
+            struct ANALYTIC_VELOCITY_6:public ANALYTIC_VELOCITY<TV>
+            {
+                typedef typename TV::SCALAR T;
+                T xl,xq,tl,tq;
+                TV con;
+                MATRIX<T,TV::m> lin;
+                typename TV::SPIN w;
+                ANALYTIC_VELOCITY_6(T xl,T xq,T tl,T tq): xl(xl),xq(xq),tl(tl),tq(tq),con(.2,.5),lin(.2,-.1,.5,-.7) {}
+                virtual TV u(const TV& X,T t) const {return (con+lin*X*xl+con.Dot(X)*X*xq)*(1+t*tl+t*t*tq);}
+                virtual MATRIX<T,TV::m> du(const TV& X,T t) const
+                {return (lin*xl+con.Dot(X)*xq+MATRIX<T,TV::m>::Outer_Product(X,con)*xq)*(1+t*tl+t*t*tq);}
+            };
+            struct ANALYTIC_POLYMER_6:public ANALYTIC_POLYMER_STRESS<TV>
+            {
+                T xl,xq,tl,tq;
+                T_MAT con;
+                TV vec;
+                ANALYTIC_POLYMER_6(T xl,T xq,T tl,T tq): xl(xl),xq(xq),tl(tl),tq(tq)
+                {for(int i=0;i<TV::m;i++) for(int j=i;j<TV::m;j++) con(i,j)=(i+j)%3*(T).3;vec=con.Row(0);}
+                ~ANALYTIC_POLYMER_6() {}
+                virtual T_MAT S(const TV& X,T t) const
+                {return (con+con*vec.Dot(X)*xl+T_MAT::Outer_Product(X)*xq)*(1-(T).5*t*tl+(T).3*t*t*tq);}
+                virtual T_MAT dSdX(const TV& X,T t,int a) const
+                {return (con*vec(a)*xl+T_MAT::Symmetric_Outer_Product(X,TV::Axis_Vector(a))*xq)*(1-(T).5*t*tl+(T).3*t*t*tq);}
+                virtual T_MAT dSdt(const TV& X,T t) const
+                {return (con+con*vec.Dot(X)*xl+T_MAT::Outer_Product(X)*xq)*(-(T).5*tl+(T).6*t*tq);}
+            };
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+            analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),.8,1,0);
+            analytic_velocity=new ANALYTIC_VELOCITY_6((parameter>>0)&1,(parameter>>4)&1,(parameter>>1)&1,(parameter>>5)&1);
+            analytic_polymer_stress=new ANALYTIC_POLYMER_6((parameter>>2)&1,(parameter>>6)&1,(parameter>>3)&1,(parameter>>7)&1);
             inv_Wi=(T).5;
             break;
         default: return false;}
