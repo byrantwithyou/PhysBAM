@@ -94,7 +94,7 @@ Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& Z,const T
     Add_Debug_Particle(Y-N*offset,VECTOR<T,3>(1,1,1));
     Add_Debug_Particle(Y-N*offset*2,VECTOR<T,3>(1,1,1));
 
-    T2 A=bc_Z(Y,time);
+    T2 A=bc_Z(Y+V*dt,time);
     T2 B=Z_INTERP().Clamped_To_Array(grid,Z,Y-N*offset);
     T2 C=Z_INTERP().Clamped_To_Array(grid,Z,Y-N*offset*2);
     T t=c/(2*offset);

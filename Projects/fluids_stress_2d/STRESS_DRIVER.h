@@ -38,7 +38,7 @@ public:
     void Simulate_To_Frame(const int frame_input);
     void Write_Output_Files(const int frame);
     void Write_Substep(const std::string& title,const int substep,const int level=0);
-    void Advection(T dt,bool one_step,int from_time,int to_time);
+    void Advection(T dt,bool one_step,int from_time,int to_time,int bc_time);
     void Extrapolate_Stress(ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S);
     void Assert_Advection_CFL(const ARRAY<T,FACE_INDEX<TV::m> >& u,T dt) const;
     void Add_RHS_Terms(T dt);

@@ -26,7 +26,7 @@ public:
 
     const LEVELSET<TV>& levelset;
     const T_FACE_LOOKUP& face_velocities;
-    T max_in,max_out,time;
+    T max_in,max_out,time,dt;
     boost::function<T2(const TV& X,T time)> bc_Z;
 
     ADVECTION_UPWIND(const LEVELSET<TV>& levelset,const T_FACE_LOOKUP& face_velocities,T max_in,T max_out,

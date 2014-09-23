@@ -117,14 +117,14 @@ Advance_One_Time_Step(bool first_step)
 
     if(!first_step){
         example.polymer_stress.Exchange(next_polymer_stress);
-        Advection(dt,first_step,first_step-1,0);
+        Advection(dt,first_step,first_step-1,0,first_step-1);
         example.prev_polymer_stress.Exchange(next_polymer_stress);}
     else example.prev_polymer_stress=example.polymer_stress;
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP("middle",0,1);
     Add_RHS_Terms((2-first_step)*dt);
 
-    Advection(dt,first_step,0,1);
+    Advection(dt,first_step,0,1,1);
     example.polymer_stress.Exchange(next_polymer_stress);
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after stress evolution",0,1);
@@ -160,7 +160,7 @@ Add_RHS_Terms(T dt)
 // Function Advection
 //#####################################################################
 template<class TV> void STRESS_DRIVER<TV>::
-Advection(T dt,bool one_step,int from_time,int to_time) // -1 = n-1, 0 = n, 1 = n+1
+Advection(T dt,bool one_step,int from_time,int to_time,int bc_time) // -1 = n-1, 0 = n, 1 = n+1
 {
     typedef QUADRATIC_INTERPOLATION_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m> > S_INT;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m>,AVERAGING_UNIFORM<TV>,S_INT > quadratic_advection;
@@ -173,7 +173,8 @@ Advection(T dt,bool one_step,int from_time,int to_time) // -1 = n-1, 0 = n, 1 = 
     ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S_dst=to_time?next_polymer_stress:example.polymer_stress;
 
     ADVECTION_UPWIND<TV,SYMMETRIC_MATRIX<T,TV::m>,S_INT> au(example.levelset,example.face_velocities,example.grid.dX.Max()*2,
-        example.grid.dX.Max()*3,[&](const TV& X,T time){return example.Polymer_Stress(X,time);},time+from_time*dt);
+        example.grid.dX.Max()*3,[&](const TV& X,T time){return example.Polymer_Stress(X,time);},time+dt*bc_time);
+    au.dt=dt*(bc_time-from_time);
 
     if(one_step){
         au.Update_Advection_Equation_Cell_Lookup(example.grid,S_dst,S_src,lookup_face_velocities,boundary_S,
