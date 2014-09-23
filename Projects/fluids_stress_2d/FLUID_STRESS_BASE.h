@@ -49,7 +49,7 @@ public:
     using BASE::grid;using BASE::output_directory;using BASE::face_velocities;using BASE::write_substeps_level;
     using BASE::restart;using BASE::last_frame;using BASE::dt;using BASE::levelset;
     using BASE::time_steps_per_frame;using BASE::substeps_delay_frame;using BASE::polymer_stress;
-    using BASE::number_of_ghost_cells;using BASE::inv_Wi;
+    using BASE::number_of_ghost_cells;using BASE::inv_Wi;using BASE::use_du_terms;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -74,7 +74,8 @@ public:
     bool override_surface_tension;
     bool use_pls_over_levelset;
     bool use_levelset_over_pls;
-    
+    bool use_inv_Wi;
+
     TV gravity;
 
     ANALYTIC_VELOCITY<TV>* analytic_velocity;

@@ -139,19 +139,21 @@ template<class TV> void STRESS_DRIVER<TV>::
 Add_RHS_Terms(T dt)
 {
     for(CELL_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next()){
-        MATRIX<T,TV::m> du;
-        for(int a=0;a<TV::m;a++){
-            FACE_INDEX<TV::m> f0=it.Full_First_Face_Index(a),f1=it.Full_Second_Face_Index(a);
-            du(a,a)=(example.face_velocities(f1)-example.face_velocities(f0))*example.grid.one_over_dX(a);
-            for(int b=0;b<TV::m;b++)
-                if(b!=a){
-                    FACE_INDEX<TV::m> f0a(f0),f0b(f0),f1a(f1),f1b(f1);
-                    f0a.index(b)--;
-                    f0b.index(b)++;
-                    f1a.index(b)--;
-                    f1b.index(b)++;
-                    du(a,b)=(example.face_velocities(f0b)-example.face_velocities(f0a)+example.face_velocities(f1b)-example.face_velocities(f1a))*((T).25*example.grid.one_over_dX(b));}}
-        SYMMETRIC_MATRIX<T,TV::m> S=example.prev_polymer_stress(it.index),M=(du*S).Twice_Symmetric_Part()+example.inv_Wi*(S-1);
+        SYMMETRIC_MATRIX<T,TV::m> S=example.prev_polymer_stress(it.index),M=example.inv_Wi*(S-1);
+        if(example.use_du_terms){
+            MATRIX<T,TV::m> du;
+            for(int a=0;a<TV::m;a++){
+                FACE_INDEX<TV::m> f0=it.Full_First_Face_Index(a),f1=it.Full_Second_Face_Index(a);
+                du(a,a)=(example.face_velocities(f1)-example.face_velocities(f0))*example.grid.one_over_dX(a);
+                for(int b=0;b<TV::m;b++)
+                    if(b!=a){
+                        FACE_INDEX<TV::m> f0a(f0),f0b(f0),f1a(f1),f1b(f1);
+                        f0a.index(b)--;
+                        f0b.index(b)++;
+                        f1a.index(b)--;
+                        f1b.index(b)++;
+                        du(a,b)=(example.face_velocities(f0b)-example.face_velocities(f0a)+example.face_velocities(f1b)-example.face_velocities(f1a))*((T).25*example.grid.one_over_dX(b));}}
+            M+=(du*S).Twice_Symmetric_Part();}
         example.polymer_stress(it.index)+=dt*(M+example.Polymer_Stress_Forcing_Term(it.Location(),time));}
 }
 //#####################################################################
