@@ -64,7 +64,7 @@ std::string Get_Working_Directory()
 #elif defined(__linux__) || defined(__CYGWIN__) || defined(__APPLE__)
 
 bool Directory_Exists(const std::string& dirname)
-{return std::ifstream(dirname.c_str())!=0;}
+{return !std::ifstream(dirname.c_str()).fail();}
 
 bool Create_Directory(const std::string& dirname)
 {if(!Directory_Exists(dirname)){
