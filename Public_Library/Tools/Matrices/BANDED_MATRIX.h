@@ -35,6 +35,7 @@ public:
     template<class T2> void Givens_Shift_Diagonal(ARRAY<T2>& u);
     template<class T2> void Backsolve(ARRAY<T2>& u) const;
     template<class T2> void QR_Solve(ARRAY<T2>& u);
+    template<class T2> void QR_Solve(ARRAY<ARRAY<T2>>& u);
 //#####################################################################
 };
 }
