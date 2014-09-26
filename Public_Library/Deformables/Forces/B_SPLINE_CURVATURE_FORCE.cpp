@@ -193,7 +193,8 @@ Update_Position_Based_State(const T time,const bool is_position_update)
             auto N=rot*phi_p;
             auto xi=N.Dot(phi_pp);
             auto kappa=m_hat*xi;
-            auto tau=kappa-dat.kappa0(j);
+//            auto tau=kappa-dat.kappa0(j);
+            auto tau=atan2(kappa,1)-atan2(dat.kappa0(j),1);
             auto curvature_pe=curvature_stiffness/2*sqr(tau);
             auto dl=length/dat.length0(j)-1;
             auto length_pe=length_stiffness/2*sqr(dl);
