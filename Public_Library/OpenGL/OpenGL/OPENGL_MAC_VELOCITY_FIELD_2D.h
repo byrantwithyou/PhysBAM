@@ -25,14 +25,14 @@ public:
     enum VELOCITY_MODE { FACE_CENTERED, CELL_CENTERED };
     VELOCITY_MODE velocity_mode;
 
-    GRID<TV> &grid;
-    ARRAY<T,FACE_INDEX<2> > &face_velocities;
+    GRID<TV> grid;
+    ARRAY<T,FACE_INDEX<2> > face_velocities;
     ARRAY_VIEW<T,VECTOR<int,2> > &u,&v;
     ARRAY<TV> vector_field,vector_locations;
     ARRAY<bool,TV_INT> *active_cells;
     ARRAY<bool,FACE_INDEX<TV::m> > *active_faces;
 
-    OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid,ARRAY<T,FACE_INDEX<2> > &face_velocities_input,ARRAY<bool,TV_INT> *active_cells_input=0,ARRAY<bool,FACE_INDEX<TV::m> > *active_faces_input=0);
+    OPENGL_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid_input,ARRAY<bool,TV_INT> *active_cells_input=0,ARRAY<bool,FACE_INDEX<TV::m> > *active_faces_input=0);
     virtual ~OPENGL_MAC_VELOCITY_FIELD_2D();
 
     void Update();  // Call when grid/u/v change

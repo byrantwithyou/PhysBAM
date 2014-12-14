@@ -5,6 +5,7 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -12,7 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class T2,class RW> OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T2,RW>::
 OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(const GRID<TV> &grid_input, const std::string &values_filename_input, OPENGL_COLOR_MAP<T2>* color_map_input)
-    :OPENGL_COMPONENT<T>("Face Scalar Field 2D"), opengl_scalar_field(grid_input,*new ARRAY<T2,FACE_INDEX<2> >,color_map_input),
+    :OPENGL_COMPONENT<T>("Face Scalar Field 2D"), opengl_scalar_field(grid_input,opengl_scalar_field_data,color_map_input),
     values_filename(values_filename_input), x_face_values_filename(""), y_face_values_filename(""),  frame_loaded(-1), valid(false)
 {
     is_animation = FILE_UTILITIES::Is_Animated(values_filename);
@@ -24,7 +25,7 @@ OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(const GRID<TV> &grid_input, const std::str
 template<class T,class T2,class RW> OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T2,RW>::
 OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(const GRID<TV> &grid_input, const std::string &x_face_values_filename_input, const std::string &y_face_values_filename_input,
                                       OPENGL_COLOR_MAP<T2>* color_map_input)
-    :OPENGL_COMPONENT<T>("Face Scalar Field 2D"), opengl_scalar_field(grid_input,*new ARRAY<T2,FACE_INDEX<2> >,color_map_input),
+    :OPENGL_COMPONENT<T>("Face Scalar Field 2D"), opengl_scalar_field(grid_input,opengl_scalar_field_data,color_map_input),
     values_filename(), x_face_values_filename(x_face_values_filename_input), y_face_values_filename(y_face_values_filename_input),
     frame_loaded(-1), valid(false)
 {
@@ -37,8 +38,6 @@ OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(const GRID<TV> &grid_input, const std::str
 template<class T,class T2,class RW> OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T2,RW>::
 ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D()
 {
-    delete &opengl_scalar_field.x_face_values;
-    delete &opengl_scalar_field.y_face_values;
 }
 //#####################################################################
 // Function Valid_Frame

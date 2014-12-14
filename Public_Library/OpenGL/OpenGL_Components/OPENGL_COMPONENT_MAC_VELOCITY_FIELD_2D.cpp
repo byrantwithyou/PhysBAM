@@ -62,7 +62,8 @@ Initialize(const ARRAY<GRID<TV>*> &grid_array_input)
     else velocity_filename=FILE_UTILITIES::Get_Short_Name(velocity_filename);
 
     opengl_adaptive_mac_velocity_fields.Resize(number_of_levels);
-    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(*(new GRID<TV>(*grid_array_input(i))),*(new ARRAY<T,FACE_INDEX<2> >));
+    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++)
+        opengl_adaptive_mac_velocity_fields(i)=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(*grid_array_input(i));
     opengl_mac_velocity_field=opengl_adaptive_mac_velocity_fields(0);
     number_of_steps=2*opengl_mac_velocity_field->grid.counts.x;
     opengl_vorticity_magnitude=new OPENGL_SCALAR_FIELD_2D<T>(opengl_mac_velocity_field->grid,*(new ARRAY<T,VECTOR<int,2> >),OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1));
@@ -85,10 +86,6 @@ Initialize(const ARRAY<GRID<TV>*> &grid_array_input)
 template<class T,class RW> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D()
 {
-    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++){
-        delete &opengl_adaptive_mac_velocity_fields(i)->grid;
-        delete &opengl_adaptive_mac_velocity_fields(i)->u;
-        delete &opengl_adaptive_mac_velocity_fields(i)->v;}
     delete opengl_divergence_field;
 }
 //#####################################################################

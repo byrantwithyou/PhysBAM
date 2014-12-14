@@ -17,6 +17,7 @@ class OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
 public:
+    ARRAY<T2,FACE_INDEX<2> > opengl_scalar_field_data;
     OPENGL_FACE_SCALAR_FIELD_2D<T,T2>  opengl_scalar_field;
 private:
     std::string values_filename;
