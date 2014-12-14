@@ -16,9 +16,9 @@ using namespace std;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_MAC_VELOCITY_FIELD_2D<T>::
-OPENGL_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid_input,ARRAY<bool,TV_INT> *active_cells_input,ARRAY<bool,FACE_INDEX<TV::m> > *active_faces_input)
-    : OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(vector_field,vector_locations),
-     grid(grid_input),u(face_velocities.Component(0)),v(face_velocities.Component(1)),active_cells(active_cells_input),active_faces(active_faces_input)
+OPENGL_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid_input)
+    :OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(vector_field,vector_locations),
+    grid(grid_input),u(face_velocities.Component(0)),v(face_velocities.Component(1)),active_cells(0),active_faces(0)
 {
     PHYSBAM_ASSERT(grid.Is_MAC_Grid());
     Set_Velocity_Mode(CELL_CENTERED);
@@ -28,7 +28,10 @@ OPENGL_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid_input,ARRAY<bool,TV_INT> *acti
 //#####################################################################
 template<class T> OPENGL_MAC_VELOCITY_FIELD_2D<T>::
 ~OPENGL_MAC_VELOCITY_FIELD_2D()
-{}
+{
+    delete active_cells;
+    delete active_faces;
+}
 //#####################################################################
 // Function Set_Velocity_Mode
 //#####################################################################

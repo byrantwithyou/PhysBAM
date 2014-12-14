@@ -39,6 +39,7 @@ OPENGL_COMPONENT_PARTICLES_2D(const std::string &filename_input, const std::stri
     for(int i=1;i<number_of_sets;i++){
         particles_multiple(i)=new GEOMETRY_PARTICLES<TV>;
         opengl_points_multiple(i)=new OPENGL_POINTS_2D<T>(*(new ARRAY<TV>),color_map->Lookup(i));}
+    delete color_map;
         
     is_animation=FILE_UTILITIES::Is_Animated(filename);
     // Don't need to call Reinitialize here because it will be called in first call to Set_Frame

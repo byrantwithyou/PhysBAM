@@ -32,7 +32,7 @@ public:
     ARRAY<bool,TV_INT> *active_cells;
     ARRAY<bool,FACE_INDEX<TV::m> > *active_faces;
 
-    OPENGL_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid_input,ARRAY<bool,TV_INT> *active_cells_input=0,ARRAY<bool,FACE_INDEX<TV::m> > *active_faces_input=0);
+    OPENGL_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid_input);
     virtual ~OPENGL_MAC_VELOCITY_FIELD_2D();
 
     void Update();  // Call when grid/u/v change

@@ -25,7 +25,9 @@ OPENGL_LEVELSET_2D(LEVELSET<TV>& levelset_input,const OPENGL_COLOR& inside_color
 template<class T> OPENGL_LEVELSET_2D<T>::
 ~OPENGL_LEVELSET_2D()
 {
+    delete &opengl_segmented_curve_2d->curve;
     delete opengl_segmented_curve_2d;
+    delete &opengl_triangulated_area->triangulated_area;
     delete opengl_triangulated_area;
     delete solid_color_map;
     delete gradient_color_map;

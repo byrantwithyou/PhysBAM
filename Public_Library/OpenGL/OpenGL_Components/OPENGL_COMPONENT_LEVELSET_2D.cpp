@@ -30,6 +30,7 @@ OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const st
     for(int j=0;j<opengl_levelsets.m;j++)
         opengl_levelsets(j)=new OPENGL_LEVELSET_2D<T>(*(new LEVELSET<TV>(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,2> >))),color_map->Lookup(j),OPENGL_COLOR::Transparent());
     opengl_levelset=opengl_levelsets(0);
+    delete color_map;
 
     is_animation=FILE_UTILITIES::Is_Animated(levelset_filename);
     Reinitialize();
@@ -43,7 +44,8 @@ template<class T,class RW> OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
     for(int j=0;j<opengl_levelsets.m;j++){
         delete &opengl_levelsets(j)->levelset.grid;
         delete &opengl_levelsets(j)->levelset.phi;
-        delete &opengl_levelsets(j)->levelset;}
+        delete &opengl_levelsets(j)->levelset;
+        delete opengl_levelsets(j);}
 }
 //#####################################################################
 // Function Valid_Frame

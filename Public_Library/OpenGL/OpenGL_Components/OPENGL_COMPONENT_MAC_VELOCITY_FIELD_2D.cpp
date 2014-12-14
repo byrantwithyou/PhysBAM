@@ -24,12 +24,13 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &v
     :OPENGL_COMPONENT<T>("MAC Velocity Field 2D"),draw_vorticity(false),
     velocity_filename(velocity_filename_input),directory_adaptive(directory_adaptive_input),filename_active_cells(filename_active_cells_input),filename_active_faces(filename_active_faces_input),level(1),
     use_levels(true),level_loaded(-1),valid(false),draw_divergence(false),draw_all_levels(true),draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),
-    streamlines(*new SEGMENT_MESH(),*new GEOMETRY_PARTICLES<TV>()),opengl_streamlines(streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
+    opengl_streamlines(streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
 {
     ARRAY<GRID<TV>*> grid_array;
     grid_array.Resize(1);
     grid_array(0)=new GRID<TV>(grid);
     Initialize(grid_array);
+    grid_array.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Constructor
@@ -37,7 +38,7 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &v
 template<class T,class RW> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &velocity_filename_input,const std::string directory_adaptive_input,const std::string filename_active_cells_input,const std::string filename_active_faces_input,const ARRAY<GRID<TV>*> grid_array_input)
     :OPENGL_COMPONENT<T>("MAC Velocity Field 2D"),draw_vorticity(false),velocity_filename(velocity_filename_input),directory_adaptive(directory_adaptive_input),filename_active_cells(filename_active_cells_input),filename_active_faces(filename_active_faces_input),level(1),use_levels(true),level_loaded(-1),
-    valid(false),draw_divergence(false),draw_all_levels(true),draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),streamlines(*new SEGMENT_MESH(),*new GEOMETRY_PARTICLES<TV>()),opengl_streamlines(streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
+    valid(false),draw_divergence(false),draw_all_levels(true),draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),opengl_streamlines(streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
 {
     Initialize(grid_array_input);
 }
@@ -61,6 +62,8 @@ Initialize(const ARRAY<GRID<TV>*> &grid_array_input)
     if(number_of_levels==0){use_levels=false;number_of_levels=1;}
     else velocity_filename=FILE_UTILITIES::Get_Short_Name(velocity_filename);
 
+    for(int i=number_of_levels;i<opengl_adaptive_mac_velocity_fields.m;i++)
+        delete opengl_adaptive_mac_velocity_fields(i);
     opengl_adaptive_mac_velocity_fields.Resize(number_of_levels);
     for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++)
         opengl_adaptive_mac_velocity_fields(i)=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(*grid_array_input(i));
@@ -86,7 +89,11 @@ Initialize(const ARRAY<GRID<TV>*> &grid_array_input)
 template<class T,class RW> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D()
 {
+    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++)
+        delete opengl_adaptive_mac_velocity_fields(i);
     delete opengl_divergence_field;
+    delete &opengl_vorticity_magnitude->values;
+    delete opengl_vorticity_magnitude;
 }
 //#####################################################################
 // Function Valid_Frame

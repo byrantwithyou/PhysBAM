@@ -5,6 +5,7 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_B_SPLINE_2D.h>
@@ -40,6 +41,7 @@ template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T,RW>:
 ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D()
 {
     delete color_map;
+    delete &deformable_body_collection;
     delete &collision_body_list;
 }
 //#####################################################################

@@ -8,7 +8,6 @@
 #define __OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D__
 
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
-#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
@@ -23,6 +22,7 @@ template<class T,int d> class OPENGL_BEZIER_SPLINE_2D;
 template<class T,int d> class OPENGL_B_SPLINE_2D;
 template<class T> class OPENGL_TRIANGULATED_AREA;
 template<class TV> class OPENGL_ADAPTIVE_NODE_SCALAR_FIELD;
+template<class TV> class DEFORMABLE_BODY_COLLECTION;
 
 template<class T,class RW=T>
 class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D:public OPENGL_COMPONENT<T>
