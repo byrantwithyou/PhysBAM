@@ -177,4 +177,7 @@ template void Dump_Levelset<VECTOR<double,3>,double>(GRID<VECTOR<double,3> > con
 template void Dump_Levelset<VECTOR<float,1>,float>(GRID<VECTOR<float,1> > const&,IMPLICIT_OBJECT<VECTOR<float,1> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
 template void Dump_Levelset<VECTOR<float,2>,float>(GRID<VECTOR<float,2> > const&,IMPLICIT_OBJECT<VECTOR<float,2> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
 template void Dump_Levelset<VECTOR<float,3>,float>(GRID<VECTOR<float,3> > const&,IMPLICIT_OBJECT<VECTOR<float,3> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void Dump_Surface<TRIANGULATED_SURFACE<float>,float>(TRIANGULATED_SURFACE<float> const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void Dump_Surface<TRIANGULATED_SURFACE<double>,double>(TRIANGULATED_SURFACE<double> const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
+
 }
