@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Data_Structures/UNION_FIND.h>
 #include <Tools/Math_Tools/FACTORIAL.h>
 #include <Tools/Matrices/FRAME.h>
 #include <Tools/Matrices/MATRIX.h>
@@ -21,6 +22,7 @@
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <fstream>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -150,6 +152,44 @@ Discard_Valence_Zero_Particles_And_Renumber(ARRAY<int>& condensation_mapping)
     Refresh_Auxiliary_Structures();
 }
 //#####################################################################
+// Function Discard_Valence_Zero_Particles_And_Renumber
+//#####################################################################
+template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
+Merge_Overlapping_Particles_And_Renumber(ARRAY<int>& condensation_mapping,T tol)
+{
+    UNION_FIND<> uf(particles.X.m);
+    PARTICLE_HIERARCHY<TV> ph(particles.X,true,0);
+    ARRAY<int> intersection_list;
+    for(int i=0;i<particles.X.m;i++){
+        intersection_list.Remove_All();
+        ph.Intersection_List(particles.X(i),intersection_list,tol);
+        for(int j=0;j<intersection_list.m;j++)
+            if((particles.X(i)-particles.X(intersection_list(j))).Magnitude_Squared()>=tol*tol)
+                uf.Union(i,intersection_list(j));}
+
+    int next=0;
+    condensation_mapping.Remove_All();
+    condensation_mapping.Resize(particles.X.m,true,true,-1);
+    for(int i=0;i<particles.X.m;i++)
+        if(condensation_mapping(i)==-1){
+            int p=uf.Find(i);
+            if(condensation_mapping(p)==-1){
+                particles.X(next)=particles.X(i);
+                condensation_mapping(p)=next++;}
+            condensation_mapping(i)=condensation_mapping(p);}
+
+    for(int p=condensation_mapping.m;p<particles.Size();p++)
+        particles.Add_To_Deletion_List(p);
+    particles.Delete_Elements_On_Deletion_List(true);
+
+    // make new triangle mesh
+    mesh.number_nodes=next;
+    mesh.elements.Flattened()=condensation_mapping.Subset(mesh.elements.Flattened());
+    Update_Number_Nodes();
+
+    Refresh_Auxiliary_Structures();
+}
+//#####################################################################
 // Function Union_Mesh_Objects_Relatively
 //#####################################################################
 template<class TV,class T_MESH> typename MESH_OBJECT<TV,T_MESH>::T_DERIVED_OBJECT* MESH_OBJECT<TV,T_MESH>::
@@ -253,6 +293,71 @@ Write(TYPED_OSTREAM& output) const
 {
     if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR("number_nodes mismatch");
     Write_Binary(output,mesh,particles.X);
+}
+//#####################################################################
+// Function Read_Obj
+//#####################################################################
+template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
+Read_Obj(const std::string& filename)
+{
+    Clean_Memory();
+    std::ifstream fin(filename);
+    char buffer[2048];
+    double d;
+    int n;
+    while(fin){
+        fin.getline(buffer,2048);
+        if(buffer[0]==0 || buffer[0]=='#' || buffer[1]!=' ') continue;
+        if(buffer[0]=='v'){
+            TV X;
+            char* s=buffer+2;
+            for(int i=0;i<TV::m;i++){
+                sscanf(s,"%lf%n",&d,&n);
+                X(i)=d;
+                s+=n;}
+            int p=particles.Add_Element();
+            particles.X(p)=X;}
+        else if(buffer[0]=='f'){
+            typename T_MESH::ELEMENT_TYPE E;
+            char* s=buffer+2;
+            for(int i=0;i<E.m-1;i++){
+                sscanf(s,"%d%n",&E(i),&n);
+                s+=n;
+                if(*s=='/') s+=strcspn(s," \t\r\n");}
+            while(sscanf(s,"%d%n",&E(E.m-1),&n)>0){
+                mesh.elements.Append(E-1);
+                s+=n;
+                if(*s=='/') s+=strcspn(s," \t\r\n");
+                E(E.m-2)=E(E.m-1);}}}
+    Update_Number_Nodes();
+}
+//#####################################################################
+// Function Write_Obj
+//#####################################################################
+template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
+Write_Obj(const std::string& filename) const
+{
+    const char* coord_str_comma[4]={"","x","x,y","x,y,z"};
+    const char* coord_str_space[4]={"","x","x y","x y z"};
+    const char* elem_str_comma[9]={"","a","a,b","a,b,c","a,b,c,d",0,0,0,"a,b,c,d,e,f,g,h"};
+    const char* elem_str_space[9]={"","a","a b","a b c","a b c d",0,0,0,"a b c d e f g h"};
+    std::ofstream fout(filename);
+    fout<<"# simple obj file format:\n";
+    fout<<"#  vertex at coordinates ("<<coord_str_comma[TV::m]<<")\n";
+    fout<<"#   v "<<coord_str_space[TV::m]<<"\n";
+    fout<<"#  element with vertices "<<elem_str_comma[T_MESH::ELEMENT_TYPE::m]<<"\n";
+    fout<<"#   f "<<elem_str_space[T_MESH::ELEMENT_TYPE::m]<<"\n";
+    fout<<"# vertices are indexed starting from 1.\n";
+
+    for(int i=0;i<particles.X.m;i++){
+        fout<<"\nv ";
+        particles.X(i).Write_Raw(fout);}
+
+    for(int i=0;i<mesh.elements.m;i++){
+        fout<<"\nf ";
+        (mesh.elements(i)+1).Write_Raw(fout);}
+
+    fout<<"\n";
 }
 //#####################################################################
 namespace PhysBAM{

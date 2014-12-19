@@ -57,6 +57,8 @@ public:
 
     void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE;
     void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
+    void Read_Obj(const std::string& filename);
+    void Write_Obj(const std::string& filename) const;
 
 //#####################################################################
     virtual void Clean_Memory();
@@ -72,6 +74,7 @@ public:
     static void Union_Mesh_Objects_Relatively(T_DERIVED_OBJECT* object,const ARRAY<T_DERIVED_OBJECT*>& object_list,const ARRAY<FRAME<TV> >& relative_frames);
     void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const PHYSBAM_OVERRIDE;
     T Volumetric_Volume();
+    void Merge_Overlapping_Particles_And_Renumber(ARRAY<int>& condensation_mapping,T tol=0);
     
 private:
     virtual void Refresh_Auxiliary_Structures_Helper()=0;
