@@ -144,10 +144,10 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         dat.he=he;
         for(int j=0;j<gauss_order;j++){
             T t=quadrature_loc[gauss_order][j];
-            auto Z0=From_Var<4,0>(XX(0));
-            auto Z1=From_Var<4,1>(XX(1));
-            auto Z2=From_Var<4,2>(XX(2));
-            auto Z3=From_Var<4,3>(XX(3));
+            auto Z0=Hess_From_Var<4,0>(XX(0));
+            auto Z1=Hess_From_Var<4,1>(XX(1));
+            auto Z2=Hess_From_Var<4,2>(XX(2));
+            auto Z3=Hess_From_Var<4,3>(XX(3));
             auto phi_p=-3*sqr(t-1)*Z0+3*(t-1)*(3*t-1)*Z1-3*t*(3*t-2)*Z2+3*sqr(t)*Z3;
             auto phi_pp=-6*(t-1)*Z0+6*(3*t-2)*Z1-6*(3*t-1)*Z2+6*t*Z3;
             auto length=phi_p.Magnitude();

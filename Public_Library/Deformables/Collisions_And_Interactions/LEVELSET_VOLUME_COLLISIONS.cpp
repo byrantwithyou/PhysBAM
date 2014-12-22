@@ -143,11 +143,11 @@ Triangulate<1>(int number_of_planes,const LEVELSET_VOLUME_COLLISIONS_POLYTOPE& p
 template<class T,class TV_VECTOR> static void
 Add_Plane_Edge_Intersection(const VECTOR<int,5>& nodes, const TV_VECTOR& X, VECTOR<T,3>& v, VECTOR<MATRIX<T,3>,5>& dv, MATRIX<TENSOR<T,3>,5>& ddv)
 {
-    auto p0=From_Var<5,0>(X(nodes(0)));
-    auto p1=From_Var<5,1>(X(nodes(1)));
-    auto p2=From_Var<5,2>(X(nodes(2)));
-    auto e0=From_Var<5,3>(X(nodes(3)));
-    auto e1=From_Var<5,4>(X(nodes(4)));
+    auto p0=Hess_From_Var<5,0>(X(nodes(0)));
+    auto p1=Hess_From_Var<5,1>(X(nodes(1)));
+    auto p2=Hess_From_Var<5,2>(X(nodes(2)));
+    auto e0=Hess_From_Var<5,3>(X(nodes(3)));
+    auto e1=Hess_From_Var<5,4>(X(nodes(4)));
     auto normal=(p1-p0).Cross(p2-p0);
     auto d0=normal.Dot(e0-p0);
     auto d1=normal.Dot(e1-p0);
@@ -166,10 +166,10 @@ Add_Plane_Edge_Intersection(const VECTOR<int,5>& nodes, const TV_VECTOR& X, VECT
 template<class T,class TV_VECTOR> static void
 Add_Plane_Edge_Intersection(const VECTOR<int,4>& nodes,const TV_VECTOR& X,VECTOR<T,2>& v,VECTOR<MATRIX<T,2>,4>& dv,MATRIX<TENSOR<T,2>,4>& ddv)
 {
-    auto p0=From_Var<4,0>(X(nodes(0)));
-    auto p1=From_Var<4,1>(X(nodes(1)));
-    auto e0=From_Var<4,2>(X(nodes(2)));
-    auto e1=From_Var<4,3>(X(nodes(3)));
+    auto p0=Hess_From_Var<4,0>(X(nodes(0)));
+    auto p1=Hess_From_Var<4,1>(X(nodes(1)));
+    auto e0=Hess_From_Var<4,2>(X(nodes(2)));
+    auto e1=Hess_From_Var<4,3>(X(nodes(3)));
     auto normal=(p1-p0);
     auto d0=normal.Dot(e0-p0);
     auto d1=normal.Dot(e1-p0);
@@ -188,12 +188,12 @@ Add_Plane_Edge_Intersection(const VECTOR<int,4>& nodes,const TV_VECTOR& X,VECTOR
 template<class T,class T_VECTOR> static void
 Integrate_Levelset(const VECTOR<VECTOR<T,2>,6>& v,const T_VECTOR& undeformed_phi,T stiffness,T& pe,VECTOR<VECTOR<T,2>,6>& dpe,MATRIX<MATRIX<T,2>,6>& ddpe)
 {
-    auto a=From_Var<6,0>(v(0));
-    auto b=From_Var<6,1>(v(1));
-    auto c=From_Var<6,2>(v(2));
-    auto d=From_Var<6,3>(v(3));
-    auto e=From_Var<6,4>(v(4));
-    auto f=From_Var<6,5>(v(5));
+    auto a=Hess_From_Var<6,0>(v(0));
+    auto b=Hess_From_Var<6,1>(v(1));
+    auto c=Hess_From_Var<6,2>(v(2));
+    auto d=Hess_From_Var<6,3>(v(3));
+    auto e=Hess_From_Var<6,4>(v(4));
+    auto f=Hess_From_Var<6,5>(v(5));
     auto X=(d+e+f)/3-c;
     auto A=a-c;
     auto B=b-c;
@@ -221,10 +221,10 @@ Integrate_Levelset(const VECTOR<VECTOR<T,2>,6>& v,const T_VECTOR& undeformed_phi
 template<class T> static void
 Integrate_Levelset_Interior(const VECTOR<VECTOR<T,3>,4>& v,T phi,T stiffness,T& pe,VECTOR<VECTOR<T,3>,4>& dpe,MATRIX<MATRIX<T,3>,4>& ddpe)
 {
-    auto a=From_Var<8,0>(v(0));
-    auto b=From_Var<8,1>(v(1));
-    auto c=From_Var<8,2>(v(2));
-    auto d=From_Var<8,3>(v(3));
+    auto a=Hess_From_Var<8,0>(v(0));
+    auto b=Hess_From_Var<8,1>(v(1));
+    auto c=Hess_From_Var<8,2>(v(2));
+    auto d=Hess_From_Var<8,3>(v(3));
     auto A=a-d;
     auto B=b-d;
     auto C=c-d;
@@ -242,14 +242,14 @@ Integrate_Levelset_Interior(const VECTOR<VECTOR<T,3>,4>& v,T phi,T stiffness,T& 
 template<class T,class T_VECTOR> static void
 Integrate_Levelset(const VECTOR<VECTOR<T,3>,8>& v,const T_VECTOR& undeformed_phi,T stiffness,T& pe,VECTOR<VECTOR<T,3>,8>& dpe,MATRIX<MATRIX<T,3>,8>& ddpe)
 {
-    auto a=From_Var<8,0>(v(0));
-    auto b=From_Var<8,1>(v(1));
-    auto c=From_Var<8,2>(v(2));
-    auto d=From_Var<8,3>(v(3));
-    auto e=From_Var<8,4>(v(4));
-    auto f=From_Var<8,5>(v(5));
-    auto g=From_Var<8,6>(v(6));
-    auto h=From_Var<8,7>(v(7));
+    auto a=Hess_From_Var<8,0>(v(0));
+    auto b=Hess_From_Var<8,1>(v(1));
+    auto c=Hess_From_Var<8,2>(v(2));
+    auto d=Hess_From_Var<8,3>(v(3));
+    auto e=Hess_From_Var<8,4>(v(4));
+    auto f=Hess_From_Var<8,5>(v(5));
+    auto g=Hess_From_Var<8,6>(v(6));
+    auto h=Hess_From_Var<8,7>(v(7));
     auto X=(e+f+g+h)/4-d;
     auto A=a-d;
     auto B=b-d;

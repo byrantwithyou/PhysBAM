@@ -24,6 +24,7 @@ using ::std::log;
 using ::std::abs;
 using ::std::sqrt;
 using ::PhysBAM::sqr;
+using ::PhysBAM::cube;
 
 #define SC typename TV::SCALAR()
 #define DX GRADIENT<TV,VEC>()
@@ -104,7 +105,7 @@ Make_Hess(typename TV::SCALAR x,const GRADIENT<TV,VEC>& dx,const HESSIAN<TV,MAT>
 
 template<int n,int i,class TV>
 AUTO_HESS_EXT<TV,typename ONE_NONZERO_VECTOR<TV,n,i>::TYPE,typename EMPTY_MAT<TV,n>::TYPE>
-From_Var(TV v,int j)
+Hess_From_Var(TV v,int j)
 {
     AUTO_HESS_EXT<TV,typename ONE_NONZERO_VECTOR<TV,n,i>::TYPE,typename EMPTY_MAT<TV,n>::TYPE> r(v(j));
     Set<i>(r.dx.x,TV::Axis_Vector(j));
@@ -113,7 +114,7 @@ From_Var(TV v,int j)
 
 template<class TV,int n>
 AUTO_HESS_EXT<TV,typename EMPTY_VEC<TV,n>::TYPE,typename EMPTY_MAT<TV,n>::TYPE>
-From_Const(typename TV::SCALAR a)
+Hess_From_Const(typename TV::SCALAR a)
 {return AUTO_HESS_EXT<TV,typename EMPTY_VEC<TV,n>::TYPE,typename EMPTY_MAT<TV,n>::TYPE>(a);}
 
 template<class TV,class VEC,class MAT>
@@ -440,7 +441,7 @@ Make_Hess_Vec(const TV& x,const GRADIENT_VEC<TV,VEC>& dx,const HESSIAN_VEC<TV,MA
 {return AUTO_HESS_EXT_VEC<TV,VEC,MAT>(x,dx,ddx);}
 
 template<int n,int i,class TV> inline
-AUTO_HESS_EXT_VEC<TV,typename ONE_NONZERO_VECTOR_MAT<TV,n,i>::TYPE,typename EMPTY_MAT_TEN<TV,n>::TYPE> From_Var(TV v)
+AUTO_HESS_EXT_VEC<TV,typename ONE_NONZERO_VECTOR_MAT<TV,n,i>::TYPE,typename EMPTY_MAT_TEN<TV,n>::TYPE> Hess_From_Var(TV v)
 {return AUTO_HESS_EXT_VEC<TV,typename ONE_NONZERO_VECTOR_MAT<TV,n,i>::TYPE,typename EMPTY_MAT_TEN<TV,n>::TYPE>(v);}
 
 template<class TV,class VEC,class MAT> inline decltype(Make_Hess_Vec(TV(),Outer_Product(TV(),DX),Tensor_Product_0(DDX,TV())))
@@ -481,8 +482,8 @@ operator*(const MATRIX<typename TV::SCALAR,TV::m>& m,const AUTO_HESS_EXT_VEC<TV,
 }
 using HETERO_DIFF::AUTO_HESS_EXT;
 using HETERO_DIFF::AUTO_HESS_EXT_VEC;
-using HETERO_DIFF::From_Const;
-using HETERO_DIFF::From_Var;
+using HETERO_DIFF::Hess_From_Const;
+using HETERO_DIFF::Hess_From_Var;
 using HETERO_DIFF::Extract;
 using HETERO_DIFF::sin;
 using HETERO_DIFF::cos;

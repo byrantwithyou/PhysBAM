@@ -128,11 +128,11 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
 template<class TV> void TRIANGLE_REPULSIONS_PENALTY<TV>::
 Penalty(T original_volume,const VECTOR<int,4>& nodes,const ARRAY_VIEW<TV>&X,T& e,VECTOR<TV,4>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he)
 {
-    auto u=From_Var<3,0>(X(nodes(1))-X(nodes(0)));
-    auto v=From_Var<3,1>(X(nodes(2))-X(nodes(0)));
-    auto w=From_Var<3,2>(X(nodes(3))-X(nodes(0)));
+    auto u=Hess_From_Var<3,0>(X(nodes(1))-X(nodes(0)));
+    auto v=Hess_From_Var<3,1>(X(nodes(2))-X(nodes(0)));
+    auto w=Hess_From_Var<3,2>(X(nodes(3))-X(nodes(0)));
     auto a=u.Dot(v.Cross(w));
-    auto d=1-a/From_Const<TV,3>(original_volume);
+    auto d=1-a/Hess_From_Const<TV,3>(original_volume);
     auto ee=stiffness*sqr(d)*d;
     e=ee.x;
     for(int i=1;i<4;i++){

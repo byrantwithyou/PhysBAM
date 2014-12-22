@@ -165,10 +165,10 @@ Update_Position_Based_State(const T time,const bool is_position_update)
             T t=quadrature_loc[gauss_order][j];
             t=k[2]+(k[3]-k[2])*t;
             
-            auto x00=From_Var<4,0>(XX(0));
-            auto x01=From_Var<4,1>(XX(1));
-            auto x02=From_Var<4,2>(XX(2));
-            auto x03=From_Var<4,3>(XX(3));
+            auto x00=Hess_From_Var<4,0>(XX(0));
+            auto x01=Hess_From_Var<4,1>(XX(1));
+            auto x02=Hess_From_Var<4,2>(XX(2));
+            auto x03=Hess_From_Var<4,3>(XX(3));
 
             auto x10=x00+(x01-x00)*(t-k[0])/(k[3]-k[0]);
             auto x11=x01+(x02-x01)*(t-k[1])/(k[4]-k[1]);

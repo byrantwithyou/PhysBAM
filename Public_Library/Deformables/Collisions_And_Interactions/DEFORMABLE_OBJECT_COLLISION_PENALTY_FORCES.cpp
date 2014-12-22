@@ -185,9 +185,9 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 template<class T,class TV> void
 Penalty(VECTOR<int,4> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,TV::m+1>& >&X,T& e,VECTOR<TV,TV::m+1>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+1>,TV::m+1>& he,ARRAY<VECTOR<T,TV::m+1> >& stored_weights,T stiffness)
 {
-    auto w=From_Var<3,0>(X(nodes(0))-X(nodes(3)));
-    auto v=From_Var<3,1>(X(nodes(1))-X(nodes(3)));
-    auto u=From_Var<3,2>(X(nodes(2))-X(nodes(3)));
+    auto w=Hess_From_Var<3,0>(X(nodes(0))-X(nodes(3)));
+    auto v=Hess_From_Var<3,1>(X(nodes(1))-X(nodes(3)));
+    auto u=Hess_From_Var<3,2>(X(nodes(2))-X(nodes(3)));
     auto uu=u.Dot(u);
     auto vv=v.Dot(v);
     auto uv=u.Dot(v);
@@ -226,8 +226,8 @@ Penalty(VECTOR<int,4> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,T
 template<class T,class TV> void
 Penalty(VECTOR<int,3> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,TV::m+1>& >&X,T& e,VECTOR<TV,TV::m+1>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+1>,TV::m+1>& he,ARRAY<VECTOR<T,TV::m+1> >& stored_weights,T stiffness)
 {
-    auto w=From_Var<2,0>(X(nodes(0))-X(nodes(2)));
-    auto v=From_Var<2,1>(X(nodes(1))-X(nodes(2)));
+    auto w=Hess_From_Var<2,0>(X(nodes(0))-X(nodes(2)));
+    auto v=Hess_From_Var<2,1>(X(nodes(1))-X(nodes(2)));
     auto vv=v.Dot(v);
     auto vw=v.Dot(w);
     auto a=min(max(vw/vv,0),1);
@@ -258,7 +258,7 @@ Penalty(VECTOR<int,3> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,T
 template<class T,class TV> void
 Penalty(VECTOR<int,2> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,TV::m+1>& >&X,T& e,VECTOR<TV,TV::m+1>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+1>,TV::m+1>& he,ARRAY<VECTOR<T,TV::m+1> >& stored_weights,T stiffness)
 {
-    auto w=From_Var<1,0>(X(nodes(0))-X(nodes(1)));
+    auto w=Hess_From_Var<1,0>(X(nodes(0))-X(nodes(1)));
     auto phi_sq=w.Magnitude_Squared();
     auto ee=stiffness*phi_sq*sqrt(phi_sq+1e-15);
     e=ee.x;
