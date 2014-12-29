@@ -124,146 +124,24 @@ Write_Binary(TYPED_OSTREAM& output,const T& d)
 //#####################################################################
 // Multiple Argument Read_Binary
 //#####################################################################
-template<class RW,class T1,class T2>
-inline void Read_Binary(std::istream& input,T1& d1,T2& d2)
-{Read_Binary<RW>(input,d1);Read_Binary<RW>(input,d2);}
+template<class RW,class T1,class T2,class ...Args>
+inline void Read_Binary(std::istream& input,T1& d1,T2& d2,Args&& ...args)
+{Read_Binary<RW>(input,d1);Read_Binary<RW>(input,d2,args...);}
 
-template<class RW,class T1,class T2,class T3>
-inline void Read_Binary(std::istream& input,T1& d1,T2& d2,T3& d3)
-{Read_Binary<RW>(input,d1);Read_Binary<RW>(input,d2);Read_Binary<RW>(input,d3);}
-
-template<class RW,class T1,class T2,class T3,class T4>
-inline void Read_Binary(std::istream& input,T1& d1,T2& d2,T3& d3,T4& d4)
-{Read_Binary<RW>(input,d1);Read_Binary<RW>(input,d2);Read_Binary<RW>(input,d3);Read_Binary<RW>(input,d4);}
-
-template<class RW,class T1,class T2,class T3,class T4,class T5>
-inline void Read_Binary(std::istream& input,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5)
-{Read_Binary<RW>(input,d1);Read_Binary<RW>(input,d2);Read_Binary<RW>(input,d3);Read_Binary<RW>(input,d4);Read_Binary<RW>(input,d5);}
-
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6>
-inline void Read_Binary(std::istream& input,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6)
-{Read_Binary<RW>(input,d1);Read_Binary<RW>(input,d2);Read_Binary<RW>(input,d3);Read_Binary<RW>(input,d4);Read_Binary<RW>(input,d5);Read_Binary<RW>(input,d6);}
-
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6,class T7>
-inline void Read_Binary(std::istream& input,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6,T7& d7)
-{Read_Binary<RW>(input,d1);Read_Binary<RW>(input,d2);Read_Binary<RW>(input,d3);Read_Binary<RW>(input,d4);Read_Binary<RW>(input,d5);Read_Binary<RW>(input,d6);Read_Binary<RW>(input,d7);}
-
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8>
-inline void Read_Binary(std::istream& input,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6,T7& d7,T8& d8)
-{Read_Binary<RW>(input,d1);Read_Binary<RW>(input,d2);Read_Binary<RW>(input,d3);Read_Binary<RW>(input,d4);Read_Binary<RW>(input,d5);Read_Binary<RW>(input,d6);Read_Binary<RW>(input,d7);
-Read_Binary<RW>(input,d8);}
-
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8,class T9>
-inline void Read_Binary(std::istream& input,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6,T7& d7,T8& d8,T9& d9)
-{Read_Binary<RW>(input,d1);Read_Binary<RW>(input,d2);Read_Binary<RW>(input,d3);Read_Binary<RW>(input,d4);Read_Binary<RW>(input,d5);Read_Binary<RW>(input,d6);Read_Binary<RW>(input,d7);
-Read_Binary<RW>(input,d8);Read_Binary<RW>(input,d9);}
-
-template<class T1,class T2>
-inline void Read_Binary(TYPED_ISTREAM& input,T1& d1,T2& d2)
-{Read_Binary(input,d1);Read_Binary(input,d2);}
-
-template<class T1,class T2,class T3>
-inline void Read_Binary(TYPED_ISTREAM& input,T1& d1,T2& d2,T3& d3)
-{Read_Binary(input,d1);Read_Binary(input,d2);Read_Binary(input,d3);}
-
-template<class T1,class T2,class T3,class T4>
-inline void Read_Binary(TYPED_ISTREAM& input,T1& d1,T2& d2,T3& d3,T4& d4)
-{Read_Binary(input,d1);Read_Binary(input,d2);Read_Binary(input,d3);Read_Binary(input,d4);}
-
-template<class T1,class T2,class T3,class T4,class T5>
-inline void Read_Binary(TYPED_ISTREAM& input,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5)
-{Read_Binary(input,d1);Read_Binary(input,d2);Read_Binary(input,d3);Read_Binary(input,d4);Read_Binary(input,d5);}
-
-template<class T1,class T2,class T3,class T4,class T5,class T6>
-inline void Read_Binary(TYPED_ISTREAM& input,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6)
-{Read_Binary(input,d1);Read_Binary(input,d2);Read_Binary(input,d3);Read_Binary(input,d4);Read_Binary(input,d5);Read_Binary(input,d6);}
-
-template<class T1,class T2,class T3,class T4,class T5,class T6,class T7>
-inline void Read_Binary(TYPED_ISTREAM& input,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6,T7& d7)
-{Read_Binary(input,d1);Read_Binary(input,d2);Read_Binary(input,d3);Read_Binary(input,d4);Read_Binary(input,d5);Read_Binary(input,d6);Read_Binary(input,d7);}
-
-template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8>
-inline void Read_Binary(TYPED_ISTREAM& input,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6,T7& d7,T8& d8)
-{Read_Binary(input,d1);Read_Binary(input,d2);Read_Binary(input,d3);Read_Binary(input,d4);Read_Binary(input,d5);Read_Binary(input,d6);Read_Binary(input,d7);
-Read_Binary(input,d8);}
-
-template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8,class T9>
-inline void Read_Binary(TYPED_ISTREAM& input,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6,T7& d7,T8& d8,T9& d9)
-{Read_Binary(input,d1);Read_Binary(input,d2);Read_Binary(input,d3);Read_Binary(input,d4);Read_Binary(input,d5);Read_Binary(input,d6);Read_Binary(input,d7);
-Read_Binary(input,d8);Read_Binary(input,d9);}
+template<class T1,class T2,class ...Args>
+inline void Read_Binary(TYPED_ISTREAM& input,T1& d1,T2& d2,Args&& ...args)
+{Read_Binary(input,d1);Read_Binary(input,d2,args...);}
 
 //#####################################################################
 // Multiple Argument Write_Binary
 //#####################################################################
-template<class RW,class T1,class T2>
-inline void Write_Binary(std::ostream& output,const T1& d1,const T2& d2)
-{Write_Binary<RW>(output,d1);Write_Binary<RW>(output,d2);}
+template<class RW,class T1,class T2,class ...Args>
+inline void Write_Binary(std::ostream& output,const T1& d1,const T2& d2,Args&& ...args)
+{Write_Binary<RW>(output,d1);Write_Binary<RW>(output,d2,args...);}
 
-template<class RW,class T1,class T2,class T3>
-inline void Write_Binary(std::ostream& output,const T1& d1,const T2& d2,const T3& d3)
-{Write_Binary<RW>(output,d1);Write_Binary<RW>(output,d2);Write_Binary<RW>(output,d3);}
-
-template<class RW,class T1,class T2,class T3,class T4>
-inline void Write_Binary(std::ostream& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4)
-{Write_Binary<RW>(output,d1);Write_Binary<RW>(output,d2);Write_Binary<RW>(output,d3);Write_Binary<RW>(output,d4);}
-
-template<class RW,class T1,class T2,class T3,class T4,class T5>
-inline void Write_Binary(std::ostream& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5)
-{Write_Binary<RW>(output,d1);Write_Binary<RW>(output,d2);Write_Binary<RW>(output,d3);Write_Binary<RW>(output,d4);Write_Binary<RW>(output,d5);}
-
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6>
-inline void Write_Binary(std::ostream& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6)
-{Write_Binary<RW>(output,d1);Write_Binary<RW>(output,d2);Write_Binary<RW>(output,d3);Write_Binary<RW>(output,d4);Write_Binary<RW>(output,d5);Write_Binary<RW>(output,d6);}
-
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6,class T7>
-inline void Write_Binary(std::ostream& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6,const T7& d7)
-{Write_Binary<RW>(output,d1);Write_Binary<RW>(output,d2);Write_Binary<RW>(output,d3);Write_Binary<RW>(output,d4);Write_Binary<RW>(output,d5);Write_Binary<RW>(output,d6);
-Write_Binary<RW>(output,d7);}
-
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8>
-inline void Write_Binary(std::ostream& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6,const T7& d7,const T8& d8)
-{Write_Binary<RW>(output,d1);Write_Binary<RW>(output,d2);Write_Binary<RW>(output,d3);Write_Binary<RW>(output,d4);Write_Binary<RW>(output,d5);Write_Binary<RW>(output,d6);
-Write_Binary<RW>(output,d7);Write_Binary<RW>(output,d8);}
-
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8,class T9>
-inline void Write_Binary(std::ostream& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6,const T7& d7,const T8& d8,const T9& d9)
-{Write_Binary<RW>(output,d1);Write_Binary<RW>(output,d2);Write_Binary<RW>(output,d3);Write_Binary<RW>(output,d4);Write_Binary<RW>(output,d5);Write_Binary<RW>(output,d6);
-Write_Binary<RW>(output,d7);Write_Binary<RW>(output,d8);Write_Binary<RW>(output,d9);}
-
-template<class T1,class T2>
-inline void Write_Binary(TYPED_OSTREAM& output,const T1& d1,const T2& d2)
-{Write_Binary(output,d1);Write_Binary(output,d2);}
-
-template<class T1,class T2,class T3>
-inline void Write_Binary(TYPED_OSTREAM& output,const T1& d1,const T2& d2,const T3& d3)
-{Write_Binary(output,d1);Write_Binary(output,d2);Write_Binary(output,d3);}
-
-template<class T1,class T2,class T3,class T4>
-inline void Write_Binary(TYPED_OSTREAM& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4)
-{Write_Binary(output,d1);Write_Binary(output,d2);Write_Binary(output,d3);Write_Binary(output,d4);}
-
-template<class T1,class T2,class T3,class T4,class T5>
-inline void Write_Binary(TYPED_OSTREAM& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5)
-{Write_Binary(output,d1);Write_Binary(output,d2);Write_Binary(output,d3);Write_Binary(output,d4);Write_Binary(output,d5);}
-
-template<class T1,class T2,class T3,class T4,class T5,class T6>
-inline void Write_Binary(TYPED_OSTREAM& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6)
-{Write_Binary(output,d1);Write_Binary(output,d2);Write_Binary(output,d3);Write_Binary(output,d4);Write_Binary(output,d5);Write_Binary(output,d6);}
-
-template<class T1,class T2,class T3,class T4,class T5,class T6,class T7>
-inline void Write_Binary(TYPED_OSTREAM& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6,const T7& d7)
-{Write_Binary(output,d1);Write_Binary(output,d2);Write_Binary(output,d3);Write_Binary(output,d4);Write_Binary(output,d5);Write_Binary(output,d6);
-Write_Binary(output,d7);}
-
-template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8>
-inline void Write_Binary(TYPED_OSTREAM& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6,const T7& d7,const T8& d8)
-{Write_Binary(output,d1);Write_Binary(output,d2);Write_Binary(output,d3);Write_Binary(output,d4);Write_Binary(output,d5);Write_Binary(output,d6);
-Write_Binary(output,d7);Write_Binary(output,d8);}
-
-template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8,class T9>
-inline void Write_Binary(TYPED_OSTREAM& output,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6,const T7& d7,const T8& d8,const T9& d9)
-{Write_Binary(output,d1);Write_Binary(output,d2);Write_Binary(output,d3);Write_Binary(output,d4);Write_Binary(output,d5);Write_Binary(output,d6);
-Write_Binary(output,d7);Write_Binary(output,d8);Write_Binary(output,d9);}
+template<class T1,class T2,class ...Args>
+inline void Write_Binary(TYPED_OSTREAM& output,const T1& d1,const T2& d2,Args&& ...args)
+{Write_Binary(output,d1);Write_Binary(output,d2,args...);}
 
 //#####################################################################
 // Read/Write_Binary_Array
