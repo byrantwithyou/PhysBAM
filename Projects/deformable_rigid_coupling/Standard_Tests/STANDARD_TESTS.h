@@ -34,7 +34,6 @@
 
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -376,7 +375,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solid_body_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping));
         T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
         solid_body_collection.Add_Force(Create_Bending_Springs(*triangulated_surface,bending_stiffness,bending_damping));
-        PHYSBAM_DEBUG_PRINT("Spring stiffnesses",linear_stiffness,linear_damping,bending_stiffness,bending_damping);}
+        LOG::printf("Spring stiffnesses: %P %P %P %P\n",linear_stiffness,linear_damping,bending_stiffness,bending_damping);}
 
     for(int i=0;i<deformable_body_collection.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.structures(i))){
         deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.structures(i));

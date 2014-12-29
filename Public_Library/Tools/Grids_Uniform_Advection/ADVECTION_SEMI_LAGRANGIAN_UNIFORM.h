@@ -11,7 +11,6 @@
 #include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA.h>
 #include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 namespace PhysBAM{
 
 template<class TV,class T2,class T_AVERAGING,class T_INTERPOLATION> //  T_AVERAGING=AVERAGING_UNIFORM<TV>, T_INTERPOLATION=LINEAR_INTERPOLATION_UNIFORM<TV,T2>

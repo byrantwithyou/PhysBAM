@@ -7,7 +7,6 @@
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/LANCZOS_ITERATION.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/Robust_Arithmetic.h>
 #include <Tools/Matrices/MATRIX_2X2.h>

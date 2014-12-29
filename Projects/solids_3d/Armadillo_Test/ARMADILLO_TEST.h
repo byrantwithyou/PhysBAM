@@ -7,7 +7,6 @@
 #ifndef __ARMADILLO_TEST__
 #define __ARMADILLO_TEST__
 #include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET_MAKER.h>
@@ -175,7 +174,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 3: use_bindings=true;use_soft_bindings=true;use_impulses=true;break;
         case 4: use_bindings=true;use_soft_bindings=true;use_impulses=false;use_binding_springs=true;break;
     }
-    PHYSBAM_DEBUG_PRINT("Parameters",use_bindings,use_soft_bindings,use_impulses,use_edge_springs,use_binding_springs);
+    LOG::printf("Parameters: %P, %P, %P, %P, %P\n",use_bindings,use_soft_bindings,use_impulses,use_edge_springs,use_binding_springs);
     
     // geometry
     Get_Initial_Data();

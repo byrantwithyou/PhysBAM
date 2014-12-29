@@ -106,39 +106,11 @@ public:
         LOG_CLASS::Push_Scope(scope_identifier,scope_name);
     }
 
-    template<class T1>
-    SCOPE(const std::string& scope_identifier,const std::string& format,const T1& d1)
+    template<class T1,class ...Args>
+    SCOPE(const std::string& scope_identifier,const std::string& format,const T1& d1,Args&& ...args)
         :active(true)
     {
-        LOG_CLASS::Push_Scope(scope_identifier,STRING_UTILITIES::string_sprintf(format.c_str(),d1));
-    }
-
-    template<class T1,class T2>
-    SCOPE(const std::string& scope_identifier,const std::string& format,const T1& d1,const T2& d2)
-        :active(true)
-    {
-        LOG_CLASS::Push_Scope(scope_identifier,STRING_UTILITIES::string_sprintf(format.c_str(),d1,d2));
-    }
-
-    template<class T1,class T2,class T3>
-    SCOPE(const std::string& scope_identifier,const std::string& format,const T1& d1,const T2& d2,const T3& d3)
-        :active(true)
-    {
-        LOG_CLASS::Push_Scope(scope_identifier,STRING_UTILITIES::string_sprintf(format.c_str(),d1,d2,d3));
-    }
-
-    template<class T1,class T2,class T3,class T4>
-    SCOPE(const std::string& scope_identifier,const std::string& format,const T1& d1,const T2& d2,const T3& d3,const T4& d4)
-        :active(true)
-    {
-        LOG_CLASS::Push_Scope(scope_identifier,STRING_UTILITIES::string_sprintf(format.c_str(),d1,d2,d3,d4));
-    }
-
-    template<class T1,class T2,class T3,class T4,class T5>
-    SCOPE(const std::string& scope_identifier,const std::string& format,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5)
-        :active(true)
-    {
-        LOG_CLASS::Push_Scope(scope_identifier,STRING_UTILITIES::string_sprintf(format.c_str(),d1,d2,d3,d4,d5));
+        LOG_CLASS::Push_Scope(scope_identifier,STRING_UTILITIES::string_sprintf(format.c_str(),args...));
     }
 
     ~SCOPE();

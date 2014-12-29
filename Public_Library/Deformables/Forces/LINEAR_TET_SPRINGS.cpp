@@ -4,7 +4,6 @@
 //#####################################################################
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/constants.h>
 #include <Tools/Matrices/MATRIX.h>

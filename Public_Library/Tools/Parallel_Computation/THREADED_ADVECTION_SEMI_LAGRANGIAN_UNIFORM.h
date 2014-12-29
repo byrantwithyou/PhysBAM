@@ -10,7 +10,6 @@
 #include <Tools/Advection/ADVECTION.h>
 #include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 namespace PhysBAM{
 

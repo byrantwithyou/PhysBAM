@@ -9,7 +9,6 @@
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Krylov_Solvers/LANCZOS_ITERATION.h>
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>

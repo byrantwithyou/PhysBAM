@@ -7,7 +7,6 @@
 #include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
@@ -505,7 +504,6 @@ Valid_Cluster_Collision(const int rigid_body_1,const int rigid_body_2)
     if(parent_1<0 && parent_2<0) return true; // neither bound
     if(parent_1==parent_2) return false;
     bool decision=Valid_Cluster_Collision_Helper(rigid_body_1,parent_1)&&Valid_Cluster_Collision_Helper(rigid_body_2,parent_2);
-    //PHYSBAM_DEBUG_PRINT("query",rigid_body_1,rigid_body_2,parent_1,parent_2,collide_constituent_bodies,decision);
     return decision;
 }
 //#####################################################################

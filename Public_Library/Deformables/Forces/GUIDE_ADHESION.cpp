@@ -60,7 +60,6 @@ Set_Parameters(const T youngs_modulus_input,const T overdamping_fraction_input,c
 template<class TV> void GUIDE_ADHESION<TV>::
 Update_Springs(const bool search_hierarchy)
 {
-    //PHYSBAM_DEBUG_PRINT("states",youngs_modulus,overdamping_fraction,on_distance,off_distance);
     // prune broken springs
     ARRAY<VECTOR<int,2> > deletion_list;
     T_SPRING_HASH* new_springs=search_hierarchy?new T_SPRING_HASH():0; // many deletes can hurt open addressed hash table, use "generational" garbage collection

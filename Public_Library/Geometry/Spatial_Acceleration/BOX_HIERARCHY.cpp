@@ -4,7 +4,6 @@
 //#####################################################################
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Data_Structures/KD_TREE.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Matrices/MATRIX_3X3.h>

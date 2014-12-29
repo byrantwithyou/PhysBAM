@@ -123,137 +123,46 @@ bool Frame_File_Exists(const std::string &filename,int frame);
 // Read_From_File
 //#####################################################################
 // Convenience functions
-template<class RW,class T1>
-inline void Read_From_File(const std::string& filename,T1& d1)
-{std::istream* input=Safe_Open_Input(filename);Read_Binary<RW>(*input,d1);delete input;}
-template<class RW,class T1,class T2>
-inline void Read_From_File(const std::string& filename,T1& d1,T2& d2)
-{std::istream* input=Safe_Open_Input(filename);Read_Binary<RW>(*input,d1,d2);delete input;}
-template<class RW,class T1,class T2,class T3>
-inline void Read_From_File(const std::string& filename,T1& d1,T2& d2,T3& d3)
-{std::istream* input=Safe_Open_Input(filename);Read_Binary<RW>(*input,d1,d2,d3);delete input;}
-template<class RW,class T1,class T2,class T3,class T4>
-inline void Read_From_File(const std::string& filename,T1& d1,T2& d2,T3& d3,T4& d4)
-{std::istream* input=Safe_Open_Input(filename);Read_Binary<RW>(*input,d1,d2,d3,d4);delete input;}
-template<class RW,class T1,class T2,class T3,class T4,class T5>
-inline void Read_From_File(const std::string& filename,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5)
-{std::istream* input=Safe_Open_Input(filename);Read_Binary<RW>(*input,d1,d2,d3,d4,d5);delete input;}
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6>
-inline void Read_From_File(const std::string& filename,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6)
-{std::istream* input=Safe_Open_Input(filename);Read_Binary<RW>(*input,d1,d2,d3,d4,d5,d6);delete input;}
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6,class T7>
-inline void Read_From_File(const std::string& filename,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6,T7& d7)
-{std::istream* input=Safe_Open_Input(filename);Read_Binary<RW>(*input,d1,d2,d3,d4,d5,d6,d7);delete input;}
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8>
-inline void Read_From_File(const std::string& filename,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6,T7& d7,T8& d8)
-{std::istream* input=Safe_Open_Input(filename);Read_Binary<RW>(*input,d1,d2,d3,d4,d5,d6,d7,d8);delete input;}
+template<class RW,class T1,class ...Args>
+inline void Read_From_File(const std::string& filename,T1& d1,Args&& ...args)
+{std::istream* input=Safe_Open_Input(filename);Read_Binary<RW>(*input,d1,args...);delete input;}
 // runtime float/double versions
-template<class T1>
-inline void Read_From_File(const STREAM_TYPE stream_type,const std::string& filename,T1& d1)
-{std::istream* input=Safe_Open_Input(filename);TYPED_ISTREAM typed_input(*input,stream_type);Read_Binary(typed_input,d1);delete input;}
-template<class T1,class T2>
-inline void Read_From_File(const STREAM_TYPE stream_type,const std::string& filename,T1& d1,T2& d2)
-{std::istream* input=Safe_Open_Input(filename);TYPED_ISTREAM typed_input(*input,stream_type);Read_Binary(typed_input,d1,d2);delete input;}
-template<class T1,class T2,class T3>
-inline void Read_From_File(const STREAM_TYPE stream_type,const std::string& filename,T1& d1,T2& d2,T3& d3)
-{std::istream* input=Safe_Open_Input(filename);TYPED_ISTREAM typed_input(*input,stream_type);Read_Binary(typed_input,d1,d2,d3);delete input;}
-template<class T1,class T2,class T3,class T4>
-inline void Read_From_File(const STREAM_TYPE stream_type,const std::string& filename,T1& d1,T2& d2,T3& d3,T4& d4)
-{std::istream* input=Safe_Open_Input(filename);TYPED_ISTREAM typed_input(*input,stream_type);Read_Binary(typed_input,d1,d2,d3,d4);delete input;}
-template<class T1,class T2,class T3,class T4,class T5>
-inline void Read_From_File(const STREAM_TYPE stream_type,const std::string& filename,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5)
-{std::istream* input=Safe_Open_Input(filename);TYPED_ISTREAM typed_input(*input,stream_type);Read_Binary(typed_input,d1,d2,d3,d4,d5);delete input;}
-template<class T1,class T2,class T3,class T4,class T5,class T6>
-inline void Read_From_File(const STREAM_TYPE stream_type,const std::string& filename,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6)
-{std::istream* input=Safe_Open_Input(filename);TYPED_ISTREAM typed_input(*input,stream_type);Read_Binary(typed_input,d1,d2,d3,d4,d5,d6);delete input;}
-template<class T1,class T2,class T3,class T4,class T5,class T6,class T7>
-inline void Read_From_File(const STREAM_TYPE stream_type,const std::string& filename,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6,T7& d7)
-{std::istream* input=Safe_Open_Input(filename);TYPED_ISTREAM typed_input(*input,stream_type);Read_Binary(typed_input,d1,d2,d3,d4,d5,d6,d7);delete input;}
-template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8>
-inline void Read_From_File(const STREAM_TYPE stream_type,const std::string& filename,T1& d1,T2& d2,T3& d3,T4& d4,T5& d5,T6& d6,T7& d7,T8& d8)
-{std::istream* input=Safe_Open_Input(filename);TYPED_ISTREAM typed_input(*input,stream_type);Read_Binary(typed_input,d1,d2,d3,d4,d5,d6,d7,d8);delete input;}
+template<class T1,class ...Args>
+inline void Read_From_File(const STREAM_TYPE stream_type,const std::string& filename,T1& d1,Args&& ...args)
+{std::istream* input=Safe_Open_Input(filename);TYPED_ISTREAM typed_input(*input,stream_type);Read_Binary(typed_input,d1,args...);delete input;}
 //#####################################################################
 // Write_To_File
 //#####################################################################
 // Convenience functions
-template<class RW,class T1>
-inline void Write_To_File(const std::string& filename,const T1& d1)
-{std::ostream* output=Safe_Open_Output(filename);Write_Binary<RW>(*output,d1);delete output;}
-template<class RW,class T1,class T2>
-inline void Write_To_File(const std::string& filename,const T1& d1,const T2& d2)
-{std::ostream* output=Safe_Open_Output(filename);Write_Binary<RW>(*output,d1,d2);delete output;}
-template<class RW,class T1,class T2,class T3>
-inline void Write_To_File(const std::string& filename,const T1& d1,const T2& d2,const T3& d3)
-{std::ostream* output=Safe_Open_Output(filename);Write_Binary<RW>(*output,d1,d2,d3);delete output;}
-template<class RW,class T1,class T2,class T3,class T4>
-inline void Write_To_File(const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4)
-{std::ostream* output=Safe_Open_Output(filename);Write_Binary<RW>(*output,d1,d2,d3,d4);delete output;}
-template<class RW,class T1,class T2,class T3,class T4,class T5>
-inline void Write_To_File(const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5)
-{std::ostream* output=Safe_Open_Output(filename);Write_Binary<RW>(*output,d1,d2,d3,d4,d5);delete output;}
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6>
-inline void Write_To_File(const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6)
-{std::ostream* output=Safe_Open_Output(filename);Write_Binary<RW>(*output,d1,d2,d3,d4,d5,d6);delete output;}
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6,class T7>
-inline void Write_To_File(const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6,const T7& d7)
-{std::ostream* output=Safe_Open_Output(filename);Write_Binary<RW>(*output,d1,d2,d3,d4,d5,d6,d7);delete output;}
-template<class RW,class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8>
-inline void Write_To_File(const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6,const T7& d7,const T8& d8)
-{std::ostream* output=Safe_Open_Output(filename);Write_Binary<RW>(*output,d1,d2,d3,d4,d5,d6,d7,d8);delete output;}
+template<class RW,class T1,class ...Args>
+inline void Write_To_File(const std::string& filename,const T1& d1,Args&& ...args)
+{std::ostream* output=Safe_Open_Output(filename);Write_Binary<RW>(*output,d1,args...);delete output;}
 // runtime float/double versions
-template<class T1>
-inline void Write_To_File(const STREAM_TYPE stream_type,const std::string& filename,const T1& d1)
-{std::ostream* output=Safe_Open_Output(filename);TYPED_OSTREAM typed_output(*output,stream_type);Write_Binary(typed_output,d1);delete output;}
-template<class T1,class T2>
-inline void Write_To_File(const STREAM_TYPE stream_type,const std::string& filename,const T1& d1,const T2& d2)
-{std::ostream* output=Safe_Open_Output(filename);TYPED_OSTREAM typed_output(*output,stream_type);Write_Binary(typed_output,d1,d2);delete output;}
-template<class T1,class T2,class T3>
-inline void Write_To_File(const STREAM_TYPE stream_type,const std::string& filename,const T1& d1,const T2& d2,const T3& d3)
-{std::ostream* output=Safe_Open_Output(filename);TYPED_OSTREAM typed_output(*output,stream_type);Write_Binary(typed_output,d1,d2,d3);delete output;}
-template<class T1,class T2,class T3,class T4>
-inline void Write_To_File(const STREAM_TYPE stream_type,const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4)
-{std::ostream* output=Safe_Open_Output(filename);TYPED_OSTREAM typed_output(*output,stream_type);Write_Binary(typed_output,d1,d2,d3,d4);delete output;}
-template<class T1,class T2,class T3,class T4,class T5>
-inline void Write_To_File(const STREAM_TYPE stream_type,const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5)
-{std::ostream* output=Safe_Open_Output(filename);TYPED_OSTREAM typed_output(*output,stream_type);Write_Binary(typed_output,d1,d2,d3,d4,d5);delete output;}
-template<class T1,class T2,class T3,class T4,class T5,class T6>
-inline void Write_To_File(const STREAM_TYPE stream_type,const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6)
-{std::ostream* output=Safe_Open_Output(filename);TYPED_OSTREAM typed_output(*output,stream_type);Write_Binary(typed_output,d1,d2,d3,d4,d5,d6);delete output;}
-template<class T1,class T2,class T3,class T4,class T5,class T6,class T7>
-inline void Write_To_File(const STREAM_TYPE stream_type,const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6,const T7& d7)
-{std::ostream* output=Safe_Open_Output(filename);TYPED_OSTREAM typed_output(*output,stream_type);Write_Binary(typed_output,d1,d2,d3,d4,d5,d6,d7);delete output;}
-template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8>
-inline void Write_To_File(const STREAM_TYPE stream_type,const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6,const T7& d7,const T8& d8)
-{std::ostream* output=Safe_Open_Output(filename);TYPED_OSTREAM typed_output(*output,stream_type);Write_Binary(typed_output,d1,d2,d3,d4,d5,d6,d7,d8);delete output;}
+template<class T1,class ...Args>
+inline void Write_To_File(const STREAM_TYPE stream_type,const std::string& filename,const T1& d1,Args&& ...args)
+{std::ostream* output=Safe_Open_Output(filename);TYPED_OSTREAM typed_output(*output,stream_type);Write_Binary(typed_output,d1,args...);delete output;}
 //#####################################################################
 // Read_From_Text_File
 //#####################################################################
 // Convenience function
-template<class T1>
-inline void Read_From_Text_File(const std::string& filename,T1& d1)
-{std::istream* input=Safe_Open_Input(filename,false);*input>>d1;delete input;}
+inline void Read_From_Text_File_Helper(std::istream& in){}
+template<class T1,class ...Args>
+inline void Read_From_Text_File_Helper(std::istream& in,T1& d1,Args&& ...args)
+{in>>d1;Read_From_Text_File_Helper(in,args...);}
+template<class ...Args>
+inline void Read_From_Text_File(const std::string& filename,Args&& ...args)
+{std::istream* input=Safe_Open_Input(filename,false);Read_From_Text_File_Helper(*input,args...);delete input;}
 //#####################################################################
 // Write_To_Text_File
 //#####################################################################
 // Convenience functions
-template<class T1>
-inline void Write_To_Text_File(const std::string& filename,const T1& d1)
-{std::ostream* output=Safe_Open_Output(filename,false);*output<<d1;delete output;}
-template<class T1,class T2>
-inline void Write_To_Text_File(const std::string& filename,const T1& d1,const T2& d2)
-{std::ostream* output=Safe_Open_Output(filename,false);*output<<d1<<d2;delete output;}
-template<class T1,class T2,class T3>
-inline void Write_To_Text_File(const std::string& filename,const T1& d1,const T2& d2,const T3& d3)
-{std::ostream* output=Safe_Open_Output(filename,false);*output<<d1<<d2<<d3;delete output;}
-template<class T1,class T2,class T3,class T4>
-inline void Write_To_Text_File(const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4)
-{std::ostream* output=Safe_Open_Output(filename,false);*output<<d1<<d2<<d3<<d4;delete output;}
-template<class T1,class T2,class T3,class T4,class T5>
-inline void Write_To_Text_File(const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5)
-{std::ostream* output=Safe_Open_Output(filename,false);*output<<d1<<d2<<d3<<d4<<d5;delete output;}
-template<class T1,class T2,class T3,class T4,class T5,class T6>
-inline void Write_To_Text_File(const std::string& filename,const T1& d1,const T2& d2,const T3& d3,const T4& d4,const T5& d5,const T6& d6)
-{std::ostream* output=Safe_Open_Output(filename,false);*output<<d1<<d2<<d3<<d4<<d5<<d6;delete output;}
+inline void Write_To_Text_File_Helper(std::ostream& out){}
+template<class T1,class ...Args>
+inline void Write_To_Text_File_Helper(std::ostream& out,T1& d1,Args&& ...args)
+{out<<d1;Write_To_Text_File_Helper(out,args...);}
+template<class ...Args>
+inline void Write_To_Text_File(const std::string& filename,Args&& ...args)
+{std::ostream* output=Safe_Open_Output(filename,false);Write_To_Text_File_Helper(*output,args...);delete output;}
 //#####################################################################
 // Create_From_File
 //#####################################################################

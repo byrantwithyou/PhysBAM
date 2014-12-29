@@ -7,7 +7,6 @@
 #ifndef __RAY_TRACING_DRIVER__
 #define __RAY_TRACING_DRIVER__
 
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Log/PROGRESS_INDICATOR.h>
 #include <Tools/Math_Tools/integer_log.h>

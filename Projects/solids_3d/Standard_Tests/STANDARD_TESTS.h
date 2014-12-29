@@ -62,7 +62,6 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
@@ -408,7 +407,7 @@ void Parse_Options()
             if(test_number==32){
                 test_32_wind_drag_on=(T)2.83;
                 test_32_wind_drag_ramp_off=(T)3.017;}
-            PHYSBAM_DEBUG_PRINT("Basic settings",solids_parameters.cfl,solids_parameters.implicit_solve_parameters.cg_tolerance,solids_parameters.implicit_solve_parameters.cg_iterations);
+            LOG::printf("Basic settings: %P %P %P",solids_parameters.cfl,solids_parameters.implicit_solve_parameters.cg_tolerance,solids_parameters.implicit_solve_parameters.cg_iterations);
             break;
         case 6:
         case 7:
@@ -450,7 +449,7 @@ void Parse_Options()
             solids_parameters.implicit_solve_parameters.cg_iterations=200;
             solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
             solids_parameters.deformable_object_collision_parameters.disable_multiple_levelset_collisions=false;
-            PHYSBAM_DEBUG_PRINT("Basic settings",solids_parameters.cfl,solids_parameters.implicit_solve_parameters.cg_tolerance,solids_parameters.implicit_solve_parameters.cg_iterations);
+            LOG::printf("Basic settings: %P %P\n",solids_parameters.cfl,solids_parameters.implicit_solve_parameters.cg_tolerance,solids_parameters.implicit_solve_parameters.cg_iterations);
             break;
         case 14:
             last_frame=(int)(7*frame_rate);
@@ -658,7 +657,7 @@ void Parse_Options()
         if(test_number==35) cloth_triangles/=100;
         number_side_panels=(int)ceil(sqrt((T).5*(T)cloth_triangles/aspect_ratio));
         int actual_cloth_triangles=2*((int)(aspect_ratio*number_side_panels))*number_side_panels;
-        PHYSBAM_DEBUG_PRINT("cloth resolution",cloth_triangles,actual_cloth_triangles,number_side_panels);
+        LOG::printf("cloth resolution: %P, %P, %P\n",cloth_triangles,actual_cloth_triangles,number_side_panels);
         cloth_triangles=actual_cloth_triangles;
         if(test_number==35) cloth_triangles*=100;}
 
@@ -1330,7 +1329,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                     solid_body_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,axial_bending_stiffness,axial_bending_damping));}
                 T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
                 solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
-                PHYSBAM_DEBUG_PRINT("Spring stiffnesses",linear_stiffness,linear_damping,bending_stiffness,bending_damping);}
+                LOG::printf("Spring stiffnesses %P, %P, %P, %P\n",linear_stiffness,linear_damping,bending_stiffness,bending_damping);}
             else{
                 if(!no_altitude_springs) solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
                 TRIANGLE_BENDING_ELEMENTS<T>* bend=Create_Bending_Elements(triangulated_surface);
@@ -1392,7 +1391,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,linear_stiffness,linear_damping)); // were *2 and *10
             //T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
             //solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
-            PHYSBAM_DEBUG_PRINT("Spring stiffnesses",linear_stiffness,linear_damping);}
+            LOG::printf("Spring stiffnesses: %P, %P\n",linear_stiffness,linear_damping);}
             //if(!no_altitude_springs) solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
             //TRIANGLE_BENDING_ELEMENTS<T>* bend=Create_Bending_Elements(triangulated_surface);
             //bend->Set_Area_Cutoff_From_Triangulated_Surface(triangulated_surface,(T).1);

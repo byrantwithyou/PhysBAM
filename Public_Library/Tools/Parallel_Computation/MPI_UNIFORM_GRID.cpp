@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #ifdef USE_MPI

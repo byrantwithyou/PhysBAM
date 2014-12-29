@@ -5,7 +5,6 @@
 #include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Interpolation/BSPLINE.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>
@@ -72,11 +71,11 @@ Camera(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         location=parameters.Get_Parameter("Location",TV(0,0,0));
         look_at=parameters.Get_Parameter("Look_At",TV(0,0,0));
         pseudo_up=parameters.Get_Parameter("Pseudo_Up",TV(0,1,0));}
-    PHYSBAM_DEBUG_PRINT("Camera Position/Aim",location,look_at,pseudo_up);
+    LOG::printf("Camera Position/Aim: %P, %P, %P\n",location,look_at,pseudo_up);
     world.camera.Position_And_Aim_Camera(location,look_at,pseudo_up);
     world.camera.Focus_Camera(focal_distance,aspect_ratio,field_of_view);
     world.camera.film.Set_Resolution(pixels_x_direction,pixels_y_direction);
-    PHYSBAM_DEBUG_PRINT("Camera ",world.camera.position,world.camera.focal_point,world.camera.look_vector,world.camera.vertical_vector,world.camera.horizontal_vector);
+    LOG::printf("Camera: %P, %P, %P, %P, %P\n",world.camera.position,world.camera.focal_point,world.camera.look_vector,world.camera.vertical_vector,world.camera.horizontal_vector);
     // Pixel filtering
     typename FILM<T>::PIXEL_FILTER filter;std::string filter_string=parameters.Get_Parameter("Pixel_Filter",std::string("Gaussian"));
     VECTOR<T,2> filter_width=parameters.Get_Parameter("Pixel_Filter_Width",VECTOR<T,2>(2,2));

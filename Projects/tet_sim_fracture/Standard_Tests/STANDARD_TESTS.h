@@ -12,7 +12,6 @@
 
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Math_Tools/constants.h>
 #include <Tools/Matrices/ROTATION.h>

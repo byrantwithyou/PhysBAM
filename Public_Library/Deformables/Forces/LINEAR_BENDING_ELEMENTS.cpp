@@ -6,7 +6,6 @@
 #include <Tools/Arrays/CONSTANT_ARRAY.h>
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/cyclic_shift.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>

@@ -4,7 +4,6 @@
 //#####################################################################
 // Class COLLISION_GEOMETRY_SPATIAL_PARTITION
 //##################################################################### 
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
@@ -130,8 +129,8 @@ Print_Initial_Statistics() const
     for(ID i(0);i<collision_bodies.Size();i++) if(collision_bodies(i) && collision_bodies(i)->add_to_spatial_partition){number++;
         int size=Number_Of_Voxels_Occupied(i);min_size=min(min_size,size);max_size=max(max_size,size);average_size+=size;}
     average_size/=number;
-    PHYSBAM_DEBUG_PRINT("Spatial partition statistics",voxel_size,min_size,average_size,max_size);
-    PHYSBAM_DEBUG_PRINT("Spatial partition bodies",bodies_not_in_partition.m,hashtable.Size());
+    LOG::printf("Spatial partition statistics: %P, %P, %P, %P\n",voxel_size,min_size,average_size,max_size);
+    LOG::printf("Spatial partition bodies: %P, %P, %P, %P\n",bodies_not_in_partition.m,hashtable.Size());
 }
 //#####################################################################
 // Function Update_Body

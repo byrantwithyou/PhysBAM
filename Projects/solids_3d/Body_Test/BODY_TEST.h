@@ -4,7 +4,6 @@
 //#####################################################################
 #ifndef __BODY_TEST__
 #define __BODY_TEST__
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>

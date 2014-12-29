@@ -6,7 +6,6 @@
 //#####################################################################
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Math_Tools/cyclic_shift.h>
 #include <Tools/Math_Tools/permutation.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>

@@ -9,7 +9,6 @@
 //#####################################################################
 #ifndef __EMBEDDING_TEST__
 #define __EMBEDDING_TEST__
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 
@@ -239,14 +238,14 @@ void Get_Initial_Data()
 
 
     // correct mass
-    PHYSBAM_DEBUG_PRINT("before distribute ",particles.mass);
+    LOG::printf("before distribute: %P\n",particles.mass);
     binding_list.Distribute_Mass_To_Parents();
-    PHYSBAM_DEBUG_PRINT("after distribute before clear ",particles.mass);
+    LOG::printf("after distribute before clear: %P\n",particles.mass);
     binding_list.Clear_Hard_Bound_Particles(particles.mass);
-    PHYSBAM_DEBUG_PRINT("after clear",particles.mass);
+    LOG::printf("after clear: %P\n",particles.mass);
     particles.Compute_Auxiliary_Attributes(soft_bindings);
     soft_bindings.Set_Mass_From_Effective_Mass();
-    PHYSBAM_DEBUG_PRINT("soft",particles.mass);
+    LOG::printf("soft: %P\n",particles.mass);
 
     LOG::cout<<"total mass "<<particles.mass.Sum()<<std::endl;
 

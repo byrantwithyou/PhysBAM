@@ -23,7 +23,6 @@
 
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>

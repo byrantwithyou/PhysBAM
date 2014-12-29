@@ -102,7 +102,6 @@ Update_Springs(const bool search_hierarchy)
         mpi_solids->All_Gather_Particles(particles.X,particles.V);
     }
 
-    //PHYSBAM_DEBUG_PRINT("states",youngs_modulus,overdamping_fraction,on_distance,off_distance);
     // prune broken springs
     LOG::Time("Prune Particles");
     ARRAY<VECTOR<int,2> > deletion_list;

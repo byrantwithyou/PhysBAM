@@ -9,7 +9,6 @@
 #include <Tools/Data_Structures/UNION_FIND.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Log/DEBUG_PRINT.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED.h>
@@ -352,7 +351,7 @@ Initialize_Bodies()
     bool strain_limit=false;
     ARRAY<int> tet_node_list;
     solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,&active_particles,NULL));
-    PHYSBAM_DEBUG_PRINT("Parameters",overdamping_fraction,edge_stiffness);
+    LOG::printf("Parameters: %P %P\n",overdamping_fraction,edge_stiffness);
     //LINEAR_SPRINGS<TV>* guide_springs=Create_Edge_Springs(sim_guide_edges,edge_stiffness,overdamping_fraction);
     LINEAR_SPRINGS<TV>* edge_springs=Create_Edge_Springs(edges,edge_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
     edge_springs->Clamp_Restlength(restlength_clamp);
