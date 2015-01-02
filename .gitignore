@@ -48,3 +48,10 @@ Public_Library/Tools/Symbolics/PROGRAM_YACC.hpp
 *.opensdf
 *.suo
 *.vcxproj.user
+*.mov
+*.png
+*.svg
+*.pov
+*#
+camera_script
+camera_script_render
