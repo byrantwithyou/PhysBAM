@@ -192,7 +192,7 @@ public:
     T Frobenius_Norm() const
     {return sqrt(Frobenius_Norm_Squared());}
 
-    SYMMETRIC_MATRIX Cofactor_Matrix()
+    SYMMETRIC_MATRIX Cofactor_Matrix() const
     {return SYMMETRIC_MATRIX(x11,-x10,x00);}
 
     VECTOR<T,2> Largest_Column() const

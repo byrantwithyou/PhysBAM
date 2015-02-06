@@ -179,7 +179,7 @@ public:
     T Frobenius_Norm() const
     {return 0;}
 
-    SYMMETRIC_MATRIX Cofactor_Matrix()
+    SYMMETRIC_MATRIX Cofactor_Matrix() const 
     {return *this;}
 
     VECTOR<T,0> Largest_Column() const
