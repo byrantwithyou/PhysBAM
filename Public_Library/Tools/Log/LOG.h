@@ -110,7 +110,7 @@ public:
     SCOPE(const std::string& scope_identifier,const std::string& format,const T1& d1,Args&& ...args)
         :active(true)
     {
-        LOG_CLASS::Push_Scope(scope_identifier,STRING_UTILITIES::string_sprintf(format.c_str(),args...));
+        LOG_CLASS::Push_Scope(scope_identifier,STRING_UTILITIES::string_sprintf(format.c_str(),d1,args...));
     }
 
     ~SCOPE();
