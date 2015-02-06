@@ -32,6 +32,7 @@ public:
     bool print_matrix;
     int resolution;
     T stiffness_multiplier;
+    T thickness;
     T curvature_stiffness_multiplier;
     T damping_multiplier;
     ARRAY<int> externally_forced;
