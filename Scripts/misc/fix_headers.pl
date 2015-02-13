@@ -19,6 +19,7 @@ my @geometry = ();
 my @rigids = ();
 my @deformables = ();
 my @solids = ();
+my @hybrid_methods = ();
 my @incompressible = ();
 my @compressible = ();
 my @fluids = ();
@@ -44,10 +45,10 @@ my $filename;
 
 sub dump_headers
 {
-    if(!@tools && !@geometry && !@rigids && !@deformables && !@solids && !@incompressible && !@compressible && !@fluids && !@opengl && !@physbam && !@system && !@other){return;}
+    if(!@tools && !@geometry && !@rigids && !@deformables && !@solids && !@hybrid_methods && !@incompressible && !@compressible && !@fluids && !@opengl && !@physbam && !@system && !@other){return;}
     $filename eq $cf or die "Trying to insert includes from $cf into $filename.\n";
     my $last = "";
-    for $L (\@tools, \@geometry, \@rigids, \@deformables, \@solids, \@fluids, \@incompressible, \@compressible, \@opengl, \@physbam, \@system, \@other)
+    for $L (\@tools, \@geometry, \@rigids, \@deformables, \@solids, \@hybrid_methods, \@fluids, \@incompressible, \@compressible, \@opengl, \@physbam, \@system, \@other)
     {
         for(sort {$x=lc $$a[0];$y=lc $$b[0];$x=~s/_/0/g;$y=~s/_/0/g;$x cmp $y;} @$L)
         {
@@ -62,6 +63,7 @@ sub dump_headers
     @rigids = ();
     @deformables = ();
     @solids = ();
+    @hybrid_methods = ();
     @incompressible = ();
     @compressible = ();
     @fluids = ();
@@ -102,6 +104,7 @@ for $filenamex (@ARGV)
         if($header =~ /<Rigids/){push @rigids, [$header,$pre,$post];next;}
         if($header =~ /<Deformables/){push @deformables, [$header,$pre,$post];next;}
         if($header =~ /<Solids/){push @solids, [$header,$pre,$post];next;}
+        if($header =~ /<Hybrid_Methods/){push @hybrid_methods, [$header,$pre,$post];next;}
         if($header =~ /<Incompressible/){push @incompressible, [$header,$pre,$post];next;}
         if($header =~ /<Compressible/){push @compressible, [$header,$pre,$post];next;}
         if($header =~ /<Fluids/){push @fluids, [$header,$pre,$post];next;}

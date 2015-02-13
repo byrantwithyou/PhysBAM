@@ -8,7 +8,7 @@ env=env.Copy()
 
 ignore=["build","install","Documentation"]
 exclude=[]
-directories=['Ray_Tracing', 'OpenGL', 'Dynamics', 'Fluids', 'Compressible', 'Incompressible', 'Solids', 'Deformables', 'Rigids', 'Geometry', 'Tools']
+directories=['Ray_Tracing', 'OpenGL', 'Dynamics', 'Fluids', 'Compressible', 'Incompressible', 'Solids', 'Hybrid_Methods', 'Deformables', 'Rigids', 'Geometry', 'Tools']
 
 if env['install_headers'] and env['INSTALL_PATH']:
     install_include=os.path.join(env['INSTALL_PATH'],'include','physbam','')
@@ -22,7 +22,7 @@ def Sublibrary(env,name,directories,parent=None):
     if parent: env.Depends(parent,lib)
     return lib
 
-for d in ['Ray_Tracing', 'OpenGL', 'Solids', 'Deformables', 'Rigids', 'Geometry', 'Tools']:
+for d in ['Ray_Tracing', 'OpenGL', 'Solids', 'Hybrid_Methods', 'Deformables', 'Rigids', 'Geometry', 'Tools']:
     Sublibrary(env,d,[d],parent=d)
 
 Sublibrary(env,'Dynamics',['Dynamics', 'Fluids', 'Compressible', 'Incompressible'],parent='.')

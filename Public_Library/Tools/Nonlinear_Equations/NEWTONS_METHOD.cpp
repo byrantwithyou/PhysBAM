@@ -16,18 +16,18 @@ using namespace PhysBAM;
 // Function Newtons_Method
 //#####################################################################
 template <class T> bool NEWTONS_METHOD<T>::
-Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYSTEM_BASE<T>& sys,KRYLOV_VECTOR_BASE<T>& x)
+Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYSTEM_BASE<T>& sys,KRYLOV_VECTOR_BASE<T>& x,ARRAY<KRYLOV_VECTOR_BASE<T>*>& av)
 {
-    KRYLOV_VECTOR_BASE<T>& grad=*x.Clone_Default();
-    KRYLOV_VECTOR_BASE<T>& dx=*x.Clone_Default();
-    KRYLOV_VECTOR_BASE<T>& tm=*x.Clone_Default();
+    KRYLOV_SOLVER<T>::Ensure_Size(av,x,3);
+    KRYLOV_VECTOR_BASE<T>& grad=*av.Pop();
+    KRYLOV_VECTOR_BASE<T>& dx=*av.Pop();
+    KRYLOV_VECTOR_BASE<T>& tm=*av.Pop();
     MINRES<T> minres;
     CONJUGATE_GRADIENT<T> cg;
     cg.finish_before_indefiniteness=finish_before_indefiniteness;
     KRYLOV_SOLVER<T>* krylov=&minres;
     if(use_cg) krylov=&cg;
     krylov->relative_tolerance=true;
-    ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
 
     bool result=false;
 
@@ -67,11 +67,9 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         F.Make_Feasible(x);
         last_E=E;}
 
-    av.Delete_Pointers_And_Clean_Memory();
-    delete &grad;
-    delete &dx;
-    delete &tm;
-
+    av.Append(&tm);
+    av.Append(&dx);
+    av.Append(&grad);
     return result;
 }
 //#####################################################################

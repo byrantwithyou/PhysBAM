@@ -37,6 +37,7 @@ static int Initialize_Geometry_Particle()
     Register_Attribute_Name(ATTRIBUTE_ID_RIGID_BODY,"rigid_body");
     Register_Attribute_Name(ATTRIBUTE_ID_X,"X");
     Register_Attribute_Name(ATTRIBUTE_ID_V,"V");
+    Register_Attribute_Name(ATTRIBUTE_ID_MASS,"mass");
     Register_Attribute_Name(ATTRIBUTE_ID_STRUCTURE_IDS,"structure_ids");
     Register_Attribute_Name(ATTRIBUTE_ID_ID,"id");
     Register_Attribute_Name(ATTRIBUTE_ID_COLOR,"color");
@@ -59,8 +60,10 @@ static int Initialize_Geometry_Particle()
     Register_Attribute_Sample<DIAGONAL_MATRIX<float,1> ,DIAGONAL_MATRIX<double,1> >();
     Register_Attribute_Sample<DIAGONAL_MATRIX<float,2> ,DIAGONAL_MATRIX<double,2> >();
     Register_Attribute_Sample<DIAGONAL_MATRIX<float,3> ,DIAGONAL_MATRIX<double,3> >();
-    Register_Attribute_Sample<MATRIX<float,1,1> ,MATRIX<double,1,1> >();
     Register_Attribute_Sample<MATRIX<float,0,0> ,MATRIX<double,0,0> >();
+    Register_Attribute_Sample<MATRIX<float,1,1> ,MATRIX<double,1,1> >();
+    Register_Attribute_Sample<MATRIX<float,2,2> ,MATRIX<double,2,2> >();
+    Register_Attribute_Sample<MATRIX<float,3,3> ,MATRIX<double,3,3> >();
     READ_WRITE_VECTOR_HELPER(1);READ_WRITE_VECTOR_HELPER(2);READ_WRITE_VECTOR_HELPER(3);
 
     return 1;

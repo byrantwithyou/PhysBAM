@@ -64,7 +64,6 @@ Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings,const T_INDI
 }
 static int Initialize_Deformables_Particles()
 {
-    Register_Attribute_Name(ATTRIBUTE_ID_MASS,"mass");
     Register_Attribute_Name(ATTRIBUTE_ID_ONE_OVER_MASS,"one_over_mass");
     Register_Attribute_Name(ATTRIBUTE_ID_EFFECTIVE_MASS,"effective_mass");
     Register_Attribute_Name(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS,"one_over_effective_mass");

@@ -1342,7 +1342,9 @@ Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<T
     newton.max_iterations=iterations;
 
     FIX_MESH_ENERGY<TV> fme(particles.X,active_list,index_map,reverse_index_map);
-    newton.Newtons_Method(fme,system,sol);
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+    newton.Newtons_Method(fme,system,sol,av);
+    av.Delete_Pointers_And_Clean_Memory();
     particles.X.Subset(index_map)=sol.x;
 
     // DRAW DEBUG PARTICLES

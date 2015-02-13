@@ -97,7 +97,9 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     if(test_diff) minimization_objective.Test_Diff(dv);
 
     newtons_method.tolerance*=dt;
-    bool converged=newtons_method.Newtons_Method(minimization_objective,minimization_system,dv);
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+    bool converged=newtons_method.Newtons_Method(minimization_objective,minimization_system,dv,av);
+    av.Delete_Pointers_And_Clean_Memory();
     newtons_method.tolerance/=dt;
     if(converged) siggraph_hack_newton_iterations=newtons_method.iterations_used;
     else siggraph_hack_newton_iterations=~newtons_method.iterations_used;
