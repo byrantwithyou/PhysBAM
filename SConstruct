@@ -29,6 +29,7 @@ variables.AddVariables(
     BoolVariable('USE_INCOMPRESSIBLE','Use incompressible',0),
     BoolVariable('USE_RIGIDS','Use rigid bodies',0),
     BoolVariable('USE_SOLIDS','Use solids',0),
+    BoolVariable('USE_HYBRID','Use hybrid methods',0),
     BoolVariable('USE_TOOLS','Use tools',0),
     BoolVariable('USE_LEX_YACC','Use lex and yacc to allow parsing for symbolics',0),
     BoolVariable('compile_id_types_as_int','Treat ID types as int to avoid possible performance consequences',0),
@@ -237,6 +238,9 @@ def Link_Flags(env):
         env['USE_SOLIDS']=1
     if env['USE_SOLIDS']:
         env.Append(LIBS=['PhysBAM_Solids'+library_suffix])
+        env['USE_DEFORMABLES']=1
+    if env['USE_HYBRID']:
+        env.Append(LIBS=['PhysBAM_Hybrid_Methods'+library_suffix])
         env['USE_DEFORMABLES']=1
     if env['USE_DEFORMABLES']:
         env.Append(LIBS=['PhysBAM_Deformables'+library_suffix])
