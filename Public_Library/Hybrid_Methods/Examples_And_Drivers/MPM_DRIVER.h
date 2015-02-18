@@ -44,6 +44,9 @@ public:
     void Apply_Forces();
     void Perform_Particle_Collision(int p);
     void Apply_Friction();
+private:
+    T Compute_Dt() const;
+    T Max_Particle_Speed() const;
 //#####################################################################
 };
 }

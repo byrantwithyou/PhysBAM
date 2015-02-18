@@ -54,6 +54,7 @@ public:
     bool use_affine;
     bool use_midpoint;
     T flip;
+    T cfl;
 
     T newton_tolerance;
     int newton_iterations;

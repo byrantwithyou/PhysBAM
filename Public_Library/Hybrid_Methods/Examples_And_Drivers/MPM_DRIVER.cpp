@@ -112,8 +112,8 @@ Simulate_To_Frame(const int frame)
         bool done=false;
         for(int substep=0;!done;substep++){
             LOG::SCOPE scope("SUBSTEP","substep %d",substep+1);
-            // TODO: Compute example.dt
-            example.dt=example.max_dt;
+            example.dt=Compute_Dt();
+            // example.dt=example.max_dt;
 
             example.dt=clamp(example.dt,example.min_dt,example.max_dt);
             T next_time=example.time+example.dt;
@@ -286,6 +286,28 @@ template<class TV> void MPM_DRIVER<TV>::
 Apply_Friction()
 {
     // TODO
+}
+//#####################################################################
+// Function Compute_Dt
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
+Compute_Dt() const
+{
+    T critical_speed=example.cfl*example.grid.One_Over_DX().Min()/example.max_dt;
+    T v=Max_Particle_Speed();
+    return (v>critical_speed)?(example.cfl*example.grid.One_Over_DX().Min()/v):example.max_dt;
+}
+//#####################################################################
+// Function Max_Particle_Speed
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
+Max_Particle_Speed() const
+{
+    T v2=0;
+    for(int k=0;k<example.simulated_particles.m;k++){
+        int p=example.simulated_particles(k);
+        v2=max(v2,example.particles.V(p).Magnitude_Squared());}
+    return sqrt(v2);
 }
 //#####################################################################
 namespace PhysBAM{
