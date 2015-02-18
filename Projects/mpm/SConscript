@@ -1,5 +1,5 @@
 # SConscript
 
 Import('env Automatic_Program')
-env=env.Copy(USE_TOOLS=1)
-Automatic_Program(env,"test_proj",["main.cpp"])
+env=env.Copy(USE_HYBRID=1)
+Automatic_Program(env,"test_proj",["main.cpp","STANDARD_TESTS_BASE.cpp","STANDARD_TESTS_2D.cpp"])
