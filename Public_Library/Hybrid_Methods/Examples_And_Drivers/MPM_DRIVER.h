@@ -12,6 +12,7 @@ template<class TV> class MPM_EXAMPLE;
 template<class TV> class MPM_OBJECTIVE;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
 template<class TV> class MPM_KRYLOV_VECTOR;
+template<class T> class KRYLOV_VECTOR_BASE;
 
 template<class TV>
 class MPM_DRIVER

@@ -311,8 +311,10 @@ Max_Particle_Speed() const
 }
 //#####################################################################
 namespace PhysBAM{
+template class MPM_DRIVER<VECTOR<float,1> >;
 template class MPM_DRIVER<VECTOR<float,2> >;
 template class MPM_DRIVER<VECTOR<float,3> >;
+template class MPM_DRIVER<VECTOR<double,1> >;
 template class MPM_DRIVER<VECTOR<double,2> >;
 template class MPM_DRIVER<VECTOR<double,3> >;
 }

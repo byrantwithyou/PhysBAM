@@ -20,8 +20,8 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     gather_scatter(*new GATHER_SCATTER<TV>(simulated_particles,weights)),initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),write_output_files(true),output_directory("output"),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),order(2),ghost(3),
-    use_reduced_rasterization(false),use_affine(false),use_midpoint(false),flip(0),cfl(1),newton_tolerance(-100),newton_iterations(-100),
-    solver_tolerance(-100),solver_iterations(-100)
+    use_reduced_rasterization(false),use_affine(false),use_midpoint(false),flip(0),cfl(1),newton_tolerance(-100),
+    newton_iterations(-100),solver_tolerance(-100),solver_iterations(-100),threads(1)
 {
     PHYSBAM_ASSERT(grid.Is_MAC_Grid());
 }
@@ -104,8 +104,10 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
 }
 //#####################################################################
 namespace PhysBAM{
+template class MPM_EXAMPLE<VECTOR<float,1> >;
 template class MPM_EXAMPLE<VECTOR<float,2> >;
 template class MPM_EXAMPLE<VECTOR<float,3> >;
+template class MPM_EXAMPLE<VECTOR<double,1> >;
 template class MPM_EXAMPLE<VECTOR<double,2> >;
 template class MPM_EXAMPLE<VECTOR<double,3> >;
 }

@@ -61,6 +61,7 @@ public:
     T solver_tolerance;
     int solver_iterations;
     bool test_diff;
+    int threads;
 
     MPM_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~MPM_EXAMPLE();
