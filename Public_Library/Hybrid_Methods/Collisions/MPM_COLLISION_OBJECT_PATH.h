@@ -7,6 +7,8 @@
 namespace PhysBAM{
 
 template<class TV> class ROTATION;
+template<class TV> class FRAME;
+template<class TV> class TWIST;
 
 template<class TV>
 class MPM_COLLISION_OBJECT_PATH
@@ -17,11 +19,8 @@ public:
 
     virtual ~MPM_COLLISION_OBJECT_PATH();
 
-    virtual TV Translation(const T t) const=0;
-    virtual TV Translation_Velocity(const T t) const=0;
-    virtual ROTATION<TV> Rotation(const T t) const=0;
-    virtual T_SPIN Angular_Velocity(const T t) const=0;
-
+    virtual FRAME<TV> Orientation(const T t) const=0;
+    virtual TWIST<TV> Velocity(const T t) const=0;
 //#####################################################################
 };
 }

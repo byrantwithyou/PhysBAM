@@ -23,37 +23,20 @@ template<class TV> MPM_COLLISION_OBJECT_STATIC_PATH<TV>::
 {
 }
 //#####################################################################
-// Function Translation
+// Function Orientation
 //#####################################################################
-template<class TV> TV MPM_COLLISION_OBJECT_STATIC_PATH<TV>::
-Translation(const T t) const
+template<class TV> FRAME<TV> MPM_COLLISION_OBJECT_STATIC_PATH<TV>::
+Orientation(const T t) const
 {
-    return frame.t;
+    return frame;
 }
 //#####################################################################
-// Function Translation_Velocity
+// Function Velocity
 //#####################################################################
-template<class TV> TV MPM_COLLISION_OBJECT_STATIC_PATH<TV>::
-Translation_Velocity(const T t) const
+template<class TV> TWIST<TV> MPM_COLLISION_OBJECT_STATIC_PATH<TV>::
+Velocity(const T t) const
 {
-    return TV();
-}
-//#####################################################################
-// Function Rotation
-//#####################################################################
-template<class TV> ROTATION<TV> MPM_COLLISION_OBJECT_STATIC_PATH<TV>::
-Rotation(const T t) const
-{
-    return frame.r;
-}
-//#####################################################################
-// Function Angular_Velocity
-//#####################################################################
-template<class TV> typename TV::SPIN MPM_COLLISION_OBJECT_STATIC_PATH<TV>::
-Angular_Velocity(const T t) const
-{
-    typedef typename TV::SPIN T_SPIN;
-    return T_SPIN();
+    return TWIST<TV>();
 }
 template class MPM_COLLISION_OBJECT_STATIC_PATH<VECTOR<float,1> >;
 template class MPM_COLLISION_OBJECT_STATIC_PATH<VECTOR<float,2> >;

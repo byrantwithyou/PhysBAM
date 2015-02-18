@@ -23,10 +23,8 @@ public:
     MPM_COLLISION_OBJECT_UNIFORM_PATH(const FRAME<TV>& frame,const TWIST<TV>& twist);
     virtual ~MPM_COLLISION_OBJECT_UNIFORM_PATH();
 
-    TV Translation(const T t) const;
-    TV Translation_Velocity(const T t) const;
-    ROTATION<TV> Rotation(const T t) const;
-    T_SPIN Angular_Velocity(const T t) const;
+    FRAME<TV> Orientation(const T t) const;
+    TWIST<TV> Velocity(const T t) const;
 //#####################################################################
 };
 }
