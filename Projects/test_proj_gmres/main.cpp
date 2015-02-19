@@ -25,7 +25,6 @@ template<int n>
 void Test()
 {
     typedef VECTOR<T,n> TV;
-    typedef VECTOR<int,n> TV_INT;
     typedef KRYLOV_VECTOR_WRAPPER<T,TV> T_VEC;
     typedef MATRIX_SYSTEM<MATRIX<T,n>,T,T_VEC> T_MAT;
 
