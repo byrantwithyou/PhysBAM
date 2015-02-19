@@ -48,7 +48,6 @@ public:
     std::string output_directory;
     int restart;
     T dt,time,frame_dt,min_dt,max_dt;
-    int order; // interpolation order
     int ghost;
     bool use_reduced_rasterization;
     bool use_affine;
