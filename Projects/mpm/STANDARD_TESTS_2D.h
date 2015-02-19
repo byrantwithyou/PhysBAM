@@ -21,8 +21,8 @@ class STANDARD_TESTS<VECTOR<T,2> >:public STANDARD_TESTS_BASE<VECTOR<T,2> >
     typedef STANDARD_TESTS_BASE<TV> BASE;
 
 public:
-    using BASE::initial_time;using BASE::last_frame;
-    using BASE::frame_title;using BASE::write_substeps_level;
+    using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
+    using BASE::frame_title;using BASE::write_substeps_level;using BASE::particles_per_cell;
     using BASE::substeps_delay_frame;using BASE::write_output_files;
     using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;using BASE::order;
@@ -30,6 +30,7 @@ public:
     using BASE::use_midpoint;using BASE::flip;using BASE::cfl;using BASE::newton_tolerance;
     using BASE::newton_iterations;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::test_diff;using BASE::threads;using BASE::test_number;using BASE::resolution;
+    using BASE::Seed_Particles;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

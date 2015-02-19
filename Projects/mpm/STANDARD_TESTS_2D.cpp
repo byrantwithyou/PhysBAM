@@ -2,7 +2,11 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Matrices/MATRIX.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
 //#####################################################################
@@ -41,6 +45,23 @@ Read_Output_Files(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Initialize()
 {
+    switch(test_number)
+    {
+        case 1:{ // rotating circle
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box());
+            SPHERE<TV> sphere(TV(.5,.5),.3);
+            ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> > obj(sphere);
+            VECTOR<T,1> angular_velocity(0.4);
+            T density=2;
+            Seed_Particles(obj,[=](const TV& X){return angular_velocity.Cross(X-sphere.center);},
+                [=](const TV&){return MATRIX<T,2>::Cross_Product_Matrix(angular_velocity);}
+                ,density,particles_per_cell);
+            T total_mass=particles.mass.Sum();
+            TV total_momentum=particles.V.Weighted_Sum(particles.mass);
+            TV dV=total_momentum/total_mass;
+            particles.V-=dV;
+        } break;
+    }
 }
 //#####################################################################
 // Function Begin_Frame
