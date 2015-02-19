@@ -263,10 +263,8 @@ Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv)
     delete &b;
     delete &t0;
 }
-template class MPM_OBJECTIVE<VECTOR<float,1> >;
 template class MPM_OBJECTIVE<VECTOR<float,2> >;
 template class MPM_OBJECTIVE<VECTOR<float,3> >;
-template class MPM_OBJECTIVE<VECTOR<double,1> >;
 template class MPM_OBJECTIVE<VECTOR<double,2> >;
 template class MPM_OBJECTIVE<VECTOR<double,3> >;
 }

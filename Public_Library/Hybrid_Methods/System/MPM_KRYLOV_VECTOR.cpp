@@ -116,10 +116,8 @@ Resize(const KRYLOV_VECTOR_BASE<T>& w)
     u.Resize(debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(w).u.domain);
 }
 namespace PhysBAM{
-template class MPM_KRYLOV_VECTOR<VECTOR<float,1> >;
 template class MPM_KRYLOV_VECTOR<VECTOR<float,2> >;
 template class MPM_KRYLOV_VECTOR<VECTOR<float,3> >;
-template class MPM_KRYLOV_VECTOR<VECTOR<double,1> >;
 template class MPM_KRYLOV_VECTOR<VECTOR<double,2> >;
 template class MPM_KRYLOV_VECTOR<VECTOR<double,3> >;
 }

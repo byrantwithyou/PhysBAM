@@ -38,10 +38,8 @@ Velocity(const T t) const
 {
     return twist;
 }
-template class MPM_COLLISION_OBJECT_UNIFORM_PATH<VECTOR<float,1> >;
 template class MPM_COLLISION_OBJECT_UNIFORM_PATH<VECTOR<float,2> >;
 template class MPM_COLLISION_OBJECT_UNIFORM_PATH<VECTOR<float,3> >;
-template class MPM_COLLISION_OBJECT_UNIFORM_PATH<VECTOR<double,1> >;
 template class MPM_COLLISION_OBJECT_UNIFORM_PATH<VECTOR<double,2> >;
 template class MPM_COLLISION_OBJECT_UNIFORM_PATH<VECTOR<double,3> >;
 }

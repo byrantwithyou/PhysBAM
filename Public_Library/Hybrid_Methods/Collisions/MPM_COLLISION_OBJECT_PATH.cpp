@@ -12,10 +12,8 @@ template<class TV> MPM_COLLISION_OBJECT_PATH<TV>::
 ~MPM_COLLISION_OBJECT_PATH()
 {
 }
-template class MPM_COLLISION_OBJECT_PATH<VECTOR<float,1> >;
 template class MPM_COLLISION_OBJECT_PATH<VECTOR<float,2> >;
 template class MPM_COLLISION_OBJECT_PATH<VECTOR<float,3> >;
-template class MPM_COLLISION_OBJECT_PATH<VECTOR<double,1> >;
 template class MPM_COLLISION_OBJECT_PATH<VECTOR<double,2> >;
 template class MPM_COLLISION_OBJECT_PATH<VECTOR<double,3> >;
 }

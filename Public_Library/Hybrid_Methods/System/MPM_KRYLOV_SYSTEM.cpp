@@ -87,10 +87,8 @@ template<class TV> void MPM_KRYLOV_SYSTEM<TV>::
 Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const
 {
 }
-template class MPM_KRYLOV_SYSTEM<VECTOR<float,1> >;
 template class MPM_KRYLOV_SYSTEM<VECTOR<float,2> >;
 template class MPM_KRYLOV_SYSTEM<VECTOR<float,3> >;
-template class MPM_KRYLOV_SYSTEM<VECTOR<double,1> >;
 template class MPM_KRYLOV_SYSTEM<VECTOR<double,2> >;
 template class MPM_KRYLOV_SYSTEM<VECTOR<double,3> >;
 }

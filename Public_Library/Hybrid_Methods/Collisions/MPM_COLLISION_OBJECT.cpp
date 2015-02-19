@@ -71,10 +71,8 @@ Collide_Static(const T t,const TV& x,const TV& n,TV& v,bool apply_friction) cons
                 v+=v.Normalized()*vn*friction;
             else v=TV();}}
 }
-template class MPM_COLLISION_OBJECT<VECTOR<float,1> >;
 template class MPM_COLLISION_OBJECT<VECTOR<float,2> >;
 template class MPM_COLLISION_OBJECT<VECTOR<float,3> >;
-template class MPM_COLLISION_OBJECT<VECTOR<double,1> >;
 template class MPM_COLLISION_OBJECT<VECTOR<double,2> >;
 template class MPM_COLLISION_OBJECT<VECTOR<double,3> >;
 }
