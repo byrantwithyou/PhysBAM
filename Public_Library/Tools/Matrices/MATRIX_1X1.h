@@ -62,7 +62,7 @@ public:
     {}
 
     MATRIX(const DIAGONAL_MATRIX<T,1>& matrix_input)
-        :x00(matrix_input.x00)
+        :x00(matrix_input.x.x)
     {}
 
     MATRIX& operator=(const MATRIX& matrix)

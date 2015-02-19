@@ -38,7 +38,7 @@ public:
     {}
 
     SYMMETRIC_MATRIX(const DIAGONAL_MATRIX<T,2>& matrix_input)
-        :x00(matrix_input.x00),x10(T()),x11(matrix_input.x11)
+        :x00(matrix_input.x.x),x10(T()),x11(matrix_input.x.y)
     {}
 
     SYMMETRIC_MATRIX(const T y00,const T y10,const T y11)

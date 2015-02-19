@@ -37,7 +37,7 @@ public:
     SYMMETRIC_MATRIX(const DIAGONAL_MATRIX<T,d>& matrix_input)
     {
         for(int i=0;i<size;i++) x[i]=T();
-        for(int i=0;i<d;i++) Element_Lower(i,i)=matrix_input(i,i);
+        for(int i=0;i<d;i++) Element_Lower(i,i)=matrix_input.x(i);
     }
 
     int Rows() const
