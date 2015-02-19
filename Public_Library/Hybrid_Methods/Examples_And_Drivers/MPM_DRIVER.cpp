@@ -183,7 +183,7 @@ Particle_To_Grid()
     }
     else if(example.weights->constant_scalar_inertia_tensor)
     {
-        T Dp_inverse=example.weights->Constant_Scalar_Dp();
+        T Dp_inverse=example.weights->Constant_Scalar_Inverse_Dp();
         example.gather_scatter.Scatter(
             [this,Dp_inverse,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid)
             {

@@ -5,6 +5,7 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Math_Tools/pow.h>
 #include <Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 namespace PhysBAM{
 //#####################################################################
@@ -123,10 +124,20 @@ Update(const ARRAY_VIEW<TV>& X)
 // Function Constant_Scalar_Dp
 //#####################################################################
 template<class TV,int degree> typename TV::SCALAR PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
-Constant_Scalar_Dp() const
+Constant_Scalar_Inverse_Dp() const
 {
     PHYSBAM_ASSERT(degree>1);
     return (6-degree)*sqr(grid.one_over_dX(0));
+}
+//#####################################################################
+// Function Dp
+//#####################################################################
+template<class TV,int degree> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+Dp(const TV& X) const
+{
+    if(degree>1) return SYMMETRIC_MATRIX<T,TV::m>()+sqr(grid.dX(0))/(6-degree);
+    TV Z=X-grid.Center(grid.Index(X));
+    return DIAGONAL_MATRIX<T,TV::m>(Z*(grid.dX-Z));
 }
 //#####################################################################
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,1>,1>;

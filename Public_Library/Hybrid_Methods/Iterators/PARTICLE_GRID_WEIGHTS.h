@@ -8,6 +8,8 @@
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 namespace PhysBAM{
 
+template<class T,int d> class SYMMETRIC_MATRIX;
+
 template<class TV>
 class PARTICLE_GRID_WEIGHTS
 {
@@ -24,7 +26,8 @@ public:
 
     virtual void Compute(int p,SCRATCH& scratch,bool want_gradient) const=0;
     virtual void Update(const ARRAY_VIEW<TV>& X)=0;
-    virtual T Constant_Scalar_Dp() const=0;
+    virtual T Constant_Scalar_Inverse_Dp() const=0;
+    virtual SYMMETRIC_MATRIX<T,TV::m> Dp(const TV& X) const=0;
 //#####################################################################
 };
 }

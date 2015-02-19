@@ -32,7 +32,8 @@ public:
 
     void Compute(int p,typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH& scratch,bool want_gradient) const;
     void Update(const ARRAY_VIEW<TV>& X);
-    T Constant_Scalar_Dp() const;
+    T Constant_Scalar_Inverse_Dp() const;
+    SYMMETRIC_MATRIX<T,TV::m> Dp(const TV& X) const;
 //#####################################################################
 };
 }
