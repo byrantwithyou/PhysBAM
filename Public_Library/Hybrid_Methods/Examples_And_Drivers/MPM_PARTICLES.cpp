@@ -10,12 +10,11 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> MPM_PARTICLES<TV>::
 MPM_PARTICLES()
-    :X(0,0),V(0,0),mass(0,0),F(0,0),B(0,0)
+    :volume(0,0),F(0,0),B(0,0)
 {
-    Add_Array(ATTRIBUTE_ID_X,&X);
-    Add_Array(ATTRIBUTE_ID_V,&V);
+    this->Store_Velocity();
+    this->Store_Mass();
     Add_Array(ATTRIBUTE_ID_VOLUME,&volume);
-    Add_Array(ATTRIBUTE_ID_MASS,&mass);
     Add_Array(ATTRIBUTE_ID_F,&F);
     Add_Array(ATTRIBUTE_ID_B,&B);
 }

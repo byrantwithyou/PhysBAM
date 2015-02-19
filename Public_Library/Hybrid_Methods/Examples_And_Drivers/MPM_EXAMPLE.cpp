@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
+#include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
@@ -75,6 +76,8 @@ Precompute_Forces(const T time)
 {
     for(int i=0;i<forces.m;i++)
         forces(i)->Precompute(time);
+    for(int i=0;i<lagrangian_forces.m;i++)
+        lagrangian_forces(i)->Update_Position_Based_State(time,false);
 }
 //#####################################################################
 // Function Potential_Energy
@@ -85,6 +88,8 @@ Potential_Energy(const T time) const
     typename TV::SCALAR pe=0;
     for(int i=0;i<forces.m;i++)
         pe+=forces(i)->Potential_Energy(time);
+    for(int i=0;i<lagrangian_forces.m;i++)
+        pe+=lagrangian_forces(i)->Potential_Energy(time);
     return pe;
 }
 //#####################################################################
@@ -95,6 +100,15 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
     for(int i=0;i<forces.m;i++)
         forces(i)->Add_Forces(F,time);
+
+    if(!lagrangian_forces.m) return;
+    lagrangian_forces_F.Remove_All();
+    lagrangian_forces_F.Resize(particles.X.m);
+    for(int i=0;i<lagrangian_forces.m;i++)
+        lagrangian_forces(i)->Add_Velocity_Independent_Forces(lagrangian_forces_F,time);
+    gather_scatter.Scatter(
+        [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
+            F(it.Index())+=it.Weight()*lagrangian_forces_F(p);},false);
 }
 //#####################################################################
 // Function Add_Hessian_Times
@@ -104,6 +118,36 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
 {
     for(int i=0;i<forces.m;i++)
         forces(i)->Add_Hessian_Times(F,V,time);
+
+    if(!lagrangian_forces.m) return;
+    lagrangian_forces_F.Remove_All();
+    lagrangian_forces_V.Remove_All();
+    lagrangian_forces_F.Resize(particles.X.m);
+    lagrangian_forces_V.Resize(particles.X.m);
+    gather_scatter.Gather(
+        [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
+            lagrangian_forces_V(p)+=it.Weight()*V(it.Index());},false);
+    for(int i=0;i<lagrangian_forces.m;i++)
+        lagrangian_forces(i)->Add_Implicit_Velocity_Independent_Forces(lagrangian_forces_V,lagrangian_forces_F,1,time);
+    gather_scatter.Scatter(
+        [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
+            F(it.Index())+=it.Weight()*lagrangian_forces_F(p);},false);
+}
+//#####################################################################
+// Function Add_Force
+//#####################################################################
+template<class TV> void MPM_EXAMPLE<TV>::
+Add_Force(PARTICLE_GRID_FORCES<TV>& force)
+{
+    forces.Append(&force);
+}
+//#####################################################################
+// Function Add_Force
+//#####################################################################
+template<class TV> void MPM_EXAMPLE<TV>::
+Add_Force(DEFORMABLES_FORCES<TV>& force)
+{
+    lagrangian_forces.Append(&force);
 }
 //#####################################################################
 namespace PhysBAM{

@@ -17,6 +17,7 @@ template<class TV> class GATHER_SCATTER;
 template<class TV> class DEBUG_PARTICLES;
 template<class TV> class IMPLICIT_OBJECT;
 template<class TV> class MPM_COLLISION_OBJECT;
+template<class TV> class DEFORMABLES_FORCES;
 
 template<class TV>
 class MPM_EXAMPLE:public NONCOPYABLE
@@ -34,11 +35,13 @@ public:
     ARRAY<TV,TV_INT> velocity,velocity_new;
     ARRAY<int> valid_grid_indices;
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
+    ARRAY<DEFORMABLES_FORCES<TV>*> lagrangian_forces;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     MPM_KRYLOV_VECTOR<TV>& rhs;
     PARTICLE_GRID_WEIGHTS<TV>* weights;
     GATHER_SCATTER<TV>& gather_scatter;
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
+    mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
 
     T initial_time;
     int last_frame;
@@ -79,6 +82,8 @@ public:
     T Potential_Energy(const T time) const;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const;
     void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const;
+    void Add_Force(PARTICLE_GRID_FORCES<TV>& force);
+    void Add_Force(DEFORMABLES_FORCES<TV>& force);
 
 //#####################################################################
 };
