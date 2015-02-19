@@ -35,14 +35,14 @@ public:
     ARRAY<DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,TV::m> > dPi_dF;
 
     MPM_FINITE_ELEMENTS(MPM_PARTICLES<TV>& particles,ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
-        GATHER_SCATTER<TV>& gather_scatter_input,bool affect_all);
+        GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles);
     virtual ~MPM_FINITE_ELEMENTS();
 
 //#####################################################################
-    virtual void Precompute(const T time)=0;
-    virtual T Potential_Energy(const T time) const=0;
-    virtual void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const=0;
-    virtual void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const=0;
+    void Precompute(const T time) PHYSBAM_OVERRIDE;
+    T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
+    void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const PHYSBAM_OVERRIDE;
+    void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

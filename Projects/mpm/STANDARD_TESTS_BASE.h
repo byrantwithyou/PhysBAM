@@ -24,7 +24,7 @@ class STANDARD_TESTS_BASE:public MPM_EXAMPLE<TV>
 
 public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
-    using BASE::frame_title;using BASE::write_substeps_level;
+    using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::substeps_delay_frame;using BASE::write_output_files;
     using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
@@ -32,6 +32,7 @@ public:
     using BASE::use_midpoint;using BASE::flip;using BASE::cfl;using BASE::newton_tolerance;
     using BASE::newton_iterations;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::test_diff;using BASE::threads;using BASE::weights;
+    using BASE::Add_Force;
 
     int test_number;
     int resolution;
@@ -52,6 +53,9 @@ public:
     Seed_Particles(const T_OBJECT& object,boost::function<TV(const TV&)> V,
         boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,particles_per_cell);}
+
+    int Add_Gravity(TV g);
+    int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0);
 
 //#####################################################################
 };

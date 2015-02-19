@@ -136,18 +136,18 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
 //#####################################################################
 // Function Add_Force
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> int MPM_EXAMPLE<TV>::
 Add_Force(PARTICLE_GRID_FORCES<TV>& force)
 {
-    forces.Append(&force);
+    return forces.Append(&force);
 }
 //#####################################################################
 // Function Add_Force
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> int MPM_EXAMPLE<TV>::
 Add_Force(DEFORMABLES_FORCES<TV>& force)
 {
-    lagrangian_forces.Append(&force);
+    return lagrangian_forces.Append(&force);
 }
 //#####################################################################
 namespace PhysBAM{

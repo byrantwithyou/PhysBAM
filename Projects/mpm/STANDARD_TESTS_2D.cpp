@@ -59,6 +59,7 @@ Initialize()
             TV total_momentum=particles.V.Weighted_Sum(particles.mass);
             TV dV=total_momentum/total_mass;
             particles.V-=dV;
+            Add_Fixed_Corotated(1e4,0.3);
         } break;
     }
 }

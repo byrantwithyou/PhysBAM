@@ -5,7 +5,12 @@
 #include <Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
+#include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
+#include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
+#include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include "STANDARD_TESTS_BASE.h"
 namespace PhysBAM{
@@ -97,6 +102,24 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
             particles.F(p)=MATRIX<T,TV::m>()+1;
             particles.mass(p)=mass;
             particles.volume(p)=volume;}}
+}
+//#####################################################################
+// Function Add_Gravity
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Gravity(TV g)
+{
+    return Add_Force(*new DEFORMABLE_GRAVITY<TV>(particles,true,g));
+}
+//#####################################################################
+// Function Add_Fixed_Corotated
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles)
+{
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*new COROTATED_FIXED<T,TV::m>(E,nu);
+    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(particles,constitutive_model,gather_scatter,affected_particles);
+    return Add_Force(fe);
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
