@@ -7,6 +7,7 @@
 
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <boost/function.hpp>
 
@@ -45,7 +46,12 @@ public:
     virtual ~STANDARD_TESTS_BASE();
 
     void Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
-    boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell);
+        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell);
+
+    template<class T_OBJECT> typename DISABLE_IF<IS_BASE_OF<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::TYPE
+    Seed_Particles(const T_OBJECT& object,boost::function<TV(const TV&)> V,
+        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
+    {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,particles_per_cell);}
 
 //#####################################################################
 };

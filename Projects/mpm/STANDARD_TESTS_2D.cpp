@@ -50,10 +50,9 @@ Initialize()
         case 1:{ // rotating circle
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box());
             SPHERE<TV> sphere(TV(.5,.5),.3);
-            ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> > obj(sphere);
             VECTOR<T,1> angular_velocity(0.4);
             T density=2;
-            Seed_Particles(obj,[=](const TV& X){return angular_velocity.Cross(X-sphere.center);},
+            Seed_Particles(sphere,[=](const TV& X){return angular_velocity.Cross(X-sphere.center);},
                 [=](const TV&){return MATRIX<T,2>::Cross_Product_Matrix(angular_velocity);}
                 ,density,particles_per_cell);
             T total_mass=particles.mass.Sum();
