@@ -13,6 +13,7 @@
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -277,7 +278,9 @@ Apply_Forces()
 template<class TV> void MPM_DRIVER<TV>::
 Perform_Particle_Collision(int p)
 {
-    // TODO
+    if(!example.use_particle_collision) return;;
+    for(int i=0;i<example.collision_objects.m;i++)
+        example.collision_objects(i)->Collide(example.time,example.particles.X(p),example.particles.V(p));
 }
 //#####################################################################
 // Function Apply_Friction

@@ -16,6 +16,7 @@ template<class TV> class PARTICLE_GRID_WEIGHTS;
 template<class TV> class GATHER_SCATTER;
 template<class TV> class DEBUG_PARTICLES;
 template<class TV> class IMPLICIT_OBJECT;
+template<class TV> class MPM_COLLISION_OBJECT;
 
 template<class TV>
 class MPM_EXAMPLE:public NONCOPYABLE
@@ -37,7 +38,7 @@ public:
     MPM_KRYLOV_VECTOR<TV>& rhs;
     PARTICLE_GRID_WEIGHTS<TV>* weights;
     GATHER_SCATTER<TV>& gather_scatter;
-    ARRAY<IMPLICIT_OBJECT<TV>*> collision_objects;
+    ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
 
     T initial_time;
     int last_frame;
@@ -52,6 +53,7 @@ public:
     bool use_reduced_rasterization;
     bool use_affine;
     bool use_midpoint;
+    bool use_particle_collision;
     T flip;
     T cfl;
 

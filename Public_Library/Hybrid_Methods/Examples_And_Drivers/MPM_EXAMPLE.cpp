@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
@@ -20,7 +21,8 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     gather_scatter(*new GATHER_SCATTER<TV>(simulated_particles,weights)),initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),write_output_files(true),output_directory("output"),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
-    use_reduced_rasterization(false),use_affine(false),use_midpoint(false),flip(0),cfl(1),newton_tolerance(-100),
+    use_reduced_rasterization(false),use_affine(false),use_midpoint(false),
+    use_particle_collision(false),flip(0),cfl(1),newton_tolerance(-100),
     newton_iterations(-100),solver_tolerance(-100),solver_iterations(-100),threads(1)
 {
     PHYSBAM_ASSERT(grid.Is_MAC_Grid());
@@ -36,6 +38,7 @@ template<class TV> MPM_EXAMPLE<TV>::
     delete &rhs;
     delete &weights;
     delete &gather_scatter;
+    collision_objects.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Write_Output_Files
