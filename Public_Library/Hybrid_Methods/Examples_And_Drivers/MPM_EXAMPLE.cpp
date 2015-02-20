@@ -20,11 +20,11 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),debug_particles(*new DEBUG_PARTICLES<TV>),
     rhs(*new MPM_KRYLOV_VECTOR<TV>(valid_grid_indices)),weights(0),
     gather_scatter(*new GATHER_SCATTER<TV>(simulated_particles)),initial_time(0),last_frame(100),
-    write_substeps_level(-1),substeps_delay_frame(-1),write_output_files(true),output_directory("output"),
+    write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
     use_reduced_rasterization(false),use_affine(false),use_midpoint(false),
-    use_particle_collision(false),flip(0),cfl(1),newton_tolerance(-100),
-    newton_iterations(-100),solver_tolerance(-100),solver_iterations(-100),test_diff(false),threads(1)
+    use_particle_collision(false),flip(0),cfl(1),newton_tolerance(1),
+    newton_iterations(10),solver_tolerance(1e-4),solver_iterations(1000),test_diff(false),threads(1)
 {
 }
 //#####################################################################
@@ -49,12 +49,11 @@ template<class TV> MPM_EXAMPLE<TV>::
 template<class TV> void MPM_EXAMPLE<TV>::
 Write_Output_Files(const int frame)
 {
-    if(!write_output_files) return;
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
 
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/particles",output_directory.c_str(),frame),particles);
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/velocities",output_directory.c_str(),frame),velocity);
+    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),velocity);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/density",output_directory.c_str(),frame),mass);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 

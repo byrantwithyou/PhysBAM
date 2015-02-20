@@ -25,7 +25,7 @@ class STANDARD_TESTS_BASE:public MPM_EXAMPLE<TV>
 public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
-    using BASE::substeps_delay_frame;using BASE::write_output_files;
+    using BASE::substeps_delay_frame;
     using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
     using BASE::ghost;using BASE::use_reduced_rasterization;using BASE::use_affine;

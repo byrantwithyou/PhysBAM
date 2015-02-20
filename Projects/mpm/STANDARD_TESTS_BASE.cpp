@@ -32,7 +32,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     parse_args.Add("-test_diff",&test_diff,"test analytic derivatives");
     parse_args.Add("-threads",&threads,"threads","Number of threads");
     parse_args.Add("-o",&output_directory,"dir","Output directory");
-    parse_args.Add_Not("-no_output",&write_output_files,"Suppress output files");
     parse_args.Add("-framerate",&framerate,"rate","Number of frames per second");
     parse_args.Add("-min_dt",&min_dt,"dt","Minimum time step size");
     parse_args.Add("-max_dt",&max_dt,"dt","Maximum time step size");

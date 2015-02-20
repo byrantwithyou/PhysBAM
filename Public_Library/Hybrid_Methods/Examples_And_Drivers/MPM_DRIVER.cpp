@@ -80,6 +80,7 @@ Initialize()
 
     example.mass.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
+    example.velocity_new.Resize(example.grid.Domain_Indices(example.ghost));
     example.rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
 
     if(!example.restart) Write_Output_Files(0);
@@ -93,13 +94,14 @@ Advance_One_Time_Step()
 {
     example.Begin_Time_Step(example.time);
 
+    Update_Simulated_Particles();
     Update_Particle_Weights();
-
     Particle_To_Grid();
-
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",0,1);
     Apply_Forces();
-
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
     Grid_To_Particle();
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
 
     example.End_Time_Step(example.time);
 }
@@ -254,6 +256,7 @@ Grid_To_Particle()
 template<class TV> void MPM_DRIVER<TV>::
 Apply_Forces()
 {
+    example.Precompute_Forces(example.time);
     objective.Reset();
     NEWTONS_METHOD<T> newtons_method;
     newtons_method.tolerance=example.newton_tolerance*example.dt;
@@ -262,8 +265,10 @@ Apply_Forces()
     newtons_method.krylov_tolerance=example.solver_tolerance;
     newtons_method.max_krylov_iterations=example.solver_iterations;
     newtons_method.use_cg=true;
+    newtons_method.debug=true;
 
     newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance);
+    LOG::printf("max velocity: %p\n",Max_Particle_Speed());
     if(example.test_diff) objective.Test_Diff(dv);
 
     bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
@@ -315,6 +320,14 @@ Max_Particle_Speed() const
         int p=example.simulated_particles(k);
         v2=max(v2,example.particles.V(p).Magnitude_Squared());}
     return sqrt(v2);
+}
+//#####################################################################
+// Function Update_Simulated_Particles
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Update_Simulated_Particles()
+{
+    example.simulated_particles=IDENTITY_ARRAY<>(example.particles.X.m);
 }
 //#####################################################################
 namespace PhysBAM{

@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Log/LOG.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
@@ -59,6 +60,7 @@ Potential_Energy(const T time) const
     for(int k=0;k<gather_scatter.simulated_particles.m;k++){
         int p=gather_scatter.simulated_particles(k);
         pe+=particles.volume(p)*constitutive_model.Energy_Density(sigma(p),p);}
+     LOG::printf("PE: %g\n",pe);
     return pe;
 }
 //#####################################################################

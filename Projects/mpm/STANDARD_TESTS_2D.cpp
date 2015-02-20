@@ -31,6 +31,7 @@ template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Write_Output_Files(const int frame)
 {
+    BASE::Write_Output_Files(frame);
 }
 //#####################################################################
 // Function Read_Output_Files
@@ -38,6 +39,7 @@ Write_Output_Files(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Read_Output_Files(const int frame)
 {
+    BASE::Read_Output_Files(frame);
 }
 //#####################################################################
 // Function Initialize

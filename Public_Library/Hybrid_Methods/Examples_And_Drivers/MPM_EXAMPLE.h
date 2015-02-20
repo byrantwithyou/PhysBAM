@@ -48,7 +48,6 @@ public:
     std::string frame_title;
     int write_substeps_level;
     int substeps_delay_frame;
-    bool write_output_files;
     std::string output_directory;
     int restart;
     T dt,time,frame_dt,min_dt,max_dt;
