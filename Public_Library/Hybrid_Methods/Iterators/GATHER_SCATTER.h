@@ -23,7 +23,10 @@ public:
     const PARTICLE_GRID_WEIGHTS<TV>* weights;
     int threads;
 
-    GATHER_SCATTER(const ARRAY<int>& simulated_particles,const PARTICLE_GRID_WEIGHTS<TV>* weights);
+    GATHER_SCATTER(const ARRAY<int>& simulated_particles);
+    ~GATHER_SCATTER();
+
+    void Set_Weights(const PARTICLE_GRID_WEIGHTS<TV>* weights_input);
 
     // Safe to write to grid data
     template<class FUNC>

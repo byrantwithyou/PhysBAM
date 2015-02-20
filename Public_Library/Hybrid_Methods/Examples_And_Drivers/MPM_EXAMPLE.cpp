@@ -19,14 +19,13 @@ template<class TV> MPM_EXAMPLE<TV>::
 MPM_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),debug_particles(*new DEBUG_PARTICLES<TV>),
     rhs(*new MPM_KRYLOV_VECTOR<TV>(valid_grid_indices)),weights(0),
-    gather_scatter(*new GATHER_SCATTER<TV>(simulated_particles,weights)),initial_time(0),last_frame(100),
+    gather_scatter(*new GATHER_SCATTER<TV>(simulated_particles)),initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),write_output_files(true),output_directory("output"),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
     use_reduced_rasterization(false),use_affine(false),use_midpoint(false),
     use_particle_collision(false),flip(0),cfl(1),newton_tolerance(-100),
-    newton_iterations(-100),solver_tolerance(-100),solver_iterations(-100),threads(1)
+    newton_iterations(-100),solver_tolerance(-100),solver_iterations(-100),test_diff(false),threads(1)
 {
-    PHYSBAM_ASSERT(grid.Is_MAC_Grid());
 }
 //#####################################################################
 // Destructor
@@ -37,9 +36,12 @@ template<class TV> MPM_EXAMPLE<TV>::
     delete &particles;
     delete &debug_particles;
     delete &rhs;
-    delete &weights;
+    delete weights;
     delete &gather_scatter;
     collision_objects.Delete_Pointers_And_Clean_Memory();
+    forces.Delete_Pointers_And_Clean_Memory();
+    lagrangian_forces.Delete_Pointers_And_Clean_Memory();
+    av.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Write_Output_Files
@@ -148,6 +150,15 @@ template<class TV> int MPM_EXAMPLE<TV>::
 Add_Force(DEFORMABLES_FORCES<TV>& force)
 {
     return lagrangian_forces.Append(&force);
+}
+//#####################################################################
+// Function Set_Weights
+//#####################################################################
+template<class TV> void MPM_EXAMPLE<TV>::
+Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input)
+{
+    weights=weights_input;
+    gather_scatter.Set_Weights(weights);
 }
 //#####################################################################
 namespace PhysBAM{

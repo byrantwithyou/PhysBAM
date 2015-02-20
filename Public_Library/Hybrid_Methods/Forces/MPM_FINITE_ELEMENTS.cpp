@@ -19,9 +19,9 @@ template<class TV> MPM_FINITE_ELEMENTS<TV>::
 MPM_FINITE_ELEMENTS(MPM_PARTICLES<TV>& particles,ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
     GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles)
     :BASE(particles),constitutive_model(constitutive_model),affect_all(!affected_particles),
-    gather_scatter(affect_all?gather_scatter_input:
-        *new GATHER_SCATTER<TV>(*new ARRAY<int>(*affected_particles),gather_scatter_input.weights))
+    gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(*new ARRAY<int>(*affected_particles)))
 {
+    if(!affect_all) gather_scatter.Set_Weights(gather_scatter_input.weights);
 }
 //#####################################################################
 // Destructor
@@ -32,6 +32,7 @@ template<class TV> MPM_FINITE_ELEMENTS<TV>::
     if(!affect_all){
         delete &gather_scatter.simulated_particles;
         delete &gather_scatter;}
+    delete &constitutive_model;
 }
 //#####################################################################
 // Function Precompute

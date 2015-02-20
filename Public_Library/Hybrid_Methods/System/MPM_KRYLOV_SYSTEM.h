@@ -20,7 +20,6 @@ class MPM_KRYLOV_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef typename TV::SCALAR T;
 public:
     MPM_EXAMPLE<TV>& example;
-    MPM_KRYLOV_VECTOR<TV>* tmp;
     struct COLLISION
     {
         int object;

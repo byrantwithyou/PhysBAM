@@ -48,6 +48,9 @@ template<class TV> MPM_DRIVER<TV>::
 {
     DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
     delete &objective;
+    delete &dv;
+    delete &rhs;
+    av.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Execute_Main_Program
@@ -71,6 +74,7 @@ Initialize()
     output_number=current_frame=example.restart;
 
     example.Initialize();
+    PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
     if(example.restart)
         example.Read_Output_Files(example.restart);
 

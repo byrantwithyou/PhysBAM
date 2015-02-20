@@ -48,7 +48,7 @@ Initialize()
     switch(test_number)
     {
         case 1:{ // rotating circle
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box());
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             VECTOR<T,1> angular_velocity(0.4);
             T density=2;
@@ -61,6 +61,7 @@ Initialize()
             particles.V-=dV;
             Add_Fixed_Corotated(1e4,0.3);
         } break;
+        default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
 //#####################################################################

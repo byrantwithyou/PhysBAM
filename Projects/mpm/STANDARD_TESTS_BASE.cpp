@@ -66,9 +66,9 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     stored_last_frame=last_frame;
     random.Set_Seed(seed);
 
-    if(order==1) weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,threads);
-    else if(order==2) weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads);
-    else if(order==3) weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,threads);
+    if(order==1) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,threads));
+    else if(order==2) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads));
+    else if(order==3) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,threads));
     else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
 }
 //#####################################################################

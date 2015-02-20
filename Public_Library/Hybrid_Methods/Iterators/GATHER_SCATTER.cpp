@@ -12,9 +12,25 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> GATHER_SCATTER<TV>::
-GATHER_SCATTER(const ARRAY<int>& simulated_particles,const PARTICLE_GRID_WEIGHTS<TV>* weights)
-    :simulated_particles(simulated_particles),weights(weights),threads(weights->thread_scratch.m)
+GATHER_SCATTER(const ARRAY<int>& simulated_particles)
+    :simulated_particles(simulated_particles),weights(0),threads(1)
 {
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class TV> GATHER_SCATTER<TV>::
+~GATHER_SCATTER()
+{
+}
+//#####################################################################
+// Function Set_Weights
+//#####################################################################
+template<class TV> void GATHER_SCATTER<TV>::
+Set_Weights(const PARTICLE_GRID_WEIGHTS<TV>* weights_input)
+{
+    weights=weights_input;
+    threads=weights->thread_scratch.m;
 }
 template class GATHER_SCATTER<VECTOR<float,2> >;
 template class GATHER_SCATTER<VECTOR<float,3> >;

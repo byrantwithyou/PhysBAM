@@ -84,6 +84,7 @@ public:
     void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const;
     int Add_Force(PARTICLE_GRID_FORCES<TV>& force);
     int Add_Force(DEFORMABLES_FORCES<TV>& force);
+    void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
 
 //#####################################################################
 };

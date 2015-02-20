@@ -196,10 +196,6 @@ Reset()
     v1.u.Resize(v0.u.domain);
     tmp0.u.Resize(v0.u.domain);
     tmp1.u.Resize(v0.u.domain);
-    system.tmp->u.Resize(v0.u.domain);
-
-    for(int k=0;k<system.example.mass.array.m;k++)
-        system.tmp->u.array(k)=TV();
 }
 //#####################################################################
 // Function Test_Diff
