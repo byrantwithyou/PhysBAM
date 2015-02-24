@@ -13,6 +13,7 @@
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
@@ -81,7 +82,8 @@ Initialize()
     example.mass.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity_new.Resize(example.grid.Domain_Indices(example.ghost));
-    example.rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
+    dv.u.Resize(example.grid.Domain_Indices(example.ghost));
+    rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
 
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
@@ -203,9 +205,11 @@ Particle_To_Grid()
     }
     else PHYSBAM_FATAL_ERROR("General case for rasterization not implemented");
 
+    example.valid_grid_indices.Remove_All();
     for(int i=0;i<example.mass.array.m;i++)
-        if(example.mass.array(i))
-            example.velocity.array(i)/=example.mass.array(i);
+        if(example.mass.array(i)){
+            example.valid_grid_indices.Append(i);
+            example.velocity.array(i)/=example.mass.array(i);}
         else example.velocity.array(i)=TV();
 }
 //#####################################################################
@@ -329,6 +333,12 @@ template<class TV> void MPM_DRIVER<TV>::
 Update_Simulated_Particles()
 {
     example.simulated_particles=IDENTITY_ARRAY<>(example.particles.X.m);
+    example.particle_is_simulated.Remove_All();
+    example.particle_is_simulated.Resize(example.particles.X.m);
+    example.particle_is_simulated.Subset(example.simulated_particles).Fill(true);
+
+    for(int i=0;i<example.lagrangian_forces.m;i++)
+        example.lagrangian_forces(i)->Update_Mpi(example.particle_is_simulated,0);
 }
 //#####################################################################
 namespace PhysBAM{

@@ -219,7 +219,7 @@ Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv)
     T e0=0,e1=0;
     Compute(t0,&system,&g0,&e0);
 
-    for(int i=1,n=ddv.Raw_Size();i<=n;i++)
+    for(int i=0,n=ddv.Raw_Size();i<n;i++)
         ddv.Raw_Get(i)=random.Get_Uniform_Number(-eps,eps);
     system.Project(ddv);
     b.Copy(1,t0,ddv);

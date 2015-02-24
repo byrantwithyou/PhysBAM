@@ -2,9 +2,10 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Log/LOG.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
@@ -18,8 +19,7 @@ using namespace PhysBAM;
 template<class TV> MPM_EXAMPLE<TV>::
 MPM_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),debug_particles(*new DEBUG_PARTICLES<TV>),
-    rhs(*new MPM_KRYLOV_VECTOR<TV>(valid_grid_indices)),weights(0),
-    gather_scatter(*new GATHER_SCATTER<TV>(simulated_particles)),initial_time(0),last_frame(100),
+    weights(0),gather_scatter(*new GATHER_SCATTER<TV>(simulated_particles)),initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
     use_reduced_rasterization(false),use_affine(false),use_midpoint(false),
@@ -35,7 +35,6 @@ template<class TV> MPM_EXAMPLE<TV>::
 {
     delete &particles;
     delete &debug_particles;
-    delete &rhs;
     delete weights;
     delete &gather_scatter;
     collision_objects.Delete_Pointers_And_Clean_Memory();
@@ -52,7 +51,7 @@ Write_Output_Files(const int frame)
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
 
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/particles",output_directory.c_str(),frame),particles);
+    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),velocity);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/density",output_directory.c_str(),frame),mass);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
@@ -69,7 +68,7 @@ template<class TV> void MPM_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/particles",output_directory.c_str(),frame),particles);
+    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 }
 //#####################################################################

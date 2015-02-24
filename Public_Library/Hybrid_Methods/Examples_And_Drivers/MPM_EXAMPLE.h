@@ -30,6 +30,7 @@ public:
     MPM_PARTICLES<TV>& particles;
     DEBUG_PARTICLES<TV>& debug_particles;
     ARRAY<int> simulated_particles;
+    ARRAY<bool> particle_is_simulated;
 
     ARRAY<T,TV_INT> mass;
     ARRAY<TV,TV_INT> velocity,velocity_new;
@@ -37,7 +38,6 @@ public:
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
     ARRAY<DEFORMABLES_FORCES<TV>*> lagrangian_forces;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
-    MPM_KRYLOV_VECTOR<TV>& rhs;
     PARTICLE_GRID_WEIGHTS<TV>* weights;
     GATHER_SCATTER<TV>& gather_scatter;
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;

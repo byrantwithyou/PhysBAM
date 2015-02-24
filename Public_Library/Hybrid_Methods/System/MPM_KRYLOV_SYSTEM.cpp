@@ -30,6 +30,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 {
     const MPM_KRYLOV_VECTOR<TV>& V=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(BV);
     MPM_KRYLOV_VECTOR<TV>& F=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(BF);
+    F*=0;
     example.Add_Hessian_Times(F.u,V.u,example.time);
     T scale=example.use_midpoint?(T).25:1,scaled_dt_squared=sqr(example.dt*scale);
 
