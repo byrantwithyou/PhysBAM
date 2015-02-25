@@ -145,7 +145,7 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep)
         TV &gv=g.u.array(c.p);
         if(system.example.collidable_objects(c.object)->stick){gv=TV();continue;}
         T rvel=TV::Dot_Product(gv,c.n);
-        if(allow_sep && rvel<0) system.collisions.Remove_Index_Laz(i);
+        if(allow_sep && rvel<0) system.collisions.Remove_Index_Lazy(i);
         else gv-=rvel*c.n;}
 #endif
 }
