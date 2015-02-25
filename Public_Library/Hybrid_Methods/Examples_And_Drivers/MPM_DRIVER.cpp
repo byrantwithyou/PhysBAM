@@ -182,6 +182,8 @@ Particle_To_Grid()
 {
     MPM_PARTICLES<TV>& particles=example.particles;
 
+    example.mass.array.Fill(0);
+    example.velocity.array.Fill(TV());
     if(example.weights->use_gradient_transfer)
     {
         example.gather_scatter.Scatter(
