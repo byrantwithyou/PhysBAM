@@ -77,6 +77,7 @@ public:
     virtual void Begin_Time_Step(const T time)=0;
     virtual void End_Time_Step(const T time)=0;
 
+    void Capture_Stress();
     void Precompute_Forces(const T time);
     T Potential_Energy(const T time) const;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const;

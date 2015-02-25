@@ -28,7 +28,7 @@ public:
     using BASE::particles;
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model;
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > sigma;
-    ARRAY<MATRIX<T,TV::m> > U;
+    ARRAY<MATRIX<T,TV::m> > U,FV,F_n;
     bool affect_all;
     GATHER_SCATTER<TV>& gather_scatter;
     mutable ARRAY<MATRIX<T,TV::m> > tmp;
@@ -39,6 +39,7 @@ public:
     virtual ~MPM_FINITE_ELEMENTS();
 
 //#####################################################################
+    void Capture_Stress() PHYSBAM_OVERRIDE;
     void Precompute(const T time) PHYSBAM_OVERRIDE;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const PHYSBAM_OVERRIDE;

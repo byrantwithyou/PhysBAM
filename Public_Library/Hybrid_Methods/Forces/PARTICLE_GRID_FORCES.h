@@ -26,6 +26,7 @@ public:
     virtual ~PARTICLE_GRID_FORCES();
 
 //#####################################################################
+    virtual void Capture_Stress();
     virtual void Precompute(const T time)=0;
     virtual T Potential_Energy(const T time) const=0;
     virtual void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const=0;

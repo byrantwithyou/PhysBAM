@@ -75,6 +75,15 @@ Read_Output_Files(const int frame)
 // Function Precompute_Forces
 //#####################################################################
 template<class TV> void MPM_EXAMPLE<TV>::
+Capture_Stress()
+{
+    for(int i=0;i<forces.m;i++)
+        forces(i)->Capture_Stress();
+}
+//#####################################################################
+// Function Precompute_Forces
+//#####################################################################
+template<class TV> void MPM_EXAMPLE<TV>::
 Precompute_Forces(const T time)
 {
     for(int i=0;i<forces.m;i++)

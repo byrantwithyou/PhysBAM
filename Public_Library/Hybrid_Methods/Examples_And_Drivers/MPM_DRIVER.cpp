@@ -261,6 +261,7 @@ Grid_To_Particle()
 template<class TV> void MPM_DRIVER<TV>::
 Apply_Forces()
 {
+    example.Capture_Stress();
     example.Precompute_Forces(example.time);
     objective.Reset();
     NEWTONS_METHOD<T> newtons_method;
@@ -273,7 +274,7 @@ Apply_Forces()
     newtons_method.debug=true;
 
     newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance);
-    LOG::printf("max velocity: %p\n",Max_Particle_Speed());
+    LOG::printf("max velocity: %P\n",Max_Particle_Speed());
     if(example.test_diff) objective.Test_Diff(dv);
 
     bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);

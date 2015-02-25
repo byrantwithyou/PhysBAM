@@ -65,7 +65,7 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
         int p=system.example.valid_grid_indices(i);
         tmp0.u.array(p)=system.example.mass.array(p)*(use_midpoint?(T).25:1)*dv.u.array(p);}
 
-//    system.example.Update_Particle_Constitutive_Model_State(false);
+    system.example.Precompute_Forces(system.example.time);
     if(e){
         T energy=system.Inner_Product(dv,tmp0)/2;
         energy+=system.example.Potential_Energy(system.example.time);

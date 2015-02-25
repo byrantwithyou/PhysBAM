@@ -39,15 +39,25 @@ template<class TV> MPM_FINITE_ELEMENTS<TV>::
 // Function Precompute
 //#####################################################################
 template<class TV> void MPM_FINITE_ELEMENTS<TV>:: 
-Precompute(const T time)
+Capture_Stress()
 {
     U.Resize(particles.X.m);
+    FV.Resize(particles.X.m);
     sigma.Resize(particles.X.m);
     dPi_dF.Resize(particles.X.m);
+    F_n=particles.F;
+}
+//#####################################################################
+// Function Precompute
+//#####################################################################
+template<class TV> void MPM_FINITE_ELEMENTS<TV>:: 
+Precompute(const T time)
+{
     for(int k=0;k<gather_scatter.simulated_particles.m;k++){
         int p=gather_scatter.simulated_particles(k);
         MATRIX<T,TV::m> V_local;
         particles.F(p).Fast_Singular_Value_Decomposition(U(p),sigma(p),V_local);
+        FV(p)=F_n(p)*V_local;
         constitutive_model.Isotropic_Stress_Derivative(sigma(p),dPi_dF(p),p);}
 }
 //#####################################################################
@@ -60,7 +70,6 @@ Potential_Energy(const T time) const
     for(int k=0;k<gather_scatter.simulated_particles.m;k++){
         int p=gather_scatter.simulated_particles(k);
         pe+=particles.volume(p)*constitutive_model.Energy_Density(sigma(p),p);}
-     LOG::printf("PE: %g\n",pe);
     return pe;
 }
 //#####################################################################
@@ -71,8 +80,9 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
     ARRAY<MATRIX<T,TV::m> > V0_P_FT(gather_scatter.threads);
     gather_scatter.Scatter(
-        [this,&V0_P_FT](int p,int tid)
-        {V0_P_FT(tid)=U(p)*(constitutive_model.P_From_Strain(sigma(p),particles.volume(p),p)*sigma(p)).Times_Transpose(U(p));},
+        [this,&V0_P_FT](int p,int tid){
+            DIAGONAL_MATRIX<T,TV::m> Ph=constitutive_model.P_From_Strain(sigma(p),particles.volume(p),p);
+            V0_P_FT(tid)=U(p)*Ph.Times_Transpose(FV(p));},
         [&V0_P_FT,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid)
         {F(it.Index())-=V0_P_FT(tid)*it.Gradient();},
         [](int p,int tid){},true);
@@ -88,15 +98,15 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
     gather_scatter.Gather(
         [this](int p,int tid){tmp(p)=MATRIX<T,TV::m>();},
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid)
-        {tmp(p)+=MATRIX<T,TV::m>::Outer_Product(it.Gradient(),V(it.Index()));},
+        {tmp(p)+=MATRIX<T,TV::m>::Outer_Product(V(it.Index()),it.Gradient());},
         [this](int p,int tid){
-            MATRIX<T,TV::m> dFh=(tmp(p)*U(p)).Transpose_Times(U(p))*sigma(p);
-            MATRIX<T,TV::m> dPh=dPi_dF(p).Differential(dFh);
-            tmp(p)=(U(p)*(sigma(p)*particles.volume(p))).Times_Transpose(U(p)*dPh);},true);
+            MATRIX<T,TV::m> dFh=U(p).Transpose_Times(tmp(p)*FV(p));
+            MATRIX<T,TV::m> dPh=dPi_dF(p).Differential(dFh)*particles.volume(p);
+            tmp(p)=U(p)*dPh.Times_Transpose(FV(p));},true);
 
     gather_scatter.Scatter(
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid)
-        {F(it.Index())+=tmp(p).Transpose_Times(it.Gradient());},true);
+        {F(it.Index())+=tmp(p)*it.Gradient();},true);
 }
 template class MPM_FINITE_ELEMENTS<VECTOR<float,2> >;
 template class MPM_FINITE_ELEMENTS<VECTOR<float,3> >;
