@@ -20,7 +20,7 @@ namespace PhysBAM{
 template<class TV> STANDARD_TESTS_BASE<TV>::
 STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     :MPM_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),
-    order(2),seed(1234),particles_per_cell(1<<TV::m)
+    order(2),seed(1234),particles_per_cell(1<<TV::m),scale_mass(1),scale_E(1)
 {
     T framerate=24;
     parse_args.Extra(&test_number,"example number","example number to run");
@@ -48,6 +48,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     parse_args.Add("-threads",&threads,"num","Number of threads");
     parse_args.Add("-seed",&seed,"seed","Random number seed");
     parse_args.Add("-particles_per_cell",&particles_per_cell,"num","Number of particles per cell");
+    parse_args.Add("-scale_mass",&scale_mass,"scale","Scale mass of particles");
+    parse_args.Add("-scale_E",&scale_E,"scale","Scale stiffness");
     parse_args.Parse(true);
 
     frame_dt=1/framerate;

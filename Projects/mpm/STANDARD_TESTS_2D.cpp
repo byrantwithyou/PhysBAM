@@ -53,7 +53,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             VECTOR<T,1> angular_velocity(0.4);
-            T density=2;
+            T density=2*scale_mass;
             Seed_Particles(sphere,[=](const TV& X){return angular_velocity.Cross(X-sphere.center);},
                 [=](const TV&){return MATRIX<T,2>::Cross_Product_Matrix(angular_velocity);}
                 ,density,particles_per_cell);
@@ -61,26 +61,28 @@ Initialize()
             TV total_momentum=particles.V.Weighted_Sum(particles.mass);
             TV dV=total_momentum/total_mass;
             particles.V-=dV;
-            Add_Fixed_Corotated(1e4,0.3);
+            Add_Fixed_Corotated(1e4*scale_E,0.3);
         } break;
         case 2:{ // Oscillating circle
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             VECTOR<T,1> angular_velocity(0.4);
-            T density=2;
+            T density=2*scale_mass;
             Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
-            Add_Fixed_Corotated(1e4,0.3);
+            random.Fill_Uniform(particles.F,-1,1);
+            random.Fill_Uniform(particles.V,-1,1);
+            Add_Fixed_Corotated(1e4*scale_E,0.3);
         } break;
         case 3:{ // Freefall circle
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             VECTOR<T,1> angular_velocity(0.4);
-            T density=2;
+            T density=2*scale_mass;
             Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},
                 density,particles_per_cell);
-            Add_Gravity(TV(0,1));
+            Add_Gravity(TV(0,-9.8));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

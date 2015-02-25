@@ -41,6 +41,8 @@ public:
     int order;
     int seed;
     int particles_per_cell;
+    T scale_mass;
+    T scale_E;
     RANDOM_NUMBERS<T> random;
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
