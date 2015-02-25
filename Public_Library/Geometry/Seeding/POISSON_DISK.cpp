@@ -49,10 +49,10 @@ Sample(IMPLICIT_OBJECT<TV>* object,ARRAY<TV>& XXX)
             TV new_point=Generate_Random_Point_Around_Annulus(ran,point);
             if(Check_Distance(grid,grid_array,new_point,XX) && grid.domain.Lazy_Inside(new_point)){
                 found_at_least_one=true;
-                XX.Append(new_point);
-                active.Append(XX.m-1);
-                grid_array(grid.Cell(new_point,ghost))=XX.m-1;}}
-        if(!found_at_least_one) active.Remove_Index(random_index);}
+                int index=XX.Append(new_point);
+                active.Append(index);
+                grid_array(grid.Cell(new_point,ghost))=index;}}
+        if(!found_at_least_one) active.Remove_Index_Lazy(random_index);}
     for(int i=0;i<XX.m;i++) if(object->Extended_Phi(XX(i))<=0) XXX.Append(XX(i));
 }
 //#####################################################################
@@ -61,23 +61,23 @@ Sample(IMPLICIT_OBJECT<TV>* object,ARRAY<TV>& XXX)
 template<class TV> TV POISSON_DISK<TV>::
 Generate_Random_Point_Around_Annulus(RANDOM_NUMBERS<T>& random,TV& center) const
 {
-    TV v;
-    do{TV vv=random.Get_Uniform_Vector(RANGE<TV>::Centered_Box());
-        if(vv.Magnitude_Squared()<=(T)1) v=vv;
-    }while(v.Magnitude_Squared()<(T)0.25);
-    return v*min_distance*2+center;
+    while(1){
+        TV v=random.Get_Uniform_Vector(RANGE<TV>::Centered_Box());
+        T mag2=v.Magnitude_Squared();
+        if(mag2>=0.25 && mag2<=1) return v*min_distance*2+center;}
+    return TV();
 }
 //#####################################################################
 // Function Check_Distance
 //#####################################################################
 template<class TV> bool POISSON_DISK<TV>::
-Check_Distance(const GRID<TV>& grid,ARRAY<int,TV_INT>& grid_array,const TV& point,ARRAY<TV>& XX) const
+Check_Distance(const GRID<TV>& grid,ARRAY<int,TV_INT>& grid_array,const TV& point,ARRAY<TV>& X) const
 {
     TV_INT cell=grid.Cell(point,ghost);
-    RANGE<TV_INT> candidate_range(TV_INT()-1,TV_INT()+2);
+    RANGE<TV_INT> candidate_range(cell-1,cell+2);
     for(RANGE_ITERATOR<TV::m> it(candidate_range);it.Valid();it.Next()){
-        if(grid_array(it.index+cell)==-1) continue;
-        if((point-XX(grid_array(it.index+cell))).Magnitude_Squared()<sqr(min_distance)) return false;}
+        if(grid_array(it.index)==-1) continue;
+        if((point-X(grid_array(it.index))).Magnitude_Squared()<sqr(min_distance)) return false;}
     return true;
 }
 namespace PhysBAM{
