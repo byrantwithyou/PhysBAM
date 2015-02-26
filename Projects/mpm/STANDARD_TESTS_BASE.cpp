@@ -5,6 +5,7 @@
 #include <Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Seeding/POISSON_DISK.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
@@ -86,23 +87,24 @@ template<class TV> void STANDARD_TESTS_BASE<TV>::
 Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
     boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
 {
+    POISSON_DISK<TV> poisson_disk(1);
+    ARRAY<TV> X;
+    poisson_disk.Set_Distance_By_Volume(grid.dX.Product()/particles_per_cell);
+    poisson_disk.Sample(random,object,X);
+
     object.Update_Box();
     RANGE<TV_INT> range=grid.Cell_Indices(0).Intersect(grid.Clamp_To_Cell(object.Box(),3));
 
     T volume=grid.dX.Product()/particles_per_cell;
     T mass=density*volume;
-    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
-        RANGE<TV> cell_domain=grid.Cell_Domain(it.index);
-        for(int i=0;i<particles_per_cell;i++){
-            TV X=random.Get_Uniform_Vector(cell_domain);
-            if(!object.Lazy_Inside(X)) continue;
-            int p=particles.Add_Element();
-            particles.X(p)=X;
-            particles.V(p)=V(X);
-            if(use_affine) particles.B(p)=dV(X)*weights->Dp(X);
-            particles.F(p)=MATRIX<T,TV::m>()+1;
-            particles.mass(p)=mass;
-            particles.volume(p)=volume;}}
+    for(int i=0;i<X.m;i++){
+        int p=particles.Add_Element();
+        particles.X(p)=X(i);
+        particles.V(p)=V(X(i));
+        if(use_affine) particles.B(p)=dV(X(i))*weights->Dp(X(i));
+        particles.F(p)=MATRIX<T,TV::m>()+1;
+        particles.mass(p)=mass;
+        particles.volume(p)=volume;}
 }
 //#####################################################################
 // Function Add_Gravity
