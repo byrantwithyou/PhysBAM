@@ -270,19 +270,19 @@ template<class T> void OPENGL_TRIANGULATED_AREA<T>::
 Draw_Triangles(const bool use_color_map) const
 {
     OpenGL_Begin(GL_TRIANGLES);
+    if(use_color_map) triangle_color.Send_To_GL_Pipeline();
     for(int i=0;i<triangulated_area.mesh.elements.m;i++){
         if(color_map && use_color_map) (*color_map)(i).Send_To_GL_Pipeline();
         int node1,node2,node3;triangulated_area.mesh.elements(i).Get(node1,node2,node3);
         OpenGL_Triangle(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3));}
-    if(use_color_map) triangle_color.Send_To_GL_Pipeline();
     OpenGL_End();
 
     OpenGL_Begin(GL_TRIANGLES);
+    if(use_color_map) triangle_inverted_color.Send_To_GL_Pipeline();
     for(int i=0;i<triangulated_area.mesh.elements.m;i++){
         if(color_map && use_color_map) (*color_map)(i).Send_To_GL_Pipeline();
         int node1,node2,node3;triangulated_area.mesh.elements(i).Get(node1,node2,node3);
         OpenGL_Triangle(triangulated_area.particles.X(node2),triangulated_area.particles.X(node1),triangulated_area.particles.X(node3));}
-    if(use_color_map) triangle_inverted_color.Send_To_GL_Pipeline();
     OpenGL_End();
 }
 //#####################################################################
