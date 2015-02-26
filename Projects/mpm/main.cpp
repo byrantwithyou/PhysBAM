@@ -23,7 +23,6 @@ int main(int argc,char *argv[])
     typedef double T;
     typedef double RW;
     STREAM_TYPE stream_type((RW()));
-    typedef VECTOR<T,2> TV;
 
     bool use_3d=false;
     PARSE_ARGS parse_args(argc,argv);
