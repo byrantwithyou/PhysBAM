@@ -1,0 +1,45 @@
+To be implemented:
+
+* Collisions with friction
+
+* Threading
+
+* Invalid particles
+  - Invalidate particles that leave domain
+  - Update simulated_particles properly
+
+* Dump out meshes for forces in a way that allows viewer to see them.
+
+* Make viewer aware of MPM_PARTICLES directly
+
+* Implement an example with both mesh-based and non-mesh-based forces
+
+* 3D examples
+
+
+
+To be debugged:
+
+* use_midpoint
+
+* Does not conserve linear momentum:
+  - ./mpm 2 -resolution 30 -max_dt .002 -last_frame 200 -scale_mass 1 -scale_E 1 -affine -solver_tolerance .5
+
+
+To test:
+
+* Make sure -flip works correctly
+
+* Make sure -order 1 and -order 3 both work correctly
+
+* Test -particles_per_cell
+
+* Test -restart
+
+To do:
+
+* Set more sensible defaults for:
+  - -newton_iterations
+  - -newton_tolerance
+  - -solver_iterations
+  - -solver_tolerance
