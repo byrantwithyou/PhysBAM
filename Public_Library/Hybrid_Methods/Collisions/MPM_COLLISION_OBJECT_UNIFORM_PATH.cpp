@@ -28,7 +28,7 @@ template<class TV> MPM_COLLISION_OBJECT_UNIFORM_PATH<TV>::
 template<class TV> FRAME<TV> MPM_COLLISION_OBJECT_UNIFORM_PATH<TV>::
 Orientation(const T t) const
 {
-    return frame;
+    return FRAME<TV>(TV(frame.t+twist.linear*t),ROTATION<TV>::From_Rotation_Vector(twist.angular*t)*frame.r);
 }
 //#####################################################################
 // Function Velocity
