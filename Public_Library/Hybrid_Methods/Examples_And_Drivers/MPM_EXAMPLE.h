@@ -86,6 +86,9 @@ public:
     int Add_Force(DEFORMABLES_FORCES<TV>& force);
     void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
 
+    TV Total_Particle_Linear_Momentum() const;
+    TV Total_Grid_Linear_Momentum(bool vhat=false) const;
+    T Total_Grid_Kinetic_Energy(bool vhat=false) const;
 //#####################################################################
 };
 }
