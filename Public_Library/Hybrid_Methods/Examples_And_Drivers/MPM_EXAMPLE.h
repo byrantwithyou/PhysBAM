@@ -87,8 +87,8 @@ public:
     void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
 
     TV Total_Particle_Linear_Momentum() const;
-    TV Total_Grid_Linear_Momentum(bool vhat=false) const;
-    T Total_Grid_Kinetic_Energy(bool vhat=false) const;
+    TV Total_Grid_Linear_Momentum(const ARRAY<TV,TV_INT>& u) const;
+    T Total_Grid_Kinetic_Energy(const ARRAY<TV,TV_INT>& u) const;
 //#####################################################################
 };
 }

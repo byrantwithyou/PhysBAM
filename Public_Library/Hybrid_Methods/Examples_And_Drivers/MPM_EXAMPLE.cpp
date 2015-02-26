@@ -179,31 +179,31 @@ Total_Particle_Linear_Momentum() const
     TV result;
     for(int k=0;k<simulated_particles.m;k++){
         int p=simulated_particles(k);
-        result+=particles.mass(p)*particles.V(p);;}
+        result+=particles.mass(p)*particles.V(p);}
     return result;
 }
 //#####################################################################
 // Function Total_Grid_Linear_Momentum
 //#####################################################################
 template<class TV> TV MPM_EXAMPLE<TV>::
-Total_Grid_Linear_Momentum(bool vhat) const
+Total_Grid_Linear_Momentum(const ARRAY<TV,TV_INT>& u) const
 {
     TV result;
     for(int i=0;i<valid_grid_indices.m;i++){
         int j=valid_grid_indices(i);
-        result+=mass.array(j)*(vhat?velocity_new.array(j):velocity.array(j));}
+        result+=mass.array(j)*u.array(j);}
     return result;
 }
 //#####################################################################
 // Function Total_Grid_Kinetic_Energy
 //#####################################################################
 template<class TV> typename TV::SCALAR MPM_EXAMPLE<TV>::
-Total_Grid_Kinetic_Energy(bool vhat) const
+Total_Grid_Kinetic_Energy(const ARRAY<TV,TV_INT>& u) const
 {
     T result=0;
     for(int i=0;i<valid_grid_indices.m;i++){
         int j=valid_grid_indices(i);
-        result+=(T).5*mass.array(j)*(vhat?velocity_new.array(j):velocity.array(j)).Magnitude_Squared();}
+        result+=(T).5*mass.array(j)*u.array(j).Magnitude_Squared();}
     return result;
 }
 //#####################################################################
