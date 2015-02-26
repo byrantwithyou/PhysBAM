@@ -96,12 +96,6 @@ public:
     const FRAME& Frame() const
     {return *this;}
     
-    const TV& X() const
-    {return t;}
-
-    const ROTATION<TV>& Rotation() const
-    {return r;}
-
     std::string Name() const {return Static_Name();}
     static std::string Static_Name()
     {return STRING_UTILITIES::string_sprintf("FRAME<VECTOR<T,%d> >",TV::m);}
