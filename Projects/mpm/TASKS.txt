@@ -14,8 +14,6 @@ To be implemented:
 
 * Implement an example with both mesh-based and non-mesh-based forces
 
-* 3D examples
-
 
 
 To be debugged:
