@@ -27,33 +27,35 @@ template<class TV> POISSON_DISK<TV>::
 // Function Sample
 //#####################################################################
 template<class TV> void POISSON_DISK<TV>::
-Sample(IMPLICIT_OBJECT<TV>* object,ARRAY<TV>& XXX)
+Sample(RANDOM_NUMBERS<T>& random,IMPLICIT_OBJECT<TV>& object,ARRAY<TV>& X)
 {
-    object->Update_Box();
-    RANGE<TV> bounding_box=object->box.Thickened(min_distance*2);
+    X.Remove_All();
+    object.Update_Box();
+    RANGE<TV> bounding_box=object.box.Thickened(min_distance*2);
     TV_INT cell_counts=TV_INT(bounding_box.Edge_Lengths()/h)+1;
     GRID<TV> grid(cell_counts+1,RANGE<TV>(bounding_box.min_corner,bounding_box.min_corner+(TV)cell_counts*h));
     ARRAY<int,TV_INT> grid_array(grid.Cell_Indices(ghost),true,-1);
-    PHYSBAM_ASSERT(grid.domain.Contains(object->box));
-    ARRAY<TV> XX;
+    PHYSBAM_ASSERT(grid.domain.Contains(object.box));
     ARRAY<int> active;
-    TV first_point=grid.domain.Center();
+    TV first_point=random.Get_Uniform_Vector(grid.domain);
     grid_array(grid.Cell(first_point,ghost))=0;
-    XX.Append(first_point);
+    X.Append(first_point);
     active.Append(0);
     while(active.m){
-        int random_index=ran.Get_Uniform_Integer(0,active.m-1);
-        TV point=XX(active(random_index));
+        int random_index=random.Get_Uniform_Integer(0,active.m-1);
+        TV point=X(active(random_index));
         bool found_at_least_one=false;
         for(int i=0;i<max_attemps;i++){
-            TV new_point=Generate_Random_Point_Around_Annulus(ran,point);
-            if(Check_Distance(grid,grid_array,new_point,XX) && grid.domain.Lazy_Inside(new_point)){
+            TV new_point=Generate_Random_Point_Around_Annulus(random,point);
+            if(Check_Distance(grid,grid_array,new_point,X) && grid.domain.Lazy_Inside(new_point)){
                 found_at_least_one=true;
-                int index=XX.Append(new_point);
+                int index=X.Append(new_point);
                 active.Append(index);
                 grid_array(grid.Cell(new_point,ghost))=index;}}
         if(!found_at_least_one) active.Remove_Index_Lazy(random_index);}
-    for(int i=0;i<XX.m;i++) if(object->Extended_Phi(XX(i))<=0) XXX.Append(XX(i));
+    for(int i=X.m-1;i>=0;i--)
+        if(!object.Lazy_Inside(X(i)))
+            X.Remove_Index_Lazy(i);
 }
 //#####################################################################
 // Function Generate_Random_Point_Around_Annulus
@@ -80,9 +82,22 @@ Check_Distance(const GRID<TV>& grid,ARRAY<int,TV_INT>& grid_array,const TV& poin
         if((point-X(grid_array(it.index))).Magnitude_Squared()<sqr(min_distance)) return false;}
     return true;
 }
+//#####################################################################
+// Function Set_Distance_By_Volume
+//#####################################################################
+template<class TV> void POISSON_DISK<TV>::
+Set_Distance_By_Volume(T volume_per_sample)
+{
+    if(TV::m==1) min_distance=volume_per_sample*((T)2/3);
+    else if(TV::m==2) min_distance=sqrt(volume_per_sample*((T)2/3));
+    else min_distance=cbrt(volume_per_sample*((T)13/18));
+    h=min_distance/sqrt((T)(TV::m));
+}
 namespace PhysBAM{
+template class POISSON_DISK<VECTOR<float,1> >;
 template class POISSON_DISK<VECTOR<float,2> >;
 template class POISSON_DISK<VECTOR<float,3> >;
+template class POISSON_DISK<VECTOR<double,1> >;
 template class POISSON_DISK<VECTOR<double,2> >;
 template class POISSON_DISK<VECTOR<double,3> >;
 }

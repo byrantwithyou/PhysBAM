@@ -18,17 +18,17 @@ class POISSON_DISK
 public:
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    const T min_distance;
-    const int max_attemps;
-    const int ghost;
+    T min_distance;
+    int max_attemps;
+    int ghost;
     T h;
-    RANDOM_NUMBERS<T> ran;
-    POISSON_DISK(const T min_distance,const int max_attemps=30);
+    POISSON_DISK(T min_distance,int max_attemps=30);
     ~POISSON_DISK();
-    void Sample(IMPLICIT_OBJECT<TV>* object,ARRAY<TV>& XXX);
+    void Sample(RANDOM_NUMBERS<T>& random,IMPLICIT_OBJECT<TV>& object,ARRAY<TV>& X);
+    void Set_Distance_By_Volume(T volume_per_sample);
 private:
     TV Generate_Random_Point_Around_Annulus(RANDOM_NUMBERS<T>& random,TV& center) const;
-    bool Check_Distance(const GRID<TV>& grid,ARRAY<int,TV_INT>& grid_array,const TV& point,ARRAY<TV>& XX) const;
+    bool Check_Distance(const GRID<TV>& grid,ARRAY<int,TV_INT>& grid_array,const TV& point,ARRAY<TV>& X) const;
 //#####################################################################
 };
 
