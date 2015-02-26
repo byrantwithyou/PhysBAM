@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Arrays/ARRAY.h>
+#include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_3D.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_BASED_VECTOR_FIELD_3D.h>
@@ -43,7 +44,7 @@ Update()
     vector_field.Resize(0);
     vector_locations.Resize(0);
 
-    if(V.domain.Empty()) return;
+    if(V.domain.Empty_Half_Open()) return;
 
     OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
     if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE){
@@ -66,26 +67,22 @@ Update()
             vector_field(index)=V(i,j,ij);vector_locations(index++)=grid.X(TV_INT(i,j,ij));}}
     else{
         VECTOR<int,3> domain_start(V.domain.min_corner.x,V.domain.min_corner.y,V.domain.min_corner.z),domain_end(V.domain.max_corner.x,V.domain.max_corner.y,V.domain.max_corner.z);
-        if((slice->mode == OPENGL_SLICE::CELL_SLICE && (!grid.Is_MAC_Grid() || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis])) ||
-            (slice->mode == OPENGL_SLICE::NODE_SLICE && (grid.Is_MAC_Grid() || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis]))) {
+        if((slice->mode==OPENGL_SLICE::CELL_SLICE && (!grid.Is_MAC_Grid() || slice->index<domain_start[slice->axis] || slice->index>=domain_end[slice->axis])) ||
+            (slice->mode==OPENGL_SLICE::NODE_SLICE && (grid.Is_MAC_Grid() || slice->index<domain_start[slice->axis] || slice->index>=domain_end[slice->axis]))){
             // Currently we don't draw anything if the slice doesn't match where the vector field lives
             return;}
 
-        int m_start=0,m_end=grid.counts.x,n_start=0,n_end=grid.counts.y,mn_start=0,mn_end=grid.counts.z;
-        switch(slice->axis){
-            case 0:m_start=slice->index;m_end=m_start+1;break;
-            case 1:n_start=n_end=slice->index;m_end=m_start+1;break;
-            case 2:mn_start=mn_end=slice->index;m_end=m_start+1;break;}
-
-        int num_vectors=(m_end-m_start)*(n_end-n_start)*(mn_end-mn_start);
-        vector_field.Resize(num_vectors);
-        vector_locations.Resize(num_vectors);
+        RANGE<TV_INT> domain=V.domain;
+        domain.min_corner(slice->axis)=slice->index;
+        domain.max_corner(slice->axis)=slice->index+1;
 
         int idx=0;
-        for(int i=m_start;i<m_end;i++)for(int j=n_start;j<n_end;j++)for(int k=mn_start;k<mn_end;k++){
-            VECTOR<int,3> grid_index(i,j,k);
-            vector_field(idx)=V(grid_index);
-            vector_locations(idx++)=grid.X(grid_index);}}
+        vector_field.Resize(domain.Size());
+        vector_locations.Resize(domain.Size());
+        for(RANGE_ITERATOR<TV::m> it(V.domain);it.Valid();it.Next()){
+            vector_field(idx)=V(it.index);
+            vector_locations(idx)=grid.X(it.index);
+            idx++;}}
 }
 //#####################################################################
 // Print_Selection_Info

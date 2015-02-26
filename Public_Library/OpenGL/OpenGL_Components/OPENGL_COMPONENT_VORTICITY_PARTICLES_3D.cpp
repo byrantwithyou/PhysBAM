@@ -21,7 +21,7 @@ Reinitialize(bool force)
     if(!have_velocities){
         have_velocities=true;
         opengl_vector_field.vector_field.Resize(particles->Size());
-        int idx=1;
+        int idx=0;
         for(int i=0;i<particles->Size();i++)
             opengl_vector_field.vector_field(idx++)=vorticity(i);}
 }
