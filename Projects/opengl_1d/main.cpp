@@ -75,7 +75,6 @@ OPENGL_1D_VISUALIZATION()
 template<class T,class RW> OPENGL_1D_VISUALIZATION<T,RW>::
 ~OPENGL_1D_VISUALIZATION()
 {
-    delete &grid_component->object;
     delete grid_component;
 }
 //#####################################################################
