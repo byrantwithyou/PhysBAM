@@ -87,22 +87,6 @@ public:
             p(index)=c1*v1.p(index)+v2.p(index);}
     }
 
-    T Dot(const KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE
-    {
-        const FLIP_KRYLOV_VECTOR<TV>& v=debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(bv);
-
-        ARRAY<double> result_per_thread(threads);
-#pragma omp parallel for
-        for(int k=0;k<interior_cells.m;k++){
-            const TV_INT index=interior_cells(k);
-            const int tid=omp_get_thread_num();
-            result_per_thread(tid)+=(double)p(index)*(double)v.p(index);}
-        double result=0;
-        for(int tid=0;tid<threads;tid++)
-            result+=result_per_thread(tid);
-        return result;
-    }
-
     BASE* Clone_Default() const
     {
         FLIP_KRYLOV_VECTOR<TV>* c=new FLIP_KRYLOV_VECTOR<TV>(interior_cells,threads);
