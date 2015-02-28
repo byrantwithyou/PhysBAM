@@ -20,7 +20,8 @@ MPM_OBJECTIVE(MPM_EXAMPLE<TV>& example)
     v0(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
     v1(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
     tmp0(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
-    tmp1(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices))
+    tmp1(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
+    tmp2(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices))
 {
 }
 //#####################################################################
@@ -34,6 +35,7 @@ template<class TV> MPM_OBJECTIVE<TV>::
     delete &v1;
     delete &tmp0;
     delete &tmp1;
+    delete &tmp2;
 }
 //#####################################################################
 // Function Compute
@@ -69,11 +71,11 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
 
     if(g){
         MPM_KRYLOV_VECTOR<TV>& gg=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(*g);
-        tmp1*=0;
-        system.example.Add_Forces(tmp1.u,system.example.time);
+        tmp2*=0;
+        system.example.Add_Forces(tmp2.u,system.example.time);
         for(int i=0;i<system.example.valid_grid_indices.m;i++){
             int p=system.example.valid_grid_indices(i);
-            gg.u.array(p)=(dv.u.array(p)-dt/system.example.mass.array(p)*tmp1.u.array(p))*midpoint_factor;}}
+            gg.u.array(p)=(dv.u.array(p)-dt/system.example.mass.array(p)*tmp2.u.array(p))*midpoint_factor;}}
 }
 //#####################################################################
 // Function Compute
@@ -193,6 +195,7 @@ Reset()
     v1.u.Resize(v0.u.domain);
     tmp0.u.Resize(v0.u.domain);
     tmp1.u.Resize(v0.u.domain);
+    tmp2.u.Resize(v0.u.domain);
 }
 //#####################################################################
 // Function Test_Diff
