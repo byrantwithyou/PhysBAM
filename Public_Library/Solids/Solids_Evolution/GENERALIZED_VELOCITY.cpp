@@ -89,7 +89,9 @@ template<class TV> void GENERALIZED_VELOCITY<TV>::
 Copy(const T c,const BASE& bv)
 {
     const GENERALIZED_VELOCITY& v=debug_cast<const GENERALIZED_VELOCITY&>(bv);
-    V=c*v.V;rigid_V=c*v.rigid_V;kinematic_and_static_rigid_V=c*v.kinematic_and_static_rigid_V;
+    V=c*v.V;
+    rigid_V=c*v.rigid_V;
+    kinematic_and_static_rigid_V=c*v.kinematic_and_static_rigid_V;
 }
 //#####################################################################
 // Function Copy
@@ -98,16 +100,9 @@ template<class TV> void GENERALIZED_VELOCITY<TV>::
 Copy(const T c1,const BASE& bv1,const BASE& bv2)
 {
     const GENERALIZED_VELOCITY& v1=debug_cast<const GENERALIZED_VELOCITY&>(bv1),&v2=debug_cast<const GENERALIZED_VELOCITY&>(bv2);
-    V=c1*v1.V+v2.V;rigid_V=c1*v1.rigid_V+v2.rigid_V;kinematic_and_static_rigid_V=c1*v1.kinematic_and_static_rigid_V+v2.kinematic_and_static_rigid_V;
-}
-//#####################################################################
-// Function Dot
-//#####################################################################
-template<class TV> typename TV::SCALAR GENERALIZED_VELOCITY<TV>::
-Dot(const BASE& bv) const
-{
-    const GENERALIZED_VELOCITY& v=debug_cast<const GENERALIZED_VELOCITY&>(bv);
-    return V.Dot(v.V)+rigid_V.Dot(v.rigid_V)+kinematic_and_static_rigid_V.Dot(v.kinematic_and_static_rigid_V);
+    V=c1*v1.V+v2.V;
+    rigid_V=c1*v1.rigid_V+v2.rigid_V;
+    kinematic_and_static_rigid_V=c1*v1.kinematic_and_static_rigid_V+v2.kinematic_and_static_rigid_V;
 }
 //#####################################################################
 // Function Pack

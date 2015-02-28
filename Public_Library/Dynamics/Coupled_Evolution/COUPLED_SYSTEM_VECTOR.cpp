@@ -100,16 +100,6 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
     viscous_force_coefficients=c1*v1.viscous_force_coefficients+v2.viscous_force_coefficients;
 }
 //#####################################################################
-// Function Dot
-//#####################################################################
-template<class TV> typename TV::SCALAR COUPLED_SYSTEM_VECTOR<TV>::
-Dot(const BASE& bv) const
-{
-    const COUPLED_SYSTEM_VECTOR& v=debug_cast<const COUPLED_SYSTEM_VECTOR&>(bv);
-    assert(pressure.m==v.pressure.m);
-    return pressure.Dot(v.pressure)+lambda.Dot(v.lambda)+force_coefficients.Dot(v.force_coefficients)+viscous_force_coefficients.Dot(v.viscous_force_coefficients);
-}
-//#####################################################################
 // Function Print
 //#####################################################################
 template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::

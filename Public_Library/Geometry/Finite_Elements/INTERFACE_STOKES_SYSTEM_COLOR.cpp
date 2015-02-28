@@ -219,7 +219,7 @@ Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,boost::function<TV
 
     for(int i=0;i<null_modes.m;i++){
         Clear_Unused_Entries(*null_modes(i));
-        null_modes(i)->Normalize();}
+        Normalize(*null_modes(i));}
 }
 //#####################################################################
 // Function Set_RHS
@@ -431,7 +431,35 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 template<class TV> double INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
-    return debug_cast<const VECTOR_T&>(x).Dot(debug_cast<const VECTOR_T&>(y));
+    const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& u=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>&>(x);
+    const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>&>(y);
+    T dot=0;
+#pragma omp parallel
+#pragma omp single
+    {
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<u.colors;c++)
+#pragma omp task
+            {
+                const T tmp=u.u(i)(c).Dot(v.u(i)(c));
+#pragma omp critical
+                dot+=tmp;
+            }
+        for(int c=0;c<u.colors;c++)
+#pragma omp task
+        {
+            const T tmp=u.p(c).Dot(v.p(c));
+#pragma omp critical
+            dot+=tmp;
+        }
+#pragma omp task
+        {
+            const T tmp=u.q.Dot(v.q);
+#pragma omp critical
+            dot+=tmp;
+        }
+    }
+    return dot;
 }
 //#####################################################################
 // Function Convergence_Norm
@@ -470,7 +498,7 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
     // TODO: This needs to change for N/D BC.
     VECTOR_T& v=debug_cast<VECTOR_T&>(x);
     for(int i=0;i<null_modes.m;i++)
-        v.Copy(-v.Dot(*null_modes(i)),*null_modes(i),v);
+        v.Copy(-Inner_Product(v,*null_modes(i)),*null_modes(i),v);
 
     Clear_Unused_Entries(v);
 }
@@ -601,6 +629,14 @@ Get_Sparse_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const
                 for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++){
                     M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(first_col+mat.A(e).j,mat.A(e).a);
                     M.A(next_entry(first_col+mat.A(e).j)++)=SPARSE_MATRIX_ENTRY<T>(first_row+r,mat.A(e).a);}}
+}
+//#####################################################################
+// Function Normalize
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
+Normalize(KRYLOV_VECTOR_BASE<T>& x) const
+{
+    x*=1/sqrt(Inner_Product(x,x));
 }
 namespace PhysBAM{
 template class INTERFACE_STOKES_SYSTEM_COLOR<VECTOR<float,2> >;

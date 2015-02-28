@@ -74,14 +74,6 @@ Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv
         debug_cast<const MPM_KRYLOV_VECTOR&>(bv2).u.array.Subset(valid_indices);
 }
 //#####################################################################
-// Function Dot
-//#####################################################################
-template<class TV> typename TV::SCALAR MPM_KRYLOV_VECTOR<TV>::
-Dot(const KRYLOV_VECTOR_BASE<T>& bv) const
-{
-    return u.array.Subset(valid_indices).Dot(debug_cast<const MPM_KRYLOV_VECTOR&>(bv).u.array.Subset(valid_indices));
-}
-//#####################################################################
 // Function Raw_Size
 //#####################################################################
 template<class TV> int MPM_KRYLOV_VECTOR<TV>::

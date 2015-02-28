@@ -203,52 +203,6 @@ Zero_Out()
             q(i)=0;
 }
 //#####################################################################
-// Function Dot
-//#####################################################################
-template<class TV> typename TV::SCALAR INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
-Dot(const KRYLOV_VECTOR_BASE<T>& bv) const
-{
-    const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>&>(bv);
-    T result=0;
-#ifdef USE_OPENMP
-    result_per_thread.Fill(0);
-    for(int c=0;c<colors;c++)
-#pragma omp parallel for
-        for(int i=0;i<u(c).m;i++){
-            const int tid=omp_get_thread_num();
-            result_per_thread(tid)+=u(c)(i)*v.u(c)(i);}
-#pragma omp parallel for
-    for(int i=0;i<q.m;i++){
-        const int tid=omp_get_thread_num();
-        result_per_thread(tid)+=q(i)*v.q(i);}
-    for(int tid=0;tid<threads;tid++)
-        result+=result_per_thread(tid);
-#else
-    for(int c=0;c<colors;c++)
-        for(int i=0;i<u(c).m;i++)
-            result+=u(c)(i)*v.u(c)(i);
-    for(int i=0;i<q.m;i++)
-        result+=q(i)*v.q(i);
-#endif
-    return result;
-}
-//#####################################################################
-// Function Magnitude_Squared
-//#####################################################################
-template<class TV> typename TV::SCALAR INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
-Magnitude_Squared() const
-{
-    return Dot(*this);
-}
-//#####################################################################
-// Function Magnitude
-//#####################################################################
-template<class TV> typename TV::SCALAR INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
-Magnitude() const
-{
-    return sqrt(this->Magnitude_Squared());
-}
-//#####################################################################
 // Function Max_Abs
 //#####################################################################
 template<class TV> typename TV::SCALAR INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
@@ -278,14 +232,6 @@ Max_Abs() const
         max_abs=max(max_abs,u(c).Max_Abs());
 #endif
     return max_abs;
-}
-//#####################################################################
-// Function Normalize
-//#####################################################################
-template<class TV> void INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
-Normalize()
-{
-    (*this)*=1/this->Magnitude();
 }
 //#####################################################################
 // Function Scale

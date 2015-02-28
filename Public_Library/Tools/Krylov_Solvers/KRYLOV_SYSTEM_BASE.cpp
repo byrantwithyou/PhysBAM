@@ -105,14 +105,14 @@ Test_System(const KRYLOV_VECTOR_BASE<T>& t) const
     w.Copy(rx,x);
     w.Copy(ry,y,w);
     Multiply(w,z);
-    T mag_Aw=sqrt(z.Dot(z));
+    T mag_Aw=sqrt(Inner_Product(z,z));
     Multiply(y,w);
-    T mag_Ay=sqrt(w.Dot(w));
+    T mag_Ay=sqrt(Inner_Product(w,w));
     z.Copy(-ry,w,z);
     Multiply(x,w);
-    T mag_Ax=sqrt(w.Dot(w));
+    T mag_Ax=sqrt(Inner_Product(w,w));
     z.Copy(-rx,w,z);
-    T mag_resid=sqrt(z.Dot(z));
+    T mag_resid=sqrt(Inner_Product(z,z));
     r=mag_resid/max((T)1e-30,mag_Aw,mag_Ax,mag_Ay);
     if(r>tolerance) {pass=false;LOG::cout<<"Linearity Test: "<<mag_resid<<"  relative  "<<r<<std::endl;}
 
@@ -120,16 +120,16 @@ Test_System(const KRYLOV_VECTOR_BASE<T>& t) const
     w.Copy(ry,y,w);
     const KRYLOV_VECTOR_BASE<T>& tz=Precondition(w,z);
     if(&tz!=&z) z=tz;
-    mag_Aw=sqrt(z.Dot(z));
+    mag_Aw=sqrt(Inner_Product(z,z));
     const KRYLOV_VECTOR_BASE<T>& tw=Precondition(y,w);
     if(&tw!=&z) w=tw;
-    mag_Ay=sqrt(w.Dot(w));
+    mag_Ay=sqrt(Inner_Product(w,w));
     z.Copy(-ry,w,z);
     const KRYLOV_VECTOR_BASE<T>& tw2=Precondition(x,w);
     if(&tw2!=&w) w=tw2;
-    mag_Ax=sqrt(w.Dot(w));
+    mag_Ax=sqrt(Inner_Product(w,w));
     z.Copy(-rx,w,z);
-    mag_resid=sqrt(z.Dot(z));
+    mag_resid=sqrt(Inner_Product(z,z));
     r=mag_resid/max((T)1e-30,mag_Aw,mag_Ax,mag_Ay);
     if(r>tolerance) {pass=false;LOG::cout<<"Preconditioner Linearity Test: "<<mag_resid<<"  relative  "<<r<<std::endl;}
 

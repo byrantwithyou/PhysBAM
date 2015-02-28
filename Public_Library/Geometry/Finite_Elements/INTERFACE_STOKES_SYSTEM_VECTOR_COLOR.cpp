@@ -235,57 +235,6 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     q.Resize(cs.q.m);
 }
 //#####################################################################
-// Function Dot
-//#####################################################################
-template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
-Dot(const KRYLOV_VECTOR_BASE<T>& bv) const
-{
-    const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>&>(bv);
-    T dot=0;
-#pragma omp parallel
-#pragma omp single
-    {
-        for(int i=0;i<TV::m;i++)
-            for(int c=0;c<colors;c++)
-#pragma omp task
-            {
-                const T tmp=u(i)(c).Dot(v.u(i)(c));
-#pragma omp critical
-                dot+=tmp;
-            }
-        for(int c=0;c<colors;c++)
-#pragma omp task
-        {
-            const T tmp=p(c).Dot(v.p(c));
-#pragma omp critical
-            dot+=tmp;
-        }
-#pragma omp task
-        {
-            const T tmp=q.Dot(v.q);
-#pragma omp critical
-            dot+=tmp;
-        }
-    }
-    return dot;
-}
-//#####################################################################
-// Function Magnitude_Squared
-//#####################################################################
-template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
-Magnitude_Squared() const
-{
-    return Dot(*this);
-}
-//#####################################################################
-// Function Magnitude
-//#####################################################################
-template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
-Magnitude() const
-{
-    return sqrt(this->Magnitude_Squared());
-}
-//#####################################################################
 // Function Max_Abs
 //#####################################################################
 template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
@@ -318,14 +267,6 @@ Max_Abs() const
         }
     }
     return max_abs;
-}
-//#####################################################################
-// Function Normalize
-//#####################################################################
-template<class TV> void INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
-Normalize()
-{
-    (*this)*=1/this->Magnitude();
 }
 //#####################################################################
 // Function Scale

@@ -44,7 +44,9 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 template<class TV> double MPM_KRYLOV_SYSTEM<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
-    return x.Dot(y);
+    const MPM_KRYLOV_VECTOR<TV>& u=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(x);
+    const MPM_KRYLOV_VECTOR<TV>& v=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(y);
+    return u.u.array.Subset(u.valid_indices).Dot(v.u.array.Subset(v.valid_indices));
 }
 //#####################################################################
 // Function Convergence_Norm

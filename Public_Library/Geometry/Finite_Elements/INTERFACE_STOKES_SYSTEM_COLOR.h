@@ -112,6 +112,7 @@ public:
     void Pack(const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u,VECTOR<ARRAY<ARRAY<T> >,TV::m>& v) const;
     void Pack(const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,VECTOR<VECTOR<ARRAY<ARRAY<T> >,TV::m>,TV::m>& S,T scale) const;
     void Get_Sparse_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const;
+    void Normalize(KRYLOV_VECTOR_BASE<T>& x) const;
 private:
     void Set_Jacobi_Preconditioner();
 //#####################################################################

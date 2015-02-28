@@ -160,7 +160,7 @@ Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_scalar_field,
         const ARRAY<int>& inactive=inactive_u(c);
         u.Fill(1);
         for(int k=0;k<inactive.m;k++) u(inactive(k))=0;}
-    null_u.Normalize();
+    null_u*=1/sqrt(Inner_Product(null_u,null_u));
 }
 //#####################################################################
 // Function Set_RHS
@@ -261,7 +261,30 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 template<class TV> double INTERFACE_POISSON_SYSTEM_COLOR<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
-    return debug_cast<const VECTOR_T&>(x).Dot(debug_cast<const VECTOR_T&>(y));
+    const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& u=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>&>(x);
+    const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>&>(y);
+    T result=0;
+#ifdef USE_OPENMP
+    result_per_thread.Fill(0);
+    for(int c=0;c<colors;c++)
+#pragma omp parallel for
+        for(int i=0;i<u(c).m;i++){
+            const int tid=omp_get_thread_num();
+            result_per_thread(tid)+=u.u(c)(i)*v.u(c)(i);}
+#pragma omp parallel for
+    for(int i=0;i<q.m;i++){
+        const int tid=omp_get_thread_num();
+        result_per_thread(tid)+=u.q(i)*v.q(i);}
+    for(int tid=0;tid<threads;tid++)
+        result+=result_per_thread(tid);
+#else
+    for(int c=0;c<u.colors;c++)
+        for(int i=0;i<u.u(c).m;i++)
+            result+=u.u(c)(i)*v.u(c)(i);
+    for(int i=0;i<u.q.m;i++)
+        result+=u.q(i)*v.q(i);
+#endif
+    return result;
 }
 //#####################################################################
 // Function Convergence_Norm
@@ -279,7 +302,7 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
     // TODO: This needs to change for N/D BC.
     VECTOR_T& v=debug_cast<VECTOR_T&>(x);
-    if(!cdi->dc_present) v.Copy(-v.Dot(null_u),null_u,v);
+    if(!cdi->dc_present) v.Copy(-Inner_Product(v,null_u),null_u,v);
 
     for(int c=0;c<cdi->colors;c++){
         ARRAY<T>& u=v.u(c);

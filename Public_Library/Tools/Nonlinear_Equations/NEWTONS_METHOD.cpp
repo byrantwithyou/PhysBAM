@@ -61,7 +61,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
             T norm=sqrt(sys.Inner_Product(dx,dx));
             if(norm>max_newton_step_size) dx*=max_newton_step_size/norm;}
 
-        T a=Line_Search(F,x,dx,grad,tm);
+        T a=Line_Search(F,sys,x,dx,grad,tm);
         if(a<=0) break;
         x.Copy(a,dx,x);
         F.Make_Feasible(x);
@@ -90,14 +90,14 @@ Make_Downhill_Direction(const KRYLOV_SYSTEM_BASE<T>& sys,KRYLOV_VECTOR_BASE<T>& 
 // Function Line_Search
 //#####################################################################
 template <class T> T NEWTONS_METHOD<T>::
-Line_Search(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& dx,KRYLOV_VECTOR_BASE<T>& tmp,KRYLOV_VECTOR_BASE<T>& tmp2)
+Line_Search(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYSTEM_BASE<T>& sys,const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& dx,KRYLOV_VECTOR_BASE<T>& tmp,KRYLOV_VECTOR_BASE<T>& tmp2)
 {
     T a=1;
     if(use_wolfe_search){
-        PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,tmp,&tmp2);
+        PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,tmp,&tmp2,&sys);
         if(!LINE_SEARCH<T>::Line_Search_Wolfe_Conditions(pl,0,1,a,(T)1e-4,(T).9)) return 0;}
     else if(use_backtracking){
-        PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,tmp,&tmp2);
+        PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,tmp,&tmp2,&sys);
         if(!LINE_SEARCH<T>::Line_Search_Backtracking(pl,0,1,a,(T)1e-4)) return 0;}
     else if(use_golden_section_search){
         PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)> pl(F,x,dx,tmp);

@@ -20,12 +20,12 @@ template<class T> void PARAMETRIC_LINE<T,T(KRYLOV_VECTOR_BASE<T>&)>::
 Compute(const T t,T* ddg,T* dg,T* g) const
 {
     tmp.Copy(t,dx,x);
-    PHYSBAM_ASSERT((!ddg || system) && (!dg || tmp2));
+    PHYSBAM_ASSERT(((!dg && !ddg) || system) && (!dg || tmp2));
     f.Compute(tmp,ddg?system:0,dg?tmp2:0,g);
-    if(dg) *dg=tmp2->Dot(dx);
+    if(dg) *dg=system->Inner_Product(*tmp2,dx);
     if(ddg){
         system->Multiply(dx,tmp);
-        *ddg=tmp.Dot(dx);}
+        *ddg=system->Inner_Product(tmp,dx);}
 }
 template class PARAMETRIC_LINE<double,double (KRYLOV_VECTOR_BASE<double>&)>;
 template class PARAMETRIC_LINE<float,float (KRYLOV_VECTOR_BASE<float>&)>;

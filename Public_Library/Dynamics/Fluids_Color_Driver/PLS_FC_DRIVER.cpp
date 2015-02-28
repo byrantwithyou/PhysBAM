@@ -550,7 +550,7 @@ Dump_Largest_Eigenvector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ARRAY<KRYL
 
     for(int j=0;j<5;j++){
         random.Fill_Uniform(sol.u,-1,1);
-        for(int i=0;i<evs.m;i++) sol.Copy(-sol.Dot(*evs(i)),*evs(i),sol);
+        for(int i=0;i<evs.m;i++) sol.Copy(-iss.Inner_Product(sol,*evs(i)),*evs(i),sol);
         sol*=1/sqrt((T)iss.Inner_Product(sol,sol));
         T a;
         for(int i=0;i<20;i++){
@@ -565,7 +565,7 @@ Dump_Largest_Eigenvector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ARRAY<KRYL
             iss.Project(sol);
             for(int c=0;c<example.number_of_colors;c++) sol.p(c).Fill(0);
             sol.q.Fill(0);
-            for(int i=0;i<evs.m;i++) sol.Copy(-sol.Dot(*evs(i)),*evs(i),sol);
+            for(int i=0;i<evs.m;i++) sol.Copy(-iss.Inner_Product(sol,*evs(i)),*evs(i),sol);
 
             a=sqrt((T)iss.Inner_Product(sol,sol));
             sol*=1/a;
