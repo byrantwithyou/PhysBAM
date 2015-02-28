@@ -36,7 +36,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 
     for(int k=0;k<example.valid_grid_indices.m;k++){
         int i=example.valid_grid_indices(k);
-        F.u.array(i)=scaled_dt_squared*F.u.array(i)+V.u.array(i)*(scale*example.mass.array(i));}
+        F.u.array(i)=scaled_dt_squared/example.mass.array(i)*F.u.array(i)+V.u.array(i)*scale;}
 }
 //#####################################################################
 // Function Inner_Product
@@ -44,9 +44,13 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 template<class TV> double MPM_KRYLOV_SYSTEM<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
-    const MPM_KRYLOV_VECTOR<TV>& u=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(x);
-    const MPM_KRYLOV_VECTOR<TV>& v=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(y);
-    return u.u.array.Subset(u.valid_indices).Dot(v.u.array.Subset(v.valid_indices));
+    const MPM_KRYLOV_VECTOR<TV>& X=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(x);
+    const MPM_KRYLOV_VECTOR<TV>& Y=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(y);
+    T r=0;
+    for(int k=0;k<example.valid_grid_indices.m;k++){
+        int i=example.valid_grid_indices(k);
+        r+=example.mass.array(i)*X.u.array(i).Dot(Y.u.array(i));}
+    return r;
 }
 //#####################################################################
 // Function Convergence_Norm

@@ -59,22 +59,21 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
     const MPM_KRYLOV_VECTOR<TV>& dv=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(Bdv);
     v1.Copy(use_midpoint?(T).5:1,dv,v0);
     Update_F(v1);
-    tmp0*=0;
-
-    for(int i=0;i<system.example.valid_grid_indices.m;i++){
-        int p=system.example.valid_grid_indices(i);
-        tmp0.u.array(p)=system.example.mass.array(p)*(use_midpoint?(T).25:1)*dv.u.array(p);}
+    T midpoint_factor=use_midpoint?(T).25:1;
 
     system.example.Precompute_Forces(system.example.time);
     if(e){
-        T energy=system.Inner_Product(dv,tmp0)/2;
+        T energy=midpoint_factor*system.Inner_Product(dv,dv)/2;
         energy+=system.example.Potential_Energy(system.example.time);
         *e=energy;}
 
     if(g){
+        MPM_KRYLOV_VECTOR<TV>& gg=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(*g);
         tmp1*=0;
         system.example.Add_Forces(tmp1.u,system.example.time);
-        g->Copy(-dt*(use_midpoint?(T).25:1),tmp1,tmp0);}
+        for(int i=0;i<system.example.valid_grid_indices.m;i++){
+            int p=system.example.valid_grid_indices(i);
+            gg.u.array(p)=(dv.u.array(p)-dt/system.example.mass.array(p)*tmp1.u.array(p))*midpoint_factor;}}
 }
 //#####################################################################
 // Function Compute
@@ -169,9 +168,7 @@ Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance) const
     Compute(dv,0,&tmp0,&e0);
     T factor=system.example.use_midpoint?4:1;
 
-    for(int i=0;i<system.example.valid_grid_indices.m;i++){
-        int p=system.example.valid_grid_indices(i);
-        dv.u.array(p)=tmp0.u.array(p)*(-factor/system.example.mass.array(p));}
+    dv.Copy(-factor,tmp0);
     T norm_grad0=sqrt(system.Inner_Product(tmp0,tmp0));
     Compute(dv,0,&tmp0,&e1);
     T norm_grad1=sqrt(system.Inner_Product(tmp0,tmp0));
