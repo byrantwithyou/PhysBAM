@@ -77,7 +77,7 @@ Reinitialize(bool force)
         free_particles_objects.Delete_Pointers_And_Clean_Memory();free_particles_objects.Resize(m);
         free_particles_indirect_arrays.Delete_Pointers_And_Clean_Memory();free_particles_indirect_arrays.Resize(m);
         phi_list.Delete_Pointers_And_Clean_Memory();phi_list.Resize(m);
-        int color_map_index=15;
+        int color_map_index=14;
         for(int i=0;i<m;i++){
             STRUCTURE<TV>* structure=deformable_body_collection.structures(i);
             if(EMBEDDED_MATERIAL_SURFACE<TV,2>* embedding=dynamic_cast<EMBEDDED_MATERIAL_SURFACE<TV,2>*>(structure)){
