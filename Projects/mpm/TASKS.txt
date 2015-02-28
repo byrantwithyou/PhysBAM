@@ -20,9 +20,6 @@ To be debugged:
 
 * use_midpoint
 
-* Does not conserve linear momentum:
-  - ./mpm 2 -resolution 30 -max_dt .002 -last_frame 200 -scale_mass 1 -scale_E 1 -affine -solver_tolerance .5
-
 
 To test:
 
