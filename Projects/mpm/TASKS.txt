@@ -18,6 +18,8 @@ To be implemented:
 
 To be debugged:
 
+* Get rotation test working
+
 * use_midpoint
 
 
