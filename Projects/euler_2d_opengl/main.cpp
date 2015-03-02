@@ -30,7 +30,8 @@ public:
     using ANIMATED_VISUALIZATION<T>::last_frame_filename;using ANIMATED_VISUALIZATION<T>::camera_script_filename;
     using ANIMATED_VISUALIZATION<T>::opengl_window_title;using ANIMATED_VISUALIZATION<T>::opengl_world;
     using ANIMATED_VISUALIZATION<T>::Add_Component;using ANIMATED_VISUALIZATION<T>::Selection_Priority;
-    VISUALIZATION();
+    using ANIMATED_VISUALIZATION<T>::stream_type;
+    VISUALIZATION(STREAM_TYPE stream_type);
     ~VISUALIZATION();
 
 protected:
@@ -53,8 +54,8 @@ private:
 };
 
 template<class T> VISUALIZATION<T>::
-VISUALIZATION()
-    : ANIMATED_VISUALIZATION<T>(),density_component(0),pressure_component(0),world_geometry_component(0)
+VISUALIZATION(STREAM_TYPE stream_type)
+    : ANIMATED_VISUALIZATION<T>(stream_type),density_component(0),pressure_component(0),world_geometry_component(0)
 {}
 
 template<class T> VISUALIZATION<T>::
@@ -105,13 +106,13 @@ Initialize_Components_And_Key_Bindings()
     std::cout << "Using domain: " << height_m_start << " " << height_m_end << " " << height_n_start << " " << height_n_end << std::endl;
 
     std::string density_filename = basedir+"/%d/density";
-    density_component = new OPENGL_COMPONENT_HEIGHTFIELD_2D<T>(grid,density_filename,"","",height_m_start,height_m_end,height_n_start,height_n_end);
+    density_component = new OPENGL_COMPONENT_HEIGHTFIELD_2D<T>(stream_type,grid,density_filename,"","",height_m_start,height_m_end,height_n_start,height_n_end);
     density_component->Toggle_Draw_Velocities();
     density_component->selectable=true;
     density_component->Reinitialize(true);
     Add_Component(density_component, "density",'1',0);
     std::string pressure_filename = basedir+"/%d/pressure";
-    pressure_component = new OPENGL_COMPONENT_HEIGHTFIELD_2D<T>(grid,pressure_filename,"","",height_m_start,height_m_end,height_n_start,height_n_end);
+    pressure_component = new OPENGL_COMPONENT_HEIGHTFIELD_2D<T>(stream_type,grid,pressure_filename,"","",height_m_start,height_m_end,height_n_start,height_n_end);
     pressure_component->Toggle_Draw_Velocities();
     pressure_component->Toggle_Draw();
     pressure_component->selectable=true;
@@ -132,13 +133,13 @@ int main(int argc, char *argv[])
 
     if(!type_double)
     {
-        ANIMATED_VISUALIZATION<float> *visualization=new VISUALIZATION<float>;
+        ANIMATED_VISUALIZATION<float> *visualization=new VISUALIZATION<float>(STREAM_TYPE(1.f));
         visualization->Initialize_And_Run(parse_args);
         delete visualization;
     }
     else
     {
-        ANIMATED_VISUALIZATION<double> *visualization=new VISUALIZATION<double>;
+        ANIMATED_VISUALIZATION<double> *visualization=new VISUALIZATION<double>(STREAM_TYPE(1.));
         visualization->Initialize_And_Run(parse_args);
         delete visualization;
     }

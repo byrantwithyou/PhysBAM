@@ -28,7 +28,7 @@ public:
     ARRAY<TV>& V;
     ARRAY<TV> vector_field,vector_locations;
 
-    OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD(TRIANGULATED_AREA<T>& triangulated_area,ARRAY<TV>& V);
+    OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD(STREAM_TYPE stream_type,TRIANGULATED_AREA<T>& triangulated_area,ARRAY<TV>& V);
     virtual ~OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD();
 
     void Update();  // Call when triangulated area/V change

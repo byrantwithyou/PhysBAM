@@ -16,8 +16,8 @@ using namespace std;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_MAC_VELOCITY_FIELD_2D<T>::
-OPENGL_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid_input)
-    :OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(vector_field,vector_locations),
+OPENGL_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid_input)
+    :OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(stream_type,vector_field,vector_locations),
     grid(grid_input),u(face_velocities.Component(0)),v(face_velocities.Component(1)),active_cells(0),active_faces(0)
 {
     PHYSBAM_ASSERT(grid.Is_MAC_Grid());

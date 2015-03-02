@@ -25,7 +25,7 @@ template<class T> class OPENGL_TRIANGULATED_SURFACE;
 template<class TV> class ARTICULATED_RIGID_BODY;
 template<class TV> class RIGID_BODY_COLLECTION;
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D:public OPENGL_COMPONENT<T>
 {
 protected:
@@ -54,7 +54,7 @@ public:
     ARRAY<OPENGL_TRIANGULATED_SURFACE<T>*> opengl_triangulated_surface;
 protected:
     ARRAY<OPENGL_TETRAHEDRALIZED_VOLUME<T>*> opengl_tetrahedralized_volume;
-    ARRAY<OPENGL_LEVELSET_MULTIVIEW<T,RW>*> opengl_levelset;
+    ARRAY<OPENGL_LEVELSET_MULTIVIEW<T>*> opengl_levelset;
     ARRAY<OPENGL_TRIANGULATED_SURFACE<T>*> opengl_octree_levelset_surface;
     ARRAY<OPENGL_AXES<T>*> opengl_axes;
     ARRAY<bool> draw_object;
@@ -80,9 +80,9 @@ protected:
 
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir, bool use_display_lists=true);
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir, bool use_display_lists=true);
+    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::string& basedir, bool use_display_lists=true);
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir, bool use_display_lists=true);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;

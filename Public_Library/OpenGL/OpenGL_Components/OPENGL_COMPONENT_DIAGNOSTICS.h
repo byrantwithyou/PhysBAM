@@ -21,7 +21,7 @@ class OPENGL_COMPONENT_DIAGNOSTICS:public OPENGL_COMPONENT<T>
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::component_name;
     using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_DIAGNOSTICS(const std::string& filename);
+    OPENGL_COMPONENT_DIAGNOSTICS(STREAM_TYPE stream_type,const std::string& filename);
     virtual ~OPENGL_COMPONENT_DIAGNOSTICS();
 private:
     void Reinitialize();

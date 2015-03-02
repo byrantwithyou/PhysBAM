@@ -15,7 +15,7 @@
 namespace PhysBAM
 {
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_DEBUG_PARTICLES_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;
@@ -23,7 +23,8 @@ public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
     using OPENGL_COMPONENT<T>::Slice_Has_Changed;using OPENGL_COMPONENT<T>::World_Space_Box;
-    OPENGL_COMPONENT_DEBUG_PARTICLES_3D(const std::string &filename);
+    using OPENGL_COMPONENT<T>::stream_type;
+    OPENGL_COMPONENT_DEBUG_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename);
     virtual ~OPENGL_COMPONENT_DEBUG_PARTICLES_3D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;

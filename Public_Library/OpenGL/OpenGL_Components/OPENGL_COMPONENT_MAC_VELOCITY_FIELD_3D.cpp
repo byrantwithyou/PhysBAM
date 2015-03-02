@@ -15,11 +15,11 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
-OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(const GRID<TV> &grid, const std::string &velocity_filename)
-    :OPENGL_COMPONENT<T>("MAC Velocity Field"),
-     opengl_mac_velocity_field(*new GRID<TV>(grid)),
-     opengl_vorticity_magnitude(opengl_mac_velocity_field.grid,opengl_vorticity_magnitude_array,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1)),
+template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
+OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid, const std::string &velocity_filename)
+    :OPENGL_COMPONENT<T>(stream_type,"MAC Velocity Field"),
+    opengl_mac_velocity_field(stream_type,*new GRID<TV>(grid)),
+     opengl_vorticity_magnitude(stream_type,opengl_mac_velocity_field.grid,opengl_vorticity_magnitude_array,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1)),
      draw_vorticity(false),velocity_filename(velocity_filename),valid(false),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
 {
     is_animation = FILE_UTILITIES::Is_Animated(velocity_filename);
@@ -29,7 +29,7 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(const GRID<TV> &grid, const std::string &
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D()
 {
     delete &opengl_mac_velocity_field.grid;
@@ -37,7 +37,7 @@ template<class T,class RW> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::Frame_File_Exists(velocity_filename, frame_input);
@@ -45,7 +45,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);
@@ -54,16 +54,16 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
     Reinitialize();
 }
 //#####################################################################
-// Function Display
+// Function Displa
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Display() const
 {
     if(valid && draw){
@@ -73,7 +73,7 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_mac_velocity_field.Bounding_Box();
@@ -82,7 +82,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Reinitialize()
 {
     if(draw)
@@ -95,7 +95,7 @@ Reinitialize()
 
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(velocity_filename, frame);
             if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File<RW>(tmp_filename,opengl_mac_velocity_field.face_velocities);//u,opengl_mac_velocity_field.v,opengl_mac_velocity_field.w);
+                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,opengl_mac_velocity_field.face_velocities);//u,opengl_mac_velocity_field.v,opengl_mac_velocity_field.w);
             else
                 return;
 
@@ -113,7 +113,7 @@ Reinitialize()
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
 {
     if(Is_Up_To_Date(frame)){
@@ -126,7 +126,7 @@ Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
 //#####################################################################
 // Function Set_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Set_Vector_Size(double size)
 {
     opengl_mac_velocity_field.size = size;
@@ -134,7 +134,7 @@ Set_Vector_Size(double size)
 //#####################################################################
 // Function Toggle_Velocity_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Toggle_Velocity_Mode()
 {
     opengl_mac_velocity_field.Toggle_Velocity_Mode();
@@ -142,7 +142,7 @@ Toggle_Velocity_Mode()
 //#####################################################################
 // Function Toggle_Velocity_Mode_And_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Toggle_Velocity_Mode_And_Draw()
 {
     if(draw)
@@ -155,7 +155,7 @@ Toggle_Velocity_Mode_And_Draw()
 //#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Increase_Vector_Size()
 {
     opengl_mac_velocity_field.Scale_Vector_Size(1.1);
@@ -163,7 +163,7 @@ Increase_Vector_Size()
 //#####################################################################
 // Function Decrease_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Decrease_Vector_Size()
 {
     opengl_mac_velocity_field.Scale_Vector_Size(1/1.1);
@@ -171,7 +171,7 @@ Decrease_Vector_Size()
 //#####################################################################
 // Function Toggle_Arrowhead
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Toggle_Arrowhead()
 {
     opengl_mac_velocity_field.Toggle_Arrowhead_Mode();
@@ -179,7 +179,7 @@ Toggle_Arrowhead()
 //#####################################################################
 // Function Toggle_Draw_Vorticity
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Toggle_Draw_Vorticity()
 {
     draw_vorticity=!draw_vorticity;
@@ -189,7 +189,7 @@ Toggle_Draw_Vorticity()
 //#####################################################################
 // Function Normalize_Vorticity_Color_Map
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Normalize_Vorticity_Color_Map()
 {
     if(!draw_vorticity) return;
@@ -200,7 +200,7 @@ Normalize_Vorticity_Color_Map()
 //#####################################################################
 // Function Update_Vorticity
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Update_Vorticity()
 {
     GRID<TV>& grid=opengl_mac_velocity_field.grid;
@@ -214,6 +214,6 @@ Update_Vorticity()
         max_vorticity=max(max_vorticity,vorticity_magnitude);}
 }
 namespace PhysBAM{
-template class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<float,float>;
-template class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<double,double>;
+template class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<float>;
+template class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<double>;
 }

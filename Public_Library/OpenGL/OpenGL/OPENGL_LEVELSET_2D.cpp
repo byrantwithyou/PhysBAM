@@ -12,8 +12,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_LEVELSET_2D<T>::
-OPENGL_LEVELSET_2D(LEVELSET<TV>& levelset_input,const OPENGL_COLOR& inside_color_input,const OPENGL_COLOR& outside_color_input,ARRAY<bool,VECTOR<int,2> > *active_cells_input)
-    :OPENGL_SCALAR_FIELD_2D<T,T>(levelset_input.grid,levelset_input.phi,OPENGL_COLOR_RAMP<T>::Levelset_Color_Constant_Ramp(inside_color_input,outside_color_input),active_cells_input),
+OPENGL_LEVELSET_2D(STREAM_TYPE stream_type,LEVELSET<TV>& levelset_input,const OPENGL_COLOR& inside_color_input,const OPENGL_COLOR& outside_color_input,ARRAY<bool,VECTOR<int,2> > *active_cells_input)
+    :OPENGL_SCALAR_FIELD_2D<T,T>(stream_type,levelset_input.grid,levelset_input.phi,OPENGL_COLOR_RAMP<T>::Levelset_Color_Constant_Ramp(inside_color_input,outside_color_input),active_cells_input),
     levelset(levelset_input),opengl_triangulated_area(0),opengl_segmented_curve_2d(0),color_mode(COLOR_SOLID),inside_color(inside_color_input),outside_color(outside_color_input),solid_color_map(0),
     gradient_color_map(0),draw_cells(false),draw_area(false),draw_curve(true),dominant_sign(-1),draw_normals(false)
 {
@@ -101,11 +101,11 @@ Update()
         if(draw_area){
             TRIANGULATED_AREA<T>& ta=*TRIANGULATED_AREA<T>::Create();
             MARCHING_CUBES<TV>::Create_Interior(ta,levelset.grid,levelset.phi,true);
-            opengl_triangulated_area=new OPENGL_TRIANGULATED_AREA<T>(ta,false,OPENGL_COLOR::Red(),inside_color,inside_color);}
+            opengl_triangulated_area=new OPENGL_TRIANGULATED_AREA<T>(stream_type,ta,false,OPENGL_COLOR::Red(),inside_color,inside_color);}
         if(draw_curve){
             SEGMENTED_CURVE_2D<T>& sc=*SEGMENTED_CURVE_2D<T>::Create();
             MARCHING_CUBES<TV>::Create_Surface(sc,levelset.grid,levelset.phi);
-            opengl_segmented_curve_2d=new OPENGL_SEGMENTED_CURVE_2D<T>(sc);}}
+            opengl_segmented_curve_2d=new OPENGL_SEGMENTED_CURVE_2D<T>(stream_type,sc);}}
 }
 //#####################################################################
 namespace PhysBAM{

@@ -18,8 +18,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> ANIMATED_VISUALIZATION<T>::
-ANIMATED_VISUALIZATION()
-    :animation_enabled(true),play(false),loop(false),fixed_frame_rate(false),start_frame(0),stop_frame(INT_MAX),
+ANIMATED_VISUALIZATION(STREAM_TYPE stream_type)
+    :BASIC_VISUALIZATION<T>(stream_type),animation_enabled(true),play(false),loop(false),fixed_frame_rate(false),start_frame(0),stop_frame(INT_MAX),
     frame(0),frame_rate(24),frame_increment(1),last_frame_filename(""),jpeg_quality(95)
 {
     if(MOV_WRITER<float>::Enabled()) saved_frame_filename="capture.mov";

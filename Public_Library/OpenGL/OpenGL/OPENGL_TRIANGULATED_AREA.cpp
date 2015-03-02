@@ -15,9 +15,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_TRIANGULATED_AREA<T>::
-OPENGL_TRIANGULATED_AREA(TRIANGULATED_AREA<T>& triangulated_area_input,const bool draw_vertices_input,const OPENGL_COLOR& vertex_color_input,
+OPENGL_TRIANGULATED_AREA(STREAM_TYPE stream_type,TRIANGULATED_AREA<T>& triangulated_area_input,const bool draw_vertices_input,const OPENGL_COLOR& vertex_color_input,
     const OPENGL_COLOR& segment_color_input,const OPENGL_COLOR& triangle_color_input,const OPENGL_COLOR& triangle_inverted_color_input,ARRAY<OPENGL_COLOR>* color_map_input)
-    :triangulated_area(triangulated_area_input),vertex_color(vertex_color_input),segment_color(segment_color_input),triangle_color(triangle_color_input),triangle_inverted_color(triangle_inverted_color_input),
+    :OPENGL_OBJECT<T>(stream_type),triangulated_area(triangulated_area_input),vertex_color(vertex_color_input),segment_color(segment_color_input),triangle_color(triangle_color_input),triangle_inverted_color(triangle_inverted_color_input),
     velocity_color(OPENGL_COLOR::Yellow()),current_selection(0),color_map(color_map_input),draw_vertices(draw_vertices_input),draw_velocities(false),velocity_scale(0.025)
 {}
 //#####################################################################

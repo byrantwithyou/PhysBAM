@@ -32,7 +32,7 @@ public:
     bool draw_arrows;
     T scale_velocities;
 
-    OPENGL_DEBUG_PARTICLES_2D(GEOMETRY_PARTICLES<TV>& particles_input,ARRAY<DEBUG_OBJECT<TV> >& debug_objects_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White());
+    OPENGL_DEBUG_PARTICLES_2D(STREAM_TYPE stream_type,GEOMETRY_PARTICLES<TV>& particles_input,ARRAY<DEBUG_OBJECT<TV> >& debug_objects_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White());
     ~OPENGL_DEBUG_PARTICLES_2D();
 
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;

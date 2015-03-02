@@ -33,7 +33,7 @@ public:
     T scale_velocities;
     bool wireframe_only;
 
-    OPENGL_DEBUG_PARTICLES_3D(GEOMETRY_PARTICLES<TV>& particles_input,ARRAY<DEBUG_OBJECT<TV> >& debug_objects_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White());
+    OPENGL_DEBUG_PARTICLES_3D(STREAM_TYPE stream_type,GEOMETRY_PARTICLES<TV>& particles_input,ARRAY<DEBUG_OBJECT<TV> >& debug_objects_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White());
     ~OPENGL_DEBUG_PARTICLES_3D();
 
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;

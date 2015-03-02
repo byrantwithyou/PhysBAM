@@ -38,7 +38,8 @@ private:
     FRAME<TV> default_frame;
 
 public:
-    OPENGL_OBJECT();
+    STREAM_TYPE stream_type;
+    OPENGL_OBJECT(STREAM_TYPE stream_type);
     virtual ~OPENGL_OBJECT();
 
     void Set_Name(const std::string& name_input)

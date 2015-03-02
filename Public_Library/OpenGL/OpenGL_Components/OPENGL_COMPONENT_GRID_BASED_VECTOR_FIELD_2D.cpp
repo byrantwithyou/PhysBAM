@@ -8,9 +8,9 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
-OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D(const GRID<TV> &grid,const std::string &vector_field_filename)
-    :OPENGL_COMPONENT<T>("Grid Based Vector Field 2D"), opengl_grid_based_vector_field(*(new GRID<TV>(grid)), *(new ARRAY<VECTOR<T,2> ,VECTOR<int,2> >)), 
+template<class T> OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
+OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &vector_field_filename)
+    :OPENGL_COMPONENT<T>(stream_type,"Grid Based Vector Field 2D"), opengl_grid_based_vector_field(stream_type,*(new GRID<TV>(grid)), *(new ARRAY<VECTOR<T,2> ,VECTOR<int,2> >)), 
       vector_field_filename(vector_field_filename), valid(false)
 {
     is_animation = FILE_UTILITIES::Is_Animated(vector_field_filename);
@@ -19,7 +19,7 @@ OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D(const GRID<TV> &grid,const std::stri
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
+template<class T> OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 ~OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D()
 {
     delete &opengl_grid_based_vector_field.grid;
@@ -28,7 +28,7 @@ template<class T,class RW> OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::Frame_File_Exists(vector_field_filename, frame_input);
@@ -36,7 +36,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);
@@ -45,7 +45,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -54,7 +54,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 Display() const
 {
     if(valid && draw) opengl_grid_based_vector_field.Display();
@@ -62,7 +62,7 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_grid_based_vector_field.Bounding_Box();
@@ -71,7 +71,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
 {
     if(Is_Up_To_Date(frame)){
@@ -81,7 +81,7 @@ Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 Reinitialize(bool force_load_even_if_not_drawn)
 {
     if(draw||force_load_even_if_not_drawn)
@@ -94,7 +94,7 @@ Reinitialize(bool force_load_even_if_not_drawn)
 
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(vector_field_filename, frame);
             if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File<RW>(tmp_filename,opengl_grid_based_vector_field.V);
+                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,opengl_grid_based_vector_field.V);
             else
                 return;
 
@@ -107,7 +107,7 @@ Reinitialize(bool force_load_even_if_not_drawn)
 //#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 Increase_Vector_Size()
 {
     opengl_grid_based_vector_field.Scale_Vector_Size(1.1);
@@ -115,7 +115,7 @@ Increase_Vector_Size()
 //#####################################################################
 // Function Decrease_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 Decrease_Vector_Size()
 {
     opengl_grid_based_vector_field.Scale_Vector_Size(1/1.1);
@@ -123,12 +123,12 @@ Decrease_Vector_Size()
 //#####################################################################
 // Function Toggle_Arrowhead
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 Toggle_Arrowhead()
 {
     opengl_grid_based_vector_field.draw_arrowhead = !opengl_grid_based_vector_field.draw_arrowhead;
 }
 namespace PhysBAM{
-template class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<float,float>;
-template class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<double,double>;
+template class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<float>;
+template class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<double>;
 }

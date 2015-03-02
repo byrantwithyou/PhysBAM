@@ -29,7 +29,7 @@ public:
     bool draw_value;
     bool draw;
 
-    OPENGL_VECTOR_FIELD_2D(T_ARRAY& vector_field,T_ARRAY& vector_locations,const OPENGL_COLOR &color=OPENGL_COLOR::White(),
+    OPENGL_VECTOR_FIELD_2D(STREAM_TYPE stream_type,T_ARRAY& vector_field,T_ARRAY& vector_locations,const OPENGL_COLOR &color=OPENGL_COLOR::White(),
         double size=0.025,bool draw_arrowhead=true,bool draw_value=false);
     virtual ~OPENGL_VECTOR_FIELD_2D();
 

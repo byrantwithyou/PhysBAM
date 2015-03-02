@@ -12,8 +12,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,int d> OPENGL_BEZIER_SPLINE_2D<T,d>::
-OPENGL_BEZIER_SPLINE_2D(const BEZIER_SPLINE<TV,d>& curve_input,const OPENGL_COLOR &color_input)
-    :curve(curve_input),color(color_input),
+OPENGL_BEZIER_SPLINE_2D(STREAM_TYPE stream_type,const BEZIER_SPLINE<TV,d>& curve_input,const OPENGL_COLOR &color_input)
+    :OPENGL_OBJECT<T>(stream_type),curve(curve_input),color(color_input),
     vertex_color(OPENGL_COLOR::Green(0.9)),vertex_position_color(OPENGL_COLOR::Magenta()),velocity_color(OPENGL_COLOR::Cyan()),
     draw_vertices(false),draw_velocities(false),velocity_scale(0.025),current_selection(0)
 {}

@@ -10,8 +10,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
-OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD(TRIANGULATED_AREA<T>& triangulated_area,ARRAY<TV>& V)
-    :OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(vector_field,vector_locations),triangulated_area(triangulated_area),V(V)
+OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD(STREAM_TYPE stream_type,TRIANGULATED_AREA<T>& triangulated_area,ARRAY<TV>& V)
+    :OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(stream_type,vector_field,vector_locations),triangulated_area(triangulated_area),V(V)
 {}
 //#####################################################################
 // Destructor

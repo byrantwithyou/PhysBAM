@@ -29,7 +29,7 @@ public:
     bool draw_vertices,draw_velocities;
     T velocity_scale;
 
-    OPENGL_TRIANGULATED_AREA(TRIANGULATED_AREA<T>& triangulated_area_input,const bool draw_vertices_input=false,
+    OPENGL_TRIANGULATED_AREA(STREAM_TYPE stream_type,TRIANGULATED_AREA<T>& triangulated_area_input,const bool draw_vertices_input=false,
                              const OPENGL_COLOR& vertex_color_input=OPENGL_COLOR::Red(),
                              const OPENGL_COLOR& segment_color_input=OPENGL_COLOR::Green(),
                              const OPENGL_COLOR& triangle_color_input=OPENGL_COLOR::Blue(),

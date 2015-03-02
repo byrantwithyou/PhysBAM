@@ -35,7 +35,7 @@ public:
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities;
     ARRAY_VIEW<T,VECTOR<int,3> > &u, &v, &w;
 
-    OPENGL_MAC_VELOCITY_FIELD_3D(GRID<TV> &grid);
+    OPENGL_MAC_VELOCITY_FIELD_3D(STREAM_TYPE stream_type,GRID<TV> &grid);
     virtual ~OPENGL_MAC_VELOCITY_FIELD_3D();
 
     void Update();  // Call when grid/u/v/w change

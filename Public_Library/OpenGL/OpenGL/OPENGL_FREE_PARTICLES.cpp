@@ -9,8 +9,8 @@ using namespace PhysBAM;
 // Constructor
 //##################################################################### 
 template<class TV> OPENGL_FREE_PARTICLES<TV>::
-OPENGL_FREE_PARTICLES(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,INDIRECT_ARRAY<ARRAY_VIEW<TV> >& points,const OPENGL_COLOR& color,const T point_size)
-    :BASE(points,color,point_size),deformable_body_collection(deformable_body_collection)
+OPENGL_FREE_PARTICLES(STREAM_TYPE stream_type,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,INDIRECT_ARRAY<ARRAY_VIEW<TV> >& points,const OPENGL_COLOR& color,const T point_size)
+    :BASE(stream_type,points,color,point_size),deformable_body_collection(deformable_body_collection)
 {}
 //##################################################################### 
 // Function Print_Selection_Info

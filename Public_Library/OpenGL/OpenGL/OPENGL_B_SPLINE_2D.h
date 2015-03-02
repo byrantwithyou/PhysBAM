@@ -25,7 +25,7 @@ public:
 
 public:
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
-    OPENGL_B_SPLINE_2D(const B_SPLINE<TV,d>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan());
+    OPENGL_B_SPLINE_2D(STREAM_TYPE stream_type,const B_SPLINE<TV,d>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan());
 
     void Display() const PHYSBAM_OVERRIDE;
 

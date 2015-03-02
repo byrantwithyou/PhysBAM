@@ -26,7 +26,7 @@ public:
     {scale=scale*scale_input;}
 
 //#####################################################################
-    OPENGL_SCALAR_FIELD_1D(const GRID<TV>& grid,ARRAY<T2,VECTOR<int,1> >& values,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
+    OPENGL_SCALAR_FIELD_1D(STREAM_TYPE stream_type,const GRID<TV>& grid,ARRAY<T2,VECTOR<int,1> >& values,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
     virtual ~OPENGL_SCALAR_FIELD_1D();
     void Display() const PHYSBAM_OVERRIDE;
     RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;

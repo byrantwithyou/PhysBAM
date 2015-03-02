@@ -24,9 +24,9 @@ class OPENGL_TRIANGULATED_SURFACE:public OPENGL_OBJECT<T>
 {
 public:
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Point;
-    OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input=true,
+    OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input=true,
                                 const OPENGL_MATERIAL& material_input=OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Cyan()));
-    OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,
+    OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,
                                 const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input);
     virtual ~OPENGL_TRIANGULATED_SURFACE();
 

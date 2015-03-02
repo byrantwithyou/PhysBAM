@@ -46,8 +46,8 @@ protected:
     OPENGL_SELECTION<T>* current_selection;
 public:
 
-    OPENGL_TETRAHEDRALIZED_VOLUME(const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input);
-    OPENGL_TETRAHEDRALIZED_VOLUME(TETRAHEDRON_MESH* mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
+    OPENGL_TETRAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input);
+    OPENGL_TETRAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,TETRAHEDRON_MESH* mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
         const OPENGL_MATERIAL& inverted_material_input,bool initialize=true,ARRAY<OPENGL_COLOR>* color_map_input=0);
     ~OPENGL_TETRAHEDRALIZED_VOLUME();
 

@@ -68,6 +68,7 @@ public:
 private:
     bool initialized;
 public:
+    STREAM_TYPE stream_type;
 
     // objects
     ARRAY<OPENGL_OBJECT<T>*> object_list; // does not own objects
@@ -150,7 +151,7 @@ private:
     TV* current_selection; // pointer to current selection item    
 
 public:
-    OPENGL_WORLD();
+    OPENGL_WORLD(STREAM_TYPE stream_type);
     ~OPENGL_WORLD();
     static OPENGL_WORLD* Singleton();
     void Run_Visualization(const std::string& window_title="OpenGL Visualization");

@@ -31,8 +31,8 @@ public:
     ARRAY<VECTOR<T,3> > vectors_at_hex_centers;
     T vector_size;
 
-    OPENGL_HEXAHEDRALIZED_VOLUME(const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input);
-    OPENGL_HEXAHEDRALIZED_VOLUME(HEXAHEDRON_MESH* hexahedron_mesh_input,const GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
+    OPENGL_HEXAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input);
+    OPENGL_HEXAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,HEXAHEDRON_MESH* hexahedron_mesh_input,const GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
         const OPENGL_MATERIAL& inverted_material_input);
     virtual ~OPENGL_HEXAHEDRALIZED_VOLUME();
 

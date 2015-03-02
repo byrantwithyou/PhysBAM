@@ -25,7 +25,7 @@ public:
     bool draw_xz_grid,draw_xy_grid,draw_yz_grid; // whether to draw grids on each plane
     T grid_spacing;
 
-    OPENGL_AXES(const FRAME<TV>& frame_input=FRAME<TV>(),const RANGE<TV>& box_input=RANGE<TV>::Unit_Box(),
+    OPENGL_AXES(STREAM_TYPE stream_type,const FRAME<TV>& frame_input=FRAME<TV>(),const RANGE<TV>& box_input=RANGE<TV>::Unit_Box(),
         bool draw_box_input=false,bool draw_xz_grid_input=false,bool draw_xy_grid_input=false,bool draw_yz_grid_input=false,T grid_spacing_input=.1);
 
     virtual ~OPENGL_AXES();

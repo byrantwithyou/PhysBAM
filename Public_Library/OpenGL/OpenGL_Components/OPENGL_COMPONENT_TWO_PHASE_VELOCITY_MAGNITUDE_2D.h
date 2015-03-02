@@ -14,16 +14,16 @@
 
 namespace PhysBAM
 {
-template<class T,class RW> class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D;
-template<class T,class RW> class OPENGL_COMPONENT_LEVELSET_2D;
-template<class T,class RW> class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D;
+template<class T> class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D;
+template<class T> class OPENGL_COMPONENT_LEVELSET_2D;
+template<class T> class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D;
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D:public OPENGL_COMPONENT<T>
 {
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
-    OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D(OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>& V_minus_component,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>& V_plus_component,OPENGL_COMPONENT_LEVELSET_2D<T,RW>& levelset_component);
+    OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D(STREAM_TYPE stream_type,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_minus_component,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_plus_component,OPENGL_COMPONENT_LEVELSET_2D<T>& levelset_component);
     virtual ~OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
@@ -50,9 +50,9 @@ private:
 
 private:
     T magnitude_height_scale;
-    OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>& V_minus_component;
-    OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T,RW>& V_plus_component;
-    OPENGL_COMPONENT_LEVELSET_2D<T,RW>& levelset_component;
+    OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_minus_component;
+    OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_plus_component;
+    OPENGL_COMPONENT_LEVELSET_2D<T>& levelset_component;
 public:
     OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T> opengl_two_phase_velocity_magnitude;
 };

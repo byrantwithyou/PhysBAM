@@ -8,9 +8,9 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
-OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(TRIANGULATED_AREA<T>& triangulated_area,const std::string &vector_field_filename)
-    :OPENGL_COMPONENT<T>("Triangulated Area Based Vector Field 2D"),opengl_vector_field(triangulated_area,*new ARRAY<VECTOR<T,2> >), 
+template<class T> OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
+OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(STREAM_TYPE stream_type,TRIANGULATED_AREA<T>& triangulated_area,const std::string &vector_field_filename)
+    :OPENGL_COMPONENT<T>(stream_type,"Triangulated Area Based Vector Field 2D"),opengl_vector_field(stream_type,triangulated_area,*new ARRAY<VECTOR<T,2> >), 
     vector_field_filename(vector_field_filename),frame_loaded(-1),valid(false)
 {
     is_animation = FILE_UTILITIES::Is_Animated(vector_field_filename);
@@ -18,7 +18,7 @@ OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(TRIANGULATED_AREA<T>& tria
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
+template<class T> OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 ~OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD()
 {
     delete &opengl_vector_field.V;
@@ -26,7 +26,7 @@ template<class T,class RW> OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
+template<class T> bool OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::Frame_File_Exists(vector_field_filename, frame_input);
@@ -34,7 +34,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
+template<class T> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);
@@ -43,7 +43,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
+template<class T> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -52,7 +52,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
+template<class T> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Display() const
 {
     if(valid && draw) opengl_vector_field.Display();
@@ -60,7 +60,7 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_vector_field.Bounding_Box();
@@ -69,7 +69,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
+template<class T> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Reinitialize(bool force_load_even_if_not_drawn)
 {
     if(draw||force_load_even_if_not_drawn)
@@ -82,7 +82,7 @@ Reinitialize(bool force_load_even_if_not_drawn)
 
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(vector_field_filename, frame);
             if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File<RW>(tmp_filename,opengl_vector_field.V);
+                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,opengl_vector_field.V);
             else
                 return;
 
@@ -95,7 +95,7 @@ Reinitialize(bool force_load_even_if_not_drawn)
 //#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
+template<class T> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Increase_Vector_Size()
 {
     opengl_vector_field.Scale_Vector_Size(1.1);
@@ -103,7 +103,7 @@ Increase_Vector_Size()
 //#####################################################################
 // Function Decrease_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
+template<class T> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Decrease_Vector_Size()
 {
     opengl_vector_field.Scale_Vector_Size(1/1.1);
@@ -111,12 +111,12 @@ Decrease_Vector_Size()
 //#####################################################################
 // Function Toggle_Arrowhead
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>::
+template<class T> void OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Toggle_Arrowhead()
 {
     opengl_vector_field.draw_arrowhead = !opengl_vector_field.draw_arrowhead;
 }
 namespace PhysBAM{
-template class OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<float,float>;
-template class OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<double,double>;
+template class OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<float>;
+template class OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<double>;
 }

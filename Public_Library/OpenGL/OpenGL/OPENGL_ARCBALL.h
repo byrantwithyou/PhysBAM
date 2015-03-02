@@ -41,8 +41,8 @@ public:
     int rotation_axis;
     OPENGL_COLOR x_axis,y_axis,z_axis,outer_rim,highlight;
 
-    OPENGL_ARCBALL(OPENGL_WORLD<T>& opengl_world_input)
-        :opengl_world(opengl_world_input),dragging(false),use_sphere_center(false),use_object_space(false),rotation_axis(-1)
+    OPENGL_ARCBALL(STREAM_TYPE stream_type,OPENGL_WORLD<T>& opengl_world_input)
+        :OPENGL_OBJECT<T>(stream_type),opengl_world(opengl_world_input),dragging(false),use_sphere_center(false),use_object_space(false),rotation_axis(-1)
     {mNow=mDown=mDeltaNow=MATRIX<T,4>::Identity_Matrix();
     x_axis=OPENGL_COLOR::Red();y_axis=OPENGL_COLOR::Green();z_axis=OPENGL_COLOR::Blue();
     outer_rim=OPENGL_COLOR::Ground_Tan();highlight=OPENGL_COLOR::Yellow();}

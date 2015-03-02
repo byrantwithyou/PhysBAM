@@ -13,7 +13,8 @@ using namespace std;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_TEXTURED_RECT<T>::
-OPENGL_TEXTURED_RECT() : texture(0)
+OPENGL_TEXTURED_RECT(STREAM_TYPE stream_type)
+    :OPENGL_OBJECT<T>(stream_type),texture(0)
 {
 }
 //#####################################################################

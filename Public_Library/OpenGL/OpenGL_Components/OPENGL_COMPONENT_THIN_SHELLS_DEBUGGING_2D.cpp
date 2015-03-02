@@ -10,12 +10,12 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
-OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(GRID<TV> &grid,const std::string& directory)
-    :OPENGL_COMPONENT<T>("Thin Shells Debugging"),grid(grid),
+template<class T> OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
+OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(STREAM_TYPE stream_type,GRID<TV> &grid,const std::string& directory)
+    :OPENGL_COMPONENT<T>(stream_type,"Thin Shells Debugging"),grid(grid),
     invalid_color_map(OPENGL_COLOR::Red()),
-    opengl_density_valid_mask(grid,density_valid_mask,&invalid_color_map,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
-    opengl_phi_valid_mask(grid,phi_valid_mask,&invalid_color_map,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
+    opengl_density_valid_mask(stream_type,grid,density_valid_mask,&invalid_color_map,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
+    opengl_phi_valid_mask(stream_type,grid,phi_valid_mask,&invalid_color_map,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
     directory(directory),frame_loaded(-1),valid(false),
     draw_grid_visibility(false),draw_density_valid_mask(false),draw_phi_valid_mask(false)
 {
@@ -27,7 +27,7 @@ OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(GRID<TV> &grid,const std::string& dire
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Valid_Frame(int frame_input) const
 {
     // TODO: make more accurate
@@ -36,7 +36,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);
@@ -45,7 +45,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -54,7 +54,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Display() const
 {
     OPENGL_COLOR node_neighbor_not_visible_color=OPENGL_COLOR::Magenta(0.5,0.5);
@@ -95,7 +95,7 @@ Display() const
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Reinitialize(bool force)
 {
     if(force || (draw && (!valid || (is_animation && (frame_loaded != frame)) || (!is_animation && (frame_loaded < 0)))))
@@ -105,13 +105,13 @@ Reinitialize(bool force)
         if(draw_grid_visibility){
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/thin_shells_grid_visibility",frame);
             if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File<RW>(tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v);
+                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v);
         }
 
         if(draw_density_valid_mask){
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/density_valid_mask",frame);
             if(FILE_UTILITIES::File_Exists(tmp_filename)){
-                FILE_UTILITIES::Read_From_File<RW>(tmp_filename,density_valid_mask);
+                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,density_valid_mask);
                 for(int i=density_valid_mask.domain.min_corner.x;i<density_valid_mask.domain.max_corner.x;i++) for(int j=density_valid_mask.domain.min_corner.y;j<density_valid_mask.domain.max_corner.y;j++) 
                     density_valid_mask(i,j)=!density_valid_mask(i,j); // negate
                 opengl_density_valid_mask.Update();}
@@ -121,7 +121,7 @@ Reinitialize(bool force)
         if(draw_phi_valid_mask){
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/phi_valid_mask",frame);
             if(FILE_UTILITIES::File_Exists(tmp_filename)){
-                FILE_UTILITIES::Read_From_File<RW>(tmp_filename,phi_valid_mask);
+                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,phi_valid_mask);
                 for(int i=phi_valid_mask.domain.min_corner.x;i<phi_valid_mask.domain.max_corner.x;i++) for(int j=phi_valid_mask.domain.min_corner.y;j<phi_valid_mask.domain.max_corner.y;j++) 
                     phi_valid_mask(i,j)=!phi_valid_mask(i,j); // negate
                 opengl_phi_valid_mask.Update();}
@@ -135,7 +135,7 @@ Reinitialize(bool force)
 //#####################################################################
 // Function Toggle_Draw_Grid_Visibility
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Toggle_Draw_Grid_Visibility()
 {
     draw_grid_visibility=!draw_grid_visibility;
@@ -144,7 +144,7 @@ Toggle_Draw_Grid_Visibility()
 //#####################################################################
 // Function Toggle_Draw_Density_Valid_Mask
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Toggle_Draw_Density_Valid_Mask()
 {
     draw_density_valid_mask=!draw_density_valid_mask;
@@ -153,7 +153,7 @@ Toggle_Draw_Density_Valid_Mask()
 //#####################################################################
 // Function Toggle_Draw_Phi_Valid_Mask
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Toggle_Draw_Phi_Valid_Mask()
 {
     draw_phi_valid_mask=!draw_phi_valid_mask;
@@ -162,13 +162,13 @@ Toggle_Draw_Phi_Valid_Mask()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Bounding_Box() const
 {
     if(valid && draw) return World_Space_Box(grid.domain);
     else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 namespace PhysBAM{
-template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<float,float>;
-template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<double,double>;
+template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<float>;
+template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<double>;
 }

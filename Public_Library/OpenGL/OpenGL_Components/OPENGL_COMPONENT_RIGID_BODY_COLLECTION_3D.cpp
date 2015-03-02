@@ -36,12 +36,12 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir_input,bool use_display_lists)
-    :OPENGL_COMPONENT<T>("Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
+template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::string& basedir_input,bool use_display_lists)
+    :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
     rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),articulated_rigid_body(0),
-    velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
-    angular_velocity_field(angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(true),one_sided(false),
+    velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
+    angular_velocity_field(stream_type,angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(true),one_sided(false),
     front_color_map(0),back_color_map(0),
     current_selection(0)
 {
@@ -50,12 +50,12 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir_input,bool 
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input,bool use_display_lists)
-    :OPENGL_COMPONENT<T>("Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
+template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input,bool use_display_lists)
+    :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
     rigid_body_collection(rigid_body_collection),articulated_rigid_body(0),
-    velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
-    angular_velocity_field(angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(false),one_sided(false),
+    velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
+    angular_velocity_field(stream_type,angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(false),one_sided(false),
     front_color_map(0),back_color_map(0),current_selection(0)
 {
     Initialize();
@@ -63,7 +63,7 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(RIGID_BODY_COLLECTION<TV>& rigid_body_
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D()
 {
     delete front_color_map;
@@ -78,7 +78,7 @@ template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 //#####################################################################
 // Function Initialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Initialize()
 {
     is_animation=true;
@@ -105,7 +105,7 @@ Initialize()
 //#####################################################################
 // Function Set_Draw_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Set_Draw_Mode(const int mode)
 {
     draw_triangulated_surface=(mode&0x01)!=0;
@@ -115,7 +115,7 @@ Set_Draw_Mode(const int mode)
 //#####################################################################
 // Function Get_Draw_Mode
 //#####################################################################
-template<class T,class RW> int OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> int OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Get_Draw_Mode() const
 {
     return 0x04*(int)(draw_implicit_surface)+0x02*(int)(draw_tetrahedralized_volume)+0x01*(int)(draw_triangulated_surface);
@@ -123,11 +123,11 @@ Get_Draw_Mode() const
 //#####################################################################
 // Function Read_Hints
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Read_Hints(const std::string& filename)
 {
     ARRAY<OPENGL_RIGID_BODY_HINTS,int> opengl_hints;
-    FILE_UTILITIES::Read_From_File<RW>(filename,opengl_hints);
+    FILE_UTILITIES::Read_From_File(stream_type,filename,opengl_hints);
     for(int i=0;i<opengl_triangulated_surface.Size();i++) if(opengl_triangulated_surface(i) && i<opengl_hints.Size()){
         opengl_triangulated_surface(i)->Set_Front_Material(opengl_hints(i).material);
         use_object_bounding_box(i)=opengl_hints(i).include_bounding_box;}
@@ -135,7 +135,7 @@ Read_Hints(const std::string& filename)
 //#####################################################################
 // Function Resize_Structures
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Resize_Structures(const int size)
 {
     extra_components.Resize(size);
@@ -157,7 +157,7 @@ Resize_Structures(const int size)
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Reinitialize(const bool force,const bool read_geometry)
 {
     if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
@@ -165,12 +165,12 @@ Reinitialize(const bool force,const bool read_geometry)
         if(!FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
 
         // TODO: currently reads in all structures, should only read in certain kinds based on read_triangulated_surface,read_implicit_surface,read_tetrahedralized_volume
-        rigid_body_collection.Read(STREAM_TYPE(RW()),basedir,frame,&needs_init,&needs_destroy);
+        rigid_body_collection.Read(stream_type,basedir,frame,&needs_init,&needs_destroy);
 
         std::string arb_state_file=STRING_UTILITIES::string_sprintf("%s/%d/arb_state",basedir.c_str(),frame);
         if(FILE_UTILITIES::File_Exists(arb_state_file)){
             if(!articulated_rigid_body) articulated_rigid_body=new ARTICULATED_RIGID_BODY<TV>(rigid_body_collection); // TODO: read in the actual particles
-            articulated_rigid_body->Read(STREAM_TYPE(RW()),basedir,frame);
+            articulated_rigid_body->Read(stream_type,basedir,frame);
             Initialize();}
         else{delete articulated_rigid_body;articulated_rigid_body=0;}
 
@@ -182,7 +182,7 @@ Reinitialize(const bool force,const bool read_geometry)
         Resize_Structures(max_number_of_bodies);
 
         std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_forces_and_torques",basedir.c_str(),frame);
-        if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File<RW>(filename,forces_and_torques);
+        if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File(stream_type,filename,forces_and_torques);
         else forces_and_torques.Resize(0);
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
@@ -199,7 +199,7 @@ Reinitialize(const bool force,const bool read_geometry)
         // Only display real bodies (not ghost bodies)
         if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame))) {
             ARRAY<int> particles_of_this_partition;
-            FILE_UTILITIES::template Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
+            FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
             for(int i=0;i<max_number_of_bodies;i++)
                 draw_object(i)=false;
             for(int i=0;i<particles_of_this_partition.Size();i++)
@@ -229,7 +229,7 @@ Reinitialize(const bool force,const bool read_geometry)
 //#####################################################################
 // Function Reinitialize_Without_Files
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Reinitialize_Without_Files(const bool force)
 {
     if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
@@ -263,7 +263,7 @@ Reinitialize_Without_Files(const bool force)
 //#####################################################################
 // Function Initialize_One_Body
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Initialize_One_Body(const int body_id,const bool force)
 {
     if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
@@ -303,7 +303,7 @@ Initialize_One_Body(const int body_id,const bool force)
 //#####################################################################
 // Function Update_Bodies
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Update_Bodies(const bool update_arb_points)
 {
     if(articulated_rigid_body && update_arb_points) Update_Articulation_Points();
@@ -317,19 +317,19 @@ Update_Bodies(const bool update_arb_points)
 //#####################################################################
 // Function Create_Geometry
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Create_Geometry(const int id)
 {
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(id);
     draw_object(id)=true;use_object_bounding_box(id)=true;
     if(rigid_body.name=="ground") use_object_bounding_box(id)=false; // don't use the ground bounding box
-    if(!opengl_axes(id)){opengl_axes(id)=new OPENGL_AXES<T>();}
+    if(!opengl_axes(id)){opengl_axes(id)=new OPENGL_AXES<T>(stream_type);}
 
     // add tetrahedralized volume
     TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=rigid_body.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>();
     if(tetrahedralized_volume && !opengl_tetrahedralized_volume(id)){
         tetrahedralized_volume->mesh.Initialize_Triangle_Mesh();
-        opengl_tetrahedralized_volume(id)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&tetrahedralized_volume->mesh,&tetrahedralized_volume->particles,
+        opengl_tetrahedralized_volume(id)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(stream_type,&tetrahedralized_volume->mesh,&tetrahedralized_volume->particles,
             OPENGL_MATERIAL::Metal(OPENGL_COLOR::Magenta(1,1)),OPENGL_MATERIAL::Metal(OPENGL_COLOR::Yellow(1,1)),true);
         opengl_tetrahedralized_volume(id)->Enslave_Transform_To(*opengl_axes(id));}
 
@@ -338,14 +338,14 @@ Create_Geometry(const int id)
         IMPLICIT_OBJECT<TV>* object_space_implicit_object=rigid_body.implicit_object->object_space_implicit_object;
         if(LEVELSET_IMPLICIT_OBJECT<TV>* levelset_implicit_object=dynamic_cast<LEVELSET_IMPLICIT_OBJECT<TV>*>(object_space_implicit_object)){
             if(!opengl_levelset(id)){
-                opengl_levelset(id)=new OPENGL_LEVELSET_MULTIVIEW<T,RW>();
+                opengl_levelset(id)=new OPENGL_LEVELSET_MULTIVIEW<T>(stream_type);
                 opengl_levelset(id)->Set_Levelset(levelset_implicit_object->levelset);
                 opengl_levelset(id)->Set_Slice(slice);
                 opengl_levelset(id)->Generate_Triangulated_Surface();
                 opengl_levelset(id)->Enslave_Transform_To(*opengl_axes(id));}}
         if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* implicit_object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object_space_implicit_object)){
             if(!opengl_levelset(id)){
-                opengl_levelset(id)=new OPENGL_LEVELSET_MULTIVIEW<T,RW>();
+                opengl_levelset(id)=new OPENGL_LEVELSET_MULTIVIEW<T>(stream_type);
                 opengl_levelset(id)->Set_Levelset(dynamic_cast<LEVELSET_IMPLICIT_OBJECT<TV>*>(implicit_object_transformed->object_space_implicit_object)->levelset);
                 opengl_levelset(id)->Set_Slice(slice);
                 opengl_levelset(id)->Generate_Triangulated_Surface();
@@ -361,7 +361,7 @@ Create_Geometry(const int id)
     if(rigid_body.simplicial_object && !opengl_triangulated_surface(id)){
         LOG::cout<<"name = "<<rigid_body.name<<std::endl;
         OPENGL_COLOR color=opengl_colors(id);
-        opengl_triangulated_surface(id)=new OPENGL_TRIANGULATED_SURFACE<T>(*rigid_body.simplicial_object,false,OPENGL_MATERIAL::Plastic(color),
+        opengl_triangulated_surface(id)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,*rigid_body.simplicial_object,false,OPENGL_MATERIAL::Plastic(color),
             OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Green()));
         opengl_triangulated_surface(id)->Enslave_Transform_To(*opengl_axes(id));
         opengl_triangulated_surface(id)->draw_particles=draw_simplicial_object_particles;}
@@ -371,15 +371,15 @@ Create_Geometry(const int id)
         std::string filename_pattern=STRING_UTILITIES::string_sprintf("%s/accumulated_impulses_%d.%%d",basedir.c_str(),id);
         if(FILE_UTILITIES::Frame_File_Exists(filename_pattern,frame)){
             LOG::cout<<"Adding accumulated impulses to rigid body "<<id<<std::endl;
-            OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T,RW>* component=
-                new OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T,RW>(*tetrahedralized_volume,filename_pattern);
+            OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>* component=
+                new OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>(stream_type,*tetrahedralized_volume,filename_pattern);
             component->opengl_vector_field.Enslave_Transform_To(*opengl_axes(id));
             extra_components(id).Append(component);}}
 }
 //#####################################################################
 // Function Update_Geometry
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Update_Geometry(const int id)
 {
     if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<T,3> >(rigid_body_collection.Rigid_Body(id).Frame());
@@ -387,7 +387,7 @@ Update_Geometry(const int id)
         std::string color_map_filename=STRING_UTILITIES::string_sprintf("%s/%d/stress_map_of_tetrahedralized_volume_%d",basedir.c_str(),frame,id);
         if(FILE_UTILITIES::File_Exists(color_map_filename)){
             if(!opengl_tetrahedralized_volume(id)->color_map) opengl_tetrahedralized_volume(id)->color_map=new ARRAY<OPENGL_COLOR>;
-            FILE_UTILITIES::Read_From_File<RW>(color_map_filename,*opengl_tetrahedralized_volume(id)->color_map);}
+            FILE_UTILITIES::Read_From_File(stream_type,color_map_filename,*opengl_tetrahedralized_volume(id)->color_map);}
         else if(opengl_tetrahedralized_volume(id)->color_map){delete opengl_tetrahedralized_volume(id)->color_map;opengl_tetrahedralized_volume(id)->color_map=0;}}
     RIGID_BODY<TV> &rigid_body=rigid_body_collection.Rigid_Body(id);
     if(rigid_body.implicit_object && rigid_body.implicit_object->object_space_implicit_object->update_every_frame)
@@ -402,7 +402,7 @@ Update_Geometry(const int id)
             delete surface;
 
             OPENGL_COLOR color=opengl_colors(id);
-            opengl_triangulated_surface(id)=new OPENGL_TRIANGULATED_SURFACE<T>(*rigid_body.simplicial_object,false,OPENGL_MATERIAL::Plastic(color),
+            opengl_triangulated_surface(id)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,*rigid_body.simplicial_object,false,OPENGL_MATERIAL::Plastic(color),
                 OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Green()));
             opengl_triangulated_surface(id)->Enslave_Transform_To(*opengl_axes(id));
             opengl_triangulated_surface(id)->draw_particles=draw_simplicial_object_particles;
@@ -413,7 +413,7 @@ Update_Geometry(const int id)
 //#####################################################################
 // Function Destroy_Geometry
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Destroy_Geometry(const int id)
 {
     if(draw_object.Size()<id)return; // it's possible that we try to delete geometry that we've never added because of substepping in the simulator
@@ -426,7 +426,7 @@ Destroy_Geometry(const int id)
 //#####################################################################
 // Function Initialize_Display_Lists
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Initialize_Display_Lists()
 {
 #if 0
@@ -446,7 +446,7 @@ Initialize_Display_Lists()
 //#####################################################################
 // Function Update_Object_Labels
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Update_Object_Labels()
 {
     int number_of_drawn_bodies=draw_object.Count_Matches(true);
@@ -471,7 +471,7 @@ Update_Object_Labels()
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame_input));
@@ -479,7 +479,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);
@@ -488,7 +488,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -497,7 +497,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Draw_All_Objects
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Draw_All_Objects()
 {
     Set_Draw(true);
@@ -505,7 +505,7 @@ Draw_All_Objects()
 //#####################################################################
 // Function Use_Bounding_Box
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Use_Bounding_Box() const
 {
     int num_drawable_objects=0;
@@ -517,7 +517,7 @@ Use_Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Bounding_Box() const
 {
     RANGE<VECTOR<T,3> > box;
@@ -531,7 +531,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     OPENGL_SELECTION<T>* selection=0;
@@ -552,7 +552,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 //#####################################################################
 // Function Highlight_Selection
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
     if(selection->type==OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_3D){
@@ -575,7 +575,7 @@ Highlight_Selection(OPENGL_SELECTION<T>* selection)
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Clear_Highlight()
 {
     for(int i=0;i<opengl_triangulated_surface.Size();i++)
@@ -588,7 +588,7 @@ Clear_Highlight()
 //#####################################################################
 // Function Turn_Smooth_Shading_On
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Turn_Smooth_Shading_On()
 {
     for(int i=0;i<opengl_triangulated_surface.Size();i++)
@@ -597,7 +597,7 @@ Turn_Smooth_Shading_On()
 //#####################################################################
 // Function Turn_Smooth_Shading_Off
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Turn_Smooth_Shading_Off()
 {
     for(int i=0;i<opengl_triangulated_surface.Size();i++)
@@ -606,7 +606,7 @@ Turn_Smooth_Shading_Off()
 //#####################################################################
 // Function Slice_Has_Changed
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Slice_Has_Changed()
 {
     for(int i=0;i<opengl_levelset.Size();i++){
@@ -616,7 +616,7 @@ Slice_Has_Changed()
 //#####################################################################
 // Function Set_Draw_Object
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Set_Draw_Object(int i,bool draw_it)
 {
     draw_object(i)=draw_it;
@@ -624,7 +624,7 @@ Set_Draw_Object(int i,bool draw_it)
 //#####################################################################
 // Function Get_Draw_Object
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Get_Draw_Object(int i) const
 {
     return draw_object(i);
@@ -632,7 +632,7 @@ Get_Draw_Object(int i) const
 //#####################################################################
 // Function Set_Object_Material
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Set_Object_Material(int i,const OPENGL_MATERIAL &front_material_input)
 {
     if(!opengl_triangulated_surface(i)) return;
@@ -642,7 +642,7 @@ Set_Object_Material(int i,const OPENGL_MATERIAL &front_material_input)
 //#####################################################################
 // Function Set_Object_Material
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Set_Object_Material(int i,const OPENGL_MATERIAL &front_material_input,const OPENGL_MATERIAL &back_material_input)
 {
     if(!opengl_triangulated_surface(i)) return;
@@ -653,7 +653,7 @@ Set_Object_Material(int i,const OPENGL_MATERIAL &front_material_input,const OPEN
 //#####################################################################
 // Function Set_Use_Bounding_Box
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Set_Use_Object_Bounding_Box(int i,bool use_it)
 {
     use_object_bounding_box(i)=use_it;
@@ -661,7 +661,7 @@ Set_Use_Object_Bounding_Box(int i,bool use_it)
 //#####################################################################
 // Function Set_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Set_Vector_Size(double size)
 {
     velocity_field.size=size;
@@ -670,7 +670,7 @@ Set_Vector_Size(double size)
 //#####################################################################
 // Function Toggle_Velocity_Vectors
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Velocity_Vectors()
 {
     draw_velocity_vectors=!draw_velocity_vectors;
@@ -679,7 +679,7 @@ Toggle_Velocity_Vectors()
 //#####################################################################
 // Function Toggle_Angular_Velocity_Vectors
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Angular_Velocity_Vectors()
 {
     draw_angular_velocity_vectors=!draw_angular_velocity_vectors;
@@ -688,7 +688,7 @@ Toggle_Angular_Velocity_Vectors()
 //#####################################################################
 // Function Toggle_Individual_Axes
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Individual_Axes()
 {
     draw_individual_axes=!draw_individual_axes;
@@ -697,7 +697,7 @@ Toggle_Individual_Axes()
 //#####################################################################
 // Function Toggle_Output_Positions
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Output_Positions()
 {
     output_positions=!output_positions;
@@ -706,7 +706,7 @@ Toggle_Output_Positions()
 //#####################################################################
 // Function Toggle_Show_Object_Names
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Show_Object_Names()
 {
     show_object_names=!show_object_names;
@@ -714,7 +714,7 @@ Toggle_Show_Object_Names()
 //#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Increase_Vector_Size()
 {
     velocity_field.Scale_Vector_Size(1.1);
@@ -723,7 +723,7 @@ Increase_Vector_Size()
 //#####################################################################
 // Function Decrease_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Decrease_Vector_Size()
 {
     velocity_field.Scale_Vector_Size(1/1.1);
@@ -732,7 +732,7 @@ Decrease_Vector_Size()
 //#####################################################################
 // Function Toggle_Draw_Values
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Draw_Values()
 {
     velocity_field.draw_value=!velocity_field.draw_value;
@@ -741,7 +741,7 @@ Toggle_Draw_Values()
 //#####################################################################
 // Function Toggle_Draw_Values
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_One_Sided()
 {
     one_sided=!one_sided;
@@ -750,7 +750,7 @@ Toggle_One_Sided()
 //#####################################################################
 // Function Toggle_Draw_Particles
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Draw_Particles()
 {
     draw_simplicial_object_particles=!draw_simplicial_object_particles;
@@ -761,7 +761,7 @@ Toggle_Draw_Particles()
 //#####################################################################
 // Function Toggle_Draw_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Draw_Mode()
 {
     int mode=Get_Draw_Mode();
@@ -771,7 +771,7 @@ Toggle_Draw_Mode()
 //#####################################################################
 // Function Turn_Off_Individual_Smooth_Shading_Prompt
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Turn_Off_Individual_Smooth_Shading_Prompt()
 {
     if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
@@ -783,7 +783,7 @@ Turn_Off_Individual_Smooth_Shading_Prompt()
 //#####################################################################
 // Function Turn_Off_Individual_Smooth_Shading
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Turn_Off_Individual_Smooth_Shading()
 {
     OPENGL_WORLD<T>::Singleton()->Prompt_User("Turn off smooth shading for object: ",Turn_Off_Individual_Smooth_Shading_Prompt_CB(),"");
@@ -791,7 +791,7 @@ Turn_Off_Individual_Smooth_Shading()
 //#####################################################################
 // Function Manipulate_Individual_Body_Prompt
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Manipulate_Individual_Body_Prompt()
 {
     if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
@@ -810,7 +810,7 @@ Manipulate_Individual_Body_Prompt()
 //#####################################################################
 // Function Manipulate_Individual_Body
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Manipulate_Individual_Body()
 {
     OPENGL_WORLD<T>::Singleton()->Prompt_User("Manipulate: ",Manipulate_Individual_Body_Prompt_CB(),"");
@@ -827,19 +827,20 @@ Bounding_Box() const
 //#####################################################################
 // Function Read_Articulated_Information
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Read_Articulated_Information(const std::string& filename)
 {
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
+    TYPED_ISTREAM typed_input(*input,stream_type);
     // this will need to be changed to reflect multiple articulation points per rigid body
-    int numpoints=0;Read_Binary<RW>(*input,numpoints);articulation_points.Exact_Resize(numpoints);joint_frames.Exact_Resize(numpoints);
-    for(int i=0;i<numpoints;i++) Read_Binary<RW>(*input,articulation_points(i),joint_frames(i));
-    Read_Binary<RW>(*input,projected_COM);delete input;
+    int numpoints=0;Read_Binary(typed_input,numpoints);articulation_points.Exact_Resize(numpoints);joint_frames.Exact_Resize(numpoints);
+    for(int i=0;i<numpoints;i++) Read_Binary(typed_input,articulation_points(i),joint_frames(i));
+    Read_Binary(typed_input,projected_COM);delete input;
 }
 //#####################################################################
 // Function Update_Articulation_Points
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Update_Articulation_Points()
 {
     int num_points=2*articulated_rigid_body->joint_mesh.Num_Joints();
@@ -855,7 +856,7 @@ Update_Articulation_Points()
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Display() const
 {
     if(!draw) return;
@@ -928,9 +929,9 @@ Display() const
 
     RANGE<TV> axes_box(RANGE<TV>::Unit_Box()*2);
     //RANGE<TV> axes_box(0,velocity_field.size,0,velocity_field.size,0,velocity_field.size);
-    if(draw_joint_frames==1) for(int i=0;i<joint_frames.m;i++)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
-    else if(draw_joint_frames==2) for(int i=1;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
-    else if(draw_joint_frames==3) for(int i=0;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
+    if(draw_joint_frames==1) for(int i=0;i<joint_frames.m;i++)(OPENGL_AXES<T>(stream_type,joint_frames(i),axes_box)).Display();
+    else if(draw_joint_frames==2) for(int i=1;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(stream_type,joint_frames(i),axes_box)).Display();
+    else if(draw_joint_frames==3) for(int i=0;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(stream_type,joint_frames(i),axes_box)).Display();
 
     if(draw_forces_and_torques && forces_and_torques.Size()==rigid_body_collection.rigid_body_particles.Size()){
         glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -951,7 +952,7 @@ Display() const
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
 {
     if(!selection || selection->object!=this) return;
@@ -1028,7 +1029,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection)
 //#####################################################################
 // Function Toggle_Articulation_Points
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Articulation_Points()
 {
     draw_articulation_points=!draw_articulation_points;
@@ -1036,7 +1037,7 @@ Toggle_Articulation_Points()
 //#####################################################################
 // Function Toggle_Joint_Frames
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Joint_Frames()
 {
     draw_joint_frames++;
@@ -1045,7 +1046,7 @@ Toggle_Joint_Frames()
 //#####################################################################
 // Function Toggle_Forces_And_Torques
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Forces_And_Torques()
 {
     draw_forces_and_torques=!draw_forces_and_torques;
@@ -1061,7 +1062,7 @@ Bounding_Box() const
 }
 //#####################################################################
 namespace PhysBAM{
-template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<float,float>;
-template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<double,double>;
+template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<float>;
+template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<double>;
 }
 

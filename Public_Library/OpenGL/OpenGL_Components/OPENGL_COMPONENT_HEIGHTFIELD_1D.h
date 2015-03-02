@@ -17,13 +17,14 @@
 namespace PhysBAM
 {
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_HEIGHTFIELD_1D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid, 
+    using OPENGL_COMPONENT<T>::stream_type;
+    OPENGL_COMPONENT_HEIGHTFIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid, 
                                     const std::string& height_filename,
                                     const std::string& x_filename_input="",
                                     const std::string& ground_filename_input="",

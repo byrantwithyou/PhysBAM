@@ -25,7 +25,7 @@ public:
     GRID<TV>& grid;
     ARRAY<VECTOR<T,2>,VECTOR<int,2> >& V;
 
-    OPENGL_GRID_BASED_VECTOR_FIELD_2D(GRID<TV>& grid,ARRAY<VECTOR<T,2>,VECTOR<int,2> >& V);
+    OPENGL_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV>& grid,ARRAY<VECTOR<T,2>,VECTOR<int,2> >& V);
     virtual ~OPENGL_GRID_BASED_VECTOR_FIELD_2D();
 
     void Update();  // Call when grid/V change

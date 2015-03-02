@@ -12,20 +12,21 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 namespace PhysBAM{
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::stream_type;
     ARRAY<SYMMETRIC_MATRIX<T,2> ,VECTOR<int,2> > field;
     OPENGL_SYMMETRIC_MATRIX_FIELD_2D<T> opengl_symmetric_matrix_field;
     std::string field_filename;
     int frame_loaded;
     bool valid;
 
-    OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D(const GRID<TV>& grid,const std::string& field_filename_input)
-        :OPENGL_COMPONENT<T>("Symmetric Matrix Field 2D"),opengl_symmetric_matrix_field(grid,field),
+    OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV>& grid,const std::string& field_filename_input)
+        :OPENGL_COMPONENT<T>(stream_type,"Symmetric Matrix Field 2D"),opengl_symmetric_matrix_field(stream_type,grid,field),
         field_filename(field_filename_input),frame_loaded(-1),valid(false)
     {
         is_animation=FILE_UTILITIES::Is_Animated(field_filename);Reinitialize();

@@ -23,7 +23,7 @@ template<class T,int d> class OPENGL_B_SPLINE_2D;
 template<class T> class OPENGL_TRIANGULATED_AREA;
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
@@ -37,6 +37,7 @@ protected:
     bool invalidate_deformable_objects_selection_each_frame;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::stream_type;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> segmented_curve_objects;
     ARRAY<OPENGL_BEZIER_SPLINE_2D<T,3>*> bezier_spline_objects;
@@ -52,7 +53,7 @@ public:
     bool has_embedded_objects;
     ARRAY<ARRAY<T>*> phi_list;
 
-    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(const std::string& prefix,const int start_frame);
+    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D();
     
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;

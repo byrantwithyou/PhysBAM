@@ -18,9 +18,9 @@ using namespace PhysBAM;
 //#####################################################################
 // Function OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
-OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(const std::string& prefix,const int start_frame)
-    :OPENGL_COMPONENT<T>("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),display_mode(0),
+template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
+OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame)
+    :OPENGL_COMPONENT<T>(stream_type,"Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),display_mode(0),
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
     collision_body_list(*new COLLISION_BODY_COLLECTION<TV>),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),real_selection(0),
@@ -37,7 +37,7 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(const std::string& prefix,const i
 //#####################################################################
 // Function ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D()
 {
     delete color_map;
@@ -47,7 +47,7 @@ template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>:
 //#####################################################################
 // Function Initialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Initialize()
 {
     draw_velocity_vectors=false;
@@ -55,7 +55,7 @@ Initialize()
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Reinitialize(bool force,bool read_geometry)
 {
     if(!(draw && (force || (is_animation && frame_loaded!=frame) || (!is_animation && frame_loaded<0)))) return;
@@ -64,7 +64,7 @@ Reinitialize(bool force,bool read_geometry)
     std::string static_frame_string=frame_string;
     int static_frame=FILE_UTILITIES::File_Exists(frame_string+"deformable_object_structures")?frame:-1;
     bool read_static_variables=static_frame!=-1 || first_time || !deformable_body_collection.structures.m;
-    if(read_geometry) deformable_body_collection.Read(STREAM_TYPE(RW()),prefix,prefix,frame,static_frame,read_static_variables,true);
+    if(read_geometry) deformable_body_collection.Read(stream_type,prefix,prefix,frame,static_frame,read_static_variables,true);
     if(read_static_variables){
         int m=deformable_body_collection.structures.m;active_list.Resize(m,true,true,true);
         point_simplices_1d_objects.Delete_Pointers_And_Clean_Memory();point_simplices_1d_objects.Resize(m);
@@ -72,7 +72,7 @@ Reinitialize(bool force,bool read_geometry)
             STRUCTURE<TV>* structure=deformable_body_collection.structures(i);
             if(POINT_SIMPLICES_1D<T>* point_simplices_1d=dynamic_cast<POINT_SIMPLICES_1D<T>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": point simplices 1d\n";
-                point_simplices_1d_objects(i)=new OPENGL_POINT_SIMPLICES_1D<T>(*point_simplices_1d,OPENGL_COLOR((T).5,(T).25,0));
+                point_simplices_1d_objects(i)=new OPENGL_POINT_SIMPLICES_1D<T>(stream_type,*point_simplices_1d,OPENGL_COLOR((T).5,(T).25,0));
                 point_simplices_1d_objects(i)->draw_vertices=true;}
             else{if(first_time) LOG::cout<<"object "<<i<<": object unrecognized at geometry level\n";}}}
 
@@ -84,7 +84,7 @@ Reinitialize(bool force,bool read_geometry)
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/deformable_object_particles",prefix.c_str(),frame_input));
@@ -92,7 +92,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);Reinitialize();
@@ -100,7 +100,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -110,7 +110,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Draw_All_Objects
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Draw_All_Objects()
 {
     Set_Draw(true);
@@ -118,7 +118,7 @@ Draw_All_Objects()
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Display() const
 {
     if(!draw || !valid) return;
@@ -139,7 +139,7 @@ Display() const
 //#####################################################################
 // Function Cycle_Display_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Cycle_Display_Mode()
 {
     display_mode=(display_mode+1)%4;
@@ -147,7 +147,7 @@ Cycle_Display_Mode()
 //#####################################################################
 // Function Show_Only_First
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Show_Only_First()
 {
     active_list.Fill(false);
@@ -156,7 +156,7 @@ Show_Only_First()
 //#####################################################################
 // Function Use_Bounding_Box
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Use_Bounding_Box() const
 {
     return draw && valid && deformable_body_collection.structures.m>0;
@@ -164,7 +164,7 @@ Use_Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Bounding_Box() const
 {
     RANGE<VECTOR<T,3> > box;
@@ -175,7 +175,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Highlight_Particle
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Highlight_Particle()
 {
     OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Particle Number: ",Highlight_Particle_Response_CB());
@@ -183,7 +183,7 @@ Highlight_Particle()
 //#####################################################################
 // Function Toggle_Active_Value
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Toggle_Active_Value()
 {
     OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Component Number: ",Toggle_Active_Value_Response_CB());
@@ -191,7 +191,7 @@ Toggle_Active_Value()
 //#####################################################################
 // Function Toggle_Use_Active_List
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Toggle_Use_Active_List()
 {
     if(active_list.m<1) return;
@@ -201,7 +201,7 @@ Toggle_Use_Active_List()
 //#####################################################################
 // Function Select_Segment
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Toggle_Selection_Mode()
 {
     if(!real_selection) return;
@@ -216,7 +216,7 @@ Toggle_Selection_Mode()
 //#####################################################################
 // Function Increment_Active_Object
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Increment_Active_Object()
 {
     if(active_list.m<1 || !use_active_list) return;
@@ -227,7 +227,7 @@ Increment_Active_Object()
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>* selection=0;
@@ -244,7 +244,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 //#####################################################################
 // Function Set_Selection
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Set_Selection(OPENGL_SELECTION<T>* selection)
 {
     if(selection->type!=OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_1D) return;
@@ -253,7 +253,7 @@ Set_Selection(OPENGL_SELECTION<T>* selection)
 //#####################################################################
 // Function Highlight_Selection
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
     if(selection->type!=OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_1D) return;
@@ -264,7 +264,7 @@ Highlight_Selection(OPENGL_SELECTION<T>* selection)
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Clear_Highlight()
 {
     for(int i=0;i<point_simplices_1d_objects.m;i++) if(point_simplices_1d_objects(i) && active_list(i)) point_simplices_1d_objects(i)->Clear_Highlight();
@@ -273,7 +273,7 @@ Clear_Highlight()
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const
 {
     if(selection && selection->type==OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_1D && selection->object==this){
@@ -284,7 +284,7 @@ Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection
 //#####################################################################
 // Function Toggle_Active_Value_Response
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Toggle_Active_Value_Response()
 {
     bool start_val=true;
@@ -299,7 +299,7 @@ Toggle_Active_Value_Response()
 //#####################################################################
 // Function Highlight_Particle_Response
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Highlight_Particle_Response()
 {
     if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
@@ -320,7 +320,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Set_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Set_Vector_Size(double size)
 {
     //velocity_field.size=size;
@@ -328,7 +328,7 @@ Set_Vector_Size(double size)
 //#####################################################################
 // Function Toggle_Velocity_Vectors
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Toggle_Velocity_Vectors()
 {
     draw_velocity_vectors=!draw_velocity_vectors;
@@ -337,7 +337,7 @@ Toggle_Velocity_Vectors()
 //#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Increase_Vector_Size()
 {
     //velocity_field.Scale_Vector_Size(1.1);
@@ -345,7 +345,7 @@ Increase_Vector_Size()
 //#####################################################################
 // Function Decrease_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Decrease_Vector_Size()
 {
     //velocity_field.Scale_Vector_Size(1/1.1);
@@ -353,7 +353,7 @@ Decrease_Vector_Size()
 //#####################################################################
 // Function Update_Object_Labels
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Update_Velocity_Field()
 {
     if(draw_velocity_vectors){
@@ -363,7 +363,7 @@ Update_Velocity_Field()
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T,RW>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
 {
     if(old_selection && old_selection->object==this && invalidate_deformable_objects_selection_each_frame) delete_selection=true;
@@ -371,6 +371,6 @@ Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selectio
 }
 //#####################################################################
 namespace PhysBAM{
-template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<float,float>;
-template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<double,double>;
+template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<float>;
+template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<double>;
 }

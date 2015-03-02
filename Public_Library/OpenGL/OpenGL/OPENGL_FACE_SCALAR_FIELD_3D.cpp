@@ -16,9 +16,9 @@ namespace PhysBAM{
 // OPENGL_FACE_SCALAR_FIELD_3D
 //#####################################################################
 template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
-OPENGL_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<3> > &face_values_input,OPENGL_COLOR_MAP<T2> *color_map_input)
-    :grid(grid_input),face_values(face_values_input),x_face_values(face_values_input.Component(0)),y_face_values(face_values_input.Component(1)),z_face_values(face_values_input.Component(2)),
-    color_map(color_map_input),scale(1),opengl_points(*new ARRAY<VECTOR<T,3> >)
+OPENGL_FACE_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<3> > &face_values_input,OPENGL_COLOR_MAP<T2> *color_map_input)
+    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),face_values(face_values_input),x_face_values(face_values_input.Component(0)),y_face_values(face_values_input.Component(1)),z_face_values(face_values_input.Component(2)),
+    color_map(color_map_input),scale(1),opengl_points(stream_type,*new ARRAY<VECTOR<T,3> >)
 {
     PHYSBAM_ASSERT(color_map);
 }

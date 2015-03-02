@@ -8,8 +8,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_OBJECT<T>::
-OPENGL_OBJECT()
-    :frame(&default_frame),selectable(false),visible(true),show_name(true),slice(0)
+OPENGL_OBJECT(STREAM_TYPE stream_type)
+    :frame(&default_frame),selectable(false),visible(true),show_name(true),slice(0),stream_type(stream_type)
 {
 }
 //#####################################################################

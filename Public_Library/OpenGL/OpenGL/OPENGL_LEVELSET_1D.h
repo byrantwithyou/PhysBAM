@@ -20,8 +20,8 @@ public:
     LEVELSET<TV>& levelset;
     OPENGL_COLOR point_color, line_color;
 
-    OPENGL_LEVELSET_1D(LEVELSET<TV>& levelset_input,const OPENGL_COLOR& point_color_input=OPENGL_COLOR::Cyan(),const OPENGL_COLOR& line_color_input=OPENGL_COLOR::Blue((T).5))
-        :OPENGL_SCALAR_FIELD_1D<T,T>(levelset_input.grid,levelset_input.phi,point_color_input,line_color_input),levelset(levelset_input),
+    OPENGL_LEVELSET_1D(STREAM_TYPE stream_type,LEVELSET<TV>& levelset_input,const OPENGL_COLOR& point_color_input=OPENGL_COLOR::Cyan(),const OPENGL_COLOR& line_color_input=OPENGL_COLOR::Blue((T).5))
+        :OPENGL_SCALAR_FIELD_1D<T,T>(stream_type,levelset_input.grid,levelset_input.phi,point_color_input,line_color_input),levelset(levelset_input),
         point_color(point_color_input),line_color(line_color_input)
     {}
 

@@ -19,7 +19,7 @@ class OPENGL_LEVELSET_2D:public OPENGL_SCALAR_FIELD_2D<T,T>
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    using OPENGL_SCALAR_FIELD_2D<T,T>::grid;
+    using OPENGL_SCALAR_FIELD_2D<T,T>::grid;using OPENGL_SCALAR_FIELD_2D<T,T>::stream_type;
     using OPENGL_SCALAR_FIELD_2D<T,T>::Send_Transform_To_GL_Pipeline;
     using OPENGL_SCALAR_FIELD_2D<T,T>::active_cells;
 
@@ -36,7 +36,7 @@ private:
     bool draw_normals;
 
 public:
-    OPENGL_LEVELSET_2D(LEVELSET<TV>& levelset_input,const OPENGL_COLOR& inside_color_input=OPENGL_COLOR::Blue(),
+    OPENGL_LEVELSET_2D(STREAM_TYPE stream_type,LEVELSET<TV>& levelset_input,const OPENGL_COLOR& inside_color_input=OPENGL_COLOR::Blue(),
         const OPENGL_COLOR& outside_color_input=OPENGL_COLOR::Red((T).5),ARRAY<bool,VECTOR<int,2> > *active_cells_input=0);
 
     virtual ~OPENGL_LEVELSET_2D();

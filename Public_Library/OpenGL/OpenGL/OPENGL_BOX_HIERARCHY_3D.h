@@ -18,13 +18,13 @@ class OPENGL_BOX_HIERARCHY_3D:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
-    using OPENGL_OBJECT<T>::World_Space_Box;
+    using OPENGL_OBJECT<T>::World_Space_Box;using OPENGL_OBJECT<T>::stream_type;
     BOX_HIERARCHY<TV>* hierarchy;
     OPENGL_COLOR color;
     int min_height,max_height;
 
-    OPENGL_BOX_HIERARCHY_3D(BOX_HIERARCHY<TV> *hierarchy_in,const OPENGL_COLOR &color_input = OPENGL_COLOR::White()) 
-        :hierarchy(hierarchy_in),color(color_input),min_height(1),max_height(1)
+    OPENGL_BOX_HIERARCHY_3D(STREAM_TYPE stream_type,BOX_HIERARCHY<TV> *hierarchy_in,const OPENGL_COLOR &color_input = OPENGL_COLOR::White()) 
+        :OPENGL_OBJECT<T>(stream_type),hierarchy(hierarchy_in),color(color_input),min_height(1),max_height(1)
     {}
 
     void Display() const PHYSBAM_OVERRIDE;

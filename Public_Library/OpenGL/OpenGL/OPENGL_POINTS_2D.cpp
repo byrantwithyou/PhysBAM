@@ -10,8 +10,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,class T_ARRAY> OPENGL_POINTS_2D<T,T_ARRAY>::
-OPENGL_POINTS_2D(T_ARRAY& points_input,const OPENGL_COLOR& color_input,float point_size_input)
-    :points(points_input),color(color_input),point_size(point_size_input),draw_point_numbers(false),draw_radii(false),point_colors(0),point_ids(0),point_radii(0)
+OPENGL_POINTS_2D(STREAM_TYPE stream_type,T_ARRAY& points_input,const OPENGL_COLOR& color_input,float point_size_input)
+    :OPENGL_OBJECT<T>(stream_type),points(points_input),color(color_input),point_size(point_size_input),draw_point_numbers(false),draw_radii(false),point_colors(0),point_ids(0),point_radii(0)
 {}
 //#####################################################################
 // Destructor

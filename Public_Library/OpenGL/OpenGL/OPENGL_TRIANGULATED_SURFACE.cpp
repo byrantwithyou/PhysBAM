@@ -15,8 +15,8 @@ using namespace PhysBAM;
 // Constructor from geometry, one-sided
 //#####################################################################
 template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
-OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,const OPENGL_MATERIAL& material_input)
-    :surface(surface_input),two_sided(false),front_material(material_input),
+OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,const OPENGL_MATERIAL& material_input)
+    :OPENGL_OBJECT<T>(stream_type),surface(surface_input),two_sided(false),front_material(material_input),
     back_material(material_input),vertex_normals(0),vertex_colors(0),smooth_normals(smooth_normals_input),use_display_list(false),
     owns_display_list(false),current_selection(0),current_node(1),highlight_current_node(false),highlight_neighbors_of_current_node(true),highlight_boundary(false),
     wireframe_only(false),draw_subsets(false),draw_velocities(false),draw_particles(false),velocity_scale((T).025)
@@ -27,8 +27,8 @@ OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,bool smooth_n
 // Constructor from geometry, two-sided
 //#####################################################################
 template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
-OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input)
-    :surface(surface_input),two_sided(true),front_material(front_material_input),
+OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input)
+    :OPENGL_OBJECT<T>(stream_type),surface(surface_input),two_sided(true),front_material(front_material_input),
     back_material(back_material_input),vertex_normals(0),vertex_colors(0),smooth_normals(smooth_normals_input),use_display_list(false),
     owns_display_list(false),current_selection(0),current_node(1),highlight_current_node(false),highlight_neighbors_of_current_node(true),highlight_boundary(false),wireframe_only(false),
     draw_subsets(false),draw_velocities(false),draw_particles(false),velocity_scale((T).025)

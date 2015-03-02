@@ -26,7 +26,7 @@ public:
     OPENGL_COLOR vertex_color,segment_color,vertex_position_color,velocity_color;
     bool draw_vertices;
 
-    OPENGL_POINT_SIMPLICES_1D(const POINT_SIMPLICES_1D<T>& simplices_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan());
+    OPENGL_POINT_SIMPLICES_1D(STREAM_TYPE stream_type,const POINT_SIMPLICES_1D<T>& simplices_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan());
 
 //#####################################################################
     void Display() const PHYSBAM_OVERRIDE;

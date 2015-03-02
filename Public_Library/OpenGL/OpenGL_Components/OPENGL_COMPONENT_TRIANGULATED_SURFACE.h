@@ -14,13 +14,13 @@
 namespace PhysBAM
 {
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_TRIANGULATED_SURFACE:public OPENGL_COMPONENT<T>
 {
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_TRIANGULATED_SURFACE(const std::string &filename, bool use_display_list = true);
+    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
+    OPENGL_COMPONENT_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,const std::string &filename, bool use_display_list = true);
     virtual ~OPENGL_COMPONENT_TRIANGULATED_SURFACE();
     
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;

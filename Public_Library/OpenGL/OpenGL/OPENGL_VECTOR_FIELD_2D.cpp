@@ -9,8 +9,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T_ARRAY> OPENGL_VECTOR_FIELD_2D<T_ARRAY>::
-OPENGL_VECTOR_FIELD_2D(T_ARRAY& vector_field,T_ARRAY& vector_locations,const OPENGL_COLOR &color,double size,bool draw_arrowhead,bool draw_value)
-    :vector_field(vector_field),vector_locations(vector_locations),vector_color(color),size(size),draw_arrowhead(draw_arrowhead),draw_value(draw_value),draw(true)
+OPENGL_VECTOR_FIELD_2D(STREAM_TYPE stream_type,T_ARRAY& vector_field,T_ARRAY& vector_locations,const OPENGL_COLOR &color,double size,bool draw_arrowhead,bool draw_value)
+    :OPENGL_OBJECT<T>(stream_type),vector_field(vector_field),vector_locations(vector_locations),vector_color(color),size(size),draw_arrowhead(draw_arrowhead),draw_value(draw_value),draw(true)
 {
 }
 //#####################################################################

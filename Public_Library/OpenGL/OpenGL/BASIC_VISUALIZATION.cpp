@@ -27,8 +27,8 @@ namespace{
 // Constructor
 //#####################################################################
 template<class T> BASIC_VISUALIZATION<T>::
-BASIC_VISUALIZATION() 
-    :opengl_axes(0),set_window_position(false),opengl_window_title("OpenGL Visualization"),add_axes(true),render_offscreen(false),
+BASIC_VISUALIZATION(STREAM_TYPE stream_type) 
+    :stream_type(stream_type),opengl_axes(0),opengl_world(stream_type),set_window_position(false),opengl_window_title("OpenGL Visualization"),add_axes(true),render_offscreen(false),
     opt_left_handed(false),opt_smooth(false),selection_enabled(true),current_selection(0)
 {
     The_Visualization<T>()=this;
@@ -245,7 +245,7 @@ Reset_Objects_In_World()
     // Add components
     for(int i=0;i<component_list.m;i++) opengl_world.Add_Object(component_list(i),true,true);
     if(add_axes){
-        if(!opengl_axes) opengl_axes=new OPENGL_AXES<T>();
+        if(!opengl_axes) opengl_axes=new OPENGL_AXES<T>(stream_type);
         opengl_world.Add_Object(opengl_axes,false);}
 }
 //#####################################################################

@@ -11,8 +11,8 @@ using namespace PhysBAM;
 // OPENGL_GRID_BASED_VECTOR_FIELD_2D
 //#####################################################################
 template<class T> OPENGL_GRID_BASED_VECTOR_FIELD_2D<T>::
-OPENGL_GRID_BASED_VECTOR_FIELD_2D(GRID<TV>& grid, ARRAY<VECTOR<T,2>,VECTOR<int,2> >& V)
-    :OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(vector_field,vector_locations),grid(grid),V(V)
+OPENGL_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV>& grid, ARRAY<VECTOR<T,2>,VECTOR<int,2> >& V)
+    :OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(stream_type,vector_field,vector_locations),grid(grid),V(V)
 {}
 //#####################################################################
 // ~OPENGL_GRID_BASED_VECTOR_FIELD_2D

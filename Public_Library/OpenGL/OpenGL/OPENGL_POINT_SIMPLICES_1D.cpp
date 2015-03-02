@@ -13,8 +13,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_POINT_SIMPLICES_1D<T>::
-OPENGL_POINT_SIMPLICES_1D(const POINT_SIMPLICES_1D<T>& simplices_input,const OPENGL_COLOR &color_input)
-    :simplices(simplices_input),color(color_input),
+OPENGL_POINT_SIMPLICES_1D(STREAM_TYPE stream_type,const POINT_SIMPLICES_1D<T>& simplices_input,const OPENGL_COLOR &color_input)
+    :OPENGL_OBJECT<T>(stream_type),simplices(simplices_input),color(color_input),
     vertex_color(OPENGL_COLOR::Green(0.9)),segment_color(OPENGL_COLOR::Blue(0.9)),vertex_position_color(OPENGL_COLOR::Magenta()),
     draw_vertices(false)
 {}

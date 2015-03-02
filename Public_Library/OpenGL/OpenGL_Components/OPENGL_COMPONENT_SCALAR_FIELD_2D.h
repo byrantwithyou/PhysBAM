@@ -14,16 +14,16 @@
 namespace PhysBAM
 {
 
-template<class T,class T2=T,class RW=T>
+template<class T,class T2=T>
 class OPENGL_COMPONENT_SCALAR_FIELD_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::stream_type;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
     // Should be able to combine these two constructors into one (with a default arg) but for some reason I can't get it to compile in linux...
-    OPENGL_COMPONENT_SCALAR_FIELD_2D(GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
-    OPENGL_COMPONENT_SCALAR_FIELD_2D(GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
+    OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
+    OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
                                      typename OPENGL_SCALAR_FIELD_2D<T,T2>::DRAW_MODE draw_mode_input);
     virtual ~OPENGL_COMPONENT_SCALAR_FIELD_2D();
 

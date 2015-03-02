@@ -16,7 +16,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Function Reset
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Reset()
 {
 levelset_filename="";
@@ -34,7 +34,7 @@ delete opengl_scalar_field;opengl_scalar_field=0;
 //#####################################################################
 // Function Reset_Surface
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Reset_Surface()
 {
 triangulated_surface_filename="";
@@ -44,7 +44,7 @@ delete opengl_triangulated_surface;opengl_triangulated_surface=0;
 //#####################################################################
 // Function Set_Levelset
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Set_Levelset(LEVELSET<TV>& levelset_input)
 {
 Reset();
@@ -54,7 +54,7 @@ i_own_levelset=false;
 //#####################################################################
 // Function Read_Levelset
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Read_Levelset(const std::string& levelset_filename_input)
 {
 Reset();
@@ -63,7 +63,7 @@ levelset_filename=levelset_filename_input;
 //#####################################################################
 // Function Levelset
 //#####################################################################
-template<class T,class RW> const LEVELSET<VECTOR<T,3> >* OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> const LEVELSET<VECTOR<T,3> >* OPENGL_LEVELSET_MULTIVIEW<T>::
 Levelset() const
 {
 return levelset;
@@ -71,7 +71,7 @@ return levelset;
 //#####################################################################
 // Function Set_Triangulated_Surface
 //#####################################################################
-template<class T,class RW> const TRIANGULATED_SURFACE<T>* OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> const TRIANGULATED_SURFACE<T>* OPENGL_LEVELSET_MULTIVIEW<T>::
 Get_Triangulated_Surface() const
 {
 return triangulated_surface;
@@ -79,7 +79,7 @@ return triangulated_surface;
 //#####################################################################
 // Function Set_Triangulated_Surface
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Set_Triangulated_Surface(TRIANGULATED_SURFACE<T> &triangulated_surface_input)
 {
 PHYSBAM_ASSERT(!triangulated_surface);
@@ -89,7 +89,7 @@ i_own_triangulated_surface=false;
 //#####################################################################
 // Function Read_Triangulated_Surface
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Read_Triangulated_Surface(const std::string& triangulated_surface_filename_input)
 {
 PHYSBAM_ASSERT(!triangulated_surface);
@@ -98,7 +98,7 @@ triangulated_surface_filename=triangulated_surface_filename_input;
 //#####################################################################
 // Function Generate_Triangulated_Surface
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Generate_Triangulated_Surface(bool write_generated_triangulated_surface_input,const std::string& triangulated_surface_filename_input)
 {
 PHYSBAM_ASSERT(!triangulated_surface);
@@ -109,19 +109,19 @@ if(write_generated_triangulated_surface) triangulated_surface_filename=triangula
 //#####################################################################
 // Function Initialize_Levelset
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Initialize_Levelset()
 {
 if(!levelset){
     if(levelset_filename.length() > 0){
         levelset=new LEVELSET<TV>(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,3> >));
-        FILE_UTILITIES::Read_From_File<RW>(levelset_filename,*levelset);
+        FILE_UTILITIES::Read_From_File(stream_type,levelset_filename,*levelset);
             i_own_levelset=true;}}
 }
 //#####################################################################
 // Function Initialize_Triangulated_Surface
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Initialize_Triangulated_Surface()
 {
     if(!triangulated_surface){
@@ -137,26 +137,26 @@ Initialize_Triangulated_Surface()
                     (*triangulated_surface->vertex_normals)(p)=levelset->Normal(triangulated_surface->particles.X(p));
                 if(write_generated_triangulated_surface && triangulated_surface_filename.length() > 0){
                     const int vertex_normals_length=1; // needed for backwards compatibility, since vertex_normals used to be ARRAYS<TV,1>
-                    FILE_UTILITIES::Write_To_File<RW>(triangulated_surface_filename,*triangulated_surface,vertex_normals_length,*triangulated_surface->vertex_normals);}
+                    FILE_UTILITIES::Write_To_File(stream_type,triangulated_surface_filename,*triangulated_surface,vertex_normals_length,*triangulated_surface->vertex_normals);}
                 i_own_triangulated_surface=true;}}
         else if(triangulated_surface_filename.length() > 0){
             triangulated_surface=TRIANGULATED_SURFACE<T>::Create();
             triangulated_surface->Use_Vertex_Normals();triangulated_surface->vertex_normals=new ARRAY<TV>;
             int vertex_normals_length; // needed for backwards compatibility, since vertex_normals used to be ARRAYS<TV,1>
-            FILE_UTILITIES::Read_From_File<RW>(triangulated_surface_filename,*triangulated_surface,vertex_normals_length,*triangulated_surface->vertex_normals);
+            FILE_UTILITIES::Read_From_File(stream_type,triangulated_surface_filename,*triangulated_surface,vertex_normals_length,*triangulated_surface->vertex_normals);
             PHYSBAM_ASSERT(vertex_normals_length==1);
             i_own_triangulated_surface=true;}}
 }
 //#####################################################################
 // Function Initialize_OpenGL_Triangulated_Surface
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Initialize_OpenGL_Triangulated_Surface()
 {
     if(!opengl_triangulated_surface){
         Initialize_Triangulated_Surface();
         if(triangulated_surface){
-            opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(*triangulated_surface,smooth_shading,front_surface_material,back_surface_material);
+            opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,*triangulated_surface,smooth_shading,front_surface_material,back_surface_material);
             if(triangulated_surface->vertex_normals){
                 opengl_triangulated_surface->Initialize_Vertex_Normals();
                 *opengl_triangulated_surface->vertex_normals=*triangulated_surface->vertex_normals;}}}
@@ -164,20 +164,20 @@ Initialize_OpenGL_Triangulated_Surface()
 //#####################################################################
 // Function Initialize_OpenGL_Scalar_Field
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Initialize_OpenGL_Scalar_Field()
 {
     Initialize_Levelset();
     if(!levelset) return;
 
     if(!opengl_scalar_field && levelset){
-        opengl_scalar_field=new OPENGL_SCALAR_FIELD_3D<T,T>(levelset->grid,levelset->phi,OPENGL_COLOR_RAMP<T>::Levelset_Color_Constant_Ramp(inside_slice_color,outside_slice_color));
+        opengl_scalar_field=new OPENGL_SCALAR_FIELD_3D<T>(stream_type,levelset->grid,levelset->phi,OPENGL_COLOR_RAMP<T>::Levelset_Color_Constant_Ramp(inside_slice_color,outside_slice_color));
         opengl_scalar_field->color_maps.Insert(OPENGL_COLOR_RAMP<T>::Levelset_Color_Linear_Ramp(inside_slice_color,outside_slice_color,opengl_scalar_field->grid.dX.x*10),2);}
 }
 //#####################################################################
 // Function Initialize
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Initialize()
 {
     if(!opengl_triangulated_surface) Update();
@@ -185,7 +185,7 @@ Initialize()
 //#####################################################################
 // Function Set_Surface_Material
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Set_Surface_Material(const OPENGL_MATERIAL &front_surface_mat,const OPENGL_MATERIAL &back_surface_mat)
 {
     front_surface_material=front_surface_mat;
@@ -195,7 +195,7 @@ Set_Surface_Material(const OPENGL_MATERIAL &front_surface_mat,const OPENGL_MATER
 //#####################################################################
 // Function Set_Overlayed_Surface_Material
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Set_Overlayed_Surface_Material(const OPENGL_MATERIAL &overlayed_surface_mat)
 {
     overlayed_surface_material=overlayed_surface_mat;
@@ -204,7 +204,7 @@ Set_Overlayed_Surface_Material(const OPENGL_MATERIAL &overlayed_surface_mat)
 //#####################################################################
 // Function Set_Slice_Color
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Set_Slice_Color(const OPENGL_COLOR &inside_slice_color_input,const OPENGL_COLOR &outside_slice_color_input)
 {
     inside_slice_color=inside_slice_color_input;
@@ -214,7 +214,7 @@ Set_Slice_Color(const OPENGL_COLOR &inside_slice_color_input,const OPENGL_COLOR 
 //#####################################################################
 // Function Set_Slice_Color_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Set_Slice_Color_Mode(COLOR_MODE color_mode_input)
 {
     color_mode=color_mode_input;
@@ -223,7 +223,7 @@ Set_Slice_Color_Mode(COLOR_MODE color_mode_input)
 //#####################################################################
 // Function Set_Two_Sided
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Set_Two_Sided(bool two_sided_input)
 {
     two_sided=two_sided_input;
@@ -231,7 +231,7 @@ Set_Two_Sided(bool two_sided_input)
 //#####################################################################
 // Function Toggle_Slice_Color_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Toggle_Slice_Color_Mode() 
 {
     COLOR_MODE new_color_mode=(COLOR_MODE)(((int)color_mode+1)%2);
@@ -240,7 +240,7 @@ Toggle_Slice_Color_Mode()
 //#####################################################################
 // Function Update
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Update()
 {
     OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
@@ -265,7 +265,7 @@ Update()
 //#####################################################################
 // Function Slice_Has_Changed
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Slice_Has_Changed()
 {
     if(opengl_scalar_field) {
@@ -276,7 +276,7 @@ Slice_Has_Changed()
 //#####################################################################
 // Function Toggle_Display_Overlay
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Toggle_Display_Overlay()
 {
     display_overlay=!display_overlay;
@@ -285,7 +285,7 @@ Toggle_Display_Overlay()
 //#####################################################################
 // Function Toggle_Smooth_Slice_Texture
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Toggle_Smooth_Slice_Texture()
 {
     smooth_slice_texture=!smooth_slice_texture;
@@ -294,7 +294,7 @@ Toggle_Smooth_Slice_Texture()
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Display() const
 {
     OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
@@ -311,7 +311,7 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_LEVELSET_MULTIVIEW<T>::
 Bounding_Box() const
 {
     if(levelset) return World_Space_Box(levelset->grid.domain);
@@ -323,7 +323,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Turn_Smooth_Shading_On
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Turn_Smooth_Shading_On()
 {
     smooth_shading=true;
@@ -332,7 +332,7 @@ Turn_Smooth_Shading_On()
 //#####################################################################
 // Function Turn_Smooth_Shading_Off
 //#####################################################################
-template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Turn_Smooth_Shading_Off()
 {
     smooth_shading=false;

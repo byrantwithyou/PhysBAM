@@ -31,7 +31,7 @@ public:
     int scale;
 
 //##################################################################### 
-    OPENGL_GRID_3D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White());
+    OPENGL_GRID_3D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White());
     virtual ~OPENGL_GRID_3D();
     void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;

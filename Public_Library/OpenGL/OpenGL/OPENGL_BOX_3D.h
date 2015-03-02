@@ -23,8 +23,8 @@ public:
     RANGE<TV>& box;
     OPENGL_COLOR color;
 
-    OPENGL_BOX_3D(RANGE<TV>& box_input,const OPENGL_COLOR& color_input=OPENGL_COLOR::White()) 
-        :box(box_input),color(color_input)
+    OPENGL_BOX_3D(STREAM_TYPE stream_type,RANGE<TV>& box_input,const OPENGL_COLOR& color_input=OPENGL_COLOR::White()) 
+        :OPENGL_OBJECT<T>(stream_type),box(box_input),color(color_input)
     {}
 
     void Display() const PHYSBAM_OVERRIDE;

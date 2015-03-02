@@ -9,13 +9,13 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
-OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid_input, 
+template<class T> OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
+OPENGL_COMPONENT_HEIGHTFIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid_input, 
                                 const std::string& height_filename_input,
                                 const std::string& x_filename_input,
                                 const std::string& ground_filename_input,
                                 const std::string& u_filename_input)
-    :OPENGL_COMPONENT<T>("Heightfield 1D"), grid(grid_input), opengl_vector_field(vector_field,vector_locations), scale(1), displacement_scale(1), valid(false), 
+    :OPENGL_COMPONENT<T>(stream_type,"Heightfield 1D"), grid(grid_input), opengl_vector_field(stream_type,vector_field,vector_locations), scale(1), displacement_scale(1), valid(false), 
       draw_velocities(true), draw_points(true), selected_index(0)
 {
     height_filename=height_filename_input;
@@ -37,7 +37,7 @@ OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid_input,
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 ~OPENGL_COMPONENT_HEIGHTFIELD_1D()
 {
     delete x;
@@ -47,7 +47,7 @@ template<class T,class RW> OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::File_Exists(is_animation?STRING_UTILITIES::string_sprintf(height_filename.c_str(),frame_input):height_filename);
@@ -55,7 +55,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);
@@ -64,7 +64,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -73,7 +73,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Display() const
 {
     OPENGL_COLOR water_color(0,0,1);
@@ -186,7 +186,7 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Bounding_Box() const
 {
     if(valid && draw)
@@ -207,7 +207,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Reinitialize(bool force)
 {
     if(draw){
@@ -218,21 +218,21 @@ Reinitialize(bool force)
             if(success){
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(height_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File<RW>(filename,height);
+                    FILE_UTILITIES::Read_From_File(stream_type,filename,height);
                     if(height.Size().x != grid.counts.x) success=false;}
                 else success=false;}
 
             if(success && x){
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(x_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File<RW>(filename,*x);
+                    FILE_UTILITIES::Read_From_File(stream_type,filename,*x);
                     if(height.Size().x != x->Size().x) success=false;}
                 else success=false;}
     
             if(success && ground){
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(ground_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File<RW>(filename,*ground);
+                    FILE_UTILITIES::Read_From_File(stream_type,filename,*ground);
                     if(height.Size().x != ground->Size().x) success=false;
                     else height += (*ground);}
                 else success=false;}
@@ -240,7 +240,7 @@ Reinitialize(bool force)
             if(success && draw_velocities && u_filename.length()){
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(u_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File<RW>(filename,*u);
+                    FILE_UTILITIES::Read_From_File(stream_type,filename,*u);
                     if(height.Size().x != u->Size().x) success=false;
                     else for(int i=0;i<grid.counts.x;i++){
                             vector_field(i)=VECTOR<T,2>((*u)(i),0);
@@ -254,7 +254,7 @@ Reinitialize(bool force)
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     if(buffer_size == 1)
@@ -268,7 +268,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 //#####################################################################
 // Function Highlight_Selection
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
     if(selection->type != OPENGL_SELECTION<T>::COMPONENT_HEIGHTFIELD_1D) return;
@@ -278,7 +278,7 @@ Highlight_Selection(OPENGL_SELECTION<T>* selection)
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Clear_Highlight()
 {
     selected_index=-1;
@@ -286,7 +286,7 @@ Clear_Highlight()
 //#####################################################################
 // Function Set_Scale
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Set_Scale(T scale_input)
 {
     scale=scale_input;
@@ -295,7 +295,7 @@ Set_Scale(T scale_input)
 //#####################################################################
 // Function Increase_Scale
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Increase_Scale()
 {
     scale *= 1.1;
@@ -304,7 +304,7 @@ Increase_Scale()
 //#####################################################################
 // Function Decrease_Scale
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Decrease_Scale()
 {
     scale *= 1/1.1;
@@ -313,7 +313,7 @@ Decrease_Scale()
 //#####################################################################
 // Function Increase_Displacement_Scale
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Increase_Displacement_Scale()
 {
     displacement_scale *= 1.1;
@@ -321,7 +321,7 @@ Increase_Displacement_Scale()
 //#####################################################################
 // Function Decrease_Displacement_Scale
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Decrease_Displacement_Scale()
 {
     displacement_scale *= 1/1.1;
@@ -329,7 +329,7 @@ Decrease_Displacement_Scale()
 //#####################################################################
 // Function Increase_Velocity_Scale
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Increase_Velocity_Scale()
 {
     opengl_vector_field.size *= 1.1;
@@ -337,7 +337,7 @@ Increase_Velocity_Scale()
 //#####################################################################
 // Function Decrease_Velocity_Scale
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Decrease_Velocity_Scale()
 {
     opengl_vector_field.size *= 1/1.1;
@@ -345,7 +345,7 @@ Decrease_Velocity_Scale()
 //#####################################################################
 // Function Toggle_Draw_Velocities
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Toggle_Draw_Velocities()
 {
     draw_velocities=!draw_velocities;
@@ -354,7 +354,7 @@ Toggle_Draw_Velocities()
 //#####################################################################
 // Function Toggle_Draw_Points
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
+template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Toggle_Draw_Points()
 {
     draw_points=!draw_points;
@@ -370,6 +370,6 @@ Bounding_Box() const
 }
 
 namespace PhysBAM{
-template class OPENGL_COMPONENT_HEIGHTFIELD_1D<float,float>;
-template class OPENGL_COMPONENT_HEIGHTFIELD_1D<double,double>;
+template class OPENGL_COMPONENT_HEIGHTFIELD_1D<float>;
+template class OPENGL_COMPONENT_HEIGHTFIELD_1D<double>;
 }

@@ -12,7 +12,7 @@
 
 namespace PhysBAM{
 
-template<class T,class T2=T,class RW=T>
+template<class T,class T2=T>
 class OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,1> TV;
@@ -26,7 +26,8 @@ private:
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D(const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
+    using OPENGL_COMPONENT<T>::stream_type;
+    OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
     virtual ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D();
 
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE

@@ -19,8 +19,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_3D<T,T2>::
-OPENGL_SCALAR_FIELD_3D(const GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,3> > &values_input,OPENGL_COLOR_MAP<T2> *color_map_input,DRAW_MODE draw_mode_input)
-    :grid(grid_input),values(values_input),current_color_map(0),opengl_textured_rect(0),opengl_points(0),smooth_slice_texture(false),scale_range(false)
+OPENGL_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,3> > &values_input,OPENGL_COLOR_MAP<T2> *color_map_input,DRAW_MODE draw_mode_input)
+    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),current_color_map(0),opengl_textured_rect(0),opengl_points(0),smooth_slice_texture(false),scale_range(false)
 {
     PHYSBAM_ASSERT(color_map_input);
     Initialize_Color_Maps(color_map_input);
@@ -363,10 +363,10 @@ Set_Draw_Mode(DRAW_MODE draw_mode_input)
 
     if(draw_mode==DRAW_TEXTURE){
         Delete_Points();
-        if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT<T>;}
+        if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT<T>(stream_type);}
     else{
         Delete_Textured_Rect();
-        if(!opengl_points) opengl_points=new OPENGL_POINTS_3D<T>(*new ARRAY<TV>);}
+        if(!opengl_points) opengl_points=new OPENGL_POINTS_3D<T>(stream_type,*new ARRAY<TV>);}
 
     Update();
 }
@@ -536,7 +536,7 @@ Update_Slice()
         Delete_Textured_Rect();
         return;}
 
-    if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT<T>();
+    if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT<T>(stream_type);
 
     // Handle values arrays which are not (1,m)(1,n)
     TV half_dX=(T)0.5*grid.dX;

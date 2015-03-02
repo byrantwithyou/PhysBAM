@@ -28,7 +28,7 @@ namespace PhysBAM{
 
 template<class T> class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D;
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;
@@ -44,7 +44,7 @@ protected:
     int display_soft_bound_surface_mode,display_hard_bound_surface_mode,display_forces_mode,interaction_pair_display_mode;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
     COLLISION_BODY_COLLECTION<TV>& collision_body_list;
     DEFORMABLE_BODY_COLLECTION<TV> &deformable_body_collection;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection;
@@ -71,7 +71,7 @@ public:
     ARRAY<FORCE_DATA<TV> > force_data_list;
     OPENGL_COLOR_RAMP<T>* color_map_forces;
 
-    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const std::string& prefix,const int start_frame);
+    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D();
     
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;

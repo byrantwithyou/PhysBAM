@@ -12,9 +12,9 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
-OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input)
-    :OPENGL_COMPONENT<T>("Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
+template<class T> OPENGL_COMPONENT_LEVELSET_2D<T>::
+OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset_filename_input,const std::string filename_set_input)
+    :OPENGL_COMPONENT<T>(stream_type,"Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
     frame_loaded(-1),set(0),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false)
 {
     int number_of_sets=0;
@@ -28,7 +28,7 @@ OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const st
     opengl_levelsets.Resize(number_of_sets);
     OPENGL_INDEXED_COLOR_MAP* color_map=OPENGL_INDEXED_COLOR_MAP::Levelset_Multiple_Color_Map();
     for(int j=0;j<opengl_levelsets.m;j++)
-        opengl_levelsets(j)=new OPENGL_LEVELSET_2D<T>(*(new LEVELSET<TV>(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,2> >))),color_map->Lookup(j),OPENGL_COLOR::Transparent());
+        opengl_levelsets(j)=new OPENGL_LEVELSET_2D<T>(stream_type,*(new LEVELSET<TV>(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,2> >))),color_map->Lookup(j),OPENGL_COLOR::Transparent());
     opengl_levelset=opengl_levelsets(0);
     delete color_map;
 
@@ -38,7 +38,7 @@ OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const st
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> OPENGL_COMPONENT_LEVELSET_2D<T>::
 ~OPENGL_COMPONENT_LEVELSET_2D()
 {
     for(int j=0;j<opengl_levelsets.m;j++){
@@ -50,7 +50,7 @@ template<class T,class RW> OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_LEVELSET_2D<T>::
 Valid_Frame(int frame_input) const
 {
     if(use_sets) return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame_input,set));
@@ -59,7 +59,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);
@@ -68,7 +68,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -77,7 +77,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Display() const
 {
     if(valid && draw){
@@ -87,7 +87,7 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_LEVELSET_2D<T>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_levelset->Bounding_Box();
@@ -96,7 +96,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const
 {
     if(Is_Up_To_Date(frame)){
@@ -119,7 +119,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_se
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Reinitialize(const bool force_even_if_not_drawn)
 {
     if(draw||force_even_if_not_drawn){
@@ -128,12 +128,12 @@ Reinitialize(const bool force_even_if_not_drawn)
             if(use_sets)
                 for(int i=0;i<opengl_levelsets.m;i++){
                     filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,i);
-                    if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File<RW>(filename.c_str(),opengl_levelsets(i)->levelset);
+                    if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File(stream_type,filename.c_str(),opengl_levelsets(i)->levelset);
                     else return;
                     opengl_levelsets(i)->Update();}
             else{
                 filename=FILE_UTILITIES::Get_Frame_Filename(levelset_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File<RW>(filename.c_str(),opengl_levelset->levelset);
+                if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File(stream_type,filename.c_str(),opengl_levelset->levelset);
                 else return;
                 opengl_levelset->Update();}
             frame_loaded=frame;set_loaded=set;valid=true;}}
@@ -141,7 +141,7 @@ Reinitialize(const bool force_even_if_not_drawn)
 //#####################################################################
 // Function Toggle_Color_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Toggle_Color_Mode()
 {
     for(int j=0;j<opengl_levelsets.m;j++) opengl_levelsets(j)->Toggle_Color_Map();
@@ -149,7 +149,7 @@ Toggle_Color_Mode()
 //#####################################################################
 // Function Toggle_Smooth
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Toggle_Smooth()
 {
     for(int j=0;j<opengl_levelsets.m;j++) opengl_levelsets(j)->Toggle_Smooth_Texture();
@@ -157,7 +157,7 @@ Toggle_Smooth()
 //#####################################################################
 // Function Toggle_Normals
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Toggle_Normals()
 {
     for(int j=0;j<opengl_levelsets.m;j++) opengl_levelsets(j)->Toggle_Normals();
@@ -165,7 +165,7 @@ Toggle_Normals()
 //#####################################################################
 // Function Toggle_Draw_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Toggle_Draw_Mode()
 {
     for(int j=0;j<opengl_levelsets.m;j++){
@@ -179,7 +179,7 @@ Toggle_Draw_Mode()
 //#####################################################################
 // Function Toggle_Draw_Sign
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Toggle_Draw_Sign()
 {
     for(int j=0;j<opengl_levelsets.m;j++){
@@ -189,7 +189,7 @@ Toggle_Draw_Sign()
 //#####################################################################
 // Function Next_Set
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Next_Set()
 {
     set=min(set+1,opengl_levelsets.m-1);
@@ -200,7 +200,7 @@ Next_Set()
 //#####################################################################
 // Function Previous_Set
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Previous_Set()
 {
     set=max(set-1,0);
@@ -211,7 +211,7 @@ Previous_Set()
 //#####################################################################
 // Function Toggle_Draw_Multiple_Levelsets
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Toggle_Draw_Multiple_Levelsets()
 {
     draw_multiple_levelsets=!draw_multiple_levelsets;
@@ -219,12 +219,12 @@ Toggle_Draw_Multiple_Levelsets()
 //#####################################################################
 // Function Toggle_Draw_Ghost_Values
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Toggle_Draw_Ghost_Values()
 {
     for(int j=0;j<opengl_levelsets.m;j++) opengl_levelsets(j)->Toggle_Draw_Ghost_Values();
 }
 namespace PhysBAM{
-template class OPENGL_COMPONENT_LEVELSET_2D<float,float>;
-template class OPENGL_COMPONENT_LEVELSET_2D<double,double>;
+template class OPENGL_COMPONENT_LEVELSET_2D<float>;
+template class OPENGL_COMPONENT_LEVELSET_2D<double>;
 }

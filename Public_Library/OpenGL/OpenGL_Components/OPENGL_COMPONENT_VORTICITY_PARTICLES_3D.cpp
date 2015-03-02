@@ -8,16 +8,16 @@
 using namespace PhysBAM;
 
 const ATTRIBUTE_ID ATTRIBUTE_ID_VORTICITY(16);
-template<class T,class RW> OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T,RW>::
-OPENGL_COMPONENT_VORTICITY_PARTICLES_3D(const std::string &filename,bool use_ids_input)
-    :OPENGL_COMPONENT_PARTICLES_3D<T,RW>(filename,"",use_ids_input,false)
+template<class T> OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T>::
+OPENGL_COMPONENT_VORTICITY_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename,bool use_ids_input)
+    :OPENGL_COMPONENT_PARTICLES_3D<T>(stream_type,filename,"",use_ids_input,false)
 {}
 
-template<class T,class RW> void OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T>::
 Reinitialize(bool force)
 {
     const ARRAY_VIEW<typename TV::SPIN>& vorticity=*particles->template Get_Array<typename TV::SPIN>(ATTRIBUTE_ID_VORTICITY);
-    OPENGL_COMPONENT_PARTICLES_3D<T,RW>::Reinitialize(force);
+    OPENGL_COMPONENT_PARTICLES_3D<T>::Reinitialize(force);
     if(!have_velocities){
         have_velocities=true;
         opengl_vector_field.vector_field.Resize(particles->Size());
@@ -26,6 +26,6 @@ Reinitialize(bool force)
             opengl_vector_field.vector_field(idx++)=vorticity(i);}
 }
 namespace PhysBAM{
-template class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<float,float>;
-template class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<double,double>;
+template class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<float>;
+template class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<double>;
 }

@@ -13,8 +13,8 @@ using namespace PhysBAM;
 // OPENGL_GRID_BASED_VECTOR_FIELD_3D
 //#####################################################################
 template<class T> OPENGL_GRID_BASED_VECTOR_FIELD_3D<T>::
-OPENGL_GRID_BASED_VECTOR_FIELD_3D(GRID<TV> &grid, ARRAY<VECTOR<T,3> ,VECTOR<int,3> > &V)
-    :OPENGL_VECTOR_FIELD_3D<T>(*(new ARRAY<VECTOR<T,3> >),*(new ARRAY<VECTOR<T,3> >),OPENGL_COLOR::Gray(.8f),.25f,true,false,false),grid(grid),V(V)
+OPENGL_GRID_BASED_VECTOR_FIELD_3D(STREAM_TYPE stream_type,GRID<TV> &grid, ARRAY<VECTOR<T,3> ,VECTOR<int,3> > &V)
+    :OPENGL_VECTOR_FIELD_3D<T>(stream_type,*(new ARRAY<VECTOR<T,3> >),*(new ARRAY<VECTOR<T,3> >),OPENGL_COLOR::Gray(.8f),.25f,true,false,false),grid(grid),V(V)
 {
     max_vectors_3d = 100000;
 }

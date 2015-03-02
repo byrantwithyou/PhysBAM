@@ -26,9 +26,9 @@ public:
     OPENGL_COLOR positive_color,negative_color;
     T size;
 
-    OPENGL_SYMMETRIC_MATRIX_FIELD_3D(const GRID<TV>& grid_input,const ARRAY<SYMMETRIC_MATRIX<T,3>,VECTOR<int,3> >& field_input,const T size_input=0.025,
+    OPENGL_SYMMETRIC_MATRIX_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV>& grid_input,const ARRAY<SYMMETRIC_MATRIX<T,3>,VECTOR<int,3> >& field_input,const T size_input=0.025,
         const OPENGL_COLOR& positive_color_input=OPENGL_COLOR::Red(),const OPENGL_COLOR& negative_color_input=OPENGL_COLOR::Yellow())
-        :grid(grid_input),field(field_input),positive_color(positive_color_input),negative_color(negative_color_input),size(size_input)
+        :OPENGL_OBJECT<T>(stream_type),grid(grid_input),field(field_input),positive_color(positive_color_input),negative_color(negative_color_input),size(size_input)
     {}
 
     void Slice_Has_Changed() PHYSBAM_OVERRIDE

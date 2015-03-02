@@ -11,8 +11,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_GRID_3D<T>::
-OPENGL_GRID_3D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input) 
-    :current_selection(0),grid(grid_input),color(color_input),draw_ghost_values(true),hide_non_selected_grid(false),owns_grid(false),scale(1)
+OPENGL_GRID_3D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input) 
+    :OPENGL_OBJECT<T>(stream_type),current_selection(0),grid(grid_input),color(color_input),draw_ghost_values(true),hide_non_selected_grid(false),owns_grid(false),scale(1)
 {
 }
 //#####################################################################

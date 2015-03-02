@@ -28,13 +28,13 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const std::string& basedir_input)
-    :OPENGL_COMPONENT<T>("Rigid Geometry Collection 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
+template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::string& basedir_input)
+    :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_individual_axes(false),draw_node_velocity_vectors(false),draw_segmented_curve(true),draw_triangulated_area(false),draw_implicit_curve(false),
     draw_articulation_points(false),draw_forces_and_torques(false),draw_linear_muscles(false),need_destroy_rigid_body_collection(true),
     rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),articulated_rigid_body(0),
-    velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true),
+    velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(stream_type,node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true),
     current_selection(0)
 {
     is_animation=true;
@@ -43,13 +43,13 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const std::string& basedir_input)
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input)
-    :OPENGL_COMPONENT<T>("Rigid Geometry Collection 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
+template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input)
+    :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_individual_axes(false),draw_node_velocity_vectors(false),draw_segmented_curve(true),draw_triangulated_area(false),draw_implicit_curve(false),
     draw_articulation_points(false),draw_forces_and_torques(false),draw_linear_muscles(false),need_destroy_rigid_body_collection(false),
     rigid_body_collection(rigid_body_collection),articulated_rigid_body(0),
-    velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true),
+    velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(stream_type,node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true),
     current_selection(0)
 {
     is_animation=true;
@@ -58,7 +58,7 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(RIGID_BODY_COLLECTION<TV>& rigid_body_
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D()
 {
     if(need_destroy_rigid_body_collection) delete &rigid_body_collection;
@@ -66,7 +66,7 @@ template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
 //#####################################################################
 // Function Set_Draw_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Set_Draw_Mode(const int mode)
 {
     draw_segmented_curve=(mode&0x01)!=0;
@@ -76,7 +76,7 @@ Set_Draw_Mode(const int mode)
 //#####################################################################
 // Function Get_Draw_Mode
 //#####################################################################
-template<class T,class RW> int OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> int OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Get_Draw_Mode() const
 {
     return 0x04*(int)(draw_implicit_curve)+0x02*(int)(draw_triangulated_area)+0x01*(int)(draw_segmented_curve);
@@ -84,12 +84,13 @@ Get_Draw_Mode() const
 //#####################################################################
 // Function Read_Hints
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Read_Hints(const std::string& filename)
 {
     ARRAY<OPENGL_RIGID_BODY_HINTS,int> opengl_hints;
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
-    Read_Binary<RW>(*input,opengl_hints);delete input;
+    TYPED_ISTREAM typed_input(*input,stream_type);
+    Read_Binary(typed_input,opengl_hints);delete input;
 
     for(int i=0;i<opengl_segmented_curve.Size();i++) if(opengl_segmented_curve(i) && i<opengl_hints.Size()){
         opengl_segmented_curve(i)->color=opengl_hints(i).material.diffuse;
@@ -98,27 +99,27 @@ Read_Hints(const std::string& filename)
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Reinitialize(const bool force,const bool read_geometry)
 {
     if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
         valid=false;
         if(!FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
 
-        rigid_body_collection.Read(STREAM_TYPE(RW()),basedir,frame,&needs_init,&needs_destroy); // TODO: avoiding reading triangulated areas
+        rigid_body_collection.Read(stream_type,basedir,frame,&needs_init,&needs_destroy); // TODO: avoiding reading triangulated areas
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
         std::string arb_state_file=STRING_UTILITIES::string_sprintf("%s/%d/arb_state",basedir.c_str(),frame);
         if(FILE_UTILITIES::File_Exists(arb_state_file)){
             if(!articulated_rigid_body) articulated_rigid_body=new ARTICULATED_RIGID_BODY<TV>(rigid_body_collection); // TODO: read in the actual particles
-            articulated_rigid_body->Read(STREAM_TYPE(RW()),basedir,frame);}
+            articulated_rigid_body->Read(stream_type,basedir,frame);}
         else{delete articulated_rigid_body;articulated_rigid_body=0;}
 
         if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",basedir.c_str(),frame)))
             Read_Articulated_Information(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",basedir.c_str(),frame));
 
         std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_forces_and_torques",basedir.c_str(),frame);
-        if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File<RW>(filename,forces_and_torques);
+        if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File(stream_type,filename,forces_and_torques);
         else forces_and_torques.Resize(0);
 
         int max_number_of_bodies(max(opengl_segmented_curve.Size(),rigid_body_collection.rigid_body_particles.Size()));
@@ -139,7 +140,7 @@ Reinitialize(const bool force,const bool read_geometry)
         // Only display real bodies (not ghost bodies)
         if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame))) {
             ARRAY<int> particles_of_this_partition;
-            FILE_UTILITIES::template Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
+            FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
             for(int i=0;i<max_number_of_bodies;i++)
                 draw_object(i)=false;
             for(int i=0;i<particles_of_this_partition.Size();i++)
@@ -151,7 +152,7 @@ Reinitialize(const bool force,const bool read_geometry)
             else Destroy_Geometry(id);}
         for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
         if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),frame)))
-            FILE_UTILITIES::template Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),frame),colors);
+            FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),frame),colors);
         for(int id=0;id<colors.m;id++){
             if(colors(id)==0) Set_Object_Color(id,OPENGL_COLOR::Green());
             if(colors(id)==1) Set_Object_Color(id,OPENGL_COLOR::Magenta());}
@@ -164,14 +165,14 @@ Reinitialize(const bool force,const bool read_geometry)
 //#####################################################################
 // Function Create_Geometry
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Create_Geometry(const int id)
 {
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(id);
 
-    if(!opengl_axes(id)){opengl_axes(id)=new OPENGL_AXES<T>();}
+    if(!opengl_axes(id)){opengl_axes(id)=new OPENGL_AXES<T>(stream_type);}
     if(rigid_body.simplicial_object && !opengl_segmented_curve(id)){
-        opengl_segmented_curve(id)=new OPENGL_SEGMENTED_CURVE_2D<T>(*rigid_body.simplicial_object);
+        opengl_segmented_curve(id)=new OPENGL_SEGMENTED_CURVE_2D<T>(stream_type,*rigid_body.simplicial_object);
         opengl_segmented_curve(id)->draw_vertices=true;
         opengl_segmented_curve(id)->Enslave_Transform_To(*opengl_axes(id));}
 
@@ -179,13 +180,13 @@ Create_Geometry(const int id)
     TRIANGULATED_AREA<T>* triangulated_area=rigid_body.template Find_Structure<TRIANGULATED_AREA<T>*>();
     if(triangulated_area && !opengl_triangulated_area(id)){
         triangulated_area->mesh.Initialize_Segment_Mesh();
-        opengl_triangulated_area(id)=new OPENGL_TRIANGULATED_AREA<T>(*triangulated_area);
+        opengl_triangulated_area(id)=new OPENGL_TRIANGULATED_AREA<T>(stream_type,*triangulated_area);
         opengl_triangulated_area(id)->Enslave_Transform_To(*opengl_axes(id));}
 
     if(rigid_body.implicit_object && !opengl_levelset(id)){ // ASSUMES LEVELSET_IMPLICIT_CURVE!
         IMPLICIT_OBJECT<TV>* object_space_implicit_object=rigid_body.implicit_object->object_space_implicit_object;
         if(LEVELSET_IMPLICIT_OBJECT<TV>* levelset_implicit_object=dynamic_cast<LEVELSET_IMPLICIT_OBJECT<TV>*>(object_space_implicit_object)){
-            opengl_levelset(id)=new OPENGL_LEVELSET_2D<T>(levelset_implicit_object->levelset);
+            opengl_levelset(id)=new OPENGL_LEVELSET_2D<T>(stream_type,levelset_implicit_object->levelset);
             // TODO: fix me
             //opengl_levelset(id)->Set_Color_Mode(OPENGL_LEVELSET_2D<T>::COLOR_GRADIENT);
             opengl_levelset(id)->draw_cells=true;opengl_levelset(id)->draw_curve=false;opengl_levelset(id)->draw_area=false;
@@ -196,15 +197,15 @@ Create_Geometry(const int id)
         std::string filename_pattern=STRING_UTILITIES::string_sprintf("%s/accumulated_impulses_%d.%%d",basedir.c_str(),id);
         if(FILE_UTILITIES::Frame_File_Exists(filename_pattern,frame)){
             LOG::cout<<"Adding accumulated impulses to rigid body "<<id<<std::endl;
-            OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>* component=
-                new OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T,RW>(*triangulated_area,filename_pattern);
+            OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>* component=
+                new OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>(stream_type,*triangulated_area,filename_pattern);
             component->opengl_vector_field.Enslave_Transform_To(*opengl_axes(id));
             extra_components(id).Append(component);}}
 }
 //#####################################################################
 // Function Update_Geometry
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Update_Geometry(const int id)
 {
     if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<T,3> >(Convert_2d_To_3d(rigid_body_collection.Rigid_Body(id).Frame()));
@@ -212,14 +213,14 @@ Update_Geometry(const int id)
         std::string color_map_filename=STRING_UTILITIES::string_sprintf("%s/%d/stress_map_of_triangulated_area_%d",basedir.c_str(),frame,id);
         if(FILE_UTILITIES::File_Exists(color_map_filename)){
             if(!opengl_triangulated_area(id)->color_map) opengl_triangulated_area(id)->color_map=new ARRAY<OPENGL_COLOR>;
-            FILE_UTILITIES::Read_From_File<RW>(color_map_filename,*opengl_triangulated_area(id)->color_map);}
+            FILE_UTILITIES::Read_From_File(stream_type,color_map_filename,*opengl_triangulated_area(id)->color_map);}
         else if(opengl_triangulated_area(id)->color_map){delete opengl_triangulated_area(id)->color_map;opengl_triangulated_area(id)->color_map=0;}}
     for(int i=0;i<extra_components(id).m;i++) extra_components(id)(i)->Set_Frame(frame);
 }
 //#####################################################################
 // Function Destroy_Geometry
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Destroy_Geometry(const int id)
 {
     if(opengl_segmented_curve(id)){delete opengl_segmented_curve(id);opengl_segmented_curve(id)=0;}
@@ -232,7 +233,7 @@ Destroy_Geometry(const int id)
 //#####################################################################
 // Function Update_Object_Labels
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Update_Object_Labels()
 {
     int number_of_drawn_bodies=draw_object.Count_Matches(true);
@@ -278,7 +279,7 @@ Update_Object_Labels()
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame_input));
@@ -286,7 +287,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);
@@ -295,7 +296,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -303,7 +304,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Use_Bounding_Box
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Use_Bounding_Box() const
 {
     int num_drawable_objects=0;
@@ -315,7 +316,7 @@ Use_Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Bounding_Box() const
 {
     RANGE<VECTOR<T,3> > box;
@@ -328,7 +329,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     OPENGL_SELECTION<T>* selection=0;
@@ -352,7 +353,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 //#####################################################################
 // Function Highlight_Selection
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
     delete current_selection;current_selection=0;
@@ -375,7 +376,7 @@ Highlight_Selection(OPENGL_SELECTION<T>* selection)
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Clear_Highlight()
 {
     delete current_selection;current_selection=0;
@@ -387,7 +388,7 @@ Clear_Highlight()
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
 {
     if(!selection) return;
@@ -476,7 +477,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection)
 //#####################################################################
 // Function Set_Draw_Object
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Set_Draw_Object(int i,bool draw_it)
 {
     if(i>draw_object.Size()) draw_object.Resize(i);
@@ -485,7 +486,7 @@ Set_Draw_Object(int i,bool draw_it)
 //#####################################################################
 // Function Set_Object_Color
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Set_Object_Color(int i,const OPENGL_COLOR &color_input)
 {
     if(!opengl_segmented_curve(i)) return;
@@ -495,7 +496,7 @@ Set_Object_Color(int i,const OPENGL_COLOR &color_input)
 //#####################################################################
 // Function Get_Draw_Object
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Get_Draw_Object(int i) const
 {
     return draw_object(i);
@@ -503,7 +504,7 @@ Get_Draw_Object(int i) const
 //#####################################################################
 // Function Set_Use_Object_Bounding_Box
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Set_Use_Object_Bounding_Box(int i,bool use_it)
 {
     use_object_bounding_box(i)=use_it;
@@ -511,7 +512,7 @@ Set_Use_Object_Bounding_Box(int i,bool use_it)
 //#####################################################################
 // Function Set_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Set_Vector_Size(double size)
 {
     velocity_field.size=size;
@@ -520,7 +521,7 @@ Set_Vector_Size(double size)
 //#####################################################################
 // Function Toggle_Velocity_Vectors
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Toggle_Velocity_Vectors()
 {
     draw_velocity_vectors=!draw_velocity_vectors;
@@ -529,7 +530,7 @@ Toggle_Velocity_Vectors()
 //#####################################################################
 // Function Toggle_Individual_Axes
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Toggle_Individual_Axes()
 {
     draw_individual_axes=!draw_individual_axes;
@@ -538,7 +539,7 @@ Toggle_Individual_Axes()
 //#####################################################################
 // Function Toggle_Output_Positions
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Toggle_Output_Positions()
 {
     output_positions=!output_positions;
@@ -547,7 +548,7 @@ Toggle_Output_Positions()
 //#####################################################################
 // Function Toggle_Show_Object_Names
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Toggle_Show_Object_Names()
 {
     show_object_names=!show_object_names;
@@ -555,7 +556,7 @@ Toggle_Show_Object_Names()
 //#####################################################################
 // Function Toggle_Node_Velocity_Vectors
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Toggle_Node_Velocity_Vectors()
 {
     draw_node_velocity_vectors=!draw_node_velocity_vectors;
@@ -564,7 +565,7 @@ Toggle_Node_Velocity_Vectors()
 //#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Increase_Vector_Size()
 {
     velocity_field.Scale_Vector_Size(1.1);
@@ -573,7 +574,7 @@ Increase_Vector_Size()
 //#####################################################################
 // Function Decrease_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Decrease_Vector_Size()
 {
     velocity_field.Scale_Vector_Size(1/1.1);
@@ -582,7 +583,7 @@ Decrease_Vector_Size()
 //#####################################################################
 // Function Toggle_Draw_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Toggle_Draw_Mode()
 {
     int mode=Get_Draw_Mode();
@@ -601,19 +602,20 @@ Bounding_Box() const
 //#####################################################################
 // Function Read_Articulated_Information
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Read_Articulated_Information(const std::string& filename)
 {
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
+    TYPED_ISTREAM typed_input(*input,stream_type);
     // this will need to be changed to reflect multiple articulation points per rigid body
-    int numpoints=0;Read_Binary<RW,int>(*input,numpoints);articulation_points.Exact_Resize(numpoints);
-    for(int i=0;i<numpoints;i++) Read_Binary<RW,VECTOR<T,2> >(*input,articulation_points(i));
+    int numpoints=0;Read_Binary(typed_input,numpoints);articulation_points.Exact_Resize(numpoints);
+    for(int i=0;i<numpoints;i++) Read_Binary(typed_input,articulation_points(i));
     delete input;
 }
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Display() const
 {
     if(draw){
@@ -723,7 +725,7 @@ Display() const
 //#####################################################################
 // Function Toggle_Articulation_Points
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Toggle_Articulation_Points()
 {
     draw_articulation_points=!draw_articulation_points;
@@ -731,7 +733,7 @@ Toggle_Articulation_Points()
 //#####################################################################
 // Function Toggle_Articulation_Points
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Toggle_Linear_Muscles()
 {
     draw_linear_muscles=!draw_linear_muscles;
@@ -739,7 +741,7 @@ Toggle_Linear_Muscles()
 //#####################################################################
 // Function Toggle_Forces_And_Torques
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T,RW>::
+template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Toggle_Forces_And_Torques()
 {
     draw_forces_and_torques=!draw_forces_and_torques;
@@ -764,6 +766,6 @@ Bounding_Box() const
 }
 //#####################################################################
 namespace PhysBAM{
-template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<float,float>;
-template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<double,double>;
+template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<float>;
+template class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<double>;
 }

@@ -31,7 +31,7 @@ private:
     OPENGL_SELECTION<T>* current_selection;
 
 public:
-    OPENGL_SEGMENTED_CURVE_2D(const SEGMENTED_CURVE_2D<T>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan());
+    OPENGL_SEGMENTED_CURVE_2D(STREAM_TYPE stream_type,const SEGMENTED_CURVE_2D<T>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan());
 
     void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;

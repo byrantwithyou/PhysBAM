@@ -21,7 +21,7 @@ public:
     double width, height;
     OPENGL_TEXTURE *texture;
 
-    OPENGL_TEXTURED_RECT();
+    OPENGL_TEXTURED_RECT(STREAM_TYPE stream_type);
 
     void Set_Texture(OPENGL_TEXTURE *texture_input);
     void Display() const PHYSBAM_OVERRIDE;

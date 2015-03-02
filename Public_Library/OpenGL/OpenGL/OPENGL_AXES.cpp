@@ -10,9 +10,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_AXES<T>::
-OPENGL_AXES(const FRAME<TV>& frame_input,const RANGE<TV>& box_input,bool draw_box_input,
+OPENGL_AXES(STREAM_TYPE stream_type,const FRAME<TV>& frame_input,const RANGE<TV>& box_input,bool draw_box_input,
     bool draw_xz_grid_input,bool draw_xy_grid_input,bool draw_yz_grid_input,T grid_spacing_input)
-    :box(box_input),draw_box(draw_box_input),draw_xz_grid(draw_xz_grid_input),draw_xy_grid(draw_xy_grid_input),
+    :OPENGL_OBJECT<T>(stream_type),box(box_input),draw_box(draw_box_input),draw_xz_grid(draw_xz_grid_input),draw_xy_grid(draw_xy_grid_input),
     draw_yz_grid(draw_yz_grid_input),grid_spacing(grid_spacing_input)
 {
     *frame=frame_input;

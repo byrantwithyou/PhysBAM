@@ -17,13 +17,14 @@
 namespace PhysBAM
 {
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::World_Space_Box;
+    using OPENGL_COMPONENT<T>::stream_type;
     GRID<TV> grid,mac_grid,u_grid,v_grid,w_grid;
     ARRAY<VECTOR<bool,3>,VECTOR<int,3> > node_neighbors_visible;
     ARRAY<VECTOR<PAIR<bool,T>,4>,VECTOR<int,3> > face_corners_visible_from_face_center_u; // length 4, order is front bottom, front top, back bottom, back top
@@ -43,7 +44,7 @@ private:
     bool draw_face_corners_visible;
 
 public:
-    OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D(const GRID<TV> &grid,const std::string& directory);
+    OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string& directory);
     
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

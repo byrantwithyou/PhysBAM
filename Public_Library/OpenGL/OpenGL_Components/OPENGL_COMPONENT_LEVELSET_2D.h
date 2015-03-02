@@ -11,14 +11,14 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 namespace PhysBAM{
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_LEVELSET_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::stream_type;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input="");
+    OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset_filename_input,const std::string filename_set_input="");
     virtual ~OPENGL_COMPONENT_LEVELSET_2D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
@@ -53,7 +53,7 @@ public:
     
 private:
     void Reinitialize(const bool force_even_if_not_drawn=false);
-    template<class,class> friend class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D;
+    template<class> friend class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D;
 
 public:
     OPENGL_LEVELSET_2D<T>* opengl_levelset;

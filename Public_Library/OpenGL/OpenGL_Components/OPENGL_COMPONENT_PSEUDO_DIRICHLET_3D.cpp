@@ -11,16 +11,16 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T,RW>::
-OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D(const GRID<TV> &grid,const std::string &filename_input)
-    :OPENGL_COMPONENT<T>("Pseudo Dirichlet"),mac_grid(grid.Get_MAC_Grid()),velocity_scale(0.025),filename(filename_input),frame_loaded(-1),valid(false)
+template<class T> OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
+OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &filename_input)
+    :OPENGL_COMPONENT<T>(stream_type,"Pseudo Dirichlet"),mac_grid(grid.Get_MAC_Grid()),velocity_scale(0.025),filename(filename_input),frame_loaded(-1),valid(false)
 {
     is_animation = FILE_UTILITIES::Is_Animated(filename);
 }
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::Frame_File_Exists(filename, frame_input);
@@ -28,7 +28,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);
@@ -37,7 +37,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -46,7 +46,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Display() const
 {
     OPENGL_COLOR point_color=OPENGL_COLOR::White();
@@ -81,7 +81,7 @@ Display() const
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Reinitialize(bool force)
 {
     if(draw||force)
@@ -92,7 +92,7 @@ Reinitialize(bool force)
 
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(filename, frame);
             if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File<RW>(tmp_filename,pseudo_dirichlet_cells);
+                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,pseudo_dirichlet_cells);
             else
                 return;
 
@@ -104,7 +104,7 @@ Reinitialize(bool force)
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Bounding_Box() const
 {
     if(valid && draw) return RANGE<VECTOR<T,3> >(mac_grid.domain);
@@ -113,7 +113,7 @@ Bounding_Box() const
 //#####################################################################
 // Bounding_Box
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const
 {
     if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && Is_Up_To_Date(frame)){
@@ -126,7 +126,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_se
 //#####################################################################
 // Function Set_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Set_Vector_Size(const T vector_size)
 {
     velocity_scale=vector_size;
@@ -134,7 +134,7 @@ Set_Vector_Size(const T vector_size)
 //#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Increase_Vector_Size()
 {
     velocity_scale*=(T)1.1;
@@ -142,13 +142,13 @@ Increase_Vector_Size()
 //#####################################################################
 // Function Decrease_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Decrease_Vector_Size()
 {
     velocity_scale/=(T)1.1;
 }
 //#####################################################################
 namespace PhysBAM{
-template class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<float,float>;
-template class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<double,double>;
+template class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<float>;
+template class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<double>;
 }

@@ -20,15 +20,15 @@ using namespace PhysBAM;
 //#####################################################################
 // Function OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
-OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const std::string& prefix,const int start_frame)
-    :OPENGL_COMPONENT<T>("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),hide_unselected(false),display_mode(0),display_relative_velocity_mode(0),number_of_segmented_curve(1),
+template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
+OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame)
+    :OPENGL_COMPONENT<T>(stream_type,"Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),hide_unselected(false),display_mode(0),display_relative_velocity_mode(0),number_of_segmented_curve(1),
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
     display_hard_bound_surface_mode(0),display_forces_mode(0),interaction_pair_display_mode(0),
     collision_body_list(*new COLLISION_BODY_COLLECTION<TV>),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),real_selection(0),
     has_tetrahedralized_volumes(false),has_hexahedralized_volumes(false),
-    velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,false,false),
+    velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,false,false),
     color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
     has_embedded_objects(false),has_soft_bindings(false)
 {
@@ -54,7 +54,7 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const std::string& prefix,const i
 //#####################################################################
 // Function ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D()
 {
     delete color_map;
@@ -72,7 +72,7 @@ template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>:
 //#####################################################################
 // Function Initialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Initialize()
 {
     draw_velocity_vectors=false;
@@ -80,7 +80,7 @@ Initialize()
 //#####################################################################
 // Function Set_Material
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Set_Material(const int object,const OPENGL_MATERIAL& front_material,const OPENGL_MATERIAL& back_material)
 {
     if(triangulated_surface_objects(object)){
@@ -95,7 +95,7 @@ Set_Material(const int object,const OPENGL_MATERIAL& front_material,const OPENGL
 //#####################################################################
 // Function Set_All_Materials
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Set_All_Materials(const OPENGL_MATERIAL& meshfront,const OPENGL_MATERIAL& front_material,const OPENGL_MATERIAL& back_material)
 {
     for(int i=0;i<deformable_body_collection.structures.m;i++) Set_Material(i,front_material,back_material);
@@ -103,7 +103,7 @@ Set_All_Materials(const OPENGL_MATERIAL& meshfront,const OPENGL_MATERIAL& front_
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Reinitialize(bool force,bool read_geometry)
 {
     if(!(draw && (force || (is_animation && frame_loaded!=frame) || (!is_animation && frame_loaded<0)))) return;
@@ -112,16 +112,16 @@ Reinitialize(bool force,bool read_geometry)
     std::string static_frame_string=frame_string;
     int static_frame=FILE_UTILITIES::File_Exists(frame_string+"deformable_object_structures")?frame:-1;
     bool read_static_variables=static_frame!=-1 || first_time || !deformable_body_collection.structures.m;
-    if(read_geometry) deformable_body_collection.Read(STREAM_TYPE(RW()),prefix,prefix,frame,static_frame,read_static_variables,true);
+    if(read_geometry) deformable_body_collection.Read(stream_type,prefix,prefix,frame,static_frame,read_static_variables,true);
     if(FILE_UTILITIES::File_Exists(frame_string+"/interaction_pairs") && interaction_pair_display_mode)
-        FILE_UTILITIES::Read_From_File(STREAM_TYPE(RW()),frame_string+"/interaction_pairs",point_triangle_interaction_pairs,edge_edge_interaction_pairs);
+        FILE_UTILITIES::Read_From_File(stream_type,frame_string+"/interaction_pairs",point_triangle_interaction_pairs,edge_edge_interaction_pairs);
     else{
         point_triangle_interaction_pairs.Remove_All();edge_edge_interaction_pairs.Remove_All();}
     
     std::string filename=frame_string+"/deformable_object_force_data";
     if(FILE_UTILITIES::File_Exists(filename)){
         if(first_time) LOG::cout<<"reading "<<filename<<std::endl;
-        FILE_UTILITIES::Read_From_File(STREAM_TYPE(RW()),filename,force_data_list);}
+        FILE_UTILITIES::Read_From_File(stream_type,filename,force_data_list);}
     else force_data_list.Remove_All();
 
     if(read_static_variables){
@@ -140,7 +140,7 @@ Reinitialize(bool force,bool read_geometry)
             STRUCTURE<TV>* structure=deformable_body_collection.structures(i);
             if(SEGMENTED_CURVE<TV>* segmented_curve=dynamic_cast<SEGMENTED_CURVE<TV>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": segmented curve\n";
-                segmented_curve_objects(i)=new OPENGL_SEGMENTED_CURVE_3D<T>(*segmented_curve,OPENGL_COLOR((T).5,(T).25,0));
+                segmented_curve_objects(i)=new OPENGL_SEGMENTED_CURVE_3D<T>(stream_type,*segmented_curve,OPENGL_COLOR((T).5,(T).25,0));
                 segmented_curve_objects(i)->use_solid_color=false;}
             else if(TRIANGULATED_SURFACE<T>* triangulated_surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(structure)){
                 if(first_time && triangulated_surface->mesh.elements.m)
@@ -150,44 +150,44 @@ Reinitialize(bool force,bool read_geometry)
                 ARRAY<OPENGL_COLOR> front_colors,back_colors;
                 front_colors.Append(OPENGL_COLOR::Yellow());back_colors.Append(OPENGL_COLOR::Magenta());
                 front_colors.Append(OPENGL_COLOR::Green());back_colors.Append(OPENGL_COLOR::Cyan());
-                triangulated_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(*triangulated_surface,false,
+                triangulated_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,*triangulated_surface,false,
                     OPENGL_MATERIAL::Metal(front_colors(i%front_colors.Size())),OPENGL_MATERIAL::Metal(back_colors(i%back_colors.Size())));}
             else if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(structure)){
                 if(first_time && tetrahedralized_volume->mesh.elements.m)
                     LOG::cout<<"object "<<i<<": tetrahedralized_volume, range = "<<tetrahedralized_volume->mesh.elements.Flattened().Min()<<" "<<tetrahedralized_volume->mesh.elements.Flattened().Max()<<"\n";
                 else LOG::cout<<"object "<<i<<": tetrahedralized_volume, empty\n";
-                tetrahedralized_volume_objects(i)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&tetrahedralized_volume->mesh,&(deformable_body_collection.particles),
+                tetrahedralized_volume_objects(i)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(stream_type,&tetrahedralized_volume->mesh,&(deformable_body_collection.particles),
                     OPENGL_MATERIAL::Metal(OPENGL_COLOR::Red(.7f)),OPENGL_MATERIAL::Metal(OPENGL_COLOR::Green(.7f)));}
             else if(HEXAHEDRALIZED_VOLUME<T>* hexahedralized_volume=dynamic_cast<HEXAHEDRALIZED_VOLUME<T>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": hexahedralized_volume\n";
-                hexahedralized_volume_objects(i)=new OPENGL_HEXAHEDRALIZED_VOLUME<T>(&hexahedralized_volume->mesh,&(deformable_body_collection.particles),
+                hexahedralized_volume_objects(i)=new OPENGL_HEXAHEDRALIZED_VOLUME<T>(stream_type,&hexahedralized_volume->mesh,&(deformable_body_collection.particles),
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Matte(OPENGL_COLOR::Green()));}
             else if(FREE_PARTICLES<TV>* fp=dynamic_cast<FREE_PARTICLES<TV>*>(structure)){
                 free_particles_indirect_arrays(i)=new INDIRECT_ARRAY<ARRAY_VIEW<TV> >(deformable_body_collection.particles.X,fp->nodes);
-                free_particles_objects(i)=new OPENGL_FREE_PARTICLES<TV>(deformable_body_collection,*free_particles_indirect_arrays(i),color_map->Lookup(color_map_index--));}
+                free_particles_objects(i)=new OPENGL_FREE_PARTICLES<TV>(stream_type,deformable_body_collection,*free_particles_indirect_arrays(i),color_map->Lookup(color_map_index--));}
             if(EMBEDDED_MATERIAL_SURFACE<TV,2>* embedding=dynamic_cast<EMBEDDED_MATERIAL_SURFACE<TV,2>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": embedded triangulated surface\n";
-                boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(embedding->material_surface,false,
+                boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,embedding->material_surface,false,
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Yellow()),OPENGL_MATERIAL::Matte(OPENGL_COLOR::Cyan()));
-                hard_bound_boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(Create_Hard_Bound_Boundary_Surface(embedding->material_surface),false,
+                hard_bound_boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,Create_Hard_Bound_Boundary_Surface(embedding->material_surface),false,
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Magenta(.5f)));
                 embedding->embedded_object.simplicial_object.mesh.Initialize_Segment_Mesh();
-                triangulated_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(embedding->embedded_object.simplicial_object,false,
+                triangulated_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,embedding->embedded_object.simplicial_object,false,
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()));}
             else if(EMBEDDED_MATERIAL_SURFACE<TV,3>* embedding=dynamic_cast<EMBEDDED_MATERIAL_SURFACE<TV,3>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": embedded tetrahedralized volume\n";
-                boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(embedding->material_surface,false);
-                embedded_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(embedding->embedded_object.embedded_object,false,
+                boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,embedding->material_surface,false);
+                embedded_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,embedding->embedded_object.embedded_object,false,
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()));
-                hard_bound_boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(Create_Hard_Bound_Boundary_Surface(embedding->material_surface),false,
+                hard_bound_boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,Create_Hard_Bound_Boundary_Surface(embedding->material_surface),false,
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Magenta(.5f)));
                 embedding->embedded_object.simplicial_object.mesh.Initialize_Neighbor_Nodes();
-                tetrahedralized_volume_objects(i)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&embedding->embedded_object.simplicial_object.mesh,
+                tetrahedralized_volume_objects(i)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(stream_type,&embedding->embedded_object.simplicial_object.mesh,
                     &deformable_body_collection.particles,OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Matte(OPENGL_COLOR::Green()));}
             else if(EMBEDDING<TV>* embedding=dynamic_cast<EMBEDDING<TV>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": embedding\n";
-                boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(embedding->material_surface,false);
-                hard_bound_boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(Create_Hard_Bound_Boundary_Surface(embedding->material_surface),false,
+                boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,embedding->material_surface,false);
+                hard_bound_boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,Create_Hard_Bound_Boundary_Surface(embedding->material_surface),false,
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Magenta(.5f)));}
             else{if(first_time) LOG::cout<<"object "<<i<<": object unrecognized\n";}}}
 
@@ -201,16 +201,16 @@ Reinitialize(bool force,bool read_geometry)
 #endif
         if(tetrahedralized_volume_objects(i)){
             std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/subset_%d",prefix.c_str(),frame,i);
-            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File<RW>(filename,tetrahedralized_volume_objects(i)->subset);
+            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File(stream_type,filename,tetrahedralized_volume_objects(i)->subset);
             filename=STRING_UTILITIES::string_sprintf("%s/%d/colliding_nodes_%d",prefix.c_str(),frame,i);
-            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File<RW>(filename,tetrahedralized_volume_objects(i)->subset_particles);}
+            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File(stream_type,filename,tetrahedralized_volume_objects(i)->subset_particles);}
         else if(hexahedralized_volume_objects(i)){
             std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/subset_%d",prefix.c_str(),frame,i);
-            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File<RW>(filename,hexahedralized_volume_objects(i)->subset);
+            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File(stream_type,filename,hexahedralized_volume_objects(i)->subset);
             filename=STRING_UTILITIES::string_sprintf("%s/%d/colliding_nodes_%d",prefix.c_str(),frame,i);
-            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File<RW>(filename,hexahedralized_volume_objects(i)->subset_particles);
+            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File(stream_type,filename,hexahedralized_volume_objects(i)->subset_particles);
             filename=STRING_UTILITIES::string_sprintf("%s/%d/directions_%d",prefix.c_str(),frame,i);
-            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File<RW>(filename,hexahedralized_volume_objects(i)->vectors_at_hex_centers);}}
+            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File(stream_type,filename,hexahedralized_volume_objects(i)->vectors_at_hex_centers);}}
     if(smooth_shading){
         for(int i=0;i<triangulated_surface_objects.m;i++) if(triangulated_surface_objects(i)) triangulated_surface_objects(i)->Initialize_Vertex_Normals();
         for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i))tetrahedralized_volume_objects(i)->Initialize_Vertex_Normals();
@@ -230,7 +230,7 @@ Reinitialize(bool force,bool read_geometry)
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/deformable_object_particles",prefix.c_str(),frame_input));
@@ -238,7 +238,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);Reinitialize();
@@ -246,7 +246,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -257,7 +257,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Draw_All_Objects
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Draw_All_Objects()
 {
     Set_Draw(true);
@@ -265,7 +265,7 @@ Draw_All_Objects()
 //#####################################################################
 // Function Set_Display_Modes
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Set_Display_Modes(bool& display_triangulated_surface_objects,bool& display_tetrahedralized_volume_objects,
         bool& display_hexahedralized_volume_objects,bool& display_free_particles_objects,bool& display_boundary_surface_objects,
         bool& display_hard_bound_boundary_surface_objects) const
@@ -294,7 +294,7 @@ Set_Display_Modes(bool& display_triangulated_surface_objects,bool& display_tetra
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Display() const
 {
     if(!draw || !valid) return;
@@ -423,7 +423,7 @@ Display() const
 //#####################################################################
 // Function Cycle_Display_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Cycle_Display_Mode()
 {
     display_mode=(display_mode+1)%4;
@@ -432,7 +432,7 @@ Cycle_Display_Mode()
 //#####################################################################
 // Function Cycle_Cutaway_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Cycle_Cutaway_Mode()
 {
     for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))tetrahedralized_volume_objects(i)->Cycle_Cutaway_Mode();
@@ -440,7 +440,7 @@ Cycle_Cutaway_Mode()
 //#####################################################################
 // Function Show_Only_First
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Show_Only_First()
 {
     active_list.Fill(false);
@@ -450,7 +450,7 @@ Show_Only_First()
 //#####################################################################
 // Function Decrease_Cutaway_Fraction
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Decrease_Cutaway_Fraction()
 {
     for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))tetrahedralized_volume_objects(i)->Decrease_Cutaway_Fraction();
@@ -458,7 +458,7 @@ Decrease_Cutaway_Fraction()
 //#####################################################################
 // Function Increase_Cutaway_Fraction
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Increase_Cutaway_Fraction()
 {
     for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))tetrahedralized_volume_objects(i)->Increase_Cutaway_Fraction();
@@ -466,7 +466,7 @@ Increase_Cutaway_Fraction()
 //#####################################################################
 // Function Create_One_Big_Triangulated_Surface_And_Write_To_File
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Create_One_Big_Triangulated_Surface_And_Write_To_File()
 {
     GEOMETRY_PARTICLES<VECTOR<T,3> >& particles=deformable_body_collection.particles;TRIANGLE_MESH mesh;
@@ -485,7 +485,7 @@ Create_One_Big_Triangulated_Surface_And_Write_To_File()
 //#####################################################################
 // Function Use_Bounding_Box
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Use_Bounding_Box() const
 {
     return draw && valid && deformable_body_collection.structures.m>0;
@@ -493,7 +493,7 @@ Use_Bounding_Box() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Bounding_Box() const
 {
     RANGE<VECTOR<T,3> > box=RANGE<VECTOR<T,3> >::Empty_Box();
@@ -509,7 +509,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Highlight_Particle
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Highlight_Particle()
 {
     OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Particle Number: ",Highlight_Particle_Response_CB());
@@ -517,7 +517,7 @@ Highlight_Particle()
 //#####################################################################
 // Function Toggle_Active_Value
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Active_Value()
 {
     OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Component Number: ",Toggle_Active_Value_Response_CB());
@@ -525,7 +525,7 @@ Toggle_Active_Value()
 //#####################################################################
 // Function Toggle_Hide_Unselected
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Hide_Unselected()
 {
     if(real_selection) hide_unselected=!hide_unselected;
@@ -533,7 +533,7 @@ Toggle_Hide_Unselected()
 //#####################################################################
 // Function Toggle_Draw_Interior
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Draw_Interior()
 {
     for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i)) tetrahedralized_volume_objects(i)->Toggle_Boundary_Only();
@@ -542,7 +542,7 @@ Toggle_Draw_Interior()
 //#####################################################################
 // Function Toggle_Draw_Subsets
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Draw_Subsets()
 {
     for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))
@@ -553,7 +553,7 @@ Toggle_Draw_Subsets()
 //#####################################################################
 // Function Toggle_Use_Active_List
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Use_Active_List()
 {
     if(active_list.m<1) return;
@@ -564,7 +564,7 @@ Toggle_Use_Active_List()
 //#####################################################################
 // Function Select_Segment
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Selection_Mode()
 {
     if(!real_selection) return;
@@ -583,7 +583,7 @@ Toggle_Selection_Mode()
 //#####################################################################
 // Function Increment_Active_Object
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Increment_Active_Object()
 {
     if(active_list.m<1 || !use_active_list) return;
@@ -595,7 +595,7 @@ Increment_Active_Object()
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* selection=0;
@@ -617,7 +617,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
 //#####################################################################
 // Function Set_Selection
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Set_Selection(OPENGL_SELECTION<T>* selection)
 {
     if(selection->type!=OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D) return;
@@ -626,7 +626,7 @@ Set_Selection(OPENGL_SELECTION<T>* selection)
 //#####################################################################
 // Function Highlight_Selection
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Highlight_Selection(OPENGL_SELECTION<T>* selection)
 {
     if(selection->type!=OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D) return;
@@ -639,7 +639,7 @@ Highlight_Selection(OPENGL_SELECTION<T>* selection)
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Clear_Highlight()
 {
     for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i) && active_list(i)) segmented_curve_objects(i)->Clear_Highlight();
@@ -656,7 +656,7 @@ Clear_Highlight()
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const
 {
     if(selection && selection->type==OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D && selection->object==this){
@@ -667,7 +667,7 @@ Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection
 //#####################################################################
 // Function Toggle_Active_Value_Response
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Active_Value_Response()
 {
     bool start_val=true;
@@ -683,7 +683,7 @@ Toggle_Active_Value_Response()
 //#####################################################################
 // Function Highlight_Particle_Response
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Highlight_Particle_Response()
 {
     if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
@@ -704,7 +704,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Set_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Set_Vector_Size(double size)
 {
     velocity_field.size=size;
@@ -712,7 +712,7 @@ Set_Vector_Size(double size)
 //#####################################################################
 // Function Toggle_Velocity_Vectors
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Velocity_Vectors()
 {
     draw_velocity_vectors=!draw_velocity_vectors;
@@ -721,7 +721,7 @@ Toggle_Velocity_Vectors()
 //#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Increase_Vector_Size()
 {
     velocity_field.Scale_Vector_Size(1.1);
@@ -729,7 +729,7 @@ Increase_Vector_Size()
 //#####################################################################
 // Function Decrease_Vector_Size
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Decrease_Vector_Size()
 {
     velocity_field.Scale_Vector_Size(1/1.1);
@@ -737,7 +737,7 @@ Decrease_Vector_Size()
 //#####################################################################
 // Function Update_Object_Labels
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Update_Velocity_Field()
 {
     if(!draw_velocity_vectors) return;
@@ -771,7 +771,7 @@ Update_Velocity_Field()
 //#####################################################################
 // Function Cycle_Relative_Velocity_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Cycle_Relative_Velocity_Mode()
 {
     display_relative_velocity_mode=(display_relative_velocity_mode+1)%number_of_segmented_curve;
@@ -779,7 +779,7 @@ Cycle_Relative_Velocity_Mode()
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class RW> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
 {
     if(old_selection && old_selection->object==this && invalidate_deformable_objects_selection_each_frame) delete_selection=true;
@@ -788,7 +788,7 @@ Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selectio
 //#####################################################################
 // Function Toggle_Differentiate_Inverted
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Differentiate_Inverted()
 {
     for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i)) tetrahedralized_volume_objects(i)->Toggle_Differentiate_Inverted();
@@ -797,7 +797,7 @@ Toggle_Differentiate_Inverted()
 //#####################################################################
 // Function Create_Hard_Bound_Boundary_Surface
 //#####################################################################
-template<class T,class RW> TRIANGULATED_SURFACE<T>& OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> TRIANGULATED_SURFACE<T>& OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Create_Hard_Bound_Boundary_Surface(TRIANGULATED_SURFACE<T>& boundary_surface)
 {
     TRIANGULATED_SURFACE<T>& hard_bound_boundary_surface=*TRIANGULATED_SURFACE<T>::Create(boundary_surface.particles);
@@ -811,7 +811,7 @@ Create_Hard_Bound_Boundary_Surface(TRIANGULATED_SURFACE<T>& boundary_surface)
 //#####################################################################
 // Function Cycle_Hard_Bound_Surface_Display_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Cycle_Hard_Bound_Surface_Display_Mode()
 {
     display_hard_bound_surface_mode=(display_hard_bound_surface_mode+1)%3;
@@ -820,7 +820,7 @@ Cycle_Hard_Bound_Surface_Display_Mode()
 //#####################################################################
 // Function Cycle_Forces_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Cycle_Forces_Mode()
 {
     display_forces_mode=(display_forces_mode+1)%6;
@@ -834,17 +834,17 @@ Cycle_Forces_Mode()
 //#####################################################################
 // Function Cycle_Interaction_Pair_Display_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Cycle_Interaction_Pair_Display_Mode()
 {
     if(!interaction_pair_display_mode && !point_triangle_interaction_pairs.m && !edge_edge_interaction_pairs.m){
         std::string file=STRING_UTILITIES::string_sprintf("%s/%d/interaction_pairs",prefix.c_str(),frame);
         if(FILE_UTILITIES::File_Exists(file))
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(RW()),file,point_triangle_interaction_pairs,edge_edge_interaction_pairs);}
+            FILE_UTILITIES::Read_From_File(stream_type,file,point_triangle_interaction_pairs,edge_edge_interaction_pairs);}
     interaction_pair_display_mode=(interaction_pair_display_mode+1)%4;
 }
 //#####################################################################
 namespace PhysBAM{
-template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<float,float>;
-template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<double,double>;
+template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<float>;
+template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<double>;
 }

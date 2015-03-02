@@ -24,7 +24,7 @@ class OPENGL_FREE_PARTICLES:public OPENGL_POLICY<TV_input>::OPENGL_POINTS
 public:
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
 
-    OPENGL_FREE_PARTICLES(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,INDIRECT_ARRAY<ARRAY_VIEW<TV> >& points,const OPENGL_COLOR& color=OPENGL_COLOR::White(),const T point_size=5);
+    OPENGL_FREE_PARTICLES(STREAM_TYPE stream_type,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,INDIRECT_ARRAY<ARRAY_VIEW<TV> >& points,const OPENGL_COLOR& color=OPENGL_COLOR::White(),const T point_size=5);
     ~OPENGL_FREE_PARTICLES(){}
 
 //#####################################################################

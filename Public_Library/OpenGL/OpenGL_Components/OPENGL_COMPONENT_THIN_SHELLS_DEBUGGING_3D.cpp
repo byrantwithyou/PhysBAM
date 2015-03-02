@@ -10,11 +10,11 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
-OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D(const GRID<TV> &grid,const std::string& directory)
-    :OPENGL_COMPONENT<T>("Thin Shells Debugging"),grid(grid),
+template<class T> OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
+OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string& directory)
+    :OPENGL_COMPONENT<T>(stream_type,"Thin Shells Debugging"),grid(grid),
     invalid_color_map(OPENGL_COLOR::Red()),
-    opengl_density_valid_mask(grid,density_valid_mask,&invalid_color_map,OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS),
+    opengl_density_valid_mask(stream_type,grid,density_valid_mask,&invalid_color_map,OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS),
     directory(directory),frame_loaded(-1),valid(false),
     draw_density_valid_mask(false),draw_node_neighbors_visible(false),draw_face_corners_visible(false)
 {
@@ -27,7 +27,7 @@ OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D(const GRID<TV> &grid,const std::string
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
+template<class T> bool OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
 Valid_Frame(int frame_input) const
 {
     // TODO: make more accurate
@@ -36,7 +36,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);
@@ -45,7 +45,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -54,7 +54,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
 Display() const
 {
     OPENGL_COLOR node_neighbor_not_visible_color=OPENGL_COLOR::Magenta(0.5,0.5);
@@ -114,7 +114,7 @@ Display() const
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
 Reinitialize(bool force)
 {
     if(force || (draw && (!valid || (is_animation && (frame_loaded != frame)) || (!is_animation && (frame_loaded < 0)))))
@@ -124,13 +124,13 @@ Reinitialize(bool force)
         if(draw_node_neighbors_visible || draw_face_corners_visible){
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/thin_shells_grid_visibility",frame);
             if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File<RW>(tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v,face_corners_visible_from_face_center_w);
+                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v,face_corners_visible_from_face_center_w);
         }
 
         if(draw_density_valid_mask){
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/density_valid_mask",frame);
             if(FILE_UTILITIES::File_Exists(tmp_filename)){
-                FILE_UTILITIES::Read_From_File<RW>(tmp_filename,density_valid_mask);
+                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,density_valid_mask);
                 for(RANGE_ITERATOR<TV::m> it(density_valid_mask.domain);it.Valid();it.Next())
                     density_valid_mask(it.index)=!density_valid_mask(it.index); // negate
                 opengl_density_valid_mask.Update();}
@@ -144,7 +144,7 @@ Reinitialize(bool force)
 //#####################################################################
 // Function Toggle_Draw_Grid_Visibility_Mode
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
 Toggle_Draw_Grid_Visibility_Mode()
 {
     int mode=((int)draw_node_neighbors_visible<<1) + ((int)draw_face_corners_visible);
@@ -156,7 +156,7 @@ Toggle_Draw_Grid_Visibility_Mode()
 //#####################################################################
 // Function Toggle_Draw_Density_Valid_Mask
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
 Toggle_Draw_Density_Valid_Mask()
 {
     draw_density_valid_mask=!draw_density_valid_mask;
@@ -165,7 +165,7 @@ Toggle_Draw_Density_Valid_Mask()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
 Bounding_Box() const
 {
     if(valid && draw) return World_Space_Box(grid.domain);
@@ -174,7 +174,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Set_Slice
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
 Set_Slice(OPENGL_SLICE *slice_input)
 {
     slice=slice_input;
@@ -183,12 +183,12 @@ Set_Slice(OPENGL_SLICE *slice_input)
 //#####################################################################
 // Function Slice_Has_Changed
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T,RW>::
+template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
 Slice_Has_Changed()
 {
     opengl_density_valid_mask.Slice_Has_Changed();
 }
 namespace PhysBAM{
-template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<float,float>;
-template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<double,double>;
+template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<float>;
+template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<double>;
 }

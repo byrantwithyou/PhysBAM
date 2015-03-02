@@ -13,8 +13,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_SEGMENTED_CURVE_2D<T>::
-OPENGL_SEGMENTED_CURVE_2D(const SEGMENTED_CURVE_2D<T>& curve_input,const OPENGL_COLOR &color_input)
-    :curve(curve_input),color(color_input),
+OPENGL_SEGMENTED_CURVE_2D(STREAM_TYPE stream_type,const SEGMENTED_CURVE_2D<T>& curve_input,const OPENGL_COLOR &color_input)
+    :OPENGL_OBJECT<T>(stream_type),curve(curve_input),color(color_input),
     vertex_color(OPENGL_COLOR::Green(0.9)),vertex_position_color(OPENGL_COLOR::Magenta()),velocity_color(OPENGL_COLOR::Cyan()),
     draw_vertices(false),draw_velocities(false),velocity_scale(0.025),current_selection(0)
 {}

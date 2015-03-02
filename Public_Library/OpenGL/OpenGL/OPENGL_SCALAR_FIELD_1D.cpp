@@ -11,8 +11,8 @@ using namespace PhysBAM;
 // Function OPENGL_SCALAR_FIELD_1D
 //#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_1D<T,T2>::
-OPENGL_SCALAR_FIELD_1D(const GRID<TV>& grid,ARRAY<T2,VECTOR<int,1> >& values,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
-    :grid(grid),values(values),point_color(point_color),line_color(line_color),scale(1)
+OPENGL_SCALAR_FIELD_1D(STREAM_TYPE stream_type,const GRID<TV>& grid,ARRAY<T2,VECTOR<int,1> >& values,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
+    :OPENGL_OBJECT<T>(stream_type),grid(grid),values(values),point_color(point_color),line_color(line_color),scale(1)
 {}
 //#####################################################################
 // Function OPENGL_SCALAR_FIELD_1D

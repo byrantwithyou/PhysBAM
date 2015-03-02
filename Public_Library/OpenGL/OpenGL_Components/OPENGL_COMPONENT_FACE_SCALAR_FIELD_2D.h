@@ -12,7 +12,7 @@
 
 namespace PhysBAM{
 
-template<class T,class T2=T,class RW=T>
+template<class T,class T2=T>
 class OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
@@ -28,8 +28,9 @@ private:
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
-    OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(const GRID<TV> &grid_input,const std::string &x_face_values_filename_input,const std::string &y_face_values_filename_input,
+    using OPENGL_COMPONENT<T>::stream_type;
+    OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
+    OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &x_face_values_filename_input,const std::string &y_face_values_filename_input,
         OPENGL_COLOR_MAP<T2>* color_map_input);
     virtual ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D();
 

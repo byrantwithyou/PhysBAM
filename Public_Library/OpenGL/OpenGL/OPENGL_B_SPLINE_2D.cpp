@@ -13,8 +13,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,int d> OPENGL_B_SPLINE_2D<T,d>::
-OPENGL_B_SPLINE_2D(const B_SPLINE<TV,d>& curve_input,const OPENGL_COLOR &color_input)
-    :BASE(bezier_version,color_input),bezier_version(),curve(curve_input)
+OPENGL_B_SPLINE_2D(STREAM_TYPE stream_type,const B_SPLINE<TV,d>& curve_input,const OPENGL_COLOR &color_input)
+    :BASE(stream_type,bezier_version,color_input),bezier_version(),curve(curve_input)
 {
     Fill_Bezier<TV>(bezier_version,curve);
 }

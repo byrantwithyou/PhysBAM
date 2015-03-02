@@ -13,7 +13,7 @@
 namespace PhysBAM
 {
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD:public OPENGL_COMPONENT<T>
 {
 public:
@@ -25,7 +25,8 @@ private:
 
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(TRIANGULATED_AREA<T>& triangulated_area,const std::string &vector_field_filename_input);
+    using OPENGL_COMPONENT<T>::stream_type;
+    OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(STREAM_TYPE stream_type,TRIANGULATED_AREA<T>& triangulated_area,const std::string &vector_field_filename_input);
     virtual ~OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;

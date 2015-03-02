@@ -19,8 +19,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
-OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,DRAW_MODE draw_mode_input)
-    : grid(grid_input),values(values_input),active_cells(0),draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),scale_range(false)
+OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,DRAW_MODE draw_mode_input)
+    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),active_cells(0),draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),scale_range(false)
 {
     PHYSBAM_ASSERT(color_map_input);
     Initialize_Color_Maps(color_map_input);
@@ -30,8 +30,8 @@ OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_inp
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
-OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,ARRAY<bool,VECTOR<int,2> >* active_cells_input,DRAW_MODE draw_mode_input)
-    : grid(grid_input),values(values_input),active_cells(active_cells_input),draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),scale_range(false)
+OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,ARRAY<bool,VECTOR<int,2> >* active_cells_input,DRAW_MODE draw_mode_input)
+    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),active_cells(active_cells_input),draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),scale_range(false)
 {
     PHYSBAM_ASSERT(color_map_input);
     Initialize_Color_Maps(color_map_input);
@@ -242,9 +242,9 @@ Set_Draw_Mode(DRAW_MODE draw_mode_input)
     }
 
     if(draw_mode==DRAW_TEXTURE) {
-        if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT<T>;
+        if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT<T>(stream_type);
     } else if(draw_mode==DRAW_POINTS) {
-        if(!opengl_points) opengl_points=new OPENGL_POINTS_2D<T>(*new ARRAY<VECTOR<T,2> >);
+        if(!opengl_points) opengl_points=new OPENGL_POINTS_2D<T>(stream_type,*new ARRAY<VECTOR<T,2> >);
     }
 
     Update();
@@ -392,7 +392,7 @@ Update_Contour_Curves()
         for(int i=0;i<contour_values.m;i++){
             SEGMENTED_CURVE_2D<float>& sc=*SEGMENTED_CURVE_2D<float>::Create();
             MARCHING_CUBES<TV>::Create_Surface(sc,grid,scalar_field_as_levelset.phi,contour_values(i));
-            contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<float>(sc,color_map->Lookup(Pre_Map_Value(contour_values(i))));}}
+            contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<float>(stream_type,sc,color_map->Lookup(Pre_Map_Value(contour_values(i))));}}
     else contour_curves.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
@@ -409,7 +409,7 @@ Update_Contour_Curves()
         for(int i=0;i<contour_values.m;i++){
             SEGMENTED_CURVE_2D<double>& sc=*SEGMENTED_CURVE_2D<double>::Create();
             MARCHING_CUBES<TV>::Create_Surface(sc,grid,scalar_field_as_levelset.phi,contour_values(i));
-            contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<double>(sc,color_map->Lookup(Pre_Map_Value(contour_values(i))));}}
+            contour_curves(i)=new OPENGL_SEGMENTED_CURVE_2D<double>(stream_type,sc,color_map->Lookup(Pre_Map_Value(contour_values(i))));}}
     else contour_curves.Delete_Pointers_And_Clean_Memory();
 }
 

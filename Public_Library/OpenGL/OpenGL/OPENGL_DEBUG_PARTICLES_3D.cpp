@@ -13,8 +13,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_DEBUG_PARTICLES_3D<T>::
-OPENGL_DEBUG_PARTICLES_3D(GEOMETRY_PARTICLES<TV>& particle_input,ARRAY<DEBUG_OBJECT<TV> >& debug_objects_input,const OPENGL_COLOR& color_input)
-    :particles(particle_input),debug_objects(debug_objects_input),default_color(color_input),velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),draw_velocities(false),scale_velocities((T).025),wireframe_only(false)
+OPENGL_DEBUG_PARTICLES_3D(STREAM_TYPE stream_type,GEOMETRY_PARTICLES<TV>& particle_input,ARRAY<DEBUG_OBJECT<TV> >& debug_objects_input,const OPENGL_COLOR& color_input)
+    :OPENGL_OBJECT<T>(stream_type),particles(particle_input),debug_objects(debug_objects_input),default_color(color_input),velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),draw_velocities(false),scale_velocities((T).025),wireframe_only(false)
 {}
 //#####################################################################
 // Destructor

@@ -17,7 +17,7 @@ namespace PhysBAM
 {
 template<class TV> class GRID;
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;
@@ -32,7 +32,8 @@ private:
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D(const GRID<TV> &grid,const std::string &filename_input);
+    using OPENGL_COMPONENT<T>::stream_type;
+    OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &filename_input);
     
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

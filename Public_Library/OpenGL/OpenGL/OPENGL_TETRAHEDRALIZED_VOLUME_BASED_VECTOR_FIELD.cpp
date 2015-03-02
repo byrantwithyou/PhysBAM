@@ -10,8 +10,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>::
-OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume, ARRAY<TV>& V)
-    :OPENGL_VECTOR_FIELD_3D<T>(*(new ARRAY<TV>),*(new ARRAY<TV>)),tetrahedralized_volume(tetrahedralized_volume),V(V)
+OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD(STREAM_TYPE stream_type,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume, ARRAY<TV>& V)
+    :OPENGL_VECTOR_FIELD_3D<T>(stream_type,*(new ARRAY<TV>),*(new ARRAY<TV>)),tetrahedralized_volume(tetrahedralized_volume),V(V)
 {}
 //#####################################################################
 // Destructor

@@ -32,7 +32,7 @@ public:
     {scale=scale*scale_input;}
 
 //#####################################################################
-    OPENGL_FACE_SCALAR_FIELD_1D(const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<1> > &face_values_input,OPENGL_COLOR point_color_input,OPENGL_COLOR line_color_input);
+    OPENGL_FACE_SCALAR_FIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<1> > &face_values_input,OPENGL_COLOR point_color_input,OPENGL_COLOR line_color_input);
     virtual ~OPENGL_FACE_SCALAR_FIELD_1D();
     void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;

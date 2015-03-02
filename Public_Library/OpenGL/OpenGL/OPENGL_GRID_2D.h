@@ -37,8 +37,8 @@ private:
     int frame;
 
 public:
-    OPENGL_GRID_2D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White(),const std::string basedir_input="",const int frame_input=0)
-        :grid(grid_input),active_cell_mask(0),ghost_cell_mask(0),active_face_mask(0),ghost_face_mask(0),active_node_mask(0),ghost_node_mask(0),color(color_input),draw(true),draw_ghost_values(true),draw_mask_type(0),current_selection(0),basedir(basedir_input),frame(frame_input)
+    OPENGL_GRID_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White(),const std::string basedir_input="",const int frame_input=0)
+        :OPENGL_OBJECT<T>(stream_type),grid(grid_input),active_cell_mask(0),ghost_cell_mask(0),active_face_mask(0),ghost_face_mask(0),active_node_mask(0),ghost_node_mask(0),color(color_input),draw(true),draw_ghost_values(true),draw_mask_type(0),current_selection(0),basedir(basedir_input),frame(frame_input)
     {Reinitialize();}
 
     void Display() const PHYSBAM_OVERRIDE;

@@ -10,9 +10,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_VECTOR_FIELD_3D<T>::
-OPENGL_VECTOR_FIELD_3D(ARRAY<VECTOR<T,3> >& field,ARRAY<VECTOR<T,3> >& locations,const OPENGL_COLOR& color,double size, 
+OPENGL_VECTOR_FIELD_3D(STREAM_TYPE stream_type,ARRAY<VECTOR<T,3> >& field,ARRAY<VECTOR<T,3> >& locations,const OPENGL_COLOR& color,double size, 
     bool draw_arrowhead,bool draw_value,bool draw_basepoint,bool draw_fancy_arrow)
-    :vector_field(field),vector_locations(locations),vector_color(color),size(size),
+    :OPENGL_OBJECT<T>(stream_type),vector_field(field),vector_locations(locations),vector_color(color),size(size),
     draw_arrowhead(draw_arrowhead),draw_value(draw_value),draw_basepoint(draw_basepoint),draw_fancy_arrow(draw_fancy_arrow)
     ,vector_hat(0)
 {

@@ -24,7 +24,7 @@ template<class T> void OPENGL_BOX_HIERARCHY_3D<T>::
 Display_Helper(const int cell,const int height) const
 {
     if(height>=min_height && height<=max_height){
-        OPENGL_BOX_3D<T> opengl_box(hierarchy->box_hierarchy(cell),color);
+        OPENGL_BOX_3D<T> opengl_box(stream_type,hierarchy->box_hierarchy(cell),color);
         opengl_box.Display();}
     if(!hierarchy->Leaf(cell)){
         int left_cell,right_cell;

@@ -8,11 +8,11 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
-OPENGL_COMPONENT_TRIANGULATED_SURFACE(const std::string &filename, bool use_display_list)
-    :OPENGL_COMPONENT<T>("Triangulated Surface"), 
+template<class T> OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
+OPENGL_COMPONENT_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,const std::string &filename, bool use_display_list)
+    :OPENGL_COMPONENT<T>(stream_type,"Triangulated Surface"), 
       triangulated_surface(*TRIANGULATED_SURFACE<T>::Create()),
-      opengl_triangulated_surface(triangulated_surface, false,
+    opengl_triangulated_surface(stream_type,triangulated_surface, false,
                                   OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Red()),
                                   OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Blue())),
       filename(filename), frame_loaded(-1), valid(false), use_display_list(use_display_list)
@@ -23,7 +23,7 @@ OPENGL_COMPONENT_TRIANGULATED_SURFACE(const std::string &filename, bool use_disp
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T,class RW> OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
+template<class T> OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
 ~OPENGL_COMPONENT_TRIANGULATED_SURFACE()
 {
     delete &triangulated_surface.mesh;
@@ -33,7 +33,7 @@ template<class T,class RW> OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class RW> bool OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
+template<class T> bool OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::Frame_File_Exists(filename, frame_input);
@@ -41,7 +41,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
+template<class T> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT<T>::Set_Frame(frame_input);
@@ -50,7 +50,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
+template<class T> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT<T>::Set_Draw(draw_input);
@@ -59,7 +59,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
+template<class T> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
 Display() const
 {
     if(valid && draw) 
@@ -77,7 +77,7 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class RW> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_triangulated_surface.Bounding_Box();
@@ -86,7 +86,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class RW> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,RW>::
+template<class T> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
 Reinitialize()
 {
     if(draw)
@@ -97,7 +97,7 @@ Reinitialize()
             valid = false;
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(filename, frame);
             if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File<RW>(tmp_filename,triangulated_surface);
+                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,triangulated_surface);
             else
                 return;
 
@@ -108,7 +108,7 @@ Reinitialize()
     }
 }
 namespace PhysBAM{
-template class OPENGL_COMPONENT_TRIANGULATED_SURFACE<float,float>;
-template class OPENGL_COMPONENT_TRIANGULATED_SURFACE<double,double>;
+template class OPENGL_COMPONENT_TRIANGULATED_SURFACE<float>;
+template class OPENGL_COMPONENT_TRIANGULATED_SURFACE<double>;
 }
 

@@ -13,7 +13,7 @@
 
 namespace PhysBAM{
 
-template<class T,class RW=T>
+template<class T>
 class OPENGL_COMPONENT_LEVELSET_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;
@@ -21,7 +21,7 @@ public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
     using OPENGL_COMPONENT<T>::Is_Up_To_Date;
-    OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename,
+    OPENGL_COMPONENT_LEVELSET_3D(STREAM_TYPE stream_type,const std::string& levelset_filename,
                                  const std::string& triangulated_surface_filename = "",
                                  const std::string& filename_set_input = "",
                                  const std::string& filename_triangulated_surface_set_input = "",
@@ -64,11 +64,11 @@ public:
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_LEVELSET_3D, Toggle_Draw_Multiple_Levelsets, "Toggle mutliple/single levelset draw");
 private:
     void Reinitialize();
-    void Reinitialize_Levelset(const std::string& levelset_filename, const std::string& triangulated_surface_filename, OPENGL_LEVELSET_MULTIVIEW<T,RW>* levelset_multiview);
+    void Reinitialize_Levelset(const std::string& levelset_filename, const std::string& triangulated_surface_filename, OPENGL_LEVELSET_MULTIVIEW<T>* levelset_multiview);
 
 public:
-    OPENGL_LEVELSET_MULTIVIEW<T,RW>* opengl_levelset_multiview;
-    ARRAY<OPENGL_LEVELSET_MULTIVIEW<T,RW>* > opengl_levelset_multiviews;
+    OPENGL_LEVELSET_MULTIVIEW<T>* opengl_levelset_multiview;
+    ARRAY<OPENGL_LEVELSET_MULTIVIEW<T>* > opengl_levelset_multiviews;
 
 private:
     std::string levelset_filename;
