@@ -57,6 +57,7 @@ public:
     bool use_affine;
     bool use_midpoint;
     bool use_particle_collision;
+    bool print_stats;
     T flip;
     T cfl;
 
@@ -66,6 +67,9 @@ public:
     int solver_iterations;
     bool test_diff;
     int threads;
+
+    TV last_linear_momentum;
+    typename TV::SPIN last_angular_momentum;
 
     MPM_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~MPM_EXAMPLE();

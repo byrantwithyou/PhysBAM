@@ -105,8 +105,10 @@ Advance_One_Time_Step()
     Update_Simulated_Particles();
     Update_Particle_Weights();
     Particle_To_Grid();
+    Print_Grid_Stats("after particle to grid",example.dt,example.velocity,0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",0,1);
     Apply_Forces();
+    Print_Grid_Stats("after forces",example.dt,example.velocity_new,&example.velocity);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
     Grid_To_Particle();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
@@ -348,6 +350,20 @@ Update_Simulated_Particles()
 
     for(int i=0;i<example.lagrangian_forces.m;i++)
         example.lagrangian_forces(i)->Update_Mpi(example.particle_is_simulated,0);
+}
+//#####################################################################
+// Function Print_Grid_Stats
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0)
+{
+    if(!example.print_stats) return;
+    typename TV::SPIN am=example.Total_Grid_Angular_Momentum(dt,u,u0);
+    TV lm=example.Total_Grid_Linear_Momentum(u);
+    LOG::cout<<str<<" linear  "<<lm<<"  diff "<<(lm-example.last_linear_momentum)<<std::endl;
+    LOG::cout<<str<<" angular "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
+    example.last_linear_momentum=lm;
+    example.last_angular_momentum=am;
 }
 //#####################################################################
 namespace PhysBAM{
