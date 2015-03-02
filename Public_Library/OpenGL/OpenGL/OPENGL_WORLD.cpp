@@ -1231,7 +1231,7 @@ Convert_Mouse_Coordinates(int x,int y)
 template<class T> void OPENGL_WORLD<T>::
 Save_Screen(const std::string& filename,const bool use_back_buffer,int jpeg_quality)
 {
-    ARRAY<VECTOR<T,4> ,VECTOR<int,2> > image;
+    ARRAY<VECTOR<T,4>,VECTOR<int,2> > image;
     Get_Image(image,use_back_buffer);
     IMAGE<T>::Write(filename,image);
 }
@@ -1239,7 +1239,7 @@ Save_Screen(const std::string& filename,const bool use_back_buffer,int jpeg_qual
 // Function Get_Image
 //#####################################################################
 template<class T> template<int d> void OPENGL_WORLD<T>::
-Get_Image(ARRAY<VECTOR<T,d> ,VECTOR<int,2> > &image,const bool use_back_buffer)
+Get_Image(ARRAY<VECTOR<T,d>,VECTOR<int,2> > &image,const bool use_back_buffer)
 {
     // Assuming GLubyte is same type as unsigned char
     STATIC_ASSERT(sizeof(GLfloat)==sizeof(float));
@@ -1249,11 +1249,13 @@ Get_Image(ARRAY<VECTOR<T,d> ,VECTOR<int,2> > &image,const bool use_back_buffer)
     glGetIntegerv(GL_VIEWPORT,vp);
     PHYSBAM_ASSERT(window->Width()==vp[2] && window->Height()==vp[3]);
 
-    ARRAY<VECTOR<T,d> ,VECTOR<int,2> > temporary_image(0,window->Height(),0,window->Width());
+    ARRAY<VECTOR<float,d>,VECTOR<int,2> > temporary_image(0,window->Height(),0,window->Width());
     image.Resize(0,window->Width(),0,window->Height()); // temporary is row major
     glReadBuffer(use_back_buffer?GL_BACK:GL_FRONT);
     glReadPixels(0,0,window->Width(),window->Height(),d==3?GL_RGB:GL_RGBA,GL_FLOAT,temporary_image.array.Get_Array_Pointer());
-    for(int i=0;i<window->Width();i++) for(int j=0;j<window->Height();j++) image(i,j)=temporary_image(j,i); // swap to column major
+    for(int i=0;i<window->Width();i++)
+        for(int j=0;j<window->Height();j++)
+            image(i,j)=VECTOR<T,d>(temporary_image(j,i)); // swap to column major
 }
 //#####################################################################
 // Function Display_Prompt_Strings
