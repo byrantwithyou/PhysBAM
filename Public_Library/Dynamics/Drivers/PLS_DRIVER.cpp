@@ -9,7 +9,6 @@
 #include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <Tools/Vectors/VECTOR_UTILITIES.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <Dynamics/Drivers/PLS_DRIVER.h>
@@ -86,10 +85,6 @@ Initialize()
     else{
         example.boundary=&example.boundary_scalar;
         example.phi_boundary=&example.phi_boundary_water;}
-
-    if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV> *refine=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>*>(&example.projection)){
-        refine->boundary=example.boundary;
-        refine->phi_boundary=example.phi_boundary;}
 
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
     example.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);

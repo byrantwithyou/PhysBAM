@@ -58,7 +58,7 @@ public:
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV> collision_bodies_affecting_fluid;
     ARRAY<IMPLICIT_OBJECT<TV>*> sources;
 
-    WATER_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads=1,int refine=0);
+    WATER_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads=1);
     virtual ~WATER_EXAMPLE();
     
     T Time_At_Frame(const int frame) const

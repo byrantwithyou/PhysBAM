@@ -5,7 +5,6 @@
 #ifndef __STRESS_DRIVER__
 #define __STRESS_DRIVER__
 #include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
 #include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 

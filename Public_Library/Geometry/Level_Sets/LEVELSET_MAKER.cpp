@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/FLOOD_FILL_GRAPH.h>
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/FLOOD_FILL.h>
 #include <Tools/Log/LOG.h>

@@ -7,8 +7,9 @@
 #ifndef __FLUID_STRAIN_UNIFORM__
 #define __FLUID_STRAIN_UNIFORM__
 
+#include <Tools/Advection/ADVECTION_FORWARD.h>
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
+#include <Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Incompressible/Boundaries/BOUNDARY_FORWARD.h>
@@ -25,7 +26,8 @@ class FLUID_STRAIN_UNIFORM:public FLUID_STRAIN<typename TV::SCALAR>
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<SYMMETRIC_MATRIX<T,TV::m> ,TV_INT> T_ARRAYS_SYMMETRIC_MATRIX;
-    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
+    typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T> T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
     typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX;
 public:
     using FLUID_STRAIN<T>::viscosity_index;using FLUID_STRAIN<T>::strainrate_time;using FLUID_STRAIN<T>::elastic_modulus;

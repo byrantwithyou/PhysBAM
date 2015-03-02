@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __PLS_DRIVER__
 #define __PLS_DRIVER__
-#include <Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
+#include <Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
 #include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
@@ -16,7 +16,7 @@ class PLS_DRIVER
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
+    typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T> T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
 
 protected:
     int current_frame;

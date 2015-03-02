@@ -79,14 +79,13 @@ int main(int argc,char *argv[])
     PARSE_ARGS parse_args(argc,argv);
     MPI_WORLD mpi_world(parse_args);
 
-    int scale=128,threads=1,refine=1;
+    int scale=128,threads=1;
     parse_args.Print_Arguments();
     parse_args.Add("-scale",&scale,"scale","fine scale grid resolution");
-    parse_args.Add("-refine",&refine,"levels","refine levels");
     parse_args.Add("-threads",&threads,"threads","number of threads");
     parse_args.Parse(true);
 
-    WATER_EXAMPLE<TV>* example=new WATER_EXAMPLE<TV>(stream_type,threads,refine);
+    WATER_EXAMPLE<TV>* example=new WATER_EXAMPLE<TV>(stream_type,threads);
 
     example->last_frame=100;
     example->cfl=1;

@@ -30,7 +30,7 @@ template<class TV>
 class FLUIDS_PARAMETERS_UNIFORM:public FLUIDS_PARAMETERS<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
+    typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T> T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
 public:
     typedef FLUIDS_PARAMETERS<TV> BASE;
     using BASE::smoke;using BASE::fire;using BASE::water;using BASE::use_body_force;using BASE::grid;
@@ -104,7 +104,6 @@ public:
     bool use_levelset_viscosity;
     bool print_viscosity_matrix;
     bool use_second_order_pressure;
-    bool use_modified_projection;
     bool use_surface_solve;
     int projection_scale;
     VECTOR<bool,TV::m> periodic_boundary;

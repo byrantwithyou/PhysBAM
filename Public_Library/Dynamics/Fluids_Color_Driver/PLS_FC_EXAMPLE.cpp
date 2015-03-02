@@ -9,7 +9,6 @@
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Forces/FLUID_GRAVITY.h>
 #include <Incompressible/Forces/INCOMPRESSIBILITY.h>
-#include <Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
 #include <Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 using namespace PhysBAM;

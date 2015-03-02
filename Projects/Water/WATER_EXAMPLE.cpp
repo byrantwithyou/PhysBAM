@@ -8,19 +8,18 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Incompressible/Forces/FLUID_GRAVITY.h>
 #include <Incompressible/Forces/INCOMPRESSIBILITY.h>
-#include <Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
 #include "WATER_EXAMPLE.h"
 using namespace PhysBAM;
 //#####################################################################
 // WATER_EXAMPLE
 //#####################################################################
 template<class TV> WATER_EXAMPLE<TV>::
-WATER_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads,int refine)
+WATER_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
     write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),number_of_ghost_cells(3),
     cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),//incompressible_fluid_collection(mac_grid),
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),
-    projection(refine>1?*new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>(mac_grid,particle_levelset_evolution.Particle_Levelset(0).levelset,refine):*new PROJECTION_DYNAMICS_UNIFORM<TV>(mac_grid,false,false,false,false,thread_queue)),
+    projection(*new PROJECTION_DYNAMICS_UNIFORM<TV>(mac_grid,false,false,false,false,thread_queue)),
     particle_levelset_evolution(mac_grid,collision_bodies_affecting_fluid,number_of_ghost_cells,false),
     incompressible(mac_grid,projection),boundary(0),rigid_body_collection(0),collision_bodies_affecting_fluid(mac_grid)
 {

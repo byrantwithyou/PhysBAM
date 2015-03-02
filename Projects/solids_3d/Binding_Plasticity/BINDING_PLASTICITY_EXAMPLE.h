@@ -29,7 +29,6 @@
 #include <Solids/Meshing/RED_GREEN_TRIANGLES.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <Dynamics/Heat_Flows/HEAT_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_input>

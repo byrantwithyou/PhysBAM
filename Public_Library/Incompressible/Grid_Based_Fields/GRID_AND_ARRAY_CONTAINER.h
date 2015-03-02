@@ -7,8 +7,9 @@
 #ifndef __GRID_AND_ARRAY_CONTAINER__    
 #define __GRID_AND_ARRAY_CONTAINER__
 
+#include <Tools/Advection/ADVECTION_FORWARD.h>
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
+#include <Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/VECTOR_UTILITIES.h>
@@ -21,7 +22,7 @@ template<class TV,class T2>
 class GRID_AND_ARRAY_CONTAINER:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
+    typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T> T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
 public:
     GRID<TV>& grid;
     ARRAY<T2,TV_INT> array;

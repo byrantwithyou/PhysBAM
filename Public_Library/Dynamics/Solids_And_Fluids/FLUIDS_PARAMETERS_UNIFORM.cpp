@@ -27,7 +27,6 @@
 #include <Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
-#include <Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <Compressible/Compressible_Fluids/COMPRESSIBLE_AUXILIARY_DATA.h>
 #include <Compressible/Equations_Of_State/EOS_GAMMA.h>
@@ -55,7 +54,7 @@ FLUIDS_PARAMETERS_UNIFORM(const int number_of_regions_input,const typename FLUID
     maccormack_semi_lagrangian(*new ADVECTION_MACCORMACK_UNIFORM<TV,T,T_ADVECTION_SEMI_LAGRANGIAN_SCALAR>(semi_lagrangian,&maccormack_node_mask,&maccormack_cell_mask,
         &maccormack_face_mask)),euler(0),euler_solid_fluid_coupling_utilities(0),compressible_incompressible_coupling_utilities(0),projection(0),use_reacting_flow(false),
     use_flame_speed_multiplier(false),use_dsd(false),use_psi_R(false),use_levelset_viscosity(false),print_viscosity_matrix(false),use_second_order_pressure(false),
-    use_modified_projection(false),use_surface_solve(true),projection_scale(1)
+    use_surface_solve(true),projection_scale(1)
 {
     Initialize_Number_Of_Regions(number_of_regions_input);
 }
@@ -102,18 +101,16 @@ Initialize_Fluid_Evolution(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velo
         particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>(*grid,*collision_bodies_affecting_fluid,number_of_ghost_cells,false);
         particle_levelset_evolution->Particle_Levelset(0).thread_queue=thread_queue;
         particle_levelset_evolution->Particle_Levelset(0).levelset.thread_queue=thread_queue;
-        if(!projection){
-            if(use_modified_projection) projection=new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>(*grid,particle_levelset_evolution->Particle_Levelset(0).levelset,projection_scale,1,use_surface_solve,fire,false,use_poisson,use_poisson);
-            else projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,false,false,use_poisson,thread_queue);}
+        if(!projection)
+            projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,false,false,use_poisson,thread_queue);
         projection->elliptic_solver->thread_queue=thread_queue;        
         incompressible=new INCOMPRESSIBLE_UNIFORM<TV>(*grid,*projection);
         phi_boundary=&phi_boundary_water; // override default
         phi_boundary_water.Set_Velocity_Pointer(incompressible_face_velocities);
         boundary_mac_slip.Set_Phi(particle_levelset_evolution->phi);}
     else if(!compressible){ // smoke or sph
-        if(!projection){
-            if(use_modified_projection) projection=new PROJECTION_REFINEMENT_UNIFORM<TV>(*grid,projection_scale,1,fire,false,use_poisson,use_poisson);
-            else projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,false,false,use_poisson);}
+        if(!projection)
+            projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,false,false,use_poisson);
         incompressible=new INCOMPRESSIBLE_UNIFORM<TV>(*grid,*projection);}
 
     if(sph){

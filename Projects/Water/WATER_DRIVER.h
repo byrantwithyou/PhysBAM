@@ -5,7 +5,7 @@
 #ifndef __WATER_DRIVER__
 #define __WATER_DRIVER__
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
+#include <Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Rigids/Rigids_Evolution/KINEMATIC_EVOLUTION.h>
@@ -19,7 +19,7 @@ class WATER_DRIVER
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ADVECTION_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
+    typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T> T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
 protected:
     int current_frame;
     T time;

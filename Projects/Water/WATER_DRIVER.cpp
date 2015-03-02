@@ -11,7 +11,6 @@
 #include <Tools/Vectors/VECTOR_UTILITIES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
@@ -94,9 +93,6 @@ Initialize()
         example.boundary=&example.boundary_scalar;
         example.phi_boundary=&example.phi_boundary_water;}
 
-    if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV> *refine=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>*>(&example.projection)){
-        refine->boundary=example.boundary;
-        refine->phi_boundary=example.phi_boundary;}
     example.rigid_body_collection.Update_Kinematic_Particles();
 
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
@@ -107,9 +103,7 @@ Initialize()
         example.particle_levelset_evolution.Levelset_Advection(1).Set_Custom_Advection(*threaded_advection_scalar);
         example.incompressible.Set_Custom_Advection(*threaded_advection_scalar);
         example.particle_levelset_evolution.Particle_Levelset(0).Set_Thread_Queue(thread_queue);
-        example.particle_levelset_evolution.Particle_Levelset(0).levelset.thread_queue=thread_queue;
-        if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>* refinement=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<TV>*>(&example.projection))
-            refinement->thread_queue=thread_queue;}
+        example.particle_levelset_evolution.Particle_Levelset(0).levelset.thread_queue=thread_queue;}
     else{
         example.particle_levelset_evolution.Levelset_Advection(1).Set_Custom_Advection(example.advection_scalar);
         example.incompressible.Set_Custom_Advection(example.advection_scalar);}

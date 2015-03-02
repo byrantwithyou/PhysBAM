@@ -8,8 +8,8 @@
 #define __DENSITY_CONTAINER__
 
 #include <Incompressible/Advection_Collidable/ADVECTION_COLLIDABLE_FORWARD.h>
-#include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_POLICY_UNIFORM.h>
 #include <Incompressible/Grid_Based_Fields/GRID_AND_ARRAY_CONTAINER.h>
+#include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> struct GRID_ARRAYS_POLICY;
@@ -19,7 +19,8 @@ template<class TV>
 class DENSITY_CONTAINER:public GRID_AND_ARRAY_CONTAINER<TV,typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename ADVECTION_COLLIDABLE_POLICY<TV>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL;typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
+    typedef ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<TV,T> T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL;
+    typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
 public:
     typedef GRID_AND_ARRAY_CONTAINER<TV,T> BASE;

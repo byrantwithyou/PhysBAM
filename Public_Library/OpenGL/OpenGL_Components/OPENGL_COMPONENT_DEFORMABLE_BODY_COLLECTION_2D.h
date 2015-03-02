@@ -21,7 +21,6 @@ template<class T> class OPENGL_SEGMENTED_CURVE_2D;
 template<class T,int d> class OPENGL_BEZIER_SPLINE_2D;
 template<class T,int d> class OPENGL_B_SPLINE_2D;
 template<class T> class OPENGL_TRIANGULATED_AREA;
-template<class TV> class OPENGL_ADAPTIVE_NODE_SCALAR_FIELD;
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
 
 template<class T,class RW=T>
