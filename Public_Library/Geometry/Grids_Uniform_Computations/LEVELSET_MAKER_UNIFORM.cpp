@@ -32,8 +32,8 @@ Compute_Level_Set(T_SURFACE& surface,GRID<TV>& grid,int ghost_cells,ARRAY<T,TV_I
         for(RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next()){
             TV X=grid.X(it.index);
             T dist=simplex.Distance_To_Element(X),&p=phi(it.index);
-            if(p==FLT_MAX) seed_indices.Append(it.index);
             if(dist<abs(p)+dx*(T)1e-4 && dist<dx){
+                if(p==FLT_MAX) seed_indices.Append(it.index);
                 bool new_sign=simplex.Signed_Distance(X)<0;
                 if(abs(dist-abs(p))<dx*(T)1e-4 && new_sign!=(p<0))
                     new_sign=surface.Inside(X);
