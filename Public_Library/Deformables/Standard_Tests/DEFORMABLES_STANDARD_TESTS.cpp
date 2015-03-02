@@ -293,7 +293,7 @@ Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bind
     for(int i=0;i<object.mesh.elements.m;i++) object.mesh.elements(i)=map_to_new_particles.Subset(object.mesh.elements(i));
 }
 //#####################################################################
-// Function Read_Or_Initialize_Implicit_Surface
+// Function Initialize_Implicit_Surface
 //#####################################################################
 template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>* DEFORMABLES_STANDARD_TESTS<TV>::
 Initialize_Implicit_Surface(T_SURFACE& surface,int max_res) const
@@ -339,7 +339,8 @@ Initialize_Tetrahedron_Collisions(const int id_number,const std::string& output_
         triangulated_surface=tetrahedralized_volume.triangulated_surface;}
     DEFORMABLE_PARTICLES<TV>& undeformed_particles=*deformable_body_collection.particles.Clone();
     TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
-    undeformed_triangulated_surface.Update_Triangle_List();undeformed_triangulated_surface.Initialize_Hierarchy();
+    undeformed_triangulated_surface.Update_Triangle_List();
+    undeformed_triangulated_surface.Initialize_Hierarchy();
     std::string levelset_filename=STRING_UTILITIES::string_sprintf("%s/common/deformable_body_undeformed_levelset_%d.phi",output_directory.c_str(),id_number);
     LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Read_Or_Initialize_Implicit_Surface(levelset_filename,output_directory,undeformed_triangulated_surface);
     deformable_body_collection.collisions.collision_body_list.Add_Body(new TETRAHEDRON_COLLISION_BODY<T>(tetrahedralized_volume,undeformed_triangulated_surface,undeformed_levelset,triangulated_surface),0,true);
