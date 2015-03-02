@@ -195,6 +195,20 @@ Total_Grid_Linear_Momentum(const ARRAY<TV,TV_INT>& u) const
     return result;
 }
 //#####################################################################
+// Function Total_Grid_Angular_Momentum
+//#####################################################################
+template<class TV> typename TV::SPIN MPM_EXAMPLE<TV>::
+Total_Grid_Angular_Momentum(T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0) const
+{
+    typename TV::SPIN result;
+    for(int k=0;k<valid_grid_indices.m;k++){
+        int i=valid_grid_indices(k);
+        TV X=location.array(i);
+        if(use_midpoint && u0) X+=dt/2*u0->array(i);
+        result+=mass.array(i)*TV::Cross_Product(X,u.array(i));}
+    return result;
+}
+//#####################################################################
 // Function Total_Grid_Kinetic_Energy
 //#####################################################################
 template<class TV> typename TV::SCALAR MPM_EXAMPLE<TV>::

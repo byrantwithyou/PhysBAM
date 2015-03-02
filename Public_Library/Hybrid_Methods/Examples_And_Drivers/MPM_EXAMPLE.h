@@ -33,6 +33,7 @@ public:
     ARRAY<bool> particle_is_simulated;
 
     ARRAY<T,TV_INT> mass;
+    ARRAY<TV,TV_INT> location;
     ARRAY<TV,TV_INT> velocity,velocity_new;
     ARRAY<int> valid_grid_indices;
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
@@ -88,6 +89,7 @@ public:
 
     TV Total_Particle_Linear_Momentum() const;
     TV Total_Grid_Linear_Momentum(const ARRAY<TV,TV_INT>& u) const;
+    typename TV::SPIN Total_Grid_Angular_Momentum(T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0) const;
     T Total_Grid_Kinetic_Energy(const ARRAY<TV,TV_INT>& u) const;
 //#####################################################################
 };
