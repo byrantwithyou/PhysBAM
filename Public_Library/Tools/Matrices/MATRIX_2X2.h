@@ -301,6 +301,9 @@ public:
     T Simplex_Minimum_Altitude() const
     {return Determinant()/sqrt(max(Column(0).Magnitude_Squared(),Column(1).Magnitude_Squared(),(Column(0)-Column(1)).Magnitude_Squared()));}
 
+    VECTOR<T,1> Contract_Permutation_Tensor() const
+    {return VECTOR<T,1>(x[2]-x[1]);}
+
     template<class RW> void Read(std::istream& input)
     {Read_Binary_Array<RW>(input,x,m*n);}
 

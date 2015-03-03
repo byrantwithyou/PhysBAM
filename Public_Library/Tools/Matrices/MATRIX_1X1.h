@@ -259,6 +259,9 @@ public:
     MATRIX<T,0,1> Cross_Product_Matrix_Times(const VECTOR<T,1>& v)
     {return MATRIX<T,0,1>();}
 
+    VECTOR<T,0> Contract_Permutation_Tensor() const
+    {return VECTOR<T,0>();}
+
     bool Positive_Definite() const
     {return x00>0;}
 

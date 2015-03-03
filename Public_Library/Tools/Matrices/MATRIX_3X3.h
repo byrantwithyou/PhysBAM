@@ -366,6 +366,9 @@ public:
     static MATRIX<T,3> Cross_Product_Matrix(const VECTOR<T,3>& v)
     {return MATRIX<T,3>(0,v.z,-v.y,-v.z,0,v.x,v.y,-v.x,0);}
 
+    VECTOR<T,3> Contract_Permutation_Tensor() const
+    {return VECTOR<T,3>(x[7]-x[5],x[2]-x[6],x[3]-x[1]);}
+
     template<class RW> void Read(std::istream& input)
     {Read_Binary_Array<RW>(input,x,m*n);}
 
