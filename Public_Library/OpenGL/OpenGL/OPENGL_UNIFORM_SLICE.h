@@ -131,6 +131,16 @@ public:
         }
     }
 
+    GRID<TV> Get_Slice_Grid() const
+    {
+        GRID<TV> slice_grid(grid.Get_MAC_Grid());
+        slice_grid.domain.min_corner(axis)+=index*grid.dX(axis);
+        slice_grid.domain.max_corner(axis)=slice_grid.domain.min_corner(axis)+grid.dX(axis);
+        slice_grid.counts(axis)=1;
+        slice_grid.numbers_of_cells=slice_grid.counts;
+        return slice_grid;
+    }
+
     void Print_Slice_Info(std::ostream& output_stream) PHYSBAM_OVERRIDE;
 private:
     void Update_Clip_Planes() PHYSBAM_OVERRIDE;

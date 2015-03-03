@@ -20,7 +20,6 @@ public:
     OPENGL_FACE_SCALAR_FIELD_3D<T,T2>  opengl_scalar_field;
 private:
     std::string values_filename;
-    std::string x_face_values_filename,y_face_values_filename,z_face_values_filename;
     int frame_loaded;
     bool valid;
 
@@ -28,9 +27,8 @@ public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
     using OPENGL_COMPONENT<T>::stream_type;
-    OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
-    OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &x_face_values_filename_input,
-                                          const std::string &y_face_values_filename_input,const std::string &z_face_values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
+    OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,
+        const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
     virtual ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D();
 
     virtual void Set_Slice(OPENGL_SLICE *slice_input) PHYSBAM_OVERRIDE

@@ -674,13 +674,8 @@ Initialize_Components_And_Key_Bindings()
         if(slice_manager.slice) slice_manager.Add_Object(sph_particles_component);}
 
     if(has_valid_grid){
-        // TODO: this is legacy output form, probably can be removed now
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>* psi_N_component=0;
-        if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_u",start_frame) &&
-           FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_v",start_frame) &&
-           FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_w",start_frame))
-            psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(stream_type,grid,basedir+"/%d/psi_N_u",basedir+"/%d/psi_N_v",basedir+"/%d/psi_N_w",new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
-        else if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N",start_frame))
+        if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N",start_frame))
             psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(stream_type,grid,basedir+"/%d/psi_N",new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         if(psi_N_component){
             Add_Component(psi_N_component,"Psi_N points",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);

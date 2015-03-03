@@ -14,7 +14,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_1D<T,T2>::
 OPENGL_FACE_SCALAR_FIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<1> > &face_values_input,OPENGL_COLOR point_color_input,OPENGL_COLOR line_color_input)
-:OPENGL_OBJECT<T>(stream_type),grid(grid_input),face_values(face_values_input),x_face_values(face_values.Component(0)),point_color(point_color_input),line_color(line_color_input),scale(1)
+:OPENGL_OBJECT<T>(stream_type),grid(grid_input),face_values(face_values_input),point_color(point_color_input),line_color(line_color_input),scale(1)
 {
 }
 //#####################################################################
@@ -35,14 +35,14 @@ Display() const
     line_color.Send_To_GL_Pipeline();
     OpenGL_Begin(GL_LINE_STRIP);
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
-        OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,scale*x_face_values(iterator.Face_Index())));}
+        OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,scale*face_values(iterator.Full_Index())));}
     OpenGL_End();
     glColor3f(0,1,1);
     glPointSize(3.0);
     point_color.Send_To_GL_Pipeline();
     OpenGL_Begin(GL_POINTS);
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
-        OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,scale*x_face_values(iterator.Face_Index())));}
+        OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,scale*face_values(iterator.Full_Index())));}
     OpenGL_End();
     glPopAttrib();
 }
@@ -54,8 +54,9 @@ Display_Bool_Helper(const OPENGL_FACE_SCALAR_FIELD_1D<T,bool>& self)
     glPointSize(8.0);
     self.point_color.Send_To_GL_Pipeline();
     OpenGL_Begin(GL_POINTS);
-    for(FACE_ITERATOR<VECTOR<T,1> > iterator(self.grid);iterator.Valid();iterator.Next()) if(self.x_face_values(iterator.Face_Index())){
-        OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,(T)0));}
+    for(FACE_ITERATOR<VECTOR<T,1> > iterator(self.grid);iterator.Valid();iterator.Next())
+        if(self.face_values(iterator.Full_Index())){
+            OpenGL_Vertex(VECTOR<T,2>(iterator.Location().x,(T)0));}
     OpenGL_End();
     glPopAttrib();
 }
@@ -86,8 +87,10 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection)
     // TODO: this should also interpolate to particles
     if(selection && selection->type==OPENGL_SELECTION<T>::GRID_CELL_1D && grid.Is_MAC_Grid()){
         VECTOR<int,1> index=((OPENGL_SELECTION_GRID_CELL_1D<T>*)selection)->index;
-        T2 left=x_face_values(index.x);
-        T2 right=x_face_values(index.x+1);
+        FACE_INDEX<TV::m> ix(0,index);
+        T2 left=face_values(ix);
+        ix.index.x++;
+        T2 right=face_values(ix);
         output_stream<<"    left = "<<left<<",right = "<<right<<std::endl;}
 }
 //#####################################################################

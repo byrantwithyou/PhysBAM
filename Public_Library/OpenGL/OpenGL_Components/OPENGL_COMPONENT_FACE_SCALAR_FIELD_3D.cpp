@@ -11,24 +11,11 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
-OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input, const std::string &values_filename_input, OPENGL_COLOR_MAP<T2>* color_map_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Face Scalar Field 3D"), opengl_scalar_field(stream_type,grid_input,internal_scalar_field,color_map_input),
-      values_filename(values_filename_input), x_face_values_filename(""), y_face_values_filename(""), z_face_values_filename(""), frame_loaded(-1), valid(false)
+OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input)
+    :OPENGL_COMPONENT<T>(stream_type,"Face Scalar Field 3D"),opengl_scalar_field(stream_type,grid_input,internal_scalar_field,color_map_input),
+      values_filename(values_filename_input),frame_loaded(-1),valid(false)
 {
     is_animation = FILE_UTILITIES::Is_Animated(values_filename);
-    Reinitialize();
-}
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class T,class T2> OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
-OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input, const std::string &x_face_values_filename_input, const std::string &y_face_values_filename_input,
-                                      const std::string &z_face_values_filename_input, OPENGL_COLOR_MAP<T2>* color_map_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Face Scalar Field 3D"), opengl_scalar_field(stream_type,grid_input,internal_scalar_field,color_map_input),
-      values_filename(), x_face_values_filename(x_face_values_filename_input), y_face_values_filename(y_face_values_filename_input), z_face_values_filename(z_face_values_filename_input), 
-      frame_loaded(-1), valid(false)
-{
-    is_animation = FILE_UTILITIES::Is_Animated(x_face_values_filename);
     Reinitialize();
 }
 //#####################################################################
@@ -44,12 +31,7 @@ template<class T,class T2> OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
 template<class T,class T2> bool OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
 Valid_Frame(int frame_input) const
 {
-    if(!values_filename.empty())
-        return FILE_UTILITIES::Frame_File_Exists(values_filename, frame_input);
-    else
-        return FILE_UTILITIES::Frame_File_Exists(x_face_values_filename, frame_input) && 
-               FILE_UTILITIES::Frame_File_Exists(y_face_values_filename, frame_input) &&
-               FILE_UTILITIES::Frame_File_Exists(z_face_values_filename, frame_input);
+    return FILE_UTILITIES::Frame_File_Exists(values_filename,frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -111,22 +93,10 @@ Reinitialize()
             valid = false;
 
             std::string filename;
-            if(!values_filename.empty()){
-                filename=FILE_UTILITIES::Get_Frame_Filename(values_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename))
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,opengl_scalar_field.face_values);
-                else return;}
-            else{
-                filename=FILE_UTILITIES::Get_Frame_Filename(x_face_values_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File(stream_type,filename,opengl_scalar_field.x_face_values);
-                else return;
-                filename=FILE_UTILITIES::Get_Frame_Filename(y_face_values_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File(stream_type,filename,opengl_scalar_field.y_face_values);
-                else return;
-                filename=FILE_UTILITIES::Get_Frame_Filename(z_face_values_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File(stream_type,filename,opengl_scalar_field.z_face_values);
-                else return;
-            }
+            filename=FILE_UTILITIES::Get_Frame_Filename(values_filename,frame);
+            if(FILE_UTILITIES::File_Exists(filename))
+                FILE_UTILITIES::Read_From_File(stream_type,filename,opengl_scalar_field.face_values);
+            else return;
 
             opengl_scalar_field.Update();
             frame_loaded = frame;

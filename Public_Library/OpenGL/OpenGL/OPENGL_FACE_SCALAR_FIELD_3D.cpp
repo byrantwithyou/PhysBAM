@@ -2,6 +2,7 @@
 // Copyright 2004-2009, Eran Guendelman, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND_VIEW.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
@@ -17,7 +18,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 OPENGL_FACE_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<3> > &face_values_input,OPENGL_COLOR_MAP<T2> *color_map_input)
-    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),face_values(face_values_input),x_face_values(face_values_input.Component(0)),y_face_values(face_values_input.Component(1)),z_face_values(face_values_input.Component(2)),
+    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),face_values(face_values_input),
     color_map(color_map_input),scale(1),opengl_points(stream_type,*new ARRAY<VECTOR<T,3> >)
 {
     PHYSBAM_ASSERT(color_map);
@@ -37,7 +38,7 @@ template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 Display() const
 {
-    if(x_face_values.domain.Empty()) return;
+    if(face_values.Component(0).domain.Empty()) return;
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -59,26 +60,24 @@ Bounding_Box() const
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 Update()
 {
-    opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product()+z_face_values.Size().Product());
-    int index=0;
-    VECTOR<int,3> index_start,index_end;
     OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
-    OPENGL_UNIFORM_SLICE<T>::Get_Face_Index_Range(slice,x_face_values,1,index_start,index_end);
-    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++) {
-        opengl_points.points(index)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j,k)));
-        opengl_points.Set_Point_Color(index,color_map->Lookup(x_face_values(i,j,k)));
-        index++;}
-    OPENGL_UNIFORM_SLICE<T>::Get_Face_Index_Range(slice,y_face_values,2,index_start,index_end);
-    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++) {
-        opengl_points.points(index)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j,k)));
-        opengl_points.Set_Point_Color(index,color_map->Lookup(y_face_values(i,j,k)));
-        index++;}
-    OPENGL_UNIFORM_SLICE<T>::Get_Face_Index_Range(slice,z_face_values,3,index_start,index_end);
-    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++) {
-        opengl_points.points(index)=grid.Face(FACE_INDEX<TV::m>(2,TV_INT(i,j,k)));
-        opengl_points.Set_Point_Color(index,color_map->Lookup(z_face_values(i,j,k)));
-        index++;}
-    opengl_points.points.Resize(index);
+    opengl_points.points.Remove_All();
+    opengl_points.Store_Point_Colors(true);
+    for(FACE_ITERATOR<TV> it(slice?slice->Get_Slice_Grid():grid,face_values.Number_Of_Ghost_Cells());it.Valid();it.Next()){
+        opengl_points.points.Append(it.Location());
+        opengl_points.point_colors->Append(color_map->Lookup(face_values(it.Full_Index())));}
+}
+//#####################################################################
+// Function Bool_Update_Helper
+//#####################################################################
+template<class T> static void 
+Bool_Update_Helper(OPENGL_FACE_SCALAR_FIELD_3D<T,bool>& self)
+{
+    OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)self.slice;
+    self.opengl_points.points.Remove_All();
+    for(FACE_ITERATOR<VECTOR<T,3> > it(slice?slice->Get_Slice_Grid():self.grid,self.face_values.Number_Of_Ghost_Cells());it.Valid();it.Next())
+        if(self.face_values(it.Full_Index()))
+            self.opengl_points.points.Append(it.Location());
 }
 //#####################################################################
 // Update
@@ -86,21 +85,7 @@ Update()
 template<> void OPENGL_FACE_SCALAR_FIELD_3D<float,bool>::
 Update()
 {
-    OPENGL_UNIFORM_SLICE<float>* slice=(OPENGL_UNIFORM_SLICE<float>*)this->slice;
-    opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product()+z_face_values.Size().Product());
-    opengl_points.color=color_map->Lookup(true);
-    int index=0;
-    VECTOR<int,3> index_start,index_end;
-    OPENGL_UNIFORM_SLICE<float>::Get_Face_Index_Range(slice,x_face_values,0,index_start,index_end,scale);
-    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
-        if(x_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j,k)));
-    OPENGL_UNIFORM_SLICE<float>::Get_Face_Index_Range(slice,y_face_values,1,index_start,index_end,scale);
-    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
-        if(y_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j,k)));
-    OPENGL_UNIFORM_SLICE<float>::Get_Face_Index_Range(slice,z_face_values,2,index_start,index_end,scale);
-    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
-        if(z_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(2,TV_INT(i,j,k)));
-    opengl_points.points.Resize(index);
+    Bool_Update_Helper(*this);
 }
 //#####################################################################
 // Update
@@ -108,21 +93,7 @@ Update()
 template<> void OPENGL_FACE_SCALAR_FIELD_3D<double,bool>::
 Update()
 {
-    OPENGL_UNIFORM_SLICE<double>* slice=(OPENGL_UNIFORM_SLICE<double>*)this->slice;
-    opengl_points.points.Resize(x_face_values.Size().Product()+y_face_values.Size().Product()+z_face_values.Size().Product());
-    opengl_points.color=color_map->Lookup(true);
-    int index=0;
-    VECTOR<int,3> index_start,index_end;
-    OPENGL_UNIFORM_SLICE<double>::Get_Face_Index_Range(slice,x_face_values,0,index_start,index_end);
-    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
-        if(x_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(0,TV_INT(i,j,k)));
-    OPENGL_UNIFORM_SLICE<double>::Get_Face_Index_Range(slice,y_face_values,1,index_start,index_end);
-    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
-        if(y_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(1,TV_INT(i,j,k)));
-    OPENGL_UNIFORM_SLICE<double>::Get_Face_Index_Range(slice,z_face_values,2,index_start,index_end);
-    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
-        if(z_face_values(i,j,k)) opengl_points.points(index++)=grid.Face(FACE_INDEX<TV::m>(2,TV_INT(i,j,k)));
-    opengl_points.points.Resize(index);
+    Bool_Update_Helper(*this);
 }
 //#####################################################################
 // Slice_Has_Changed
@@ -141,9 +112,16 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection)
     // TODO: this should also interpolate to particles
     if(selection && selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && grid.Is_MAC_Grid()){
         VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)selection)->index;
-        T2 left=x_face_values(index),right=x_face_values(index.x+1,index.y,index.z),
-            bottom=y_face_values(index),top=y_face_values(index.x,index.y+1,index.z),
-            back=z_face_values(index),front=z_face_values(index.x,index.y,index.z+1);
+        FACE_INDEX<TV::m> ix(0,index),iy(1,index),iz(2,index);
+        T2 left=face_values(ix);
+        T2 bottom=face_values(iy);
+        T2 back=face_values(iz);
+        ix.index.x++;
+        iy.index.y++;
+        iz.index.z++;
+        T2 right=face_values(ix);
+        T2 top=face_values(iy);
+        T2 front=face_values(iz);
         output_stream<<"    left = "<<left<<",right = "<<right<<std::endl;
         output_stream<<"    bottom = "<<bottom<<",top = "<<top<<std::endl;
         output_stream<<"    back = "<<back<<",front = "<<front<<std::endl;}

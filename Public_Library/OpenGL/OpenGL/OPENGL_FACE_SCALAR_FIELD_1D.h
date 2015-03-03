@@ -21,7 +21,6 @@ public:
     using OPENGL_OBJECT<T>::World_Space_Box;
     GRID<TV> grid;
     ARRAY<T2,FACE_INDEX<1> > &face_values;
-    ARRAY_VIEW<T2,VECTOR<int,1> > &x_face_values;
     OPENGL_COLOR point_color;
     OPENGL_COLOR line_color;
 private:
