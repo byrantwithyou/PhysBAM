@@ -80,6 +80,24 @@ Initialize()
                 density,particles_per_cell);
             Add_Gravity(TV(0,-9.8));
         } break;
+        case 4:{ // Colliding spheres/rings
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            ARRAY<SPHERE<TV> > spheres;
+            ARRAY<T> inner_radius;
+            ARRAY<TV> V0;
+            spheres.Append(SPHERE<TV>(TV(0.3,0.5),0.1));inner_radius.Append(0.05);V0.Append(TV(1,0));
+            spheres.Append(SPHERE<TV>(TV(0.7,0.5),0.15));inner_radius.Append(0.03);V0.Append(TV(-0.5,0));
+            for(int i=0;i<spheres.m;i++){
+                T density=2*scale_mass;
+                int last_m=particles.number;
+                Seed_Particles(spheres(i),[=](const TV& X){return V0(i);},[=](const TV&){return MATRIX<T,2>();},
+                    density,particles_per_cell);
+                for(int k=last_m;k<particles.number;k++){
+                    if((particles.X(k)-spheres(i).center).Magnitude_Squared()<sqr(inner_radius(i))){
+                        particles.deletion_list.Append(k);}}}
+            particles.Delete_Elements_On_Deletion_List();
+            Add_Fixed_Corotated(1e3*scale_E,0.3);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
