@@ -122,7 +122,7 @@ PD_Curl(const T scale,const FRAME<TV>& frame,const T k_p,const int number_of_joi
 template<class TV> RIGID_BODY<TV>* SOLIDS_STANDARD_TESTS<TV>::
 Create_Rigid_Body_From_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const T density,
     const T cell_size,const int subdivision_loops,bool perform_manifold_check,const bool (*create_levelset_test)(TETRAHEDRALIZED_VOLUME<T>&),
-    const bool use_levelset_maker,const int levels_of_octree)
+    const bool use_levelset_maker)
 {
     PHYSBAM_ASSERT(density>0);
     RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
@@ -133,7 +133,7 @@ Create_Rigid_Body_From_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahe
     mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Mass().inertia_tensor,dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume.particles));
     rigid_body->Frame()=frame_local;
     rigid_body->Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(tetrahedralized_volume,*tetrahedralized_volume.triangulated_surface,cell_size,subdivision_loops,
-        create_levelset_test,use_levelset_maker,levels_of_octree);
+        create_levelset_test,use_levelset_maker);
     return rigid_body;
 }
 //#####################################################################
@@ -142,7 +142,7 @@ Create_Rigid_Body_From_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahe
 template<class TV> RIGID_BODY<TV>* SOLIDS_STANDARD_TESTS<TV>::
 Create_Rigid_Body_From_Fracture_Tetrahedralized_Volume(EMBEDDED_MATERIAL_SURFACE<TV,3>& embedded_material_surface,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,
     const T density,const T cell_size,const int subdivision_loops,const bool perform_manifold_check,const bool (*create_levelset_test)(TETRAHEDRALIZED_VOLUME<T>&),
-    const bool use_levelset_maker,const int levels_of_octree)
+    const bool use_levelset_maker)
 {
     PHYSBAM_ASSERT(density>0);
     RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
@@ -159,7 +159,7 @@ Create_Rigid_Body_From_Fracture_Tetrahedralized_Volume(EMBEDDED_MATERIAL_SURFACE
     rigid_body->Frame()=frame_local;
     embedded_material_surface.embedded_object.Update_Embedded_Particle_Positions();
     rigid_body->Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(tetrahedralized_volume,material_surface,cell_size,subdivision_loops,create_levelset_test,
-        use_levelset_maker,levels_of_octree);
+        use_levelset_maker);
     return rigid_body;
 }
 //#####################################################################

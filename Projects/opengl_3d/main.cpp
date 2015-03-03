@@ -91,15 +91,14 @@ private:
 
     // TODO: need better grid control 
     OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_3D<T> >* grid_component;
-    OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_3D<T> >* coarse_grid_component;
 
     // Options
     std::string basedir;
     bool has_diagnostics;
 
-    GRID<TV> grid,mac_grid,regular_grid,coarse_grid,coarse_mac_grid,coarse_regular_grid;
-    bool has_valid_grid,has_valid_rle_grid,has_valid_octree_grid,has_valid_coarse_grid;
-    bool node_based,coarse_node_based;
+    GRID<TV> grid,mac_grid,regular_grid;
+    bool has_valid_grid;
+    bool node_based;
     OPENGL_SLICE_MANAGER<T> slice_manager;
     OPENGL_BOX_3D<T>* opengl_box;
     OPENGL_UNIFORM_SLICE<T>* slice;
@@ -116,7 +115,7 @@ private:
 template<class T> VISUALIZATION<T>::
 VISUALIZATION(STREAM_TYPE stream_type)
     :ANIMATED_VISUALIZATION<T>(stream_type),positive_particles_component(0),negative_particles_component(0),
-    removed_positive_particles_component(0),removed_negative_particles_component(0),grid_component(0),coarse_grid_component(0),opengl_box(0),slice(0),
+    removed_positive_particles_component(0),removed_negative_particles_component(0),grid_component(0),opengl_box(0),slice(0),
     allow_caching(true),always_add_mac_velocities(false)
 {
 }
@@ -166,29 +165,12 @@ template<class T> void VISUALIZATION<T>::
 Read_Grid()
 {
     has_valid_grid=false;
-    has_valid_coarse_grid=false;
-    has_valid_octree_grid=false;
-    std::string octree_filename;
     std::string filename,coarse_filename;
 
-    std::string octree_grid_prefix="";
-    octree_filename=STRING_UTILITIES::string_sprintf("%s/%d/octree_grid",basedir.c_str(),start_frame);
     filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset",basedir.c_str(),start_frame);
     coarse_filename=STRING_UTILITIES::string_sprintf("%s/%d/coarse_levelset",basedir.c_str(),start_frame);
     // For backwards compatibility
     if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
-
-    if(FILE_UTILITIES::File_Exists(coarse_filename)){
-        std::cout<<"Reading coarse_grid from '"<<coarse_filename<<"'..."<<std::endl;
-        ARRAY<T,VECTOR<int,3> > phi;
-        LEVELSET<TV> levelset(coarse_grid,phi);
-        FILE_UTILITIES::Read_From_File(stream_type,coarse_filename,levelset);
-        has_valid_coarse_grid=true;}
-    else if(FILE_UTILITIES::File_Exists(basedir+"/common/coarse_grid")){
-        coarse_filename=basedir+"/common/coarse_grid";
-        LOG::cout<<"Reading coarse grid from '"<<coarse_filename<<"'..."<<std::flush;
-        FILE_UTILITIES::Read_From_File(stream_type,coarse_filename,coarse_grid);
-        has_valid_coarse_grid=true;}
 
     if(FILE_UTILITIES::File_Exists(filename)){
         std::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
@@ -205,10 +187,6 @@ Read_Grid()
     if(has_valid_grid){
         node_based=!grid.Is_MAC_Grid();
         mac_grid=grid.Get_MAC_Grid();regular_grid=grid.Get_Regular_Grid();}
-
-    if(has_valid_coarse_grid){
-        coarse_node_based=!coarse_grid.Is_MAC_Grid();
-        coarse_mac_grid=coarse_grid.Get_MAC_Grid();coarse_regular_grid=coarse_grid.Get_Regular_Grid();}
 }
 
 //#####################################################################
@@ -499,23 +477,6 @@ Initialize_Components_And_Key_Bindings()
             opengl_world.Append_Bind_Key('-',vector_velocity_component->Decrease_Vector_Size_CB());
             opengl_world.Append_Bind_Key('h',vector_velocity_component->Toggle_Arrowhead_CB());}
 
-        OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>* coarse_mac_velocity_component=0;
-        opengl_world.Set_Key_Binding_Category("Coarse Velocity");
-        filename=basedir+"/%d/coarse_mac_velocities";
-        if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-            coarse_mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>(stream_type,coarse_mac_grid,filename);
-            coarse_mac_velocity_component->opengl_mac_velocity_field.scale=grid.Domain_Indices().max_corner(1)/coarse_grid.Domain_Indices().max_corner(1);
-            coarse_mac_velocity_component->opengl_mac_velocity_field.size=.01;
-            coarse_mac_velocity_component->opengl_mac_velocity_field.vector_color=OPENGL_COLOR::Blue();
-            coarse_mac_velocity_component->opengl_mac_velocity_field.Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_3D<T>::FACE_CENTERED);
-            Add_Component(coarse_mac_velocity_component,"coarse MAC velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-            slice_manager.Add_Object(coarse_mac_velocity_component);}
-        if(coarse_mac_velocity_component){
-            opengl_world.Append_Bind_Key('x',coarse_mac_velocity_component->Toggle_Draw_CB());
-            opengl_world.Append_Bind_Key('V',coarse_mac_velocity_component->Toggle_Velocity_Mode_And_Draw_CB());
-            opengl_world.Append_Bind_Key('=',coarse_mac_velocity_component->Increase_Vector_Size_CB());
-            opengl_world.Append_Bind_Key('-',coarse_mac_velocity_component->Decrease_Vector_Size_CB());
-            opengl_world.Append_Bind_Key('h',coarse_mac_velocity_component->Toggle_Arrowhead_CB());}
         filename=basedir+"/%d/centered_velocities";
         if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
             OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* center_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,mac_grid,filename);
@@ -632,15 +593,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('^',grid_component->object.Toggle_Draw_Ghost_Values_CB());
         slice_manager.Add_Object(grid_component);}
-    if(has_valid_coarse_grid){
-        OPENGL_GRID_3D<T>* opengl_grid=new OPENGL_GRID_3D<T>(stream_type,*(new GRID<TV>(coarse_grid)),OPENGL_COLOR::Ground_Tan(.5));
-        opengl_grid->owns_grid=true;
-        opengl_grid->scale=grid.Domain_Indices().max_corner(1)/coarse_grid.Domain_Indices().max_corner(1);
-        coarse_grid_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_3D<T> >(stream_type,*opengl_grid);
-        Add_Component(coarse_grid_component,"Coarse Grid",'y',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
-        opengl_world.Append_Bind_Key('^',coarse_grid_component->object.Toggle_Draw_Ghost_Values_CB());
-        slice_manager.Add_Object(coarse_grid_component);}
-
 
     opengl_world.Set_Key_Binding_Category("Particles");
 
@@ -721,20 +673,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(sph_particles_component,"SPH particles",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         if(slice_manager.slice) slice_manager.Add_Object(sph_particles_component);}
 
-    if(has_valid_coarse_grid){
-        // TODO: this is legacy output form, probably can be removed now
-        OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>* psi_N_component=0;
-        if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_u",start_frame) &&
-           FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_v",start_frame) &&
-           FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_w",start_frame))
-            psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(stream_type,coarse_grid,basedir+"/%d/psi_N_u",basedir+"/%d/psi_N_v",basedir+"/%d/psi_N_w",new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
-        else if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/coarse_psi_N",start_frame))
-            psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(stream_type,coarse_grid,basedir+"/%d/coarse_psi_N",new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
-        if(psi_N_component){
-            psi_N_component->opengl_scalar_field.scale=grid.Domain_Indices().max_corner(1)/coarse_grid.Domain_Indices().max_corner(1);
-            Add_Component(psi_N_component,"Coarse Psi_N points",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-            opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_N_component->Toggle_Draw_CB());
-            slice_manager.Add_Object(psi_N_component);}}
     if(has_valid_grid){
         // TODO: this is legacy output form, probably can be removed now
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>* psi_N_component=0;
@@ -749,12 +687,6 @@ Initialize_Components_And_Key_Bindings()
             opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->Toggle_Draw_CB());
             slice_manager.Add_Object(psi_N_component);}}
 
-    filename=basedir+"/%d/coarse_psi_D";
-    if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(stream_type,coarse_mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);
-        Add_Component(psi_D_component,"Psi_D points",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_D_component->Toggle_Draw_CB());
-        slice_manager.Add_Object(psi_D_component);}
     filename=basedir+"/%d/psi_D";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(stream_type,mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);

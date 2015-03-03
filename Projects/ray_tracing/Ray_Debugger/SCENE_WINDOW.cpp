@@ -70,7 +70,7 @@ template<class T> void SCENE_WINDOW<T>::Initialize_Objects()
 }
 template<class T> void SCENE_WINDOW<T>::Draw_Irradiance_Cache()
 {
-    if(display_irradiance_cache)Draw_Octree(world.irradiance_cache.octree_grid,world.irradiance_cache.octree_grid.cells(1,1,1));
+//    if(display_irradiance_cache)Draw_Octree(world.irradiance_cache.octree_grid,world.irradiance_cache.octree_grid.cells(1,1,1));
 }
 //#####################################################################
 // Draw_Subsurface_Scattering_Samples
@@ -99,8 +99,6 @@ template<class T> void SCENE_WINDOW<T>::Draw_Subsurface_Scattering_Samples(SUBSU
         OpenGL_Vertex(bssrdf_tree->samples(i).position + bssrdf_tree->samples(i).normal);
     }
     glEnd(); 
-    
-//    Draw_Octree(bssrdf_tree->octree_grid,bssrdf_tree->octree_grid.cells(1,1,1));
 }
 
 //#####################################################################

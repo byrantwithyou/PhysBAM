@@ -269,7 +269,6 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         LOG::cout<<"Voxel"<<std::endl;
         bool precompute=parameters.Get_Parameter("Precompute_Single_Scattering",false);
         std::string grid_filename=parameters.Get_Parameter("Grid_Filename",std::string("<unknown>"));
-        std::string coarse_grid_filename=parameters.Get_Parameter("Coarse_Grid_Filename",std::string("<unknown>"));
         std::string density_filename=parameters.Get_Parameter("Density_Filename",std::string("<unknown>"));
         std::string density_fraction_filename=parameters.Get_Parameter("Density_Fraction_Filename",std::string("<unknown>"));
         std::string temperature_filename=parameters.Get_Parameter("Temperature_Filename",std::string("<unknown>"));
@@ -311,11 +310,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             LOG::cout<<"Using density cubic"<<std::endl;
             for(CELL_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){VECTOR<int,TV::dimension> cell=iterator.Cell_Index();(*density_data)(cell)=(*density_data)(cell)*(*density_data)(cell)*(*density_data)(cell);}}
         LOG::cout<<"  Read grid " <<*grid;
-        RENDERING_UNIFORM_VOXELS<T> *voxels;
-        if(coarse_grid_filename!="<unknown>"){
-            GRID<TV>* coarse_grid=new GRID<TV>;FILE_UTILITIES::template Read_From_File<RW>(Animated_Filename(coarse_grid_filename,frame),*coarse_grid);
-            voxels=new RENDERING_UNIFORM_VOXELS<T>(*grid,*coarse_grid,*density_data,(T)volume_step);}
-        else voxels=new RENDERING_UNIFORM_VOXELS<T>(*grid,*density_data,(T)volume_step);
+        RENDERING_UNIFORM_VOXELS<T> *voxels=new RENDERING_UNIFORM_VOXELS<T>(*grid,*density_data,(T)volume_step);
         if(temperature_filename!="<unknown>"){
             ARRAY<T,VECTOR<int,3> >* temperature_data=new ARRAY<T,VECTOR<int,3> >;voxels->data.Append(temperature_data);
             FILE_UTILITIES::template Read_From_File<RW>(Animated_Filename(temperature_filename,frame),*temperature_data);}

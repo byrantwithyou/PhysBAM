@@ -88,15 +88,14 @@ private:
     OPENGL_COMPONENT_PARTICLES_2D<T>* negative_particles_component;
     OPENGL_COMPONENT_PARTICLES_2D<T>* removed_positive_particles_component;
     OPENGL_COMPONENT_PARTICLES_2D<T>* removed_negative_particles_component;
-    OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_2D<T> >* grid_component,*coarse_grid_component;
+    OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_2D<T> >* grid_component;
     // Options
     std::string basedir;
 
-    GRID<TV> grid,mac_grid,regular_grid,coarse_grid,coarse_mac_grid,coarse_regular_grid;
+    GRID<TV> grid,mac_grid,regular_grid;
     bool has_valid_grid;
     bool has_valid_sub_grids;
-    bool has_valid_coarse_grid;
-    bool node_based,coarse_node_based;
+    bool node_based;
 
     ARRAY<int> rigid_bodies_no_draw_list;
 };
@@ -109,7 +108,7 @@ OPENGL_2D_VISUALIZATION(STREAM_TYPE stream_type)
     sph_cell_weight_component(0),
     pressure_component(0),coarse_pressure_component(0),positive_particles_component(0),negative_particles_component(0),
     removed_positive_particles_component(0),removed_negative_particles_component(0),
-    grid_component(0),coarse_grid_component(0)
+    grid_component(0)
 {
     add_axes=false;
 }
@@ -120,7 +119,6 @@ template<class T> OPENGL_2D_VISUALIZATION<T>::
 ~OPENGL_2D_VISUALIZATION()
 {
     delete grid_component;
-    delete coarse_grid_component;
 }
 //#####################################################################
 // Add_Arguments
@@ -163,7 +161,6 @@ Read_Grid()
 {
     has_valid_grid=false;
     has_valid_sub_grids=false;
-    has_valid_coarse_grid=false;
     std::string filename,coarse_filename,sub_filename;
 
     sub_filename=STRING_UTILITIES::string_sprintf("%s/%d/sub_grids",basedir.c_str(),start_frame);
@@ -171,12 +168,6 @@ Read_Grid()
     // For backwards compatibility
     if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
     if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset_0",basedir.c_str(),start_frame);
-
-    if(FILE_UTILITIES::File_Exists(basedir+"/common/coarse_grid")){
-        coarse_filename=basedir+"/common/coarse_grid";
-        LOG::cout<<"Reading coarse grid from '"<<coarse_filename<<"'..."<<std::flush;
-        FILE_UTILITIES::Read_From_File(stream_type,coarse_filename,coarse_grid);
-        has_valid_coarse_grid=true;}
 
     if(FILE_UTILITIES::File_Exists(filename)){
         LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl<<std::flush;
@@ -193,10 +184,6 @@ Read_Grid()
     if(has_valid_grid){
         node_based=!grid.Is_MAC_Grid();
         mac_grid=grid.Get_MAC_Grid();regular_grid=grid.Get_Regular_Grid();}
-
-    if(has_valid_coarse_grid){
-        coarse_node_based=!coarse_grid.Is_MAC_Grid();
-        coarse_mac_grid=coarse_grid.Get_MAC_Grid();coarse_regular_grid=coarse_grid.Get_Regular_Grid();}
 }
 
 //#####################################################################
@@ -481,30 +468,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('-',vector_velocity_component->Decrease_Vector_Size_CB());
         opengl_world.Append_Bind_Key('h',vector_velocity_component->Toggle_Arrowhead_CB());}
 
-    // Uniform coarse velocities
-    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>* coarse_mac_velocity_component=0;
-    opengl_world.Set_Key_Binding_Category("Coarse Velocity");
-    filename=basedir+"/%d/coarse_mac_velocities";
-    if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        coarse_mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,coarse_mac_grid,filename);
-        for(int i=0;i<coarse_mac_velocity_component->opengl_adaptive_mac_velocity_fields.m;i++){
-            coarse_mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->size=.01;
-            coarse_mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->vector_color=OPENGL_COLOR::Blue();
-            coarse_mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);}
-        coarse_mac_velocity_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
-        Add_Component(coarse_mac_velocity_component,"coarse MAC velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
-    if(coarse_mac_velocity_component){
-        opengl_world.Append_Bind_Key('x',coarse_mac_velocity_component->Toggle_Draw_CB());
-        opengl_world.Append_Bind_Key('V',coarse_mac_velocity_component->Toggle_Velocity_Mode_And_Draw_CB());
-        opengl_world.Append_Bind_Key("<F9>",coarse_mac_velocity_component->Toggle_Draw_Divergence_CB());
-        opengl_world.Append_Bind_Key('=',coarse_mac_velocity_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',coarse_mac_velocity_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',coarse_mac_velocity_component->Toggle_Arrowhead_CB());
-        opengl_world.Append_Bind_Key('S',coarse_mac_velocity_component->Toggle_Draw_Streamlines_CB());
-        opengl_world.Append_Bind_Key('/',coarse_mac_velocity_component->Toggle_Use_Streamline_Seed_CB());
-        opengl_world.Append_Bind_Key(']',coarse_mac_velocity_component->Lengthen_Streamlines_CB());
-        opengl_world.Append_Bind_Key('[',coarse_mac_velocity_component->Shorten_Streamlines_CB());}
-
     filename=basedir+"/%d/beta_face";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T>* beta_face_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T>(stream_type,mac_grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,.002,OPENGL_COLOR::Gray(1),OPENGL_COLOR::Gray(0)));
@@ -602,16 +565,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(pressure_component,"Pressure",'7',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F10),pressure_component->Toggle_Draw_Mode_CB());}
 
-    opengl_world.Set_Key_Binding_Category("Coarse Pressure");
-    // TODO: these ramps are leaking memory
-    filename=basedir+"/%d/coarse_pressure";
-    if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        coarse_pressure_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,coarse_mac_grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Cyan(0,0),OPENGL_COLOR::Cyan(1)));
-        coarse_pressure_component->opengl_scalar_field.Set_Scale_Range(-20,20);
-        coarse_pressure_component->opengl_scalar_field.Set_Uniform_Contour_Values(0,20,1);
-        Add_Component(coarse_pressure_component,"Coarse Pressure",'7',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F10),coarse_pressure_component->Toggle_Draw_Mode_CB());}
-
     opengl_world.Set_Key_Binding_Category("Compressible_Implicit_Pressure");
     filename=basedir+"/%d/compressible_implicit_pressure";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
@@ -638,12 +591,6 @@ Initialize_Components_And_Key_Bindings()
         grid_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_2D<T> >(stream_type,*opengl_grid);
         Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('^',grid_component->object.Toggle_Draw_Ghost_Values_CB());}
-    opengl_world.Set_Key_Binding_Category("Coarse Grid");
-    if(has_valid_coarse_grid){
-        OPENGL_GRID_2D<T>* opengl_grid=new OPENGL_GRID_2D<T>(stream_type,*(new GRID<TV>(coarse_grid)),OPENGL_COLOR::Ground_Tan(.5));
-        coarse_grid_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_2D<T> >(stream_type,*opengl_grid);
-        Add_Component(coarse_grid_component,"Coarse Grid",'y',BASIC_VISUALIZATION<T>::SELECTABLE);
-        opengl_world.Append_Bind_Key('^',coarse_grid_component->object.Toggle_Draw_Ghost_Values_CB());}
     opengl_world.Set_Key_Binding_Category("Sub Grids");
 
     // deformable and rigid bodies
@@ -694,11 +641,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(soft_constraints_deformable_objects_component,"Soft Constraints Deformable Objects",'e',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);}
 
     opengl_world.Set_Key_Binding_Category("Fluid Boundaries");
-    if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/coarse_psi_N",start_frame)){
-        OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>* psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>(stream_type,coarse_grid,basedir+"/%d/coarse_psi_N",
-            new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
-        Add_Component(psi_N_component,"Coarse Psi_N points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_N_component->Toggle_Draw_CB());}
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N",start_frame)){
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>* psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>(stream_type,grid,basedir+"/%d/psi_N",
             new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
@@ -720,11 +662,6 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,"",false,false);
         Add_Component(component,"Collision Iterators",'I',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);}
-    filename=basedir+"/%d/coarse_psi_D";
-    if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>(stream_type,coarse_mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS);
-        Add_Component(psi_D_component,"Coarse Psi_D points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_D_component->Toggle_Draw_CB());}
     filename=basedir+"/%d/psi_D";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>(stream_type,mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS);

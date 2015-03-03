@@ -134,7 +134,6 @@ public:
         std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_mac_velocities",face_velocities_ghost);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",upsampled_mac_grid);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/coarse_grid",mac_grid);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density",upsampled_density);
     }
 

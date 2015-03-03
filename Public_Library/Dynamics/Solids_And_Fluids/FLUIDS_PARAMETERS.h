@@ -38,7 +38,6 @@ class FLUIDS_PARAMETERS:public NONCOPYABLE
     typedef BOUNDARY<TV,SYMMETRIC_MATRIX<T,TV::m> > T_BOUNDARY_SYMMETRIC_MATRIX;
 public:
     const bool smoke,fire,water,sph,compressible;
-    bool quadtree,octree;
     int number_of_ghost_cells;
     T cfl;
     TV gravity;

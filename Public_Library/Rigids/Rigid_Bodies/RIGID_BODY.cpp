@@ -665,7 +665,7 @@ Diagonalize_Inertia_Tensor(const SYMMETRIC_MATRIX<T,TV::SPIN::m>& inertia_tensor
 //#####################################################################
 template<class TV> template<class T2> void RIGID_BODY<TV>::
 Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(TETRAHEDRALIZED_VOLUME<T2>& tetrahedralized_volume,TRIANGULATED_SURFACE<T>& triangulated_surface,const T cell_size,
-    const int subdivision_loops,const bool (*create_levelset_test)(TETRAHEDRALIZED_VOLUME<T>&),const bool use_implicit_surface_maker,const int levels_of_octree,const T shrink_levelset_amount)
+    const int subdivision_loops,const bool (*create_levelset_test)(TETRAHEDRALIZED_VOLUME<T>&),const bool use_implicit_surface_maker,const T shrink_levelset_amount)
 {
     Add_Structure(tetrahedralized_volume);
     TRIANGULATED_SURFACE<T>* triangulated_surface_condensed=TRIANGULATED_SURFACE<T>::Create();

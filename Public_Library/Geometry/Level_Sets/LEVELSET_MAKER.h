@@ -32,7 +32,6 @@ public:
     T surface_thickness_or_zero; // if zero, use grid.dx/100
     T surface_padding_for_flood_fill_or_negative; // if negative, use grid.dx/100 (0 means no padding)
     ARRAY<VECTOR<int,3> > initialized_indices;
-    ARRAY<int> initialized_indices_octree;
     bool write_debug_data;
     bool write_debug_path;
     VECTOR<int,3> path_start_node,path_end_node;

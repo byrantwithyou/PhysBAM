@@ -55,7 +55,6 @@ public:
 protected:
     ARRAY<OPENGL_TETRAHEDRALIZED_VOLUME<T>*> opengl_tetrahedralized_volume;
     ARRAY<OPENGL_LEVELSET_MULTIVIEW<T>*> opengl_levelset;
-    ARRAY<OPENGL_TRIANGULATED_SURFACE<T>*> opengl_octree_levelset_surface;
     ARRAY<OPENGL_AXES<T>*> opengl_axes;
     ARRAY<bool> draw_object;
     ARRAY<bool> use_object_bounding_box;

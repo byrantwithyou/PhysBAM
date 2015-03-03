@@ -53,7 +53,7 @@ public:
     {for(int i=0;i<boundary_datatypes_array.m;i++) MPI_UTILITIES::Free_Elements_And_Clean_Memory(boundary_datatypes_array(i));
     for(int i=0;i<ghost_datatypes_array.m;i++) MPI_UTILITIES::Free_Elements_And_Clean_Memory(ghost_datatypes_array(i));}
 
-    // use .97 for octrees and .99 for uniform grids!
+    // use .99 for uniform grids!
     void Use_Modified_Incomplete_Cholesky(const T modified_incomplete_cholesky_coefficient_input=(T).97)
     {incomplete_cholesky=true;modified_incomplete_cholesky=true;modified_incomplete_cholesky_coefficient=modified_incomplete_cholesky_coefficient_input;} // note that both are true
 

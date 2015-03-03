@@ -327,7 +327,7 @@ public:
     void Diagonalize_Inertia_Tensor(const SYMMETRIC_MATRIX<T,TV::SPIN::m>& inertia_tensor_at_center_of_mass);
     template<class T2> void Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(TETRAHEDRALIZED_VOLUME<T2>& tetrahedralized_volume,
         TRIANGULATED_SURFACE<T>& triangulated_surface,const T cell_size,const int subdivision_loops=0,const bool (*create_levelset_test)(TETRAHEDRALIZED_VOLUME<T>&)=0,
-        const bool use_implicit_surface_maker=true,const int levels_of_octree=0,const T shrink_levelset_amount=0);
+        const bool use_implicit_surface_maker=true,const T shrink_levelset_amount=0);
     void Update_Bounding_Box();
     void Update_Bounding_Box_From_Implicit_Geometry();
     void Add_Structure(STRUCTURE<TV>& structure); // set up acceleration stuctures for certain types of structures

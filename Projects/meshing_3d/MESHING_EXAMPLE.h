@@ -24,7 +24,6 @@ public:
     TETRAHEDRAL_MESHING<T> tetrahedral_meshing;
     std::string implicit_surface_filename;
     bool use_multiple_levelset_implicit_surface;
-    bool use_octree_implicit_surface; // otherwise use level set implicit surface
     T bcc_lattice_cell_size; // size of a grid cell in the bcc lattice - 0 means it is calculated automatically
     bool use_adaptive_refinement; // otherwise uniform refinement is used
     int max_subdivision_levels;
@@ -51,7 +50,7 @@ protected:
 public:
 
     MESHING_EXAMPLE(const STREAM_TYPE stream_type)
-        :stream_type(stream_type),tetrahedral_meshing(stream_type),use_multiple_levelset_implicit_surface(false),use_octree_implicit_surface(false),
+        :stream_type(stream_type),tetrahedral_meshing(stream_type),use_multiple_levelset_implicit_surface(false),
         bcc_lattice_cell_size(0),use_adaptive_refinement(true),max_subdivision_levels(7),
         use_optimization(true),use_dynamics(true),
         number_of_initial_optimization_steps(3),number_of_final_optimization_steps(0),

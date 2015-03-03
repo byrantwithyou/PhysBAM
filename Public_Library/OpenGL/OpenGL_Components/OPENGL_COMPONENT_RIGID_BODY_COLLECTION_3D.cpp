@@ -71,7 +71,6 @@ template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
     opengl_triangulated_surface.Delete_Pointers_And_Clean_Memory();
     opengl_tetrahedralized_volume.Delete_Pointers_And_Clean_Memory();
     opengl_levelset.Delete_Pointers_And_Clean_Memory();
-    opengl_octree_levelset_surface.Delete_Pointers_And_Clean_Memory();
     opengl_axes.Delete_Pointers_And_Clean_Memory();
     if(need_destroy_rigid_body_collection) delete &rigid_body_collection;
 }
@@ -143,13 +142,11 @@ Resize_Structures(const int size)
         delete opengl_triangulated_surface(i);
         delete opengl_tetrahedralized_volume(i);
         delete opengl_levelset(i);
-        delete opengl_octree_levelset_surface(i);
         delete opengl_axes(i);}
 
     opengl_triangulated_surface.Resize(size);
     opengl_tetrahedralized_volume.Resize(size);
     opengl_levelset.Resize(size);
-    opengl_octree_levelset_surface.Resize(size);
     opengl_axes.Resize(size);
     draw_object.Resize(size);
     use_object_bounding_box.Resize(size);
@@ -278,7 +275,6 @@ Initialize_One_Body(const int body_id,const bool force)
         opengl_triangulated_surface.Resize(max_number_of_bodies);
         opengl_tetrahedralized_volume.Resize(max_number_of_bodies);
         opengl_levelset.Resize(max_number_of_bodies);
-        opengl_octree_levelset_surface.Resize(max_number_of_bodies);
         //extra_components.Resize(max_number_of_bodies);
         opengl_axes.Resize(max_number_of_bodies);
         draw_object.Resize(max_number_of_bodies);
@@ -889,7 +885,6 @@ Display() const
                     break;}
                 opengl_levelset(i)->Update();
                 opengl_levelset(i)->Display();}
-            if(opengl_octree_levelset_surface(i)) opengl_octree_levelset_surface(i)->Display();
             glPopName();}
         glPopName();}
     if(draw_individual_axes)

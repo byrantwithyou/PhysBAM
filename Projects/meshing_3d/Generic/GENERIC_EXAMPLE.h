@@ -137,7 +137,7 @@ class GENERIC_EXAMPLE:public MESHING_EXAMPLE<T>
 public:
     typedef MESHING_EXAMPLE<T> BASE;
     using BASE::tetrahedral_meshing;using BASE::implicit_surface_filename;
-    using BASE::use_octree_implicit_surface;using BASE::bcc_lattice_cell_size;using BASE::use_adaptive_refinement;
+    using BASE::bcc_lattice_cell_size;using BASE::use_adaptive_refinement;
     using BASE::max_subdivision_levels;using BASE::use_optimization;using BASE::use_dynamics;
     using BASE::number_of_initial_optimization_steps;using BASE::number_of_final_optimization_steps;
     using BASE::force_attraction_coefficient;using BASE::velocity_attraction_coefficient;
@@ -167,7 +167,6 @@ public:
 
         // levelset
         implicit_surface_filename=parameter_list.Get_Parameter("levelset","<unknown>");
-        use_octree_implicit_surface=parameter_list.Get_Parameter("use_octree_implicit_surface",false);
         use_multiple_levelset_implicit_surface=parameter_list.Get_Parameter("use_multiple_levelset_implicit_surface",false);
         if(implicit_surface_filename=="<unknown>"){std::cerr<<"No levelset specified."<<std::endl;exit(1);}
 
