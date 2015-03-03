@@ -31,6 +31,7 @@
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -100,7 +101,7 @@ public:
     T current_dt;
     bool implicit_solid,no_implicit_solid,use_cut_volume,use_low_order_advection;
 
-    GEOMETRY_PARTICLES<TV> debug_particles;
+    DEBUG_PARTICLES<TV> debug_particles;
     SEGMENTED_CURVE_2D<T>* front_tracked_structure;
     SEGMENTED_CURVE_2D<T>* rebuild_curve;
     ARRAY<TV> saved_tracked_particles_X;

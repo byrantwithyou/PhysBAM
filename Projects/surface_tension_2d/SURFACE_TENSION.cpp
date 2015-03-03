@@ -27,9 +27,6 @@ SURFACE_TENSION(const STREAM_TYPE stream_type)
 
 {
     LOG::cout<<std::setprecision(16);
-    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-    debug_particles.Store_Velocity(true);
-    Store_Debug_Particles(&debug_particles);
 }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -919,8 +916,7 @@ Write_Output_Files(const int frame) const
 {
     BASE::Write_Output_Files(frame);
     FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
-    FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
-    const_cast<GEOMETRY_PARTICLES<TV>&>(debug_particles).Delete_All_Elements();
+    debug_particles.Write_Debug_Particles(this->stream_type,output_directory,frame);
 }
 //#####################################################################
 // Function Initialize_Surface_Particles
@@ -1072,30 +1068,6 @@ Update_Time_Varying_Material_Properties(const T time)
         LEVELSET_MAKER_UNIFORM<TV>::Compute_Level_Set(*front_tracked_structure,*fluids_parameters.grid,3,phi);}
 }
 //#####################################################################
-// Function Store_Debug_Particles
-//#####################################################################
-template<class T> GEOMETRY_PARTICLES<VECTOR<T,2> >* SURFACE_TENSION<T>::
-Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle)
-{
-    static GEOMETRY_PARTICLES<TV>* stored_particles=0;
-    GEOMETRY_PARTICLES<TV>* tmp=stored_particles;
-    if(particle) stored_particles=particle;
-    return tmp;
-}
-//#####################################################################
-// Function Add_Debug_Particle
-//#####################################################################
-template<class TV> void PhysBAM::
-Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color)
-{
-    typedef typename TV::SCALAR T;
-    GEOMETRY_PARTICLES<TV>* particles=(GEOMETRY_PARTICLES<TV>*)SURFACE_TENSION<T>::Store_Debug_Particles();
-    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles->template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-    int p=particles->Add_Element();
-    particles->X(p)=X;
-    (*color_attribute)(p)=color;
-}
-//#####################################################################
 // Function FSI_Analytic_Test
 //#####################################################################
 template<class T> void SURFACE_TENSION<T>::
@@ -1107,7 +1079,6 @@ FSI_Analytic_Test()
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
     TV solid_gravity=TV(0,-(T)9.8*m/(s*s));
     fluids_parameters.surface_tension=0;
-    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
 
     fluids_parameters.gravity.y=-(T)9.8*m;
     fluids_parameters.density=(T)100/(m*m);
@@ -1141,7 +1112,6 @@ FSI_Analytic_Test()
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
     FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),0));
-    FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Postprocess_Frame
@@ -1200,30 +1170,7 @@ Postprocess_Substep(const T dt,const T time)
         LOG::cout<<"Analytic Vel at [.75,.5]: "<<-omega*circle_perturbation*pow(T(.25)/circle_radius,(T)oscillation_mode-1)*sin(omega*time)*TV(1,0)<<std::endl;
     }
 }
-//#####################################################################
-// Function Debug_Particle_Set_Attribute
-//#####################################################################
-template<class TV,class ATTR> void PhysBAM::
-Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr)
-{
-    typedef typename TV::SCALAR T;
-    GEOMETRY_PARTICLES<TV>* particles=(GEOMETRY_PARTICLES<TV>*)SURFACE_TENSION<T>::Store_Debug_Particles();
-    ARRAY_VIEW<ATTR>* attribute=particles->template Get_Array<ATTR>(id);
-    attribute->Last()=attr;
-}
 namespace PhysBAM{
 template class SURFACE_TENSION<float>;
-template void Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);
-template void Add_Debug_Particle<VECTOR<float,2> >(VECTOR<float,2> const&,VECTOR<float,3> const&);
-template void Add_Debug_Particle<VECTOR<float,3> >(VECTOR<float,3> const&,VECTOR<float,3> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,1>,VECTOR<float,1> >(ATTRIBUTE_ID,VECTOR<float,1> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float,2> >(ATTRIBUTE_ID,VECTOR<float,2> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(ATTRIBUTE_ID,VECTOR<float,3> const&);
 template class SURFACE_TENSION<double>;
-template void Add_Debug_Particle<VECTOR<double,1> >(VECTOR<double,1> const&,VECTOR<double,3> const&);
-template void Add_Debug_Particle<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<double,3> const&);
-template void Add_Debug_Particle<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,1>,VECTOR<double,1> >(ATTRIBUTE_ID,VECTOR<double,1> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<double,2> >(ATTRIBUTE_ID,VECTOR<double,2> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<double,3> >(ATTRIBUTE_ID,VECTOR<double,3> const&);
 }
