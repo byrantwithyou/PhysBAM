@@ -102,6 +102,7 @@ Advance_One_Time_Step()
 {
     example.Begin_Time_Step(example.time);
 
+    Print_Particle_Stats("particle state",example.dt,example.velocity,0);
     Update_Simulated_Particles();
     Update_Particle_Weights();
     Particle_To_Grid();
@@ -360,6 +361,20 @@ Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,T
     if(!example.print_stats) return;
     typename TV::SPIN am=example.Total_Grid_Angular_Momentum(dt,u,u0);
     TV lm=example.Total_Grid_Linear_Momentum(u);
+    LOG::cout<<str<<" linear  "<<lm<<"  diff "<<(lm-example.last_linear_momentum)<<std::endl;
+    LOG::cout<<str<<" angular "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
+    example.last_linear_momentum=lm;
+    example.last_angular_momentum=am;
+}
+//#####################################################################
+// Function Print_Grid_Stats
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Print_Particle_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0)
+{
+    if(!example.print_stats) return;
+    typename TV::SPIN am=example.Total_Particle_Angular_Momentum();
+    TV lm=example.Total_Particle_Linear_Momentum();
     LOG::cout<<str<<" linear  "<<lm<<"  diff "<<(lm-example.last_linear_momentum)<<std::endl;
     LOG::cout<<str<<" angular "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
     example.last_linear_momentum=lm;

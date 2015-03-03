@@ -198,6 +198,19 @@ Total_Grid_Linear_Momentum(const ARRAY<TV,TV_INT>& u) const
 // Function Total_Grid_Angular_Momentum
 //#####################################################################
 template<class TV> typename TV::SPIN MPM_EXAMPLE<TV>::
+Total_Particle_Angular_Momentum() const
+{
+    typename TV::SPIN result;
+    for(int k=0;k<simulated_particles.m;k++){
+        int p=simulated_particles(k);
+        result+=particles.mass(p)*particles.X(p).Cross(particles.V(p));
+        if(use_affine) result-=particles.mass(p)*particles.B(p).Contract_Permutation_Tensor();}
+    return result;
+}
+//#####################################################################
+// Function Total_Grid_Angular_Momentum
+//#####################################################################
+template<class TV> typename TV::SPIN MPM_EXAMPLE<TV>::
 Total_Grid_Angular_Momentum(T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0) const
 {
     typename TV::SPIN result;

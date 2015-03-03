@@ -49,6 +49,7 @@ public:
     T Max_Particle_Speed() const;
     void Update_Simulated_Particles();
     void Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0);
+    void Print_Particle_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0);
 //#####################################################################
 };
 }
