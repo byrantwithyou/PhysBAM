@@ -254,8 +254,13 @@ Grid_To_Particle()
                 TV_INT index=it.Index();
                 TV V_grid=example.velocity_new(index);
                 TV Z=example.grid.Center(index);
-                TV xi_new=Z+dt/2*(V_grid+example.velocity(index));
-                TV xp_new=particles.X(p)+dt/2*(Vn_interpolate+V_pic);
+                TV xi_new,xp_new;
+                if(example.use_midpoint){
+                    xi_new=Z+dt/2*(V_grid+example.velocity(index));
+                    xp_new=particles.X(p)+dt/2*(Vn_interpolate+V_pic);}
+                else{
+                    xi_new=Z+dt*V_grid;
+                    xp_new=particles.X(p)+dt*V_pic;}
                 B+=it.Weight()/2*(MATRIX<T,TV::m>::Outer_Product(V_grid,Z-particles.X(p)+xi_new-xp_new)
                     +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));}
 
