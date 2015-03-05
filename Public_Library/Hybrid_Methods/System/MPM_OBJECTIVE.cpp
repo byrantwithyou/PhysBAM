@@ -119,7 +119,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
         int i=system.example.valid_grid_indices(k);
         TV V=v0.u.array(i)+dv.u.array(i);
         T deepest=0;
-        COLLISION c={0,i};
+        COLLISION c={-1,i};
         for(int j=0;j<system.example.collision_objects.m;j++){
             T depth=0;
             COLLISION t={j,i};
@@ -127,7 +127,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
                 system.collisions.Append(t);
                 if(depth<deepest)
                     c=t;}}
-        if(!c.object) continue;
+        if(c.object==-1) continue;
         dv.u.array(i)=V-v0.u.array(i);}
 }
 //#####################################################################
