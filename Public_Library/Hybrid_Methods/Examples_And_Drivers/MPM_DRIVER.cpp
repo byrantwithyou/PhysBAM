@@ -280,21 +280,28 @@ Apply_Forces()
     example.Capture_Stress();
     example.Precompute_Forces(example.time);
     objective.Reset();
-    NEWTONS_METHOD<T> newtons_method;
-    newtons_method.tolerance=example.newton_tolerance*example.dt;
-    newtons_method.progress_tolerance=1e-5;
-    newtons_method.max_iterations=example.newton_iterations;
-    newtons_method.krylov_tolerance=example.solver_tolerance;
-    newtons_method.max_krylov_iterations=example.solver_iterations;
-    newtons_method.use_cg=true;
-    newtons_method.debug=true;
+    if(example.use_forward_euler){
+        objective.tmp2*=0;
+        example.Add_Forces(objective.tmp2.u,example.time);
+        for(int i=0;i<example.valid_grid_indices.m;i++){
+            int p=example.valid_grid_indices(i);
+            dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}}
+    else{
+        NEWTONS_METHOD<T> newtons_method;
+        newtons_method.tolerance=example.newton_tolerance*example.dt;
+        newtons_method.progress_tolerance=1e-5;
+        newtons_method.max_iterations=example.newton_iterations;
+        newtons_method.krylov_tolerance=example.solver_tolerance;
+        newtons_method.max_krylov_iterations=example.solver_iterations;
+        newtons_method.use_cg=true;
+        newtons_method.debug=true;
 
-    newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance);
-    LOG::printf("max velocity: %P\n",Max_Particle_Speed());
-    if(example.test_diff) objective.Test_Diff(dv);
+        newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance);
+        LOG::printf("max velocity: %P\n",Max_Particle_Speed());
+        if(example.test_diff) objective.Test_Diff(dv);
 
-    bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
-    if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;
+        bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
+        if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;}
 
     Apply_Friction();
     objective.Restore_F();
