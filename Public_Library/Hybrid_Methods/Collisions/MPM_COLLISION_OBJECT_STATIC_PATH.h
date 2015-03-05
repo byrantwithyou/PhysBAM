@@ -19,7 +19,7 @@ class MPM_COLLISION_OBJECT_STATIC_PATH:public MPM_COLLISION_OBJECT_PATH<TV>
 public:
     FRAME<TV> frame;
 
-    MPM_COLLISION_OBJECT_STATIC_PATH(const FRAME<TV>& frame);
+    MPM_COLLISION_OBJECT_STATIC_PATH(const FRAME<TV> frame);
     virtual ~MPM_COLLISION_OBJECT_STATIC_PATH();
 
     FRAME<TV> Orientation(const T t) const;

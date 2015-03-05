@@ -11,7 +11,7 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> MPM_COLLISION_OBJECT_STATIC_PATH<TV>::
-MPM_COLLISION_OBJECT_STATIC_PATH(const FRAME<TV>& frame)
+MPM_COLLISION_OBJECT_STATIC_PATH(const FRAME<TV> frame)
     :frame(frame)
 {
 }

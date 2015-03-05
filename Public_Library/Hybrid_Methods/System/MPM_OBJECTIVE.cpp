@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Tools/Log/LOG.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
@@ -110,27 +111,24 @@ Restore_F() const
 template<class TV> void MPM_OBJECTIVE<TV>::
 Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
 {
-#if 0
+    if(!system.example.collision_objects.m) return;
     MPM_KRYLOV_VECTOR<TV>& dv=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(Bdv);
     system.collisions.Remove_All();
-    if(!system.example.collidable_objects.m) return;
 
     for(int k=0;k<system.example.valid_grid_indices.m;k++){
         int i=system.example.valid_grid_indices(k);
-        if(system.example.mass.array(i)<system.example.mass_threshold) continue;
         TV V=v0.u.array(i)+dv.u.array(i);
         T deepest=0;
         COLLISION c={0,i};
-        for(int j=0;j<system.example.collidable_objects.m;j++){
+        for(int j=0;j<system.example.collision_objects.m;j++){
             T depth=0;
             COLLISION t={j,i};
-            if(system.example.collidable_objects(j)->Collide(system.example.location.array(i),time,V,&depth,&t.n,false)){
+            if(system.example.collision_objects(j)->Collide(system.example.time,system.example.location.array(i),V,&depth,&t.n,false)){
                 system.collisions.Append(t);
                 if(depth<deepest)
                     c=t;}}
         if(!c.object) continue;
         dv.u.array(i)=V-v0.u.array(i);}
-#endif
 }
 //#####################################################################
 // Function Project_Gradient_And_Prune_Constraints
@@ -138,17 +136,16 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
 template<class TV> void MPM_OBJECTIVE<TV>::
 Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep) const
 {
-#if 0
+    if(!system.example.collision_objects.m) return;
     MPM_KRYLOV_VECTOR<TV>& g=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(Bg);
-//
-    for(int i=system.collisions.m;i>0;i--){
+
+    for(int i=system.collisions.m-1;i>=0;i--){
         COLLISION& c=system.collisions(i);
         TV &gv=g.u.array(c.p);
-        if(system.example.collidable_objects(c.object)->stick){gv=TV();continue;}
+        if(system.example.collision_objects(c.object)->sticky){gv=TV();continue;}
         T rvel=TV::Dot_Product(gv,c.n);
         if(allow_sep && rvel<0) system.collisions.Remove_Index_Lazy(i);
         else gv-=rvel*c.n;}
-#endif
 }
 //#####################################################################
 // Function Make_Feasible

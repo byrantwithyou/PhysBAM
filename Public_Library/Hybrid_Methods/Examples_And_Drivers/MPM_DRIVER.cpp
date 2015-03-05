@@ -319,7 +319,25 @@ Perform_Particle_Collision(int p)
 template<class TV> void MPM_DRIVER<TV>::
 Apply_Friction()
 {
-    // TODO
+    if(!example.collision_objects.m) return;
+    objective.Adjust_For_Collision(dv);
+    objective.Compute_Unconstrained(dv,0,&objective.tmp0,0);
+    objective.tmp1=objective.tmp0;
+    objective.Project_Gradient_And_Prune_Constraints(objective.tmp1,true);
+
+    for(int i=0;i<objective.system.collisions.m;i++){
+        const typename MPM_KRYLOV_SYSTEM<TV>::COLLISION& c=objective.system.collisions(i);
+        T normal_force=TV::Dot_Product(c.n,objective.tmp0.u.array(c.p)-objective.tmp1.u.array(c.p));
+        TV& v=objective.v1.u.array(c.p);
+        if(example.collision_objects(c.object)->sticky){
+            v=TV();
+            continue;}
+        TV t=v.Projected_Orthogonal_To_Unit_Direction(c.n);
+        T t_mag=t.Normalize();
+        T coefficient_of_friction=example.collision_objects(c.object)->friction;
+        if(t_mag<=coefficient_of_friction*normal_force/example.mass.array(c.p))
+            v.Project_On_Unit_Direction(c.n);
+        else v-=coefficient_of_friction/example.mass.array(c.p)*normal_force*t;}
 }
 //#####################################################################
 // Function Compute_Dt

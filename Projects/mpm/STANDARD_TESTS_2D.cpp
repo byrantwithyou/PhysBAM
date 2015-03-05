@@ -2,10 +2,13 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Matrices/FRAME.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT_STATIC_PATH.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
@@ -97,6 +100,19 @@ Initialize()
                         particles.deletion_list.Append(k);}}}
             particles.Delete_Elements_On_Deletion_List();
             Add_Fixed_Corotated(1e3*scale_E,0.3);
+        } break;
+        case 5:{ // Dropping sphere to ground
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            SPHERE<TV> sphere(TV(.5,.5),.2);
+            T density=2*scale_mass;
+            Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},
+                density,particles_per_cell);
+            Add_Gravity(TV(0,-9.8));
+            Add_Fixed_Corotated(1e3*scale_E,0.3);
+            MPM_COLLISION_OBJECT<TV>* ground=new MPM_COLLISION_OBJECT<TV>(
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(),TV(1,.1))),
+                new MPM_COLLISION_OBJECT_STATIC_PATH<TV>(FRAME<TV>()),true,10);
+            collision_objects.Append(ground);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
