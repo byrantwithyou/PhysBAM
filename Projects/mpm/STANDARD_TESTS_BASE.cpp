@@ -39,6 +39,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     parse_args.Add("-order",&order,"order","Interpolation basis order");
     parse_args.Add("-affine",&use_affine,"Use affine PIC");
     parse_args.Add("-midpoint",&use_midpoint,"Use midpoint rule");
+    parse_args.Add("-particle_collision",&use_particle_collision,"Use particle collision");
     parse_args.Add("-print_stats",&print_stats,"Print momentum/energy stats");
     parse_args.Add("-flip",&flip,"frac","Flip ratio");
     parse_args.Add("-cfl",&cfl,"cfl","CFL number");
