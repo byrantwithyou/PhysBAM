@@ -102,6 +102,7 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
     T mass=density*volume;
     for(int i=0;i<X.m;i++){
         int p=particles.Add_Element();
+        particles.valid(p)=true;
         particles.X(p)=X(i);
         particles.V(p)=V(X(i));
         if(use_affine) particles.B(p)=dV(X(i))*weights->Dp(X(i));

@@ -4,10 +4,6 @@ To be implemented:
 
 * Threading
 
-* Invalid particles
-  - Invalidate particles that leave domain
-  - Update simulated_particles properly
-
 * Dump out meshes for forces in a way that allows viewer to see them.
 
 * Make viewer aware of MPM_PARTICLES directly

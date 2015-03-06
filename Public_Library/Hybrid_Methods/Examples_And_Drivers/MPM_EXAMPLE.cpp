@@ -57,7 +57,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 
     for(int i=0;i<particles.X.m;i++){
-        Add_Debug_Particle(particles.X(i),VECTOR<T,3>(1,1,1));
+        Add_Debug_Particle(particles.X(i),VECTOR<T,3>(1,particles.valid(i),1));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(i));}
     for(int i=0;i<location.array.m;i++){
         TV& X=location.array(i);

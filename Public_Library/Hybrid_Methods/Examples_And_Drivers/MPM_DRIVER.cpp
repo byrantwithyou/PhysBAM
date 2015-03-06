@@ -269,7 +269,9 @@ Grid_To_Particle()
         if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
         else particles.X(p)+=particles.V(p)*dt;
         particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
-        particles.B(p)=B;}
+        particles.B(p)=B;
+
+        if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}
 }
 //#####################################################################
 // Function Apply_Forces
@@ -374,7 +376,11 @@ Max_Particle_Speed() const
 template<class TV> void MPM_DRIVER<TV>::
 Update_Simulated_Particles()
 {
-    example.simulated_particles=IDENTITY_ARRAY<>(example.particles.X.m);
+    example.simulated_particles.Remove_All();
+    for(int p=0;p<example.particles.number;p++)
+        if(example.particles.valid(p))
+            example.simulated_particles.Append(p);
+    // example.simulated_particles=IDENTITY_ARRAY<>(example.particles.X.m);
     example.particle_is_simulated.Remove_All();
     example.particle_is_simulated.Resize(example.particles.X.m);
     example.particle_is_simulated.Subset(example.simulated_particles).Fill(true);
