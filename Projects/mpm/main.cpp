@@ -1,3 +1,4 @@
+#include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include "STANDARD_TESTS_2D.h"
@@ -23,6 +24,8 @@ int main(int argc,char *argv[])
     typedef double T;
     typedef double RW;
     STREAM_TYPE stream_type((RW()));
+    PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
+    PROCESS_UTILITIES::Set_Backtrace(true);
 
     bool use_3d=false;
     PARSE_ARGS parse_args(argc,argv);
