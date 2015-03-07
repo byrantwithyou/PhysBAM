@@ -262,8 +262,6 @@ Initialize_Components_And_Key_Bindings()
 
     if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
         OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>* rigid_bodies_component=0;
-        //if(deformable_objects_component) rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>(stream_type,deformable_objects_component->solid_body_collection.rigid_body_collection,basedir,true);
-        //else rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>(stream_type,basedir,true);
         rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>(stream_type,basedir,true);
         rigid_bodies_component->Set_Vector_Size(0.01);
         rigid_bodies_component->Set_Frame(start_frame); // needed before reinitialize so that no draw list will work

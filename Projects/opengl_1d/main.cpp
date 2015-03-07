@@ -15,7 +15,7 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_1D.h>
-#include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_RIGID_BODIES_1D.h>
+#include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_1D.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <fstream>
@@ -164,9 +164,10 @@ Initialize_Components_And_Key_Bindings()
             "u",'\0',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE);
     filename=basedir+"/%d/rigid_body_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RIGID_BODIES_1D<T>* rigid_body_component=new OPENGL_COMPONENT_RIGID_BODIES_1D<T>(stream_type,basedir);
-        Add_Component(rigid_body_component,"Rigid Bodies",'5',BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key('n',rigid_body_component->Toggle_Show_Object_Names_CB());}
+        OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>* rigid_bodies_component=
+            new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>(stream_type,basedir);
+        Add_Component(rigid_bodies_component,"Rigid Bodies",'5',BASIC_VISUALIZATION<T>::OWNED);
+        opengl_world.Append_Bind_Key('n',rigid_bodies_component->Toggle_Show_Object_Names_CB());}
     filename=basedir+"/%d/deformable_object_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>* deformable_geometry_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>(stream_type,basedir,start_frame);

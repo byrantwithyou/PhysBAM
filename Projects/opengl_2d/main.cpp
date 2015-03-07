@@ -602,10 +602,7 @@ Initialize_Components_And_Key_Bindings()
         if(!FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
             }}
     if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
-        //if(deformable_objects_component) rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODIES_2D<T>(deformable_objects_component->solid_body_collection.rigid_body_collection,basedir);
-        //else rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODIES_2D<T>(stream_type,basedir);
         rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>(stream_type,basedir);
-        //rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODIES_2D<T>(stream_type,basedir);
         rigid_bodies_component->Set_Vector_Size(.01);
         rigid_bodies_component->selectable=true;
         if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/colors",start_frame)) FILE_UTILITIES::template Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),start_frame),rigid_bodies_component->colors);
