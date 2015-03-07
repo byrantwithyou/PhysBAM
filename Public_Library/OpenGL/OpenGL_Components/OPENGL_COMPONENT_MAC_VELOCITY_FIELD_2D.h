@@ -26,21 +26,13 @@ public:
     using OPENGL_COMPONENT<T>::Toggle_Draw;using OPENGL_COMPONENT<T>::stream_type;
     typedef LINEAR_INTERPOLATION_UNIFORM<TV,T> T_LINEAR_INTERPOLATION_VECTOR;
     OPENGL_MAC_VELOCITY_FIELD_2D<T>* opengl_mac_velocity_field;
-    ARRAY<OPENGL_MAC_VELOCITY_FIELD_2D<T>* > opengl_adaptive_mac_velocity_fields;
     OPENGL_SCALAR_FIELD_2D<T>* opengl_vorticity_magnitude;
     bool draw_vorticity;
 private:
     std::string velocity_filename;
-    std::string directory_adaptive;
-    std::string filename_active_cells;
-    std::string filename_active_faces;
     int frame_loaded;
-    int level;
-    bool use_levels;
-    int level_loaded;
     bool valid;
     bool draw_divergence;
-    bool draw_all_levels;
     bool draw_streamlines,use_seed_for_streamlines;
     ARRAY<T,VECTOR<int,2> > divergence;
     OPENGL_SCALAR_FIELD_2D<T>* opengl_divergence_field;
@@ -52,9 +44,7 @@ private:
     unsigned int streamline_seed;
 
 public:
-    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input,const std::string directory_adaptive_input="",const std::string filename_active_cells_input="",const std::string filename_active_faces_input="");
-    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input,const std::string directory_adaptive_input,const std::string filename_active_cells_input,const std::string filename_active_faces_input,const ARRAY<GRID<TV>*> grid_array_input);
-    void Initialize(const ARRAY<GRID<TV>*> &grid_array_input);
+    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input);
     virtual ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
@@ -75,9 +65,6 @@ public:
     void Decrease_Vector_Size();
     void Toggle_Arrowhead();
     void Toggle_Draw_Divergence();
-    void Toggle_Draw_All_Levels();
-    void Next_Level();
-    void Previous_Level();
     void Toggle_Draw_Streamlines();
     void Toggle_Use_Streamline_Seed();
     void Set_Streamline_Seed(const unsigned int seed=0);

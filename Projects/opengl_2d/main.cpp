@@ -400,28 +400,25 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/kinetic_energy";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         ke_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-        for(int i=0;i<ke_component->opengl_adaptive_mac_velocity_fields.m;i++){
-            ke_component->opengl_adaptive_mac_velocity_fields(i)->size=.01;
-            ke_component->opengl_adaptive_mac_velocity_fields(i)->vector_color=OPENGL_COLOR::Green();
-            ke_component->opengl_adaptive_mac_velocity_fields(i)->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);}
+        ke_component->opengl_mac_velocity_field->size=.01;
+        ke_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Green();
+        ke_component->opengl_mac_velocity_field->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
         ke_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
         Add_Component(ke_component,"Kinetic Energy",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/mac_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-        for(int i=0;i<mac_velocity_component->opengl_adaptive_mac_velocity_fields.m;i++){
-            mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->size=.01;
-            mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->vector_color=OPENGL_COLOR::Magenta();
-            mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);}
+        mac_velocity_component->opengl_mac_velocity_field->size=.01;
+        mac_velocity_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Magenta();
+        mac_velocity_component->opengl_mac_velocity_field->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
         mac_velocity_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
         Add_Component(mac_velocity_component,"MAC velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/compressible_mac_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-        for(int i=0;i<mac_velocity_component->opengl_adaptive_mac_velocity_fields.m;i++){
-            mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->size=.01;
-            mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->vector_color=OPENGL_COLOR::Magenta();
-            mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);}
+        mac_velocity_component->opengl_mac_velocity_field->size=.01;
+        mac_velocity_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Magenta();
+        mac_velocity_component->opengl_mac_velocity_field->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
         mac_velocity_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
         Add_Component(mac_velocity_component,"Compressible MAC velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/centered_velocities";
@@ -434,10 +431,9 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         std::cout<<"Using mass fluxes (from "<<filename<<")"<<std::endl;
         OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>* face_flux_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-        for(int i=0;i<face_flux_component->opengl_adaptive_mac_velocity_fields.m;i++){
-            face_flux_component->opengl_adaptive_mac_velocity_fields(i)->size=.01;
-            face_flux_component->opengl_adaptive_mac_velocity_fields(i)->vector_color=OPENGL_COLOR::Magenta();
-            face_flux_component->opengl_adaptive_mac_velocity_fields(i)->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);}
+        face_flux_component->opengl_mac_velocity_field->size=.01;
+        face_flux_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Magenta();
+        face_flux_component->opengl_mac_velocity_field->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
         face_flux_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
         Add_Component(face_flux_component,"Mass fluxes",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('M',face_flux_component->Toggle_Velocity_Mode_And_Draw_CB());

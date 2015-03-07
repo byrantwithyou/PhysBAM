@@ -20,54 +20,16 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input,const std::string directory_adaptive_input,const std::string filename_active_cells_input,const std::string filename_active_faces_input)
+OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input)
     :OPENGL_COMPONENT<T>(stream_type,"MAC Velocity Field 2D"),draw_vorticity(false),
-    velocity_filename(velocity_filename_input),directory_adaptive(directory_adaptive_input),filename_active_cells(filename_active_cells_input),filename_active_faces(filename_active_faces_input),level(1),
-    use_levels(true),level_loaded(-1),valid(false),draw_divergence(false),draw_all_levels(true),draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),
+    velocity_filename(velocity_filename_input),valid(false),draw_divergence(false),
+    draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),
     opengl_streamlines(stream_type,streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
-{
-    ARRAY<GRID<TV>*> grid_array;
-    grid_array.Resize(1);
-    grid_array(0)=new GRID<TV>(grid);
-    Initialize(grid_array);
-    grid_array.Delete_Pointers_And_Clean_Memory();
-}
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input,const std::string directory_adaptive_input,const std::string filename_active_cells_input,const std::string filename_active_faces_input,const ARRAY<GRID<TV>*> grid_array_input)
-    :OPENGL_COMPONENT<T>(stream_type,"MAC Velocity Field 2D"),draw_vorticity(false),velocity_filename(velocity_filename_input),directory_adaptive(directory_adaptive_input),filename_active_cells(filename_active_cells_input),filename_active_faces(filename_active_faces_input),level(1),use_levels(true),level_loaded(-1),
-    valid(false),draw_divergence(false),draw_all_levels(true),draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),opengl_streamlines(stream_type,streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
-{
-    Initialize(grid_array_input);
-}
-//#####################################################################
-// Function Initialize
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-Initialize(const ARRAY<GRID<TV>*> &grid_array_input)
 {
     is_animation=FILE_UTILITIES::Is_Animated(velocity_filename);
     frame_loaded=-1;
 
-    int number_of_levels=0;
-    while(directory_adaptive!=""){
-        std::string dirname=STRING_UTILITIES::string_sprintf(directory_adaptive.c_str(),(number_of_levels+1));
-        LOG::cout<<"Checking "<<dirname<<std::endl;
-        if(FILE_UTILITIES::Directory_Exists(dirname)) number_of_levels++;
-        else break;}
-    LOG::cout<<"Found "<<number_of_levels<<" levels for adaptive"<<std::endl;
-    
-    if(number_of_levels==0){use_levels=false;number_of_levels=1;}
-    else velocity_filename=FILE_UTILITIES::Get_Short_Name(velocity_filename);
-
-    for(int i=number_of_levels;i<opengl_adaptive_mac_velocity_fields.m;i++)
-        delete opengl_adaptive_mac_velocity_fields(i);
-    opengl_adaptive_mac_velocity_fields.Resize(number_of_levels);
-    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++)
-        opengl_adaptive_mac_velocity_fields(i)=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(stream_type,*grid_array_input(i));
-    opengl_mac_velocity_field=opengl_adaptive_mac_velocity_fields(0);
+    opengl_mac_velocity_field=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(stream_type,grid);
     number_of_steps=2*opengl_mac_velocity_field->grid.counts.x;
     opengl_vorticity_magnitude=new OPENGL_SCALAR_FIELD_2D<T>(stream_type,opengl_mac_velocity_field->grid,*(new ARRAY<T,VECTOR<int,2> >),OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1));
 
@@ -89,8 +51,7 @@ Initialize(const ARRAY<GRID<TV>*> &grid_array_input)
 template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D()
 {
-    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++)
-        delete opengl_adaptive_mac_velocity_fields(i);
+    delete &opengl_mac_velocity_field;
     delete opengl_divergence_field;
     delete &opengl_vorticity_magnitude->values;
     delete opengl_vorticity_magnitude;
@@ -101,8 +62,7 @@ template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 template<class T> bool OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 Valid_Frame(int frame_input) const
 {
-    if(use_levels) return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf(directory_adaptive.c_str(),level)+FILE_UTILITIES::Get_Frame_Filename(velocity_filename.c_str(), frame_input));
-    else return FILE_UTILITIES::Frame_File_Exists(velocity_filename, frame_input);
+    return FILE_UTILITIES::Frame_File_Exists(velocity_filename, frame_input);
 }
 //#####################################################################
 // Function Print_Selection_Info
@@ -142,9 +102,7 @@ template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 Display() const
 {
     if(valid){
-        if(draw){
-            if(draw_all_levels) for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Display();
-            else opengl_adaptive_mac_velocity_fields(level)->Display();}
+        if(draw) opengl_mac_velocity_field->Display();
         if(draw_divergence) opengl_divergence_field->Display();
         if(draw_vorticity) opengl_vorticity_magnitude->Display();
         if(draw_streamlines) opengl_streamlines.Display();}
@@ -165,28 +123,14 @@ template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 Reinitialize()
 {
     if(draw || draw_divergence){
-        if((is_animation && (frame_loaded!=frame || level_loaded!=level)) || (!is_animation && frame_loaded < 0)){
+        if((is_animation && frame_loaded!=frame) || (!is_animation && frame_loaded < 0)){
             valid = false;
-            if(use_levels) for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++){
-                std::string tmp_filename=STRING_UTILITIES::string_sprintf(directory_adaptive.c_str(),i)+FILE_UTILITIES::Get_Frame_Filename(velocity_filename.c_str(),frame);
-                if(FILE_UTILITIES::File_Exists(tmp_filename)) FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,opengl_adaptive_mac_velocity_fields(i)->u,opengl_adaptive_mac_velocity_fields(i)->v);
-                else return;
-                tmp_filename=STRING_UTILITIES::string_sprintf(directory_adaptive.c_str(),i)+FILE_UTILITIES::Get_Frame_Filename(filename_active_cells.c_str(),frame);
-                LOG::cout<<"Reading active cells from"<<tmp_filename<<std::endl;
-                if(FILE_UTILITIES::File_Exists(tmp_filename)){if(!opengl_adaptive_mac_velocity_fields(i)->active_cells) opengl_adaptive_mac_velocity_fields(i)->active_cells=new ARRAY<bool,TV_INT>();
-                    FILE_UTILITIES::Read_From_File<bool>(tmp_filename,*opengl_adaptive_mac_velocity_fields(i)->active_cells);}
-                else return;
-                tmp_filename=STRING_UTILITIES::string_sprintf(directory_adaptive.c_str(),i)+FILE_UTILITIES::Get_Frame_Filename(filename_active_faces.c_str(),frame);
-                LOG::cout<<"Reading active faces from"<<tmp_filename<<std::endl;
-                if(FILE_UTILITIES::File_Exists(tmp_filename)){if(!opengl_adaptive_mac_velocity_fields(i)->active_faces) opengl_adaptive_mac_velocity_fields(i)->active_faces=new ARRAY<bool,FACE_INDEX<TV::m> >();
-                    FILE_UTILITIES::Read_From_File<bool>(tmp_filename,*opengl_adaptive_mac_velocity_fields(i)->active_faces);}
-                opengl_adaptive_mac_velocity_fields(i)->Update();}
-            else{
-                std::string tmp_filename=FILE_UTILITIES::Get_Frame_Filename(velocity_filename.c_str(), frame);
-                if(FILE_UTILITIES::File_Exists(tmp_filename)) FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,opengl_mac_velocity_field->face_velocities);
-                else return;
-                opengl_mac_velocity_field->Update();}
-            frame_loaded=frame;level_loaded=level;valid=true;
+            std::string tmp_filename=FILE_UTILITIES::Get_Frame_Filename(velocity_filename.c_str(), frame);
+            if(FILE_UTILITIES::File_Exists(tmp_filename)) FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,opengl_mac_velocity_field->face_velocities);
+            else return;
+            opengl_mac_velocity_field->Update();
+            frame_loaded=frame;
+            valid=true;
             Update_Divergence();
             Update_Streamlines();
             if(draw_vorticity){
@@ -264,7 +208,7 @@ Update_Streamlines()
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 Toggle_Velocity_Mode()
 {
-    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Toggle_Velocity_Mode();
+    opengl_mac_velocity_field->Toggle_Velocity_Mode();
 }
 //#####################################################################
 // Function Toggle_Velocity_Mode_And_Draw
@@ -285,7 +229,7 @@ Toggle_Velocity_Mode_And_Draw()
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 Increase_Vector_Size()
 {
-    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Scale_Vector_Size(1.1);
+    opengl_mac_velocity_field->Scale_Vector_Size(1.1);
 }
 //#####################################################################
 // Function Decrease_Vector_Size
@@ -293,7 +237,7 @@ Increase_Vector_Size()
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 Decrease_Vector_Size()
 {
-    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Scale_Vector_Size(1/1.1);
+    opengl_mac_velocity_field->Scale_Vector_Size(1/1.1);
 }
 //#####################################################################
 // Function Toggle_Arrowhead
@@ -301,7 +245,7 @@ Decrease_Vector_Size()
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 Toggle_Arrowhead()
 {
-    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->draw_arrowhead = !opengl_adaptive_mac_velocity_fields(i)->draw_arrowhead;
+    opengl_mac_velocity_field->draw_arrowhead = !opengl_mac_velocity_field->draw_arrowhead;
 }
 //#####################################################################
 // Function Toggle_Draw_Divergence
@@ -311,14 +255,6 @@ Toggle_Draw_Divergence()
 {
     draw_divergence=!draw_divergence;
     Update_Divergence();
-}
-//#####################################################################
-// Function Toggle_Draw_All_Levels
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-Toggle_Draw_All_Levels()
-{
-    draw_all_levels=!draw_all_levels;
 }
 //#####################################################################
 // Function Toggle_Draw_Streamlines
@@ -362,24 +298,6 @@ Shorten_Streamlines()
 {
     number_of_steps=max(number_of_steps-10,0);
     Update_Streamlines();
-}
-//#####################################################################
-// Function Next_Level
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-Next_Level(){
-    level=min(level+1,opengl_adaptive_mac_velocity_fields.m);
-    opengl_mac_velocity_field=opengl_adaptive_mac_velocity_fields(level);
-    Reinitialize();
-}
-//#####################################################################
-// Function Previous_Level
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-Previous_Level(){
-    level=max(level-1,1);
-    opengl_mac_velocity_field=opengl_adaptive_mac_velocity_fields(level);
-    Reinitialize();
 }
 //#####################################################################
 // Function Toggle_Draw_Vorticity
