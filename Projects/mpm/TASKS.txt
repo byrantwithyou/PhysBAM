@@ -27,9 +27,3 @@ To test:
 * Test -restart
 
 To do:
-
-* Set more sensible defaults for:
-  - -newton_iterations
-  - -newton_tolerance
-  - -solver_iterations
-  - -solver_tolerance
