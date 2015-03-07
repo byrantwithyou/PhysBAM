@@ -22,8 +22,4 @@ To test:
 
 * Make sure -order 1 and -order 3 both work correctly
 
-* Test -particles_per_cell
-
-* Test -restart
-
 To do:
