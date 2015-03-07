@@ -11,14 +11,9 @@ To be implemented:
 * Implement an example with both mesh-based and non-mesh-based forces
 
 
-
 To be debugged:
 
 * Get rotation test working
-
-* Dies on "Line_Search_Wolfe_Conditions:195: Assertion failed, condition = a0.dfa<0" with NAN in output.
-     ./mpm 2 -affine -last_frame 10 -max_dt .01 -newton_tolerance 1e-5 -solver_tolerance .5 -midpoint -newton_iterations 100
-
 
 
 To test:
