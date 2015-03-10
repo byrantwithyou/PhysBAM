@@ -51,7 +51,7 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &g
 template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D()
 {
-    delete &opengl_mac_velocity_field;
+    delete opengl_mac_velocity_field;
     delete opengl_divergence_field;
     delete &opengl_vorticity_magnitude->values;
     delete opengl_vorticity_magnitude;
