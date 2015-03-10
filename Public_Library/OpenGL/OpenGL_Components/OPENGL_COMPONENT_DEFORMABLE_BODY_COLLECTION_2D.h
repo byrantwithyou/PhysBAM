@@ -37,7 +37,7 @@ protected:
     bool invalidate_deformable_objects_selection_each_frame;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> segmented_curve_objects;
     ARRAY<OPENGL_BEZIER_SPLINE_2D<T,3>*> bezier_spline_objects;
@@ -76,10 +76,6 @@ public:
     void Decrease_Vector_Size();
     void Toggle_Draw_Velocities();
     void Cycle_Display_Mode();
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D,Increase_Vector_Size,"Increase vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D,Decrease_Vector_Size,"Decrease vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D,Toggle_Draw_Velocities,"Toggle draw velocities");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D,Cycle_Display_Mode,"Cycle embedded display mode");
 
     virtual void Reinitialize(bool force=false);    // Needs to be called after some state changes
 

@@ -22,7 +22,7 @@ template<class T>
 class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D:public OPENGL_COMPONENT<T>
 {
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D(STREAM_TYPE stream_type,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_minus_component,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_plus_component,OPENGL_COMPONENT_LEVELSET_2D<T>& levelset_component);
     virtual ~OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D();
 
@@ -39,10 +39,6 @@ public:
     void Toggle_3D_Mode();
     void Increase_Point_Size();
     void Decrease_Point_Size();
-
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D, Toggle_3D_Mode, "Toggle 3d mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D, Increase_Point_Size, "Increase point size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D, Decrease_Point_Size, "Decrease point size");
 
 private:
     void Reinitialize(const bool force_even_if_not_drawn=false);

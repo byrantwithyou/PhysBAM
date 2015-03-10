@@ -14,6 +14,9 @@ OPENGL_COMPONENT_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_in
     :OPENGL_COMPONENT<T>(stream_type,"Scalar Field 3D"), opengl_scalar_field(stream_type,grid_input,*new ARRAY<T2,VECTOR<int,3> >,color_map_input),
       scalar_field_filename(scalar_field_filename_input), frame_loaded(-1), valid(false)
 {
+    viewer_callbacks.Set("toggle_smooth_slice",{[this](){Toggle_Smooth_Slice();},"Toggle smooth"});
+    viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
+    viewer_callbacks.Set("toggle_color_map",{[this](){Toggle_Color_Map();},"Toggle color map"});
     is_animation = FILE_UTILITIES::Is_Animated(scalar_field_filename);
 }
 //#####################################################################
@@ -25,6 +28,9 @@ OPENGL_COMPONENT_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_in
     :OPENGL_COMPONENT<T>(stream_type,"Scalar Field 3D"), opengl_scalar_field(stream_type,grid_input,*new ARRAY<T2,VECTOR<int,3> >,color_map_input,draw_mode_input),
       scalar_field_filename(scalar_field_filename_input), frame_loaded(-1), valid(false)
 {
+    viewer_callbacks.Set("toggle_smooth_slice",{[this](){Toggle_Smooth_Slice();},"Toggle smooth"});
+    viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
+    viewer_callbacks.Set("toggle_color_map",{[this](){Toggle_Color_Map();},"Toggle color map"});
     is_animation = FILE_UTILITIES::Is_Animated(scalar_field_filename);
 }
 //#####################################################################

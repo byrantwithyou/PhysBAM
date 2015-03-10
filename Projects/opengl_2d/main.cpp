@@ -55,7 +55,7 @@ public:
     using ANIMATED_VISUALIZATION<T>::frame_increment;using ANIMATED_VISUALIZATION<T>::frame_title;
     using ANIMATED_VISUALIZATION<T>::Update_OpenGL_Strings;using ANIMATED_VISUALIZATION<T>::camera_script_filename;
     using ANIMATED_VISUALIZATION<T>::Add_Component;using ANIMATED_VISUALIZATION<T>::Selection_Priority;
-    using ANIMATED_VISUALIZATION<T>::frame_rate;using ANIMATED_VISUALIZATION<T>::Draw_All_Objects_CB;
+    using ANIMATED_VISUALIZATION<T>::frame_rate;using ANIMATED_VISUALIZATION<T>::draw_all_objects_cb;
     using ANIMATED_VISUALIZATION<T>::Set_Current_Selection;using ANIMATED_VISUALIZATION<T>::stream_type;
     OPENGL_2D_VISUALIZATION(STREAM_TYPE stream_type);
     ~OPENGL_2D_VISUALIZATION();
@@ -71,15 +71,10 @@ private:
     virtual void Pre_Frame_Extra();
     virtual void Set_Frame_Extra();
 
-    void Cycle_Draw_Extra();
     void Command_Prompt();
     void Command_Prompt_Response();
     void Toggle_2d_Mode();
     void Change_Level(int new_level);
-    DEFINE_CALLBACK_CREATOR(OPENGL_2D_VISUALIZATION,Cycle_Draw_Extra);
-    DEFINE_CALLBACK_CREATOR(OPENGL_2D_VISUALIZATION,Command_Prompt);
-    DEFINE_CALLBACK_CREATOR(OPENGL_2D_VISUALIZATION,Command_Prompt_Response);
-    DEFINE_CALLBACK_CREATOR(OPENGL_2D_VISUALIZATION,Toggle_2d_Mode);
 
     // Components
     OPENGL_COMPONENT_SCALAR_FIELD_2D<T> *sph_cell_weight_component;
@@ -206,15 +201,15 @@ Initialize_Components_And_Key_Bindings()
         density_component->opengl_scalar_field.Update();
         opengl_world.Set_Key_Binding_Category("Density");
         Add_Component(density_component,"Density",'d',BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key('D',density_component->Toggle_Color_Map_CB());
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F8),density_component->Toggle_Draw_Mode_CB());
-        opengl_world.Append_Bind_Key('`',density_component->Toggle_Smooth_CB());}
+        opengl_world.Append_Bind_Key('D',density_component->viewer_callbacks.Get("toggle_color_map"));
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F8),density_component->viewer_callbacks.Get("toggle_draw_mode"));
+        opengl_world.Append_Bind_Key('`',density_component->viewer_callbacks.Get("toggle_smooth"));}
     filename=basedir+"/%d/density_gradient";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* density_gradient_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,
             OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)));
         density_gradient_component->opengl_scalar_field.Update();
-        density_gradient_component->Toggle_Draw();
+        density_gradient_component->viewer_callbacks.Get("toggle_draw").func();
         opengl_world.Set_Key_Binding_Category("Density");
         Add_Component(density_gradient_component,"Density Gradient",'8',BASIC_VISUALIZATION<T>::OWNED);}
     // Soot
@@ -225,15 +220,15 @@ Initialize_Components_And_Key_Bindings()
         soot_component->opengl_scalar_field.Update();
         opengl_world.Set_Key_Binding_Category("Soot");
         Add_Component(soot_component,"Soot",'i',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key('D',soot_component->Toggle_Color_Map_CB());
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F8),soot_component->Toggle_Draw_Mode_CB());
-        opengl_world.Append_Bind_Key('`',soot_component->Toggle_Smooth_CB());}
+        opengl_world.Append_Bind_Key('D',soot_component->viewer_callbacks.Get("toggle_color_map"));
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F8),soot_component->viewer_callbacks.Get("toggle_draw_mode"));
+        opengl_world.Append_Bind_Key('`',soot_component->viewer_callbacks.Get("toggle_smooth"));}
     filename=basedir+"/%d/internal_energy";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* internal_energy_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,
             OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Yellow(1,1)));
         internal_energy_component->opengl_scalar_field.Update();
-        internal_energy_component->Toggle_Draw();
+        internal_energy_component->viewer_callbacks.Get("toggle_draw").func();
         opengl_world.Set_Key_Binding_Category("Density");
         Add_Component(internal_energy_component,"Internal_Energy",'E',BASIC_VISUALIZATION<T>::OWNED);}
 
@@ -245,8 +240,8 @@ Initialize_Components_And_Key_Bindings()
         temperature_component->opengl_scalar_field.Set_Scale_Range(temp0.Min(),temp0.Max());
         opengl_world.Set_Key_Binding_Category("Temperature");
         Add_Component(temperature_component,"Temperature",'t',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key('T',temperature_component->Toggle_Color_Map_CB());
-        opengl_world.Append_Bind_Key('`',temperature_component->Toggle_Smooth_CB());}
+        opengl_world.Append_Bind_Key('T',temperature_component->viewer_callbacks.Get("toggle_color_map"));
+        opengl_world.Append_Bind_Key('`',temperature_component->viewer_callbacks.Get("toggle_smooth"));}
 
     // SPH
     filename=basedir+"/%d/sph_cell_weights";
@@ -292,15 +287,15 @@ Initialize_Components_And_Key_Bindings()
             levelset_component->opengl_levelsets(0)->Update();}
         opengl_world.Set_Key_Binding_Category("Level Set");
         Add_Component(levelset_component,"Level Set",'l',BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key(';',levelset_component->Toggle_Draw_Mode_CB());
-        opengl_world.Append_Bind_Key('\'',levelset_component->Toggle_Draw_Sign_CB());
-        opengl_world.Append_Bind_Key('L',levelset_component->Toggle_Color_Mode_CB());
-        opengl_world.Append_Bind_Key('n',levelset_component->Toggle_Normals_CB());
-        opengl_world.Append_Bind_Key('`',levelset_component->Toggle_Smooth_CB());
-        opengl_world.Append_Bind_Key('>',levelset_component->Next_Set_CB());
-        opengl_world.Append_Bind_Key('<',levelset_component->Previous_Set_CB());
-        opengl_world.Append_Bind_Key('M',levelset_component->Toggle_Draw_Multiple_Levelsets_CB());
-        opengl_world.Append_Bind_Key('^',levelset_component->Toggle_Draw_Ghost_Values_CB());}
+        opengl_world.Append_Bind_Key(';',levelset_component->viewer_callbacks.Get("toggle_draw_mode"));
+        opengl_world.Append_Bind_Key('\'',levelset_component->viewer_callbacks.Get("toggle_draw_sign"));
+        opengl_world.Append_Bind_Key('L',levelset_component->viewer_callbacks.Get("toggle_color_mode"));
+        opengl_world.Append_Bind_Key('n',levelset_component->viewer_callbacks.Get("toggle_normals"));
+        opengl_world.Append_Bind_Key('`',levelset_component->viewer_callbacks.Get("toggle_smooth"));
+        opengl_world.Append_Bind_Key('>',levelset_component->viewer_callbacks.Get("next_set"));
+        opengl_world.Append_Bind_Key('<',levelset_component->viewer_callbacks.Get("previous_set"));
+        opengl_world.Append_Bind_Key('M',levelset_component->viewer_callbacks.Get("toggle_draw_multiple_levelsets"));
+        opengl_world.Append_Bind_Key('^',levelset_component->viewer_callbacks.Get("toggle_draw_ghost_values"));}
     filename=basedir+"/%d/object_levelset";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_LEVELSET_2D<T>* object_levelset_component=new OPENGL_COMPONENT_LEVELSET_2D<T>(stream_type,filename);
@@ -312,8 +307,8 @@ Initialize_Components_And_Key_Bindings()
         object_levelset_component->opengl_levelset->Update();
         opengl_world.Set_Key_Binding_Category("Object Level Set");
         Add_Component(object_levelset_component,"Object Level Set",'9',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key('(',object_levelset_component->Toggle_Draw_Mode_CB());
-        opengl_world.Append_Bind_Key(')',object_levelset_component->Toggle_Color_Mode_CB());}
+        opengl_world.Append_Bind_Key('(',object_levelset_component->viewer_callbacks.Get("toggle_draw_mode"));
+        opengl_world.Append_Bind_Key(')',object_levelset_component->viewer_callbacks.Get("toggle_color_mode"));}
 
     // Particles
     opengl_world.Set_Key_Binding_Category("Particles");
@@ -325,11 +320,11 @@ Initialize_Components_And_Key_Bindings()
         positive_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
         if(!positive_particles_component->Uses_Sets()) positive_particles_component->opengl_points->color=OPENGL_COLOR(1,.5,0);
         Add_Component(positive_particles_component,"Positive particles",'1',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
-        opengl_world.Append_Bind_Key('!',positive_particles_component->Toggle_Draw_Point_Numbers_CB());
-        opengl_world.Append_Bind_Key('%',positive_particles_component->Toggle_Draw_Radii_CB());
-        opengl_world.Append_Bind_Key('>',positive_particles_component->Next_Set_CB());
-        opengl_world.Append_Bind_Key('<',positive_particles_component->Previous_Set_CB());
-        opengl_world.Append_Bind_Key('M',positive_particles_component->Toggle_Draw_Multiple_Particle_Sets_CB());}
+        opengl_world.Append_Bind_Key('!',positive_particles_component->viewer_callbacks.Get("toggle_draw_point_numbers"));
+        opengl_world.Append_Bind_Key('%',positive_particles_component->viewer_callbacks.Get("toggle_draw_radii"));
+        opengl_world.Append_Bind_Key('>',positive_particles_component->viewer_callbacks.Get("next_set"));
+        opengl_world.Append_Bind_Key('<',positive_particles_component->viewer_callbacks.Get("previous_set"));
+        opengl_world.Append_Bind_Key('M',positive_particles_component->viewer_callbacks.Get("toggle_draw_multiple_particle_sets"));}
     filename=basedir+"/%d/negative_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/negative_particles_0",start_frame)){
         negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,
@@ -337,33 +332,33 @@ Initialize_Components_And_Key_Bindings()
         negative_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
         if(!negative_particles_component->Uses_Sets()) negative_particles_component->opengl_points->color=OPENGL_COLOR(0,.5,1);
         Add_Component(negative_particles_component,"Negative particles",'2',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
-        opengl_world.Append_Bind_Key('@',negative_particles_component->Toggle_Draw_Point_Numbers_CB());
-        opengl_world.Append_Bind_Key('%',negative_particles_component->Toggle_Draw_Radii_CB());
-        opengl_world.Append_Bind_Key('>',negative_particles_component->Next_Set_CB());
-        opengl_world.Append_Bind_Key('<',negative_particles_component->Previous_Set_CB());
-        opengl_world.Append_Bind_Key('M',negative_particles_component->Toggle_Draw_Multiple_Particle_Sets_CB());}
+        opengl_world.Append_Bind_Key('@',negative_particles_component->viewer_callbacks.Get("toggle_draw_point_numbers"));
+        opengl_world.Append_Bind_Key('%',negative_particles_component->viewer_callbacks.Get("toggle_draw_radii"));
+        opengl_world.Append_Bind_Key('>',negative_particles_component->viewer_callbacks.Get("next_set"));
+        opengl_world.Append_Bind_Key('<',negative_particles_component->viewer_callbacks.Get("previous_set"));
+        opengl_world.Append_Bind_Key('M',negative_particles_component->viewer_callbacks.Get("toggle_draw_multiple_particle_sets"));}
     filename=basedir+"/%d/removed_positive_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_positive_particles_0",start_frame)){
         removed_positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,basedir+"/%d/removed_positive_particles_%d",
             true,particles_stored_per_cell_uniform);
         removed_positive_particles_component->opengl_points->color=OPENGL_COLOR::Green();
         Add_Component(removed_positive_particles_component,"Removed positive particles",'3',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
-        opengl_world.Append_Bind_Key('#',removed_positive_particles_component->Toggle_Draw_Point_Numbers_CB());
-        opengl_world.Append_Bind_Key('%',removed_positive_particles_component->Toggle_Draw_Radii_CB());
-        opengl_world.Append_Bind_Key('>',removed_positive_particles_component->Next_Set_CB());
-        opengl_world.Append_Bind_Key('<',removed_positive_particles_component->Previous_Set_CB());
-        opengl_world.Append_Bind_Key('M',removed_positive_particles_component->Toggle_Draw_Multiple_Particle_Sets_CB());}
+        opengl_world.Append_Bind_Key('#',removed_positive_particles_component->viewer_callbacks.Get("toggle_draw_point_numbers"));
+        opengl_world.Append_Bind_Key('%',removed_positive_particles_component->viewer_callbacks.Get("toggle_draw_radii"));
+        opengl_world.Append_Bind_Key('>',removed_positive_particles_component->viewer_callbacks.Get("next_set"));
+        opengl_world.Append_Bind_Key('<',removed_positive_particles_component->viewer_callbacks.Get("previous_set"));
+        opengl_world.Append_Bind_Key('M',removed_positive_particles_component->viewer_callbacks.Get("toggle_draw_multiple_particle_sets"));}
     filename=basedir+"/%d/removed_negative_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_negative_particles_0",start_frame)){
         removed_negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,
             basedir+"/%d/removed_negative_particles_%d",true,particles_stored_per_cell_uniform);
         removed_negative_particles_component->opengl_points->color=OPENGL_COLOR::Cyan();
         Add_Component(removed_negative_particles_component,"Removed negative particles",'4',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
-        opengl_world.Append_Bind_Key('$',removed_negative_particles_component->Toggle_Draw_Point_Numbers_CB());
-        opengl_world.Append_Bind_Key('%',removed_negative_particles_component->Toggle_Draw_Radii_CB());
-        opengl_world.Append_Bind_Key('>',removed_negative_particles_component->Next_Set_CB());
-        opengl_world.Append_Bind_Key('<',removed_negative_particles_component->Previous_Set_CB());
-        opengl_world.Append_Bind_Key('M',removed_negative_particles_component->Toggle_Draw_Multiple_Particle_Sets_CB());}
+        opengl_world.Append_Bind_Key('$',removed_negative_particles_component->viewer_callbacks.Get("toggle_draw_point_numbers"));
+        opengl_world.Append_Bind_Key('%',removed_negative_particles_component->viewer_callbacks.Get("toggle_draw_radii"));
+        opengl_world.Append_Bind_Key('>',removed_negative_particles_component->viewer_callbacks.Get("next_set"));
+        opengl_world.Append_Bind_Key('<',removed_negative_particles_component->viewer_callbacks.Get("previous_set"));
+        opengl_world.Append_Bind_Key('M',removed_negative_particles_component->viewer_callbacks.Get("toggle_draw_multiple_particle_sets"));}
     filename=basedir+"/%d/particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PARTICLES_2D<T>* particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,"",true,false);
@@ -436,39 +431,39 @@ Initialize_Components_And_Key_Bindings()
         face_flux_component->opengl_mac_velocity_field->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
         face_flux_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
         Add_Component(face_flux_component,"Mass fluxes",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key('M',face_flux_component->Toggle_Velocity_Mode_And_Draw_CB());
-        opengl_world.Append_Bind_Key('=',face_flux_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',face_flux_component->Decrease_Vector_Size_CB());}
+        opengl_world.Append_Bind_Key('M',face_flux_component->viewer_callbacks.Get("toggle_velocity_mode_and_draw"));
+        opengl_world.Append_Bind_Key('=',face_flux_component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',face_flux_component->viewer_callbacks.Get("decrease_vector_size"));}
     // TODO: integrate these into creation stage...
     if(ke_component){
-        opengl_world.Append_Bind_Key('B',ke_component->Toggle_Velocity_Mode_And_Draw_CB());
-        opengl_world.Append_Bind_Key('=',ke_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',ke_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',ke_component->Toggle_Arrowhead_CB());}
+        opengl_world.Append_Bind_Key('B',ke_component->viewer_callbacks.Get("toggle_velocity_mode_and_draw"));
+        opengl_world.Append_Bind_Key('=',ke_component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',ke_component->viewer_callbacks.Get("decrease_vector_size"));
+        opengl_world.Append_Bind_Key('h',ke_component->viewer_callbacks.Get("toggle_arrowhead"));}
     if(mac_velocity_component){
-        opengl_world.Append_Bind_Key('C',mac_velocity_component->Toggle_Draw_CB());
-        opengl_world.Append_Bind_Key('V',mac_velocity_component->Toggle_Velocity_Mode_And_Draw_CB());
-        opengl_world.Append_Bind_Key("<F9>",mac_velocity_component->Toggle_Draw_Divergence_CB());
-        opengl_world.Append_Bind_Key('=',mac_velocity_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',mac_velocity_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',mac_velocity_component->Toggle_Arrowhead_CB());
-        opengl_world.Append_Bind_Key('S',mac_velocity_component->Toggle_Draw_Streamlines_CB());
-        opengl_world.Append_Bind_Key('/',mac_velocity_component->Toggle_Use_Streamline_Seed_CB());
-        opengl_world.Append_Bind_Key(']',mac_velocity_component->Lengthen_Streamlines_CB());
-        opengl_world.Append_Bind_Key('[',mac_velocity_component->Shorten_Streamlines_CB());
-        opengl_world.Append_Bind_Key('v',mac_velocity_component->Toggle_Draw_Vorticity_CB());
-        opengl_world.Append_Bind_Key('N',mac_velocity_component->Normalize_Vorticity_Color_Map_CB());}
+        opengl_world.Append_Bind_Key('C',mac_velocity_component->viewer_callbacks.Get("toggle_draw"));
+        opengl_world.Append_Bind_Key('V',mac_velocity_component->viewer_callbacks.Get("toggle_velocity_mode_and_draw"));
+        opengl_world.Append_Bind_Key("<F9>",mac_velocity_component->viewer_callbacks.Get("toggle_draw_divergence"));
+        opengl_world.Append_Bind_Key('=',mac_velocity_component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',mac_velocity_component->viewer_callbacks.Get("decrease_vector_size"));
+        opengl_world.Append_Bind_Key('h',mac_velocity_component->viewer_callbacks.Get("toggle_arrowhead"));
+        opengl_world.Append_Bind_Key('S',mac_velocity_component->viewer_callbacks.Get("toggle_draw_streamlines"));
+        opengl_world.Append_Bind_Key('/',mac_velocity_component->viewer_callbacks.Get("toggle_use_streamline_seed"));
+        opengl_world.Append_Bind_Key(']',mac_velocity_component->viewer_callbacks.Get("lengthen_streamlines"));
+        opengl_world.Append_Bind_Key('[',mac_velocity_component->viewer_callbacks.Get("shorten_streamlines"));
+        opengl_world.Append_Bind_Key('v',mac_velocity_component->viewer_callbacks.Get("toggle_draw_vorticity"));
+        opengl_world.Append_Bind_Key('N',mac_velocity_component->viewer_callbacks.Get("normalize_vorticity_color_map"));}
     if(vector_velocity_component){
-        opengl_world.Append_Bind_Key('v',vector_velocity_component->Toggle_Draw_CB());
-        opengl_world.Append_Bind_Key('=',vector_velocity_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',vector_velocity_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',vector_velocity_component->Toggle_Arrowhead_CB());}
+        opengl_world.Append_Bind_Key('v',vector_velocity_component->viewer_callbacks.Get("toggle_draw"));
+        opengl_world.Append_Bind_Key('=',vector_velocity_component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',vector_velocity_component->viewer_callbacks.Get("decrease_vector_size"));
+        opengl_world.Append_Bind_Key('h',vector_velocity_component->viewer_callbacks.Get("toggle_arrowhead"));}
 
     filename=basedir+"/%d/beta_face";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T>* beta_face_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T>(stream_type,mac_grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,.002,OPENGL_COLOR::Gray(1),OPENGL_COLOR::Gray(0)));
         Add_Component(beta_face_component,"Beta Face",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F6),beta_face_component->Toggle_Draw_CB());}
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F6),beta_face_component->viewer_callbacks.Get("toggle_draw"));}
 
     filename=basedir+"/%d/mac_velocities_fuel";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
@@ -477,9 +472,9 @@ Initialize_Components_And_Key_Bindings()
         mac_velocity_fuel_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Cyan();
         mac_velocity_fuel_component->opengl_mac_velocity_field->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
         Add_Component(mac_velocity_fuel_component,"MAC velocities fuel",'B',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',mac_velocity_fuel_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',mac_velocity_fuel_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',mac_velocity_fuel_component->Toggle_Arrowhead_CB());}
+        opengl_world.Append_Bind_Key('=',mac_velocity_fuel_component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',mac_velocity_fuel_component->viewer_callbacks.Get("decrease_vector_size"));
+        opengl_world.Append_Bind_Key('h',mac_velocity_fuel_component->viewer_callbacks.Get("toggle_arrowhead"));}
 
     filename=basedir+"/%d/velocities_ghost_fuel";
     OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>* vector_velocity_ghost_minus_component=0;
@@ -489,20 +484,20 @@ Initialize_Components_And_Key_Bindings()
             vector_velocity_ghost_minus_component->opengl_grid_based_vector_field.size=.01;
             vector_velocity_ghost_minus_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             Add_Component(vector_velocity_ghost_minus_component,"Node ghost fuel velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-            opengl_world.Append_Bind_Key('c',vector_velocity_ghost_minus_component->Toggle_Draw_CB());
-            opengl_world.Append_Bind_Key('h',vector_velocity_ghost_minus_component->Toggle_Arrowhead_CB());
-            opengl_world.Append_Bind_Key('=',vector_velocity_ghost_minus_component->Increase_Vector_Size_CB());
-            opengl_world.Append_Bind_Key('-',vector_velocity_ghost_minus_component->Decrease_Vector_Size_CB());}
+            opengl_world.Append_Bind_Key('c',vector_velocity_ghost_minus_component->viewer_callbacks.Get("toggle_draw"));
+            opengl_world.Append_Bind_Key('h',vector_velocity_ghost_minus_component->viewer_callbacks.Get("toggle_arrowhead"));
+            opengl_world.Append_Bind_Key('=',vector_velocity_ghost_minus_component->viewer_callbacks.Get("increase_vector_size"));
+            opengl_world.Append_Bind_Key('-',vector_velocity_ghost_minus_component->viewer_callbacks.Get("decrease_vector_size"));}
         else{
             OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>* mac_velocity_ghost_minus_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
             mac_velocity_ghost_minus_component->opengl_mac_velocity_field->size=.01;
             mac_velocity_ghost_minus_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Green();
             mac_velocity_ghost_minus_component->Set_Draw(false);
             Add_Component(mac_velocity_ghost_minus_component,"MAC ghost fuel velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-            opengl_world.Append_Bind_Key('c',mac_velocity_ghost_minus_component->Toggle_Velocity_Mode_And_Draw_CB());
-            opengl_world.Append_Bind_Key('=',mac_velocity_ghost_minus_component->Increase_Vector_Size_CB());
-            opengl_world.Append_Bind_Key('-',mac_velocity_ghost_minus_component->Decrease_Vector_Size_CB());
-            opengl_world.Append_Bind_Key('h',mac_velocity_ghost_minus_component->Toggle_Arrowhead_CB());}}
+            opengl_world.Append_Bind_Key('c',mac_velocity_ghost_minus_component->viewer_callbacks.Get("toggle_velocity_mode_and_draw"));
+            opengl_world.Append_Bind_Key('=',mac_velocity_ghost_minus_component->viewer_callbacks.Get("increase_vector_size"));
+            opengl_world.Append_Bind_Key('-',mac_velocity_ghost_minus_component->viewer_callbacks.Get("decrease_vector_size"));
+            opengl_world.Append_Bind_Key('h',mac_velocity_ghost_minus_component->viewer_callbacks.Get("toggle_arrowhead"));}}
 
     filename=basedir+"/%d/velocities_ghost";
     OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>* vector_velocity_ghost_plus_component=0;
@@ -513,19 +508,19 @@ Initialize_Components_And_Key_Bindings()
             vector_velocity_ghost_plus_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             vector_velocity_ghost_plus_component->Set_Draw(false);
             Add_Component(vector_velocity_ghost_plus_component,"Node ghost velocities",'b',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-            opengl_world.Append_Bind_Key('h',vector_velocity_ghost_plus_component->Toggle_Arrowhead_CB());
-            opengl_world.Append_Bind_Key('=',vector_velocity_ghost_plus_component->Increase_Vector_Size_CB());
-            opengl_world.Append_Bind_Key('-',vector_velocity_ghost_plus_component->Decrease_Vector_Size_CB());}
+            opengl_world.Append_Bind_Key('h',vector_velocity_ghost_plus_component->viewer_callbacks.Get("toggle_arrowhead"));
+            opengl_world.Append_Bind_Key('=',vector_velocity_ghost_plus_component->viewer_callbacks.Get("increase_vector_size"));
+            opengl_world.Append_Bind_Key('-',vector_velocity_ghost_plus_component->viewer_callbacks.Get("decrease_vector_size"));}
         else{
             OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>* mac_velocity_ghost_plus_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
             mac_velocity_ghost_plus_component->opengl_mac_velocity_field->size=.01;
             mac_velocity_ghost_plus_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Green();
             mac_velocity_ghost_plus_component->Set_Draw(false);
             Add_Component(mac_velocity_ghost_plus_component,"MAC ghost velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-            opengl_world.Append_Bind_Key('b',mac_velocity_ghost_plus_component->Toggle_Velocity_Mode_And_Draw_CB());
-            opengl_world.Append_Bind_Key('=',mac_velocity_ghost_plus_component->Increase_Vector_Size_CB());
-            opengl_world.Append_Bind_Key('-',mac_velocity_ghost_plus_component->Decrease_Vector_Size_CB());
-            opengl_world.Append_Bind_Key('h',mac_velocity_ghost_plus_component->Toggle_Arrowhead_CB());}}
+            opengl_world.Append_Bind_Key('b',mac_velocity_ghost_plus_component->viewer_callbacks.Get("toggle_velocity_mode_and_draw"));
+            opengl_world.Append_Bind_Key('=',mac_velocity_ghost_plus_component->viewer_callbacks.Get("increase_vector_size"));
+            opengl_world.Append_Bind_Key('-',mac_velocity_ghost_plus_component->viewer_callbacks.Get("decrease_vector_size"));
+            opengl_world.Append_Bind_Key('h',mac_velocity_ghost_plus_component->viewer_callbacks.Get("toggle_arrowhead"));}}
 
     if(has_valid_grid && vector_velocity_ghost_minus_component && vector_velocity_ghost_plus_component && levelset_component){
         OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>* two_phase_velocity_magnitude_component=new OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>
@@ -535,10 +530,10 @@ Initialize_Components_And_Key_Bindings()
         two_phase_velocity_magnitude_component->opengl_two_phase_velocity_magnitude.plus.vector_color=OPENGL_COLOR::Magenta();
         two_phase_velocity_magnitude_component->opengl_two_phase_velocity_magnitude.minus.vector_color=OPENGL_COLOR::Cyan();
         Add_Component(two_phase_velocity_magnitude_component,"Two Phase Magnitude",'2',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key('\\',two_phase_velocity_magnitude_component->Toggle_3D_Mode_CB());
-        //opengl_world.Append_Bind_Key('h',two_phase_velocity_magnitude_component->Toggle_Arrowhead_CB());
-        opengl_world.Append_Bind_Key('=',two_phase_velocity_magnitude_component->Increase_Point_Size_CB());
-        opengl_world.Append_Bind_Key('-',two_phase_velocity_magnitude_component->Decrease_Point_Size_CB());}
+        opengl_world.Append_Bind_Key('\\',two_phase_velocity_magnitude_component->viewer_callbacks.Get("toggle_3d_mode"));
+        //opengl_world.Append_Bind_Key('h',two_phase_velocity_magnitude_component->viewer_callbacks.Get("toggle_arrowhead"));
+        opengl_world.Append_Bind_Key('=',two_phase_velocity_magnitude_component->viewer_callbacks.Get("increase_point_size"));
+        opengl_world.Append_Bind_Key('-',two_phase_velocity_magnitude_component->viewer_callbacks.Get("decrease_point_size"));}
 
     filename=basedir+"/%d/center_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
@@ -546,9 +541,9 @@ Initialize_Components_And_Key_Bindings()
         center_velocity_component->opengl_grid_based_vector_field.size=.01;
         center_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
         Add_Component(center_velocity_component,"Centered velocities",'V',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',center_velocity_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',center_velocity_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',center_velocity_component->Toggle_Arrowhead_CB());}
+        opengl_world.Append_Bind_Key('=',center_velocity_component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',center_velocity_component->viewer_callbacks.Get("decrease_vector_size"));
+        opengl_world.Append_Bind_Key('h',center_velocity_component->viewer_callbacks.Get("toggle_arrowhead"));}
 
     opengl_world.Set_Key_Binding_Category("Pressure");
     // TODO: these ramps are leaking memory
@@ -559,7 +554,7 @@ Initialize_Components_And_Key_Bindings()
         pressure_component->opengl_scalar_field.Set_Scale_Range(0,30);
         pressure_component->opengl_scalar_field.Set_Uniform_Contour_Values(2,28,(T)26/(T)53);
         Add_Component(pressure_component,"Pressure",'7',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F10),pressure_component->Toggle_Draw_Mode_CB());}
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F10),pressure_component->viewer_callbacks.Get("toggle_draw_mode"));}
 
     opengl_world.Set_Key_Binding_Category("Compressible_Implicit_Pressure");
     filename=basedir+"/%d/compressible_implicit_pressure";
@@ -567,7 +562,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* compressible_implicit_pressure_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,mac_grid,filename,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1));
         compressible_implicit_pressure_component->opengl_scalar_field.Set_Uniform_Contour_Values(0,20,1);
         Add_Component(compressible_implicit_pressure_component,"Compressible_Implicit_Pressure",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F9),compressible_implicit_pressure_component->Toggle_Draw_CB());}
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F9),compressible_implicit_pressure_component->viewer_callbacks.Get("toggle_draw"));}
     filename=basedir+"/%d/pressure_gradient";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* pressure_gradient_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Magenta(1,1)));
@@ -578,7 +573,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* pressure2_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,mac_grid,filename,pressure_for_pressure_coupling_color_map);
         pressure2_component->opengl_scalar_field.Set_Uniform_Contour_Values(-10000,10000,100);
         Add_Component(pressure2_component,"Pressure2",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F7),pressure2_component->Toggle_Draw_CB());}
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F7),pressure2_component->viewer_callbacks.Get("toggle_draw"));}
 
     // Draw grid here so it'll be above particles and pressure
     opengl_world.Set_Key_Binding_Category("Grid");
@@ -586,7 +581,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_GRID_2D<T>* opengl_grid=new OPENGL_GRID_2D<T>(stream_type,*(new GRID<TV>(grid)),OPENGL_COLOR::Gray(.5));
         grid_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_2D<T> >(stream_type,*opengl_grid);
         Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION<T>::SELECTABLE);
-        opengl_world.Append_Bind_Key('^',grid_component->object.Toggle_Draw_Ghost_Values_CB());}
+        opengl_world.Append_Bind_Key('^',grid_component->object.viewer_callbacks.Get("toggle_draw_ghost_values"));}
     opengl_world.Set_Key_Binding_Category("Sub Grids");
 
     // deformable and rigid bodies
@@ -611,21 +606,21 @@ Initialize_Components_And_Key_Bindings()
             rigid_bodies_component->Set_Draw_Object(rigid_bodies_no_draw_list(i),false);}
         opengl_world.Set_Key_Binding_Category("Rigid Bodies");
         Add_Component(rigid_bodies_component,"Rigid Bodies",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
-        opengl_world.Append_Bind_Key('5',rigid_bodies_component->Toggle_Draw_Mode_CB());
-        opengl_world.Append_Bind_Key('%',rigid_bodies_component->Toggle_Velocity_Vectors_CB());
-        opengl_world.Append_Bind_Key('a',rigid_bodies_component->Toggle_Articulation_Points_CB());
-        opengl_world.Append_Bind_Key('%',rigid_bodies_component->Toggle_Show_Object_Names_CB());
-        opengl_world.Append_Bind_Key('=',rigid_bodies_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',rigid_bodies_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('m',rigid_bodies_component->Toggle_Linear_Muscles_CB());}
+        opengl_world.Append_Bind_Key('5',rigid_bodies_component->viewer_callbacks.Get("toggle_draw_mode"));
+        opengl_world.Append_Bind_Key('%',rigid_bodies_component->viewer_callbacks.Get("toggle_velocity_vectors"));
+        opengl_world.Append_Bind_Key('a',rigid_bodies_component->viewer_callbacks.Get("toggle_articulation_points"));
+        opengl_world.Append_Bind_Key('%',rigid_bodies_component->viewer_callbacks.Get("toggle_show_object_names"));
+        opengl_world.Append_Bind_Key('=',rigid_bodies_component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',rigid_bodies_component->viewer_callbacks.Get("decrease_vector_size"));
+        opengl_world.Append_Bind_Key('m',rigid_bodies_component->viewer_callbacks.Get("toggle_linear_muscles"));}
     if(deformable_objects_component){
         opengl_world.Set_Key_Binding_Category("Deformable Objects");
         Add_Component(deformable_objects_component,"Deformable Objects",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
-        opengl_world.Append_Bind_Key('8',deformable_objects_component->Toggle_Draw_CB());
-        opengl_world.Append_Bind_Key('e',deformable_objects_component->Cycle_Display_Mode_CB());
-        opengl_world.Append_Bind_Key('*',deformable_objects_component->Toggle_Draw_Velocities_CB());
-        opengl_world.Append_Bind_Key('=',deformable_objects_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',deformable_objects_component->Decrease_Vector_Size_CB());}
+        opengl_world.Append_Bind_Key('8',deformable_objects_component->viewer_callbacks.Get("toggle_draw"));
+        opengl_world.Append_Bind_Key('e',deformable_objects_component->viewer_callbacks.Get("cycle_display_mode"));
+        opengl_world.Append_Bind_Key('*',deformable_objects_component->viewer_callbacks.Get("toggle_draw_velocities"));
+        opengl_world.Append_Bind_Key('=',deformable_objects_component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',deformable_objects_component->viewer_callbacks.Get("decrease_vector_size"));}
 
     std::string soft_constraints_deformable_object_filename=basedir+STRING_UTILITIES::string_sprintf("/%d/soft_constraints_deformable_object_particles",start_frame);
     if(FILE_UTILITIES::File_Exists(soft_constraints_deformable_object_filename)){
@@ -638,15 +633,15 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>* psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>(stream_type,grid,basedir+"/%d/psi_N",
             new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         Add_Component(psi_N_component,"Psi_N points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->Toggle_Draw_CB());}
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->viewer_callbacks.Get("toggle_draw"));}
     filename=basedir+"/%d/debug_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>(stream_type,filename);
         Add_Component(component,"Debug particles",'w',BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key('W',component->Toggle_Draw_Velocities_CB());
-        opengl_world.Append_Bind_Key('h',component->Toggle_Arrowhead_CB());
-        opengl_world.Append_Bind_Key('=',component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',component->Decrease_Vector_Size_CB());}
+        opengl_world.Append_Bind_Key('W',component->viewer_callbacks.Get("toggle_draw_velocities"));
+        opengl_world.Append_Bind_Key('h',component->viewer_callbacks.Get("toggle_arrowhead"));
+        opengl_world.Append_Bind_Key('=',component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',component->viewer_callbacks.Get("decrease_vector_size"));}
     filename=basedir+"/%d/residual_energy";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,"",false,false);
@@ -659,20 +654,20 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>(stream_type,mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS);
         Add_Component(psi_D_component,"Psi_D points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_D_component->Toggle_Draw_CB());}
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_D_component->viewer_callbacks.Get("toggle_draw"));}
 
     filename=basedir+"/%d/euler_psi";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>* psi_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>(stream_type,mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Red()),OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS);
         Add_Component(psi_component,"Psi points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F3),psi_component->Toggle_Draw_CB());}
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F3),psi_component->viewer_callbacks.Get("toggle_draw"));}
 
     filename=basedir+"/%d/colors";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T,int>* psi_colors_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T,int>(stream_type,mac_grid,filename,colors_color_map,OPENGL_SCALAR_FIELD_2D<T,int>::DRAW_POINTS);
         Add_Component(psi_colors_component,"Psi colors",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_colors_component->Toggle_Draw_CB());}
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_colors_component->viewer_callbacks.Get("toggle_draw"));}
 
     filename=basedir+"/%d/pressure_jumps";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
@@ -680,36 +675,36 @@ Initialize_Components_And_Key_Bindings()
         pressure_jump_component->opengl_grid_based_vector_field.size=.01;
         pressure_jump_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Magenta();
         Add_Component(pressure_jump_component,"Pressure jumps",'&',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',pressure_jump_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',pressure_jump_component->Decrease_Vector_Size_CB());}
+        opengl_world.Append_Bind_Key('=',pressure_jump_component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',pressure_jump_component->viewer_callbacks.Get("decrease_vector_size"));}
 
     filename=basedir+"/%d/thin_shells_grid_visibility";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>* thin_shells_debugging_component=new OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>(stream_type,grid,basedir);
         opengl_world.Set_Key_Binding_Category("Thin Shells");
         Add_Component(thin_shells_debugging_component,"thin shells debugging",'\0',BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F4),thin_shells_debugging_component->Toggle_Draw_Grid_Visibility_CB());
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),thin_shells_debugging_component->Toggle_Draw_Density_Valid_Mask_CB());
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),thin_shells_debugging_component->Toggle_Draw_Phi_Valid_Mask_CB());}
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F4),thin_shells_debugging_component->viewer_callbacks.Get("toggle_draw_grid_visibility"));
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),thin_shells_debugging_component->viewer_callbacks.Get("toggle_draw_density_valid_mask"));
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),thin_shells_debugging_component->viewer_callbacks.Get("toggle_draw_phi_valid_mask"));}
 
     filename=basedir+"/%d/strain";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<T>* strain_component=new OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<T>(stream_type,grid,filename);
         Add_Component(strain_component,"Strain",'e',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key('+',strain_component->Increase_Size_CB());
-        opengl_world.Append_Bind_Key('_',strain_component->Decrease_Size_CB());}
+        opengl_world.Append_Bind_Key('+',strain_component->viewer_callbacks.Get("increase_size"));
+        opengl_world.Append_Bind_Key('_',strain_component->viewer_callbacks.Get("decrease_size"));}
 
     filename=basedir+"/%d/strain_0";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<T>* strain_component=new OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<T>(stream_type,grid,filename);
         Add_Component(strain_component,"Strain",'e',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
-        opengl_world.Append_Bind_Key('+',strain_component->Increase_Size_CB());
-        opengl_world.Append_Bind_Key('_',strain_component->Decrease_Size_CB());}
+        opengl_world.Append_Bind_Key('+',strain_component->viewer_callbacks.Get("increase_size"));
+        opengl_world.Append_Bind_Key('_',strain_component->viewer_callbacks.Get("decrease_size"));}
 
     // Commands and misc
     opengl_world.Set_Key_Binding_Category("Misc.");
-    opengl_world.Append_Bind_Key('~',Command_Prompt_CB("Command prompt"));
-    opengl_world.Append_Bind_Key('\\',Toggle_2d_Mode_CB("Cycle 2d mode."));
+    opengl_world.Append_Bind_Key('~',{[this](){Command_Prompt();},"command_prompt"});
+    opengl_world.Append_Bind_Key('\\',{[this](){Toggle_2d_Mode();},"toggle_2d_mode"});
 
     // Initialize priority ordering for selections
     Selection_Priority(OPENGL_SELECTION<T>::DEBUG_PARTICLES_2D)=110;
@@ -829,7 +824,7 @@ Toggle_2d_Mode()
 template<class T> void OPENGL_2D_VISUALIZATION<T>::
 Command_Prompt()
 {
-    opengl_world.Prompt_User("Command: ",Command_Prompt_Response_CB());
+    opengl_world.Prompt_User("Command: ",{[this](){Command_Prompt_Response();},"command_prompt_response"});
 }
 //#####################################################################
 // main

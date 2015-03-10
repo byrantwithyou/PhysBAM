@@ -17,6 +17,16 @@ OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset
     :OPENGL_COMPONENT<T>(stream_type,"Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
     frame_loaded(-1),set(0),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false)
 {
+    viewer_callbacks.Set("toggle_color_mode",{[this](){Toggle_Color_Mode();},"Toggle color mode"});
+    viewer_callbacks.Set("toggle_smooth",{[this](){Toggle_Smooth();},"Toggle smooth levelset draw"});
+    viewer_callbacks.Set("toggle_normals",{[this](){Toggle_Normals();},"Toggle levelset normals draw"});
+    viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle levelset contour/cellview"});
+    viewer_callbacks.Set("toggle_draw_sign",{[this](){Toggle_Draw_Sign();},"Toggle levelset sign direction"});
+    viewer_callbacks.Set("next_set",{[this](){Next_Set();},"Switch to next set"});
+    viewer_callbacks.Set("previous_set",{[this](){Previous_Set();},"Switch to previous set"});
+    viewer_callbacks.Set("toggle_draw_multiple_levelsets",{[this](){Toggle_Draw_Multiple_Levelsets();},"Toggle mutliple/single levelset draw"});
+    viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"Toggle draw ghost values"});
+
     int number_of_sets=0;
     while(filename_set!=""){
         std::string filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,number_of_sets);

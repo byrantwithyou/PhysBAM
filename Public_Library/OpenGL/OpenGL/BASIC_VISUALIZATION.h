@@ -32,8 +32,6 @@ public:
     void Initialize_And_Run(PARSE_ARGS &parse_args);
 
     virtual void Process_Hits(GLint hits, GLuint buffer[]);
-
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION, Draw_All_Objects);
 protected:
     virtual void Add_Arguments(PARSE_ARGS &parse_args);
     virtual void Parse_Arguments(PARSE_ARGS &parse_args);
@@ -62,17 +60,14 @@ private:
     void Reset_Up();
     void Toggle_Axes();
     void Draw_All_Objects();
-
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Reset_View);
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Reset_Up);
-    DEFINE_CALLBACK_CREATOR(BASIC_VISUALIZATION,Toggle_Axes);
-
 public:
     STREAM_TYPE stream_type;
     ARRAY<OPENGL_COMPONENT<T>*> component_list;
     ARRAY<OPENGL_COMPONENT<T>*> owned_components;
     HASHTABLE<std::string,OPENGL_COMPONENT<T>*> component_by_name;
     OPENGL_AXES<T> * opengl_axes;
+
+    OPENGL_CALLBACK reset_view_cb,reset_up_cb,toggle_axes_cb,draw_all_objects_cb;
 
     OPENGL_WORLD<T> opengl_world;
     int width,height;

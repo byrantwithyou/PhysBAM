@@ -25,7 +25,7 @@ class OPENGL_COMPONENT_HEIGHTFIELD_2D:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_HEIGHTFIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid, 
                                     const std::string& height_filename,
                                     const std::string& xz_filename_input="",
@@ -59,15 +59,6 @@ public:
     void Decrease_Velocity_Scale();
     void Toggle_Draw_Velocities();
     void Toggle_Subdivision();
-
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_HEIGHTFIELD_2D, Increase_Scale, "Increase scale");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_HEIGHTFIELD_2D, Decrease_Scale, "Decrease scale");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_HEIGHTFIELD_2D, Increase_Displacement_Scale, "Increase displacement scale");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_HEIGHTFIELD_2D, Decrease_Displacement_Scale, "Decrease displacement scale");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_HEIGHTFIELD_2D, Increase_Velocity_Scale, "Increase velocity scale");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_HEIGHTFIELD_2D, Decrease_Velocity_Scale, "Decrease velocity scale");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_HEIGHTFIELD_2D, Toggle_Draw_Velocities, "Toggle draw velocities");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_HEIGHTFIELD_2D, Toggle_Subdivision, "Toggle subdivision");
 
 public:
     void Reinitialize(bool force=false);

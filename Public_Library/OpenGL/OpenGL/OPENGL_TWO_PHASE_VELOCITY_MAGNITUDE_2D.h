@@ -17,18 +17,18 @@ namespace PhysBAM{
 template<class T>
 class OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D:public OPENGL_OBJECT<T>
 {
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     using OPENGL_OBJECT<T>::World_Space_Box;
     T height_scale;
     GRID<TV>& grid;
-    ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_minus;
-    ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_plus;
+    ARRAY<TV,TV_INT >& V_minus;
+    ARRAY<TV,TV_INT >& V_plus;
     LEVELSET<TV>& levelset;
     OPENGL_VECTOR_FIELD_3D<T> minus;
     OPENGL_VECTOR_FIELD_3D<T> plus;
 
-    OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D(STREAM_TYPE stream_type,GRID<TV>& grid,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_minus,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_plus,LEVELSET<TV>& levelset);
+    OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D(STREAM_TYPE stream_type,GRID<TV>& grid,ARRAY<TV,TV_INT>& V_minus,ARRAY<TV,TV_INT>& V_plus,LEVELSET<TV>& levelset);
     virtual ~OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D();
 
 //#####################################################################

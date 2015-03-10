@@ -20,7 +20,7 @@ class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,2> TV;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::component_name;
-    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &vector_field_filename_input);
     virtual ~OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D();
 
@@ -38,10 +38,6 @@ public:
     void Increase_Vector_Size();
     void Decrease_Vector_Size();
     void Toggle_Arrowhead();
-
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D, Increase_Vector_Size, "Increase vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D, Decrease_Vector_Size, "Decrease vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D, Toggle_Arrowhead, "Toggle arrowhead");
 
 private:
     void Reinitialize(bool force_load_even_if_not_drawn=false);

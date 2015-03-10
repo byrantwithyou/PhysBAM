@@ -22,6 +22,19 @@ ANIMATED_VISUALIZATION(STREAM_TYPE stream_type)
     :BASIC_VISUALIZATION<T>(stream_type),animation_enabled(true),play(false),loop(false),fixed_frame_rate(false),start_frame(0),stop_frame(INT_MAX),
     frame(0),frame_rate(24),frame_increment(1),last_frame_filename(""),jpeg_quality(95)
 {
+    next_frame_cb={[this](){Next_Frame();},"Next frame"};
+    prev_frame_cb={[this](){Prev_Frame();},"Prev frame"};
+    goto_frame_cb={[this](){Goto_Frame();},"Goto frame"};
+    reset_cb={[this](){Reset();},"Reset"};
+    toggle_play_cb={[this](){Toggle_Play();},"Play/Pause"};
+    toggle_loop_cb={[this](){Toggle_Loop();},"Loop"};
+    toggle_fixed_frame_rate_cb={[this](){Toggle_Fixed_Frame_Rate();},"Toggle fixed frame rate"};
+    goto_last_frame_cb={[this](){Goto_Last_Frame();},"Goto last frame"};
+    goto_frame_prompt_cb={[this](){Goto_Frame_Prompt();},"goto_frame_prompt"};
+    capture_frames_cb={[this](){Capture_Frames();},"Capture frames (to images)"};
+    capture_frames_prompt_cb={[this](){Capture_Frames_Prompt();},"capture_frames_prompt"};
+    null_cb={0,0};
+
     if(MOV_WRITER<float>::Enabled()) saved_frame_filename="capture.mov";
     else if(IMAGE<float>::Is_Supported(".png")) saved_frame_filename="capture.%05d.png";
     else if(IMAGE<float>::Is_Supported(".jpg")) saved_frame_filename="capture.%05d.jpg";
@@ -70,16 +83,16 @@ Initialize_Components_And_Key_Bindings()
     opengl_world.Set_Key_Binding_Category("Default Keys (ANIMATED_VISUALIZATION)");
     opengl_world.Set_Key_Binding_Category_Priority(100);
 
-    opengl_world.Bind_Key('p',Toggle_Play_CB("Play/Pause"));
-    opengl_world.Bind_Key('P',Toggle_Loop_CB("Loop"));
-    opengl_world.Bind_Key('r',Reset_CB("Reset"));
-    opengl_world.Bind_Key('s',Next_Frame_CB("Next frame"));
-    opengl_world.Bind_Key('S',Next_Frame_CB("Next frame"));
-    opengl_world.Bind_Key("^s",Prev_Frame_CB("Prev frame"));
-    opengl_world.Bind_Key('g',Goto_Frame_CB("Goto frame"));
-    opengl_world.Bind_Key('f',Toggle_Fixed_Frame_Rate_CB("Toggle fixed frame rate"));
-    opengl_world.Bind_Key('z',Goto_Last_Frame_CB("Goto last frame"));
-    opengl_world.Bind_Key("^d",Capture_Frames_CB("Capture frames (to images)"));
+    opengl_world.Bind_Key('p',toggle_play_cb);
+    opengl_world.Bind_Key('P',toggle_loop_cb);
+    opengl_world.Bind_Key('r',reset_cb);
+    opengl_world.Bind_Key('s',next_frame_cb);
+    opengl_world.Bind_Key('S',next_frame_cb);
+    opengl_world.Bind_Key("^s",prev_frame_cb);
+    opengl_world.Bind_Key('g',goto_frame_cb);
+    opengl_world.Bind_Key('f',toggle_fixed_frame_rate_cb);
+    opengl_world.Bind_Key('z',goto_last_frame_cb);
+    opengl_world.Bind_Key("^d",capture_frames_cb);
 
     opengl_world.Set_Key_Binding_Category("User-Defined Keys");
     opengl_world.Set_Key_Binding_Category_Priority(1);
@@ -225,8 +238,8 @@ Next_Frame()
     bool valid=Valid_Frame(frame+frame_increment);
     if(valid || loop){
         Set_Frame(valid?frame+frame_increment:start_frame);
-        opengl_world.Set_Idle_Callback(play?Next_Frame_CB():0,fixed_frame_rate?(float)1/frame_rate:0);}
-    else if(play) opengl_world.Set_Idle_Callback(Next_Frame_CB(),.2);
+        opengl_world.Set_Idle_Callback(play?next_frame_cb:null_cb,fixed_frame_rate?(float)1/frame_rate:0);}
+    else if(play) opengl_world.Set_Idle_Callback(next_frame_cb,.2);
 }
 //#####################################################################
 // Function Prev_Frame
@@ -256,7 +269,7 @@ template<class T> void ANIMATED_VISUALIZATION<T>::
 Goto_Frame()
 {
     if(!animation_enabled) return;
-    opengl_world.Prompt_User("Goto frame: ",Goto_Frame_Prompt_CB(),"");
+    opengl_world.Prompt_User("Goto frame: ",goto_frame_prompt_cb,"");
 }
 //#####################################################################
 // Function Reset
@@ -276,7 +289,7 @@ Toggle_Play()
 {
     if(!animation_enabled) return;
     play=!play;
-    opengl_world.Set_Idle_Callback(play?Next_Frame_CB():0,fixed_frame_rate?(float)1/frame_rate:0);
+    opengl_world.Set_Idle_Callback(play?next_frame_cb:null_cb,fixed_frame_rate?(float)1/frame_rate:0);
 }
 //#####################################################################
 // Function Toggle_Loop
@@ -294,7 +307,7 @@ Toggle_Fixed_Frame_Rate()
 {
     fixed_frame_rate=!fixed_frame_rate;
     if(fixed_frame_rate) last_frame_time=0;
-    opengl_world.Set_Idle_Callback(play?Next_Frame_CB():0,fixed_frame_rate?(float)1/frame_rate:0);
+    opengl_world.Set_Idle_Callback(play?next_frame_cb:null_cb,fixed_frame_rate?(float)1/frame_rate:0);
 }
 //#####################################################################
 // Function Capture_Frames_Prompt
@@ -308,16 +321,16 @@ Capture_Frames_Prompt()
     if(capture_frames_prompt_state.step==0){
         if(!opengl_world.prompt_response.empty()) capture_frames_prompt_state.filename_pattern=opengl_world.prompt_response;
         capture_frames_prompt_state.step=1;
-        opengl_world.Prompt_User(STRING_UTILITIES::string_sprintf("Start frame [%d]: ",start_frame),Capture_Frames_Prompt_CB(),"");}
+        opengl_world.Prompt_User(STRING_UTILITIES::string_sprintf("Start frame [%d]: ",start_frame),capture_frames_prompt_cb,"");}
     else if(capture_frames_prompt_state.step==1){
         if(!opengl_world.prompt_response.empty()) STRING_UTILITIES::String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.start_frame);
         capture_frames_prompt_state.step=2;
-        opengl_world.Prompt_User("End frame [last valid frame]: ",Capture_Frames_Prompt_CB(),"");}
+        opengl_world.Prompt_User("End frame [last valid frame]: ",capture_frames_prompt_cb,"");}
     else if(capture_frames_prompt_state.step==2){
         if(!opengl_world.prompt_response.empty()) STRING_UTILITIES::String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.end_frame);
         capture_frames_prompt_state.step=3;
         if(STRING_UTILITIES::toupper(FILE_UTILITIES::Get_File_Extension(capture_frames_prompt_state.filename_pattern))=="JPG")
-            opengl_world.Prompt_User(STRING_UTILITIES::string_sprintf("JPEG quality [%d]: ",jpeg_quality),Capture_Frames_Prompt_CB(),"");
+            opengl_world.Prompt_User(STRING_UTILITIES::string_sprintf("JPEG quality [%d]: ",jpeg_quality),capture_frames_prompt_cb,"");
         else done=true;}
     else if(capture_frames_prompt_state.step==3){
         if(opengl_world.prompt_response.empty()) STRING_UTILITIES::String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.jpeg_quality);
@@ -340,7 +353,7 @@ Capture_Frames()
     capture_frames_prompt_state.end_frame=INT_MAX;
     capture_frames_prompt_state.jpeg_quality=jpeg_quality;
     capture_frames_prompt_state.step=1;
-    opengl_world.Prompt_User("Capture filename [" + saved_frame_filename + "]: ",Capture_Frames_Prompt_CB(),"");
+    opengl_world.Prompt_User("Capture filename [" + saved_frame_filename + "]: ",capture_frames_prompt_cb,"");
 }
 namespace PhysBAM{
 template class ANIMATED_VISUALIZATION<double>;

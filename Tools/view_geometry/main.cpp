@@ -14,7 +14,6 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_AXES.h>
-#include <OpenGL/OpenGL/OPENGL_BASIC_CALLBACKS.h>
 #include <OpenGL/OpenGL/OPENGL_BOX_3D.h>
 #include <OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <OpenGL/OpenGL/OPENGL_HEXAHEDRALIZED_VOLUME.h>
@@ -45,60 +44,6 @@ template<class T> void Add_Box_File(const std::string& filename,OPENGL_WORLD<T>&
 //#################################################################
 static bool triangulated_surface_highlight_boundary=false;
 static bool print_statistics=true;
-//#################################################################
-// Class OPENGL_CALLBACK_TOGGLE_TWO_SIDED
-//#################################################################
-template<class T>
-class OPENGL_CALLBACK_TOGGLE_TWO_SIDED:public OPENGL_CALLBACK
-{
-public:
-    OPENGL_TRIANGULATED_SURFACE<T>& surface;
-    bool is_two_sided;
-
-    explicit OPENGL_CALLBACK_TOGGLE_TWO_SIDED(OPENGL_TRIANGULATED_SURFACE<T>& surface_input)
-        :surface(surface_input),is_two_sided(false)
-    {}
-
-    void operator()()
-    {is_two_sided=!is_two_sided;
-    surface.Set_Two_Sided(is_two_sided);}
-
-    void Print(std::ostream& out){out<<"Toggle two sided";}
-};
-//#################################################################
-// Class OPENGL_CALLBACK_CROSS_SECTION
-//#################################################################
-template<class T>
-class OPENGL_CALLBACK_CROSS_SECTION:public OPENGL_CALLBACK
-{
-public:
-    OPENGL_TETRAHEDRALIZED_VOLUME<T>& tets;
-    T ymin,ymax;
-    int cut,range;
-
-    explicit OPENGL_CALLBACK_CROSS_SECTION(OPENGL_TETRAHEDRALIZED_VOLUME<T>& tets_input)
-        :tets(tets_input),range(100)
-    {
-        cut=range;
-        tets.subset.Preallocate(tets.mesh->elements.m);
-        ymin=FLT_MAX;ymax=-FLT_MAX;
-        for(int p=0;p<tets.particles->Size();p++){
-            ymin=PhysBAM::min(ymin,tets.particles->X(p).y);
-            ymax=PhysBAM::max(ymax,tets.particles->X(p).y);}
-    }
-
-    void operator()()
-    {tets.boundary_only=false;
-    tets.subset.Remove_All();
-    cut--;if(cut<0)cut=range;
-    T y=ymin+(ymax-ymin)*cut/range;
-    for(int t=0;t<tets.mesh->elements.m;t++){
-        int i,j,k,l;tets.mesh->elements(t).Get(i,j,k,l);
-        if(tets.particles->X(i).y<y || tets.particles->X(j).y<y || tets.particles->X(k).y<y || tets.particles->X(l).y<y)
-            tets.subset.Append(t);}}
-
-    void Print(std::ostream& out){out<<"Cross section";}
-};
 //#################################################################
 // Function main
 //#################################################################
@@ -136,8 +81,8 @@ template<class T> void Add_File(const std::string& filename,int number)
     world.Set_Ambient_Light(.2);
     world.Initialize("PhysBAM geometry viewer");
 
-    world.Bind_Key("^c", new OPENGL_CALLBACK_SAVE_VIEW<T>(world, "camera_script", true));
-    world.Bind_Key('c', new OPENGL_CALLBACK_LOAD_VIEW<T>(world, "camera_script", true));
+    world.Bind_Key("^c",{[&world](){world.Save_View("camera_script",true);},"Save view"});
+    world.Bind_Key('c',{[&world](){world.Load_View("camera_script",true);},"Load view"});
 
     FILE_TYPE type=Get_File_Type(filename);
     switch(type){
@@ -178,7 +123,6 @@ template<class T> void Add_Hex_File(const std::string& filename,OPENGL_WORLD<T>&
         HEXAHEDRALIZED_VOLUME<T>* hex_vol;
         FILE_UTILITIES::Create_From_File<T>(filename,hex_vol);
         OPENGL_HEXAHEDRALIZED_VOLUME<T>* ohv=new OPENGL_HEXAHEDRALIZED_VOLUME<T>(world.stream_type,&hex_vol->mesh,&hex_vol->particles,OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.7),float(1),float(.8))),OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.7),float(8),float(.1))));
-        //world.Bind_Key('0'+number,new OPENGL_CALLBACK_TOGGLE_TWO_SIDED(*ohv));
         world.Add_Object(ohv,true,true);}
     catch(FILESYSTEM_ERROR&){}
 }
@@ -196,7 +140,8 @@ template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD<T
         area->Update_Bounding_Box();
         LOG::cout<<"bounding box: "<<*area->bounding_box<<std::endl;
         OPENGL_TRIANGULATED_SURFACE<T>* opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(world.stream_type,*surface,false);
-        world.Bind_Key('0'+number,new OPENGL_CALLBACK_TOGGLE_TWO_SIDED<T>(*opengl_triangulated_surface));
+        world.Bind_Key('0'+number,{[opengl_triangulated_surface](){static bool is_two_sided=false;is_two_sided=!is_two_sided;opengl_triangulated_surface->Set_Two_Sided(is_two_sided);},"Toggle Two Sided"});
+
         world.Add_Object(opengl_triangulated_surface,true,true);}
     catch(FILESYSTEM_ERROR&){}
 }
@@ -214,7 +159,7 @@ template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD<T>&
         OPENGL_TRIANGULATED_SURFACE<T>* opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(world.stream_type,*surface,false,
             OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Blue()));
         if(triangulated_surface_highlight_boundary) opengl_triangulated_surface->highlight_boundary=true;
-        world.Bind_Key('0'+number,new OPENGL_CALLBACK_TOGGLE_TWO_SIDED<T>(*opengl_triangulated_surface));
+        world.Bind_Key('0'+number,{[opengl_triangulated_surface](){static bool is_two_sided=false;is_two_sided=!is_two_sided;opengl_triangulated_surface->Set_Two_Sided(is_two_sided);},"Toggle Two Sided"});
         world.Add_Object(opengl_triangulated_surface,true,true);}
     catch(FILESYSTEM_ERROR&){}
 }
@@ -307,7 +252,26 @@ template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD<T>&
         if(print_statistics) tetrahedralized_volume->Print_Statistics(LOG::cout);}
         OPENGL_TETRAHEDRALIZED_VOLUME<T>* tets=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(world.stream_type,&(tetrahedralized_volume->mesh),&(tetrahedralized_volume->particles),
             OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.9),float(.1),float(.1))),OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.1),float(.9),float(.1))));
-        world.Bind_Key('c',new OPENGL_CALLBACK_CROSS_SECTION<T>(*tets));
+        T ymin,ymax;
+        int range=100;
+        tets->subset.Preallocate(tets->mesh->elements.m);
+        ymin=FLT_MAX;ymax=-FLT_MAX;
+        for(int p=0;p<tets->particles->Size();p++){
+            ymin=PhysBAM::min(ymin,tets->particles->X(p).y);
+            ymax=PhysBAM::max(ymax,tets->particles->X(p).y);}
+        world.Bind_Key('c',{[tets,ymin,ymax,range](){
+            static int cut=range;
+            tets->boundary_only=false;
+            tets->subset.Remove_All();
+            cut--;
+            if(cut<0)cut=range;
+            T y=ymin+(ymax-ymin)*cut/range;
+            for(int t=0;t<tets->mesh->elements.m;t++){
+                int i,j,k,l;
+                tets->mesh->elements(t).Get(i,j,k,l);
+                if(tets->particles->X(i).y<y || tets->particles->X(j).y<y || tets->particles->X(k).y<y || tets->particles->X(l).y<y)
+                    tets->subset.Append(t);}
+                },"Cross section"});
         world.Add_Object(tets,true,true);}
     catch(FILESYSTEM_ERROR&){}
 }

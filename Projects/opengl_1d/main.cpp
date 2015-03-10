@@ -167,7 +167,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>* rigid_bodies_component=
             new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>(stream_type,basedir);
         Add_Component(rigid_bodies_component,"Rigid Bodies",'5',BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key('n',rigid_bodies_component->Toggle_Show_Object_Names_CB());}
+        opengl_world.Append_Bind_Key('n',rigid_bodies_component->viewer_callbacks.Get("toggle_show_object_names"));}
     filename=basedir+"/%d/deformable_object_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>* deformable_geometry_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>(stream_type,basedir,start_frame);
@@ -292,7 +292,7 @@ Initialize_Components_And_Key_Bindings()
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,bool>* psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,bool>(stream_type,grid,filename,OPENGL_COLOR::Cyan(),OPENGL_COLOR::Cyan());
         Add_Component(psi_N_component,"Psi_N points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->Toggle_Draw_CB());}
+        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->viewer_callbacks.Get("toggle_draw"));}
     filename=basedir+"/%d/psi_D";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,bool>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Red()),
@@ -307,11 +307,11 @@ Initialize_Components_And_Key_Bindings()
     opengl_world.Set_Key_Binding_Category("Scaling");
     for(int c=0;c<component_list.m;c++){
         if(OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>* scalar_field_component=dynamic_cast<OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>*>(component_list(c))){
-            opengl_world.Append_Bind_Key('>',scalar_field_component->Increase_Scale_CB());
-            opengl_world.Append_Bind_Key('<',scalar_field_component->Decrease_Scale_CB());}
+            opengl_world.Append_Bind_Key('>',scalar_field_component->viewer_callbacks.Get("increase_scale"));
+            opengl_world.Append_Bind_Key('<',scalar_field_component->viewer_callbacks.Get("decrease_scale"));}
         else if(OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T>* face_scalar_field_component=dynamic_cast<OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T>*>(component_list(c))){
-            opengl_world.Append_Bind_Key('>',face_scalar_field_component->Increase_Scale_CB());
-            opengl_world.Append_Bind_Key('<',face_scalar_field_component->Decrease_Scale_CB());}}
+            opengl_world.Append_Bind_Key('>',face_scalar_field_component->viewer_callbacks.Get("increase_scale"));
+            opengl_world.Append_Bind_Key('<',face_scalar_field_component->viewer_callbacks.Get("decrease_scale"));}}
 }
 //#####################################################################
 // Function Set_Frame_Extra

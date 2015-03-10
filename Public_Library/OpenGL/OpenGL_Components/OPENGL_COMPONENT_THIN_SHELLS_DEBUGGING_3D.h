@@ -24,7 +24,7 @@ class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D:public OPENGL_COMPONENT<T>
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::World_Space_Box;
-    using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_COMPONENT<T>::viewer_callbacks;
     GRID<TV> grid,mac_grid,u_grid,v_grid,w_grid;
     ARRAY<VECTOR<bool,3>,VECTOR<int,3> > node_neighbors_visible;
     ARRAY<VECTOR<PAIR<bool,T>,4>,VECTOR<int,3> > face_corners_visible_from_face_center_u; // length 4, order is front bottom, front top, back bottom, back top
@@ -58,9 +58,6 @@ public:
 
     void Toggle_Draw_Grid_Visibility_Mode();
     void Toggle_Draw_Density_Valid_Mask();
-
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D, Toggle_Draw_Grid_Visibility_Mode, "Toggle draw grid visibility mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D, Toggle_Draw_Density_Valid_Mask, "Toggle draw density valid mask");
 
 private:
     void Reinitialize(bool force=false);

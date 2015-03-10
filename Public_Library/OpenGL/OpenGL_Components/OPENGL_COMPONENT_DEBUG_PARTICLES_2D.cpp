@@ -20,6 +20,12 @@ OPENGL_COMPONENT_DEBUG_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &f
     :OPENGL_COMPONENT<T>(stream_type,"Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),debug_objects(*new ARRAY<DEBUG_OBJECT<TV> >),opengl_particles(*new OPENGL_DEBUG_PARTICLES_2D<T>(stream_type,particles,debug_objects)),
     filename(filename_input),frame_loaded(-1),set(0),set_loaded(-1),valid(false),draw_multiple_particle_sets(false)
 {
+    viewer_callbacks.Set("toggle_draw_velocities",{[this](){Toggle_Draw_Velocities();},"Toggle draw velocities"});
+    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
+    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
+    viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrow heads"});
+    viewer_callbacks.Set("command_prompt",{[this](){Command_Prompt();},"Command prompt"});
+
     is_animation=FILE_UTILITIES::Is_Animated(filename);
     // Don't need to call Reinitialize here because it will be called in first call to Set_Frame
 }
@@ -243,7 +249,7 @@ Command_Prompt_Response()
 template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Command_Prompt()
 {
-    OPENGL_WORLD<T>::Singleton()->Prompt_User("Command: ",Command_Prompt_Response_CB(),"");
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Command: ",{[this](){Command_Prompt_Response();},""});
 }
 //#####################################################################
 // Selection object functions

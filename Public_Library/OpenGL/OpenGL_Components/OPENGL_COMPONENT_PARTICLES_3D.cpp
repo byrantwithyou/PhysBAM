@@ -16,14 +16,24 @@ using namespace PhysBAM;
 // Function OPENGL_COMPONENT_PARTICLES_3D
 //#####################################################################
 template<class T> OPENGL_COMPONENT_PARTICLES_3D<T>::
-OPENGL_COMPONENT_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename_input, const std::string &filename_set_input, bool use_ids_input, bool particles_stored_per_cell_uniform_input, bool particles_stored_per_cell_adaptive_input)
+OPENGL_COMPONENT_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename_input, const std::string &filename_set_input, bool use_ids_input, bool particles_stored_per_cell_uniform_input)
     :OPENGL_COMPONENT<T>(stream_type,"Particles 3D"), particles(new GEOMETRY_PARTICLES<TV>),opengl_points(new OPENGL_POINTS_3D<T>(stream_type,*(new ARRAY<VECTOR<T,3> >))),
     opengl_vector_field(stream_type,*(new ARRAY<VECTOR<T,3> >),opengl_points->points,OPENGL_COLOR::Cyan()),
     filename(filename_input), filename_set(filename_set_input),frame_loaded(-1), set(0), set_loaded(-1),number_of_sets(0),use_sets(false),valid(false),
     draw_velocities(false),have_velocities(false),use_ids(use_ids_input),
-    particles_stored_per_cell_uniform(particles_stored_per_cell_uniform_input),particles_stored_per_cell_adaptive(particles_stored_per_cell_adaptive_input),
+    particles_stored_per_cell_uniform(particles_stored_per_cell_uniform_input),
     draw_multiple_particle_sets(false)
 {
+    viewer_callbacks.Set("toggle_draw_point_numbers",{[this](){Toggle_Draw_Point_Numbers();},"Toggle draw point numbers"});
+    viewer_callbacks.Set("toggle_draw_velocities",{[this](){Toggle_Draw_Velocities();},"Toggle draw velocities"});
+    viewer_callbacks.Set("command_prompt",{[this](){Command_Prompt();},"Command prompt"});
+    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
+    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
+    viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrow head style"});
+    viewer_callbacks.Set("next_set",{[this](){Next_Set();},"Switch to next set"});
+    viewer_callbacks.Set("previous_set",{[this](){Previous_Set();},"Switch to previous set"});
+    viewer_callbacks.Set("toggle_draw_multiple_particle_sets",{[this](){Toggle_Draw_Multiple_Particle_Sets();},"Toggle drawing multiple particle sets"});
+
     number_of_sets=0;
     while(filename_set!=""){
         std::string filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,number_of_sets);
@@ -272,12 +282,6 @@ Reinitialize(bool force)
                 ARRAY_VIEW<const PARTICLES<VECTOR<T,3> >* const> initialization_array_view(initialization_array.Size(),initialization_array.Get_Array_Pointer());
                 particles_multiple(i)->Initialize(initialization_array_view);
                 particles_per_cell.Delete_Pointers_And_Clean_Memory();}
-            else if(particles_stored_per_cell_adaptive){
-                PHYSBAM_FATAL_ERROR();
-                ARRAY<GEOMETRY_PARTICLES<TV>*> particles_per_cell;
-                Read_Binary(typed_input,particles_per_cell);
-                //particles_multiple(i)->Initialize(particles_per_cell);
-                particles_per_cell.Delete_Pointers_And_Clean_Memory();}
             else{
                 Read_Binary(typed_input,*particles_multiple(i));}
             delete input_file;
@@ -336,7 +340,7 @@ Command_Prompt_Response()
 template<class T> void OPENGL_COMPONENT_PARTICLES_3D<T>::
 Command_Prompt()
 {
-    OPENGL_WORLD<T>::Singleton()->Prompt_User("Command: ",Command_Prompt_Response_CB(),"");
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Command: ",{[this](){Command_Prompt_Response();},""});
 }
 //#####################################################################
 // Function Next_Set

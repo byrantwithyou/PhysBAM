@@ -49,7 +49,7 @@ protected:
 
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std::string& basedir);
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D();
@@ -73,10 +73,6 @@ public:
     void Toggle_Output_Positions();
     void Toggle_Show_Object_Names();
     void Toggle_Draw_Mode();
-
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D, Toggle_Output_Positions, "Toggle output positions");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D, Toggle_Show_Object_Names, "Toggle show object names");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D, Toggle_Draw_Mode, "Toggle draw mode");
 
 public:
     virtual void Reinitialize(const bool force=false,const bool read_geometry=true); // Needs to be called after some state changes

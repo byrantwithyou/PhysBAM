@@ -49,7 +49,7 @@ class OPENGL_KEY_BINDING_CATEGORY
 public:
     std::string name;
     int priority;
-    ARRAY<PAIR<OPENGL_KEY,OPENGL_CALLBACK*> > key_bindings;
+    ARRAY<PAIR<OPENGL_KEY,OPENGL_CALLBACK> > key_bindings;
 
     OPENGL_KEY_BINDING_CATEGORY() {}
     OPENGL_KEY_BINDING_CATEGORY(const std::string &name,int priority) : name(name),priority(priority) {}
@@ -69,6 +69,7 @@ private:
     bool initialized;
 public:
     STREAM_TYPE stream_type;
+    bool smooth_shading;
 
     // objects
     ARRAY<OPENGL_OBJECT<T>*> object_list; // does not own objects
@@ -100,7 +101,7 @@ private:
     bool view_auto_help;
 
     // Idle/Timer Data
-    OPENGL_CALLBACK* idle_callback;
+    OPENGL_CALLBACK idle_callback;
     int timer_id;
     T idle_delay;
     T idle_timer;
@@ -131,7 +132,7 @@ private:
     bool ctrl_was_pressed; 
 
     // Keyboard Interaction
-    ARRAY<ARRAY<OPENGL_CALLBACK*>,VECTOR<int,2> > key_bindings;
+    ARRAY<ARRAY<OPENGL_CALLBACK>,VECTOR<int,2> > key_bindings;
     std::string current_key_binding_category;
     int current_key_binding_category_priority;
     ARRAY<OPENGL_KEY_BINDING_CATEGORY> key_bindings_by_category;
@@ -143,7 +144,7 @@ public:
     std::string prompt_response;
     bool prompt_response_success;
 private:
-    OPENGL_CALLBACK* prompt_response_cb;
+    OPENGL_CALLBACK prompt_response_cb;
 
     // Selection
     PROCESS_HITS_CB process_hits_cb;
@@ -166,14 +167,14 @@ public:
     void Set_Key_Binding_Category(const std::string &category);
     void Set_Key_Binding_Category_Priority(int priority=1);
 
-    void Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK* callback);
-    void Bind_Key(const std::string& key,OPENGL_CALLBACK* callback);
-    void Append_Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK* callback);
-    void Append_Bind_Key(const std::string& key,OPENGL_CALLBACK* callback);
+    void Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK callback);
+    void Bind_Key(const std::string& key,OPENGL_CALLBACK callback);
+    void Append_Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK callback);
+    void Append_Bind_Key(const std::string& key,OPENGL_CALLBACK callback);
     void Unbind_Key(const OPENGL_KEY& key);
     void Unbind_Keys(const std::string& keys);
 
-    void Set_Idle_Callback(OPENGL_CALLBACK* callback,const T delay);
+    void Set_Idle_Callback(OPENGL_CALLBACK callback,const T delay);
     void Set_View_Target_Timer(const T view_target_timer_input);
     void Prepare_For_Idle();
     void Handle_Idle();
@@ -239,21 +240,9 @@ public:
     static void Resize_Window(const int width,const int height);
 
     void Display_Prompt_Strings();
-    void Prompt_User(const std::string& prompt,OPENGL_CALLBACK* prompt_response_cb){Prompt_User(prompt,prompt_response_cb,"");} // workaround for MSVC's inability to handle defaults
-    void Prompt_User(const std::string& prompt,OPENGL_CALLBACK* prompt_response_cb,const std::string& default_response);
+    void Prompt_User(const std::string& prompt,OPENGL_CALLBACK prompt_response_cb){Prompt_User(prompt,prompt_response_cb,"");} // workaround for MSVC's inability to handle defaults
+    void Prompt_User(const std::string& prompt,OPENGL_CALLBACK prompt_response_cb,const std::string& default_response);
 
-    // Basic callbacks
-    void Toggle_Background();
-    void Toggle_Help();
-    void Toggle_Show_Frames_Per_Second();
-    void Resize_To_Standard_Size();
-    void Quit();
-    DEFINE_CALLBACK_CREATOR(OPENGL_WORLD,Toggle_Background);
-    DEFINE_CALLBACK_CREATOR(OPENGL_WORLD,Toggle_Help);
-    DEFINE_CALLBACK_CREATOR(OPENGL_WORLD,Toggle_Show_Frames_Per_Second);
-    DEFINE_CALLBACK_CREATOR(OPENGL_WORLD,Resize_To_Standard_Size);
-    DEFINE_CALLBACK_CREATOR(OPENGL_WORLD,Quit);
-public:
     friend class OPENGL_WINDOW<T>;
 //    friend class OPENGL_WINDOW_GLUT<T>;
     friend class OPENGL_WINDOW_ANDROID;

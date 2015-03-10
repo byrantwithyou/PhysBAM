@@ -26,6 +26,19 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),real_selection(0),
     color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
 {
+    viewer_callbacks.Set("toggle_active_value",{[this](){Toggle_Active_Value();},"Toggle viewing of elements"});
+    viewer_callbacks.Set("toggle_use_active_list",{[this](){Toggle_Use_Active_List();},"Toggle drawing subset of the deformable objects in the list"});
+    viewer_callbacks.Set("toggle_selection_mode",{[this](){Toggle_Selection_Mode();},"Toggle selecting a whole segment or just one part"});
+    viewer_callbacks.Set("increment_active_object",{[this](){Increment_Active_Object();},"Increment deformable object being drawn"});
+    viewer_callbacks.Set("cycle_display_mode",{[this](){Cycle_Display_Mode();},"Cycle embedded display mode"});
+    viewer_callbacks.Set("show_only_first",{[this](){Show_Only_First();},"Show only first deformable object"});
+    viewer_callbacks.Set("highlight_particle",{[this](){Highlight_Particle();},"Highlight a particle"});
+    viewer_callbacks.Set("toggle_velocity_vectors",{[this](){Toggle_Velocity_Vectors();},"Toggle particle velocity vectors"});
+    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
+    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
+    viewer_callbacks.Set("toggle_active_value_response",{[this](){Toggle_Active_Value_Response();},""});
+    viewer_callbacks.Set("highlight_particle_response",{[this](){Highlight_Particle_Response();},""});
+
     // check for per frame particles
     if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
         invalidate_deformable_objects_selection_each_frame=true;
@@ -178,7 +191,7 @@ Bounding_Box() const
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Highlight_Particle()
 {
-    OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Particle Number: ",Highlight_Particle_Response_CB());
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Particle Number: ",{[this](){Highlight_Particle_Response();},""});
 }
 //#####################################################################
 // Function Toggle_Active_Value
@@ -186,7 +199,7 @@ Highlight_Particle()
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Toggle_Active_Value()
 {
-    OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Component Number: ",Toggle_Active_Value_Response_CB());
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Component Number: ",{[this](){Toggle_Active_Value_Response();},""});
 }
 //#####################################################################
 // Function Toggle_Use_Active_List

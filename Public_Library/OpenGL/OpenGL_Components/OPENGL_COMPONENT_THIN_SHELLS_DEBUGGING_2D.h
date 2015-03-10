@@ -23,7 +23,7 @@ class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::World_Space_Box;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::World_Space_Box;using OPENGL_COMPONENT<T>::stream_type;using OPENGL_COMPONENT<T>::viewer_callbacks;
     GRID<TV> grid,mac_grid,u_grid,v_grid;
     ARRAY<VECTOR<bool,2> ,VECTOR<int,2> > node_neighbors_visible;
     ARRAY<VECTOR<PAIR<bool,T>,2>,VECTOR<int,2> > face_corners_visible_from_face_center_u; // length 2, order is bottom, top
@@ -55,10 +55,6 @@ public:
     void Toggle_Draw_Grid_Visibility();
     void Toggle_Draw_Density_Valid_Mask();
     void Toggle_Draw_Phi_Valid_Mask();
-
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D, Toggle_Draw_Grid_Visibility, "Toggle draw grid visibility");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D, Toggle_Draw_Density_Valid_Mask, "Toggle draw density valid mask");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D, Toggle_Draw_Phi_Valid_Mask, "Toggle draw phi valid mask");
 
 private:
     void Reinitialize(bool force=false);

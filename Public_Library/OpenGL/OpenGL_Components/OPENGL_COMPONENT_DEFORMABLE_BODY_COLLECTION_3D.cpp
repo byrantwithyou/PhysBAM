@@ -32,6 +32,29 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std
     color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
     has_embedded_objects(false),has_soft_bindings(false)
 {
+    viewer_callbacks.Set("toggle_active_value",{[this](){Toggle_Active_Value();},"Toggle viewing of elements"});
+    viewer_callbacks.Set("toggle_draw_interior",{[this](){Toggle_Draw_Interior();},"Toggle view of interior elements for tetraheralized volumes"});
+    viewer_callbacks.Set("toggle_differentiate_inverted",{[this](){Toggle_Differentiate_Inverted();},"Toggle use of different color for inverted tetrahera"});
+    viewer_callbacks.Set("toggle_draw_subsets",{[this](){Toggle_Draw_Subsets();},"Toggle drawing of subset tets and particles for tetraheralized volumes"});
+    viewer_callbacks.Set("toggle_hide_unselected",{[this](){Toggle_Hide_Unselected();},"Toggle drawing of the selected regions"});
+    viewer_callbacks.Set("toggle_use_active_list",{[this](){Toggle_Use_Active_List();},"Toggle drawing subset of the deformable objects in the list"});
+    viewer_callbacks.Set("toggle_selection_mode",{[this](){Toggle_Selection_Mode();},"Toggle selecting a whole segment or just one part"});
+    viewer_callbacks.Set("increment_active_object",{[this](){Increment_Active_Object();},"Increment deformable object being drawn"});
+    viewer_callbacks.Set("cycle_display_mode",{[this](){Cycle_Display_Mode();},"Cycle embedded display mode"});
+    viewer_callbacks.Set("cycle_cutaway_mode",{[this](){Cycle_Cutaway_Mode();},"Cycle cutaway mode"});
+    viewer_callbacks.Set("decrease_cutaway_fraction",{[this](){Decrease_Cutaway_Fraction();},"Decrease_Cutaway_Fraction"});
+    viewer_callbacks.Set("increase_cutaway_fraction",{[this](){Increase_Cutaway_Fraction();},"Increase_Cutaway_Fraction"});
+    viewer_callbacks.Set("create_one_big_triangulated_surface_and_write_to_file",{[this](){Create_One_Big_Triangulated_Surface_And_Write_To_File();},"Make one big boundary tri surface"});
+    viewer_callbacks.Set("cycle_relative_velocity_mode",{[this](){Cycle_Relative_Velocity_Mode();},"Visualize relative velocity"});
+    viewer_callbacks.Set("show_only_first",{[this](){Show_Only_First();},"Show only first deformable object"});
+    viewer_callbacks.Set("highlight_particle",{[this](){Highlight_Particle();},"Highlight a particle"});
+    viewer_callbacks.Set("toggle_velocity_vectors",{[this](){Toggle_Velocity_Vectors();},"Toggle particle velocity vectors"});
+    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
+    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
+    viewer_callbacks.Set("cycle_forces_mode",{[this](){Cycle_Forces_Mode();},"Cycle forces display mode"});
+    viewer_callbacks.Set("cycle_hard_bound_surface_display_mode",{[this](){Cycle_Hard_Bound_Surface_Display_Mode();},"Cycle hard bound embedded surface display mode"});
+    viewer_callbacks.Set("cycle_interaction_pair_display_mode",{[this](){Cycle_Interaction_Pair_Display_Mode();},"Cycle display of interaction pairs"});
+
     // check for per frame particles
     if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
         invalidate_deformable_objects_selection_each_frame=true;
@@ -512,7 +535,7 @@ Bounding_Box() const
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Highlight_Particle()
 {
-    OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Particle Number: ",Highlight_Particle_Response_CB());
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Particle Number: ",{[this](){Highlight_Particle_Response();},""});
 }
 //#####################################################################
 // Function Toggle_Active_Value
@@ -520,7 +543,7 @@ Highlight_Particle()
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Active_Value()
 {
-    OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Component Number: ",Toggle_Active_Value_Response_CB());
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Component Number: ",{[this](){Toggle_Active_Value_Response();},""});
 }
 //#####################################################################
 // Function Toggle_Hide_Unselected

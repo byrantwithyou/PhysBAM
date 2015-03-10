@@ -21,7 +21,7 @@ template<class T>
 class OPENGL_GRID_2D:public OPENGL_OBJECT<T>
 {
 public:
-    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
+    using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;using OPENGL_OBJECT<T>::viewer_callbacks;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
     GRID<TV>      &grid;
     ARRAY<bool,TV_INT> *active_cell_mask,*ghost_cell_mask;
@@ -39,7 +39,10 @@ private:
 public:
     OPENGL_GRID_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White(),const std::string basedir_input="",const int frame_input=0)
         :OPENGL_OBJECT<T>(stream_type),grid(grid_input),active_cell_mask(0),ghost_cell_mask(0),active_face_mask(0),ghost_face_mask(0),active_node_mask(0),ghost_node_mask(0),color(color_input),draw(true),draw_ghost_values(true),draw_mask_type(0),current_selection(0),basedir(basedir_input),frame(frame_input)
-    {Reinitialize();}
+    {
+        viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
+        Reinitialize();
+    }
 
     void Display() const PHYSBAM_OVERRIDE;
     virtual void Set_Frame(int frame_input);
@@ -52,8 +55,6 @@ public:
     void Toggle_Draw_Ghost_Values();
     void Reinitialize();
     void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
-
-    DEFINE_CALLBACK_CREATOR(OPENGL_GRID_2D, Toggle_Draw_Ghost_Values);
 };
 
 template<class T>

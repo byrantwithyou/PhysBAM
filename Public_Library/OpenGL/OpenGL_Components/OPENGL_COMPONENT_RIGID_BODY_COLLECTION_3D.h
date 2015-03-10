@@ -79,7 +79,7 @@ protected:
 
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::string& basedir, bool use_display_lists=true);
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir, bool use_display_lists=true);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D();
@@ -124,23 +124,6 @@ public:
     void Toggle_One_Sided();
     void Toggle_Draw_Particles();
 
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_Velocity_Vectors, "Toggle velocity vectors");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_Angular_Velocity_Vectors, "Toggle angular velocity vectors");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_Individual_Axes, "Toggle individual axes");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_Output_Positions, "Toggle output positions");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_Show_Object_Names, "Toggle show object names");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Turn_Off_Individual_Smooth_Shading, "Turn off individual smooth shading");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Manipulate_Individual_Body, "Manipulate individual body");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_Draw_Mode, "Toggle draw mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Increase_Vector_Size, "Increase vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Decrease_Vector_Size, "Decrease vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_Draw_Values, "Toggle draw values");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_One_Sided, "Toggle one/two sided drawing");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_Draw_Particles, "Toggle drawing of simplicial object's vertices");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_Articulation_Points, "Toggle articulation points");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_Joint_Frames, "Toggle joint frames");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Toggle_Forces_And_Torques, "Toggle forces and torques");
-
     void Read_Articulated_Information(const std::string& filename);
     void Update_Articulation_Points();
 
@@ -165,10 +148,8 @@ protected:
     void Toggle_Draw_Mode();
 
     void Turn_Off_Individual_Smooth_Shading_Prompt();
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Turn_Off_Individual_Smooth_Shading_Prompt, "");
     
     void Manipulate_Individual_Body_Prompt();
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D, Manipulate_Individual_Body_Prompt, "");
 };
 
 template<class T>

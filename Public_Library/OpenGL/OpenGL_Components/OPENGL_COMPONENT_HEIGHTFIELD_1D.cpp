@@ -18,6 +18,15 @@ OPENGL_COMPONENT_HEIGHTFIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid_inp
     :OPENGL_COMPONENT<T>(stream_type,"Heightfield 1D"), grid(grid_input), opengl_vector_field(stream_type,vector_field,vector_locations), scale(1), displacement_scale(1), valid(false), 
       draw_velocities(true), draw_points(true), selected_index(0)
 {
+    viewer_callbacks.Set("increase_scale",{[this](){Increase_Scale();},"Increase scale"});
+    viewer_callbacks.Set("decrease_scale",{[this](){Decrease_Scale();},"Decrease scale"});
+    viewer_callbacks.Set("increase_displacement_scale",{[this](){Increase_Displacement_Scale();},"Increase displacement scale"});
+    viewer_callbacks.Set("decrease_displacement_scale",{[this](){Decrease_Displacement_Scale();},"Decrease displacement space"});
+    viewer_callbacks.Set("increase_velocity_scale",{[this](){Increase_Velocity_Scale();},"Increase velocity scale"});
+    viewer_callbacks.Set("decrease_velocity_scale",{[this](){Decrease_Velocity_Scale();},"Decrease velocity scale"});
+    viewer_callbacks.Set("toggle_draw_velocities",{[this](){Toggle_Draw_Velocities();},"Toggle draw velocities"});
+    viewer_callbacks.Set("toggle_draw_points",{[this](){Toggle_Draw_Points();},"Toggle draw points"});
+
     height_filename=height_filename_input;
     if(x_filename_input.length()){x=new ARRAY<T,TV_INT>;x_filename=x_filename_input;}
     else{x=0;x_filename="";}

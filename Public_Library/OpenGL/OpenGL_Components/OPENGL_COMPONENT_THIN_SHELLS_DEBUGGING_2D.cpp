@@ -19,6 +19,10 @@ OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(STREAM_TYPE stream_type,GRID<TV> &grid
     directory(directory),frame_loaded(-1),valid(false),
     draw_grid_visibility(false),draw_density_valid_mask(false),draw_phi_valid_mask(false)
 {
+    viewer_callbacks.Set("toggle_draw_grid_visibility",{[this](){Toggle_Draw_Grid_Visibility();},"Toggle draw grid visibility"});
+    viewer_callbacks.Set("toggle_draw_density_valid_mask",{[this](){Toggle_Draw_Density_Valid_Mask();},"Toggle draw density valid mask"});
+    viewer_callbacks.Set("toggle_draw_phi_valid_mask",{[this](){Toggle_Draw_Phi_Valid_Mask();},"Toggle draw phi valid mask"});
+
     is_animation=true;
     mac_grid=grid.Get_MAC_Grid();
     u_grid=grid.Get_Face_Grid(0);

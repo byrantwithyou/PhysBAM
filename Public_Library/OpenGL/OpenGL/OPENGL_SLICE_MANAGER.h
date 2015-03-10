@@ -20,21 +20,20 @@ public:
     OPENGL_SLICE* slice;
     ARRAY<OPENGL_OBJECT<T>*> objects;
 private:
-    OPENGL_CALLBACK* slice_has_changed_callback;
+    OPENGL_CALLBACK slice_has_changed_callback;
    
 public:
     OPENGL_SLICE_MANAGER()
-        :slice(0),slice_has_changed_callback(0)
-    {}
+        :slice(0)
+    {
+    }
 
     ~OPENGL_SLICE_MANAGER()
     {
-        delete slice_has_changed_callback;
     }
 
-    void Set_Slice_Has_Changed_Callback(OPENGL_CALLBACK* slice_has_changed_callback_input)
+    void Set_Slice_Has_Changed_Callback(OPENGL_CALLBACK slice_has_changed_callback_input)
     {
-        delete slice_has_changed_callback;
         slice_has_changed_callback=slice_has_changed_callback_input;
     }
     
@@ -50,15 +49,10 @@ public:
     }
 
     // Callbacks for convenience
-    void Toggle_Slice_Mode() { slice->Toggle_Slice_Mode(); Update_Objects(); if(slice_has_changed_callback) (*slice_has_changed_callback)();}
-    void Toggle_Slice_Axis() { slice->Toggle_Slice_Axis(); Update_Objects(); if(slice_has_changed_callback) (*slice_has_changed_callback)();}
-    void Increment_Slice() { slice->Increment_Slice(); Update_Objects(); if(slice_has_changed_callback) (*slice_has_changed_callback)();}
-    void Decrement_Slice() { slice->Decrement_Slice(); Update_Objects(); if(slice_has_changed_callback) (*slice_has_changed_callback)();}
-
-    DEFINE_CALLBACK_CREATOR(OPENGL_SLICE_MANAGER, Toggle_Slice_Mode);
-    DEFINE_CALLBACK_CREATOR(OPENGL_SLICE_MANAGER, Toggle_Slice_Axis);
-    DEFINE_CALLBACK_CREATOR(OPENGL_SLICE_MANAGER, Increment_Slice);
-    DEFINE_CALLBACK_CREATOR(OPENGL_SLICE_MANAGER, Decrement_Slice);
+    void Toggle_Slice_Mode() { slice->Toggle_Slice_Mode(); Update_Objects(); if(slice_has_changed_callback.func) slice_has_changed_callback.func();}
+    void Toggle_Slice_Axis() { slice->Toggle_Slice_Axis(); Update_Objects(); if(slice_has_changed_callback.func) slice_has_changed_callback.func();}
+    void Increment_Slice() { slice->Increment_Slice(); Update_Objects(); if(slice_has_changed_callback.func) slice_has_changed_callback.func();}
+    void Decrement_Slice() { slice->Decrement_Slice(); Update_Objects(); if(slice_has_changed_callback.func) slice_has_changed_callback.func();}
 };
 }
 #endif

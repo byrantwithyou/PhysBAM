@@ -19,6 +19,7 @@ class OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D:public OPENGL_COMPONENT<T>
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_OBJECT<T>::viewer_callbacks;
     ARRAY<SYMMETRIC_MATRIX<T,3>,VECTOR<int,3> > field;
     OPENGL_SYMMETRIC_MATRIX_FIELD_3D<T> opengl_symmetric_matrix_field;
     std::string field_filename;
@@ -30,6 +31,9 @@ public:
         field_filename(field_filename_input),frame_loaded(-1),valid(false)
     {
         is_animation=FILE_UTILITIES::Is_Animated(field_filename);Reinitialize();
+
+        viewer_callbacks.Set("increase_size",{[this](){Increase_Size();},"Increase symmetric matrix size"});
+        viewer_callbacks.Set("decrease_size",{[this](){Decrease_Size();},"Decrease symmetric matrix size"});
     }
 
     virtual ~OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D()
@@ -67,9 +71,6 @@ public:
 
     void Decrease_Size()
     {opengl_symmetric_matrix_field.size*=1/(T)1.1;}
-
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D,Increase_Size,"Increase symmetric matrix size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D,Decrease_Size,"Decrease symmetric matrix size");
 
 //#####################################################################
     void Reinitialize(bool force_load_even_if_not_drawn=false);

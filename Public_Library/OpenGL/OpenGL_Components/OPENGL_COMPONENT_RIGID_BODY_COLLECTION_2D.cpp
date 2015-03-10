@@ -37,6 +37,18 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::str
     velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(stream_type,node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true),
     current_selection(0)
 {
+    viewer_callbacks.Set("toggle_velocity_vectors",{[this](){Toggle_Velocity_Vectors();},"Toggle velocity vectors"});
+    viewer_callbacks.Set("toggle_individual_axes",{[this](){Toggle_Individual_Axes();},"Toggle individual axes"});
+    viewer_callbacks.Set("toggle_output_positions",{[this](){Toggle_Output_Positions();},"Toggle output positions"});
+    viewer_callbacks.Set("toggle_show_object_names",{[this](){Toggle_Show_Object_Names();},"Toggle show object names"});
+    viewer_callbacks.Set("toggle_node_velocity_vectors",{[this](){Toggle_Node_Velocity_Vectors();},"Toggle node velocity vectors"});
+    viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
+    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
+    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
+    viewer_callbacks.Set("toggle_articulation_points",{[this](){Toggle_Articulation_Points();},"Toggle articulation points"});
+    viewer_callbacks.Set("toggle_linear_muscles",{[this](){Toggle_Linear_Muscles();},"Toggle linear muscles"});
+    viewer_callbacks.Set("toggle_forces_and_torques",{[this](){Toggle_Forces_And_Torques();},"Toggle forces and torques"});
+
     is_animation=true;
     has_init_destroy_information=true;
 }
@@ -52,6 +64,18 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,RIGID_BODY_COL
     velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(stream_type,node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true),
     current_selection(0)
 {
+    viewer_callbacks.Set("toggle_velocity_vectors",{[this](){Toggle_Velocity_Vectors();},"Toggle velocity vectors"});
+    viewer_callbacks.Set("toggle_individual_axes",{[this](){Toggle_Individual_Axes();},"Toggle individual axes"});
+    viewer_callbacks.Set("toggle_output_positions",{[this](){Toggle_Output_Positions();},"Toggle output positions"});
+    viewer_callbacks.Set("toggle_show_object_names",{[this](){Toggle_Show_Object_Names();},"Toggle show object names"});
+    viewer_callbacks.Set("toggle_node_velocity_vectors",{[this](){Toggle_Node_Velocity_Vectors();},"Toggle node velocity vectors"});
+    viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
+    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
+    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
+    viewer_callbacks.Set("toggle_articulation_points",{[this](){Toggle_Articulation_Points();},"Toggle articulation points"});
+    viewer_callbacks.Set("toggle_linear_muscles",{[this](){Toggle_Linear_Muscles();},"Toggle linear muscles"});
+    viewer_callbacks.Set("toggle_forces_and_torques",{[this](){Toggle_Forces_And_Torques();},"Toggle forces and torques"});
+
     is_animation=true;
     has_init_destroy_information=true;
 }

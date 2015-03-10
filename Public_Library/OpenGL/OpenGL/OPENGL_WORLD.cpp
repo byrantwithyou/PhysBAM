@@ -12,7 +12,6 @@
 #include <Tools/Utilities/TIMER.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <OpenGL/OpenGL/OPENGL_ARCBALL.h>
-#include <OpenGL/OpenGL/OPENGL_BASIC_CALLBACKS.h>
 #include <OpenGL/OpenGL/OPENGL_LIGHT.h>
 #include <OpenGL/OpenGL/OPENGL_MOUSE_HANDLER.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
@@ -42,17 +41,16 @@ template<class T> inline OPENGL_WORLD<T>*& Opengl_World()
 //#####################################################################
 template<class T> OPENGL_WORLD<T>::
 OPENGL_WORLD(STREAM_TYPE stream_type)
-    :initialized(false),stream_type(stream_type),ambient_light(OPENGL_COLOR::White()),fovy(50),mode_2d(false),load_names_for_selection(false),window(0),
-    fill_mode(DRAW_FILLED),enable_lighting_for_wireframe(false),white_background(false),
+    :initialized(false),stream_type(stream_type),smooth_shading(false),ambient_light(OPENGL_COLOR::White()),fovy(50),mode_2d(false),load_names_for_selection(false),
+    window(0),fill_mode(DRAW_FILLED),enable_lighting_for_wireframe(false),white_background(false),
     display_strings(true),show_object_names(false),display_object_names_in_corner(false),view_auto_help(false),
-    idle_callback(0),timer_id(0),idle_delay(0),idle_timer(0),view_target_timer(0),frame_counter_timer(0),frames_rendered(0),frames_per_second(0),show_frames_per_second(true),
+    timer_id(0),idle_delay(0),idle_timer(0),view_target_timer(0),frame_counter_timer(0),frames_rendered(0),frames_per_second(0),show_frames_per_second(true),
     left_handed_coordinate_system(false),nearclip_factor(.0625),farclip_factor(4),nearclip(nearclip_factor),farclip(farclip_factor),
     arcball(new OPENGL_ARCBALL<T>(stream_type,*this)),camera_distance(1),arcball_matrix(arcball->Value()),rotation_matrix(arcball->Value()),
     zoom_direction(1),translation_direction(1),oldmousex(0),oldmousey(0),do_mouse_rotation(false),do_mouse_zoom(false),do_mouse_target_xy(false),
     do_mouse_target_z(false),external_mouse_handler(0),shift_was_pressed(false),ctrl_was_pressed(false),
-    current_key_binding_category("User-Defined Keys"),current_key_binding_category_priority(1),prompt_mode(false),prompt_response_cb(0),
-    process_hits_cb(0),selection_mode(false),
-    current_selection(0)
+    current_key_binding_category("User-Defined Keys"),current_key_binding_category_priority(1),prompt_mode(false),
+    process_hits_cb(0),selection_mode(false),current_selection(0)
 {
     if(Opengl_World<T>()!=0) PHYSBAM_FATAL_ERROR(); 
     Opengl_World<T>()=this;
@@ -61,28 +59,49 @@ OPENGL_WORLD(STREAM_TYPE stream_type)
 
     Set_Key_Binding_Category("Default Keys (OPENGL_WORLD)");
     Set_Key_Binding_Category_Priority(1000);
-    Bind_Key("^q",Quit_CB("Quit"));
-    Bind_Key("^w",new OPENGL_CALLBACK_CYCLE(&fill_mode,0,2,"Toggle wireframe mode"));
+    Bind_Key("^q",{[this](){exit(0);},"Quit"});
+    Bind_Key("^w",{[this](){fill_mode=(fill_mode+1)%3;},"Toggle wireframe mode"});
+
     // TODO: fix full screen
-    //Bind_Key("^f",new OPENGL_CALLBACK_FULLSCREEN(&width,&height));
-    Bind_Key("^m",new OPENGL_CALLBACK_ZOOM<T>(.75f,&camera_distance,&nearclip,&farclip));
-    Bind_Key("^n",new OPENGL_CALLBACK_ZOOM<T>(4.f/3,&camera_distance,&nearclip,&farclip));
-    Bind_Key("^i",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(-.05f,0,0),&camera_distance,&target_position));
-    Bind_Key("^o",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(.05f,0,0),&camera_distance,&target_position));
-    Bind_Key("^j",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(0,-.05f,0),&camera_distance,&target_position));
-    Bind_Key("^k",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(0,.05f,0),&camera_distance,&target_position));
-    Bind_Key("^h",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(0,0,-.05f),&camera_distance,&target_position));
-    Bind_Key("^l",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(0,0,.05f),&camera_distance,&target_position));
-    Bind_Key("^v",new OPENGL_CALLBACK_MOVE_TARGET<T>(*this,TV(),&camera_distance,&target_position));
-    Bind_Key("^d",new OPENGL_CALLBACK_SAVE_SCREEN<T>(*this));
-    Bind_Key("^p",new OPENGL_CALLBACK_SAVE_TO_EPS<T>(*this));
-    Bind_Key("^|",Toggle_Show_Frames_Per_Second_CB("Toggle Show Frames/Second"));
-    Bind_Key("^g",new OPENGL_CALLBACK_TOGGLE_SMOOTH_SHADING<T>(*this));
-    Bind_Key("^a",new OPENGL_CALLBACK_TOGGLE(&show_object_names,"Toggle object names"));
-    Bind_Key("^t",Toggle_Background_CB("Toggle Background"));
-    Bind_Key("|",Resize_To_Standard_Size_CB("Resize Window to 640x480"));
-    Bind_Key('?',Toggle_Help_CB("Display Help"));
-    Bind_Key("<F1>",new OPENGL_CALLBACK_TOGGLE(&display_strings,"Toggle display strings"));
+    Bind_Key("^m",{[this](){camera_distance*=(T).75;nearclip*=(T).75;farclip*=(T).75;},"Zoom by 3/4"});
+    Bind_Key("^n",{[this](){camera_distance/=(T).75;nearclip/=(T).75;farclip/=(T).75;},"Zoom by 4/3"});
+
+    Bind_Key("^d",{[this]()
+            {
+                LOG::cout<<"Filename for saving image in .ppm or .jpg (if supported) formats (return for default, - for cancel)\n";
+                std::string filename;
+                getline(std::cin,filename);
+                size_t len=filename.length();
+                if(filename[len-1]=='\n'){--len;filename=filename.substr(0,len);}
+                if(len<=0) return;
+                LOG::cout<<"saving to %s..."<<filename;
+                Save_Screen(filename,true);
+                LOG::cout<<"\n";
+            },"Save screen"});
+    Bind_Key("^|",{[this]()
+            {
+                show_frames_per_second=!show_frames_per_second;
+                if(show_frames_per_second){frame_counter_timer=1;Prepare_For_Idle();}
+                else frame_counter_timer=0;
+            },"Toggle Show Frames/Second"});
+    Bind_Key("^g",{[this]()
+            {
+                if(smooth_shading){
+                    smooth_shading=false;
+                    for(int i=0;i<object_list.m;i++)
+                        if(can_toggle_smooth_shading(i))
+                            object_list(i)->Turn_Smooth_Shading_Off();}
+                else{
+                    smooth_shading=true;
+                    for(int i=0;i<object_list.m;i++)
+                        if(can_toggle_smooth_shading(i))
+                            object_list(i)->Turn_Smooth_Shading_On();}
+            },"Toggle smooth shading"});
+    Bind_Key("^a",{[this](){show_object_names=!show_object_names;},"Toggle object names"});
+    Bind_Key("^t",{[this](){white_background=!white_background;},"Toggle Background"});
+    Bind_Key("|",{[this](){window->Request_Resize(640,480);},"Display Help"});
+    Bind_Key("<F1>",{[this](){display_strings=!display_strings;},"Toggle display strings"});
+
     Set_Key_Binding_Category("User-Defined Keys");
     Set_Key_Binding_Category_Priority(1);
     Set_View_Target_Timer(1);
@@ -94,14 +113,10 @@ OPENGL_WORLD(STREAM_TYPE stream_type)
 template<class T> OPENGL_WORLD<T>::
 ~OPENGL_WORLD()
 {
-    for(int index=0;index<key_bindings_by_category.m;index++)
-        for(int key=0;key<key_bindings_by_category(index).key_bindings.m;key++)
-            delete key_bindings_by_category(index).key_bindings(key).y;
     Clear_All_Lights();
     delete window;
     delete arcball;
     Opengl_World<T>()=0;
-    delete idle_callback;
 }
 //#####################################################################
 // Singleton
@@ -225,15 +240,16 @@ Set_Key_Binding_Category_Priority(int priority)
 // Function Bind_Key
 //####################################################################
 template<class T> void OPENGL_WORLD<T>::
-Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK* callback)
+Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK callback)
 {
-    Unbind_Key(key);Append_Bind_Key(key,callback);
+    Unbind_Key(key);
+    Append_Bind_Key(key,callback);
 }
 //#####################################################################
 // Function Bind_Key
 //####################################################################
 template<class T> void OPENGL_WORLD<T>::
-Bind_Key(const std::string& key,OPENGL_CALLBACK* callback)
+Bind_Key(const std::string& key,OPENGL_CALLBACK callback)
 {
     Bind_Key(OPENGL_KEY::From_String(key),callback);
 }
@@ -241,7 +257,7 @@ Bind_Key(const std::string& key,OPENGL_CALLBACK* callback)
 // Function Append_Bind_Key
 //####################################################################
 template<class T> void OPENGL_WORLD<T>::
-Append_Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK* callback)
+Append_Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK callback)
 {
     key_bindings(key.Index()).Append(callback);
     int index;
@@ -249,13 +265,13 @@ Append_Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK* callback)
     if(index>=key_bindings_by_category.m){ // Insert in location dependent on priority
         for(index=0;index<key_bindings_by_category.m && key_bindings_by_category(index).priority<=current_key_binding_category_priority;index++){}
         key_bindings_by_category.Insert(OPENGL_KEY_BINDING_CATEGORY(current_key_binding_category,current_key_binding_category_priority),index);}
-    key_bindings_by_category(index).key_bindings.Append(PAIR<OPENGL_KEY,OPENGL_CALLBACK*>(key,callback));
+    key_bindings_by_category(index).key_bindings.Append(PAIR<OPENGL_KEY,OPENGL_CALLBACK>(key,callback));
 }
 //#####################################################################
 // Function Append_Bind_Key
 //####################################################################
 template<class T> void OPENGL_WORLD<T>::
-Append_Bind_Key(const std::string& key,OPENGL_CALLBACK* callback)
+Append_Bind_Key(const std::string& key,OPENGL_CALLBACK callback)
 {
     Append_Bind_Key(OPENGL_KEY::From_String(key),callback);
 }
@@ -269,8 +285,7 @@ Unbind_Key(const OPENGL_KEY& key)
     for(int i=0;i<key_bindings_by_category.m;i++)
         for(int j=0;j<key_bindings_by_category(i).key_bindings.m;j++)
             if(key_bindings_by_category(i).key_bindings(j).x==key){
-                delete key_bindings_by_category(i).key_bindings(j).y;
-                key_bindings_by_category(i).key_bindings(j).y=0;
+                key_bindings_by_category(i).key_bindings(j).y={0,0};
                 key_bindings_by_category(i).key_bindings.Remove_Index(j);}
 }
 //#####################################################################
@@ -286,10 +301,9 @@ Unbind_Keys(const std::string& keys)
 // Function Set_Idle_Callback
 //#####################################################################
 template<class T> void OPENGL_WORLD<T>::
-Set_Idle_Callback(OPENGL_CALLBACK* callback,const T delay)
+Set_Idle_Callback(OPENGL_CALLBACK callback,const T delay)
 {
     bool need_prepare=!idle_timer || idle_timer>delay;
-    delete idle_callback;
     idle_callback=callback;
     idle_delay=delay;
     idle_timer=idle_delay;
@@ -306,16 +320,6 @@ Set_View_Target_Timer(const T view_target_timer_input)
     if(need_prepare) Prepare_For_Idle();
 }
 //#####################################################################
-// Function Toggle_Show_Frames_Per_Second
-//#####################################################################
-template<class T> void OPENGL_WORLD<T>::
-Toggle_Show_Frames_Per_Second()
-{
-    show_frames_per_second=!show_frames_per_second;
-    if(show_frames_per_second){frame_counter_timer=1;Prepare_For_Idle();}
-    else frame_counter_timer=0;
-}
-//#####################################################################
 // Function Prepare_For_Idle
 //#####################################################################
 template<class T> void OPENGL_WORLD<T>::
@@ -323,7 +327,7 @@ Prepare_For_Idle()
 {
     if(!timer_id) timer_id=TIMER::Singleton()->Register_Timer();
     if(!initialized) return;
-    bool use_idle=idle_callback && !idle_delay;
+    bool use_idle=idle_callback.func && !idle_delay;
     window->Setup_Idle(use_idle);
 
     // If not use idle then wait awhile without consuming CPU
@@ -348,10 +352,11 @@ Handle_Idle()
     if(show_frames_per_second){
         frame_counter_timer-=delta_time;
         if(frame_counter_timer<0){frame_counter_timer=1;frames_per_second=frames_rendered;frames_rendered=0;}}
-    if(idle_callback){
+    if(idle_callback.func){
         idle_timer-=delta_time;
         if(idle_timer<=0){
-            need_redisplay=true;(*idle_callback)();
+            need_redisplay=true;
+            idle_callback.func();
             idle_timer=idle_delay;}}
     if(need_redisplay) window->Redisplay();
     Prepare_For_Idle();
@@ -362,7 +367,7 @@ Handle_Idle()
 template<class T> void OPENGL_WORLD<T>::
 Handle_Timer()
 {
-    if(!idle_callback || idle_delay) Handle_Idle();
+    if(idle_callback.func || idle_delay) Handle_Idle();
 }
 //#####################################################################
 // Function Handle_Display_Prompt_Only
@@ -591,7 +596,7 @@ Handle_Keypress_Main(const OPENGL_KEY& key,int x,int y)
     if(key_bindings(index).m >=1)
     {
         for(int i=0;i<key_bindings(index).m;i++)
-            (*key_bindings(index)(i))();
+            key_bindings(index)(i).func();
         window->Redisplay();
     }
 }
@@ -608,7 +613,7 @@ Handle_Keypress_Prompt(unsigned char key)
         if(key==27){prompt_response.clear();prompt_response_success=false;}
         glPopAttrib();
         prompt_mode=false;
-        (*prompt_response_cb)();}
+        prompt_response_cb.func();}
     window->Redisplay();
 }
 //#####################################################################
@@ -816,14 +821,13 @@ Display_Auto_Help()
             strings1.Append(key_bindings_by_category(i).name+":");
             strings2.Append("");
             for(int j=0;j<key_bindings_by_category(i).key_bindings.m;j++){
-                std::ostringstream string_stream1,string_stream2;
-                string_stream1.flags(std::ios::right);string_stream1.width(5);
+                std::ostringstream string_stream1;
+                string_stream1.flags(std::ios::right);
+                string_stream1.width(5);
                 string_stream1<<key_bindings_by_category(i).key_bindings(j).x.Name();
                 string_stream1<<":";
                 strings1.Append(string_stream1.str());
-                string_stream2<<"      ";
-                key_bindings_by_category(i).key_bindings(j).y->Print(string_stream2);
-                strings2.Append(string_stream2.str());}}}
+                strings2.Append(std::string("      ")+key_bindings_by_category(i).key_bindings(j).y.help);}}}
 
     Display_Strings(strings2,OPENGL_COLOR::Yellow(),true,0,13,GLUT_BITMAP_8_BY_13);
     Display_Strings(strings1,OPENGL_COLOR::White(),false,0,13,GLUT_BITMAP_8_BY_13);
@@ -1271,7 +1275,7 @@ template<class T> void OPENGL_WORLD<T>::Display_Prompt_Strings()
 //#####################################################################
 // Function Prompt_User
 //#####################################################################
-template<class T> void OPENGL_WORLD<T>::Prompt_User(const std::string& prompt_input,OPENGL_CALLBACK* prompt_response_cb_input,const std::string& default_response)
+template<class T> void OPENGL_WORLD<T>::Prompt_User(const std::string& prompt_input,OPENGL_CALLBACK prompt_response_cb_input,const std::string& default_response)
 {
     prompt=prompt_input;
     prompt_response=default_response;
@@ -1282,38 +1286,6 @@ template<class T> void OPENGL_WORLD<T>::Prompt_User(const std::string& prompt_in
     glDrawBuffer(GL_FRONT);
     prompt_mode=true;
     view_auto_help=false; // force it off
-}
-//#####################################################################
-// Function Toggle_Background
-//#####################################################################
-template<class T> void OPENGL_WORLD<T>::
-Toggle_Background()
-{
-    white_background=!white_background;
-}
-//#####################################################################
-// Function Toggle_Background
-//#####################################################################
-template<class T> void OPENGL_WORLD<T>::
-Toggle_Help()
-{
-    view_auto_help=!view_auto_help;
-}
-//#####################################################################
-// Resize_To_Standard_Size
-//#####################################################################
-template<class T> void OPENGL_WORLD<T>::
-Resize_To_Standard_Size()
-{
-    window->Request_Resize(640,480);
-}
-//#####################################################################
-// Quit
-//#####################################################################
-template<class T> void OPENGL_WORLD<T>::
-Quit()
-{
-    exit(0);
 }
 //#####################################################################
 template void OPENGL_WORLD<float>::Get_Image(ARRAY<VECTOR<float,3>,VECTOR<int,2> > &image,const bool use_back_buffer);

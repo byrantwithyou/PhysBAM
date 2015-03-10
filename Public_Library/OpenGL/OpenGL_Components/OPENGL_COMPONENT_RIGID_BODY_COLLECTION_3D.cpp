@@ -80,6 +80,23 @@ template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Initialize()
 {
+    viewer_callbacks.Set("toggle_velocity_vectors",{[this](){Toggle_Velocity_Vectors();},"Toggle velocity vectors"});
+    viewer_callbacks.Set("toggle_angular_velocity_vectors",{[this](){Toggle_Angular_Velocity_Vectors();},"Toggle angular velocity vectors"});
+    viewer_callbacks.Set("toggle_individual_axes",{[this](){Toggle_Individual_Axes();},"Toggle individual axes"});
+    viewer_callbacks.Set("toggle_output_positions",{[this](){Toggle_Output_Positions();},"Toggle output positions"});
+    viewer_callbacks.Set("toggle_show_object_names",{[this](){Toggle_Show_Object_Names();},"Toggle show object names"});
+    viewer_callbacks.Set("turn_off_individual_smooth_shading",{[this](){Turn_Off_Individual_Smooth_Shading();},"Turn off individual smooth shading"});
+    viewer_callbacks.Set("manipulate_individual_body",{[this](){Manipulate_Individual_Body();},"Manipulate individual body"});
+    viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
+    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
+    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
+    viewer_callbacks.Set("toggle_draw_values",{[this](){Toggle_Draw_Values();},"Toggle draw values"});
+    viewer_callbacks.Set("toggle_one_sided",{[this](){Toggle_One_Sided();},"Toggle one/two sided drawing"});
+    viewer_callbacks.Set("toggle_draw_particles",{[this](){Toggle_Draw_Particles();},"Toggle drawing of simplicial object's vertices"});
+    viewer_callbacks.Set("toggle_articulation_points",{[this](){Toggle_Articulation_Points();},"Toggle articulation points"});
+    viewer_callbacks.Set("toggle_joint_frames",{[this](){Toggle_Joint_Frames();},"Toggle joint frames"});
+    viewer_callbacks.Set("toggle_forces_and_torques",{[this](){Toggle_Forces_And_Torques();},"Toggle forces and torques"});
+
     is_animation=true;
     show_object_names=false;
     output_positions=true;
@@ -782,7 +799,7 @@ Turn_Off_Individual_Smooth_Shading_Prompt()
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Turn_Off_Individual_Smooth_Shading()
 {
-    OPENGL_WORLD<T>::Singleton()->Prompt_User("Turn off smooth shading for object: ",Turn_Off_Individual_Smooth_Shading_Prompt_CB(),"");
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Turn off smooth shading for object: ",{[this](){Turn_Off_Individual_Smooth_Shading_Prompt();},""});
 }
 //#####################################################################
 // Function Manipulate_Individual_Body_Prompt
@@ -809,7 +826,7 @@ Manipulate_Individual_Body_Prompt()
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Manipulate_Individual_Body()
 {
-    OPENGL_WORLD<T>::Singleton()->Prompt_User("Manipulate: ",Manipulate_Individual_Body_Prompt_CB(),"");
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Manipulate: ",{[this](){Manipulate_Individual_Body_Prompt();},""});
 }
 //#####################################################################
 // Selection Bounding_Box

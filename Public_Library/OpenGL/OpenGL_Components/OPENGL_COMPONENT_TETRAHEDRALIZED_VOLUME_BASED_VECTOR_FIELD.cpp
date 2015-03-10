@@ -13,6 +13,10 @@ OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD(STREAM_TYPE stream_ty
     :OPENGL_COMPONENT<T>(stream_type,"Triangulated Area Based Vector Field 3D"),opengl_vector_field(stream_type,tetrahedralized_volume,*new ARRAY<VECTOR<T,3> >), 
     vector_field_filename(vector_field_filename),frame_loaded(-1),valid(false)
 {
+    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
+    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
+    viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrowhead"});
+
     is_animation = FILE_UTILITIES::Is_Animated(vector_field_filename);
 }
 //#####################################################################

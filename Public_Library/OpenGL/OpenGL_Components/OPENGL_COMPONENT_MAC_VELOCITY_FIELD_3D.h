@@ -22,7 +22,7 @@ class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D:public OPENGL_COMPONENT<T>
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::Toggle_Draw;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input);
     virtual ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D();
 
@@ -48,14 +48,6 @@ public:
     void Toggle_Arrowhead();
     void Toggle_Draw_Vorticity();
     void Normalize_Vorticity_Color_Map();
-
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D, Toggle_Velocity_Mode, "Toggle velocity mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D, Toggle_Velocity_Mode_And_Draw, "Toggle velocity mode and draw");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D, Increase_Vector_Size, "Increase vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D, Decrease_Vector_Size, "Decrease vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D, Toggle_Arrowhead, "Toggle arrowhead");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D, Toggle_Draw_Vorticity, "Toggle draw vorticity");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D, Normalize_Vorticity_Color_Map, "Normalize vorticity map based on current frame");
 
 private:
     void Reinitialize();

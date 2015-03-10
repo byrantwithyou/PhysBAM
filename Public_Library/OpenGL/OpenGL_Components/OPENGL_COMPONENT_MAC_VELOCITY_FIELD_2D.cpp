@@ -26,6 +26,19 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &g
     draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),
     opengl_streamlines(stream_type,streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
 {
+    viewer_callbacks.Set("toggle_velocity_mode",{[this](){Toggle_Velocity_Mode();},"Toggle velocity mode"});
+    viewer_callbacks.Set("toggle_velocity_mode_and_draw",{[this](){Toggle_Velocity_Mode_And_Draw();},"Toggle velocity mode and draw"});
+    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
+    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
+    viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrowhead"});
+    viewer_callbacks.Set("toggle_draw_divergence",{[this](){Toggle_Draw_Divergence();},"Toggle draw divergence"});
+    viewer_callbacks.Set("toggle_draw_streamlines",{[this](){Toggle_Draw_Streamlines();},"Toggle draw streamlines"});
+    viewer_callbacks.Set("toggle_use_streamline_seed",{[this](){Toggle_Use_Streamline_Seed();},"Toggle draw consistent streamlines"});
+    viewer_callbacks.Set("lengthen_streamlines",{[this](){Lengthen_Streamlines();},"Lengthen streamlines"});
+    viewer_callbacks.Set("shorten_streamlines",{[this](){Shorten_Streamlines();},"Shorten streamlines"});
+    viewer_callbacks.Set("toggle_draw_vorticity",{[this](){Toggle_Draw_Vorticity();},"Toggle draw vorticity"});
+    viewer_callbacks.Set("normalize_vorticity_color_map",{[this](){Normalize_Vorticity_Color_Map();},"Normalize vorticity map based on current frame"});
+
     is_animation=FILE_UTILITIES::Is_Animated(velocity_filename);
     frame_loaded=-1;
 
@@ -219,9 +232,9 @@ Toggle_Velocity_Mode_And_Draw()
     if(draw)
     {
         Toggle_Velocity_Mode();
-        if((int)opengl_mac_velocity_field->velocity_mode==0) Toggle_Draw();
+        if((int)opengl_mac_velocity_field->velocity_mode==0) Set_Draw(!draw);
     }
-    else Toggle_Draw();
+    else Set_Draw(!draw);
 }
 //#####################################################################
 // Function Increase_Vector_Size

@@ -11,6 +11,9 @@ template<class T> OPENGL_COMPONENT<T>::
 OPENGL_COMPONENT(STREAM_TYPE stream_type,const std::string &name)
  :OPENGL_OBJECT<T>(stream_type),frame(0),draw(true),is_animation(false),component_name(name)
 {
+    viewer_callbacks.Set("next_frame",{[this](){Set_Frame(frame+1);},"Next frame"});
+    viewer_callbacks.Set("prev_frame",{[this](){Set_Frame(frame-1);},"Prev frame"});
+    viewer_callbacks.Set("toggle_draw",{[this](){Set_Draw(!draw);},"Toggle draw"});
 }
 //#####################################################################
 // Destructor
@@ -65,22 +68,6 @@ template<class T> bool OPENGL_COMPONENT<T>::
 Use_Bounding_Box() const
 {
     return draw;
-}
-//#####################################################################
-// Function Next_Frame
-//#####################################################################
-template<class T> void OPENGL_COMPONENT<T>::
-Next_Frame()
-{
-    Set_Frame(frame+1);
-}
-//#####################################################################
-// Function Prev_Frame
-//#####################################################################
-template<class T> void OPENGL_COMPONENT<T>::
-Prev_Frame()
-{
-    Set_Frame(frame-1);
 }
 namespace PhysBAM{
 template class OPENGL_COMPONENT<double>;

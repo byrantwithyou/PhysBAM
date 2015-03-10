@@ -21,9 +21,8 @@ class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::Toggle_Draw;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_OBJECT<T>::viewer_callbacks;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
     typedef LINEAR_INTERPOLATION_UNIFORM<TV,T> T_LINEAR_INTERPOLATION_VECTOR;
     OPENGL_MAC_VELOCITY_FIELD_2D<T>* opengl_mac_velocity_field;
     OPENGL_SCALAR_FIELD_2D<T>* opengl_vorticity_magnitude;
@@ -72,19 +71,6 @@ public:
     void Shorten_Streamlines();
     void Toggle_Draw_Vorticity();
     void Normalize_Vorticity_Color_Map();
-
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Toggle_Velocity_Mode, "Toggle velocity mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Toggle_Velocity_Mode_And_Draw, "Toggle velocity mode and draw");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Increase_Vector_Size, "Increase vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Decrease_Vector_Size, "Decrease vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Toggle_Arrowhead, "Toggle arrowhead");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Toggle_Draw_Divergence, "Toggle draw divergence");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Toggle_Draw_Streamlines, "Toggle draw streamlines");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Toggle_Use_Streamline_Seed, "Toggle draw consistent streamlines");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Lengthen_Streamlines, "Lengthen streamlines");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Shorten_Streamlines, "Shorten streamlines");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Toggle_Draw_Vorticity, "Toggle draw vorticity");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D, Normalize_Vorticity_Color_Map, "Normalize vorticity map based on current frame");
 
 private:
     void Reinitialize();

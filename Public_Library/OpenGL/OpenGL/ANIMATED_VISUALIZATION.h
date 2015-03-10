@@ -7,6 +7,7 @@
 #ifndef __ANIMATED_VISUALIZATION__
 #define __ANIMATED_VISUALIZATION__
 
+#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <OpenGL/OpenGL/BASIC_VISUALIZATION.h>
 #include <climits>
 
@@ -60,24 +61,14 @@ public:
     void    Toggle_Fixed_Frame_Rate();
     void    Goto_Last_Frame();
 
-    DEFINE_CALLBACK_CREATOR(ANIMATED_VISUALIZATION, Next_Frame);
-    DEFINE_CALLBACK_CREATOR(ANIMATED_VISUALIZATION, Prev_Frame);
-    DEFINE_CALLBACK_CREATOR(ANIMATED_VISUALIZATION, Goto_Frame);
-    DEFINE_CALLBACK_CREATOR(ANIMATED_VISUALIZATION, Reset);
-    DEFINE_CALLBACK_CREATOR(ANIMATED_VISUALIZATION, Toggle_Play);
-    DEFINE_CALLBACK_CREATOR(ANIMATED_VISUALIZATION, Toggle_Loop);
-    DEFINE_CALLBACK_CREATOR(ANIMATED_VISUALIZATION, Toggle_Fixed_Frame_Rate);
-    DEFINE_CALLBACK_CREATOR(ANIMATED_VISUALIZATION, Goto_Last_Frame);
+    OPENGL_CALLBACK next_frame_cb,prev_frame_cb,goto_frame_cb,reset_cb,toggle_play_cb,toggle_loop_cb,null_cb;
+    OPENGL_CALLBACK toggle_fixed_frame_rate_cb,goto_last_frame_cb,goto_frame_prompt_cb,capture_frames_cb,capture_frames_prompt_cb;
 
 private:
     void    Goto_Frame_Prompt();
     void    Capture_Frames();
     void    Capture_Frames_Prompt();
     CAPTURE_FRAMES_PROMPT_STATE capture_frames_prompt_state;
-
-    DEFINE_CALLBACK_CREATOR(ANIMATED_VISUALIZATION, Goto_Frame_Prompt);
-    DEFINE_CALLBACK_CREATOR(ANIMATED_VISUALIZATION, Capture_Frames);
-    DEFINE_CALLBACK_CREATOR(ANIMATED_VISUALIZATION, Capture_Frames_Prompt);
 
 protected:
     bool    animation_enabled;

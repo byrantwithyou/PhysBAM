@@ -33,7 +33,7 @@ protected:
     bool invalidate_deformable_objects_selection_each_frame;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     COLLISION_BODY_COLLECTION<TV>& collision_body_list;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>* real_selection;
@@ -87,23 +87,10 @@ public:
     void Increase_Vector_Size();
     void Update_Velocity_Field();
 
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Toggle_Active_Value,"Toggle viewing of elements");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Toggle_Use_Active_List,"Toggle drawing subset of the deformable objects in the list");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Toggle_Selection_Mode,"Toggle selecting a whole segment or just one part");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Increment_Active_Object,"Increment deformable object being drawn");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Cycle_Display_Mode,"Cycle embedded display mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Show_Only_First,"Show only first deformable object");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Highlight_Particle,"Highlight a particle");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Toggle_Velocity_Vectors,"Toggle particle velocity vectors");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Increase_Vector_Size,"Increase vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Decrease_Vector_Size,"Decrease vector size");
-
     virtual void Reinitialize(bool force=false,bool read_geometry=true);    // Needs to be called after some state changes
     
     void Toggle_Active_Value_Response();
     void Highlight_Particle_Response();
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Toggle_Active_Value_Response,"");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D,Highlight_Particle_Response,"");
 private:
     void Initialize();    // Needs to be called after some state changes
 };

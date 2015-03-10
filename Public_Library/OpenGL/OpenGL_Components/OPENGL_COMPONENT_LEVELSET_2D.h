@@ -17,7 +17,7 @@ class OPENGL_COMPONENT_LEVELSET_2D:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::stream_type;
-    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset_filename_input,const std::string filename_set_input="");
     virtual ~OPENGL_COMPONENT_LEVELSET_2D();
 
@@ -41,15 +41,6 @@ public:
     void Previous_Set();
     void Toggle_Draw_Multiple_Levelsets();
     void Toggle_Draw_Ghost_Values();
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_LEVELSET_2D,Toggle_Color_Mode,"Toggle color mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_LEVELSET_2D,Toggle_Smooth,"Toggle smooth levelset draw");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_LEVELSET_2D,Toggle_Normals,"Toggle levelset normals draw");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_LEVELSET_2D,Toggle_Draw_Mode,"Toggle levelset contour/cellview");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_LEVELSET_2D,Toggle_Draw_Sign,"Toggle levelset sign direction");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_LEVELSET_2D,Next_Set,"Switch to next set");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_LEVELSET_2D,Previous_Set,"Switch to previous set");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_LEVELSET_2D,Toggle_Draw_Multiple_Levelsets,"Toggle mutliple/single levelset draw");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_LEVELSET_2D, Toggle_Draw_Ghost_Values, "Toggle draw ghost values");
     
 private:
     void Reinitialize(const bool force_even_if_not_drawn=false);

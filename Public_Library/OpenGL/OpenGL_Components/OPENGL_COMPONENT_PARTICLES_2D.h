@@ -23,7 +23,7 @@ class OPENGL_COMPONENT_PARTICLES_2D:public OPENGL_COMPONENT<T>
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::World_Space_Box;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &filename, const std::string &filename_set_input="", bool use_ids_input = true, bool particles_stored_per_cell_uniform_input = false);
     virtual ~OPENGL_COMPONENT_PARTICLES_2D();
 
@@ -57,13 +57,6 @@ public:
     void Next_Set();
     void Previous_Set();
     void Toggle_Draw_Multiple_Particle_Sets();
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_PARTICLES_2D, Toggle_Draw_Point_Numbers, "Toggle draw point numbers");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_PARTICLES_2D, Toggle_Draw_Radii, "Toggle draw radii");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_PARTICLES_2D, Toggle_Draw_Velocities, "Toggle draw velocities");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_PARTICLES_2D, Command_Prompt, "Command prompt");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_PARTICLES_2D, Next_Set, "Switch to next set");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_PARTICLES_2D, Previous_Set, "Switch to previous set");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_PARTICLES_2D, Toggle_Draw_Multiple_Particle_Sets, "Toggle drawing multiple particle sets");
 
 private:
     void Reinitialize(bool force=false);
@@ -71,7 +64,6 @@ private:
     ARRAY_VIEW<int>* Get_Particles_Id_Array(int set_number=0) const;
 
     void Command_Prompt_Response();
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_PARTICLES_2D, Command_Prompt_Response, "");
 
 public:
     GEOMETRY_PARTICLES<TV>* particles;

@@ -23,6 +23,10 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std::str
     draw_node_velocity_vectors(false),draw_point_simplices(true),
     rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),current_selection(0),need_destroy_rigid_body_collection(true)
 {
+    viewer_callbacks.Set("toggle_output_positions",{[this](){Toggle_Output_Positions();},"Toggle output positions"});
+    viewer_callbacks.Set("toggle_show_object_names",{[this](){Toggle_Show_Object_Names();},"Toggle show object names"});
+    viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
+
     is_animation=true;
     has_init_destroy_information=true;
 }
@@ -34,6 +38,10 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(STREAM_TYPE stream_type,RIGID_BODY_COL
     :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection 1D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_node_velocity_vectors(false),draw_point_simplices(true),rigid_body_collection(rigid_body_collection),current_selection(0),need_destroy_rigid_body_collection(false)
 {
+    viewer_callbacks.Set("toggle_output_positions",{[this](){Toggle_Output_Positions();},"Toggle output positions"});
+    viewer_callbacks.Set("toggle_show_object_names",{[this](){Toggle_Show_Object_Names();},"Toggle show object names"});
+    viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
+
     is_animation=true;
     has_init_destroy_information=true;
 }

@@ -112,9 +112,9 @@ Initialize_Components_And_Key_Bindings()
     density_component->Reinitialize(true);
     Add_Component(density_component, "density",'1',0);
     std::string pressure_filename = basedir+"/%d/pressure";
-    pressure_component = new OPENGL_COMPONENT_HEIGHTFIELD_2D<T>(stream_type,grid,pressure_filename,"","",height_m_start,height_m_end,height_n_start,height_n_end);
-    pressure_component->Toggle_Draw_Velocities();
-    pressure_component->Toggle_Draw();
+    pressure_component = new OPENGL_COMPONENT_HEIGHTFIELD_2D<T>(stream_type,grid,pressure_filename,"","");
+    pressure_component->viewer_callbacks.Get("toggle_draw_velocities").func();
+    pressure_component->viewer_callbacks.Get("toggle_draw").func();
     pressure_component->selectable=true;
     pressure_component->Reinitialize(true);
     Add_Component(pressure_component, "pressure",'2',0);

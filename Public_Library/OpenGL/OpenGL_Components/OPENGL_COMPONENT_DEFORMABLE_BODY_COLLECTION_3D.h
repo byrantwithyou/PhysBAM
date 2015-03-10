@@ -44,7 +44,7 @@ protected:
     int display_soft_bound_surface_mode,display_hard_bound_surface_mode,display_forces_mode,interaction_pair_display_mode;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     COLLISION_BODY_COLLECTION<TV>& collision_body_list;
     DEFORMABLE_BODY_COLLECTION<TV> &deformable_body_collection;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection;
@@ -141,35 +141,10 @@ public:
     void Cycle_Hard_Bound_Surface_Display_Mode();
     void Cycle_Interaction_Pair_Display_Mode();
 
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Toggle_Active_Value,"Toggle viewing of elements");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Toggle_Draw_Interior,"Toggle view of interior elements for tetraheralized volumes");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Toggle_Differentiate_Inverted,"Toggle use of different color for inverted tetrahera");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Toggle_Draw_Subsets,"Toggle drawing of subset tets and particles for tetraheralized volumes");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Toggle_Hide_Unselected,"Toggle drawing of the selected regions");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Toggle_Use_Active_List,"Toggle drawing subset of the deformable objects in the list");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Toggle_Selection_Mode,"Toggle selecting a whole segment or just one part");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Increment_Active_Object,"Increment deformable object being drawn");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Cycle_Display_Mode,"Cycle embedded display mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Cycle_Cutaway_Mode,"Cycle cutaway mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Decrease_Cutaway_Fraction,"Decrease_Cutaway_Fraction");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Increase_Cutaway_Fraction,"Increase_Cutaway_Fraction");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Create_One_Big_Triangulated_Surface_And_Write_To_File,"Make one big boundary tri surface");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Cycle_Relative_Velocity_Mode,"Visualize relative velocity");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Show_Only_First,"Show only first deformable object");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Highlight_Particle,"Highlight a particle");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Toggle_Velocity_Vectors,"Toggle particle velocity vectors");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Increase_Vector_Size,"Increase vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Decrease_Vector_Size,"Decrease vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Cycle_Forces_Mode,"Cycle forces display mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Cycle_Hard_Bound_Surface_Display_Mode,"Cycle hard bound embedded surface display mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Cycle_Interaction_Pair_Display_Mode,"Cycle display of interaction pairs");
-
     virtual void Reinitialize(bool force=false,bool read_geometry=true);    // Needs to be called after some state changes
     
     void Toggle_Active_Value_Response();
     void Highlight_Particle_Response();
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Toggle_Active_Value_Response,"");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D,Highlight_Particle_Response,"");
 private:
     void Initialize();    // Needs to be called after some state changes
 };

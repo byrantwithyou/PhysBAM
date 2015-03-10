@@ -23,6 +23,14 @@ OPENGL_COMPONENT_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &filenam
       particles_stored_per_cell_uniform(particles_stored_per_cell_uniform_input),
       draw_multiple_particle_sets(false)
 {
+    viewer_callbacks.Set("toggle_draw_point_numbers",{[this](){Toggle_Draw_Point_Numbers();},"Toggle draw point numbers"});
+    viewer_callbacks.Set("toggle_draw_radii",{[this](){Toggle_Draw_Radii();},"Toggle draw radii"});
+    viewer_callbacks.Set("toggle_draw_velocities",{[this](){Toggle_Draw_Velocities();},"Toggle draw velocities"});
+    viewer_callbacks.Set("command_prompt",{[this](){Command_Prompt();},"Command prompt"});
+    viewer_callbacks.Set("next_set",{[this](){Next_Set();},"Switch to next set"});
+    viewer_callbacks.Set("previous_set",{[this](){Previous_Set();},"Switch to previous set"});
+    viewer_callbacks.Set("toggle_draw_multiple_particle_sets",{[this](){Toggle_Draw_Multiple_Particle_Sets();},"Toggle drawing multiple particle sets"});
+
     number_of_sets=0;
     while(filename_set!=""){
         std::string filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,number_of_sets);
@@ -372,7 +380,7 @@ Command_Prompt_Response()
 template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
 Command_Prompt()
 {
-    OPENGL_WORLD<T>::Singleton()->Prompt_User("Command: ", Command_Prompt_Response_CB(),"");
+    OPENGL_WORLD<T>::Singleton()->Prompt_User("Command: ",{[this](){Command_Prompt_Response();},""});
 }
 //#####################################################################
 // Function Next_Set

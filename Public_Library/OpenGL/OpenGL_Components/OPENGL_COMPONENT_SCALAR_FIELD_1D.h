@@ -22,7 +22,7 @@ private:
     bool valid;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_COMPONENT<T>::viewer_callbacks;
     OPENGL_SCALAR_FIELD_1D<T,T2>  opengl_scalar_field;
 
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE
@@ -42,8 +42,6 @@ public:
     void Scale(const T scale);
     void Increase_Scale();
     void Decrease_Scale();
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_SCALAR_FIELD_1D,Increase_Scale,"Increase scale");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_SCALAR_FIELD_1D,Decrease_Scale,"Decrease scale");
 private:
     void Reinitialize();
 //##################################################################### 

@@ -6,7 +6,6 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <OpenGL/OpenGL/BASIC_VISUALIZATION.h>
 #include <OpenGL/OpenGL/OPENGL_AXES.h>
-#include <OpenGL/OpenGL/OPENGL_BASIC_CALLBACKS.h>
 #include <OpenGL/OpenGL/OPENGL_LIGHT.h>
 #include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 #include <OpenGL/OpenGL/OPENGL_WINDOW.h>
@@ -31,6 +30,11 @@ BASIC_VISUALIZATION(STREAM_TYPE stream_type)
     :stream_type(stream_type),opengl_axes(0),opengl_world(stream_type),set_window_position(false),opengl_window_title("OpenGL Visualization"),add_axes(true),render_offscreen(false),
     opt_left_handed(false),opt_smooth(false),selection_enabled(true),current_selection(0)
 {
+    reset_view_cb={[this](){Reset_View();},"Center view on selection (or reset if none)"};
+    reset_up_cb={[this](){Reset_Up();},"Reset up vector for view"};
+    toggle_axes_cb={[this](){Toggle_Axes();},"Toggle axes"};
+    draw_all_objects_cb={[this](){Draw_All_Objects();},"draw_all_objects"};
+
     The_Visualization<T>()=this;
 }
 //#####################################################################
@@ -80,10 +84,10 @@ Add_Component(OPENGL_COMPONENT<T>* component,const std::string &name,const char 
 {
     LOG::cout<<"Using Component '"<<name<<"'"<<std::endl;
     component->Set_Name(name);
-    if(toggle_draw_key!='\0') opengl_world.Append_Bind_Key(toggle_draw_key,component->Toggle_Draw_CB());
+    if(toggle_draw_key!='\0') opengl_world.Append_Bind_Key(toggle_draw_key,component->viewer_callbacks.Get("toggle_draw"));
     if(flags & SELECTABLE) component->selectable=true;
     if(flags & OWNED) owned_components.Append(component);
-    if(flags & START_HIDDEN) component->Toggle_Draw();
+    if(flags & START_HIDDEN) component->viewer_callbacks.Get("toggle_draw").func();
     component_list.Append(component);
     component_by_name.Insert(name,component);
 }
@@ -156,13 +160,13 @@ Initialize_Components_And_Key_Bindings()
     // Remove some silly key bindings
     opengl_world.Unbind_Keys("^m^n^o^j^k^h^l^v^d");
 
-    opengl_world.Bind_Key("^r",Reset_View_CB("Center view on selection (or reset if none)"));
-    opengl_world.Bind_Key("^u",Reset_Up_CB("Reset up vector for view"));
-    opengl_world.Bind_Key("^a",Toggle_Axes_CB("Toggle axes"));
+    opengl_world.Bind_Key("^r",reset_view_cb);
+    opengl_world.Bind_Key("^u",reset_up_cb);
+    opengl_world.Bind_Key("^a",toggle_axes_cb);
 
     if(!camera_script_filename.empty()){
-        opengl_world.Bind_Key("^c",new OPENGL_CALLBACK_SAVE_VIEW<T>(opengl_world,camera_script_filename,true));
-        opengl_world.Bind_Key('c',new OPENGL_CALLBACK_LOAD_VIEW<T>(opengl_world,camera_script_filename,true));}
+        opengl_world.Bind_Key("^c",{[this](){opengl_world.Save_View(camera_script_filename,true);},"Save view"});
+        opengl_world.Bind_Key('c',{[this](){opengl_world.Load_View(camera_script_filename,true);},"Load view"});}
 
     opengl_world.Set_Key_Binding_Category("User-Defined Keys");
     opengl_world.Set_Key_Binding_Category_Priority(1);

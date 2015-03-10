@@ -23,7 +23,7 @@ public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
     using OPENGL_COMPONENT<T>::Slice_Has_Changed;using OPENGL_COMPONENT<T>::World_Space_Box;
-    using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_DEBUG_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename);
     virtual ~OPENGL_COMPONENT_DEBUG_PARTICLES_3D();
 
@@ -48,17 +48,11 @@ public:
     void Decrease_Vector_Size();
     void Command_Prompt();
     void Set_Slice(OPENGL_SLICE *slice_input);
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEBUG_PARTICLES_3D,Show_Colored_Wireframe,"Show colored wireframe");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEBUG_PARTICLES_3D,Toggle_Draw_Velocities,"Toggle draw velocities");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEBUG_PARTICLES_3D,Increase_Vector_Size,"Increase vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEBUG_PARTICLES_3D,Decrease_Vector_Size,"Decrease vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEBUG_PARTICLES_3D,Command_Prompt,"Command prompt");
 
 private:
     void Reinitialize(bool force=false);
 
     void Command_Prompt_Response();
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEBUG_PARTICLES_3D, Command_Prompt_Response, "");
 
 public:
     GEOMETRY_PARTICLES<TV>& particles;

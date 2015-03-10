@@ -19,7 +19,7 @@ class OPENGL_COMPONENT_SCALAR_FIELD_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::viewer_callbacks;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
     // Should be able to combine these two constructors into one (with a default arg) but for some reason I can't get it to compile in linux...
     OPENGL_COMPONENT_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
@@ -44,9 +44,6 @@ public:
     void Toggle_Smooth_Slice();
     void Toggle_Draw_Mode();
     void Toggle_Color_Map();
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_SCALAR_FIELD_3D, Toggle_Smooth_Slice, "Toggle smooth");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_SCALAR_FIELD_3D, Toggle_Draw_Mode, "Toggle draw mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_SCALAR_FIELD_3D, Toggle_Color_Map, "Toggle color map");
 
 private:
     void Reinitialize();

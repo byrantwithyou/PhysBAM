@@ -15,6 +15,8 @@ OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &gr
     :OPENGL_COMPONENT<T>(stream_type,"Face Scalar Field 1D"),opengl_face_scalar_field(stream_type,grid_input,*new ARRAY<T2,FACE_INDEX<1> >,point_color,line_color),
       values_filename(values_filename_input),frame_loaded(-1),valid(false)
 {
+    viewer_callbacks.Set("increase_scale",{[this](){Increase_Scale();},"Increase scale"});
+    viewer_callbacks.Set("decrease_scale",{[this](){Decrease_Scale();},"Decrease scale"});
     is_animation = FILE_UTILITIES::Is_Animated(values_filename);
     Reinitialize();
 }

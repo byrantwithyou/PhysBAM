@@ -13,6 +13,10 @@ OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,const GRID<T
     :OPENGL_COMPONENT<T>(stream_type,"Grid Based Vector Field 2D"), opengl_grid_based_vector_field(stream_type,*(new GRID<TV>(grid)), *(new ARRAY<VECTOR<T,2> ,VECTOR<int,2> >)), 
       vector_field_filename(vector_field_filename), valid(false)
 {
+    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
+    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
+    viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrowhead"});
+
     is_animation = FILE_UTILITIES::Is_Animated(vector_field_filename);
     frame_loaded = -1;
 }

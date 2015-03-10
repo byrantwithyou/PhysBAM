@@ -27,6 +27,13 @@ OPENGL_COMPONENT_LEVELSET_3D(STREAM_TYPE stream_type,const std::string& levelset
       frame_loaded(-1),check_triangulated_surface_file_time(check_triangulated_surface_file_time_input),
       set(0),set_loaded(-1),use_sets(true),draw_multiple_levelsets(true),ghost_cells(3)
 {
+    viewer_callbacks.Set("toggle_display_overlay",{[this](){Toggle_Display_Overlay();},"Toggle display overlay (in slice mode)"});
+    viewer_callbacks.Set("toggle_slice_color_mode",{[this](){Toggle_Slice_Color_Mode();},"Toggle solid/gradient slice colors"});
+    viewer_callbacks.Set("toggle_smooth_slice",{[this](){Toggle_Smooth_Slice();},"Toggle smooth levelset draw"});
+    viewer_callbacks.Set("next_set",{[this](){Next_Set();},"Switch to next set"});
+    viewer_callbacks.Set("previous_set",{[this](){Previous_Set();},"Switch to previous set"});
+    viewer_callbacks.Set("toggle_draw_multiple_levelsets",{[this](){Toggle_Draw_Multiple_Levelsets();},"Toggle mutliple/single levelset draw"});
+
     int number_of_sets=0;
     while(filename_set!=""){
         std::string filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,number_of_sets);

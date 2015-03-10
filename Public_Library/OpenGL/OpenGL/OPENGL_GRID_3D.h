@@ -22,6 +22,7 @@ class OPENGL_GRID_3D:public OPENGL_OBJECT<T>
     OPENGL_SELECTION<T>* current_selection;
 public:
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
+    using OPENGL_OBJECT<T>::viewer_callbacks;
 
     GRID<TV> &grid;
     OPENGL_COLOR color;
@@ -40,7 +41,6 @@ public:
     void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
     void Clear_Highlight() PHYSBAM_OVERRIDE;
     void Toggle_Draw_Ghost_Values();
-    DEFINE_CALLBACK_CREATOR(OPENGL_GRID_3D,Toggle_Draw_Ghost_Values);
 private:
     void Draw_Subgrid(const TV_INT &node_start,const TV_INT &node_end) const;
     void Draw_Nodes_For_Selection(const TV_INT &node_start,const TV_INT &node_end) const;

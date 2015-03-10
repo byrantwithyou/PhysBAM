@@ -25,7 +25,7 @@ private:
 
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(STREAM_TYPE stream_type,TRIANGULATED_AREA<T>& triangulated_area,const std::string &vector_field_filename_input);
     virtual ~OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD();
 
@@ -42,10 +42,6 @@ public:
     void Increase_Vector_Size();
     void Decrease_Vector_Size();
     void Toggle_Arrowhead();
-
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD, Increase_Vector_Size, "Increase vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD, Decrease_Vector_Size, "Decrease vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD, Toggle_Arrowhead, "Toggle arrowhead");
 
 private:
     void Reinitialize(bool force_load_even_if_not_drawn=false);

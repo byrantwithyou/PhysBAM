@@ -13,6 +13,10 @@ OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(STREAM_TYPE stream_type,TR
     :OPENGL_COMPONENT<T>(stream_type,"Triangulated Area Based Vector Field 2D"),opengl_vector_field(stream_type,triangulated_area,*new ARRAY<VECTOR<T,2> >), 
     vector_field_filename(vector_field_filename),frame_loaded(-1),valid(false)
 {
+    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
+    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
+    viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrowhead"});
+
     is_animation = FILE_UTILITIES::Is_Animated(vector_field_filename);
 }
 //#####################################################################

@@ -17,6 +17,8 @@ template<class T,class T2> OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T2>::
 OPENGL_COMPONENT_SCALAR_FIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &scalar_field_filename,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
     :OPENGL_COMPONENT<T>(stream_type,"Scalar Field 1D"),scalar_field_filename(scalar_field_filename),frame_loaded(INT_MIN),valid(false),opengl_scalar_field(stream_type,grid,*new ARRAY<T2,VECTOR<int,1> >,point_color,line_color)
 {
+    viewer_callbacks.Set("increase_scale",{[this](){Increase_Scale();},"Increase scale"});
+    viewer_callbacks.Set("decrease_scale",{[this](){Decrease_Scale();},"Decrease scale"});
     is_animation=FILE_UTILITIES::Is_Animated(scalar_field_filename);
 }
 //#####################################################################

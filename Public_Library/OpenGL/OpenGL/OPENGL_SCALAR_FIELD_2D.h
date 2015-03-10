@@ -24,7 +24,7 @@ class OPENGL_SCALAR_FIELD_2D:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    using OPENGL_OBJECT<T>::World_Space_Box;using OPENGL_OBJECT<T>::stream_type;
+    using OPENGL_OBJECT<T>::World_Space_Box;using OPENGL_OBJECT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     GRID<TV>& grid;
     ARRAY<T2,VECTOR<int,2> > &values;
     ARRAY<bool,VECTOR<int,2> > *active_cells;
@@ -67,8 +67,6 @@ public:
     void Toggle_Smooth_Texture();
     void Toggle_Draw_Ghost_Values();
     void Toggle_Color_Map();
-
-    DEFINE_CALLBACK_CREATOR(OPENGL_SCALAR_FIELD_2D, Toggle_Draw_Ghost_Values);
 
 private:
     void Initialize_Color_Maps(OPENGL_COLOR_MAP<T2>* color_map_input);

@@ -71,7 +71,7 @@ protected:
 
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::string& basedir);
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D();
@@ -110,18 +110,6 @@ public:
     void Toggle_Articulation_Points();
     void Toggle_Linear_Muscles();
     void Toggle_Forces_And_Torques();
-
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Velocity_Vectors, "Toggle velocity vectors");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Individual_Axes, "Toggle individual axes");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Output_Positions, "Toggle output positions");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Show_Object_Names, "Toggle show object names");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Node_Velocity_Vectors, "Toggle node velocity vectors");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Draw_Mode, "Toggle draw mode");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Increase_Vector_Size, "Increase vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Decrease_Vector_Size, "Decrease vector size");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Articulation_Points, "Toggle articulation points");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Linear_Muscles, "Toggle linear muscles");
-    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D, Toggle_Forces_And_Torques, "Toggle forces and torques");
 
 public:
     virtual void Reinitialize(const bool force=false,const bool read_geometry=true);    // Needs to be called after some state changes
