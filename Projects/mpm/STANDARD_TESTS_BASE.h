@@ -57,6 +57,16 @@ public:
         boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,particles_per_cell);}
 
+    void Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
+        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& sg);
+
+    template<class T_OBJECT> typename DISABLE_IF<IS_BASE_OF<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::TYPE
+    Seed_Particles(const T_OBJECT& object,boost::function<TV(const TV&)> V,
+        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& sg)
+    {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,sg);}
+
+    void Add_Particle(const TV& X,const TV& V,const T mass,const T volume,const MATRIX<T,TV::m> F,const MATRIX<T,TV::m> B);
+
     int Add_Gravity(TV g);
     int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0);
 

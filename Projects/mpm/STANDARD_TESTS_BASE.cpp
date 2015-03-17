@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
@@ -100,15 +101,38 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
 
     T volume=grid.dX.Product()/particles_per_cell;
     T mass=density*volume;
-    for(int i=0;i<X.m;i++){
-        int p=particles.Add_Element();
-        particles.valid(p)=true;
-        particles.X(p)=X(i);
-        particles.V(p)=V(X(i));
-        if(use_affine) particles.B(p)=dV(X(i))*weights->Dp(X(i));
-        particles.F(p)=MATRIX<T,TV::m>()+1;
-        particles.mass(p)=mass;
-        particles.volume(p)=volume;}
+    for(int i=0;i<X.m;i++) 
+        Add_Particle(X(i),V(X(i)),mass,volume,MATRIX<T,TV::m>()+1,dV(X(i))*weights->Dp(X(i)));
+}
+//#####################################################################
+// Function Seed_Particles
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
+    boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& sg)
+{
+    ARRAY<TV> X;
+    for(NODE_ITERATOR<TV> it(sg);it.Valid();it.Next()) X.Append(sg.X(it.index));
+    T volume=sg.dX.Product();
+    T mass=density*volume;
+    for(int i=0;i<X.m;i++)
+        if(object.Lazy_Inside(X(i)))
+            Add_Particle(X(i),V(X(i)),mass,volume,MATRIX<T,TV::m>()+1,dV(X(i))*weights->Dp(X(i)));
+}
+//#####################################################################
+// Function Add_Particle
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Add_Particle(const TV& X,const TV& V,const T mass,const T volume,const MATRIX<T,TV::m> F,const MATRIX<T,TV::m> B)
+{
+    int p=particles.Add_Element();
+    particles.valid(p)=true;
+    particles.X(p)=X;
+    particles.V(p)=V;
+    if(use_affine) particles.B(p)=B;
+    particles.F(p)=F;
+    particles.mass(p)=mass;
+    particles.volume(p)=volume;
 }
 //#####################################################################
 // Function Add_Gravity
