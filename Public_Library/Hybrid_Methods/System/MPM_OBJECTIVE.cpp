@@ -87,12 +87,14 @@ Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
     for(int k=0;k<system.example.simulated_particles.m;k++){
         int p=system.example.simulated_particles(k);
         MATRIX<T,TV::m> grad_Vp;
-        TV Vp;
+        TV Vp,Vn_interpolate;
         for(PARTICLE_GRID_ITERATOR<TV> it(system.example.weights,p,true,0);it.Valid();it.Next()){
             Vp+=it.Weight()*v.u(it.Index());
+            Vn_interpolate+=it.Weight()*v0.u(it.Index());
             grad_Vp+=MATRIX<T,TV::m>::Outer_Product(v.u(it.Index()),it.Gradient());}
         system.example.particles.F(p)=F0(k)+system.example.dt/(system.example.use_midpoint+1)*grad_Vp*F0(k);
-        system.example.particles.X(p)=X0(k)+system.example.dt*Vp;}
+        if(system.example.use_midpoint) system.example.particles.X(p)=X0(k)+system.example.dt/2*(Vp+Vn_interpolate);
+        else system.example.particles.X(p)=X0(k)+system.example.dt*Vp;}
 }
 //#####################################################################
 // Function Compute
