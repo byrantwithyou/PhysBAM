@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_SYSTEM.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
@@ -69,6 +70,7 @@ Project(KRYLOV_VECTOR_BASE<T>& BV) const
     MPM_KRYLOV_VECTOR<TV>& V=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(BV);
     for(int i=0;i<collisions.m;i++){
         const COLLISION& c=collisions(i);
+        if(example.collision_objects(c.object)->sticky){V.u.array(c.p)=TV();continue;}
         V.u.array(c.p)=V.u.array(c.p).Projected_Orthogonal_To_Unit_Direction(c.n);}
 }
 //#####################################################################
