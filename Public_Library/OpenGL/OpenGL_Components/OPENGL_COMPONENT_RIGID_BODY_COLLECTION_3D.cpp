@@ -23,7 +23,6 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <OpenGL/OpenGL/OPENGL_AXES.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
-#include <OpenGL/OpenGL/OPENGL_RIGID_BODY_HINTS.h>
 #include <OpenGL/OpenGL/OPENGL_SHAPES.h>
 #include <OpenGL/OpenGL/OPENGL_TRIANGULATED_SURFACE.h>
 #include <OpenGL/OpenGL/OPENGL_WORLD.h>
@@ -135,18 +134,6 @@ template<class T> int OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Get_Draw_Mode() const
 {
     return 0x04*(int)(draw_implicit_surface)+0x02*(int)(draw_tetrahedralized_volume)+0x01*(int)(draw_triangulated_surface);
-}
-//#####################################################################
-// Function Read_Hints
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Read_Hints(const std::string& filename)
-{
-    ARRAY<OPENGL_RIGID_BODY_HINTS,int> opengl_hints;
-    FILE_UTILITIES::Read_From_File(stream_type,filename,opengl_hints);
-    for(int i=0;i<opengl_triangulated_surface.Size();i++) if(opengl_triangulated_surface(i) && i<opengl_hints.Size()){
-        opengl_triangulated_surface(i)->Set_Front_Material(opengl_hints(i).material);
-        use_object_bounding_box(i)=opengl_hints(i).include_bounding_box;}
 }
 //#####################################################################
 // Function Resize_Structures

@@ -33,24 +33,19 @@ static VECTOR<int,4> Spring_Nodes(unsigned char pair_id,const VECTOR<int,4>& n)
 // Constructor
 //#####################################################################
 template<class T> OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-OPENGL_TETRAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input)
-    :OPENGL_OBJECT<T>(stream_type),material(material_input),inverted_material(inverted_material_input),use_inverted_material(true),mesh(0),particles(0),current_tetrahedron(0),current_node(0),
-    current_boundary_triangle(0),boundary_only(true),draw_subsets(false),cutaway_mode(0),cutaway_fraction((T).5),color_map(0),smooth_normals(false),
-    vertex_normals(0),current_selection(0)
-{
-    Initialize();
-}
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class T> OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 OPENGL_TETRAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,TETRAHEDRON_MESH* mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
     const OPENGL_MATERIAL& inverted_material_input,bool initialize,ARRAY<OPENGL_COLOR>* color_map_input)
     :OPENGL_OBJECT<T>(stream_type),material(material_input),inverted_material(inverted_material_input),use_inverted_material(true),mesh(mesh_input),particles(particles_input),current_tetrahedron(0),current_node(0),
     current_boundary_triangle(0),boundary_only(true),draw_subsets(false),cutaway_mode(0),cutaway_fraction((T).5),color_map(color_map_input),smooth_normals(false),
     vertex_normals(0),current_selection(0)
 {
-    if(initialize)Initialize();
+    if(initialize){
+        if(!mesh->boundary_mesh)
+            mesh->Initialize_Boundary_Mesh(); // Neighboring nodes is no longer initialized here to conserve memory.
+        if(!mesh->node_on_boundary)
+            mesh->Initialize_Node_On_Boundary();
+        minimum_valence=mesh->Minimum_Valence();
+        mesh->Initialize_Boundary_Nodes();}
 }
 //#####################################################################
 // Destructor

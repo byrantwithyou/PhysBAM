@@ -102,8 +102,6 @@ public:
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
     void Slice_Has_Changed() PHYSBAM_OVERRIDE;
 
-    void Read_Hints(const std::string& filename);
-
     void Set_Draw_Object(int i, bool draw_it);  // Need to call Reinitialize after changing draw objects
     bool Get_Draw_Object(int i) const;
     void Set_Object_Material(int i, const OPENGL_MATERIAL &front_material_input);

@@ -199,7 +199,7 @@ Reinitialize(bool force,bool read_geometry)
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()));}
             else if(EMBEDDED_MATERIAL_SURFACE<TV,3>* embedding=dynamic_cast<EMBEDDED_MATERIAL_SURFACE<TV,3>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": embedded tetrahedralized volume\n";
-                boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,embedding->material_surface,false);
+                boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,embedding->material_surface,false,OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Cyan()));
                 embedded_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,embedding->embedded_object.embedded_object,false,
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()));
                 hard_bound_boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,Create_Hard_Bound_Boundary_Surface(embedding->material_surface),false,
@@ -209,7 +209,7 @@ Reinitialize(bool force,bool read_geometry)
                     &deformable_body_collection.particles,OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Matte(OPENGL_COLOR::Green()));}
             else if(EMBEDDING<TV>* embedding=dynamic_cast<EMBEDDING<TV>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": embedding\n";
-                boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,embedding->material_surface,false);
+                boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,embedding->material_surface,false,OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Cyan()));
                 hard_bound_boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,Create_Hard_Bound_Boundary_Surface(embedding->material_surface),false,
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Magenta(.5f)));}
             else{if(first_time) LOG::cout<<"object "<<i<<": object unrecognized\n";}}}

@@ -63,8 +63,6 @@ public:
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
-    void Read_Hints(const std::string& filename);
-
     void Set_Draw_Object(int i, bool draw_it);  // Need to call Reinitialize after changing draw objects
     bool Get_Draw_Object(int i) const;
     void Set_Object_Color(int i, const OPENGL_COLOR &color);

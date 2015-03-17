@@ -17,7 +17,7 @@ OPENGL_COMPONENT_HEIGHTFIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid_inp
                                 int m_start_input,int m_end_input,int n_start_input,int n_end_input)
     :OPENGL_COMPONENT<T>(stream_type,"Heightfield 2D"), 
     triangulated_surface(*TRIANGULATED_SURFACE<T>::Create()),
-    opengl_triangulated_surface(stream_type,triangulated_surface, false),
+    opengl_triangulated_surface(stream_type,triangulated_surface,false,OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Cyan())),
     vertical_offset(0), allow_smooth_shading(true), subdivide_surface(false),
     initial_grid(grid_input), grid(grid_input), height(grid.Domain_Indices()), 
     opengl_vector_field(stream_type,vector_field, vector_locations, OPENGL_COLOR::Green(), 0.025, true, false, true),

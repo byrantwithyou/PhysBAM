@@ -139,7 +139,7 @@ template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD<T
         for(int p=0;p<area->particles.Size();p++)surface->particles.X(p)=VECTOR<T,3>(area->particles.X(p));
         area->Update_Bounding_Box();
         LOG::cout<<"bounding box: "<<*area->bounding_box<<std::endl;
-        OPENGL_TRIANGULATED_SURFACE<T>* opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(world.stream_type,*surface,false);
+        OPENGL_TRIANGULATED_SURFACE<T>* opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(world.stream_type,*surface,false,OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Cyan()));
         world.Bind_Key('0'+number,{[opengl_triangulated_surface](){static bool is_two_sided=false;is_two_sided=!is_two_sided;opengl_triangulated_surface->Set_Two_Sided(is_two_sided);},"Toggle Two Sided"});
 
         world.Add_Object(opengl_triangulated_surface,true,true);}

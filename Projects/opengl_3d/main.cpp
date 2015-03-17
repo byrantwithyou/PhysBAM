@@ -268,11 +268,6 @@ Initialize_Components_And_Key_Bindings()
         for(int i=0;i<rigid_bodies_no_draw_list.m;i++){
             std::cout<<"Rigid bodies: not drawing object "<<rigid_bodies_no_draw_list(i)<<std::endl;
             rigid_bodies_component->Set_Draw_Object(rigid_bodies_no_draw_list(i),false);}
-        // Read hints if available
-        std::string hints_filename=basedir+"/common/opengl_hints";
-        if(FILE_UTILITIES::File_Exists(hints_filename)){
-            std::cout<<"Using opengl rigid body hints"<<std::endl;
-            rigid_bodies_component->Read_Hints(hints_filename);}
         rigid_bodies_component->Reinitialize();
         opengl_world.Set_Key_Binding_Category("Rigid Bodies");
         Add_Component(rigid_bodies_component,"Rigid Bodies",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);

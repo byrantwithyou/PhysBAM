@@ -18,7 +18,6 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <OpenGL/OpenGL/OPENGL_AXES.h>
 #include <OpenGL/OpenGL/OPENGL_LEVELSET_2D.h>
-#include <OpenGL/OpenGL/OPENGL_RIGID_BODY_HINTS.h>
 #include <OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>
 #include <OpenGL/OpenGL/OPENGL_SHAPES.h>
 #include <OpenGL/OpenGL/OPENGL_TRIANGULATED_AREA.h>
@@ -104,21 +103,6 @@ template<class T> int OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Get_Draw_Mode() const
 {
     return 0x04*(int)(draw_implicit_curve)+0x02*(int)(draw_triangulated_area)+0x01*(int)(draw_segmented_curve);
-}
-//#####################################################################
-// Function Read_Hints
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
-Read_Hints(const std::string& filename)
-{
-    ARRAY<OPENGL_RIGID_BODY_HINTS,int> opengl_hints;
-    std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
-    TYPED_ISTREAM typed_input(*input,stream_type);
-    Read_Binary(typed_input,opengl_hints);delete input;
-
-    for(int i=0;i<opengl_segmented_curve.Size();i++) if(opengl_segmented_curve(i) && i<opengl_hints.Size()){
-        opengl_segmented_curve(i)->color=opengl_hints(i).material.diffuse;
-        use_object_bounding_box(i)=opengl_hints(i).include_bounding_box;}
 }
 //#####################################################################
 // Function Reinitialize

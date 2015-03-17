@@ -10,7 +10,6 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <OpenGL/OpenGL/OPENGL_AXES.h>
 #include <OpenGL/OpenGL/OPENGL_POINT_SIMPLICES_1D.h>
-#include <OpenGL/OpenGL/OPENGL_RIGID_BODY_HINTS.h>
 #include <OpenGL/OpenGL/OPENGL_SHAPES.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D.h>
 using namespace PhysBAM;
@@ -52,21 +51,6 @@ template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
 ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D()
 {
     if(need_destroy_rigid_body_collection) delete &rigid_body_collection;
-}
-//#####################################################################
-// Function Read_Hints
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
-Read_Hints(const std::string& filename)
-{
-    ARRAY<OPENGL_RIGID_BODY_HINTS,int> opengl_hints;
-    std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
-    TYPED_ISTREAM typed_input(*input,stream_type);
-    Read_Binary(typed_input,opengl_hints);delete input;
-
-    for(int i=0;i<opengl_point_simplices.Size();i++) if(opengl_point_simplices(i) && i<opengl_hints.Size()){
-        opengl_point_simplices(i)->color=opengl_hints(i).material.diffuse;
-        use_object_bounding_box(i)=opengl_hints(i).include_bounding_box;}
 }
 //#####################################################################
 // Function Reinitialize

@@ -13,15 +13,6 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_HEXAHEDRALIZED_VOLUME<T>::
-OPENGL_HEXAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input)
-    :OPENGL_OBJECT<T>(stream_type),material(material_input),inverted_material(inverted_material_input),current_hexahedron(1),boundary_only(true),draw_subsets(false),vector_size((T).005)
-{
-    Initialize();
-}
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class T> OPENGL_HEXAHEDRALIZED_VOLUME<T>::
 OPENGL_HEXAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,HEXAHEDRON_MESH* hexahedron_mesh_input,const GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
     const OPENGL_MATERIAL& inverted_material_input)
     :OPENGL_OBJECT<T>(stream_type),material(material_input),inverted_material(inverted_material_input),hexahedron_mesh(hexahedron_mesh_input),particles(particles_input),current_hexahedron(1),

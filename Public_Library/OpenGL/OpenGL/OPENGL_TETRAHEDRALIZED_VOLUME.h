@@ -46,14 +46,9 @@ protected:
     OPENGL_SELECTION<T>* current_selection;
 public:
 
-    OPENGL_TETRAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input);
     OPENGL_TETRAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,TETRAHEDRON_MESH* mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
         const OPENGL_MATERIAL& inverted_material_input,bool initialize=true,ARRAY<OPENGL_COLOR>* color_map_input=0);
     ~OPENGL_TETRAHEDRALIZED_VOLUME();
-
-    void Initialize()
-    {if(!mesh->boundary_mesh) mesh->Initialize_Boundary_Mesh(); // Neighboring nodes is no longer initialized here to conserve memory.
-    if(!mesh->node_on_boundary) mesh->Initialize_Node_On_Boundary();minimum_valence=mesh->Minimum_Valence();mesh->Initialize_Boundary_Nodes();}
 
     void Display() const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
