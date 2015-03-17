@@ -48,7 +48,7 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
     tmp1=dv;
     Make_Feasible(tmp1);
     Compute_Unconstrained(tmp1,h,g,e);
-    if(g) Project_Gradient_And_Prune_Constraints(*g,h&&false);
+    if(g) Project_Gradient_And_Prune_Constraints(*g,h);
 }
 //#####################################################################
 // Function Compute
@@ -136,7 +136,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
 template<class TV> void MPM_OBJECTIVE<TV>::
 Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep) const
 {
-    if(!system.example.collision_objects.m) return;
+    if(!system.collisions.m) return;
     MPM_KRYLOV_VECTOR<TV>& g=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(Bg);
 
     for(int i=system.collisions.m-1;i>=0;i--){
