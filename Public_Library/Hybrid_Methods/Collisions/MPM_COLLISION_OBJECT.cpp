@@ -64,7 +64,8 @@ Collide_Static(const T t,const TV& x,const TV& n,TV& v,bool apply_friction) cons
 {
     if(sticky){v=TV();return;}
     T vn=TV::Dot_Product(v,n);
-    if(vn<0){
+    // if(vn<0){
+    if(1){
         v-=n*vn;
         if(apply_friction){
             if(-vn*friction<v.Magnitude())

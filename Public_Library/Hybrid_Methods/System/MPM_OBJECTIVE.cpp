@@ -125,7 +125,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
         for(int j=0;j<system.example.collision_objects.m;j++){
             T depth=0;
             COLLISION t={j,i};
-            if(system.example.collision_objects(j)->Collide(system.example.time,system.example.location.array(i),V,&depth,&t.n,false)){
+            if(system.example.collision_objects(j)->Collide(system.example.time,system.example.location.array(i),V,&depth,&t.n,true)){
                 system.collisions.Append(t);
                 if(depth<deepest)
                     c=t;}}
@@ -146,8 +146,9 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep)
         TV &gv=g.u.array(c.p);
         if(system.example.collision_objects(c.object)->sticky){gv=TV();continue;}
         T rvel=TV::Dot_Product(gv,c.n);
-        if(allow_sep && rvel<0) system.collisions.Remove_Index_Lazy(i);
-        else gv-=rvel*c.n;}
+        // if(allow_sep && rvel>0) system.collisions.Remove_Index_Lazy(i);
+        // else gv-=rvel*c.n;}
+        gv-=rvel*c.n;}
 }
 //#####################################################################
 // Function Make_Feasible

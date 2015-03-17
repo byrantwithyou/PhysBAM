@@ -343,11 +343,12 @@ Apply_Friction()
             dv.u.array(c.p)=v-objective.v0.u.array(c.p);
             continue;}
         TV t=v.Projected_Orthogonal_To_Unit_Direction(c.n);
-        T t_mag=t.Normalize();
-        T coefficient_of_friction=example.collision_objects(c.object)->friction;
-        if(t_mag<=coefficient_of_friction*normal_force/example.mass.array(c.p))
-            v.Project_On_Unit_Direction(c.n);
-        else v-=coefficient_of_friction/example.mass.array(c.p)*normal_force*t;
+        v=t;
+        // T t_mag=t.Normalize();
+        // T coefficient_of_friction=example.collision_objects(c.object)->friction;
+        // if(t_mag<=coefficient_of_friction*normal_force/example.mass.array(c.p))
+        //     v.Project_On_Unit_Direction(c.n);
+        // else v-=coefficient_of_friction/example.mass.array(c.p)*normal_force*t;
         dv.u.array(c.p)=v-objective.v0.u.array(c.p);}
 }
 //#####################################################################
