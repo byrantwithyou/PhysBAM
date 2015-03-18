@@ -9,6 +9,7 @@
 #include <Geometry/Seeding/POISSON_DISK.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
+#include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
@@ -149,6 +150,16 @@ template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles)
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*new COROTATED_FIXED<T,TV::m>(E,nu);
+    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(particles,constitutive_model,gather_scatter,affected_particles);
+    return Add_Force(fe);
+}
+//#####################################################################
+// Function Add_Neo_Hookean
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles)
+{
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*new NEO_HOOKEAN<T,TV::m>(E,nu);
     MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(particles,constitutive_model,gather_scatter,affected_particles);
     return Add_Force(fe);
 }

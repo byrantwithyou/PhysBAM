@@ -101,18 +101,20 @@ Initialize()
             particles.Delete_Elements_On_Deletion_List();
             Add_Fixed_Corotated(1e3*scale_E,0.3);
         } break;
-        case 5:{ // Dropping sphere to ground
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            SPHERE<TV> sphere(TV(.5,.5),.2);
-            T density=2*scale_mass;
-            Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},
-                density,particles_per_cell);
-            Add_Gravity(TV(0,-9.8));
-            Add_Fixed_Corotated(1e3*scale_E,0.3);
-            MPM_COLLISION_OBJECT<TV>* ground=new MPM_COLLISION_OBJECT<TV>(
-                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(),TV(1,.1))),
-                new MPM_COLLISION_OBJECT_STATIC_PATH<TV>(FRAME<TV>()),true,10);
-            collision_objects.Append(ground);
+        case 5:{ // Rebound of an elastic cylinder
+            T dx=0.5; grid.Initialize(TV_INT(31+8,11+8),RANGE<TV>(TV(0-dx/2-dx*4,0-dx/2-dx*4),TV(15+dx/2+dx*4,5+dx/2+dx*4)),true);
+            MPM_COLLISION_OBJECT<TV>* left=new MPM_COLLISION_OBJECT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(0+dx/2,15))),
+                new MPM_COLLISION_OBJECT_STATIC_PATH<TV>(FRAME<TV>()),false,0);
+            MPM_COLLISION_OBJECT<TV>* right=new MPM_COLLISION_OBJECT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(15-dx/2,-5),TV(20,15))),
+                new MPM_COLLISION_OBJECT_STATIC_PATH<TV>(FRAME<TV>()),false,0);
+            collision_objects.Append(left);
+            collision_objects.Append(right);
+            SPHERE<TV> sphere(TV(2.5,2.5),1.5);
+            T density=4*scale_mass;
+            GRID<TV> sg(TV_INT(12,12),RANGE<TV>(TV(2.5-dx/2*5.5,2.5-dx/2*5.5),TV(2.5+dx/2*5.5,2.5+dx/2*5.5)));
+            Seed_Particles(sphere,[=](const TV& X){return TV(0.5,0);},[=](const TV&){return MATRIX<T,2>();},
+                density,sg);
+            Add_Neo_Hookean(85.5*scale_E,0.425); //solve({E/(2*(1+r))=30,E*r/((1+r)*(1-2*r))=170},{E,r});
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

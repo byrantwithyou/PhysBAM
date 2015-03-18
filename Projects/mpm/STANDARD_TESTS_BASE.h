@@ -69,6 +69,7 @@ public:
 
     int Add_Gravity(TV g);
     int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0);
+    int Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles=0);
 
 //#####################################################################
 };

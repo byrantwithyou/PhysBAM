@@ -31,7 +31,8 @@ public:
     using BASE::newton_tolerance;using BASE::newton_iterations;using BASE::solver_tolerance;
     using BASE::solver_iterations;using BASE::test_diff;using BASE::threads;using BASE::test_number;
     using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Gravity;
-    using BASE::Add_Fixed_Corotated;using BASE::random;using BASE::collision_objects;
+    using BASE::Add_Fixed_Corotated;using BASE::Add_Neo_Hookean;using BASE::random;
+    using BASE::collision_objects;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
