@@ -72,6 +72,7 @@ public:
     TV last_linear_momentum;
     typename TV::SPIN last_angular_momentum;
     T last_te;
+    T last_grid_ke;
 
     MPM_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~MPM_EXAMPLE();

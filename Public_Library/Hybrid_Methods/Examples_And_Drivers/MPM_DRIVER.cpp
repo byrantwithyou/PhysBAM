@@ -401,10 +401,13 @@ Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,T
     if(!example.print_stats) return;
     typename TV::SPIN am=example.Total_Grid_Angular_Momentum(dt,u,u0);
     TV lm=example.Total_Grid_Linear_Momentum(u);
+    T ke=example.Total_Grid_Kinetic_Energy(u);
     LOG::cout<<str<<" linear  "<<lm<<"  diff "<<(lm-example.last_linear_momentum)<<std::endl;
     LOG::cout<<str<<" angular "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
+    LOG::cout<<str<<" ke "<<ke<<"  diff "<<(ke-example.last_grid_ke)<<std::endl;
     example.last_linear_momentum=lm;
     example.last_angular_momentum=am;
+    example.last_grid_ke=ke;
 }
 //#####################################################################
 // Function Print_Grid_Stats
