@@ -107,6 +107,7 @@ Advance_One_Time_Step()
     Update_Particle_Weights();
     Particle_To_Grid();
     Print_Grid_Stats("after particle to grid",example.dt,example.velocity,0);
+    Print_Energy_Stats("after particle to grid",example.velocity);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",0,1);
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt,example.velocity_new,&example.velocity);
@@ -418,6 +419,23 @@ Print_Particle_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<
     LOG::cout<<str<<" angular "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
     example.last_linear_momentum=lm;
     example.last_angular_momentum=am;
+}
+//#####################################################################
+// Function Print_Energy_Stats
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u)
+{
+    if(!example.print_stats) return;
+    example.Capture_Stress();
+    example.Precompute_Forces(example.time);
+    T ke=example.Total_Grid_Kinetic_Energy(u);
+    T pe=example.Potential_Energy(example.time);
+    T te=ke+pe;
+    LOG::cout<<str<<" kinetic  "<<ke<<std::endl;
+    LOG::cout<<str<<" potential "<<pe<<std::endl;
+    LOG::cout<<str<<" total energy "<<te<<" diff "<<(te-example.last_te)<<std::endl;
+    example.last_te=te;
 }
 //#####################################################################
 namespace PhysBAM{
