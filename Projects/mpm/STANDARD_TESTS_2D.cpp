@@ -73,6 +73,13 @@ Initialize()
             Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
+
+            // DEBUGGING
+            particles.deletion_list.Append(0);
+            particles.deletion_list.Append(1);
+            particles.deletion_list.Append(2);
+            particles.Delete_Elements_On_Deletion_List();
+
             Add_Fixed_Corotated(1e3*scale_E,0.3);
         } break;
         case 3:{ // Freefall circle
