@@ -70,14 +70,18 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
-            Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},
+            Seed_Particles(sphere,[=](const TV& X){return TV(0.1,0);},[=](const TV&){return MATRIX<T,2>();},
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
+
+            particles.B.Fill(MATRIX<T,2>(1,2,3,10));
 
             // DEBUGGING
             particles.deletion_list.Append(0);
             particles.deletion_list.Append(1);
             particles.deletion_list.Append(2);
+            particles.deletion_list.Append(3);
+
             particles.Delete_Elements_On_Deletion_List();
 
             Add_Fixed_Corotated(1e3*scale_E,0.3);
