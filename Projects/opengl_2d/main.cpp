@@ -36,7 +36,6 @@
 #include <Dynamics/Particles/SPH_PARTICLES.h>
 #include <fstream>
 #include <sstream>
-//#include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_RIGID_BODIES_2D.h>
 #include <string.h>
 using namespace PhysBAM;
 using namespace std;
@@ -586,7 +585,6 @@ Initialize_Components_And_Key_Bindings()
 
     // deformable and rigid bodies
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>* rigid_bodies_component=0;
-    //OPENGL_COMPONENT_RIGID_BODIES_2D<T>* rigid_bodies_component=0;
     OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>* deformable_objects_component=0;
     std::string deformable_object_filename=STRING_UTILITIES::string_sprintf("%s/%d/deformable_object_particles",basedir.c_str(),start_frame);
     if(FILE_UTILITIES::File_Exists(deformable_object_filename)){
