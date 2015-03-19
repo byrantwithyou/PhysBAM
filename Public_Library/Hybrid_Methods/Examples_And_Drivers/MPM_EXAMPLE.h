@@ -99,6 +99,7 @@ public:
     typename TV::SPIN Total_Grid_Angular_Momentum(T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0) const;
     typename TV::SPIN Total_Particle_Angular_Momentum() const;
     T Total_Grid_Kinetic_Energy(const ARRAY<TV,TV_INT>& u) const;
+    T Total_Particle_Kinetic_Energy() const;
 //#####################################################################
 };
 }

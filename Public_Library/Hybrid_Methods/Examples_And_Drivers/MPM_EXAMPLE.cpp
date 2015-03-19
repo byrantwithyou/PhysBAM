@@ -239,6 +239,21 @@ Total_Grid_Kinetic_Energy(const ARRAY<TV,TV_INT>& u) const
     return result;
 }
 //#####################################################################
+// Function Total_Grid_Kinetic_Energy
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_EXAMPLE<TV>::
+Total_Particle_Kinetic_Energy() const
+{
+    T result=0,Dp_inverse=0;
+    if(use_affine && weights->constant_scalar_inertia_tensor)
+        Dp_inverse=weights->Constant_Scalar_Inverse_Dp();
+    for(int k=0;k<simulated_particles.m;k++){
+        int p=simulated_particles(k);
+        result+=particles.mass(p)/2*particles.V(p).Magnitude_Squared();
+        if(use_affine) result+=particles.mass(p)/2*Dp_inverse*particles.B(p).Frobenius_Norm_Squared();}
+    return result;
+}
+//#####################################################################
 namespace PhysBAM{
 template class MPM_EXAMPLE<VECTOR<float,2> >;
 template class MPM_EXAMPLE<VECTOR<float,3> >;

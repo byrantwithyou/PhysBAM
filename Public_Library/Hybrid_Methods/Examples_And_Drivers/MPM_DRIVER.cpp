@@ -418,10 +418,13 @@ Print_Particle_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<
     if(!example.print_stats) return;
     typename TV::SPIN am=example.Total_Particle_Angular_Momentum();
     TV lm=example.Total_Particle_Linear_Momentum();
+    T ke=example.Total_Particle_Kinetic_Energy();
     LOG::cout<<str<<" linear  "<<lm<<"  diff "<<(lm-example.last_linear_momentum)<<std::endl;
     LOG::cout<<str<<" angular "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
+    LOG::cout<<str<<" ke "<<ke<<"  diff "<<(ke-example.last_grid_ke)<<std::endl;
     example.last_linear_momentum=lm;
     example.last_angular_momentum=am;
+    example.last_grid_ke=ke;
 }
 //#####################################################################
 // Function Print_Energy_Stats
