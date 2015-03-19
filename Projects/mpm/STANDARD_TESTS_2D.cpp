@@ -116,6 +116,17 @@ Initialize()
                 density,sg);
             Add_Neo_Hookean(85.5*scale_E,0.425); //solve({E/(2*(1+r))=30,E*r/((1+r)*(1-2*r))=170},{E,r});
         } break;
+        case 6:{ // Skew impact of two elastic cylinders
+            T dx=1; grid.Initialize(TV_INT(21+8,13+8),RANGE<TV>(TV(0-dx/2-dx*4,0-dx/2-dx*4),TV(20+dx/2+dx*4,12+dx/2+dx*4)),true);
+            T density=5*scale_mass;
+            SPHERE<TV> sphere1(TV(3,3),2);
+            GRID<TV> sg1(TV_INT(12,12),RANGE<TV>(TV(2.5-dx/2*5.5,2.5-dx/2*5.5),TV(2.5+dx/2*5.5,2.5+dx/2*5.5)));
+            Seed_Particles(sphere1,[=](const TV& X){return TV(0.75,0);},[=](const TV&){return MATRIX<T,2>();},density,sg1);
+            SPHERE<TV> sphere2(TV(16,5),2);
+            GRID<TV> sg2(TV_INT(12,12),RANGE<TV>(TV(2.5-dx/2*5+13.5,2.5-dx/2*5.5+2),TV(2.5+dx/2*5.5+13,2.5+dx/2*5.5+2)));
+            Seed_Particles(sphere2,[=](const TV& X){return TV(-0.75,0);},[=](const TV&){return MATRIX<T,2>();},density,sg2);
+            Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
