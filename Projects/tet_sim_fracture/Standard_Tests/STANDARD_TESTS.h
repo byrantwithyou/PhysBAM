@@ -31,7 +31,7 @@
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
-#include <Deformables/Constitutive_Models/ROTATED_LINEAR.h>
+#include <Deformables/Constitutive_Models/COROTATED.h>
 #include <Deformables/Constitutive_Models/SIMPLE_PLASTICITY.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
@@ -232,7 +232,7 @@ void Plastic_Mattress(int nx,int ny,int nz,const ROTATION<TV>& rot,const RANGE<T
     SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(tetrahedralized_volume,1000);
 
     if(false) plasticity_model=new SIMPLE_PLASTICITY<T,3>(tetrahedralized_volume.mesh.elements.m,2,2);
-    solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new ROTATED_LINEAR<T,3>((T)1e6,(T).3,(T).02),true,(T).1,true,true,false,plasticity_model));
+    solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new COROTATED<T,3>((T)1e6,(T).3,(T).02),true,(T).1,true,true,false,plasticity_model));
 
     // initialize_fracture_tetrahedralized_volume
     fracture_object=new FRACTURE_TETRAHEDRALIZED_VOLUME<T>(embedded_object);

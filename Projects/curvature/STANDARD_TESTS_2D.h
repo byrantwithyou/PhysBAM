@@ -31,10 +31,10 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_PENALTY.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Forces/B_SPLINE_CURVATURE_FORCE.h>
-#include <Deformables/Forces/MOONEY_RIVLIN_B_SPLINE_CURVATURE_FORCE.h>
 #include <Deformables/Forces/BEZIER_C2_FORCE.h>
 #include <Deformables/Forces/BEZIER_CURVATURE_FORCE.h>
 #include <Deformables/Forces/ELASTIC_ETHER_DRAG.h>
+#include <Deformables/Forces/MOONEY_RIVLIN_B_SPLINE_CURVATURE_FORCE.h>
 #include <Deformables/Forces/RALEIGH_DAMPING_FORCE.h>
 #include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>

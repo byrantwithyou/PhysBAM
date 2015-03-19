@@ -4,8 +4,8 @@
 //#####################################################################
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
-#include <Deformables/Forces/MOONEY_RIVLIN_B_SPLINE_CURVATURE_FORCE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
+#include <Deformables/Forces/MOONEY_RIVLIN_B_SPLINE_CURVATURE_FORCE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 namespace{

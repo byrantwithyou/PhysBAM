@@ -54,7 +54,6 @@
 #include <Deformables/Constitutive_Models/COROTATED.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
-#include <Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/COLLISION_AREA_PENALTY_FORCE.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>

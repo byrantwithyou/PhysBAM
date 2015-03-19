@@ -14,7 +14,6 @@
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h>
-#include <Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <fstream>
 

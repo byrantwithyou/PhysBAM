@@ -8,15 +8,15 @@
 #define __SPLINE_MODEL__
 
 #include <Tools/Math_Tools/constants.h>
-#include <Deformables/Constitutive_Models/ROTATED_LINEAR.h>
+#include <Deformables/Constitutive_Models/COROTATED.h>
 namespace PhysBAM{
 
 template<class T,int d>
-class SPLINE_MODEL:public ROTATED_LINEAR<T,d>
+class SPLINE_MODEL:public COROTATED<T,d>
 {
     typedef VECTOR<T,d> TV;
 public:
-    typedef ROTATED_LINEAR<T,d> BASE;
+    typedef COROTATED<T,d> BASE;
     using BASE::constant_lambda;using BASE::constant_mu;using BASE::lambda;using BASE::mu;
 
 private:
@@ -34,7 +34,7 @@ public:
     template<class T_FIELD0,class T_FIELD1>
     void Set_Parameters(const T_FIELD0& youngs_modulus_input,const T_FIELD0& poissons_ratio_input,const T_FIELD1& hardening_deformation_input,const T_FIELD1& hardening_strength_input,
         const T_FIELD0& Rayleigh_coefficient)
-    {ROTATED_LINEAR<T,d>::Set_Parameters(youngs_modulus_input,poissons_ratio_input,Rayleigh_coefficient);
+    {COROTATED<T,d>::Set_Parameters(youngs_modulus_input,poissons_ratio_input,Rayleigh_coefficient);
     Set(hardening_deformation,hardening_deformation_input);
     Set(hardening_strength,hardening_strength_input);
     coefficient=(hardening_strength-1)/(3*(hardening_deformation*hardening_deformation));

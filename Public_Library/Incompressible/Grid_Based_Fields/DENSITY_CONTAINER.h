@@ -8,8 +8,8 @@
 #define __DENSITY_CONTAINER__
 
 #include <Incompressible/Advection_Collidable/ADVECTION_COLLIDABLE_FORWARD.h>
-#include <Incompressible/Grid_Based_Fields/GRID_AND_ARRAY_CONTAINER.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
+#include <Incompressible/Grid_Based_Fields/GRID_AND_ARRAY_CONTAINER.h>
 namespace PhysBAM{
 
 template<class TV> struct GRID_ARRAYS_POLICY;

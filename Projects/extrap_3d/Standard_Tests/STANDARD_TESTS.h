@@ -86,7 +86,6 @@
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h>
 #include <Deformables/Constitutive_Models/RC_EXTRAPOLATED.h>
 #include <Deformables/Constitutive_Models/RC2_EXTRAPOLATED.h>
-#include <Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <Deformables/Constitutive_Models/ST_VENANT_KIRCHHOFF.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>

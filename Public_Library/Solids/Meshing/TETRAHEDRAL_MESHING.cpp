@@ -17,8 +17,8 @@
 #include <Deformables/Bindings/BINDING_LIST.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
+#include <Deformables/Constitutive_Models/COROTATED.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
-#include <Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_3D.h>
@@ -343,7 +343,7 @@ Initialize_Dynamics()
         solid_body_collection.Add_Force(new ETHER_DRAG<TV>(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume.particles),
                 solid_body_collection.rigid_body_collection,true,true,dynamic_ether_viscosity));
     if(use_finite_volume) solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,
-        new ROTATED_LINEAR<T,3>(youngs_modulus,poissons_ratio,Rayleigh_coefficient)));
+        new COROTATED<T,3>(youngs_modulus,poissons_ratio,Rayleigh_coefficient)));
     else if(use_masses_and_springs){
         solid_body_collection.Add_Force(Create_Edge_Springs(tetrahedralized_volume,edge_spring_stiffness,edge_spring_overdamping_fraction));
         solid_body_collection.Add_Force(Create_Altitude_Springs(tetrahedralized_volume,altitude_spring_stiffness,

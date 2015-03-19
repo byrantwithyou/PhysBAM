@@ -23,7 +23,6 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_2D.h>
-//#include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_RIGID_BODIES_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D.h>
@@ -37,6 +36,7 @@
 #include <Dynamics/Particles/SPH_PARTICLES.h>
 #include <fstream>
 #include <sstream>
+//#include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_RIGID_BODIES_2D.h>
 #include <string.h>
 using namespace PhysBAM;
 using namespace std;

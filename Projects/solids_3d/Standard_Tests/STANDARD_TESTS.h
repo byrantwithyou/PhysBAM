@@ -77,8 +77,8 @@
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <Deformables/Constitutive_Models/COROTATED.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
-#include <Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <Deformables/Constitutive_Models/SPLINE_MODEL.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/AXIAL_BENDING_SPRINGS.h>
@@ -1500,7 +1500,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>()){
                 //solid_body_collection.Add_Force(Create_Edge_Springs(*tetrahedralized_volume,
                 //    stiffness_multiplier*10000/(1+sqrt((T)2)),damping_multiplier*10));
-                solid_body_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new ROTATED_LINEAR<T,3>((T)1e4,(T).3,(T).1)));
+                solid_body_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new COROTATED<T,3>((T)1e4,(T).3,(T).1)));
             }
             if(TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>*>()){
                 T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
