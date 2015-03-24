@@ -66,27 +66,17 @@ Initialize()
             particles.V-=dV;
             Add_Fixed_Corotated(1e3*scale_E,0.3);
         } break;
-        case 2:{ // Oscillating circle
+        case 2:{ // oscillating circle
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
             Seed_Particles(sphere,[=](const TV& X){return TV(0.1,0);},[=](const TV&){return MATRIX<T,2>();},
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
-
             particles.B.Fill(MATRIX<T,2>(1,2,3,10));
-
-            // DEBUGGING
-            particles.deletion_list.Append(0);
-            particles.deletion_list.Append(1);
-            particles.deletion_list.Append(2);
-            particles.deletion_list.Append(3);
-
-            particles.Delete_Elements_On_Deletion_List();
-
             Add_Fixed_Corotated(1e3*scale_E,0.3);
         } break;
-        case 3:{ // Freefall circle
+        case 3:{ // freefall circle
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
@@ -94,25 +84,25 @@ Initialize()
                 density,particles_per_cell);
             Add_Gravity(TV(0,-9.8));
         } break;
-        case 4:{ // Colliding spheres/rings
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            ARRAY<SPHERE<TV> > spheres;
-            ARRAY<T> inner_radius;
-            ARRAY<TV> V0;
-            spheres.Append(SPHERE<TV>(TV(0.3,0.5),0.1));inner_radius.Append(0.05);V0.Append(TV(1,0));
-            spheres.Append(SPHERE<TV>(TV(0.7,0.5),0.15));inner_radius.Append(0.03);V0.Append(TV(-0.5,0));
-            for(int i=0;i<spheres.m;i++){
-                T density=2*scale_mass;
-                int last_m=particles.number;
-                Seed_Particles(spheres(i),[=](const TV& X){return V0(i);},[=](const TV&){return MATRIX<T,2>();},
-                    density,particles_per_cell);
-                for(int k=last_m;k<particles.number;k++){
-                    if((particles.X(k)-spheres(i).center).Magnitude_Squared()<sqr(inner_radius(i))){
+        case 4:{ // colliding of two rings
+            T dx=0.001; grid.Initialize(TV_INT(49+8,49+8),RANGE<TV>(TV(0-dx/2-dx*4,0-dx/2-dx*4),TV(0.48+dx/2+dx*4,0.48+dx/2+dx*4)),true);
+            ARRAY<SPHERE<TV> > spheres; ARRAY<TV> v0; ARRAY<T> r;
+            spheres.Append(SPHERE<TV>(TV(0.1,0.24),0.04)); spheres.Append(SPHERE<TV>(TV(0.4,0.24),0.04));
+            v0.Append(TV(50,0)); v0.Append(TV(-50,0));
+            r.Append(0.03); r.Append(0.03);
+            for(int s=0;s<spheres.m;s++){
+                SPHERE<TV>& sphere=spheres(s);
+                T density=1010*scale_mass;
+                GRID<TV> sg(TV_INT(48,48),sphere.Bounding_Box().Thickened(r(s)*(T)1.5));
+                int last=particles.number;
+                Seed_Particles(sphere,[=](const TV& X){return v0(s);},[=](const TV&){return MATRIX<T,2>();},density,sg);
+                for(int k=last;k<particles.number;k++){
+                    if((particles.X(k)-sphere.center).Magnitude_Squared()<sqr(r(s))){
                         particles.deletion_list.Append(k);}}}
             particles.Delete_Elements_On_Deletion_List();
-            Add_Fixed_Corotated(1e3*scale_E,0.3);
+            Add_Neo_Hookean(0.073*1e9*scale_E,0.4);
         } break;
-        case 5:{ // Rebound of an elastic cylinder
+        case 5:{ // rebound of an elastic cylinder
             T dx=0.5; grid.Initialize(TV_INT(31+8,11+8),RANGE<TV>(TV(0-dx/2-dx*4,0-dx/2-dx*4),TV(15+dx/2+dx*4,5+dx/2+dx*4)),true);
             MPM_COLLISION_OBJECT<TV>* left=new MPM_COLLISION_OBJECT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(0+dx/2,15))),
                 new MPM_COLLISION_OBJECT_STATIC_PATH<TV>(FRAME<TV>()),false,0);
@@ -127,7 +117,7 @@ Initialize()
                 density,sg);
             Add_Neo_Hookean(85.5*scale_E,0.425); //solve({E/(2*(1+r))=30,E*r/((1+r)*(1-2*r))=170},{E,r});
         } break;
-        case 6:{ // Skew impact of two elastic cylinders
+        case 6:{ // skew impact of two elastic cylinders
             T dx=1; grid.Initialize(TV_INT(21+8,13+8),RANGE<TV>(TV(0-dx/2-dx*4,0-dx/2-dx*4),TV(20+dx/2+dx*4,12+dx/2+dx*4)),true);
             T density=5*scale_mass;
             SPHERE<TV> sphere1(TV(3,3),2);
