@@ -140,6 +140,14 @@ Dp(const TV& X) const
     return DIAGONAL_MATRIX<T,TV::m>(Z*(grid.dX-Z));
 }
 //#####################################################################
+// Function Order
+//#####################################################################
+template<class TV,int degree> int PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+Order() const
+{
+    return degree;
+}
+//#####################################################################
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,2>,1>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,3>,1>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,2>,1>;

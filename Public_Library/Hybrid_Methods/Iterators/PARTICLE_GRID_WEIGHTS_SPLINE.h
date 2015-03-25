@@ -34,6 +34,7 @@ public:
     void Update(const ARRAY_VIEW<TV>& X);
     T Constant_Scalar_Inverse_Dp() const;
     SYMMETRIC_MATRIX<T,TV::m> Dp(const TV& X) const;
+    int Order() const;
 //#####################################################################
 };
 }

@@ -28,6 +28,7 @@ public:
     virtual void Update(const ARRAY_VIEW<TV>& X)=0;
     virtual T Constant_Scalar_Inverse_Dp() const=0;
     virtual SYMMETRIC_MATRIX<T,TV::m> Dp(const TV& X) const=0;
+    virtual int Order() const=0;
 //#####################################################################
 };
 }
