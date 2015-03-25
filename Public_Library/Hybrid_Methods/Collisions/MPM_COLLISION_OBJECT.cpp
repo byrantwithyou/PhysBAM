@@ -23,8 +23,8 @@ MPM_COLLISION_OBJECT(IMPLICIT_OBJECT<TV>* impob,MPM_COLLISION_OBJECT_PATH<TV>* p
 template<class TV> MPM_COLLISION_OBJECT<TV>::
 ~MPM_COLLISION_OBJECT()
 {
-    if(impob) delete impob;
-    if(path) delete path;
+    delete impob;
+    delete path;
 }
 //#####################################################################
 // Function Detect
@@ -32,11 +32,14 @@ template<class TV> MPM_COLLISION_OBJECT<TV>::
 template<class TV> bool MPM_COLLISION_OBJECT<TV>::
 Detect(const T t,const TV& x,T* phi,TV* n) const
 {
-    TV X=path->Orientation(t).Inverse_Times(x);
+    TV X=x;
+    if(path) X=path->Orientation(t).Inverse_Times(X);
     T ep=impob->Extended_Phi(X);
     if(ep<0){
         if(phi) *phi=ep;
-        if(n) *n=path->Orientation(t).r.Rotate(impob->Normal(X));
+        if(n){
+            *n=impob->Normal(X);
+            if(path) *n=path->Orientation(t).r.Rotate(*n);}
         return true;}
     return false;
 }
@@ -48,8 +51,10 @@ Collide(const T t,const TV& x,TV& v,T* phi,TV* n,bool apply_friction) const
 {
     TV normal;
     if(Detect(t,x,phi,&normal)){
-        TV V=TV::Cross_Product(path->Velocity(t).angular,x-path->Orientation(t).t)+path->Velocity(t).linear;
-        v-=V;
+        TV V;
+        if(path){
+            V=TV::Cross_Product(path->Velocity(t).angular,x-path->Orientation(t).t)+path->Velocity(t).linear;
+            v-=V;}
         Collide_Static(t,x,normal,v,apply_friction);
         v+=V;
         if(n) *n=normal;
