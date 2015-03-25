@@ -128,6 +128,31 @@ Initialize()
             Seed_Particles(sphere2,[=](const TV& X){return TV(-0.75,0);},[=](const TV&){return MATRIX<T,2>();},density,sg2);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
+        case 7:{ // ping-pong ring
+            // ./mpm 7 -flip 0  -affine -midpoint -max_dt 1e-3 -cfl .1 -framerate 2400 -newton_tolerance 1e-5 -solver_tolerance 1e-5  -last_frame 240 -order 2 -print_stats | grep 'total'
+            grid.Initialize(TV_INT(48,48),RANGE<TV>(TV(),TV(0.48,0.48)),true);
+            MPM_COLLISION_OBJECT<TV>* left=new MPM_COLLISION_OBJECT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(0.11,15))),
+                new MPM_COLLISION_OBJECT_STATIC_PATH<TV>(FRAME<TV>()),true,0);
+            MPM_COLLISION_OBJECT<TV>* right=new MPM_COLLISION_OBJECT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(0.3,-5),TV(20,15))),
+                new MPM_COLLISION_OBJECT_STATIC_PATH<TV>(FRAME<TV>()),true,0);
+            collision_objects.Append(left);
+            collision_objects.Append(right);
+            ARRAY<SPHERE<TV> > spheres; ARRAY<TV> v0; ARRAY<T> r;
+            spheres.Append(SPHERE<TV>(TV(0.2,0.24),0.04));
+            v0.Append(TV(50,0));
+            r.Append(0.03);
+            for(int s=0;s<spheres.m;s++){
+                SPHERE<TV>& sphere=spheres(s);
+                T density=1010*scale_mass;
+                GRID<TV> sg(TV_INT(52,52),sphere.Bounding_Box().Thickened(r(s)*(T)1.5));
+                int last=particles.number;
+                Seed_Particles(sphere,[=](const TV& X){return v0(s);},[=](const TV&){return MATRIX<T,2>();},density,sg);
+                for(int k=last;k<particles.number;k++){
+                    if((particles.X(k)-sphere.center).Magnitude_Squared()<sqr(r(s))){
+                        particles.deletion_list.Append(k);}}}
+            particles.Delete_Elements_On_Deletion_List();
+            Add_Neo_Hookean(0.073*1e9*scale_E,0.4);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
