@@ -402,9 +402,9 @@ Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,T
     typename TV::SPIN am=example.Total_Grid_Angular_Momentum(dt,u,u0);
     TV lm=example.Total_Grid_Linear_Momentum(u);
     T ke=example.Total_Grid_Kinetic_Energy(u);
-    LOG::cout<<str<<" linear  "<<lm<<"  diff "<<(lm-example.last_linear_momentum)<<std::endl;
-    LOG::cout<<str<<" angular "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
-    LOG::cout<<str<<" ke "<<ke<<"  diff "<<(ke-example.last_grid_ke)<<std::endl;
+    LOG::cout<<str<<" linear  "<<"time " <<example.time<<" value "<<lm<<"  diff "<<(lm-example.last_linear_momentum)<<std::endl;
+    LOG::cout<<str<<" angular "<<"time " <<example.time<<" value "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
+    LOG::cout<<str<<" ke "<<"time " <<example.time<<" value "<<ke<<"  diff "<<(ke-example.last_grid_ke)<<std::endl;
     example.last_linear_momentum=lm;
     example.last_angular_momentum=am;
     example.last_grid_ke=ke;
@@ -419,8 +419,8 @@ Print_Particle_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<
     typename TV::SPIN am=example.Total_Particle_Angular_Momentum();
     TV lm=example.Total_Particle_Linear_Momentum();
     // T ke=example.Total_Particle_Kinetic_Energy();
-    LOG::cout<<str<<" linear  "<<lm<<"  diff "<<(lm-example.last_linear_momentum)<<std::endl;
-    LOG::cout<<str<<" angular "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
+    LOG::cout<<str<<" linear  "<<"time " <<example.time<<" value "<<lm<<"  diff "<<(lm-example.last_linear_momentum)<<std::endl;
+    LOG::cout<<str<<" angular "<<"time " <<example.time<<" value "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
     // LOG::cout<<str<<" ke "<<ke<<"  diff "<<(ke-example.last_grid_ke)<<std::endl;
     example.last_linear_momentum=lm;
     example.last_angular_momentum=am;
@@ -438,9 +438,9 @@ Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u)
     T ke=example.Total_Grid_Kinetic_Energy(u);
     T pe=example.Potential_Energy(example.time);
     T te=ke+pe;
-    LOG::cout<<str<<" kinetic  "<<ke<<std::endl;
-    LOG::cout<<str<<" potential "<<pe<<std::endl;
-    LOG::cout<<str<<" total energy "<<te<<" diff "<<(te-example.last_te)<<std::endl;
+    LOG::cout<<str<<" kinetic  "<<"time " <<example.time<<" value "<<ke<<std::endl;
+    LOG::cout<<str<<" potential "<<"time " <<example.time<<" value "<<pe<<std::endl;
+    LOG::cout<<str<<" total energy "<<"time " <<example.time<<" value "<<te<<" diff "<<(te-example.last_te)<<std::endl;
     example.last_te=te;
 }
 //#####################################################################
