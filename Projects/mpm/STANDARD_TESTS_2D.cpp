@@ -85,7 +85,7 @@ Initialize()
             Add_Gravity(TV(0,-9.8));
         } break;
         case 4:{ // colliding of two rings
-            T dx=0.001; grid.Initialize(TV_INT(49+8,49+8),RANGE<TV>(TV(0-dx/2-dx*4,0-dx/2-dx*4),TV(0.48+dx/2+dx*4,0.48+dx/2+dx*4)),true);
+            grid.Initialize(TV_INT(48,48),RANGE<TV>(TV(),TV(0.48,0.48)),true);
             ARRAY<SPHERE<TV> > spheres; ARRAY<TV> v0; ARRAY<T> r;
             spheres.Append(SPHERE<TV>(TV(0.1,0.24),0.04)); spheres.Append(SPHERE<TV>(TV(0.4,0.24),0.04));
             v0.Append(TV(50,0)); v0.Append(TV(-50,0));
@@ -93,7 +93,7 @@ Initialize()
             for(int s=0;s<spheres.m;s++){
                 SPHERE<TV>& sphere=spheres(s);
                 T density=1010*scale_mass;
-                GRID<TV> sg(TV_INT(48,48),sphere.Bounding_Box().Thickened(r(s)*(T)1.5));
+                GRID<TV> sg(TV_INT(52,52),sphere.Bounding_Box().Thickened(r(s)*(T)1.5));
                 int last=particles.number;
                 Seed_Particles(sphere,[=](const TV& X){return v0(s);},[=](const TV&){return MATRIX<T,2>();},density,sg);
                 for(int k=last;k<particles.number;k++){
