@@ -37,6 +37,7 @@ public:
 
     int test_number;
     int resolution;
+    bool user_resolution;
     int stored_last_frame;
     bool user_last_frame;
     int order;

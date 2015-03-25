@@ -22,13 +22,13 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> STANDARD_TESTS_BASE<TV>::
 STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-    :MPM_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),
+    :MPM_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),user_last_frame(false),
     order(2),seed(1234),particles_per_cell(1<<TV::m),scale_mass(1),scale_E(1)
 {
     T framerate=24;
     parse_args.Extra(&test_number,"example number","example number to run");
     parse_args.Add("-restart",&restart,"frame","restart frame");
-    parse_args.Add("-resolution",&resolution,"resolution","grid resolution");
+    parse_args.Add("-resolution",&resolution,&user_resolution,"resolution","grid resolution");
     parse_args.Add("-substeps",&write_substeps_level,"level","output-substep level");
     parse_args.Add("-substeps_delay",&substeps_delay_frame,"frame","delay substeps until after this frame");
     parse_args.Add("-last_frame",&last_frame,&user_last_frame,"frame","number of frames to simulate");
