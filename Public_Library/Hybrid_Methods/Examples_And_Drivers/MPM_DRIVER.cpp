@@ -133,9 +133,8 @@ Simulate_To_Frame(const int frame)
         for(int substep=0;!done;substep++){
             LOG::SCOPE scope("SUBSTEP","substep %d",substep+1);
             example.dt=Compute_Dt();
-            // example.dt=example.max_dt;
-
             example.dt=clamp(example.dt,example.min_dt,example.max_dt);
+            LOG::cout<<"substep dt: "<<example.dt<<std::endl;
             T next_time=example.time+example.dt;
             if(next_time>time_at_frame){
                 next_time=time_at_frame;
@@ -358,9 +357,10 @@ Apply_Friction()
 template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
 Compute_Dt() const
 {
-    T critical_speed=example.cfl*example.grid.One_Over_DX().Min()/example.max_dt;
+    T critical_speed=example.cfl*example.grid.DX().Min()/example.max_dt;
     T v=Max_Particle_Speed();
-    return (v>critical_speed)?(example.cfl*example.grid.One_Over_DX().Min()/v):example.max_dt;
+    if(example.use_affine) v+=Max_Affine_Speed_Contribution();
+    return (v>critical_speed)?(example.cfl*example.grid.DX().Min()/v):example.max_dt;
 }
 //#####################################################################
 // Function Max_Particle_Speed
@@ -372,6 +372,22 @@ Max_Particle_Speed() const
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);
         v2=max(v2,example.particles.V(p).Magnitude_Squared());}
+    return sqrt(v2);
+}
+//#####################################################################
+// Function Max_Affine_Speed_Contribution
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
+Max_Affine_Speed_Contribution() const
+{
+    if(!example.weights->constant_scalar_inertia_tensor) return (T)0;
+    T Dp_inverse_squared=sqr(example.weights->Constant_Scalar_Inverse_Dp());
+    T alpha=(T)0.5*(example.weights->Order()+1);
+    T alpha_dx_squared=sqr(alpha*example.grid.DX().Min());
+    T v2=0;
+    for(int k=0;k<example.simulated_particles.m;k++){
+        int p=example.simulated_particles(k);
+        v2=max(v2,Dp_inverse_squared*example.particles.B(p).Frobenius_Norm_Squared()*alpha_dx_squared);}
     return sqrt(v2);
 }
 //#####################################################################
