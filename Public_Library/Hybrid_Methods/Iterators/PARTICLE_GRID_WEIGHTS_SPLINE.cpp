@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
 #include <Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
@@ -73,13 +74,13 @@ template<class TV> static void
 Compute_Weights(VECTOR<TV,3>& w,VECTOR<TV,3>& dw,TV x,TV one_over_dX)
 {
     typedef typename TV::SCALAR T;
-    w(0)=(T).5*x*x-(T)1.5*x+(T)1.125;
+    w(0)=(T).5*sqr(x-(T)1.5);
     dw(0)=(x-(T)1.5)*one_over_dX;
     x-=(T)1;
     w(1)=-x*x+(T).75;
     dw(1)=(T)(-2)*x*one_over_dX;
     x-=(T)1;
-    w(2)=(T).5*x*x+(T)1.5*x+(T)1.125;
+    w(2)=(T).5*sqr(x+(T)1.5);
     dw(2)=(x+(T)1.5)*one_over_dX;
 }
 //#####################################################################
@@ -89,10 +90,10 @@ template<class TV> static void
 Compute_Weights(VECTOR<TV,4>& w,VECTOR<TV,4>& dw,TV x,TV one_over_dX)
 {
     typedef typename TV::SCALAR T;
-    TV x2,x3;
-    x2=x*x;x3=x2*x;
-    w(0)=-((T)1/6)*x3+x2-(T)2*x+(T)4/3;
-    dw(0)=(-(T).5*x2+(T)2*x-(T)2)*one_over_dX;
+    x=clamp(x,TV()+1,TV()+2);
+    TV x2,x3,z=(T)2-x,z2=z*z;
+    w(0)=((T)1/6)*z2*z;
+    dw(0)=-(T).5*one_over_dX*z2;
     x-=(T)1;
     x2=x*x;x3=x2*x;
     w(1)=(T).5*x3-x2+(T)2/3;
@@ -102,9 +103,9 @@ Compute_Weights(VECTOR<TV,4>& w,VECTOR<TV,4>& dw,TV x,TV one_over_dX)
     w(2)=-(T).5*x3-x2+(T)2/3;
     dw(2)=(-(T)1.5*x2-(T)2*x)*one_over_dX;
     x-=(T)1;
-    x2=x*x;x3=x2*x;
-    w(3)=((T)1/6)*x3+x2+(T)2*x+(T)4/3;
-    dw(3)=((T).5*x2+(T)2*x+(T)2)*one_over_dX;
+    z=(T)2+x;z2=z*z;
+    w(3)=((T)1/6)*z2*z;
+    dw(3)=(T).5*one_over_dX*z2;
 }
 //#####################################################################
 // Function Update
