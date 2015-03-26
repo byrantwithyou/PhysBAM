@@ -55,7 +55,7 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
     if(g) Project_Gradient_And_Prune_Constraints(*g,h);
     if(h){
         for(int i=0;i<minimization_system.collisions.m;i++){
-            const COLLISION& c = minimization_system.collisions(i);
+            const COLLISION& c=minimization_system.collisions(i);
             minimization_system.forced_collisions.Insert(c.p,c.object);}}
     if(g){
         GENERALIZED_VELOCITY<TV>& gg=debug_cast<GENERALIZED_VELOCITY<TV>&>(*g);
