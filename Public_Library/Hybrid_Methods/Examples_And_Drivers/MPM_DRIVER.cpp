@@ -358,8 +358,7 @@ template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
 Compute_Dt() const
 {
     T critical_speed=example.cfl*example.grid.DX().Min()/example.max_dt;
-    T v=Max_Particle_Speed();
-    if(example.use_affine) v+=Max_Affine_Speed_Contribution();
+    T v=Grid_V_Upper_Bound();
     return (v>critical_speed)?(example.cfl*example.grid.DX().Min()/v):example.max_dt;
 }
 //#####################################################################
@@ -375,20 +374,18 @@ Max_Particle_Speed() const
     return sqrt(v2);
 }
 //#####################################################################
-// Function Max_Affine_Speed_Contribution
+// Function Grid_V_Upper_Bound
 //#####################################################################
 template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
-Max_Affine_Speed_Contribution() const
+Grid_V_Upper_Bound() const
 {
-    if(!example.weights->constant_scalar_inertia_tensor) return (T)0;
-    T Dp_inverse_squared=sqr(example.weights->Constant_Scalar_Inverse_Dp());
-    T alpha=(T)0.5*(example.weights->Order()+1);
-    T alpha_dx_squared=sqr(alpha*example.grid.DX().Min());
-    T v2=0;
+    if(!example.use_affine || !example.weights->constant_scalar_inertia_tensor) return Max_Particle_Speed();
+    T result=0;
+    T ksi=(T)6*sqrt((T)TV::m)*example.grid.One_Over_DX().Min();
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);
-        v2=max(v2,Dp_inverse_squared*example.particles.B(p).Frobenius_Norm_Squared()*alpha_dx_squared);}
-    return sqrt(v2);
+        result=max(result,example.particles.V(p).Magnitude()+example.particles.B(p).Frobenius_Norm()*ksi);}
+    return result;
 }
 //#####################################################################
 // Function Update_Simulated_Particles

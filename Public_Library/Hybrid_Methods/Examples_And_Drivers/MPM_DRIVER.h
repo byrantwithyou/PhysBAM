@@ -47,7 +47,7 @@ public:
     void Apply_Friction();
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
-    T Max_Affine_Speed_Contribution() const;
+    T Grid_V_Upper_Bound() const;
     void Update_Simulated_Particles();
     void Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0);
     void Print_Particle_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0);
