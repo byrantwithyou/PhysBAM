@@ -15,11 +15,12 @@ To be debugged:
 
 * Get rotation test working
 
+* Newton does not converge for test 8, when collisions are occuring.
+
 
 To test:
 
 * Make sure -flip works correctly
 
-* Make sure -order 1 and -order 3 both work correctly
 
 To do:
