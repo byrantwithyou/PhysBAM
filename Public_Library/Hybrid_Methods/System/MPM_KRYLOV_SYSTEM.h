@@ -7,6 +7,7 @@
 #ifndef __MPM_KRYLOV_SYSTEM__
 #define __MPM_KRYLOV_SYSTEM__
 #include <Tools/Arrays/ARRAY.h>
+#include <Tools/Data_Structures/HASHTABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Vectors/VECTOR.h>
@@ -24,11 +25,15 @@ public:
     {
         int object;
         int p;
-        TV n;
-        bool noslip;
+        T phi,n_dE;
+        TV n,H_dE;
+        SYMMETRIC_MATRIX<T,TV::m> H;
     };
 
+    MPM_KRYLOV_VECTOR<TV>& tmp;
     ARRAY<COLLISION> collisions;
+    ARRAY<int> stuck_nodes;
+    HASHTABLE<int,int> forced_collisions;
     MPM_KRYLOV_SYSTEM(MPM_EXAMPLE<TV>& example);
     virtual ~MPM_KRYLOV_SYSTEM();
 

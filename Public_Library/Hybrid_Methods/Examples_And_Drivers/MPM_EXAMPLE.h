@@ -25,6 +25,13 @@ class MPM_EXAMPLE:public NONCOPYABLE
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
+    struct MPM_COLLISION_OBJECT
+    {
+        IMPLICIT_OBJECT<TV>* io;
+        bool sticky;
+        T friction;
+    };
+
     GRID<TV> grid;
     STREAM_TYPE stream_type;
     MPM_PARTICLES<TV>& particles;
@@ -41,7 +48,7 @@ public:
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     PARTICLE_GRID_WEIGHTS<TV>* weights;
     GATHER_SCATTER<TV>& gather_scatter;
-    ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
+    ARRAY<MPM_COLLISION_OBJECT> collision_objects;
     mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
 
     T initial_time;

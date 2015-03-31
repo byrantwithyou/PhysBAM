@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_SYSTEM.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
@@ -13,7 +12,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> MPM_KRYLOV_SYSTEM<TV>::
 MPM_KRYLOV_SYSTEM(MPM_EXAMPLE<TV>& example)
-    :KRYLOV_SYSTEM_BASE<T>(false,false),example(example)
+    :KRYLOV_SYSTEM_BASE<T>(false,false),example(example),tmp(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices))
 {
 }
 //#####################################################################
@@ -22,6 +21,7 @@ MPM_KRYLOV_SYSTEM(MPM_EXAMPLE<TV>& example)
 template<class TV> MPM_KRYLOV_SYSTEM<TV>::
 ~MPM_KRYLOV_SYSTEM()
 {
+    delete &tmp;
 }
 //#####################################################################
 // Function Multiply
@@ -31,13 +31,25 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 {
     const MPM_KRYLOV_VECTOR<TV>& V=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(BV);
     MPM_KRYLOV_VECTOR<TV>& F=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(BF);
+    tmp=V;
+    tmp.u.array.Subset(stuck_nodes).Fill(TV());
+    for(int i=0;i<collisions.m;i++){
+        const COLLISION& c=collisions(i);
+        tmp.u.array(c.p).Project_Orthogonal_To_Unit_Direction(c.n);}
+
     F*=0;
-    example.Add_Hessian_Times(F.u,V.u,example.time);
+    example.Add_Hessian_Times(F.u,tmp.u,example.time);
     T scale=example.use_midpoint?(T).25:1,scaled_dt_squared=sqr(example.dt*scale);
 
     for(int k=0;k<example.valid_grid_indices.m;k++){
         int i=example.valid_grid_indices(k);
-        F.u.array(i)=scaled_dt_squared/example.mass.array(i)*F.u.array(i)+V.u.array(i)*scale;}
+        F.u.array(i)=scaled_dt_squared/example.mass.array(i)*F.u.array(i)+tmp.u.array(i)*scale;}
+
+    F.u.array.Subset(stuck_nodes).Fill(TV());
+    for(int i=0;i<collisions.m;i++){
+        const COLLISION& c=collisions(i);
+        TV& v=F.u.array(c.p),tt=V.u.array(c.p); // tmp -> V?
+        v-=c.n*c.n.Dot(v)+example.dt*(c.H*tt*c.n_dE+c.n.Dot(tt)*c.H_dE+c.H_dE.Dot(tt)*c.n);}
 }
 //#####################################################################
 // Function Inner_Product
@@ -67,11 +79,6 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const
 template<class TV> void MPM_KRYLOV_SYSTEM<TV>::
 Project(KRYLOV_VECTOR_BASE<T>& BV) const
 {
-    MPM_KRYLOV_VECTOR<TV>& V=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(BV);
-    for(int i=0;i<collisions.m;i++){
-        const COLLISION& c=collisions(i);
-        if(example.collision_objects(c.object)->sticky){V.u.array(c.p)=TV();continue;}
-        V.u.array(c.p)=V.u.array(c.p).Projected_Orthogonal_To_Unit_Direction(c.n);}
 }
 //#####################################################################
 // Function Project_Nullspace

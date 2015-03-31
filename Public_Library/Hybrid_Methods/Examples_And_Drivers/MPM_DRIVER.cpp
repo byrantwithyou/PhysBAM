@@ -14,8 +14,8 @@
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -85,6 +85,7 @@ Initialize()
     example.velocity_new.Resize(example.grid.Domain_Indices(example.ghost));
     dv.u.Resize(example.grid.Domain_Indices(example.ghost));
     rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
+    objective.system.tmp.u.Resize(example.grid.Domain_Indices(example.ghost));
 
     int i=0;
     example.location.Resize(example.grid.Domain_Indices(example.ghost));
@@ -319,8 +320,14 @@ template<class TV> void MPM_DRIVER<TV>::
 Perform_Particle_Collision(int p)
 {
     if(!example.use_particle_collision) return;;
-    for(int i=0;i<example.collision_objects.m;i++)
-        example.collision_objects(i)->Collide(example.time,example.particles.X(p),example.particles.V(p));
+    for(int i=0;i<example.collision_objects.m;i++){
+        TV X=example.particles.X(p);
+        IMPLICIT_OBJECT<TV>* io=example.collision_objects(i).io;
+        T phi=io->Extended_Phi(X);
+        if(phi>=0) continue;
+        if(example.collision_objects(i).sticky) return;
+        X-=phi*io->Normal(X);
+        example.particles.X(p)=X;}
 }
 //#####################################################################
 // Function Apply_Friction
@@ -338,7 +345,7 @@ Apply_Friction()
         const typename MPM_KRYLOV_SYSTEM<TV>::COLLISION& c=objective.system.collisions(i);
         T normal_force=TV::Dot_Product(c.n,objective.tmp0.u.array(c.p)-objective.tmp1.u.array(c.p));
         TV& v=objective.v1.u.array(c.p);
-        if(example.collision_objects(c.object)->sticky){
+        if(example.collision_objects(c.object).sticky){
             v=TV();
             dv.u.array(c.p)=v-objective.v0.u.array(c.p);
             continue;}

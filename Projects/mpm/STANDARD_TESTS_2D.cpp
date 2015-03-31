@@ -7,8 +7,6 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT_STATIC_PATH.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
@@ -107,13 +105,11 @@ Initialize()
             if(!user_resolution) resolution=10;
             T dx=(T)5/resolution;
             grid.Initialize(TV_INT(3,1)*resolution+9,RANGE<TV>(TV(),TV(15,5)).Thickened(dx*(T)4.5),true);
-            MPM_COLLISION_OBJECT<TV>* left=new MPM_COLLISION_OBJECT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(0+dx/2,15))),0,false,0);
-            MPM_COLLISION_OBJECT<TV>* right=new MPM_COLLISION_OBJECT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(15-dx/2,-5),TV(20,15))),0,false,0);
-            collision_objects.Append(left);
-            collision_objects.Append(right);
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(0+dx/2,15))),false,0});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(15-dx/2,-5),TV(20,15))),false,0});
             SPHERE<TV> sphere(TV(2.5,2.5),1.5);
             T density=4*scale_mass;
-            GRID<TV> sg(TV_INT(12,12),RANGE<TV>(TV(2.5-dx/2*5.5,2.5-dx/2*5.5),TV(2.5+dx/2*5.5,2.5+dx/2*5.5)));
+            GRID<TV> sg(grid.numbers_of_cells*2,grid.domain,true);
             Seed_Particles(sphere,[=](const TV& X){return TV(0.5,0);},[=](const TV&){return MATRIX<T,2>();},
                 density,sg);
             Add_Neo_Hookean(85.5*scale_E,0.425); //solve({E/(2*(1+r))=30,E*r/((1+r)*(1-2*r))=170},{E,r});
@@ -125,21 +121,18 @@ Initialize()
             grid.Initialize(TV_INT(5,3)*third_resolution+9,RANGE<TV>(TV(),TV(20,12)).Thickened(dx*(T)4.5),true);
             T density=5*scale_mass;
             SPHERE<TV> sphere1(TV(3,3),2);
-            GRID<TV> sg1(TV_INT(12,12),RANGE<TV>(TV(2.5-dx/2*5.5,2.5-dx/2*5.5),TV(2.5+dx/2*5.5,2.5+dx/2*5.5)));
-            Seed_Particles(sphere1,[=](const TV& X){return TV(0.75,0);},[=](const TV&){return MATRIX<T,2>();},density,sg1);
+            GRID<TV> sg(grid.numbers_of_cells*2,grid.domain,true);
+            Seed_Particles(sphere1,[=](const TV& X){return TV(0.75,0);},[=](const TV&){return MATRIX<T,2>();},density,sg);
             SPHERE<TV> sphere2(TV(16,5),2);
-            GRID<TV> sg2(TV_INT(12,12),RANGE<TV>(TV(2.5-dx/2*5+13.5,2.5-dx/2*5.5+2),TV(2.5+dx/2*5.5+13,2.5+dx/2*5.5+2)));
-            Seed_Particles(sphere2,[=](const TV& X){return TV(-0.75,0);},[=](const TV&){return MATRIX<T,2>();},density,sg2);
+            Seed_Particles(sphere2,[=](const TV& X){return TV(-0.75,0);},[=](const TV&){return MATRIX<T,2>();},density,sg);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
         case 7:{ // ping-pong ring
             // ./mpm 7 -flip 0  -affine -midpoint -max_dt 1e-3 -cfl .1 -framerate 2400 -newton_tolerance 1e-5 -solver_tolerance 1e-5  -last_frame 240 -order 2 -print_stats | grep 'total'
             if(!user_resolution) resolution=480;
             grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(),TV(0.48,0.48)),true);
-            MPM_COLLISION_OBJECT<TV>* left=new MPM_COLLISION_OBJECT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(0.11,15))),0,false,0);
-            MPM_COLLISION_OBJECT<TV>* right=new MPM_COLLISION_OBJECT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(0.3,-5),TV(20,15))),0,false,0);
-            collision_objects.Append(left);
-            collision_objects.Append(right);
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(0.11,15))),false,0});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(0.3,-5),TV(20,15))),false,0});
             ARRAY<SPHERE<TV> > spheres; ARRAY<TV> v0; ARRAY<T> r;
             spheres.Append(SPHERE<TV>(TV(0.2,0.24),0.04));
             v0.Append(TV(50,0));
@@ -155,6 +148,28 @@ Initialize()
                         particles.deletion_list.Append(k);}}}
             particles.Delete_Elements_On_Deletion_List();
             Add_Neo_Hookean(0.073e9*scale_E,0.4);
+        } break;
+        case 8:{ // collision an elastic cylinder
+            if(!user_resolution) resolution=10;
+            T dx=(T)5/resolution;
+            grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)).Thickened(dx*(T)4.5),true);
+            RANGE<TV> wallL=grid.domain.Thickened((T).5),wallR=grid.domain.Thickened((T).5);
+            RANGE<TV> wallB=grid.domain.Thickened((T).5),wallT=grid.domain.Thickened((T).5);
+            wallL.max_corner.x=grid.domain.min_corner.x+(T).5;
+            wallB.max_corner.y=grid.domain.min_corner.y+(T).5;
+            wallR.min_corner.x=grid.domain.max_corner.x-(T).5;
+            wallT.min_corner.y=grid.domain.max_corner.y-(T).5;
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallL),false,0});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallR),false,0});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallT),false,0});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallB),false,0});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(SPHERE<TV>(TV(4,3),1)),false,0});
+            SPHERE<TV> sphere(TV(2.55,2.55),.3);
+            T density=4*scale_mass;
+            GRID<TV> sg(grid.numbers_of_cells*2,grid.domain,true);
+            Seed_Particles(sphere,[=](const TV& X){return TV(0.5,0);},[=](const TV&){return MATRIX<T,2>();},
+                density,sg);
+            Add_Neo_Hookean(scale_E,0.425);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

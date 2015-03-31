@@ -4,8 +4,8 @@
 //#####################################################################
 #include <Tools/Log/LOG.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
@@ -37,7 +37,8 @@ template<class TV> MPM_EXAMPLE<TV>::
     delete &debug_particles;
     delete weights;
     delete &gather_scatter;
-    collision_objects.Delete_Pointers_And_Clean_Memory();
+    for(int i=0;i<collision_objects.m;i++)
+        delete collision_objects(i).io;
     forces.Delete_Pointers_And_Clean_Memory();
     lagrangian_forces.Delete_Pointers_And_Clean_Memory();
     av.Delete_Pointers_And_Clean_Memory();
@@ -62,7 +63,7 @@ Write_Output_Files(const int frame)
     for(int i=0;i<location.array.m;i++){
         TV& X=location.array(i);
         for(int j=0;j<collision_objects.m;j++){
-            if(collision_objects(j)->Detect(time,X)){
+            if(collision_objects(j).io->Extended_Phi(X)<0){
                 Add_Debug_Particle(X,VECTOR<T,3>(0.7,0.3,0.3));break;}}}
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 }

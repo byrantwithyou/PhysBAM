@@ -4,7 +4,7 @@
 //#####################################################################
 #include <Tools/Log/LOG.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
@@ -46,9 +46,14 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
 {
     const MPM_KRYLOV_VECTOR<TV>& dv=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(Bdv);
     tmp1=dv;
+    if(h) system.forced_collisions.Clean_Memory();
     Make_Feasible(tmp1);
     Compute_Unconstrained(tmp1,h,g,e);
     if(g) Project_Gradient_And_Prune_Constraints(*g,h);
+    if(h){
+        for(int i=0;i<system.collisions.m;i++){
+            const COLLISION& c=system.collisions(i);
+            system.forced_collisions.Insert(c.p,c.object);}}
 }
 //#####################################################################
 // Function Compute
@@ -116,21 +121,39 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
     if(!system.example.collision_objects.m) return;
     MPM_KRYLOV_VECTOR<TV>& dv=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(Bdv);
     system.collisions.Remove_All();
+    T midpoint_scale=system.example.use_midpoint?(T).5:1;
 
     for(int k=0;k<system.example.valid_grid_indices.m;k++){
         int i=system.example.valid_grid_indices(k);
-        TV V=v0.u.array(i)+dv.u.array(i);
-        T deepest=0;
-        COLLISION c={-1,i};
+        TV V=v0.u.array(i)+midpoint_scale*dv.u.array(i);
+        TV X0=system.example.location.array(i);
+        TV X=X0+system.example.dt*V;
+        T deepest_phi=0;
+        int deepest_index=-1;
+        IMPLICIT_OBJECT<TV>* deepest_io=0;
+        if(int* object_index=system.forced_collisions.Get_Pointer(i)){
+            deepest_index=*object_index;
+            deepest_io=system.example.collision_objects(deepest_index).io;
+            T phi0=deepest_io->Extended_Phi(X0),phi=deepest_io->Extended_Phi(X);
+            if(phi0<0) phi-=phi0;
+            deepest_phi=phi;}
         for(int j=0;j<system.example.collision_objects.m;j++){
-            T depth=0;
-            COLLISION t={j,i};
-            if(system.example.collision_objects(j)->Collide(system.example.time,system.example.location.array(i),V,&depth,&t.n,true)){
-                system.collisions.Append(t);
-                if(depth<deepest)
-                    c=t;}}
-        if(c.object==-1) continue;
-        dv.u.array(i)=V-v0.u.array(i);}
+            IMPLICIT_OBJECT<TV>* io=system.example.collision_objects(j).io;
+            T phi0=io->Extended_Phi(X0),phi=io->Extended_Phi(X);
+            if(phi0<0) phi-=phi0;
+            if(phi<deepest_phi){
+                deepest_phi=phi;
+                deepest_io=io;
+                deepest_index=j;}}
+        if(deepest_index==-1) continue;
+        if(system.example.collision_objects(deepest_index).sticky){
+            system.stuck_nodes.Append(i);
+            continue;}
+        COLLISION c={deepest_index,i,deepest_phi,0,deepest_io->Extended_Normal(X),TV(),deepest_io->Hessian(X)};
+        system.collisions.Append(c);
+        X-=deepest_phi*c.n;
+        V=(X-system.example.location.array(i))/system.example.dt;
+        dv.u.array(i)=(V-v0.u.array(i))/midpoint_scale;}
 }
 //#####################################################################
 // Function Project_Gradient_And_Prune_Constraints
@@ -140,15 +163,15 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep)
 {
     if(!system.collisions.m) return;
     MPM_KRYLOV_VECTOR<TV>& g=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(Bg);
-
+    g.u.array.Subset(system.stuck_nodes).Fill(TV());
     for(int i=system.collisions.m-1;i>=0;i--){
         COLLISION& c=system.collisions(i);
         TV &gv=g.u.array(c.p);
-        if(system.example.collision_objects(c.object)->sticky){gv=TV();continue;}
-        T rvel=TV::Dot_Product(gv,c.n);
-        // if(allow_sep && rvel>0) system.collisions.Remove_Index_Lazy(i);
-        // else gv-=rvel*c.n;}
-        gv-=rvel*c.n;}
+        c.n_dE=gv.Dot(c.n);
+        if(allow_sep && c.n_dE<0) system.collisions.Remove_Index_Lazy(i);
+        else{
+            c.H_dE=c.H*gv;
+            gv-=c.n_dE*c.n+c.phi*c.H_dE;}}
 }
 //#####################################################################
 // Function Make_Feasible
