@@ -1,0 +1,12 @@
+# SConscript
+import os
+Import('env Automatic_Program')
+env=env.Copy(USE_HYBRID=1)
+
+if os.environ.has_key('PARTIO_INCLUDE_PATH') and os.environ.has_key('PARTIO_LIBRARY_PATH'):
+    partio_include_path=os.environ['PARTIO_INCLUDE_PATH']
+    partio_library_path=os.environ['PARTIO_LIBRARY_PATH']
+    env.Append(CPPPATH=[partio_include_path])
+    env.Append(LIBPATH=[partio_library_path])
+    env.Append(LIBS=['partio'])
+    Automatic_Program(env,"mpm2partio",["main.cpp"])
