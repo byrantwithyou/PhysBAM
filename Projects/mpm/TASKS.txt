@@ -10,10 +10,10 @@ To be implemented:
 
 * Implement an example with both mesh-based and non-mesh-based forces
 
+* Plasticity
+
 
 To be debugged:
-
-* Get rotation test working
 
 * Newton does not converge for test 8, when collisions are occuring.
 
