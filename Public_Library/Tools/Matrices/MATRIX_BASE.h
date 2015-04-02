@@ -9,6 +9,7 @@
 
 #include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Tools/Data_Structures/ELEMENT_ID.h>
+#include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Math_Tools/max.h>
 #include <Tools/Math_Tools/sqr.h>
 #include <Tools/Matrices/MATRIX_ARITHMETIC_POLICY.h>
