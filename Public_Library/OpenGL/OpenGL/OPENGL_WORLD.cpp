@@ -890,7 +890,7 @@ Display_Strings(bool draw_transparent_box)
     static OPENGL_COLOR text_color=OPENGL_COLOR::White();
     if(show_frames_per_second){
         ARRAY<std::string> strings_with_fps;
-        strings_with_fps.Append(STRING_UTILITIES::string_sprintf("%dfps",frames_per_second));
+        strings_with_fps.Append(LOG::sprintf("%dfps",frames_per_second));
         strings_with_fps.Append_Elements(strings_to_print);
         Display_Strings(strings_with_fps,text_color,draw_transparent_box);}
     else
@@ -923,7 +923,7 @@ Display_Object_Names_In_Corner()
 
     ARRAY<std::string> strings;
 
-    if(show_frames_per_second) strings.Append(STRING_UTILITIES::string_sprintf("%dfps",frames_per_second));
+    if(show_frames_per_second) strings.Append(LOG::sprintf("%dfps",frames_per_second));
 
     Display_Strings(strings,OPENGL_COLOR::White(),true,0,12,GLUT_BITMAP_HELVETICA_12);
 }

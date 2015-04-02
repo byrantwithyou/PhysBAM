@@ -16,6 +16,7 @@
 #include <Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
 #include <Tools/Grids_Uniform_Computations/GRADIENT_UNIFORM.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Utilities/Find_Type.h>
@@ -605,7 +606,7 @@ template<class TV> template<class T_ARRAYS_PARTICLES> void FLUIDS_PARAMETERS_UNI
 Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_particles,const T_ARRAYS_PARTICLES& particles,const std::string& output_directory,const std::string& prefix,
     const int frame) const
 {
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
     int total_number_of_particles=Total_Number_Of_Particles(particles);
     LOG::cout<<"Writing "<<total_number_of_particles<<" "<<prefix<<std::endl;
 
@@ -613,7 +614,7 @@ Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_part
     if(write_flattened_particles){
         PARTICLES<TV>* all_particles=template_particles.Clone();
         all_particles->Initialize(particles.array);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s_all",output_directory.c_str(),frame,prefix.c_str()),*all_particles);}
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/%s_all",output_directory.c_str(),frame,prefix.c_str()),*all_particles);}
 }
 //#####################################################################
 // Function Read_Particles
@@ -623,7 +624,7 @@ Read_Particles(const STREAM_TYPE stream_type,const T_PARTICLES& template_particl
     const int frame)
 {
     STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value)); 
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
     if(typeid(template_particles)!=typeid(T_PARTICLES)) // swap in clones of template_particle for pure T_PARTICLESs
         for(int i=0;i<particles.array.Size();i++) if(particles.array(i)){
             T_PARTICLES* replacement=template_particles.Clone();
@@ -638,7 +639,7 @@ Read_Particles(const STREAM_TYPE stream_type,const T_PARTICLES& template_particl
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame)
 {
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/grid",*grid);
     if(mpi_grid) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/global_grid",mpi_grid->global_grid);
 
@@ -668,7 +669,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
                 if(use_strain && write_strain) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/strain",incompressible->strain->e);}
             else if(number_of_regions>=2){
                 for(int i=0;i<number_of_regions;i++){
-                    std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg): This still does .%d.gz
+                    std::string ii=LOG::sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg): This still does .%d.gz
                     PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
                     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
                     if(write_particles && frame%restart_data_write_rate==0){
@@ -702,7 +703,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int first_frame,const int frame) const
 {
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     if(!simulate) return;
     if(use_soot){
         ARRAY<T,TV_INT> soot_ghost(grid->Cell_Indices(number_of_ghost_cells),false);
@@ -753,7 +754,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
                     FILE_UTILITIES::Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);}
             else if(number_of_regions>=2){
                 for(int i=0;i<number_of_regions;i++){
-                    std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg) ...
+                    std::string ii=LOG::sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg) ...
                     PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
                     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
                     if(write_particles && frame%restart_data_write_rate==0){
@@ -774,7 +775,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
                 if(use_multiphase_strain.Count_Matches(0)<number_of_regions && number_of_regions>=2)
                     for(int i=0;i<number_of_regions;i++){
                         if(incompressible_multiphase->strains(i)){
-                            std::string i_dot_f=STRING_UTILITIES::string_sprintf("%d.%s",i,f.c_str()); // TODO(jontg): ...
+                            std::string i_dot_f=LOG::sprintf("%d.%s",i,f.c_str()); // TODO(jontg): ...
                             ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> e_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
                             incompressible_multiphase->strains(i)->e_boundary->Fill_Ghost_Cells(*grid,incompressible_multiphase->strains(i)->e,e_ghost,0,0,number_of_ghost_cells); // TODO: use real dt/time
                             FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/strain_"+i_dot_f,e_ghost);}}}}

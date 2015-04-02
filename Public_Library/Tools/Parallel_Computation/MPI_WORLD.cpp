@@ -77,7 +77,7 @@ Initialize(bool force_mpi)
             char version[21];
             int length=fscanf(laminfo," LAM/MPI: %20s",version);
             if(!length) PHYSBAM_FATAL_ERROR("LAM/MPI version check failed: couldn't parse laminfo output");
-            if(strncmp(version,LAM_VERSION,20)) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("LAM/MPI version check failed: compiled with %s, run with %s",LAM_VERSION,version));
+            if(strncmp(version,LAM_VERSION,20)) PHYSBAM_FATAL_ERROR(LOG::sprintf("LAM/MPI version check failed: compiled with %s, run with %s",LAM_VERSION,version));
             pclose(laminfo);}}
 #elif defined(OPEN_MPI)
     if(getenv("LAMRANK"))
@@ -86,13 +86,13 @@ Initialize(bool force_mpi)
         LOG::cout<<"Detected OpenMPI Runtime Environment"<<std::endl;
         use_mpi=true;
         if(check_version){
-            std::string compiled_version=STRING_UTILITIES::string_sprintf("%d.%d.%d",OMPI_MAJOR_VERSION,OMPI_MINOR_VERSION,OMPI_RELEASE_VERSION);
+            std::string compiled_version=LOG::sprintf("%d.%d.%d",OMPI_MAJOR_VERSION,OMPI_MINOR_VERSION,OMPI_RELEASE_VERSION);
             FILE* ompi_info=popen("ompi_info -version ompi full","r");
             if(!ompi_info) PHYSBAM_FATAL_ERROR("Open MPI version check failed: couldn't run ompi_info");
             char version[21];
             if(!Find_Version(ompi_info," Open MPI: %20s",version))
                 PHYSBAM_FATAL_ERROR("Open MPI version check failed: couldn't parse ompi_info output");
-            if(compiled_version!=version) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Open MPI version check failed: compiled with %s, run with %s",compiled_version.c_str(),version));
+            if(compiled_version!=version) PHYSBAM_FATAL_ERROR(LOG::sprintf("Open MPI version check failed: compiled with %s, run with %s",compiled_version.c_str(),version));
             pclose(ompi_info);}}
 #else
 //#error Unrecognized MPI package
@@ -100,7 +100,7 @@ Initialize(bool force_mpi)
     if(!use_mpi){initialized=false;return;}
     int argc=0;char** argv=0; // these are ignored by lam and openmpi
     int status=MPI_Init(&argc,&argv);
-    if(status!=MPI_SUCCESS) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("MPI_Init failed: status %d",status));
+    if(status!=MPI_SUCCESS) PHYSBAM_FATAL_ERROR(LOG::sprintf("MPI_Init failed: status %d",status));
     initialized=true;
     global_rank=rank=MPI::COMM_WORLD.Get_rank();
 

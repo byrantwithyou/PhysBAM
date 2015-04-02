@@ -6,6 +6,7 @@
 //#####################################################################
 #include <Tools/Log/LOG.h>
 #include <Tools/Log/PROGRESS_INDICATOR.h>
+#include <Tools/Log/SCOPE.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_VOXELS.h>

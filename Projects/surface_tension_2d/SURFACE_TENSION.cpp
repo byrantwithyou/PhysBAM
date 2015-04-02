@@ -219,7 +219,7 @@ Parse_Options()
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
     Add_Rigid_Body_Walls();
-    output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number,resolution);
+    output_directory=LOG::sprintf("Test_%d",test_number,resolution);
 }
 //#####################################################################
 // Function Add_Rigid_Body_Walls
@@ -915,7 +915,7 @@ template<class T> void SURFACE_TENSION<T>::
 Write_Output_Files(const int frame) const
 {
     BASE::Write_Output_Files(frame);
-    FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
+    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
     debug_particles.Write_Debug_Particles(this->stream_type,output_directory,frame);
 }
 //#####################################################################
@@ -1111,7 +1111,7 @@ FSI_Analytic_Test()
     analytic_solution=-(solid_mass*-solid_gravity.y+rho*size.x*size.y*-fluids_parameters.gravity.y)*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
-    FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),0));
+    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
 }
 //#####################################################################
 // Function Postprocess_Frame

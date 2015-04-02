@@ -89,7 +89,7 @@ Display() const
             for(int i=0;i<points.Size();i++){
                 OPENGL_COLOR label_color=(point_colors)?((*point_colors)(i)*0.8):(color*0.8);
                 label_color.Send_To_GL_Pipeline();
-                OpenGL_String(points(i),point_ids?STRING_UTILITIES::string_sprintf("%d [id=%d] [%f %f]",i,(*point_ids)(i),points(i).x,points(i).y):STRING_UTILITIES::string_sprintf("%d",i));}}
+                OpenGL_String(points(i),point_ids?LOG::sprintf("%d [id=%d] [%f %f]",i,(*point_ids)(i),points(i).x,points(i).y):LOG::sprintf("%d",i));}}
         }
     
     glPopAttrib();

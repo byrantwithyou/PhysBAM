@@ -7,6 +7,7 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
@@ -53,7 +54,7 @@ Read_Output_Files_Solids(const int frame)
 {
     solid_body_collection.Read(stream_type,output_directory,frame,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
         solids_parameters.write_deformable_body,solids_parameters.write_from_every_process);
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     //if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
     //    newmark->Read_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
 }
@@ -102,7 +103,7 @@ template<class TV> template<class T_MPI> void SOLIDS_FLUIDS_EXAMPLE<TV>::
 Adjust_Output_Directory_For_MPI(const T_MPI mpi)
 {
     if(mpi && mpi->Number_Of_Processors()>1){
-        output_directory+=STRING_UTILITIES::string_sprintf("/%d",(mpi->rank+1));
+        output_directory+=LOG::sprintf("/%d",(mpi->rank+1));
         FILE_UTILITIES::Create_Directory(output_directory);
         FILE_UTILITIES::Create_Directory(output_directory+"/common");
         LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",restart);}

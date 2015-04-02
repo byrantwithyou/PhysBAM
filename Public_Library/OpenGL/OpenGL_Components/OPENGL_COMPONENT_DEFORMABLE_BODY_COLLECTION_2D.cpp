@@ -31,7 +31,7 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std
     viewer_callbacks.Set("toggle_draw_velocities",{[this](){Toggle_Draw_Velocities();},"Toggle draw velocities"});
     viewer_callbacks.Set("cycle_display_mode",{[this](){Cycle_Display_Mode();},"Cycle embedded display mode"});
     // check for per frame structures
-    if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
+    if(FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
         invalidate_deformable_objects_selection_each_frame=true;
     else invalidate_deformable_objects_selection_each_frame=false;
 
@@ -62,7 +62,7 @@ Reinitialize(bool force)
 {
     if(!(draw && (force || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0)))) return;
     static bool first_time=true;
-    std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/deformable_object_structures",prefix.c_str(),frame);
+    std::string filename=LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),frame);
     bool read_static_variables=!deformable_body_collection.structures.m;
     int static_frame=-1;
     if(FILE_UTILITIES::File_Exists(filename)){static_frame=frame;read_static_variables=true;}
@@ -113,10 +113,10 @@ Reinitialize(bool force)
                 if(first_time) LOG::cout<<"object "<<i<<": triangulated area\n";
                 triangulated_area->mesh.Initialize_Segment_Mesh(); // to enable segment selection
                 triangulated_area_objects(i)=new OPENGL_TRIANGULATED_AREA<T>(stream_type,*triangulated_area,true);}
-            else PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Weird object %d",i));}}
+            else PHYSBAM_FATAL_ERROR(LOG::sprintf("Weird object %d",i));}}
     for(int i=0;i<deformable_body_collection.structures.m;i++){
-        std::string suffix=STRING_UTILITIES::string_sprintf("_%d",i);
-        std::string frame_prefix=STRING_UTILITIES::string_sprintf("%s/%d",prefix.c_str(),frame);
+        std::string suffix=LOG::sprintf("_%d",i);
+        std::string frame_prefix=LOG::sprintf("%s/%d",prefix.c_str(),frame);
         if(FILE_UTILITIES::File_Exists(frame_prefix+"stress_map_of_triangulated_area"+suffix)){
             if(first_time) LOG::cout<<"adding stress map to triangulated area"<<std::endl;
             ARRAY<OPENGL_COLOR > *color_map=new ARRAY<OPENGL_COLOR >;
@@ -132,7 +132,7 @@ Reinitialize(bool force)
 template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s%d/deformable_object_particles",prefix.c_str(),frame_input));
+    return FILE_UTILITIES::File_Exists(LOG::sprintf("%s%d/deformable_object_particles",prefix.c_str(),frame_input));
 }
 //#####################################################################
 // Function Set_Frame

@@ -7,6 +7,7 @@
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>

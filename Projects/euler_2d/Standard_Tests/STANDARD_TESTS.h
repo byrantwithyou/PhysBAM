@@ -194,11 +194,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
         state_right=TV_DIMENSION((T)1,(T)0,(T)0,(T)1.5e5);}
 
 
-    if(timesplit) output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-    else output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+    if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+    else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
-    if(spring_factor!=(T)1) output_directory=STRING_UTILITIES::string_sprintf("%s_spring_factor_%lf",output_directory.c_str(),spring_factor);
+    if(spring_factor!=(T)1) output_directory=LOG::sprintf("%s_spring_factor_%lf",output_directory.c_str(),spring_factor);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {
     BASE::Parse_Late_Options();
@@ -348,7 +348,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // Output, in gnuplot-parsable form, the surface of the mesh
     if(test_number==3){
-        std::string gnuplot_file=STRING_UTILITIES::string_sprintf("%s/common/gnuplot_data_0.dat",output_directory.c_str());
+        std::string gnuplot_file=LOG::sprintf("%s/common/gnuplot_data_0.dat",output_directory.c_str());
         std::ofstream gnuplot_surface_stream;
         gnuplot_surface_stream.open(gnuplot_file.c_str());
         boundary->mesh.Initialize_Ordered_Loop_Nodes();assert(boundary->mesh.ordered_loop_nodes->m==1);
@@ -405,7 +405,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     if(test_number!=3) return;
-    std::string gnuplot_file=STRING_UTILITIES::string_sprintf("%s/common/gnuplot_data_%d.dat",output_directory.c_str(),frame);
+    std::string gnuplot_file=LOG::sprintf("%s/common/gnuplot_data_%d.dat",output_directory.c_str(),frame);
     std::ofstream gnuplot_surface_stream;
     gnuplot_surface_stream.open(gnuplot_file.c_str());
 

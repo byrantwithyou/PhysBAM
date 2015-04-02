@@ -99,7 +99,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     last_frame=1000;
         
-    output_directory=STRING_UTILITIES::string_sprintf("DSD_No_Navier_Stokes/DSD_No_Navier_Stokes_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
+    output_directory=LOG::sprintf("DSD_No_Navier_Stokes/DSD_No_Navier_Stokes_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
     LOG::cout<<"Running DSD simulation to "<<output_directory<<std::endl;
 
     //sources

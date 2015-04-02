@@ -30,6 +30,7 @@
 
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Math_Tools/integer_log.h>
 #include <Tools/Matrices/QUATERNION.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
@@ -155,21 +156,21 @@ void Parse_Options()
     BASE::Parse_Options();
     tests.data_directory=data_directory;
     LOG::cout<<"Running Incompressible Test Number "<<test_number<<std::endl;
-    output_directory=STRING_UTILITIES::string_sprintf("Incompressible/Test_%d",test_number);
-    if(frame_rate!=24) output_directory+=STRING_UTILITIES::string_sprintf("_fr%g",frame_rate);
-    if(minimum_volume_recovery_time_scale) output_directory+=STRING_UTILITIES::string_sprintf("_mvrts%g",minimum_volume_recovery_time_scale);
+    output_directory=LOG::sprintf("Incompressible/Test_%d",test_number);
+    if(frame_rate!=24) output_directory+=LOG::sprintf("_fr%g",frame_rate);
+    if(minimum_volume_recovery_time_scale) output_directory+=LOG::sprintf("_mvrts%g",minimum_volume_recovery_time_scale);
     
-    if(test_poissons_ratio!=(T).5) output_directory+=STRING_UTILITIES::string_sprintf("_p%g",test_poissons_ratio);
-    if(hittime!=1) output_directory+=STRING_UTILITIES::string_sprintf("_ht%g",hittime);
+    if(test_poissons_ratio!=(T).5) output_directory+=LOG::sprintf("_p%g",test_poissons_ratio);
+    if(hittime!=1) output_directory+=LOG::sprintf("_ht%g",hittime);
     if(high_resolution) output_directory+="_hires";
     LOG::Stat("stiffen",stiffen);
-    if(stiffen!=1) output_directory+=STRING_UTILITIES::string_sprintf("_stiff%g",stiffen);
-    if(max_cg_iterations!=20) output_directory+=STRING_UTILITIES::string_sprintf("_cgi%d",max_cg_iterations);
-    if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7) output_directory+=STRING_UTILITIES::string_sprintf("_cgs%g",solids_cg_tolerance);
+    if(stiffen!=1) output_directory+=LOG::sprintf("_stiff%g",stiffen);
+    if(max_cg_iterations!=20) output_directory+=LOG::sprintf("_cgi%d",max_cg_iterations);
+    if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7) output_directory+=LOG::sprintf("_cgs%g",solids_cg_tolerance);
     if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7 && (test_number==7 || test_number==8 || test_number==10)) solids_cg_tolerance=(T)1e-2;
     if(merge_at_boundary) output_directory+="_bound";
     if(!use_neumann) output_directory+="_noneumann";
-    if(ground_friction) output_directory+=STRING_UTILITIES::string_sprintf("_fric%g",ground_friction);
+    if(ground_friction) output_directory+=LOG::sprintf("_fric%g",ground_friction);
     
     if(hittime!=1) tori_n=(int)hittime;
 

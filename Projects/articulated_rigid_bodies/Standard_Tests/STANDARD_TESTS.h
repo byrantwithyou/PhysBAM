@@ -166,7 +166,7 @@ public:
         ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
         BASE::Parse_Options();
         tests.data_directory=data_directory;
-        output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         if(arb.use_krylov_poststab) arb.use_poststab_in_cg=false;
         if(use_prestab_iterations) solids_parameters.rigid_body_collision_parameters.contact_iterations=arb.max_iterations;
     }
@@ -407,7 +407,7 @@ void Get_Initial_Data()
                         joint->Set_Joint_To_Parent_Frame(connections(k)->Frame()*joint_frame.Inverse());
                         joint->Set_Joint_To_Child_Frame(box->Frame()*joint_frame.Inverse());}}}
             break;}
-        default:PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
+        default:PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 }
 //#####################################################################
 // Function Initialize_Bodies
@@ -508,7 +508,7 @@ void PD_Curl(TV shift,ROTATION<TV> orient,const T k_p)
         child_body->Frame().t=orient.Rotate(TV(cheight,0,0))+shift;
         child_body->Frame().r=orient;
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
+        child_body->name=LOG::sprintf("child_%d",i);
 
         joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(child_body->particle_index-1,child_body->particle_index,joint);
         ROTATION<TV> desired_rotation=ROTATION<TV>(desired_x,TV(1,0,0));
@@ -550,7 +550,7 @@ void Muscle_Curl(TV shift,ROTATION<TV> orient)
         child->Frame().r=orient;
         child->Frame().t=shift;
         child->Set_Coefficient_Of_Restitution(0.5);
-        child->name=STRING_UTILITIES::string_sprintf("child_%d",i);
+        child->name=LOG::sprintf("child_%d",i);
 
         POINT_JOINT<TV>& joint=*new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(child->particle_index-1,child->particle_index,&joint);
         joint.Set_Joint_To_Parent_Frame(FRAME<TV>(radius,ROTATION<TV>(-(T)pi/2,TV(0,1,0))));
@@ -598,9 +598,9 @@ int Large_Cluster_Cube(FRAME<TV>shift_frame,T scale,const T friction)
     ARRAY<RIGID_BODY<TV>*>& bodies=*new ARRAY<RIGID_BODY<TV>*>(8);
     int count=0;
     for(int i=0;i<8;i++){
-//        bodies(i)->name=STRING_UTILITIES::string_sprintf("child::%d",bodies(i)));}
+//        bodies(i)->name=LOG::sprintf("child::%d",bodies(i)));}
         bodies(i)=&tests.Add_Rigid_Body("subdivided_box",1,friction);
-        bodies(i)->name=STRING_UTILITIES::string_sprintf("child::%d",bodies(i));}
+        bodies(i)->name=LOG::sprintf("child::%d",bodies(i));}
     for(int i=-1;i<=1;i+=2) for(int j=-1;j<=1;j+=2) for(int k=-1;k<=1;k+=2) bodies(++count)->Frame()=shift_frame*FRAME<TV>(TV((T)k,(T)j,(T)i));
     tests.Add_Gravity();
 //    cluster_id=rigid_body_particles.Add_Cluster_Body(&bodies);

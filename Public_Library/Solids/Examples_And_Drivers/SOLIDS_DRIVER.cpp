@@ -11,6 +11,7 @@
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Utilities/INTERRUPTS.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
@@ -71,7 +72,7 @@ Simulate_To_Frame(const int frame_input)
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         Postprocess_Frame(++current_frame);
         if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files(current_frame);
-        else if(example.write_substeps_level!=-1) Write_Substep(STRING_UTILITIES::string_sprintf("END Frame %d",current_frame),0,example.write_substeps_level);
+        else if(example.write_substeps_level!=-1) Write_Substep(LOG::sprintf("END Frame %d",current_frame),0,example.write_substeps_level);
         LOG::cout<<"TIME = "<<time<<std::endl;}
 }
 //#####################################################################
@@ -178,7 +179,7 @@ Advance_To_Target_Time(const T target_time)
 
         last_dt=restart_dt?restart_dt:dt;time+=last_dt;restart_dt=0;
 
-        Write_Substep(STRING_UTILITIES::string_sprintf("END Substep %d",substep),substep,0);}
+        Write_Substep(LOG::sprintf("END Substep %d",substep),substep,0);}
 }
 //#####################################################################
 // Function Setup_Solids
@@ -289,7 +290,7 @@ Compute_Dt(const T time,const T target_time,bool& done)
     if(example.max_dt){fluids_dt=min(fluids_dt,example.max_dt);solids_dt=min(solids_dt,example.max_dt);}
     T dt=min(fluids_dt,solids_dt);
     LOG::cout<<"dt = solids_dt = "<<dt<<std::endl;
-    if(example.abort_when_dt_below && dt<example.abort_when_dt_below) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("dt too small (%g < %g)",dt,example.abort_when_dt_below));
+    if(example.abort_when_dt_below && dt<example.abort_when_dt_below) PHYSBAM_FATAL_ERROR(LOG::sprintf("dt too small (%g < %g)",dt,example.abort_when_dt_below));
     done=false;
     SOLIDS_EXAMPLE<TV>::Clamp_Time_Step_With_Target_Time(time,target_time,dt,done,solids_parameters.min_dt);
     return dt;
@@ -302,7 +303,7 @@ Write_Output_Files(const int frame)
 {
     LOG::SCOPE scope("writing output files");
     FILE_UTILITIES::Create_Directory(example.output_directory);
-    FILE_UTILITIES::Create_Directory(example.output_directory+STRING_UTILITIES::string_sprintf("/%d",frame));
+    FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
     Write_First_Frame(frame);
 

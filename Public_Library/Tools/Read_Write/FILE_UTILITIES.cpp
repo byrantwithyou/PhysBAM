@@ -190,14 +190,14 @@ std::string filename=dirname+"/"+dummy_filename;bool success=!std::ofstream(file
 // Function Find_First_Nonexistent_File_In_Sequence
 //###################################################################
 std::string Find_First_Nonexistent_File_In_Sequence(std::string filename_pattern,const int id_start,int* id_result)
-{int id=id_start;while(File_Exists(STRING_UTILITIES::string_sprintf(filename_pattern.c_str(),id))) id++;
-if(id_result) *id_result=id;return STRING_UTILITIES::string_sprintf(filename_pattern.c_str(),id);}
+{int id=id_start;while(File_Exists(LOG::sprintf(filename_pattern.c_str(),id))) id++;
+if(id_result) *id_result=id;return LOG::sprintf(filename_pattern.c_str(),id);}
 //###################################################################
 // Function Find_First_Nonexistent_Directory_In_Sequence
 //###################################################################
 std::string Find_First_Nonexistent_Directory_In_Sequence(std::string directory_pattern,const int id_start,int* id_final)
-{int id=id_start;while(Directory_Exists(STRING_UTILITIES::string_sprintf(directory_pattern.c_str(),id))) id++;
-if(id_final) *id_final=id;return STRING_UTILITIES::string_sprintf(directory_pattern.c_str(),id);}
+{int id=id_start;while(Directory_Exists(LOG::sprintf(directory_pattern.c_str(),id))) id++;
+if(id_final) *id_final=id;return LOG::sprintf(directory_pattern.c_str(),id);}
 //###################################################################
 // Function Make_First_Nonexistent_Directory_In_Sequence
 //###################################################################
@@ -269,7 +269,7 @@ bool Is_Animated(const std::string &filename)
 {return filename.find("%d") != std::string::npos;}
 
 std::string Get_Frame_Filename(const std::string &filename,int frame)
-{return Is_Animated(filename)?STRING_UTILITIES::string_sprintf(filename.c_str(),frame):filename;}
+{return Is_Animated(filename)?LOG::sprintf(filename.c_str(),frame):filename;}
 
 bool Frame_File_Exists(const std::string &filename,int frame)
 {return File_Exists(Get_Frame_Filename(filename,frame));}

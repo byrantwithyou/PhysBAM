@@ -87,7 +87,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             last_frame=(int)(5*frame_rate);
             break;
     }
-    output_directory=STRING_UTILITIES::string_sprintf("Hair_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Hair_Tests/Test_%d",test_number);
     LOG::cout<<"output_directory="<<output_directory<<std::endl;
     volume_output_file.open("/home/mlentine/volumes.txt");
     

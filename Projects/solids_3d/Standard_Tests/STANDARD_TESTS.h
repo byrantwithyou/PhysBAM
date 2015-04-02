@@ -331,7 +331,7 @@ void Parse_Options()
     BASE::Parse_Options();
     tests.data_directory=data_directory;
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     frame_rate=24;
     
     T cloth_clamp_fraction=(T).03; // from curtain and ball
@@ -345,11 +345,11 @@ void Parse_Options()
     if(stiffness_multiplier!=1){
         if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=22 && test_number !=30 && test_number!=1){
             LOG::cerr<<"-stiffen not supported for example "<<test_number<<std::endl;exit(1);}
-        output_directory+=STRING_UTILITIES::string_sprintf("_stiffen%g",stiffness_multiplier);}
+        output_directory+=LOG::sprintf("_stiffen%g",stiffness_multiplier);}
     if(damping_multiplier!=1){
         if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=22 && test_number!=1){
             LOG::cerr<<"-dampen not supported for example "<<test_number<<std::endl;exit(1);}
-        output_directory+=STRING_UTILITIES::string_sprintf("_dampen%g",damping_multiplier);}
+        output_directory+=LOG::sprintf("_dampen%g",damping_multiplier);}
 
     solids_parameters.use_trapezoidal_rule_for_velocities=!use_be;
     solids_parameters.use_rigid_deformable_contact=true;
@@ -500,7 +500,7 @@ void Parse_Options()
             solids_parameters.triangle_collision_parameters.turn_off_all_collisions=true;
             break;
         case 24:{
-            if(test_24_poissons_ratio!=(T).5) output_directory+=STRING_UTILITIES::string_sprintf("_p%g",test_24_poissons_ratio);
+            if(test_24_poissons_ratio!=(T).5) output_directory+=LOG::sprintf("_p%g",test_24_poissons_ratio);
             break;}
         case 25:
             last_frame=(int)(6*frame_rate);
@@ -639,17 +639,17 @@ void Parse_Options()
         output_directory+="_noattractions";}
     
     if(opt_repulsion_pair_update_frequency){
-        output_directory+=STRING_UTILITIES::string_sprintf("_repulsionpairupdatefrequency=%d",solids_parameters.triangle_collision_parameters.repulsion_pair_update_frequency);}
+        output_directory+=LOG::sprintf("_repulsionpairupdatefrequency=%d",solids_parameters.triangle_collision_parameters.repulsion_pair_update_frequency);}
     
     if(opt_velocity_prune){
         //solids_parameters.collision_pair_velocity_pruning=true;
         output_directory+="_velocityprune";}
     
     if(opt_topological_hierarchy_build_frequency){
-        output_directory+=STRING_UTILITIES::string_sprintf("_topologicalhierarchybuildfrequency=%d",solids_parameters.triangle_collision_parameters.topological_hierarchy_build_frequency);}
+        output_directory+=LOG::sprintf("_topologicalhierarchybuildfrequency=%d",solids_parameters.triangle_collision_parameters.topological_hierarchy_build_frequency);}
     
     if(opt_side_panels){
-        output_directory+=STRING_UTILITIES::string_sprintf("_sidepanels=%d",number_side_panels);}
+        output_directory+=LOG::sprintf("_sidepanels=%d",number_side_panels);}
     cloth_triangles=2*number_side_panels*(int)(number_side_panels*aspect_ratio);
     
     if(opt_cloth_triangles){

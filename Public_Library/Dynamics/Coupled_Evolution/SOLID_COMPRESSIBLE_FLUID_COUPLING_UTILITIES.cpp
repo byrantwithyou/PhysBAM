@@ -7,6 +7,7 @@
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <Geometry/Basic_Geometry/POLYGON.h>
 #include <Geometry/Basic_Geometry/RAY.h>

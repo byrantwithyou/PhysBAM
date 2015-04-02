@@ -59,7 +59,7 @@ template<class T> OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 template<class T> bool OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(is_animation?STRING_UTILITIES::string_sprintf(height_filename.c_str(),frame_input):height_filename);
+    return FILE_UTILITIES::File_Exists(is_animation?LOG::sprintf(height_filename.c_str(),frame_input):height_filename);
 }
 //#####################################################################
 // Function Set_Frame
@@ -154,7 +154,7 @@ Display() const
                 OpenGL_End();
 
                 for(int i=0;i<grid.counts.x;i++)
-                    OpenGL_String(VECTOR<T,2>(grid.X(TV_INT(i)).x,scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
+                    OpenGL_String(VECTOR<T,2>(grid.X(TV_INT(i)).x,scale*height(i)),LOG::sprintf("%d",i));
 
                 if(selected_index>=0){
                     selected_point_color.Send_To_GL_Pipeline();
@@ -162,7 +162,7 @@ Display() const
                     OpenGL_Begin(GL_POINTS);
                     OpenGL_Vertex(VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i)));
                     OpenGL_End();
-                    OpenGL_String(VECTOR<T,2>(grid.X(TV_INT(i)).x,scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
+                    OpenGL_String(VECTOR<T,2>(grid.X(TV_INT(i)).x,scale*height(i)),LOG::sprintf("%d",i));
                 }
 
                 glPopAttrib();

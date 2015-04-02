@@ -105,8 +105,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.compressible_monitor_conservation_error=true;
 
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    if(timesplit) output_directory=STRING_UTILITIES::string_sprintf("Smooth_Flow/Test_1__Resolution_%d_semiimplicit",(fluids_parameters.grid->counts.x));
-    else output_directory=STRING_UTILITIES::string_sprintf("Smooth_Flow/Test_1__Resolution_%d_explicit",(fluids_parameters.grid->counts.x));
+    if(timesplit) output_directory=LOG::sprintf("Smooth_Flow/Test_1__Resolution_%d_semiimplicit",(fluids_parameters.grid->counts.x));
+    else output_directory=LOG::sprintf("Smooth_Flow/Test_1__Resolution_%d_explicit",(fluids_parameters.grid->counts.x));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
 }

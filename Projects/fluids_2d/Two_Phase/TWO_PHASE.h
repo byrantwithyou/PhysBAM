@@ -105,7 +105,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     GRID<TV>& grid=*fluids_parameters.grid;
     grid.Initialize(TV_INT(10*cells+1,20*cells+1),RANGE<TV>(TV((T)-.01,(T)-.01),TV((T).01,(T).02)));
 
-    output_directory=STRING_UTILITIES::string_sprintf("Two_Phase/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+    output_directory=LOG::sprintf("Two_Phase/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
     LOG::cout<<"output directory="<<output_directory<<std::endl;
 
     // set example-specific parameters

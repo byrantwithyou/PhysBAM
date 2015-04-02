@@ -341,7 +341,7 @@ Initialize_Tetrahedron_Collisions(const int id_number,const std::string& output_
     TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
     undeformed_triangulated_surface.Update_Triangle_List();
     undeformed_triangulated_surface.Initialize_Hierarchy();
-    std::string levelset_filename=STRING_UTILITIES::string_sprintf("%s/common/deformable_body_undeformed_levelset_%d.phi",output_directory.c_str(),id_number);
+    std::string levelset_filename=LOG::sprintf("%s/common/deformable_body_undeformed_levelset_%d.phi",output_directory.c_str(),id_number);
     LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Read_Or_Initialize_Implicit_Surface(levelset_filename,output_directory,undeformed_triangulated_surface);
     deformable_body_collection.collisions.collision_body_list.Add_Body(new TETRAHEDRON_COLLISION_BODY<T>(tetrahedralized_volume,undeformed_triangulated_surface,undeformed_levelset,triangulated_surface),0,true);
 }

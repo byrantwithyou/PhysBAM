@@ -77,7 +77,7 @@ Display() const
             glDisable(GL_DEPTH_TEST);
             (vector_color+OPENGL_COLOR(0.8,0.8,0.8)).Send_To_GL_Pipeline();
             for(int i=0;i<vector_locations.m;i++)
-                OpenGL_String(vector_locations(i)+(T)1.1*(T)size*vector_field(i),STRING_UTILITIES::string_sprintf("%.3f %.3f %.3f",vector_field(i).x,vector_field(i).y,vector_field(i).z));
+                OpenGL_String(vector_locations(i)+(T)1.1*(T)size*vector_field(i),LOG::sprintf("%.3f %.3f %.3f",vector_field(i).x,vector_field(i).y,vector_field(i).z));
             vector_color.Send_To_GL_Pipeline();
             glEnable(GL_DEPTH_TEST);}
         glPopAttrib();}

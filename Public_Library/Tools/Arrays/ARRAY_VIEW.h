@@ -8,7 +8,7 @@
 #define __ARRAY_VIEW__
 
 #include <Tools/Arrays/ARRAY_BASE.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
+#include <Tools/Log/LOG_PRINTF.h>
 #include <Tools/Utilities/EXCEPTIONS.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>
 namespace PhysBAM{
@@ -139,7 +139,7 @@ public:
     template<class RW>
     void Read(std::istream& input)
     {ID read_size;Read_Binary<RW>(input,read_size);
-    if(read_size!=Size()) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Expected size %d, read %d",Size(),read_size));
+    if(read_size!=Size()) throw READ_ERROR(LOG::sprintf("Expected size %d, read %d",Size(),read_size));
     Read_Binary_Array<RW>(input,Get_Array_Pointer(),Value(Size()));}
 
     template<class RW>

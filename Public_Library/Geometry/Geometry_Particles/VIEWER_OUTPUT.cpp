@@ -57,7 +57,7 @@ Flush_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const char* title
 
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 
-    std::string frame_directory=STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame);
+    std::string frame_directory=LOG::sprintf("%s/%i",output_directory.c_str(),frame);
     FILE_UTILITIES::Write_To_File(stream_type,frame_directory+"/mac_velocities.gz",face_velocities);
     if(title) FILE_UTILITIES::Write_To_Text_File(frame_directory+"/frame_title",title);
 

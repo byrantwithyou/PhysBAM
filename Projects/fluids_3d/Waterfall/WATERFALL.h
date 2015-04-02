@@ -80,7 +80,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
     fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
     fluids_parameters.write_debug_data=true;
-    output_directory=STRING_UTILITIES::string_sprintf("Waterfall/Test_%d_Waterfall_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
+    output_directory=LOG::sprintf("Waterfall/Test_%d_Waterfall_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
         (fluids_parameters.grid->counts.z-1));
     fluids_parameters.delete_fluid_inside_objects=true;
     fluids_parameters.enforce_divergence_free_extrapolation=false;

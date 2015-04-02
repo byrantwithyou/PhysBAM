@@ -161,7 +161,7 @@ Capture_Frames(const std::string& filename_pattern,int capture_start_frame,int c
     Set_Frame(capture_start_frame);
     for(;;){
         if(use_eps){
-            std::string filename=STRING_UTILITIES::string_sprintf(filename_pattern.c_str(),frame);
+            std::string filename=LOG::sprintf(filename_pattern.c_str(),frame);
             opengl_eps_output=new OPENGL_EPS_OUTPUT<float>(filename);}
         opengl_world.Render_World(false,swap_buffers);
         glFinish();
@@ -171,7 +171,7 @@ Capture_Frames(const std::string& filename_pattern,int capture_start_frame,int c
             opengl_world.Get_Image(image,swap_buffers);
             if(mov) mov->Add_Frame(image);}
         else if(!use_eps){
-            std::string filename=STRING_UTILITIES::string_sprintf(filename_pattern.c_str(),frame);
+            std::string filename=LOG::sprintf(filename_pattern.c_str(),frame);
             LOG::cout<<"Capturing frame "<<frame<<" to "<<filename<<std::endl;
             opengl_world.Save_Screen(filename,swap_buffers,jpeg_quality);}
         else{delete opengl_eps_output;opengl_eps_output=0;}
@@ -225,7 +225,7 @@ template<class T> void ANIMATED_VISUALIZATION<T>::
 Update_OpenGL_Strings()
 {
     opengl_world.Clear_Strings();
-    if(animation_enabled) opengl_world.Add_String(STRING_UTILITIES::string_sprintf("frame %d",frame)+(frame_title.empty()?"":": "+frame_title));
+    if(animation_enabled) opengl_world.Add_String(LOG::sprintf("frame %d",frame)+(frame_title.empty()?"":": "+frame_title));
     BASIC_VISUALIZATION<T>::Update_OpenGL_Strings();
 }
 //#####################################################################
@@ -321,7 +321,7 @@ Capture_Frames_Prompt()
     if(capture_frames_prompt_state.step==0){
         if(!opengl_world.prompt_response.empty()) capture_frames_prompt_state.filename_pattern=opengl_world.prompt_response;
         capture_frames_prompt_state.step=1;
-        opengl_world.Prompt_User(STRING_UTILITIES::string_sprintf("Start frame [%d]: ",start_frame),capture_frames_prompt_cb,"");}
+        opengl_world.Prompt_User(LOG::sprintf("Start frame [%d]: ",start_frame),capture_frames_prompt_cb,"");}
     else if(capture_frames_prompt_state.step==1){
         if(!opengl_world.prompt_response.empty()) STRING_UTILITIES::String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.start_frame);
         capture_frames_prompt_state.step=2;
@@ -330,7 +330,7 @@ Capture_Frames_Prompt()
         if(!opengl_world.prompt_response.empty()) STRING_UTILITIES::String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.end_frame);
         capture_frames_prompt_state.step=3;
         if(STRING_UTILITIES::toupper(FILE_UTILITIES::Get_File_Extension(capture_frames_prompt_state.filename_pattern))=="JPG")
-            opengl_world.Prompt_User(STRING_UTILITIES::string_sprintf("JPEG quality [%d]: ",jpeg_quality),capture_frames_prompt_cb,"");
+            opengl_world.Prompt_User(LOG::sprintf("JPEG quality [%d]: ",jpeg_quality),capture_frames_prompt_cb,"");
         else done=true;}
     else if(capture_frames_prompt_state.step==3){
         if(opengl_world.prompt_response.empty()) STRING_UTILITIES::String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.jpeg_quality);
@@ -339,7 +339,7 @@ Capture_Frames_Prompt()
     if(done){
         Capture_Frames(capture_frames_prompt_state.filename_pattern,capture_frames_prompt_state.start_frame,capture_frames_prompt_state.end_frame,
             capture_frames_prompt_state.jpeg_quality);
-        if(system(STRING_UTILITIES::string_sprintf("pbp %s &",capture_frames_prompt_state.filename_pattern.c_str()).c_str())){};}
+        if(system(LOG::sprintf("pbp %s &",capture_frames_prompt_state.filename_pattern.c_str()).c_str())){};}
 }
 //#####################################################################
 // Function Capture_Frames

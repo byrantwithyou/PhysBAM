@@ -8,6 +8,7 @@
 #ifndef __WIND_TUNNEL__
 #define __WIND_TUNNEL__
 
+#include <Tools/Log/SCOPE.h>
 #include <fstream>
 #include <iostream>
 #include "math.h"
@@ -140,9 +141,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     wall_thickness=(T).1;
     if(timesplit)
-        output_directory=STRING_UTILITIES::string_sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+        output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
     else
-        output_directory=STRING_UTILITIES::string_sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+        output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
 }

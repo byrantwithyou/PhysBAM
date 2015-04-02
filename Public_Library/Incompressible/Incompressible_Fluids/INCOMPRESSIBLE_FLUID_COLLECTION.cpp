@@ -29,7 +29,7 @@ template<class TV> INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
 template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
 Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
 {
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
 }
 //#####################################################################
@@ -38,7 +38,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
 template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
 Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame)
 {
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     std::string filename=output_directory+"/"+f+"/mac_velocities";
     std::string centered_velocity_filename=output_directory+"/"+f+"/centered_velocities";
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;

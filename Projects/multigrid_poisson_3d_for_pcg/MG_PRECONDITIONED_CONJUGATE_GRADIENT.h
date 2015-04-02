@@ -8,6 +8,7 @@
 #define __MG_PRECONDITIONED_CONJUGATE_GRADIENT__
 
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <cfloat>
 #include <limits>
 #include "MULTIGRID_POISSON.h"

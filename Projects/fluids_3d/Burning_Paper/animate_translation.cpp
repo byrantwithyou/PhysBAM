@@ -27,7 +27,7 @@ template<class T,class RW> void Process(int argc,char* argv[])
     parse_args.Extra(&frame,"frame","frame");
     parse_args.Parse();
 
-    std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);
+    std::string f=LOG::sprintf(".%d",frame);
     LOG::cout<<"frame = "<<frame<<", translation = "<<Translation_Vector<T>(frame)<<std::endl;
 
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output("animated_translation"+f,false);    

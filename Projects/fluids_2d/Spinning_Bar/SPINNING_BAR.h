@@ -60,7 +60,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     first_frame=0;last_frame=2000;
     frame_rate=24;
     restart=false;restart_frame=18;
-    output_directory=STRING_UTILITIES::string_sprintf("Spinning_Bar/output_%d",resolution);
+    output_directory=LOG::sprintf("Spinning_Bar/output_%d",resolution);
     fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false; 
     fluids_parameters.number_particles_per_cell=32;
     fluids_parameters.particle_half_bandwidth=1; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -86,7 +86,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     //use_external_velocity=true;
 
     fluids_parameters.viscosity=0;//(T)25;
-    if(fluids_parameters.viscosity) output_directory+=STRING_UTILITIES::string_sprintf("_v%g",fluids_parameters.viscosity);
+    if(fluids_parameters.viscosity) output_directory+=LOG::sprintf("_v%g",fluids_parameters.viscosity);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

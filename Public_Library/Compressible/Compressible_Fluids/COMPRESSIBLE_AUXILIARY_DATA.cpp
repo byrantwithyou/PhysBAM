@@ -57,7 +57,7 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
                 momentum_flux.Component(axis)(face_index)=fluxes->Component(axis)(face_index)(1);
                 energy_flux.Component(axis)(face_index)=fluxes->Component(axis)(face_index)(TV::m+1);}}}
 
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     if(write_debug_data){
         GRADIENT::Compute_Magnitude(grid,number_of_ghost_cells,density,density_gradient);
         GRADIENT::Compute_Magnitude(grid,number_of_ghost_cells,pressure,pressure_gradient);

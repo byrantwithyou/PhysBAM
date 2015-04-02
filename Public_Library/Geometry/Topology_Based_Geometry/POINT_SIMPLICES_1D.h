@@ -54,7 +54,7 @@ public:
 
     virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
     static std::string Static_Name()
-    {return STRING_UTILITIES::string_sprintf("SIMPLICIAL_OBJECT<T,VECTOR<T,%d>,0>",TV::dimension);}
+    {return LOG::sprintf("SIMPLICIAL_OBJECT<T,VECTOR<T,%d>,0>",TV::dimension);}
 
     virtual std::string Extension() const PHYSBAM_OVERRIDE {return Static_Extension();}
     static std::string Static_Extension() 

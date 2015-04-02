@@ -55,7 +55,7 @@ public:
     virtual int Number_Of_Tests() const=0;
 
     virtual std::string Identify_Test(int n) const
-    {return STRING_UTILITIES::string_sprintf("%s %i",name.c_str(),n);}
+    {return LOG::sprintf("%s %i",name.c_str(),n);}
 
     static TEST_BASE* Lookup_Test_Suite(std::string test_name)
     {TEST_BASE* test;if(!Test_Registry().Get(test_name,test)) return 0;return test;}

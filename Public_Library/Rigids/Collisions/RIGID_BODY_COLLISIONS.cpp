@@ -6,6 +6,7 @@
 #include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Data_Structures/STACK.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/SCOPE.h>
 #include <Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>

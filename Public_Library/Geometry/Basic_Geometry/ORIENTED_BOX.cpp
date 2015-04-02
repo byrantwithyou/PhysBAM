@@ -6,7 +6,6 @@
 //##################################################################### 
 #include <Tools/Auto_Diff/AUTO_DIFF.h>
 #include <Tools/Auto_Diff/AUTO_HESS.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 namespace PhysBAM{
 //#####################################################################
@@ -120,7 +119,7 @@ Hessian(const TV& X) const
 template<class TV> std::string ORIENTED_BOX<TV>::
 Name()
 {   
-    return STRING_UTILITIES::string_sprintf("ORIENTED_BOX<VECTOR<T,%d>",d);
+    return LOG::sprintf("ORIENTED_BOX<VECTOR<T,%d>",d);
 }
 //#####################################################################
 #define INSTANTIATION_HELPER(T,d) \

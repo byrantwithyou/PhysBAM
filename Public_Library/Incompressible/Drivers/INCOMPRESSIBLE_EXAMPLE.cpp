@@ -39,7 +39,7 @@ template<class TV> INCOMPRESSIBLE_EXAMPLE<TV>::
 template<class TV> void INCOMPRESSIBLE_EXAMPLE<TV>::
 Write_Output_Files(const int frame)
 {
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/grid",mac_grid);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
@@ -62,7 +62,7 @@ Write_Output_Files(const int frame)
 template<class TV> void INCOMPRESSIBLE_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/density",density);
     std::string filename;
     filename=output_directory+"/"+f+"/mac_velocities";

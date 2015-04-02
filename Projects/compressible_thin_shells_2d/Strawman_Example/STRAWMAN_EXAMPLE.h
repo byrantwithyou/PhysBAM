@@ -9,7 +9,6 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Read_Write/TYPED_STREAM.h>
 #include <Geometry/Basic_Geometry/LINE_2D.h>
@@ -135,7 +134,7 @@ virtual void Parse_Options() PHYSBAM_OVERRIDE
     else method=NEW_GFM;
 
     advection_scheme.Set_Order(order);
-    output_directory=STRING_UTILITIES::string_sprintf("Strawman_Example/Solution_%f_Resolution_%d_Order_%d",fluid_tangential_velocity,resolution,order);
+    output_directory=LOG::sprintf("Strawman_Example/Solution_%f_Resolution_%d_Order_%d",fluid_tangential_velocity,resolution,order);
     switch(method){
       case ANALYTIC:output_directory+="_Analytic";break;
       case EXTRAPOLATION:output_directory+="_Extrapolated";break;
@@ -381,7 +380,7 @@ T Compute_Dt(const T time,const T target_time,bool& done) const
 //#####################################################################
 void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
 {
-    std::string frame_folder=output_directory+STRING_UTILITIES::string_sprintf("/%d/",frame);
+    std::string frame_folder=output_directory+LOG::sprintf("/%d/",frame);
     if(frame==0) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/transverse_velocity",fluid_tangential_velocity);
 
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/center_velocities",velocity);
@@ -394,16 +393,16 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     { // PLS
         const PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=pls_evolution->Particle_Levelset(0);
         FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"levelset",particle_levelset.levelset);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s",frame_folder.c_str(),"positive_particles"),particle_levelset.positive_particles);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s",frame_folder.c_str(),"negative_particles"),particle_levelset.negative_particles);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s",frame_folder.c_str(),"removed_positive_particles"),particle_levelset.removed_positive_particles);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s",frame_folder.c_str(),"removed_negative_particles"),particle_levelset.removed_negative_particles);
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%s",frame_folder.c_str(),"positive_particles"),particle_levelset.positive_particles);
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%s",frame_folder.c_str(),"negative_particles"),particle_levelset.negative_particles);
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%s",frame_folder.c_str(),"removed_positive_particles"),particle_levelset.removed_positive_particles);
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%s",frame_folder.c_str(),"removed_negative_particles"),particle_levelset.removed_negative_particles);
         FILE_UTILITIES::Write_To_Text_File(frame_folder+"last_unique_particle_id",particle_levelset.last_unique_particle_id);
 
         FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/psi_N",face_valid_mask);
     }
 
-    FILE_UTILITIES::Write_To_Text_File(output_directory+STRING_UTILITIES::string_sprintf("/%d/frame_title",frame),frame_title);
+    FILE_UTILITIES::Write_To_Text_File(output_directory+LOG::sprintf("/%d/frame_title",frame),frame_title);
 }
 //#####################################################################
 };

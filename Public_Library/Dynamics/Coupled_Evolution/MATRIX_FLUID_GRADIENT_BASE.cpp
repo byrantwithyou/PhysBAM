@@ -92,7 +92,7 @@ Test_Matrix() const
 template<class TV> void MATRIX_FLUID_GRADIENT_BASE<TV>::
 Print_Each_Matrix(int n) const
 {
-    OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("G-%i.txt",n).c_str()).Write("G",gradient);
+    OCTAVE_OUTPUT<T>(LOG::sprintf("G-%i.txt",n).c_str()).Write("G",gradient);
 }
 //#####################################################################
 // Function Add_Raw_Matrix

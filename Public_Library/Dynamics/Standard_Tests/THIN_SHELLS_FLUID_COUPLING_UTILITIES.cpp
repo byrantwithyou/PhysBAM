@@ -277,7 +277,7 @@ Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T,3> >& example,const 
 template<class T> void THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::
 Set_Deformable_Object_Parameters_2D(const int id,T& density,PARAMETER_LIST& parameter_list)
 {
-    std::string prefix=STRING_UTILITIES::string_sprintf("deformable_object_%d",id);
+    std::string prefix=LOG::sprintf("deformable_object_%d",id);
     parameter_list.Get_Parameter_In_Place(prefix+".density",density);
 }
 //#####################################################################
@@ -286,7 +286,7 @@ Set_Deformable_Object_Parameters_2D(const int id,T& density,PARAMETER_LIST& para
 template<class T> void THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::
 Set_Deformable_Object_Parameters_3D(const int id,T& edge_stiffness_scaling,T& altitude_stiffness_scaling,T& density,PARAMETER_LIST& parameter_list)
 {
-    std::string prefix=STRING_UTILITIES::string_sprintf("deformable_object_%d",id);
+    std::string prefix=LOG::sprintf("deformable_object_%d",id);
     parameter_list.Get_Parameter_In_Place(prefix+".edge_stiffness_scaling",edge_stiffness_scaling);
     parameter_list.Get_Parameter_In_Place(prefix+".altitude_stiffness_scaling",altitude_stiffness_scaling);
     parameter_list.Get_Parameter_In_Place(prefix+".density",density);
@@ -297,7 +297,7 @@ Set_Deformable_Object_Parameters_3D(const int id,T& edge_stiffness_scaling,T& al
 template<class T> void THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::
 Set_Rigid_Body_Parameters_2D(const int id,T& density,PARAMETER_LIST& parameter_list)
 {
-    std::string prefix=STRING_UTILITIES::string_sprintf("rigid_body_%d",id);
+    std::string prefix=LOG::sprintf("rigid_body_%d",id);
     parameter_list.Get_Parameter_In_Place(prefix+".density",density);
 }
 //#####################################################################
@@ -306,7 +306,7 @@ Set_Rigid_Body_Parameters_2D(const int id,T& density,PARAMETER_LIST& parameter_l
 template<class T> void THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::
 Set_Rigid_Body_Parameters_3D(const int id,T& density,PARAMETER_LIST& parameter_list)
 {
-    std::string prefix=STRING_UTILITIES::string_sprintf("rigid_body_%d",id);
+    std::string prefix=LOG::sprintf("rigid_body_%d",id);
     parameter_list.Get_Parameter_In_Place(prefix+".density",density);
 }
 //#####################################################################

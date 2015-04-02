@@ -5,7 +5,6 @@
 // Class FLUID_TO_SOLID_INTERPOLATION
 //##################################################################### 
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
@@ -89,7 +88,7 @@ Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,ARRAY<T>& fluid_
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION<TV>::
 Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const
 {
-    OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("H-%i.txt",n).c_str());
+    OCTAVE_OUTPUT<T> oo(LOG::sprintf("H-%i.txt",n).c_str());
     oo.Begin_Sparse_Matrix("H",G.Raw_Size(),fluid_faces);
     ARRAY<int> reverse_map_deformable(G.V.array.Size());
     reverse_map_deformable.Subset(G.V.indices)=IDENTITY_ARRAY<>(G.V.Size());

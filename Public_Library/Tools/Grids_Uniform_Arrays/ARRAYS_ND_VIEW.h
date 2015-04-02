@@ -10,7 +10,6 @@
 #include <Tools/Arrays/ARRAY_VIEW.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND_BASE.h>
 #include <Tools/Math_Tools/exchange.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <Tools/Utilities/EXCEPTIONS.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>

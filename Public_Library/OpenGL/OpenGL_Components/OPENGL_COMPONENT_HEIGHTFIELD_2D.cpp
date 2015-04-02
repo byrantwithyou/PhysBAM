@@ -82,7 +82,7 @@ template<class T> OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
 template<class T> bool OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(is_animation?STRING_UTILITIES::string_sprintf(height_filename.c_str(),frame_input):height_filename);
+    return FILE_UTILITIES::File_Exists(is_animation?LOG::sprintf(height_filename.c_str(),frame_input):height_filename);
 }
 //#####################################################################
 // Function Set_Frame

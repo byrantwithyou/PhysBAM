@@ -114,7 +114,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     grid.Initialize(TV_INT(10*cells+1,20*cells+1),RANGE<TV>(TV((T)-.05,0),TV((T).05,(T).2)));
     //grid.Initialize(TV_INT(15*cells+1,20*cells+1),RANGE<TV>(TV((T)-.075,0),TV((T).075,(T).2)));
 
-    output_directory=STRING_UTILITIES::string_sprintf("Glass/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+    output_directory=LOG::sprintf("Glass/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
         
     random.Set_Seed(1);
     particle_id=0;

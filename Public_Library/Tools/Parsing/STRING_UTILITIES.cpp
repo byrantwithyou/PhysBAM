@@ -104,16 +104,6 @@ bool IEnds_With(const std::string& input,const std::string& test)
     return test_index==0;
 }
 
-std::string string_sprintf(const char *format_string,...) // Assumes a max string length of 2048, since Windows doesn't support safety
-{
-    static char tmp[2048];
-    va_list marker;
-    va_start(marker,format_string);
-    vsprintf(tmp,format_string,marker);
-    va_end(marker);
-    return tmp;
-}
-
 //#####################################################################
 }
 }

@@ -48,13 +48,13 @@ template<class T> void PNG_FILE<T>::
 Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
 {
     FILE* file=fopen(filename.c_str(),"rb");
-    if(!file) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Failed to open %s for reading",filename.c_str()));
+    if(!file) throw READ_ERROR(LOG::sprintf("Failed to open %s for reading",filename.c_str()));
 
     png_structp png_ptr=png_create_read_struct(PNG_LIBPNG_VER_STRING,0,0,0);
-    if(!png_ptr) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Error reading png file %s",filename.c_str()));
+    if(!png_ptr) throw READ_ERROR(LOG::sprintf("Error reading png file %s",filename.c_str()));
     png_infop info_ptr=png_create_info_struct(png_ptr);
-    if(!info_ptr) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Error reading png file %s",filename.c_str()));
-    if(setjmp(png_jmpbuf(png_ptr))) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Error reading png file %s",filename.c_str()));
+    if(!info_ptr) throw READ_ERROR(LOG::sprintf("Error reading png file %s",filename.c_str()));
+    if(setjmp(png_jmpbuf(png_ptr))) throw READ_ERROR(LOG::sprintf("Error reading png file %s",filename.c_str()));
     png_init_io(png_ptr,file);
     png_read_png(png_ptr,info_ptr,PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_STRIP_ALPHA | PNG_TRANSFORM_PACKING,0);
     int width=png_get_image_width(png_ptr,info_ptr),height=png_get_image_height(png_ptr,info_ptr);
@@ -78,13 +78,13 @@ template<class T> template<int d> void PNG_FILE<T>::
 Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
 {  
     FILE* file=fopen(filename.c_str(),"wb");
-    if(!file) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Failed to open %s for writing",filename.c_str()));
+    if(!file) PHYSBAM_FATAL_ERROR(LOG::sprintf("Failed to open %s for writing",filename.c_str()));
 
     png_structp png_ptr=png_create_write_struct(PNG_LIBPNG_VER_STRING,0,0,0);
-    if(!png_ptr) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Error writing png file %s",filename.c_str()));
+    if(!png_ptr) PHYSBAM_FATAL_ERROR(LOG::sprintf("Error writing png file %s",filename.c_str()));
     png_infop info_ptr=png_create_info_struct(png_ptr);
-    if(!info_ptr) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Error writing png file %s",filename.c_str()));
-    if(setjmp(png_jmpbuf(png_ptr))) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Error writing png file %s",filename.c_str()));
+    if(!info_ptr) PHYSBAM_FATAL_ERROR(LOG::sprintf("Error writing png file %s",filename.c_str()));
+    if(setjmp(png_jmpbuf(png_ptr))) PHYSBAM_FATAL_ERROR(LOG::sprintf("Error writing png file %s",filename.c_str()));
     png_init_io(png_ptr,file);
     int color_type;
     switch(d){case 3:color_type=PNG_COLOR_TYPE_RGB;break;case 4:color_type=PNG_COLOR_TYPE_RGBA;break;

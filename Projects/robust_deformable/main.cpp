@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
@@ -199,12 +200,12 @@ int main(int argc,char* argv[])
 
     simulation.solid_body_collection.Update_Simulated_Particles();
 
-    vo.Flush_Frame(STRING_UTILITIES::string_sprintf("frame %d",0).c_str());
+    vo.Flush_Frame(LOG::sprintf("frame %d",0).c_str());
     simulation.solid_body_collection.Write(stream_type,output_directory,0,-1,true,true,true,true,false);
     for(int frame=1;frame<=steps;frame++)
     {
         simulation.Advance_One_Time_Step_Position(dt);
-        vo.Flush_Frame(STRING_UTILITIES::string_sprintf("frame %d",frame).c_str());
+        vo.Flush_Frame(LOG::sprintf("frame %d",frame).c_str());
         simulation.solid_body_collection.Write(stream_type,output_directory,frame,-1,true,true,true,true,false);
     }
 

@@ -39,7 +39,7 @@ public:
 
     std::string Get_Output_Filename(const int frame)
     {std::string filename;
-    filename=STRING_UTILITIES::string_sprintf(output_filename.c_str(),frame);
+    filename=LOG::sprintf(output_filename.c_str(),frame);
     if(keep_old_files && FILE_UTILITIES::File_Exists(filename)){
         std::string test_filename;
         for(int i=1;;i++){
@@ -50,7 +50,7 @@ public:
 
     std::string Get_Alpha_Filename(const int frame)
     {std::string filename;
-    filename=STRING_UTILITIES::string_sprintf(alpha_filename.c_str(),frame);
+    filename=LOG::sprintf(alpha_filename.c_str(),frame);
     if(keep_old_files && FILE_UTILITIES::File_Exists(filename)){
         std::string test_filename;
         for(int i=1;;i++){

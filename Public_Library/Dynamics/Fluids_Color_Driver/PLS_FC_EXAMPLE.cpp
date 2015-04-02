@@ -65,7 +65,7 @@ template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Write_Output_Files(const int frame)
 {
     if(!write_output_files) return;
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     ARRAY<T,FACE_INDEX<TV::dimension> > V(face_velocities(0).domain_indices);
     Merge_Velocities(V,face_velocities,face_color);
 
@@ -73,17 +73,17 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
     // particle levelset
     for(int i=0;i<number_of_colors;i++){
-        std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f;
+        std::string ii=LOG::sprintf("%d",i),i_dot_f=ii+"."+f;
         PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=*particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/levelset_%d",output_directory.c_str(),frame,i),particle_levelset.levelset);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.positive_particles);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.negative_particles);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/removed_positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_positive_particles);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/removed_negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_negative_particles);
-        FILE_UTILITIES::Write_To_Text_File(STRING_UTILITIES::string_sprintf("%s/%d/last_unique_particle_id_%d",output_directory.c_str(),frame,i),particle_levelset.last_unique_particle_id);}
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset_%d",output_directory.c_str(),frame,i),particle_levelset.levelset);
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.positive_particles);
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.negative_particles);
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/removed_positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_positive_particles);
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/removed_negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_negative_particles);
+        FILE_UTILITIES::Write_To_Text_File(LOG::sprintf("%s/%d/last_unique_particle_id_%d",output_directory.c_str(),frame,i),particle_levelset.last_unique_particle_id);}
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
-    if(save_pressure) FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/pressure",output_directory.c_str(),frame),pressure);
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
+    if(save_pressure) FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/pressure",output_directory.c_str(),frame),pressure);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
         time,face_color,prev_face_color,face_velocities,prev_face_velocities);
 }
 //#####################################################################
@@ -92,18 +92,18 @@ Write_Output_Files(const int frame)
 template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
 Read_Output_Files(const int frame)
 {
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     for(int i=0;i<number_of_colors;i++){
-        std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f;
+        std::string ii=LOG::sprintf("%d",i),i_dot_f=ii+"."+f;
         PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=*particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/levelset_%d",output_directory.c_str(),frame,i),particle_levelset.levelset);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.positive_particles);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.negative_particles);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/removed_positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_positive_particles);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/removed_negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_negative_particles);
-        FILE_UTILITIES::Read_From_Text_File(STRING_UTILITIES::string_sprintf("%s/%d/last_unique_particle_id_%d",output_directory.c_str(),frame,i),particle_levelset.last_unique_particle_id);}
-    if(save_pressure) FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/pressure",output_directory.c_str(),frame),pressure);
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/levelset_%d",output_directory.c_str(),frame,i),particle_levelset.levelset);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.positive_particles);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.negative_particles);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/removed_positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_positive_particles);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/removed_negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_negative_particles);
+        FILE_UTILITIES::Read_From_Text_File(LOG::sprintf("%s/%d/last_unique_particle_id_%d",output_directory.c_str(),frame,i),particle_levelset.last_unique_particle_id);}
+    if(save_pressure) FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/pressure",output_directory.c_str(),frame),pressure);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
         time,face_color,prev_face_color,face_velocities,prev_face_velocities);
 }
 //#####################################################################

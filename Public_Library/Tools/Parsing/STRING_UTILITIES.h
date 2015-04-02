@@ -32,8 +32,6 @@ bool Parse_Integer_List(const std::string& str,ARRAY<int>& integer_list);
 std::string Join(const std::string& separator,const ARRAY<std::string>& tokens);
 void Split(const std::string& str,const std::string& separator,ARRAY<std::string>& tokens);
 
-std::string string_sprintf(const char *format_string,...); // Assumes a max string length of 2048, since Windows doesn't support safety
-
 template<class T> inline bool String_To_Value(const std::string& str,T& value) // requires operator>>
 {std::istringstream string_stream(str);string_stream>>value;return !string_stream.fail();}
 

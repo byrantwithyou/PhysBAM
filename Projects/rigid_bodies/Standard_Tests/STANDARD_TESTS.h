@@ -153,10 +153,10 @@ public:
     {
         BASE::Parse_Options();
         tests.data_directory=data_directory;
-        output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
 
-        if(small_block_mass!=1) output_directory+=STRING_UTILITIES::string_sprintf("_m%g",small_block_mass);
-        if(parameter) output_directory+=STRING_UTILITIES::string_sprintf("_param%i",parameter);
+        if(small_block_mass!=1) output_directory+=LOG::sprintf("_m%g",small_block_mass);
+        if(parameter) output_directory+=LOG::sprintf("_param%i",parameter);
     }
     
     void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
@@ -262,7 +262,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
       case 33: Collision_Contact_Pairs_Test();break;
       case 34: Deforming_Sphere();break;
       case 35: Cluster_Fracture();break;
-      default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
+      default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
     
     // add forces
     if(test_number==16){
@@ -288,7 +288,7 @@ void Bounce(const T angle)
     for(int i=0;i<100;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",1,(T).5);
         rigid_body.Frame().t=TV(0,5*i,0);rigid_body.Set_Coefficient_Of_Restitution(.1);
-        rigid_body.name=STRING_UTILITIES::string_sprintf("sphere %i",i);}
+        rigid_body.name=LOG::sprintf("sphere %i",i);}
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,0,1,1);
     ground.Frame().r=ROTATION<TV>(angle,TV(0,0,1));
@@ -306,7 +306,7 @@ void Nonconvex_Bounce()
         rigid_body.Frame().t=TV(x_pos[i],5,0);
         rigid_body.Frame().r=ROTATION<TV>(z_angle[i],TV(0,0,1))*ROTATION<TV>((T)-0.5,TV(1,0,0))*ROTATION<TV>((T)pi,TV(0,1,0));
         rigid_body.Set_Coefficient_Of_Restitution(cor[i]);
-        rigid_body.name=STRING_UTILITIES::string_sprintf("bone (cor %g)",cor[i]);}
+        rigid_body.name=LOG::sprintf("bone (cor %g)",cor[i]);}
 
     tests.Add_Ground((T).5,0,1);
 }
@@ -322,7 +322,7 @@ void Billiard_Balls()
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",(T)1,mu);
         rigid_body.Frame().t=TV((T)(k?2*(k-(number+1)/2):-30),1,0);
         if(!k) rigid_body.Twist().linear=TV(20,0,0);
-        rigid_body.name=STRING_UTILITIES::string_sprintf("sphere%d",k);
+        rigid_body.name=LOG::sprintf("sphere%d",k);
         rigid_body.Set_Coefficient_Of_Restitution(cor);}
 
     tests.Add_Ground((T)1,0,0).Set_Coefficient_Of_Rolling_Friction(1);
@@ -461,7 +461,7 @@ void Plank()
         rigid_body->Frame().t=TV(x_pos[i],baseboxsize+y_pos[i],z_pos[i]);
         rigid_body->Set_Coefficient_Of_Restitution(stack_epsilon);
         rigid_body->Set_Mass(smallboxmass);
-        rigid_body->name=STRING_UTILITIES::string_sprintf("stack box %s",name[i]);}
+        rigid_body->name=LOG::sprintf("stack box %s",name[i]);}
     rigid_body->Frame().r=ROTATION<TV>((T)pi/4,TV(0,1,0));
 
     rigid_body=&tests.Add_Rigid_Body(boxfile,1,1);
@@ -523,7 +523,7 @@ void Ring_Test()
         for(int j=0;j<poles;j++){
             // Poles
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
-            rigid_body.name=STRING_UTILITIES::string_sprintf("pole %d %d",i,j);
+            rigid_body.name=LOG::sprintf("pole %d %d",i,j);
             rigid_body.is_static=true;
             rigid_body.Frame().t=TV((i-(poles+1)/(T)2)*7,10,(j-(poles+1)/(T)2)*7);}
 
@@ -1036,7 +1036,7 @@ void Removed_Bodies()
         bodies.Append(&tests.Add_Rigid_Body("subdivided_box",(T)1,(T).5));
         bodies(i)->Frame().t=TV(0,i,0);
         bodies(i)->Set_Coefficient_Of_Restitution((T).5);
-        bodies(i)->name=STRING_UTILITIES::string_sprintf("box-%i",i);}
+        bodies(i)->name=LOG::sprintf("box-%i",i);}
     for(int i=1;i<=20;i+=2) solid_body_collection.rigid_body_collection.rigid_body_particles.Remove_Body(bodies(i)->particle_index);
     tests.Add_Ground();
 }
@@ -1051,7 +1051,7 @@ void Kinematic_Collision()
         bodies.Append(&tests.Add_Rigid_Body("subdivided_box",(T)1,(T).5));
         bodies(i)->Frame().t=TV(0,2*i-1,0);
         bodies(i)->Set_Coefficient_Of_Restitution((T).5);
-        bodies(i)->name=STRING_UTILITIES::string_sprintf("box-%i",i);}
+        bodies(i)->name=LOG::sprintf("box-%i",i);}
 
     RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("sphere_66k",(T).5,(T).5);
     rigid_body->Set_Coefficient_Of_Restitution((T).5);
@@ -1078,7 +1078,7 @@ void Drop_Cubes()
         RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("subdivided_box",(T)1,(T).5);
         children.Append(rigid_body->particle_index);
         rigid_body->Frame().t=TV(0,2,0);
-        rigid_body->name=STRING_UTILITIES::string_sprintf("box-%i",i);}
+        rigid_body->name=LOG::sprintf("box-%i",i);}
 
     int cluster_particle=rigid_bindings.Add_Binding(children);
     RIGID_BODY<TV>* rigid_body_cluster=&solid_body_collection.rigid_body_collection.Rigid_Body(cluster_particle);

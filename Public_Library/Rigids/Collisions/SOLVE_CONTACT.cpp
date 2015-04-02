@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Arrays/ARRAY.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Tools/Vectors/VECTOR.h>

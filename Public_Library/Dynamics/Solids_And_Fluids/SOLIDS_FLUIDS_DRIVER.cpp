@@ -6,6 +6,7 @@
 //#####################################################################
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
@@ -67,7 +68,7 @@ Simulate_To_Frame(const int frame_input)
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         Postprocess_Frame(++current_frame);
         if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files(current_frame);
-        else if(example.write_substeps_level!=-1) Write_Substep(STRING_UTILITIES::string_sprintf("END Frame %d",current_frame),0,example.write_substeps_level);
+        else if(example.write_substeps_level!=-1) Write_Substep(LOG::sprintf("END Frame %d",current_frame),0,example.write_substeps_level);
         LOG::cout<<"TIME = "<<time<<std::endl;}
 }
 //#####################################################################

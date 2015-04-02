@@ -48,7 +48,7 @@ public:
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=1;
-        output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     }
 
@@ -104,7 +104,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     switch(test_number){
       case 1: Kinematic();break;
       case 2: Kinematic();break;
-      default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
+      default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 }
 //#####################################################################
 // Function Kinematic

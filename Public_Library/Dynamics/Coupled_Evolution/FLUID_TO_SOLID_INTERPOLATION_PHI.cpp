@@ -10,7 +10,6 @@
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Polynomials/CUBIC.h>
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>

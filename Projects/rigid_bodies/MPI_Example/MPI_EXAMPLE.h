@@ -141,7 +141,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     tests.data_directory=data_directory;
-    output_directory=STRING_UTILITIES::string_sprintf("MPI_Example/Test_%d",test_number);
+    output_directory=LOG::sprintf("MPI_Example/Test_%d",test_number);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
@@ -160,7 +160,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 8: Pushout_Test(); break;
         case 9: Many_Sphere_Test(); break;
         case 10: Break_Levelset(); break;
-        default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
+        default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 }
 //#####################################################################
 // Function Pyramid_Of_Boxes
@@ -351,7 +351,7 @@ void Break_Levelset()
     ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >;
     LEVELSET<TV> levelset(grid,phi);
     data_directory="../../../Public_Data/";
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Rigid_Bodies/sphere_66k.phi",data_directory.c_str()),levelset);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Rigid_Bodies/sphere_66k.phi",data_directory.c_str()),levelset);
     TV_INT counts=TV_INT::All_Ones_Vector()*25;
     GRID<TV> body_grid(counts,levelset.grid.Domain());
     TRIANGULATED_SURFACE<T>* surface=0;    

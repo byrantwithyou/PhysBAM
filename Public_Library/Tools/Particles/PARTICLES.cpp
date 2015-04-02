@@ -279,11 +279,11 @@ Read(TYPED_ISTREAM& input)
 {
     int version;
     Read_Binary(input,version);
-    if(version!=1) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized particle version %d",(int)version));
+    if(version!=1) throw READ_ERROR(LOG::sprintf("Unrecognized particle version %d",(int)version));
 
     int size;
     Read_Binary(input,size);
-    if(size<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid negative size %d",size));
+    if(size<0) throw READ_ERROR(LOG::sprintf("Invalid negative size %d",size));
     Clean_Memory();
     Resize(size);
     ATTRIBUTE_INDEX num_attributes;

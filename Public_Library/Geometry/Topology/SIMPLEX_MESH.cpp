@@ -349,9 +349,9 @@ Read(std::istream& input)
     int backward_compatible;Read_Binary<RW>(input,number_nodes,backward_compatible,elements);
     if(elements.m){
         int min_index=elements.Flattened().Min(),max_index=elements.Flattened().Min();
-        if(number_nodes<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid negative number_nodes = %d",number_nodes));
-        if(min_index<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d",min_index));
-        if(max_index>=number_nodes) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d (number_nodes = %d)",min_index,number_nodes));
+        if(number_nodes<0) throw READ_ERROR(LOG::sprintf("Invalid negative number_nodes = %d",number_nodes));
+        if(min_index<0) throw READ_ERROR(LOG::sprintf("Invalid vertex index %d",min_index));
+        if(max_index>=number_nodes) throw READ_ERROR(LOG::sprintf("Invalid vertex index %d (number_nodes = %d)",min_index,number_nodes));
     }
 }
 //#####################################################################

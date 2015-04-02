@@ -40,7 +40,7 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std
     viewer_callbacks.Set("highlight_particle_response",{[this](){Highlight_Particle_Response();},""});
 
     // check for per frame particles
-    if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
+    if(FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
         invalidate_deformable_objects_selection_each_frame=true;
     else invalidate_deformable_objects_selection_each_frame=false;
 
@@ -73,7 +73,7 @@ Reinitialize(bool force,bool read_geometry)
 {
     if(!(draw && (force || (is_animation && frame_loaded!=frame) || (!is_animation && frame_loaded<0)))) return;
     static bool first_time=true;
-    std::string frame_string=STRING_UTILITIES::string_sprintf("%s/%d/",prefix.c_str(),frame);
+    std::string frame_string=LOG::sprintf("%s/%d/",prefix.c_str(),frame);
     std::string static_frame_string=frame_string;
     int static_frame=FILE_UTILITIES::File_Exists(frame_string+"deformable_object_structures")?frame:-1;
     bool read_static_variables=static_frame!=-1 || first_time || !deformable_body_collection.structures.m;
@@ -100,7 +100,7 @@ Reinitialize(bool force,bool read_geometry)
 template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/deformable_object_particles",prefix.c_str(),frame_input));
+    return FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/deformable_object_particles",prefix.c_str(),frame_input));
 }
 //#####################################################################
 // Function Set_Frame

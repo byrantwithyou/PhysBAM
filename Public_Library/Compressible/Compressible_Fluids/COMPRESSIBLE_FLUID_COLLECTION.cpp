@@ -26,7 +26,7 @@ template<class TV> COMPRESSIBLE_FLUID_COLLECTION<TV>::
 template<class TV> void COMPRESSIBLE_FLUID_COLLECTION<TV>::
 Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
 {
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi",psi);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/euler_U",U);
 
@@ -39,7 +39,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
 template<class TV> void COMPRESSIBLE_FLUID_COLLECTION<TV>::
 Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame)
 {
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     if(FILE_UTILITIES::File_Exists(output_directory+"/"+f+"/psi")){
         FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/psi",psi);}
 

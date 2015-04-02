@@ -8,7 +8,6 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
@@ -515,7 +514,7 @@ Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,ARRAY<T>& fluid_
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_CUT<TV>::
 Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const
 {
-    OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("H-%i.txt",n).c_str());
+    OCTAVE_OUTPUT<T> oo(LOG::sprintf("H-%i.txt",n).c_str());
     oo.Begin_Sparse_Matrix("H",G.Raw_Size(),fluid_faces);
     ARRAY<int> reverse_map_deformable(G.V.array.Size());
     reverse_map_deformable.Subset(G.V.indices)=IDENTITY_ARRAY<>(G.V.Size());
@@ -533,7 +532,7 @@ Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const
     ARRAY<VECTOR<int,TV::m+1> > extra_faces;
     for(typename HASHTABLE<TV_INT,CUT_CELL>::CONST_ITERATOR it(cut_cells);it.Valid();it.Next())
         extra_faces.Append(it.Key().Append(it.Data().face));
-    OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("extra-map-%i.txt",n).c_str()).Write("extra_map",extra_faces);
+    OCTAVE_OUTPUT<T>(LOG::sprintf("extra-map-%i.txt",n).c_str()).Write("extra_map",extra_faces);
 }
 //#####################################################################
 // Function Add_Raw_Matrix

@@ -72,7 +72,7 @@ Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,co
         step_count++;
         TV current_position=ray.ray.Point(current_t);
         T current_volumetric_step=voxel_object->Volumetric_Integration_Step(RAY<TV>(current_position,-ray.ray.direction,true), world.random.Get_Uniform_Number((T)0,(T)1));
-        if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("Volumetric_Step %f, Current_T %f\n",current_volumetric_step,current_t));
+        if(ray.debug_ray) ray.debug_ray->Add_Comment(LOG::sprintf("Volumetric_Step %f, Current_T %f\n",current_volumetric_step,current_t));
         if(current_t-current_volumetric_step<start_t){last_segment=true;current_volumetric_step=current_t-start_t;}
         TV sample_point=ray.ray.Point(current_t-(T).5*current_volumetric_step);
 
@@ -152,7 +152,7 @@ Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,co
                 transmittance*=attenuation;
                 // early exit
                 TV precomputed_light=voxel_object->Precomputed_Light_Data(sample_point,light.light_index);
-                if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("Exit early at %f %f %f with precomputed value %f %f %f\n",sample_point.x,sample_point.y,sample_point.z,precomputed_light.x,precomputed_light.y,precomputed_light.z));
+                if(ray.debug_ray) ray.debug_ray->Add_Comment(LOG::sprintf("Exit early at %f %f %f with precomputed value %f %f %f\n",sample_point.x,sample_point.y,sample_point.z,precomputed_light.x,precomputed_light.y,precomputed_light.z));
                 return transmittance*precomputed_light+emitted_radiance;}
             else{
                 T volumetric_coefficient=voxel_object->Source_Term(1,sample_point);

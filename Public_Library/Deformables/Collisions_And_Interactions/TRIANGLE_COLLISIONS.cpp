@@ -10,6 +10,7 @@
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Math_Tools/Robust_Arithmetic.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/ROTATION.h>

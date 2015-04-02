@@ -42,7 +42,7 @@ Add_Joint(JOINT<TV>* new_joint_input)
 template<class TV> void JOINT_MESH<TV>::
 Read(TYPED_ISTREAM& input,const std::string& directory,const int frame) // assumes static variables are already read in
 {
-    std::string prefix=STRING_UTILITIES::string_sprintf("%s/%d/joint_mesh_",directory.c_str(),frame);
+    std::string prefix=LOG::sprintf("%s/%d/joint_mesh_",directory.c_str(),frame);
     ARRAY<JOINT_ID> needs_init;
     if(!input.type.use_doubles) dynamic_list.template Read<float>(prefix,needs_init);
     else dynamic_list.template Read<double>(prefix,needs_init);
@@ -55,7 +55,7 @@ Read(TYPED_ISTREAM& input,const std::string& directory,const int frame) // assum
             case TYPE_ANGLE_JOINT: joint_ptr=new ANGLE_JOINT<TV>();break;
             case PRISMATIC_TWIST_JOINT_TYPE: joint_ptr=new PRISMATIC_TWIST_JOINT<TV>();break;
             case NORMAL_JOINT_TYPE: joint_ptr=new NORMAL_JOINT<TV>();break;
-            default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Invalid joint type %d",joint_type));}
+            default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Invalid joint type %d",joint_type));}
         Read_Binary(input,*(JOINT<TV>*)joint_ptr);}
     Read_Binary(input,undirected_graph);
 }
@@ -65,7 +65,7 @@ Read(TYPED_ISTREAM& input,const std::string& directory,const int frame) // assum
 template<class TV> void JOINT_MESH<TV>::
 Write(TYPED_OSTREAM& output,const std::string& directory,const int frame) const
 {
-    std::string prefix=STRING_UTILITIES::string_sprintf("%s/%d/joint_mesh_",directory.c_str(),frame);
+    std::string prefix=LOG::sprintf("%s/%d/joint_mesh_",directory.c_str(),frame);
     if(!output.type.use_doubles)
         dynamic_list.template Write<float>(prefix);
     else dynamic_list.template Write<double>(prefix);
@@ -77,7 +77,7 @@ Write(TYPED_OSTREAM& output,const std::string& directory,const int frame) const
         else if(type==typeid(ANGLE_JOINT<TV>)) joint_type=TYPE_ANGLE_JOINT;
         else if(type==typeid(PRISMATIC_TWIST_JOINT<TV>)) joint_type=PRISMATIC_TWIST_JOINT_TYPE;
         else if(type==typeid(NORMAL_JOINT<TV>)) joint_type=NORMAL_JOINT_TYPE;
-        else PHYSBAM_NOT_IMPLEMENTED(STRING_UTILITIES::string_sprintf("Don't know how to write out a joint of type %s",type.name()));
+        else PHYSBAM_NOT_IMPLEMENTED(LOG::sprintf("Don't know how to write out a joint of type %s",type.name()));
         Write_Binary(output,joint_type,*Joints(i));}
     Write_Binary(output,undirected_graph);
 }

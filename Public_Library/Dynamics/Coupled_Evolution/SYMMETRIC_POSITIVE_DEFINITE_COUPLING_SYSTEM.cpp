@@ -352,12 +352,12 @@ Set_Up_RHS(VECTOR_T& V,VECTOR_T& F,const GENERALIZED_VELOCITY<TV>& solids_veloci
 
     if(print_index_map && !print_matrix) index_map.Print(solve_id);
     if(print_matrix) Print_Matrix(V);
-    if(print_rhs) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",F);
+    if(print_rhs) OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",F);
     if(print_each_matrix){
         LOG::cout<<"Solve id: "<<solve_id<<std::endl;
         Print_Each_Matrix(solve_id);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("us-%i.txt",solve_id).c_str()).Write("us",fluid_velocity_vector);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("vs-%i.txt",solve_id).c_str()).Write("vs",solids_velocity_star);}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("us-%i.txt",solve_id).c_str()).Write("us",fluid_velocity_vector);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("vs-%i.txt",solve_id).c_str()).Write("vs",solids_velocity_star);}
 }
 //#####################################################################
 // Function Setup_Tolerances
@@ -434,8 +434,8 @@ Print_Matrix(const VECTOR_T& vec) const
     LOG::cout<<V.force_coefficients.Size()<<" force coefficients"<<std::endl;
     LOG::cout<<V.viscous_force_coefficients.Size()<<" viscous force coefficients"<<std::endl;
     LOG::cout<<"Solve id: "<<solve_id<<std::endl;
-    OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("matrix-%i.txt",solve_id).c_str()).Write("M",*this,V,F);
-    if(use_preconditioner) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("precond-%i.txt",solve_id).c_str()).Write_Preconditioner("P",*this,V,F);
+    OCTAVE_OUTPUT<T>(LOG::sprintf("matrix-%i.txt",solve_id).c_str()).Write("M",*this,V,F);
+    if(use_preconditioner) OCTAVE_OUTPUT<T>(LOG::sprintf("precond-%i.txt",solve_id).c_str()).Write_Preconditioner("P",*this,V,F);
 }
 //#####################################################################
 // Function Print_Matrix
@@ -450,7 +450,7 @@ Print_Each_Matrix(int n) const
          solid_interpolation->Print_Each_Matrix(n,temporary_solids_velocity);
          if(fluid_to_solid_interpolation) fluid_to_solid_interpolation->Print_Each_Matrix(n,fluid_gradient->gradient.m,temporary_solids_velocity);
 
-         OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("Mi-%i.txt",solve_id).c_str());
+         OCTAVE_OUTPUT<T> oo(LOG::sprintf("Mi-%i.txt",solve_id).c_str());
          oo.Begin_Sparse_Matrix("Mi",temporary_solids_velocity.Raw_Size(),temporary_solids_velocity.Raw_Size());
 
          for(int i=0;i<solid_mass->one_over_mass.Size();i++)
@@ -467,8 +467,8 @@ Print_Each_Matrix(int n) const
      fluid_poisson->Print_Each_Matrix(n);
      if(use_viscous_forces) fluid_viscous_forces->Print_Each_Matrix(n);
      if(use_full_ic){
-         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("full_matrix-%i.txt",solve_id).c_str()).Write("FM",full_matrix);
-         if(full_matrix.C) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("full_precon-%i.txt",solve_id).c_str()).Write("FP",*full_matrix.C);}
+         OCTAVE_OUTPUT<T>(LOG::sprintf("full_matrix-%i.txt",solve_id).c_str()).Write("FM",full_matrix);
+         if(full_matrix.C) OCTAVE_OUTPUT<T>(LOG::sprintf("full_precon-%i.txt",solve_id).c_str()).Write("FP",*full_matrix.C);}
 }
 //#####################################################################
 // Function Gather
@@ -557,7 +557,7 @@ Apply_Massless_Structure_Force_To_Fluid(ARRAY<T>& fluid_velocity,T time) const
     temporary_solids_velocity.V.array.Fill(TV());
     temporary_solids_velocity.rigid_V.array.Fill(TWIST<TV>());
     solid_forces->solid_body_collection.Add_Velocity_Independent_Forces(temporary_solids_velocity.V.array,temporary_solids_velocity.rigid_V.array,time);
-    if(print_each_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("f-%i.txt",solve_id).c_str()).Write("f",temporary_solids_velocity);
+    if(print_each_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("f-%i.txt",solve_id).c_str()).Write("f",temporary_solids_velocity);
     fluid_to_solid_interpolation->Transpose_Times(temporary_solids_velocity,temp);
     Dump_Substep(temp,temporary_solids_velocity,"after interp");
     fluid_mass->Inverse_Times(temp,temp);
@@ -832,7 +832,7 @@ Compute_Scatter_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& gather_matrix)
 
     matrix_helper.Set_Matrix(offset_viscous+size_viscous,size_fluids+size_solids,gather_matrix);
 
-    if(print_each_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("SC-%i.txt",solve_id).c_str()).Write("SC",gather_matrix);
+    if(print_each_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("SC-%i.txt",solve_id).c_str()).Write("SC",gather_matrix);
 }
 //#####################################################################
 // Function Compute_Inverse_Mass_Matrix

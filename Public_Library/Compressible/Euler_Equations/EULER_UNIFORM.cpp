@@ -9,6 +9,7 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/SCOPE.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #include <Compressible/Euler_Equations/EULER_1D_EIGENSYSTEM_F.h>
 #include <Compressible/Euler_Equations/EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY.h>

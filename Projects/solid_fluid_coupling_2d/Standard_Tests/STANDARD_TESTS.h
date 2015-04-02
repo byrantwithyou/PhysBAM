@@ -412,9 +412,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
         
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
     if(fluids_parameters.use_slip)
-        output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
     else
-        output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
@@ -423,8 +423,8 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     if(debug_particles.Size()){
-        FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
-        FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
+        FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
+        FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
         debug_particles.Delete_All_Elements();}
 
     if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(solids_evolution)){
@@ -475,7 +475,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 
         ARRAY<T,TV_INT> stream_function(RANGE<TV_INT>(domain_indices.min_corner,domain_indices.max_corner+1));
         stream_function(1,1)=0;
-        std::ofstream out(STRING_UTILITIES::string_sprintf("%s/%i/stream_function.dat",output_directory.c_str(),frame).c_str());
+        std::ofstream out(LOG::sprintf("%s/%i/stream_function.dat",output_directory.c_str(),frame).c_str());
         TV dX=fluids_parameters.grid->DX();
         // use nodes so the derivatives are central
         for(int i=0;i<domain_indices.max_corner.x+1;i++){
@@ -1398,8 +1398,8 @@ void Analytic_Test()
     analytic_solution=-(solid_mass*solid_gravity.Magnitude()+rho*size.x*size.y*fluids_parameters.gravity.Magnitude())*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
-    FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),0));
-    FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
+    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
+    FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Flow_Past_Fixed_Cylinder
@@ -1441,8 +1441,8 @@ void Flow_Past_Fixed_Cylinder()
     sample_points.Append(TV(3,2.25));
     sample_points.Append(TV(2,3));
 
-    FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),0));
-    FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
+    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
+    FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Flow_Past_Fixed_Cylinder
@@ -1468,8 +1468,8 @@ void Vortex_Shedding()
     rigid_body.is_static=true;
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);
 
-    FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),0));
-    FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
+    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
+    FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Oscillating_Disk_Domain_Velocity_Sample
@@ -1511,7 +1511,7 @@ void Oscillating_Disk()
     solids_tests.Set_Mass_Of_Particles(triangulated_area,1,false);
     PHYSBAM_ASSERT(triangulated_area.mesh.Orientations_Consistent());
 
-    /*std::string circle_file=data_directory+STRING_UTILITIES::string_sprintf("/Triangulated_Areas/circle-%d.tri2d",solid_resolution);
+    /*std::string circle_file=data_directory+LOG::sprintf("/Triangulated_Areas/circle-%d.tri2d",solid_resolution);
       TRIANGULATED_AREA<T>& triangulated_area=solids_tests.Create_Triangulated_Object(circle_file,RIGID_BODY_STATE<TV>(),true,true,(T).2);*/
 
     // add structures and rigid bodies to collisions

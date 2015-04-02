@@ -10,7 +10,7 @@
 #define __BMP_HEADER__
 
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
+#include <Tools/Log/LOG_PRINTF.h>
 #include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 namespace PhysBAM{
 
@@ -54,11 +54,11 @@ struct BMP_HEADER{
     Read_Binary<RW>(input,bitmap_size,x_pixels_per_meter,y_pixels_per_meter,number_of_colors,number_of_important_colors);
 
     //check validity
-    if(file_type[0]!='B' || file_type[1]!='M') PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Illegal file type: %c%c",file_type[0],file_type[1]));
+    if(file_type[0]!='B' || file_type[1]!='M') PHYSBAM_FATAL_ERROR(LOG::sprintf("Illegal file type: %c%c",file_type[0],file_type[1]));
     if(info_header_size != 40) LOG::cerr<<"Warning: weird info_header_size: "<<info_header_size<<" (expected 40)"<<std::endl;
-    if(number_of_bitplanes != 1) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Illegal number of bitplanes: %d (must be 1)",number_of_bitplanes));
-    if(bits_per_pixel != 24) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Number of bits per pixel: %d (the only supported number is 24)",bits_per_pixel));
-    if(type_of_compression != 0) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Type of compression %d (the only supported type is 0)",type_of_compression));}
+    if(number_of_bitplanes != 1) PHYSBAM_FATAL_ERROR(LOG::sprintf("Illegal number of bitplanes: %d (must be 1)",number_of_bitplanes));
+    if(bits_per_pixel != 24) PHYSBAM_FATAL_ERROR(LOG::sprintf("Number of bits per pixel: %d (the only supported number is 24)",bits_per_pixel));
+    if(type_of_compression != 0) PHYSBAM_FATAL_ERROR(LOG::sprintf("Type of compression %d (the only supported type is 0)",type_of_compression));}
 
     template<class RW> void Write(std::ostream& output) const
     {Write_Binary<RW>(output,file_type[0],file_type[1],file_size,reserved1,reserved2,offset,info_header_size);

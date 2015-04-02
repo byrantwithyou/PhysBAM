@@ -40,7 +40,7 @@ Draw_Highlighted_Vertex(const TV& position,int id,const OPENGL_COLOR& color)
     OpenGL_Begin(GL_POINTS);
     OpenGL_Vertex(position);
     OpenGL_End();
-    if(id>=0) OpenGL_String(position,STRING_UTILITIES::string_sprintf("   %d",id));
+    if(id>=0) OpenGL_String(position,LOG::sprintf("   %d",id));
     glPopAttrib();
 }
 //#####################################################################
@@ -56,7 +56,7 @@ Draw_Highlighted_Segment(const TV& x0,const TV& x1,int id,const OPENGL_COLOR& co
     OpenGL_Begin(GL_LINES);
     OpenGL_Line(x0,x1);
     OpenGL_End();
-    if(id>=0) OpenGL_String((typename TV::SCALAR).5*(x0+x1),STRING_UTILITIES::string_sprintf("   %d",id));
+    if(id>=0) OpenGL_String((typename TV::SCALAR).5*(x0+x1),LOG::sprintf("   %d",id));
     glPopAttrib();
 }
 //#####################################################################
@@ -73,7 +73,7 @@ Draw_Highlighted_Curve(const ARRAY<VECTOR<TV,2> >& X,int id,const OPENGL_COLOR& 
     OpenGL_Begin(GL_LINES);
     for(int i=0;i<X.m;i++) {OpenGL_Line(X(i).x,X(i).y);total+=X(i).x;}
     OpenGL_End();
-    if(id>=0) OpenGL_String((typename TV::SCALAR)1./X.m*(total),STRING_UTILITIES::string_sprintf("   %d",id));
+    if(id>=0) OpenGL_String((typename TV::SCALAR)1./X.m*(total),LOG::sprintf("   %d",id));
     glPopAttrib();
 }
 //#####################################################################
@@ -91,7 +91,7 @@ Draw_Highlighted_Triangle_Boundary(const TV& x0,const TV& x1,const TV& x2,int id
     OpenGL_Vertex(x1);
     OpenGL_Vertex(x2);
     OpenGL_End();
-    if(id>=0) OpenGL_String(((typename TV::SCALAR)1/3)*(x0+x1+x2),STRING_UTILITIES::string_sprintf("%d",id));
+    if(id>=0) OpenGL_String(((typename TV::SCALAR)1/3)*(x0+x1+x2),LOG::sprintf("%d",id));
     glPopAttrib();
 }
 //#####################################################################
@@ -116,7 +116,7 @@ Draw_Highlighted_Tetrahedron_Boundary(const VECTOR<T,3>& x0,const VECTOR<T,3>& x
     OpenGL_Vertex(x3);
     OpenGL_Vertex(x2);
     OpenGL_End();
-    if(id>=0) OpenGL_String((T)0.25*(x0+x1+x2+x3),STRING_UTILITIES::string_sprintf("%d",id));
+    if(id>=0) OpenGL_String((T)0.25*(x0+x1+x2+x3),LOG::sprintf("%d",id));
     glPopAttrib();
 }
 //#####################################################################

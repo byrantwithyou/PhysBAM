@@ -59,7 +59,7 @@ void Get_Initial_Data()
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     
     LEVELSET_MAKER<T> levelset_maker;
-    TRIANGULATED_SURFACE<T>& surface=tests.Create_Triangulated_Object(STRING_UTILITIES::string_sprintf("%s/Triangulated_Surfaces/armadillo_original_400k.tri",data_directory.c_str()),
+    TRIANGULATED_SURFACE<T>& surface=tests.Create_Triangulated_Object(LOG::sprintf("%s/Triangulated_Surfaces/armadillo_original_400k.tri",data_directory.c_str()),
         RIGID_BODY_STATE<TV>(FRAME<TV>(VECTOR<T,3>(0,(T).6,0))),false,false,(T).01);
     surface.Update_Bounding_Box();RANGE<TV> box=*surface.bounding_box;int size_x=20;
     TV lengths=box.Edge_Lengths();TV aspect=lengths/lengths.x;

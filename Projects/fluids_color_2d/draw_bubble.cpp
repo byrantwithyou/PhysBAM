@@ -54,12 +54,12 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
     parse_args.Parse();
 
     GRID<TV> grid;
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/common/grid",sim_dir.c_str()),grid);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/common/grid",sim_dir.c_str()),grid);
     std::cout<<grid.domain<<size<<std::endl;
     if(force_dims) size.y=(int)(grid.domain.Edge_Lengths().y/grid.domain.Edge_Lengths().x*size.x);
 
     ARRAY<T,TV_INT> pressure;
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/pressure",sim_dir.c_str(),frame),pressure);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/pressure",sim_dir.c_str(),frame),pressure);
 
     if(depressurize)
     {
@@ -84,7 +84,7 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
         for(int i=0;;i++){
             ARRAY<T,TV_INT>* phi=new ARRAY<T,TV_INT>;
             LEVELSET<TV>* ls=new LEVELSET<TV>(grid,*phi);
-            try{FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%d/levelset_%d.gz",sim_dir.c_str(),frame,i),*ls);}
+            try{FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%d/levelset_%d.gz",sim_dir.c_str(),frame,i),*ls);}
             catch(...){delete ls;break;}
             phis.Append(phi);
             levelsets.Append(ls);
@@ -142,7 +142,7 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
     PNG_FILE<T>::Write(base_filename+".png",pressure_image);
     LOG::cout<<"pressure range: "<<p_range<<std::endl;
 
-    int ret=system(STRING_UTILITIES::string_sprintf("convert %s.png %s.eps -composite %s-full.png",base_filename.c_str(),base_filename.c_str(),base_filename.c_str()).c_str());
+    int ret=system(LOG::sprintf("convert %s.png %s.eps -composite %s-full.png",base_filename.c_str(),base_filename.c_str(),base_filename.c_str()).c_str());
     PHYSBAM_ASSERT(!ret);
     phis.Delete_Pointers_And_Clean_Memory();
     levelsets.Delete_Pointers_And_Clean_Memory();

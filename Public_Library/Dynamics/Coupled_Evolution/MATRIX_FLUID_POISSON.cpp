@@ -151,7 +151,7 @@ Test_Matrix(const bool print_matrix) const
 template<class TV> void MATRIX_FLUID_POISSON<TV>::
 Print_Each_Matrix(int n) const
 {
-    OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Poiss-%i.txt",n).c_str()).Write("Poiss",poisson);
+    OCTAVE_OUTPUT<T>(LOG::sprintf("Poiss-%i.txt",n).c_str()).Write("Poiss",poisson);
 }
 //#####################################################################
 namespace PhysBAM{

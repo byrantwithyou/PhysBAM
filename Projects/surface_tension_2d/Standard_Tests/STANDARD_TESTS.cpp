@@ -176,7 +176,7 @@ Parse_Options()
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
         
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
 }
 template<class T> void STANDARD_TESTS<T>::
 Parse_Late_Options() {BASE::Parse_Late_Options();}
@@ -611,8 +611,8 @@ Write_Output_Files(const int frame) const
 {
     BASE::Write_Output_Files(frame);
     if(debug_particles.Size() || frame==0){
-        FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
-        FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);}
+        FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
+        FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);}
 }
 //#####################################################################
 // Function Initialize_Surface_Particles
@@ -777,8 +777,8 @@ FSI_Analytic_Test()
     analytic_solution=-(solid_mass*-solid_gravity.y+rho*size.x*size.y*fluids_parameters.gravity)*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
-    FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),0));
-    FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
+    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
+    FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Postprocess_Frame

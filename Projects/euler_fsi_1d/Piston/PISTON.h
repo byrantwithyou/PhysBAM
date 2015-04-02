@@ -132,8 +132,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     motion_curve.Add_Control_Point(0,TV(piston_initial_position));
     motion_curve.Add_Control_Point(last_frame/frame_rate,TV(piston_final_position));
 
-    if(timesplit) output_directory=STRING_UTILITIES::string_sprintf("Piston/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
-    else output_directory=STRING_UTILITIES::string_sprintf("Piston/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
+    if(timesplit) output_directory=LOG::sprintf("Piston/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
+    else output_directory=LOG::sprintf("Piston/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
 

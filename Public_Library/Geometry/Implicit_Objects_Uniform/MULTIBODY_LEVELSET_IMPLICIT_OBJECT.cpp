@@ -319,7 +319,7 @@ Name() const
 template<class TV> std::string MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>::
 Static_Name()
 {
-    return STRING_UTILITIES::string_sprintf("MULTIBODY_LEVELSET_IMPLICIT_OBJECT<T,VECTOR<T,%d> >",TV::dimension);
+    return LOG::sprintf("MULTIBODY_LEVELSET_IMPLICIT_OBJECT<T,VECTOR<T,%d> >",TV::dimension);
 }
 //#####################################################################
 // Function Extension

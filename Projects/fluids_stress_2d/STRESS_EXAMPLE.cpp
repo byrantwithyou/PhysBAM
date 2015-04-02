@@ -37,13 +37,13 @@ template<class TV> void STRESS_EXAMPLE<TV>::
 Write_Output_Files(const int frame)
 {
     if(!write_output_files) return;
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
 
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/levelset",output_directory.c_str(),frame),levelset);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),levelset);
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
         time,face_velocities,prev_face_velocities);
 }
 //#####################################################################
@@ -52,9 +52,9 @@ Write_Output_Files(const int frame)
 template<class TV> void STRESS_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/levelset",output_directory.c_str(),frame),levelset);
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
+    std::string f=LOG::sprintf("%d",frame);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),levelset);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
         time,face_velocities,prev_face_velocities);
 }
 //#####################################################################

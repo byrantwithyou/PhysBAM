@@ -10,11 +10,7 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Utilities/TIMER.h>
 namespace PhysBAM{
-namespace LOG_NULL{
-log_null_class cout;
-log_null_class cerr;
-}
-namespace LOG_REAL{
+namespace LOG{
 //#####################################################################
 namespace{
 LOG_CLASS* private_instance=0;
@@ -109,7 +105,7 @@ LOG_CLASS::LOG_CLASS(const bool suppress_cout_input,const bool suppress_cerr_inp
     if(private_instance) delete private_instance;private_instance=this;
     if(cache_initial_output){
         log_file=FILE_UTILITIES::Temporary_File();
-        if(!log_file) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Couldn't create temporary log file tmpfile=%s",log_file));
+        if(!log_file) PHYSBAM_FATAL_ERROR(LOG::sprintf("Couldn't create temporary log file tmpfile=%s",log_file));
         log_file_temporary=true;}
     timer_id=timer_singleton->Register_Timer();
     if(cout_buffer) delete cout_buffer;cout_buffer=new LOG_COUT_BUFFER;cout.rdbuf(cout_buffer);
@@ -181,11 +177,11 @@ Copy_Log_To_File(const std::string& filename,const bool append)
     if(!filename.empty()){
         if(append){
             log_file=fopen(filename.c_str(),"a");
-            if(!log_file) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Can't open log file %s for append",filename.c_str()));
+            if(!log_file) PHYSBAM_FATAL_ERROR(LOG::sprintf("Can't open log file %s for append",filename.c_str()));
             ::std::putc('\n',log_file);}
         else{
             log_file=fopen(filename.c_str(),"w");
-            if(!log_file) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Can't open log file %s for writing",filename.c_str()));}
+            if(!log_file) PHYSBAM_FATAL_ERROR(LOG::sprintf("Can't open log file %s for writing",filename.c_str()));}
         if(!temporary_file){
             Instance()->root->Dump_Names(log_file);
             LOG_ENTRY::log_file_start_on_separate_line=LOG_ENTRY::log_file_needs_indent=Instance()->current_entry->log_file_end_on_separate_line=true;}
@@ -302,9 +298,5 @@ Dump_Log()
     LOG_CLASS& instance=*Instance();
     Dump_Log_Helper(instance,instance.suppress_cout);
 }
-SCOPE::
-~SCOPE()
-{if(active) LOG_CLASS::Pop_Scope();}
-
 }
 }

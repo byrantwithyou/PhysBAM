@@ -42,7 +42,7 @@ public:
         parse_args.Parse();
 
         mac_grid.Initialize(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true);
-        output_directory=STRING_UTILITIES::string_sprintf("Water_Tests/Test_%d_%d",test_number,scale);
+        output_directory=LOG::sprintf("Water_Tests/Test_%d_%d",test_number,scale);
         if(TV::dimension==3){
             VECTOR<T,3> point1,point2;
             point1=VECTOR<T,3>::All_Ones_Vector()*(T).6;point1(0)=.4;point1(1)=.95;point2=VECTOR<T,3>::All_Ones_Vector()*(T).6;point2(0)=.4;point2(1)=1;

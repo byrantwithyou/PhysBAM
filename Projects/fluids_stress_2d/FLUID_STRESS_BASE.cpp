@@ -97,7 +97,7 @@ template<class TV> FLUID_STRESS_BASE<TV>::
 template<class TV> void FLUID_STRESS_BASE<TV>::
 After_Initialize_Example()
 {
-    if(!override_output_directory) output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number);
+    if(!override_output_directory) output_directory=LOG::sprintf("Test_%d",test_number);
 }
 //#####################################################################
 // Function Initialize_Common_Example

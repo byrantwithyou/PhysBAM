@@ -76,7 +76,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     else if(tests.test_number==2) number_of_particles=15000;
     else{LOG::cerr<<"unrecognzed SPH test number"<<std::endl;exit(1);}
 
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(tests.grid.counts.x-1),(tests.grid.counts.y-1));
+    output_directory=LOG::sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(tests.grid.counts.x-1),(tests.grid.counts.y-1));
     LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

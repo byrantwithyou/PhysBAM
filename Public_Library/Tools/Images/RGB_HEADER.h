@@ -10,7 +10,7 @@
 #define __RGB_HEADER__
 
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
+#include <Tools/Log/LOG_PRINTF.h>
 #include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <Tools/Utilities/EXCEPTIONS.h>
 #include <cstring>
@@ -47,10 +47,10 @@ struct RGB_HEADER
     Swap_Endian();
     
     //check validity
-    if(magic_number!=474) throw READ_ERROR(STRING_UTILITIES::string_sprintf("illegal file type %d, should be 474",magic_number));
-    if(channels != 3) throw READ_ERROR(STRING_UTILITIES::string_sprintf("illegal number of channels: %d (must be 3)",channels));
-    if(bytes_per_channel != 1) throw READ_ERROR(STRING_UTILITIES::string_sprintf("only 1 bytes per channel supported (you gave %d)",bytes_per_channel));
-    if(dimensions != 2 && dimensions != 3) throw READ_ERROR(STRING_UTILITIES::string_sprintf("dimensions field must be 2 or 3 (you gave %d)",dimensions));}
+    if(magic_number!=474) throw READ_ERROR(LOG::sprintf("illegal file type %d, should be 474",magic_number));
+    if(channels != 3) throw READ_ERROR(LOG::sprintf("illegal number of channels: %d (must be 3)",channels));
+    if(bytes_per_channel != 1) throw READ_ERROR(LOG::sprintf("only 1 bytes per channel supported (you gave %d)",bytes_per_channel));
+    if(dimensions != 2 && dimensions != 3) throw READ_ERROR(LOG::sprintf("dimensions field must be 2 or 3 (you gave %d)",dimensions));}
 
     template<class RW> void Write(std::ostream& output) const
     {RGB_HEADER swapped=*this;swapped.Swap_Endian();

@@ -9,6 +9,7 @@
 
 #include <Tools/Log/LOG.h>
 #include <Tools/Log/PROGRESS_INDICATOR.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Random_Numbers/PIECEWISE_CONSTANT_PDF.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>

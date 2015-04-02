@@ -297,7 +297,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     BASE::Parse_Options();
     tests.data_directory=data_directory;
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     frame_rate=24;
     override_no_collisions=override_no_collisions&&!override_collisions;
     if(use_rand_seed) rand.Set_Seed(rand_seed);
@@ -2426,7 +2426,7 @@ void Preprocess_Frame(const int frame)
     dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
     if (dump_sv)
     {
-        std::string output_file=STRING_UTILITIES::string_sprintf("%s/SV_%d",output_directory.c_str(),frame);
+        std::string output_file=LOG::sprintf("%s/SV_%d",output_directory.c_str(),frame);
         svout.open(output_file.c_str());
     }
 

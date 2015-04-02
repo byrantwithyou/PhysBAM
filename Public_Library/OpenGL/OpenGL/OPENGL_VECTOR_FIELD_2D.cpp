@@ -46,7 +46,7 @@ Display() const
     if(draw_value){
         (vector_color+OPENGL_COLOR(.8f,.8f,.8f)).Send_To_GL_Pipeline();
         for(int i=0;i<vector_locations.Size();i++)
-            OpenGL_String(vector_locations(i)+(T)1.1*(T)size*vector_field(i),STRING_UTILITIES::string_sprintf("%.3f %.3f",vector_field(i).x,vector_field(i).y));}
+            OpenGL_String(vector_locations(i)+(T)1.1*(T)size*vector_field(i),LOG::sprintf("%.3f %.3f",vector_field(i).x,vector_field(i).y));}
 
     glPopAttrib();
     glPopMatrix();

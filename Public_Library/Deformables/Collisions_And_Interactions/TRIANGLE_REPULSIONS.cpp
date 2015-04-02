@@ -8,6 +8,7 @@
 #include <Tools/Data_Structures/OPERATION_HASH.h>
 #include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Math_Tools/Robust_Arithmetic.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Basic_Geometry/POINT_2D.h>

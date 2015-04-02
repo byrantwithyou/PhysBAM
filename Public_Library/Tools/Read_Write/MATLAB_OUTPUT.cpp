@@ -59,7 +59,7 @@ Write_Header_File(const std::string& file_name,const ARRAY<T,VECTOR<int,1> >& x,
 {
     int m=x.domain.max_corner.x,data_int;double data_double;
     std::ofstream Matlab_Output;
-    Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
+    Matlab_Output.open(LOG::sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     data_int=m;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     for(int i=0;i<m;i++){data_double=x(i);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
@@ -82,7 +82,7 @@ Write_Header_File(const std::string& file_name,const ARRAY<T,VECTOR<int,2> >& x,
 {
     int m=x.domain.max_corner.x,n=x.domain.max_corner.y,data_int;double data_double;
     std::ofstream Matlab_Output;
-    Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
+    Matlab_Output.open(LOG::sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     data_int=m;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     data_int=n;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     int i;for(i=0;i<m;i++) for(int j=0;j<n;j++){data_double=x(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
@@ -108,7 +108,7 @@ template<class T> void MATLAB_OUTPUT::
 Write_Header_File(const std::string& file_name,const ARRAY<T,VECTOR<int,3> >& x,const ARRAY<T,VECTOR<int,3> >& y,const ARRAY<T,VECTOR<int,3> >& z,const int stepnumber)
 {
     int m=x.domain.max_corner.x,n=x.domain.max_corner.y,mn=x.domain.max_corner.z,data_int;double data_double;
-    std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
+    std::ofstream Matlab_Output;Matlab_Output.open(LOG::sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     data_int=m;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     data_int=n;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     data_int=mn;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
@@ -127,7 +127,7 @@ template<class T> void MATLAB_OUTPUT::
 Write_Output_File(const std::string& file_name,const ARRAY<T,VECTOR<int,1> >& output,const int stepnumber)
 {
     int m=output.domain.max_corner.x;double data_double;
-    std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
+    std::ofstream Matlab_Output;Matlab_Output.open(LOG::sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     for(int i=0;i<m;i++){data_double=output(i);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }
@@ -138,7 +138,7 @@ template<class T> void MATLAB_OUTPUT::
 Write_Output_File(const std::string& file_name,const ARRAY<T,VECTOR<int,2> >& output,const int stepnumber)
 {
     int m=output.domain.max_corner.x,n=output.domain.max_corner.y;double data_double;
-    std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
+    std::ofstream Matlab_Output;Matlab_Output.open(LOG::sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     for(int i=0;i<m;i++) for(int j=0;j<n;j++){data_double=output(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }
@@ -149,7 +149,7 @@ template<class T> void MATLAB_OUTPUT::
 Write_Output_File(const std::string& file_name,const ARRAY<T,VECTOR<int,3> >& output,const int stepnumber)
 {
     double data_double;
-    std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
+    std::ofstream Matlab_Output;Matlab_Output.open(LOG::sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     for(RANGE_ITERATOR<3> it(output.domain);it.Valid();it.Next()){
         data_double=output(it.index);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
@@ -161,7 +161,7 @@ template<class T,int d> void MATLAB_OUTPUT::
 Write_Output_File(const std::string& file_name,const ARRAY_VIEW<VECTOR<T,d> >& X,const int stepnumber)
 {
     std::ofstream Matlab_Output;
-    Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
+    Matlab_Output.open(LOG::sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     int data_int=X.Size();if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     for(int a=0;a<d;a++) for(int k=0;k<X.Size();k++){
         double data_double=X(k)[a];if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}

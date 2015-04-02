@@ -118,7 +118,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
-    output_directory=STRING_UTILITIES::string_sprintf("Binding_Springs_Test/Test_%d",test_number);
+    output_directory=LOG::sprintf("Binding_Springs_Test/Test_%d",test_number);
     frame_rate=24;
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-6;
     last_frame=200;

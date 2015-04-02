@@ -8,6 +8,7 @@
 #include <Tools/Data_Structures/QUEUE.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Math_Tools/integer_log.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -239,7 +240,7 @@ void Optimize_Particle_Order(const int reorder_partition_input)
         PHYSBAM_ASSERT(partitions==partition_nodes.m);
         if(reorder_partition_input){
             if(reorder_partition_input<1 || reorder_partition_input>partitions)
-                PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Invalid reorder_partition %d",reorder_partition_input));
+                PHYSBAM_FATAL_ERROR(LOG::sprintf("Invalid reorder_partition %d",reorder_partition_input));
             min_reorder_partition=max_reorder_partition=reorder_partition_input;}
         else{min_reorder_partition=1;max_reorder_partition=partitions;}}
     else{

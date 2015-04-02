@@ -90,7 +90,7 @@ template<class TV_input> void COMPRESSIBLE_EXAMPLE<TV_input>::
 Write_Output_Files(const int frame) const
 {
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
 
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/grid",mac_grid);

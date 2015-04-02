@@ -39,7 +39,7 @@ public:
     while(!last_segment){
         step_count++;
         T current_volumetric_step=volumetric_step;
-        if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("Volumetric_Step %f, Current_T %f\n",current_volumetric_step,current_t));
+        if(ray.debug_ray) ray.debug_ray->Add_Comment(LOG::sprintf("Volumetric_Step %f, Current_T %f\n",current_volumetric_step,current_t));
         if(current_t-current_volumetric_step<start_t){last_segment=true;current_volumetric_step=current_t-start_t;}
         VECTOR<T,3> midpoint=ray.ray.Point(current_t-T(.5)*current_volumetric_step);        
         // absorption and outscattering

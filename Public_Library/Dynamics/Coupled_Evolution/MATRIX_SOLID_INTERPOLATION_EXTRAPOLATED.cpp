@@ -79,7 +79,7 @@ Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,GENERALIZ
 template<class TV> void MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<TV>::
 Print_Each_Matrix(int n,GENERALIZED_VELOCITY<TV>& G) const
 {
-    OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("J-%i.txt",n).c_str());
+    OCTAVE_OUTPUT<T> oo(LOG::sprintf("J-%i.txt",n).c_str());
     oo.Begin_Sparse_Matrix("J",Value(Number_Of_Constraints()),G.Raw_Size());
     ARRAY<int> reverse_map_deformable(G.V.array.Size());
     reverse_map_deformable.Subset(G.V.indices)=IDENTITY_ARRAY<>(G.V.Size());

@@ -5,6 +5,7 @@
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -108,7 +109,7 @@ Advance_To_Target_Time(const T target_time)
 
         time+=dt;
 
-        Write_Substep(STRING_UTILITIES::string_sprintf("END Substep %d",substep),substep,0);}
+        Write_Substep(LOG::sprintf("END Substep %d",substep),substep,0);}
 }
 //#####################################################################
 // Setup_Fluids

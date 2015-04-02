@@ -1,4 +1,5 @@
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

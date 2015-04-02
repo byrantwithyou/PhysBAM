@@ -165,8 +165,8 @@ Update_Divergence()
         static ARRAY<bool,TV_INT> psi_D;
         bool got_all_psi=true;
         if(!psi_N_psi_D_basedir.empty()){
-            std::string psi_N_filename=STRING_UTILITIES::string_sprintf("%s/%d/psi_N",psi_N_psi_D_basedir.c_str(),frame);
-            std::string psi_D_filename=STRING_UTILITIES::string_sprintf("%s/%d/psi_D",psi_N_psi_D_basedir.c_str(),frame);
+            std::string psi_N_filename=LOG::sprintf("%s/%d/psi_N",psi_N_psi_D_basedir.c_str(),frame);
+            std::string psi_D_filename=LOG::sprintf("%s/%d/psi_D",psi_N_psi_D_basedir.c_str(),frame);
             if(FILE_UTILITIES::File_Exists(psi_N_filename)) FILE_UTILITIES::Read_From_File(stream_type,psi_N_filename,psi_N);
             else got_all_psi=false;
             if(FILE_UTILITIES::File_Exists(psi_D_filename)) FILE_UTILITIES::Read_From_File(stream_type,psi_D_filename,psi_D);

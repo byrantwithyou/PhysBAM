@@ -10,6 +10,7 @@
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Matrices/MATRIX_4X4.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
@@ -286,7 +287,7 @@ Read_Output_Files_Fluids(const int frame)
 {
     fluids_parameters.Read_Output_Files(stream_type,output_directory,frame);
     fluid_collection.Read_Output_Files(stream_type,output_directory,frame);
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
 }
 //#####################################################################
 // Function Write_Output_Files
@@ -295,7 +296,7 @@ template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Write_Output_Files(const int frame) const
 {
     if(this->use_test_output){
-        std::string file=STRING_UTILITIES::string_sprintf("%s/%s-%03d.txt",output_directory.c_str(),this->test_output_prefix.c_str(),frame);
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),this->test_output_prefix.c_str(),frame);
         OCTAVE_OUTPUT<T> oo(file.c_str());
         if(solid_body_collection.deformable_body_collection.particles.X.m){
             oo.Write("db_X",solid_body_collection.deformable_body_collection.particles.X.Flattened());
@@ -313,7 +314,7 @@ Write_Output_Files(const int frame) const
         if(fluids_parameters.euler) oo.Write("cf_U",fluids_parameters.euler->U.array.Flattened());}
 
     FILE_UTILITIES::Create_Directory(output_directory);
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
     FILE_UTILITIES::Create_Directory(output_directory+"/common");
     Write_Frame_Title(frame);
@@ -345,7 +346,7 @@ Read_Output_Files_Solids(const int frame)
 {
     solid_body_collection.Read(stream_type,output_directory,frame,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
         solids_parameters.write_deformable_body,solids_parameters.write_from_every_process);
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     //if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
     //    newmark->Read_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
 }

@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Grids_Uniform_Computations/DUALCONTOUR_2D.h>

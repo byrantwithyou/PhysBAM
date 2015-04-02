@@ -14,6 +14,7 @@
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
@@ -388,19 +389,19 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 
     if(example.dump_matrix){
         KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Z-%d.txt",solve_id).c_str()).Write_Preconditioner("Z",iss,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,*vectors(0));
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("Z-%d.txt",solve_id).c_str()).Write_Preconditioner("Z",iss,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,*vectors(0));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
     if(example.sparse_dump_matrix){
         SPARSE_MATRIX_FLAT_MXN<T> M;
         iss.Get_Sparse_Matrix(M);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%d.txt",solve_id).c_str()).Write("M",M);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%d.txt",solve_id).c_str()).Write("M",M);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
 
     if(example.dump_matrix){
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%d.txt",solve_id).c_str()).Write("x",sol);}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("x-%d.txt",solve_id).c_str()).Write("x",sol);}
     if(example.dump_largest_eigenvector) Dump_Largest_Eigenvector(iss,vectors);
 
     iss.Multiply(sol,*vectors(0));
@@ -520,9 +521,9 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Write_Output_Files(const int frame)
 {
     FILE_UTILITIES::Create_Directory(example.output_directory);
-    FILE_UTILITIES::Create_Directory(example.output_directory+STRING_UTILITIES::string_sprintf("/%d",frame));
+    FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
-    FILE_UTILITIES::Write_To_Text_File(example.output_directory+STRING_UTILITIES::string_sprintf("/%d/frame_title",frame),example.frame_title);
+    FILE_UTILITIES::Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
     if(frame==0)
         FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);
@@ -546,7 +547,7 @@ Dump_Largest_Eigenvector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ARRAY<KRYL
     ARRAY<INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>*> evs;
     RANDOM_NUMBERS<T> random;
 
-    OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("ev-%d.txt",solve_id).c_str());
+    OCTAVE_OUTPUT<T> oo(LOG::sprintf("ev-%d.txt",solve_id).c_str());
 
     for(int j=0;j<5;j++){
         random.Fill_Uniform(sol.u,-1,1);
@@ -572,10 +573,10 @@ Dump_Largest_Eigenvector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ARRAY<KRYL
             LOG::cout<<"eig approx "<<a<<"   dp "<<iss.Inner_Product(sol,tmp)<<std::endl;
             tmp=sol;}
 
-        Dump_Vector(iss,sol,STRING_UTILITIES::string_sprintf("eigenvector (%g)",a).c_str());
+        Dump_Vector(iss,sol,LOG::sprintf("eigenvector (%g)",a).c_str());
         evs.Append(new INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>(sol));
-        oo.Write(STRING_UTILITIES::string_sprintf("EV%d",j).c_str(),sol);
-        oo.Write(STRING_UTILITIES::string_sprintf("ev%d",j).c_str(),a);}
+        oo.Write(LOG::sprintf("EV%d",j).c_str(),sol);
+        oo.Write(LOG::sprintf("ev%d",j).c_str(),a);}
 
     evs.Delete_Pointers_And_Clean_Memory();
 }

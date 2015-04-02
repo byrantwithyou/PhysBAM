@@ -98,7 +98,7 @@ Print() const
 template<class TV> void MATRIX_FLUID_INTERPOLATION<TV>::
 Print_Each_Matrix(int n) const
 {
-    OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("W-%i.txt",n).c_str());
+    OCTAVE_OUTPUT<T> oo(LOG::sprintf("W-%i.txt",n).c_str());
     oo.Begin_Sparse_Matrix("W",Value(rows.m),index_map.Number_Faces());
 
     for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++)

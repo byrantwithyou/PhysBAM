@@ -97,12 +97,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     LOG::cout<<"Example number "<<test_number<<std::endl;
-    std::string filename=STRING_UTILITIES::string_sprintf("Mass_Conservation/example_%d.param",test_number);
+    std::string filename=LOG::sprintf("Mass_Conservation/example_%d.param",test_number);
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading parameter file '"<<filename<<"'"<<std::endl;parameter_list.Read(filename);}
     random.Set_Seed(7411);
 
     // Common parameters
-    output_directory=STRING_UTILITIES::string_sprintf("Mass_Conservation/example_%d_resolution_%d",test_number%resolution);
+    output_directory=LOG::sprintf("Mass_Conservation/example_%d_resolution_%d",test_number%resolution);
     first_frame=0;restart=false;restart_frame=0;frame_rate=300;
 
     // Fluids parameters

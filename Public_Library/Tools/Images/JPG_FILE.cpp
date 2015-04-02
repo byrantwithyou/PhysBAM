@@ -40,7 +40,7 @@ template<class T> void JPG_FILE<T>::
 Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
 {
     struct jpeg_decompress_struct cinfo;FILE * infile;int row_stride;struct jpeg_error_mgr error_manager;
-    if(!(infile=fopen(filename.c_str(),"rb"))) throw READ_ERROR(STRING_UTILITIES::string_sprintf("JPG_FILE::Read: Can't open %s",filename.c_str()));
+    if(!(infile=fopen(filename.c_str(),"rb"))) throw READ_ERROR(LOG::sprintf("JPG_FILE::Read: Can't open %s",filename.c_str()));
     cinfo.err=jpeg_std_error(&error_manager);error_manager.error_exit=Read_Error;
     jpeg_create_decompress(&cinfo);jpeg_stdio_src(&cinfo,infile);jpeg_read_header(&cinfo,TRUE);jpeg_start_decompress(&cinfo);
 
@@ -73,7 +73,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     cinfo.err=jpeg_std_error(&jerr);
     jpeg_create_compress(&cinfo);
     if(!(outfile = fopen(filename.c_str(), "wb")))
-        PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("JPG_FILE::Write: Can't open %s",filename.c_str()));
+        PHYSBAM_FATAL_ERROR(LOG::sprintf("JPG_FILE::Write: Can't open %s",filename.c_str()));
     jpeg_stdio_dest(&cinfo,outfile);
     cinfo.image_width=counts.x;cinfo.image_height=counts.y;cinfo.input_components=3;
     cinfo.in_color_space=JCS_RGB; // colorspace of input image

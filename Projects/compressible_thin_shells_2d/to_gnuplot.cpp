@@ -9,7 +9,6 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
@@ -40,7 +39,7 @@ int main(int argc,char* argv[])
     GRID<TV> grid;
     ARRAY<T,VECTOR<int,2> > data;
     FILE_UTILITIES::Read_From_File<RW>(input_directory+"/common/grid",grid);
-    std::string f=STRING_UTILITIES::string_sprintf("/%d/",frame);
+    std::string f=LOG::sprintf("/%d/",frame);
     if(frame >= 0){
         FILE_UTILITIES::Read_From_File<RW>(input_directory+f+"/"+data_file,data);}
 //#####################################################################

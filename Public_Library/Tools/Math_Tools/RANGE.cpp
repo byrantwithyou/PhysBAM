@@ -5,7 +5,6 @@
 //#####################################################################
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -85,7 +84,7 @@ Hessian(const TV& X) const
 template<class TV> std::string RANGE<TV>::
 Name()
 {
-    return STRING_UTILITIES::string_sprintf("RANGE<VECTOR<T,%d>",d);
+    return LOG::sprintf("RANGE<VECTOR<T,%d>",d);
 }
 //#####################################################################
 #define INSTANTIATION_HELPER(T,d) \

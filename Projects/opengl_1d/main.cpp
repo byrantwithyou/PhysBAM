@@ -319,11 +319,11 @@ Initialize_Components_And_Key_Bindings()
 template<class T> void OPENGL_1D_VISUALIZATION<T>::
 Set_Frame_Extra()
 {
-    std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/frame_title",basedir.c_str(),frame);
+    std::string filename=LOG::sprintf("%s/%d/frame_title",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(filename)){std::ifstream input(filename.c_str());getline(input,frame_title);}
     else frame_title="";
-    filename=STRING_UTILITIES::string_sprintf("%s/%d/time",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){T time;FILE_UTILITIES::template Read_From_File(stream_type,filename,time);frame_title=STRING_UTILITIES::string_sprintf("(%.05f) ",time)+frame_title;}
+    filename=LOG::sprintf("%s/%d/time",basedir.c_str(),frame);
+    if(FILE_UTILITIES::File_Exists(filename)){T time;FILE_UTILITIES::template Read_From_File(stream_type,filename,time);frame_title=LOG::sprintf("(%.05f) ",time)+frame_title;}
 }
 //#####################################################################
 // Function Pre_Frame_Extra

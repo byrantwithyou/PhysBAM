@@ -11,6 +11,7 @@
 #include <Tools/Krylov_Solvers/LANCZOS_ITERATION.h>
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Math_Tools/Inverse.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -369,10 +370,10 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
     solver->iterations_used=&solid_body_collection.iterations_used_diagnostic;
     solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
 
-    if(print_each_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",coupled_b);    // TODO: this isn't actually valid for all the solver types
+    if(print_each_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",coupled_b);    // TODO: this isn't actually valid for all the solver types
     if(!solver->Solve(*coupled_system,coupled_x,coupled_b,coupled_vectors,fluid_tolerance,1,max_iterations))
         PHYSBAM_DEBUG_WRITE_SUBSTEP("FAILED CONVERGENCE",0,1);
-    if(print_each_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",coupled_x);
+    if(print_each_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("x-%i.txt",solve_id).c_str()).Write("x",coupled_x);
     LOG::cout<<"Residual L_inf norm="<<coupled_system->Residual_Linf_Norm(coupled_x,coupled_b)<<std::endl;
 
     LOG::Stop_Time();
@@ -439,8 +440,8 @@ Output_Iterators(const STREAM_TYPE stream_type,const char* output_directory,int 
         particles.X(p)=iterator.Location();
         color_attribute(p)=VECTOR<T,3>((T).5,(T).5,1);}
 
-    FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory,frame));
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%i/collision_iterators",output_directory,frame),particles);
+    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory,frame));
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%i/collision_iterators",output_directory,frame),particles);
 }
 //#####################################################################
 // Function Make_Divergence_Free

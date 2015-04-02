@@ -67,7 +67,7 @@ Parse_Options()
     LOG::cout<<"PARAM FILE is "<<parameter_file<<std::endl;
     parameter_list.Begin_Parse(parameter_file);
     std::string test_name=parameter_list.Get_Parameter("test_name",(std::string)"Test");
-    output_directory=STRING_UTILITIES::string_sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
+    output_directory=LOG::sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
     solids_parameters.cfl=parameter_list.Get_Parameter("cfl",(T)10);
     cfl_strain_rate=parameter_list.Get_Parameter("cfl_strain_rate",(T)0.1);
     solids_parameters.implicit_solve_parameters.cg_iterations=parameter_list.Get_Parameter("cg_iterations",(int)200);
@@ -222,8 +222,8 @@ Initialize_Bodies()
     deformable_body_collection.Add_Structure(&extra_edges);
     deformable_body_collection.Add_Structure(&bending_edges);
     deformable_body_collection.Add_Structure(&torsion_edges);
-    FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%s/fixed_nodes_start",data_directory.c_str(),sim_folder.c_str()),fixed_nodes_start);
-    FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%s/fixed_nodes_end",data_directory.c_str(),sim_folder.c_str()),fixed_nodes_end);
+    FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%s/fixed_nodes_start",data_directory.c_str(),sim_folder.c_str()),fixed_nodes_start);
+    FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%s/fixed_nodes_end",data_directory.c_str(),sim_folder.c_str()),fixed_nodes_end);
 
     PHYSBAM_FATAL_ERROR();
 #if 0
@@ -544,7 +544,7 @@ Preprocess_Solids_Substep(const T time,const int substep) {
 template<class T_input> void HAIR_STRAND_TESTS<T_input>::
 Postprocess_Frame(const int frame)
 {
-    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+STRING_UTILITIES::string_sprintf("/adhesion.%d",frame));
+    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
 }
 //#####################################################################
 // Function Write_Output_Files
@@ -553,7 +553,7 @@ template<class T_input> void HAIR_STRAND_TESTS<T_input>::
 Write_Output_Files(const int frame) const
 {
     BASE::Write_Output_Files(frame);
-    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+STRING_UTILITIES::string_sprintf("/adhesion.%d",frame));
+    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
 }
 //#####################################################################
 namespace PhysBAM{

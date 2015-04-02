@@ -327,19 +327,19 @@ void Parse_Options() PHYSBAM_OVERRIDE
         spring_stiffness=2e7;
         spring_overdamping_fraction=0;}
 
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d__Resolution_%d",test_number,(fluids_parameters.grid->counts.x));
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d",test_number,(fluids_parameters.grid->counts.x));
     if(timesplit) output_directory+="_semiimplicit";
     else output_directory+="_explicit";
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
     if(use_slip) output_directory+="_slip";
     if(transition_to_incompressible)  output_directory+="_transition_incompressible";
-    if(simulate_rigids || simulate_deformable) output_directory+=STRING_UTILITIES::string_sprintf("_mass_%f",solid_mass);
+    if(simulate_rigids || simulate_deformable) output_directory+=LOG::sprintf("_mass_%f",solid_mass);
     if(use_sound_speed_based_cfl) output_directory+="_using_sound_speed_cfl";
     if(fluids_parameters.compressible_apply_cavitation_correction) output_directory+="_cavitation";
     if(fluids_parameters.compressible_adaptive_time_step) output_directory+="_adaptive";
 
-    output_directory+=STRING_UTILITIES::string_sprintf("_rk%d_delta%.4f",rk_order,solid_position_delta);
+    output_directory+=LOG::sprintf("_rk%d_delta%.4f",rk_order,solid_position_delta);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {
     BASE::Parse_Late_Options();
@@ -517,7 +517,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 virtual void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
 {
     BASE::Write_Output_Files(frame);
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     if(fluids_parameters.euler->timesplit){
         ARRAY<bool,TV_INT> irregular_cells(fluids_parameters.euler_solid_fluid_coupling_utilities->near_interface);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",irregular_cells);}

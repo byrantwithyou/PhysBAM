@@ -12,6 +12,7 @@
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Utilities/INTERRUPTS.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
@@ -99,7 +100,7 @@ Simulate_To_Frame(const int frame_input)
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         Postprocess_Frame(++current_frame);
         if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files(current_frame);
-        else if(example.write_substeps_level!=-1) Write_Substep(STRING_UTILITIES::string_sprintf("END Frame %d",current_frame),0,example.write_substeps_level);
+        else if(example.write_substeps_level!=-1) Write_Substep(LOG::sprintf("END Frame %d",current_frame),0,example.write_substeps_level);
         LOG::cout<<"TIME = "<<time<<std::endl;}
 }
 //#####################################################################
@@ -410,7 +411,7 @@ Advance_To_Target_Time(const T target_time)
         example.solids_evolution->example_forces_and_velocities.Advance_One_Time_Step_End_Callback(dt,time);
         solids_evolution_callbacks->Postprocess_Solids_Substep(example.solids_evolution->time,substep);
         example.Postprocess_Substep(dt,time);
-        Write_Substep(STRING_UTILITIES::string_sprintf("END Substep %d",substep),substep,0);}
+        Write_Substep(LOG::sprintf("END Substep %d",substep),substep,0);}
 }
 //#####################################################################
 // Function Advect_Fluid
@@ -604,7 +605,7 @@ Write_Output_Files(const int frame)
 {
     LOG::SCOPE scope("writing output files");
     FILE_UTILITIES::Create_Directory(example.output_directory);
-    FILE_UTILITIES::Create_Directory(example.output_directory+STRING_UTILITIES::string_sprintf("/%d",frame));
+    FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
     Write_First_Frame(frame);
 

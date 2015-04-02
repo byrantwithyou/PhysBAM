@@ -186,7 +186,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     BASE::Parse_Options();
     tests.data_directory=data_directory;
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     last_frame=1000;
 
     switch(test_number){
@@ -282,7 +282,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
@@ -738,7 +738,7 @@ void Preprocess_Frame(const int frame)
     
     if (dump_sv)
     {
-        std::string output_file = STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
+        std::string output_file = LOG::sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
         svout.open(output_file.c_str());
     }
 }

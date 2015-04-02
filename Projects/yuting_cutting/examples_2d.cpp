@@ -36,11 +36,11 @@ template<class TV>
 void Dump(const SOLID_BODY_COLLECTION<TV>& solid_body_collection,DEBUG_PARTICLES<TV>& debug_particles,int frame,const char* frame_title)
 {
     FILE_UTILITIES::Create_Directory(output_directory);
-    FILE_UTILITIES::Create_Directory(output_directory+STRING_UTILITIES::string_sprintf("/%d",frame));
+    FILE_UTILITIES::Create_Directory(output_directory+LOG::sprintf("/%d",frame));
     FILE_UTILITIES::Create_Directory(output_directory+"/common");
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
-    FILE_UTILITIES::Write_To_Text_File(output_directory+STRING_UTILITIES::string_sprintf("/%d/frame_title",frame),frame_title);
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    FILE_UTILITIES::Write_To_Text_File(output_directory+LOG::sprintf("/%d/frame_title",frame),frame_title);
+    std::string f=LOG::sprintf("%d",frame);
     FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
     debug_particles.Write_Debug_Particles(STREAM_TYPE((RW())),output_directory,frame);
     solid_body_collection.Write(STREAM_TYPE((RW())),output_directory,frame,0,true,true,true,true,false);

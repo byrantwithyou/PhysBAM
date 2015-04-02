@@ -36,7 +36,7 @@ OPENGL_COMPONENT_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filenam
 
     number_of_sets=0;
     while(filename_set!=""){
-        std::string filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,number_of_sets);
+        std::string filename=LOG::sprintf(filename_set.c_str(),frame,number_of_sets);
         LOG::cout<<"Checking "<<filename<<std::endl;
         if(FILE_UTILITIES::File_Exists(filename)) number_of_sets++;
         else break;}
@@ -266,7 +266,7 @@ Reinitialize(bool force)
 
     for(int i=0;i<number_of_sets;i++){
         std::string frame_filename;
-        if(use_sets) frame_filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,i);
+        if(use_sets) frame_filename=LOG::sprintf(filename_set.c_str(),frame,i);
         else frame_filename=FILE_UTILITIES::Get_Frame_Filename(filename,frame);
         
         try{

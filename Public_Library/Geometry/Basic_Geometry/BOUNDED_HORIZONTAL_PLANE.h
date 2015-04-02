@@ -8,7 +8,6 @@
 #define __BOUNDED_HORIZONTAL_PLANE__
 
 #include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 
@@ -60,7 +59,7 @@ public:
     {return VECTOR<T,TV::dimension-1>();}
 
     static std::string Name()
-    {return STRING_UTILITIES::string_sprintf("BOUNDED_HORIZONTAL_PLANE<VECTOR<T,%d> >",TV::m);}
+    {return LOG::sprintf("BOUNDED_HORIZONTAL_PLANE<VECTOR<T,%d> >",TV::m);}
 
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,half_width);}

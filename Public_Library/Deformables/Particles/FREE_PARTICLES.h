@@ -7,7 +7,6 @@
 #ifndef __FREE_PARTICLES__
 #define __FREE_PARTICLES__
 
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
 namespace PhysBAM{
 
@@ -24,7 +23,7 @@ public:
 
     virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
     static std::string Static_Name()
-    {return STRING_UTILITIES::string_sprintf("FREE_PARTICLES<T,VECTOR<T,%d> >",TV::m);}
+    {return LOG::sprintf("FREE_PARTICLES<T,VECTOR<T,%d> >",TV::m);}
 
     static FREE_PARTICLES* Create(GEOMETRY_PARTICLES<TV>& particles)
     {return Create();}

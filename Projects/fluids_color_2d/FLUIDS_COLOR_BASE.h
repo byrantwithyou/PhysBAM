@@ -181,7 +181,7 @@ public:
 
     void After_Initialize_Example()
     {
-        if(!override_output_directory) output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number);
+        if(!override_output_directory) output_directory=LOG::sprintf("Test_%d",test_number);
 
         if(use_pls_over_levelset){if(use_level_set_method) use_pls=true;use_level_set_method=false;}
         if(use_levelset_over_pls){if(use_pls) use_level_set_method=true;use_pls=false;}

@@ -10,6 +10,7 @@
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Math_Tools/Robust_Arithmetic.h>
 #include <Tools/Math_Tools/sign.h>
 #include <Tools/Matrices/MATRIX_1X1.h>

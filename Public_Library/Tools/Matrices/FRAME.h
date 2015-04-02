@@ -10,7 +10,6 @@
 #include <Tools/Math_Tools/ONE.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Matrices/ROTATION.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Vectors/COMPLEX.h>
 #include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
@@ -98,7 +97,7 @@ public:
     
     std::string Name() const {return Static_Name();}
     static std::string Static_Name()
-    {return STRING_UTILITIES::string_sprintf("FRAME<VECTOR<T,%d> >",TV::m);}
+    {return LOG::sprintf("FRAME<VECTOR<T,%d> >",TV::m);}
 
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,t,r);}

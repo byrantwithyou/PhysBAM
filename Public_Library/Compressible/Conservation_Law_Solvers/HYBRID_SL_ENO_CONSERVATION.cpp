@@ -11,6 +11,7 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Tools/Log/SCOPE.h>
 #include <Compressible/Conservation_Law_Solvers/BOUNDARY_OBJECT.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION.h>
 #include <Compressible/Conservation_Law_Solvers/EIGENSYSTEM.h>

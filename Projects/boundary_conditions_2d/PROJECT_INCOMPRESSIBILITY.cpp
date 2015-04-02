@@ -93,17 +93,17 @@ void Project_Incompressibility(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,c
     static int solve_id=0;solve_id++;
     if(verbose){
         KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,2);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-temp-%i.txt",solve_id).c_str()).Write("temp",temp);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-G-%i.txt",solve_id).c_str()).Write("G",system.gradient);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-ND-%i.txt",solve_id).c_str()).Write("ND",system.neg_divergence);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-bi-%i.txt",solve_id).c_str()).Write("bi",system.beta_inverse);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-b-%i.txt",solve_id).c_str()).Write("b",b);}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("proj-temp-%i.txt",solve_id).c_str()).Write("temp",temp);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("proj-M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("proj-G-%i.txt",solve_id).c_str()).Write("G",system.gradient);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("proj-ND-%i.txt",solve_id).c_str()).Write("ND",system.neg_divergence);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("proj-bi-%i.txt",solve_id).c_str()).Write("bi",system.beta_inverse);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("proj-b-%i.txt",solve_id).c_str()).Write("b",b);}
 
     CONJUGATE_RESIDUAL<T> solver;
     solver.Solve(system,x,b,vectors,cg_tolerance,1,1000000);
 
-    if(verbose){OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-x-%i.txt",solve_id).c_str()).Write("x",x);}
+    if(verbose){OCTAVE_OUTPUT<T>(LOG::sprintf("proj-x-%i.txt",solve_id).c_str()).Write("x",x);}
 
     for(int i=0;i<index_to_cell.m;i++) p(index_to_cell(i))=x.v(i);
     if(neumann_pocket) p.Subset(ai.cell_samples)-=p.Subset(ai.cell_samples).Average();

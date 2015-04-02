@@ -115,7 +115,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             std::string rigid_body_particles_file_name=parameters.Get_Parameter("Prefix",std::string("unknown"));
             std::string parents_input=parameters.Get_Parameter("Parents",std::string(""));
             STRING_UTILITIES::Parse_Integer_List(parents_input,parents);
-            if(parents.m) FILE_UTILITIES::Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_parents",rigid_body_particles_file_name.c_str(),frame),rigid_body_parents);}
+            if(parents.m) FILE_UTILITIES::Read_From_File<RW>(LOG::sprintf("%s/%d/rigid_body_parents",rigid_body_particles_file_name.c_str(),frame),rigid_body_parents);}
         RIGID_BODY_COLLECTION<TV> &rigid_body_collection=Get_Rigid_Objects(parameters,frame,rigid_body_collection_name);
 
         if(range!="<unknown>"){
@@ -141,7 +141,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             std::string render_object=parameters.Get_Parameter("Render_Object",std::string("Null")); // object to use instead of an extra object
             if(render_object=="Null"){
                 RENDERING_TRIANGULATED_SURFACE<T>* rendering_triangulated_surface=0;
-                std::string file_name=rigid_body_collection_name+"_"+STRING_UTILITIES::string_sprintf("%d",id);
+                std::string file_name=rigid_body_collection_name+"_"+LOG::sprintf("%d",id);
                 if(type=="Rigid_Body_Instance" && objects.Get(file_name,object)){rendering_triangulated_surface=dynamic_cast<RENDERING_TRIANGULATED_SURFACE<T>*>(object);object->name=name;}
                 if(!rendering_triangulated_surface){
                     if(!rigid_body_collection.Rigid_Body(id).simplicial_object->mesh.elements.m){
@@ -183,7 +183,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         std::string prefix=parameters.Get_Parameter("Prefix",std::string("<unknown>"));
         std::string static_frame_prefix=parameters.Get_Parameter("Static_Frame_Prefix",prefix);
         prefix+="/";static_frame_prefix+="/";
-        std::string frame_string=STRING_UTILITIES::string_sprintf("%d/",local_frame);
+        std::string frame_string=LOG::sprintf("%d/",local_frame);
         int static_frame=FILE_UTILITIES::File_Exists(static_frame_prefix+frame_string+"deformable_object_structures")?frame:-1;
         std::string free_particles_geometry=parameters.Get_Parameter("Free_Particles_Geometry",std::string("Null")); // object to use instead of an extra object
         std::string free_particles_range=parameters.Get_Parameter("Free_Particles_Range",std::string("<unknown>"));
@@ -254,13 +254,13 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                     Apply_Triangulated_Surface_Parameters(*triangulated_surface,parameters);}
 
                 object->Update_Transform(current_transform);
-                std::string texture_coordinate_file=parameters.Get_Parameter(STRING_UTILITIES::string_sprintf("Texture_Coordinate_File%d",i),std::string("unknown"));
+                std::string texture_coordinate_file=parameters.Get_Parameter(LOG::sprintf("Texture_Coordinate_File%d",i),std::string("unknown"));
                 if(texture_coordinate_file!="unknown"){
                     std::string filename;
-                    filename=STRING_UTILITIES::string_sprintf(texture_coordinate_file.c_str(),local_frame);
+                    filename=LOG::sprintf(texture_coordinate_file.c_str(),local_frame);
                     surface->template Read_Texture_Coordinates<RW>(filename);}
-                object->name=name+"_"+STRING_UTILITIES::string_sprintf("%d",i);
-                object->material_shader=shaders.Get(parameters.Get_Parameter(STRING_UTILITIES::string_sprintf("Shader%d",i),shader_name));
+                object->name=name+"_"+LOG::sprintf("%d",i);
+                object->material_shader=shaders.Get(parameters.Get_Parameter(LOG::sprintf("Shader%d",i),shader_name));
                 object->priority=priority;object->support_transparent_overlapping_objects=support_transparent_overlapping_objects;
                 object->two_sided=two_sided;
                 if(sample_locations_filename!="unknown") dynamic_cast<RENDERING_TRIANGULATED_SURFACE<T>&>(*object).sample_locations_file=sample_locations_filename;
@@ -274,7 +274,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         else{LOG::cout<<"A Range is Required for a Deformable_Object_Instance."<<std::endl;PHYSBAM_FATAL_ERROR();}
         for(int index=0;index<integer_list.m;index++){
             int i=integer_list(index);
-            std::string structure_name=object_name+"_"+STRING_UTILITIES::string_sprintf("%d",i);
+            std::string structure_name=object_name+"_"+LOG::sprintf("%d",i);
             if(!objects.Get(structure_name,object)){LOG::cerr<<"Structure "<<structure_name<<" not found.  Check original range for object "<<name<<std::endl;PHYSBAM_FATAL_ERROR();}
             object->name=name;object->material_shader=shaders.Get(shader_name);
             /*if(add_to_collisions){

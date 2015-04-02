@@ -45,9 +45,9 @@ struct SIM_DATA
         ARRAY<int,FACE_INDEX<TV::m> > prev_face_color;
         ARRAY<ARRAY<T,FACE_INDEX<TV::m> > > prev_face_velocities;
         FILE_UTILITIES::Read_From_File(stream_type,dir+"/common/grid",grid);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/levelset_%d",dir.c_str(),frame,0),levelset);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/pressure",dir.c_str(),frame),pressure);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/restart_data",dir.c_str(),frame),
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/levelset_%d",dir.c_str(),frame,0),levelset);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/pressure",dir.c_str(),frame),pressure);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",dir.c_str(),frame),
             time,face_color,prev_face_color,face_velocities,prev_face_velocities);
         res=grid.counts.x;
         for(int d=0;d<TV::m;d++) face_grids(d)=grid.Get_Face_Grid(d);

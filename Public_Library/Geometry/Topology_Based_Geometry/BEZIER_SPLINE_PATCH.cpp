@@ -161,7 +161,7 @@ Name() const
 template<class TV, int d> std::string BEZIER_SPLINE_PATCH<TV,d>::
 Static_Name()
 {
-    return STRING_UTILITIES::string_sprintf("BEZIER_SPLINE_PATCH<VECTOR<T,%d> ,%d>",TV::dimension,d);
+    return LOG::sprintf("BEZIER_SPLINE_PATCH<VECTOR<T,%d> ,%d>",TV::dimension,d);
 }
 //#####################################################################
 // Function Extension

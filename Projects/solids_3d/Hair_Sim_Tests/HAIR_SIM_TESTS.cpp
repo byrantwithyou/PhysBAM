@@ -81,7 +81,7 @@ Parse_Options()
     LOG::cout<<"PARAM FILE is "<<parameter_file<<std::endl;
     parameter_list.Begin_Parse(parameter_file);
     std::string test_name=parameter_list.Get_Parameter("test_name",(std::string)"Test");
-    output_directory=STRING_UTILITIES::string_sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
+    output_directory=LOG::sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
     use_wind=parameter_list.Get_Parameter("use_wind",(bool)false);
     use_drag=parameter_list.Get_Parameter("use_drag",(bool)false);
     drag_viscosity=parameter_list.Get_Parameter("drag_viscosity",(T)5);
@@ -179,7 +179,7 @@ Initialize_Bodies()
     
     // compute last frame
     if(use_deforming_levelsets){
-        int levelset_frames;FILE_UTILITIES::Read_From_Text_File(STRING_UTILITIES::string_sprintf("%s/%s/motion/last_frame",data_directory.c_str(),sim_folder.c_str()),levelset_frames);
+        int levelset_frames;FILE_UTILITIES::Read_From_Text_File(LOG::sprintf("%s/%s/motion/last_frame",data_directory.c_str(),sim_folder.c_str()),levelset_frames);
         last_frame=(int)((T)levelset_frames*levelset_frequency*(T)frame_rate)+round_number(start_time*frame_rate);
         last_frame-=1;}
     else{
@@ -399,7 +399,7 @@ Initialize_Bodies()
         segment_adhesion=new SEGMENT_ADHESION<TV>(particles,edges.mesh,particle_to_spring_id,solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.intersecting_edge_edge_pairs);
         segment_adhesion->Set_Parameters(adhesion_stiffness,(T)10,adhesion_start_radius,adhesion_stop_radius,max_connections);
         solid_body_collection.Add_Force(segment_adhesion);
-        if(restart) segment_adhesion->Read_State(stream_type,output_directory+STRING_UTILITIES::string_sprintf("/adhesion.%d",restart_frame));
+        if(restart) segment_adhesion->Read_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",restart_frame));
         else segment_adhesion->Write_State(stream_type,output_directory+"/adhesion.0");}
     // drag forces
     ETHER_DRAG<TV>* ether_drag=new ETHER_DRAG<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,&active_particles,NULL);
@@ -427,8 +427,8 @@ Initialize_Bodies()
         ARRAY<T,VECTOR<int,3> >& phi_1=*new ARRAY<T,VECTOR<int,3> >;
         ARRAY<TV,VECTOR<int,3> >& velocity_1=*new ARRAY<TV,VECTOR<int,3> >;
         LEVELSET<TV> levelset_1(grid_1,phi_1);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),current_levelset),levelset_1);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity_1);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),current_levelset),levelset_1);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity_1);
         LOG::cout<<"READING LEVELSET NUMBER: "<<current_levelset<<std::endl;
         LEVELSET_IMPLICIT_OBJECT<TV> *levelset_implicit_object_1=new LEVELSET_IMPLICIT_OBJECT<TV>(levelset_1.grid,levelset_1.phi);
         levelset_implicit_object_1->V=&velocity_1;
@@ -436,8 +436,8 @@ Initialize_Bodies()
         ARRAY<T,VECTOR<int,3> > &phi_2=*new ARRAY<T,VECTOR<int,3> >;
         ARRAY<TV,VECTOR<int,3> >& velocity_2=*new ARRAY<TV,VECTOR<int,3> >;
         LEVELSET<TV> levelset_2(grid_2,phi_2);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),++current_levelset),levelset_2);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity_2);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),++current_levelset),levelset_2);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity_2);
         LOG::cout<<"READING LEVELSET NUMBER: "<<current_levelset<<std::endl;
         LEVELSET_IMPLICIT_OBJECT<TV> *levelset_implicit_object_2=new LEVELSET_IMPLICIT_OBJECT<TV>(levelset_2.grid,levelset_2.phi);
         levelset_implicit_object_2->V=&velocity_2;
@@ -521,8 +521,8 @@ Initialize_Bodies()
     //Bindings
     ARRAY<TV> bindings1,bindings2; // Will be populated into ones to apply after MPI setup
     if(use_deforming_levelsets){
-        FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),(current_levelset-1)),bindings1);
-        FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),bindings2);}
+        FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),(current_levelset-1)),bindings1);
+        FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),bindings2);}
     else for(int i=0;i<fixed_nodes.m;i++){bindings1.Append(particles.X(fixed_nodes(i)));bindings2.Append(particles.X(fixed_nodes(i)));}
     // transform all points into world space
     for(int i=0;i<offset;i++) {particles.X(i)=implicit_rigid_body->World_Space_Point(particles.X(i));}
@@ -599,15 +599,15 @@ Update_Keyframed_Parameters_For_Time_Update_Helper(const T time,T_IMPLICIT_COMBI
     if (pseudo_time>=current_levelset){
         bindings1_to_apply=bindings2_to_apply;
         ARRAY<TV> bindings2;
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),++current_levelset),bindings2);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),++current_levelset),bindings2);
         bindings2_to_apply=bindings2.Subset(fixed_nodes_indices);
         Compute_Binding_Velocities();
         GRID<TV>& grid=*new GRID<TV>;
         ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >;
         ARRAY<TV,VECTOR<int,3> >& velocity=*new ARRAY<TV,VECTOR<int,3> >;
         LEVELSET<TV> levelset(grid,phi);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),current_levelset),levelset);
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),current_levelset),levelset);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity);
         LOG::cout<<"PRE object1="<<combined.implicit_object1<<" object2="<<combined.implicit_object2<<std::endl;
         LOG::cout<<"READING LEVELSET NUMBER: "<<current_levelset<<std::endl;
         LEVELSET_IMPLICIT_OBJECT<TV> *levelset_implicit_object=new LEVELSET_IMPLICIT_OBJECT<TV>(levelset.grid,levelset.phi);
@@ -803,8 +803,8 @@ Postprocess_Frame(const int frame)
 {
     if (frame/frame_rate>=start_time) solids_parameters.triangle_collision_parameters.temporary_enable_collisions=solids_parameters.triangle_collision_parameters.perform_self_collision;
     //Write_Output_Files(frame);
-    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+STRING_UTILITIES::string_sprintf("/adhesion.%d",frame));
-    if(guide_adhesion) guide_adhesion->Write_State(stream_type,output_directory+STRING_UTILITIES::string_sprintf("/adhesion.%d",frame));
+    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
+    if(guide_adhesion) guide_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
 }
 //#####################################################################
 // Function Add_External_Impulses_Before
@@ -896,18 +896,18 @@ Write_Interpolated_Level_Set(const int frame,T_IMPLICIT_COMBINED& combined) cons
         ARRAY<T,VECTOR<int,3> > phi(grid.Domain_Indices());
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) phi(i,j,ij)=combined(grid.X(TV_INT(i,j,ij)));
         LEVELSET<TV> interpolated_levelset(grid,phi);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/grid.%d",output_directory.c_str(),frame),grid);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/levelset.%d",output_directory.c_str(),frame),interpolated_levelset);}
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/grid.%d",output_directory.c_str(),frame),grid);
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/levelset.%d",output_directory.c_str(),frame),interpolated_levelset);}
     else{
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/grid.%d",output_directory.c_str(),frame),((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset.grid);
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/levelset.%d",output_directory.c_str(),frame),((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset);}
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/grid.%d",output_directory.c_str(),frame),((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset.grid);
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/levelset.%d",output_directory.c_str(),frame),((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset);}
 }
 template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Write_Output_Files(const int frame) const
 {
     BASE::Write_Output_Files(frame);
-    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+STRING_UTILITIES::string_sprintf("/adhesion.%d",frame));
-    if(guide_adhesion) guide_adhesion->Write_State(stream_type,output_directory+STRING_UTILITIES::string_sprintf("/adhesion.%d",frame));
+    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
+    if(guide_adhesion) guide_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
     if(use_deforming_levelsets){
         if(use_eulerian_level_set_interpolation) Write_Interpolated_Level_Set(frame,
             ((IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>&)*((IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*)implicit_rigid_body->implicit_object)->object_space_implicit_object));

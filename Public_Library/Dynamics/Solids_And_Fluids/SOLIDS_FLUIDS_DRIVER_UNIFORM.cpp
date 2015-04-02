@@ -10,6 +10,7 @@
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Utilities/INTERRUPTS.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
@@ -483,7 +484,7 @@ Advance_To_Target_Time(const T target_time)
 
         last_dt=restart_dt?restart_dt:dt;time+=last_dt;restart_dt=0;
 
-        Write_Substep(STRING_UTILITIES::string_sprintf("END Substep %d",substep),substep,0);}
+        Write_Substep(LOG::sprintf("END Substep %d",substep),substep,0);}
 }
 //#####################################################################
 // Function Integrate_Fluid_Non_Advection_Forces
@@ -1374,7 +1375,7 @@ Compute_Dt(const T time,const T target_time,bool& done)
         LOG::cout<<"fluids_dt = "<<fluids_dt<<", solids_dt = "<<solids_dt<<" dt="<<dt<<std::endl;
     else
         LOG::cout<<"dt = solids_dt = "<<dt<<std::endl;
-    if(example.abort_when_dt_below && dt<example.abort_when_dt_below) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("dt too small (%g < %g)",dt,example.abort_when_dt_below));
+    if(example.abort_when_dt_below && dt<example.abort_when_dt_below) PHYSBAM_FATAL_ERROR(LOG::sprintf("dt too small (%g < %g)",dt,example.abort_when_dt_below));
     done=false;
     SOLIDS_FLUIDS_EXAMPLE<TV>::Clamp_Time_Step_With_Target_Time(time,target_time,dt,done,solids_parameters.min_dt);
     return dt;
@@ -1387,7 +1388,7 @@ Write_Output_Files(const int frame)
 {
     LOG::SCOPE scope("writing output files");
     FILE_UTILITIES::Create_Directory(example.output_directory);
-    FILE_UTILITIES::Create_Directory(example.output_directory+STRING_UTILITIES::string_sprintf("/%d",frame));
+    FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
     Write_First_Frame(frame);
 

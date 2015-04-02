@@ -2,7 +2,8 @@
 // Copyright 2009.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
+#include <Tools/Arrays/ARRAY.h>
+#include <Tools/Log/LOG_PRINTF.h>
 #include <Tools/Math_Tools/exchange.h>
 #include <Tools/Math_Tools/maxabs.h>
 #include <Tools/Math_Tools/min.h>

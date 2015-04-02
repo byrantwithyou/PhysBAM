@@ -105,7 +105,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     tests.data_directory=data_directory;
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
@@ -138,7 +138,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
           RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("subdivided_box",2,(T).5);
           rigid_body->Frame()=FRAME<TV>(TV(10,2),rotation);
           break;}
-      default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
+      default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 
     tests.Add_Ground(.5,-2,1);
 
@@ -228,7 +228,7 @@ void PD_Example()
         child_body=&tests.Add_Rigid_Body("square_refined",(T).2,(T).5);
         child_body->Frame().t=TV(cheight,0);
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
+        child_body->name=LOG::sprintf("child_%d",i);
 
         joint=new POINT_JOINT<TV>();arb->joint_mesh.Add_Articulation(child_body->particle_index-1,child_body->particle_index,joint);
         JOINT_FUNCTION<TV>* jfunc=new JOINT_FUNCTION<TV>(*joint,*parent_body,*child_body);
@@ -257,9 +257,9 @@ int Large_Cluster_Square(FRAME<TV>shift_frame,T scale=1)
     ARRAY<RIGID_BODY<TV>*>& bodies=*new ARRAY<RIGID_BODY<TV>*>(4);
     int count=0;
     for(int i=0;i<4;i++){
-//        bodies(i)->name=STRING_UTILITIES::string_sprintf("child::%d",bodies(i)));}
+//        bodies(i)->name=LOG::sprintf("child::%d",bodies(i)));}
         bodies(i)=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-        bodies(i)->name=STRING_UTILITIES::string_sprintf("child::%d",bodies(i)));
+        bodies(i)->name=LOG::sprintf("child::%d",bodies(i)));
         solids_parameters.collision_body_list.Add_Body(bodies(i));}
     for(int i=-1;i<=1;i+=2) for(int j=-1;j<=1;j+=2) bodies(++count)->Frame()=shift_frame*FRAME<TV>(TV((T)j,(T)i));
     tests.Add_Gravity();

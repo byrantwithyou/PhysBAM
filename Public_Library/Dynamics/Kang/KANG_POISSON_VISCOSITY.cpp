@@ -204,9 +204,9 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     static int solve_id=-1;solve_id++;
     if(print_matrix){
         LOG::cout<<"pressure solve id "<<solve_id<<std::endl;
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",matrix);
-        if(system.P) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Z-%i.txt",solve_id).c_str()).Write("Z",*system.P);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs.v);}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",matrix);
+        if(system.P) OCTAVE_OUTPUT<T>(LOG::sprintf("Z-%i.txt",solve_id).c_str()).Write("Z",*system.P);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs.v);}
 
     CONJUGATE_RESIDUAL<T> cr;
     CONJUGATE_GRADIENT<T> cg;
@@ -215,7 +215,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     KRYLOV_SOLVER<T>* solver=&cr;
     solver->restart_iterations=fluids_parameters.cg_restart_iterations;
     solver->Solve(system,p,rhs,vectors,fluids_parameters.incompressible_tolerance,0,fluids_parameters.incompressible_iterations);
-    if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",p.v);
+    if(print_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("x-%i.txt",solve_id).c_str()).Write("x",p.v);
 
     INTERPOLATED_COLOR_MAP<T> color_map;
     color_map.Initialize_Colors((T)-.3,(T).3,false,true,false);
@@ -333,9 +333,9 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     static int solve_id=-1;solve_id++;
     if(print_matrix){
         LOG::cout<<"viscosity id "<<solve_id<<std::endl;
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-rho-%i.txt",solve_id).c_str()).Write("rho",r.v);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",matrix);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b.v);}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("visc-rho-%i.txt",solve_id).c_str()).Write("rho",r.v);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",matrix);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b.v);}
 
     if(implicit){
         typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
@@ -343,7 +343,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         SYSTEM system(matrix);
         system.P=matrix.C;
         b.v*=r.v;
-        if(print_matrix && system.P) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-Z-%i.txt",solve_id).c_str()).Write("Z",*system.P);
+        if(print_matrix && system.P) OCTAVE_OUTPUT<T>(LOG::sprintf("visc-Z-%i.txt",solve_id).c_str()).Write("Z",*system.P);
         CONJUGATE_RESIDUAL<T> cr;
         CONJUGATE_GRADIENT<T> cg;
         SYMMQMR<T> qm;
@@ -356,7 +356,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         matrix.Times(u.v,q.v);
         q.v/=r.v;
         u.v=b.v-q.v;}
-    if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-u-%i.txt",solve_id).c_str()).Write("u",u.v);
+    if(print_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("visc-u-%i.txt",solve_id).c_str()).Write("u",u.v);
 
     INTERPOLATED_COLOR_MAP<T> color_map;
     color_map.Initialize_Colors(u.v.Min(),u.v.Max(),false,true,false);

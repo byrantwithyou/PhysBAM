@@ -183,7 +183,7 @@ Test_Matrix() const
 template<class TV> void MATRIX_SOLID_FORCES<TV>::
 Print_Each_Matrix(int n,const GENERALIZED_VELOCITY<TV>& V,T sqrt_dt) const
 {
-    OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("C-%i.txt",n).c_str());
+    OCTAVE_OUTPUT<T> oo(LOG::sprintf("C-%i.txt",n).c_str());
 
     GENERALIZED_VELOCITY<TV> G(V);
     int c=G.Raw_Size();

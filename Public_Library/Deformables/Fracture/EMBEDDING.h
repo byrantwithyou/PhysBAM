@@ -44,7 +44,7 @@ public:
 
     virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
     static std::string Static_Name()
-    {return STRING_UTILITIES::string_sprintf("EMBEDDING<VECTOR<T,%d> >",TV::dimension);}
+    {return LOG::sprintf("EMBEDDING<VECTOR<T,%d> >",TV::dimension);}
 
     void Update_Number_Nodes() PHYSBAM_OVERRIDE
     {material_surface.Update_Number_Nodes();}

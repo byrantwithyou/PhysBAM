@@ -159,7 +159,7 @@ Read(const std::string& prefix,ARRAY<int>& needs_init)
     needs_init.Remove_All();
     needs_write.Remove_All();
     ARRAY<int> active_ids;char version;
-    FILE_UTILITIES::Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%sactive_ids",prefix.c_str()),version,next_unique_id,active_ids);
+    FILE_UTILITIES::Read_From_File<RW>(LOG::sprintf("%sactive_ids",prefix.c_str()),version,next_unique_id,active_ids);
     PHYSBAM_ASSERT(version==1);
     ARRAY<void*> new_array;
     ARRAY<bool> element_copied(array.Size());
@@ -184,7 +184,7 @@ template<class RW> void DYNAMIC_LIST_CORE::
 Write(const std::string& prefix) const
 {
     const char version=1;
-    FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%sactive_ids",prefix.c_str()),version,next_unique_id,index_to_id_map);
+    FILE_UTILITIES::Write_To_File<RW>(LOG::sprintf("%sactive_ids",prefix.c_str()),version,next_unique_id,index_to_id_map);
     for(int i=needs_write.m-1;i>=0;i--) if(id_to_index_map(needs_write(i))<0) needs_write.Remove_Index_Lazy(i);
     // handle case of new element which was removed without being written
 }

@@ -270,11 +270,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
-    // output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_density_%d",test_number,resolution,solid_density);
+    // output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_density_%d",test_number,resolution,solid_density);
     if(fluids_parameters.use_slip)
-        output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_slip",test_number,resolution);
+        output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_slip",test_number,resolution);
     else
-        output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests_Water/Test_%d_Resolution_%d",test_number,resolution);
+        output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d",test_number,resolution);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

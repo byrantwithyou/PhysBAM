@@ -220,7 +220,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
     if(use_fmm && (compute_unsigned_distance_function || compute_signed_distance_function)){
         for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) 
             phi(it.index)=clamp(phi(it.index),-10*grid.dX.Min(),10*grid.dX.Min()); // clamp away from FLT_MAX to avoid floating point exceptions
-        if(verbose) LOG::Time(STRING_UTILITIES::string_sprintf("Fast Marching (one sided band width=%f)",fmm_one_sided_band_width));
+        if(verbose) LOG::Time(LOG::sprintf("Fast Marching (one sided band width=%f)",fmm_one_sided_band_width));
         GRID<TV> grid_copy=grid;LEVELSET<TV> levelset(grid_copy,phi);
         if(compute_unsigned_distance_function) levelset.Fast_Marching_Method(0,fmm_stopping_distance,&initialized_indices);
         else if(compute_signed_distance_function) levelset.Fast_Marching_Method(0,fmm_stopping_distance,phi_offset?&initialized_indices:0);}
@@ -228,7 +228,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
     if(compute_velocity && extrapolate_velocity){
         if(!compute_signed_distance_function || !use_fmm){LOG::cerr<<"Can only extrapolate velocity if computing signed distance function"<<std::endl;}
         else{
-            if(verbose) LOG::Time(STRING_UTILITIES::string_sprintf("Extrapolating velocity (one sided band width=%f)",velocity_extrapolation_one_sided_band_width));
+            if(verbose) LOG::Time(LOG::sprintf("Extrapolating velocity (one sided band width=%f)",velocity_extrapolation_one_sided_band_width));
             GRID<TV> grid_copy=grid;
             EXTRAPOLATION_UNIFORM<TV,TV> extrapolation(grid_copy,phi,*velocity,3);
             extrapolation.Set_Custom_Seed_Indices(&initialized_indices);

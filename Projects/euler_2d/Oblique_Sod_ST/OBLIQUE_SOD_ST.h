@@ -97,8 +97,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.compressible_timesplit=timesplit;
 
     output_directory="Oblique_Sod_ST/matlab";        
-    if(timesplit) output_directory=STRING_UTILITIES::string_sprintf("Oblique_Sod_ST/Resolution_%d_%d_semiimplicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-    else output_directory=STRING_UTILITIES::string_sprintf("Oblique_Sod_ST/Resolution_%d_%d_explicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+    if(timesplit) output_directory=LOG::sprintf("Oblique_Sod_ST/Resolution_%d_%d_semiimplicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+    else output_directory=LOG::sprintf("Oblique_Sod_ST/Resolution_%d_%d_explicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
 }

@@ -55,7 +55,7 @@ Preprocess_File(std::string raw_filename,const int frame)
     std::string filename=FILE_UTILITIES::Get_Frame_Filename(raw_filename,frame);
     std::ifstream input_stream(filename.c_str());
     std::string directory=FILE_UTILITIES::Get_Base_Directory_Name(filename);
-    if(!input_stream) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Could not open scene file %s",filename.c_str()));
+    if(!input_stream) PHYSBAM_FATAL_ERROR(LOG::sprintf("Could not open scene file %s",filename.c_str()));
     std::string line,statement;
     while(std::getline(input_stream,line)){
         std::string::size_type comment=line.find("//");

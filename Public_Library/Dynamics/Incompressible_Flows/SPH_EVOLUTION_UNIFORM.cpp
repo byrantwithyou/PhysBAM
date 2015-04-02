@@ -11,6 +11,7 @@
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Math_Tools/constants.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
@@ -278,7 +279,7 @@ Postprocess_Particles(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,co
         sph_particles.V(p)[axis]+=delta_slip*delta_velocity(p)[axis]/delta_weight(p)[axis];}}
 
     if(flip_ratio!=1){
-        LOG::Time(STRING_UTILITIES::string_sprintf("applying FLIP to PIC with ratio %f",flip_ratio));
+        LOG::Time(LOG::sprintf("applying FLIP to PIC with ratio %f",flip_ratio));
         int ghost_cells=3;
         ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(grid,ghost_cells);
         incompressible.boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,ghost_cells);
@@ -295,7 +296,7 @@ Postprocess_Particles(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,co
 
     if(attraction_strength){
         int skip_number=1+attraction_skip_number;
-        LOG::Time(STRING_UTILITIES::string_sprintf("attracting particles with skip %d",skip_number));
+        LOG::Time(LOG::sprintf("attracting particles with skip %d",skip_number));
         T attraction_restlength=attraction_restlength_cells*grid.dX.Min();
         T halfway_between_restlength_and_radius=(T).5*(attraction_restlength+radius);
         const RANGE<TV>& domain=grid.domain;

@@ -179,7 +179,7 @@ public:
     
     template<class RW> void Read(std::istream& input)
     {Clean_Memory();Read_Binary<RW>(input,domain_indices);Read_Binary<RW>(input,buffer_size);
-    if(buffer_size<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid negative array size %d",buffer_size));
+    if(buffer_size<0) throw READ_ERROR(LOG::sprintf("Invalid negative array size %d",buffer_size));
     if(!buffer_size) return;
     base_pointer=new T[buffer_size];
     Read_Binary_Array<RW>(input,base_pointer,buffer_size);

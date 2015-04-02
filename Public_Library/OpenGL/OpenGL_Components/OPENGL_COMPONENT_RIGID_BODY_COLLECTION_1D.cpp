@@ -60,7 +60,7 @@ Reinitialize(const bool force,const bool read_geometry)
 {
     if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
         valid=false;
-        if(!FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
+        if(!FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
         rigid_body_collection.Read(stream_type,basedir,frame,&needs_init,&needs_destroy);
 
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
@@ -133,7 +133,7 @@ Update_Object_Labels()
             if(opengl_point_simplices(i)){
                 if(output_positions){
                     //rigid_body_collection.Rigid_Body(i).Update_Angular_Velocity();
-                    opengl_point_simplices(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f>",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particles.frame(i).t.x));}
+                    opengl_point_simplices(i)->Set_Name(LOG::sprintf("%s <%.3f>",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particles.frame(i).t.x));}
                 else opengl_point_simplices(i)->Set_Name(rigid_body_collection.Rigid_Body(i).name);}}}
     for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
         if(draw_object(i)){
@@ -147,7 +147,7 @@ Update_Object_Labels()
 template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/rigid_bodies",basedir.c_str(),frame_input));
+    return FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/rigid_bodies",basedir.c_str(),frame_input));
 }
 //#####################################################################
 // Function Set_Frame
@@ -185,7 +185,7 @@ Display() const
             glColor3f(1,1,1);
             for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
                 if(draw_object(i) && rigid_body_collection.Rigid_Body(i).name.length()){
-                    OpenGL_String(rigid_body_collection.rigid_body_particles.frame(i).t,STRING_UTILITIES::string_sprintf("%s %f",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particles.twist(i).linear.x));}}}
+                    OpenGL_String(rigid_body_collection.rigid_body_particles.frame(i).t,LOG::sprintf("%s %f",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particles.twist(i).linear.x));}}}
         glPopAttrib();}
 }
 //#####################################################################

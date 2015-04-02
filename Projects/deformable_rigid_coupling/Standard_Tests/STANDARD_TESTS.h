@@ -35,6 +35,7 @@
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
@@ -209,7 +210,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     tests.data_directory=data_directory;
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
@@ -330,7 +331,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 22: Sphere_Block(true);break;
         case 23: Sphere_Block(false);break;
         case 24: Two_Way_Tori();break;
-      default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
+      default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 
     if(dynamic_subsampling) Initialize_Dynamic_Subsampling();
 
@@ -629,14 +630,14 @@ void Sliding_Test()
     rigid_body->Frame().r=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
     rigid_body->Twist().linear=rigid_body->Frame().r.Rotate(TV(-initial_speed_down_ramp1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution(0);
-    rigid_body->name=STRING_UTILITIES::string_sprintf("box 1 mu=%.2f",mu);
+    rigid_body->name=LOG::sprintf("box 1 mu=%.2f",mu);
 
     rigid_body=&tests.Add_Rigid_Body(boxfile,box_size,mu);
     rigid_body->Frame().t=TV(-box_size*sin(ground_angle_rad),box_size*cos(ground_angle_rad),8*box_size);
     rigid_body->Frame().r=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Twist().linear=rigid_body->Frame().r.Rotate(TV(-initial_speed_down_ramp2,0,0));
-    rigid_body->name=STRING_UTILITIES::string_sprintf("box 2 mu=%.2f",mu);
+    rigid_body->name=LOG::sprintf("box 2 mu=%.2f",mu);
 
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();solid_body_collection.deformable_body_collection.Add_Structure(&free_particles);
     int particle_rest=solid_body_collection.deformable_body_collection.particles.Add_Element(),particle_fall=solid_body_collection.deformable_body_collection.particles.Add_Element();
@@ -947,7 +948,7 @@ void Ring_Drop()
         for(int j=0;j<poles;j++){
             TV position((i-(poles+1)/(T)2)*7,10,(j-(poles+1)/(T)2)*7);
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
-            rigid_body.name=STRING_UTILITIES::string_sprintf("pole %d %d",i,j);
+            rigid_body.name=LOG::sprintf("pole %d %d",i,j);
             rigid_body.is_static=true;
             rigid_body.Frame().t=position;}
 
@@ -1107,7 +1108,7 @@ void PD_Snake(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p
         child_body->Frame().t=orient.Rotate(TV(cheight,0,0))+shift;
         child_body->Frame().r=orient*initial_orientation;
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
+        child_body->name=LOG::sprintf("child_%d",i);
         child_body->Set_Mass(50);
 
         ROTATION<TV> desired_rotation=ROTATION<TV>(desired_x,TV());

@@ -209,7 +209,7 @@ void Random_Scene_Generator(const ARRAY<std::string>& filenames,const int random
     for(i=0;i<filenames.m;i++){// create all the objects to get their bounding boxes
         T scale=random_placement.Random_Scale(random_numbers);
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(filenames(i),scale,1);
-        rigid_body.name=STRING_UTILITIES::string_sprintf("%s %d",filenames(i).c_str(),i);
+        rigid_body.name=LOG::sprintf("%s %d",filenames(i).c_str(),i);
         random_placement.Random_Placement(random_numbers,rigid_body);}
     
     RIGID_BODY_INTERSECTIONS<TV> intersections(rigid_body_collection);

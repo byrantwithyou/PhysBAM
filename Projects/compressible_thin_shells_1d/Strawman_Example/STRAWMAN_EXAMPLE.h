@@ -6,7 +6,6 @@
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Matrices/MATRIX_1X1.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Read_Write/TYPED_STREAM.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
@@ -52,7 +51,7 @@ class STRAWMAN_EXAMPLE
         : stream_type(T()),resolution(resolution),frame(0),grid(TV_INT(resolution),RANGE<TV>(TV((T)-1),TV(0)),true),
         velocity(grid.Domain_Indices(3)),rho_with_extrapolation(grid.Domain_Indices(3)),rho_fixed(grid.Domain_Indices(3)),
          rho_tmp(grid.Domain_Indices(3)),initial_distance((T)-.5),solid_velocity((T)-1),rigid_body_collection(0)
-    {output_directory=STRING_UTILITIES::string_sprintf("Strawman_Example/Solution_Resolution_%d",resolution);}
+    {output_directory=LOG::sprintf("Strawman_Example/Solution_Resolution_%d",resolution);}
 
 //#####################################################################
 // Function Initialize
@@ -181,7 +180,7 @@ void Run(){
     while (time < final_time){
         if(time+(T)2*dt>final_time && time+dt<final_time-(T)1e-12) dt = (final_time-time)/(T)2;
         Euler_Step(dt,time);
-        Write_Output_Files(time+dt,STRING_UTILITIES::string_sprintf("Frame %d",frame));
+        Write_Output_Files(time+dt,LOG::sprintf("Frame %d",frame));
         time+=dt;
     }
 }
@@ -190,10 +189,10 @@ void Run(){
 //#####################################################################
 void Write_Output_Files(const T& time,const std::string& frame_title)
 {
-    std::string frame_folder=output_directory+STRING_UTILITIES::string_sprintf("/%d/",frame);
+    std::string frame_folder=output_directory+LOG::sprintf("/%d/",frame);
     FILE_UTILITIES::Create_Directory(frame_folder);
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/time",output_directory.c_str(),frame),time);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/time",output_directory.c_str(),frame),time);
 
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/density",rho_with_extrapolation);
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/rho_fixed",rho_fixed);
@@ -212,7 +211,7 @@ void Write_Output_Files(const T& time,const std::string& frame_title)
     rho_fixed(solid_clamped_tn)=rho_fixed(solid_clamped_tn+1);
     rho_analytic(solid_clamped_tn)=rho_analytic(solid_clamped_tn+1);
 
-    FILE_UTILITIES::Write_To_Text_File(output_directory+STRING_UTILITIES::string_sprintf("/%d/frame_title",frame),frame_title);
+    FILE_UTILITIES::Write_To_Text_File(output_directory+LOG::sprintf("/%d/frame_title",frame),frame_title);
 
     frame++;
 }

@@ -6,6 +6,7 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
+#include <Tools/Log/SCOPE.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_UNIFORM.h>

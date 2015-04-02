@@ -10,6 +10,7 @@
 #include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Vectors/VECTOR_UTILITIES.h>
 #include <Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>

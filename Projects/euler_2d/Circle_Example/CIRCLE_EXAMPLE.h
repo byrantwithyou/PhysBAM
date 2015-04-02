@@ -329,8 +329,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
          fluids_parameters.temperature_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_temperature,(T).1);}
 
     // Set output directory
-    if(timesplit) output_directory=STRING_UTILITIES::string_sprintf("Circle_Example/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-    else output_directory=STRING_UTILITIES::string_sprintf("Circle_Example/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+    if(timesplit) output_directory=LOG::sprintf("Circle_Example/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+    else output_directory=LOG::sprintf("Circle_Example/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
     if(use_slip) output_directory+="_slip";
@@ -338,7 +338,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(use_soot) output_directory+="_soot";
     if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
     if(strong_shock) output_directory+="_strong";
-    output_directory+=STRING_UTILITIES::string_sprintf("_mass_%f",solid_mass);
+    output_directory+=LOG::sprintf("_mass_%f",solid_mass);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

@@ -119,7 +119,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     tests.data_directory=data_directory;
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.cfl=1;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
@@ -142,7 +142,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     switch(test_number){
         case 1: last_frame=240;break;
         case 2: last_frame=240;break;
-        default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
+        default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
@@ -158,7 +158,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     switch(test_number){
         case 1: Plastic_Mattress(2,2,2,ROTATION<TV>(1,TV(1,1,1)),RANGE<TV>(TV(-(T).5,-(T).5,-(T).5),TV((T).5,(T).5,(T).5)),(T)1.2);break;
         case 2: Plastic_Mattress(2,4,4,ROTATION<TV>(0,TV(1,1,1)),RANGE<TV>(TV(-(T).5,-(T)1.5,-(T)1.5),TV((T).5,(T)1.5,(T)1.5)),(T)1.2);break;
-      default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
+      default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 
     tests.Add_Ground();
 
@@ -246,7 +246,7 @@ void Plastic_Mattress(int nx,int ny,int nz,const ROTATION<TV>& rot,const RANGE<T
 //#####################################################################
 void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
 {
-    std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);
+    std::string f=LOG::sprintf(".%d",frame);
 
     // viewer and restart output
     SOLIDS_EXAMPLE<TV>::Write_Output_Files(frame);
@@ -278,7 +278,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
 //#####################################################################
 void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
 {
-    std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);
+    std::string f=LOG::sprintf(".%d",frame);
 
     SOLIDS_EXAMPLE<TV>::Read_Output_Files_Solids(frame);
     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/fracture_object"+f,*fracture_object);

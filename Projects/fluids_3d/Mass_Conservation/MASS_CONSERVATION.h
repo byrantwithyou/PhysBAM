@@ -97,7 +97,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    std::string filename=STRING_UTILITIES::string_sprintf("Mass_Conservation/example_%d.param",test_number);
+    std::string filename=LOG::sprintf("Mass_Conservation/example_%d.param",test_number);
     if(FILE_UTILITIES::File_Exists(filename)){std::cout<<"Reading parameter file '"<<filename<<"'"<<std::endl;parameter_list.Read(filename);}
 
     random.Set_Seed(3891);
@@ -105,7 +105,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     pi_over_314 = (T)pi/314;
 
     // Common parameters
-    output_directory=STRING_UTILITIES::string_sprintf("Mass_Conservation/example_%d_resolution_%d",test_number,resolution);
+    output_directory=LOG::sprintf("Mass_Conservation/example_%d_resolution_%d",test_number,resolution);
     first_frame=0;restart=false;restart_frame=0;frame_rate=300;
 
     // Fluids parameters

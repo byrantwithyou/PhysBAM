@@ -94,7 +94,7 @@ Inverse_Times_Add(const ARRAY<T>& faces_in,ARRAY<T>& faces_out) const
 template<class TV> void GENERALIZED_FLUID_MASS<TV>::
 Print_Each_Matrix(int n) const
 {
-    OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Bi-%i.txt",n).c_str()).Write("Bi",one_over_fluid_mass_at_faces);
+    OCTAVE_OUTPUT<T>(LOG::sprintf("Bi-%i.txt",n).c_str()).Write("Bi",one_over_fluid_mass_at_faces);
 }
 //#####################################################################
 // Function Add_Raw_Matrix

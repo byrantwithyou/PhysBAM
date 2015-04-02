@@ -9,6 +9,7 @@
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/PAIR.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Vectors/VECTOR.h>

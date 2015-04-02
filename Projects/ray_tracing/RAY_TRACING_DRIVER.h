@@ -9,6 +9,7 @@
 
 #include <Tools/Log/LOG.h>
 #include <Tools/Log/PROGRESS_INDICATOR.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Math_Tools/integer_log.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>

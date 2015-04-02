@@ -48,9 +48,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(test_number==1) fluids_parameters.grid->Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
     if(test_number==2) fluids_parameters.grid->Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
     if(test_number==3) fluids_parameters.grid->Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
-    if(!pseudo_dirichlet) output_directory=STRING_UTILITIES::string_sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d",test_number,
+    if(!pseudo_dirichlet) output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d",test_number,
         (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));
-    else output_directory=STRING_UTILITIES::string_sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d_pseudo_dirichlet",test_number,
+    else output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d_pseudo_dirichlet",test_number,
         (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

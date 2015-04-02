@@ -158,9 +158,9 @@ template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
 Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
 {
    LOG::Time("Writing Vortex Specific Data");
-   FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/vorticity_particles",output_directory.c_str(),frame),vorticity_particles);
-   FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/grid_vorticity",output_directory.c_str(),frame),grid_vorticity);
-   FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/grid_vorticity_particles",output_directory.c_str(),frame),grid_vorticity_particles);
+   FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/vorticity_particles",output_directory.c_str(),frame),vorticity_particles);
+   FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/grid_vorticity",output_directory.c_str(),frame),grid_vorticity);
+   FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/grid_vorticity_particles",output_directory.c_str(),frame),grid_vorticity_particles);
    LOG::Stop_Time();
 }
 //#####################################################################
@@ -169,7 +169,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
 template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
 Read_Output_Files(const STREAM_TYPE stream_type,const std::string& input_directory,const int frame)
 {
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/vorticity_particles",input_directory.c_str(),frame),vorticity_particles);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/vorticity_particles",input_directory.c_str(),frame),vorticity_particles);
 }
 //#####################################################################
 namespace PhysBAM{

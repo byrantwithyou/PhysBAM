@@ -7,10 +7,13 @@
 #ifndef __LOG_PRINTF__
 #define __LOG_PRINTF__
 #include <Tools/Log/LOG.h>
+#include <Tools/Utilities/TYPE_UTILITIES.h>
 #include <climits>
 #include <cstdio>
+#include <cstring>
+#include <stdexcept>
 namespace PhysBAM{
-namespace LOG_REAL{
+namespace LOG{
 
 struct PRINTF_FORMAT_FLAGS
 {

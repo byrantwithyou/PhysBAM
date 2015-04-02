@@ -96,7 +96,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     tests.data_directory=data_directory;
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
@@ -119,7 +119,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 3: Sphere_Test();break;
         case 4: Bounce(0);break;
         case 5: Bricks();break;
-        default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
+        default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 
     tests.Add_Gravity();
 }
@@ -151,7 +151,7 @@ void Ring_Test()
         for(int j=0;j<poles;j++){
             // Poles
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
-            rigid_body.name=STRING_UTILITIES::string_sprintf("pole %d %d",i,j);
+            rigid_body.name=LOG::sprintf("pole %d %d",i,j);
             rigid_body.is_static=true;
             rigid_body.Frame().t=TV((i-(poles+1)/(T)2)*7,10,(j-(poles+1)/(T)2)*7);}
 
@@ -186,7 +186,7 @@ void Bone_Test()
         for(int j=0;j<poles;j++){
             // Poles
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
-            rigid_body.name=STRING_UTILITIES::string_sprintf("pole %d %d",i,j);
+            rigid_body.name=LOG::sprintf("pole %d %d",i,j);
             rigid_body.is_static=true;
             rigid_body.Frame().t=TV((i-(poles+1)/(T)2)*7,10,(j-(poles+1)/(T)2)*7);}
 
@@ -254,11 +254,11 @@ void Bounce(const T angle)
     for(int i=0;i<3;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",1,(T).5);
         rigid_body.Frame().t=TV(x_pos[i],5,0);rigid_body.Set_Coefficient_Of_Restitution(cor[i]);
-        rigid_body.name=STRING_UTILITIES::string_sprintf("sphere (cor %g)",cor[i]);}
+        rigid_body.name=LOG::sprintf("sphere (cor %g)",cor[i]);}
 
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",1,(T).5);
     rigid_body.Frame().t=TV(x_pos[2],8,0);rigid_body.Set_Coefficient_Of_Restitution(0);
-    rigid_body.name=STRING_UTILITIES::string_sprintf("sphere");
+    rigid_body.name=LOG::sprintf("sphere");
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,0,1,1);
     ground.Frame().r=ROTATION<TV>(angle,TV(0,0,1));

@@ -7,46 +7,16 @@
 #ifndef __LOG__
 #define __LOG__
 
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
-#include <Tools/Utilities/TIMER.h>
 #include <cassert>
 #include <ostream>
 #include <sstream>
 namespace PhysBAM{
 
-#define LOG_REAL LOG
+class TIMER;
 
-namespace LOG_NULL{
-struct log_null_class {
-    template<class T> log_null_class& operator<<(const T&){return *this;}
-    log_null_class& operator<<(std::ostream& (*)(std::ostream&)){return *this;}
-    template<class T> void flags(const T&);
-    template<class T> void width(const T&);
-    template<class A,class B> void Copy_Log_To_File(const A&,const B&){}
-};
-extern log_null_class cout;
-extern log_null_class cerr;
-template<class T> inline void Time(const T&){}
-template<class A,class B> inline void Stat(const A&,const B&){}
-inline void Stop_Time(){}
-inline void Finish_Logging(){}
-template<class A,class B,class C,class D> inline void Initialize_Logging(const A&,const B&,const C&,const D&){}
-inline log_null_class* Instance(){return &cout;}
-
-struct SCOPE
-{
-    template<class A> SCOPE(const A&){}
-    template<class A,class B> SCOPE(const A&,const B&){}
-    template<class A,class B,class C> SCOPE(const A&,const B&,const C&){}
-    template<class A,class B,class C,class D> SCOPE(const A&,const B&,const C&,const D&){}
-    template<class A,class B,class C,class D,class E> SCOPE(const A&,const B&,const C&,const D&,const E&){}
-    void Pop(){}
-};
-}
-
-namespace LOG_REAL{
+namespace LOG{
 
 class LOG_ENTRY;
 class LOG_SCOPE;
@@ -86,54 +56,13 @@ public:
 //##################################################################### 
 };
 
-class SCOPE:private NONCOPYABLE
-{
-    bool active;
-public:
-    SCOPE()
-        :active(false)
-    {}
-
-    SCOPE(const std::string& scope_identifier)
-        :active(true)
-    {
-        LOG_CLASS::Push_Scope(scope_identifier,scope_identifier);
-    }
-
-    SCOPE(const std::string& scope_identifier,const std::string& scope_name)
-        :active(true)
-    {
-        LOG_CLASS::Push_Scope(scope_identifier,scope_name);
-    }
-
-    template<class T1,class ...Args>
-    SCOPE(const std::string& scope_identifier,const std::string& format,const T1& d1,Args&& ...args)
-        :active(true)
-    {
-        LOG_CLASS::Push_Scope(scope_identifier,STRING_UTILITIES::string_sprintf(format.c_str(),d1,args...));
-    }
-
-    ~SCOPE();
-    
-    void Push(const std::string& scope_identifier,const std::string& scope_name)
-    {assert(!active);active=true;LOG_CLASS::Push_Scope(scope_identifier,scope_name);}
-
-    template<class T1>
-    void Push(const std::string& scope_identifier,const std::string& format,const T1& d1)
-    {Push(scope_identifier,STRING_UTILITIES::string_sprintf(format,d1));}
-
-    void Pop()
-    {assert(active);active=false;LOG_CLASS::Pop_Scope();}
-//##################################################################### 
-};
-
 // These next few lines are important to ensure no static data from LOG.cpp is accessed for DLLs
 LOG_CLASS* Instance();
 std::ostream& cout_Helper();
 std::ostream& cerr_Helper();
 namespace{
-    static std::ostream& cout PHYSBAM_UNUSED =::PhysBAM::LOG_REAL::cout_Helper();
-    static std::ostream& cerr PHYSBAM_UNUSED =::PhysBAM::LOG_REAL::cerr_Helper();
+    static std::ostream& cout PHYSBAM_UNUSED =::PhysBAM::LOG::cout_Helper();
+    static std::ostream& cerr PHYSBAM_UNUSED =::PhysBAM::LOG::cerr_Helper();
 }
 
 void Initialize_Logging(const bool suppress_cout_input=false,const bool suppress_timing_input=false,const int verbosity_level_input=1<<30,const bool cache_initial_output=false);
@@ -157,5 +86,4 @@ LOG_CLASS::Time_Helper(format);}
 //##################################################################### 
 }
 }
-#include <Tools/Log/LOG_PRINTF.h>
 #endif

@@ -235,7 +235,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_density=fluids_parameters.use_temperature=false;
     fluids_parameters.use_body_force=false;
 
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
     if(use_maccormack){
         fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
         fluids_parameters.use_maccormack_for_incompressible=true;}

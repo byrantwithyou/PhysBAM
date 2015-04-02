@@ -66,7 +66,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     tests.data_directory=data_directory;
-    output_directory=STRING_UTILITIES::string_sprintf("ARB_Example/output_%d",test_number);
+    output_directory=LOG::sprintf("ARB_Example/output_%d",test_number);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
@@ -157,7 +157,7 @@ void Chain()
         rigid_body(i)->Set_Mass(1);
         rigid_body(i)->Set_Coefficient_Of_Restitution((T).5);
         rigid_body(i)->coefficient_of_friction=1;
-        rigid_body(i)->name=STRING_UTILITIES::string_sprintf("link%d",i);
+        rigid_body(i)->name=LOG::sprintf("link%d",i);
         rigid_body(i)->is_static=(i==1);
         if(i>1){
             JOINT<TV>* joint=0;
@@ -206,7 +206,7 @@ void Spring()
         rigid_body[i]->Set_Coefficient_Of_Restitution(0);
         rigid_body[i]->coefficient_of_friction=1;
         rigid_body[i]->Set_Mass((horizontal?width:slanted_length)*5);
-        rigid_body[i]->name=STRING_UTILITIES::string_sprintf("link%d",i);
+        rigid_body[i]->name=LOG::sprintf("link%d",i);
         if(i>1){
             POINT_JOINT<TV>* joint=new POINT_JOINT<TV>();
             if(horizontal){joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(slanted_length/2,0)));joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(width/2,0)));}

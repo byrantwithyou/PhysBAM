@@ -10,7 +10,6 @@
 
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
@@ -216,7 +215,7 @@ void Create_Rigid_Stamp()
     T widths[8]={3,1,4,4,3,3,3,4};
     T y_rotations[8]={(T)pi/12,0,0,(T)pi/4,0,0,0,0};
     for(unsigned int i=0;i<siggraph.length();i++){ // letters
-        std::string letter_filename=STRING_UTILITIES::string_sprintf("Letters/%c",siggraph[i]);
+        std::string letter_filename=LOG::sprintf("Letters/%c",siggraph[i]);
         tests.Add_Rigid_Body(letter_filename,letters_scale,0); 
         T offset=-7.5;for(unsigned int l=0;l<i;l++) offset+=dx*widths[l];
         letters_frames_save(i+1).t.x=offset+dx/(T)2*widths[i];

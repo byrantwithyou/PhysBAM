@@ -281,8 +281,8 @@ Read(TYPED_ISTREAM& input)
     else Read_Binary_Array<float>(input.stream,particles.X.Get_Array_Pointer(),size);
     if(mesh.elements.m){
         int min_index=mesh.elements.Flattened().Min(),max_index=mesh.elements.Flattened().Max();
-        if(min_index<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d",min_index));
-        if(max_index>=particles.Size()) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Read invalid vertex index %d (particles.Size() = %d)",max_index,particles.Size()));
+        if(min_index<0) throw READ_ERROR(LOG::sprintf("Invalid vertex index %d",min_index));
+        if(max_index>=particles.Size()) throw READ_ERROR(LOG::sprintf("Read invalid vertex index %d (particles.Size() = %d)",max_index,particles.Size()));
         Update_Number_Nodes();}
 }
 //#####################################################################

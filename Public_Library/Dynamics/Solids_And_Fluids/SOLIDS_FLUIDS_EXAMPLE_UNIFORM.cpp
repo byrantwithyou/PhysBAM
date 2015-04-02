@@ -7,6 +7,7 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Matrices/MATRIX_4X4.h>
 #include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
@@ -508,7 +509,7 @@ Read_Output_Files_Fluids(const int frame)
 {
     fluids_parameters.Read_Output_Files(stream_type,output_directory,frame);
     fluid_collection.Read_Output_Files(stream_type,output_directory,frame);
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     if(fluids_parameters.smoke||fluids_parameters.fire||fluids_parameters.water){
         if(fluids_parameters.solid_affects_fluid && fluids_parameters.fluid_affects_solid){std::string filename;
             /*
@@ -540,7 +541,7 @@ template<class TV> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
 Write_Output_Files(const int frame) const
 {
     if(this->use_test_output){
-        std::string file=STRING_UTILITIES::string_sprintf("%s/%s-%03d.txt",output_directory.c_str(),this->test_output_prefix.c_str(),frame);
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),this->test_output_prefix.c_str(),frame);
         OCTAVE_OUTPUT<T> oo(file.c_str());
         if(solid_body_collection.deformable_body_collection.particles.X.m){
             oo.Write("db_X",solid_body_collection.deformable_body_collection.particles.X.Flattened());
@@ -559,7 +560,7 @@ Write_Output_Files(const int frame) const
 
 
     FILE_UTILITIES::Create_Directory(output_directory);
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
     FILE_UTILITIES::Create_Directory(output_directory+"/common");
     Write_Frame_Title(frame);

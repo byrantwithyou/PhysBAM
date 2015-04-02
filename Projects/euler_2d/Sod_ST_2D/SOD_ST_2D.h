@@ -125,8 +125,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
         solids_parameters.implicit_solve_parameters.cg_projection_iterations=0; // TODO: check this
         solids_parameters.implicit_solve_parameters.cg_iterations=400;}
 
-    if(timesplit) output_directory=STRING_UTILITIES::string_sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-    else output_directory=STRING_UTILITIES::string_sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+    if(timesplit) output_directory=LOG::sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+    else output_directory=LOG::sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
 }

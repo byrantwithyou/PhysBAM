@@ -114,7 +114,7 @@ Print() const
 template<class TV> void MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::
 Print_Each_Matrix(int n) const
 {
-    OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("W-%i.txt",n).c_str());
+    OCTAVE_OUTPUT<T> oo(LOG::sprintf("W-%i.txt",n).c_str());
     oo.Begin_Sparse_Matrix("W",Value(Number_Of_Constraints()),index_map.Number_Faces());
 
     for(int i=0;i<stencils.m;i++) for(int a=0;a<d;a++){

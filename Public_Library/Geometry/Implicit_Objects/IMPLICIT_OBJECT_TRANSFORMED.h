@@ -73,7 +73,7 @@ public:
     {return SYMMETRIC_MATRIX<T,TV::m>::Conjugate(transform->Frame().r.Rotation_Matrix(),object_space_hessian);}
 
     static std::string Name_Helper()
-    {return STRING_UTILITIES::string_sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,%s>",TV::dimension,FRAME<TV>::Static_Name().c_str());}
+    {return LOG::sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,%s>",TV::dimension,FRAME<TV>::Static_Name().c_str());}
 
     template<class READ_TRANSFORM> void Read_Transform_Helper(TYPED_ISTREAM& input,const READ_TRANSFORM& transform_input)
     {PHYSBAM_FATAL_ERROR();}
@@ -154,7 +154,7 @@ public:
     {return scale*object_space_hessian;}
 
     static std::string Name_Helper()
-    {return STRING_UTILITIES::string_sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,T>",TV::dimension);}
+    {return LOG::sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,T>",TV::dimension);}
 
     void Read_Transform_Helper(TYPED_ISTREAM& input)
     {Read_Binary(input,center,scale,one_over_scale,center_adjustment);}

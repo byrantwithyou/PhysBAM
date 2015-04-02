@@ -122,7 +122,7 @@ template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_arg
         LOG::cout<<"reading grid from "<<exact_grid<<std::endl;}
 
     if(output_filename.empty()){
-        std::string dimensions=STRING_UTILITIES::string_sprintf("%dx%dx%d",grid.counts.x,grid.counts.y,grid.counts.z);
+        std::string dimensions=LOG::sprintf("%dx%dx%d",grid.counts.x,grid.counts.y,grid.counts.z);
         output_filename=FILE_UTILITIES::Get_Basename(input_filename)+dimensions+(use_octree?".oct":".phi");}
 
     std::cout<<"Input filename: "<<input_filename<<std::endl;

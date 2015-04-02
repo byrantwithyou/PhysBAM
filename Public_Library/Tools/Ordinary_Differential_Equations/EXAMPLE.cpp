@@ -2,6 +2,7 @@
 // Copyright 2009, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
@@ -55,7 +56,7 @@ Set_Write_Substeps_Level(const int level)
 template<class TV> void EXAMPLE<TV>::
 Write_Frame_Title(const int frame) const
 {
-    if(write_frame_title) FILE_UTILITIES::Write_To_Text_File(STRING_UTILITIES::string_sprintf("%s/%d/frame_title",output_directory.c_str(),frame),frame_title);
+    if(write_frame_title) FILE_UTILITIES::Write_To_Text_File(LOG::sprintf("%s/%d/frame_title",output_directory.c_str(),frame),frame_title);
 }
 template<class TV> void EXAMPLE<TV>::
 Limit_Dt(T& dt,const T time)

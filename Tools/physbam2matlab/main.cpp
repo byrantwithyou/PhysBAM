@@ -45,7 +45,7 @@ public:
 
 private:
     template <class T_TYPE> void Convert_Data(const std::string& file_name_prefix,const int frame)
-    {std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    {std::string f=LOG::sprintf("%d",frame);
     std::string input_file=input_directory+"/"+f+"/"+file_name_prefix;
     std::string output_file=output_directory+"/"+file_name_prefix;
     T_TYPE data;FILE_UTILITIES::Read_From_File<RW>(input_file,data);

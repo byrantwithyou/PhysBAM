@@ -125,7 +125,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     GRID<TV>& grid=*fluids_parameters.grid;
 
-    output_directory=STRING_UTILITIES::string_sprintf("Density_Targetting/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+    output_directory=LOG::sprintf("Density_Targetting/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
         
     fluids_parameters.use_sph_for_removed_negative_particles=true;
     particle_id=0;

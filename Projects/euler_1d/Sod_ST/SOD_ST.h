@@ -163,8 +163,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.compressible_timesplit=timesplit;
     fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
 
-    if(timesplit) output_directory=STRING_UTILITIES::string_sprintf("Sod_ST/Test_%d_%d_semiimplicit_%d_%1.2f",test_number,(fluids_parameters.grid->counts.x),eno_scheme,cfl_number);
-    else output_directory=STRING_UTILITIES::string_sprintf("Sod_ST/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
+    if(timesplit) output_directory=LOG::sprintf("Sod_ST/Test_%d_%d_semiimplicit_%d_%1.2f",test_number,(fluids_parameters.grid->counts.x),eno_scheme,cfl_number);
+    else output_directory=LOG::sprintf("Sod_ST/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
 

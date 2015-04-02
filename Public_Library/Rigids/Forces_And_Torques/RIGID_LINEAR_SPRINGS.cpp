@@ -7,6 +7,7 @@
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Math_Tools/Robust_Arithmetic.h>
 #include <Tools/Math_Tools/sign.h>
 #include <Tools/Polynomials/QUADRATIC.h>

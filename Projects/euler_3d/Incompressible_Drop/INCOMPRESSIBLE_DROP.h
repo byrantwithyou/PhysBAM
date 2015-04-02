@@ -108,9 +108,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     fluids_parameters.density=(T)10;
 
-    if(timesplit) output_directory=STRING_UTILITIES::string_sprintf("Incompressible_Drop/Test_%d__Resolution_%d_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),
+    if(timesplit) output_directory=LOG::sprintf("Incompressible_Drop/Test_%d__Resolution_%d_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),
         (fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
-    else output_directory=STRING_UTILITIES::string_sprintf("Incompressible_Drop/Test_%d__Resolution_%d_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),
+    else output_directory=LOG::sprintf("Incompressible_Drop/Test_%d__Resolution_%d_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),
         (fluids_parameters.grid->counts.z));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";

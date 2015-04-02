@@ -150,7 +150,7 @@ Initialize(const int test_number_input,const int resolution)
     else{
         LOG::cerr<<"unrecognized test number "<<test_number<<std::endl;exit(1);}
 
-    example.output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
+    example.output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
 
     // set up sources for each test case
     if(test_number==3){

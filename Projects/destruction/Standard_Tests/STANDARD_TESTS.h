@@ -156,7 +156,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     tests.data_directory=data_directory;
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
 
     if(createpattern){
         if(test_number==1) Create_Box_Split_Pattern();
@@ -172,7 +172,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     frame_rate=30;
 
-    if(parameter) output_directory+=STRING_UTILITIES::string_sprintf("_param%i",parameter);
+    if(parameter) output_directory+=LOG::sprintf("_param%i",parameter);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
@@ -216,7 +216,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 11: Grain_Points();break;
         case 12: Raining_Spheres();break;
         case 13: Friction_Test();break;
-        default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
+        default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 
     // correct number nodes
     for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
@@ -246,7 +246,7 @@ void Display_Pattern()
     solid_body_collection.print_diagnostics=false;
     solid_body_collection.print_residuals=false;
 
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
     for(int i=0;i<fracture_pattern.regions.m;i++){
         RIGID_BODY<TV>* new_body=new RIGID_BODY<TV>(rigid_body_collection,true);
         new_body->Add_Structure(*fracture_pattern.regions(i)->triangulated_surface);
@@ -264,7 +264,7 @@ void Prescore_Cube()
 
     for(int i=0;i<89;i++){
         if(i==36 || i==71 || i==30) continue;
-        RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(STRING_UTILITIES::string_sprintf("Fractured_Cube/fragment.%02d",i),1,(T).5);(void)rigid_body;}
+        RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(LOG::sprintf("Fractured_Cube/fragment.%02d",i),1,(T).5);(void)rigid_body;}
 
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
@@ -281,7 +281,7 @@ void Prescore_Pillar()
 
     for(int i=0;i<94;i++){
         if(i==90) continue;
-        RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(STRING_UTILITIES::string_sprintf("Fractured_Pillar/fragment.%02d",i),1,(T).5);(void)rigid_body;
+        RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(LOG::sprintf("Fractured_Pillar/fragment.%02d",i),1,(T).5);(void)rigid_body;
         if(rigid_body.Mass()<(T)1e-5) rigid_body_collection.rigid_body_particles.Remove_Body(rigid_body.particle_index);}
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
@@ -301,7 +301,7 @@ void Single_Cube()
     rigid_body.Frame()=FRAME<TV>();
     rigid_body.fracture_threshold=(T)3.0;
 
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
     (void)ground;
@@ -343,7 +343,7 @@ void Single_Cylinder()
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
     (void)ground;
 
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
 }
 //#####################################################################
 // Function Sphere_Pillar
@@ -356,7 +356,7 @@ void Sphere_Pillar()
 
     for(int i=0;i<94;i++){
         if(i==90) continue;
-        RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(STRING_UTILITIES::string_sprintf("Fractured_Pillar/fragment.%02d",i),1,(T).5);(void)rigid_body;
+        RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(LOG::sprintf("Fractured_Pillar/fragment.%02d",i),1,(T).5);(void)rigid_body;
         rigid_body.Update_Bounding_Box();T_ORIENTED_BOX oriented_box=rigid_body.Oriented_Bounding_Box();
         T min_side_length=FLT_MAX;TV saved_frame=rigid_body.Frame().t;
         for(int dim=0;dim<TV::m;dim++) min_side_length=min(min_side_length,oriented_box.edges.Column(dim).Magnitude());
@@ -481,7 +481,7 @@ void Ball_Hitting_Wall()
             solids_parameters.rigid_body_collision_parameters.allow_refracturing=true;
             break;
         default:
-            PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized param number %d",parameter));}
+            PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized param number %d",parameter));}
     if(fracture_pattern_index==8) sphere_velocity=TV((T)-10,(T)0,(T)0);
     else sphere_velocity=TV((T)-15,(T)0,(T)0);
     sphere_body->Frame().t=sphere_initial_location;
@@ -490,7 +490,7 @@ void Ball_Hitting_Wall()
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
     (void)ground;
 
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
 }
 //#####################################################################
 // Function Poor_Bunny
@@ -514,7 +514,7 @@ void Poor_Bunny()
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
     (void)ground;
 
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
 }
 //#####################################################################
 // Function Raining_Spheres
@@ -616,7 +616,7 @@ void Raining_Spheres()
 
     tests.Add_Ground((T).5,-2,1);
 
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
+    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
 }
 //#####################################################################
 // Function Update_Solids_Parameters
@@ -705,19 +705,19 @@ void Create_Pattern(const int test_number)
                 TRIANGULATED_SURFACE<T>* trisurf=DUALCONTOUR_3D<T>::Create_Triangulated_Surface_From_Levelset(lio->levelset);
                 int region_index=fracture_pattern.regions.Append(new FRACTURE_REGION<T>(trisurf,lio,false));
                 fracture_pattern.regions(region_index)->fracture_offset=TV_INT(); // TODO need to find center and then compute offset correctly
-                FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("levelset.%d.debug.phi",r),lio->levelset);
-                FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("levelset.%d.debug.tri",r),*trisurf);}
+                FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("levelset.%d.debug.phi",r),lio->levelset);
+                FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("levelset.%d.debug.tri",r),*trisurf);}
             FILE_UTILITIES::Create_Directory(output_directory);
-            FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/fracture_pattern.%d",output_directory.c_str(),test_number),fracture_pattern);
+            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/fracture_pattern.%d",output_directory.c_str(),test_number),fracture_pattern);
             return;}
         case 3:
             for(int i=0;i<89;i++){
-                RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(STRING_UTILITIES::string_sprintf("Fractured_Cube/fragment.%02d",i),1,(T).5);(void)rigid_body;
+                RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(LOG::sprintf("Fractured_Cube/fragment.%02d",i),1,(T).5);(void)rigid_body;
                 rigid_body.Update_Bounding_Box();domain.Enlarge_To_Include_Box(rigid_body.axis_aligned_bounding_box);}
             pattern_center=TV_INT(25,25,25);
             break;
         default:
-            PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
+            PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
     T dx=domain.Edge_Lengths().Max()/count;
     TV expansion=(ceil(domain.Edge_Lengths()/dx)*dx-domain.Edge_Lengths())/2+2*dx;
     domain.Change_Size(expansion);
@@ -750,7 +750,7 @@ void Create_Pattern(const int test_number)
     }
 
     FILE_UTILITIES::Create_Directory(output_directory);
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/fracture_pattern.%d",output_directory.c_str(),test_number),fracture_pattern);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/fracture_pattern.%d",output_directory.c_str(),test_number),fracture_pattern);
 }
 //#####################################################################
 // Function Shrink_Levelset
@@ -784,19 +784,19 @@ void Create_Wall_Pattern()
         GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> >& local_phi=*new ARRAY<T,VECTOR<int,3> >(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/wall/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/wall/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
         for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next())
             local_phi(iterator.index)=refined_lio->levelset.Extended_Phi(iterator.Location());
         TV_INT center_index=local_grid.Domain_Indices().Center();
         Shrink_Levelset(local_grid,local_phi,2,center_index);
         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/wall/fragment.%d.tri",data_directory.c_str(),i),*surface);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/wall/fragment.%d.tri",data_directory.c_str(),i),*surface);
         surface->Update_Number_Nodes();
         FRACTURE_REGION<T>* fr=new FRACTURE_REGION<T>(surface,lio,false);
         fr->fracture_offset=center_index;
         fp.regions.Append(fr);}
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
     return;
 }
 //#####################################################################
@@ -815,19 +815,19 @@ void Create_Bunny_Pattern()
         GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> >& local_phi=*new ARRAY<T,VECTOR<int,3> >(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/bunny/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/bunny/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
         for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next())
             local_phi(iterator.index)=refined_lio->levelset.Extended_Phi(iterator.Location());
         TV_INT center_index=local_grid.Domain_Indices().Center();
         Shrink_Levelset(local_grid,local_phi,2,center_index);
         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/bunny/fragment.%d.tri",data_directory.c_str(),i),*surface);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/bunny/fragment.%d.tri",data_directory.c_str(),i),*surface);
         surface->Update_Number_Nodes();
         FRACTURE_REGION<T>* fr=new FRACTURE_REGION<T>(surface,lio,false);
         fr->fracture_offset=center_index;
         fp.regions.Append(fr);}
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
     return;
 }
 //#####################################################################
@@ -846,19 +846,19 @@ void Create_Cylinder_Pattern()
         GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> >& local_phi=*new ARRAY<T,VECTOR<int,3> >(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/cylinder/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/cylinder/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
         for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next())
             local_phi(iterator.index)=refined_lio->levelset.Extended_Phi(iterator.Location());
         TV_INT center_index=local_grid.Domain_Indices().Center();
         Shrink_Levelset(local_grid,local_phi,2,center_index);
         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/cylinder/fragment.%d.tri",data_directory.c_str(),i),*surface);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/cylinder/fragment.%d.tri",data_directory.c_str(),i),*surface);
         surface->Update_Number_Nodes();
         FRACTURE_REGION<T>* fr=new FRACTURE_REGION<T>(surface,lio,false);
         fr->fracture_offset=center_index;
         fp.regions.Append(fr);}
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
     return;
 }
 //#####################################################################
@@ -877,19 +877,19 @@ void Create_Raining_Spheres_Pattern()
         GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> >& local_phi=*new ARRAY<T,VECTOR<int,3> >(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/raining_spheres/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/raining_spheres/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
         for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next())
             local_phi(iterator.index)=refined_lio->levelset.Extended_Phi(iterator.Location());
         TV_INT center_index=local_grid.Domain_Indices().Center();
         Shrink_Levelset(local_grid,local_phi,2,center_index);
         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/raining_spheres/fragment.%d.tri",data_directory.c_str(),i),*surface);
+        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/raining_spheres/fragment.%d.tri",data_directory.c_str(),i),*surface);
         surface->Update_Number_Nodes();
         FRACTURE_REGION<T>* fr=new FRACTURE_REGION<T>(surface,lio,false);
         fr->fracture_offset=center_index;
         fp.regions.Append(fr);}
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
     return;
 }
 //#####################################################################
@@ -917,7 +917,7 @@ void Create_Box_Split_Pattern()
         FRACTURE_REGION<T>* fr=new FRACTURE_REGION<T>(surface,lio,false);
         fr->fracture_offset=TV_INT(i==1?resolution-1+ghost_cells:ghost_cells,resolution/2-1+ghost_cells,resolution/2-1+ghost_cells);
         fp.regions.Append(fr);}
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
     return;
 }
 //#####################################################################
@@ -970,7 +970,7 @@ void Create_Pyramid_Pattern(RANGE<TV> boundary,const int min_resolution,const in
         FRACTURE_REGION<T>* fr=new FRACTURE_REGION<T>(surface,lio,false);
         fr->fracture_offset=center_index;
         fp.regions.Append(fr);}
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
     for(int m=0;m<6;m++){
         delete &fp.regions(m)->implicit_object->levelset.grid;
         delete &fp.regions(m)->implicit_object->levelset.phi;}
@@ -1069,7 +1069,7 @@ void Create_Crossing_Planes_Pattern()
             FRACTURE_REGION<T>* fr=new FRACTURE_REGION<T>(surface,lio,false);
             fr->fracture_offset=center_index;
             fp.regions.Append(fr);}}
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
 }
 //#####################################################################
 // Function Create_Grain_Boundary_Surfaces
@@ -1183,7 +1183,7 @@ void Grain_Points()
     int num_pts=fracture_pattern_index;
     T sigma=0; // TODO: Use different parameter.
 
-    FILE* F=fopen(STRING_UTILITIES::string_sprintf("%s/points.txt",output_directory.c_str()).c_str(),"w");
+    FILE* F=fopen(LOG::sprintf("%s/points.txt",output_directory.c_str()).c_str(),"w");
     PHYSBAM_ASSERT(F);
 
     fprintf(F,"%d\n",num_pts);

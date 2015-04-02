@@ -5,6 +5,7 @@
 // Class MULTIGRID_POISSON
 //#####################################################################
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 //#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include "BOX_ITERATOR.h"
 #include "MULTIGRID_POISSON.h"

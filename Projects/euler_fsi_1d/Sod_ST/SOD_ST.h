@@ -218,13 +218,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
         solids_parameters.implicit_solve_parameters.cg_projection_iterations=0; // TODO: check this
         solids_parameters.implicit_solve_parameters.cg_iterations=400;}
 
-    if(timesplit) output_directory=STRING_UTILITIES::string_sprintf("Sod_ST/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
-    else output_directory=STRING_UTILITIES::string_sprintf("Sod_ST/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
+    if(timesplit) output_directory=LOG::sprintf("Sod_ST/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
+    else output_directory=LOG::sprintf("Sod_ST/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
 
     if(test_number==11 || test_number==12 || test_number==13 || test_number==14 || test_number==15 || test_number==16){
-        output_directory+=STRING_UTILITIES::string_sprintf("_mass_%f",solid_mass);}
+        output_directory+=LOG::sprintf("_mass_%f",solid_mass);}
     if(transition_to_incompressible) output_directory+="_transition_incompressible";
     if(fluids_parameters.compressible_apply_cavitation_correction) output_directory+="_cavitation";
 
@@ -372,7 +372,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     if(write_transparency_output){ 
-        std::ostream* output=FILE_UTILITIES::Safe_Open_Output(output_directory+STRING_UTILITIES::string_sprintf("/U_%d.txt",frame),false,false);
+        std::ostream* output=FILE_UTILITIES::Safe_Open_Output(output_directory+LOG::sprintf("/U_%d.txt",frame),false,false);
         for(CELL_ITERATOR<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
             if(fluids_parameters.euler->euler_projection.elliptic_solver->psi_D(it.Cell_Index())) continue;
             TV_DIMENSION U_cell=fluids_parameters.euler->U(it.Cell_Index());

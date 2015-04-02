@@ -55,7 +55,7 @@ public:
     }
 
     std::string Animated_Filename(const std::string& filename_input,const int substitution_frame)
-    {return STRING_UTILITIES::string_sprintf(filename_input.c_str(),substitution_frame);}
+    {return LOG::sprintf(filename_input.c_str(),substitution_frame);}
 
 //#####################################################################
     void Initialize_Scene(RENDER_WORLD<T>& world,const int frame) PHYSBAM_OVERRIDE;

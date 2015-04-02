@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Ordinary_Differential_Equations/DRIVER.h>
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 using namespace PhysBAM;
@@ -81,7 +82,7 @@ template<class TV> void DRIVER<TV>::
 Read_Time(const int frame)
 {
     time=example.Time_At_Frame(frame);
-    std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/time",example.output_directory.c_str(),frame);
+    std::string filename=LOG::sprintf("%s/%d/time",example.output_directory.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(filename)){
         T corrected_time;
         FILE_UTILITIES::Read_From_File(example.stream_type,filename,corrected_time);
@@ -96,7 +97,7 @@ Read_Time(const int frame)
 template<class TV> void DRIVER<TV>::
 Read_Last_Frame()
 {
-    std::string filename=STRING_UTILITIES::string_sprintf("%s/common/last_frame",example.output_directory.c_str());
+    std::string filename=LOG::sprintf("%s/common/last_frame",example.output_directory.c_str());
     if(FILE_UTILITIES::File_Exists(filename))
         FILE_UTILITIES::Read_From_Text_File(filename, example.restart_frame);
 }
@@ -107,13 +108,13 @@ template<class TV> void DRIVER<TV>::
 Write_Output_Files(const int frame)
 {
     FILE_UTILITIES::Create_Directory(example.output_directory);
-    FILE_UTILITIES::Create_Directory(example.output_directory+STRING_UTILITIES::string_sprintf("/%d",frame));
+    FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
     Write_First_Frame(frame);
     example.Write_Output_Files(frame);
     Write_Time(frame);
     Write_Last_Frame(frame);
-    FILE_UTILITIES::Write_To_Text_File(example.output_directory+STRING_UTILITIES::string_sprintf("/%d/frame_title",frame),example.frame_title);
+    FILE_UTILITIES::Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
 }
 //#####################################################################
 namespace PhysBAM{

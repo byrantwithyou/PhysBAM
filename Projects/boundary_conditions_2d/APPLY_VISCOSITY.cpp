@@ -84,14 +84,14 @@ void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUND
     static int solve_id=0;solve_id++;
     if(verbose){
         KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,2);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b);}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b);}
 
     CONJUGATE_GRADIENT<T> cg;
     x=b;
     cg.Solve(system,x,b,vectors,cg_tolerance,1,1000000);
 
-    if(verbose){OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-x-%i.txt",solve_id).c_str()).Write("x",x);}
+    if(verbose){OCTAVE_OUTPUT<T>(LOG::sprintf("visc-x-%i.txt",solve_id).c_str()).Write("x",x);}
 
     for(int i=0;i<faces.m;i++) u(faces(i))=x.v(i);
 }

@@ -106,7 +106,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     if(test_number>2){LOG::cerr<<"unrecognized test number "<<test_number<<std::endl;exit(1);}
 
-    output_directory=STRING_UTILITIES::string_sprintf("Sheeting/Test_Sheeting_%d_Resolution_%d_%d_%d",test_number,
+    output_directory=LOG::sprintf("Sheeting/Test_Sheeting_%d_Resolution_%d_%d_%d",test_number,
         (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));
 
     // set up sources for each test case

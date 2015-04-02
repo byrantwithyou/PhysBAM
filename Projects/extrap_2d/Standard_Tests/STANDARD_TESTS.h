@@ -306,7 +306,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     BASE::Parse_Options();
     tests.data_directory=data_directory;
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     last_frame=1000;
     if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
     solid_body_collection.Print_Residuals(opt_residuals);
@@ -374,7 +374,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
+    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
@@ -848,7 +848,7 @@ void Preprocess_Frame(const int frame)
     
     if (dump_sv)
     {
-        std::string output_file=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
+        std::string output_file=LOG::sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
         svout.open(output_file.c_str());
     }
     if(test_number==33) Plot_Energy_Landscape();
@@ -1245,7 +1245,7 @@ void Energy_Profile_Plot(int frame)
         pa*=plot_scale;}
 
     FILE_UTILITIES::Create_Directory(dual_directory);
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     FILE_UTILITIES::Create_Directory(dual_directory+"/"+f);
     FILE_UTILITIES::Create_Directory(dual_directory+"/common");
 
@@ -1258,14 +1258,14 @@ void Energy_Profile_Plot(int frame)
         energy_particles.X(i)=X.Append((icm->Energy_Density(F,0)-energy_profile_plot_min)*plot_scale+1e-2);
         energy_particles.V(i)=-P.To_Vector().Append(P.To_Vector().Magnitude_Squared()).Normalized();}
 
-    FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",dual_directory.c_str(),frame));
-    FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",dual_directory.c_str(),frame),energy_particles);
+    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",dual_directory.c_str(),frame));
+    FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",dual_directory.c_str(),frame),energy_particles);
     energy_particles.Delete_All_Elements();
 
     FILE_UTILITIES::Write_To_File(this->stream_type,dual_directory+"/"+FILE_UTILITIES::Number_To_String(frame)+"/deformable_object_particles",energy_mesh->particles);
     if(frame==1 || (this->restart && frame==this->first_frame)){
-        FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",dual_directory.c_str(),0));
-        FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",dual_directory.c_str(),0),energy_particles);
+        FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",dual_directory.c_str(),0));
+        FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",dual_directory.c_str(),0),energy_particles);
         FILE_UTILITIES::Write_To_File(this->stream_type,dual_directory+"/0/deformable_object_particles",energy_mesh->particles);
         std::string f="common";
         std::ostream* output_raw=FILE_UTILITIES::Safe_Open_Output(dual_directory+"/"+f+"/deformable_object_structures");

@@ -182,7 +182,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1;
 
     if(solid_node || !mpi) solids_parameters.use_rigid_deformable_contact=true;
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_Stiffness_%d_Suboption_%d",test_number,resolution,stiffness_ratio,sub_test);
+    output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_Stiffness_%d_Suboption_%d",test_number,resolution,stiffness_ratio,sub_test);
         
     fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=false;
     fluids_parameters.density=(T)1000;
@@ -564,7 +564,7 @@ void Floppy_Fish()
         fish->Update_Number_Nodes();fish->Initialize_Triangulated_Surface();
         TRIANGULATED_SURFACE<T>& triangulated_surface=*fish->triangulated_surface;
         triangulated_surface.Update_Triangle_List();triangulated_surface.Initialize_Hierarchy();
-        fish_levelset=solids_tests.Read_Or_Initialize_Implicit_Surface(STRING_UTILITIES::string_sprintf("%s/fish_undeformed_levelset.phi",output_directory.c_str()),output_directory,triangulated_surface);}
+        fish_levelset=solids_tests.Read_Or_Initialize_Implicit_Surface(LOG::sprintf("%s/fish_undeformed_levelset.phi",output_directory.c_str()),output_directory,triangulated_surface);}
 }
 //#####################################################################
 // Function Water_Test_Number
@@ -876,7 +876,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 RIGID_BODY<TV>& sphere=solids_tests.Add_Rigid_Body("sphere",(T).1,(T)0);
                 TV position=TV((T).125+(T)i*(T).25,light_sphere_initial_height,(T).125+(T)j*(T).25);
                 sphere.Frame()=FRAME<TV>(position);
-                sphere.name=STRING_UTILITIES::string_sprintf("cork_%i_%i",i,j);
+                sphere.name=LOG::sprintf("cork_%i_%i",i,j);
                 sphere.Set_Coefficient_Of_Restitution((T)1);
                 switch(j) {
                     case 0: sphere.Set_Mass(fluid_mass*(T).1); break;

@@ -177,7 +177,7 @@ void Make_Tread(const T z_shift,int tread_side)
         rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
-        rigid_body->name=STRING_UTILITIES::string_sprintf("tread%d",tread_num);tread_num++;
+        rigid_body->name=LOG::sprintf("tread%d",tread_num);tread_num++;
         treads[tread_side].Append(rigid_body);}
     // end 1
     T radius2=(T).65;
@@ -188,7 +188,7 @@ void Make_Tread(const T z_shift,int tread_side)
         rigid_body->Frame().r=ROTATION<TV>(-(k+(T).5)*angle,TV(0,0,1))*ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0); 
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
-        rigid_body->name=STRING_UTILITIES::string_sprintf("tread%d",tread_num);tread_num++;
+        rigid_body->name=LOG::sprintf("tread%d",tread_num);tread_num++;
         treads[tread_side].Append(rigid_body);}
     // bottom treads
     for(int k=num_joints;k>=0;k--){
@@ -197,7 +197,7 @@ void Make_Tread(const T z_shift,int tread_side)
         rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>((T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
-        rigid_body->name=STRING_UTILITIES::string_sprintf("tread%d",tread_num);tread_num++;
+        rigid_body->name=LOG::sprintf("tread%d",tread_num);tread_num++;
         treads[tread_side].Append(rigid_body);}
     // end 2
     for(int k=4;k>=0;k--){
@@ -206,7 +206,7 @@ void Make_Tread(const T z_shift,int tread_side)
         rigid_body->Frame().r=ROTATION<TV>((k+(T).5)*angle,TV(0,0,1))*ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0); 
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
-        rigid_body->name=STRING_UTILITIES::string_sprintf("tread%d",tread_num);tread_num++;
+        rigid_body->name=LOG::sprintf("tread%d",tread_num);tread_num++;
         treads[tread_side].Append(rigid_body);}
     treads[tread_side].Append(treads[tread_side](1));
 

@@ -58,7 +58,7 @@ public:
         parse_args.Parse();
 
         last_frame=200;
-        output_directory=STRING_UTILITIES::string_sprintf("Smoke_Tests/Test_%d_%d_%d_vc_%1.2f_%dd_%1.2f",test_number,scale,upsample,vc,TV::dimension,buoyancy_clamp);
+        output_directory=LOG::sprintf("Smoke_Tests/Test_%d_%d_%d_vc_%1.2f_%dd_%1.2f",test_number,scale,upsample,vc,TV::dimension,buoyancy_clamp);
         if(TV::dimension==2){
             source_box_2d.min_corner=TV::Constant_Vector(0.25-source_radius);
             source_box_2d.max_corner=TV::Constant_Vector(0.25+source_radius);
@@ -131,7 +131,7 @@ public:
         boundary->Fill_Ghost_Faces(mac_grid,face_velocities,face_velocities_ghost,0,3);
         for(CELL_ITERATOR<TV> iterator(upsampled_mac_grid);iterator.Valid();iterator.Next()){
             upsampled_density(iterator.Cell_Index())=interpolation.Clamped_To_Array(mac_grid,density,iterator.Location());}
-        std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+        std::string f=LOG::sprintf("%d",frame);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_mac_velocities",face_velocities_ghost);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",upsampled_mac_grid);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density",upsampled_density);

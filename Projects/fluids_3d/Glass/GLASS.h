@@ -149,7 +149,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     time_pour=4;
         
-    output_directory=STRING_UTILITIES::string_sprintf("Glass/Glass_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
+    output_directory=LOG::sprintf("Glass/Glass_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
     LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
 
     CYLINDER<T> source1;

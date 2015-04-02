@@ -66,7 +66,7 @@ public:
 
     template<class RW> void Read(std::istream& input)
     {char version;Read_Binary<RW>(input,version);
-    if(version!=1) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized OPENGL_MATERIAL version %d",version));
+    if(version!=1) throw READ_ERROR(LOG::sprintf("Unrecognized OPENGL_MATERIAL version %d",version));
     Read_Binary<RW>(input,ambient,diffuse,specular,shininess);}
 
     template<class RW> void Write(std::ostream& output) const

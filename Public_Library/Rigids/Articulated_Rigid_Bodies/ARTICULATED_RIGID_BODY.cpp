@@ -495,20 +495,20 @@ template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame)
 {
     int local_frame=frame;
-    std::string arb_state_list_name=STRING_UTILITIES::string_sprintf("%s/common/arb_state_list",directory.c_str());
+    std::string arb_state_list_name=LOG::sprintf("%s/common/arb_state_list",directory.c_str());
     if(FILE_UTILITIES::File_Exists(arb_state_list_name)){
         if(!frame_list){frame_list=new ARRAY<int>;FILE_UTILITIES::Read_From_File(stream_type,arb_state_list_name,*frame_list);}
         local_frame=(*frame_list)(frame_list->Binary_Search(frame));}
     if(last_read!=local_frame){
-        std::istream* input=FILE_UTILITIES::Safe_Open_Input(STRING_UTILITIES::string_sprintf("%s/%d/arb_state",directory.c_str(),frame));
+        std::istream* input=FILE_UTILITIES::Safe_Open_Input(LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
         TYPED_ISTREAM typed_input(*input,stream_type);
         joint_mesh.Read(typed_input,directory,frame);
         last_read=local_frame;delete input;}
-    std::string muscle_filename=STRING_UTILITIES::string_sprintf("%s/%d/muscle_list",directory.c_str(),frame);
+    std::string muscle_filename=LOG::sprintf("%s/%d/muscle_list",directory.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(muscle_filename)){
         if(!muscle_list) muscle_list=new MUSCLE_LIST<TV>(rigid_body_collection);
         muscle_list->Read(stream_type,directory,frame);}
-    std::string muscle_activations_filename=STRING_UTILITIES::string_sprintf("%s/%d/muscle_activations",directory.c_str(),frame);
+    std::string muscle_activations_filename=LOG::sprintf("%s/%d/muscle_activations",directory.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(muscle_activations_filename)) FILE_UTILITIES::Read_From_File(stream_type,muscle_activations_filename,muscle_activations);
 }
 //#####################################################################
@@ -520,14 +520,14 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
     if(joint_mesh.Num_Joints()>0 && !(check_stale && !is_stale)){
         if(check_stale){
             if(!frame_list) frame_list=new ARRAY<int>;frame_list->Append(frame);
-            FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/common/arb_state_list",directory.c_str()),*frame_list);
+            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/common/arb_state_list",directory.c_str()),*frame_list);
             is_stale=false;}
-        std::ostream* output=FILE_UTILITIES::Safe_Open_Output(STRING_UTILITIES::string_sprintf("%s/%d/arb_state",directory.c_str(),frame));
+        std::ostream* output=FILE_UTILITIES::Safe_Open_Output(LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
         TYPED_OSTREAM typed_output(*output,stream_type);
         joint_mesh.Write(typed_output,directory,frame);
         delete output;}
     if(muscle_list) muscle_list->Write(stream_type,directory,frame);Output_Articulation_Points(stream_type,directory,frame);
-    if(muscle_activations.m>0) FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/muscle_activations",directory.c_str(),frame),muscle_activations);
+    if(muscle_activations.m>0) FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/muscle_activations",directory.c_str(),frame),muscle_activations);
 }
 //#####################################################################
 // Function Effective_Inertia_Inverse
@@ -615,19 +615,19 @@ Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool
     if(test_system) system.Test_System(x);
     if(print_matrix){
         LOG::cout<<"arb solve id "<<solve_id<<std::endl;
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*vectors(0));}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*vectors(0));}
 
     {ARTICULATED_SYSTEM<TV> system(debug_cast<ARTICULATED_RIGID_BODY<TV>&>(*this));
     system.break_loops=true;
     system.Initialize();
     if(print_matrix){
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("BM-%i.txt",solve_id).c_str()).Write("BM",system,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("BP-%i.txt",solve_id).c_str()).Write_Projection("BP",system,*vectors(0));}}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("BM-%i.txt",solve_id).c_str()).Write("BM",system,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("BP-%i.txt",solve_id).c_str()).Write_Projection("BP",system,*vectors(0));}}
 
     if(correct_position){for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)) rhs.v(j)=-Joint_Error(j)/dt;}
     else{system.Scatter(rigid_body_collection.rigid_body_particles.twist,rhs.v);rhs*=-(T)1;}
-    if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);
+    if(print_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);
 
     CONJUGATE_RESIDUAL<T> cr;
     CONJUGATE_GRADIENT<T> cg;
@@ -636,7 +636,7 @@ Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool
     if(correct_position) solver=&cr;
 //    if(!correct_position) system.internal_x=&x;
     solver->Solve(system,x,rhs,vectors,(T)1e-3,0,1000);
-    if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",x);
+    if(print_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("x-%i.txt",solve_id).c_str()).Write("x",x);
 
     system.intermediate_twists.Fill(TWIST<TV>());
     system.Gather(x.v,system.intermediate_twists);

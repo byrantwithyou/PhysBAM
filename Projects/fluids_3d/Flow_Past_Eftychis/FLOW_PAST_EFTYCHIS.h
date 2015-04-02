@@ -72,7 +72,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_vorticity_confinement=true;fluids_parameters.confinement_parameter=(T).5;
     fluids_parameters.write_debug_data=true;
 
-    output_directory=STRING_UTILITIES::string_sprintf("Flow_Past_Eftychis/Test_%d",test_number);
+    output_directory=LOG::sprintf("Flow_Past_Eftychis/Test_%d",test_number);
 
     if(test_number==1){
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;

@@ -103,7 +103,7 @@ PD_Curl(const T scale,const FRAME<TV>& frame,const T k_p,const int number_of_joi
         child_body=&Add_Rigid_Body("miniplank25wide2",scale,friction);
         child_body->Frame()=frame*FRAME<TV>(TV(cheight,0,0));
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
+        child_body->name=LOG::sprintf("child_%d",i);
         child_body->Set_Mass(50);
 
         ROTATION<TV> desired_rotation(desired_x,TV(1,0,0));

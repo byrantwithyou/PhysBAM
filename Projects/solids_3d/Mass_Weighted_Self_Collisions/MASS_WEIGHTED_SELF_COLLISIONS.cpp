@@ -54,7 +54,7 @@ Initialize_Bodies()
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     ARRAY<float> masses;
 
-    output_directory=STRING_UTILITIES::string_sprintf("Mass_Weighted_Self_Collisions/Test_%d",test_number);
+    output_directory=LOG::sprintf("Mass_Weighted_Self_Collisions/Test_%d",test_number);
     
     last_frame=1000;
     frame_rate=24;

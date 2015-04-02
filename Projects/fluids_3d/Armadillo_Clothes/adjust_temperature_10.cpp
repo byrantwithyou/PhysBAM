@@ -64,7 +64,7 @@ template<class T,class RW> void Process(int argc,char* argv[])
     std::cout<<"Adjust temperature and density for frame "<<frame<<std::endl;
 
     std::string prefix="";
-    std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);
+    std::string f=LOG::sprintf(".%d",frame);
 
     ARRAY<T,VECTOR<int,3> > temperature,density,phi;
     GRID<TV> grid;LEVELSET<TV> levelset(grid,phi);

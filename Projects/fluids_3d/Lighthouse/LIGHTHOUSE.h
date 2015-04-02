@@ -95,7 +95,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
     fluids_parameters.write_debug_data=true;
     fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).save_removed_particle_times=true;
-    output_directory=STRING_UTILITIES::string_sprintf("Lighthouse/Test_%d_Lighthouse_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
+    output_directory=LOG::sprintf("Lighthouse/Test_%d_Lighthouse_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
         (fluids_parameters.grid->counts.z-1));
     fluids_parameters.delete_fluid_inside_objects=true;
     fluids_parameters.enforce_divergence_free_extrapolation=false;
@@ -226,7 +226,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/removed_particle_times.%d",output_directory.c_str(),frame),
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/removed_particle_times.%d",output_directory.c_str(),frame),
         fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times);
     std::cout<<"Wrote "<<fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times.m<<" number of particles"<<std::endl;
     fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times.Clean_Memory();

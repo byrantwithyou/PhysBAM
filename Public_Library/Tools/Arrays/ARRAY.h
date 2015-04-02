@@ -9,8 +9,8 @@
 
 #include <Tools/Arrays/ARRAY_BASE.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Log/LOG_PRINTF.h>
 #include <Tools/Math_Tools/min.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Tools/Utilities/EXCEPTIONS.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>
@@ -230,7 +230,7 @@ public:
 
     template<class RW> void Read(std::istream& input)
     {Clean_Memory();ID m;Read_Binary<RW>(input,m);
-    if(m<ID()) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid negative array size %d",Value(m)));
+    if(m<ID()) throw READ_ERROR(LOG::sprintf("Invalid negative array size %d",Value(m)));
     if(!m) return;
     Exact_Resize(m);
     Read_Binary_Array<RW>(input,Get_Array_Pointer(),Value(m));}

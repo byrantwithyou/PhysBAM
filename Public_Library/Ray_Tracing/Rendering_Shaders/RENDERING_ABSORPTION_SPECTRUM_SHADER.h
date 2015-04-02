@@ -45,7 +45,7 @@ public:
     VECTOR<T,3> attenuation_coefficient=-ray.ray.t_max*absorption_coefficient*absorption_spectrum;
     for(int i=0;i<3;i++) if(absorption_clamp && abs(attenuation_coefficient(i))>absorption_clamp) attenuation_coefficient(i)=sign(attenuation_coefficient(i))*absorption_clamp;
     VECTOR<T,3> attenuation(exp(attenuation_coefficient.x),exp(attenuation_coefficient.y),exp(attenuation_coefficient.z));
-    if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("attenuation=%f %f %f\n",attenuation.x,attenuation.y,attenuation.z));
+    if(ray.debug_ray) ray.debug_ray->Add_Comment(LOG::sprintf("attenuation=%f %f %f\n",attenuation.x,attenuation.y,attenuation.z));
     return color*attenuation;}
 
     VECTOR<T,3> Attenuate_Photon(const RENDERING_RAY<T>& ray, const RENDERING_OBJECT<T>& object, const VECTOR<T,3>& photon_power, bool& should_throw) PHYSBAM_OVERRIDE
@@ -53,7 +53,7 @@ public:
     VECTOR<T,3> attenuation_coefficient=-ray.ray.t_max*absorption_coefficient*absorption_spectrum;
     for(int i=0;i<3;i++) if(absorption_clamp && abs(attenuation_coefficient(i))>absorption_clamp) attenuation_coefficient(i)=sign(attenuation_coefficient(i))*absorption_clamp;
     VECTOR<T,3> attenuation(exp(attenuation_coefficient.x),exp(attenuation_coefficient.y),exp(attenuation_coefficient.z));
-    if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("photon attenuation=%f %f %f\n",attenuation.x,attenuation.y,attenuation.z));
+    if(ray.debug_ray) ray.debug_ray->Add_Comment(LOG::sprintf("photon attenuation=%f %f %f\n",attenuation.x,attenuation.y,attenuation.z));
     T average_probability=(T)((attenuation.x+attenuation.y+attenuation.z)/(T)3.0);
     T current_roll=world.random.Get_Uniform_Number((T)0.0,(T)1.0);
     if(current_roll<average_probability) should_throw=false;

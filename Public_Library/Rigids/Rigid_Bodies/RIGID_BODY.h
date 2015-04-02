@@ -68,7 +68,7 @@ public:
 
     virtual std::string Name() const {return Static_Name();}
     static std::string Static_Name()
-    {return STRING_UTILITIES::string_sprintf("RIGID_BODY<VECTOR<T,%d> >",TV::m);}
+    {return LOG::sprintf("RIGID_BODY<VECTOR<T,%d> >",TV::m);}
 
     static T Coefficient_Of_Friction(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1)
     {return min(body0.coefficient_of_friction,body1.coefficient_of_friction);}

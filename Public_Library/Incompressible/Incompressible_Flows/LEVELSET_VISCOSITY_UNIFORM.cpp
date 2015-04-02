@@ -40,13 +40,13 @@ Apply_Full_Viscosity(ARRAY<T,FACE_INDEX<d> >& u,bool fully_explicit,bool fully_i
     static int solve_id=-1;solve_id++;
     if(print_matrix){
         LOG::cout<<"viscosity solve id "<<solve_id<<std::endl;
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b);}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b);}
 
     if(!fully_implicit) Apply_Explicit_Viscosity(u,axis);
     if(!fully_implicit && !fully_explicit) x.v.Exchange(b.v);
     if(!fully_explicit) Apply_Implicit_Viscosity(u,axis);
-    if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-x-%i.txt",solve_id).c_str()).Write("x",x);
+    if(print_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("visc-x-%i.txt",solve_id).c_str()).Write("x",x);
     index_map.Scatter(x.v,u);
 }
 //#####################################################################

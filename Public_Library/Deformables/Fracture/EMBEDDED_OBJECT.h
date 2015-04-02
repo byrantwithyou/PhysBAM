@@ -162,7 +162,7 @@ public:
 
     virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
     static std::string Static_Name()
-    {return STRING_UTILITIES::string_sprintf("EMBEDDED_OBJECT<T,VECTOR<T,%d>,%d>",TV::dimension,d);}
+    {return LOG::sprintf("EMBEDDED_OBJECT<T,VECTOR<T,%d>,%d>",TV::dimension,d);}
 
     void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE;
     void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;

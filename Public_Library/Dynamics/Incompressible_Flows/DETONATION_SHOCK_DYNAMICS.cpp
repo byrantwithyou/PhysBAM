@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>

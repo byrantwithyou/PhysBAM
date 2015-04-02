@@ -114,7 +114,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     else{LOG::cerr<<"unrecognzed SPH test number"<<std::endl;exit(1);}
     *fluids_parameters.grid=grid;
 
-    output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+    output_directory=LOG::sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
     LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

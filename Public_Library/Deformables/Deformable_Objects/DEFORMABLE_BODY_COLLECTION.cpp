@@ -6,6 +6,7 @@
 //#####################################################################
 #include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>

@@ -27,7 +27,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
     else if(extension=="rgb") RGB_FILE<T>::Read(filename,image);
     else if(extension=="png") PNG_FILE<T>::Read(filename,image);
     else if(extension=="pbi") FILE_UTILITIES::Read_From_File<float>(filename,image);
-    else PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unknown image file extension  from filename '%s' extension '%s'",filename.c_str(),extension.c_str()));
+    else PHYSBAM_FATAL_ERROR(LOG::sprintf("Unknown image file extension  from filename '%s' extension '%s'",filename.c_str(),extension.c_str()));
 }
 //#####################################################################
 // Function Write
@@ -62,7 +62,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     else if(extension=="png") PNG_FILE<T>::Write(filename,image_to_write);
     else if(extension=="rgb") RGB_FILE<T>::Write(filename,image_to_write);
     else if(extension=="pbi") FILE_UTILITIES::Write_To_File<float>(filename,image_to_write);
-    else PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unknown image file extension from filename '%s' extension '%s'",filename.c_str(),extension.c_str()));
+    else PHYSBAM_FATAL_ERROR(LOG::sprintf("Unknown image file extension from filename '%s' extension '%s'",filename.c_str(),extension.c_str()));
     delete corrected_image;
 }
 //#####################################################################

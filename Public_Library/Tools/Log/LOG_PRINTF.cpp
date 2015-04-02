@@ -4,8 +4,7 @@
 //#####################################################################
 #include <Tools/Log/LOG_PRINTF.h>
 namespace PhysBAM{
-namespace LOG_REAL{
-
+namespace LOG{
 void fprintf_parse_flags(const char *format,int len,PRINTF_FORMAT_FLAGS& flags)
 {
     flags.width=0;

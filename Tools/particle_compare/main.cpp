@@ -130,7 +130,7 @@ Compare_Particles(std::string& input_directory_1,std::string& input_directory_2,
 
     if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory_1+"/common/last_frame",last_frame);bool success=true;for(int i=0;i<last_frame;i++) success&=Compare_Particles(input_directory_1,input_directory_2,grid,i,type,false);return success;}
 
-    std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
+    std::string f=LOG::sprintf("%d/",frame);
     bool success=false;
     if(type==1||type==2) success=Compare_PLS_Particles<TV,PARTICLE_LEVELSET_PARTICLES<TV> >(input_directory_1,input_directory_2,"/"+f+"/"+filename,grid,frame);
     else if(type==3||type==4) success=Compare_PLS_Particles<TV,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >(input_directory_1,input_directory_2,"/"+f+"/"+filename,grid,frame);
@@ -147,7 +147,7 @@ Compare_Levelsets(std::string& input_directory_1,std::string& input_directory_2,
 
     if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory_1+"/common/last_frame",last_frame);bool success=true;for(int i=0;i<last_frame;i++){success&=Compare_Levelsets(input_directory_1,input_directory_2,grid,i);if(!success){LOG::cout<<"Failed at Frame "<<i<<std::endl;break;}}return success;}
 
-    std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
+    std::string f=LOG::sprintf("%d/",frame);
     bool success=true;ARRAY<T,TV_INT> phi1,phi2;
     LEVELSET<TV> l1(grid,phi1);FILE_UTILITIES::Read_From_File<T>(input_directory_1+"/"+f+"/levelset",l1);
     LEVELSET<TV> l2(grid,phi2);FILE_UTILITIES::Read_From_File<T>(input_directory_2+"/"+f+"/levelset",l2);
@@ -165,7 +165,7 @@ Compare_Velocities(std::string& input_directory_1,std::string& input_directory_2
     
     if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory_1+"/common/last_frame",last_frame);bool success=true;for(int i=0;i<last_frame;i++){success&=Compare_Velocities(input_directory_1,input_directory_2,grid,i);if(!success){LOG::cout<<"Failed at Frame "<<i<<std::endl;break;}}return success;}
 
-    std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
+    std::string f=LOG::sprintf("%d/",frame);
     bool success=true;
     ARRAY<T,FACE_INDEX<TV::dimension> > u1;FILE_UTILITIES::Read_From_File<T>(input_directory_1+"/"+f+"/mac_velocities",u1);
     ARRAY<T,FACE_INDEX<TV::dimension> > u2;FILE_UTILITIES::Read_From_File<T>(input_directory_2+"/"+f+"/mac_velocities",u2);

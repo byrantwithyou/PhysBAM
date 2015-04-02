@@ -112,21 +112,21 @@ Reinitialize(const bool force,const bool read_geometry)
 {
     if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
         valid=false;
-        if(!FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
+        if(!FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
 
         rigid_body_collection.Read(stream_type,basedir,frame,&needs_init,&needs_destroy); // TODO: avoiding reading triangulated areas
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
-        std::string arb_state_file=STRING_UTILITIES::string_sprintf("%s/%d/arb_state",basedir.c_str(),frame);
+        std::string arb_state_file=LOG::sprintf("%s/%d/arb_state",basedir.c_str(),frame);
         if(FILE_UTILITIES::File_Exists(arb_state_file)){
             if(!articulated_rigid_body) articulated_rigid_body=new ARTICULATED_RIGID_BODY<TV>(rigid_body_collection); // TODO: read in the actual particles
             articulated_rigid_body->Read(stream_type,basedir,frame);}
         else{delete articulated_rigid_body;articulated_rigid_body=0;}
 
-        if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",basedir.c_str(),frame)))
-            Read_Articulated_Information(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",basedir.c_str(),frame));
+        if(FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/arb_info",basedir.c_str(),frame)))
+            Read_Articulated_Information(LOG::sprintf("%s/%d/arb_info",basedir.c_str(),frame));
 
-        std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_forces_and_torques",basedir.c_str(),frame);
+        std::string filename=LOG::sprintf("%s/%d/rigid_body_forces_and_torques",basedir.c_str(),frame);
         if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File(stream_type,filename,forces_and_torques);
         else forces_and_torques.Resize(0);
 
@@ -146,9 +146,9 @@ Reinitialize(const bool force,const bool read_geometry)
             Create_Geometry(id);}
 
         // Only display real bodies (not ghost bodies)
-        if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame))) {
+        if(FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/partition",basedir.c_str(),frame))) {
             ARRAY<int> particles_of_this_partition;
-            FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
+            FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
             for(int i=0;i<max_number_of_bodies;i++)
                 draw_object(i)=false;
             for(int i=0;i<particles_of_this_partition.Size();i++)
@@ -159,8 +159,8 @@ Reinitialize(const bool force,const bool read_geometry)
             if(rigid_body_collection.Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
         for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
-        if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),frame)))
-            FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),frame),colors);
+        if(FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/colors",basedir.c_str(),frame)))
+            FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/colors",basedir.c_str(),frame),colors);
         for(int id=0;id<colors.m;id++){
             if(colors(id)==0) Set_Object_Color(id,OPENGL_COLOR::Green());
             if(colors(id)==1) Set_Object_Color(id,OPENGL_COLOR::Magenta());}
@@ -202,7 +202,7 @@ Create_Geometry(const int id)
 
     // add extra components
     if(opengl_triangulated_area(id)){
-        std::string filename_pattern=STRING_UTILITIES::string_sprintf("%s/accumulated_impulses_%d.%%d",basedir.c_str(),id);
+        std::string filename_pattern=LOG::sprintf("%s/accumulated_impulses_%d.%%d",basedir.c_str(),id);
         if(FILE_UTILITIES::Frame_File_Exists(filename_pattern,frame)){
             LOG::cout<<"Adding accumulated impulses to rigid body "<<id<<std::endl;
             OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>* component=
@@ -218,7 +218,7 @@ Update_Geometry(const int id)
 {
     if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<T,3> >(Convert_2d_To_3d(rigid_body_collection.Rigid_Body(id).Frame()));
     if(opengl_triangulated_area(id)){
-        std::string color_map_filename=STRING_UTILITIES::string_sprintf("%s/%d/stress_map_of_triangulated_area_%d",basedir.c_str(),frame,id);
+        std::string color_map_filename=LOG::sprintf("%s/%d/stress_map_of_triangulated_area_%d",basedir.c_str(),frame,id);
         if(FILE_UTILITIES::File_Exists(color_map_filename)){
             if(!opengl_triangulated_area(id)->color_map) opengl_triangulated_area(id)->color_map=new ARRAY<OPENGL_COLOR>;
             FILE_UTILITIES::Read_From_File(stream_type,color_map_filename,*opengl_triangulated_area(id)->color_map);}
@@ -276,7 +276,7 @@ Update_Object_Labels()
                     node_velocity_vectors((idx-1)*4+4)=rigid_body->Pointwise_Object_Velocity(rigid_body->World_Space_Vector(VECTOR<T,2>(-1,-1)));}}
             if(opengl_segmented_curve(i)){
                 if(output_positions){
-                    opengl_segmented_curve(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f %.3f> [w=%.3f]",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particles.frame(i).t.x,rigid_body_collection.rigid_body_particles.frame(i).t.y,rigid_body_collection.rigid_body_particles.twist(i).angular.x));}
+                    opengl_segmented_curve(i)->Set_Name(LOG::sprintf("%s <%.3f %.3f> [w=%.3f]",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particles.frame(i).t.x,rigid_body_collection.rigid_body_particles.frame(i).t.y,rigid_body_collection.rigid_body_particles.twist(i).angular.x));}
                 else opengl_segmented_curve(i)->Set_Name(rigid_body_collection.Rigid_Body(i).name);}}}
     for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
         if(draw_object(i)){
@@ -290,7 +290,7 @@ Update_Object_Labels()
 template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame_input));
+    return FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame_input));
 }
 //#####################################################################
 // Function Set_Frame
@@ -715,7 +715,7 @@ Display() const
                     OPENGL_SHAPES::Draw_Arrow(rigid_body_collection.rigid_body_particles.frame(i).t,rigid_body_collection.rigid_body_particles.frame(i).t+scale*forces_and_torques(i).x);
                 OpenGL_End();
                 for(int i=0;i<forces_and_torques.Size();i++){
-                    std::string label=STRING_UTILITIES::string_sprintf("F=%.3f %.3f, T=%.3f",forces_and_torques(i).x.x,forces_and_torques(i).x.y,forces_and_torques(i).y);
+                    std::string label=LOG::sprintf("F=%.3f %.3f, T=%.3f",forces_and_torques(i).x.x,forces_and_torques(i).x.y,forces_and_torques(i).y);
                     OpenGL_String(rigid_body_collection.rigid_body_particles.frame(i).t+scale*forces_and_torques(i).x,label);}}
 
             for(int i=0;i<extra_components.Size();i++)

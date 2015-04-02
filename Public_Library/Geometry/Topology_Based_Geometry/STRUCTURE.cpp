@@ -31,7 +31,7 @@ template<class TV> STRUCTURE<TV>* STRUCTURE<TV>::
 Create_From_Name(const std::string& name)
 {
     STRUCTURE* structure=STRUCTURE_REGISTRY<TV>::Name_To_Factory(name)->Create();
-    if(!structure) throw VALUE_ERROR(STRING_UTILITIES::string_sprintf("%s has no Create() function.",name.c_str()));
+    if(!structure) throw VALUE_ERROR(LOG::sprintf("%s has no Create() function.",name.c_str()));
     return structure;
 }
 //#####################################################################
@@ -41,7 +41,7 @@ template<class TV> STRUCTURE<TV>* STRUCTURE<TV>::
 Create_From_Name(const std::string& name,GEOMETRY_PARTICLES<TV>& particles)
 {
     STRUCTURE* structure=STRUCTURE_REGISTRY<TV>::Name_To_Factory(name)->Create(particles);
-    if(!structure) throw VALUE_ERROR(STRING_UTILITIES::string_sprintf("%s has no Create(GEOMETRY_PARTICLES<TV>& particles) function.",name.c_str()));
+    if(!structure) throw VALUE_ERROR(LOG::sprintf("%s has no Create(GEOMETRY_PARTICLES<TV>& particles) function.",name.c_str()));
     return structure;
 }
 //#####################################################################
@@ -51,7 +51,7 @@ template<class TV> STRUCTURE<TV>* STRUCTURE<TV>::
 Create_From_Extension(const std::string& extension)
 {
     STRUCTURE* structure=STRUCTURE_REGISTRY<TV>::Extension_To_Factory(extension)->Create();
-    if(!structure) throw VALUE_ERROR(STRING_UTILITIES::string_sprintf("No Create() function matching extension %s",extension.c_str()));
+    if(!structure) throw VALUE_ERROR(LOG::sprintf("No Create() function matching extension %s",extension.c_str()));
     return structure;
 }
 //#####################################################################

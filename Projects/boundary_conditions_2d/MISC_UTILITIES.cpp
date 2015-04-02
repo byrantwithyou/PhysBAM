@@ -197,7 +197,7 @@ void Dump_Error_Image(const SIM_COMMON<TV>& sim,const ARRAY<typename TV::SCALAR,
     for(RANGE_ITERATOR<TV::m> it(errors.domain);it.Valid();it.Next())
         if(T e=errors(it.index)) color_errors(it.index)=em(e);
 
-    OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("error-image-%i.txt",id).c_str()).Write("EI",color_errors);
+    OCTAVE_OUTPUT<T>(LOG::sprintf("error-image-%i.txt",id).c_str()).Write("EI",color_errors);
 }
 
 template struct ERROR_COLOR_MAP<double>;

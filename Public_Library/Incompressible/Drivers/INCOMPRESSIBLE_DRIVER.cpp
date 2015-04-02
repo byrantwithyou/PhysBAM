@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
@@ -240,9 +241,9 @@ template<class TV> void INCOMPRESSIBLE_DRIVER<TV>::
 Write_Output_Files(const int frame)
 {
     FILE_UTILITIES::Create_Directory(example.output_directory);
-    FILE_UTILITIES::Create_Directory(example.output_directory+STRING_UTILITIES::string_sprintf("/%d",frame));
+    FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
-    FILE_UTILITIES::Write_To_Text_File(example.output_directory+STRING_UTILITIES::string_sprintf("/%d/frame_title",frame),example.frame_title);
+    FILE_UTILITIES::Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
     if(frame==example.first_frame) 
         FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);

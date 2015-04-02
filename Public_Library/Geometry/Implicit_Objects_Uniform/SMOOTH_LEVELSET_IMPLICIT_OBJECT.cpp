@@ -92,7 +92,7 @@ Principal_Curvatures(const TV& X) const
 template<class TV> std::string SMOOTH_LEVELSET_IMPLICIT_OBJECT<TV>::
 Static_Name()
 {
-    return STRING_UTILITIES::string_sprintf("SMOOTH_LEVELSET_IMPLICIT_OBJECT<T,VECTOR<T,%d> >",TV::dimension);
+    return LOG::sprintf("SMOOTH_LEVELSET_IMPLICIT_OBJECT<T,VECTOR<T,%d> >",TV::dimension);
 }
 //#####################################################################
 // Function Extension

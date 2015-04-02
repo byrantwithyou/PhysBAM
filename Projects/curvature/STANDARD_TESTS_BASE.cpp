@@ -296,7 +296,7 @@ Parse_Options()
     BASE::Parse_Options();
     tests.data_directory=data_directory;
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-    output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number);
+    output_directory=LOG::sprintf("Test_%d",test_number);
     if(use_rand_seed) rand.Set_Seed(rand_seed);
     solids_parameters.implicit_solve_parameters.project_nullspace_frequency=project_nullspace;
     if(use_newmark || use_newmark_be) backward_euler_evolution=0;

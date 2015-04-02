@@ -59,7 +59,7 @@ template<class T,class RW> void Process(int argc,char* argv[])
     LOG::cout<<"Adjust temperature and density for frame "<<frame<<std::endl;
 
     std::string prefix="";
-    std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);
+    std::string f=LOG::sprintf(".%d",frame);
 
     GRID<TV> grid;FILE_UTILITIES::Read_From_File<RW>("grid",grid);
     ARRAY<T,VECTOR<int,3> > temperature,density;

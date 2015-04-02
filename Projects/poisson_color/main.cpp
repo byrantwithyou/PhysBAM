@@ -9,6 +9,7 @@
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Log/LOG.h>
+#include <Tools/Log/SCOPE.h>
 #include <Tools/Matrices/ROTATION.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>

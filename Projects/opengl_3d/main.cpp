@@ -164,10 +164,10 @@ Read_Grid()
     has_valid_grid=false;
     std::string filename,coarse_filename;
 
-    filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset",basedir.c_str(),start_frame);
-    coarse_filename=STRING_UTILITIES::string_sprintf("%s/%d/coarse_levelset",basedir.c_str(),start_frame);
+    filename=LOG::sprintf("%s/%d/levelset",basedir.c_str(),start_frame);
+    coarse_filename=LOG::sprintf("%s/%d/coarse_levelset",basedir.c_str(),start_frame);
     // For backwards compatibility
-    if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
+    if(!FILE_UTILITIES::File_Exists(filename)) filename=LOG::sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
 
     if(FILE_UTILITIES::File_Exists(filename)){
         std::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
@@ -225,7 +225,7 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(domain_box_component,"Domain box",'6',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
 
     {OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>* deformable_objects_component=0;
-    std::string deformable_object_filename=basedir+STRING_UTILITIES::string_sprintf("/%d/deformable_object_structures",start_frame);
+    std::string deformable_object_filename=basedir+LOG::sprintf("/%d/deformable_object_structures",start_frame);
     if(FILE_UTILITIES::File_Exists(basedir+"/common/deformable_object_structures") || FILE_UTILITIES::File_Exists(deformable_object_filename)){
         OPENGL_MATERIAL front_material=OPENGL_MATERIAL::Matte(OPENGL_COLOR::Yellow());
         OPENGL_MATERIAL back_material=OPENGL_MATERIAL::Matte(OPENGL_COLOR::Yellow(0.5));
@@ -286,7 +286,7 @@ Initialize_Components_And_Key_Bindings()
 
     std::string soft_constraints_deformable_object_filename=basedir+"/soft_constraints_deformable_object_particles";
     if(FILE_UTILITIES::File_Exists(soft_constraints_deformable_object_filename) // TODO(jontg): Not sure what to do here...
-        || FILE_UTILITIES::File_Exists(soft_constraints_deformable_object_filename+STRING_UTILITIES::string_sprintf(".%d",start_frame))){
+        || FILE_UTILITIES::File_Exists(soft_constraints_deformable_object_filename+LOG::sprintf(".%d",start_frame))){
         OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>* soft_constraints_deformable_objects_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>(stream_type,basedir+"/soft_constraints_",start_frame);
         soft_constraints_deformable_objects_component->selectable=true;
         Add_Component(soft_constraints_deformable_objects_component,"Soft Constraints Deformable Objects",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
@@ -775,11 +775,11 @@ Pre_Frame_Extra()
 template<class T> void VISUALIZATION<T>::
 Set_Frame_Extra()
 {
-    std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/frame_title",basedir.c_str(),frame);
+    std::string filename=LOG::sprintf("%s/%d/frame_title",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(filename)){std::ifstream input(filename.c_str());getline(input,frame_title);}
     else frame_title="";
-    filename=STRING_UTILITIES::string_sprintf("%s/%d/time",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){T time;FILE_UTILITIES::Read_From_File(stream_type,filename,time);frame_title=STRING_UTILITIES::string_sprintf("(%.05f) ",time)+frame_title;}
+    filename=LOG::sprintf("%s/%d/time",basedir.c_str(),frame);
+    if(FILE_UTILITIES::File_Exists(filename)){T time;FILE_UTILITIES::Read_From_File(stream_type,filename,time);frame_title=LOG::sprintf("(%.05f) ",time)+frame_title;}
 }
 
 template<class T> void VISUALIZATION<T>::

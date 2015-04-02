@@ -99,11 +99,11 @@ Irradiance_Estimate(const TV& location,const TV& normal,const T max_distance_squ
     ARRAY<T> photon_squared_distances(number_of_photons);
     T one_over_max_distance,actual_max_distance_squared=(T)0,max_distance_cubed;
     Locate_Photons(location,max_distance_squared,nearby_photons,photon_squared_distances,found_samples,actual_max_distance_squared);
-    if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("Got %d photons",found_samples));
+    if(ray.debug_ray) ray.debug_ray->Add_Comment(LOG::sprintf("Got %d photons",found_samples));
     if(found_samples<4) return TV();
     one_over_max_distance=T(1)/sqrt(actual_max_distance_squared);
     max_distance_cubed=actual_max_distance_squared*sqrt(actual_max_distance_squared);
-    if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("Actual Max Distance Squared %f",actual_max_distance_squared));
+    if(ray.debug_ray) ray.debug_ray->Add_Comment(LOG::sprintf("Actual Max Distance Squared %f",actual_max_distance_squared));
     //const T alpha=0.918,beta=1.953;
     T one_over_k=T(1)/T(1.1);
     for(int i=0;i<found_samples;i++){
@@ -115,7 +115,7 @@ Irradiance_Estimate(const TV& location,const TV& normal,const T max_distance_squ
     TV total_irradiance;
     if(type==PHOTON_MAP<T>::VOLUME_PHOTON_MAP) total_irradiance=irradiance/((T(4)/T(3))*T(pi)*max_distance_cubed)/(1-(T)2/3*one_over_k);
     else total_irradiance=irradiance/(T(pi)*actual_max_distance_squared)/(1-(T)2/3*one_over_k);
-    if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("Irradiance Estimate from Photon Map %f %f %f",total_irradiance.x,total_irradiance.y,total_irradiance.z));
+    if(ray.debug_ray) ray.debug_ray->Add_Comment(LOG::sprintf("Irradiance Estimate from Photon Map %f %f %f",total_irradiance.x,total_irradiance.y,total_irradiance.z));
     return total_irradiance;
 }
 //#####################################################################

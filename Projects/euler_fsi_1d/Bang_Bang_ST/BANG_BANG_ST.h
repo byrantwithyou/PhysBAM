@@ -100,8 +100,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
 
-    if(timesplit) output_directory=STRING_UTILITIES::string_sprintf("Bang_Bang_ST/Test_1__Resolution_%d_semiimplicit",(fluids_parameters.grid->counts.x));
-    else output_directory=STRING_UTILITIES::string_sprintf("Bang_Bang_ST/Test_1__Resolution_%d_explicit",(fluids_parameters.grid->counts.x));
+    if(timesplit) output_directory=LOG::sprintf("Bang_Bang_ST/Test_1__Resolution_%d_semiimplicit",(fluids_parameters.grid->counts.x));
+    else output_directory=LOG::sprintf("Bang_Bang_ST/Test_1__Resolution_%d_explicit",(fluids_parameters.grid->counts.x));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
 }

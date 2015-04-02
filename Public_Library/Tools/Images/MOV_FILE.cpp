@@ -107,7 +107,7 @@ MOV_WRITER(const std::string& filename,const int frames_per_second)
     :frames_per_second(frames_per_second),width(0),height(0)
 {
     fp=fopen(filename.c_str(),"wb");
-    if(!fp) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Failed to open %s for writing",filename.c_str()));
+    if(!fp) PHYSBAM_FATAL_ERROR(LOG::sprintf("Failed to open %s for writing",filename.c_str()));
     current_mov=new QT_ATOM(fp,"mdat");
 }
 //#####################################################################

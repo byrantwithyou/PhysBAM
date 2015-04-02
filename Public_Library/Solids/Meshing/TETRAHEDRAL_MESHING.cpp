@@ -701,7 +701,7 @@ Write_Output_Files(const int frame)
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
     FILE_UTILITIES::Create_Directory(output_directory);
-    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    std::string f=LOG::sprintf("%d",frame);
     FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
     FILE_UTILITIES::Create_Directory(output_directory+"/common");
     // write state

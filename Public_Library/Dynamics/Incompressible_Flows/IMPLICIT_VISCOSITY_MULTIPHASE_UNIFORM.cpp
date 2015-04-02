@@ -110,9 +110,9 @@ Debug_Write(const std::string& output_directory_input)
 {
     POISSON_COLLIDABLE_UNIFORM<TV>& heat_poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<TV>&>(*heat_solver);
     static int frame[3]={0,0,0};
-    std::string output_directory=output_directory_input;if(mpi_grid) output_directory+=STRING_UTILITIES::string_sprintf("/processor%d",mpi_grid->rank);
+    std::string output_directory=output_directory_input;if(mpi_grid) output_directory+=LOG::sprintf("/processor%d",mpi_grid->rank);
     FILE_UTILITIES::Create_Directory(output_directory);
-    std::string output_directory_axis=STRING_UTILITIES::string_sprintf("%s/%d",output_directory.c_str(),axis);FILE_UTILITIES::Create_Directory(output_directory_axis);
+    std::string output_directory_axis=LOG::sprintf("%s/%d",output_directory.c_str(),axis);FILE_UTILITIES::Create_Directory(output_directory_axis);
     std::string f=STRING_UTILITIES::Value_To_String(frame[axis]);
     FILE_UTILITIES::Write_To_File<T>(output_directory_axis+"/grid",face_grid);
     FILE_UTILITIES::Write_To_File<T>(output_directory_axis+"/psi_N."+f,heat_poisson.psi_N);
@@ -120,7 +120,7 @@ Debug_Write(const std::string& output_directory_input)
     FILE_UTILITIES::Write_To_File<T>(output_directory_axis+"/colors."+f,heat_poisson.filled_region_colors);
     FILE_UTILITIES::Write_To_File<T>(output_directory_axis+"/beta_face."+f,heat_poisson.beta_face);
     for(int i=0;i<densities.m;i++){
-        std::string filename=STRING_UTILITIES::string_sprintf("/levelset_%d.%s",i,f.c_str());
+        std::string filename=LOG::sprintf("/levelset_%d.%s",i,f.c_str());
         FILE_UTILITIES::Write_To_File<T>(output_directory_axis+filename,*heat_poisson.levelset_multiple->levelsets(i));}
     FILE_UTILITIES::Write_To_Text_File(output_directory_axis+"/common/last_frame",frame[axis]);frame[axis]+=1;
 }

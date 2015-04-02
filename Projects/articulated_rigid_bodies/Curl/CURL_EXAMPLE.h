@@ -120,7 +120,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(parameter_file.empty()) parameter_file="Curl/example.param";
     ARB_PARAMETERS::Read_Common_Parameters(parameter_file,*this,parameter_list);
     selection=parameter_list.Get_Parameter("selection",5);
-    output_directory+=STRING_UTILITIES::string_sprintf("_%d",selection);
+    output_directory+=LOG::sprintf("_%d",selection);
     traditional_pd=parameter_list.Get_Parameter("traditional_pd",false);
     if(traditional_pd) arb->Use_No_Actuators();
     half_acceleration=parameter_list.Get_Parameter("half_acceleration",true);
@@ -260,7 +260,7 @@ void PD_Plank_Curl_Test(int& num_joints,int& num_rigid_bodies,TV shift,ROTATION<
         child_body->Frame().r=orient;
         child_body->Twist().linear=TV(0,0,0);
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
+        child_body->name=LOG::sprintf("child_%d",i);
 
         if(parameter_list.Get_Parameter("use_bend_joint",false)) joint=new ANGLE_JOINT<TV>();
         else joint=new POINT_JOINT<TV>();
@@ -328,7 +328,7 @@ void Raise_To_Horizontal(int& num_joints,int& num_rigid_bodies,const int num_lin
         child_body->Frame().t=TV(0,cheight,0);
         child_body->Frame().r=ROTATION<TV>(-(T)pi/2,TV(0,0,1));
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
+        child_body->name=LOG::sprintf("child_%d",i);
 
         joint=new POINT_JOINT<TV>();arb->joint_mesh.Add_Articulation(int(num_rigid_bodies),int(num_rigid_bodies+1),joint);
 
@@ -394,7 +394,7 @@ void Jitter_Test(int& num_joints,int& num_rigid_bodies,const int num_links)
         child_body->Frame().t=TV(0,cheight,0);
         child_body->Frame().r=ROTATION<TV>::From_Components((T).5,-(T).5,-(T).5,-(T).5);
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
+        child_body->name=LOG::sprintf("child_%d",i);
         child_body->Set_Mass((T).001);
 
         joint=new POINT_JOINT<TV>();arb->joint_mesh.Add_Articulation(int(num_rigid_bodies),int(num_rigid_bodies+1),joint);
@@ -464,7 +464,7 @@ void PD_Plank_Test(int& num_joints,int& num_rigid_bodies,const TV& shift,const R
         child_body->Frame().r=orient;
         child_body->Twist().linear=TV(0,0,0);
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
+        child_body->name=LOG::sprintf("child_%d",i);
 
         if(parameter_list.Get_Parameter("use_point_joint",true)) joint=new POINT_JOINT<TV>();
         else joint=new ANGLE_JOINT<TV>();

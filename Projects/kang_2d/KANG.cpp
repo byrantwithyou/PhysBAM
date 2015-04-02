@@ -175,7 +175,7 @@ Parse_Options()
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
-    output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number,resolution);
+    output_directory=LOG::sprintf("Test_%d",test_number,resolution);
 }
 template<class T> void KANG<T>::
 Parse_Late_Options() {BASE::Parse_Late_Options();}
@@ -572,8 +572,8 @@ template<class T> void KANG<T>::
 Write_Output_Files(const int frame) const
 {
     BASE::Write_Output_Files(frame);
-    FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
-    FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
+    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
+    FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
     const_cast<GEOMETRY_PARTICLES<TV>&>(debug_particles).Delete_All_Elements();
 }
 //#####################################################################

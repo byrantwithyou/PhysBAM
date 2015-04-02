@@ -133,7 +133,7 @@ Test_Matrix() const
 template<class TV> void MATRIX_VISCOUS_FORCES<TV>::
 Print_Each_Matrix(int n) const
 {
-    OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("N-%i.txt",n).c_str());
+    OCTAVE_OUTPUT<T> oo(LOG::sprintf("N-%i.txt",n).c_str());
     oo.Begin_Sparse_Matrix("N",Value(last_id),index_map.Number_Faces());
     for(int i=0;i<entries.m;i++){
         const ENTRY& entry=entries(i);

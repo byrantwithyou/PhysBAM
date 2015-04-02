@@ -232,9 +232,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
 
     if(fluids_parameters.use_slip)
-        output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
     else
-        output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

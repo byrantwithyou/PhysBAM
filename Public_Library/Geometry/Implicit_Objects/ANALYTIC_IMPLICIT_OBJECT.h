@@ -5,7 +5,6 @@
 #ifndef __ANALYTIC_IMPLICIT_OBJECT__
 #define __ANALYTIC_IMPLICIT_OBJECT__
 
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 namespace PhysBAM{
 
@@ -74,7 +73,7 @@ public:
 
     virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
     static std::string Static_Name()
-    {return STRING_UTILITIES::string_sprintf("ANALYTIC_IMPLICIT_OBJECT<%s>",T_ANALYTIC::Name().c_str());}
+    {return LOG::sprintf("ANALYTIC_IMPLICIT_OBJECT<%s>",T_ANALYTIC::Name().c_str());}
 
     std::string Extension() const PHYSBAM_OVERRIDE {return "";}
 

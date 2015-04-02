@@ -89,7 +89,7 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         std::cout<<"Material "<<name<<std::endl;
         RENDERING_SUM_SHADER<T>* shader=new RENDERING_SUM_SHADER<T>(world);
         for(int i=1;;i++){
-            std::string shader_name=parameters.Get_Parameter(STRING_UTILITIES::string_sprintf("Shader_%d",i),std::string("<unknown>"));
+            std::string shader_name=parameters.Get_Parameter(LOG::sprintf("Shader_%d",i),std::string("<unknown>"));
             std::cout<<"   Shader "<<i<<" is "<<shader_name<<std::endl;
             if(shader_name=="<unknown>") break;
             shader->shaders.Append(shaders.Get(shader_name));}
@@ -337,8 +337,8 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         shaders.Set(name,shader);
         LOG::cout<<"Material '"<<name<<"' Color blend shader: ";
         for(int i=1;;i++){
-            std::string child_shader_tag=STRING_UTILITIES::string_sprintf("Shader%d",i);
-            std::string weight_tag=STRING_UTILITIES::string_sprintf("Weight%d",i);
+            std::string child_shader_tag=LOG::sprintf("Shader%d",i);
+            std::string weight_tag=LOG::sprintf("Weight%d",i);
             if(!parameters.Is_Defined(child_shader_tag) || !parameters.Is_Defined(weight_tag)) break;
             std::string child_shader_name=parameters.Get_Parameter(child_shader_tag,std::string("<unknown>"));
             T weight=parameters.Get_Parameter(weight_tag,(T)1);

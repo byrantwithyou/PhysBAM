@@ -186,16 +186,16 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
         solid_initial_position=TV((T).65,(T).11,(T)0);}
 
-    if(timesplit) output_directory=STRING_UTILITIES::string_sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),
+    if(timesplit) output_directory=LOG::sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),
         (fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
-    else output_directory=STRING_UTILITIES::string_sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),
+    else output_directory=LOG::sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),
         (fluids_parameters.grid->counts.z));
     if(eno_scheme==2) output_directory+="_density_weighted";
     else if(eno_scheme==3) output_directory+="_velocity_weighted";
     if(use_slip) output_directory+="_slip";
     if(transition_to_incompressible) output_directory+="_transition_incompressible";
     if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
-    output_directory+=STRING_UTILITIES::string_sprintf("_mass_%f",solid_mass);
+    output_directory+=LOG::sprintf("_mass_%f",solid_mass);
 
     state_inside=TV_DIMENSION((T)1,(T)0,(T)0,(T)0,(T)1);
     state_outside=TV_DIMENSION((T).125,(T)0,(T)0,(T)0,(T).1);

@@ -1,4 +1,5 @@
 #include <Tools/Data_Structures/RED_BLACK_TREE.h>
+#include <Tools/Math_Tools/exchange.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Rotate_Right

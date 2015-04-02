@@ -58,7 +58,7 @@ Parse_Options()
 {
     BASE::Parse_Options();
     tests.data_directory=data_directory;
-    output_directory=STRING_UTILITIES::string_sprintf("Bridge/%s%s",output_directory.c_str(),(selection==0?"_blocks":"_lathe_chains"));
+    output_directory=LOG::sprintf("Bridge/%s%s",output_directory.c_str(),(selection==0?"_blocks":"_lathe_chains"));
 }
 //#####################################################################
 // Function Initialize_Bodies
@@ -142,14 +142,14 @@ Make_Bridge()
     T x_shift=-4,rotation=(T)pi/2;
     for(int row=0;row<num_rungs-1;row++){
         Add_Rigid_Body("plank",(T).125,(T).5,0,FRAME<TV>(TV(x_shift+(T).8755*row,(T)-.53125,0)),"bridge");
-        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).125,(T).5,0,FRAME<TV>(TV(x_shift+(T).8755*row,0,(T).5),ROTATION<TV>(rotation,TV(0,1,0))),STRING_UTILITIES::string_sprintf("rail%d",(row*5+2)));
-        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).125,(T).5,0,FRAME<TV>(TV(x_shift+(T).8755*row,0,(T)-.5),ROTATION<TV>(rotation,TV(0,1,0))),STRING_UTILITIES::string_sprintf("rail%d",(row*5+3)));
+        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).125,(T).5,0,FRAME<TV>(TV(x_shift+(T).8755*row,0,(T).5),ROTATION<TV>(rotation,TV(0,1,0))),LOG::sprintf("rail%d",(row*5+2)));
+        Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).125,(T).5,0,FRAME<TV>(TV(x_shift+(T).8755*row,0,(T)-.5),ROTATION<TV>(rotation,TV(0,1,0))),LOG::sprintf("rail%d",(row*5+3)));
         Add_Rigid_Body("plank",(T).06,(T).5,0,FRAME<TV>(TV(x_shift+(T).43775+(T).8755*row,(T)(-.53125+.015625),.5625),ROTATION<TV>((T)pi/2,TV(0,1,0))),"side_bridge",10);
         Add_Rigid_Body("plank",(T).06,(T).5,0,FRAME<TV>(TV(x_shift+(T).43775+(T).8755*row,(T)(-.53125+.015625),(T)-.5625),ROTATION<TV>((T)pi/2,TV(0,1,0))),"side_bridge",10);}
 
     Add_Rigid_Body("plank",(T).125,(T).5,0,FRAME<TV>(TV(x_shift+(T).8755*(num_rungs-1),(T)-.53125,0)),"bridge");
-    Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).125,(T).5,0,FRAME<TV>(TV(x_shift+(T).8755*(num_rungs-1),0,(T).5),ROTATION<TV>(rotation,TV(0,1,0))),STRING_UTILITIES::string_sprintf("rail%d",(9*5+2)));
-    Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).125,(T).5,0,FRAME<TV>(TV(x_shift+(T).8755*(num_rungs-1),0,(T)-.5),ROTATION<TV>(rotation,TV(0,1,0))),STRING_UTILITIES::string_sprintf("rail%d",(9*5+3)));
+    Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).125,(T).5,0,FRAME<TV>(TV(x_shift+(T).8755*(num_rungs-1),0,(T).5),ROTATION<TV>(rotation,TV(0,1,0))),LOG::sprintf("rail%d",(9*5+2)));
+    Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).125,(T).5,0,FRAME<TV>(TV(x_shift+(T).8755*(num_rungs-1),0,(T)-.5),ROTATION<TV>(rotation,TV(0,1,0))),LOG::sprintf("rail%d",(9*5+3)));
 
     // ropes
     T rope_length=(T).75/(1+sqrt((T)3)),y0=(T).5-(T).5*rope_length*sin((T)pi/6)-(T).05,y1=(T).5-rope_length*sin((T)pi/6)-(T).05;

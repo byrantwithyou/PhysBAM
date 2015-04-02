@@ -5,7 +5,7 @@
 // Class DEBUG_UTILITIES
 //#####################################################################
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
+#include <Tools/Log/LOG_PRINTF.h>
 #include <Tools/Utilities/EXCEPTIONS.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <cassert>
@@ -41,21 +41,21 @@ void Debug_Breakpoint()
 //#####################################################################
 void Warn_If_Not_Overridden(const char* function,const char* file,unsigned int line,const std::type_info& type)
 {
-    LOG::cerr<<STRING_UTILITIES::string_sprintf("*** PHYSBAM_WARNING: %s:%s:%d: Function not overridden by %s",file,function,line,type.name())<<std::endl;
+    LOG::fprintf(LOG::cerr,"*** PHYSBAM_WARNING: %s:%s:%d: Function not overridden by %s\n",file,function,line,type.name());
 }
 //#####################################################################
 // Function Warning
 //#####################################################################
 void Warning(const std::string& message,const char* function,const char* file,unsigned int line)
 {
-    LOG::cerr<<STRING_UTILITIES::string_sprintf("*** PHYSBAM_WARNING: %s:%s:%d: %s",file,function,line,message.c_str())<<std::endl;
+    LOG::fprintf(LOG::cerr,"*** PHYSBAM_WARNING: %s:%s:%d: %s\n",file,function,line,message.c_str());
 }
 //#####################################################################
 // Function Function_Is_Not_Defined
 //#####################################################################
 void Function_Is_Not_Defined(const char* function,const char* file,unsigned int line,const std::type_info& type)
 {
-    std::string error=STRING_UTILITIES::string_sprintf("%s:%s:%d: Function not defined by %s",file,function,line,type.name());
+    std::string error=LOG::sprintf("%s:%s:%d: Function not defined by %s",file,function,line,type.name());
     LOG::cout<<std::flush;LOG::cerr<<"\n";
     PROCESS_UTILITIES::Backtrace();
     LOG::cerr<<"\n*** ERROR: "<<error<<'\n'<<std::endl;
@@ -74,7 +74,7 @@ void Not_Implemented(const char* function,const char* file,unsigned int line,con
 }
 void Not_Implemented(const char* function,const char* file,unsigned int line,const std::string& message)
 {
-    std::string error=STRING_UTILITIES::string_sprintf("%s:%s:%d: Not implemented: %s",file,function,line,message.c_str());
+    std::string error=LOG::sprintf("%s:%s:%d: Not implemented: %s",file,function,line,message.c_str());
     LOG::cout<<std::flush;LOG::cerr<<"\n";
     PROCESS_UTILITIES::Backtrace();
     LOG::cerr<<"\n*** ERROR: "<<error<<'\n'<<std::endl;
@@ -94,7 +94,7 @@ void Fatal_Error(const char* function,const char* file,unsigned int line,const c
 }
 void Fatal_Error(const char* function,const char* file,unsigned int line,const std::string& message)
 {
-    std::string error=STRING_UTILITIES::string_sprintf("%s:%s:%d: %s",file,function,line,message.c_str());
+    std::string error=LOG::sprintf("%s:%s:%d: %s",file,function,line,message.c_str());
     LOG::cout<<std::flush;LOG::cerr<<"\n";
     PROCESS_UTILITIES::Backtrace();
     LOG::cerr<<"\n*** ERROR: "<<error<<'\n'<<std::endl;
@@ -114,7 +114,7 @@ void Assertion_Failed(const char* function,const char* file,unsigned int line,co
 }
 void Assertion_Failed(const char* function,const char* file,unsigned int line,const char* condition,const std::string& message)
 {
-    std::string error=STRING_UTILITIES::string_sprintf("%s:%s:%d: %s, condition = %s",file,function,line,message.c_str(),condition);
+    std::string error=LOG::sprintf("%s:%s:%d: %s, condition = %s",file,function,line,message.c_str(),condition);
     LOG::cout<<std::flush;LOG::cerr<<"\n";
     PROCESS_UTILITIES::Backtrace();
     LOG::cerr<<"\n*** ERROR: "<<error<<'\n'<<std::endl;

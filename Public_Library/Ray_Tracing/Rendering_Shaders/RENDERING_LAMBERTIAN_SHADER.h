@@ -7,7 +7,6 @@
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Math_Tools/constants.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{
@@ -77,7 +76,7 @@ public:
         const RENDERING_OBJECT<T>& intersection_object,const TV& intersection_point,const TV& same_side_normal) const
     {TV approximate_color=world.global_photon_map.Irradiance_Estimate(intersection_point,same_side_normal,world.max_photon_distance,
             world.number_of_photons_for_estimate,ray,PHOTON_MAP<T>::GLOBAL_PHOTON_MAP);
-    if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("Approx color %f %f %f\n",approximate_color.x,approximate_color.y,approximate_color.z));
+    if(ray.debug_ray) ray.debug_ray->Add_Comment(LOG::sprintf("Approx color %f %f %f\n",approximate_color.x,approximate_color.y,approximate_color.z));
     return approximate_color*Evaluate_Diffuse_BRDF(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal);}
 
     void Receive_Photon(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,

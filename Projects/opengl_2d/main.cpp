@@ -157,11 +157,11 @@ Read_Grid()
     has_valid_sub_grids=false;
     std::string filename,coarse_filename,sub_filename;
 
-    sub_filename=STRING_UTILITIES::string_sprintf("%s/%d/sub_grids",basedir.c_str(),start_frame);
-    filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset",basedir.c_str(),start_frame);
+    sub_filename=LOG::sprintf("%s/%d/sub_grids",basedir.c_str(),start_frame);
+    filename=LOG::sprintf("%s/%d/levelset",basedir.c_str(),start_frame);
     // For backwards compatibility
-    if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
-    if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset_0",basedir.c_str(),start_frame);
+    if(!FILE_UTILITIES::File_Exists(filename)) filename=LOG::sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
+    if(!FILE_UTILITIES::File_Exists(filename)) filename=LOG::sprintf("%s/%d/levelset_0",basedir.c_str(),start_frame);
 
     if(FILE_UTILITIES::File_Exists(filename)){
         LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl<<std::flush;
@@ -586,7 +586,7 @@ Initialize_Components_And_Key_Bindings()
     // deformable and rigid bodies
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>* rigid_bodies_component=0;
     OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>* deformable_objects_component=0;
-    std::string deformable_object_filename=STRING_UTILITIES::string_sprintf("%s/%d/deformable_object_particles",basedir.c_str(),start_frame);
+    std::string deformable_object_filename=LOG::sprintf("%s/%d/deformable_object_particles",basedir.c_str(),start_frame);
     if(FILE_UTILITIES::File_Exists(deformable_object_filename)){
         deformable_objects_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>(stream_type,basedir+"/",start_frame);
         deformable_objects_component->Set_Vector_Size(.01);
@@ -598,7 +598,7 @@ Initialize_Components_And_Key_Bindings()
         rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>(stream_type,basedir);
         rigid_bodies_component->Set_Vector_Size(.01);
         rigid_bodies_component->selectable=true;
-        if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/colors",start_frame)) FILE_UTILITIES::template Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),start_frame),rigid_bodies_component->colors);
+        if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/colors",start_frame)) FILE_UTILITIES::template Read_From_File(stream_type,LOG::sprintf("%s/%d/colors",basedir.c_str(),start_frame),rigid_bodies_component->colors);
         for(int i=0;i<rigid_bodies_no_draw_list.m;i++){
             LOG::cout<<"Rigid bodies: not drawing object "<<rigid_bodies_no_draw_list(i)<<std::endl;
             rigid_bodies_component->Set_Draw_Object(rigid_bodies_no_draw_list(i),false);}
@@ -620,7 +620,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('=',deformable_objects_component->viewer_callbacks.Get("increase_vector_size"));
         opengl_world.Append_Bind_Key('-',deformable_objects_component->viewer_callbacks.Get("decrease_vector_size"));}
 
-    std::string soft_constraints_deformable_object_filename=basedir+STRING_UTILITIES::string_sprintf("/%d/soft_constraints_deformable_object_particles",start_frame);
+    std::string soft_constraints_deformable_object_filename=basedir+LOG::sprintf("/%d/soft_constraints_deformable_object_particles",start_frame);
     if(FILE_UTILITIES::File_Exists(soft_constraints_deformable_object_filename)){
         OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>* soft_constraints_deformable_objects_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>(stream_type,basedir+"/soft_constraints_",start_frame);
         soft_constraints_deformable_objects_component->Set_Vector_Size(.01);
@@ -747,11 +747,11 @@ Pre_Frame_Extra()
 template<class T> void OPENGL_2D_VISUALIZATION<T>::
 Set_Frame_Extra()
 {
-    std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/frame_title",basedir.c_str(),frame);
+    std::string filename=LOG::sprintf("%s/%d/frame_title",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(filename)){std::ifstream input(filename.c_str());getline(input,frame_title);}
     else frame_title="";
-    filename=STRING_UTILITIES::string_sprintf("%s/%d/time",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){T time;FILE_UTILITIES::Read_From_File(stream_type,filename,time);frame_title=STRING_UTILITIES::string_sprintf("(%.05f) ",time)+frame_title;}
+    filename=LOG::sprintf("%s/%d/time",basedir.c_str(),frame);
+    if(FILE_UTILITIES::File_Exists(filename)){T time;FILE_UTILITIES::Read_From_File(stream_type,filename,time);frame_title=LOG::sprintf("(%.05f) ",time)+frame_title;}
 }
 //#####################################################################
 // Command_Prompt_Response
