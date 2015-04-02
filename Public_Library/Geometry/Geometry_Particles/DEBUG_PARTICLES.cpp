@@ -119,10 +119,11 @@ Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>&
 template<class TV,class T> void PhysBAM::
 Dump_Levelset(const GRID<TV>& grid,const IMPLICIT_OBJECT<TV>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor)
 {
-    ARRAY<T,VECTOR<int,TV::m> > phi_array(grid.Numbers_Of_Nodes());
-    for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next())
+    GRID<TV> node_grid(grid.Is_MAC_Grid()?grid.Get_Regular_Grid():grid);
+    ARRAY<T,VECTOR<int,TV::m> > phi_array(node_grid.Numbers_Of_Nodes());
+    for(NODE_ITERATOR<TV> it(node_grid);it.Valid();it.Next())
         phi_array(it.index)=phi.Extended_Phi(it.Location());
-    Dump_Levelset(grid,phi_array,color,bgcolor);
+    Dump_Levelset(node_grid,phi_array,color,bgcolor);
 }
 namespace PhysBAM{
 template class DEBUG_PARTICLES<VECTOR<float,1> >;
