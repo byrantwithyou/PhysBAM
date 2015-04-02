@@ -25,6 +25,7 @@ public:
     MPM_KRYLOV_VECTOR<TV> &v0,&v1,&tmp0,&tmp1,&tmp2;
     ARRAY<MATRIX<T,TV::m> > F0;
     ARRAY<TV> X0;
+    T collision_thickness;
 
     MPM_OBJECTIVE(MPM_EXAMPLE<TV>& example);
     virtual ~MPM_OBJECTIVE();

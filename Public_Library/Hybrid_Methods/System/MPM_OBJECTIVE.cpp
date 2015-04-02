@@ -22,7 +22,8 @@ MPM_OBJECTIVE(MPM_EXAMPLE<TV>& example)
     v1(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
     tmp0(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
     tmp1(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
-    tmp2(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices))
+    tmp2(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
+    collision_thickness(1e-15)
 {
 }
 //#####################################################################
@@ -128,7 +129,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
         TV V=v0.u.array(i)+midpoint_scale*dv.u.array(i);
         TV X0=system.example.location.array(i);
         TV X=X0+system.example.dt*V;
-        T deepest_phi=0;
+        T deepest_phi=collision_thickness;
         int deepest_index=-1;
         IMPLICIT_OBJECT<TV>* deepest_io=0;
         if(int* object_index=system.forced_collisions.Get_Pointer(i)){
