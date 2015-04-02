@@ -15,8 +15,6 @@ To be implemented:
 
 To be debugged:
 
-* Newton does not converge for test 8, when collisions are occuring.
-
 
 To test:
 
