@@ -60,11 +60,8 @@ Write_Output_Files(const int frame)
     for(int i=0;i<particles.X.m;i++){
         Add_Debug_Particle(particles.X(i),VECTOR<T,3>(1,particles.valid(i),1));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(i));}
-    for(int i=0;i<location.array.m;i++){
-        TV& X=location.array(i);
-        for(int j=0;j<collision_objects.m;j++){
-            if(collision_objects(j).io->Extended_Phi(X)<0){
-                Add_Debug_Particle(X,VECTOR<T,3>(0.7,0.3,0.3));break;}}}
+    for(int i=0;i<collision_objects.m;i++)
+        Dump_Levelset(grid,*collision_objects(i).io,VECTOR<T,3>(0.7,0.3,0.3));
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 }
 //#####################################################################
