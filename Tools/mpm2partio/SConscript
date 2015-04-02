@@ -3,10 +3,11 @@ import os
 Import('env Automatic_Program')
 env=env.Copy(USE_HYBRID=1)
 
-if os.environ.has_key('PARTIO_INCLUDE_PATH') and os.environ.has_key('PARTIO_LIBRARY_PATH'):
-    partio_include_path=os.environ['PARTIO_INCLUDE_PATH']
-    partio_library_path=os.environ['PARTIO_LIBRARY_PATH']
-    env.Append(CPPPATH=[partio_include_path])
-    env.Append(LIBPATH=[partio_library_path])
+if os.environ.has_key('PARTIO') and os.environ.has_key('PARTIO_ARCH'):
+    partio_type=env['TYPE']
+    if partio_type=='release' or partio_type=='optdebug': partio_type='optimize'
+    partio_root=os.environ['PARTIO']+'/dist/'+os.environ['PARTIO_ARCH']+'-'+partio_type
+    env.Append(CPPPATH=[partio_root+'/include'])
+    env.Append(LIBPATH=[partio_root+'/lib'])
     env.Append(LIBS=['partio'])
     Automatic_Program(env,"mpm2partio",["main.cpp"])
