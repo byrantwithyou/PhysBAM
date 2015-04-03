@@ -163,6 +163,21 @@ Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles)
     MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(particles,constitutive_model,gather_scatter,affected_particles);
     return Add_Force(fe);
 }
+//#####################################################################
+// Function Add_Neo_Hookean
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Add_Walls(int flags,bool sticky,T friction) // -x +x -y +y [ -z +z ], as bit flags
+{
+    RANGE<TV> range=grid.domain.Thickened(grid.dX*(ghost*2+1));
+    for(int a=0;a<TV::m;a++)
+        for(int s=0;s<2;s++)
+            if(flags&(1<<(a*2+s))){
+                RANGE<TV> wall=range;
+                if(s) wall.max_corner(a)=grid.domain.min_corner(a);
+                else wall.min_corner(a)=grid.domain.max_corner(a);
+                collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wall),sticky,friction});}
+}
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
 template class STANDARD_TESTS_BASE<VECTOR<double,2> >;

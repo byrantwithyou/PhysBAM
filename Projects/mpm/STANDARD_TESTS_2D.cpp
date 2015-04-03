@@ -152,16 +152,7 @@ Initialize()
         case 8:{ // collision an elastic cylinder
             if(!user_resolution) resolution=10;
             grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
-            RANGE<TV> wallL=grid.domain.Thickened((T).5),wallR=grid.domain.Thickened((T).5);
-            RANGE<TV> wallB=grid.domain.Thickened((T).5),wallT=grid.domain.Thickened((T).5);
-            wallL.max_corner.x=grid.domain.min_corner.x;
-            wallB.max_corner.y=grid.domain.min_corner.y;
-            wallR.min_corner.x=grid.domain.max_corner.x;
-            wallT.min_corner.y=grid.domain.max_corner.y;
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallL),false,.3});
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallR),false,.3});
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallT),false,.3});
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallB),false,.3});
+            Add_Walls(-1,false,.3);
             collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(SPHERE<TV>(TV(4,3),1)),false,.3});
             SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
@@ -174,16 +165,7 @@ Initialize()
         case 9:{ // collision an elastic cylinder
             if(!user_resolution) resolution=10;
             grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
-            RANGE<TV> wallL=grid.domain.Thickened((T).5),wallR=grid.domain.Thickened((T).5);
-            RANGE<TV> wallB=grid.domain.Thickened((T).5),wallT=grid.domain.Thickened((T).5);
-            wallL.max_corner.x=grid.domain.min_corner.x+(T).5;
-            wallB.max_corner.y=grid.domain.min_corner.y+(T).5;
-            wallR.min_corner.x=grid.domain.max_corner.x-(T).5;
-            wallT.min_corner.y=grid.domain.max_corner.y-(T).5;
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallL),false,.3});
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallR),false,.3});
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallT),false,.3});
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallB),false,.3});
+            Add_Walls(-1,false,.3);
             SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
             GRID<TV> sg(grid.numbers_of_cells*2,grid.domain,true);

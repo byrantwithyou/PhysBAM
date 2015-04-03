@@ -32,7 +32,7 @@ public:
     using BASE::solver_iterations;using BASE::test_diff;using BASE::threads;using BASE::test_number;
     using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Gravity;
     using BASE::Add_Fixed_Corotated;using BASE::Add_Neo_Hookean;using BASE::random;
-    using BASE::collision_objects;using BASE::user_resolution;
+    using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
