@@ -60,6 +60,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),velocity);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/density",output_directory.c_str(),frame),mass);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    deformable_body_collection.Write(stream_type,output_directory,output_directory,frame,-1,frame==0,false);
 
     for(int i=0;i<particles.X.m;i++){
         Add_Debug_Particle(particles.X(i),VECTOR<T,3>(1,particles.valid(i),1));

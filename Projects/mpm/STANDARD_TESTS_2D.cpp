@@ -7,6 +7,8 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
@@ -152,7 +154,7 @@ Initialize()
         case 8:{ // collision an elastic cylinder
             if(!user_resolution) resolution=10;
             grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
-            Add_Walls(-1,false,.3);
+            Add_Walls(-1,false,.3,.1);
             collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(SPHERE<TV>(TV(4,3),1)),false,.3});
             SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
@@ -165,13 +167,21 @@ Initialize()
         case 9:{ // collision an elastic cylinder
             if(!user_resolution) resolution=10;
             grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
-            Add_Walls(-1,false,.3);
+            Add_Walls(-1,false,.3,.1);
             SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
             GRID<TV> sg(grid.numbers_of_cells*2,grid.domain,true);
             Seed_Particles(sphere,[=](const TV& X){return TV(3.0,0);},[=](const TV&){return MATRIX<T,2>();},
                 density,sg);
-            Add_Neo_Hookean(scale_E,0.425);
+            ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
+            Add_Neo_Hookean(scale_E,0.425,&mpm_particles);
+
+            SPHERE<TV> sphere2(TV(3.55,3.35),.3);
+            TRIANGULATED_AREA<T>* ta=TESSELLATION::Generate_Triangles(sphere2,ceil(sphere2.radius/grid.dX.x*2));
+            TRIANGULATED_AREA<T>& new_ta=Seed_Lagrangian_Particles(*ta,[=](const TV& X){return TV(-3.0,0);},
+                [=](const TV&){return MATRIX<T,2>();},density,true);
+            Add_Neo_Hookean(new_ta,scale_E,0.425);
+
             Add_Gravity(TV(0,-1.8));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");

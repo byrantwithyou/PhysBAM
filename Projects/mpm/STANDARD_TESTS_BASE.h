@@ -8,6 +8,7 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Deformables/Standard_Tests/DEFORMABLES_STANDARD_TESTS.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <boost/function.hpp>
 
@@ -21,6 +22,7 @@ class STANDARD_TESTS_BASE:public MPM_EXAMPLE<TV>
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef MPM_EXAMPLE<TV> BASE;
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_VOLUME;
 
 public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
@@ -33,7 +35,7 @@ public:
     using BASE::print_stats;using BASE::flip;using BASE::cfl;using BASE::newton_tolerance;
     using BASE::newton_iterations;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::test_diff;using BASE::threads;using BASE::weights;
-    using BASE::Add_Force;using BASE::Set_Weights;
+    using BASE::Add_Force;using BASE::Set_Weights;using BASE::deformable_body_collection;
 
     int test_number;
     int resolution;
@@ -46,6 +48,7 @@ public:
     T scale_mass;
     T scale_E;
     RANDOM_NUMBERS<T> random;
+    DEFORMABLES_STANDARD_TESTS<TV> tests;
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
@@ -66,12 +69,18 @@ public:
         boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& sg)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,sg);}
 
+    template<class T_STRUCTURE>
+    T_STRUCTURE& Seed_Lagrangian_Particles(T_STRUCTURE& object,boost::function<TV(const TV&)> V,
+        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass);
+
     void Add_Particle(const TV& X,const TV& V,const T mass,const T volume,const MATRIX<T,TV::m> F,const MATRIX<T,TV::m> B);
 
     int Add_Gravity(TV g);
     int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0);
     int Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles=0);
-    void Add_Walls(int flags,bool sticky,T friction); // -x +x -y +y [ -z +z ], as bit flags
+    int Add_Fixed_Corotated(T_VOLUME& object,T E,T nu);
+    int Add_Neo_Hookean(T_VOLUME& object,T E,T nu);
+    void Add_Walls(int flags,bool sticky,T friction,T inset); // -x +x -y +y [ -z +z ], as bit flags
 //#####################################################################
 };
 }

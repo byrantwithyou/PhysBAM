@@ -7,10 +7,13 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
+#include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
+#include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
@@ -25,8 +28,9 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> STANDARD_TESTS_BASE<TV>::
 STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-    :MPM_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),user_last_frame(false),
-    order(2),seed(1234),particles_per_cell(1<<TV::m),scale_mass(1),scale_E(1)
+    :MPM_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),
+    user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),scale_mass(1),scale_E(1),
+    tests(stream_type,deformable_body_collection)
 {
     T framerate=24;
     parse_args.Extra(&test_number,"example number","example number to run");
@@ -168,19 +172,56 @@ Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles)
 // Function Add_Neo_Hookean
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Add_Walls(int flags,bool sticky,T friction) // -x +x -y +y [ -z +z ], as bit flags
+Add_Walls(int flags,bool sticky,T friction,T inset) // -x +x -y +y [ -z +z ], as bit flags
 {
     RANGE<TV> range=grid.domain.Thickened(grid.dX*(ghost*2+1));
     for(int a=0;a<TV::m;a++)
         for(int s=0;s<2;s++)
             if(flags&(1<<(a*2+s))){
                 RANGE<TV> wall=range;
-                if(s) wall.max_corner(a)=grid.domain.min_corner(a);
-                else wall.min_corner(a)=grid.domain.max_corner(a);
+                if(s) wall.max_corner(a)=grid.domain.min_corner(a)+inset;
+                else wall.min_corner(a)=grid.domain.max_corner(a)-inset;
                 collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wall),sticky,friction});}
+}
+//#####################################################################
+// Function Seed_Lagrangian_Particles
+//#####################################################################
+template<class TV> template<class T_STRUCTURE> T_STRUCTURE& STANDARD_TESTS_BASE<TV>::
+Seed_Lagrangian_Particles(T_STRUCTURE& object,boost::function<TV(const TV&)> V,
+    boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass)
+{
+    int old_particles_number=particles.number;
+    T_STRUCTURE& new_object=tests.Copy_And_Add_Structure(object);
+    tests.Set_Mass_Of_Particles(new_object,density,use_constant_mass);
+    for(int p=old_particles_number;p<particles.number;p++){
+        TV X=particles.X(p);
+        particles.valid(p)=true;
+        particles.V(p)=V(X);
+        if(use_affine) particles.B(p)=dV(X)*weights->Dp(X);
+        particles.F(p)=MATRIX<T,TV::m>()+1;
+        particles.volume(p)=particles.mass(p)/density;}
+    return new_object;
+}
+//#####################################################################
+// Function Add_Fixed_Corotated
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Fixed_Corotated(T_VOLUME& object,T E,T nu)
+{
+    return Add_Force(*Create_Finite_Volume(object,new COROTATED_FIXED<T,TV::m>(E,nu,0)));
+}
+//#####################################################################
+// Function Add_Neo_Hookean
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Neo_Hookean(T_VOLUME& object,T E,T nu)
+{
+    return Add_Force(*Create_Finite_Volume(object,new NEO_HOOKEAN<T,TV::m>(E,nu,0,(T).25)));
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
 template class STANDARD_TESTS_BASE<VECTOR<double,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<double,3> >;
+template TRIANGULATED_AREA<double>& STANDARD_TESTS_BASE<VECTOR<double,2> >::Seed_Lagrangian_Particles<TRIANGULATED_AREA<double> >(TRIANGULATED_AREA<double>&,boost::function<VECTOR<double,2> (VECTOR<double,2> const&)>,boost::function<MATRIX<double,2,2> (VECTOR<double,2> const&)>,double,bool);
+template TRIANGULATED_AREA<float>& STANDARD_TESTS_BASE<VECTOR<float,2> >::Seed_Lagrangian_Particles<TRIANGULATED_AREA<float> >(TRIANGULATED_AREA<float>&,boost::function<VECTOR<float,2> (VECTOR<float,2> const&)>,boost::function<MATRIX<float,2,2> (VECTOR<float,2> const&)>,float,bool);
 }
