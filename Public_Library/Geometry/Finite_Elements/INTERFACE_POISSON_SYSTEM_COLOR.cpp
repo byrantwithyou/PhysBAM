@@ -24,6 +24,9 @@
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -265,18 +268,18 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
     const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>&>(y);
     T result=0;
 #ifdef USE_OPENMP
-    result_per_thread.Fill(0);
-    for(int c=0;c<colors;c++)
+    u.result_per_thread.Fill(0);
+    for(int c=0;c<u.colors;c++)
 #pragma omp parallel for
-        for(int i=0;i<u(c).m;i++){
+        for(int i=0;i<u.u(c).m;i++){
             const int tid=omp_get_thread_num();
-            result_per_thread(tid)+=u.u(c)(i)*v.u(c)(i);}
+            u.result_per_thread(tid)+=u.u(c)(i)*v.u(c)(i);}
 #pragma omp parallel for
-    for(int i=0;i<q.m;i++){
+    for(int i=0;i<u.q.m;i++){
         const int tid=omp_get_thread_num();
-        result_per_thread(tid)+=u.q(i)*v.q(i);}
-    for(int tid=0;tid<threads;tid++)
-        result+=result_per_thread(tid);
+        u.result_per_thread(tid)+=u.q(i)*v.q(i);}
+    for(int tid=0;tid<u.threads;tid++)
+        result+=u.result_per_thread(tid);
 #else
     for(int c=0;c<u.colors;c++)
         for(int i=0;i<u.u(c).m;i++)
