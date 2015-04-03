@@ -50,8 +50,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     parse_args.Add("-newton_iterations",&newton_iterations,"iter","Newton iterations");
     parse_args.Add("-solver_tolerance",&solver_tolerance,"tol","Solver tolerance");
     parse_args.Add("-solver_iterations",&solver_iterations,"iter","Solver iterations");
-    parse_args.Add("-test_diff",&test_diff,"Test derivatives");
-    parse_args.Add("-threads",&threads,"num","Number of threads");
     parse_args.Add("-seed",&seed,"seed","Random number seed");
     parse_args.Add("-particles_per_cell",&particles_per_cell,"num","Number of particles per cell");
     parse_args.Add("-scale_mass",&scale_mass,"scale","Scale mass of particles");
