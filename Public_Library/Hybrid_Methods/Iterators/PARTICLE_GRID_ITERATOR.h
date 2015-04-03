@@ -20,12 +20,14 @@ public:
         ARRAY<TV_INT> index;
         ARRAY<T> weight;
         ARRAY<TV> gradient;
+        //int dumb[1024];
     };
 
     SCRATCH& scratch;
     int i;
 
     PARTICLE_GRID_ITERATOR(const PARTICLE_GRID_WEIGHTS<TV>* weights,int p,bool want_gradient,int thread);
+    PARTICLE_GRID_ITERATOR(const PARTICLE_GRID_WEIGHTS<TV>* weights,int p,bool want_gradient,SCRATCH& scratch);
     const TV_INT& Index() const {return scratch.index(i);}
     const T& Weight() const {return scratch.weight(i);}
     const TV& Gradient() const {return scratch.gradient(i);}

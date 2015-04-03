@@ -18,6 +18,7 @@
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
+#include <omp.h>
 #include "STANDARD_TESTS_BASE.h"
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -74,8 +75,11 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         if(omp_get_num_threads()!=threads) PHYSBAM_FATAL_ERROR();
         LOG::cout<<"Running on "<<threads<<" threads"<<std::endl;
     }
+#else
+    PHYSBAM_ASSERT(threads==1);
 #endif
 
+    gather_scatter.threads=threads;
     stored_last_frame=last_frame;
     random.Set_Seed(seed);
 

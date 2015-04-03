@@ -78,14 +78,14 @@ Potential_Energy(const T time) const
 template<class TV> void MPM_FINITE_ELEMENTS<TV>:: 
 Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
-    ARRAY<MATRIX<T,TV::m> > V0_P_FT(gather_scatter.threads);
+    MATRIX<T,TV::m> A;
     gather_scatter.Scatter(
-        [this,&V0_P_FT](int p,int tid){
+        [this](int p,MATRIX<T,TV::m>& V0_P_FT){
             DIAGONAL_MATRIX<T,TV::m> Ph=constitutive_model.P_From_Strain(sigma(p),particles.volume(p),p);
-            V0_P_FT(tid)=U(p)*Ph.Times_Transpose(FV(p));},
-        [&V0_P_FT,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid)
-        {F(it.Index())-=V0_P_FT(tid)*it.Gradient();},
-        [](int p,int tid){},true);
+            V0_P_FT=U(p)*Ph.Times_Transpose(FV(p));},
+        [&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,const MATRIX<T,TV::m>& V0_P_FT)
+        {F(it.Index())-=V0_P_FT*it.Gradient();},
+        [](int p,const MATRIX<T,TV::m>& V0_P_FT){},true,A);
 }
 //#####################################################################
 // Function Add_Hessian_Times

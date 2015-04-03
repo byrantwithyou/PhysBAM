@@ -25,6 +25,7 @@
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
 #include <boost/function.hpp>
+#include <omp.h>
 using namespace PhysBAM;
 namespace{
     template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
@@ -93,6 +94,7 @@ Initialize()
     for(CELL_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next())
         example.location.array(i++)=it.Location();
 
+    example.gather_scatter.Initialize(example.grid);
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
 }
@@ -107,6 +109,7 @@ Advance_One_Time_Step()
     Print_Particle_Stats("particle state",example.dt,example.velocity,0);
     Update_Simulated_Particles();
     Update_Particle_Weights();
+    example.gather_scatter.Prepare_Scatter(example.particles,example.grid);
     Particle_To_Grid();
     Print_Grid_Stats("after particle to grid",example.dt,example.velocity,0);
     Print_Energy_Stats("after particle to grid",example.velocity);
@@ -234,46 +237,56 @@ Grid_To_Particle()
     MPM_PARTICLES<TV>& particles=example.particles;
     T dt=example.dt;
 
-    for(int k=0;k<example.simulated_particles.m;k++){
-        int p=example.simulated_particles(k);
-        TV Vn_interpolate,V_pic,V_flip=particles.V(p);
-        MATRIX<T,TV::m> B,grad_Vp;
+#ifdef USE_OPENMP
+    omp_set_num_threads(example.gather_scatter.threads);
+#endif
+#pragma omp parallel for
+    for(int tid=0;tid<example.gather_scatter.threads;++tid){
+        int a=example.simulated_particles.m*tid/example.gather_scatter.threads;
+        int b=example.simulated_particles.m*(tid+1)/example.gather_scatter.threads;
+        typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
 
-        for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,true,0);it.Valid();it.Next()){
-            T w=it.Weight();
-            TV_INT index=it.Index();
-            TV V_grid=example.velocity_new(index);
-            V_pic+=w*V_grid;
-            V_flip+=w*(V_grid-example.velocity(index));
-            Vn_interpolate+=w*example.velocity(index);
-            if(example.use_midpoint)
-                V_grid=(T).5*(V_grid+example.velocity(index));
-            grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
-        particles.F(p)+=dt*grad_Vp*particles.F(p);
+        for(int k=a;k<b;k++){
+            int p=example.simulated_particles(k);
+            TV Vn_interpolate,V_pic,V_flip=particles.V(p);
+            MATRIX<T,TV::m> B,grad_Vp;
 
-        if(example.use_affine)
-            for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,false,0);it.Valid();it.Next()){
+            for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,true,scratch);it.Valid();it.Next()){
+                T w=it.Weight();
                 TV_INT index=it.Index();
                 TV V_grid=example.velocity_new(index);
-                TV Z=example.grid.Center(index);
-                TV xi_new,xp_new;
-                if(example.use_midpoint){
-                    xi_new=Z+dt/2*(V_grid+example.velocity(index));
-                    xp_new=particles.X(p)+dt/2*(Vn_interpolate+V_pic);}
-                else{
-                    xi_new=Z+dt*V_grid;
-                    xp_new=particles.X(p)+dt*V_pic;}
-                B+=it.Weight()/2*(MATRIX<T,TV::m>::Outer_Product(V_grid,Z-particles.X(p)+xi_new-xp_new)
-                    +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));}
+                V_pic+=w*V_grid;
+                V_flip+=w*(V_grid-example.velocity(index));
+                Vn_interpolate+=w*example.velocity(index);
+                if(example.use_midpoint)
+                    V_grid=(T).5*(V_grid+example.velocity(index));
+                grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
+            particles.F(p)+=dt*grad_Vp*particles.F(p);
 
-        particles.V(p)=V_pic;
-        Perform_Particle_Collision(p);
-        if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
-        else particles.X(p)+=particles.V(p)*dt;
-        particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
-        particles.B(p)=B;
+            if(example.use_affine)
+                for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,false,scratch);it.Valid();it.Next()){
+                    TV_INT index=it.Index();
+                    TV V_grid=example.velocity_new(index);
+                    TV Z=example.grid.Center(index);
+                    TV xi_new,xp_new;
+                    if(example.use_midpoint){
+                        xi_new=Z+dt/2*(V_grid+example.velocity(index));
+                        xp_new=particles.X(p)+dt/2*(Vn_interpolate+V_pic);}
+                    else{
+                        xi_new=Z+dt*V_grid;
+                        xp_new=particles.X(p)+dt*V_pic;}
+                    B+=it.Weight()/2*(MATRIX<T,TV::m>::Outer_Product(V_grid,Z-particles.X(p)+xi_new-xp_new)
+                            +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));}
 
-        if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}
+                    particles.V(p)=V_pic;
+                    Perform_Particle_Collision(p);
+                    if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
+                    else particles.X(p)+=particles.V(p)*dt;
+                    particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
+                    particles.B(p)=B;
+
+                    if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;
+        }}
 }
 //#####################################################################
 // Function Apply_Forces
