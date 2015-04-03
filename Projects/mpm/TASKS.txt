@@ -1,7 +1,5 @@
 To be implemented:
 
-* Collisions with friction
-
 * Threading
 
 * Dump out meshes for forces in a way that allows viewer to see them.
