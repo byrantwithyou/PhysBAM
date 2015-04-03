@@ -342,21 +342,18 @@ Apply_Friction()
     objective.tmp1=objective.tmp0;
     objective.Project_Gradient_And_Prune_Constraints(objective.tmp1,true);
 
+    objective.v1.u.array.Subset(objective.system.stuck_nodes).Fill(TV());
     for(int i=0;i<objective.system.collisions.m;i++){
         const typename MPM_KRYLOV_SYSTEM<TV>::COLLISION& c=objective.system.collisions(i);
-        T normal_force=TV::Dot_Product(c.n,objective.tmp0.u.array(c.p)-objective.tmp1.u.array(c.p));
         TV& v=objective.v1.u.array(c.p);
-        if(example.collision_objects(c.object).sticky){
-            v=TV();
-            dv.u.array(c.p)=v-objective.v0.u.array(c.p);
-            continue;}
+        T normal_force=TV::Dot_Product(c.n,objective.tmp0.u.array(c.p)-objective.tmp1.u.array(c.p));
         TV t=v.Projected_Orthogonal_To_Unit_Direction(c.n);
-        v=t;
-        // T t_mag=t.Normalize();
-        // T coefficient_of_friction=example.collision_objects(c.object)->friction;
-        // if(t_mag<=coefficient_of_friction*normal_force/example.mass.array(c.p))
-        //     v.Project_On_Unit_Direction(c.n);
-        // else v-=coefficient_of_friction/example.mass.array(c.p)*normal_force*t;
+        T t_mag=t.Normalize();
+        T coefficient_of_friction=example.collision_objects(c.object).friction;
+        T k=coefficient_of_friction*normal_force/example.mass.array(c.p);
+        if(t_mag<=k)
+            v.Project_On_Unit_Direction(c.n);
+        else v-=k*t;
         dv.u.array(c.p)=v-objective.v0.u.array(c.p);}
 }
 //#####################################################################
