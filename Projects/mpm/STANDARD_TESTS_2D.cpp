@@ -159,17 +159,18 @@ Initialize()
             wallB.max_corner.y=grid.domain.min_corner.y+(T).5;
             wallR.min_corner.x=grid.domain.max_corner.x-(T).5;
             wallT.min_corner.y=grid.domain.max_corner.y-(T).5;
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallL),false,0});
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallR),false,0});
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallT),false,0});
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallB),false,0});
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(SPHERE<TV>(TV(4,3),1)),false,0});
-            SPHERE<TV> sphere(TV(2.55,2.55),.3);
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallL),false,.3});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallR),false,.3});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallT),false,.3});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallB),false,.3});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(SPHERE<TV>(TV(4,3),1)),false,.3});
+            SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
             GRID<TV> sg(grid.numbers_of_cells*2,grid.domain,true);
-            Seed_Particles(sphere,[=](const TV& X){return TV(0.5,0);},[=](const TV&){return MATRIX<T,2>();},
+            Seed_Particles(sphere,[=](const TV& X){return TV(3.0,0);},[=](const TV&){return MATRIX<T,2>();},
                 density,sg);
             Add_Neo_Hookean(scale_E,0.425);
+            Add_Gravity(TV(0,-1.8));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
