@@ -151,8 +151,29 @@ Initialize()
         } break;
         case 8:{ // collision an elastic cylinder
             if(!user_resolution) resolution=10;
-            T dx=(T)5/resolution;
-            grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)).Thickened(dx*(T)4.5),true);
+            grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
+            RANGE<TV> wallL=grid.domain.Thickened((T).5),wallR=grid.domain.Thickened((T).5);
+            RANGE<TV> wallB=grid.domain.Thickened((T).5),wallT=grid.domain.Thickened((T).5);
+            wallL.max_corner.x=grid.domain.min_corner.x;
+            wallB.max_corner.y=grid.domain.min_corner.y;
+            wallR.min_corner.x=grid.domain.max_corner.x;
+            wallT.min_corner.y=grid.domain.max_corner.y;
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallL),false,.3});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallR),false,.3});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallT),false,.3});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallB),false,.3});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(SPHERE<TV>(TV(4,3),1)),false,.3});
+            SPHERE<TV> sphere(TV(2.55,3.55),.3);
+            T density=4*scale_mass;
+            GRID<TV> sg(grid.numbers_of_cells*2,grid.domain,true);
+            Seed_Particles(sphere,[=](const TV& X){return TV(3.0,0);},[=](const TV&){return MATRIX<T,2>();},
+                density,sg);
+            Add_Neo_Hookean(scale_E,0.425);
+            Add_Gravity(TV(0,-1.8));
+        } break;
+        case 9:{ // collision an elastic cylinder
+            if(!user_resolution) resolution=10;
+            grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
             RANGE<TV> wallL=grid.domain.Thickened((T).5),wallR=grid.domain.Thickened((T).5);
             RANGE<TV> wallB=grid.domain.Thickened((T).5),wallT=grid.domain.Thickened((T).5);
             wallL.max_corner.x=grid.domain.min_corner.x+(T).5;
@@ -163,7 +184,6 @@ Initialize()
             collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallR),false,.3});
             collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallT),false,.3});
             collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wallB),false,.3});
-            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(SPHERE<TV>(TV(4,3),1)),false,.3});
             SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
             GRID<TV> sg(grid.numbers_of_cells*2,grid.domain,true);
