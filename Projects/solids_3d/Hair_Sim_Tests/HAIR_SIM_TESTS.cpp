@@ -261,8 +261,8 @@ Initialize_Bodies()
     offset=particles.Size();
     if(!guide_sim_folder.empty()) {
         COLLISION_BODY_COLLECTION<TV> guide_list;
-        guide_object1=new DEFORMABLE_BODY_COLLECTION<TV>(guide_list);
-        guide_object2=new DEFORMABLE_BODY_COLLECTION<TV>(guide_list);
+        guide_object1=new DEFORMABLE_BODY_COLLECTION<TV>(0,&guide_list);
+        guide_object2=new DEFORMABLE_BODY_COLLECTION<TV>(0,&guide_list);
         guide_object1->Read(stream_type,guide_sim_folder+"/",guide_sim_folder+"/",0,-1,1,solids_parameters.write_from_every_process);
         guide_object2->Read(stream_type,guide_sim_folder+"/",guide_sim_folder+"/",1,-1,0,solids_parameters.write_from_every_process);
         SEGMENTED_CURVE<TV>& guide_edges=guide_object1->template Find_Structure<SEGMENTED_CURVE<TV>&>(0);

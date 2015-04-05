@@ -14,6 +14,7 @@
 #include <Geometry/Basic_Geometry/LINE_2D.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>

@@ -34,7 +34,6 @@ protected:
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
     using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
-    COLLISION_BODY_COLLECTION<TV>& collision_body_list;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>* real_selection;
     ARRAY<OPENGL_POINT_SIMPLICES_1D<T>*> point_simplices_1d_objects;

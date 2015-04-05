@@ -14,6 +14,7 @@
 #include <Geometry/Basic_Geometry_Computations/BOX_POLYGON_INTERSECTION_AREA.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM.h>
 #include <Incompressible/Collisions_And_Interactions/CUT_CELL_COMPUTATIONS.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>

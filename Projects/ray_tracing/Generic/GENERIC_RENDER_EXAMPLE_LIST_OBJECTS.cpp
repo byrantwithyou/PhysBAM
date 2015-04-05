@@ -175,7 +175,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 object->Update_Transform(current_transform*rigid_body_collection.Rigid_Body(id).Frame().Matrix());}
             LOG::cout<<"Processed Rigid Body "<<id<<std::endl;}}
     else if(type=="Deformable_Object"){
-        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=*new DEFORMABLE_BODY_COLLECTION<TV>(*new COLLISION_BODY_COLLECTION<TV>);
+        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=*new DEFORMABLE_BODY_COLLECTION<TV>(0,0);
         int local_frame=parameters.Get_Parameter("Frame",frame);
         bool split_object=parameters.Get_Parameter("Split_Object",false);
         std::string sample_locations_filename=parameters.Get_Parameter("Sample_Locations_File",std::string("unknown"));

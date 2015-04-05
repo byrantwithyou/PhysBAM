@@ -22,9 +22,8 @@ using namespace PhysBAM;
 template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
 OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame)
     :OPENGL_COMPONENT<T>(stream_type,"Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),display_mode(0),draw_velocities(false),velocity_scale(0.025),
-    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),
-    velocity_field(stream_type,deformable_body_collection.particles.V,deformable_body_collection.particles.X),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
-    collision_body_list(*new COLLISION_BODY_COLLECTION<TV>)
+    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,0)),
+    velocity_field(stream_type,deformable_body_collection.particles.V,deformable_body_collection.particles.X),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
 {
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
@@ -46,7 +45,6 @@ template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
 {
     delete color_map;
     delete &deformable_body_collection;
-    delete &collision_body_list;
 }
 //#####################################################################
 // Function Initialize

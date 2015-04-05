@@ -13,6 +13,7 @@
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>

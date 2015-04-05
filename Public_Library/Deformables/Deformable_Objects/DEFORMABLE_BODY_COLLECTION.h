@@ -79,8 +79,9 @@ public:
     bool use_embedded_collisions;
     bool use_nonembedded_self_collision; // TODO: have one of these per fragment
     bool check_stale;
+    bool own_particles,own_collision_body_collection;
 
-    DEFORMABLE_BODY_COLLECTION(COLLISION_BODY_COLLECTION<TV>& collision_body_list);
+    DEFORMABLE_BODY_COLLECTION(DEFORMABLE_PARTICLES<TV>* particles,COLLISION_BODY_COLLECTION<TV>* collision_body_list);
     virtual ~DEFORMABLE_BODY_COLLECTION();
 
     template<class T_FORCE> T_FORCE

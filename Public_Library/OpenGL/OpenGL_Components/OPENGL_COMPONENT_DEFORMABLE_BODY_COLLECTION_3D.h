@@ -7,8 +7,7 @@
 #ifndef __OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D__
 #define __OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D__
 
-#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
-#include <Deformables/Collisions_And_Interactions/DEFORMABLES_COLLISIONS_FORWARD.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
@@ -45,7 +44,6 @@ protected:
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
-    COLLISION_BODY_COLLECTION<TV>& collision_body_list;
     DEFORMABLE_BODY_COLLECTION<TV> &deformable_body_collection;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection;
     ARRAY<OPENGL_SEGMENTED_CURVE_3D<T>*> segmented_curve_objects;

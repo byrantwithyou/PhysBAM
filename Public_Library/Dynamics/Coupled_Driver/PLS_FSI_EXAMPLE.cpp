@@ -20,6 +20,9 @@
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>

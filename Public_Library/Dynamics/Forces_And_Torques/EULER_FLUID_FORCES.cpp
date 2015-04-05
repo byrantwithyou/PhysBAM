@@ -6,6 +6,11 @@
 //#####################################################################
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>

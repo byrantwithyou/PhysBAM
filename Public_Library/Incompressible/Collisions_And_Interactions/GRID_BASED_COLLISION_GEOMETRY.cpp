@@ -8,8 +8,14 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY.h>
+#include <Incompressible/Collisions_And_Interactions/OBJECTS_IN_CELL.h>
 #include <Incompressible/Collisions_And_Interactions/RIGID_BODY_RASTERIZATION_UNIFORM.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -17,14 +23,18 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> GRID_BASED_COLLISION_GEOMETRY<TV>::
 GRID_BASED_COLLISION_GEOMETRY(GRID<TV>& grid_input)
-    :grid(grid_input),number_of_ghost_cells(3)
+    :collision_geometry_collection(*new COLLISION_BODY_COLLECTION<TV>),grid(grid_input),number_of_ghost_cells(3),
+    objects_in_cell(*new OBJECTS_IN_CELL<TV,COLLISION_GEOMETRY_ID>)
 {}
 //#####################################################################
 // Destructor
 //#####################################################################
 template<class TV> GRID_BASED_COLLISION_GEOMETRY<TV>::
 ~GRID_BASED_COLLISION_GEOMETRY()
-{}
+{
+    delete &collision_geometry_collection;
+    delete &objects_in_cell;
+}
 //##################################################################### 
 // Function Add_Bodies
 //##################################################################### 
@@ -170,6 +180,78 @@ template<class TV> bool GRID_BASED_COLLISION_GEOMETRY<TV>::
 Swept_Occupied_Block(const T_BLOCK& block) const
 {
     return swept_occupied_blocks(block.Block());
+}
+//#####################################################################
+// Function Save_State
+//#####################################################################
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
+Save_State(const int state_index,const T time)
+{
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++)
+        if(Is_Active(i))
+            collision_geometry_collection.bodies(i)->Save_State(state_index,time);
+}
+//#####################################################################
+// Function Restore_State
+//#####################################################################
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
+Restore_State(const int state_index)
+{
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++)
+        if(Is_Active(i))
+            collision_geometry_collection.bodies(i)->Restore_State(state_index);
+}
+//#####################################################################
+// Function Average_States
+//#####################################################################
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
+Average_States(const int state1, const int state2,const int result_state,const T interpolation_distance)
+{
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++)
+        if(Is_Active(i))
+            collision_geometry_collection.bodies(i)->Average_States(state1,state2,result_state,interpolation_distance);
+}
+//#####################################################################
+// Function Delete_State
+//#####################################################################
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
+Delete_State(const int state_index)
+{
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++)
+        if(Is_Active(i))
+            collision_geometry_collection.bodies(i)->Delete_State(state_index);
+}
+//#####################################################################
+// Function Intersection_With_Any_Simplicial_Object
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY<TV>::
+Intersection_With_Any_Simplicial_Object(RAY<TV>& ray,COLLISION_GEOMETRY_ID& body_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
+{
+    return collision_geometry_collection.Intersection_With_Any_Simplicial_Object(ray,body_id,objects);
+}
+//#####################################################################
+// Function Add_Bodies
+//#####################################################################
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
+Add_Bodies(COLLISION_BODY_COLLECTION<TV>& collision_geometry_list)
+{
+    collision_geometry_collection.Add_Bodies(collision_geometry_list);
+}
+//#####################################################################
+// Function Remove_Body
+//#####################################################################
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
+Remove_Body(COLLISION_GEOMETRY_ID id)
+{
+    collision_geometry_collection.Remove_Body(id);
+}
+//#####################################################################
+// Function Is_Active
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY<TV>::
+Is_Active(COLLISION_GEOMETRY_ID id) const
+{
+    return collision_geometry_collection.Is_Active(id);
 }
 //##################################################################### 
 // Function Read_State

@@ -9,6 +9,7 @@
 #include <Tools/Log/SCOPE.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Collisions_And_Interactions/COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
@@ -25,15 +26,16 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> DEFORMABLE_BODY_COLLECTION<TV>::
-DEFORMABLE_BODY_COLLECTION(COLLISION_BODY_COLLECTION<TV>& collision_body_list)
-    :particles(*new DEFORMABLE_PARTICLES<TV>),simulate(true),
+DEFORMABLE_BODY_COLLECTION(DEFORMABLE_PARTICLES<TV>* particles_input,COLLISION_BODY_COLLECTION<TV>* collision_body_list)
+    :particles(particles_input?*particles_input:*new DEFORMABLE_PARTICLES<TV>),simulate(true),
     binding_list(*new BINDING_LIST<TV>(*this)),soft_bindings(*new SOFT_BINDINGS<TV>(binding_list)),mpi_solids(0),implicit_damping(true),
     print_diagnostics(false),print_residuals(false),print_energy(false),iterations_used_diagnostic(0),
     triangle_repulsions_and_collisions_geometry(*new TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>(*this)),
     triangle_repulsions(*new TRIANGLE_REPULSIONS<TV>(triangle_repulsions_and_collisions_geometry)),
     triangle_collisions(*new TRIANGLE_COLLISIONS<TV>(triangle_repulsions_and_collisions_geometry,triangle_repulsions.repulsion_thickness)),
-    collisions(*new DEFORMABLE_OBJECT_COLLISIONS<TV>(particles,*this,structures,collision_body_list)),use_embedded_collisions(false),use_nonembedded_self_collision(false),
-    check_stale(false)
+    collisions(*new DEFORMABLE_OBJECT_COLLISIONS<TV>(particles,*this,structures,collision_body_list?*collision_body_list:*new COLLISION_BODY_COLLECTION<TV>)),
+    use_embedded_collisions(false),use_nonembedded_self_collision(false),
+    check_stale(false),own_particles(!particles_input),own_collision_body_collection(!collision_body_list)
 {
     particles.Store_Velocity();
     particles.Store_Mass();
@@ -48,8 +50,9 @@ template<class TV> DEFORMABLE_BODY_COLLECTION<TV>::
     structures.Delete_Pointers_And_Clean_Memory();
     delete &soft_bindings;
     delete &binding_list;
+    if(own_collision_body_collection) delete &collisions.collision_body_list;
     delete &collisions;
-    delete &particles;
+    if(own_particles) delete &particles;
     delete &triangle_repulsions;
     delete &triangle_collisions;
     delete &triangle_repulsions_and_collisions_geometry;
@@ -136,8 +139,8 @@ Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,
 // Function Read
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Read(const STREAM_TYPE stream_type,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,
-    const bool read_from_every_process)
+Read(const STREAM_TYPE stream_type,const std::string& prefix,const std::string& static_prefix,const int frame,
+    const int static_frame,const bool include_static_variables,const bool read_from_every_process)
 {
     particles.Store_Mass();
     if(include_static_variables) Read_Static_Variables(stream_type,static_prefix,static_frame);
@@ -149,8 +152,8 @@ Read(const STREAM_TYPE stream_type,const std::string& prefix,const std::string& 
 // Function Write
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Write(const STREAM_TYPE stream_type,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,
-    const bool write_from_every_process) const
+Write(const STREAM_TYPE stream_type,const std::string& prefix,const std::string& static_prefix,const int frame,
+    const int static_frame,const bool include_static_variables,const bool write_from_every_process) const
 {
     if(mpi_solids){
         DEFORMABLE_PARTICLES<TV>& const_particles=const_cast<DEFORMABLE_PARTICLES<TV>&>(particles);

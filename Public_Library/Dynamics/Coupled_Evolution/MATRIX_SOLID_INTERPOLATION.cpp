@@ -16,6 +16,9 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>

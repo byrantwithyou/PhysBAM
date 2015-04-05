@@ -12,7 +12,6 @@
 #include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
-#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY.h>
 namespace PhysBAM{

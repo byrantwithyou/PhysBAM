@@ -8,6 +8,7 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <Geometry/Basic_Geometry/RAY.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>

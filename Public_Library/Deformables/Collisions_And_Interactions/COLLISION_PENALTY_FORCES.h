@@ -13,7 +13,6 @@
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{

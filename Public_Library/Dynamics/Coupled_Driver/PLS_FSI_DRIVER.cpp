@@ -18,7 +18,6 @@
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
-#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>

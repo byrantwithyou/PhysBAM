@@ -5,7 +5,6 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
-#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_FREE_PARTICLES.h>
@@ -22,9 +21,8 @@ template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame)
     :OPENGL_COMPONENT<T>(stream_type,"Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),display_mode(0),
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
-    collision_body_list(*new COLLISION_BODY_COLLECTION<TV>),
-    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),real_selection(0),
-    color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
+    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,0)),
+    real_selection(0),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
 {
     viewer_callbacks.Set("toggle_active_value",{[this](){Toggle_Active_Value();},"Toggle viewing of elements"});
     viewer_callbacks.Set("toggle_use_active_list",{[this](){Toggle_Use_Active_List();},"Toggle drawing subset of the deformable objects in the list"});
@@ -55,7 +53,6 @@ template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 {
     delete color_map;
     delete &deformable_body_collection;
-    delete &collision_body_list;
 }
 //#####################################################################
 // Function Initialize

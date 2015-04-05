@@ -6,6 +6,7 @@
 //#####################################################################
 #include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
@@ -26,7 +27,7 @@ using namespace PhysBAM;
 template<class TV> SOLID_BODY_COLLECTION<TV>::
 SOLID_BODY_COLLECTION()
     :collision_body_list(*new COLLISION_BODY_COLLECTION<TV>),
-    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),
+    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,&collision_body_list)),
     rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(&collision_body_list)),
     print_energy(false),simulate(true),iterations_used_diagnostic(0)
 {

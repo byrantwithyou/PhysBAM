@@ -17,6 +17,8 @@
 #include <Geometry/Basic_Geometry_Intersections/RAY_POINT_SIMPLEX_1D_INTERSECTION.h>
 #include <Geometry/Basic_Geometry_Intersections/RAY_SEGMENT_2D_INTERSECTION.h>
 #include <Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Collisions_And_Interactions/RIGID_BODY_RASTERIZATION_UNIFORM.h>
@@ -137,6 +139,165 @@ Compute_Simplices_In_Cell(ARRAY<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV_INT>&
             RANGE<TV> box=body->World_Space_Simplex(e).Bounding_Box().Thickened(thickness);
             for(CELL_ITERATOR<TV> iterator(grid,grid.Clamp_To_Cell(box,ghost_cells+1));iterator.Valid();iterator.Next())
                 simplices_in_cell(iterator.Cell_Index()).Append(PAIR<COLLISION_GEOMETRY_ID,int>(i,e));}}
+}
+//#####################################################################
+// Function Inside_Any_Simplex_Of_Any_Body
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Inside_Any_Simplex_Of_Any_Body(const TV& location,COLLISION_GEOMETRY_ID& body_id,int& aggregate_id) const
+{
+    ARRAY<COLLISION_GEOMETRY_ID> objects;
+    TV_INT cell_index=grid.Clamp_To_Cell(location);
+    objects_in_cell.Get_Objects_For_Cell(cell_index,objects);
+    if(!objects.m) return false;
+    return collision_geometry_collection.Inside_Any_Simplex_Of_Any_Body(location,body_id,aggregate_id,&objects);
+}
+//#####################################################################
+// Function Inside_Any_Body
+//#####################################################################
+// TODO(jontg): Slow, but it works...
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Inside_Any_Body(const TV& location,COLLISION_GEOMETRY_ID& body_id) const
+{
+    return collision_geometry_collection.Inside_Any_Body(location,collision_thickness*(T).5,body_id);
+}
+//#####################################################################
+// Function Implicit_Geometry_Lazy_Inside_Any_Body
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Implicit_Geometry_Lazy_Inside_Any_Body(const TV& location,COLLISION_GEOMETRY_ID& body_id) const
+{
+    return collision_geometry_collection.Implicit_Geometry_Lazy_Inside_Any_Body(location,body_id);
+}
+//#####################################################################
+// Function Closest_Non_Intersecting_Point_Of_Any_Body
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Closest_Non_Intersecting_Point_Of_Any_Body(RAY<TV>& ray,COLLISION_GEOMETRY_ID& body_id) const
+{
+    // since the ray is a general ray, we don't get specific id's.
+    return collision_geometry_collection.Closest_Non_Intersecting_Point_Of_Any_Simplicial_Object(ray,body_id);
+}
+//#####################################################################
+// Function Cell_Center_Visible_From_Face
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Cell_Center_Visible_From_Face(const TV_INT& cell,const int axis,const TV_INT& face_index) const
+{
+    ARRAY<COLLISION_GEOMETRY_ID> objects;
+    objects_in_cell.Get_Objects_For_Cell(cell,objects);
+    if(!objects.m) return true;
+    return !collision_geometry_collection.Intersection_Between_Points(grid.Center(cell),grid.Face(FACE_INDEX<TV::m>(axis,face_index)),&objects);
+}
+//#####################################################################
+// Function Face_Velocity
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Face_Velocity(const int axis,const TV_INT& face_index,const TV_INT* cells,const int number_of_cells,const TV& X,T& face_velocity) const
+{
+    ARRAY<COLLISION_GEOMETRY_ID> objects;
+    objects_in_cell.Get_Objects_For_Cells(cells,number_of_cells,collision_geometry_collection.bodies.m,objects);
+    if(!objects.m) return false;
+    COLLISION_GEOMETRY_ID body_id;
+    int triangle_id;
+    TV intersection_point;
+    if(collision_geometry_collection.Intersection_Between_Points(X,grid.Face(FACE_INDEX<TV::m>(axis,face_index)),body_id,triangle_id,intersection_point,&objects)){
+        face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(triangle_id,intersection_point)[axis];
+        return true;}
+    return false;
+}
+//#####################################################################
+// Function Face_Velocity
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Face_Velocity(const int side,const int axis,const TV_INT& face_index,const TV_INT* cells,const int number_of_cells,const TV& X,T& face_velocity) const
+{
+    ARRAY<COLLISION_GEOMETRY_ID> objects;
+    objects_in_cell.Get_Objects_For_Cells(cells,number_of_cells,collision_geometry_collection.bodies.m,objects);
+    if(!objects.m) return false;
+    COLLISION_GEOMETRY_ID body_id;
+    int triangle_id;
+    TV intersection_point;
+    if(collision_geometry_collection.Intersection_Between_Points(X,grid.X(side==0?face_index-TV_INT::Axis_Vector(axis):face_index),body_id,triangle_id,intersection_point,&objects)){
+        face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(triangle_id,intersection_point)[axis];
+        return true;}
+    return false;
+}
+//#####################################################################
+// Function Latest_Velocity_Crossover
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Latest_Velocity_Crossover(const int side,const int axis,const TV_INT& face_index,const T dt,T& face_velocity) const
+{
+    COLLISION_GEOMETRY_ID body_id;
+    int aggregate_id;
+    TV initial_hit_point,X=grid.Face(FACE_INDEX<TV::m>(axis,face_index));
+    if(Latest_Crossover(X,X,dt,body_id,aggregate_id,initial_hit_point)){
+        face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(aggregate_id,initial_hit_point)[axis];
+        return true;}
+    ARRAY<COLLISION_GEOMETRY_ID> objects;
+    objects_in_cell.Get_Objects_For_Cells(face_index,face_index-TV_INT::Axis_Vector(axis),collision_geometry_collection.bodies.m,objects);
+    if(!objects.m) return false;
+    int triangle_id;
+    if(collision_geometry_collection.Intersection_Between_Points(grid.Center((side==0)?face_index:(face_index-TV_INT::Axis_Vector(axis))),X,body_id,triangle_id,initial_hit_point,&objects)){
+        face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(triangle_id,initial_hit_point)[axis];
+        return true;}
+    return false;
+}
+//#####################################################################
+// Function Cell_Center_Intersection
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Cell_Center_Intersection(const TV_INT& cell_index,const TV_INT* cell_indices_for_body_id,const int number_of_cells_for_body_id,const TV& X,COLLISION_GEOMETRY_ID& body_id,int& aggregate_id,
+    TV& intersection_point) const
+{
+    ARRAY<COLLISION_GEOMETRY_ID> objects;
+    objects_in_cell.Get_Objects_For_Cells(cell_indices_for_body_id,number_of_cells_for_body_id,collision_geometry_collection.bodies.m,objects);
+    if(!objects.m) return false;
+    return collision_geometry_collection.Intersection_Between_Points(grid.Center(cell_index),X,body_id,aggregate_id,intersection_point,&objects);}
+//#####################################################################
+// Function Latest_Velocity_Crossover
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Latest_Velocity_Crossover(const int axis,const TV_INT& face_index,const T dt,T& face_velocity) const
+{
+    COLLISION_GEOMETRY_ID body_id;
+    int aggregate_id;
+    TV initial_hit_point,X=grid.Face(FACE_INDEX<TV::m>(axis,face_index));
+    if(Latest_Crossover(X,X,dt,body_id,aggregate_id,initial_hit_point)){
+        face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(aggregate_id,initial_hit_point)[axis];
+        return true;}
+    return false;
+}
+//#####################################################################
+// Function Compute_Simplices_In_Cell
+//#####################################################################
+template<class TV> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Compute_Simplices_In_Cell(ARRAY<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV_INT>& simplices_in_cell,int ghost_cells,T thickness) const
+{
+    Compute_Simplices_In_Cell(simplices_in_cell,collision_geometry_collection.bodies,ghost_cells,thickness,false);
+}
+//#####################################################################
+// Function Latest_Cell_Crossover_And_Velocity
+//#####################################################################
+template<class TV> bool GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Latest_Cell_Crossover_And_Velocity(const TV_INT& cell_index,const T dt,TV& velocity) const
+{
+    COLLISION_GEOMETRY_ID body_id;
+    int aggregate_id;
+    TV initial_hit_point,X=grid.Center(cell_index);
+    if(Latest_Crossover(X,X,dt,body_id,aggregate_id,initial_hit_point)){
+        velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(aggregate_id,initial_hit_point);
+        return true;}
+    return false;
+}
+//#####################################################################
+// Function Object_Velocity
+//#####################################################################
+template<class TV> TV GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
+Object_Velocity(const COLLISION_GEOMETRY_ID body_id,const int aggregate_id,const TV& X) const
+{
+    return collision_geometry_collection(body_id).Pointwise_Object_Velocity(aggregate_id,X);
 }
 //#####################################################################
 namespace PhysBAM{

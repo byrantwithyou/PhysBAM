@@ -18,6 +18,7 @@ template<class TV> class DEBUG_PARTICLES;
 template<class TV> class IMPLICIT_OBJECT;
 template<class TV> class MPM_COLLISION_OBJECT;
 template<class TV> class DEFORMABLES_FORCES;
+template<class TV> class DEFORMABLE_BODY_COLLECTION;
 
 template<class TV>
 class MPM_EXAMPLE:public NONCOPYABLE
@@ -35,6 +36,7 @@ public:
     GRID<TV> grid;
     STREAM_TYPE stream_type;
     MPM_PARTICLES<TV>& particles;
+    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     DEBUG_PARTICLES<TV>& debug_particles;
     ARRAY<int> simulated_particles;
     ARRAY<bool> particle_is_simulated;

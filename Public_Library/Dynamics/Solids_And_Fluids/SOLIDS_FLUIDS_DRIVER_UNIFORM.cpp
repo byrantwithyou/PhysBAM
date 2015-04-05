@@ -13,7 +13,7 @@
 #include <Tools/Log/SCOPE.h>
 #include <Tools/Utilities/INTERRUPTS.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
-#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>

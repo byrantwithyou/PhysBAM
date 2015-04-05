@@ -52,7 +52,7 @@ DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const std::s
 {
     DEFORMABLE_BODY_COLLECTION<TV>*& deformable_geometry_collection=deformable_geometry_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
     if(deformable_geometry_collection) return *deformable_geometry_collection;
-    deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(*new COLLISION_BODY_COLLECTION<TV>);
+    deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(0,0);
     deformable_geometry_collection->Read(STREAM_TYPE(RW()),location,location,frame,-1,true,true);
     return *deformable_geometry_collection;
 }

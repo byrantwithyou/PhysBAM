@@ -5,6 +5,7 @@
 #include <Tools/Log/LOG.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -18,7 +19,9 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MPM_EXAMPLE<TV>::
 MPM_EXAMPLE(const STREAM_TYPE stream_type)
-    :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),debug_particles(*new DEBUG_PARTICLES<TV>),
+    :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),
+    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(&particles,0)),
+    debug_particles(*new DEBUG_PARTICLES<TV>),
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(simulated_particles)),initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
@@ -33,6 +36,7 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
 template<class TV> MPM_EXAMPLE<TV>::
 ~MPM_EXAMPLE()
 {
+    delete &deformable_body_collection;
     delete &particles;
     delete &debug_particles;
     delete weights;

@@ -10,6 +10,7 @@
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
 using namespace PhysBAM;
 //#####################################################################

@@ -7,7 +7,6 @@
 #ifndef __OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D__
 #define __OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D__
 
-#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
@@ -48,7 +47,6 @@ public:
     ARRAY<INDIRECT_ARRAY<ARRAY_VIEW<TV> >*> free_particles_indirect_arrays;
     OPENGL_VECTOR_FIELD_2D<ARRAY_VIEW<TV> > velocity_field;
     OPENGL_INDEXED_COLOR_MAP *color_map;
-    COLLISION_BODY_COLLECTION<TV>& collision_body_list;
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> embedded_curve_objects;
     bool has_embedded_objects;
     ARRAY<ARRAY<T>*> phi_list;

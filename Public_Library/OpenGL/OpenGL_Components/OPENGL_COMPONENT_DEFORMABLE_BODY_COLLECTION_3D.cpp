@@ -4,7 +4,6 @@
 //#####################################################################
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
-#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
@@ -25,9 +24,8 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std
     :OPENGL_COMPONENT<T>(stream_type,"Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),hide_unselected(false),display_mode(0),display_relative_velocity_mode(0),number_of_segmented_curve(1),
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
     display_hard_bound_surface_mode(0),display_forces_mode(0),interaction_pair_display_mode(0),
-    collision_body_list(*new COLLISION_BODY_COLLECTION<TV>),
-    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(collision_body_list)),real_selection(0),
-    has_tetrahedralized_volumes(false),has_hexahedralized_volumes(false),
+    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,0)),
+    real_selection(0),has_tetrahedralized_volumes(false),has_hexahedralized_volumes(false),
     velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,false,false),
     color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
     has_embedded_objects(false),has_soft_bindings(false)
@@ -90,7 +88,6 @@ template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
     free_particles_indirect_arrays.Delete_Pointers_And_Clean_Memory();
     delete color_map_forces;
     delete &deformable_body_collection;
-    delete &collision_body_list;
 }
 //#####################################################################
 // Function Initialize

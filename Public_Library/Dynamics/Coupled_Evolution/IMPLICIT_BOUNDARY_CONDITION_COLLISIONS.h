@@ -7,7 +7,6 @@
 #ifndef __IMPLICIT_BOUNDARY_CONDITION_COLLISIONS__
 #define __IMPLICIT_BOUNDARY_CONDITION_COLLISIONS__
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
-#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.h>
 namespace PhysBAM{
 template<class TV>
