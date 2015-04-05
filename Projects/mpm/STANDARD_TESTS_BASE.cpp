@@ -16,6 +16,9 @@
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include "STANDARD_TESTS_BASE.h"
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -59,12 +62,12 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     frame_dt=1/framerate;
 
 #ifdef USE_OPENMP
-    omp_set_num_threads(number_of_threads);
+    omp_set_num_threads(threads);
 #pragma omp parallel
 #pragma omp single
     {
-        if(omp_get_num_threads()!=number_of_threads) PHYSBAM_FATAL_ERROR();
-        LOG::cout<<"Running on "<<number_of_threads<<" threads"<<std::endl;
+        if(omp_get_num_threads()!=threads) PHYSBAM_FATAL_ERROR();
+        LOG::cout<<"Running on "<<threads<<" threads"<<std::endl;
     }
 #endif
 
