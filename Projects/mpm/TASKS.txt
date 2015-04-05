@@ -2,11 +2,7 @@ To be implemented:
 
 * Threading
 
-* Dump out meshes for forces in a way that allows viewer to see them.
-
 * Make viewer aware of MPM_PARTICLES directly
-
-* Implement an example with both mesh-based and non-mesh-based forces
 
 * Plasticity
 
