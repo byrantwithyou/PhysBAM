@@ -22,7 +22,7 @@ public:
     {}
 
     template<int d> static VECTOR<T,d> Byte_Color_To_Scalar_Color(const VECTOR<unsigned char,d> color_in)
-    {return (VECTOR<T,d>(color_in)+VECTOR<T,d>::All_Ones_Vector())/(T)512;}
+    {return (VECTOR<T,d>(color_in)+VECTOR<T,d>::All_Ones_Vector())/(T)256;}
 
     static T Byte_Color_To_Scalar_Color(const unsigned char color_in)
     {return ((T)color_in+(T).5)/256;}
