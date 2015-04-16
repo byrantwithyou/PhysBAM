@@ -62,6 +62,182 @@ SYMMETRIC_MATRIX<T,m> Contract_0(const VEC_ID_TENSOR_12<T,m>& t,const VECTOR<T,m
 template<class T,int m>
 MATRIX<T,m> Contract_0(const PERMUTATION_TENSOR<T>& t,const VECTOR<T,m>& v) {return MATRIX<T,m>::Cross_Product_Matrix(-t.x*v);}
 
+template<class T,int m,class TN>
+ZERO_MATRIX<T,m> Contract_1(const TN& t,ZERO_VECTOR<T,m> z){return ZERO_MATRIX<T,m>();}
+
+template<class T,int m>
+MATRIX<T,m> Contract_1(const TENSOR<T,m>& t,const VECTOR<T,m>& v)
+{
+    MATRIX<T,m> M;
+    for(int i=0;i<m;i++) M.Set_Row(i,t.x(i).Transpose_Times(v));
+    return M;
+}
+
+template<class T,int m>
+MATRIX<T,m> Contract_1(const SYMMETRIC_TENSOR<T,m>& t,const VECTOR<T,m>& v)
+{
+    SYMMETRIC_MATRIX<T,m> M;
+    for(int i=0;i<m;i++) M.Set_Row(i,t.x(i).Transpose_Times(v));
+    return M;
+}
+
+template<class T,int m>
+ZERO_MATRIX<T,m> Contract_1(const ZERO_TENSOR<T,m>& t,const VECTOR<T,m>& v) {return ZERO_MATRIX<T,m>();}
+
+template<class T,int m>
+MATRIX<T,m> Contract_1(const VEC_ID_TENSOR_0<T,m>& t,const VECTOR<T,m>& v) {return MATRIX<T,m>::Outer_Product(t.v,v);}
+
+template<class T,int m>
+SCALE_MATRIX<T,m> Contract_1(const VEC_ID_TENSOR_1<T,m>& t,const VECTOR<T,m>& v) {return SCALE_MATRIX<T,m>(t.v.Dot(v));}
+
+template<class T,int m>
+MATRIX<T,m> Contract_1(const VEC_ID_TENSOR_2<T,m>& t,const VECTOR<T,m>& v) {return MATRIX<T,m>::Outer_Product(v,t.v);}
+
+template<class T,int m>
+MATRIX<T,m> Contract_1(const VEC_ID_TENSOR_12<T,m>& t,const VECTOR<T,m>& v) {return v.Dot(t.v)+MATRIX<T,m>::Outer_Product(v,t.v);}
+
+template<class T,int m>
+MATRIX<T,m> Contract_1(const PERMUTATION_TENSOR<T>& t,const VECTOR<T,m>& v) {return MATRIX<T,m>::Cross_Product_Matrix(t.x*v);}
+
+template<class T,int m,class TN>
+ZERO_MATRIX<T,m> Contract_2(const TN& t,ZERO_VECTOR<T,m> z){return ZERO_MATRIX<T,m>();}
+
+template<class T,int m>
+MATRIX<T,m> Contract_2(const TENSOR<T,m>& t,const VECTOR<T,m>& v)
+{
+    MATRIX<T,m> M;
+    for(int i=0;i<m;i++) M.Set_Row(i,t.x(i)*v);
+    return M;
+}
+
+template<class T,int m>
+MATRIX<T,m> Contract_2(const SYMMETRIC_TENSOR<T,m>& t,const VECTOR<T,m>& v)
+{
+    SYMMETRIC_MATRIX<T,m> M;
+    for(int i=0;i<m;i++) M.Set_Row(i,t.x(i)*v);
+    return M;
+}
+
+template<class T,int m>
+ZERO_MATRIX<T,m> Contract_2(const ZERO_TENSOR<T,m>& t,const VECTOR<T,m>& v) {return ZERO_MATRIX<T,m>();}
+
+template<class T,int m>
+MATRIX<T,m> Contract_2(const VEC_ID_TENSOR_0<T,m>& t,const VECTOR<T,m>& v) {return MATRIX<T,m>::Outer_Product(t.v,v);}
+
+template<class T,int m>
+MATRIX<T,m> Contract_2(const VEC_ID_TENSOR_1<T,m>& t,const VECTOR<T,m>& v) {return MATRIX<T,m>::Outer_Product(v,t.v);}
+
+template<class T,int m>
+SCALE_MATRIX<T,m> Contract_2(const VEC_ID_TENSOR_2<T,m>& t,const VECTOR<T,m>& v) {return SCALE_MATRIX<T,m>(t.v.Dot(v));}
+
+template<class T,int m>
+MATRIX<T,m> Contract_2(const VEC_ID_TENSOR_12<T,m>& t,const VECTOR<T,m>& v) {return v.Dot(t.v)+MATRIX<T,m>::Outer_Product(v,t.v);}
+
+template<class T,int m>
+MATRIX<T,m> Contract_2(const PERMUTATION_TENSOR<T>& t,const VECTOR<T,m>& v) {return MATRIX<T,m>::Cross_Product_Matrix(-t.x*v);}
+
+template<class T,int m>
+VECTOR<T,m> Contract_01(const TENSOR<T,m>& t)
+{
+    VECTOR<T,m> v;
+    for(int i=0;i<m;i++) v+=t.x(i).Row(i);
+    return v;
+}
+
+template<class T,int m>
+VECTOR<T,m> Contract_01(const SYMMETRIC_TENSOR<T,m>& t)
+{
+    VECTOR<T,m> v;
+    for(int i=0;i<m;i++) v+=t.x(i).Row(i);
+    return v;
+}
+
+template<class T,int m>
+ZERO_VECTOR<T,m> Contract_01(const ZERO_TENSOR<T,m>& t) {return ZERO_VECTOR<T,m>();}
+
+template<class T,int m>
+VECTOR<T,m> Contract_01(const VEC_ID_TENSOR_0<T,m>& t) {return t.v;}
+
+template<class T,int m>
+VECTOR<T,m> Contract_01(const VEC_ID_TENSOR_1<T,m>& t) {return t.v;}
+
+template<class T,int m>
+VECTOR<T,m> Contract_01(const VEC_ID_TENSOR_2<T,m>& t) {return t.v*m;}
+
+template<class T,int m>
+VECTOR<T,m> Contract_01(const VEC_ID_TENSOR_12<T,m>& t) {return t.v*(m+1);}
+
+template<class T>
+ZERO_VECTOR<T,3> Contract_01(const PERMUTATION_TENSOR<T>& t) {return ZERO_VECTOR<T,3>();}
+
+template<class T,int m>
+VECTOR<T,m> Contract_02(const TENSOR<T,m>& t)
+{
+    VECTOR<T,m> v;
+    for(int i=0;i<m;i++) v+=t.x(i).Column(i);
+    return v;
+}
+
+template<class T,int m>
+VECTOR<T,m> Contract_02(const SYMMETRIC_TENSOR<T,m>& t)
+{
+    VECTOR<T,m> v;
+    for(int i=0;i<m;i++) v+=t.x(i).Column(i);
+    return v;
+}
+
+template<class T,int m>
+ZERO_VECTOR<T,m> Contract_02(const ZERO_TENSOR<T,m>& t) {return ZERO_VECTOR<T,m>();}
+
+template<class T,int m>
+VECTOR<T,m> Contract_02(const VEC_ID_TENSOR_0<T,m>& t) {return t.v;}
+
+template<class T,int m>
+VECTOR<T,m> Contract_02(const VEC_ID_TENSOR_1<T,m>& t) {return t.v*m;}
+
+template<class T,int m>
+VECTOR<T,m> Contract_02(const VEC_ID_TENSOR_2<T,m>& t) {return t.v;}
+
+template<class T,int m>
+VECTOR<T,m> Contract_02(const VEC_ID_TENSOR_12<T,m>& t) {return t.v*(m+1);}
+
+template<class T>
+ZERO_VECTOR<T,3> Contract_02(const PERMUTATION_TENSOR<T>& t) {return ZERO_VECTOR<T,3>();}
+
+template<class T,int m>
+VECTOR<T,m> Contract_12(const TENSOR<T,m>& t)
+{
+    VECTOR<T,m> v;
+    for(int i=0;i<m;i++) v(i)=t.x(i).Trace();
+    return v;
+}
+
+template<class T,int m>
+VECTOR<T,m> Contract_12(const SYMMETRIC_TENSOR<T,m>& t)
+{
+    VECTOR<T,m> v;
+    for(int i=0;i<m;i++) v(i)=t.x(i).Trace();
+    return v;
+}
+
+template<class T,int m>
+ZERO_VECTOR<T,m> Contract_12(const ZERO_TENSOR<T,m>& t) {return ZERO_VECTOR<T,m>();}
+
+template<class T,int m>
+VECTOR<T,m> Contract_12(const VEC_ID_TENSOR_0<T,m>& t) {return t.v*m;}
+
+template<class T,int m>
+VECTOR<T,m> Contract_12(const VEC_ID_TENSOR_1<T,m>& t) {return t.v;}
+
+template<class T,int m>
+VECTOR<T,m> Contract_12(const VEC_ID_TENSOR_2<T,m>& t) {return t.v;}
+
+template<class T,int m>
+VECTOR<T,m> Contract_12(const VEC_ID_TENSOR_12<T,m>& t) {return t.v*2;}
+
+template<class T>
+ZERO_VECTOR<T,3> Contract_12(const PERMUTATION_TENSOR<T>& t) {return ZERO_VECTOR<T,3>();}
+
 template<class T,int m,class MAT>
 ZERO_TENSOR<T,m> Tensor_Product_0(const MAT& t,ZERO_VECTOR<T,m> z){return ZERO_TENSOR<T,m>();}
 
@@ -439,6 +615,11 @@ template<class T,int m> TENSOR<T,m> Contract_1(const PERMUTATION_TENSOR<T>& p,co
 template<class T,int m> ZERO_TENSOR<T,m> Contract_1(const PERMUTATION_TENSOR<T>& p,const ZERO_MATRIX<T,m>& M) {return ZERO_TENSOR<T,m>();}
 template<class T,int m> PERMUTATION_TENSOR<T> Contract_1(const PERMUTATION_TENSOR<T>& p,IDENTITY_MATRIX<T,m> M) {return p;}
 template<class T,int m> PERMUTATION_TENSOR<T> Contract_1(const PERMUTATION_TENSOR<T>& p,SCALE_MATRIX<T,m> M) {return p*M.x;}
+
+template<class T,int m> TENSOR<T,m> Contract_1(const VEC_ID_TENSOR_0<T,m>& a,const MATRIX<T,m>& M){return Tensor_Product_0(M.Transposed(),a.v);}
+template<class T,int m> VEC_ID_TENSOR_1<T,m> Contract_1(const VEC_ID_TENSOR_1<T,m>& a,const MATRIX<T,m>& M){return VEC_ID_TENSOR_1<T,m>(M.Transpose_Times(a.v));}
+template<class T,int m> TENSOR<T,m> Contract_1(const VEC_ID_TENSOR_2<T,m>& a,const MATRIX<T,m>& M){return Tensor_Product_2(M.Transposed(),a.v);}
+template<class T,int m> TENSOR<T,m> Contract_1(const VEC_ID_TENSOR_12<T,m>& a,const MATRIX<T,m>& M){return Tensor_Product_2(M.Transposed(),a.v)+VEC_ID_TENSOR_1<T,m>(M.Transpose_Times(a.v));}
 
 template<class T,int m> TENSOR<T,m> Contract_2(const TENSOR<T,m>& p,const MATRIX<T,m>& M)
 {
