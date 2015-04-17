@@ -47,6 +47,7 @@ public:
     int particles_per_cell;
     T scale_mass;
     T scale_E;
+    T scale_speed;
     RANDOM_NUMBERS<T> random;
     DEFORMABLES_STANDARD_TESTS<TV> tests;
 

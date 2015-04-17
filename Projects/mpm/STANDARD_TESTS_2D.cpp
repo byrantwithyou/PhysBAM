@@ -55,7 +55,7 @@ Initialize()
         case 1:{ // rotating circle
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
-            VECTOR<T,1> angular_velocity(0.4);
+            VECTOR<T,1> angular_velocity(0.4*scale_speed);
             T density=2*scale_mass;
             Seed_Particles(sphere,[=](const TV& X){return angular_velocity.Cross(X-sphere.center);},
                 [=](const TV&){return MATRIX<T,2>::Cross_Product_Matrix(angular_velocity);}
@@ -73,7 +73,6 @@ Initialize()
             Seed_Particles(sphere,[=](const TV& X){return TV(0.1,0);},[=](const TV&){return MATRIX<T,2>();},
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
-            particles.B.Fill(MATRIX<T,2>(1,2,3,10));
             Add_Fixed_Corotated(1e3*scale_E,0.3);
         } break;
         case 3:{ // freefall circle
