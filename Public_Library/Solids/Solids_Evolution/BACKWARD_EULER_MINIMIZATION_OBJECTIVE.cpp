@@ -14,6 +14,7 @@
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h>
+#include <Deformables/Forces/LAZY_HESSIAN_FORCE.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -44,6 +45,10 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
 {
     const GENERALIZED_VELOCITY<TV>& dv=debug_cast<const GENERALIZED_VELOCITY<TV>&>(Bdv);
     tmp1=dv;
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++)
+        if(LAZY_HESSIAN_FORCE<TV>* f=dynamic_cast<LAZY_HESSIAN_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(k)))
+                f->Need_To_Recompute_Hessian(h);
+
     if(h)
         minimization_system.forced_collisions.Clean_Memory();
     Make_Feasible(tmp1);
