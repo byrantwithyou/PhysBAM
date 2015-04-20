@@ -15,6 +15,9 @@
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h>
 #include <Deformables/Forces/LAZY_HESSIAN_FORCE.h>
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -77,6 +80,9 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
 
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
     for(int p=0;p<particles.number;p++){
         TV dV=dv.V.array(p);
         TV& V1=v1.V.array(p);
@@ -85,6 +91,9 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
         tmp0.V.array(p)=particles.mass(p)*dV;}
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions(particles.X);
 
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
     for(int p=0;p<rigid_body_particles.number;p++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
         if(rigid_body.Has_Infinite_Inertia()) continue;
@@ -157,6 +166,9 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
     minimization_system.collisions.Remove_All();
     if(!collision_objects.m) return;
 
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
     for(int p=0;p<dv.V.array.m;p++){
         TV dV=dv.V.array(p);
         TV V=v0.V.array(p)+dV;
@@ -223,8 +235,14 @@ Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv) const
     T e0=0,e1=0;
     dv*=0;
     Compute(dv,0,&tmp0,&e0);
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
     for(int p=0;p<particles.number;p++)
         dv.V.array(p)=particles.mass(p)?tmp0.V.array(p)/-particles.mass(p):TV();
+#ifdef USE_OPENMP
+#pragma omp parallel for
+#endif
     for(int p=0;p<rigid_body_particles.number;p++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
         if(rigid_body.Has_Infinite_Inertia()) continue;
