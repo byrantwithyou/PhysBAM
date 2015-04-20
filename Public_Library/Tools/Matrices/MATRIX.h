@@ -206,6 +206,9 @@ public:
     T Parallelepiped_Measure() const
     {STATIC_ASSERT(n==1);return sqrt(Frobenius_Norm_Squared());}
 
+    static T Inner_Product(const MATRIX& A,const MATRIX& B)
+    {T t=0; for(int i=0;i<size;i++) t+=A.x[i]*B.x[i]; return t;}
+
     template<class RW> void Read(std::istream& input)
     {Read_Binary_Array<RW>(input,x,m*n);}
 

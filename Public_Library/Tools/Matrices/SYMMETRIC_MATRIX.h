@@ -132,7 +132,7 @@ public:
     T z=0;
     for(int j=0;j<i;j++) z+=Element_Lower(i,j)*v(j);
     for(int j=i;j<d;j++) z+=Element_Lower(j,i)*v(j);
-    w(i)=z;}}
+    w(i)=z;} return w;}
 
     SYMMETRIC_MATRIX Transposed() const
     {return *this;}

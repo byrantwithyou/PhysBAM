@@ -110,6 +110,9 @@ public:
     MATRIX Inverse() const
     {assert(x00);return MATRIX(1/x00);}
 
+    void Invert()
+    {*this=Inverse();}
+
     VECTOR<T,1> Inverse_Times(const VECTOR<T,1>& b) const
     {return VECTOR<T,1>(b.x/x00);}
 
