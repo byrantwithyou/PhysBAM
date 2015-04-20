@@ -22,6 +22,7 @@ class BACKWARD_EULER_MINIMIZATION_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::
 public:
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     T dt,time;
+    bool use_l_inf_norm;
     KRYLOV_VECTOR_BASE<T>* tmp;
 
     struct COLLISION

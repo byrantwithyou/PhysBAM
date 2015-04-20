@@ -16,7 +16,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::
 BACKWARD_EULER_MINIMIZATION_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities)
-    :KRYLOV_SYSTEM_BASE<T>(false,false),solid_body_collection(solid_body_collection),dt(0),time(0),tmp(0),forced_collisions(),example_forces_and_velocities(example_forces_and_velocities)
+    :KRYLOV_SYSTEM_BASE<T>(false,false),solid_body_collection(solid_body_collection),dt(0),time(0),use_l_inf_norm(false),tmp(0),forced_collisions(),example_forces_and_velocities(example_forces_and_velocities)
 {
 }
 //#####################################################################
@@ -78,6 +78,11 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1)
 template<class TV> typename TV::SCALAR BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const
 {
+    if(use_l_inf_norm){
+        T l_inf=0;
+        for(int i=0;i<BR.Raw_Size();i++)
+            l_inf=maxabs(l_inf,BR.Raw_Get(i));
+        return l_inf;}
     return sqrt(Inner_Product(BR,BR));
 }
 //#####################################################################

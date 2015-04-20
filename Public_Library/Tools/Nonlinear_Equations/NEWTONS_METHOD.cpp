@@ -37,12 +37,13 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     for(iterations_used=0;iterations_used<local_max_iterations;iterations_used++){
         T E=0;
         F.Compute(x,&sys,&grad,&E);
-        T norm_grad=sqrt(sys.Inner_Product(grad,grad));
-        if(debug) LOG::printf("GRAD STATS %.16g %.16g %.16g\n", E, (E-last_E), norm_grad);
+        T norm2_grad=sqrt(sys.Inner_Product(grad,grad));
+        T norm_grad=sys.Convergence_Norm(grad);
+        if(debug) LOG::printf("GRAD STATS %.16g %.16g %.16g %.16g\n", E, (E-last_E), norm_grad, tolerance);
 
         if(debug){
             char buff[1000];
-            sprintf(buff,"newton %d   %.16g %.16g %.16g", iterations_used, E, (E-last_E), norm_grad);
+            sprintf(buff,"newton %d   %.16g %.16g %.16g %.16g", iterations_used, E, (E-last_E), norm_grad, tolerance);
             PHYSBAM_DEBUG_WRITE_SUBSTEP(buff,1,1);}
 
         if(norm_grad<tolerance && (iterations_used || !require_one_iteration || !norm_grad)){result=true;break;}
@@ -56,7 +57,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         if(!krylov->Solve(sys,dx,tm,av,local_krylov_tolerance,0,max_krylov_iterations) && fail_on_krylov_not_converged)
             break;
 
-        if(use_gradient_descent_failsafe) Make_Downhill_Direction(sys,dx,grad,norm_grad);
+        if(use_gradient_descent_failsafe) Make_Downhill_Direction(sys,dx,grad,norm2_grad);
         if(max_newton_step_size){
             T norm=sqrt(sys.Inner_Product(dx,dx));
             if(norm>max_newton_step_size) dx*=max_newton_step_size/norm;}
