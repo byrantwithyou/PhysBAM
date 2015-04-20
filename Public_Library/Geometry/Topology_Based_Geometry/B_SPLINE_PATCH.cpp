@@ -189,7 +189,6 @@ Smooth_Fit(B_SPLINE_PATCH<TV,3>& bs,const ARRAY<TV,VECTOR<int,2>>& X,bool loop_s
 template<class TV,int d> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,2>::OBJECT* PhysBAM::
 Create_Triangulated_Surface(const B_SPLINE_PATCH<TV,d>& spline,bool same_particles)
 {
-    typedef VECTOR<int,2> IV;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,2>::OBJECT T_TRIANGULATED_SURFACE;
     T_TRIANGULATED_SURFACE* tri_patch=0;
     if(same_particles) tri_patch=T_TRIANGULATED_SURFACE::Create(spline.particles);
@@ -361,7 +360,6 @@ template<class TV> void PhysBAM::
 Fill_Bezier(BEZIER_SPLINE_PATCH<TV,3>& bez,const B_SPLINE_PATCH<TV,3>& bs)
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,2> IV;
 
     int segs_t=bs.knots_t.m-5;
     int segs_s=bs.knots_s.m-5;
