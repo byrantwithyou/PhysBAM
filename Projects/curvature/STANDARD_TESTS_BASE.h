@@ -10,6 +10,9 @@
 #include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <fstream>
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
 namespace PhysBAM{
 
 template<class TV>
@@ -25,14 +28,13 @@ public:
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     bool test_forces;
-    ARRAY<int> kinematic_ids;
     ARRAY<INTERPOLATION_CURVE<T,FRAME<TV> > > curves;
     ARRAY<int> kinematic_points;
     ARRAY<INTERPOLATION_CURVE<T,TV> > point_curves;
     bool print_matrix;
     int resolution;
     T stiffness_multiplier;
-    T thickness;
+    T thickness_multiplier;
     T curvature_stiffness_multiplier;
     T damping_multiplier;
     ARRAY<int> externally_forced;
@@ -59,10 +61,13 @@ public:
     T save_dt;
     bool self_collide_surface_only;
     bool use_vanilla_newton;
+    int gauss_order;
+    int threads;
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type);
     virtual ~STANDARD_TESTS_BASE();
 
+    void Set_Number_Of_Threads(int threads);
     void Post_Initialization() PHYSBAM_OVERRIDE;
     void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE;
     void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE;

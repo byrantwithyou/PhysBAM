@@ -40,14 +40,14 @@ namespace PhysBAM{
 template<class TV> STANDARD_TESTS_BASE<TV>::
 STANDARD_TESTS_BASE(const STREAM_TYPE stream_type)
     :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),test_forces(false),print_matrix(false),
-    resolution(0),stiffness_multiplier(1),thickness(1e-2),curvature_stiffness_multiplier(1),damping_multiplier(1),input_poissons_ratio(-1),input_youngs_modulus(0),
+    resolution(0),stiffness_multiplier(1),thickness_multiplier(1),curvature_stiffness_multiplier(1),damping_multiplier(1),input_poissons_ratio(-1),input_youngs_modulus(0),
     input_friction(.3),ether_drag(0),rand_seed(1234),
     use_rand_seed(false),use_newmark(false),use_newmark_be(false),project_nullspace(false),
     backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
     use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),
     penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),enforce_definiteness(false),
     unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),use_penalty_self_collisions(true),
-    self_collide_surface_only(false),use_vanilla_newton(false)
+    self_collide_surface_only(false),use_vanilla_newton(false),gauss_order(3),threads(1)
 {
     this->fixed_dt=1./240;
 }
@@ -57,6 +57,23 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type)
 template<class TV> STANDARD_TESTS_BASE<TV>::
 ~STANDARD_TESTS_BASE()
 {
+}
+//#####################################################################
+// Function Set_Number_Of_Threads
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Set_Number_Of_Threads(int threads)
+{
+#ifdef USE_OPENMP
+    PHYSBAM_ASSERT(threads>0);
+    omp_set_num_threads(threads);
+#pragma omp parallel
+#pragma omp master
+    {
+        PHYSBAM_ASSERT(threads==omp_get_num_threads());
+        LOG::cout<<"Running on "<<threads<<" threads"<<std::endl;
+    }
+#endif
 }
 //#####################################################################
 // Function Post_Initialization
@@ -245,6 +262,7 @@ Register_Options()
     parse_args->Add("-print_matrix",&print_matrix,"print Krylov matrix");
     parse_args->Add("-resolution",&resolution,"resolution","resolution used by multiple tests to change the parameters of the test");
     parse_args->Add("-stiffen",&stiffness_multiplier,"multiplier","stiffness multiplier");
+    parse_args->Add("-thicken",&thickness_multiplier,"multiplier","thickness multiplier");
     parse_args->Add("-kappa_stiffen",&curvature_stiffness_multiplier,"multiplier","stiffness multiplier for curvature");
     parse_args->Add("-dampen",&damping_multiplier,"multiplier","damping multiplier");
     parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
@@ -284,8 +302,11 @@ Register_Options()
 
     parse_args->Add("-use_tri_col",&solids_parameters.triangle_collision_parameters.perform_self_collision,"use triangle collisions");
     parse_args->Add("-no_self_interior",&self_collide_surface_only,"do not process penalty self collisions against interior particles");
-    parse_args->Add("-use_vanilla_newton",&use_vanilla_newton,"use triangle collisions");
+    parse_args->Add("-use_vanilla_newton",&use_vanilla_newton,"use vanilla newton");
+    parse_args->Add("-use_inf_norm",&backward_euler_evolution->minimization_system.use_l_inf_norm,"use l infinity norm to test for convergence");
     parse_args->Add("-density",&density,"density","density");
+    parse_args->Add("-gauss",&gauss_order,"order","order of gaussian quadrature to use (max 7)");
+    parse_args->Add("-threads",&threads,"threads","number of threads");
 }
 //#####################################################################
 // Function Parse_Options
@@ -310,11 +331,13 @@ Parse_Options()
     if(backward_euler_evolution && no_descent)
         backward_euler_evolution->newtons_method.use_gradient_descent_failsafe=false;
     if(use_vanilla_newton) backward_euler_evolution->newtons_method.Make_Vanilla_Newton();
+    Set_Number_Of_Threads(threads);
 
     unit_rho=kg/pow<TV::m>(m);
     unit_N=kg*m/(s*s);
     unit_p=unit_N/(m*m);
     unit_J=unit_N*m;
+    thickness_multiplier*=m;
     penalty_collisions_length*=m;
     penalty_collisions_separation*=m;
     input_youngs_modulus*=unit_p;
@@ -463,8 +486,8 @@ Read_Output_Files_Solids(const int frame)
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 {
-    for(int i=0;i<kinematic_ids.m;i++)
-        if(id==kinematic_ids(i)){
+    for(int i=0;i<kinematic_points.m;i++)
+        if(id==kinematic_points(i)){
             frame=curves(i).Value(time);
             break;}
 }
@@ -474,8 +497,8 @@ Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 template<class TV> bool STANDARD_TESTS_BASE<TV>::
 Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 {
-    for(int i=0;i<kinematic_ids.m;i++)
-        if(id==kinematic_ids(i)){
+    for(int i=0;i<kinematic_points.m;i++)
+        if(id==kinematic_points(i)){
             twist=curves(i).Derivative(time);
             return true;}
     return false;
