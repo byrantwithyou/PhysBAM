@@ -94,7 +94,7 @@ public:
     {REGISTRY& registry=Singleton();
     FACTORY_BASE<T_BASE_OBJECT>* factory;
     if(!registry.name_registry.Get(name,factory)){
-        LOG::cerr<<"'"<<name<<"' is not a registered object name.\nRegisted names are "<<registry.name_registry<<std::endl;
+        LOG::cerr<<"'"<<name<<"' is not a registered object name.\nRegistered names are "<<registry.name_registry<<std::endl;
         PHYSBAM_FATAL_ERROR();}
     return factory;}
 
@@ -102,7 +102,7 @@ public:
     {REGISTRY& registry=Singleton();
     FACTORY_BASE<T_BASE_OBJECT>* factory;
     if(!registry.extension_registry.Get(extension,factory)){
-        LOG::cerr<<"'"<<extension<<"' is not a registered object extension.\nRegisted extensions are "<<registry.extension_registry<<std::endl;
+        LOG::cerr<<"'"<<extension<<"' is not a registered object extension.\nRegistered extensions are "<<registry.extension_registry<<std::endl;
         PHYSBAM_FATAL_ERROR();}
     return factory;}
 

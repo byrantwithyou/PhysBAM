@@ -4,7 +4,9 @@
 //#####################################################################
 #include <Tools/Log/LOG.h>
 #include <Tools/Matrices/BANDED_MATRIX.h>
+#include <Tools/Matrices/MATRIX.h>
 #include <cassert>
+#include <Tools/Math_Tools/Is_NaN.h>
 namespace PhysBAM{
 namespace{
 //#####################################################################
@@ -49,9 +51,20 @@ Givens_Shift_Diagonal(ARRAY<T2>& u)
 {
     assert(diagonal_column>0);
     A(0)=A(0).Remove_Index(0).Append(0);
-    for(int i=0;i<u.m-1;i++)
-        Givens_Transpose_Times(Givens(A(i),A(i+1)),u(i),u(i+1));
+    for(int i=0;i<u.m-1;i++){
+        VECTOR<T,2> g=Givens(A(i),A(i+1));
+        Givens_Transpose_Times(g,u(i),u(i+1));
+        if(wrap) Givens_Transpose_Times(g,extra(i),extra(i+1));}
     diagonal_column--;
+}
+template<class T2,int d> void 
+Init_Helper(VECTOR<T2,d>& a,const ARRAY<T2>& u)
+{}
+template<class T2,int d> void 
+Init_Helper(VECTOR<ARRAY<T2>,d>& a,const ARRAY<ARRAY<T2>>& u)
+{
+    for(int i=0;i<d;i++)
+        a(i).Resize(u(0).m);
 }
 //#####################################################################
 // Function Backsolve
@@ -61,15 +74,13 @@ Backsolve(ARRAY<T2>& u) const
 {
     assert(diagonal_column==0);
     VECTOR<T2,w> r;
+    Init_Helper(r,u);
     for(int i=u.m-1;i>=0;i--){
         VECTOR<T2,w-1> q=r.Remove_Index(w-1);
-        T2 rhs=u(i);
         const ROW& ar=A(i);
-        for(int j=0;j<w-1;j++)
-            rhs-=ar(j+1)*q(j);
-        rhs/=A(i)(0);
-        u(i)=rhs;
-        r=q.Prepend(rhs);}
+        for(int j=0;j<w-1;j++) u(i)-=ar(j+1)*q(j);
+        u(i)/=A(i)(0);
+        r=q.Prepend(u(i));}
 }
 //#####################################################################
 // Function QR_Solve
@@ -77,85 +88,62 @@ Backsolve(ARRAY<T2>& u) const
 template<class T,int w> template<class T2> void BANDED_MATRIX<T,w>::
 QR_Solve(ARRAY<T2>& u)
 {
-    // Check the bottom-left corner.
-    for(int r=A.m+diagonal_column-w+1;r<A.m;r++){
-        for(int i=A.m+diagonal_column-r;i<w;i++){
-            if(abs(A(r)(i))>1e-14){
-                ROW temp;
-                for(int j=i;j<w;j++){temp(j-i)=A(r)(j);A(r)(j)=0;}
-                for(int c=-diagonal_column+r+i-A.m,R=c+diagonal_column;R<r;c++,R++){
-                    // leftmost entry of temp corresponds to slot A[r][c].
-                    T multiplier=-temp(0)/A(R)(0); // THIS CAN BE DIVISION BY 0.
-                    temp+=multiplier*A(R);
-                    for(int k=0;k<w-1;k++) temp(k)=temp(k+1);
-                    temp(w-1)=0;
-                    u(r)+=multiplier*u(R);}
-                for(int k=0;k<w;k++) A(r)(k)+=temp(k);}}}
-
-    // Now check the top-right corner.
-    int DC=w-diagonal_column-1;
-    for(int r=A.m+DC-w+1;r<A.m;r++){
-        for(int i=A.m+DC-r;i<w;i++){
-            if(abs(A(A.m-1-r)(w-1-i))>1e-14){
-                ROW temp;
-                for(int j=i;j<w;j++){temp(j-i)=A(A.m-1-r)(w-1-j);A(A.m-1-r)(w-1-j)=0;}
-                for(int c=-DC+r+i-A.m,R=c+DC;R<r;c++,R++){
-                    T multiplier=-temp(0)/A(A.m-1-R)(w-1);
-                    for(int k=0;k<w-1;k++) temp(k)=temp(k+1)+multiplier*A(A.m-1-R)(w-2-k);
-                    u(A.m-1-r)+=multiplier*u(A.m-1-R);}
-                for(int k=0;k<w;k++) A(A.m-1-r)(w-1-k)+=temp(k);}}}
+    int odc=diagonal_column;
+    if(wrap){
+        // Move the top-right corner to the rhs
+        extra.Resize(u.m);
+        for(int i=0;i<extra.m;i++)
+            extra(i).Resize(w-1);
+        for(int i=0;i<odc;i++){
+            for(int j=0;j<odc-i;j++){
+                extra(i)(j+i+w-1-odc)=A(i)(j);
+                A(i)(j)=0;}}
+        // Move the bottom-left corner to the rhs
+        for(int i=A.m-w+1+odc;i<A.m;i++){
+            for(int j=odc+A.m-i;j<w;j++){
+                extra(i)(j+i-A.m-odc)=A(i)(j);
+                A(i)(j)=0;}}}
 
     while(diagonal_column>0)
         Givens_Shift_Diagonal(u);
     Backsolve(u);
-}
-template<class T,int w> template<class T2> void BANDED_MATRIX<T,w>::
-QR_Solve(ARRAY<ARRAY<T2>>& u)
-{
-    // Check the bottom-left corner.
-    for(int r=A.m+diagonal_column-w+1;r<A.m;r++){
-        for(int i=A.m+diagonal_column-r;i<w;i++){
-            if(abs(A(r)(i))>1e-14){
-                ROW temp;
-                for(int j=i;j<w;j++){temp(j-i)=A(r)(j);A(r)(j)=0;}
-                for(int c=-diagonal_column+r+i-A.m,R=c+diagonal_column;R<r;c++,R++){
-                    // leftmost entry of temp corresponds to slot A[r][c].
-                    T multiplier=-temp(0)/A(R)(0); // THIS CAN BE DIVISION BY 0.
-                    temp+=multiplier*A(R);
-                    for(int k=0;k<w-1;k++) temp(k)=temp(k+1);
-                    temp(w-1)=0;
-                    u(r).Copy(multiplier,u(R),u(r));}
-                for(int k=0;k<w;k++) A(r)(k)+=temp(k);}}}
 
-    // Now check the top-right corner.
-    int DC=w-diagonal_column-1;
-    for(int r=A.m+DC-w+1;r<A.m;r++){
-        for(int i=A.m+DC-r;i<w;i++){
-            if(abs(A(A.m-1-r)(w-1-i))>1e-14){
-                ROW temp;
-                for(int j=i;j<w;j++){temp(j-i)=A(A.m-1-r)(w-1-j);A(A.m-1-r)(w-1-j)=0;}
-                for(int c=-DC+r+i-A.m,R=c+DC;R<r;c++,R++){
-                    T multiplier=-temp(0)/A(A.m-1-R)(w-1);
-                    for(int k=0;k<w-1;k++) temp(k)=temp(k+1)+multiplier*A(A.m-1-R)(w-2-k); 
-                    u(A.m-1-r).Copy(multiplier,u(A.m-1-R),u(A.m-1-r));}
-                for(int k=0;k<w;k++) A(A.m-1-r)(w-1-k)+=temp(k);}}}
-
-    while(diagonal_column>0)
-        Givens_Shift_Diagonal(u);
-    Backsolve(u);
+    if(wrap){
+        Backsolve(extra);
+        MATRIX<T,w-1> ICE;
+        for(int i=0;i<w-1;i++){
+            for(int j=0;j<odc;j++)
+                ICE(j,i)=extra(j)(i)+((i==j)?1:0);
+            for(int j=odc;j<w-1;j++)
+                ICE(j,i)=extra(j+u.m-w+1)(i)+((i==j)?1:0);}
+        ICE.Invert();
+        VECTOR<T2,w-1> a;
+        Init_Helper(a,u);
+        for(int i=0;i<w-1;i++){
+            for(int j=0;j<odc;j++)
+                a(i)+=ICE(i,j)*u(j);
+            for(int j=odc;j<w-1;j++)
+                a(i)+=ICE(i,j)*u(j+u.m-w+1);}
+        for(int i=0;i<u.m;i++)
+            for(int j=0;j<w-1;j++)
+                u(i)-=extra(i)(j)*a(j);}
 }
+
 template class BANDED_MATRIX<float,4>;
 template class BANDED_MATRIX<double,4>;
 template class BANDED_MATRIX<float,3>;
 template class BANDED_MATRIX<double,3>;
+template class BANDED_MATRIX<float,2>;
+template class BANDED_MATRIX<double,2>;
 template void BANDED_MATRIX<float,4>::QR_Solve<VECTOR<float,2> >(ARRAY<VECTOR<float,2>,int>&);
 template void BANDED_MATRIX<double,4>::QR_Solve<VECTOR<double,2> >(ARRAY<VECTOR<double,2>,int>&);
 template void BANDED_MATRIX<float,3>::QR_Solve<VECTOR<float,2> >(ARRAY<VECTOR<float,2>,int>&);
 template void BANDED_MATRIX<double,3>::QR_Solve<VECTOR<double,2> >(ARRAY<VECTOR<double,2>,int>&);
+template void BANDED_MATRIX<double,2>::QR_Solve<double>(ARRAY<double>&);
 template void BANDED_MATRIX<double,3>::QR_Solve<double>(ARRAY<double>&);
 template void BANDED_MATRIX<double,4>::QR_Solve<double>(ARRAY<double>&);
-template void BANDED_MATRIX<float,3>::QR_Solve<VECTOR<float,2> >(ARRAY<ARRAY<VECTOR<float,2>,int>,int>&);
-template void BANDED_MATRIX<double,3>::QR_Solve<VECTOR<double,2> >(ARRAY<ARRAY<VECTOR<double,2>,int>,int>&);
-template void BANDED_MATRIX<float,3>::QR_Solve<VECTOR<float,3> >(ARRAY<ARRAY<VECTOR<float,3>,int>,int>&);
-template void BANDED_MATRIX<double,3>::QR_Solve<VECTOR<double,3> >(ARRAY<ARRAY<VECTOR<double,3>,int>,int>&);
+template void BANDED_MATRIX<float,3>::QR_Solve<ARRAY<VECTOR<float,2>> >(ARRAY<ARRAY<VECTOR<float,2>,int>,int>&);
+template void BANDED_MATRIX<double,3>::QR_Solve<ARRAY<VECTOR<double,2>> >(ARRAY<ARRAY<VECTOR<double,2>,int>,int>&);
+template void BANDED_MATRIX<float,3>::QR_Solve<ARRAY<VECTOR<float,3>> >(ARRAY<ARRAY<VECTOR<float,3>,int>,int>&);
+template void BANDED_MATRIX<double,3>::QR_Solve<ARRAY<VECTOR<double,3>> >(ARRAY<ARRAY<VECTOR<double,3>,int>,int>&);
 }

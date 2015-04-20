@@ -8,6 +8,7 @@
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
 #include <OpenGL/OpenGL/OPENGL_FREE_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_3D.h>
 #include <OpenGL/OpenGL/OPENGL_SHAPES.h>
@@ -150,6 +151,7 @@ Reinitialize(bool force,bool read_geometry)
         triangulated_surface_objects.Delete_Pointers_And_Clean_Memory();triangulated_surface_objects.Resize(m);
         tetrahedralized_volume_objects.Delete_Pointers_And_Clean_Memory();tetrahedralized_volume_objects.Resize(m);
         hexahedralized_volume_objects.Delete_Pointers_And_Clean_Memory();hexahedralized_volume_objects.Resize(m);
+        b_spline_patch_objects.Delete_Pointers_And_Clean_Memory();b_spline_patch_objects.Resize(m);
         free_particles_objects.Delete_Pointers_And_Clean_Memory();free_particles_objects.Resize(m);
         free_particles_indirect_arrays.Delete_Pointers_And_Clean_Memory();free_particles_indirect_arrays.Resize(m);
         embedded_surface_objects.Delete_Pointers_And_Clean_Memory();embedded_surface_objects.Resize(m);
@@ -182,6 +184,13 @@ Reinitialize(bool force,bool read_geometry)
                 if(first_time) LOG::cout<<"object "<<i<<": hexahedralized_volume\n";
                 hexahedralized_volume_objects(i)=new OPENGL_HEXAHEDRALIZED_VOLUME<T>(stream_type,&hexahedralized_volume->mesh,&(deformable_body_collection.particles),
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Matte(OPENGL_COLOR::Green()));}
+            else if(B_SPLINE_PATCH<TV,3>* b_spline_patch=dynamic_cast<B_SPLINE_PATCH<TV,3>*>(structure)){
+                if(first_time) LOG::cout<<"object "<<i<<": b-spline surface\n";
+                ARRAY<OPENGL_COLOR> front_colors,back_colors;
+                front_colors.Append(OPENGL_COLOR::Blue());back_colors.Append(OPENGL_COLOR::Yellow());
+                front_colors.Append(OPENGL_COLOR::Red());back_colors.Append(OPENGL_COLOR::Cyan());
+                b_spline_patch_objects(i)=new OPENGL_B_SPLINE_PATCH<T>(stream_type,*b_spline_patch,
+                    OPENGL_MATERIAL::Metal(front_colors(i%front_colors.Size())),OPENGL_MATERIAL::Metal(back_colors(i%back_colors.Size())));}
             else if(FREE_PARTICLES<TV>* fp=dynamic_cast<FREE_PARTICLES<TV>*>(structure)){
                 free_particles_indirect_arrays(i)=new INDIRECT_ARRAY<ARRAY_VIEW<TV> >(deformable_body_collection.particles.X,fp->nodes);
                 free_particles_objects(i)=new OPENGL_FREE_PARTICLES<TV>(stream_type,deformable_body_collection,*free_particles_indirect_arrays(i),color_map->Lookup(color_map_index--));}
@@ -324,6 +333,7 @@ Display() const
 
     bool display_triangulated_surface_objects,display_tetrahedralized_volume_objects,display_hexahedralized_volume_objects,
          display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects;
+    bool display_b_spline_patch_objects=true;
     Set_Display_Modes(display_triangulated_surface_objects,display_tetrahedralized_volume_objects,
             display_hexahedralized_volume_objects,display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects);
 
@@ -344,7 +354,9 @@ Display() const
         if(hexahedralized_volume_objects(i) && display_hexahedralized_volume_objects){
             glPushName(3);hexahedralized_volume_objects(i)->Display();glPopName();}
         if(free_particles_objects(i) && display_free_particles_objects){glPushName(6);free_particles_objects(i)->Display();glPopName();}
+        if(b_spline_patch_objects(i) && display_b_spline_patch_objects){glPushName(7);b_spline_patch_objects(i)->Display();glPopName();}
         glPopName();}
+
 
     if(slice && slice->Is_Slice_Mode()) glPopAttrib();
 
@@ -629,6 +641,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
             case 4:selection->subobject=embedded_surface_objects(buffer[0]);break;
             case 5:selection->subobject=boundary_surface_objects(buffer[0]);break;
             case 6:selection->subobject=free_particles_objects(buffer[0]);break;
+            case 7:selection->subobject=b_spline_patch_objects(buffer[0]);break;
             default:PHYSBAM_FATAL_ERROR();}
         selection->body_selection=selection->subobject->Get_Selection(&buffer[2],buffer_size-2);
         if(!selection->body_selection){delete selection;selection=0;}}

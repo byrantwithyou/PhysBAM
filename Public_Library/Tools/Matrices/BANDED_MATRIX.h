@@ -19,9 +19,11 @@ public:
     typedef VECTOR<T,w> ROW;
     ARRAY<ROW> A;
     int diagonal_column;
+    bool wrap;
+    ARRAY<ARRAY<T>> extra;
 
     BANDED_MATRIX(const int m=0)
-        :A(m)
+        :A(m),diagonal_column(0),wrap(false)
     {}
 
     int Size() const
@@ -35,7 +37,6 @@ public:
     template<class T2> void Givens_Shift_Diagonal(ARRAY<T2>& u);
     template<class T2> void Backsolve(ARRAY<T2>& u) const;
     template<class T2> void QR_Solve(ARRAY<T2>& u);
-    template<class T2> void QR_Solve(ARRAY<ARRAY<T2>>& u);
 //#####################################################################
 };
 }

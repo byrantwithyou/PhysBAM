@@ -19,6 +19,7 @@
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>
+#include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
@@ -101,6 +102,8 @@ bool Register_Structures(){
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<B_SPLINE<VECTOR<float,3>,3> >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<B_SPLINE<VECTOR<double,2>,3> >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<B_SPLINE<VECTOR<double,3>,3> >();    
+    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<B_SPLINE_PATCH<VECTOR<float,3>,3> >();
+    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<B_SPLINE_PATCH<VECTOR<double,3>,3> >();
     return true;
 }
 bool registered_structures_asdf=Register_Structures();

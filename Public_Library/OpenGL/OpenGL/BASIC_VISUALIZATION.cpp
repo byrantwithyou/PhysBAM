@@ -149,7 +149,7 @@ Parse_Args(PARSE_ARGS &parse_args)
     Parse_Arguments(parse_args);
 }
 //#####################################################################
-// Function Add_Key_Bindings
+// Function Initialize_Components_And_Key_Bindings
 //#####################################################################
 template<class T> void BASIC_VISUALIZATION<T>::
 Initialize_Components_And_Key_Bindings()

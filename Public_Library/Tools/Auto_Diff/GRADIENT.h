@@ -51,6 +51,10 @@ template<class TV,int d,class VEC> inline void
 Extract(VECTOR<TV,d>& dx,const GRADIENT<TV,VEC>& v)
 {Extract(dx,v.x);}
 
+template<class TV,int d,class VEC> inline void
+Extract(MATRIX<typename TV::SCALAR,TV::m,d>& dx,const GRADIENT<TV,VEC>& v)
+{TV w;for(int i=0;i<d;i++){Get(w,v.x,i);dx.Set_Column(i,w);}}
+
 }
 }
 #endif

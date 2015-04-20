@@ -41,7 +41,7 @@ public:
 };
 template<class TV> void Smooth_Fit(BEZIER_SPLINE_PATCH<TV,3>& bs,ARRAY_VIEW<TV> X);
 template<class TV> void Smooth_Fit_Loop(BEZIER_SPLINE_PATCH<TV,3>& bs,ARRAY_VIEW<TV> X);
-template<class TV,int d> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,1>::OBJECT*
-Create_Segmented_Curve(const BEZIER_SPLINE_PATCH<TV,d>& spline,bool same_particles);
+template<class TV,int d> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,2>::OBJECT*
+Create_Triangulated_Object(const BEZIER_SPLINE_PATCH<TV,d>& spline,bool same_particles);
 }
 #endif

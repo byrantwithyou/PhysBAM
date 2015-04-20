@@ -85,13 +85,34 @@ Smooth_Fit_Loop(BEZIER_SPLINE_PATCH<TV,3>& bs,ARRAY_VIEW<TV> X)
     PHYSBAM_NOT_IMPLEMENTED();
 }
 //#####################################################################
-// Function Create_Segmented_Curve
+// Function Create_Triangulated_Object
 //#####################################################################
-template<class TV,int d> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,1>::OBJECT* PhysBAM::
-Create_Segmented_Curve(const BEZIER_SPLINE_PATCH<TV,d>& spline,bool same_particles)
+template<class TV,int d> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,2>::OBJECT* PhysBAM::
+Create_Triangulated_Object(const BEZIER_SPLINE_PATCH<TV,d>& spline,bool same_particles)
 {
-    /////TODO
-    PHYSBAM_NOT_IMPLEMENTED();
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,2>::OBJECT T_TRIANGULATED_OBJECT;
+    T_TRIANGULATED_OBJECT* tri_surface=0;
+    if(same_particles) tri_surface=T_TRIANGULATED_OBJECT::Create(spline.particles);
+    else tri_surface=T_TRIANGULATED_OBJECT::Create();
+
+    for(int i=0;i<spline.control_points.m;i++){
+        const VECTOR<int,d+1>& elem=spline.control_points(i);
+        tri_surface->mesh.elements.Append(VECTOR<int,3>(elem(0),elem(d-1),elem(d*(d+1))));
+        tri_surface->mesh.elements.Append(VECTOR<int,3>(elem(d),elem(sqr(d+1)-1),elem(d*(d+1))));
+    }
+
+    if(!same_particles){
+        ARRAY<int> map(spline.particles.X.m,true,-1);
+        ARRAY_VIEW<int> av=tri_surface->mesh.elements.Flattened();
+        int next=0;
+        for(int i=0;i<av.m;i++)
+            if(map(av(i))<0){
+                map(av(i))=next++;
+                tri_surface->particles.Add_Element();
+                tri_surface->particles.X.Last()=spline.particles.X(av(i));}
+        av=map.Subset(av);}
+    tri_surface->Update_Number_Nodes();
+    return tri_surface;
 }
 //#####################################################################
 // Function Create

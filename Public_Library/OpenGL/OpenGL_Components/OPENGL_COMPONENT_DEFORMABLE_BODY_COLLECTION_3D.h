@@ -21,6 +21,7 @@
 #include <OpenGL/OpenGL/OPENGL_TETRAHEDRALIZED_VOLUME.h>
 #include <OpenGL/OpenGL/OPENGL_TRIANGULATED_SURFACE.h>
 #include <OpenGL/OpenGL/OPENGL_VECTOR_FIELD_3D.h>
+#include <OpenGL/OpenGL/OPENGL_B_SPLINE_PATCH.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D.h>
 namespace PhysBAM{
@@ -50,6 +51,7 @@ public:
     ARRAY<OPENGL_TRIANGULATED_SURFACE<T>*> triangulated_surface_objects;
     ARRAY<OPENGL_TETRAHEDRALIZED_VOLUME<T>*> tetrahedralized_volume_objects;
     ARRAY<OPENGL_HEXAHEDRALIZED_VOLUME<T>*> hexahedralized_volume_objects;
+    ARRAY<OPENGL_B_SPLINE_PATCH<T>*> b_spline_patch_objects;
     ARRAY<OPENGL_POINTS_3D<T,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >*> free_particles_objects;
     ARRAY<INDIRECT_ARRAY<ARRAY_VIEW<TV> >*> free_particles_indirect_arrays;
     bool has_tetrahedralized_volumes,has_hexahedralized_volumes;
