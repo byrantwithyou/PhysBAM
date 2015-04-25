@@ -17,8 +17,9 @@
 #include <cmath>
 namespace PhysBAM{
 template<class T,int d>
-struct IDENTITY_MATRIX
+class IDENTITY_MATRIX
 {
+public:
     typedef T SCALAR;
     enum WA {m=d,n=d};
     explicit IDENTITY_MATRIX() {}

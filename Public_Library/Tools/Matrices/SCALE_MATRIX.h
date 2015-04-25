@@ -17,8 +17,9 @@
 #include <cmath>
 namespace PhysBAM{
 template<class T,int d>
-struct SCALE_MATRIX
+class SCALE_MATRIX
 {
+public:
     typedef T SCALAR;
     enum WA {m=d,n=d};
     T x;
@@ -44,6 +45,10 @@ struct SCALE_MATRIX
     {return *this;}
 };
 
+template<class T,int d> MATRIX<T,d> operator+= (MATRIX<T,d>& m,const SCALE_MATRIX<T,d>& s) {return m+=s.x;}
+template<class T,int d> MATRIX<T,d> operator-= (MATRIX<T,d>& m,const SCALE_MATRIX<T,d>& s) {return m-=s.x;}
+template<class T,int d> MATRIX<T,d> operator+= (MATRIX<T,d>& m,const IDENTITY_MATRIX<T,d>& s) {return m+=1;}
+template<class T,int d> MATRIX<T,d> operator-= (MATRIX<T,d>& m,const IDENTITY_MATRIX<T,d>& s) {return m-=1;}
 
 template<class T,int d> SCALE_MATRIX<T,d> operator+ (const SCALE_MATRIX<T,d>& a,const SCALE_MATRIX<T,d>& b) {return SCALE_MATRIX<T,d>(a.x+b.x);}
 template<class T,int d> MATRIX<T,d> operator+ (const SCALE_MATRIX<T,d>& s,const MATRIX<T,d>& m) {return m+s.x;}

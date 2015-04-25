@@ -12,8 +12,10 @@
 namespace PhysBAM{
 
 template<class T,int d>
-struct ZERO_VECTOR
+class ZERO_VECTOR
 {
+public:
+    enum {m=d};
     typedef T SCALAR;
     ZERO_VECTOR operator-() const
     {return *this;}
@@ -33,6 +35,8 @@ struct ZERO_VECTOR
     T Dot(const ZERO_VECTOR&) const
     {return T();}
 };
+
+template<class T,int d> VECTOR<T,d> operator+=(const VECTOR<T,d>& v,const ZERO_VECTOR<T,d>& z){return v;}
 
 template<class T,int d> VECTOR<T,d> operator+ (const ZERO_VECTOR<T,d>& z,const VECTOR<T,d>& v) {return v;}
 template<class T,int d> VECTOR<T,d> operator+ (const VECTOR<T,d>& v,const ZERO_VECTOR<T,d>& z) {return v;}

@@ -19,8 +19,10 @@ namespace PhysBAM{
 
 // T_ijk=x*e_ijk
 template<class T>
-struct PERMUTATION_TENSOR
+class PERMUTATION_TENSOR
 {
+public:
+    static const bool is_tensor=true;
     typedef T SCALAR;
     enum {m=3,n=3,p=3};
     T x;

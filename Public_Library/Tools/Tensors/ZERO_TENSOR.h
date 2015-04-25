@@ -19,8 +19,10 @@ namespace PhysBAM{
 
 // T_ijk=0
 template<class T,int mm,int nn,int pp>
-struct ZERO_TENSOR
+class ZERO_TENSOR
 {
+public:
+    static const bool is_tensor=true;
     typedef T SCALAR;
     enum {m=mm,n=nn,p=pp};
     ZERO_TENSOR operator-() const

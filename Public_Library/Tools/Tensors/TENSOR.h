@@ -20,16 +20,21 @@ namespace PhysBAM{
 
 // general T_ijk
 template<class T,int mm,int nn,int pp>
-struct TENSOR
+class TENSOR
 {
+public:
+    static const bool is_tensor=true;
     typedef T SCALAR;
     enum {m=mm,n=nn,p=pp};
     VECTOR<MATRIX<T,n,p>,m> x;
 
     TENSOR(){}
 
-    TENSOR(const SYMMETRIC_TENSOR<T,m,n>& t)
-    {for(int i=0;i<m;i++) x(i)=t.x(i);}
+    const T& operator()(int i,int j,int k) const
+    {return x(i)(j,k);}
+
+    T& operator()(int i,int j,int k)
+    {return x(i)(j,k);}
 
     TENSOR operator-() const
     {TENSOR t;for(int i=0;i<m;i++) t.x(i)=-x(i);return t;}
@@ -46,6 +51,10 @@ struct TENSOR
     TENSOR<T,m,p,n> Transposed() const // swaps last two indices
     {TENSOR<T,m,p,n> t;for(int i=0;i<m;i++) t.x(i)=x(i).Transposed();return t;}
 };
+
+template<class T,int m,int n,int p>
+TENSOR<T,m,n,p> operator*(T a,const TENSOR<T,m,n,p>& s)
+{return s*a;}
 }
 #include <Tools/Tensors/PRIMITIVE_TENSORS.h>
 #endif

@@ -17,8 +17,9 @@
 #include <cmath>
 namespace PhysBAM{
 template<class T,int mm,int nn>
-struct ZERO_MATRIX
+class ZERO_MATRIX
 {
+public:
     typedef T SCALAR;
     enum WA {m=mm,n=nn};
     ZERO_MATRIX operator-() const
