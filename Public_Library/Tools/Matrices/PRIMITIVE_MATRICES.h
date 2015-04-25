@@ -14,6 +14,9 @@
 #include <Tools/Vectors/ZERO_VECTOR.h>
 #include <cmath>
 namespace PhysBAM{
+template<class T,int m,int n> MATRIX<T,m,n> operator+=(MATRIX<T,m,n>& M,const ZERO_MATRIX<T,m,n>& z){return M;}
+template<class T,int m,int n> MATRIX<T,m,n> operator-=(MATRIX<T,m,n>& M,const ZERO_MATRIX<T,m,n>& z){return M;}
+
 template<class T,int d> inline SYMMETRIC_MATRIX<T,d> Cast_Helper(ZERO_MATRIX<T,d> z){return SYMMETRIC_MATRIX<T,d>();}
 template<class T,int d> inline SYMMETRIC_MATRIX<T,d> Cast_Helper(SCALE_MATRIX<T,d> z){return SYMMETRIC_MATRIX<T,d>()+z.x;}
 template<class T,int d> inline SYMMETRIC_MATRIX<T,d> Cast_Helper(IDENTITY_MATRIX<T,d> z){return SYMMETRIC_MATRIX<T,d>::Identity_Matrix();}

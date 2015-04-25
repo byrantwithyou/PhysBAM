@@ -8,7 +8,7 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Tensors/PRIMITIVE_TENSORS.h>
-#include <Tools/Tensors/VEC_ID_TENSOR_1.h>
+#include <Tools/Tensors/VEC_ID_TENSOR.h>
 #include <Tools/Vectors/VECTOR.h>
 
 using namespace PhysBAM;
@@ -30,7 +30,7 @@ struct HELPER
     MATRIX<T,TV::m> A,B,F_hat,G,S,H,K;
     T J,a,b,q,c,g,h,k,m,n,p,Phi;
 
-    VEC_ID_TENSOR_1<T,TV::m,TV::m> dA[2],dB[2],dF_hat[2];
+    VEC_ID_TENSOR<T,1,TV::m,TV::m> dA[2],dB[2],dF_hat[2];
     TENSOR<T,TV::m,TV::m,TV::m> dS[2],dH[2],dK[2];
     TV B_bar[2],F_bar[2],K_bar[2],H_bar[2],dJ[2],da[2],db[2],dc[2],dg[2],dq[2],dh[2],dk[2],dm[2],dn[2],dp[2],dPhi[2];
 
@@ -91,9 +91,9 @@ void Fill_Diff(HELPER& z)
         z.dB[i].v=z.B_bar[i];
         z.F_bar[i]=z.Fn.Transpose_Times(z.dw[i]);
         z.dF_hat[i].v=z.F_bar[i];
-        z.dS[i]=Tensor_Product_1(id,z.B_bar[i])+Tensor_Product_0(id,z.B_bar[i]);
+        z.dS[i]=Tensor_Product<1>(id,z.B_bar[i])+Tensor_Product<0>(id,z.B_bar[i]);
         z.H_bar[i]=z.H.Transpose_Times(z.F_bar[i]);
-        z.dH[i]=Tensor_Product_1(z.H,-z.H_bar[i]);
+        z.dH[i]=Tensor_Product<1>(z.H,-z.H_bar[i]);
         z.dJ[i]=z.J*z.H_bar[i];
         z.da[i]=z.la*(z.J-1)*z.dJ[i];
         z.db[i]=z.mu*z.H_bar[i];
@@ -101,7 +101,7 @@ void Fill_Diff(HELPER& z)
         z.dc[i]=z.mu_N*z.Fn.Determinant()*z.dq[i];
         z.dg[i]=z.B_bar[i]*2;
         z.K_bar[i]=z.K.Transpose_Times(z.B_bar[i]);
-        z.dK[i]=-Tensor_Product_1(z.K,z.K_bar[i])-Tensor_Product_0(z.K.Transposed(),z.K_bar[i]);
+        z.dK[i]=-Tensor_Product<1>(z.K,z.K_bar[i])-Tensor_Product<0>(z.K.Transposed(),z.K_bar[i]);
         z.dh[i]=2*z.h*z.K_bar[i];
         z.dk[i]=-2*z.k/TV::m*z.K_bar[i];
         z.dm[i]=2*z.m/TV::m*z.H_bar[i];
@@ -146,7 +146,7 @@ template<class T_TENSOR>
 void Test(const char* name,TV dx[2],MATRIX<T,TV::m> a,MATRIX<T,TV::m> b,T_TENSOR da[2],T_TENSOR db[2])
 {
     MATRIX<T,TV::m> x=b-a;
-    MATRIX<T,TV::m> y=Contract_2(db[0]+da[0],dx[0])/2+Contract_2(db[1]+da[1],dx[1])/2;
+    MATRIX<T,TV::m> y=Contract<2>(db[0]+da[0],dx[0])/2+Contract<2>(db[1]+da[1],dx[1])/2;
     LOG::printf("DIFF %s: %.16g %.16g -> %.16g\n",name,x.Frobenius_Norm()/eps,y.Frobenius_Norm()/eps,(x-y).Frobenius_Norm()/max(max(x.Frobenius_Norm(),y.Frobenius_Norm()),1e-30));
 }
 

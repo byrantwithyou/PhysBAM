@@ -386,7 +386,7 @@ struct AUTO_DIFF_EXT_VEC
     {return Make_Diff_Vec(x/a,dx/a);}
 
     decltype(Make_Diff(x.Dot(TV()),dx.Transpose_Times(TV()))) Dot(TV v) const
-    {return Make_Diff(x.Dot(v),dx.Transpose_Times(v),Contract_0);}
+    {return Make_Diff(x.Dot(v),dx.Transpose_Times(v));}
 
     template<class VEC1>
     decltype(Make_Diff(x.Dot(TV()),dx.Transpose_Times(TV())+VDX1.Transpose_Times(x)))
@@ -397,7 +397,7 @@ struct AUTO_DIFF_EXT_VEC
     Cross(const TV& a) const
     {
         MATRIX<T,TV::m> cp_a=MATRIX<T,TV::m>::Cross_Product_Matrix(a);
-        return Make_Diff_Vec(x.Cross(a),-cp_a*dx,Contract_0);
+        return Make_Diff_Vec(x.Cross(a),-cp_a*dx);
     }
 
     template<class VEC1>
@@ -438,7 +438,7 @@ AUTO_DIFF_EXT_VEC<TV,typename ONE_NONZERO_VECTOR_MAT<TV,n,i>::TYPE> Diff_From_Va
 
 template<class TV,class VEC> inline decltype(Make_Diff_Vec(TV(),Outer_Product(TV(),DX)))
 operator*(const AUTO_DIFF_EXT<TV,VEC>& a,TV v)
-{return Make_Diff_Vec(v*a.x,Outer_Product(v,a.dx),Tensor_Product_0);}
+{return Make_Diff_Vec(v*a.x,Outer_Product(v,a.dx));}
 
 template<class TV,class VEC> inline decltype(AUTO_DIFF_EXT<TV,VEC>()*TV())
 operator*(TV v,const AUTO_DIFF_EXT<TV,VEC>& a)

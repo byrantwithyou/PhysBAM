@@ -56,12 +56,12 @@ HESSIAN_VEC<TV,decltype(MAT_SYM_TENSOR_PRODUCT_12::Type(VEC(),VEC1()))> Symmetri
 {HESSIAN_VEC<TV,decltype(MAT_SYM_TENSOR_PRODUCT_12::Type(VEC(),VEC1()))> r;MAT_SYM_TENSOR_PRODUCT_12()(r.x,gv.x,g.x);return r;}
 
 template<class TV,class MAT,class TV2>
-typename ENABLE_IF<IS_VECTOR<TV2>::value,HESSIAN<TV,decltype(MAT_CONTRACT_0::Type(MAT(),TV2()))> >::TYPE Contract_0(const HESSIAN_VEC<TV,MAT>& h,const TV2& v)
-{HESSIAN<TV,decltype(MAT_CONTRACT_0::Type(MAT(),TV2()))> r;MAT_CONTRACT_0()(r.x,h.x,v);return r;}
+typename ENABLE_IF<IS_VECTOR<TV2>::value,HESSIAN<TV,decltype(MAT_CONTRACT_0V::Type(MAT(),TV2()))> >::TYPE Contract_0(const HESSIAN_VEC<TV,MAT>& h,const TV2& v)
+{HESSIAN<TV,decltype(MAT_CONTRACT_0V::Type(MAT(),TV2()))> r;MAT_CONTRACT_0V()(r.x,h.x,v);return r;}
 
 template<class TV,class MAT,class T_MAT>
-typename ENABLE_IF<IS_MATRIX<T_MAT>::value,HESSIAN_VEC<TV,decltype(MAT_CONTRACT_0::Type(MAT(),T_MAT()))> >::TYPE Contract_0(const HESSIAN_VEC<TV,MAT>& h,const T_MAT& v)
-{HESSIAN_VEC<TV,decltype(MAT_CONTRACT_0::Type(MAT(),T_MAT()))> r;MAT_CONTRACT_0()(r.x,h.x,v);return r;}
+typename ENABLE_IF<IS_MATRIX<T_MAT>::value,HESSIAN_VEC<TV,decltype(MAT_CONTRACT_0M::Type(MAT(),T_MAT()))> >::TYPE Contract_0(const HESSIAN_VEC<TV,MAT>& h,const T_MAT& v)
+{HESSIAN_VEC<TV,decltype(MAT_CONTRACT_0M::Type(MAT(),T_MAT()))> r;MAT_CONTRACT_0M()(r.x,h.x,v);return r;}
 
 template<class TV,class VEC,class VEC1>
 HESSIAN_VEC<TV,decltype(MAT_SYM_DOUBLE_CONTRACT_12::Type(VEC(),VEC1(),PERMUTATION_TENSOR<typename TV::SCALAR>()))> 
