@@ -422,12 +422,20 @@ public:
     {for(int i=0;i<Rows();i++) (*this)(i,j)=a(i);}
 
     template<class T_VECTOR>
+    void Add_Column(const int j,const ARRAY_BASE<T,T_VECTOR>& a)
+    {for(int i=0;i<Rows();i++) (*this)(i,j)+=a(i);}
+
+    template<class T_VECTOR>
     void Get_Column(const int j,ARRAY_BASE<T,T_VECTOR>& a) const
     {for(int i=0;i<Rows();i++) a(i)=(*this)(i,j);}
 
     template<class T_VECTOR>
     void Set_Row(const int i,const ARRAY_BASE<T,T_VECTOR>& a)
     {for(int j=0;j<Columns();j++) (*this)(i,j)=a(j);}
+
+    template<class T_VECTOR>
+    void Add_Row(const int i,const ARRAY_BASE<T,T_VECTOR>& a)
+    {for(int j=0;j<Columns();j++) (*this)(i,j)+=a(j);}
 
     template<class T_VECTOR>
     void Get_Row(const int i,ARRAY_BASE<T,T_VECTOR>& a) const

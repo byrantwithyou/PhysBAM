@@ -89,11 +89,17 @@ public:
     void Set_Column(const int j,const VECTOR<T,1>& v)
     {assert(j==0);x00=v.x;}
 
+    void Add_Column(const int j,const VECTOR<T,1>& v)
+    {assert(j==0);x00+=v.x;}
+
     VECTOR<T,1> Row(const int j) const
     {assert(j==0);return VECTOR<T,1>(x00);}
 
     void Set_Row(const int j,const VECTOR<T,1>& v)
     {assert(j==0);x00=v.x;}
+
+    void Add_Row(const int j,const VECTOR<T,1>& v)
+    {assert(j==0);x00+=v.x;}
 
     bool operator==(const MATRIX& A) const
     {return x00==A.x00;}
@@ -297,6 +303,9 @@ public:
 
     MATRIX Symmetric_Part() const
     {return *this;}
+
+    SYMMETRIC_MATRIX<T,1> Twice_Symmetric_Part() const
+    {return SYMMETRIC_MATRIX<T,1>(x00*2);}
 
     VECTOR<T,1> To_Vector() const
     {return VECTOR<T,1>(x00);}

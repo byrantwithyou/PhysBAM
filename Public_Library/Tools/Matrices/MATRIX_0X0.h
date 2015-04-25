@@ -62,10 +62,16 @@ public:
     void Set_Column(const int i,const VECTOR<T,0>& )
     {PHYSBAM_FATAL_ERROR();}
 
+    void Add_Column(const int i,const VECTOR<T,0>& )
+    {PHYSBAM_FATAL_ERROR();}
+
     VECTOR<T,0> Row(const int i) const
     {PHYSBAM_FATAL_ERROR();}
 
     void Set_Row(const int i,const VECTOR<T,0>& )
+    {PHYSBAM_FATAL_ERROR();}
+
+    void Add_Row(const int i,const VECTOR<T,0>& )
     {PHYSBAM_FATAL_ERROR();}
 
     bool Valid_Index(const int i,const int j) const

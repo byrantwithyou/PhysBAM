@@ -51,6 +51,24 @@ public:
         transpose=MATRIX<T,3,2>(v1.x,v2.x,v3.x,v1.y,v2.y,v3.y);
     }
 
+    VECTOR<T,2> Column(const int j) const
+    {return transpose.Row(j);}
+
+    void Set_Column(const int j,const VECTOR<T,2>& v)
+    {transpose.Set_Row(j,v);}
+
+    void Add_Column(const int j,const VECTOR<T,2>& v)
+    {transpose.Add_Row(j,v);}
+
+    VECTOR<T,3> Row(const int j) const
+    {return transpose.Column(j);}
+
+    void Set_Row(const int j,const VECTOR<T,3>& v)
+    {transpose.Set_Column(j,v);}
+
+    void Add_Row(const int j,const VECTOR<T,3>& v)
+    {transpose.Add_Column(j,v);}
+
     void Fast_Singular_Value_Decomposition(MATRIX<T,2>& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX<T,3,2>& V) const
     {transpose.Fast_Singular_Value_Decomposition(V,singular_values,U);}
 

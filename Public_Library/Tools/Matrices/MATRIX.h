@@ -80,7 +80,19 @@ public:
     {assert((unsigned)j<n);VECTOR<T,m> r;for(int i=0;i<m;i++) r(i)=x[m*j+i];return r;}
 
     void Set_Column(const int j,const VECTOR<T,m>& v)
-    {assert((unsigned)j<n);VECTOR<T,m> r;for(int i=0;i<m;i++) x[m*j+i]=v(i);}
+    {assert((unsigned)j<n);for(int i=0;i<m;i++) x[m*j+i]=v(i);}
+
+    void Add_Column(const int j,const VECTOR<T,m>& v)
+    {assert((unsigned)j<n);for(int i=0;i<m;i++) x[m*j+i]+=v(i);}
+
+    VECTOR<T,n> Row(const int j) const
+    {assert((unsigned)j<m);VECTOR<T,n> r;for(int i=0;i<n;i++) r(i)=(*this)(j,i);return r;}
+
+    void Set_Row(const int j,const VECTOR<T,n>& v)
+    {assert((unsigned)j<m);for(int i=0;i<n;i++) (*this)(j,i)=v(i);}
+
+    void Add_Row(const int j,const VECTOR<T,n>& v)
+    {assert((unsigned)j<m);for(int i=0;i<n;i++) (*this)(j,i)+=v(i);}
 
     bool operator==(const MATRIX& A) const
     {for(int i=0;i<size;i++) if(x[i]!=A.x[i]) return false;return true;}

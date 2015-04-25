@@ -76,11 +76,17 @@ public:
     void Set_Column(const int j,const VECTOR<T,4>& v)
     {assert((unsigned)j<4);x[4*j]=v(0);x[4*j+1]=v(1);x[4*j+2]=v(2);x[4*j+3]=v(3);}
 
+    void Add_Column(const int j,const VECTOR<T,4>& v)
+    {assert((unsigned)j<4);x[4*j]+=v(0);x[4*j+1]+=v(1);x[4*j+2]+=v(2);x[4*j+3]+=v(3);}
+
     VECTOR<T,4> Row(const int j) const
     {assert((unsigned)j<4);return VECTOR<T,4>(x[j],x[j+4],x[j+8],x[j+12]);}
 
     void Set_Row(const int j,const VECTOR<T,4>& v)
     {assert((unsigned)j<4);x[j]=v(0);x[j+4]=v(1);x[j+8]=v(2);x[j+12]=v(3);}
+
+    void Add_Row(const int j,const VECTOR<T,4>& v)
+    {assert((unsigned)j<4);x[j]+=v(0);x[j+4]+=v(1);x[j+8]+=v(2);x[j+12]+=v(3);}
 
     bool operator==(const MATRIX& A) const
     {for(int i=0;i<16;i++) if(x[i]!=A.x[i]) return false;return true;}
