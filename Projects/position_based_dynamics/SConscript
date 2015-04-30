@@ -1,0 +1,5 @@
+# SConscript
+
+Import('env Automatic_Program')
+env=env.Copy(USE_GEOMETRY=1)
+Automatic_Program(env,"pbd",["main.cpp","STANDARD_TESTS_BASE.cpp","STANDARD_TESTS_2D.cpp","STANDARD_TESTS_3D.cpp","PBD_DRIVER.cpp","PBD_EXAMPLE.cpp","PBD_CONSTRAINTS.cpp"])
