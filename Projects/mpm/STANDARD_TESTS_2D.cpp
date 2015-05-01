@@ -150,7 +150,7 @@ Initialize()
             particles.Delete_Elements_On_Deletion_List();
             Add_Neo_Hookean(0.073e9*scale_E,0.4);
         } break;
-        case 8:{ // collision an elastic cylinder
+        case 8:{ // collision an elastic cylinder (TODO: fix description.)
             if(!user_resolution) resolution=10;
             grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
             Add_Walls(-1,false,.3,.1);
@@ -163,7 +163,7 @@ Initialize()
             Add_Neo_Hookean(scale_E,0.425);
             Add_Gravity(TV(0,-1.8));
         } break;
-        case 9:{ // collision an elastic cylinder
+        case 9:{ // collision an elastic cylinder (TODO: fix description.)
             if(!user_resolution) resolution=10;
             grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
             Add_Walls(-1,false,.3,.1);
@@ -180,6 +180,29 @@ Initialize()
             TRIANGULATED_AREA<T>& new_ta=Seed_Lagrangian_Particles(*ta,[=](const TV& X){return TV(-3.0,0);},
                 [=](const TV&){return MATRIX<T,2>();},density,true);
             Add_Neo_Hookean(new_ta,scale_E,0.425);
+
+            Add_Gravity(TV(0,-1.8));
+        } break;
+        case 10:{ // mpm projectile vs end-holded wall
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            Add_Walls(-1,false,.3,.1);
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(.45,.75),TV(.65,.85))),true,0});
+            collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(.45,.15),TV(.65,.25))),true,0});
+            {SPHERE<TV> sphere(TV(.2,.5),.06);
+                T density=2*scale_mass;
+                Seed_Particles(sphere,[=](const TV& X){return TV(1,0);},[=](const TV&){return MATRIX<T,2>();},
+                    density,particles_per_cell);
+                ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
+                Add_Fixed_Corotated(20*scale_E,0.3,&foo);}
+            int N_sphere_particles=particles.number;
+            {RANGE<TV> box(TV(.5,.2),TV(.6,.8));
+                T density=1*scale_mass;
+                Seed_Particles(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},
+                    density,particles_per_cell);
+                int N_box_particles=particles.number-N_sphere_particles;
+                ARRAY<int> foo(N_box_particles);
+                for(int k=0;k<foo.m;k++) foo(k)=k+N_sphere_particles;
+                Add_Fixed_Corotated(1*scale_E,0.3,&foo);}
 
             Add_Gravity(TV(0,-1.8));
         } break;
