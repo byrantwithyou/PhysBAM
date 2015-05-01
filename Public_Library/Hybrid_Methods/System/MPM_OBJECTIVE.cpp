@@ -180,7 +180,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
 template<class TV> void MPM_OBJECTIVE<TV>::
 Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep) const
 {
-    if(!system.collisions.m) return;
+    if(!system.collisions.m && !system.stuck_nodes.m) return;
     MPM_KRYLOV_VECTOR<TV>& g=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(Bg);
     g.u.array.Subset(system.stuck_nodes).Fill(TV());
 
