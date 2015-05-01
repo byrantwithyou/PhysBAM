@@ -9,10 +9,8 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> PARTICLE_GRID_WEIGHTS<TV>::
 PARTICLE_GRID_WEIGHTS(int threads)
-    :thread_scratch(threads),use_gradient_transfer(false),constant_scalar_inertia_tensor(false)
+    :use_gradient_transfer(false),constant_scalar_inertia_tensor(false)
 {
-    for(int i=0;i<threads;i++)
-        thread_scratch(i)=new SCRATCH;
 }
 //#####################################################################
 // Destructor
@@ -20,7 +18,6 @@ PARTICLE_GRID_WEIGHTS(int threads)
 template<class TV> PARTICLE_GRID_WEIGHTS<TV>::
 ~PARTICLE_GRID_WEIGHTS()
 {
-    thread_scratch.Delete_Pointers_And_Clean_Memory();
 }
 template class PARTICLE_GRID_WEIGHTS<VECTOR<float,2> >;
 template class PARTICLE_GRID_WEIGHTS<VECTOR<float,3> >;

@@ -25,7 +25,9 @@
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
 #include <boost/function.hpp>
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 using namespace PhysBAM;
 namespace{
     template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
@@ -89,12 +91,20 @@ Initialize()
     rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
     objective.system.tmp.u.Resize(example.grid.Domain_Indices(example.ghost));
 
-    int i=0;
-    example.location.Resize(example.grid.Domain_Indices(example.ghost));
-    for(CELL_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next())
-        example.location.array(i++)=it.Location();
+    RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
+    example.location.Resize(range,false,false);
+#pragma omp parallel for
+    for(int t=0;t<example.threads;t++){
+        int a=(range.max_corner.x-range.min_corner.x)*t/example.threads+range.min_corner.x;
+        int b=(range.max_corner.x-range.min_corner.x)*(t+1)/example.threads+range.min_corner.x;
+        RANGE<TV_INT> local_range(range);
+        local_range.max_corner.x=a;
+        int i=local_range.Size();
+        local_range.min_corner.x=a;
+        local_range.max_corner.x=b;
+        for(RANGE_ITERATOR<TV::m> it(local_range);it.Valid();it.Next())
+            example.location.array(i++)=example.grid.Center(it.index);}
 
-    example.gather_scatter.Initialize(example.grid);
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
 }
@@ -109,7 +119,7 @@ Advance_One_Time_Step()
     Print_Particle_Stats("particle state",example.dt,example.velocity,0);
     Update_Simulated_Particles();
     Update_Particle_Weights();
-    example.gather_scatter.Prepare_Scatter(example.particles,example.grid);
+    example.gather_scatter.Prepare_Scatter(example.particles);
     Particle_To_Grid();
     Print_Grid_Stats("after particle to grid",example.dt,example.velocity,0);
     Print_Energy_Stats("after particle to grid",example.velocity);
@@ -200,8 +210,8 @@ Particle_To_Grid()
     example.velocity.array.Fill(TV());
     if(example.weights->use_gradient_transfer)
     {
-        example.gather_scatter.Scatter(
-            [this,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid)
+        example.gather_scatter.template Scatter<int>(
+            [this,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
             {
                 example.mass(it.Index())+=it.Weight()*particles.mass(p);
                 example.velocity(it.Index())+=particles.mass(p)*(it.Weight()*particles.V(p)+particles.B(p)*it.Gradient());
@@ -210,8 +220,8 @@ Particle_To_Grid()
     else if(example.weights->constant_scalar_inertia_tensor)
     {
         T Dp_inverse=example.weights->Constant_Scalar_Inverse_Dp();
-        example.gather_scatter.Scatter(
-            [this,Dp_inverse,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid)
+        example.gather_scatter.template Scatter<int>(
+            [this,Dp_inverse,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
             {
                 example.mass(it.Index())+=it.Weight()*particles.mass(p);
                 TV V=particles.V(p);
@@ -237,9 +247,6 @@ Grid_To_Particle()
     MPM_PARTICLES<TV>& particles=example.particles;
     T dt=example.dt;
 
-#ifdef USE_OPENMP
-    omp_set_num_threads(example.gather_scatter.threads);
-#endif
 #pragma omp parallel for
     for(int tid=0;tid<example.gather_scatter.threads;++tid){
         int a=example.simulated_particles.m*tid/example.gather_scatter.threads;
@@ -285,8 +292,7 @@ Grid_To_Particle()
                     particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
                     particles.B(p)=B;
 
-                    if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;
-        }}
+                    if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}}
 }
 //#####################################################################
 // Function Apply_Forces
@@ -300,6 +306,7 @@ Apply_Forces()
     if(example.use_forward_euler){
         objective.tmp2*=0;
         example.Add_Forces(objective.tmp2.u,example.time);
+#pragma omp parallel for
         for(int i=0;i<example.valid_grid_indices.m;i++){
             int p=example.valid_grid_indices(i);
             dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}}
@@ -323,6 +330,7 @@ Apply_Forces()
     Apply_Friction();
     objective.Restore_F();
 
+#pragma omp parallel for
     for(int i=0;i<example.valid_grid_indices.m;i++){
         int j=example.valid_grid_indices(i);
         example.velocity_new.array(j)=dv.u.array(j)+objective.v0.u.array(j);}
@@ -386,6 +394,7 @@ template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
 Max_Particle_Speed() const
 {
     T v2=0;
+#pragma omp parallel for reduction(max:v2)
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);
         v2=max(v2,example.particles.V(p).Magnitude_Squared());}
@@ -400,6 +409,7 @@ Grid_V_Upper_Bound() const
     if(!example.use_affine || !example.weights->constant_scalar_inertia_tensor) return Max_Particle_Speed();
     T result=0;
     T ksi=(T)6*sqrt((T)TV::m)*example.grid.One_Over_DX().Min();
+#pragma omp parallel for reduction(max:result)
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);
         result=max(result,example.particles.V(p).Magnitude()+example.particles.B(p).Frobenius_Norm()*ksi);}

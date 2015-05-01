@@ -9,13 +9,6 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> PARTICLE_GRID_ITERATOR<TV>::
-PARTICLE_GRID_ITERATOR(const PARTICLE_GRID_WEIGHTS<TV>* weights,int p,bool want_gradient,int thread)
-    :scratch(*weights->thread_scratch(thread)),i(0)
-{
-    weights->Compute(p,scratch,want_gradient);
-}
-
-template<class TV> PARTICLE_GRID_ITERATOR<TV>::
 PARTICLE_GRID_ITERATOR(const PARTICLE_GRID_WEIGHTS<TV>* weights,int p,bool want_gradient,SCRATCH& scratch)
     :scratch(scratch),i(0)
 {

@@ -7,6 +7,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_SYSTEM.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
@@ -80,6 +81,7 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
         MPM_KRYLOV_VECTOR<TV>& gg=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(*g);
         tmp2*=0;
         system.example.Add_Forces(tmp2.u,system.example.time);
+#pragma omp parallel for
         for(int i=0;i<system.example.valid_grid_indices.m;i++){
             int p=system.example.valid_grid_indices(i);
             gg.u.array(p)=(dv.u.array(p)-dt/system.example.mass.array(p)*tmp2.u.array(p))*midpoint_factor;}}
@@ -90,17 +92,31 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
 template<class TV> void MPM_OBJECTIVE<TV>::
 Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
 {
-    for(int k=0;k<system.example.simulated_particles.m;k++){
-        int p=system.example.simulated_particles(k);
+    struct HELPER
+    {
         MATRIX<T,TV::m> grad_Vp;
         TV Vp,Vn_interpolate;
-        for(PARTICLE_GRID_ITERATOR<TV> it(system.example.weights,p,true,0);it.Valid();it.Next()){
-            Vp+=it.Weight()*v.u(it.Index());
-            Vn_interpolate+=it.Weight()*v0.u(it.Index());
-            grad_Vp+=MATRIX<T,TV::m>::Outer_Product(v.u(it.Index()),it.Gradient());}
-        system.example.particles.F(p)=F0(k)+system.example.dt/(system.example.use_midpoint+1)*grad_Vp*F0(k);
-        if(system.example.use_midpoint) system.example.particles.X(p)=X0(k)+system.example.dt/2*(Vp+Vn_interpolate);
-        else system.example.particles.X(p)=X0(k)+system.example.dt*Vp;}
+    };
+
+    system.example.gather_scatter.template Gather<HELPER>(
+        [](int p,HELPER& h)
+        {
+            h.grad_Vp=MATRIX<T,TV::m>();
+            h.Vp=TV();
+            h.Vn_interpolate=TV();
+        },
+        [this,&v](int p,const PARTICLE_GRID_ITERATOR<TV>& it,HELPER& h)
+        {
+            h.Vp+=it.Weight()*v.u(it.Index());
+            h.Vn_interpolate+=it.Weight()*v0.u(it.Index());
+            h.grad_Vp+=MATRIX<T,TV::m>::Outer_Product(v.u(it.Index()),it.Gradient());
+        },
+        [this](int p,HELPER& h)
+        {
+            system.example.particles.F(p)=F0(p)+system.example.dt/(system.example.use_midpoint+1)*h.grad_Vp*F0(p);
+            if(system.example.use_midpoint) system.example.particles.X(p)=X0(p)+system.example.dt/2*(h.Vp+h.Vn_interpolate);
+            else system.example.particles.X(p)=X0(p)+system.example.dt*h.Vp;
+        },true);
 }
 //#####################################################################
 // Function Compute
@@ -108,10 +124,11 @@ Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
 template<class TV> void MPM_OBJECTIVE<TV>::
 Restore_F() const
 {
+#pragma omp parallel for
     for(int k=0;k<system.example.simulated_particles.m;k++){
         int p=system.example.simulated_particles(k);
-        system.example.particles.F(p)=F0(k);
-        system.example.particles.X(p)=X0(k);}
+        system.example.particles.F(p)=F0(p);
+        system.example.particles.X(p)=X0(p);}
 }
 //#####################################################################
 // Function Adjust_For_Collision
@@ -124,6 +141,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
     system.collisions.Remove_All();
     T midpoint_scale=system.example.use_midpoint?(T).5:1;
 
+    // TODO: parallelize
     for(int k=0;k<system.example.valid_grid_indices.m;k++){
         int i=system.example.valid_grid_indices(k);
         TV V=v0.u.array(i)+midpoint_scale*dv.u.array(i);
@@ -165,14 +183,20 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep)
     if(!system.collisions.m) return;
     MPM_KRYLOV_VECTOR<TV>& g=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(Bg);
     g.u.array.Subset(system.stuck_nodes).Fill(TV());
-    for(int i=system.collisions.m-1;i>=0;i--){
+
+#pragma omp parallel for
+    for(int i=0;i<system.collisions.m;i++){
         COLLISION& c=system.collisions(i);
         TV &gv=g.u.array(c.p);
         c.n_dE=gv.Dot(c.n);
-        if(allow_sep && c.n_dE<0) system.collisions.Remove_Index_Lazy(i);
-        else{
+        if(!allow_sep || c.n_dE>=0){
             c.H_dE=c.H*gv;
             gv-=c.n_dE*c.n+c.phi*c.H_dE;}}
+
+    for(int i=system.collisions.m-1;i>=0;i--){
+        COLLISION& c=system.collisions(i);
+        if(allow_sep && c.n_dE<0)
+            system.collisions.Remove_Index_Lazy(i);}
 }
 //#####################################################################
 // Function Make_Feasible
@@ -208,12 +232,13 @@ Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance) const
 template<class TV> void MPM_OBJECTIVE<TV>::
 Reset()
 {
-    F0.Resize(system.example.simulated_particles.m);
-    X0.Resize(system.example.simulated_particles.m);
+    F0.Resize(system.example.particles.X.m);
+    X0.Resize(system.example.particles.X.m);
+#pragma omp parallel for
     for(int k=0;k<system.example.simulated_particles.m;k++){
         int p=system.example.simulated_particles(k);
-        F0(k)=system.example.particles.F(p);
-        X0(k)=system.example.particles.X(p);}
+        F0(p)=system.example.particles.F(p);
+        X0(p)=system.example.particles.X(p);}
 
     v0.u=system.example.velocity;
     v1.u.Resize(v0.u.domain);

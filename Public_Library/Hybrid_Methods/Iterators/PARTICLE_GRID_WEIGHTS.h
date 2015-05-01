@@ -17,7 +17,6 @@ class PARTICLE_GRID_WEIGHTS
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH SCRATCH;
 public:
-    mutable ARRAY<SCRATCH*> thread_scratch;
     bool use_gradient_transfer;
     bool constant_scalar_inertia_tensor;
 

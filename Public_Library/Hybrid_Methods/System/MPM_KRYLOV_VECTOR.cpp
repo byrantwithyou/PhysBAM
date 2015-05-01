@@ -26,7 +26,10 @@ template<class TV> MPM_KRYLOV_VECTOR<TV>::
 template<class TV> const MPM_KRYLOV_VECTOR<TV>& MPM_KRYLOV_VECTOR<TV>::
 operator= (const MPM_KRYLOV_VECTOR& bv)
 {
-    u.array.Subset(valid_indices)=bv.u.array.Subset(valid_indices);
+#pragma omp parallel for
+    for(int k=0;k<valid_indices.m;k++){
+        int i=valid_indices(k);
+        u.array(i)=bv.u.array(i);}
     return *this;
 }
 //#####################################################################
@@ -35,7 +38,11 @@ operator= (const MPM_KRYLOV_VECTOR& bv)
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& MPM_KRYLOV_VECTOR<TV>::
 operator+=(const KRYLOV_VECTOR_BASE<T>& bv)
 {
-    u.array.Subset(valid_indices)+=debug_cast<const MPM_KRYLOV_VECTOR&>(bv).u.array.Subset(valid_indices);
+    const MPM_KRYLOV_VECTOR& v=debug_cast<const MPM_KRYLOV_VECTOR&>(bv);
+#pragma omp parallel for
+    for(int k=0;k<valid_indices.m;k++){
+        int i=valid_indices(k);
+        u.array(i)+=v.u.array(i);}
     return *this;
 }
 //#####################################################################
@@ -44,7 +51,11 @@ operator+=(const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& MPM_KRYLOV_VECTOR<TV>::
 operator-=(const KRYLOV_VECTOR_BASE<T>& bv)
 {
-    u.array.Subset(valid_indices)-=debug_cast<const MPM_KRYLOV_VECTOR&>(bv).u.array.Subset(valid_indices);
+    const MPM_KRYLOV_VECTOR& v=debug_cast<const MPM_KRYLOV_VECTOR&>(bv);
+#pragma omp parallel for
+    for(int k=0;k<valid_indices.m;k++){
+        int i=valid_indices(k);
+        u.array(i)-=v.u.array(i);}
     return *this;
 }
 //#####################################################################
@@ -53,7 +64,10 @@ operator-=(const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& MPM_KRYLOV_VECTOR<TV>::
 operator*=(const T a)
 {
-    u.array.Subset(valid_indices)*=a;
+#pragma omp parallel for
+    for(int k=0;k<valid_indices.m;k++){
+        int i=valid_indices(k);
+        u.array(i)*=a;}
     return *this;
 }
 //#####################################################################
@@ -62,7 +76,11 @@ operator*=(const T a)
 template<class TV> void MPM_KRYLOV_VECTOR<TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 {
-    u.array.Subset(valid_indices)=c*debug_cast<const MPM_KRYLOV_VECTOR&>(bv).u.array.Subset(valid_indices);
+    const MPM_KRYLOV_VECTOR& v=debug_cast<const MPM_KRYLOV_VECTOR&>(bv);
+#pragma omp parallel for
+    for(int k=0;k<valid_indices.m;k++){
+        int i=valid_indices(k);
+        u.array(i)=c*v.u.array(i);}
 }
 //#####################################################################
 // Function Copy
@@ -70,8 +88,12 @@ Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> void MPM_KRYLOV_VECTOR<TV>::
 Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2)
 {
-    u.array.Subset(valid_indices)=c1*debug_cast<const MPM_KRYLOV_VECTOR&>(bv1).u.array.Subset(valid_indices)+
-        debug_cast<const MPM_KRYLOV_VECTOR&>(bv2).u.array.Subset(valid_indices);
+    const MPM_KRYLOV_VECTOR& v1=debug_cast<const MPM_KRYLOV_VECTOR&>(bv1);
+    const MPM_KRYLOV_VECTOR& v2=debug_cast<const MPM_KRYLOV_VECTOR&>(bv2);
+#pragma omp parallel for
+    for(int k=0;k<valid_indices.m;k++){
+        int i=valid_indices(k);
+        u.array(i)=c1*v1.u.array(i)+v2.u.array(i);}
 }
 //#####################################################################
 // Function Raw_Size

@@ -41,6 +41,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
     example.Add_Hessian_Times(F.u,tmp.u,example.time);
     T scale=example.use_midpoint?(T).25:1,scaled_dt_squared=sqr(example.dt*scale);
 
+#pragma omp parallel for
     for(int k=0;k<example.valid_grid_indices.m;k++){
         int i=example.valid_grid_indices(k);
         F.u.array(i)=scaled_dt_squared/example.mass.array(i)*F.u.array(i)+tmp.u.array(i)*scale;}
@@ -60,9 +61,13 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
     const MPM_KRYLOV_VECTOR<TV>& X=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(x);
     const MPM_KRYLOV_VECTOR<TV>& Y=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(y);
     T r=0;
-    for(int k=0;k<example.valid_grid_indices.m;k++){
-        int i=example.valid_grid_indices(k);
-        r+=example.mass.array(i)*X.u.array(i).Dot(Y.u.array(i));}
+#pragma omp parallel for reduction(+:r)
+    for(int t=0;t<example.threads;t++){
+        int a=t*example.valid_grid_indices.m/example.threads;
+        int b=(t+1)*example.valid_grid_indices.m/example.threads;
+        for(int k=a;k<b;k++){
+            int i=example.valid_grid_indices(k);
+            r+=example.mass.array(i)*X.u.array(i).Dot(Y.u.array(i));}}
     return r;
 }
 //#####################################################################
