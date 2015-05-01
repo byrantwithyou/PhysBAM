@@ -6,6 +6,9 @@ To be implemented:
 
 * Plasticity
 
+* Should be able to handle moving collision objects with constrants
+
+* Penalty collisions for moving collision objects
 
 To be debugged:
 
