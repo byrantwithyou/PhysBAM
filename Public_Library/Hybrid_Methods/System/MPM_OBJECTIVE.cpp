@@ -140,6 +140,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
     MPM_KRYLOV_VECTOR<TV>& dv=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(Bdv);
     system.collisions.Remove_All();
     T midpoint_scale=system.example.use_midpoint?(T).5:1;
+    system.stuck_nodes.Remove_All();
 
     // TODO: parallelize
     for(int k=0;k<system.example.valid_grid_indices.m;k++){
@@ -150,23 +151,31 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
         T deepest_phi=collision_thickness;
         int deepest_index=-1;
         IMPLICIT_OBJECT<TV>* deepest_io=0;
+        bool stuck=false;
         if(int* object_index=system.forced_collisions.Get_Pointer(i)){
             deepest_index=*object_index;
             deepest_io=system.example.collision_objects(deepest_index).io;
             T phi0=deepest_io->Extended_Phi(X0),phi=deepest_io->Extended_Phi(X);
-            if(phi0<0) phi-=phi0;
+            if(phi0<0){
+                phi-=phi0;
+                if(system.example.collision_objects(deepest_index).sticky)
+                    stuck=true;}
             deepest_phi=phi;}
-        for(int j=0;j<system.example.collision_objects.m;j++){
+        for(int j=0;j<system.example.collision_objects.m && !stuck;j++){
             IMPLICIT_OBJECT<TV>* io=system.example.collision_objects(j).io;
             T phi0=io->Extended_Phi(X0),phi=io->Extended_Phi(X);
-            if(phi0<0) phi-=phi0;
-            if(phi<deepest_phi){
+            if(phi0<0){
+                phi-=phi0;
+                if(system.example.collision_objects(deepest_index).sticky)
+                    stuck=true;}
+            if(phi<deepest_phi || stuck){
                 deepest_phi=phi;
                 deepest_io=io;
                 deepest_index=j;}}
         if(deepest_index==-1) continue;
-        if(system.example.collision_objects(deepest_index).sticky){
+        if(stuck){
             system.stuck_nodes.Append(i);
+            dv.u.array(i)=-v0.u.array(i)/midpoint_scale; // Come to rest
             continue;}
         COLLISION c={deepest_index,i,deepest_phi,0,deepest_io->Extended_Normal(X),TV(),deepest_io->Hessian(X)};
         system.collisions.Append(c);

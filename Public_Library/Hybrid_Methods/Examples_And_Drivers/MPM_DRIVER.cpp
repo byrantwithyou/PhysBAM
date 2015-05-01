@@ -206,8 +206,12 @@ Particle_To_Grid()
 {
     MPM_PARTICLES<TV>& particles=example.particles;
 
-    example.mass.array.Fill(0);
-    example.velocity.array.Fill(TV());
+#pragma parallel for
+    for(int i=0;i<example.mass.array.m;i++){
+        example.mass.array(i)=0;
+        example.velocity.array(i)=TV();
+        example.velocity_new.array(i)=TV();}
+
     if(example.weights->use_gradient_transfer)
     {
         example.gather_scatter.template Scatter<int>(
@@ -334,6 +338,7 @@ Apply_Forces()
     for(int i=0;i<example.valid_grid_indices.m;i++){
         int j=example.valid_grid_indices(i);
         example.velocity_new.array(j)=dv.u.array(j)+objective.v0.u.array(j);}
+    example.velocity_new.array.Subset(objective.system.stuck_nodes).Fill(TV());
 }
 //#####################################################################
 // Function Perform_Particle_Collision
