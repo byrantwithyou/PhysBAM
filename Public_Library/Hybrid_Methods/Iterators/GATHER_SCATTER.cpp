@@ -33,7 +33,7 @@ template<class TV> void GATHER_SCATTER<TV>::
 Prepare_Scatter(const MPM_PARTICLES<TV>& particles)
 {
     if(threads<2) return;
-    int min_width=(weights->Order()+1)/2;/(min_width*partitions));
+    int min_width=(weights->Order()+1)/2;
     ARRAY<int> counts(grid.numbers_of_cells.x),sum_counts(grid.numbers_of_cells.x);
     for(int k=0;k<simulated_particles.m;++k){
         int p=simulated_particles(k);
