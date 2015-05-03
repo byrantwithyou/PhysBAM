@@ -43,7 +43,7 @@ public:
     void Particle_To_Grid();
     void Grid_To_Particle();
     void Apply_Forces();
-    void Perform_Particle_Collision(int p);
+    void Perform_Particle_Collision(int p,T time);
     void Apply_Friction();
     T Compute_Dt() const;
     T Max_Particle_Speed() const;

@@ -36,6 +36,7 @@ public:
     using BASE::newton_iterations;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::test_diff;using BASE::threads;using BASE::weights;
     using BASE::Add_Force;using BASE::Set_Weights;using BASE::deformable_body_collection;
+    using BASE::Add_Collision_Object;
 
     int test_number;
     int resolution;

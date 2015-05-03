@@ -185,7 +185,7 @@ Add_Walls(int flags,bool sticky,T friction,T inset) // -x +x -y +y [ -z +z ], as
                 RANGE<TV> wall=range;
                 if(s) wall.max_corner(a)=grid.domain.min_corner(a)+inset;
                 else wall.min_corner(a)=grid.domain.max_corner(a)-inset;
-                collision_objects.Append({new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(wall),sticky,friction});}
+                Add_Collision_Object(wall,sticky,friction);}
 }
 //#####################################################################
 // Function Seed_Lagrangian_Particles

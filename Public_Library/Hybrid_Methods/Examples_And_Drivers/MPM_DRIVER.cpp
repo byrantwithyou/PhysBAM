@@ -292,7 +292,7 @@ Grid_To_Particle()
                             +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));}
 
                     particles.V(p)=V_pic;
-                    Perform_Particle_Collision(p);
+                    Perform_Particle_Collision(p,example.time+example.dt);
                     if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
                     else particles.X(p)+=particles.V(p)*dt;
                     particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
@@ -340,22 +340,22 @@ Apply_Forces()
     for(int i=0;i<example.valid_grid_indices.m;i++){
         int j=example.valid_grid_indices(i);
         example.velocity_new.array(j)=dv.u.array(j)+objective.v0.u.array(j);}
-    example.velocity_new.array.Subset(objective.system.stuck_nodes).Fill(TV());
+    example.velocity_new.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
 }
 //#####################################################################
 // Function Perform_Particle_Collision
 //#####################################################################
 template<class TV> void MPM_DRIVER<TV>::
-Perform_Particle_Collision(int p)
+Perform_Particle_Collision(int p,T time)
 {
     if(!example.use_particle_collision) return;;
     for(int i=0;i<example.collision_objects.m;i++){
         TV X=example.particles.X(p);
-        IMPLICIT_OBJECT<TV>* io=example.collision_objects(i).io;
-        T phi=io->Extended_Phi(X);
+        MPM_COLLISION_OBJECT<TV>* io=example.collision_objects(i);
+        T phi=io->Phi(X,time);
         if(phi>=0) continue;
-        if(example.collision_objects(i).sticky) return;
-        X-=phi*io->Normal(X);
+        if(example.collision_objects(i)->sticky) return;
+        X-=phi*io->Normal(X,time);
         example.particles.X(p)=X;}
 }
 //#####################################################################
@@ -377,7 +377,7 @@ Apply_Friction()
         T normal_force=TV::Dot_Product(c.n,objective.tmp0.u.array(c.p)-objective.tmp1.u.array(c.p));
         TV t=v.Projected_Orthogonal_To_Unit_Direction(c.n);
         T t_mag=t.Normalize();
-        T coefficient_of_friction=example.collision_objects(c.object).friction;
+        T coefficient_of_friction=example.collision_objects(c.object)->friction;
         T k=coefficient_of_friction*normal_force/example.mass.array(c.p);
         if(t_mag<=k)
             v.Project_On_Unit_Direction(c.n);

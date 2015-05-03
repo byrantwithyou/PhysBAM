@@ -141,6 +141,9 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
     system.collisions.Remove_All();
     T midpoint_scale=system.example.use_midpoint?(T).5:1;
     system.stuck_nodes.Remove_All();
+    system.stuck_velocity.Remove_All();
+    T t0=system.example.time;
+    T t1=t0+system.example.dt;
 
     // TODO: parallelize
     for(int k=0;k<system.example.valid_grid_indices.m;k++){
@@ -150,23 +153,23 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
         TV X=X0+system.example.dt*V;
         T deepest_phi=collision_thickness;
         int deepest_index=-1;
-        IMPLICIT_OBJECT<TV>* deepest_io=0;
+        MPM_COLLISION_OBJECT<TV>* deepest_io=0;
         bool stuck=false;
         if(int* object_index=system.forced_collisions.Get_Pointer(i)){
             deepest_index=*object_index;
-            deepest_io=system.example.collision_objects(deepest_index).io;
-            T phi0=deepest_io->Extended_Phi(X0),phi=deepest_io->Extended_Phi(X);
+            deepest_io=system.example.collision_objects(deepest_index);
+            T phi0=deepest_io->Phi(X0,t0),phi=deepest_io->Phi(X,t1);
             if(phi0<0){
                 phi-=phi0;
-                if(system.example.collision_objects(deepest_index).sticky)
+                if(system.example.collision_objects(deepest_index)->sticky)
                     stuck=true;}
             deepest_phi=phi;}
         for(int j=0;j<system.example.collision_objects.m && !stuck;j++){
-            IMPLICIT_OBJECT<TV>* io=system.example.collision_objects(j).io;
-            T phi0=io->Extended_Phi(X0),phi=io->Extended_Phi(X);
+            MPM_COLLISION_OBJECT<TV>* io=system.example.collision_objects(j);
+            T phi0=io->Phi(X0,t0),phi=io->Phi(X,t1);
             if(phi0<0){
                 phi-=phi0;
-                if(system.example.collision_objects(deepest_index).sticky)
+                if(system.example.collision_objects(j)->sticky)
                     stuck=true;}
             if(phi<deepest_phi || stuck){
                 deepest_phi=phi;
@@ -174,10 +177,12 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
                 deepest_index=j;}}
         if(deepest_index==-1) continue;
         if(stuck){
+            TV SV=deepest_io->Velocity(X,t1);
             system.stuck_nodes.Append(i);
-            dv.u.array(i)=-v0.u.array(i)/midpoint_scale; // Come to rest
+            system.stuck_velocity.Append(SV);
+            dv.u.array(i)=(SV-v0.u.array(i))/midpoint_scale; // Come to rest
             continue;}
-        COLLISION c={deepest_index,i,deepest_phi,0,deepest_io->Extended_Normal(X),TV(),deepest_io->Hessian(X)};
+        COLLISION c={deepest_index,i,deepest_phi,0,deepest_io->Normal(X,t1),TV(),deepest_io->Hessian(X,t1)};
         system.collisions.Append(c);
         X-=deepest_phi*c.n;
         V=(X-system.example.location.array(i))/system.example.dt;

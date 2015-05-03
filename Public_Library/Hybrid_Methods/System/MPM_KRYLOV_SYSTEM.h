@@ -33,6 +33,7 @@ public:
     MPM_KRYLOV_VECTOR<TV>& tmp;
     ARRAY<COLLISION> collisions;
     ARRAY<int> stuck_nodes;
+    ARRAY<TV> stuck_velocity;
     HASHTABLE<int,int> forced_collisions;
     MPM_KRYLOV_SYSTEM(MPM_EXAMPLE<TV>& example);
     virtual ~MPM_KRYLOV_SYSTEM();

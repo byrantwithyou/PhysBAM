@@ -7,6 +7,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
@@ -41,8 +42,7 @@ template<class TV> MPM_EXAMPLE<TV>::
     delete &debug_particles;
     delete weights;
     delete &gather_scatter;
-    for(int i=0;i<collision_objects.m;i++)
-        delete collision_objects(i).io;
+    collision_objects.Delete_Pointers_And_Clean_Memory();
     forces.Delete_Pointers_And_Clean_Memory();
     lagrangian_forces.Delete_Pointers_And_Clean_Memory();
     av.Delete_Pointers_And_Clean_Memory();
@@ -67,7 +67,8 @@ Write_Output_Files(const int frame)
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(i));}
     GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
     for(int i=0;i<collision_objects.m;i++)
-        Dump_Levelset(ghost_grid,*collision_objects(i).io,VECTOR<T,3>(0.7,0.3,0.3));
+        if(IMPLICIT_OBJECT<TV>* io=collision_objects(i)->Get_Implicit_Object(time))
+            Dump_Levelset(ghost_grid,*io,VECTOR<T,3>(0.7,0.3,0.3));
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 }
 //#####################################################################
@@ -287,6 +288,14 @@ Total_Particle_Kinetic_Energy() const
         if(use_affine) result_local+=particles.mass(p)/2*Dp_inverse*particles.B(p).Frobenius_Norm_Squared();
         result+=result_local;}
     return result;
+}
+//#####################################################################
+// Function Add_Collision_Object
+//#####################################################################
+template<class TV> void MPM_EXAMPLE<TV>::
+Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,bool sticky,T friction)
+{
+    collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,sticky,friction));
 }
 //#####################################################################
 namespace PhysBAM{

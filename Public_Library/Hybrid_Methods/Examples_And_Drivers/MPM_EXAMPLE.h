@@ -6,6 +6,8 @@
 #define __MPM_EXAMPLE__
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 namespace PhysBAM{
 
 template<class TV> class MPM_PARTICLES;
@@ -19,6 +21,7 @@ template<class TV> class IMPLICIT_OBJECT;
 template<class TV> class MPM_COLLISION_OBJECT;
 template<class TV> class DEFORMABLES_FORCES;
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
+template<class TV> class MPM_COLLISION_OBJECT;
 
 template<class TV>
 class MPM_EXAMPLE:public NONCOPYABLE
@@ -26,13 +29,6 @@ class MPM_EXAMPLE:public NONCOPYABLE
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
-    struct MPM_COLLISION_OBJECT
-    {
-        IMPLICIT_OBJECT<TV>* io;
-        bool sticky;
-        T friction;
-    };
-
     GRID<TV> grid;
     STREAM_TYPE stream_type;
     MPM_PARTICLES<TV>& particles;
@@ -51,7 +47,7 @@ public:
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     PARTICLE_GRID_WEIGHTS<TV>* weights;
     GATHER_SCATTER<TV>& gather_scatter;
-    ARRAY<MPM_COLLISION_OBJECT> collision_objects;
+    ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
     mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
 
     T initial_time;
@@ -103,6 +99,10 @@ public:
     int Add_Force(PARTICLE_GRID_FORCES<TV>& force);
     int Add_Force(DEFORMABLES_FORCES<TV>& force);
     void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
+    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,bool sticky,T friction);
+    template<class OBJECT> typename DISABLE_IF<IS_POINTER<OBJECT>::value>::TYPE
+    Add_Collision_Object(const OBJECT& object,bool sticky,T friction)
+    {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),sticky,friction);}
 
     TV Total_Particle_Linear_Momentum() const;
     TV Total_Grid_Linear_Momentum(const ARRAY<TV,TV_INT>& u) const;
