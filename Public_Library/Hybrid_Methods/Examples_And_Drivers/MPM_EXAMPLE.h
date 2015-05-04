@@ -45,6 +45,7 @@ public:
     ARRAY<TV,TV_INT> location;
     ARRAY<TV,TV_INT> velocity,velocity_new;
     ARRAY<int> valid_grid_indices;
+    ARRAY<TV_INT> valid_grid_cell_indices;
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
     ARRAY<DEFORMABLES_FORCES<TV>*> lagrangian_forces;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;

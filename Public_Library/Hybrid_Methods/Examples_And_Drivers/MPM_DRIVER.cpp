@@ -236,11 +236,13 @@ Particle_To_Grid()
     else PHYSBAM_FATAL_ERROR("General case for rasterization not implemented");
 
     example.valid_grid_indices.Remove_All();
-    for(int i=0;i<example.mass.array.m;i++)
+    for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
+        int i=example.mass.Standard_Index(it.index);
         if(example.mass.array(i)){
             example.valid_grid_indices.Append(i);
+            example.valid_grid_cell_indices.Append(it.index);
             example.velocity.array(i)/=example.mass.array(i);}
-        else example.velocity.array(i)=TV();
+        else example.velocity.array(i)=TV();}
 }
 //#####################################################################
 // Function Grid_To_Particle
