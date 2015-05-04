@@ -73,7 +73,7 @@ struct AUTO_DIFF_EXT
 
     template<class VEC1> decltype(Make_Diff(x/SC,(dx-(x/SC)*DX1)/SC))
     operator/(const AUTO_DIFF_EXT<TV,VEC1>& a) const
-    {T z=x/a.x,ax2=sqr(a.x);auto q=dx-z*a.dx;return Make_Diff(z,q/a.x);}
+    {T z=x/a.x;auto q=dx-z*a.dx;return Make_Diff(z,q/a.x);}
 
     AUTO_DIFF_EXT operator+(T a) const
     {return Make_Diff(x+a,dx);}

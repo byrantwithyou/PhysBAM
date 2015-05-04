@@ -214,7 +214,6 @@ Fill_Bezier(BEZIER_SPLINE<TV,3>& bez,const B_SPLINE<TV,3>& bs)
         T k14=bs.knots(i+3)-bs.knots(i);
         T k24=bs.knots(i+3)-bs.knots(i+1);
         T k34=bs.knots(i+3)-bs.knots(i+2);
-        T k15=bs.knots(i+4)-bs.knots(i);
         T k25=bs.knots(i+4)-bs.knots(i+1);
         T k35=bs.knots(i+4)-bs.knots(i+2);
         T k45=bs.knots(i+4)-bs.knots(i+3);
