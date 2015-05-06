@@ -317,6 +317,51 @@ Initialize()
             MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(particles,*neo,gather_scatter,0);
             Add_Force(*fe);
         } break;
+        case 21:{ // circle with random initial velocities
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-3,-3),TV(4,4)),true);
+            SPHERE<TV> sphere(TV(.5,.5),.3);
+            T density=2*scale_mass;
+            Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
+            RANDOM_NUMBERS<T> random;
+            random.Fill_Uniform(particles.V,-1,1);
+            Add_Fixed_Corotated(1e3*scale_E,0.3);
+        } break;
+        case 22:{ // (fluid test) pool of water 
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box(grid.dX*(T).5,TV(1-grid.dX(0)*(T).5,0.25));
+            T density=2*scale_mass;
+            Seed_Particles(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
+            Add_Fixed_Corotated(1e3*scale_E,0.3);
+            Add_Gravity(TV(0,-1.8));
+        } break;
+        case 23:{ // (fluid test) dam break 
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box;
+            box=RANGE<TV>(grid.dX*(T).5,TV(0.2,0.75));
+            T density=2*scale_mass;
+            Seed_Particles(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
+            Add_Fixed_Corotated(1e3*scale_E,0.3);
+            Add_Gravity(TV(0,-1.8));
+        } break;
+        case 24:{ // (fluid test) circle drop 
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            SPHERE<TV> sphere(TV(.5,.7),.2);
+            T density=2*scale_mass;
+            Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
+            Add_Fixed_Corotated(1e3*scale_E,0.3);
+            Add_Gravity(TV(0,-1.8));
+        } break;
+        case 25:{ // (fluid test) pool of water w/ single particle
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box(grid.dX*(T).5,TV(1-grid.dX(0)*(T).5,0.25));
+            T density=2*scale_mass;
+            T volume=grid.dX.Product()/particles_per_cell;
+            T mass=density*volume;
+            Seed_Particles(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
+            Add_Particle(TV(.5,.9),TV(),mass,volume,MATRIX<T,TV::m>()+1,MATRIX<T,TV::m>());
+            Add_Gravity(TV(0,-1.8));
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }

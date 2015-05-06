@@ -3,9 +3,12 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Tools/Boundaries/BOUNDARY.h>
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
+#include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/GMRES.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
@@ -13,6 +16,7 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Log/SCOPE.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
@@ -22,8 +26,12 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
+#include <Hybrid_Methods/System/FLUID_KRYLOV_SYSTEM.h>
+#include <Hybrid_Methods/System/FLUID_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
+#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <Dynamics/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 #include <boost/function.hpp>
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -42,7 +50,10 @@ template<class TV> MPM_DRIVER<TV>::
 MPM_DRIVER(MPM_EXAMPLE<TV>& example)
     :example(example),objective(*new MPM_OBJECTIVE<TV>(example)),
     dv(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
-    rhs(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices))
+    rhs(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
+    fluid_sys(*new FLUID_KRYLOV_SYSTEM<TV>(example)),
+    fluid_p(*new FLUID_KRYLOV_VECTOR<TV>(example.valid_pressure_indices)),
+    fluid_rhs(*new FLUID_KRYLOV_VECTOR<TV>(example.valid_pressure_indices))
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
@@ -56,7 +67,11 @@ template<class TV> MPM_DRIVER<TV>::
     delete &objective;
     delete &dv;
     delete &rhs;
+    delete &fluid_sys;
+    delete &fluid_p;
+    delete &fluid_rhs;
     av.Delete_Pointers_And_Clean_Memory();
+    bv.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Execute_Main_Program
@@ -88,9 +103,23 @@ Initialize()
     if(example.use_max_weight) example.max_weight.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity_new.Resize(example.grid.Domain_Indices(example.ghost));
+    example.cell_C.Resize(example.grid.Domain_Indices(example.ghost));
     dv.u.Resize(example.grid.Domain_Indices(example.ghost));
     rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
     objective.system.tmp.u.Resize(example.grid.Domain_Indices(example.ghost));
+
+    if(example.use_fluid){
+        //old stuffs
+        fluid_p.p.Resize(example.grid.Domain_Indices(example.ghost));
+        fluid_rhs.p.Resize(example.grid.Domain_Indices(example.ghost));
+        example.mass_f.Resize(example.grid.Domain_Indices(example.ghost));
+        example.velocity_f.Resize(example.grid.Domain_Indices(example.ghost));
+        example.velocity_new_f.Resize(example.grid.Domain_Indices(example.ghost));
+        example.cell_solid.Resize(example.grid.Domain_Indices(example.ghost));
+        example.cell_pressure.Resize(example.grid.Domain_Indices(example.ghost));
+        example.cell_C.Resize(example.grid.Domain_Indices(example.ghost));
+        for(CELL_ITERATOR<TV> iterator(example.grid,example.ghost,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
+            example.cell_solid(iterator.Cell_Index())=true;}
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
     example.location.Resize(range,false,false);
@@ -128,8 +157,48 @@ Advance_One_Time_Step()
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt,example.velocity_new,&example.velocity);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
-    Grid_To_Particle();
+    if(example.use_fluid){
+        // Energy and Momentum test
+        T energyP=0,energyC=0,energyF=0;
+        TV momentumP,momentumC,momentumF;
+        for(int k=0;k<example.simulated_particles.m;k++){
+            int p=example.simulated_particles(k);
+            energyP+=(T).5*example.particles.V(p).Magnitude_Squared()*example.particles.mass(p);
+            momentumP+=example.particles.mass(p)*example.particles.V(p);}
+        for(int i=0;i<example.valid_pressure_indices.m;i++){
+            int j=example.valid_pressure_indices(i);
+            energyC+=(T).5*example.mass.array(j)*example.velocity_new.array(j).Magnitude_Squared();
+            momentumC+=example.mass.array(j)*example.velocity_new.array(j);}
+
+        Compute_Cell_C();
+        for(FACE_ITERATOR<TV> iterator(example.grid,example.ghost);iterator.Valid();iterator.Next()){
+            FACE_INDEX<TV::m> face=iterator.Full_Index();
+            energyF+=(T).5*example.mass_f(face)*example.velocity_f(face)*example.velocity_f(face);
+            momentumF(face.axis)+=example.mass_f(face)*example.velocity_f(face);}
+        //Cell_To_Face();
+        Cell_To_Face_C();
+        div=Pressure_Projection();
+        if(example.use_f2p)
+            Face_To_Particle();
+        else{
+            Face_To_Cell();
+            Grid_To_Particle();}
+        LOG::printf("ENERGY [PARTICLE]:\t%e\n",energyP);
+        LOG::printf("ENERGY [CELL CENTER]:\t%e\n",energyC);
+        LOG::printf("ENERGY [FACE]:\t\t%e\n",energyF);
+        //LOG::printf("ENERGY RATIO [CELL CENTER/PARTICLE]:\t%e\n",energyC/energyP);
+        //LOG::printf("ENERGY RATIO [FACE/CELL CENTER]:\t%e\n",energyF/energyC);
+        //LOG::printf("ENERGY RATIO [FACE/PARTICLE]:\t\t%e\n",energyF/energyP);
+        LOG::printf("MOMENTUM [PARTICLE]:\t%P\n",momentumP);
+        LOG::printf("MOMENTUM [CELL CENTER]:\t%P\n",momentumC);
+        LOG::printf("MOMENTUM [FACE]:\t\t%P\n",momentumF);
+    }
+    else
+        Grid_To_Particle();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
+    /*if(div>1e-1){
+        Write_Output_Files(++output_number);
+        PHYSBAM_FATAL_ERROR("Div kills it");}*/
 
     example.End_Time_Step(example.time);
 }
@@ -198,6 +267,8 @@ template<class TV> void MPM_DRIVER<TV>::
 Update_Particle_Weights()
 {
     example.weights->Update(example.particles.X);
+    for(int i=0;i<TV::m;++i)
+        example.face_weights(i)->Update(example.particles.X);
 }
 //#####################################################################
 // Function Particle_To_Grid
@@ -207,7 +278,7 @@ Particle_To_Grid()
 {
     MPM_PARTICLES<TV>& particles=example.particles;
 
-#pragma parallel for
+#pragma omp parallel for
     for(int i=0;i<example.mass.array.m;i++){
         example.mass.array(i)=0;
         example.velocity.array(i)=TV();
@@ -221,7 +292,11 @@ Particle_To_Grid()
             {
                 example.mass(it.Index())+=it.Weight()*particles.mass(p);
                 if(example.use_max_weight){T& w=example.max_weight(it.Index());w=max(w,it.Weight());}
-                example.velocity(it.Index())+=particles.mass(p)*(it.Weight()*particles.V(p)+particles.B(p)*it.Gradient());
+                TV V=particles.V(p);
+                if(example.use_affine){
+                    V+=particles.C(p)*((example.grid.Center(it.Index())-particles.X(p)));
+                    example.velocity(it.Index())+=it.Weight()*particles.mass(p)*V;}
+                else example.velocity(it.Index())+=particles.mass(p)*(it.Weight()*particles.V(p)+particles.B(p)*it.Gradient());
             },true);
     }
     else if(example.weights->constant_scalar_inertia_tensor)
@@ -232,21 +307,46 @@ Particle_To_Grid()
             {
                 example.mass(it.Index())+=it.Weight()*particles.mass(p);
                 if(example.use_max_weight) example.max_weight(it.Index())+=it.Weight();
+                example.cell_C(it.Index())+=MATRIX<T,TV::m>::Outer_Product(particles.V(p),it.Gradient());
                 TV V=particles.V(p);
-                if(example.use_affine) V+=particles.B(p)*(Dp_inverse*(example.grid.Center(it.Index())-particles.X(p)));
+                if(example.use_affine) {
+                    if(example.use_fluid)
+                        V+=particles.C(p)*(example.grid.Center(it.Index())-particles.X(p));
+                    else
+                        V+=particles.B(p)*(Dp_inverse*(example.grid.Center(it.Index())-particles.X(p)));}
                 example.velocity(it.Index())+=it.Weight()*particles.mass(p)*V;
-            },false);
+            },true);
     }
     else PHYSBAM_FATAL_ERROR("General case for rasterization not implemented");
 
     example.valid_grid_indices.Remove_All();
+    example.valid_grid_cell_indices.Remove_All();
+    if(example.use_fluid){
+        example.valid_pressure_indices.Remove_All();
+        example.valid_pressure_cell_indices.Remove_All();
+        example.cell_pressure.Fill(false);}
     for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
         int i=example.mass.Standard_Index(it.index);
         if(example.mass.array(i)){
+            if(example.use_fluid){
+                example.cell_pressure.array(i)=true;
+                if(!example.cell_solid.array(i)){
+                    bool valid=false;
+                    if(example.weights->Order()==1)
+                        valid=true;
+                    else {
+                        int c=0;
+                        for(int d=0;d<TV::m;++d)
+                            c+=(example.cell_solid(it.index-TV_INT::Axis_Vector(d))||example.cell_solid(it.index+TV_INT::Axis_Vector(d)));
+                        if(c<TV::m) valid=true;}
+                    if(valid){
+                        example.valid_pressure_indices.Append(i);
+                        example.valid_pressure_cell_indices.Append(it.index);}}}
             example.valid_grid_indices.Append(i);
             example.valid_grid_cell_indices.Append(it.index);
             example.velocity.array(i)/=example.mass.array(i);}
         else example.velocity.array(i)=TV();}
+        //LOG::printf("These are the flags:\n%P\n",example.cell_pressure);
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -266,7 +366,7 @@ Grid_To_Particle()
         for(int k=a;k<b;k++){
             int p=example.simulated_particles(k);
             TV Vn_interpolate,V_pic,V_flip=particles.V(p);
-            MATRIX<T,TV::m> B,grad_Vp;
+            MATRIX<T,TV::m> B,C,grad_Vp;
 
             for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,true,scratch);it.Valid();it.Next()){
                 T w=it.Weight();
@@ -304,8 +404,246 @@ Grid_To_Particle()
             else particles.X(p)+=particles.V(p)*dt;
             particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
             particles.B(p)=B;
+            SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> Dp_inverse_transpose=example.weights->Dp(particles.X(p)).Inverse();
+            particles.C(p)=B*Dp_inverse_transpose;
 
             if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}}
+}
+//#####################################################################
+// Function Face_To_Particle
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Face_To_Particle()
+{
+    MPM_PARTICLES<TV>& particles=example.particles;
+    T dt=example.dt;
+       
+#pragma omp parallel for
+    for(int tid=0;tid<example.gather_scatter.threads;++tid){
+        int a=example.simulated_particles.m*tid/example.gather_scatter.threads;
+        int b=example.simulated_particles.m*(tid+1)/example.gather_scatter.threads;
+        typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
+
+        for(int k=a;k<b;k++){
+            int p=example.simulated_particles(k);
+            TV Vn_interpolate,V_pic,V_flip=particles.V(p);
+            MATRIX<T,TV::m> C;
+            for(int i=0;i<TV::m;++i)
+                for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights(i),p,true,scratch);it.Valid();it.Next()){
+                    T w=it.Weight();
+                    FACE_INDEX<TV::m> face_index(i,it.Index());
+                    T V_grid=example.velocity_new_f(face_index);
+                    V_pic(i)+=w*V_grid;
+                    V_flip(i)+=w*(V_grid-example.velocity_f(face_index));
+                    if(example.use_midpoint){
+                        PHYSBAM_NOT_IMPLEMENTED("Midpoint with Face_To_Particle is not supported");}
+
+                    if(example.use_affine){
+                        TV tmp=example.velocity_new_f(face_index)*it.Gradient();
+                        for(int k=0;k<TV::m;++k)
+                            C(i,k)+=tmp(k);}}
+            particles.V(p)=V_pic;
+            Perform_Particle_Collision(p);
+            if(example.use_midpoint) PHYSBAM_NOT_IMPLEMENTED("Midpoint with Face_To_Particle is not supported");
+            else particles.X(p)+=particles.V(p)*dt;
+            particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
+            particles.C(p)=C;
+            particles.F(p)+=dt*C*particles.F(p);
+            if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}}
+}
+//#####################################################################
+// Function Compute_Cell_C
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Compute_Cell_C()
+{
+    example.cell_C.Fill(MATRIX<T,TV::m>());
+    T one_over_dx=example.grid.one_over_dX(0);
+    for(int t=0;t<example.valid_grid_cell_indices.m;t++){
+        TV_INT index=example.valid_grid_cell_indices(t);
+        MATRIX<T,TV::m> C;
+        for(int i=0;i<TV::m;i++)
+            for(int j=0;j<TV::m;j++){
+                TV_INT e=TV_INT::Axis_Vector(j);
+                if (example.mass(index+e)) 
+                    C(i,j)=(example.velocity_new(index+e)(i)-example.velocity_new(index)(i))*one_over_dx;
+                else
+                    C(i,j)=(example.velocity_new(index)(i)-example.velocity_new(index-e)(i))*one_over_dx;}
+        example.cell_C(index)=C;}
+}
+//#####################################################################
+// Function Cell_To_Face
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Cell_To_Face()
+{
+    // TODO: parallelzie
+    example.mass_f.Fill(0);
+    example.velocity_f.Fill(0);
+    example.velocity_new_f.Fill(0);
+
+#pragma omp parallel for
+    for(int t=0;t<example.valid_grid_cell_indices.m;t++){
+        TV_INT index=example.valid_grid_cell_indices(t);
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> face(a,example.grid.First_Face_Index_In_Cell(a,index));
+            example.mass_f(face)+=example.mass(index);
+            example.velocity_f(face)+=example.mass(index)*example.velocity_new(index)(a);}}
+#pragma omp parallel for
+    for(int t=0;t<example.valid_grid_cell_indices.m;t++){
+        TV_INT index=example.valid_grid_cell_indices(t);
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> face(a,example.grid.Second_Face_Index_In_Cell(a,index));
+            example.mass_f(face)+=example.mass(index);
+            example.velocity_f(face)+=example.mass(index)*example.velocity_new(index)(a);}}
+
+    // TODO: improve efficiency
+    for(FACE_ITERATOR<TV> iterator(example.grid,example.ghost);iterator.Valid();iterator.Next()){
+        FACE_INDEX<TV::m> face=iterator.Full_Index();
+        if(example.mass_f(face)){
+            example.velocity_f(face)/=example.mass_f(face);
+            example.mass_f(face)*=(T).5;}}
+}
+//#####################################################################
+// Function Cell_To_Face_C
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Cell_To_Face_C()
+{
+    // TODO: parallelzie
+    example.mass_f.Fill(0);
+    example.velocity_f.Fill(0);
+    example.velocity_new_f.Fill(0);
+
+#pragma omp parallel for
+    for(int t=0;t<example.valid_grid_cell_indices.m;t++){
+        TV_INT index=example.valid_grid_cell_indices(t);
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> face(a,example.grid.First_Face_Index_In_Cell(a,index));
+            example.mass_f(face)+=example.mass(index);
+            example.velocity_f(face)+=example.mass(index)*(
+                    example.velocity_new(index)(a)-(example.cell_C(index)*TV::Axis_Vector(a)*example.grid.dX(a))(a)*(T).5);}}
+#pragma omp parallel for
+    for(int t=0;t<example.valid_grid_cell_indices.m;t++){
+        TV_INT index=example.valid_grid_cell_indices(t);
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> face(a,example.grid.Second_Face_Index_In_Cell(a,index));
+            example.mass_f(face)+=example.mass(index);
+            example.velocity_f(face)+=example.mass(index)*(
+                    example.velocity_new(index)(a)+(example.cell_C(index)*TV::Axis_Vector(a)*example.grid.dX(a))(a)*(T).5);}}
+
+    // TODO: improve efficiency
+    for(FACE_ITERATOR<TV> iterator(example.grid,example.ghost);iterator.Valid();iterator.Next()){
+        FACE_INDEX<TV::m> face=iterator.Full_Index();
+        if(example.mass_f(face)){
+            example.velocity_f(face)/=example.mass_f(face);
+            example.mass_f(face)*=(T).5;}}
+}
+//#####################################################################
+// Function Face_To_Cell
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Face_To_Cell()
+{
+#pragma omp parallel for
+    for(int t=0;t<example.valid_grid_cell_indices.m;t++){
+        TV_INT index=example.valid_grid_cell_indices(t);
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> faceF(a,example.grid.First_Face_Index_In_Cell(a,index));
+            FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
+            example.velocity_new(index)(a)=(example.velocity_new_f(faceF)+example.velocity_new_f(faceS))*(T).5;}}
+}
+//#####################################################################
+// Function Face_To_Cell_FLIP
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Face_To_Cell_FLIP()
+{
+    T flip_ratio=(T)0.75;
+#pragma omp parallel for
+    for(int t=0;t<example.valid_grid_cell_indices.m;t++){
+        TV_INT index=example.valid_grid_cell_indices(t);
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> faceF(a,example.grid.First_Face_Index_In_Cell(a,index));
+            FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
+            T pic=(example.velocity_new_f(faceF)+example.velocity_new_f(faceS))*(T).5;
+            T flip=example.velocity_new(index)(a)+pic-
+                (example.velocity_f(faceF)+example.velocity_f(faceS))*(T).5;
+            example.velocity_new(index)(a)=flip_ratio*flip+(1-flip_ratio)*pic;
+        }}
+}
+//#####################################################################
+// Function Pressure_Projection
+//#####################################################################
+//template<class TV> void MPM_DRIVER<TV>::
+template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
+Pressure_Projection()
+{
+    CONJUGATE_GRADIENT<T> cg; 
+    T one_over_dx=example.grid.one_over_dX(0);
+    fluid_p.p.Fill(0);
+    fluid_rhs.p.Fill(0);
+    for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
+        TV_INT index=example.valid_pressure_cell_indices(t);
+        for(int a=0;a<TV::m;a++){
+            const TV_INT axis=TV_INT::Axis_Vector(a);
+            FACE_INDEX<TV::m> faceF(a,example.grid.First_Face_Index_In_Cell(a,index));
+            FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
+            fluid_rhs.p(index)+=-(example.velocity_f(faceS)-example.velocity_f(faceF));
+            if(example.weights->Order()==1){
+                if(example.cell_solid(index-axis)&&example.cell_solid(index+axis))
+                    PHYSBAM_NOT_IMPLEMENTED("Fluid trapped between two solids (rhs)");
+                else if(example.cell_solid(index-axis)&&!example.cell_solid(index+axis))
+                    fluid_rhs.p(index)-=(example.velocity_f(faceS)+example.velocity_f(faceF));
+                else if(!example.cell_solid(index-axis)&&example.cell_solid(index+axis))
+                    fluid_rhs.p(index)+=(example.velocity_f(faceS)+example.velocity_f(faceF));}
+            else PHYSBAM_NOT_IMPLEMENTED();
+        }
+        fluid_rhs.p(index)*=one_over_dx;}
+    cg.finish_before_indefiniteness=true;
+    cg.relative_tolerance=false;
+    bool converged=cg.Solve(fluid_sys,fluid_p,fluid_rhs,bv,1e-8,0,1000);
+    if(!converged)
+        LOG::printf("CG DID NOT CONVERGE.\n");
+    example.velocity_new_f=example.velocity_f;
+    for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
+        TV_INT index=example.valid_pressure_cell_indices(t);
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> faceF(a,example.grid.First_Face_Index_In_Cell(a,index));
+            FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
+            example.velocity_new_f(faceF)-=fluid_p.p(index)*one_over_dx;
+            example.velocity_new_f(faceS)+=fluid_p.p(index)*one_over_dx;}}
+    //APPLY BC ON THE FACES
+    for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
+        TV_INT index=example.valid_pressure_cell_indices(t);
+        for(int a=0;a<TV::m;a++){
+            const TV_INT axis=TV_INT::Axis_Vector(a);
+            FACE_INDEX<TV::m> faceF(a,example.grid.First_Face_Index_In_Cell(a,index));
+            FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
+            if(example.cell_solid(index+axis))
+                example.velocity_new_f(faceS)=-example.velocity_new_f(faceF);
+            if(example.cell_solid(index-axis))
+                example.velocity_new_f(faceF)=-example.velocity_new_f(faceS);}}
+
+    // Diagnostics
+    T divmax=0;
+    TV_INT where;
+    int cell_type;
+    for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
+        TV_INT index=example.valid_pressure_cell_indices(t);
+        T div=0;
+        for(int a=0;a<TV::m;a++){
+            const TV_INT axis=TV_INT::Axis_Vector(a);
+            FACE_INDEX<TV::m> faceF(a,example.grid.First_Face_Index_In_Cell(a,index));
+            FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
+            if(!example.cell_solid(index-axis)||!example.cell_solid(index+axis)||!example.cell_solid(index-2*axis)||!example.cell_solid(index+2*axis))
+                div+=example.velocity_new_f(faceS)-example.velocity_new_f(faceF);}
+        if(abs(div)>divmax) {divmax=abs(div); where=index; cell_type=example.cell_pressure(index);}}
+    divmax*=one_over_dx;
+
+    LOG::cout<<"Divergence after projection\t"<<divmax<<std::endl;
+    LOG::printf("where: %P\t cell_type: %d\n",where,cell_type);
+    return divmax;
 }
 //#####################################################################
 // Function Apply_Forces
@@ -509,3 +847,4 @@ template class MPM_DRIVER<VECTOR<float,3> >;
 template class MPM_DRIVER<VECTOR<double,2> >;
 template class MPM_DRIVER<VECTOR<double,3> >;
 }
+

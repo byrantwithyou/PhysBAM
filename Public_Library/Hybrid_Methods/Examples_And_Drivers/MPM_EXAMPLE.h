@@ -5,6 +5,8 @@
 #ifndef __MPM_EXAMPLE__
 #define __MPM_EXAMPLE__
 #include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Matrices/MATRIX.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
@@ -42,15 +44,31 @@ public:
     ARRAY<T,TV_INT> max_weight;
     ARRAY<TV,TV_INT> location;
     ARRAY<TV,TV_INT> velocity,velocity_new;
+    ARRAY<MATRIX<T,TV::m>,TV_INT> cell_C;
     ARRAY<int> valid_grid_indices;
     ARRAY<TV_INT> valid_grid_cell_indices;
+    ARRAY<int> valid_pressure_indices;
+    ARRAY<TV_INT> valid_pressure_cell_indices;
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
     ARRAY<DEFORMABLES_FORCES<TV>*> lagrangian_forces;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     PARTICLE_GRID_WEIGHTS<TV>* weights;
+    VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights;
     GATHER_SCATTER<TV>& gather_scatter;
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
     mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
+
+    // fluid stuff
+    bool use_fluid;
+    ARRAY<T,FACE_INDEX<TV::m> > mass_f;
+    ARRAY<T,FACE_INDEX<TV::m> > velocity_f;
+    ARRAY<T,FACE_INDEX<TV::m> > velocity_new_f;
+    ARRAY<bool,TV_INT> cell_solid;
+    ARRAY<bool,TV_INT> cell_pressure;
+
+    // Affine matrices
+    MATRIX<T,TV::m> A;
+    TV b;
 
     T initial_time;
     int last_frame;
@@ -66,6 +84,7 @@ public:
     int ghost;
     bool use_reduced_rasterization;
     bool use_affine;
+    bool use_f2p;
     bool use_midpoint;
     bool use_symplectic_euler;
     bool use_particle_collision;

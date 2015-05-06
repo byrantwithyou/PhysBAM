@@ -54,6 +54,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     parse_args.Add("-max_dt",&max_dt,"dt","Maximum time step size");
     parse_args.Add("-order",&order,"order","Interpolation basis order");
     parse_args.Add("-affine",&use_affine,"Use affine PIC");
+    parse_args.Add("-use_f2p",&use_f2p,"Use face to particle (direct) transfer");
     parse_args.Add("-midpoint",&use_midpoint,"Use midpoint rule");
     parse_args.Add("-symplectic_euler",&use_symplectic_euler,"Use forward euler for grid update");
     parse_args.Add("-particle_collision",&use_particle_collision,"Use particle collision");
@@ -74,6 +75,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     parse_args.Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
     parse_args.Add("-regular_seeding",&regular_seeding,"use regular particle seeding");
     parse_args.Add("-use_early_gradient_transfer",&use_early_gradient_transfer,"use early gradient transfer for Cp");
+    parse_args.Add("-use_fluid",&use_fluid,"Use fluid stuff");
     parse_args.Parse(true);
 
     frame_dt=1/framerate;

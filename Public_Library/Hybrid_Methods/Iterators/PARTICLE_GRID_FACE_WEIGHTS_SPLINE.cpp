@@ -7,14 +7,14 @@
 #include <Tools/Math_Tools/pow.h>
 #include <Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_WEIGHTS_SPLINE.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class TV,int degree> PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
-PARTICLE_GRID_WEIGHTS_SPLINE(const GRID<TV>& grid,int threads)
-    :BASE(threads),grid(grid)
+template<class TV,int degree> PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,degree>::
+PARTICLE_GRID_FACE_WEIGHTS_SPLINE(const GRID<TV>& grid,int threads,int axis)
+    :BASE(threads),grid(grid),axis(axis)
 {
     this->use_gradient_transfer=(degree==1);
     this->constant_scalar_inertia_tensor=(degree!=1);
@@ -22,14 +22,14 @@ PARTICLE_GRID_WEIGHTS_SPLINE(const GRID<TV>& grid,int threads)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class TV,int degree> PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
-~PARTICLE_GRID_WEIGHTS_SPLINE()
+template<class TV,int degree> PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,degree>::
+~PARTICLE_GRID_FACE_WEIGHTS_SPLINE()
 {
 }
 //#####################################################################
 // Function Compute
 //#####################################################################
-template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+template<class TV,int degree> void PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,degree>::
 Compute(int p,typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH& scratch,bool want_gradient) const
 {
     const PRECOMPUTE_DATA& pd=precompute_data(p);
@@ -110,20 +110,23 @@ Compute_Weights(VECTOR<TV,4>& w,VECTOR<TV,4>& dw,TV x,TV one_over_dX)
 //#####################################################################
 // Function Update
 //#####################################################################
-template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+template<class TV,int degree> void PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,degree>::
 Update(const ARRAY_VIEW<TV>& X)
 {
     precompute_data.Resize(X.m);
     for(int p=0;p<X.m;p++){
         PRECOMPUTE_DATA& pd=precompute_data(p);
-        pd.base=grid.Cell(X(p)-(T).5*degree*grid.DX(),degree+1);
-        TV X_eval=X(p)-grid.Center(pd.base);
-        Compute_Weights(pd.w,pd.dw,X_eval*grid.one_over_dX,grid.one_over_dX);}
+        TV dir=X(p)-(T).5*degree*grid.DX();
+        dir(axis)+=(T).5*grid.dX(axis);
+        pd.base=grid.Cell(dir,degree+1);
+        TV X_eval=X(p)-grid.Face(FACE_INDEX<TV::m>(axis,pd.base));
+        //for(int k=0;k<TV::m;k++)
+            Compute_Weights(pd.w,pd.dw,X_eval*grid.one_over_dX,grid.one_over_dX);}
 }
 //#####################################################################
 // Function Constant_Scalar_Dp
 //#####################################################################
-template<class TV,int degree> typename TV::SCALAR PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+template<class TV,int degree> typename TV::SCALAR PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,degree>::
 Constant_Scalar_Inverse_Dp() const
 {
     PHYSBAM_ASSERT(degree>1);
@@ -132,7 +135,7 @@ Constant_Scalar_Inverse_Dp() const
 //#####################################################################
 // Function Dp
 //#####################################################################
-template<class TV,int degree> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+template<class TV,int degree> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,degree>::
 Dp(const TV& X) const
 {
     if(degree>1) return SYMMETRIC_MATRIX<T,TV::m>()+sqr(grid.dX(0))/(6-degree);
@@ -142,22 +145,22 @@ Dp(const TV& X) const
 //#####################################################################
 // Function Order
 //#####################################################################
-template<class TV,int degree> int PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+template<class TV,int degree> int PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,degree>::
 Order() const
 {
     return degree;
 }
 //#####################################################################
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,2>,1>;
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,3>,1>;
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,2>,1>;
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,3>,1>;
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,2>,2>;
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,3>,2>;
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,2>,2>;
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,3>,2>;
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,2>,3>;
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,3>,3>;
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,2>,3>;
-template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,3>,3>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<float,2>,1>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<float,3>,1>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<double,2>,1>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<double,3>,1>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<float,2>,2>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<float,3>,2>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<double,2>,2>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<double,3>,2>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<float,2>,3>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<float,3>,3>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<double,2>,3>;
+template class PARTICLE_GRID_FACE_WEIGHTS_SPLINE<VECTOR<double,3>,3>;
 }

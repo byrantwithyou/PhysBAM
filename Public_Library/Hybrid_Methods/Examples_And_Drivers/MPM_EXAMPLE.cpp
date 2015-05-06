@@ -14,6 +14,7 @@
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_WEIGHTS_SPLINE.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -27,7 +28,7 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),mass_contour(-1),use_max_weight(false),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
-    use_reduced_rasterization(false),use_affine(false),use_midpoint(false),use_symplectic_euler(false),
+    use_reduced_rasterization(false),use_affine(false),use_f2p(false),use_midpoint(false),use_symplectic_euler(false),
     use_particle_collision(false),print_stats(false),flip(0),cfl(1),newton_tolerance(1),
     newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),test_diff(false),threads(1),
     output_structures_each_frame(false)
@@ -60,6 +61,10 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),velocity_new);
+    if(use_fluid){
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),velocity_new_f);
+        //FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/velocities",output_directory.c_str(),frame),velocity_f);
+        }
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/density",output_directory.c_str(),frame),mass);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
     int static_frame=output_structures_each_frame?frame:-1;
@@ -186,6 +191,14 @@ Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input)
 {
     weights=weights_input;
     gather_scatter.weights=weights;
+    for(int i=0;i<TV::m;++i)
+        if(weights->Order()==1)
+            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,1>(grid,threads,i);
+        else if(weights->Order()==2)
+            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,2>(grid,threads,i);
+        else if(weights->Order()==3)
+            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,3>(grid,threads,i);
+        else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
 }
 //#####################################################################
 // Function Total_Particle_Linear_Momentum
@@ -280,7 +293,7 @@ Total_Grid_Kinetic_Energy(const ARRAY<TV,TV_INT>& u) const
     return result;
 }
 //#####################################################################
-// Function Total_Grid_Kinetic_Energy
+// Function Total_Particle_Kinetic_Energy
 //#####################################################################
 template<class TV> typename TV::SCALAR MPM_EXAMPLE<TV>::
 Total_Particle_Kinetic_Energy() const

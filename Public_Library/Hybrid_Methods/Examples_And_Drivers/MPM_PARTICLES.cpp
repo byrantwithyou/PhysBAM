@@ -17,6 +17,7 @@ MPM_PARTICLES()
     Add_Array(ATTRIBUTE_ID_VOLUME,&volume);
     Add_Array(ATTRIBUTE_ID_F,&F);
     Add_Array(ATTRIBUTE_ID_B,&B);
+    Add_Array(ATTRIBUTE_ID_C,&C);
     Add_Array(ATTRIBUTE_ID_VALID,&valid);
 }
 //#####################################################################
@@ -44,6 +45,7 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_VOLUME,"volume");
     Register_Attribute_Name(ATTRIBUTE_ID_F,"F");
     Register_Attribute_Name(ATTRIBUTE_ID_B,"B");
+    Register_Attribute_Name(ATTRIBUTE_ID_C,"C");
     Register_Attribute_Name(ATTRIBUTE_ID_VALID,"valid");
     Register_Attribute_Name(ATTRIBUTE_ID_S,"S");
     return 0;

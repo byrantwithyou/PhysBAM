@@ -9,10 +9,12 @@
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 namespace PhysBAM{
 
+template<class TV> class FLUID_KRYLOV_SYSTEM;
+template<class TV> class FLUID_KRYLOV_VECTOR;
 template<class TV> class MPM_EXAMPLE;
+template<class TV> class MPM_KRYLOV_VECTOR;
 template<class TV> class MPM_OBJECTIVE;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
-template<class TV> class MPM_KRYLOV_VECTOR;
 template<class T> class KRYLOV_VECTOR_BASE;
 
 template<class TV>
@@ -25,11 +27,15 @@ public:
 
     int current_frame;
     int output_number;
-
+    T div;
     MPM_EXAMPLE<TV>& example;
     MPM_OBJECTIVE<TV>& objective;
     MPM_KRYLOV_VECTOR<TV>& dv,&rhs;
+    FLUID_KRYLOV_SYSTEM<TV>& fluid_sys;
+    FLUID_KRYLOV_VECTOR<TV>& fluid_p;
+    FLUID_KRYLOV_VECTOR<TV>& fluid_rhs;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> bv;
 
     MPM_DRIVER(MPM_EXAMPLE<TV>& example);
     virtual ~MPM_DRIVER();
@@ -44,6 +50,13 @@ public:
     void Update_Particle_Weights();
     void Particle_To_Grid();
     void Grid_To_Particle();
+    void Face_To_Particle();
+    void Compute_Cell_C();
+    void Cell_To_Face();
+    void Cell_To_Face_C();
+    void Face_To_Cell();
+    void Face_To_Cell_FLIP();
+    T Pressure_Projection();
     void Apply_Forces();
     void Perform_Particle_Collision(int p,T time);
     void Apply_Friction();

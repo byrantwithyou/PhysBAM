@@ -172,6 +172,20 @@ Initialize()
             Seed_Particles_Helper(sphere2,[=](const TV& X){return TV(-0.75,0,0);},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
+        case 22:{ // (fluid test) pool of water 
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box(TV(0,0,0),TV(1,0.25,1));
+            T density=2*scale_mass;
+            Seed_Particles(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
+            Add_Gravity(TV(0,-9.8,0));
+        } break;
+        case 24:{ // (fluid test) circle drop 
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            SPHERE<TV> sphere(TV(.5,.75,.5),.2);
+            T density=2*scale_mass;
+            Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
+            Add_Gravity(TV(0,-9.8,0));
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
