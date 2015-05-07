@@ -49,6 +49,7 @@ public:
     T scale_mass;
     T scale_E;
     T scale_speed;
+    T penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length;
     RANDOM_NUMBERS<T> random;
     DEFORMABLES_STANDARD_TESTS<TV> tests;
 
@@ -75,14 +76,18 @@ public:
     T_STRUCTURE& Seed_Lagrangian_Particles(T_STRUCTURE& object,boost::function<TV(const TV&)> V,
         boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass);
 
-    void Add_Particle(const TV& X,const TV& V,const T mass,const T volume,const MATRIX<T,TV::m> F,const MATRIX<T,TV::m> B);
+    void Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io);
+    template<class OBJECT> typename DISABLE_IF<IS_POINTER<OBJECT>::value>::TYPE
+    Add_Penalty_Collision_Object(const OBJECT& object)
+    {Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object));}
 
+    void Add_Particle(const TV& X,const TV& V,const T mass,const T volume,const MATRIX<T,TV::m> F,const MATRIX<T,TV::m> B);
     int Add_Gravity(TV g);
     int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0);
     int Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles=0);
     int Add_Fixed_Corotated(T_VOLUME& object,T E,T nu);
     int Add_Neo_Hookean(T_VOLUME& object,T E,T nu);
-    void Add_Walls(int flags,bool sticky,T friction,T inset); // -x +x -y +y [ -z +z ], as bit flags
+    void Add_Walls(int flags,bool sticky,T friction,T inset,bool penalty); // -x +x -y +y [ -z +z ], as bit flags
 //#####################################################################
 };
 }

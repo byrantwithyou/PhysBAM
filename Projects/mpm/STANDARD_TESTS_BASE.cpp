@@ -9,6 +9,7 @@
 #include <Geometry/Seeding/POISSON_DISK.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
@@ -30,6 +31,7 @@ template<class TV> STANDARD_TESTS_BASE<TV>::
 STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     :MPM_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),scale_mass(1),scale_E(1),scale_speed(1),
+    penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),
     tests(stream_type,deformable_body_collection)
 {
     T framerate=24;
@@ -62,6 +64,9 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     parse_args.Add("-scale_mass",&scale_mass,"scale","Scale mass of particles");
     parse_args.Add("-scale_E",&scale_E,"scale","Scale stiffness");
     parse_args.Add("-scale_speed",&scale_speed,"scale","Scale initial speed of simulated object");
+    parse_args.Add("-penalty_stiffness",&penalty_collisions_stiffness,"tol","penalty collisions stiffness");
+    parse_args.Add("-penalty_separation",&penalty_collisions_separation,"tol","penalty collisions separation");
+    parse_args.Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
     parse_args.Parse(true);
 
     frame_dt=1/framerate;
@@ -176,7 +181,7 @@ Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles)
 // Function Add_Neo_Hookean
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Add_Walls(int flags,bool sticky,T friction,T inset) // -x +x -y +y [ -z +z ], as bit flags
+Add_Walls(int flags,bool sticky,T friction,T inset,bool penalty) // -x +x -y +y [ -z +z ], as bit flags
 {
     RANGE<TV> range=grid.domain.Thickened(grid.dX*(ghost*2+1));
     for(int a=0;a<TV::m;a++)
@@ -185,7 +190,8 @@ Add_Walls(int flags,bool sticky,T friction,T inset) // -x +x -y +y [ -z +z ], as
                 RANGE<TV> wall=range;
                 if(s) wall.max_corner(a)=grid.domain.min_corner(a)+inset;
                 else wall.min_corner(a)=grid.domain.max_corner(a)-inset;
-                Add_Collision_Object(wall,sticky,friction);}
+                if(penalty) Add_Penalty_Collision_Object(wall);
+                else Add_Collision_Object(wall,sticky,friction);}
 }
 //#####################################################################
 // Function Seed_Lagrangian_Particles
@@ -221,6 +227,14 @@ template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Neo_Hookean(T_VOLUME& object,T E,T nu)
 {
     return Add_Force(*Create_Finite_Volume(object,new NEO_HOOKEAN<T,TV::m>(E,nu,0,(T).25)));
+}
+//#####################################################################
+// Function Add_Penalty_Collision_Object
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io)
+{
+    this->Add_Force(*new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,io,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;

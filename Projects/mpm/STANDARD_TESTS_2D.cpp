@@ -9,6 +9,7 @@
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include "STANDARD_TESTS_2D.h"
@@ -154,7 +155,7 @@ Initialize()
         case 8:{ // collision an elastic cylinder (TODO: fix description.)
             if(!user_resolution) resolution=10;
             grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
-            Add_Walls(-1,false,.3,.1);
+            Add_Walls(-1,false,.3,.1,false);
             Add_Collision_Object(SPHERE<TV>(TV(4,3),1),false,.3);
             SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
@@ -167,7 +168,7 @@ Initialize()
         case 9:{ // collision an elastic cylinder (TODO: fix description.)
             if(!user_resolution) resolution=10;
             grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
-            Add_Walls(-1,false,.3,.1);
+            Add_Walls(-1,false,.3,.1,false);
             SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
             GRID<TV> sg(grid.numbers_of_cells*2,grid.domain,true);
@@ -186,7 +187,7 @@ Initialize()
         } break;
         case 10:{ // mpm projectile vs end-holded wall
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            Add_Walls(-1,false,.3,.1);
+            Add_Walls(-1,false,.3,.1,false);
             Add_Collision_Object(RANGE<TV>(TV(.45,.75),TV(.65,.85)),true,0);
             Add_Collision_Object(RANGE<TV>(TV(.45,.15),TV(.65,.25)),true,0);
             {SPHERE<TV> sphere(TV(.2,.5),.06);
@@ -216,11 +217,21 @@ Initialize()
             ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
             Add_Fixed_Corotated(1*scale_E,0.3,&foo);
             Add_Gravity(TV(0,-9.8));
-            Add_Walls(-1,false,.3,.1);
+            Add_Walls(-1,false,.3,.1,false);
             MPM_COLLISION_IMPLICIT_OBJECT<TV>* bottom=dynamic_cast<MPM_COLLISION_IMPLICIT_OBJECT<TV>*>(collision_objects(3));
             bottom->func_frame=[this](T time){return FRAME<TV>(TV(0,(T).75-abs((T).15*time*scale_speed-(T).75)));};
             bottom->func_twist=[this](T time){return TWIST<TV>(TV(0,-sign((T).15*time*scale_speed-(T).75)*(T).15*scale_speed),typename TV::SPIN());};
         } break;
+        case 12:{ // freefall circle, rising ground, penalty collisions
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            SPHERE<TV> sphere(TV(.5,.5),.3);
+            T density=2*scale_mass;
+            Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},
+                density,particles_per_cell);
+            ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
+            Add_Fixed_Corotated(1*scale_E,0.3,&foo);
+            Add_Gravity(TV(0,-9.8));
+            Add_Walls(-1,false,.3,.1,true);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
