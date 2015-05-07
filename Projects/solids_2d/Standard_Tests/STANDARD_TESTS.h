@@ -18,7 +18,6 @@
 //  12. Curtain and ball
 //  13. Falling mattress, random start
 //  14. Several falling mattresses
-//  15. Penalty collision test
 //  16. Crush test
 //  17. Matress, no gravity, random start
 //  18. Matress, no gravity, point start
@@ -55,7 +54,6 @@
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <Deformables/Forces/COLLISION_AREA_PENALTY_FORCE.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Deformables/Forces/INCOMPRESSIBLE_FINITE_VOLUME.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
@@ -242,7 +240,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 8: 
         case 13:
         case 14:
-        case 15:
         case 16:
         case 22:
         case 21:
@@ -395,10 +392,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(12,4))),100);
             tests.Add_Ground();
             break;}
-        case 15:{
-            for(int i=0;i<parameter;i++) tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1.2*i))),100);
-            tests.Add_Ground();
-            break;}
         case 16: {
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1))),100);
             RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",10,(T)0);
@@ -532,15 +525,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             solid_body_collection.Add_Force(Create_Incompressible_Finite_Volume(triangulated_area));
             Add_Constitutive_Model(triangulated_area,(T)2e3,(T)0,(T).01);
-            break;}
-        case 15:{
-            solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
-            COLLISION_AREA_PENALTY_FORCE<TV>* penalty_force=new COLLISION_AREA_PENALTY_FORCE<TV>(particles);
-            for(int i=0;i<parameter;i++){
-                TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>(i);
-                penalty_force->Add_Mesh(triangulated_area);
-                Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);}
-            solid_body_collection.Add_Force(penalty_force);
             break;}
         case 17:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.template Find_Structure<TRIANGULATED_AREA<T>&>();

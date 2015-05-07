@@ -83,7 +83,6 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/AXIAL_BENDING_SPRINGS.h>
 #include <Deformables/Forces/BINDING_SPRINGS.h>
-#include <Deformables/Forces/COLLISION_AREA_PENALTY_FORCE.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Deformables/Forces/INCOMPRESSIBLE_FINITE_VOLUME.h>
 #include <Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h>
