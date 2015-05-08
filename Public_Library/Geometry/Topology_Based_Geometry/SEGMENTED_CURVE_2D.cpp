@@ -18,7 +18,6 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> SEGMENTED_CURVE_2D<T>::
 SEGMENTED_CURVE_2D()
-    :SEGMENTED_CURVE<TV>(*new SEGMENT_MESH,*new GEOMETRY_PARTICLES<TV>)
 {
 }
 //#####################################################################
