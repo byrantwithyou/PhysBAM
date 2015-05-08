@@ -227,6 +227,7 @@ template<class TV> bool MPM_OBJECTIVE<TV>::
 Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance) const
 {
     MPM_KRYLOV_VECTOR<TV>& dv=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(Bdv);
+    system.forced_collisions.Remove_All();
     T e0=0,e1=0;
     dv*=0;
     Compute(dv,0,&tmp0,&e0);

@@ -330,6 +330,7 @@ Apply_Forces()
         LOG::printf("max velocity: %P\n",Max_Particle_Speed());
         if(example.test_diff) objective.Test_Diff(dv);
 
+        objective.system.forced_collisions.Remove_All();
         bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
         if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;}
 
