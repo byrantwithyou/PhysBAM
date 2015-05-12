@@ -50,7 +50,7 @@ public:
     T Grid_V_Upper_Bound() const;
     void Update_Simulated_Particles();
     void Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0);
-    void Print_Particle_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0);
+    void Print_Particle_Stats(const char* str,T dt);
     void Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u);
 //#####################################################################
 };

@@ -116,8 +116,8 @@ Advance_One_Time_Step()
 {
     example.Begin_Time_Step(example.time);
 
-    Print_Particle_Stats("particle state",example.dt,example.velocity,0);
     Update_Simulated_Particles();
+    Print_Particle_Stats("particle state",example.dt);
     Update_Particle_Weights();
     example.gather_scatter.Prepare_Scatter(example.particles);
     Particle_To_Grid();
@@ -463,7 +463,7 @@ Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,T
 // Function Print_Grid_Stats
 //#####################################################################
 template<class TV> void MPM_DRIVER<TV>::
-Print_Particle_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0)
+Print_Particle_Stats(const char* str,T dt)
 {
     if(!example.print_stats) return;
     typename TV::SPIN am=example.Total_Particle_Angular_Momentum();
