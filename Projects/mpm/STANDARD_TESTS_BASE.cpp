@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
@@ -30,7 +31,8 @@ namespace PhysBAM{
 template<class TV> STANDARD_TESTS_BASE<TV>::
 STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     :MPM_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),
-    user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),scale_mass(1),scale_E(1),scale_speed(1),
+    user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
+    scale_mass(1),scale_E(1),scale_speed(1),
     penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),
     tests(stream_type,deformable_body_collection)
 {
@@ -67,6 +69,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     parse_args.Add("-penalty_stiffness",&penalty_collisions_stiffness,"tol","penalty collisions stiffness");
     parse_args.Add("-penalty_separation",&penalty_collisions_separation,"tol","penalty collisions separation");
     parse_args.Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
+    parse_args.Add("-regular_seeding",&regular_seeding,"use regular particle seeding");
     parse_args.Parse(true);
 
     frame_dt=1/framerate;
@@ -124,15 +127,31 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
-    boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& sg)
+    boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid)
 {
-    ARRAY<TV> X;
-    for(NODE_ITERATOR<TV> it(sg);it.Valid();it.Next()) X.Append(sg.X(it.index));
-    T volume=sg.dX.Product();
+    T volume=seed_grid.dX.Product();
     T mass=density*volume;
-    for(int i=0;i<X.m;i++)
-        if(object.Lazy_Inside(X(i)))
-            Add_Particle(X(i),V(X(i)),mass,volume,MATRIX<T,TV::m>()+1,dV(X(i))*weights->Dp(X(i)));
+    for(CELL_ITERATOR<TV> it(seed_grid);it.Valid();it.Next()){
+        TV X=it.Location();
+        if(object.Lazy_Inside(X))
+            Add_Particle(X,V(X),mass,volume,MATRIX<T,TV::m>()+1,dV(X)*weights->Dp(X));}
+}
+//#####################################################################
+// Function Seed_Particles
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Seed_Particles_Helper(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
+    boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
+{
+    if(!regular_seeding) return Seed_Particles(object,V,dV,density,particles_per_cell);
+
+    object.Update_Box();
+    RANGE<TV_INT> range=grid.Clamp_To_Cell(object.Box(),3).Intersect(grid.Cell_Indices());
+    TV LB=grid.Node(range.min_corner);
+    TV UB=grid.Node(range.max_corner);
+    T scale=pow<1,TV::m>((T)particles_per_cell);
+    GRID<TV> seed_grid(range.Edge_Lengths()*scale,RANGE<TV>(LB,UB),true);
+    Seed_Particles(object,V,dV,density,seed_grid);
 }
 //#####################################################################
 // Function Add_Particle

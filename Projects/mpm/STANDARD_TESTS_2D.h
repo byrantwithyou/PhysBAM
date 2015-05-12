@@ -34,6 +34,7 @@ public:
     using BASE::Add_Fixed_Corotated;using BASE::Add_Neo_Hookean;using BASE::random;
     using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
     using BASE::tests;using BASE::Seed_Lagrangian_Particles;using BASE::Add_Collision_Object;
+    using BASE::Seed_Particles_Helper;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
