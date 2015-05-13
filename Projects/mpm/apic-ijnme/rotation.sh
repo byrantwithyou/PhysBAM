@@ -17,7 +17,9 @@ wait
 fi
 
 for i in {apic,pic,flip}{,-be,-symp} ; do
-    grep angular rotation-$i/common/log.txt | grep 'particle state angular' | awk '{print $5 " " $7}' | sed 's/[()]//g' > am-$i.txt
+    grep 'particle state angular' rotation-$i/common/log.txt | awk '{print $5 " " $7}' | sed 's/[()]//g' > am-$i.txt
+    grep 'after particle to grid particle total energy' rotation-$i/common/log.txt | awk '{print $9 " " $11}' | sed 's/<.*//g' > en-p-$i.txt
+    grep 'after particle to grid total energy' rotation-$i/common/log.txt | awk '{print $8 " " $10}' | sed 's/<.*//g' > en-g-$i.txt
 done
 
 ./plot-am.m \
@@ -30,3 +32,17 @@ pic-symp "PIC Symplectic Euler"  g-. \
 flip "FLIP Midpoint Rule"  b- \
 flip-be "FLIP Backward Euler"  b-- \
 flip-symp "FLIP Symplectic Euler"  b-.
+
+./plot-en.m \
+g-apic "APIC Midpoint Rule"  r- \
+g-apic-be "APIC Backward Euler"  r-- \
+g-apic-symp "APIC Symplectic Euler"  r-. \
+g-pic "PIC Midpoint Rule"  g- \
+g-pic-be "PIC Backward Euler"  g-- \
+g-pic-symp "PIC Symplectic Euler"  g-. \
+g-flip "FLIP Midpoint Rule (grid)"  b- \
+g-flip-be "FLIP Backward Euler (grid)"  b-- \
+g-flip-symp "FLIP Symplectic Euler (grid)"  b-. \
+p-flip "FLIP Midpoint Rule (particle)"  k- \
+p-flip-be "FLIP Backward Euler (particle)"  k-- \
+p-flip-symp "FLIP Symplectic Euler (particle)"  k-.
