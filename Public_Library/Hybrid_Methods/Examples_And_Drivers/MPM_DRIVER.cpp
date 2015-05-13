@@ -486,11 +486,13 @@ Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u)
     example.Capture_Stress();
     example.Precompute_Forces(example.time);
     T ke=example.Total_Grid_Kinetic_Energy(u);
+    T ke2=example.Total_Particle_Kinetic_Energy();
     T pe=example.Potential_Energy(example.time);
     T te=ke+pe;
     LOG::cout<<str<<" kinetic  "<<"time " <<example.time<<" value "<<ke<<std::endl;
     LOG::cout<<str<<" potential "<<"time " <<example.time<<" value "<<pe<<std::endl;
     LOG::cout<<str<<" total energy "<<"time " <<example.time<<" value "<<te<<" diff "<<(te-example.last_te)<<std::endl;
+    LOG::cout<<str<<" particle total energy "<<"time " <<example.time<<" value "<<(ke2+pe)<<std::endl;
     example.last_te=te;
 }
 //#####################################################################
