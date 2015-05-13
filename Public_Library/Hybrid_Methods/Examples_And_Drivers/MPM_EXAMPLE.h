@@ -62,7 +62,7 @@ public:
     bool use_reduced_rasterization;
     bool use_affine;
     bool use_midpoint;
-    bool use_forward_euler;
+    bool use_symplectic_euler;
     bool use_particle_collision;
     bool print_stats;
     T flip;

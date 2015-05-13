@@ -309,7 +309,7 @@ Apply_Forces()
     example.Capture_Stress();
     example.Precompute_Forces(example.time);
     objective.Reset();
-    if(example.use_forward_euler){
+    if(example.use_symplectic_euler){
         objective.tmp2*=0;
         example.Add_Forces(objective.tmp2.u,example.time);
 #pragma omp parallel for

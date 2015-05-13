@@ -26,7 +26,7 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
-    use_reduced_rasterization(false),use_affine(false),use_midpoint(false),use_forward_euler(false),
+    use_reduced_rasterization(false),use_affine(false),use_midpoint(false),use_symplectic_euler(false),
     use_particle_collision(false),print_stats(false),flip(0),cfl(1),newton_tolerance(1),
     newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),test_diff(false),threads(1)
 {
