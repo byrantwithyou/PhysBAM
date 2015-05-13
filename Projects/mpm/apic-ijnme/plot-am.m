@@ -4,6 +4,7 @@ n=size(argv())(1);
 
 legs={};
 hold on
+axis([0,5,0.00980,0.01035]);
 for i = 1:n/3
   filename=argv(){3*i-2};
   leg=argv(){3*i-1};
