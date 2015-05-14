@@ -22,7 +22,27 @@ for i in {apic,pic,flip}{,-be,-symp} ; do
     grep 'after particle to grid total energy' rotation-$i/common/log.txt | awk '{print $8 " " $10}' | sed 's/<.*//g' > en-g-$i.txt
 done
 
-./plot-am.m \
+cat <<EOF > st.m
+n=size(argv())(1);
+
+legs={};
+hold on
+axis([0,5,0.00980,0.01035]);
+for i = 1:n/3
+  filename=argv(){3*i-2};
+  leg=argv(){3*i-1};
+  form=argv(){3*i};
+  x=load(["am-" filename ".txt"]);
+  plot(x(:,1),x(:,2),form);
+  legs{i}=leg;
+end
+legend(legs,"location","southeast");
+xlabel('Time');
+ylabel('Angular momentum');
+title('Angular momentum for varous schemes');
+print -color -deps "all-am-rotation.pdf";
+EOF
+octave -q st.m \
 apic "APIC Midpoint Rule"  r- \
 apic-be "APIC Backward Euler"  r-- \
 apic-symp "APIC Symplectic Euler"  r-. \
@@ -33,7 +53,28 @@ flip "FLIP Midpoint Rule"  b- \
 flip-be "FLIP Backward Euler"  b-- \
 flip-symp "FLIP Symplectic Euler"  b-.
 
-./plot-en.m \
+cat <<EOF > st.m
+n=size(argv())(1);
+
+legs={};
+hold on
+axis([0,5,0.0018,0.0021]);
+for i = 1:n/3
+  filename=argv(){3*i-2};
+  leg=argv(){3*i-1};
+  form=argv(){3*i};
+  ["en-" filename ".txt"]
+  x=load(["en-" filename ".txt"]);
+  plot(x(:,1),x(:,2),form);
+  legs{i}=leg;
+end
+legend(legs,"location","southeast");
+xlabel('Time');
+ylabel('Energy');
+title('Total energy for varous schemes');
+print -color -deps "all-en-rotation.pdf";
+EOF
+octave -q st.m \
 g-apic "APIC Midpoint Rule"  r- \
 g-apic-be "APIC Backward Euler"  r-- \
 g-apic-symp "APIC Symplectic Euler"  r-. \
