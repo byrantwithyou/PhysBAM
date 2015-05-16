@@ -1,21 +1,5 @@
 To be implemented:
 
-* Threading
-
 * Make viewer aware of MPM_PARTICLES directly
 
 * Plasticity
-
-* Should be able to handle moving collision objects with constrants
-
-* Penalty collisions for moving collision objects
-
-To be debugged:
-
-
-To test:
-
-* Make sure -flip works correctly
-
-
-To do:
