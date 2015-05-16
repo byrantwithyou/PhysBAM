@@ -38,6 +38,7 @@ public:
     ARRAY<bool> particle_is_simulated;
 
     ARRAY<T,TV_INT> mass;
+    ARRAY<T,TV_INT> max_weight;
     ARRAY<TV,TV_INT> location;
     ARRAY<TV,TV_INT> velocity,velocity_new;
     ARRAY<int> valid_grid_indices;
@@ -57,6 +58,7 @@ public:
     int substeps_delay_frame;
     std::string output_directory;
     T mass_contour;
+    bool use_max_weight;
     int restart;
     T dt,time,frame_dt,min_dt,max_dt;
     int ghost;

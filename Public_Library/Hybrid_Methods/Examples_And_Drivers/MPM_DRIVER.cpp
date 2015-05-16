@@ -85,6 +85,7 @@ Initialize()
         example.Read_Output_Files(example.restart);
 
     example.mass.Resize(example.grid.Domain_Indices(example.ghost));
+    if(example.use_max_weight) example.max_weight.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity_new.Resize(example.grid.Domain_Indices(example.ghost));
     dv.u.Resize(example.grid.Domain_Indices(example.ghost));
@@ -210,7 +211,8 @@ Particle_To_Grid()
     for(int i=0;i<example.mass.array.m;i++){
         example.mass.array(i)=0;
         example.velocity.array(i)=TV();
-        example.velocity_new.array(i)=TV();}
+        example.velocity_new.array(i)=TV();
+        if(example.use_max_weight) example.max_weight.array(i)=0;}
 
     if(example.weights->use_gradient_transfer)
     {
@@ -218,6 +220,7 @@ Particle_To_Grid()
             [this,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
             {
                 example.mass(it.Index())+=it.Weight()*particles.mass(p);
+                if(example.use_max_weight){T& w=example.max_weight(it.Index());w=max(w,it.Weight());}
                 example.velocity(it.Index())+=particles.mass(p)*(it.Weight()*particles.V(p)+particles.B(p)*it.Gradient());
             },true);
     }
@@ -228,6 +231,7 @@ Particle_To_Grid()
             [this,Dp_inverse,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
             {
                 example.mass(it.Index())+=it.Weight()*particles.mass(p);
+                if(example.use_max_weight) example.max_weight(it.Index())+=it.Weight();
                 TV V=particles.V(p);
                 if(example.use_affine) V+=particles.B(p)*(Dp_inverse*(example.grid.Center(it.Index())-particles.X(p)));
                 example.velocity(it.Index())+=it.Weight()*particles.mass(p)*V;
