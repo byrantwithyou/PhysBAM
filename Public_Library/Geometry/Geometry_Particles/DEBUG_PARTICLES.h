@@ -53,8 +53,10 @@ template<class TV,int d> inline void Add_Debug_Object(const VECTOR<TV,d>& object
 template<class TV,int d> void Add_Debug_Object(const VECTOR<TV,d>& object,const VECTOR<typename TV::SCALAR,3>& color,const VECTOR<typename TV::SCALAR,3>& bgcolor);
 template<class T_SURFACE,class T> void Dump_Surface(const T_SURFACE& surface,const VECTOR<T,3>& color){Dump_Surface(surface,color,color);}
 template<class TV,class TV_INT,class T> void Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>& color){Dump_Levelset(grid,phi,color,color);}
+template<class TV,class TV_INT,class T> void Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>& color,T contour_value){Dump_Levelset(grid,phi,color,color,contour_value);}
 template<class T_SURFACE,class T> void Dump_Surface(const T_SURFACE& surface,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor);
 template<class TV,class TV_INT,class T> void Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor);
+template<class TV,class TV_INT,class T> void Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor,T contour_value);
 template<class TV,class T> void Dump_Levelset(const GRID<TV>& grid,const IMPLICIT_OBJECT<TV>& phi,const VECTOR<T,3>& color){Dump_Levelset(grid,phi,color,color);}
 template<class TV,class T> void Dump_Levelset(const GRID<TV>& grid,const IMPLICIT_OBJECT<TV>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor);
 }

@@ -5,6 +5,7 @@
 #include <Tools/Log/LOG.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
@@ -24,7 +25,7 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(&particles,0)),
     debug_particles(*new DEBUG_PARTICLES<TV>),
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),initial_time(0),last_frame(100),
-    write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),
+    write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),mass_contour(-1),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
     use_reduced_rasterization(false),use_affine(false),use_midpoint(false),use_symplectic_euler(false),
     use_particle_collision(false),print_stats(false),flip(0),cfl(1),newton_tolerance(1),
@@ -69,6 +70,8 @@ Write_Output_Files(const int frame)
     for(int i=0;i<collision_objects.m;i++)
         if(IMPLICIT_OBJECT<TV>* io=collision_objects(i)->Get_Implicit_Object(time))
             Dump_Levelset(ghost_grid,*io,VECTOR<T,3>(0.7,0.3,0.3));
+    if(mass_contour>=0)
+        Dump_Levelset(grid,mass,VECTOR<T,3>(0.2,0.6,0.2),mass_contour*Average_Particle_Mass());
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 }
 //#####################################################################
@@ -288,6 +291,18 @@ Total_Particle_Kinetic_Energy() const
         if(use_affine) result_local+=particles.mass(p)/2*Dp_inverse*particles.B(p).Frobenius_Norm_Squared();
         result+=result_local;}
     return result;
+}
+//#####################################################################
+// Function Average_Particle_Mass
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_EXAMPLE<TV>::
+Average_Particle_Mass() const
+{
+    T result=0;
+#pragma omp parallel for reduction(+:result)
+    for(int k=0;k<simulated_particles.m;k++)
+        result+=particles.mass(simulated_particles(k));
+    return result/(T)particles.number;
 }
 //#####################################################################
 // Function Add_Collision_Object

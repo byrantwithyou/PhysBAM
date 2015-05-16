@@ -56,6 +56,7 @@ public:
     int write_substeps_level;
     int substeps_delay_frame;
     std::string output_directory;
+    T mass_contour;
     int restart;
     T dt,time,frame_dt,min_dt,max_dt;
     int ghost;
@@ -110,6 +111,7 @@ public:
     typename TV::SPIN Total_Particle_Angular_Momentum() const;
     T Total_Grid_Kinetic_Energy(const ARRAY<TV,TV_INT>& u) const;
     T Total_Particle_Kinetic_Energy() const;
+    T Average_Particle_Mass() const;
 //#####################################################################
 };
 }
