@@ -1,25 +1,26 @@
 #!/bin/bash
 
+NAME=`basename $0 | sed 's/\.sh$//'`
 ARGS="1 -max_dt 1e-2 -newton_tolerance 1e-4 -regular_seeding -print_stats -last_frame 120"
 if ! : ; then
-../mpm -affine -midpoint -o rotation-apic $ARGS >/dev/null &
-../mpm -midpoint -o rotation-pic $ARGS >/dev/null &
-../mpm -flip 1 -midpoint -o rotation-flip $ARGS >/dev/null &
+../mpm -affine -midpoint -o $NAME-apic $ARGS >/dev/null &
+../mpm -midpoint -o $NAME-pic $ARGS >/dev/null &
+../mpm -flip 1 -midpoint -o $NAME-flip $ARGS >/dev/null &
 
-../mpm -affine -o rotation-apic-be $ARGS >/dev/null &
-../mpm -o rotation-pic-be $ARGS >/dev/null &
-../mpm -flip 1 -o rotation-flip-be $ARGS >/dev/null &
+../mpm -affine -o $NAME-apic-be $ARGS >/dev/null &
+../mpm -o $NAME-pic-be $ARGS >/dev/null &
+../mpm -flip 1 -o $NAME-flip-be $ARGS >/dev/null &
 
-../mpm -affine -symplectic_euler -o rotation-apic-symp $ARGS -max_dt 1e-3 >/dev/null &
-../mpm -symplectic_euler -o rotation-pic-symp $ARGS -max_dt 1e-3 >/dev/null &
-../mpm -flip 1 -symplectic_euler -o rotation-flip-symp $ARGS -max_dt 1e-3 >/dev/null &
+../mpm -affine -symplectic_euler -o $NAME-apic-symp $ARGS -max_dt 1e-3 >/dev/null &
+../mpm -symplectic_euler -o $NAME-pic-symp $ARGS -max_dt 1e-3 >/dev/null &
+../mpm -flip 1 -symplectic_euler -o $NAME-flip-symp $ARGS -max_dt 1e-3 >/dev/null &
 wait
 fi
 
 for i in {apic,pic,flip}{,-be,-symp} ; do
-    grep 'particle state angular' rotation-$i/common/log.txt | awk '{print $5 " " $7}' | sed 's/[()]//g' > am-$i.txt
-    grep 'after particle to grid particle total energy' rotation-$i/common/log.txt | awk '{print $9 " " $11}' | sed 's/<.*//g' > en-p-$i.txt
-    grep 'after particle to grid total energy' rotation-$i/common/log.txt | awk '{print $8 " " $10}' | sed 's/<.*//g' > en-g-$i.txt
+    grep 'particle state angular' $NAME-$i/common/log.txt | awk '{print $5 " " $7}' | sed 's/[()]//g' > am-$i.txt
+    grep 'after particle to grid particle total energy' $NAME-$i/common/log.txt | awk '{print $9 " " $11}' | sed 's/<.*//g' > en-p-$i.txt
+    grep 'after particle to grid total energy' $NAME-$i/common/log.txt | awk '{print $8 " " $10}' | sed 's/<.*//g' > en-g-$i.txt
 done
 
 cat <<EOF > st.m
@@ -40,7 +41,7 @@ legend(legs,"location","southeast");
 xlabel('Time');
 ylabel('Angular momentum');
 title('Angular momentum for varous schemes');
-print -color -deps "all-am-rotation.pdf";
+print -color -deps "all-am-$NAME.pdf";
 EOF
 octave -q st.m \
 apic "APIC Midpoint Rule"  r- \
@@ -72,7 +73,7 @@ legend(legs,"location","southeast");
 xlabel('Time');
 ylabel('Energy');
 title('Total energy for varous schemes');
-print -color -deps "all-en-rotation.pdf";
+print -color -deps "all-en-$NAME.pdf";
 EOF
 octave -q st.m \
 g-apic "APIC Midpoint Rule"  r- \
