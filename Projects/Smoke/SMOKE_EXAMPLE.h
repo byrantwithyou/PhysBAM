@@ -31,6 +31,7 @@ public:
     int write_substeps_level;
     bool write_debug_data;
     std::string output_directory;
+    bool N_boundary;
 
     T cfl;
 

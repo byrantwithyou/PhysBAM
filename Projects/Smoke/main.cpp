@@ -24,6 +24,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     parse_args.Add("-restart",&example->restart,"frame","restart frame");
     parse_args.Add("-substeps",&example->write_substeps_level,"level","output-substep level");
     parse_args.Add("-e",&example->last_frame,"frame","last frame");
+    parse_args.Add("-N_boundary",&example->N_boundary,"use Neumann boundary (wall) for grid domain boundary");
     parse_args.Parse();
 
     TV point1=TV::All_Ones_Vector()*.2,point2=TV::All_Ones_Vector()*.3;point1(2)=0;point2(2)=.05;

@@ -12,7 +12,7 @@ using namespace PhysBAM;
 template<class TV> SMOKE_EXAMPLE<TV>::
 SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
-    restart(0),write_debug_data(false),output_directory("output"),cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
+    restart(0),write_debug_data(false),output_directory("output"),N_boundary(false),cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(mac_grid,false,false,thread_queue),advection_scalar(thread_queue),boundary(0)
 {
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
@@ -65,7 +65,11 @@ Set_Boundary_Conditions(const T time)
             TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);    
             for(FACE_ITERATOR<TV> iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
                 TV_INT boundary_face=axis_side==0?iterator.Face_Index()+TV_INT::Axis_Vector(axis):iterator.Face_Index()-TV_INT::Axis_Vector(axis);
-                projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
+                if(N_boundary){
+                    FACE_INDEX<TV::dimension> face(axis,boundary_face);
+                    projection.elliptic_solver->psi_N(face)=true;
+                    face_velocities(face)=0;}
+                else projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
     for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         if(source.Lazy_Inside(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
