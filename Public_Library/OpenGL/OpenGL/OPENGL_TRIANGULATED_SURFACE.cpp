@@ -237,7 +237,8 @@ Display() const
             for(int i=0;i<surface.mesh.elements.m;i++){
                 const VECTOR<int,3>& nodes=surface.mesh.elements(i);
                 for(int j=0;j<nodes.m;j++){
-                    //OPENGL_SHAPES::Draw_Arrow(surface.particles.X(nodes[j]),surface.particles.X(nodes[j])+velocity_scale*surface.particles.V(nodes[j]));
+//                    OPENGL_SHAPES::Draw_Arrow(surface.particles.X(nodes[j]),surface.particles.X(nodes[j])+velocity_scale*surface.particles.V(nodes[j]));
+                    OPENGL_SHAPES::Draw_Vector(surface.particles.X(nodes[j]),velocity_scale*surface.particles.V(nodes[j]));
                 }
             }
             glPopAttrib();
