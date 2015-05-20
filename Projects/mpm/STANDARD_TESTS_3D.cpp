@@ -6,6 +6,9 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
+#include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
+#include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include "STANDARD_TESTS_3D.h"
 namespace PhysBAM{
@@ -79,6 +82,58 @@ Initialize()
             Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},
                 density,particles_per_cell);
             Add_Gravity(TV(0,-9.8,0));
+        } break;
+        case 4:{ // subdivision surface - 40x40 strip
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-3,-3,-3),TV(3,3,3)),true);
+            
+            
+            std::string filename=data_directory+"/OpenSubdiv_Surfaces/strip_40.dat.gz";
+            OPENSUBDIV_SURFACE<TV>* surf=OPENSUBDIV_SURFACE<TV>::Create();
+            T thickness=1e-3;
+            surf->Initialize(filename,thickness);
+
+            T density=1000;
+//            surf->Set_Masses(density,thickness);
+
+            T c1=3.5e6;
+            T c2=1.3e6;
+            T stiffness_multiplier=scale_E;
+            T thickness_multiplier=1;
+
+            OPENSUBDIV_SURFACE<TV>& new_surf=Seed_Lagrangian_Particles(*surf,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,false);
+            MOONEY_RIVLIN_CURVATURE<T> model=MOONEY_RIVLIN_CURVATURE<T>(c1*stiffness_multiplier,c2*stiffness_multiplier,thickness*thickness_multiplier);
+            Add_Force(*new OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,3>(particles,new_surf,model));
+
+            Add_Walls(8,COLLISION_TYPE::separate,.3,.1,false);
+
+            Add_Gravity(TV(0,-9.8,0));
+        } break;
+        case 5:{ // subdivision surface - duck
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-3,-3,-3),TV(3,3,3)),true);
+            
+            std::string filename=data_directory+"/OpenSubdiv_Surfaces/duck_1073f.dat.gz";
+            OPENSUBDIV_SURFACE<TV>* surf=OPENSUBDIV_SURFACE<TV>::Create();
+            T thickness=1e-3;
+            surf->Initialize(filename,thickness);
+            
+            T density=1000;
+//            surf->Set_Masses(density,thickness);
+
+            T c1=3.5e6;
+            T c2=1.3e6;
+            T stiffness_multiplier=scale_E;
+            T thickness_multiplier=1;
+
+            OPENSUBDIV_SURFACE<TV>& new_surf=Seed_Lagrangian_Particles(*surf,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,false);
+            MOONEY_RIVLIN_CURVATURE<T> model=MOONEY_RIVLIN_CURVATURE<T>(c1*stiffness_multiplier,c2*stiffness_multiplier,thickness*thickness_multiplier);
+            Add_Force(*new OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,3>(particles,new_surf,model));
+
+            for(int p=0;p<particles.X.m;p++)
+                particles.X(p)(0)*=0.5;
+
+            Add_Walls(8,COLLISION_TYPE::separate,.3,.1,false);
+
+//            Add_Gravity(TV(0,-9.8,0));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

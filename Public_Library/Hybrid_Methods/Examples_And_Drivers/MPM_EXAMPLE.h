@@ -58,6 +58,7 @@ public:
     int write_substeps_level;
     int substeps_delay_frame;
     std::string output_directory;
+    std::string data_directory;
     T mass_contour;
     bool use_max_weight;
     int restart;

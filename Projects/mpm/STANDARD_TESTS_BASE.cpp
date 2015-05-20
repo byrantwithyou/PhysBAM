@@ -8,6 +8,7 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
+#include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
@@ -200,7 +201,7 @@ Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles)
     return Add_Force(fe);
 }
 //#####################################################################
-// Function Add_Neo_Hookean
+// Function Add_Walls
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty) // -x +x -y +y [ -z +z ], as bit flags
@@ -264,4 +265,6 @@ template class STANDARD_TESTS_BASE<VECTOR<double,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<double,3> >;
 template TRIANGULATED_AREA<double>& STANDARD_TESTS_BASE<VECTOR<double,2> >::Seed_Lagrangian_Particles<TRIANGULATED_AREA<double> >(TRIANGULATED_AREA<double>&,boost::function<VECTOR<double,2> (VECTOR<double,2> const&)>,boost::function<MATRIX<double,2,2> (VECTOR<double,2> const&)>,double,bool);
 template TRIANGULATED_AREA<float>& STANDARD_TESTS_BASE<VECTOR<float,2> >::Seed_Lagrangian_Particles<TRIANGULATED_AREA<float> >(TRIANGULATED_AREA<float>&,boost::function<VECTOR<float,2> (VECTOR<float,2> const&)>,boost::function<MATRIX<float,2,2> (VECTOR<float,2> const&)>,float,bool);
+template OPENSUBDIV_SURFACE<VECTOR<double,3>,3>& STANDARD_TESTS_BASE<VECTOR<double,3> >::Seed_Lagrangian_Particles<OPENSUBDIV_SURFACE<VECTOR<double,3>,3> >(OPENSUBDIV_SURFACE<VECTOR<double,3>,3>&,boost::function<VECTOR<double,3> (VECTOR<double,3> const&)>,boost::function<MATRIX<double,3,3> (VECTOR<double,3> const&)>,double,bool);
+template OPENSUBDIV_SURFACE<VECTOR<float,3>,3>& STANDARD_TESTS_BASE<VECTOR<float,3> >::Seed_Lagrangian_Particles<OPENSUBDIV_SURFACE<VECTOR<float,3>,3> >(OPENSUBDIV_SURFACE<VECTOR<float,3>,3>&,boost::function<VECTOR<float,3> (VECTOR<float,3> const&)>,boost::function<MATRIX<float,3,3> (VECTOR<float,3> const&)>,float,bool);
 }
