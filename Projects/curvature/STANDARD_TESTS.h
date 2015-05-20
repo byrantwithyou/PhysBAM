@@ -14,6 +14,7 @@
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Implicit_Objects_Uniform/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
+#include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES.h>
@@ -25,12 +26,14 @@
 #include <Deformables/Forces/ELASTIC_ETHER_DRAG.h>
 #include <Deformables/Forces/RALEIGH_DAMPING_FORCE.h>
 #include <Deformables/Forces/B_SPLINE_PATCH_CURVATURE_FORCE.h>
+#include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <string>
 #include <fstream>
 #include "STANDARD_TESTS_BASE.h"
 namespace PhysBAM{
@@ -83,6 +86,93 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     switch(test_number){
+        case 997:{
+            OPENSUBDIV_SURFACE<TV>* surf=OPENSUBDIV_SURFACE<TV>::Create(particles);
+
+            std::string filename=data_directory+"/OpenSubdiv_Surfaces/strip_40.dat.gz";
+            int res=40;
+            
+            T thickness=1e-3;
+            surf->Initialize(filename,thickness*thickness_multiplier);
+            surf->Set_Mass(density);
+
+            deformable_body_collection.Add_Structure(surf);
+            deformable_body_collection.Add_Structure(Create_Triangulated_Surface(*surf,true));
+            
+            T c1=3.5e6;
+            T c2=1.3e6;
+
+            MOONEY_RIVLIN_CURVATURE<T> model=MOONEY_RIVLIN_CURVATURE<T>(c1*stiffness_multiplier,c2*stiffness_multiplier,thickness*thickness_multiplier);
+            deformable_body_collection.Add_Force(new OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,3>(particles,*surf,model));
+//            // 3 is the gauss order.
+
+
+//            for(int i=0;i<res;i++){
+//                int p=i*res;
+//                kinematic_points.Append(p);
+//                INTERPOLATION_CURVE<T,TV> c;
+//                c.Add_Control_Point(0,particles.X(p));
+//            point_curves.Append(c);}
+
+            int M=res;
+            int N=res;
+            int first0=M/3;
+            int last0=2*M/3;
+            int boundary_thickness=ceil((T)N/10.0);
+            int last1=N;
+            for(int i=0;i<=last0-first0;i++){
+                for(int j=0;j<boundary_thickness;j++){
+                    int p=surf->control_points((i+first0)*M+j);
+                    kinematic_points.Append(p);
+                    INTERPOLATION_CURVE<T,TV> c;
+                    c.Add_Control_Point(0,particles.X(p));
+                    point_curves.Append(c);}
+                for(int j=last1-boundary_thickness;j<last1;j++){
+                    int p=surf->control_points((i+first0)*M+j);
+                    kinematic_points.Append(p);
+                    INTERPOLATION_CURVE<T,TV> c;
+                    c.Add_Control_Point(0,particles.X(p));
+//                    c.Add_Control_Point(0,particles.X(p)+m*TV(0,0,0.01));
+                    c.Add_Control_Point(1,particles.X(p)+m*TV(0,0,0.01));
+//                    c.Add_Control_Point(2,particles.X(p)-m*TV(0,0,.25));
+                    
+                    c.Add_Control_Point(5,particles.X(p)-m*TV(0,0,1));
+////                    c.Add_Control_Point(0,particles.X(p)+m*TV(0,0,0.01));
+////                    c.Add_Control_Point(1,particles.X(p)+m*TV(0,0,0.01));
+////                    c.Add_Control_Point(5,particles.X(p)-m*TV(0,0,1));
+                    point_curves.Append(c);}}
+            
+            
+            Add_Gravity();
+            automatically_add_to_collision_structures=false;
+            break;}
+        case 996:{// let part of a duck drape itself.
+            OPENSUBDIV_SURFACE<TV>* surf=OPENSUBDIV_SURFACE<TV>::Create(particles);
+            std::string filename=data_directory+"/OpenSubdiv_Surfaces/duck_1073f.dat.gz";
+            T thickness=1e-3;
+            surf->Initialize(filename,thickness*thickness_multiplier);
+            surf->Set_Mass(density);
+            deformable_body_collection.Add_Structure(surf);
+            deformable_body_collection.Add_Structure(Create_Triangulated_Surface(*surf,true));
+            T c1=3.5e6;
+            T c2=1.3e6;
+            MOONEY_RIVLIN_CURVATURE<T> model=MOONEY_RIVLIN_CURVATURE<T>(c1*stiffness_multiplier,c2*stiffness_multiplier,thickness*thickness_multiplier);
+            deformable_body_collection.Add_Force(new OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,3>(particles,*surf,model));
+
+            // let's hold the top part of the duck fixed. // now try moving the top part. // and stretching too?
+            for(int p=0;p<particles.X.m;p++){
+                int cp=surf->control_points(p);
+                if(particles.X(cp)(1)>.25){
+                    kinematic_points.Append(cp);
+                    INTERPOLATION_CURVE<T,TV> c;
+                    c.Add_Control_Point(0,particles.X(cp));
+                    c.Add_Control_Point(1,particles.X(cp));
+                    c.Add_Control_Point(5,particles.X(cp)-m*TV(1,0,0));
+//                    c.Add_Control_Point(5,0.5*particles.X(cp)-m*TV(1,0,0));
+                    point_curves.Append(c);}}
+            Add_Gravity();
+            automatically_add_to_collision_structures=false;
+            break;}
         case 1:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)25,0)*m)),true,true,density,m);
             tests.Add_Ground(0,1.99*m);
@@ -234,7 +324,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data_After(automatically_add_to_collision_structures);
 
     switch(test_number){
-        case 1: case 2: case 3: case 4: case 7: case 8: case 9:{
+        case 1: case 2: case 3: case 4: case 7: case 8: case 9: case 997: case 996:{
 //                for(int i=0;i<kinematic_points.m;i++)
 //                    particles.mass(kinematic_points(i))=FLT_MAX;
                  use_penalty_self_collisions=false;}
