@@ -21,6 +21,7 @@
 #include <Geometry/Tessellation/TORUS_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>
+#include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
@@ -386,6 +387,12 @@ Set_Mass_Of_Particles(const T_OBJECT& object,const T density,const bool use_cons
             assert(mass_scaled>0);
             particles.mass.Subset(object.mesh.elements(t))+=mass_scaled;}}
 }
+template<class TV> template<int gauss_order> void DEFORMABLES_STANDARD_TESTS<TV>::
+Set_Mass_Of_Particles(const OPENSUBDIV_SURFACE<TV,gauss_order>& object,const T density,const bool use_constant_mass)
+{
+    PHYSBAM_ASSERT(density>0);
+    object.Set_Mass(density,use_constant_mass);
+}
 //#####################################################################
 // Function Create_Cloth_Panel
 //#####################################################################
@@ -687,3 +694,7 @@ template BEZIER_SPLINE<VECTOR<float,2>,3>& DEFORMABLES_STANDARD_TESTS<VECTOR<flo
 template B_SPLINE<VECTOR<float,2>,3>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Copy_And_Add_Structure<B_SPLINE<VECTOR<float,2>,3> >(B_SPLINE<VECTOR<float,2>,3>&,ARRAY<int,int>*,bool);
 template LEVELSET_IMPLICIT_OBJECT<VECTOR<double,2> >* DEFORMABLES_STANDARD_TESTS<VECTOR<double,2> >::Initialize_Implicit_Surface(SEGMENTED_CURVE_2D<double>&,int) const;
 template LEVELSET_IMPLICIT_OBJECT<VECTOR<float,2> >* DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Initialize_Implicit_Surface(SEGMENTED_CURVE_2D<float>&,int) const;
+template OPENSUBDIV_SURFACE<VECTOR<double,3>,3>& DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Copy_And_Add_Structure<OPENSUBDIV_SURFACE<VECTOR<double,3>,3> >(OPENSUBDIV_SURFACE<VECTOR<double,3>,3>&,ARRAY<int,int>*,bool);
+template OPENSUBDIV_SURFACE<VECTOR<float,3>,3>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Copy_And_Add_Structure<OPENSUBDIV_SURFACE<VECTOR<float,3>,3> >(OPENSUBDIV_SURFACE<VECTOR<float,3>,3>&,ARRAY<int,int>*,bool);
+template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Set_Mass_Of_Particles<3>(OPENSUBDIV_SURFACE<VECTOR<double,3>,3> const&,double,bool);
+template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Set_Mass_Of_Particles<3>(OPENSUBDIV_SURFACE<VECTOR<float,3>,3> const&,float,bool);

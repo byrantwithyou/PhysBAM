@@ -9,6 +9,7 @@
 
 #include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
@@ -95,6 +96,7 @@ public:
         TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters,TRIANGULATED_SURFACE<T>* triangulated_surface=0);
     TRIANGULATED_SURFACE<T>& Create_Drifted_Surface(const TRIANGULATED_SURFACE<T>& triangulated_surface,SOFT_BINDINGS<TV>& soft_bindings,const bool use_impulses_for_collisions=false) const;
     template <class T_OBJECT> static void Set_Mass_Of_Particles(const T_OBJECT& volume,const T density,const bool use_constant_mass=false);
+    template <int gauss_order> static void Set_Mass_Of_Particles(const OPENSUBDIV_SURFACE<TV,gauss_order>& volume,const T density,const bool use_constant_mass=false);
     void PD_Curl(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p,const int number_of_joints,const bool parent_static=true,const T friction=.5);
     TRIANGULATED_SURFACE<T>& Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_BODY_STATE<TV>* initial_state,
         TRIANGULATED_SURFACE_CLIPPING_HELPER<T> *clipping_function,ARRAY<int>* particle_indices);
