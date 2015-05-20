@@ -309,9 +309,9 @@ Average_Particle_Mass() const
 // Function Add_Collision_Object
 //#####################################################################
 template<class TV> void MPM_EXAMPLE<TV>::
-Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,bool sticky,T friction)
+Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction)
 {
-    collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,sticky,friction));
+    collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,type,friction));
 }
 //#####################################################################
 namespace PhysBAM{

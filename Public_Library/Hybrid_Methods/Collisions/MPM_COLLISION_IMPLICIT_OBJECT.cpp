@@ -13,8 +13,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> MPM_COLLISION_IMPLICIT_OBJECT<TV>::
-MPM_COLLISION_IMPLICIT_OBJECT(IMPLICIT_OBJECT<TV>* io,bool sticky_input,T friction_input)
-    :MPM_COLLISION_OBJECT<TV>(sticky_input,friction_input),iot_frame(0),iot(0),io(io)
+MPM_COLLISION_IMPLICIT_OBJECT(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type_input,T friction_input)
+    :MPM_COLLISION_OBJECT<TV>(type_input,friction_input),iot_frame(0),iot(0),io(io)
 {
 }
 //#####################################################################

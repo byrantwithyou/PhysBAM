@@ -107,8 +107,8 @@ Initialize()
             if(!user_resolution) resolution=10;
             T dx=(T)5/resolution;
             grid.Initialize(TV_INT(3,1)*resolution+9,RANGE<TV>(TV(),TV(15,5)).Thickened(dx*(T)4.5),true);
-            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(0+dx/2,15)),false,0);
-            Add_Collision_Object(RANGE<TV>(TV(15-dx/2,-5),TV(20,15)),false,0);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(0+dx/2,15)),COLLISION_TYPE::slip,0);
+            Add_Collision_Object(RANGE<TV>(TV(15-dx/2,-5),TV(20,15)),COLLISION_TYPE::slip,0);
             SPHERE<TV> sphere(TV(2.5,2.5),1.5);
             T density=4*scale_mass;
             Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0.5,0);},[=](const TV&){return MATRIX<T,2>();},
@@ -131,8 +131,8 @@ Initialize()
             // ./mpm 7 -flip 0  -affine -midpoint -max_dt 1e-3 -cfl .1 -framerate 2400 -newton_tolerance 1e-5 -solver_tolerance 1e-5  -last_frame 240 -order 2 -print_stats | grep 'total'
             if(!user_resolution) resolution=480;
             grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(),TV(0.48,0.48)),true);
-            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(0.11,15)),false,0);
-            Add_Collision_Object(RANGE<TV>(TV(0.3,-5),TV(20,15)),false,0);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(0.11,15)),COLLISION_TYPE::separate,0);
+            Add_Collision_Object(RANGE<TV>(TV(0.3,-5),TV(20,15)),COLLISION_TYPE::separate,0);
             ARRAY<SPHERE<TV> > spheres; ARRAY<TV> v0; ARRAY<T> r;
             spheres.Append(SPHERE<TV>(TV(0.2,0.24),0.04));
             v0.Append(TV(50,0));
@@ -151,8 +151,8 @@ Initialize()
         case 8:{ // collision an elastic cylinder (TODO: fix description.)
             if(!user_resolution) resolution=10;
             grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
-            Add_Walls(-1,false,.3,.1,false);
-            Add_Collision_Object(SPHERE<TV>(TV(4,3),1),false,.3);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,false);
+            Add_Collision_Object(SPHERE<TV>(TV(4,3),1),COLLISION_TYPE::separate,.3);
             SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
             Seed_Particles_Helper(sphere,[=](const TV& X){return TV(3.0,0);},[=](const TV&){return MATRIX<T,2>();},
@@ -163,7 +163,7 @@ Initialize()
         case 9:{ // collision an elastic cylinder (TODO: fix description.)
             if(!user_resolution) resolution=10;
             grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
-            Add_Walls(-1,false,.3,.1,false);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,false);
             SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
             Seed_Particles_Helper(sphere,[=](const TV& X){return TV(3.0,0);},[=](const TV&){return MATRIX<T,2>();},
@@ -181,9 +181,9 @@ Initialize()
         } break;
         case 10:{ // mpm projectile vs end-holded wall
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            Add_Walls(-1,false,.3,.1,false);
-            Add_Collision_Object(RANGE<TV>(TV(.45,.75),TV(.65,.85)),true,0);
-            Add_Collision_Object(RANGE<TV>(TV(.45,.15),TV(.65,.25)),true,0);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,false);
+            Add_Collision_Object(RANGE<TV>(TV(.45,.75),TV(.65,.85)),COLLISION_TYPE::stick,0);
+            Add_Collision_Object(RANGE<TV>(TV(.45,.15),TV(.65,.25)),COLLISION_TYPE::stick,0);
             {SPHERE<TV> sphere(TV(.2,.5),.06);
                 T density=2*scale_mass;
                 Seed_Particles_Helper(sphere,[=](const TV& X){return TV(1,0);},[=](const TV&){return MATRIX<T,2>();},
@@ -211,7 +211,7 @@ Initialize()
             ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
             Add_Fixed_Corotated(1*scale_E,0.3,&foo);
             Add_Gravity(TV(0,-9.8));
-            Add_Walls(-1,false,.3,.1,false);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,false);
             MPM_COLLISION_IMPLICIT_OBJECT<TV>* bottom=dynamic_cast<MPM_COLLISION_IMPLICIT_OBJECT<TV>*>(collision_objects(3));
             bottom->func_frame=[this](T time){return FRAME<TV>(TV(0,(T).75-abs((T).15*time*scale_speed-(T).75)));};
             bottom->func_twist=[this](T time){return TWIST<TV>(TV(0,-sign((T).15*time*scale_speed-(T).75)*(T).15*scale_speed),typename TV::SPIN());};
@@ -225,7 +225,7 @@ Initialize()
             ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
             Add_Fixed_Corotated(1*scale_E,0.3,&foo);
             Add_Gravity(TV(0,-9.8));
-            Add_Walls(-1,false,.3,.1,true);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,true);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

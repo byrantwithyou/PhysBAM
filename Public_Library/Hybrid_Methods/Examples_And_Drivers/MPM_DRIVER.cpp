@@ -280,7 +280,9 @@ Grid_To_Particle()
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             particles.F(p)+=dt*grad_Vp*particles.F(p);
 
-            if(example.use_affine)
+            if(example.use_affine && example.use_early_gradient_transfer)
+                B=grad_Vp/example.weights->Constant_Scalar_Inverse_Dp();
+            else if(example.use_affine)
                 for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,false,scratch);it.Valid();it.Next()){
                     TV_INT index=it.Index();
                     TV V_grid=example.velocity_new(index);
@@ -295,14 +297,14 @@ Grid_To_Particle()
                     B+=it.Weight()/2*(MATRIX<T,TV::m>::Outer_Product(V_grid,Z-particles.X(p)+xi_new-xp_new)
                             +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));}
 
-                    particles.V(p)=V_pic;
-                    Perform_Particle_Collision(p,example.time+example.dt);
-                    if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
-                    else particles.X(p)+=particles.V(p)*dt;
-                    particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
-                    particles.B(p)=B;
+            particles.V(p)=V_pic;
+            Perform_Particle_Collision(p,example.time+example.dt);
+            if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
+            else particles.X(p)+=particles.V(p)*dt;
+            particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
+            particles.B(p)=B;
 
-                    if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}}
+            if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}}
 }
 //#####################################################################
 // Function Apply_Forces
@@ -359,7 +361,7 @@ Perform_Particle_Collision(int p,T time)
         MPM_COLLISION_OBJECT<TV>* io=example.collision_objects(i);
         T phi=io->Phi(X,time);
         if(phi>=0) continue;
-        if(example.collision_objects(i)->sticky) return;
+        if(example.collision_objects(i)->type==COLLISION_TYPE::stick) return;
         X-=phi*io->Normal(X,time);
         example.particles.X(p)=X;}
 }

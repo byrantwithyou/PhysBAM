@@ -161,7 +161,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
             T phi0=deepest_io->Phi(X0,t0),phi=deepest_io->Phi(X,t1);
             if(phi0<0){
                 phi-=phi0;
-                if(system.example.collision_objects(deepest_index)->sticky)
+                if(system.example.collision_objects(deepest_index)->type==COLLISION_TYPE::stick)
                     stuck=true;}
             deepest_phi=phi;}
         for(int j=0;j<system.example.collision_objects.m && !stuck;j++){
@@ -169,7 +169,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
             T phi0=io->Phi(X0,t0),phi=io->Phi(X,t1);
             if(phi0<0){
                 phi-=phi0;
-                if(system.example.collision_objects(j)->sticky)
+                if(system.example.collision_objects(j)->type==COLLISION_TYPE::stick)
                     stuck=true;}
             if(phi<deepest_phi || stuck){
                 deepest_phi=phi;
@@ -182,7 +182,8 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
             system.stuck_velocity.Append(SV);
             dv.u.array(i)=(SV-v0.u.array(i))/midpoint_scale; // Come to rest
             continue;}
-        COLLISION c={deepest_index,i,deepest_phi,0,deepest_io->Normal(X,t1),TV(),deepest_io->Hessian(X,t1)};
+        bool allow_sep=system.example.collision_objects(deepest_index)->type==COLLISION_TYPE::separate;
+        COLLISION c={deepest_index,i,deepest_phi,0,deepest_io->Normal(X,t1),TV(),deepest_io->Hessian(X,t1),allow_sep};
         system.collisions.Append(c);
         X-=deepest_phi*c.n;
         V=(X-system.example.location.array(i))/system.example.dt;
@@ -203,13 +204,13 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep)
         COLLISION& c=system.collisions(i);
         TV &gv=g.u.array(c.p);
         c.n_dE=gv.Dot(c.n);
-        if(!allow_sep || c.n_dE>=0){
+        if(!allow_sep || !c.allow_sep || c.n_dE>=0){
             c.H_dE=c.H*gv;
             gv-=c.n_dE*c.n+c.phi*c.H_dE;}}
 
     for(int i=system.collisions.m-1;i>=0;i--){
-        COLLISION& c=system.collisions(i);
-        if(allow_sep && c.n_dE<0)
+        const COLLISION& c=system.collisions(i);
+        if(allow_sep && c.allow_sep && c.n_dE<0)
             system.collisions.Remove_Index_Lazy(i);}
 }
 //#####################################################################

@@ -28,6 +28,7 @@ public:
         T phi,n_dE;
         TV n,H_dE;
         SYMMETRIC_MATRIX<T,TV::m> H;
+        bool allow_sep;
     };
 
     MPM_KRYLOV_VECTOR<TV>& tmp;

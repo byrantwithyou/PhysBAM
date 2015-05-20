@@ -6,6 +6,7 @@
 #define __MPM_DRIVER__
 #include <Tools/Grids_Uniform/FACE_INDEX.h>
 #include <Tools/Vectors/VECTOR.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 namespace PhysBAM{
 
 template<class TV> class MPM_EXAMPLE;
@@ -19,6 +20,7 @@ class MPM_DRIVER
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
 public:
 
     int current_frame;

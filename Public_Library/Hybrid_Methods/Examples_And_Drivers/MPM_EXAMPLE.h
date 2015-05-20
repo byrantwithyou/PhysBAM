@@ -29,6 +29,7 @@ class MPM_EXAMPLE:public NONCOPYABLE
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
+    typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
     GRID<TV> grid;
     STREAM_TYPE stream_type;
     MPM_PARTICLES<TV>& particles;
@@ -67,6 +68,7 @@ public:
     bool use_midpoint;
     bool use_symplectic_euler;
     bool use_particle_collision;
+    bool use_early_gradient_transfer;
     bool print_stats;
     T flip;
     T cfl;
@@ -102,10 +104,10 @@ public:
     int Add_Force(PARTICLE_GRID_FORCES<TV>& force);
     int Add_Force(DEFORMABLES_FORCES<TV>& force);
     void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
-    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,bool sticky,T friction);
+    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction);
     template<class OBJECT> typename DISABLE_IF<IS_POINTER<OBJECT>::value>::TYPE
-    Add_Collision_Object(const OBJECT& object,bool sticky,T friction)
-    {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),sticky,friction);}
+    Add_Collision_Object(const OBJECT& object,COLLISION_TYPE type,T friction)
+    {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),type,friction);}
 
     TV Total_Particle_Linear_Momentum() const;
     TV Total_Grid_Linear_Momentum(const ARRAY<TV,TV_INT>& u) const;

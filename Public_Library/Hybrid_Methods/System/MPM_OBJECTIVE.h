@@ -21,6 +21,7 @@ class MPM_OBJECTIVE:public NONLINEAR_FUNCTION<typename TV::SCALAR(KRYLOV_VECTOR_
     typedef typename TV::SCALAR T;
     typedef typename MPM_KRYLOV_SYSTEM<TV>::COLLISION COLLISION;
 public:
+    typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
     MPM_KRYLOV_SYSTEM<TV>& system;
     MPM_KRYLOV_VECTOR<TV> &v0,&v1,&tmp0,&tmp1,&tmp2;
     ARRAY<MATRIX<T,TV::m> > F0;

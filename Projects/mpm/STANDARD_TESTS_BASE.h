@@ -29,7 +29,7 @@ public:
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::collision_objects;using BASE::substeps_delay_frame;
     using BASE::output_directory;using BASE::mass_contour;using BASE::use_max_weight;
-    using BASE::restart;using BASE::dt;using BASE::time;
+    using BASE::restart;using BASE::dt;using BASE::time;using BASE::use_early_gradient_transfer;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
     using BASE::ghost;using BASE::use_reduced_rasterization;using BASE::use_affine;
     using BASE::use_midpoint;using BASE::use_symplectic_euler;using BASE::use_particle_collision;
@@ -37,7 +37,7 @@ public:
     using BASE::newton_iterations;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::test_diff;using BASE::threads;using BASE::weights;
     using BASE::Add_Force;using BASE::Set_Weights;using BASE::deformable_body_collection;
-    using BASE::Add_Collision_Object;
+    using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;
 
     int test_number;
     int resolution;
@@ -97,7 +97,7 @@ public:
     int Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles=0);
     int Add_Fixed_Corotated(T_VOLUME& object,T E,T nu);
     int Add_Neo_Hookean(T_VOLUME& object,T E,T nu);
-    void Add_Walls(int flags,bool sticky,T friction,T inset,bool penalty); // -x +x -y +y [ -z +z ], as bit flags
+    void Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty); // -x +x -y +y [ -z +z ], as bit flags
 //#####################################################################
 };
 }

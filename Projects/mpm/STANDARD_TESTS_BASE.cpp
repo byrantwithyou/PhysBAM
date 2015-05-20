@@ -72,6 +72,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     parse_args.Add("-penalty_separation",&penalty_collisions_separation,"tol","penalty collisions separation");
     parse_args.Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
     parse_args.Add("-regular_seeding",&regular_seeding,"use regular particle seeding");
+    parse_args.Add("-use_early_gradient_transfer",&use_early_gradient_transfer,"use early gradient transfer for Cp");
     parse_args.Parse(true);
 
     frame_dt=1/framerate;
@@ -202,7 +203,7 @@ Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles)
 // Function Add_Neo_Hookean
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Add_Walls(int flags,bool sticky,T friction,T inset,bool penalty) // -x +x -y +y [ -z +z ], as bit flags
+Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty) // -x +x -y +y [ -z +z ], as bit flags
 {
     RANGE<TV> range=grid.domain.Thickened(grid.dX*(ghost*2+1));
     for(int a=0;a<TV::m;a++)
@@ -212,7 +213,7 @@ Add_Walls(int flags,bool sticky,T friction,T inset,bool penalty) // -x +x -y +y 
                 if(s) wall.max_corner(a)=grid.domain.min_corner(a)+inset;
                 else wall.min_corner(a)=grid.domain.max_corner(a)-inset;
                 if(penalty) Add_Penalty_Collision_Object(wall);
-                else Add_Collision_Object(wall,sticky,friction);}
+                else Add_Collision_Object(wall,type,friction);}
 }
 //#####################################################################
 // Function Seed_Lagrangian_Particles

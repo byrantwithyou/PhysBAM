@@ -16,11 +16,12 @@ class MPM_COLLISION_IMPLICIT_OBJECT:public MPM_COLLISION_OBJECT<TV>
     FRAME<TV>* iot_frame;
     IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* iot;
 public:
+    using typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE;
     IMPLICIT_OBJECT<TV>* io;
     boost::function<FRAME<TV>(T)> func_frame;
     boost::function<TWIST<TV>(T)> func_twist;
 
-    MPM_COLLISION_IMPLICIT_OBJECT(IMPLICIT_OBJECT<TV>* io,bool sticky_input,T friction_input);
+    MPM_COLLISION_IMPLICIT_OBJECT(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type_input,T friction_input);
     virtual ~MPM_COLLISION_IMPLICIT_OBJECT();
     T Phi(const TV& X,T time) const PHYSBAM_OVERRIDE;
     TV Normal(const TV& X,T time) const PHYSBAM_OVERRIDE;

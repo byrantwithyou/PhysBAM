@@ -13,10 +13,10 @@ class MPM_COLLISION_OBJECT
 {
     typedef typename TV::SCALAR T;
 public:
-    bool sticky;
+    enum COLLISION_TYPE {stick,slip,separate} type;
     T friction;
 
-    MPM_COLLISION_OBJECT(bool sticky,T friction): sticky(sticky),friction(friction) {}
+    MPM_COLLISION_OBJECT(COLLISION_TYPE type,T friction): type(type),friction(friction) {}
     virtual ~MPM_COLLISION_OBJECT();
     virtual T Phi(const TV& X,T time) const=0;
     virtual TV Normal(const TV& X,T time) const=0;

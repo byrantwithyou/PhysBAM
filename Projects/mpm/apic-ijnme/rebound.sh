@@ -2,7 +2,7 @@
 
 NAME=`basename $0 | sed 's/\.sh$//'`
 ARGS="5 -max_dt 1e-1 -framerate 1 -newton_tolerance 1e-4 -regular_seeding -print_stats -last_frame 200"
-if ! : ; then
+if : ; then
 ../mpm -affine -midpoint -o $NAME-apic $ARGS >/dev/null &
 ../mpm -midpoint -o $NAME-pic $ARGS >/dev/null &
 ../mpm -flip 1 -midpoint -o $NAME-flip $ARGS >/dev/null &
