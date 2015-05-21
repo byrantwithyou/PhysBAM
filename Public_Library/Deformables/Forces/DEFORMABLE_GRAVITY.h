@@ -62,7 +62,7 @@ public:
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
     T Potential_Energy(int p,const T time) const;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
-    void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

@@ -27,7 +27,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 template<class TV> void RALEIGH_DAMPING_FORCE<TV>::
 Lagged_Update_Position_Based_State(const T time)
 {
-    force.Update_Position_Based_State(time,false);
+    force.Update_Position_Based_State(time,false,true);
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -57,7 +57,7 @@ Potential_Energy(const T time) const
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void RALEIGH_DAMPING_FORCE<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     D_V0.Resize(particles.V.m);
     D_V0.Fill(TV());

@@ -63,7 +63,7 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 // Function Update_Position_Based_State
 //#####################################################################
 template<class T> void DEFORMABLE_WIND_DRAG_3D<T>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     T_SIMPLICIAL_OBJECT& simplicial_object=*triangulated_surface;
     T wind_viscosity=use_constant_wind?constant_wind_viscosity:spatially_varying_wind_viscosity;

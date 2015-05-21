@@ -84,7 +84,7 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 // Function Update_Position_Based_State
 //#####################################################################
 template<class T> void FINITE_VOLUME_HEXAHEDRONS<T>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     int elements=strain_measure.H_DmH_inverse.m;
     U.Resize(elements,false,false);De_inverse_hat.Resize(elements,false,false);Fe_hat.Resize(elements,false,false);

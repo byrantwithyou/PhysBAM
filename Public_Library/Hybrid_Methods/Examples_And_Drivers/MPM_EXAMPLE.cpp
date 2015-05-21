@@ -98,12 +98,12 @@ Capture_Stress()
 // Function Precompute_Forces
 //#####################################################################
 template<class TV> void MPM_EXAMPLE<TV>::
-Precompute_Forces(const T time)
+Precompute_Forces(const T time,const bool update_hessian)
 {
     for(int i=0;i<forces.m;i++)
         forces(i)->Precompute(time);
     for(int i=0;i<lagrangian_forces.m;i++)
-        lagrangian_forces(i)->Update_Position_Based_State(time,false);
+        lagrangian_forces(i)->Update_Position_Based_State(time,false,update_hessian);
 }
 //#####################################################################
 // Function Potential_Energy

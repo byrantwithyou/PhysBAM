@@ -90,7 +90,7 @@ public:
     virtual void Limit_Time_Step_By_Strain_Rate(const bool limit_time_step_by_strain_rate_input=true,const T max_strain_per_time_step_input=.1);
     virtual void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const=0;
     virtual void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)=0;
-    virtual void Update_Position_Based_State(const T time,const bool is_position_update);
+    virtual void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian);
     virtual void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const=0;
     virtual void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const=0;
     virtual int Velocity_Dependent_Forces_Size() const;

@@ -33,7 +33,7 @@ template<class TV> BW_STRETCH_FORCES<TV>::
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void BW_STRETCH_FORCES<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     for(TRIANGLE_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int s=iterator.Data();
         typename BASE::STATE& state=states(s);
@@ -70,7 +70,7 @@ template<class TV> typename TV::SCALAR BW_STRETCH_FORCES<TV>::
 Potential_Energy(const T time) const
 {
     T potential_energy=0;
-    const_cast<BW_STRETCH_FORCES<TV>* >(this)->Update_Position_Based_State(time,true);
+    const_cast<BW_STRETCH_FORCES<TV>* >(this)->Update_Position_Based_State(time,true,true);
     for(TRIANGLE_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int s=iterator.Data();
         potential_energy+=Potential_Energy(s,time);}
     return potential_energy;

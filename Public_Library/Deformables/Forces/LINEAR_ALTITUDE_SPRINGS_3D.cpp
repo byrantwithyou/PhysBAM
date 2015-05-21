@@ -151,7 +151,7 @@ Fill_Spring_State(int t,int isolated_node_number,int node1,int node2,int node3,i
 // Function Update_Position_Based_State
 //#####################################################################
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     if(use_shortest_spring_only) spring_states.Resize(mesh.elements.m);
     else spring_states_all_springs.Resize(mesh.elements.m);

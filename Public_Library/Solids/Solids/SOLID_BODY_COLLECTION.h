@@ -84,7 +84,7 @@ public:
     void Disable_Spring_Elasticity();
     void Update_Simulated_Particles();
     void Delete_Forces();
-    void Update_Position_Based_State(const T time,const bool is_position_update);
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian);
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;
     void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,

@@ -121,7 +121,8 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
     solid_body_collection.Enforce_Definiteness(true);
     example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
     Set_External_Positions(particles.X,time+dt);binding_list.Clamp_Particles_To_Embedded_Positions();
-    solid_body_collection.Update_Position_Based_State(time+dt,true);solid_body_collection.deformable_body_collection.Update_Collision_Penalty_Forces_And_Derivatives();
+    solid_body_collection.Update_Position_Based_State(time+dt,true,true);
+    solid_body_collection.deformable_body_collection.Update_Collision_Penalty_Forces_And_Derivatives();
 
     // iterate to steady state
     T supnorm=0;int iteration;
@@ -134,7 +135,7 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
         if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(particles.X);
         binding_list.Clamp_Particles_To_Embedded_Positions();
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(particles.X);
-        solid_body_collection.Update_Position_Based_State(time+dt,true);
+        solid_body_collection.Update_Position_Based_State(time+dt,true,true);
         solid_body_collection.deformable_body_collection.Update_Collision_Penalty_Forces_And_Derivatives();
         GENERALIZED_VELOCITY<TV>& R=debug_cast<GENERALIZED_VELOCITY<TV>&>(*krylov_vectors(0));
         R.V.Fill(TV());

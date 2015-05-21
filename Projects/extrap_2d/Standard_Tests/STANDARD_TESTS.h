@@ -1015,7 +1015,7 @@ void Init_Scatter_Plot()
 {
     int s=0;
     for(int f=0;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
-        force->Update_Position_Based_State(0,true);
+        force->Update_Position_Based_State(0,true,false);
         s+=force->Fe_hat.m;}
 
     contrail.Resize(s);
@@ -1161,7 +1161,7 @@ void Plot_Energy_Landscape()
             T y=2*sigma_range*j/image_size+1.2e-5;
             particles.X(3)=TV(-x,y);
             particles.X(5)=TV(x,y);
-            solid_body_collection.Update_Position_Based_State(0,false);
+            solid_body_collection.Update_Position_Based_State(0,false,false);
             T ke,pe;
             solid_body_collection.Compute_Energy(0,ke,pe);
             solid_body_collection.Add_Velocity_Independent_Forces(F,TW,0);

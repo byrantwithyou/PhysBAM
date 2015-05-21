@@ -39,7 +39,7 @@ public:
     void Set_Damping(const T damping_input)
     {damping=damping_input;}
 
-    void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE
     {}
 
     T CFL_Strain_Rate() const PHYSBAM_OVERRIDE// linear bending elements require large edge spring stiffness to work, so we assume those dominate the CFL

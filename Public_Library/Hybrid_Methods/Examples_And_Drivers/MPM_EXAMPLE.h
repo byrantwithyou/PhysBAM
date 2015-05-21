@@ -98,7 +98,7 @@ public:
     virtual void End_Time_Step(const T time)=0;
 
     void Capture_Stress();
-    void Precompute_Forces(const T time);
+    void Precompute_Forces(const T time,const bool update_hessian);
     T Potential_Energy(const T time) const;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const;
     void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const;

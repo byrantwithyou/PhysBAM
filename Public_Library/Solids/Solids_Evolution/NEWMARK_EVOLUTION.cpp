@@ -360,7 +360,7 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
         if(solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions) solid_body_collection.deformable_body_collection.collisions.Activate_Collisions(false);}
 
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(solid_body_collection.deformable_body_collection.particles.X);
-    solid_body_collection.Update_Position_Based_State(time+dt,true);
+    solid_body_collection.Update_Position_Based_State(time+dt,true,true);
 
     // get momentum difference for v^n -> v^{n+1/2} udpate
     if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
@@ -542,7 +542,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt/2);
 
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(solid_body_collection.deformable_body_collection.particles.X);
-        solid_body_collection.Update_Position_Based_State(time+dt/2,(solids_parameters.allow_altitude_spring_change_between_updates?true:false));
+        solid_body_collection.Update_Position_Based_State(time+dt/2,(solids_parameters.allow_altitude_spring_change_between_updates?true:false),true);
         Make_Incompressible(dt,false); // make velocity divergence free
         if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
         Trapezoidal_Step_Velocity(dt,time);
@@ -559,7 +559,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
 
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(solid_body_collection.deformable_body_collection.particles.X);
-        solid_body_collection.Update_Position_Based_State(time+dt,(solids_parameters.allow_altitude_spring_change_between_updates?true:false));
+        solid_body_collection.Update_Position_Based_State(time+dt,(solids_parameters.allow_altitude_spring_change_between_updates?true:false),true);
         Make_Incompressible(dt,false); // make velocity divergence free
         if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
         Backward_Euler_Step_Velocity(dt,time); // TODO: Tamar & Craig, do you need post stab?

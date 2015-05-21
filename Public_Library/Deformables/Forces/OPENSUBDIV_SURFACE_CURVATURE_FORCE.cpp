@@ -119,7 +119,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 // Function Update_Position_Based_State
 //#####################################################################
 template<class T,int gauss_order> void OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,gauss_order>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     T local_pe=0;
     if(data.m!=surf.m){

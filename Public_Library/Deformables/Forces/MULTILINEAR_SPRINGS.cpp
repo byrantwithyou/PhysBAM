@@ -37,7 +37,7 @@ Set_Spring_Phases(const ARRAY<VECTOR<T,2> >& compression_intervals_input,const A
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void MULTILINEAR_SPRINGS<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     states.Resize(segment_mesh.elements.m,false,false);current_lengths.Resize(segment_mesh.elements.m,false,false);
     correction_force.Resize(segment_mesh.elements.m,false,false);

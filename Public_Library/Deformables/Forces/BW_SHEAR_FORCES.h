@@ -28,7 +28,7 @@ public:
     virtual ~BW_SHEAR_FORCES();
 
 //#####################################################################
-    void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
     T Potential_Energy(int s,const T time) const;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################

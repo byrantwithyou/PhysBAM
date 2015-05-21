@@ -419,7 +419,7 @@ Integrate_Simplex(const SIMPLEX_NODES& simplex,const X_VECTOR& X,const PHI_VECTO
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     pe=0;
     grad_pe.Remove_All();

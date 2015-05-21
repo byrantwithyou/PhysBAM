@@ -92,7 +92,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void BEZIER_C2_FORCE<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     MATRIX<T,2> rot(0,1,-1,0);
     pe=0;

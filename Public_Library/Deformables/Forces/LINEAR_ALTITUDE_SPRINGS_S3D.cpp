@@ -91,7 +91,7 @@ Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction) // 1 is critic
 // Function Update_Position_Based_State
 //#####################################################################
 template<class T> void LINEAR_ALTITUDE_SPRINGS_S3D<T>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     ARRAY_VIEW<const TV> X(particles.X);int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 are the segment
     int used_springs=0,total_elements=0;

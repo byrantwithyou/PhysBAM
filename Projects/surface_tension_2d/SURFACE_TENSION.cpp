@@ -1029,7 +1029,7 @@ Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T curren
         fsi->gradient=gradient;
         SURFACE_TENSION_FORCE<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<TV>*>();
         if(!force) return;
-        force->Update_Position_Based_State(current_position_time,true);}
+        force->Update_Position_Based_State(current_position_time,true,true);}
 
     if(rebuild_surface){
         SURFACE_TENSION_FORCE<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<TV>*>();
@@ -1043,7 +1043,7 @@ Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T curren
         fi->entries=fluid_interpolation_entries;
         si->entries=solid_interpolation_entries;
 
-        force->Update_Position_Based_State(current_position_time,true);
+        force->Update_Position_Based_State(current_position_time,true,true);
 
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle rebuild",0,0);}
 }

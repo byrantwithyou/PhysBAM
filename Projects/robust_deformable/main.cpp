@@ -74,7 +74,7 @@ public:
         const_cast<MINIMIZATION_OBJECTIVE<TV>*>(this)->v1.Copy(-1,x0,x);
         const_cast<MINIMIZATION_OBJECTIVE<TV>*>(this)->v1*=1/dt;
         const_cast<MINIMIZATION_OBJECTIVE<TV>*>(this)->x1.Copy(1,x);
-        solid_body_collection.Update_Position_Based_State(time,true);
+        solid_body_collection.Update_Position_Based_State(time,true,h);
 
         if(e){
             T ke=0,pe=0;

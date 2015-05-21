@@ -171,7 +171,7 @@ template<class T> void Set_Inversion_Based_On_Implicit_Surface(FINITE_VOLUME<VEC
         fvm.Fe_hat(triangle).x.y*=-1;fvm.U(triangle).Set_Column(1,-fvm.U(triangle).Column(1));}
 }}
 template<class TV,int d> void FINITE_VOLUME<TV,d>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     if(this->use_implicit_velocity_independent_forces) Save_Stress_Derivative();
     if(anisotropic_model && !V) PHYSBAM_FATAL_ERROR();

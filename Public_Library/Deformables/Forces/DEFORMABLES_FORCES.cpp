@@ -111,7 +111,7 @@ Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void DEFORMABLES_FORCES<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
 }
 //#####################################################################

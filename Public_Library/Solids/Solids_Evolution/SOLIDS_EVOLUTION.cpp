@@ -148,7 +148,7 @@ Initialize_Deformable_Objects(const T frame_rate,const bool restart)
 
     solid_body_collection.Set_CFL_Number(solids_parameters.cfl);
     example_forces_and_velocities.Update_Time_Varying_Material_Properties(time);
-    solid_body_collection.Update_Position_Based_State(time,true);
+    solid_body_collection.Update_Position_Based_State(time,true,true);
 }
 //#####################################################################
 // Function Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions
@@ -201,7 +201,7 @@ Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,i
         for(int p=0;p<particles.Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
     else{particles.V=V_save;return false;} // restore all the unmodified velocities
     example_forces_and_velocities.Update_Time_Varying_Material_Properties(time);
-    solid_body_collection.Update_Position_Based_State(time,false);
+    solid_body_collection.Update_Position_Based_State(time,false,true);
 
     return true;
 }

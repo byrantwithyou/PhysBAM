@@ -39,7 +39,7 @@ Potential_Energy(const T time) const
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void DEFORMABLE_GRAVITY<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
 }
 //#####################################################################

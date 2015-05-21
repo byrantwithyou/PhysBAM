@@ -143,7 +143,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 // Function Update_Position_Based_State
 //#####################################################################
 template<class T> void LINEAR_TET_SPRINGS<T>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     spring_states.Resize(mesh.elements.m);
 

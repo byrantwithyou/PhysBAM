@@ -72,7 +72,7 @@ Set_Constants_From_Particles(const T material_stiffness,const T material_damping
 // Function Update_Position_Based_State
 //#####################################################################
 template<class T> void SEGMENT_BENDING_ELEMENTS<T>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     elastic_s.Resize(bending_triples.m,false,false);damping_coefficient.Resize(bending_triples.m,false,false);force_directions.Resize(bending_triples.m,false,false);
     for(TRIPLE_ITERATOR iterator(force_triples);iterator.Valid();iterator.Next()){int q=iterator.Data();

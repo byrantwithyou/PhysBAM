@@ -46,7 +46,7 @@ public:
 
 //#####################################################################
     void Set_Spring_Phases(const ARRAY<VECTOR<T,2> >& compression_intervals_input,const ARRAY<VECTOR<T,2> >& stretching_intervals_input);
-    void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
     void Set_Overdamping_Fraction(const T overdamping_fraction) PHYSBAM_OVERRIDE;
     void Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) PHYSBAM_OVERRIDE;

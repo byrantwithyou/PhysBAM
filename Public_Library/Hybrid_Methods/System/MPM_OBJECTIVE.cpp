@@ -71,7 +71,7 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
     Update_F(v1);
     T midpoint_factor=use_midpoint?(T).25:1;
 
-    system.example.Precompute_Forces(system.example.time);
+    system.example.Precompute_Forces(system.example.time,h);
     if(e){
         T energy=midpoint_factor*system.Inner_Product(dv,dv)/2;
         energy+=system.example.Potential_Energy(system.example.time);

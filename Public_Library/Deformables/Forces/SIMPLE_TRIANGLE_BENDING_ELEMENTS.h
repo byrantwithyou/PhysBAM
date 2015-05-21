@@ -67,7 +67,7 @@ public:
     void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
     void Set_Quadruples_From_Triangle_Mesh(TRIANGLE_MESH& mesh);
     void Set_Constants_From_Particles(const T material_stiffness,const T material_damping);
-    void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 

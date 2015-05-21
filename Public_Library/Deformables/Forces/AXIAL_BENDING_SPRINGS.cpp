@@ -121,7 +121,7 @@ Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction) // 1 is critic
 // Function Update_Position_Based_State
 //#####################################################################
 template<class T> void AXIAL_BENDING_SPRINGS<T>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     optimization_current_length.Resize(spring_particles.m,false,false);optimization_direction.Resize(spring_particles.m,false,false);
     optimization_weights.Resize(spring_particles.m,false,false);optimization_coefficient.Resize(spring_particles.m,false,false);

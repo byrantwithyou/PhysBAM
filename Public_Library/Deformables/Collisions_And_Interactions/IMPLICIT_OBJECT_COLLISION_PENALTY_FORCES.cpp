@@ -62,7 +62,7 @@ Update_Position_Based_State_Particle(int p)
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     pe=0;
     penetrating_particles.Remove_All();

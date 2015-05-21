@@ -51,7 +51,7 @@ public:
     T CFL_Strain_Rate() const PHYSBAM_OVERRIDE
     {return FLT_MAX;}
 
-    void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE
     {}
 
     void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE

@@ -77,11 +77,11 @@ Update_Simulated_Particles()
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     for(int k=0;k<solids_forces.m;k++) solids_forces(k)->Update_Position_Based_State(time);
     for(int k=0;k<rigid_body_collection.rigids_forces.m;k++) rigid_body_collection.rigids_forces(k)->Update_Position_Based_State(time);
-    for(int k=0;k<deformable_body_collection.deformables_forces.m;k++) deformable_body_collection.deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
+    for(int k=0;k<deformable_body_collection.deformables_forces.m;k++) deformable_body_collection.deformables_forces(k)->Update_Position_Based_State(time,is_position_update,update_hessian);
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces

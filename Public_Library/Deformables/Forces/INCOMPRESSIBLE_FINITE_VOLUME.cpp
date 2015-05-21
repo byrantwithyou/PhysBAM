@@ -91,9 +91,9 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    BASE::Update_Position_Based_State(time,is_position_update);
+    BASE::Update_Position_Based_State(time,is_position_update,update_hessian);
     if(MPI_WORLD::Initialized() && !mpi_solids) PHYSBAM_FATAL_ERROR();
     ARRAY<T> element_volumes(strain_measure.mesh.elements.m,false); // TODO: this is not efficient.
 
@@ -263,7 +263,7 @@ Test_System()
 {
     if(disable_projection) return;
     RANDOM_NUMBERS<T> random;random.Set_Seed(1823);
-    Update_Position_Based_State(0,true);
+    Update_Position_Based_State(0,true,true);
 
     pressure_full.Resize(particles.Size(),false,false);divergence_full.Resize(particles.Size(),false,false);
     const ARRAY<int> &fragment_dynamic_particles=force_dynamic_particles_list,
@@ -314,7 +314,7 @@ Test_System()
         ARRAY<TV> X_old(X);
         X+=dt*V;
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(particles.X);
-        Update_Position_Based_State(0,true);
+        Update_Position_Based_State(0,true,true);
 
         ARRAY<T> dv_full(volumes_full.m);KRYLOV_VECTOR_T dv(dv_full,fragment_dynamic_particles);
         dv.v=volumes-old_volumes;
@@ -325,7 +325,7 @@ Test_System()
 
         // restore old positions
         X=X_old;
-        Update_Position_Based_State(0,true);}
+        Update_Position_Based_State(0,true,true);}
 
     exit(1);
 }
@@ -469,7 +469,7 @@ Set_Neumann_Boundary_Conditions(const ARRAY<COLLISION_PARTICLE_STATE<TV> >* part
 template<class TV,int d> typename TV::SCALAR INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Max_Relative_Velocity_Error()
 {
-    Update_Position_Based_State(0,true);
+    Update_Position_Based_State(0,true,true);
     T max_error=0;
     
     for(int i=0;i<force_dynamic_particles_list.m;i++){int p=force_dynamic_particles_list(i);
@@ -483,7 +483,7 @@ Max_Relative_Velocity_Error()
 template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Save_Volumes()
 {
-    Update_Position_Based_State(0,true);
+    Update_Position_Based_State(0,true,true);
     saved_volumes_full=volumes_full;
 }
 //#####################################################################
@@ -492,7 +492,7 @@ Save_Volumes()
 template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Check_Improvement()
 {
-    Update_Position_Based_State(0,true);
+    Update_Position_Based_State(0,true,true);
     T ave_improve=0,max_improve=-FLT_MAX,min_improve=FLT_MAX,old_total_volume_accumulated=0,new_total_volume_accumulated=0;
     int better=0,worse=0,same=0;
     const INDIRECT_ARRAY<const ARRAY<T> > volumes(volumes_full.Subset(force_dynamic_particles_list));

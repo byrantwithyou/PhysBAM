@@ -230,7 +230,7 @@ Clamp_Restlength_With_Fraction_Of_Springs(const T fraction)
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void LINEAR_SPRINGS<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     states.Resize(segment_mesh.elements.m,false,false);
     current_lengths.Resize(segment_mesh.elements.m,false,false);

@@ -314,7 +314,7 @@ First_Order_Time_Step(int substep,T dt)
     
 
     example.solids_evolution->example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
-    example.solid_body_collection.Update_Position_Based_State(time+dt,true);
+    example.solid_body_collection.Update_Position_Based_State(time+dt,true,true);
 //    example.solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<VECTOR<T,2> >*>()->Dump_Curvatures();
     if(slip){
         slip->two_phase=example.two_phase;

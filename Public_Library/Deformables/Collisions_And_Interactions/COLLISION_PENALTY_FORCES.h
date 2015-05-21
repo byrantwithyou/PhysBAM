@@ -87,7 +87,7 @@ public:
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE
     {}
 
-    void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE
     {if(collision_body_list_id>=COLLISION_GEOMETRY_ID(0) && typeid((*collision_body_list)(collision_body_list_id))==typeid(TETRAHEDRON_COLLISION_BODY<T>)){
         TETRAHEDRON_COLLISION_BODY<T>& collision_body=(TETRAHEDRON_COLLISION_BODY<T>&)((*collision_body_list)(collision_body_list_id));
         collision_body.tetrahedralized_volume.hierarchy->Update_Boxes(collision_body.collision_thickness);

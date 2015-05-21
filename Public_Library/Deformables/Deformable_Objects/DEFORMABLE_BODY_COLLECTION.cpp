@@ -314,9 +314,10 @@ CFL_Strain_Rate()
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    for(int k=0;k<deformables_forces.m;k++) deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
+    for(int k=0;k<deformables_forces.m;k++)
+        deformables_forces(k)->Update_Position_Based_State(time,is_position_update,update_hessian);
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
@@ -382,15 +383,15 @@ Test_Energy(const T time)
     ARRAY_VIEW<TV> X1(X2a);
     for(int i=0;i<deformables_forces.m;i++){
         ARRAY<TV> F(particles.X.m);
-        deformables_forces(i)->Update_Position_Based_State(time,true);
+        deformables_forces(i)->Update_Position_Based_State(time,true,false);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);
         T PE0=deformables_forces(i)->Potential_Energy(time);
         particles.X.Exchange(X1);
-        deformables_forces(i)->Update_Position_Based_State(time,true);
+        deformables_forces(i)->Update_Position_Based_State(time,true,false);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);
         T PE1=deformables_forces(i)->Potential_Energy(time);
         particles.X.Exchange(X1);
-        deformables_forces(i)->Update_Position_Based_State(time,true);
+        deformables_forces(i)->Update_Position_Based_State(time,true,false);
         T W=F.Dot(dX)/2;
         T dPE=(PE0-PE1)/e,dW=W/e,rel=(dPE-dW)/max(abs(dW),(T)1e-20);
         LOG::cout<<"potential energy test d phi "<<dPE<<"  W "<<dW<<"   rel "<<rel<<"   "<<typeid(*deformables_forces(i)).name()<<std::endl;}
@@ -410,16 +411,16 @@ Test_Force_Derivatives(const T time)
     ARRAY_VIEW<TV> X1(X2a);
     for(int i=0;i<deformables_forces.m;i++){
         ARRAY<TV> F(particles.X.m),G(particles.X.m);
-        deformables_forces(i)->Update_Position_Based_State(time,true);
+        deformables_forces(i)->Update_Position_Based_State(time,true,true);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);
         deformables_forces(i)->Add_Implicit_Velocity_Independent_Forces(dX,G,(T).5,time);
         F*=-(T)1;
         particles.X.Exchange(X1);
-        deformables_forces(i)->Update_Position_Based_State(time,true);
+        deformables_forces(i)->Update_Position_Based_State(time,true,true);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);
         deformables_forces(i)->Add_Implicit_Velocity_Independent_Forces(dX,G,(T).5,time);
         particles.X.Exchange(X1);
-        deformables_forces(i)->Update_Position_Based_State(time,true);
+        deformables_forces(i)->Update_Position_Based_State(time,true,true);
         T MF=sqrt(F.Magnitude_Squared());
         T MG=sqrt(G.Magnitude_Squared());
         T MD=sqrt((F-G).Magnitude_Squared());

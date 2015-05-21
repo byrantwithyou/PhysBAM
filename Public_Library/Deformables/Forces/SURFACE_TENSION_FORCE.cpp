@@ -53,7 +53,7 @@ template<class T> static void Tangential_Helper(MATRIX<T,1,0>& tangential,const 
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void SURFACE_TENSION_FORCE<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     coefficients.Resize(surface.mesh.elements.m);
     normal.Resize(surface.mesh.elements.m);

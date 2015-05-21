@@ -381,7 +381,7 @@ Advance_Dynamics(const T time,const T stopping_time,const bool verbose)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     // prepare for force computation
-    solid_body_collection.Update_Position_Based_State(time,true);
+    solid_body_collection.Update_Position_Based_State(time,true,true);
 
     T new_time=time;
     int substep=0;bool done=false;

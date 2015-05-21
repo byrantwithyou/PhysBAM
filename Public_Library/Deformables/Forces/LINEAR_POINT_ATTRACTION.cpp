@@ -37,7 +37,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void LINEAR_POINT_ATTRACTION<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
 }
 //#####################################################################

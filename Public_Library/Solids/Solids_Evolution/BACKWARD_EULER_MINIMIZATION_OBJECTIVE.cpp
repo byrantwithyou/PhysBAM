@@ -102,7 +102,7 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
         tmp0.rigid_V.array(p)=rigid_body.Inertia_Times(d_twist);}
 
     T energy=minimization_system.Inner_Product(dv,tmp0)/2;
-    energy+=Update_Position_Based_State_Early_Out(time,true,h?FLT_MAX:last_energy);
+    energy+=Update_Position_Based_State_Early_Out(time,true,h?FLT_MAX:last_energy,h);
 
     if(h) last_energy=energy;
 
@@ -120,7 +120,7 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> typename TV::SCALAR BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
-Update_Position_Based_State_Early_Out(T time,bool is_position_update,T energy_early_out) const
+Update_Position_Based_State_Early_Out(T time,bool is_position_update,T energy_early_out,bool update_hessian) const
 {
     T energy=0;
     for(int k=0;k<solid_body_collection.solids_forces.m;k++)
@@ -133,7 +133,7 @@ Update_Position_Based_State_Early_Out(T time,bool is_position_update,T energy_ea
             energy+=solid_body_collection.rigid_body_collection.rigids_forces(k)->Potential_Energy(time);}
     for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++)
         if(!deformables_forces_lazy.Contains(k)){
-            solid_body_collection.deformable_body_collection.deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
+            solid_body_collection.deformable_body_collection.deformables_forces(k)->Update_Position_Based_State(time,is_position_update,update_hessian);
             energy+=solid_body_collection.deformable_body_collection.deformables_forces(k)->Potential_Energy(time);}
 
     if(energy>energy_early_out) return energy;
@@ -147,7 +147,7 @@ Update_Position_Based_State_Early_Out(T time,bool is_position_update,T energy_ea
         energy+=solid_body_collection.rigid_body_collection.rigids_forces(it.Key())->Potential_Energy(time);
         if(energy>energy_early_out) return energy;}
     for(HASHTABLE<int>::ITERATOR it(deformables_forces_lazy);it.Valid();it.Next()){
-        solid_body_collection.deformable_body_collection.deformables_forces(it.Key())->Update_Position_Based_State(time,is_position_update);
+        solid_body_collection.deformable_body_collection.deformables_forces(it.Key())->Update_Position_Based_State(time,is_position_update,update_hessian);
         energy+=solid_body_collection.deformable_body_collection.deformables_forces(it.Key())->Potential_Energy(time);
         if(energy>energy_early_out) return energy;}
     return energy;

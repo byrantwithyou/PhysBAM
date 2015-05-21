@@ -315,7 +315,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void SEGMENT_ADHESION<TV>::
-Update_Position_Based_State(const T time,const bool is_position_update)
+Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     Update_Springs(false);
 }
