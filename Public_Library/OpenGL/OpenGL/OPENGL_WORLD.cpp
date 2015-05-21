@@ -99,7 +99,8 @@ OPENGL_WORLD(STREAM_TYPE stream_type)
             },"Toggle smooth shading"});
     Bind_Key("^a",{[this](){show_object_names=!show_object_names;},"Toggle object names"});
     Bind_Key("^t",{[this](){white_background=!white_background;},"Toggle Background"});
-    Bind_Key("|",{[this](){window->Request_Resize(640,480);},"Display Help"});
+    Bind_Key("|",{[this](){window->Request_Resize(640,480);},"Resize Window to 640x480"});
+    Bind_Key("?",{[this](){view_auto_help=!view_auto_help;},"Display Help"});
     Bind_Key("<F1>",{[this](){display_strings=!display_strings;},"Toggle display strings"});
 
     Set_Key_Binding_Category("User-Defined Keys");
