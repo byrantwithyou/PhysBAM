@@ -92,7 +92,7 @@ Initialize()
             T thickness=1e-3;
             surf->Initialize(filename,thickness);
 
-            T density=1000;
+            T density=1000*scale_mass;
 //            surf->Set_Masses(density,thickness);
 
             T c1=3.5e6;
@@ -116,7 +116,7 @@ Initialize()
             T thickness=1e-3;
             surf->Initialize(filename,thickness);
             
-            T density=1000;
+            T density=1000*scale_mass;
 //            surf->Set_Masses(density,thickness);
 
             T c1=3.5e6;
