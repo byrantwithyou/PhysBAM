@@ -157,7 +157,7 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
         lagrangian_forces(i)->Add_Implicit_Velocity_Independent_Forces(lagrangian_forces_V,lagrangian_forces_F,1,time);
     gather_scatter.template Scatter<int>(
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
-            F(it.Index())+=it.Weight()*lagrangian_forces_F(p);},false);
+            F(it.Index())-=it.Weight()*lagrangian_forces_F(p);},false);
 }
 //#####################################################################
 // Function Add_Force
