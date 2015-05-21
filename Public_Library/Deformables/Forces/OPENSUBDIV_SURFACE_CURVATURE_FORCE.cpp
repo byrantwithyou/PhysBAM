@@ -64,9 +64,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 template<class T,int gauss_order> void OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,gauss_order>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
 {
-#ifdef USE_OPENMP
 #pragma omp parallel for 
-#endif
     for(int face=0;face<surf.m;face++){
         const ARRAY<int>& nodes=surf.face_data(face).nodes;
         ARRAY<TV> f(nodes.m);
@@ -90,9 +88,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
                     for(int five1=0;five1<5;five1++)
                         f(al)+=A(al)(i,j)(five1)*heAv(five1);
             }}
-#ifdef USE_OPENMP
 #pragma omp critical
-#endif
                 F.Subset(nodes)-=f;}
 }
 //#####################################################################
@@ -131,9 +127,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         for(int face=0;face<surf.m;face++){
             data(face).ge.Resize(surf.face_data(face).nodes.m);}}
 
-#ifdef USE_OPENMP
 #pragma omp parallel for reduction(+:local_pe)
-#endif
     for(int face=0;face<surf.m;face++){
         TM2 ge;
         const ARRAY<int>& nodes=surf.face_data(face).nodes;

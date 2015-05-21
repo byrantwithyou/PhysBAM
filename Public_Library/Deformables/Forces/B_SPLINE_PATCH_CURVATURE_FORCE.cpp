@@ -76,9 +76,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 template<class T,int gauss_order> void B_SPLINE_PATCH_CURVATURE_FORCE<T,gauss_order>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
 {
-#ifdef USE_OPENMP
 #pragma omp parallel for 
-#endif
     for(int e=0;e<spline.m;e++){
         VECTOR<int,16> nodes = spline.Control_Points_For_Element(e);
         RANGE<VECTOR<T,2>> r=spline.Range_For_Element(e);
@@ -102,9 +100,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
                 for(int al=0;al<nodes.m;al++)
                     for(int five1=0;five1<5;five1++)
                         f(al)+=Aij(five1)(al)*heAv(five1);}
-#ifdef USE_OPENMP
 #pragma omp critical
-#endif
         F.Subset(nodes)-=f;}
 }
 //#####################################################################
@@ -195,9 +191,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                     for(int a=0;a<nodes.m;a++)
                         particles.mass(nodes(a))+=mass*w(a);}}}}
 
-#ifdef USE_OPENMP
 #pragma omp parallel for reduction(+:local_pe)
-#endif
     for(int e=0;e<spline.m;e++){
         TM2 ge;
         VECTOR<int,16> nodes=spline.Control_Points_For_Element(e);

@@ -51,14 +51,10 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
     F.rigid_V.array.Fill(TWIST<TV>());
     solid_body_collection.Add_Implicit_Velocity_Independent_Forces(t.V.array,t.rigid_V.array,F.V.array,F.rigid_V.array,-dt*dt,time);
 
-#ifdef USE_OPENMP
 #pragma omp parallel for
-#endif
     for(int p=0;p<particles.number;p++) F.V.array(p)+=particles.mass(p)*t.V.array(p);
 
-#ifdef USE_OPENMP
 #pragma omp parallel for
-#endif
     for(int p=0;p<rigid_body_particles.number;p++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
         if(rigid_body.Has_Infinite_Inertia()) continue;
