@@ -8,8 +8,10 @@
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
+#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
+#include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include "STANDARD_TESTS_2D.h"
@@ -226,6 +228,33 @@ Initialize()
             Add_Fixed_Corotated(1*scale_E,0.3,&foo);
             Add_Gravity(TV(0,-9.8));
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,true);
+        } break;
+        case 13:{ // surface tension test: fixed topology circle shell
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            SEGMENTED_CURVE_2D<T>* sc=SEGMENTED_CURVE_2D<T>::Create();
+            TV center(0.5,0.5);
+            T radius=0.2;
+            int N=80;
+            T density=1*scale_mass;
+            sc->particles.Add_Elements(N);
+            sc->Update_Number_Nodes();
+            for(int n=0;n<N;n++){
+                T theta=(T)n*2.0*3.1415926/(T)N;
+                TV X=center+TV(radius*cos(theta),radius*sin(theta));
+                X(0)+=random.Get_Uniform_Number(-radius*0.2,radius*0.2);
+                X(1)+=random.Get_Uniform_Number(-radius*0.2,radius*0.2);
+                LOG::cout<<X<<std::endl;
+                sc->particles.X(n)=X;
+                int np1=(n!=N-1)?(n+1):0;
+                sc->mesh.elements.Append(TV_INT(n,np1));
+                LOG::cout<<sc->mesh.elements(n)<<std::endl;}
+            SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*sc,[=](const TV& X){return TV(0.0,0);},[=](const TV&){return MATRIX<T,2>();},density,true);
+            for(int n=0;n<N;n++){
+                LOG::cout<<"d" << particles.mass(n)<<std::endl;}
+            surface_tension_id=0;
+            SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)0.01);
+            stf->use_velocity_independent_implicit_forces=true;
+            Add_Force(*stf);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

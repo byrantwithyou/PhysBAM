@@ -35,7 +35,8 @@ public:
     using BASE::use_midpoint;using BASE::use_symplectic_euler;using BASE::use_particle_collision;
     using BASE::print_stats;using BASE::flip;using BASE::cfl;using BASE::newton_tolerance;
     using BASE::newton_iterations;using BASE::solver_tolerance;using BASE::solver_iterations;
-    using BASE::test_diff;using BASE::threads;using BASE::weights;
+    using BASE::test_diff;using BASE::threads;using BASE::surface_tension_id;using BASE::weights;
+    using BASE::lagrangian_forces;
     using BASE::Add_Force;using BASE::Set_Weights;using BASE::deformable_body_collection;
     using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;using BASE::data_directory;
 
