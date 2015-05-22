@@ -47,7 +47,8 @@ template<class TV,int gauss_order> OPENSUBDIV_SURFACE<TV,gauss_order>::
 template<class TV,int gauss_order> OPENSUBDIV_SURFACE<TV,gauss_order>* OPENSUBDIV_SURFACE<TV,gauss_order>::
 Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const
 {
-    OPENSUBDIV_SURFACE* surf=new OPENSUBDIV_SURFACE(new_particles);
+    OPENSUBDIV_SURFACE* surf=Create(new_particles);
+    surf->need_destroy_particles=false;
     int offset=new_particles.Size();
     new_particles.Append(particles);
     if(particle_indices) particle_indices->Append_Elements(IDENTITY_ARRAY<>(particles.Size())+offset);
@@ -95,23 +96,38 @@ template<class TV,int gauss_order> void OPENSUBDIV_SURFACE<TV,gauss_order>::
 Read(TYPED_ISTREAM& input)
 {
     int num_verts;
-    Read_Binary(input,m,num_verts,gauss_order,mesh);
+    Read_Binary(input,m,num_verts,gauss_order);
 
-    particles.Clean_Memory();
-    particles.Resize(num_verts);
+    mesh.Clean_Memory();
+    mesh.Resize(m);
     int size;
     Read_Binary(input,size);
-    PHYSBAM_ASSERT(size==num_verts);
-    if(input.type.use_doubles) Read_Binary_Array<double>(input.stream,particles.X.Get_Array_Pointer(),num_verts);
-    else Read_Binary_Array<float>(input.stream,particles.X.Get_Array_Pointer(),num_verts);
+    PHYSBAM_ASSERT(size==m);
+    if(input.type.use_doubles) Read_Binary_Array<double>(input.stream,mesh.Get_Array_Pointer(),m);
+    else Read_Binary_Array<float>(input.stream,mesh.Get_Array_Pointer(),m);
 
-    control_points=IDENTITY_ARRAY<>(num_verts);
+    for(int i=0;i<m;i++)
+        for(int j=0;j<4;j++)
+            PHYSBAM_ASSERT(mesh(i)(j)<num_verts);
+
+    particles.Clean_Memory();
+    Read_Binary(input,size);
+    particles.Resize(size);
+    if(input.type.use_doubles) Read_Binary_Array<double>(input.stream,particles.X.Get_Array_Pointer(),size);
+    else Read_Binary_Array<float>(input.stream,particles.X.Get_Array_Pointer(),size);
+    
+    control_points.Clean_Memory();
+    control_points.Resize(num_verts);
+    Read_Binary(input,size);
+    PHYSBAM_ASSERT(size==num_verts);
+    if(input.type.use_doubles) Read_Binary_Array<double>(input.stream,control_points.Get_Array_Pointer(),num_verts);
+    else Read_Binary_Array<float>(input.stream,control_points.Get_Array_Pointer(),num_verts);
 
     Read_Binary(input,size);
     PHYSBAM_ASSERT(size==m);
     face_data.Exact_Resize(m);
-    if(input.type.use_doubles) Read_Binary_Array<double>(input.stream,face_data.Get_Array_Pointer(),size);
-    else Read_Binary_Array<float>(input.stream,face_data.Get_Array_Pointer(),size);
+    if(input.type.use_doubles) Read_Binary_Array<double>(input.stream,face_data.Get_Array_Pointer(),m);
+    else Read_Binary_Array<float>(input.stream,face_data.Get_Array_Pointer(),m);
 }
 //#####################################################################
 // Function Write
@@ -122,6 +138,7 @@ Write(TYPED_OSTREAM& output) const
     Write_Binary(output,m,control_points.m,gauss_order);
     Write_Binary(output,mesh);
     Write_Binary(output,particles.X);
+    Write_Binary(output,control_points);
     Write_Binary(output,face_data);
 }
 namespace{
@@ -141,7 +158,7 @@ template<class TV,int gauss_order> void OPENSUBDIV_SURFACE<TV,gauss_order>::
 Compute_G0()
 {
     for(int face=0;face<m;face++){
-        const ARRAY<int>& nodes=face_data(face).nodes;
+        const ARRAY<int> nodes(control_points.Subset(face_data(face).nodes));
         const ARRAY<MATRIX<VECTOR<T,5>,gauss_order> >& A=face_data(face).A;
         
         for(int i=0;i<gauss_order;i++){
@@ -187,7 +204,7 @@ Set_Mass(T density,bool use_constant_mass) const
     else{
     parts->mass.Subset(control_points).Fill((T)0);
     for(int face=0;face<m;face++){
-        const ARRAY<int>& nodes=face_data(face).nodes;
+        const ARRAY<int> nodes(control_points.Subset(face_data(face).nodes));
         for(int i=0;i<gauss_order;i++){
             for(int j=0;j<gauss_order;j++){
                 const ARRAY<MATRIX<T,gauss_order> >& w=face_data(face).w;

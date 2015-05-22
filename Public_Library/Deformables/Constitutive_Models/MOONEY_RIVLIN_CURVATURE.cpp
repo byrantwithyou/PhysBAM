@@ -85,7 +85,7 @@ Helper(const T1& a1,const T2& a2,const T3& lambda_n,const T4& dlambda_n1,const T
 // Function Potential_Energy_Helper
 //#####################################################################
 template<class T> template<class T1,class T2,class T3,class T4,class T5,class T6> T MOONEY_RIVLIN_CURVATURE<T>::
-Potential_Energy_Helper(const T1& a1,const T2& a2,const T3& da11,const T4& da12,const T5& da22,const VECTOR<TM,3>& G0_inv,const VECTOR<T,3>& G0_det,TM2& ge,T6 he) const
+Potential_Energy_Helper(const T1& a1,const T2& a2,const T3& da11,const T4& da12,const T5& da22,const VECTOR<TM,3>& G0_inv,const VECTOR<T,3>& G0_det,TM2& ge,T6 he,T weight) const
 {
    auto a3=a1.Cross(a2);
    auto da31=da11.Cross(a2)+a1.Cross(da12);
@@ -101,12 +101,12 @@ Potential_Energy_Helper(const T1& a1,const T2& a2,const T3& da11,const T4& da12,
    auto lambda_n=beta*a3;
    auto dlambda_n1=beta*(da31-(dm_sqr1/m_sqr)*a3);
    auto dlambda_n2=beta*(da31-(dm_sqr2/m_sqr)*a3);
-
+   T scale=weight*thickness/6;
    T e=0;
    ge=TM2();
-   e+=Helper(a1,a2,lambda_n,dlambda_n1,dlambda_n2,G0_inv(1),ge,he,0,2*thickness*G0_det(1)/3);
-   e+=Helper(a1,a2,lambda_n,dlambda_n1,dlambda_n2,G0_inv(0),ge,he,-thickness/2,thickness*G0_det(0)/6);
-   e+=Helper(a1,a2,lambda_n,dlambda_n1,dlambda_n2,G0_inv(2),ge,he,thickness/2,thickness*G0_det(2)/6);
+   e+=Helper(a1,a2,lambda_n,dlambda_n1,dlambda_n2,G0_inv(1),ge,he,0,4*scale*G0_det(1));
+   e+=Helper(a1,a2,lambda_n,dlambda_n1,dlambda_n2,G0_inv(0),ge,he,-thickness/2,scale*G0_det(0));
+   e+=Helper(a1,a2,lambda_n,dlambda_n1,dlambda_n2,G0_inv(2),ge,he,thickness/2,scale*G0_det(2));
 
    return e;
 }
@@ -114,7 +114,7 @@ Potential_Energy_Helper(const T1& a1,const T2& a2,const T3& da11,const T4& da12,
 // Function Potential_Energy
 //#####################################################################
 template<class T> T MOONEY_RIVLIN_CURVATURE<T>::
-Potential_Energy(TV A1,TV A2,TV dA11,TV dA12,TV dA22,const VECTOR<TM,3>& G0_inv,const VECTOR<T,3>& G0_det,TM2& ge,TT& he) const
+Potential_Energy(TV A1,TV A2,TV dA11,TV dA12,TV dA22,const VECTOR<TM,3>& G0_inv,const VECTOR<T,3>& G0_det,TM2& ge,TT& he,T weight) const
 {
     auto a1=Hess_From_Var<5,0>(A1);
     auto a2=Hess_From_Var<5,1>(A2);
@@ -122,20 +122,20 @@ Potential_Energy(TV A1,TV A2,TV dA11,TV dA12,TV dA22,const VECTOR<TM,3>& G0_inv,
     auto da12=Hess_From_Var<5,3>(dA12);
     auto da22=Hess_From_Var<5,4>(dA22);
     he=TT();
-    return Potential_Energy_Helper(a1,a2,da11,da12,da22,G0_inv,G0_det,ge,&he);
+    return Potential_Energy_Helper(a1,a2,da11,da12,da22,G0_inv,G0_det,ge,&he,weight);
 }
 //#####################################################################
 // Function Potential_Energy
 //#####################################################################
 template<class T> T MOONEY_RIVLIN_CURVATURE<T>::
-Potential_Energy(TV A1,TV A2,TV dA11,TV dA12,TV dA22,const VECTOR<TM,3>& G0_inv,const VECTOR<T,3>& G0_det,TM2& ge) const
+Potential_Energy(TV A1,TV A2,TV dA11,TV dA12,TV dA22,const VECTOR<TM,3>& G0_inv,const VECTOR<T,3>& G0_det,TM2& ge,T weight) const
 {
     auto a1=Diff_From_Var<5,0>(A1);
     auto a2=Diff_From_Var<5,1>(A2);
     auto da11=Diff_From_Var<5,2>(dA11);
     auto da12=Diff_From_Var<5,3>(dA12);
     auto da22=Diff_From_Var<5,4>(dA22);
-    return Potential_Energy_Helper(a1,a2,da11,da12,da22,G0_inv,G0_det,ge,0);
+    return Potential_Energy_Helper(a1,a2,da11,da12,da22,G0_inv,G0_det,ge,0,weight);
 }
 template class MOONEY_RIVLIN_CURVATURE<float>;
 template class MOONEY_RIVLIN_CURVATURE<double>;

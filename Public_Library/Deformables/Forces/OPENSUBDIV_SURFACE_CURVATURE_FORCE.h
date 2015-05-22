@@ -9,15 +9,14 @@
 
 #include <Tools/Data_Structures/FORCE_ELEMENTS.h>
 #include <Tools/Matrices/MATRIX.h>
-#include <Tools/Tensors/TENSOR.h>
 #include <Tools/Matrices/MATRIX_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
-#include <Deformables/Forces/LAZY_HESSIAN_FORCE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
+#include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 
 template<class T,int gauss_order>
-class OPENSUBDIV_SURFACE_CURVATURE_FORCE:public LAZY_HESSIAN_FORCE<VECTOR<T,3> >
+class OPENSUBDIV_SURFACE_CURVATURE_FORCE:public DEFORMABLES_FORCES<VECTOR<T,3> >
 {
 public:
     typedef VECTOR<T,3> TV;
@@ -31,7 +30,6 @@ public:
 
     const OPENSUBDIV_SURFACE<TV>& surf;
     MOONEY_RIVLIN_CURVATURE<T> model;
-    bool recompute_hessian;
 
     struct DATA
     {
@@ -56,7 +54,6 @@ public:
     void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
     void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
-    void Need_To_Recompute_Hessian(bool) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

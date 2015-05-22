@@ -221,10 +221,10 @@ Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty) // -x +
 //#####################################################################
 template<class TV> template<class T_STRUCTURE> T_STRUCTURE& STANDARD_TESTS_BASE<TV>::
 Seed_Lagrangian_Particles(T_STRUCTURE& object,boost::function<TV(const TV&)> V,
-    boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass)
+    boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass,bool destroy_after)
 {
     int old_particles_number=particles.number;
-    T_STRUCTURE& new_object=tests.Copy_And_Add_Structure(object);
+    T_STRUCTURE& new_object=tests.Copy_And_Add_Structure(object,0,destroy_after);
     tests.Set_Mass_Of_Particles(new_object,density,use_constant_mass);
     for(int p=old_particles_number;p<particles.number;p++){
         TV X=particles.X(p);
@@ -263,8 +263,8 @@ template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
 template class STANDARD_TESTS_BASE<VECTOR<double,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<double,3> >;
-template TRIANGULATED_AREA<double>& STANDARD_TESTS_BASE<VECTOR<double,2> >::Seed_Lagrangian_Particles<TRIANGULATED_AREA<double> >(TRIANGULATED_AREA<double>&,boost::function<VECTOR<double,2> (VECTOR<double,2> const&)>,boost::function<MATRIX<double,2,2> (VECTOR<double,2> const&)>,double,bool);
-template TRIANGULATED_AREA<float>& STANDARD_TESTS_BASE<VECTOR<float,2> >::Seed_Lagrangian_Particles<TRIANGULATED_AREA<float> >(TRIANGULATED_AREA<float>&,boost::function<VECTOR<float,2> (VECTOR<float,2> const&)>,boost::function<MATRIX<float,2,2> (VECTOR<float,2> const&)>,float,bool);
-template OPENSUBDIV_SURFACE<VECTOR<double,3>,3>& STANDARD_TESTS_BASE<VECTOR<double,3> >::Seed_Lagrangian_Particles<OPENSUBDIV_SURFACE<VECTOR<double,3>,3> >(OPENSUBDIV_SURFACE<VECTOR<double,3>,3>&,boost::function<VECTOR<double,3> (VECTOR<double,3> const&)>,boost::function<MATRIX<double,3,3> (VECTOR<double,3> const&)>,double,bool);
-template OPENSUBDIV_SURFACE<VECTOR<float,3>,3>& STANDARD_TESTS_BASE<VECTOR<float,3> >::Seed_Lagrangian_Particles<OPENSUBDIV_SURFACE<VECTOR<float,3>,3> >(OPENSUBDIV_SURFACE<VECTOR<float,3>,3>&,boost::function<VECTOR<float,3> (VECTOR<float,3> const&)>,boost::function<MATRIX<float,3,3> (VECTOR<float,3> const&)>,float,bool);
+template TRIANGULATED_AREA<double>& STANDARD_TESTS_BASE<VECTOR<double,2> >::Seed_Lagrangian_Particles<TRIANGULATED_AREA<double> >(TRIANGULATED_AREA<double>&,boost::function<VECTOR<double,2> (VECTOR<double,2> const&)>,boost::function<MATRIX<double,2,2> (VECTOR<double,2> const&)>,double,bool,bool);
+template TRIANGULATED_AREA<float>& STANDARD_TESTS_BASE<VECTOR<float,2> >::Seed_Lagrangian_Particles<TRIANGULATED_AREA<float> >(TRIANGULATED_AREA<float>&,boost::function<VECTOR<float,2> (VECTOR<float,2> const&)>,boost::function<MATRIX<float,2,2> (VECTOR<float,2> const&)>,float,bool,bool);
+template OPENSUBDIV_SURFACE<VECTOR<double,3>,3>& STANDARD_TESTS_BASE<VECTOR<double,3> >::Seed_Lagrangian_Particles<OPENSUBDIV_SURFACE<VECTOR<double,3>,3> >(OPENSUBDIV_SURFACE<VECTOR<double,3>,3>&,boost::function<VECTOR<double,3> (VECTOR<double,3> const&)>,boost::function<MATRIX<double,3,3> (VECTOR<double,3> const&)>,double,bool,bool);
+template OPENSUBDIV_SURFACE<VECTOR<float,3>,3>& STANDARD_TESTS_BASE<VECTOR<float,3> >::Seed_Lagrangian_Particles<OPENSUBDIV_SURFACE<VECTOR<float,3>,3> >(OPENSUBDIV_SURFACE<VECTOR<float,3>,3>&,boost::function<VECTOR<float,3> (VECTOR<float,3> const&)>,boost::function<MATRIX<float,3,3> (VECTOR<float,3> const&)>,float,bool,bool);
 }

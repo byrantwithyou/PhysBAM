@@ -19,6 +19,7 @@ class STANDARD_TESTS<VECTOR<T,3> >:public STANDARD_TESTS_BASE<VECTOR<T,3> >
     typedef VECTOR<T,3> TV;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef STANDARD_TESTS_BASE<TV> BASE;
+    typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
 
 public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
@@ -32,7 +33,7 @@ public:
     using BASE::solver_iterations;using BASE::test_diff;using BASE::threads;using BASE::test_number;
     using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Gravity;
     using BASE::Add_Fixed_Corotated;using BASE::random;using BASE::Seed_Lagrangian_Particles;
-    using BASE::Add_Force;using BASE::Add_Walls;using typename BASE::COLLISION_TYPE;using BASE::data_directory;
+    using BASE::Add_Force;using BASE::Add_Walls;using BASE::data_directory;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

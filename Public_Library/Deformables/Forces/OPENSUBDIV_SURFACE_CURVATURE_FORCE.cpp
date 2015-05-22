@@ -30,7 +30,7 @@ double quadrature_weight[8][7]=
 //#####################################################################
 template<class T,int gauss_order> OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,gauss_order>::
 OPENSUBDIV_SURFACE_CURVATURE_FORCE(DEFORMABLE_PARTICLES<TV>& particles,const OPENSUBDIV_SURFACE<TV>& surf_input,const MOONEY_RIVLIN_CURVATURE<T>& model_input)
-    :LAZY_HESSIAN_FORCE<TV>(particles),surf(surf_input),model(model_input),recompute_hessian(true)
+    :DEFORMABLES_FORCES<TV>(particles),surf(surf_input),model(model_input)
 {
 }
 //#####################################################################
@@ -47,7 +47,7 @@ template<class T,int gauss_order> void OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,gaus
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     for(int e=0;e<surf.m;e++){
-        const ARRAY<int>& a=surf.face_data(e).nodes;
+        const ARRAY<int> a(surf.control_points.Subset(surf.face_data(e).nodes));
         for(int i=0;i<a.m;i++)
             F(a(i))-=data(e).ge(i);}
 }
@@ -66,28 +66,38 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
 {
 #pragma omp parallel for 
     for(int face=0;face<surf.m;face++){
-        const ARRAY<int>& nodes=surf.face_data(face).nodes;
+        const ARRAY<int> nodes(surf.control_points.Subset(surf.face_data(face).nodes));
+        const ARRAY<MATRIX<VECTOR<T,5>,gauss_order> >& A=surf.face_data(face).A;
         ARRAY<TV> f(nodes.m);
         ARRAY<TV> v(V.Subset(nodes)*scale);
-        for(int i=0;i<gauss_order;i++){
+        MATRIX<VECTOR<TV,5>,gauss_order> Av;
+        MATRIX<VECTOR<TV,5>,gauss_order> heAv;
+        for(int ga=0;ga<nodes.m;ga++){
+            const TV& vga=v(ga);
+            for(int i=0;i<gauss_order;i++)
+                for(int j=0;j<gauss_order;j++){
+                    VECTOR<TV,5>& Avij=Av(i,j);
+                    const VECTOR<T,5>& Aga=A(ga)(i,j);
+                    for(int five=0;five<5;five++)
+                        Avij(five)+=Aga(five)*vga;}}
+        
+        for(int i=0;i<gauss_order;i++)
             for(int j=0;j<gauss_order;j++){
-                const ARRAY<MATRIX<VECTOR<T,5>,gauss_order> >& A=surf.face_data(face).A;
+                const VECTOR<TV,5>& Avij=Av(i,j);
+                VECTOR<TV,5>& heAvij=heAv(i,j);
                 const TT& he=data(face).he(i,j);
-                T weight=quadrature_weight[gauss_order][i]*quadrature_weight[gauss_order][j];
-                VECTOR<TV,5> Av;
-                for(int five=0;five<5;five++)
-                    for(int ga=0;ga<nodes.m;ga++)
-                        Av(five)+=weight*A(ga)(i,j)(five)*v(ga);
-
-                VECTOR<TV,5> heAv;
-                for(int five1=0;five1<5;five1++)
-                    for(int five2=0;five2<5;five2++)
-                        heAv(five1)+=he(five1,five2)*Av(five2);
-
-                for(int al=0;al<nodes.m;al++)
+                for(int five2=0;five2<5;five2++)
                     for(int five1=0;five1<5;five1++)
-                        f(al)+=A(al)(i,j)(five1)*heAv(five1);
-            }}
+                        heAvij(five1)+=he(five1,five2)*Avij(five2);}
+
+        for(int al=0;al<nodes.m;al++){
+            TV& fal=f(al);
+            for(int i=0;i<gauss_order;i++)
+                for(int j=0;j<gauss_order;j++){
+                    const VECTOR<TV,5>& heAvij=heAv(i,j);
+                    const VECTOR<T,5>& Aal=A(al)(i,j);
+                    for(int five1=0;five1<5;five1++)
+                        fal+=Aal(five1)*heAvij(five1);}}
 #pragma omp critical
                 F.Subset(nodes)-=f;}
 }
@@ -130,27 +140,25 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 #pragma omp parallel for reduction(+:local_pe)
     for(int face=0;face<surf.m;face++){
         TM2 ge;
-        const ARRAY<int>& nodes=surf.face_data(face).nodes;
+        const ARRAY<int> nodes(surf.control_points.Subset(surf.face_data(face).nodes));
         const ARRAY<MATRIX<VECTOR<T,5>,gauss_order> >& A=surf.face_data(face).A;
         for(int i=0;i<nodes.m;i++) data(face).ge(i)=TV();
 
         for(int i=0;i<gauss_order;i++){
             for(int j=0;j<gauss_order;j++){
                 VECTOR<TV,5> a;
-                for(int five=0;five<5;five++)
-                    for(int al=0;al<nodes.m;al++)
+                for(int al=0;al<nodes.m;al++)
+                    for(int five=0;five<5;five++)
                         a(five)+=A(al)(i,j)(five)*particles.X(nodes(al));
 
                 T weight=quadrature_weight[gauss_order][i]*quadrature_weight[gauss_order][j];
-                if(recompute_hessian)
-                    local_pe+=weight*model.Potential_Energy(a(0),a(1),a(2),a(3),a(4),surf.face_data(face).G0_inv(i,j),surf.face_data(face).G0_det(i,j),ge,data(face).he(i,j));
+                if(update_hessian)
+                    local_pe+=model.Potential_Energy(a(0),a(1),a(2),a(3),a(4),surf.face_data(face).G0_inv(i,j),surf.face_data(face).G0_det(i,j),ge,data(face).he(i,j),weight);
                 else
-                    local_pe+=weight*model.Potential_Energy(a(0),a(1),a(2),a(3),a(4),surf.face_data(face).G0_inv(i,j),surf.face_data(face).G0_det(i,j),ge);
+                    local_pe+=model.Potential_Energy(a(0),a(1),a(2),a(3),a(4),surf.face_data(face).G0_inv(i,j),surf.face_data(face).G0_det(i,j),ge,weight);
 
                 for(int al=0;al<nodes.m;al++)
-                    for(int dim=0;dim<3;dim++)
-                        for(int five=0;five<5;five++)
-                            data(face).ge(al)(dim)+=ge(dim,five)*A(al)(i,j)(five)*weight;}}}
+                    data(face).ge(al)+=ge*A(al)(i,j);}}}
     pe=local_pe;
 }
 //#####################################################################
@@ -167,14 +175,6 @@ Potential_Energy(const T time) const
 template<class T,int gauss_order> void OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,gauss_order>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-}
-//#####################################################################
-// Function Need_To_Recompute_Hessian
-//#####################################################################
-template<class T,int gauss_order> void OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,gauss_order>::
-Need_To_Recompute_Hessian(bool h)
-{
-    recompute_hessian=h;
 }
 //template class OPENSUBDIV_SURFACE_CURVATURE_FORCE<float,1>;
 //template class OPENSUBDIV_SURFACE_CURVATURE_FORCE<double,1>;

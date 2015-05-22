@@ -117,7 +117,6 @@ Initialize()
             surf->Initialize(filename,thickness);
             
             T density=1000*scale_mass;
-//            surf->Set_Masses(density,thickness);
 
             T c1=3.5e6;
             T c2=1.3e6;
@@ -128,12 +127,41 @@ Initialize()
             MOONEY_RIVLIN_CURVATURE<T> model=MOONEY_RIVLIN_CURVATURE<T>(c1*stiffness_multiplier,c2*stiffness_multiplier,thickness*thickness_multiplier);
             Add_Force(*new OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,3>(particles,new_surf,model));
 
-            for(int p=0;p<particles.X.m;p++)
-                particles.X(p)(0)*=0.5;
+//            for(int p=0;p<particles.X.m;p++) // squish the duck.
+//                particles.X(p)(0)*=0.5;
 
             Add_Walls(8,COLLISION_TYPE::separate,.3,.1,false);
 
-//            Add_Gravity(TV(0,-9.8,0));
+            Add_Gravity(TV(0,-9.8,0));
+        } break;
+        case 6:{ // subdivision surface - drop several ducks.
+            int num_duckies=3;
+            grid.Initialize(resolution*TV_INT(2,num_duckies,2),RANGE<TV>(TV(-6,-3,-6),TV(6,3+6*(num_duckies-1),6)),true);
+            
+            std::string filename=data_directory+"/OpenSubdiv_Surfaces/duck_1073f.dat.gz";
+
+            T c1=3.5e6;
+            T c2=1.3e6;
+            T stiffness_multiplier=scale_E;
+            T thickness_multiplier=1;
+            T density=1000;
+            T thickness=1e-3;
+
+            MOONEY_RIVLIN_CURVATURE<T> model=MOONEY_RIVLIN_CURVATURE<T>(c1*stiffness_multiplier,c2*stiffness_multiplier,thickness*thickness_multiplier);
+
+            OPENSUBDIV_SURFACE<TV>* surf=OPENSUBDIV_SURFACE<TV>::Create();
+            surf->Initialize(filename,thickness);
+            for(int i=0;i<num_duckies;i++){
+                for(int p=0;p<particles.X.m;p++)
+                    particles.X(p)(1)+=6;
+                OPENSUBDIV_SURFACE<TV>& new_surf=Seed_Lagrangian_Particles(*surf,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,false,false);
+                Add_Force(*new OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,3>(particles,new_surf,model));
+            }
+
+            Add_Walls(8,COLLISION_TYPE::separate,.3,.1,false);
+
+            Add_Gravity(TV(0,-9.8,0));
+            delete surf;
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

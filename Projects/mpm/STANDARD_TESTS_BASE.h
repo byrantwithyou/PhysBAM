@@ -84,7 +84,7 @@ public:
 
     template<class T_STRUCTURE>
     T_STRUCTURE& Seed_Lagrangian_Particles(T_STRUCTURE& object,boost::function<TV(const TV&)> V,
-        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass);
+        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass,bool destroy_after=true);
 
     void Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io);
     template<class OBJECT> typename DISABLE_IF<IS_POINTER<OBJECT>::value>::TYPE
