@@ -71,12 +71,12 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void B_SPLINE_CURVATURE_FORCE<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     for(int i=2;i<spline.knots.m-3;i++){
         VECTOR<int,4> nodes(spline.control_points.Subset(VECTOR<int,4>(i-2,i-1,i,i+1)));
         const MATRIX<MATRIX<T,TV::m>,4>& he=data(i-2).he;
-        VECTOR<TV,4> v(V.Subset(nodes)*scale),f;
+        VECTOR<TV,4> v(V.Subset(nodes)),f;
         for(int j=0;j<4;j++)
             for(int k=0;k<4;k++)
                 f(j)+=he(j,k)*v(k);

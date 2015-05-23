@@ -96,7 +96,7 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
         if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
         for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++)
             if(dynamic_cast<BINDING_SPRINGS<TV>*>(&*solid_body_collection.deformable_body_collection.deformables_forces(k)))
-                solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(particles.X,B_full,1,current_velocity_time+dt);
+                solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(particles.X,B_full,current_velocity_time+dt);
         if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
         solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B_full,rigid_B_full);}
 

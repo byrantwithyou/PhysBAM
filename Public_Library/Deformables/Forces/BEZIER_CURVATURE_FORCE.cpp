@@ -70,12 +70,12 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void BEZIER_CURVATURE_FORCE<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     for(int i=0;i<spline.control_points.m;i++){
         const VECTOR<int,4>& nodes=spline.control_points(i);
         const MATRIX<MATRIX<T,TV::m>,4>& he=data(i).he;
-        VECTOR<TV,4> v(V.Subset(nodes)*scale),f;
+        VECTOR<TV,4> v(V.Subset(nodes)),f;
         for(int j=0;j<4;j++)
             for(int k=0;k<4;k++)
                 f(j)+=he(j,k)*v(k);

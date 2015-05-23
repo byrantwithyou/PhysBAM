@@ -60,7 +60,7 @@ Enforce_Definiteness(const bool enforce_definiteness_input)
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void RIGID_ETHER_DRAG<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {
 }
 //#####################################################################

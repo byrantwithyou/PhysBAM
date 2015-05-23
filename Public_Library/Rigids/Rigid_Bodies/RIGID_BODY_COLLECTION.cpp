@@ -263,12 +263,12 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VI
 // Function Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const
 {
     assert(rigid_F_full.Size()==rigid_body_particles.Size());
     for(int k=0;k<rigids_forces.m;k++)
         if(rigids_forces(k)->use_implicit_velocity_independent_forces)
-            rigids_forces(k)->Add_Implicit_Velocity_Independent_Forces(rigid_V_full,rigid_F_full,scale,time);
+            rigids_forces(k)->Add_Implicit_Velocity_Independent_Forces(rigid_V_full,rigid_F_full,time);
 }
 //#####################################################################
 // Function Update_Position_Based_State

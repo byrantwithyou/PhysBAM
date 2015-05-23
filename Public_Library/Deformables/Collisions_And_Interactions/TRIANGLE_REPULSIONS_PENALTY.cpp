@@ -41,7 +41,7 @@ Lagged_Update_Position_Based_State(const T time)
 // Function Add_Velocity_Dependent_Forces
 //#####################################################################
 template<class TV> void TRIANGLE_REPULSIONS_PENALTY<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     for(int bp=0;bp<bad_pairs.m;bp++){
         int i=bad_pairs(bp);
@@ -49,7 +49,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
         for(int j=0;j<n.m;j++){
             int p=n(j);
             for(int k=0;k<n.m;k++)
-                F(p)-=H_pe(bp)(j)(k)*V(n(k))*scale;}}
+                F(p)-=H_pe(bp)(j)(k)*V(n(k));}}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces

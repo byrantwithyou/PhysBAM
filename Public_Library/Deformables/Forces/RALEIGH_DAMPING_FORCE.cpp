@@ -33,9 +33,11 @@ Lagged_Update_Position_Based_State(const T time)
 // Function Add_Velocity_Dependent_Forces
 //#####################################################################
 template<class TV> void RALEIGH_DAMPING_FORCE<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    force.Add_Implicit_Velocity_Independent_Forces(V,F,coefficient*dt_dv_over_dx/dt*scale,time);
+    tmp.Fill(TV());
+    force.Add_Implicit_Velocity_Independent_Forces(V,tmp,time);
+    F+=coefficient*dt_dv_over_dx/dt*tmp;
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -59,9 +61,11 @@ Potential_Energy(const T time) const
 template<class TV> void RALEIGH_DAMPING_FORCE<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
+    tmp.Resize(particles.V.m);
     D_V0.Resize(particles.V.m);
     D_V0.Fill(TV());
-    force.Add_Implicit_Velocity_Independent_Forces(particles.V,D_V0,coefficient,time);
+    force.Add_Implicit_Velocity_Independent_Forces(particles.V,D_V0,time);
+    D_V0*=coefficient;
 }
 //#####################################################################
 // Function Add_Dependencies

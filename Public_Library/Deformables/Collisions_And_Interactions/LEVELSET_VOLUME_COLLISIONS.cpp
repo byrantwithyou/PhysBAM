@@ -605,20 +605,20 @@ Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) co
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     for(int pp=0;pp<overlapping_particles.m;pp++){
         const VECTOR<int,2*TV::m+2>& n=overlapping_particles(pp);
         for(int i=0;i<n.m;i++){
             int p=n(i);
             for(int j=0;j<n.m;j++)
-                F(p)-=H_pe(pp)(i,j)*V(n(j))*scale;}}
+                F(p)-=H_pe(pp)(i,j)*V(n(j));}}
     for(int pp=0;pp<interior_overlapping_particles.m;pp++){
         const VECTOR<int,TV::m+1>& n=interior_overlapping_particles(pp);
         for(int i=0;i<n.m;i++){
             int p=n(i);
             for(int j=0;j<n.m;j++)
-                F(p)-=interior_H_pe(pp)(i,j)*V(n(j))*scale;}}
+                F(p)-=interior_H_pe(pp)(i,j)*V(n(j));}}
 }
 //#####################################################################
 // Function Enforce_Definiteness

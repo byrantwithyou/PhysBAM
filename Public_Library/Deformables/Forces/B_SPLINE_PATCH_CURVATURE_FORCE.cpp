@@ -74,14 +74,14 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class T,int gauss_order> void B_SPLINE_PATCH_CURVATURE_FORCE<T,gauss_order>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
 #pragma omp parallel for 
     for(int e=0;e<spline.m;e++){
         VECTOR<int,16> nodes = spline.Control_Points_For_Element(e);
         RANGE<VECTOR<T,2>> r=spline.Range_For_Element(e);
         const DATA& dat=data(e);
-        VECTOR<TV,16> v(V.Subset(nodes)*scale),f;
+        VECTOR<TV,16> v(V.Subset(nodes)),f;
         for(int i=0;i<gauss_order;i++)
             for(int j=0;j<gauss_order;j++){
                 const VECTOR<VECTOR<T,16>,5>& Aij=dat.A(i,j);

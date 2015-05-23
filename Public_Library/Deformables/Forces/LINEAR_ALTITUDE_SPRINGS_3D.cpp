@@ -290,7 +290,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         int total_springs=use_shortest_spring_only?1:4;
@@ -305,7 +305,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
                 const SPRING_PARAMETER& parameter=parameters(t)(state.node);
                 Fill_Node_Indices(i,j,k,l,state.node,node1,node2,node3,node4);
                 T rl=parameter.restlength;
-                TV force=parameter.youngs_modulus/rl*scale*TV::Dot_Product(V(node1)-state.barycentric.x*V(node2)-state.barycentric.y*V(node3)-state.barycentric.z*V(node4),state.direction)*state.direction;
+                TV force=parameter.youngs_modulus/rl*TV::Dot_Product(V(node1)-state.barycentric.x*V(node2)-state.barycentric.y*V(node3)-state.barycentric.z*V(node4),state.direction)*state.direction;
                 F(node1)-=force;F(node2)+=state.barycentric.x*force;F(node3)+=state.barycentric.y*force;F(node4)+=state.barycentric.z*force;}}}
 }
 //#####################################################################

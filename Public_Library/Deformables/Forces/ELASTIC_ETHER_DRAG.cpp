@@ -33,9 +33,9 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 // Function Add_Velocity_Dependent_Forces
 //#####################################################################
 template<class TV> void ELASTIC_ETHER_DRAG<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    T c=coefficient*dt_dv_over_dx/dt*scale;
+    T c=coefficient*dt_dv_over_dx/dt;
     for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){
         int k=iterator.Data();
         F(k)-=c*particles.mass(k)*V(k);}

@@ -116,8 +116,8 @@ public:
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const PHYSBAM_OVERRIDE
-    {for(int p=0;p<check_collision.m;p++) F(check_collision(p))+=collision_force_derivative(p)*V(check_collision(p))*scale;}
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
+    {for(int p=0;p<check_collision.m;p++) F(check_collision(p))+=collision_force_derivative(p)*V(check_collision(p));}
 
     T CFL_Strain_Rate() const PHYSBAM_OVERRIDE
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

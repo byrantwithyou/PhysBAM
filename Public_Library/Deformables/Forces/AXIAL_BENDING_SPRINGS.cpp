@@ -161,13 +161,13 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class T> void AXIAL_BENDING_SPRINGS<T>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
         int node1,node2,node3,node4;spring_particles(s).Get(node1,node2,node3,node4);
         T w1,w2,w3,w4;optimization_weights(s).Get(w1,w2,w3,w4);
         TV dl=w1*V(node1)+w2*V(node2)-w3*V(node3)-w4*V(node4);
-        TV force=youngs_modulus(s)/restlength(s)*scale/*sqr(attached_edge_length(s)/attached_edge_restlength(s)-1)*/*dl.Projected_On_Unit_Direction(optimization_direction(s));
+        TV force=youngs_modulus(s)/restlength(s)/*sqr(attached_edge_length(s)/attached_edge_restlength(s)-1)*/*dl.Projected_On_Unit_Direction(optimization_direction(s));
         F(node1)-=w1*force;F(node2)-=w2*force;F(node3)+=w3*force;F(node4)+=w4*force;}
 }
 //#####################################################################

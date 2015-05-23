@@ -48,11 +48,11 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void BEZIER_C2_FORCE<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T scale,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     for(int i=0;i<data.m;i++){
         const MATRIX<MATRIX<T,TV::m>,4>& he=data(i).he;
-        VECTOR<TV,4> v(V.Subset(data(i).pts)*scale),f;
+        VECTOR<TV,4> v(V.Subset(data(i).pts)),f;
         for(int j=0;j<4;j++)
             for(int k=0;k<4;k++)
                 f(j)+=he(j,k)*v(k);
@@ -60,7 +60,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
 
     for(int i=0;i<2;i++){
         const MATRIX<MATRIX<T,TV::m>,3>& he=end_he[i];
-        VECTOR<TV,3> v(V.Subset(end_pts[i])*scale),f;
+        VECTOR<TV,3> v(V.Subset(end_pts[i])),f;
         for(int j=0;j<3;j++)
             for(int k=0;k<3;k++)
                 f(j)+=he(j,k)*v(k);
