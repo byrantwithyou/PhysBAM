@@ -249,9 +249,6 @@ Initialize()
                 sc->mesh.elements.Append(TV_INT(n,np1));
                 LOG::cout<<sc->mesh.elements(n)<<std::endl;}
             SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*sc,[=](const TV& X){return TV(0.0,0);},[=](const TV&){return MATRIX<T,2>();},density,true);
-            for(int n=0;n<N;n++){
-                LOG::cout<<"d" << particles.mass(n)<<std::endl;}
-            surface_tension_id=0;
             SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)0.01);
             stf->use_velocity_independent_implicit_forces=true;
             Add_Force(*stf);

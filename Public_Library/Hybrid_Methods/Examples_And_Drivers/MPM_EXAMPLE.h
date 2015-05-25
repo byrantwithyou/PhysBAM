@@ -86,8 +86,6 @@ public:
     T last_te;
     T last_grid_ke;
 
-    int surface_tension_id;
-
     MPM_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~MPM_EXAMPLE();
     
