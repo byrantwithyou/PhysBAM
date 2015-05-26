@@ -151,30 +151,28 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
         TV V=v0.u.array(i)+midpoint_scale*dv.u.array(i);
         TV X0=system.example.location.array(i);
         TV X=X0+system.example.dt*V;
-        T deepest_phi=collision_thickness;
+        T deepest_phi=FLT_MAX;
         int deepest_index=-1;
         MPM_COLLISION_OBJECT<TV>* deepest_io=0;
         bool stuck=false;
         if(int* object_index=system.forced_collisions.Get_Pointer(i)){
             deepest_index=*object_index;
             deepest_io=system.example.collision_objects(deepest_index);
-            T phi0=deepest_io->Phi(X0,t0),phi=deepest_io->Phi(X,t1);
-            if(phi0<0){
-                phi-=phi0;
-                if(system.example.collision_objects(deepest_index)->type==COLLISION_TYPE::stick)
-                    stuck=true;}
-            deepest_phi=phi;}
+            T phi0=deepest_io->Phi(X0,t0),phi=deepest_io->Phi(X,t1)-min(phi0,(T)0);
+            deepest_phi=phi;
+            COLLISION_TYPE type=system.example.collision_objects(deepest_index)->type;
+            if(type==COLLISION_TYPE::stick) stuck=true;}
         for(int j=0;j<system.example.collision_objects.m && !stuck;j++){
             MPM_COLLISION_OBJECT<TV>* io=system.example.collision_objects(j);
-            T phi0=io->Phi(X0,t0),phi=io->Phi(X,t1);
-            if(phi0<0){
-                phi-=phi0;
-                if(system.example.collision_objects(j)->type==COLLISION_TYPE::stick)
-                    stuck=true;}
-            if(phi<deepest_phi || stuck){
-                deepest_phi=phi;
-                deepest_io=io;
-                deepest_index=j;}}
+            T phi0=io->Phi(X0,t0),phi=io->Phi(X,t1)-min(phi0,(T)0);
+            COLLISION_TYPE type=system.example.collision_objects(j)->type;
+            if(type==COLLISION_TYPE::stick){if(phi0>0) continue;stuck=true;}
+            if(type==COLLISION_TYPE::slip && phi0>0) continue;
+            if(type==COLLISION_TYPE::separate && phi>collision_thickness) continue;
+            if(type!=COLLISION_TYPE::stick && phi>deepest_phi) continue;
+            deepest_index=j;
+            deepest_io=io;
+            deepest_phi=phi;}
         if(deepest_index==-1) continue;
         if(stuck){
             TV SV=deepest_io->Velocity(X,t1);
