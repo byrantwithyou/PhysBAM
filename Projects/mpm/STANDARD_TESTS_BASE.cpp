@@ -184,9 +184,11 @@ Add_Gravity(TV g)
 // Function Add_Fixed_Corotated
 //#####################################################################
 template<class TV> int STANDARD_TESTS_BASE<TV>::
-Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles)
+Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles,bool no_mu)
 {
-    ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*new COROTATED_FIXED<T,TV::m>(E,nu);
+    COROTATED_FIXED<T,TV::m>* coro=new COROTATED_FIXED<T,TV::m>(E,nu);
+    if(no_mu) coro->Zero_Out_Mu();
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*coro;
     MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(particles,constitutive_model,gather_scatter,affected_particles);
     return Add_Force(fe);
 }

@@ -26,6 +26,7 @@ class STANDARD_TESTS_BASE:public MPM_EXAMPLE<TV>
 
 public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
+    using BASE::mass;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::collision_objects;using BASE::substeps_delay_frame;
     using BASE::output_directory;using BASE::mass_contour;using BASE::use_max_weight;
@@ -94,7 +95,7 @@ public:
 
     void Add_Particle(const TV& X,const TV& V,const T mass,const T volume,const MATRIX<T,TV::m> F,const MATRIX<T,TV::m> B);
     int Add_Gravity(TV g);
-    int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0);
+    int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0,bool no_mu=false);
     int Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles=0);
     int Add_Fixed_Corotated(T_VOLUME& object,T E,T nu);
     int Add_Neo_Hookean(T_VOLUME& object,T E,T nu);
