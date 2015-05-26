@@ -253,6 +253,16 @@ Initialize()
             stf->use_velocity_independent_implicit_forces=true;
             Add_Force(*stf);
         } break;
+        case 14:{ // test dynamic changing lagrangian mesh (in Begin_Frame)
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-1,-1),TV(2,2)),true);
+            SPHERE<TV> sphere(TV(.5,.5),.3);
+            T density=2*scale_mass;
+            Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0,0);},[=](const TV&){return MATRIX<T,2>();},
+                density,particles_per_cell);
+            particles.F.Fill(MATRIX<T,2>()+1.5);
+            ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
+            Add_Fixed_Corotated(scale_E,0.3,&mpm_particles);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
@@ -262,6 +272,29 @@ Initialize()
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Begin_Frame(const int frame)
 {
+    switch(test_number)
+    {
+        case 14:{
+            if(frame==0){
+                T density=2*scale_mass;
+                SPHERE<TV> sphere2(TV(0.55,0.35),.2);
+                TRIANGULATED_AREA<T>* ta=TESSELLATION::Generate_Triangles(sphere2,ceil(sphere2.radius/grid.dX.x*2));
+                Nsurface=ta->particles.number;
+                TRIANGULATED_AREA<T>& new_ta=Seed_Lagrangian_Particles(*ta,[=](const TV& X){return TV(-3.0,0);},
+                    [=](const TV&){return MATRIX<T,2>();},density,true);
+                Add_Fixed_Corotated(new_ta,(T)10*scale_E,0.425);}
+            else if(frame==6){
+                for(int k=particles.number-Nsurface;k<particles.number;k++) particles.Add_To_Deletion_List(k);
+                particles.Delete_Elements_On_Deletion_List();
+                T density=2*scale_mass;
+                SPHERE<TV> sphere2(TV(1,1),.3);
+                TRIANGULATED_AREA<T>* ta=TESSELLATION::Generate_Triangles(sphere2,ceil(sphere2.radius/grid.dX.x*2));
+                Nsurface=ta->particles.number;
+                TRIANGULATED_AREA<T>& new_ta=Seed_Lagrangian_Particles(*ta,[=](const TV& X){return TV(-3.0,-1.5);},
+                    [=](const TV&){return MATRIX<T,2>();},density,true);
+                Add_Fixed_Corotated(new_ta,(T)10*scale_E,0.425);}
+        } break;
+    }
 }
 //#####################################################################
 // Function End_Frame

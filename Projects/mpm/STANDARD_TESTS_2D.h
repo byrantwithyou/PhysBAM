@@ -39,6 +39,8 @@ public:
     using BASE::tests;using BASE::Seed_Lagrangian_Particles;using BASE::Add_Collision_Object;
     using BASE::Seed_Particles_Helper;using BASE::Add_Force;
 
+    int Nsurface;
+
     STANDARD_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 
