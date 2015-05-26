@@ -44,6 +44,15 @@ Set_Parameters(const T youngs_modulus_input,const T poissons_ratio_input,const T
     constant_beta=Rayleigh_coefficient*constant_mu;
 }
 //#####################################################################
+// Function Zero_Out_Mu
+//#####################################################################
+template<class T,int d> void COROTATED_FIXED<T,d>::
+Zero_Out_Mu()
+{
+    constant_mu=0;
+    constant_beta=0;
+}
+//#####################################################################
 // Function P_From_Strain
 //#####################################################################
 template<class T,int d> DIAGONAL_MATRIX<T,d> COROTATED_FIXED<T,d>::
