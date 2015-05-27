@@ -41,6 +41,7 @@ public:
     using BASE::Seed_Particles_Helper;using BASE::Add_Force;
 
     int Nsurface;
+    ARRAY<int> steal;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

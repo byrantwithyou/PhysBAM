@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <Tools/Matrices/FRAME.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
@@ -267,17 +268,39 @@ Initialize()
             Add_Fixed_Corotated(scale_E,0.3,&mpm_particles);
         } break;
         case 15:{ // surface tension circle
+
+            //one   ./mpm 15 -resolution 64 -last_frame 500 -scale_E 10 -newton_tolerance 1e-5 -particles_per_cell 8 -max_dt 1e-3 -affine
+
+            //two ./mpm 15   -resolution 64 -last_frame 500 -scale_E 10 -newton_tolerance 1e-5 -particles_per_cell 4  -max_dt 1e-3 -affine
+
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             T density=2*scale_mass;
-            RANGE<TV> box(TV(.3,.3),TV(.5,.5));
-            Seed_Particles_Helper(box,[=](const TV& X){return TV(0,0);},[=](const TV&){return MATRIX<T,2>();},
-                density,particles_per_cell);
-            RANGE<TV> box2(TV(.5,.35),TV(.8,.45));
-            Seed_Particles_Helper(box2,[=](const TV& X){return TV(0,0);},[=](const TV&){return MATRIX<T,2>();},
-                density,particles_per_cell);
-            ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
-            bool no_mu=true;
-            Add_Fixed_Corotated(scale_E,0.3,&mpm_particles,no_mu);
+            if(1) // c=1e-2
+            {
+                RANGE<TV> box(TV(.3,.3),TV(.5,.5));
+                Seed_Particles_Helper(box,[=](const TV& X){return TV(0,0);},[=](const TV&){return MATRIX<T,2>();},
+                    density,particles_per_cell);
+                RANGE<TV> box2(TV(.5,.35),TV(.8,.45));
+                Seed_Particles_Helper(box2,[=](const TV& X){return TV(0,0);},[=](const TV&){return MATRIX<T,2>();},
+                    density,particles_per_cell);
+                ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
+                bool no_mu=true;
+                Add_Fixed_Corotated(scale_E,0.3,&mpm_particles,no_mu);
+            }
+            if(0) // c=1e-3
+            {
+                RANGE<TV> box(TV(.2,.3),TV(.4,.5));
+                Seed_Particles_Helper(box,[=](const TV& X){return TV(0.1,0);},[=](const TV&){return MATRIX<T,2>();},
+                    density,particles_per_cell);
+                RANGE<TV> box2(TV(.6,.3),TV(.8,.5));
+                Seed_Particles_Helper(box2,[=](const TV& X){return TV(-0.1,0);},[=](const TV&){return MATRIX<T,2>();},
+                    density,particles_per_cell);
+                ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
+                bool no_mu=true;
+                Add_Fixed_Corotated(scale_E,0.3,&mpm_particles,no_mu);
+            }
+
+
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
@@ -325,12 +348,25 @@ End_Frame(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Begin_Time_Step(const T time)
 {
-    static int count=0;
+    // static int count=0;
     switch(test_number)
     {
         case 15:{
-            if(count++>1) break;
-            for(int k=particles.number-Nsurface;k<particles.number;k++) particles.Add_To_Deletion_List(k);
+            // if(count++>1 ) break;
+            int N_non_surface=particles.number-Nsurface;
+            for(int k=N_non_surface;k<particles.number;k++){
+                particles.Add_To_Deletion_List(k);
+
+                // return stolen property
+                int m=steal(k-N_non_surface);
+                particles.mass(m)+=particles.mass(k);
+                particles.volume(m)+=particles.volume(k);
+                // particles.X(m)=(particles.X(m)+particles.X(k))*0.5;
+                particles.V(m)=(particles.V(m)+particles.V(k))*0.5;
+                if(use_affine) particles.B(m)=(particles.B(m)+particles.B(k))*0.5;
+
+
+            }
             LOG::cout<<"deleting "<<Nsurface<<" particles..."<<std::endl;
             particles.Delete_Elements_On_Deletion_List();
             lagrangian_forces.Delete_Pointers_And_Clean_Memory();
@@ -338,6 +374,28 @@ Begin_Time_Step(const T time)
 
             SEGMENTED_CURVE_2D<T>* surface=SEGMENTED_CURVE_2D<T>::Create();
             MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,particles.mass(0)*1);
+
+            // blobby
+            if(0){
+                T r=grid.DX()(0)*.9;
+                GRID<TV> lsgrid; lsgrid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box());
+
+                ARRAY<T,TV_INT> phi;
+                phi.Resize(lsgrid.Domain_Indices(ghost));
+                phi.Fill(FLT_MAX);
+
+                for(int k=0;k<particles.number;k++){
+                    TV Xp=particles.X(k);
+                    TV_INT cell=lsgrid.Cell(Xp,ghost);
+                    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT()-3,TV_INT()+7));it.Valid();it.Next()){
+                        TV_INT index=cell+it.index;
+                        TV Xi=lsgrid.Node(index);
+                        T d=(Xi-Xp).Magnitude();
+                        if(d<phi(index)) phi(index)=d;}}
+                for(int i=0;i<phi.array.m;i++) phi.array(i)-=r;
+
+                MARCHING_CUBES<TV>::Create_Surface(*surface,lsgrid,phi,0);
+            } // end blobby
 
             T min_marching_length=FLT_MAX;
             for(int k=0;k<surface->mesh.elements.m;k++){
@@ -351,12 +409,43 @@ Begin_Time_Step(const T time)
             Nsurface=surface->particles.number;
             LOG::cout<<"adding "<<Nsurface<<" particles..."<<std::endl;
             SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*surface,[=](const TV& X){return TV(0.0,0);},[=](const TV&){return MATRIX<T,2>();},(T)0.001,true);
-            for(int k=Nold;k<particles.number;k++) particles.mass(k)=particles.mass(0);
-            SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)1e-3);
+
+            // for(int k=Nold;k<particles.number;k++) particles.mass(k)=surface_mass/Nsurface;
+
+            steal.Clean_Memory();
+            for(int k=Nold;k<particles.number;k++){
+                
+                T dist=FLT_MAX;
+                int m=-1;
+                for(int q=0;q<Nold;q++){
+                    if(steal.Contains(q)) continue;
+                    T dd=(particles.X(q)-particles.X(k)).Magnitude_Squared();
+                    if(dd<dist){
+                        dist=dd;
+                        m=q;}}
+                T split_mass=particles.mass(m)*.5;
+                T split_volume=particles.volume(m)*.5;
+                TV com=particles.X(m);
+
+                particles.mass(m)=split_mass;
+                particles.volume(m)=split_volume;
+                // particles.X(m)=com*(T)2-particles.X(k);
+                
+                particles.mass(k)=split_mass;
+                particles.volume(k)=split_volume;
+                particles.V(k)=particles.V(m);
+                if(use_affine) particles.B(k)=particles.B(m);
+
+                steal.Append(m);
+
+            }
+
+
+            SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)1e-2);
             stf->use_velocity_independent_implicit_forces=true;
             Add_Force(*stf);
 
-            Dump_Surface(new_sc,VECTOR<T,3>(1,1,0)); 
+            // Dump_Surface(new_sc,VECTOR<T,3>(1,1,0)); 
         } break;
     }
 
