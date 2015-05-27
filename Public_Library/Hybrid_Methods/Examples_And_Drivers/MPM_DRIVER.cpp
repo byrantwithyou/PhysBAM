@@ -422,11 +422,11 @@ Grid_V_Upper_Bound() const
 {
     if(!example.use_affine || !example.weights->constant_scalar_inertia_tensor) return Max_Particle_Speed();
     T result=0;
-    T ksi=(T)6*sqrt((T)TV::m)*example.grid.One_Over_DX().Min();
+    T xi=(T)6*sqrt((T)TV::m)*example.grid.One_Over_DX().Min();
 #pragma omp parallel for reduction(max:result)
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);
-        result=max(result,example.particles.V(p).Magnitude()+example.particles.B(p).Frobenius_Norm()*ksi);}
+        result=max(result,example.particles.V(p).Magnitude()+example.particles.B(p).Frobenius_Norm()*xi);}
     return result;
 }
 //#####################################################################
