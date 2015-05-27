@@ -196,5 +196,6 @@ template void Dump_Levelset<VECTOR<float,2>,float>(GRID<VECTOR<float,2> > const&
 template void Dump_Levelset<VECTOR<float,3>,float>(GRID<VECTOR<float,3> > const&,IMPLICIT_OBJECT<VECTOR<float,3> > const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
 template void Dump_Surface<TRIANGULATED_SURFACE<float>,float>(TRIANGULATED_SURFACE<float> const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
 template void Dump_Surface<TRIANGULATED_SURFACE<double>,double>(TRIANGULATED_SURFACE<double> const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
-
+template void Dump_Surface<SEGMENTED_CURVE_2D<float>,float>(SEGMENTED_CURVE_2D<float> const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void Dump_Surface<SEGMENTED_CURVE_2D<double>,double>(SEGMENTED_CURVE_2D<double> const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
 }
