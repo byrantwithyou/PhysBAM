@@ -6,12 +6,14 @@
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -323,6 +325,41 @@ End_Frame(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Begin_Time_Step(const T time)
 {
+    static int count=0;
+    switch(test_number)
+    {
+        case 15:{
+            if(count++>1) break;
+            for(int k=particles.number-Nsurface;k<particles.number;k++) particles.Add_To_Deletion_List(k);
+            LOG::cout<<"deleting "<<Nsurface<<" particles..."<<std::endl;
+            particles.Delete_Elements_On_Deletion_List();
+            lagrangian_forces.Delete_Pointers_And_Clean_Memory();
+            this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+
+            SEGMENTED_CURVE_2D<T>* surface=SEGMENTED_CURVE_2D<T>::Create();
+            MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,particles.mass(0)*1);
+
+            T min_marching_length=FLT_MAX;
+            for(int k=0;k<surface->mesh.elements.m;k++){
+                TV A=surface->particles.X(surface->mesh.elements(k).x);
+                TV B=surface->particles.X(surface->mesh.elements(k).y);
+                T d=(A-B).Magnitude();
+                min_marching_length=min(min_marching_length,d);}
+            LOG::cout<<"MIN MARCHING LENGTH: " <<min_marching_length<<std::endl;
+
+            int Nold=particles.number;
+            Nsurface=surface->particles.number;
+            LOG::cout<<"adding "<<Nsurface<<" particles..."<<std::endl;
+            SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*surface,[=](const TV& X){return TV(0.0,0);},[=](const TV&){return MATRIX<T,2>();},(T)0.001,true);
+            for(int k=Nold;k<particles.number;k++) particles.mass(k)=particles.mass(0);
+            SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)1e-3);
+            stf->use_velocity_independent_implicit_forces=true;
+            Add_Force(*stf);
+
+            Dump_Surface(new_sc,VECTOR<T,3>(1,1,0)); 
+        } break;
+    }
+
 }
 //#####################################################################
 // Function End_Time_Step
@@ -330,27 +367,6 @@ Begin_Time_Step(const T time)
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 End_Time_Step(const T time)
 {
-    static int count=0;
-    switch(test_number)
-    {
-        case 15:{
-            if(count++ >3) break;
-            for(int k=particles.number-Nsurface;k<particles.number;k++) particles.Add_To_Deletion_List(k);
-            LOG::cout<<"deleting "<<Nsurface<<" particles..."<<std::endl;
-            particles.Delete_Elements_On_Deletion_List();
-            lagrangian_forces.Delete_Pointers_And_Clean_Memory();
-            SEGMENTED_CURVE_2D<T>* surface=SEGMENTED_CURVE_2D<T>::Create();
-            MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,particles.mass(0)*(T)1.1);
-            int Nold=particles.number;
-            Nsurface=surface->particles.number;
-            LOG::cout<<"adding "<<Nsurface<<" particles..."<<std::endl;
-            SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*surface,[=](const TV& X){return TV(0.0,0);},[=](const TV&){return MATRIX<T,2>();},(T)0.001,true);
-            for(int k=Nold;k<particles.number;k++) particles.mass(k)=0;
-            SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)1e-4);
-            stf->use_velocity_independent_implicit_forces=true;
-            Add_Force(*stf);
-        } break;
-    }
 }
 template class STANDARD_TESTS<VECTOR<float,2> >;
 template class STANDARD_TESTS<VECTOR<double,2> >;
