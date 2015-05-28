@@ -15,7 +15,6 @@ MPM_PARTICLES()
     this->Store_Velocity();
     this->Store_Mass();
     Add_Array(ATTRIBUTE_ID_VOLUME,&volume);
-    Add_Array(ATTRIBUTE_ID_V_CHECK,&V_check);
     Add_Array(ATTRIBUTE_ID_F,&F);
     Add_Array(ATTRIBUTE_ID_B,&B);
     Add_Array(ATTRIBUTE_ID_C,&C);
@@ -44,7 +43,6 @@ Store_S(bool store)
 static int Initialize_MPM_Particles()
 {
     Register_Attribute_Name(ATTRIBUTE_ID_VOLUME,"volume");
-    Register_Attribute_Name(ATTRIBUTE_ID_V_CHECK,"V_check");
     Register_Attribute_Name(ATTRIBUTE_ID_F,"F");
     Register_Attribute_Name(ATTRIBUTE_ID_B,"B");
     Register_Attribute_Name(ATTRIBUTE_ID_C,"C");

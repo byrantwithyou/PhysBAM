@@ -12,9 +12,9 @@ namespace PhysBAM{
 template<class TV> class FLUID_KRYLOV_SYSTEM;
 template<class TV> class FLUID_KRYLOV_VECTOR;
 template<class TV> class MPM_EXAMPLE;
-template<class TV> class MPM_KRYLOV_VECTOR;
 template<class TV> class MPM_OBJECTIVE;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
+template<class TV> class MPM_KRYLOV_VECTOR;
 template<class T> class KRYLOV_VECTOR_BASE;
 
 template<class TV>
@@ -27,7 +27,7 @@ public:
 
     int current_frame;
     int output_number;
-    T div;
+
     MPM_EXAMPLE<TV>& example;
     MPM_OBJECTIVE<TV>& objective;
     MPM_KRYLOV_VECTOR<TV>& dv,&rhs;
@@ -55,7 +55,7 @@ public:
     void Cell_To_Face();
     void Cell_To_Face_C();
     void Face_To_Cell();
-    void Face_To_Cell_FLIP();
+    void Make_Incompressible();
     T Pressure_Projection();
     void Apply_Forces();
     void Perform_Particle_Collision(int p,T time);

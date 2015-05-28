@@ -3,11 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Boundaries/BOUNDARY.h>
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/GMRES.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
@@ -16,7 +14,6 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Log/SCOPE.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
@@ -30,8 +27,6 @@
 #include <Hybrid_Methods/System/FLUID_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
-#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
-#include <Dynamics/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 #include <boost/function.hpp>
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -101,24 +96,21 @@ Initialize()
 
     example.mass.Resize(example.grid.Domain_Indices(example.ghost));
     if(example.use_max_weight) example.max_weight.Resize(example.grid.Domain_Indices(example.ghost));
-    example.volume.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity_new.Resize(example.grid.Domain_Indices(example.ghost));
-    example.velocity_check.Resize(example.grid.Domain_Indices(example.ghost));
-    example.cell_C.Resize(example.grid.Domain_Indices(example.ghost));
     dv.u.Resize(example.grid.Domain_Indices(example.ghost));
     rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
     objective.system.tmp.u.Resize(example.grid.Domain_Indices(example.ghost));
 
-    if(example.use_fluid){
+    if(example.incompressible){
         fluid_p.p.Resize(example.grid.Domain_Indices(example.ghost));
         fluid_rhs.p.Resize(example.grid.Domain_Indices(example.ghost));
         example.mass_f.Resize(example.grid.Domain_Indices(example.ghost));
+        example.volume.Resize(example.grid.Domain_Indices(example.ghost));
         example.volume_f.Resize(example.grid.Domain_Indices(example.ghost));
         example.density_f.Resize(example.grid.Domain_Indices(example.ghost));
         example.velocity_f.Resize(example.grid.Domain_Indices(example.ghost));
         example.velocity_new_f.Resize(example.grid.Domain_Indices(example.ghost));
-        example.velocity_check_f.Resize(example.grid.Domain_Indices(example.ghost));
         example.cell_solid.Resize(example.grid.Domain_Indices(example.ghost));
         example.cell_pressure.Resize(example.grid.Domain_Indices(example.ghost));
         example.cell_C.Resize(example.grid.Domain_Indices(example.ghost));
@@ -161,70 +153,11 @@ Advance_One_Time_Step()
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt,example.velocity_new,&example.velocity);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
-    if(example.use_fluid){
-        // Energy and Momentum test
-        T energyP=0,energyC=0,energyF=0,energyCAfter=0,energyPAfter=0,difVP=0,dif_check_old=0;
-        TV momentumP,momentumC,momentumF;
-        for(int k=0;k<example.simulated_particles.m;k++){
-            int p=example.simulated_particles(k);
-            energyP+=(T).5*example.particles.V(p).Magnitude_Squared()*example.particles.mass(p);
-            momentumP+=example.particles.mass(p)*example.particles.V(p);}
-        for(int i=0;i<example.valid_pressure_indices.m;i++){
-            int j=example.valid_pressure_indices(i);
-            energyC+=(T).5*example.mass.array(j)*example.velocity_new.array(j).Magnitude_Squared();
-            momentumC+=example.mass.array(j)*example.velocity_new.array(j);}
-
-        Compute_Cell_C();
-        for(FACE_ITERATOR<TV> iterator(example.grid,example.ghost);iterator.Valid();iterator.Next()){
-            FACE_INDEX<TV::m> face=iterator.Full_Index();
-            energyF+=(T).5*example.mass_f(face)*example.velocity_f(face)*example.velocity_f(face);
-            momentumF(face.axis)+=example.mass_f(face)*example.velocity_f(face);}
-        //Cell_To_Face();
-        Cell_To_Face_C();
-        example.velocity_new_f=example.velocity_f;
-        div=Pressure_Projection();
-        if(example.use_f2p)
-            Face_To_Particle();
-        else{
-            Face_To_Cell();
-        for(int i=0;i<example.valid_pressure_indices.m;i++){
-            int j=example.valid_pressure_indices(i);
-            dif_check_old+=(example.velocity.array(j)-example.velocity_check.array(j)).Magnitude();}
-
-            Grid_To_Particle();}
-        for(int i=0;i<example.valid_pressure_indices.m;i++){
-            int j=example.valid_pressure_indices(i);
-            energyCAfter+=(T).5*example.mass.array(j)*example.velocity_check.array(j).Magnitude_Squared();}
-        for(int k=0;k<example.simulated_particles.m;k++){
-            int p=example.simulated_particles(k);
-            energyPAfter+=(T).5*example.particles.V_check(p).Magnitude_Squared()*example.particles.mass(p);
-            difVP+=(T)(example.particles.V_check(p)-example.particles.V(p)).Magnitude_Squared();}
-
-        //LOG::printf("ENERGY [PARTICLE]:\t%e\n",energyP);
-        //LOG::printf("ENERGY [CELL CENTER]:\t%e\n",energyC);
-        //LOG::printf("ENERGY [FACE]:\t\t%e\n",energyF);
-        //LOG::printf("ENERGY DIFF [CELL CENTER]:\t%e\n",energyCAfter-energyC);
-        //LOG::printf("ENERGY DIFF [PARTICLE]:\t%e\n",energyPAfter-energyP);
-        //LOG::printf("VELOCITY DIFF [PARTICLE]:\t%e\n",difVP);
-        //LOG::printf("VELOCITY DIFF [CELL]:\t%e\n",dif_check_old);
-        //LOG::printf("ENERGY RATIO [CELL CENTER/PARTICLE]:\t%e\n",energyC/energyP);
-        //LOG::printf("ENERGY RATIO [FACE/CELL CENTER]:\t%e\n",energyF/energyC);
-        //LOG::printf("ENERGY RATIO [FACE/PARTICLE]:\t\t%e\n",energyF/energyP);
-        //LOG::printf("MOMENTUM [PARTICLE]:\t%P\n",momentumP);
-        //LOG::printf("MOMENTUM [CELL CENTER]:\t%P\n",momentumC);
-        //LOG::printf("MOMENTUM [FACE]:\t\t%P\n",momentumF);
-    }
+    if(example.incompressible)
+        Make_Incompressible();
     else
         Grid_To_Particle();
-    //TV v=(example.particles.X(0)-TV::Constant_Vector(0.5)).Normalized()*0.5;
-    //std::swap(v(0),v(1)); v(0)*=-1;
-    //example.particles.V(0)=v;
-    //TV_INT index=example.grid.Index(example.particles.X(0));
-    //LOG::printf("DIFFERENCE IN C: %e\n",(example.particles.C(0)-example.cell_C(index)).Frobenius_Norm_Squared());
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
-    /*if(div>1e-1){
-        Write_Output_Files(++output_number);
-        PHYSBAM_FATAL_ERROR("Div kills it");}*/
 
     example.End_Time_Step(example.time);
 }
@@ -293,8 +226,9 @@ template<class TV> void MPM_DRIVER<TV>::
 Update_Particle_Weights()
 {
     example.weights->Update(example.particles.X);
-    for(int i=0;i<TV::m;++i)
-        example.face_weights(i)->Update(example.particles.X);
+    if(example.incompressible)
+        for(int i=0;i<TV::m;++i)
+            example.face_weights(i)->Update(example.particles.X);
 }
 //#####################################################################
 // Function Particle_To_Grid
@@ -310,11 +244,7 @@ Particle_To_Grid()
         example.volume.array(i)=0;
         example.velocity.array(i)=TV();
         example.velocity_new.array(i)=TV();
-<<<<<<< HEAD
         if(example.use_max_weight) example.max_weight.array(i)=0;}
-=======
-        example.velocity_check.array(i)=TV();}
->>>>>>> density pressure projection working
 
     if(example.weights->use_gradient_transfer)
     {
@@ -322,14 +252,10 @@ Particle_To_Grid()
             [this,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
             {
                 example.mass(it.Index())+=it.Weight()*particles.mass(p);
-<<<<<<< HEAD
                 if(example.use_max_weight){T& w=example.max_weight(it.Index());w=max(w,it.Weight());}
-=======
-                example.volume(it.Index())+=it.Weight()*particles.volume(p);
->>>>>>> density pressure projection working
-                TV V=particles.V(p);
-                if(example.use_affine){
-                    V+=particles.C(p)*((example.grid.Center(it.Index())-particles.X(p)));
+                if(example.incompressible){
+                    example.volume(it.Index())+=it.Weight()*particles.volume(p);
+                    TV V=particles.V(p)+particles.C(p)*((example.grid.Center(it.Index())-particles.X(p)));
                     example.velocity(it.Index())+=it.Weight()*particles.mass(p)*V;}
                 else example.velocity(it.Index())+=particles.mass(p)*(it.Weight()*particles.V(p)+particles.B(p)*it.Gradient());
             },true);
@@ -341,16 +267,12 @@ Particle_To_Grid()
             [this,Dp_inverse,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
             {
                 example.mass(it.Index())+=it.Weight()*particles.mass(p);
-<<<<<<< HEAD
                 if(example.use_max_weight) example.max_weight(it.Index())+=it.Weight();
-=======
-                example.volume(it.Index())+=it.Weight()*particles.volume(p);
->>>>>>> density pressure projection working
-                example.cell_C(it.Index())+=MATRIX<T,TV::m>::Outer_Product(particles.V(p),it.Gradient());
                 TV V=particles.V(p);
                 if(example.use_affine) {
-                    if(example.use_fluid)
-                        V+=particles.C(p)*(example.grid.Center(it.Index())-particles.X(p));
+                    if(example.incompressible){
+                        example.volume(it.Index())+=it.Weight()*particles.volume(p);
+                        V+=particles.C(p)*(example.grid.Center(it.Index())-particles.X(p));}
                     else
                         V+=particles.B(p)*(Dp_inverse*(example.grid.Center(it.Index())-particles.X(p)));}
                 example.velocity(it.Index())+=it.Weight()*particles.mass(p)*V;
@@ -360,32 +282,22 @@ Particle_To_Grid()
 
     example.valid_grid_indices.Remove_All();
     example.valid_grid_cell_indices.Remove_All();
-    if(example.use_fluid){
+    if(example.incompressible){
         example.valid_pressure_indices.Remove_All();
         example.valid_pressure_cell_indices.Remove_All();
         example.cell_pressure.Fill(false);}
     for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
         int i=example.mass.Standard_Index(it.index);
         if(example.mass.array(i)){
-            if(example.use_fluid){
+            if(example.incompressible){
                 example.cell_pressure.array(i)=true;
                 if(!example.cell_solid.array(i)){
-                    bool valid=false;
-                    if(example.weights->Order()==1)
-                        valid=true;
-                    else {
-                        int c=0;
-                        for(int d=0;d<TV::m;++d)
-                            c+=(example.cell_solid(it.index-TV_INT::Axis_Vector(d))||example.cell_solid(it.index+TV_INT::Axis_Vector(d)));
-                        if(c<TV::m) valid=true;}
-                    if(valid){
-                        example.valid_pressure_indices.Append(i);
-                        example.valid_pressure_cell_indices.Append(it.index);}}}
+                    example.valid_pressure_indices.Append(i);
+                    example.valid_pressure_cell_indices.Append(it.index);}}
             example.valid_grid_indices.Append(i);
             example.valid_grid_cell_indices.Append(it.index);
             example.velocity.array(i)/=example.mass.array(i);}
         else example.velocity.array(i)=TV();}
-        //LOG::printf("These are the flags:\n%P\n",example.cell_pressure);
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -404,34 +316,25 @@ Grid_To_Particle()
 
         for(int k=a;k<b;k++){
             int p=example.simulated_particles(k);
-            TV Vn_interpolate,V_pic,V_flip=particles.V(p),V_pic_check,V_flip_check=particles.V(p);
+            TV Vn_interpolate,V_pic,V_flip=particles.V(p);
             MATRIX<T,TV::m> B,C,grad_Vp;
 
             for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,true,scratch);it.Valid();it.Next()){
-                if(output_number==87)
-                LOG::cout<<"index="<<it.Index()<<std::endl;
                 T w=it.Weight();
                 TV_INT index=it.Index();
                 TV V_grid=example.velocity_new(index);
-                TV V_grid_check=example.velocity_check(index);
                 V_pic+=w*V_grid;
-                V_pic_check+=w*V_grid_check;
                 V_flip+=w*(V_grid-example.velocity(index));
-                V_flip_check+=w*(V_grid-example.velocity_check(index));
                 Vn_interpolate+=w*example.velocity(index);
                 if(example.use_midpoint)
                     V_grid=(T).5*(V_grid+example.velocity(index));
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             particles.F(p)+=dt*grad_Vp*particles.F(p);
-<<<<<<< HEAD
             if(particles.store_S) particles.S(p)+=dt*(grad_Vp*particles.S(p)).Twice_Symmetric_Part();
 
             if(example.use_affine && example.use_early_gradient_transfer)
                 B=grad_Vp/example.weights->Constant_Scalar_Inverse_Dp();
             else if(example.use_affine)
-=======
-            if(example.use_affine)
->>>>>>> density pressure projection working
                 for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,false,scratch);it.Valid();it.Next()){
                     TV_INT index=it.Index();
                     TV V_grid=example.velocity_new(index);
@@ -446,28 +349,14 @@ Grid_To_Particle()
                     B+=it.Weight()/2*(MATRIX<T,TV::m>::Outer_Product(V_grid,Z-particles.X(p)+xi_new-xp_new)
                             +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));}
 
-<<<<<<< HEAD
             particles.V(p)=V_pic;
             Perform_Particle_Collision(p,example.time+example.dt);
+            SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> Dp_inverse_transpose=example.weights->Dp(particles.X(p)).Inverse();
+            particles.C(p)=B*Dp_inverse_transpose;
             if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
             else particles.X(p)+=particles.V(p)*dt;
             particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
             particles.B(p)=B;
-            SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> Dp_inverse_transpose=example.weights->Dp(particles.X(p)).Inverse();
-            particles.C(p)=B*Dp_inverse_transpose;
-=======
-                if(output_number==87)
-                LOG::cout<<"passes"<<std::endl;
-                    particles.V(p)=V_pic;
-                    Perform_Particle_Collision(p);
-                    SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> Dp_inverse_transpose=example.weights->Dp(particles.X(p)).Inverse();
-                    if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
-                    else particles.X(p)+=particles.V(p)*dt;
-                    particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
-                    particles.V_check(p)=V_flip_check*example.flip+V_pic_check*(1-example.flip);
-                    particles.B(p)=B;
-                    particles.C(p)=B*Dp_inverse_transpose;
->>>>>>> density pressure projection working
 
             if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}}
 }
@@ -505,7 +394,7 @@ Face_To_Particle()
                         for(int k=0;k<TV::m;++k)
                             C(i,k)+=tmp(k);}}
             particles.V(p)=V_pic;
-            Perform_Particle_Collision(p);
+            Perform_Particle_Collision(p,example.time+example.dt);
             if(example.use_midpoint) PHYSBAM_NOT_IMPLEMENTED("Midpoint with Face_To_Particle is not supported");
             else particles.X(p)+=particles.V(p)*dt;
             particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
@@ -605,16 +494,7 @@ Cell_To_Face_C()
             example.velocity_f(face)/=example.mass_f(face);
             example.mass_f(face)*=(T).5;
             example.volume_f(face)*=(T).5;
-            if(abs(example.volume_f(face))>1e-23)
-                example.density_f(face)=example.mass_f(face)/example.volume_f(face);
-            else{
-                LOG::printf("volume_f[%P]=%P\n",face,example.volume_f(face));
-                PHYSBAM_FATAL_ERROR("THERE IS A CELL WITH VOLUME <= 1E-16");}
-            if(abs(example.volume_f(face))<1e-10)
-                LOG::printf("density_f[%P]=%f\n",face,example.density_f(face));
-            if(abs(example.density_f(face)-(T)2)>1e-10)
-                PHYSBAM_FATAL_ERROR("DENSITY IS WRONG!\n");
-        }}
+            example.density_f(face)=example.mass_f(face)/example.volume_f(face);}}
 }
 //#####################################################################
 // Function Face_To_Cell
@@ -628,28 +508,51 @@ Face_To_Cell()
         for(int a=0;a<TV::m;a++){
             FACE_INDEX<TV::m> faceF(a,example.grid.First_Face_Index_In_Cell(a,index));
             FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
-            example.velocity_new(index)(a)=(example.velocity_new_f(faceF)+example.velocity_new_f(faceS))*(T).5;
-            example.velocity_check(index)(a)=(example.velocity_check_f(faceF)+example.velocity_check_f(faceS))*(T).5; 
-        }}
+            example.velocity_new(index)(a)=(example.velocity_new_f(faceF)+example.velocity_new_f(faceS))*(T).5;}}
 }
 //#####################################################################
-// Function Face_To_Cell_FLIP
+// Function Make_Incompressible
 //#####################################################################
 template<class TV> void MPM_DRIVER<TV>::
-Face_To_Cell_FLIP()
+Make_Incompressible()
 {
-    T flip_ratio=(T)0.75;
-#pragma omp parallel for
-    for(int t=0;t<example.valid_grid_cell_indices.m;t++){
-        TV_INT index=example.valid_grid_cell_indices(t);
-        for(int a=0;a<TV::m;a++){
-            FACE_INDEX<TV::m> faceF(a,example.grid.First_Face_Index_In_Cell(a,index));
-            FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
-            T pic=(example.velocity_new_f(faceF)+example.velocity_new_f(faceS))*(T).5;
-            T flip=example.velocity_new(index)(a)+pic-
-                (example.velocity_f(faceF)+example.velocity_f(faceS))*(T).5;
-            example.velocity_new(index)(a)=flip_ratio*flip+(1-flip_ratio)*pic;
-        }}
+    // Energy and Momentum test
+    T energyP=0,energyC=0,energyF=0,energyCAfter=0;
+    TV momentumP,momentumC,momentumF;
+    for(int k=0;k<example.simulated_particles.m;k++){
+        int p=example.simulated_particles(k);
+        energyP+=(T).5*example.particles.V(p).Magnitude_Squared()*example.particles.mass(p);
+        momentumP+=example.particles.mass(p)*example.particles.V(p);}
+    for(int i=0;i<example.valid_pressure_indices.m;i++){
+        int j=example.valid_pressure_indices(i);
+        energyC+=(T).5*example.mass.array(j)*example.velocity_new.array(j).Magnitude_Squared();
+        momentumC+=example.mass.array(j)*example.velocity_new.array(j);}
+
+    Compute_Cell_C();
+    for(FACE_ITERATOR<TV> iterator(example.grid,example.ghost);iterator.Valid();iterator.Next()){
+        FACE_INDEX<TV::m> face=iterator.Full_Index();
+        energyF+=(T).5*example.mass_f(face)*example.velocity_f(face)*example.velocity_f(face);
+        momentumF(face.axis)+=example.mass_f(face)*example.velocity_f(face);}
+    //Cell_To_Face();
+    Cell_To_Face_C();
+    example.velocity_new_f=example.velocity_f;
+    Pressure_Projection();
+    if(example.use_f2p)
+        Face_To_Particle();
+    else{
+        Face_To_Cell();
+        Grid_To_Particle();}
+
+    //LOG::printf("ENERGY [PARTICLE]:\t%e\n",energyP);
+    //LOG::printf("ENERGY [CELL CENTER]:\t%e\n",energyC);
+    //LOG::printf("ENERGY [FACE]:\t\t%e\n",energyF);
+    //LOG::printf("ENERGY DIFF [CELL CENTER]:\t%e\n",energyCAfter-energyC);
+    //LOG::printf("ENERGY RATIO [CELL CENTER/PARTICLE]:\t%e\n",energyC/energyP);
+    //LOG::printf("ENERGY RATIO [FACE/CELL CENTER]:\t%e\n",energyF/energyC);
+    //LOG::printf("ENERGY RATIO [FACE/PARTICLE]:\t\t%e\n",energyF/energyP);
+    //LOG::printf("MOMENTUM [PARTICLE]:\t%P\n",momentumP);
+    //LOG::printf("MOMENTUM [CELL CENTER]:\t%P\n",momentumC);
+    //LOG::printf("MOMENTUM [FACE]:\t\t%P\n",momentumF);
 }
 //#####################################################################
 // Function Pressure_Projection
@@ -685,7 +588,6 @@ Pressure_Projection()
     if(!converged)
         LOG::printf("CG DID NOT CONVERGE.\n");
     example.velocity_new_f=example.velocity_f;
-    example.velocity_check_f=example.velocity_f;
     //UPDATE VELOCITY ON FACES
     for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
         TV_INT index=example.valid_pressure_cell_indices(t);
@@ -694,13 +596,6 @@ Pressure_Projection()
             FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
             example.velocity_new_f(faceF)-=fluid_p.p(index)*one_over_dx/(T)example.density_f(faceF);
             example.velocity_new_f(faceS)+=fluid_p.p(index)*one_over_dx/(T)example.density_f(faceS);}}
-    /*for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
-        TV_INT index=example.valid_pressure_cell_indices(t);
-        for(int a=0;a<TV::m;a++){
-            FACE_INDEX<TV::m> faceF(a,example.grid.First_Face_Index_In_Cell(a,index));
-            FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
-            example.velocity_new_f(faceF)-=fluid_p.p(index)*one_over_dx;
-            example.velocity_new_f(faceS)+=fluid_p.p(index)*one_over_dx;}}*/
     //APPLY BC ON THE FACES
     for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
         TV_INT index=example.valid_pressure_cell_indices(t);
@@ -935,4 +830,3 @@ template class MPM_DRIVER<VECTOR<float,3> >;
 template class MPM_DRIVER<VECTOR<double,2> >;
 template class MPM_DRIVER<VECTOR<double,3> >;
 }
-

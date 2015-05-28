@@ -35,50 +35,27 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 
     for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
         TV_INT index=example.valid_pressure_cell_indices(t);
-        T sum=(T)0;//((T(0)));
+        T sum=0;
         T center=0;
         for(int a=0;a<TV_INT::m;++a){
             const TV_INT axis=TV_INT::Axis_Vector(a);
             FACE_INDEX<TV::m> faceF(a,example.grid.First_Face_Index_In_Cell(a,index));
             FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
             if(example.weights->Order()==1){
-                /*if(!example.cell_solid(index+axis))
-                    sum+=V.p(index+axis)-V.p(index);*/
-                //WITHOUT DENSITY
-                /*if(example.cell_solid(index-axis)&&example.cell_solid(index+axis))
-                    PHYSBAM_FATAL_ERROR("Fluid trapped between two solids");
-                else if(example.cell_solid(index-axis)&&!example.cell_solid(index+axis))
-                    sum-=2*V.p(index+axis)/2;
-                else if(!example.cell_solid(index-axis)&&example.cell_solid(index+axis))
-                    sum-=2*V.p(index-axis)/2;
-                else if(!example.cell_solid(index-axis)&&!example.cell_solid(index+axis))
-                    sum-=(V.p(index-axis)+V.p(index+axis))/2;}*/
-                //WITH DENSITY 
                 if(example.cell_solid(index-axis)&&example.cell_solid(index+axis))
                     PHYSBAM_FATAL_ERROR("Fluid trapped between two solids");
                 else if(example.cell_solid(index-axis)&&!example.cell_solid(index+axis)){
                     sum+=(T)2*(-V.p(index+axis))/example.density_f(faceS);
-                    center+=(T)2*V.p(index)/example.density_f(faceS);
-                }
+                    center+=(T)2*V.p(index)/example.density_f(faceS);}
                 else if(!example.cell_solid(index-axis)&&example.cell_solid(index+axis)){
                     sum+=(T)2*(-V.p(index-axis))/example.density_f(faceF);
-                    center+=(T)2*V.p(index)/example.density_f(faceF);
-                }
+                    center+=(T)2*V.p(index)/example.density_f(faceF);}
                 else if(!example.cell_solid(index-axis)&&!example.cell_solid(index+axis)){
                     sum+=(-V.p(index+axis))/example.density_f(faceS)+(-V.p(index-axis))/example.density_f(faceF);
-                    center+=V.p(index)/example.density_f(faceF)+V.p(index)/example.density_f(faceS);
-                }}
+                    center+=V.p(index)/example.density_f(faceF)+V.p(index)/example.density_f(faceS);}}
             else PHYSBAM_NOT_IMPLEMENTED();
-                /*if(example.cell_solid(index-axis)&&example.cell_solid(index+axis))
-                    PHYSBAM_FATAL_ERROR("Fluid trapped between two solids");
-                else if(!example.cell_solid(index+axis))
-                    sum-=(V.p(index-axis)+V.p(index+axis*/
         }
-        //F.p(index)=(x)/2+sum)*example.grid.one_over_dX(0)*example.grid.one_over_dX(0);
-        F.p(index)=(center+sum)*example.grid.one_over_dX(0)*example.grid.one_over_dX(0);
-        //WITHOUT DENSITY
-        //F.p(index)=(2*TV::m*V.p(index)/2+sum)*example.grid.one_over_dX(0)*example.grid.one_over_dX(0);
-    }
+        F.p(index)=(center+sum)*example.grid.one_over_dX(0)*example.grid.one_over_dX(0);}
 }
 //#####################################################################
 // Function Inner_Product

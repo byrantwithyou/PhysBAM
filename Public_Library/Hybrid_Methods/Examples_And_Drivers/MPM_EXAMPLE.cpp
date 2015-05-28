@@ -29,7 +29,7 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),mass_contour(-1),use_max_weight(false),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
     use_reduced_rasterization(false),use_affine(false),use_f2p(false),use_midpoint(false),use_symplectic_euler(false),
-    use_particle_collision(false),print_stats(false),flip(0),cfl(1),newton_tolerance(1),
+    use_particle_collision(false),use_early_gradient_transfer(false),print_stats(false),flip(0),cfl(1),newton_tolerance(1),
     newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),test_diff(false),threads(1),
     output_structures_each_frame(false)
 {
@@ -61,10 +61,8 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),velocity_new);
-    if(use_fluid){
+    if(incompressible)
         FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),velocity_new_f);
-        //FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/velocities",output_directory.c_str(),frame),velocity_f);
-        }
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/density",output_directory.c_str(),frame),mass);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
     int static_frame=output_structures_each_frame?frame:-1;
@@ -72,7 +70,7 @@ Write_Output_Files(const int frame)
     deformable_body_collection.Write(stream_type,output_directory,output_directory,frame,static_frame,write_structures,false);
 
     for(int i=0;i<particles.X.m;i++){
-        Add_Debug_Particle(particles.X(i),VECTOR<T,3>(1,particles.valid(i),1));
+        Add_Debug_Particle(particles.X(i),VECTOR<T,3>(particles.mass(i)==particles.mass(0)?1:0,particles.valid(i),1));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(i));}
     GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
     for(int i=0;i<collision_objects.m;i++)

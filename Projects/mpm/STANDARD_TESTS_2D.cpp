@@ -321,8 +321,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-3,-3),TV(4,4)),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
-            Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
-            RANDOM_NUMBERS<T> random;
+            Seed_Particles_Helper(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
             random.Fill_Uniform(particles.V,-1,1);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
         } break;
@@ -330,7 +329,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(grid.dX*(T).5,TV(1-grid.dX(0)*(T).5,0.25));
             T density=2*scale_mass;
-            Seed_Particles(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
+            Seed_Particles_Helper(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
             Add_Gravity(TV(0,-1.8));
         } break;
@@ -339,7 +338,7 @@ Initialize()
             RANGE<TV> box;
             box=RANGE<TV>(grid.dX*(T).5,TV(0.2,0.75));
             T density=2*scale_mass;
-            Seed_Particles(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
+            Seed_Particles_Helper(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
             Add_Gravity(TV(0,-1.8));
         } break;
@@ -347,7 +346,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.7),.2);
             T density=2*scale_mass;
-            Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
+            Seed_Particles_Helper(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
             Add_Gravity(TV(0,-1.8));
         } break;
@@ -357,8 +356,18 @@ Initialize()
             T density=2*scale_mass;
             T volume=grid.dX.Product()/particles_per_cell;
             T mass=density*volume;
-            Seed_Particles(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
+            Seed_Particles_Helper(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
             Add_Particle(TV(.5,.9),TV(),mass,volume,MATRIX<T,TV::m>()+1,MATRIX<T,TV::m>());
+            Add_Gravity(TV(0,-1.8));
+        } break;
+        case 26:{ // Raleigh Taylor
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box(grid.dX*(T).5,TV(1-grid.dX(0)*(T).5,0.20));
+            T density=2*scale_mass;
+            Seed_Particles_Helper(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
+            density*=10;
+            box+=TV(0,0.20);
+            Seed_Particles_Helper(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,2>();},density,particles_per_cell);
             Add_Gravity(TV(0,-1.8));
         } break;
         case 99:{ // single particle

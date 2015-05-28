@@ -75,7 +75,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     parse_args.Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
     parse_args.Add("-regular_seeding",&regular_seeding,"use regular particle seeding");
     parse_args.Add("-use_early_gradient_transfer",&use_early_gradient_transfer,"use early gradient transfer for Cp");
-    parse_args.Add("-use_fluid",&use_fluid,"Use fluid stuff");
+    parse_args.Add("-incompressible",&incompressible,"Make simulated media incompressible");
     parse_args.Parse(true);
 
     frame_dt=1/framerate;
