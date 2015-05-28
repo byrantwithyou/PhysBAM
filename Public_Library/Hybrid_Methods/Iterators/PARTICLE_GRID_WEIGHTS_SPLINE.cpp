@@ -61,6 +61,8 @@ template<class TV> static void
 Compute_Weights(VECTOR<TV,2>& w,VECTOR<TV,2>& dw,TV x,TV one_over_dX)
 {
     typedef typename TV::SCALAR T;
+    for(int k=0;k<TV::m;++k)
+        if(x(k)==0) x(k)=1e-10;
     w(0)=(T)1-x;
     dw(0)=-one_over_dX;
     x-=1;

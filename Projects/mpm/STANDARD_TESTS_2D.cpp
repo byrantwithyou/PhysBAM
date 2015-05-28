@@ -361,6 +361,14 @@ Initialize()
             Add_Particle(TV(.5,.9),TV(),mass,volume,MATRIX<T,TV::m>()+1,MATRIX<T,TV::m>());
             Add_Gravity(TV(0,-1.8));
         } break;
+        case 99:{ // single particle
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            T density=2*scale_mass;
+            T volume=grid.dX.Product()/particles_per_cell;
+            T mass=density*volume;
+            Add_Particle(TV(.8,.5),TV(),mass,volume,MATRIX<T,TV::m>()+1,MATRIX<T,TV::m>());
+            Add_Gravity(TV(0,-1.8));
+        } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

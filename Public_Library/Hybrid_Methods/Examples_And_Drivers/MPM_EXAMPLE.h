@@ -40,10 +40,10 @@ public:
     ARRAY<int> simulated_particles;
     ARRAY<bool> particle_is_simulated;
 
-    ARRAY<T,TV_INT> mass;
+    ARRAY<T,TV_INT> mass,volume;
     ARRAY<T,TV_INT> max_weight;
     ARRAY<TV,TV_INT> location;
-    ARRAY<TV,TV_INT> velocity,velocity_new;
+    ARRAY<TV,TV_INT> velocity,velocity_new,velocity_check;
     ARRAY<MATRIX<T,TV::m>,TV_INT> cell_C;
     ARRAY<int> valid_grid_indices;
     ARRAY<TV_INT> valid_grid_cell_indices;
@@ -60,9 +60,10 @@ public:
 
     // fluid stuff
     bool use_fluid;
-    ARRAY<T,FACE_INDEX<TV::m> > mass_f;
+    ARRAY<T,FACE_INDEX<TV::m> > mass_f,volume_f,density_f;
     ARRAY<T,FACE_INDEX<TV::m> > velocity_f;
     ARRAY<T,FACE_INDEX<TV::m> > velocity_new_f;
+    ARRAY<T,FACE_INDEX<TV::m> > velocity_check_f;
     ARRAY<bool,TV_INT> cell_solid;
     ARRAY<bool,TV_INT> cell_pressure;
 
