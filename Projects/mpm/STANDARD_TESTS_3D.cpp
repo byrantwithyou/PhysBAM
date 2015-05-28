@@ -163,6 +163,15 @@ Initialize()
             Add_Gravity(TV(0,-9.8,0));
             delete surf;
         } break;
+        case 7:{ // skew impact of two elastic spheres
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(),TV(30,30,30)),true);
+            T density=5*scale_mass;
+            SPHERE<TV> sphere1(TV(10,13,15),2);
+            Seed_Particles_Helper(sphere1,[=](const TV& X){return TV(0.75,0,0);},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
+            SPHERE<TV> sphere2(TV(20,15,15),2);
+            Seed_Particles_Helper(sphere2,[=](const TV& X){return TV(-0.75,0,0);},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
+            Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
