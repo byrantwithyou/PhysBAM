@@ -114,6 +114,9 @@ Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
         [this](int p,HELPER& h)
         {
             system.example.particles.F(p)=F0(p)+system.example.dt/(system.example.use_midpoint+1)*h.grad_Vp*F0(p);
+            if(system.example.particles.store_S)
+                system.example.particles.S(p)=S0(p)
+                    +(system.example.dt/(system.example.use_midpoint+1)*h.grad_Vp*S0(p)).Twice_Symmetric_Part();
             if(system.example.use_midpoint) system.example.particles.X(p)=X0(p)+system.example.dt/2*(h.Vp+h.Vn_interpolate);
             else system.example.particles.X(p)=X0(p)+system.example.dt*h.Vp;
         },true);
@@ -128,6 +131,7 @@ Restore_F() const
     for(int k=0;k<system.example.simulated_particles.m;k++){
         int p=system.example.simulated_particles(k);
         system.example.particles.F(p)=F0(p);
+        if(system.example.particles.store_S) system.example.particles.S(p)=S0(p);
         system.example.particles.X(p)=X0(p);}
 }
 //#####################################################################
@@ -247,11 +251,13 @@ template<class TV> void MPM_OBJECTIVE<TV>::
 Reset()
 {
     F0.Resize(system.example.particles.X.m);
+    if(system.example.particles.store_S) S0.Resize(system.example.particles.X.m);
     X0.Resize(system.example.particles.X.m);
 #pragma omp parallel for
     for(int k=0;k<system.example.simulated_particles.m;k++){
         int p=system.example.simulated_particles(k);
         F0(p)=system.example.particles.F(p);
+        if(system.example.particles.store_S) S0(p)=system.example.particles.S(p);
         X0(p)=system.example.particles.X(p);}
 
     v0.u=system.example.velocity;

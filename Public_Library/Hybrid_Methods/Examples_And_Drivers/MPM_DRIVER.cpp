@@ -279,6 +279,7 @@ Grid_To_Particle()
                     V_grid=(T).5*(V_grid+example.velocity(index));
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             particles.F(p)+=dt*grad_Vp*particles.F(p);
+            if(particles.store_S) particles.S(p)+=dt*(grad_Vp*particles.S(p)).Twice_Symmetric_Part();
 
             if(example.use_affine && example.use_early_gradient_transfer)
                 B=grad_Vp/example.weights->Constant_Scalar_Inverse_Dp();

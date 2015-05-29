@@ -10,7 +10,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> MPM_PARTICLES<TV>::
 MPM_PARTICLES()
-    :volume(0,0),F(0,0),B(0,0),valid(0,0)
+    :store_S(false),volume(0,0),F(0,0),B(0,0),valid(0,0)
 {
     this->Store_Velocity();
     this->Store_Mass();
@@ -26,6 +26,17 @@ template<class TV> MPM_PARTICLES<TV>::
 ~MPM_PARTICLES()
 {}
 //#####################################################################
+// Function Store_S
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Store_S(bool store)
+{
+    if(store_S==store) return;
+    store_S=store;
+    if(store) Add_Array(ATTRIBUTE_ID_S,&S);
+    else Remove_Array(ATTRIBUTE_ID_S);
+}
+//#####################################################################
 // Function Initialize_MPM_Particles
 //#####################################################################
 static int Initialize_MPM_Particles()
@@ -34,6 +45,7 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_F,"F");
     Register_Attribute_Name(ATTRIBUTE_ID_B,"B");
     Register_Attribute_Name(ATTRIBUTE_ID_VALID,"valid");
+    Register_Attribute_Name(ATTRIBUTE_ID_S,"S");
     return 0;
 }
 int initialize_deformables_particles=Initialize_MPM_Particles();

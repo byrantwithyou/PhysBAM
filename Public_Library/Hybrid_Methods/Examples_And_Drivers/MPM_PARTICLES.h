@@ -18,6 +18,7 @@ const ATTRIBUTE_ID ATTRIBUTE_ID_F(40);
 const ATTRIBUTE_ID ATTRIBUTE_ID_VOLUME(41);
 const ATTRIBUTE_ID ATTRIBUTE_ID_B(42);
 const ATTRIBUTE_ID ATTRIBUTE_ID_VALID(43);
+const ATTRIBUTE_ID ATTRIBUTE_ID_S(44);
 
 template<class TV>
 class MPM_PARTICLES:public CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> >
@@ -25,14 +26,17 @@ class MPM_PARTICLES:public CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> 
     typedef typename TV::SCALAR T;
     typedef CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> > BASE;
 public:
-    using BASE::Add_Array;
+    using BASE::Add_Array;using BASE::Remove_Array;
 
+    bool store_S;
     ARRAY_VIEW<T> volume;
     ARRAY_VIEW<MATRIX<T,TV::m> > F,B;
+    ARRAY_VIEW<SYMMETRIC_MATRIX<T,TV::m> > S;
     ARRAY_VIEW<bool> valid;
 
     MPM_PARTICLES();
     virtual ~MPM_PARTICLES();
+    void Store_S(bool store=true);
 //#####################################################################
 };
 }

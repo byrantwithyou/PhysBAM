@@ -18,6 +18,8 @@
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Forces/MPM_OLDROYD_FINITE_ELEMENTS.h>
+#include <Hybrid_Methods/Forces/OLDROYD_NEO_HOOKEAN.h>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
 //#####################################################################
@@ -299,8 +301,21 @@ Initialize()
                 bool no_mu=true;
                 Add_Fixed_Corotated(scale_E,0.3,&mpm_particles,no_mu);
             }
+        } break;
+        case 16:{ // oscillating circle
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            SPHERE<TV> sphere(TV(.5,.5),.3);
+            T density=2*scale_mass;
+            particles.Store_S();
+            Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0.1,0);},[=](const TV&){return MATRIX<T,2>();},
+                density,particles_per_cell);
+            particles.F.Fill(MATRIX<T,2>()+1.5);
 
-
+            OLDROYD_NEO_HOOKEAN<TV> *neo=new OLDROYD_NEO_HOOKEAN<TV>;
+            neo->mu=1000;
+            neo->lambda=1000;
+            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(particles,*neo,gather_scatter,0);
+            Add_Force(*fe);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

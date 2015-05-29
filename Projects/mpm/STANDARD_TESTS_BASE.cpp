@@ -169,6 +169,7 @@ Add_Particle(const TV& X,const TV& V,const T mass,const T volume,const MATRIX<T,
     particles.V(p)=V;
     if(use_affine) particles.B(p)=B;
     particles.F(p)=F;
+    if(particles.store_S) particles.S(p)=F.Outer_Product_Matrix();
     particles.mass(p)=mass;
     particles.volume(p)=volume;
 }
@@ -234,6 +235,7 @@ Seed_Lagrangian_Particles(T_STRUCTURE& object,boost::function<TV(const TV&)> V,
         particles.V(p)=V(X);
         if(use_affine) particles.B(p)=dV(X)*weights->Dp(X);
         particles.F(p)=MATRIX<T,TV::m>()+1;
+        if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
         particles.volume(p)=particles.mass(p)/density;}
     return new_object;
 }
