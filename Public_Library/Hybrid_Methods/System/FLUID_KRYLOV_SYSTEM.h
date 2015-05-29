@@ -21,8 +21,8 @@ class FLUID_KRYLOV_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
-    MPM_EXAMPLE<TV>& example;
-    FLUID_KRYLOV_SYSTEM(MPM_EXAMPLE<TV>& example);
+    const MPM_EXAMPLE<TV>& example;
+    FLUID_KRYLOV_SYSTEM(const MPM_EXAMPLE<TV>& example);
     virtual ~FLUID_KRYLOV_SYSTEM();
 
     void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const PHYSBAM_OVERRIDE;

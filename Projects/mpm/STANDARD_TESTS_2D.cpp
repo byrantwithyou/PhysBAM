@@ -354,7 +354,11 @@ Initialize()
         } break;
         case 22:{ // (fluid test) pool of water 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box(grid.dX*(T).5,TV(1-grid.dX(0)*(T).5,0.25));
+            RANGE<TV> box;
+            if(order==2)
+                box=RANGE<TV>(grid.dX,TV(1-grid.dX(0),0.25));
+            else
+                box=RANGE<TV>(grid.dX*(T).5,TV(1-grid.dX(0)*(T).5,0.25));
             T density=2*scale_mass;
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
@@ -363,7 +367,10 @@ Initialize()
         case 23:{ // (fluid test) dam break 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box;
-            box=RANGE<TV>(grid.dX*(T).5,TV(0.2,0.75));
+            if(order==2)
+                box=RANGE<TV>(grid.dX,TV(0.2,0.75));
+            else
+                box=RANGE<TV>(grid.dX*(T).5,TV(0.2,0.75));
             T density=2*scale_mass;
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
@@ -389,7 +396,11 @@ Initialize()
         } break;
         case 26:{ // Raleigh Taylor
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box(grid.dX*(T).5,TV(1-grid.dX(0)*(T).5,0.20));
+            RANGE<TV> box;
+            if(order==2)
+                box=RANGE<TV>(grid.dX,TV(1-grid.dX(0),0.20));
+            else
+                box=RANGE<TV>(grid.dX*(T).5,TV(1-grid.dX(0)*(T).5,0.20));
             T density=2*scale_mass;
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             density*=10;
