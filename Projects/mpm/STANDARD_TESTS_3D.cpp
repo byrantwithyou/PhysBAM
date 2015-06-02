@@ -2,9 +2,11 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
@@ -172,6 +174,7 @@ Initialize()
             Seed_Particles_Helper(sphere2,[=](const TV& X){return TV(-0.75,0,0);},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
+
         case 22:{ // (fluid test) pool of water 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(TV(0,0,0),TV(1,0.25,1));
@@ -186,6 +189,39 @@ Initialize()
             Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
             Add_Gravity(TV(0,-9.8,0));
         } break;
+
+        case 8:{ // torus into a box
+            grid.Initialize(TV_INT(resolution,resolution*2,resolution)+1,RANGE<TV>(TV(),TV(1,2,1)),true);
+
+            // Add_Walls(8,COLLISION_TYPE::separate,.3,.1,false);
+
+            T thickness=.1;
+            Add_Collision_Object(RANGE<TV>(TV(.2,0,.2),TV(.8,.1,.8)),COLLISION_TYPE::separate,.3);
+            Add_Collision_Object(RANGE<TV>(TV(.2-thickness,0,0.2-thickness),TV(.8+thickness,.4,.2)),COLLISION_TYPE::separate,.3);
+            Add_Collision_Object(RANGE<TV>(TV(.2-thickness,0,0.8),TV(.8+thickness,.4,0.8+thickness)),COLLISION_TYPE::separate,.3);
+            Add_Collision_Object(RANGE<TV>(TV(0.2-thickness,0,0.2),TV(.2,.4,.8)),COLLISION_TYPE::separate,.3);
+            Add_Collision_Object(RANGE<TV>(TV(.8,0,0.2),TV(.8+thickness,.4,.8)),COLLISION_TYPE::separate,.3);
+
+            T density=5*scale_mass;
+            ANALYTIC_IMPLICIT_OBJECT<TORUS<T> > torus(TORUS<T>(TV(),TV(1,0,0),0.02*2,0.03*2));
+            Seed_Particles(torus,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
+            int m=particles.number;
+            GRID<TV> torus_grid(TV_INT(2,3,2),RANGE<TV>(TV(.4,1,.4),TV(.6,1.5,.6)));
+            for(NODE_ITERATOR<TV> iterator(torus_grid);iterator.Valid();iterator.Next()){
+                TV center=iterator.Location();
+                T angle=random.Get_Uniform_Number((T)0,(T)pi*2);
+                ROTATION<TV> rotation(angle,TV(0,1,0));
+                for(int k=0;k<m;k++)
+                    Add_Particle(center+rotation.Rotate(particles.X(k)),particles.V(k),particles.mass(k),particles.volume(k),particles.F(k),particles.B(k));
+                break;
+            }
+            for(int k=0;k<m;k++) particles.Add_To_Deletion_List(k);
+            particles.Delete_Elements_On_Deletion_List(true);
+            Add_Fixed_Corotated(150,0.4);
+            Add_Gravity(TV(0,-9.8,0));
+        } break;
+
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
