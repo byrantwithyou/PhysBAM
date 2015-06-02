@@ -241,7 +241,7 @@ Particle_To_Grid()
 #pragma omp parallel for
     for(int i=0;i<example.mass.array.m;i++){
         example.mass.array(i)=0;
-        example.volume.array(i)=0;
+        if(example.incompressible) example.volume.array(i)=0;
         example.velocity.array(i)=TV();
         example.velocity_new.array(i)=TV();
         if(example.use_max_weight) example.max_weight.array(i)=0;}
