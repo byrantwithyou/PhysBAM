@@ -329,8 +329,9 @@ Grid_To_Particle()
                 if(example.use_midpoint)
                     V_grid=(T).5*(V_grid+example.velocity(index));
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
-            particles.F(p)+=dt*grad_Vp*particles.F(p);
-            if(particles.store_S) particles.S(p)+=dt*(grad_Vp*particles.S(p)).Twice_Symmetric_Part();
+            MATRIX<T,TV::m> A=dt*grad_Vp+1;
+            particles.F(p)=A*particles.F(p);
+            if(particles.store_S) particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,particles.S(p))+example.dt*example.inv_Wi)/(1+example.dt*example.inv_Wi);
 
             if(example.use_affine && example.use_early_gradient_transfer)
                 B=grad_Vp/example.weights->Constant_Scalar_Inverse_Dp();
@@ -638,7 +639,7 @@ Apply_Forces()
     objective.Reset();
     if(example.use_symplectic_euler){
         objective.tmp2*=0;
-        example.Precompute_Forces(example.time,false);
+        example.Precompute_Forces(example.time,example.dt,false);
         example.Add_Forces(objective.tmp2.u,example.time);
 #pragma omp parallel for
         for(int i=0;i<example.valid_grid_indices.m;i++){
@@ -812,7 +813,7 @@ Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u)
 {
     if(!example.print_stats) return;
     example.Capture_Stress();
-    example.Precompute_Forces(example.time,false);
+    example.Precompute_Forces(example.time,example.dt,false);
     T ke=example.Total_Grid_Kinetic_Energy(u);
     T ke2=example.Total_Particle_Kinetic_Energy();
     T pe=example.Potential_Energy(example.time);

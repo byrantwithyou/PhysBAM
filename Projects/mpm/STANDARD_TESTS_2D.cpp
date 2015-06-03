@@ -310,11 +310,12 @@ Initialize()
             Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0.1,0);},[=](const TV&){return MATRIX<T,2>();},
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
+            particles.S.Fill(SYMMETRIC_MATRIX<T,2>()+sqr(1.5));
 
             OLDROYD_NEO_HOOKEAN<TV> *neo=new OLDROYD_NEO_HOOKEAN<TV>;
-            neo->mu=1000;
-            neo->lambda=1000;
-            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(particles,*neo,gather_scatter,0);
+            neo->mu=10000;
+            neo->lambda=10000;
+            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0);
             Add_Force(*fe);
         } break;
         case 21:{ // circle with random initial velocities

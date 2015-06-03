@@ -11,10 +11,11 @@
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
-#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_WEIGHTS_SPLINE.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -25,12 +26,13 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(&particles,0)),
     debug_particles(*new DEBUG_PARTICLES<TV>),
-    weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),initial_time(0),last_frame(100),
+    weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
+    force_helper(*new MPM_FORCE_HELPER<TV>(particles)),initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),mass_contour(-1),use_max_weight(false),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
     use_reduced_rasterization(false),use_affine(false),use_f2p(false),use_midpoint(false),use_symplectic_euler(false),
-    use_particle_collision(false),use_early_gradient_transfer(false),print_stats(false),flip(0),cfl(1),newton_tolerance(1),
-    newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),test_diff(false),threads(1),
+    use_particle_collision(false),use_early_gradient_transfer(false),print_stats(false),flip(0),cfl(1),inv_Wi(0),
+    newton_tolerance(1),newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),test_diff(false),threads(1),
     output_structures_each_frame(false)
 {
 }
@@ -45,6 +47,7 @@ template<class TV> MPM_EXAMPLE<TV>::
     delete &debug_particles;
     delete weights;
     delete &gather_scatter;
+    delete &force_helper;
     collision_objects.Delete_Pointers_And_Clean_Memory();
     forces.Delete_Pointers_And_Clean_Memory();
     lagrangian_forces.Delete_Pointers_And_Clean_Memory();
@@ -97,17 +100,17 @@ Read_Output_Files(const int frame)
 template<class TV> void MPM_EXAMPLE<TV>::
 Capture_Stress()
 {
-    for(int i=0;i<forces.m;i++)
-        forces(i)->Capture_Stress();
+    force_helper.Fn=particles.F;
+    if(particles.store_S) force_helper.Sn=particles.S;
 }
 //#####################################################################
 // Function Precompute_Forces
 //#####################################################################
 template<class TV> void MPM_EXAMPLE<TV>::
-Precompute_Forces(const T time,const bool update_hessian)
+Precompute_Forces(const T time,const T dt,const bool update_hessian)
 {
     for(int i=0;i<forces.m;i++)
-        forces(i)->Precompute(time);
+        forces(i)->Precompute(time,dt);
     for(int i=0;i<lagrangian_forces.m;i++)
         lagrangian_forces(i)->Update_Position_Based_State(time,false,update_hessian);
 }

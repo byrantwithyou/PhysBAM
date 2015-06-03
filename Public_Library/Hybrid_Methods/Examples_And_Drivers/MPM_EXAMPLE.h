@@ -24,6 +24,7 @@ template<class TV> class MPM_COLLISION_OBJECT;
 template<class TV> class DEFORMABLES_FORCES;
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
 template<class TV> class MPM_COLLISION_OBJECT;
+template<class TV> class MPM_FORCE_HELPER;
 
 template<class TV>
 class MPM_EXAMPLE:public NONCOPYABLE
@@ -57,6 +58,7 @@ public:
     GATHER_SCATTER<TV>& gather_scatter;
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
     mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
+    MPM_FORCE_HELPER<TV>& force_helper;
 
     // fluid stuff
     bool incompressible;
@@ -88,6 +90,7 @@ public:
     bool print_stats;
     T flip;
     T cfl;
+    T inv_Wi;
 
     T newton_tolerance;
     int newton_iterations;
@@ -114,7 +117,7 @@ public:
     virtual void End_Time_Step(const T time)=0;
 
     void Capture_Stress();
-    void Precompute_Forces(const T time,const bool update_hessian);
+    void Precompute_Forces(const T time,const T dt,const bool update_hessian);
     T Potential_Energy(const T time) const;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const;
     void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const;

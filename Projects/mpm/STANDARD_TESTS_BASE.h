@@ -26,7 +26,7 @@ class STANDARD_TESTS_BASE:public MPM_EXAMPLE<TV>
 
 public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
-    using BASE::mass;
+    using BASE::mass;using BASE::force_helper;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::collision_objects;using BASE::substeps_delay_frame;
     using BASE::output_directory;using BASE::mass_contour;using BASE::use_max_weight;

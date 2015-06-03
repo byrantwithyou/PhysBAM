@@ -34,13 +34,13 @@ public:
     mutable ARRAY<MATRIX<T,TV::m> > tmp;
     ARRAY<DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,TV::m> > dPi_dF;
 
-    MPM_FINITE_ELEMENTS(MPM_PARTICLES<TV>& particles,ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
+    MPM_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
+        ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
         GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles);
     virtual ~MPM_FINITE_ELEMENTS();
 
 //#####################################################################
-    void Capture_Stress() PHYSBAM_OVERRIDE;
-    void Precompute(const T time) PHYSBAM_OVERRIDE;
+    void Precompute(const T time,const T dt) PHYSBAM_OVERRIDE;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const PHYSBAM_OVERRIDE;
     void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const PHYSBAM_OVERRIDE;

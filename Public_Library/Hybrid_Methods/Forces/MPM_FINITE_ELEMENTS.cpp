@@ -17,9 +17,10 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> MPM_FINITE_ELEMENTS<TV>::
-MPM_FINITE_ELEMENTS(MPM_PARTICLES<TV>& particles,ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
+MPM_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
     GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles)
-    :BASE(particles),constitutive_model(constitutive_model),affect_all(!affected_particles),
+    :BASE(force_helper),constitutive_model(constitutive_model),affect_all(!affected_particles),
     gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles)))
 {
     if(!affect_all){
@@ -42,20 +43,12 @@ template<class TV> MPM_FINITE_ELEMENTS<TV>::
 // Function Precompute
 //#####################################################################
 template<class TV> void MPM_FINITE_ELEMENTS<TV>:: 
-Capture_Stress()
+Precompute(const T time,const T dt)
 {
     U.Resize(particles.X.m);
     FV.Resize(particles.X.m);
     sigma.Resize(particles.X.m);
     dPi_dF.Resize(particles.X.m);
-    F_n=particles.F;
-}
-//#####################################################################
-// Function Precompute
-//#####################################################################
-template<class TV> void MPM_FINITE_ELEMENTS<TV>:: 
-Precompute(const T time)
-{
 #pragma omp parallel for
     for(int k=0;k<gather_scatter.simulated_particles.m;k++){
         int p=gather_scatter.simulated_particles(k);

@@ -10,6 +10,7 @@
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
 #include <Hybrid_Methods/Forces/MPM_OLDROYD_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 namespace PhysBAM{
@@ -17,10 +18,11 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> MPM_OLDROYD_FINITE_ELEMENTS<TV>::
-MPM_OLDROYD_FINITE_ELEMENTS(MPM_PARTICLES<TV>& particles,OLDROYD_CONSTITUTIVE_MODEL<TV>& constitutive_model,
+MPM_OLDROYD_FINITE_ELEMENTS(MPM_FORCE_HELPER<TV>& force_helper,
+    OLDROYD_CONSTITUTIVE_MODEL<TV>& constitutive_model,
     GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles)
-    :BASE(particles),constitutive_model(constitutive_model),affect_all(!affected_particles),
-    gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles)))
+    :BASE(force_helper),constitutive_model(constitutive_model),affect_all(!affected_particles),
+    gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles))),stored_dt(0),inv_Wi(0)
 {
     if(!affect_all){
         gather_scatter.weights=gather_scatter_input.weights;
@@ -42,17 +44,9 @@ template<class TV> MPM_OLDROYD_FINITE_ELEMENTS<TV>::
 // Function Precompute
 //#####################################################################
 template<class TV> void MPM_OLDROYD_FINITE_ELEMENTS<TV>:: 
-Capture_Stress()
+Precompute(const T time,const T dt)
 {
-    Fn=particles.F;
-    Sn=particles.S;
-}
-//#####################################################################
-// Function Precompute
-//#####################################################################
-template<class TV> void MPM_OLDROYD_FINITE_ELEMENTS<TV>:: 
-Precompute(const T time)
-{
+    stored_dt=dt;
     constitutive_model.Resize(particles.number);
 #pragma omp parallel for
     for(int k=0;k<gather_scatter.simulated_particles.m;k++){
@@ -78,13 +72,14 @@ Potential_Energy(const T time) const
 template<class TV> void MPM_OLDROYD_FINITE_ELEMENTS<TV>:: 
 Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
+    T zeta=2/(1+stored_dt*inv_Wi);
     gather_scatter.template Scatter<MATRIX<T,TV::m> >(
-        [this](int p,MATRIX<T,TV::m>& A)
+        [this,zeta](int p,MATRIX<T,TV::m>& A)
         {
             SYMMETRIC_MATRIX<T,TV::m> dQ;
             MATRIX<T,TV::m> dP;
             constitutive_model.Gradient(dP,dQ,p);
-            A=(dP.Times_Transpose(Fn(p))+dQ.Times_Transpose(Sn(p)*2))*particles.volume(p);
+            A=(dP.Times_Transpose(force_helper.Fn(p))+zeta*(dQ*force_helper.A(p)*force_helper.Sn(p)))*particles.volume(p);
         },
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,const MATRIX<T,TV::m>& A)
         {F(it.Index())-=A*it.Gradient();},
@@ -98,15 +93,20 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
 {
     tmp.Resize(particles.X.m);
 
+    T zeta=2/(1+stored_dt*inv_Wi);
     gather_scatter.template Gather<int>(
         [this](int p,int data){tmp(p)=MATRIX<T,TV::m>();},
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {tmp(p)+=MATRIX<T,TV::m>::Outer_Product(V(it.Index()),it.Gradient());},
-        [this](int p,int data){
-            SYMMETRIC_MATRIX<T,TV::m> B=(tmp(p)*Sn(p)).Twice_Symmetric_Part(),dQ;
-            MATRIX<T,TV::m> C=tmp(p)*Fn(p),dP;
+        [this,zeta](int p,int data){
+            SYMMETRIC_MATRIX<T,TV::m> B=(tmp(p)*force_helper.Sn(p)).Twice_Symmetric_Part(),dQ,dQ2;
+            MATRIX<T,TV::m> C=tmp(p)*force_helper.Fn(p),dP,dP2;
             constitutive_model.Hessian(C,B,dP,dQ,p);
-            tmp(p)=(dP.Times_Transpose(Fn(p))+dQ.Times_Transpose(Sn(p)*2))*particles.volume(p);},true);
+            constitutive_model.Gradient(dP2,dQ2,p);
+            MATRIX<T,TV::m> G=dP.Times_Transpose(force_helper.Fn(p));
+            G+=zeta*dQ*force_helper.Sn(p).Times_Transpose(force_helper.A(p));
+            G+=zeta*dQ2*tmp(p)*force_helper.Sn(p);
+            tmp(p)=G*particles.volume(p);},true);
 
     gather_scatter.template Scatter<int>(
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)

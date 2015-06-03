@@ -2,14 +2,15 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> PARTICLE_GRID_FORCES<TV>::
-PARTICLE_GRID_FORCES(MPM_PARTICLES<TV>& particles)
-    :particles(particles)
+PARTICLE_GRID_FORCES(const MPM_FORCE_HELPER<TV>& force_helper)
+    :force_helper(force_helper),particles(force_helper.particles)
 {
 }
 //#####################################################################
@@ -17,13 +18,6 @@ PARTICLE_GRID_FORCES(MPM_PARTICLES<TV>& particles)
 //#####################################################################
 template<class TV> PARTICLE_GRID_FORCES<TV>::
 ~PARTICLE_GRID_FORCES()
-{
-}
-//#####################################################################
-// Function Capture_Stress
-//#####################################################################
-template<class TV> void PARTICLE_GRID_FORCES<TV>::
-Capture_Stress()
 {
 }
 template class PARTICLE_GRID_FORCES<VECTOR<float,2> >;

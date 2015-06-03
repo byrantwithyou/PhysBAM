@@ -7,11 +7,12 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
-#include <Hybrid_Methods/System/MPM_KRYLOV_SYSTEM.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
+#include <Hybrid_Methods/System/MPM_KRYLOV_SYSTEM.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -71,7 +72,7 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
     Update_F(v1);
     T midpoint_factor=use_midpoint?(T).25:1;
 
-    system.example.Precompute_Forces(system.example.time,h);
+    system.example.Precompute_Forces(system.example.time,system.example.dt,h);
     if(e){
         T energy=midpoint_factor*system.Inner_Product(dv,dv)/2;
         energy+=system.example.Potential_Energy(system.example.time);
@@ -98,6 +99,9 @@ Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
         TV Vp,Vn_interpolate;
     };
 
+    if(system.example.particles.store_S)
+        system.example.force_helper.A.Resize(system.example.particles.number);
+
     system.example.gather_scatter.template Gather<HELPER>(
         [](int p,HELPER& h)
         {
@@ -113,10 +117,11 @@ Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
         },
         [this](int p,HELPER& h)
         {
-            system.example.particles.F(p)=F0(p)+system.example.dt/(system.example.use_midpoint+1)*h.grad_Vp*F0(p);
-            if(system.example.particles.store_S)
-                system.example.particles.S(p)=S0(p)
-                    +(system.example.dt/(system.example.use_midpoint+1)*h.grad_Vp*S0(p)).Twice_Symmetric_Part();
+            MATRIX<T,TV::m> A=system.example.dt/(system.example.use_midpoint+1)*h.grad_Vp+1;
+            system.example.particles.F(p)=A*F0(p);
+            if(system.example.particles.store_S){
+                system.example.force_helper.A(p)=A;
+                system.example.particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,S0(p))+system.example.dt*system.example.inv_Wi)/(1+system.example.dt*system.example.inv_Wi);}
             if(system.example.use_midpoint) system.example.particles.X(p)=X0(p)+system.example.dt/2*(h.Vp+h.Vn_interpolate);
             else system.example.particles.X(p)=X0(p)+system.example.dt*h.Vp;
         },true);
