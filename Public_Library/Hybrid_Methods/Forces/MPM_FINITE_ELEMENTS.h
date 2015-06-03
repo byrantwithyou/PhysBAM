@@ -25,10 +25,10 @@ class MPM_FINITE_ELEMENTS:public PARTICLE_GRID_FORCES<TV>
     typedef VECTOR<int,TV::m> TV_INT;
     typedef PARTICLE_GRID_FORCES<TV> BASE;
 public:
-    using BASE::particles;
+    using BASE::particles;using BASE::force_helper;
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model;
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > sigma;
-    ARRAY<MATRIX<T,TV::m> > U,FV,F_n;
+    ARRAY<MATRIX<T,TV::m> > U,FV;
     bool affect_all;
     GATHER_SCATTER<TV>& gather_scatter;
     mutable ARRAY<MATRIX<T,TV::m> > tmp;

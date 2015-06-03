@@ -95,6 +95,10 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     stored_last_frame=last_frame;
     random.Set_Seed(seed);
 
+    particles.Store_B(use_affine && !incompressible);
+    particles.Store_C(use_affine && incompressible);
+    particles.Store_S(use_oldroyd);
+
     if(order==1) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,threads));
     else if(order==2) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads));
     else if(order==3) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,threads));
@@ -124,8 +128,8 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
 
     T volume=grid.dX.Product()/particles_per_cell;
     T mass=density*volume;
-    for(int i=0;i<X.m;i++) 
-        Add_Particle(X(i),V(X(i)),mass,volume,MATRIX<T,TV::m>()+1,dV(X(i))*weights->Dp(X(i)));
+    for(int i=0;i<X.m;i++)
+        Add_Particle(X(i),V,dV,mass,volume);
 }
 //#####################################################################
 // Function Seed_Particles
@@ -139,7 +143,7 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
     for(CELL_ITERATOR<TV> it(seed_grid);it.Valid();it.Next()){
         TV X=it.Location();
         if(object.Lazy_Inside(X))
-            Add_Particle(X,V(X),mass,volume,MATRIX<T,TV::m>()+1,dV(X)*weights->Dp(X));}
+            Add_Particle(X,V,dV,mass,volume);}
 }
 //#####################################################################
 // Function Seed_Particles
@@ -162,15 +166,17 @@ Seed_Particles_Helper(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)>
 // Function Add_Particle
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Add_Particle(const TV& X,const TV& V,const T mass,const T volume,const MATRIX<T,TV::m> F,const MATRIX<T,TV::m> B)
+Add_Particle(const TV& X,boost::function<TV(const TV&)> V,boost::function<MATRIX<T,TV::m>(const TV&)> dV,
+    const T mass,const T volume)
 {
     int p=particles.Add_Element();
     particles.valid(p)=true;
     particles.X(p)=X;
-    particles.V(p)=V;
-    if(use_affine) particles.B(p)=B;
-    particles.F(p)=F;
-    if(particles.store_S) particles.S(p)=F.Outer_Product_Matrix();
+    if(V) particles.V(p)=V(X);
+    particles.F(p)=MATRIX<T,TV::m>()+1;
+    if(particles.store_B && dV) particles.B(p)=dV(X)*weights->Dp(X);
+    if(particles.store_C && dV) particles.C(p)=dV(X);
+    if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
     particles.mass(p)=mass;
     particles.volume(p)=volume;
 }

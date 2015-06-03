@@ -204,7 +204,7 @@ Initialize()
 
             T density=5*scale_mass;
             ANALYTIC_IMPLICIT_OBJECT<TORUS<T> > torus(TORUS<T>(TV(),TV(1,0,0),0.02*2,0.03*2));
-            Seed_Particles(torus,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
+            Seed_Particles(torus,0,0,density,particles_per_cell);
             int m=particles.number;
             GRID<TV> torus_grid(TV_INT(2,3,2),RANGE<TV>(TV(.4,1,.4),TV(.6,1.5,.6)));
             for(NODE_ITERATOR<TV> iterator(torus_grid);iterator.Valid();iterator.Next()){
@@ -212,7 +212,7 @@ Initialize()
                 T angle=random.Get_Uniform_Number((T)0,(T)pi*2);
                 ROTATION<TV> rotation(angle,TV(0,1,0));
                 for(int k=0;k<m;k++)
-                    Add_Particle(center+rotation.Rotate(particles.X(k)),particles.V(k),particles.mass(k),particles.volume(k),particles.F(k),particles.B(k));
+                    Add_Particle(center+rotation.Rotate(particles.X(k)),0,0,particles.mass(k),particles.volume(k));
                 break;
             }
             for(int k=0;k<m;k++) particles.Add_To_Deletion_List(k);

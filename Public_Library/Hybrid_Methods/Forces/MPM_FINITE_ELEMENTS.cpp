@@ -11,6 +11,7 @@
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
+#include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 namespace PhysBAM{
 //#####################################################################
@@ -54,7 +55,7 @@ Precompute(const T time,const T dt)
         int p=gather_scatter.simulated_particles(k);
         MATRIX<T,TV::m> V_local;
         particles.F(p).Fast_Singular_Value_Decomposition(U(p),sigma(p),V_local);
-        FV(p)=F_n(p)*V_local;
+        FV(p)=force_helper.Fn(p)*V_local;
         constitutive_model.Isotropic_Stress_Derivative(sigma(p),dPi_dF(p),p);}
 }
 //#####################################################################
