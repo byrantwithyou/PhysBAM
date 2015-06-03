@@ -31,9 +31,9 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),
     mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
     use_reduced_rasterization(false),use_affine(false),use_f2p(false),use_midpoint(false),use_symplectic_euler(false),
-    use_particle_collision(false),use_early_gradient_transfer(false),print_stats(false),flip(0),cfl(1),inv_Wi(0),
-    newton_tolerance(1),newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),test_diff(false),threads(1),
-    output_structures_each_frame(false)
+    use_particle_collision(false),use_early_gradient_transfer(false),use_oldroyd(false),print_stats(false),flip(0),
+    cfl(1),inv_Wi(0),newton_tolerance(1),newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),
+    test_diff(false),threads(1),output_structures_each_frame(false)
 {
 }
 //#####################################################################
@@ -253,7 +253,7 @@ Total_Particle_Angular_Momentum() const
         for(int k=a;k<b;k++){
             int p=simulated_particles(k);
             result_local+=particles.mass(p)*particles.X(p).Cross(particles.V(p));
-            if(use_affine) result_local-=particles.mass(p)*particles.B(p).Contract_Permutation_Tensor();}
+            if(particles.store_B) result_local-=particles.mass(p)*particles.B(p).Contract_Permutation_Tensor();}
 #pragma omp critical
         result+=result_local;}
     return result;
@@ -305,7 +305,7 @@ Total_Particle_Kinetic_Energy() const
     for(int k=0;k<simulated_particles.m;k++){
         int p=simulated_particles(k);
         T result_local=particles.mass(p)/2*particles.V(p).Magnitude_Squared();
-        if(use_affine) result_local+=particles.mass(p)/2*Dp_inverse*particles.B(p).Frobenius_Norm_Squared();
+        if(particles.store_B) result_local+=particles.mass(p)/2*Dp_inverse*particles.B(p).Frobenius_Norm_Squared();
         result+=result_local;}
     return result;
 }

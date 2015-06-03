@@ -16,8 +16,6 @@ MPM_PARTICLES()
     this->Store_Mass();
     Add_Array(ATTRIBUTE_ID_VOLUME,&volume);
     Add_Array(ATTRIBUTE_ID_F,&F);
-    Add_Array(ATTRIBUTE_ID_B,&B);
-    Add_Array(ATTRIBUTE_ID_C,&C);
     Add_Array(ATTRIBUTE_ID_VALID,&valid);
 }
 //#####################################################################
@@ -26,6 +24,17 @@ MPM_PARTICLES()
 template<class TV> MPM_PARTICLES<TV>::
 ~MPM_PARTICLES()
 {}
+//#####################################################################
+// Function Store_B
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Store_B(bool store)
+{
+    if(store_B==store) return;
+    store_B=store;
+    if(store) Add_Array(ATTRIBUTE_ID_B,&B);
+    else Remove_Array(ATTRIBUTE_ID_B);
+}
 //#####################################################################
 // Function Store_S
 //#####################################################################
@@ -36,6 +45,17 @@ Store_S(bool store)
     store_S=store;
     if(store) Add_Array(ATTRIBUTE_ID_S,&S);
     else Remove_Array(ATTRIBUTE_ID_S);
+}
+//#####################################################################
+// Function Store_C
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Store_C(bool store)
+{
+    if(store_C==store) return;
+    store_C=store;
+    if(store) Add_Array(ATTRIBUTE_ID_C,&C);
+    else Remove_Array(ATTRIBUTE_ID_C);
 }
 //#####################################################################
 // Function Initialize_MPM_Particles

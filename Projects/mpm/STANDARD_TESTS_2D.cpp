@@ -306,7 +306,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
-            particles.Store_S();
+            use_oldroyd=true;
             Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0.1,0);},[=](const TV&){return MATRIX<T,2>();},
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);

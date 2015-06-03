@@ -29,7 +29,7 @@ class MPM_PARTICLES:public CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> 
 public:
     using BASE::Add_Array;using BASE::Remove_Array;
 
-    bool store_S;
+    bool store_B,store_S,store_C;
     ARRAY_VIEW<T> volume;
     ARRAY_VIEW<MATRIX<T,TV::m> > F,B,C;
     ARRAY_VIEW<SYMMETRIC_MATRIX<T,TV::m> > S;
@@ -37,7 +37,9 @@ public:
 
     MPM_PARTICLES();
     virtual ~MPM_PARTICLES();
+    void Store_B(bool store=true);
     void Store_S(bool store=true);
+    void Store_C(bool store=true);
 //#####################################################################
 };
 }

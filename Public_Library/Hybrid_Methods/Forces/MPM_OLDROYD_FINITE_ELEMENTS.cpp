@@ -46,6 +46,7 @@ template<class TV> MPM_OLDROYD_FINITE_ELEMENTS<TV>::
 template<class TV> void MPM_OLDROYD_FINITE_ELEMENTS<TV>:: 
 Precompute(const T time,const T dt)
 {
+    PHYSBAM_ASSERT(particles.store_S);
     stored_dt=dt;
     constitutive_model.Resize(particles.number);
 #pragma omp parallel for

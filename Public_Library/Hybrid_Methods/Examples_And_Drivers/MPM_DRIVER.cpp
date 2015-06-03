@@ -101,6 +101,10 @@ Initialize()
     rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
     objective.system.tmp.u.Resize(example.grid.Domain_Indices(example.ghost));
 
+    example.particles.Store_B(example.use_affine && !example.incompressible);
+    example.particles.Store_C(example.use_affine && example.incompressible);
+    example.particles.Store_S(example.use_oldroyd);
+
     if(example.incompressible){
         fluid_p.p.Resize(example.grid.Domain_Indices(example.ghost));
         fluid_rhs.p.Resize(example.grid.Domain_Indices(example.ghost));
@@ -244,37 +248,24 @@ Particle_To_Grid()
         example.velocity.array(i)=TV();
         example.velocity_new.array(i)=TV();}
 
-    if(example.weights->use_gradient_transfer)
-    {
-        example.gather_scatter.template Scatter<int>(
-            [this,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
-            {
-                example.mass(it.Index())+=it.Weight()*particles.mass(p);
-                if(example.incompressible){
-                    example.volume(it.Index())+=it.Weight()*particles.volume(p);
-                    TV V=particles.V(p)+particles.C(p)*((example.grid.Center(it.Index())-particles.X(p)));
-                    example.velocity(it.Index())+=it.Weight()*particles.mass(p)*V;}
-                else example.velocity(it.Index())+=particles.mass(p)*(it.Weight()*particles.V(p)+particles.B(p)*it.Gradient());
-            },true);
-    }
-    else if(example.weights->constant_scalar_inertia_tensor)
-    {
-        T Dp_inverse=example.weights->Constant_Scalar_Inverse_Dp();
-        example.gather_scatter.template Scatter<int>(
-            [this,Dp_inverse,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
-            {
-                example.mass(it.Index())+=it.Weight()*particles.mass(p);
-                TV V=particles.V(p);
-                if(example.use_affine) {
-                    if(example.incompressible){
-                        example.volume(it.Index())+=it.Weight()*particles.volume(p);
-                        V+=particles.C(p)*(example.grid.Center(it.Index())-particles.X(p));}
-                    else
-                        V+=particles.B(p)*(Dp_inverse*(example.grid.Center(it.Index())-particles.X(p)));}
-                example.velocity(it.Index())+=it.Weight()*particles.mass(p)*V;
-            },true);
-    }
-    else PHYSBAM_FATAL_ERROR("General case for rasterization not implemented");
+    T scale=1;
+    if(particles.store_B && !example.weights->use_gradient_transfer)
+        scale=example.weights->Constant_Scalar_Inverse_Dp();
+    bool use_gradient=!example.incompressible && example.weights->use_gradient_transfer;
+    ARRAY_VIEW<MATRIX<T,TV::m> > dV(example.incompressible?particles.C:particles.B);
+    example.gather_scatter.template Scatter<int>(
+        [this,scale,&particles,use_gradient,dV](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
+        {
+            T w=it.Weight();
+            TV_INT index=it.Index();
+            example.mass(index)+=w*particles.mass(p);
+            if(example.incompressible) example.volume(index)+=w*particles.volume(p);
+            TV V=w*particles.V(p);
+            if(example.use_affine){
+                if(use_gradient) V+=particles.B(p)*it.Gradient();
+                else V+=dV(p)*(w*scale*(example.grid.Center(index)-particles.X(p)));}
+            example.velocity(index)+=particles.mass(p)*V;
+        },true);
 
     example.valid_grid_indices.Remove_All();
     example.valid_grid_cell_indices.Remove_All();
@@ -313,7 +304,7 @@ Grid_To_Particle()
         for(int k=a;k<b;k++){
             int p=example.simulated_particles(k);
             TV Vn_interpolate,V_pic,V_flip=particles.V(p);
-            MATRIX<T,TV::m> B,C,grad_Vp;
+            MATRIX<T,TV::m> B,grad_Vp;
 
             for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,true,scratch);it.Valid();it.Next()){
                 T w=it.Weight();
@@ -327,8 +318,9 @@ Grid_To_Particle()
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             MATRIX<T,TV::m> A=dt*grad_Vp+1;
             particles.F(p)=A*particles.F(p);
-            if(particles.store_S) particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,particles.S(p))+example.dt*example.inv_Wi)/(1+example.dt*example.inv_Wi);
-
+            if(particles.store_S){
+                T k=example.dt*example.inv_Wi;
+                particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,particles.S(p))+k)/(1+k);}
             if(example.use_affine && example.use_early_gradient_transfer)
                 B=grad_Vp/example.weights->Constant_Scalar_Inverse_Dp();
             else if(example.use_affine)
@@ -349,11 +341,11 @@ Grid_To_Particle()
             particles.V(p)=V_pic;
             Perform_Particle_Collision(p,example.time+example.dt);
             SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> Dp_inverse_transpose=example.weights->Dp(particles.X(p)).Inverse();
-            particles.C(p)=B*Dp_inverse_transpose;
+            if(particles.store_B) particles.B(p)=B;
+            if(particles.store_C) particles.C(p)=B*Dp_inverse_transpose;
             if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
             else particles.X(p)+=particles.V(p)*dt;
             particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
-            particles.B(p)=B;
 
             if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}}
 }
@@ -395,7 +387,7 @@ Face_To_Particle()
             if(example.use_midpoint) PHYSBAM_NOT_IMPLEMENTED("Midpoint with Face_To_Particle is not supported");
             else particles.X(p)+=particles.V(p)*dt;
             particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
-            particles.C(p)=C;
+            if(particles.store_C) particles.C(p)=C;
             particles.F(p)+=dt*C*particles.F(p);
             if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}}
 }
@@ -745,7 +737,9 @@ Grid_V_Upper_Bound() const
 #pragma omp parallel for reduction(max:result)
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);
-        result=max(result,example.particles.V(p).Magnitude()+example.particles.B(p).Frobenius_Norm()*xi);}
+        T v=example.particles.V(p).Magnitude();
+        if(example.particles.store_B) v+=example.particles.B(p).Frobenius_Norm()*xi;
+        result=max(result,v);}
     return result;
 }
 //#####################################################################
