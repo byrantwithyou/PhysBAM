@@ -22,10 +22,10 @@ def Sublibrary(env,name,directories,parent=None):
     if parent: env.Depends(parent,lib)
     return lib
 
-for d in ['Ray_Tracing', 'OpenGL', 'Solids',  'Deformables', 'Rigids', 'Geometry', 'Tools']:
+for d in ['Ray_Tracing', 'OpenGL', 'Solids', 'Hybrid_Methods', 'Deformables', 'Rigids', 'Geometry', 'Tools']:
     Sublibrary(env,d,[d],parent=d)
 
-Sublibrary(env,'Dynamics',['Dynamics', 'Fluids', 'Compressible', 'Hybrid_Methods', 'Incompressible'],parent='.')
+Sublibrary(env,'Dynamics',['Dynamics', 'Fluids', 'Compressible', 'Incompressible'],parent='.')
 
 if env["PLATFORM"].startswith("win32"):
     exclude_regex=re.compile("OpenGL|Ray_Tracing|CVS")
