@@ -95,7 +95,6 @@ Initialize()
         example.Read_Output_Files(example.restart);
 
     example.mass.Resize(example.grid.Domain_Indices(example.ghost));
-    if(example.use_max_weight) example.max_weight.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity_new.Resize(example.grid.Domain_Indices(example.ghost));
     dv.u.Resize(example.grid.Domain_Indices(example.ghost));
@@ -243,8 +242,7 @@ Particle_To_Grid()
         example.mass.array(i)=0;
         if(example.incompressible) example.volume.array(i)=0;
         example.velocity.array(i)=TV();
-        example.velocity_new.array(i)=TV();
-        if(example.use_max_weight) example.max_weight.array(i)=0;}
+        example.velocity_new.array(i)=TV();}
 
     if(example.weights->use_gradient_transfer)
     {
@@ -252,7 +250,6 @@ Particle_To_Grid()
             [this,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
             {
                 example.mass(it.Index())+=it.Weight()*particles.mass(p);
-                if(example.use_max_weight){T& w=example.max_weight(it.Index());w=max(w,it.Weight());}
                 if(example.incompressible){
                     example.volume(it.Index())+=it.Weight()*particles.volume(p);
                     TV V=particles.V(p)+particles.C(p)*((example.grid.Center(it.Index())-particles.X(p)));
@@ -267,7 +264,6 @@ Particle_To_Grid()
             [this,Dp_inverse,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
             {
                 example.mass(it.Index())+=it.Weight()*particles.mass(p);
-                if(example.use_max_weight) example.max_weight(it.Index())+=it.Weight();
                 TV V=particles.V(p);
                 if(example.use_affine) {
                     if(example.incompressible){

@@ -29,7 +29,7 @@ public:
     using BASE::mass;using BASE::force_helper;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::collision_objects;using BASE::substeps_delay_frame;
-    using BASE::output_directory;using BASE::mass_contour;using BASE::use_max_weight;
+    using BASE::output_directory;using BASE::mass_contour;
     using BASE::restart;using BASE::dt;using BASE::time;using BASE::use_early_gradient_transfer;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
     using BASE::ghost;using BASE::use_reduced_rasterization;using BASE::use_affine;;using BASE::use_f2p;

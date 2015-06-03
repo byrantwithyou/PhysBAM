@@ -28,8 +28,8 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     debug_particles(*new DEBUG_PARTICLES<TV>),
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
     force_helper(*new MPM_FORCE_HELPER<TV>(particles)),initial_time(0),last_frame(100),
-    write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),mass_contour(-1),use_max_weight(false),
-    restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
+    write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),
+    mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
     use_reduced_rasterization(false),use_affine(false),use_f2p(false),use_midpoint(false),use_symplectic_euler(false),
     use_particle_collision(false),use_early_gradient_transfer(false),print_stats(false),flip(0),cfl(1),inv_Wi(0),
     newton_tolerance(1),newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),test_diff(false),threads(1),
@@ -79,9 +79,8 @@ Write_Output_Files(const int frame)
     for(int i=0;i<collision_objects.m;i++)
         if(IMPLICIT_OBJECT<TV>* io=collision_objects(i)->Get_Implicit_Object(time))
             Dump_Levelset(ghost_grid,*io,VECTOR<T,3>(0.7,0.3,0.3));
-    if(mass_contour>=0){
-        if(use_max_weight) Dump_Levelset(grid,max_weight,VECTOR<T,3>(0.2,0.6,0.2),mass_contour);
-        else Dump_Levelset(grid,mass,VECTOR<T,3>(0.2,0.6,0.2),mass_contour*Average_Particle_Mass());}
+    if(mass_contour>=0)
+        Dump_Levelset(grid,mass,VECTOR<T,3>(0.2,0.6,0.2),mass_contour*Average_Particle_Mass());
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 }
 //#####################################################################

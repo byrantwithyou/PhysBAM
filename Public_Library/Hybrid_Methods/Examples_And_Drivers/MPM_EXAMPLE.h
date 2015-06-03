@@ -42,7 +42,6 @@ public:
     ARRAY<bool> particle_is_simulated;
 
     ARRAY<T,TV_INT> mass,volume;
-    ARRAY<T,TV_INT> max_weight;
     ARRAY<TV,TV_INT> location;
     ARRAY<TV,TV_INT> velocity,velocity_new;
     ARRAY<MATRIX<T,TV::m>,TV_INT> cell_C;
@@ -76,7 +75,6 @@ public:
     std::string output_directory;
     std::string data_directory;
     T mass_contour;
-    bool use_max_weight;
     int restart;
     T dt,time,frame_dt,min_dt,max_dt;
     int ghost;
