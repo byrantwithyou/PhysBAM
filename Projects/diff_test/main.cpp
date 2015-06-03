@@ -23,62 +23,27 @@ T eps=1e-6;
 
 struct HELPER
 {
-    MATRIX<T,TV::m> SSn,Fn;
-    TV dw[2],xn[2],xh[2];
-    T dt,W,mu,la,mu_N,V0;
+    SYMMETRIC_MATRIX<T,TV::m> A;
+    MATRIX<T,TV::m> db[2],ddb[2];
+    TV u,v,x[2],b,dc[2],ddc[2];
+    T c;
 
-    MATRIX<T,TV::m> A,B,F_hat,G,S,H,K;
-    T J,a,b,q,c,g,h,k,m,n,p,Phi;
-
-    VEC_ID_TENSOR<T,1,TV::m,TV::m> dA[2],dB[2],dF_hat[2];
-    TENSOR<T,TV::m,TV::m,TV::m> dS[2],dH[2],dK[2];
-    TV B_bar[2],F_bar[2],K_bar[2],H_bar[2],dJ[2],da[2],db[2],dc[2],dg[2],dq[2],dh[2],dk[2],dm[2],dn[2],dp[2],dPhi[2];
-
-    MATRIX<T,TV::m> ddJ[2][2],dda[2][2],ddb[2][2],ddc[2][2],ddq[2][2],ddk[2][2],ddm[2][2],ddn[2][2],ddp[2][2],ddPhi[2][2];
+    VEC_ID_SYM_TENSOR<T,2,TV::m> dA[2],ddA[2];
 };
 
 void Init(HELPER& z)
 {
-    rnd.Fill_Uniform(z.SSn,-1,1);
-    z.SSn=z.SSn.Times_Transpose(z.SSn);
+    for(int i=0;i<2;i++) rnd.Fill_Uniform(z.x[i],-1,1);
 
-    rnd.Fill_Uniform(z.Fn,-1,1);
-    z.Fn=z.Fn+3;
-
-    for(int i=0;i<2;i++){
-        rnd.Fill_Uniform(z.dw[i],-1,1);
-        rnd.Fill_Uniform(z.xn[i],-1,1);
-        rnd.Fill_Uniform(z.xh[i],-1,1);}
-
-    rnd.Fill_Uniform(z.dt,.001,1);
-    rnd.Fill_Uniform(z.W,.001,1);
-    rnd.Fill_Uniform(z.mu,.001,1);
-    rnd.Fill_Uniform(z.la,.001,1);
-    rnd.Fill_Uniform(z.mu_N,.001,1);
-    rnd.Fill_Uniform(z.V0,.001,1);
+    rnd.Fill_Uniform(z.u,-1,1);
+    rnd.Fill_Uniform(z.v,-1,1);
 }
 
 void Fill(HELPER& z)
 {
-    for(int i=0;i<2;i++) z.A+=MATRIX<T,TV::m>::Outer_Product(z.xh[i]-z.xn[i],z.dw[i]);
-    z.B=z.A*z.SSn;
-    z.F_hat=(z.A+1)*z.Fn;
-    z.G=z.SSn+z.dt/z.W*((T)1-z.SSn);
-    z.S=z.G+z.B.Twice_Symmetric_Part();
-    z.H=z.F_hat.Inverse();
-    z.J=z.F_hat.Determinant();
-    z.a=z.la/2*sqr(z.J-1);
-    z.b=z.mu*log(z.J);
-    z.q=1/(2*sqr(z.dt))*(z.A.Frobenius_Norm_Squared()+z.A.Double_Contract(z.A.Transposed()));
-    z.c=z.mu_N*z.Fn.Determinant()*z.q;
-    z.g=z.S.Trace();
-    z.K=z.S.Inverse();
-    z.h=z.S.Determinant();
-    z.k=pow(z.h,-1.0/TV::m);//
-    z.m=pow(z.J,2.0/TV::m);
-    z.n=z.k*z.g;
-    z.p=z.mu/2*z.m*z.n;
-    z.Phi=z.V0*(z.p-z.b+z.a+z.c);
+    for(int i=0;i<2;i++) z.A+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(z.x[i]);
+    z.b=z.A*z.u;
+    z.c=z.b.Dot(z.v);
 }
 
 void Fill_Diff(HELPER& z)
@@ -86,46 +51,21 @@ void Fill_Diff(HELPER& z)
     IDENTITY_MATRIX<T,TV::m> id;
 
     for(int i=0;i<2;i++){
-        z.dA[i].v=z.dw[i];
-        z.B_bar[i]=z.SSn*z.dw[i];
-        z.dB[i].v=z.B_bar[i];
-        z.F_bar[i]=z.Fn.Transpose_Times(z.dw[i]);
-        z.dF_hat[i].v=z.F_bar[i];
-        z.dS[i]=Tensor_Product<1>(id,z.B_bar[i])+Tensor_Product<0>(id,z.B_bar[i]);
-        z.H_bar[i]=z.H.Transpose_Times(z.F_bar[i]);
-        z.dH[i]=Tensor_Product<1>(z.H,-z.H_bar[i]);
-        z.dJ[i]=z.J*z.H_bar[i];
-        z.da[i]=z.la*(z.J-1)*z.dJ[i];
-        z.db[i]=z.mu*z.H_bar[i];
-        z.dq[i]=(z.A*z.dw[i]+z.A.Transpose_Times(z.dw[i]))/sqr(z.dt);
-        z.dc[i]=z.mu_N*z.Fn.Determinant()*z.dq[i];
-        z.dg[i]=z.B_bar[i]*2;
-        z.K_bar[i]=z.K.Transpose_Times(z.B_bar[i]);
-        z.dK[i]=-Tensor_Product<1>(z.K,z.K_bar[i])-Tensor_Product<0>(z.K.Transposed(),z.K_bar[i]);
-        z.dh[i]=2*z.h*z.K_bar[i];
-        z.dk[i]=-2*z.k/TV::m*z.K_bar[i];
-        z.dm[i]=2*z.m/TV::m*z.H_bar[i];
-        z.dn[i]=z.dk[i]*z.g+z.k*z.dg[i];
-        z.dp[i]=z.mu/2*z.dm[i]*z.n+z.mu/2*z.m*z.dn[i];
-        z.dPhi[i]=z.V0*(z.dp[i]-z.db[i]+z.da[i]+z.dc[i]);}
+        z.dA[i].v=z.x[i];
+        z.db[i]=Contract<1>(z.dA[i],z.u);
+        z.dc[i]=z.db[i].Transpose_Times(z.v);
+    }
 }
 
-void Fill_Hess(HELPER& z)
+void Fill_Hess(HELPER& z,TV dx[2])
 {
-    for(int j=0;j<2;j++){
-        for(int k=0;k<2;k++){
-            z.ddJ[j][k]=MATRIX<T,TV::m>::Outer_Product(z.H_bar[j],z.J*z.H_bar[k])-MATRIX<T,TV::m>::Outer_Product(z.J*z.H_bar[k],z.H_bar[j]);
-            z.dda[j][k]=MATRIX<T,TV::m>::Outer_Product(z.la*z.dJ[j],z.dJ[k])+z.la*(z.J-1)*z.ddJ[j][k];
-            z.ddb[j][k]=MATRIX<T,TV::m>::Outer_Product(-z.mu*z.H_bar[k],z.H_bar[j]);
-            z.ddq[j][k]=(z.dw[j].Dot(z.dw[k])+MATRIX<T,TV::m>::Outer_Product(z.dw[k],z.dw[j]))/sqr(z.dt);
-            z.ddc[j][k]=z.mu_N*z.Fn.Determinant()*z.ddq[j][k];
-            z.ddk[j][k]=MATRIX<T,TV::m>::Outer_Product(4*z.k/(TV::m*TV::m)*z.K_bar[j],z.K_bar[k])+MATRIX<T,TV::m>::Outer_Product(2*z.k/TV::m*z.K_bar[k],z.K_bar[j])+2*z.k/TV::m*z.B_bar[j].Dot(z.K_bar[k])*z.K;
-            z.ddm[j][k]=
-                MATRIX<T,TV::m>::Outer_Product(4*z.m/(TV::m*TV::m)*z.H_bar[j],z.H_bar[k])-
-                MATRIX<T,TV::m>::Outer_Product(2*z.m/TV::m*z.H_bar[k],z.H_bar[j]);
-            z.ddn[j][k]=z.ddk[j][k]*z.g+MATRIX<T,TV::m>::Outer_Product(z.dk[j],z.dg[k])+MATRIX<T,TV::m>::Outer_Product(z.dg[j],z.dk[k]);
-            z.ddp[j][k]=z.mu/2*(z.ddm[j][k]*z.n+MATRIX<T,TV::m>::Outer_Product(z.dm[j],z.dn[k])+MATRIX<T,TV::m>::Outer_Product(z.dn[j],z.dm[k])+z.ddn[j][k]*z.m);
-            z.ddPhi[j][k]=z.V0*(z.ddp[j][k]-z.ddb[j][k]+z.dda[j][k]+z.ddc[j][k]);}}
+    IDENTITY_MATRIX<T,TV::m> id;
+
+    for(int i=0;i<2;i++){
+        z.ddA[i].v=dx[i];
+        z.ddb[i]=Contract<1>(z.ddA[i],z.u);
+        z.ddc[i]=z.ddb[i].Transpose_Times(z.v);
+    }
 }
 
 void Test(const char* name,TV dx[2],T a,T b,TV da[2],TV db[2])
@@ -159,6 +99,49 @@ void Test(const char* name,TV dx[2],TV a[2],TV b[2],MATRIX<T,TV::m> da[2][2],MAT
     LOG::printf("DIFF %s: %.16g %.16g -> %.16g\n",name,x.Flattened().Magnitude()/eps,y.Flattened().Magnitude()/eps,(x-y).Flattened().Magnitude()/max(max(x.Flattened().Magnitude(),y.Flattened().Magnitude()),1e-30));
 }
 
+void Test(const char* name,TV dx[2],TV a[2],TV b[2],TV da[2],TV db[2])
+{
+    VECTOR<TV,2> x,y;
+    for(int i=0;i<2;i++){
+        x(i)=b[i]-a[i];
+        y(i)=(db[i]+da[i])/2;}
+    LOG::printf("DIFF %s: %.16g %.16g -> %.16g\n",name,x.Flattened().Magnitude()/eps,y.Flattened().Magnitude()/eps,(x-y).Flattened().Magnitude()/max(max(x.Flattened().Magnitude(),y.Flattened().Magnitude()),1e-30));
+}
+
+template<class T_MATRIX0,class T_MATRIX1> typename ENABLE_IF<IS_MATRIX<T_MATRIX0>::value && IS_MATRIX<T_MATRIX1>::value>::TYPE
+Test(const char* name,TV dx[2],T_MATRIX0 a[2],T_MATRIX0 b[2],T_MATRIX1 da[2],T_MATRIX1 db[2])
+{
+    MATRIX<T,TV::m> x[2],y[2],z[2];
+    for(int i=0;i<2;i++){
+        x[i]=b[i]-a[i];
+        y[i]=(db[i]+da[i])/2;
+        z[i]=x[i]-y[i];}
+    T Mx=sqrt(x[0].Frobenius_Norm_Squared()+x[1].Frobenius_Norm_Squared());
+    T My=sqrt(y[0].Frobenius_Norm_Squared()+y[1].Frobenius_Norm_Squared());
+    T Mz=sqrt(z[0].Frobenius_Norm_Squared()+z[1].Frobenius_Norm_Squared());
+    LOG::printf("DIFF %s: %.16g %.16g -> %.16g\n",name,Mx/eps,My/eps,Mz/max(max(Mx,My),1e-30));
+}
+
+template<class T_TENSOR0,class T_TENSOR1> typename ENABLE_IF<IS_TENSOR<T_TENSOR0>::value && IS_TENSOR<T_TENSOR1>::value>::TYPE
+Test(const char* name,TV dx[2],T_TENSOR0 a[2],T_TENSOR0 b[2],T_TENSOR1 da[2],T_TENSOR1 db[2])
+{
+    TENSOR<T,TV::m> x[2],y[2],z[2];
+    for(int i=0;i<2;i++){
+        x[i]+=b[i]-a[i];
+        y[i]+=(db[i]+da[i])/2;
+        z[i]=x[i]-y[i];}
+    T Mx=0,My=0,Mz=0;
+    for(int i=0;i<2;i++)
+        for(int j=0;j<TV::m;j++){
+            Mx+=x[i].x[j].Frobenius_Norm_Squared();
+            My+=y[i].x[j].Frobenius_Norm_Squared();
+            Mz+=z[i].x[j].Frobenius_Norm_Squared();}
+    Mx=sqrt(Mx);
+    My=sqrt(My);
+    Mz=sqrt(Mz);
+    LOG::printf("DIFF %s: %.16g %.16g -> %.16g\n",name,Mx/eps,My/eps,Mz/max(max(Mx,My),1e-30));
+}
+
 #define TEST(x) Test(#x,dx,z0.x,z1.x,z0.d##x,z1.d##x);
 
 int main(int argc, char* argv[])
@@ -172,7 +155,7 @@ int main(int argc, char* argv[])
     TV dx[2];
     for(int i=0;i<2;i++) rnd.Fill_Uniform(dx[i],-eps,eps);
     HELPER z1=z0;
-    for(int i=0;i<2;i++) z1.xh[i]+=dx[i];
+    for(int i=0;i<2;i++) z1.x[i]+=dx[i];
         
     Fill(z0);
     Fill(z1);
@@ -180,38 +163,15 @@ int main(int argc, char* argv[])
     Fill_Diff(z0);
     Fill_Diff(z1);
         
-    Fill_Hess(z0);
-    Fill_Hess(z1);
+    Fill_Hess(z0,dx);
+    Fill_Hess(z1,dx);
 
     TEST(A);
-    TEST(B);
-    TEST(F_hat);
-    TEST(S);
-    TEST(H);
-    TEST(J);
-    TEST(a);
     TEST(b);
-    TEST(q);
     TEST(c);
-    TEST(g);
-    TEST(K);
-    TEST(h);
-    TEST(k);
-    TEST(m);
-    TEST(n);
-    TEST(p);
-    TEST(Phi);
-
-    TEST(dJ);
-    TEST(da);
+    TEST(dA);
     TEST(db);
-    TEST(dq);
     TEST(dc);
-    TEST(dk);
-    TEST(dm);
-    TEST(dn);
-    TEST(dp);
-    TEST(dPhi);
 
     return 0;
 }
