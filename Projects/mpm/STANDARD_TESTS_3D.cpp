@@ -7,8 +7,12 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
+#include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
+#include <Geometry/Grids_Uniform_Computations/TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -191,6 +195,7 @@ Initialize()
         } break;
 
         case 8:{ // torus into a box
+            // TODO: fix crash ./mpm -3d 8 -affine -last_frame 500 -midpoint -resolution 40 -newton_tolerance 1e-3 
             grid.Initialize(TV_INT(resolution,resolution*2,resolution)+1,RANGE<TV>(TV(),TV(1,2,1)),true);
 
             // Add_Walls(8,COLLISION_TYPE::separate,.3,.1,false);
@@ -221,6 +226,41 @@ Initialize()
             Add_Gravity(TV(0,-9.8,0));
         } break;
 
+        case 9:{ // torus into a bowl
+            // TODO: fix crash in LEVELSET_MAKER_UNIFORM ./mpm -3d 9 -resolution 80
+            grid.Initialize(TV_INT(resolution,resolution,resolution)+1,RANGE<TV>(TV(-2,-2,-2),TV(2,2,2)),true);
+
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/Rigid_Bodies/bowl.tri.gz",*surface);
+            LOG::cout<<"Read mesh "<<surface->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh "<<surface->particles.number<<std::endl;
+            surface->mesh.Initialize_Adjacent_Elements();    
+            surface->mesh.Initialize_Neighbor_Nodes();
+            surface->mesh.Initialize_Incident_Elements();
+            surface->Update_Bounding_Box();
+            surface->Initialize_Hierarchy();
+            surface->Update_Triangle_List();
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,300);
+            Add_Collision_Object(levelset,COLLISION_TYPE::separate,.3);
+
+            T density=5*scale_mass;
+            ANALYTIC_IMPLICIT_OBJECT<TORUS<T> > torus(TORUS<T>(TV(),TV(1,0,0),0.02*2,0.03*2));
+            Seed_Particles(torus,0,0,density,particles_per_cell);
+            int m=particles.number;
+            GRID<TV> torus_grid(TV_INT(2,3,2),RANGE<TV>(TV(0,1.5,0),TV(.6,2.5,.6)));
+            for(NODE_ITERATOR<TV> iterator(torus_grid);iterator.Valid();iterator.Next()){
+                TV center=iterator.Location();
+                T angle=random.Get_Uniform_Number((T)0,(T)pi*2);
+                ROTATION<TV> rotation(angle,TV(0,1,0));
+                for(int k=0;k<m;k++)
+                    Add_Particle(center+rotation.Rotate(particles.X(k)),0,0,particles.mass(k),particles.volume(k));
+                break;
+            }
+            for(int k=0;k<m;k++) particles.Add_To_Deletion_List(k);
+            particles.Delete_Elements_On_Deletion_List(true);
+            Add_Fixed_Corotated(150,0.4);
+            Add_Gravity(TV(0,-9.8,0));
+        } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
@@ -253,6 +293,29 @@ template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 End_Time_Step(const T time)
 {
 }
+
+//#####################################################################
+// Function Initialize_Implicit_Surface
+//
+// This was copied from DEFORMABLES_STANDARD_TESTS.cpp
+// TODO: put this function somewhere more convenient (maybe as a constructor of LEVELSET_IMPLICIT_OBJECT?)
+//#####################################################################
+template<class T> LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* STANDARD_TESTS<VECTOR<T,3> >::
+Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res)
+{
+    typedef VECTOR<int,TV::m> TV_INT;
+    LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >::Create();
+    surface.Update_Bounding_Box();
+    RANGE<VECTOR<T,3> > box=*surface.bounding_box;
+    GRID<VECTOR<T,3> >& ls_grid=undeformed_levelset.levelset.grid;
+    ARRAY<T,TV_INT>& phi=undeformed_levelset.levelset.phi;
+    ls_grid=GRID<VECTOR<T,3> >::Create_Grid_Given_Cell_Size(box,box.Edge_Lengths().Max()/max_res,false,5);
+    phi.Resize(ls_grid.Domain_Indices());
+    LEVELSET_MAKER_UNIFORM<VECTOR<T,3> >::Compute_Level_Set(surface,ls_grid,0,phi);
+    undeformed_levelset.Update_Box();
+    return &undeformed_levelset;
+}
+
 template class STANDARD_TESTS<VECTOR<float,3> >;
 template class STANDARD_TESTS<VECTOR<double,3> >;
 }

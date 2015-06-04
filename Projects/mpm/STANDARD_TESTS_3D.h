@@ -34,6 +34,7 @@ public:
     using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Gravity;
     using BASE::Add_Fixed_Corotated;using BASE::random;using BASE::Seed_Lagrangian_Particles;
     using BASE::Add_Force;using BASE::Add_Walls;using BASE::data_directory;
+    using BASE::stream_type;
     using BASE::Seed_Particles_Helper;using BASE::Add_Neo_Hookean;using BASE::Add_Collision_Object;
     using BASE::Add_Particle;
 
@@ -48,6 +49,7 @@ public:
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE;
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE;
 
+    LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res);
 //#####################################################################
 };
 }
