@@ -50,6 +50,9 @@ public:
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE;
 
     LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res);
+
+    // Case private additional storage
+    int case10_m;
 //#####################################################################
 };
 }

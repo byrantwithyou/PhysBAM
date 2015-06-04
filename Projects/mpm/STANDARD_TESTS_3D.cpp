@@ -261,7 +261,21 @@ Initialize()
             Add_Fixed_Corotated(150,0.4);
             Add_Gravity(TV(0,-9.8,0));
         } break;
-
+        case 10:{ // torus into a box one by one
+            grid.Initialize(TV_INT(resolution,resolution*2,resolution)+1,RANGE<TV>(TV(),TV(1,2,1)),true);
+            T thickness=.2;
+            Add_Collision_Object(RANGE<TV>(TV(-1,-1,-1),TV(2,.1,2)),COLLISION_TYPE::separate,.5);
+            Add_Collision_Object(RANGE<TV>(TV(-1,-1,0.2-thickness),TV(2,.6,.2)),COLLISION_TYPE::separate,.5);
+            Add_Collision_Object(RANGE<TV>(TV(-1,-1,0.8),TV(2,.6,0.8+thickness)),COLLISION_TYPE::separate,.5);
+            Add_Collision_Object(RANGE<TV>(TV(0.2-thickness,-1,-1),TV(.2,.6,2)),COLLISION_TYPE::separate,.5);
+            Add_Collision_Object(RANGE<TV>(TV(.8,-1,-1),TV(.8+thickness,.6,2)),COLLISION_TYPE::separate,.5);
+            T density=5*scale_mass;
+            ANALYTIC_IMPLICIT_OBJECT<TORUS<T> > torus(TORUS<T>(TV(),TV(1,0,0),0.02*2,0.03*2));
+            Seed_Particles(torus,0,0,density,particles_per_cell);
+            for(int i=0;i<particles.number;i++) particles.valid(i)=false;
+            case10_m=particles.number;
+            Add_Gravity(TV(0,-9.8,0));
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
@@ -271,6 +285,21 @@ Initialize()
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Begin_Frame(const int frame)
 {
+    // static int i=0;
+    switch(test_number)
+    {
+        case 10:{
+            if(frame%8==0 && frame<200){
+                TV center=random.Get_Uniform_Vector(TV(.4,1,.4),TV(.6,1,.6));
+                T angle=random.Get_Uniform_Number((T)0,(T)pi*2);
+                ROTATION<TV> rotation(angle,TV(0,1,0));
+                int old_m=particles.number;
+                for(int k=0;k<case10_m;k++) Add_Particle(center+rotation.Rotate(particles.X(k)),0,0,particles.mass(k),particles.volume(k));
+                ARRAY<int> mpm_particles;
+                for(int k=old_m;k<old_m+case10_m;k++) mpm_particles.Append(k);
+                Add_Fixed_Corotated(150,0.3,&mpm_particles);}
+        } break;
+    }
 }
 //#####################################################################
 // Function End_Frame
