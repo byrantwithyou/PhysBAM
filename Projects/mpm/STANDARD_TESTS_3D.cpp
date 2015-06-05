@@ -339,8 +339,8 @@ Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res)
     GRID<VECTOR<T,3> >& ls_grid=undeformed_levelset.levelset.grid;
     ARRAY<T,TV_INT>& phi=undeformed_levelset.levelset.phi;
     ls_grid=GRID<VECTOR<T,3> >::Create_Grid_Given_Cell_Size(box,box.Edge_Lengths().Max()/max_res,false,5);
-    phi.Resize(ls_grid.Domain_Indices());
-    LEVELSET_MAKER_UNIFORM<VECTOR<T,3> >::Compute_Level_Set(surface,ls_grid,0,phi);
+    phi.Resize(ls_grid.Domain_Indices(3));
+    LEVELSET_MAKER_UNIFORM<VECTOR<T,3> >::Compute_Level_Set(surface,ls_grid,3,phi);
     undeformed_levelset.Update_Box();
     return &undeformed_levelset;
 }
