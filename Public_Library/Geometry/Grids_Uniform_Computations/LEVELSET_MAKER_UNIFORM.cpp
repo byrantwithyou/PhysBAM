@@ -21,6 +21,7 @@ namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const 
 template<class TV> void LEVELSET_MAKER_UNIFORM<TV>::
 Compute_Level_Set(T_SURFACE& surface,GRID<TV>& grid,int ghost_cells,ARRAY<T,TV_INT>& phi)
 {
+    PHYSBAM_ASSERT(phi.domain.min_corner.Max()<=-ghost_cells);
     if(!surface.mesh.adjacent_elements) surface.mesh.Initialize_Adjacent_Elements();
     phi.Fill(FLT_MAX);
     T dx=grid.dX.Max();
@@ -28,7 +29,7 @@ Compute_Level_Set(T_SURFACE& surface,GRID<TV>& grid,int ghost_cells,ARRAY<T,TV_I
     ARRAY<TV_INT> seed_indices;
     for(int i=0;i<surface.mesh.elements.m;i++){
         typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX simplex(surface.particles.X.Subset(surface.mesh.elements(i)));
-        RANGE<TV_INT>  box(grid.Clamp_To_Cell(simplex.Bounding_Box(),ghost_cells).Thickened(1));
+        RANGE<TV_INT>  box(grid.Clamp_To_Cell(simplex.Bounding_Box(),ghost_cells).Thickened(1).Intersect(phi.domain));
         for(RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next()){
             TV X=grid.X(it.index);
             T dist=simplex.Distance_To_Element(X),&p=phi(it.index);
@@ -51,7 +52,7 @@ Compute_Level_Set(T_SURFACE& surface,GRID<TV>& grid,int ghost_cells,ARRAY<T,TV_I
                 for(int s=-1;s<2;s+=2){
                     TV_INT index=todo(i);
                     index(a)+=s;
-                    if(phi(index)==FLT_MAX){
+                    if(phi.domain.Lazy_Inside_Half_Open(index) && phi(index)==FLT_MAX){
                         phi(index)=-FLT_MAX;
                         next.Append(index);}}
         next.Exchange(todo);}
