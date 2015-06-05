@@ -51,34 +51,6 @@ public:
     else if(abs(value_y) >= abs(value_x)+dx) return value_x+LEVELSET_UTILITIES<T>::Sign(phi)*dx;
     else{T dx2=sqr(dx),dy2=sqr(dy);return (dy2*value_x+dx2*value_y+LEVELSET_UTILITIES<T>::Sign(phi)*dx*dy*sqrt(dx2+dy2-sqr(value_x-value_y)))/(dx2+dy2);}}
 
-    static T Solve_Close_Point(const T phi,const bool no_x,const T value_x,const bool no_y,const T value_y,const T dx,const T dy)
-    {T sign=LEVELSET_UTILITIES<T>::Sign(phi);assert(!no_x || !no_y);
-    if(no_x) return value_y+sign*dy;
-    if(no_y) return value_x+sign*dx;
-    return Solve_Quadratic(phi,value_x,value_y,dx,dy);} // candidates exist in both directions
-
-    static T Solve_Close_Point(const T phi,const bool no_x,const T value_x,const bool no_y,const T value_y,const bool no_z,const T value_z,const T dx,const T dy,const T dz)
-    {T sign=LEVELSET_UTILITIES<T>::Sign(phi);assert(!no_x || !no_y || !no_z);
-    if(no_x){
-        if(no_y) return value_z+sign*dz;
-        if(no_z) return value_y+sign*dy;
-        return Solve_Quadratic(phi,value_y,value_z,dy,dz);}
-    if(no_y){
-        if(no_z) return value_x+sign*dx;
-        return Solve_Quadratic(phi,value_x,value_z,dx,dz);}
-    if(no_z) return Solve_Quadratic(phi,value_x,value_y,dx,dy);
-    // candidates exist in all three directions
-    T value_yz=Solve_Quadratic(phi,value_y,value_z,dy,dz);
-    if(abs(value_x) >= abs(value_yz)) return value_yz;
-    T value_xz=Solve_Quadratic(phi,value_x,value_z,dx,dz);
-    if(abs(value_y) >= abs(value_xz)) return value_xz;
-    T value_xy=Solve_Quadratic(phi,value_x,value_y,dx,dy);
-    if(abs(value_z) >= abs(value_xy)) return value_xy;
-    // use the candidates in all three directions
-    T dx2=sqr(dx),dy2=sqr(dy),dz2=sqr(dz),dx2dy2=dx2*dy2,dx2dz2=dx2*dz2,dy2dz2=dy2*dz2;
-    return (dy2dz2*value_x+dx2dz2*value_y+dx2dy2*value_z+sign*dx*dy*dz*
-        sqrt(dx2dy2+dx2dz2+dy2dz2-dx2*sqr(value_y-value_z)-dy2*sqr(value_x-value_z)-dz2*sqr(value_x-value_y)))/(dx2dy2+dx2dz2+dy2dz2);}
-
     template<int dimension>
     static T Solve_Close_Point(const T phi,const int number_of_axis,const T value[dimension],const T dx[dimension])
     {assert(number_of_axis);
