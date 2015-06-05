@@ -262,18 +262,24 @@ Initialize()
             Add_Gravity(TV(0,-9.8,0));
         } break;
         case 10:{ // torus into a box one by one
-            grid.Initialize(TV_INT(resolution,resolution*2,resolution)+1,RANGE<TV>(TV(),TV(1,2,1)),true);
-            T thickness=.2;
-            Add_Collision_Object(RANGE<TV>(TV(-1,-1,-1),TV(2,.1,2)),COLLISION_TYPE::separate,.5);
-            Add_Collision_Object(RANGE<TV>(TV(-1,-1,0.2-thickness),TV(2,.6,.2)),COLLISION_TYPE::separate,.5);
-            Add_Collision_Object(RANGE<TV>(TV(-1,-1,0.8),TV(2,.6,0.8+thickness)),COLLISION_TYPE::separate,.5);
-            Add_Collision_Object(RANGE<TV>(TV(0.2-thickness,-1,-1),TV(.2,.6,2)),COLLISION_TYPE::separate,.5);
-            Add_Collision_Object(RANGE<TV>(TV(.8,-1,-1),TV(.8+thickness,.6,2)),COLLISION_TYPE::separate,.5);
+            grid.Initialize(TV_INT(resolution*3,resolution*2,resolution*3)+1,RANGE<TV>(TV(-1,0,-1),TV(2,2,2)),true);
+            RANGE<TV> ym(TV(0.2,0.0,0.2),TV(0.8,0.2,0.8));
+            RANGE<TV> xm(TV(0.2,0.2,0.2),TV(0.3,0.5,0.8));
+            RANGE<TV> xM(TV(0.7,0.2,0.2),TV(0.8,0.5,0.8));
+            RANGE<TV> zm(TV(0.3,0.2,0.2),TV(0.7,0.5,0.3));
+            RANGE<TV> zM(TV(0.3,0.2,0.7),TV(0.7,0.5,0.8));
+            Add_Penalty_Collision_Object(ym);
+            Add_Penalty_Collision_Object(xm);
+            Add_Penalty_Collision_Object(xM);
+            Add_Penalty_Collision_Object(zm);
+            Add_Penalty_Collision_Object(zM);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,true);
             T density=5*scale_mass;
             ANALYTIC_IMPLICIT_OBJECT<TORUS<T> > torus(TORUS<T>(TV(),TV(1,0,0),0.02*2,0.03*2));
             Seed_Particles(torus,0,0,density,particles_per_cell);
             for(int i=0;i<particles.number;i++) particles.valid(i)=false;
             case10_m=particles.number;
+            LOG::cout<<"one torus particle #: "<<case10_m<<std::endl;
             Add_Gravity(TV(0,-9.8,0));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
@@ -297,7 +303,7 @@ Begin_Frame(const int frame)
                 for(int k=0;k<case10_m;k++) Add_Particle(center+rotation.Rotate(particles.X(k)),0,0,particles.mass(k),particles.volume(k));
                 ARRAY<int> mpm_particles;
                 for(int k=old_m;k<old_m+case10_m;k++) mpm_particles.Append(k);
-                Add_Fixed_Corotated(150,0.3,&mpm_particles);}
+                Add_Fixed_Corotated(150*scale_E,0.3,&mpm_particles);}
         } break;
     }
 }
