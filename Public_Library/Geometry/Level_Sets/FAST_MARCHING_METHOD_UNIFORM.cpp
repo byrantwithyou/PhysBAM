@@ -259,7 +259,7 @@ template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
 Update_Close_Point(ARRAY<T,TV_INT>& phi_ghost,const ARRAY<bool,TV_INT>& done,const TV_INT& index)
 {
     T value[3]={}; // the phi value to use in the given direction
-    T dx[3]; // the edge length in the given direction
+    T dx[3]={0}; // the edge length in the given direction
     int number_of_axis=0; // the number of axis that we want to use later
 
     // check each principal axis
