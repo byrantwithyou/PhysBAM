@@ -23,8 +23,12 @@ namespace PhysBAM{
 //#####################################################################
 template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-    :STANDARD_TESTS_BASE<TV>(stream_type,parse_args)
+    :STANDARD_TESTS_BASE<TV>(stream_type,parse_args),case11_w1(0),case11_w2(0)
 {
+    parse_args.Add("-w1",&case11_w1,"angular velocity","initial angular speed of simulated object");
+    parse_args.Add("-w2",&case11_w2,"angular velocity","initial angular speed of simulated object");
+    parse_args.Parse(true);
+
     parse_args.Parse();
 }
 //#####################################################################
@@ -281,6 +285,19 @@ Initialize()
             case10_m=particles.number;
             LOG::cout<<"one torus particle #: "<<case10_m<<std::endl;
             Add_Gravity(TV(0,-9.8,0));
+        } break;
+        case 11:{ // skew impact of two elastic spheres with initial angular velocity
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(),TV(30,30,30)),true);
+            T density=5*scale_mass;
+            SPHERE<TV> sphere1(TV(10,13,15),2);
+            VECTOR<T,3> angular_velocity1(TV(0,0,case11_w1));
+            Seed_Particles_Helper(sphere1,[=](const TV& X){return angular_velocity1.Cross(X-sphere1.center)+TV(0.75,0,0);},
+                [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity1);},density,particles_per_cell);
+            SPHERE<TV> sphere2(TV(20,15,15),2);
+            VECTOR<T,3> angular_velocity2(TV(0,0,case11_w2));
+            Seed_Particles_Helper(sphere2,[=](const TV& X){return angular_velocity2.Cross(X-sphere2.center)+TV(-0.75,0,0);},
+                [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity2);},density,particles_per_cell);
+            Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

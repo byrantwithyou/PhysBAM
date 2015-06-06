@@ -53,6 +53,8 @@ public:
 
     // Case private additional storage
     int case10_m;
+    T case11_w1;
+    T case11_w2;
 //#####################################################################
 };
 }
