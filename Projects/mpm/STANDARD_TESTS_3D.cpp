@@ -275,7 +275,7 @@ Initialize()
             Add_Penalty_Collision_Object(zM);
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,true);
             T density=5*scale_mass;
-            ANALYTIC_IMPLICIT_OBJECT<TORUS<T> > torus(TORUS<T>(TV(),TV(1,0,0),0.02*2,0.03*2));
+            ANALYTIC_IMPLICIT_OBJECT<TORUS<T> > torus(TORUS<T>(TV(),TV(1,0,0),0.02*1.5,0.04*1.5));
             Seed_Particles(torus,0,0,density,particles_per_cell);
             for(int i=0;i<particles.number;i++) particles.valid(i)=false;
             case10_m=particles.number;
