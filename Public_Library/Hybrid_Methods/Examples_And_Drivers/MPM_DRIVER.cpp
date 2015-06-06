@@ -340,9 +340,8 @@ Grid_To_Particle()
 
             particles.V(p)=V_pic;
             Perform_Particle_Collision(p,example.time+example.dt);
-            SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> Dp_inverse_transpose=example.weights->Dp(particles.X(p)).Inverse();
             if(particles.store_B) particles.B(p)=B;
-            if(particles.store_C) particles.C(p)=B*Dp_inverse_transpose;
+            if(particles.store_C) particles.C(p)=grad_Vp;
             if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
             else particles.X(p)+=particles.V(p)*dt;
             particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
