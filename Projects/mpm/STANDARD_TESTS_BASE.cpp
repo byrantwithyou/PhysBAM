@@ -239,8 +239,9 @@ Seed_Lagrangian_Particles(T_STRUCTURE& object,boost::function<TV(const TV&)> V,
     for(int p=old_particles_number;p<particles.number;p++){
         TV X=particles.X(p);
         particles.valid(p)=true;
-        particles.V(p)=V(X);
-        if(use_affine) particles.B(p)=dV(X)*weights->Dp(X);
+        if(V) particles.V(p)=V(X);
+        if(particles.store_B && dV) particles.B(p)=dV(X)*weights->Dp(X);
+        if(particles.store_C && dV) particles.C(p)=dV(X);
         particles.F(p)=MATRIX<T,TV::m>()+1;
         if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
         particles.volume(p)=particles.mass(p)/density;}
