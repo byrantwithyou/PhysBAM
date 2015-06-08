@@ -300,12 +300,28 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         TV dl=V(node2)-V(node1),dl_projected=dl.Projected_On_Unit_Direction(state.direction);
         TV dforce=constant_youngs_modulus/restlength(s)*dl_projected;
+        
+        // fanfu is CONFUSED
+        if(0){
+            TV dX=particles.X(node2)-particles.X(node1);
+            T l=dX.Magnitude();
+            T l0=restlength(s);
+            dforce=constant_youngs_modulus/l0*((T)1-l0/l)*dl+constant_youngs_modulus/(l*l*l)*TV::Dot_Product(dX,dl)*dX;}
+
         F(node1)+=dforce;F(node2)-=dforce;}
     else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         TV dl=V(node2)-V(node1),dl_projected=dl.Projected_On_Unit_Direction(state.direction);
         TV dforce=youngs_modulus(s)/restlength(s)*dl_projected;
+
+        // fanfu is CONFUSED
+        if(0){
+            TV dX=particles.X(node2)-particles.X(node1);
+            T l=dX.Magnitude();
+            T l0=restlength(s);
+            dforce=youngs_modulus(s)/l0*((T)1-l0/l)*dl+youngs_modulus(s)/(l*l*l)*TV::Dot_Product(dX,dl)*dX;}
+
         F(node1)+=dforce;F(node2)-=dforce;}
 }
 //#####################################################################

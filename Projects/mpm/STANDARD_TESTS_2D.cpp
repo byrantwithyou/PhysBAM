@@ -320,11 +320,9 @@ Initialize()
             Add_Force(*fe);
         } break;
         case 17:{ // spring test
-            // TODO: surprisingly, force diff test fails
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            Add_Walls(-1,COLLISION_TYPE::stick,(T)0,0.2,true);
             SEGMENTED_CURVE_2D<T>* sc=SEGMENTED_CURVE_2D<T>::Create();
-            TV S(0.5,0.9);
+            TV S(0.3,0.6);
             TV E(0.7,0.5);
             int N=20;
             TV D=(E-S)/(T)(N-1);
@@ -340,8 +338,11 @@ Initialize()
             LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,new_sc.mesh,true);
             stf->Set_Restlength_From_Particles();
             stf->Set_Stiffness((T)10);
+            stf->Set_Damping((T)0);
             Add_Force(*stf);
-            Add_Gravity(TV(0,-9.8));
+            for(int n=0;n<N;n++)
+                for(int d=0;d<TV::m;d++)
+                    particles.X(n)(d)+=random.Get_Uniform_Number(-0.2,0.2);
         } break;
         case 21:{ // circle with random initial velocities
             grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-3,-3),TV(4,4)),true);
