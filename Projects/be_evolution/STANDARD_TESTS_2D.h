@@ -52,6 +52,9 @@
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <fstream>
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
 namespace PhysBAM{
 
 extern int siggraph_hack_newton_iterations;
@@ -111,15 +114,17 @@ public:
     ARRAY<TV> initial_positions;
     std::string image_file;
     std::string raw_image_file;
+    int threads;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),test_forces(false),
         print_matrix(false),resolution(0),stiffness_multiplier(1),damping_multiplier(1),image_size(500,500),rand_seed(1234),
         use_rand_seed(false),use_residuals(false),use_newmark(false),use_newmark_be(false),project_nullspace(false),
         backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
-        use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
-        penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),final_x((T)-16.175),
-        ether_drag(0),cell_iterator(0),use_vanilla_newton(false),image_file("image.png"),raw_image_file("image.txt")
+        use_penalty_collisions(false),use_constraint_collisions(true),penalty_collisions_stiffness((T)1e4),
+        penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),enforce_definiteness(false),
+        unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),final_x((T)-16.175),ether_drag(0),
+        cell_iterator(0),use_vanilla_newton(false),image_file("image.png"),raw_image_file("image.txt"),threads(1)
     {
         this->fixed_dt=1./240;
         solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
@@ -179,7 +184,20 @@ public:
         parse_args.Add("-use_vanilla_newton",&use_vanilla_newton,"use triangle collisions");
         parse_args.Add("-image_file",&image_file,"file","output image filename");
         parse_args.Add("-raw_image_file",&raw_image_file,"file","octave output image filename");
+        parse_args.Add("-threads",&threads,"threads","Number of threads");
         parse_args.Parse();
+
+#ifdef USE_OPENMP
+        omp_set_num_threads(threads);
+#pragma omp parallel
+#pragma omp single
+        {
+            if(omp_get_num_threads()!=threads) PHYSBAM_FATAL_ERROR();
+            LOG::cout<<"Running on "<<threads<<" threads"<<std::endl;
+        }
+#else
+        PHYSBAM_ASSERT(threads==1);
+#endif
 
         tests.data_directory=data_directory;
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;

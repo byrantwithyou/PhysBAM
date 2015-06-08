@@ -113,6 +113,9 @@
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <fstream>
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
 namespace PhysBAM{
 
 template<class TV> class STANDARD_TESTS;
@@ -191,6 +194,7 @@ public:
     bool use_vanilla_newton;
     T collision_height;
     T collision_speed;
+    int threads;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),test_forces(false),
@@ -207,7 +211,7 @@ public:
         penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
         penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),
         use_penalty_self_collisions(true),use_distance_based_self_collisions(false),rod_length(4),rod_radius(.3),attachment_length(.6),save_dt(0),self_collide_surface_only(false),
-        use_vanilla_newton(false),collision_height(5),collision_speed(4)
+        use_vanilla_newton(false),collision_height(5),collision_speed(4),threads(1)
     {
         this->fixed_dt=1./240;
 
@@ -298,7 +302,21 @@ public:
         parse_args.Add("-use_vanilla_newton",&use_vanilla_newton,"use triangle collisions");
         parse_args.Add("-collision_height",&collision_height,"height","height of collision body in test 68");
         parse_args.Add("-collision_speed",&collision_speed,"speed","speed of collision body in test 68");
+        parse_args.Add("-threads",&threads,"threads","Number of threads");
         parse_args.Parse();
+
+#ifdef USE_OPENMP
+        omp_set_num_threads(threads);
+#pragma omp parallel
+#pragma omp single
+        {
+            if(omp_get_num_threads()!=threads) PHYSBAM_FATAL_ERROR();
+            LOG::cout<<"Running on "<<threads<<" threads"<<std::endl;
+        }
+#else
+        PHYSBAM_ASSERT(threads==1);
+#endif
+
 
         tests.data_directory=data_directory;
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
