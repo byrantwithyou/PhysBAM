@@ -11,6 +11,7 @@
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Log/SCOPE.h>
+#include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/Robust_Arithmetic.h>
 #include <Tools/Math_Tools/sign.h>
 #include <Tools/Matrices/MATRIX_1X1.h>
@@ -240,14 +241,16 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         STATE& state=states(s);
         state.nodes=VECTOR<int,2>(node1,node2);
-        state.direction=X(node2)-X(node1);
+        state.dX=X(node2)-X(node1);
+        state.direction=state.dX;
         current_lengths(s)=state.direction.Normalize();
         state.coefficient=constant_damping/restlength(s);}
     else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         STATE& state=states(s);
         state.nodes=VECTOR<int,2>(node1,node2);
-        state.direction=X(node2)-X(node1);
+        state.dX=X(node2)-X(node1);
+        state.direction=state.dX;
         current_lengths(s)=state.direction.Normalize();
         state.coefficient=damping(s)/restlength(s);}
     if(use_plasticity) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
@@ -298,30 +301,16 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
     if(!youngs_modulus.m) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
-        TV dl=V(node2)-V(node1),dl_projected=dl.Projected_On_Unit_Direction(state.direction);
-        TV dforce=constant_youngs_modulus/restlength(s)*dl_projected;
-        
-        // fanfu is CONFUSED
-        if(0){
-            TV dX=particles.X(node2)-particles.X(node1);
-            T l=dX.Magnitude();
-            T l0=restlength(s);
-            dforce=constant_youngs_modulus/l0*((T)1-l0/l)*dl+constant_youngs_modulus/(l*l*l)*TV::Dot_Product(dX,dl)*dX;}
-
+        TV dl=V(node2)-V(node1);
+        T l=current_lengths(s),l3=cube(l);
+        TV dforce=constant_youngs_modulus*(l-restlength(s))/(restlength(s)*l)*dl+constant_youngs_modulus/l3*TV::Dot_Product(state.dX,dl)*state.dX;
         F(node1)+=dforce;F(node2)-=dforce;}
     else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
-        TV dl=V(node2)-V(node1),dl_projected=dl.Projected_On_Unit_Direction(state.direction);
-        TV dforce=youngs_modulus(s)/restlength(s)*dl_projected;
-
-        // fanfu is CONFUSED
-        if(0){
-            TV dX=particles.X(node2)-particles.X(node1);
-            T l=dX.Magnitude();
-            T l0=restlength(s);
-            dforce=youngs_modulus(s)/l0*((T)1-l0/l)*dl+youngs_modulus(s)/(l*l*l)*TV::Dot_Product(dX,dl)*dX;}
-
+        TV dl=V(node2)-V(node1);
+        T l=current_lengths(s),l3=cube(l);
+        TV dforce=youngs_modulus(s)*(l-restlength(s))/(restlength(s)*l)*dl+youngs_modulus(s)/l3*TV::Dot_Product(state.dX,dl)*state.dX;
         F(node1)+=dforce;F(node2)-=dforce;}
 }
 //#####################################################################

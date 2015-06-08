@@ -53,6 +53,7 @@ protected:
         T coefficient;
         T sqrt_coefficient;
         TV direction;
+        TV dX;
     };
     ARRAY<STATE> states;
     ARRAY<T> current_lengths;
