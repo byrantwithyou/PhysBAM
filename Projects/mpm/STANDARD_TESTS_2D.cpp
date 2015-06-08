@@ -15,6 +15,7 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -317,6 +318,30 @@ Initialize()
             neo->lambda=10000;
             MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0);
             Add_Force(*fe);
+        } break;
+        case 17:{ // spring test
+            // TODO: surprisingly, force diff test fails
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            Add_Walls(-1,COLLISION_TYPE::stick,(T)0,0.2,true);
+            SEGMENTED_CURVE_2D<T>* sc=SEGMENTED_CURVE_2D<T>::Create();
+            TV S(0.5,0.9);
+            TV E(0.7,0.5);
+            int N=20;
+            TV D=(E-S)/(T)(N-1);
+            T density=1*scale_mass;
+            sc->particles.Add_Elements(N);
+            sc->Update_Number_Nodes();
+            for(int n=0;n<N-1;n++){
+                TV X=S+D*n;
+                sc->particles.X(n)=X;
+                sc->mesh.elements.Append(TV_INT(n,n+1));}
+            sc->particles.X(N-1)=E;
+            SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*sc,[=](const TV& X){return TV(0.0,0);},0,density,true);
+            LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,new_sc.mesh,true);
+            stf->Set_Restlength_From_Particles();
+            stf->Set_Stiffness((T)10);
+            Add_Force(*stf);
+            Add_Gravity(TV(0,-9.8));
         } break;
         case 21:{ // circle with random initial velocities
             grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-3,-3),TV(4,4)),true);
