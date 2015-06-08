@@ -705,7 +705,7 @@ void Get_Initial_Data()
 
     switch(test_number){
         case 1: case 7:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)25,0)*m)),true,true,density,m);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)5,0)*m)),true,true,density,m);
             tests.Add_Ground(0,1.99*m);
             break;}
         case 2:{
@@ -730,7 +730,7 @@ void Get_Initial_Data()
             else
                 tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).4,(T)0)*m,ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,.005*m);
             //            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.3,0)*m)),true,true,density,5.0*m);
-//            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0)*m)),true,true,density,m);
+//            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0)*m)),true,true,density,m);
            // tests.Create_Mattress(GRID<TV>(TV_INT(13,13,13),RANGE<TV>(TV(-1,1,-1),TV(1,3,1))*m),true,0);
 
             tests.Add_Ground();
@@ -759,7 +759,7 @@ void Get_Initial_Data()
             curves(0).Add_Control_Point(1,FRAME<TV>(TV(0,(T)1,0)));
             curves(0).Add_Control_Point(2,FRAME<TV>(TV(0,(T)1,0)));
             curves(0).Add_Control_Point(3,FRAME<TV>(TV(0,(T)2,0)));
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1,0)*m)),true,true,density,.4*m);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1,0)*m)),true,true,density,.4*m);
             tests.Add_Ground();
             break;}
         case 8:{
@@ -768,8 +768,8 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 9:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1,0)*m)),true,true,density,.5*m);
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0.1,(T)3,0)*m)),true,true,density,.5*m);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1,0)*m)),true,true,density,.5*m);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0.1,(T)3,0)*m)),true,true,density,.5*m);
             tests.Add_Ground();
             break;}
         case 10:{
@@ -860,7 +860,7 @@ void Get_Initial_Data()
             last_frame=1000;
             break;}
         case 30: {
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)-90,(T)6,(T)11)*m)),true,true,density,1.0*m);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)-90,(T)6,(T)11)*m)),true,true,density,1.0*m);
             RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(20,20,20)*m);
             box1.Frame().t=TV(19,10,10)*m;
             box1.is_static=true;
@@ -1115,7 +1115,7 @@ void Get_Initial_Data()
             for(int i=0;i<128;i++) curves(0).Add_Control_Point(i,FRAME<TV>(TV(-25+i*velocity,radius*1.05,0)*m,ROTATION<TV>(-i*velocity/radius,TV(0,0,1))));
 
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,2,0)*m));
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,3,0)*m)),true,true,density,3*m);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,3,0)*m)),true,true,density,3*m);
             // tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             tests.Add_Ground(1e8);
             break;}
@@ -1621,9 +1621,9 @@ void Get_Initial_Data()
             kinematic_ids.Append(shell.particle_index);
             rigid_body_collection.rigid_body_particles.kinematic(shell.particle_index)=true;
 
-            T y_start=6.75*m;
+            T y_start=3.75*m;
             T y_stop=0.75*m;
-            T t_stop=4;
+            T t_stop=2;
 
             curves.Resize(1);
             curves(0).Add_Control_Point(0,FRAME<TV>(TV(0,y_start,0)*m,ROTATION<TV>(pi/2,TV(1,0,0))));
