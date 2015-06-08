@@ -83,7 +83,7 @@ public:
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;
     using BASE::frame_rate;using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;
-    using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::stream_type;
+    using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::stream_type;
 
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
     T velocity_multiplier;
@@ -111,13 +111,80 @@ public:
     ARRAY<TV_INT> cell_samples;
     bool use_maccormack;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.SMOKE),
-        solids_tests(stream_type,data_directory,solid_body_collection),velocity_multiplier(1),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args,0,fluids_parameters.SMOKE),
+        solids_tests(stream_type_input,data_directory,solid_body_collection),velocity_multiplier(1),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
         bending_stiffness_multiplier((T)1),bending_damping_multiplier((T)1),parameter(0),boundary_offset(0),extra_cells(0),base_resolution(4),run_self_tests(false),
         print_poisson_matrix(false),print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false),
         use_eno_advection(false),angle(0),outside_tolerance(0),viscosity_only(false),use_maccormack(false)
     {
+        parse_args.Add("-mass",&mass_multiplier,"scale","scale mass");
+        parse_args.Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"iterations","solver iterations");
+        parse_args.Add("-viscosity",&fluids_parameters.viscosity,"value","viscosity");
+        parse_args.Add("-test_system",&run_self_tests,"run self tests");
+        parse_args.Add("-print_poisson_matrix",&print_poisson_matrix,"print poisson matrix");
+        parse_args.Add("-print_index_map",&print_index_map,"print index map");
+        parse_args.Add("-print_matrix",&print_matrix,"print matrix");
+        parse_args.Add("-print_each_matrix",&print_each_matrix,"print each matrix");
+        parse_args.Add("-output_iterators",&output_iterators,"output iterators");
+        parse_args.Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
+        parse_args.Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"use preconditioner");
+        parse_args.Add("-leakproof",&solids_fluids_parameters.use_leakproof_solve,"use leakproof solve");
+        parse_args.Add("-maccormack",&use_maccormack,"use maccormack");
+        parse_args.Add("-boundary_offset",&boundary_offset,"value","boundary offset");
+        parse_args.Add("-levelset_viscosity",&fluids_parameters.use_levelset_viscosity,"use levelset viscosity");
+        parse_args.Add("-print_viscosity_matrix",&fluids_parameters.print_viscosity_matrix,"print viscosity matrix");
+        parse_args.Add("-angle",&angle,"angle","angle");
+        parse_args.Add("-base_resolution",&base_resolution,"res","base resolution");
+        parse_args.Parse();
+
+        solids_tests.data_directory=data_directory;
+        last_frame=100;
+        LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
+
+        angle*=pi/180;
+        solids_parameters.implicit_solve_parameters.cg_iterations=fluids_parameters.incompressible_iterations;
+        if(test_number==2 || test_number==3 || test_number==4) fluids_parameters.use_psi_R=true;
+        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+        solids_parameters.rigid_body_collision_parameters.use_push_out=false;
+        solids_parameters.use_post_cg_constraints=false;
+        solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
+
+        fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
+
+        solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+        solids_parameters.use_trapezoidal_rule_for_velocities=false;
+        solids_parameters.implicit_solve_parameters.cg_restart_iterations=1000;
+        solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
+
+        fluids_parameters.use_slip=true;
+        fluids_parameters.use_vorticity_confinement=false;
+        fluids_parameters.use_preconditioner_for_slip_system=true;
+
+        solids_fluids_parameters.use_leakproof_solve=false;
+
+        if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
+
+        fluids_parameters.use_removed_positive_particles=true;
+        fluids_parameters.use_removed_negative_particles=true;
+        fluids_parameters.write_removed_positive_particles=true;
+        fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.store_particle_ids=true;
+        fluids_parameters.removed_positive_particle_buoyancy_constant=0;
+        //solid_body_collection.print_residuals=true;
+
+        fluids_parameters.gravity=TV();
+        fluids_parameters.density=(T)100;
+        fluids_parameters.use_vorticity_confinement=false;
+        fluids_parameters.use_density=fluids_parameters.use_temperature=false;
+        fluids_parameters.use_body_force=false;
+
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
+        if(use_maccormack){
+            fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
+            fluids_parameters.use_maccormack_for_incompressible=true;}
+
+        fluids_parameters.use_second_order_pressure=true;
     }
 
     virtual ~STANDARD_TESTS()
@@ -163,86 +230,7 @@ public:
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-mass",&mass_multiplier,"scale","scale mass");
-    parse_args->Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"iterations","solver iterations");
-    parse_args->Add("-viscosity",&fluids_parameters.viscosity,"value","viscosity");
-    parse_args->Add("-test_system",&run_self_tests,"run self tests");
-    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print poisson matrix");
-    parse_args->Add("-print_index_map",&print_index_map,"print index map");
-    parse_args->Add("-print_matrix",&print_matrix,"print matrix");
-    parse_args->Add("-print_each_matrix",&print_each_matrix,"print each matrix");
-    parse_args->Add("-output_iterators",&output_iterators,"output iterators");
-    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
-    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"use preconditioner");
-    parse_args->Add("-leakproof",&solids_fluids_parameters.use_leakproof_solve,"use leakproof solve");
-    parse_args->Add("-maccormack",&use_maccormack,"use maccormack");
-    parse_args->Add("-boundary_offset",&boundary_offset,"value","boundary offset");
-    parse_args->Add("-levelset_viscosity",&fluids_parameters.use_levelset_viscosity,"use levelset viscosity");
-    parse_args->Add("-print_viscosity_matrix",&fluids_parameters.print_viscosity_matrix,"print viscosity matrix");
-    parse_args->Add("-angle",&angle,"angle","angle");
-    parse_args->Add("-base_resolution",&base_resolution,"res","base resolution");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    solids_tests.data_directory=data_directory;
-    last_frame=100;
-    LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-
-    angle*=pi/180;
-    solids_parameters.implicit_solve_parameters.cg_iterations=fluids_parameters.incompressible_iterations;
-    if(test_number==2 || test_number==3 || test_number==4) fluids_parameters.use_psi_R=true;
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    solids_parameters.rigid_body_collision_parameters.use_push_out=false;
-    solids_parameters.use_post_cg_constraints=false;
-    solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
-
-    fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
-
-    solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-    solids_parameters.use_trapezoidal_rule_for_velocities=false;
-    solids_parameters.implicit_solve_parameters.cg_restart_iterations=1000;
-    solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
-
-    fluids_parameters.use_slip=true;
-    fluids_parameters.use_vorticity_confinement=false;
-    fluids_parameters.use_preconditioner_for_slip_system=true;
-
-    solids_fluids_parameters.use_leakproof_solve=false;
-
-    if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
-
-    fluids_parameters.use_removed_positive_particles=true;
-    fluids_parameters.use_removed_negative_particles=true;
-    fluids_parameters.write_removed_positive_particles=true;
-    fluids_parameters.write_removed_negative_particles=true;
-    fluids_parameters.store_particle_ids=true;
-    fluids_parameters.removed_positive_particle_buoyancy_constant=0;
-    //solid_body_collection.print_residuals=true;
-
-    fluids_parameters.gravity=TV();
-    fluids_parameters.density=(T)100;
-    fluids_parameters.use_vorticity_confinement=false;
-    fluids_parameters.use_density=fluids_parameters.use_temperature=false;
-    fluids_parameters.use_body_force=false;
-
-    output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
-    if(use_maccormack){
-        fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
-        fluids_parameters.use_maccormack_for_incompressible=true;}
-
-    fluids_parameters.use_second_order_pressure=true;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

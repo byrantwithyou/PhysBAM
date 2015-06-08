@@ -38,7 +38,7 @@ class PLS_FSI_EXAMPLE:public EXAMPLE<TV_input>,public EXAMPLE_FORCES_AND_VELOCIT
     typedef typename MATRIX_POLICY<TV>::TRANSFORMATION_MATRIX T_TRANSFORMATION_MATRIX;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
 public:
-    typedef EXAMPLE<TV> BASE;using BASE::parse_args;using BASE::Set_Write_Substeps_Level;
+    typedef EXAMPLE<TV> BASE;using BASE::Set_Write_Substeps_Level;
     using BASE::output_directory;using BASE::first_frame;using BASE::restart;using BASE::Write_Frame_Title;using BASE::stream_type;
     using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Source_Reseed_Mask;
     using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Source_Velocities;using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Object_Velocities; // silence -Woverloaded-virtual
@@ -62,7 +62,7 @@ public:
     KANG_POISSON_VISCOSITY<TV>* kang_poisson_viscosity;
     bool opt_skip_debug_data,opt_solidscg,opt_solidscr,opt_solidssymmqmr;
 
-    PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions);
+    PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int number_of_regions);
     virtual ~PLS_FSI_EXAMPLE();
 
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
@@ -93,8 +93,7 @@ public:
     void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;
     void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time) PHYSBAM_OVERRIDE;
     void Log_Parameters() const PHYSBAM_OVERRIDE;
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
+    void After_Construction() PHYSBAM_OVERRIDE;
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,
         const T time) PHYSBAM_OVERRIDE;
     virtual void Update_Fluid_Parameters(const T dt,const T time);
@@ -120,7 +119,7 @@ public:
     virtual void Melting_Substep(const T dt,const T time){}
     virtual void Modify_Fluid_For_Melting(const T dt,const T time){}
     virtual void Update_Melting_Substep_Parameters(const T dt,const T time){}
-    void Parse_Late_Options() PHYSBAM_OVERRIDE;
+    void After_Initialization() PHYSBAM_OVERRIDE;
     template<class T_MPI> void Adjust_Output_Directory_For_MPI(const T_MPI mpi);
     virtual void Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
         ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}

@@ -25,7 +25,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
-    using BASE::solid_body_collection;using BASE::stream_type;using BASE::parse_args;using BASE::test_number;
+    using BASE::solid_body_collection;using BASE::stream_type;using BASE::test_number;
 
     T flow_speed;
     int body;
@@ -33,9 +33,47 @@ public:
     TV source_vector;
 
 
-    FLOW_PAST_EFTYCHIS(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.SMOKE)
+    FLOW_PAST_EFTYCHIS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,0,fluids_parameters.SMOKE)
     {
+        parse_args.Parse();
+
+        GRID<TV> full_grid(TV_INT(75,75,75),RANGE<TV>(TV((T)-.3,(T)0.35,(T)-.3),TV((T).3,(T).95,(T).3)));
+        *fluids_parameters.grid=full_grid;
+        fluids_parameters.use_vorticity_confinement=true;fluids_parameters.confinement_parameter=(T).5;
+        fluids_parameters.write_debug_data=true;
+
+        output_directory=LOG::sprintf("Flow_Past_Eftychis/Test_%d",test_number);
+
+        if(test_number==1){
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+            fluids_parameters.confinement_parameter=(T).5;
+        }
+        else if(test_number==2){
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;
+            fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=true;
+            fluids_parameters.gravity=TV();
+            source_sphere.radius=(T).1;
+            source_sphere.center=TV((T)-.24,(T).62,(T).25);
+            source_vector=TV((T).66666,0,(T)-.66666);
+            fluids_parameters.confinement_parameter=(T).15;
+        }
+        else if(test_number==3){
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;
+            fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=true;
+            //fluids_parameters.gravity=TV();
+            source_sphere.radius=(T).1;
+            source_sphere.center=TV((T)-.24,(T).62,(T).25);
+            source_vector=TV((T).66666,0,(T)-.66666);
+            fluids_parameters.gravity=source_vector*fluids_parameters.gravity.Magnitude();
+            fluids_parameters.confinement_parameter=(T).15;
+        }
+ 
+        last_frame=600;
+        frame_rate=120;
+        
+        flow_speed=(T)1;
     }
 
     ~FLOW_PAST_EFTYCHIS()
@@ -54,57 +92,7 @@ public:
     void Initialize_Euler_State() PHYSBAM_OVERRIDE {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    GRID<TV> full_grid(TV_INT(75,75,75),RANGE<TV>(TV((T)-.3,(T)0.35,(T)-.3),TV((T).3,(T).95,(T).3)));
-    *fluids_parameters.grid=full_grid;
-    fluids_parameters.use_vorticity_confinement=true;fluids_parameters.confinement_parameter=(T).5;
-    fluids_parameters.write_debug_data=true;
-
-    output_directory=LOG::sprintf("Flow_Past_Eftychis/Test_%d",test_number);
-
-    if(test_number==1){
-        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-        fluids_parameters.confinement_parameter=(T).5;
-    }
-    else if(test_number==2){
-        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;
-        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=true;
-        fluids_parameters.gravity=TV();
-        source_sphere.radius=(T).1;
-        source_sphere.center=TV((T)-.24,(T).62,(T).25);
-        source_vector=TV((T).66666,0,(T)-.66666);
-        fluids_parameters.confinement_parameter=(T).15;
-    }
-    else if(test_number==3){
-        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;
-        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=true;
-        //fluids_parameters.gravity=TV();
-        source_sphere.radius=(T).1;
-        source_sphere.center=TV((T)-.24,(T).62,(T).25);
-        source_vector=TV((T).66666,0,(T)-.66666);
-        fluids_parameters.gravity=source_vector*fluids_parameters.gravity.Magnitude();
-        fluids_parameters.confinement_parameter=(T).15;
-    }
- 
-    last_frame=600;
-    frame_rate=120;
-        
-    flow_speed=(T)1;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

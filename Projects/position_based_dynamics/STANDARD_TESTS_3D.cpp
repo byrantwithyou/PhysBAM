@@ -8,8 +8,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class T> STANDARD_TESTS<VECTOR<T,3> >::
-STANDARD_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-    :STANDARD_TESTS_BASE<TV>(stream_type,parse_args)
+STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args)
 {
     parse_args.Parse();
 }

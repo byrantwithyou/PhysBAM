@@ -16,9 +16,12 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> MAGNETS_EXAMPLE<T>::
-MAGNETS_EXAMPLE(const STREAM_TYPE stream_type)
-    :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection)
+MAGNETS_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection)
 {
+    parse_args.Parse();
+    tests.data_directory=data_directory;
+    output_directory="Magnets/output";
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     last_frame=500;
@@ -35,24 +38,6 @@ MAGNETS_EXAMPLE(const STREAM_TYPE stream_type)
 template<class T> MAGNETS_EXAMPLE<T>::
 ~MAGNETS_EXAMPLE()
 {
-}
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-template<class T> void MAGNETS_EXAMPLE<T>::
-Register_Options()
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-template<class T> void MAGNETS_EXAMPLE<T>::
-Parse_Options()
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    output_directory="Magnets/output";
 }
 //#####################################################################
 // Function Initialize_Bodies

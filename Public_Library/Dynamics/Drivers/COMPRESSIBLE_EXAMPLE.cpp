@@ -15,8 +15,8 @@ using namespace PhysBAM;
 // COMPRESSIBLE_EXAMPLE
 //#####################################################################
 template<class TV_input> COMPRESSIBLE_EXAMPLE<TV_input>::
-COMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input)
-    :EXAMPLE<TV>(stream_type_input),
+COMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :EXAMPLE<TV>(stream_type_input,parse_args),
     number_of_ghost_cells(3),cfl((T).9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
     euler(mac_grid),euler_solid_fluid_coupling_utilities(euler),compressible_fluid_collection(mac_grid),face_velocities(mac_grid),
     conservation_method(0),boundary(0),pressure_boundary(0),

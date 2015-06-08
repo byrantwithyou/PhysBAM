@@ -23,7 +23,7 @@ class EMBEDDING_TEST:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
-    using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
+    using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
 
     bool target_position;
@@ -33,27 +33,14 @@ public:
     T stiffness;
 //std::string data_directory;
 
-    EMBEDDING_TEST(const STREAM_TYPE stream_type)
-        :BASE(stream_type),test_3_use_bound(true),stiffness(1)
+    EMBEDDING_TEST(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),test_3_use_bound(true),stiffness(1)
     {
+        parse_args.Add("-stiffen",&stiffness,"value","stiffness multiplier for various tests");
+        parse_args.Parse();
     }
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options()
-{
-    BASE::Register_Options();
-    parse_args->Add("-stiffen",&stiffness,"value","stiffness multiplier for various tests");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options()
-{
-    BASE::Parse_Options();
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################

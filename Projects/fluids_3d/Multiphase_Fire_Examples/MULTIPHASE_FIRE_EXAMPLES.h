@@ -22,38 +22,26 @@ public:
     typedef MULTIPHASE_FIRE_EXAMPLES_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::pseudo_dirichlet;using BASE::resolution;
-    using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::test_number;using BASE::parse_args;
+    using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::test_number;
     
-    MULTIPHASE_FIRE_EXAMPLES(const STREAM_TYPE stream_type)
-        :MULTIPHASE_FIRE_EXAMPLES_UNIFORM<TV>(stream_type)
+    MULTIPHASE_FIRE_EXAMPLES(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :MULTIPHASE_FIRE_EXAMPLES_UNIFORM<TV>(stream_type_input,parse_args)
     {
+        parse_args.Parse();
+
+        LOG::cout<<"Running Multiphase Fire Example Number "<<test_number<<" at resolution "<<resolution<<std::endl;
+        fluids_parameters.solve_neumann_regions=false;
+        int cells=1*resolution;
+        if(test_number==1) fluids_parameters.grid->Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
+        if(test_number==2) fluids_parameters.grid->Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
+        if(test_number==3) fluids_parameters.grid->Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
+        if(!pseudo_dirichlet) output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d",test_number,
+            (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));
+        else output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d_pseudo_dirichlet",test_number,
+            (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));
     }
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    LOG::cout<<"Running Multiphase Fire Example Number "<<test_number<<" at resolution "<<resolution<<std::endl;
-    fluids_parameters.solve_neumann_regions=false;
-    int cells=1*resolution;
-    if(test_number==1) fluids_parameters.grid->Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
-    if(test_number==2) fluids_parameters.grid->Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
-    if(test_number==3) fluids_parameters.grid->Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
-    if(!pseudo_dirichlet) output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d",test_number,
-        (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));
-    else output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d_pseudo_dirichlet",test_number,
-        (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 };
 }

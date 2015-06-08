@@ -24,7 +24,7 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::output_directory;using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::write_last_frame;using BASE::data_directory;
     using BASE::stream_type;using BASE::restart;using BASE::initial_time;using BASE::first_frame;using BASE::last_frame;using BASE::restart_frame;using BASE::frame_rate;
-    using BASE::test_number;using BASE::parse_args;using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Position_Nodes; // silence -Woverloaded-virtual
+    using BASE::test_number;using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Position_Nodes; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     RIGID_BODY<TV> *box1,*box2;
@@ -33,7 +33,7 @@ public:
     int selection;
     bool use_rigid_deformable_evolution_old;
 
-    BRIDGE_EXAMPLE(const STREAM_TYPE stream_type);
+    BRIDGE_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~BRIDGE_EXAMPLE();
 
     // Unused callbacks
@@ -52,9 +52,7 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
 
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
-    void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
     void Initialize_Bodies() PHYSBAM_OVERRIDE;
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE;

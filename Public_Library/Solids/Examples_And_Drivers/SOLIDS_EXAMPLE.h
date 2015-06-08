@@ -38,7 +38,7 @@ class SOLIDS_EXAMPLE:public EXAMPLE<TV>,public EXAMPLE_FORCES_AND_VELOCITIES<TV>
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
     typedef AVERAGING_UNIFORM<TV> T_AVERAGING;
 public:
-    using EXAMPLE_FORCES_AND_VELOCITIES<TV>::Set_External_Positions;using BASE::parse_args; // silence -Woverloaded-virtual
+    using EXAMPLE_FORCES_AND_VELOCITIES<TV>::Set_External_Positions;
     using BASE::output_directory;using BASE::frame_title;using BASE::stream_type;using BASE::initial_time;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;
     using BASE::write_last_frame;using BASE::write_time;using BASE::write_substeps_level;using BASE::Set_Write_Substeps_Level;//using BASE::data_directory;
     using BASE::restart;using BASE::Write_Frame_Title;
@@ -54,7 +54,7 @@ public:
     DEBUG_PARTICLES<TV>& debug_particles;
     bool opt_skip_debug_data;
 
-    SOLIDS_EXAMPLE(const STREAM_TYPE stream_type);
+    SOLIDS_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
     virtual ~SOLIDS_EXAMPLE();
 
     void Set_Minimum_Collision_Thickness(const T minimum_collision_thickness_input=1e-6)
@@ -70,8 +70,7 @@ public:
     // solids
     virtual void Initialize_Bodies();
     virtual void Read_Output_Files_Solids(const int frame);
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Late_Options() PHYSBAM_OVERRIDE;
+    void After_Initialization() PHYSBAM_OVERRIDE;
     void Post_Velocity_Advection_Callback(const T dt,const T time){}
     virtual void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;
     void Adjust_Output_Directory_For_MPI(const MPI_SOLIDS<TV>* mpi);

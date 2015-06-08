@@ -95,7 +95,7 @@ public:
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;
     using BASE::frame_rate;using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::Add_To_Fluid_Simulation;
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;
-    using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::Add_Thin_Shell_To_Fluid_Simulation;
+    using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::Add_Thin_Shell_To_Fluid_Simulation;
 
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
     GRID<TV> mattress_grid,mattress_grid_stub;
@@ -141,15 +141,328 @@ public:
     TRIANGULATED_AREA<T>* test_43_triangulated_area;
     FINITE_VOLUME<TV,2>* finite_volume;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.SMOKE),
-        solids_tests(stream_type,data_directory,solid_body_collection),deformable_object_id(0),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args,0,fluids_parameters.SMOKE),
+        solids_tests(stream_type_input,data_directory,solid_body_collection),deformable_object_id(0),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
         bending_stiffness_multiplier((T)1),bending_damping_multiplier((T)1),rigid_body_id(0),flow_particles(false),run_self_tests(false),print_poisson_matrix(false),
         print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false),circle_refinement(0),scale_length(1),use_solid(false),fluid_gravity(0,(T)9.8),solid_gravity(0,(T)9.8),
         solid_width((T).1111),solid_density(100),widen_domain(0),period(10),max_dt(0),beam_elements_width(2),beam_elements_length(40),solid_resolution(216),
         use_viscosity(false),use_solid_width(false),use_solid_density(false)
     {
         LOG::cout<<std::setprecision(16);
+        fluids_parameters.incompressible_iterations=3000;
+        parse_args.Add("-mass",&mass_multiplier,"value","mass_multiplier");
+        parse_args.Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"value","cg iterations");
+        parse_args.Add("-slip",&fluids_parameters.use_slip,"use slip");
+        parse_args.Add("-viscosity",&fluids_parameters.viscosity,&use_viscosity,"value","fluid viscosity");
+        parse_args.Add("-test_system",&run_self_tests,"Run self tests");
+        parse_args.Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
+        parse_args.Add("-print_index_map",&print_index_map,"print_index_map");
+        parse_args.Add("-print_matrix",&print_matrix,"print_matrix");
+        parse_args.Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
+        parse_args.Add("-output_iterators",&output_iterators,"output_iterators");
+        parse_args.Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
+        parse_args.Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"preconditioner");
+        parse_args.Add("-leakproof",&solids_fluids_parameters.use_leakproof_solve,"use leakproof solve");
+        parse_args.Add("-use_viscous_forces",&use_viscous_forces,"use_viscous_forces");
+        parse_args.Add("-scale_length",&scale_length,"value","scale_length");
+        parse_args.Add("-use_solid",&use_solid,"use_solid");
+        parse_args.Add("-fluid_gravity",&fluid_gravity.y,"value","fluid_gravity");
+        parse_args.Add("-solid_gravity",&solid_gravity.y,"value","solid_gravity");
+        parse_args.Add("-solid_width",&solid_width,&use_solid_width,"value","solid_width");
+        parse_args.Add("-solid_density",&solid_density,&use_solid_density,"value","solid_density");
+        parse_args.Add("-widen_domain",&widen_domain,"value","widen_domain");
+        parse_args.Add("-period",&period,"value","period");
+        parse_args.Add("-max_dt",&max_dt,"value","maximum dt");
+        parse_args.Add("-stokes",&fluids_parameters.stokes_flow,"disable advection");
+        parse_args.Add("-beam_res_w",&beam_elements_width,"value","beam_elements_width");
+        parse_args.Add("-beam_res_h",&beam_elements_length,"value","beam_elements_length");
+        parse_args.Add("-solid_resolution",&solid_resolution,"value","solid_resolution");
+        parse_args.Parse();
+
+        solids_tests.data_directory=data_directory;
+        last_frame=100;
+        frame_rate=24;
+
+        fluids_parameters.cfl=(T).9;
+        fluids_parameters.confinement_parameter=(T).04;        
+        fluids_parameters.rho_bottom=1;
+        fluids_parameters.rho_top=(T).65;
+        fluids_parameters.density_buoyancy_constant=fluids_parameters.temperature_buoyancy_constant=0;
+        fluids_parameters.temperature_container.Set_Cooling_Constant(0);
+        solids_parameters.implicit_solve_parameters.cg_iterations=fluids_parameters.incompressible_iterations;
+        fluids_parameters.use_coupled_implicit_viscosity=use_viscous_forces;
+        solid_gravity=-solid_gravity;
+        fluid_gravity=-fluid_gravity;
+
+        LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
+
+        //mattress_grid=GRID<TV>(TV_INT(3,3),RANGE<TV>(TV((T).25,(T).81),TV((T).75,(T)1.05)));
+        mattress_grid=GRID<TV>(TV_INT(3,3),RANGE<TV>(TV((T).26,(T).81),TV((T).76,(T)1.04)));
+        mattress_grid_stub=GRID<TV>(TV_INT(2,2),RANGE<TV>(TV((T)20.25,(T)-21.05),TV((T)20.75,(T)-21.01)));
+        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+        solids_parameters.rigid_body_collision_parameters.use_push_out=false;
+        solids_parameters.use_post_cg_constraints=false;
+        solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
+        fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
+
+        solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+        solids_parameters.use_trapezoidal_rule_for_velocities=false;
+        solids_parameters.implicit_solve_parameters.cg_restart_iterations=200;
+        solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
+        //solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
+        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;
+        velocity_multiplier=(T)1;
+
+        fluids_parameters.use_vorticity_confinement=false;
+        fluids_parameters.use_preconditioner_for_slip_system=true;
+        solids_fluids_parameters.use_leakproof_solve=false;
+        if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
+        
+        fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
+        fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.store_particle_ids=true;
+        // T default_removed_positive_particle_buoyancy_constant=fluids_parameters.removed_positive_particle_buoyancy_constant;
+        fluids_parameters.removed_positive_particle_buoyancy_constant=0;
+        //solid_body_collection.print_residuals=true;
+
+        fluids_parameters.gravity=TV();
+
+        switch(test_number){
+            case 1:
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+                fluids_parameters.gravity.y=-(T)9.8;
+                fluids_parameters.density=(T)1;
+                (*fluids_parameters.grid).Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)1.5)));
+                fluids_parameters.use_density=fluids_parameters.use_temperature=false;
+                break;
+            case 2:
+                //last_frame=1000;
+                (*fluids_parameters.grid).Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)1.5)));
+                //fluids_parameters.density=(T)300;
+                fluids_parameters.gravity.y=-(T)9.8;
+                fluids_parameters.density=(T)1000;
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+                velocity_multiplier=10;
+                fluids_parameters.use_density=fluids_parameters.use_temperature=false;
+                break;
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+                fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,15*resolution+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
+                last_frame=1000;
+                fluids_parameters.density=(T)1000;
+                rigid_body_count=6;
+                velocity_multiplier=(T)15;
+                fluids_parameters.use_body_force=true;
+                break;
+            case 7:
+                fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,15*resolution+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
+                last_frame=1000;
+                fluids_parameters.density=(T)1000;
+                rigid_body_count=6;
+                velocity_multiplier=(T)15;
+                fluids_parameters.use_body_force=true;
+                break;
+            case 8:
+                fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,15*resolution+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
+                last_frame=1000;
+                fluids_parameters.density=(T)10;
+                velocity_multiplier=(T)5;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                fluids_parameters.density=(T)1;
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+                balloon_initial_radius=(T).2;
+                light_sphere_drop_time=(T).5;
+                heavy_sphere_drop_time=(T)1.5;
+                heavy_sphere_initial_height=(T).25;
+                light_sphere_initial_height=(T).25;
+                fluids_parameters.use_body_force=true;
+                break;
+            case 9:
+                last_frame=5000;
+                fluids_parameters.gravity.y=-(T)9.8;
+                fluids_parameters.density=(T)1000;
+                fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][0]=true;//fluids_parameters.domain_walls[1][1]=true;
+                (*fluids_parameters.grid).Initialize(TV_INT(2*resolution+1,5*resolution+1),RANGE<TV>(TV((T)-2,(T)0),TV((T)2,(T)10)));
+                fluids_parameters.use_body_force=true;
+                break;
+            case 10: // flow chamber
+            case 11:
+                fluids_parameters.grid->Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
+                last_frame=1000;
+                fluids_parameters.gravity.y=-(T)9.8;
+                fluids_parameters.density=(T)1000;
+                fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+                velocity_multiplier=5;
+                fluids_parameters.use_body_force=true;
+                break;
+            case 12:
+                fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
+                (*fluids_parameters.grid).Initialize(TV_INT(4*resolution+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)4,(T)1)));
+                // (*fluids_parameters.grid).Initialize(TV_INT(4*resolution+1,2*resolution+1),RANGE<TV>(TV((T)0,(T)-0.5),TV((T)4,(T)1.5)));
+                flow_particles=true;
+                fluids_parameters.use_body_force=true;
+            
+                break;
+            case 13:
+                fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
+                (*fluids_parameters.grid).Initialize(TV_INT(2*resolution+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)));
+                velocity_angle=pi/16;
+                fluids_parameters.density=(T)1000;
+                fluids_parameters.use_body_force=true;
+                break;
+            case 20:
+                last_frame=1000;
+                (*fluids_parameters.grid).Initialize(TV_INT((int)(1.5*resolution)+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)));
+                //fluids_parameters.density=(T)300;
+                fluids_parameters.gravity.y=-(T)9.8;
+                fluids_parameters.density=(T)1000;
+                fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;
+                velocity_multiplier=10;
+                fluids_parameters.use_density=fluids_parameters.use_temperature=false;
+                break;
+            case 30:
+                (*fluids_parameters.grid).Initialize(TV_INT((int)(1.5*resolution)+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)));
+                last_frame=1000;
+                fluids_parameters.gravity.y=-(T)9.8;
+                fluids_parameters.density=(T).1;
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+//                velocity_multiplier=10;
+                fluids_parameters.use_density=fluids_parameters.use_temperature=false;
+                break;
+            case 31:
+            case 34:
+            case 35:
+            case 36:
+            case 37:
+            case 38:
+            case 39:
+                fluids_parameters.grid->Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
+                for(int axis=0;axis<TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
+                break;
+            case 32:
+                fluids_parameters.grid->Initialize(TV_INT(resolution,4*resolution),RANGE<TV>(TV(0,0),TV((T).04*scale_length,(T).16*scale_length)),true);
+                break;
+            case 33:
+                fluids_parameters.grid->Initialize(TV_INT(2,1)*resolution,RANGE<TV>(TV(),TV(2,1)),true);
+                fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+                break;
+            case 40:
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
+                {T extend=(T)1/resolution*widen_domain*scale_length;
+                    (*fluids_parameters.grid).Initialize(TV_INT(resolution+1+2*widen_domain,resolution+1),RANGE<TV>(TV(-extend,(T)0),TV(1+extend,(T)scale_length)));}
+                if(!use_viscosity) fluids_parameters.viscosity=100;
+                if(!use_solid_density) solid_density=150;
+                if(!use_solid_width) solid_width=(T)1/3;
+                break;
+            case 41:
+                fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+                (*fluids_parameters.grid).Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0,0),TV(4,4)));
+                break;
+            case 42:
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+                (*fluids_parameters.grid).Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+                break;
+            case 43:
+                fluids_parameters.grid->Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0,0),TV(1,1)));
+                for(int axis=0;axis<TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
+                break;
+            case 44:
+                fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+                (*fluids_parameters.grid).Initialize(TV_INT((int)(2.5*resolution)+1,resolution+1),RANGE<TV>(TV(-(T)2.5,-(T)3.5),TV(15,(T)3.5)));
+                break;
+            default:
+                LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
+        
+        THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
+        if(fluids_parameters.use_slip)
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
+        else
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
+    }
+    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+//#####################################################################
+// Function Postprocess_Frame
+//#####################################################################
+    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+    {
+        if(debug_particles.Size()){
+            FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
+            FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
+            debug_particles.Delete_All_Elements();}
+
+        if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(solids_evolution)){
+            UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV> iterator_info(*fluids_parameters.collision_bodies_affecting_fluid);
+            if(frame==1) evolution->Output_Iterators(this->stream_type,output_directory.c_str(),0);
+            evolution->Output_Iterators(this->stream_type,output_directory.c_str(),frame);}
+        if(test_number==40){
+            T v=fluid_collection.incompressible_fluid_collection.face_velocities(FACE_INDEX<2>(2,fluids_parameters.grid->counts/2));
+            if(solid_body_collection.rigid_body_collection.rigid_body_particles.frame.m>=3) v=solid_body_collection.rigid_body_collection.rigid_body_particles.twist(2).linear.y;
+            LOG::cout<<"middle-velocity "<<v<<"   error from analytic solution "<<(v/analytic_solution-1)<<std::endl;}
+        if(test_number==32){
+            LOG::cout<<"solid-velocity "<<solid_body_collection.rigid_body_collection.rigid_body_particles.twist.Last().linear.y<<std::endl;}
+        if(test_number==41){
+            ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
+            LINEAR_INTERPOLATION_UNIFORM<TV,T> interp;
+            for(int i=0;i<sample_points.m;i++){
+                TV X=sample_points(i),V;
+                for(int d=0;d<V.m;d++)
+                    V(d)=interp.Clamped_To_Array(fluids_parameters.grid->Get_Face_Grid(d),face_velocities.Component(d),X);
+                LOG::cout<<"velocity at "<<X<<" : "<<V<<std::endl;}}
+        if(test_number==43){
+            ARRAY<T,FACE_INDEX<2> > face_velocities_copy(fluid_collection.incompressible_fluid_collection.face_velocities);
+            DEFORMABLE_PARTICLES<TV>& particles=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(test_43_triangulated_area->particles);
+            RANGE<TV_INT> domain_indices=fluids_parameters.grid->Domain_Indices();
+            T volume=fluids_parameters.grid->Cell_Size();
+            double kinetic_energy=0;
+            for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
+                int simplex=test_43_triangulated_area->Inside(iterator.Location(),1e-4);
+                FACE_INDEX<2> face_index=iterator.Full_Index();
+                if(simplex!=0){
+                    TRIANGLE_2D<T> triangle=test_43_triangulated_area->Get_Element(simplex);
+                    VECTOR<T,3> barycentric_weights=TRIANGLE_2D<T>::Barycentric_Coordinates(iterator.Location(),triangle.X);
+                    VECTOR<int,3> triangle_indices=test_43_triangulated_area->mesh.elements(simplex);
+                    T scalar_velocity=0;
+                    for(int i=0;i<3;i++)
+                        scalar_velocity+=barycentric_weights(i)*particles.V(triangle_indices(i))(face_index.axis);
+                    face_velocities_copy(face_index)=scalar_velocity;
+                }
+                if(face_index.index(face_index.axis)<=domain_indices.max_corner(face_index.axis)) // avoid double counting wrapped faces
+                    kinetic_energy+=sqr(face_velocities_copy(face_index));
+            }
+            kinetic_energy*=.5*volume;
+            LOG::cout<<"Total kinetic energy at frame "<<frame<<" is "<<kinetic_energy<<std::endl;
+
+            T potential_energy=0,solid_kinetic_energy=0;
+            solid_body_collection.Compute_Energy(frame/frame_rate,solid_kinetic_energy,potential_energy);
+            LOG::cout<<"Total potential energy at frame "<<frame<<" is "<<potential_energy<<std::endl;
+
+            ARRAY<T,TV_INT> stream_function(RANGE<TV_INT>(domain_indices.min_corner,domain_indices.max_corner+1));
+            stream_function(1,1)=0;
+            std::ofstream out(LOG::sprintf("%s/%i/stream_function.dat",output_directory.c_str(),frame).c_str());
+            TV dX=fluids_parameters.grid->DX();
+            // use nodes so the derivatives are central
+            for(int i=0;i<domain_indices.max_corner.x+1;i++){
+                for(int j=0;j<domain_indices.max_corner.y+1;j++){
+                    int count=0;
+                    T estimate=0;
+                    if(i>1){ // integrate v_y in the x direction
+                        estimate+=stream_function(i-1,j)+dX.x*face_velocities_copy.Component(1)(i-1,j);
+                        count++;}
+                    if(j>1){ // integrate v_x in the y direction
+                        estimate+=stream_function(i,j-1)-dX.y*face_velocities_copy.Component(0)(i,j-1);
+                        count++;}
+                    if(count)
+                        stream_function(i,j)=estimate/count;
+                    out<<i<<" "<<j<<" "<<stream_function(i,j)<<std::endl;
+                }
+                out<<std::endl;
+            }
+        }
     }
 
     // Unused callbacks
@@ -171,331 +484,6 @@ public:
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Post_Initialization() PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    fluids_parameters.incompressible_iterations=3000;
-    parse_args->Add("-mass",&mass_multiplier,"value","mass_multiplier");
-    parse_args->Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"value","cg iterations");
-    parse_args->Add("-slip",&fluids_parameters.use_slip,"use slip");
-    parse_args->Add("-viscosity",&fluids_parameters.viscosity,&use_viscosity,"value","fluid viscosity");
-    parse_args->Add("-test_system",&run_self_tests,"Run self tests");
-    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
-    parse_args->Add("-print_index_map",&print_index_map,"print_index_map");
-    parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
-    parse_args->Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
-    parse_args->Add("-output_iterators",&output_iterators,"output_iterators");
-    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
-    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"preconditioner");
-    parse_args->Add("-leakproof",&solids_fluids_parameters.use_leakproof_solve,"use leakproof solve");
-    parse_args->Add("-use_viscous_forces",&use_viscous_forces,"use_viscous_forces");
-    parse_args->Add("-scale_length",&scale_length,"value","scale_length");
-    parse_args->Add("-use_solid",&use_solid,"use_solid");
-    parse_args->Add("-fluid_gravity",&fluid_gravity.y,"value","fluid_gravity");
-    parse_args->Add("-solid_gravity",&solid_gravity.y,"value","solid_gravity");
-    parse_args->Add("-solid_width",&solid_width,&use_solid_width,"value","solid_width");
-    parse_args->Add("-solid_density",&solid_density,&use_solid_density,"value","solid_density");
-    parse_args->Add("-widen_domain",&widen_domain,"value","widen_domain");
-    parse_args->Add("-period",&period,"value","period");
-    parse_args->Add("-max_dt",&max_dt,"value","maximum dt");
-    parse_args->Add("-stokes",&fluids_parameters.stokes_flow,"disable advection");
-    parse_args->Add("-beam_res_w",&beam_elements_width,"value","beam_elements_width");
-    parse_args->Add("-beam_res_h",&beam_elements_length,"value","beam_elements_length");
-    parse_args->Add("-solid_resolution",&solid_resolution,"value","solid_resolution");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    solids_tests.data_directory=data_directory;
-    last_frame=100;
-    frame_rate=24;
-
-    fluids_parameters.cfl=(T).9;
-    fluids_parameters.confinement_parameter=(T).04;        
-    fluids_parameters.rho_bottom=1;
-    fluids_parameters.rho_top=(T).65;
-    fluids_parameters.density_buoyancy_constant=fluids_parameters.temperature_buoyancy_constant=0;
-    fluids_parameters.temperature_container.Set_Cooling_Constant(0);
-    solids_parameters.implicit_solve_parameters.cg_iterations=fluids_parameters.incompressible_iterations;
-    fluids_parameters.use_coupled_implicit_viscosity=use_viscous_forces;
-    solid_gravity=-solid_gravity;
-    fluid_gravity=-fluid_gravity;
-
-    LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-
-    //mattress_grid=GRID<TV>(TV_INT(3,3),RANGE<TV>(TV((T).25,(T).81),TV((T).75,(T)1.05)));
-    mattress_grid=GRID<TV>(TV_INT(3,3),RANGE<TV>(TV((T).26,(T).81),TV((T).76,(T)1.04)));
-    mattress_grid_stub=GRID<TV>(TV_INT(2,2),RANGE<TV>(TV((T)20.25,(T)-21.05),TV((T)20.75,(T)-21.01)));
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    solids_parameters.rigid_body_collision_parameters.use_push_out=false;
-    solids_parameters.use_post_cg_constraints=false;
-    solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
-    fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
-
-    solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-    solids_parameters.use_trapezoidal_rule_for_velocities=false;
-    solids_parameters.implicit_solve_parameters.cg_restart_iterations=200;
-    solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
-    //solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
-    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
-    fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;
-    velocity_multiplier=(T)1;
-
-    fluids_parameters.use_vorticity_confinement=false;
-    fluids_parameters.use_preconditioner_for_slip_system=true;
-    solids_fluids_parameters.use_leakproof_solve=false;
-    if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
-        
-    fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
-    fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
-    fluids_parameters.store_particle_ids=true;
-    // T default_removed_positive_particle_buoyancy_constant=fluids_parameters.removed_positive_particle_buoyancy_constant;
-    fluids_parameters.removed_positive_particle_buoyancy_constant=0;
-    //solid_body_collection.print_residuals=true;
-
-    fluids_parameters.gravity=TV();
-
-    switch(test_number){
-        case 1:
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-            fluids_parameters.gravity.y=-(T)9.8;
-            fluids_parameters.density=(T)1;
-            (*fluids_parameters.grid).Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)1.5)));
-            fluids_parameters.use_density=fluids_parameters.use_temperature=false;
-            break;
-        case 2:
-            //last_frame=1000;
-            (*fluids_parameters.grid).Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV((T)0,(T)0),TV((T)1,(T)1.5)));
-            //fluids_parameters.density=(T)300;
-            fluids_parameters.gravity.y=-(T)9.8;
-            fluids_parameters.density=(T)1000;
-            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-            velocity_multiplier=10;
-            fluids_parameters.use_density=fluids_parameters.use_temperature=false;
-            break;
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-            fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,15*resolution+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
-            last_frame=1000;
-            fluids_parameters.density=(T)1000;
-            rigid_body_count=6;
-            velocity_multiplier=(T)15;
-            fluids_parameters.use_body_force=true;
-            break;
-        case 7:
-            fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,15*resolution+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
-            last_frame=1000;
-            fluids_parameters.density=(T)1000;
-            rigid_body_count=6;
-            velocity_multiplier=(T)15;
-            fluids_parameters.use_body_force=true;
-            break;
-        case 8:
-            fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,15*resolution+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
-            last_frame=1000;
-            fluids_parameters.density=(T)10;
-            velocity_multiplier=(T)5;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            fluids_parameters.density=(T)1;
-            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-            balloon_initial_radius=(T).2;
-            light_sphere_drop_time=(T).5;
-            heavy_sphere_drop_time=(T)1.5;
-            heavy_sphere_initial_height=(T).25;
-            light_sphere_initial_height=(T).25;
-            fluids_parameters.use_body_force=true;
-            break;
-        case 9:
-            last_frame=5000;
-            fluids_parameters.gravity.y=-(T)9.8;
-            fluids_parameters.density=(T)1000;
-            fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][0]=true;//fluids_parameters.domain_walls[1][1]=true;
-            (*fluids_parameters.grid).Initialize(TV_INT(2*resolution+1,5*resolution+1),RANGE<TV>(TV((T)-2,(T)0),TV((T)2,(T)10)));
-            fluids_parameters.use_body_force=true;
-            break;
-        case 10: // flow chamber
-        case 11:
-            fluids_parameters.grid->Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
-            last_frame=1000;
-            fluids_parameters.gravity.y=-(T)9.8;
-            fluids_parameters.density=(T)1000;
-            fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-            velocity_multiplier=5;
-            fluids_parameters.use_body_force=true;
-            break;
-        case 12:
-            fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
-            (*fluids_parameters.grid).Initialize(TV_INT(4*resolution+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)4,(T)1)));
-            // (*fluids_parameters.grid).Initialize(TV_INT(4*resolution+1,2*resolution+1),RANGE<TV>(TV((T)0,(T)-0.5),TV((T)4,(T)1.5)));
-            flow_particles=true;
-            fluids_parameters.use_body_force=true;
-            
-            break;
-        case 13:
-            fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
-            (*fluids_parameters.grid).Initialize(TV_INT(2*resolution+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)));
-            velocity_angle=pi/16;
-            fluids_parameters.density=(T)1000;
-            fluids_parameters.use_body_force=true;
-            break;
-        case 20:
-            last_frame=1000;
-            (*fluids_parameters.grid).Initialize(TV_INT((int)(1.5*resolution)+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)));
-            //fluids_parameters.density=(T)300;
-            fluids_parameters.gravity.y=-(T)9.8;
-            fluids_parameters.density=(T)1000;
-            fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;
-            velocity_multiplier=10;
-            fluids_parameters.use_density=fluids_parameters.use_temperature=false;
-            break;
-        case 30:
-            (*fluids_parameters.grid).Initialize(TV_INT((int)(1.5*resolution)+1,resolution+1),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1)));
-            last_frame=1000;
-            fluids_parameters.gravity.y=-(T)9.8;
-            fluids_parameters.density=(T).1;
-            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-//                velocity_multiplier=10;
-            fluids_parameters.use_density=fluids_parameters.use_temperature=false;
-            break;
-        case 31:
-        case 34:
-        case 35:
-        case 36:
-        case 37:
-        case 38:
-        case 39:
-            fluids_parameters.grid->Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
-            for(int axis=0;axis<TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
-            break;
-        case 32:
-            fluids_parameters.grid->Initialize(TV_INT(resolution,4*resolution),RANGE<TV>(TV(0,0),TV((T).04*scale_length,(T).16*scale_length)),true);
-            break;
-        case 33:
-            fluids_parameters.grid->Initialize(TV_INT(2,1)*resolution,RANGE<TV>(TV(),TV(2,1)),true);
-            fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-            break;
-        case 40:
-            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
-            {T extend=(T)1/resolution*widen_domain*scale_length;
-                (*fluids_parameters.grid).Initialize(TV_INT(resolution+1+2*widen_domain,resolution+1),RANGE<TV>(TV(-extend,(T)0),TV(1+extend,(T)scale_length)));}
-            if(!use_viscosity) fluids_parameters.viscosity=100;
-            if(!use_solid_density) solid_density=150;
-            if(!use_solid_width) solid_width=(T)1/3;
-            break;
-        case 41:
-            fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-            (*fluids_parameters.grid).Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0,0),TV(4,4)));
-            break;
-        case 42:
-            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-            (*fluids_parameters.grid).Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            break;
-        case 43:
-            fluids_parameters.grid->Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0,0),TV(1,1)));
-            for(int axis=0;axis<TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
-            break;
-        case 44:
-            fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-            (*fluids_parameters.grid).Initialize(TV_INT((int)(2.5*resolution)+1,resolution+1),RANGE<TV>(TV(-(T)2.5,-(T)3.5),TV(15,(T)3.5)));
-            break;
-        default:
-            LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
-        
-    THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
-    if(fluids_parameters.use_slip)
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
-    else
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
-//#####################################################################
-// Function Postprocess_Frame
-//#####################################################################
-void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
-{
-    if(debug_particles.Size()){
-        FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
-        FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
-        debug_particles.Delete_All_Elements();}
-
-    if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(solids_evolution)){
-        UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV> iterator_info(*fluids_parameters.collision_bodies_affecting_fluid);
-        if(frame==1) evolution->Output_Iterators(this->stream_type,output_directory.c_str(),0);
-        evolution->Output_Iterators(this->stream_type,output_directory.c_str(),frame);}
-    if(test_number==40){
-        T v=fluid_collection.incompressible_fluid_collection.face_velocities(FACE_INDEX<2>(2,fluids_parameters.grid->counts/2));
-        if(solid_body_collection.rigid_body_collection.rigid_body_particles.frame.m>=3) v=solid_body_collection.rigid_body_collection.rigid_body_particles.twist(2).linear.y;
-        LOG::cout<<"middle-velocity "<<v<<"   error from analytic solution "<<(v/analytic_solution-1)<<std::endl;}
-    if(test_number==32){
-        LOG::cout<<"solid-velocity "<<solid_body_collection.rigid_body_collection.rigid_body_particles.twist.Last().linear.y<<std::endl;}
-    if(test_number==41){
-        ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
-        LINEAR_INTERPOLATION_UNIFORM<TV,T> interp;
-        for(int i=0;i<sample_points.m;i++){
-            TV X=sample_points(i),V;
-            for(int d=0;d<V.m;d++)
-            V(d)=interp.Clamped_To_Array(fluids_parameters.grid->Get_Face_Grid(d),face_velocities.Component(d),X);
-            LOG::cout<<"velocity at "<<X<<" : "<<V<<std::endl;}}
-    if(test_number==43){
-        ARRAY<T,FACE_INDEX<2> > face_velocities_copy(fluid_collection.incompressible_fluid_collection.face_velocities);
-        DEFORMABLE_PARTICLES<TV>& particles=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(test_43_triangulated_area->particles);
-        RANGE<TV_INT> domain_indices=fluids_parameters.grid->Domain_Indices();
-        T volume=fluids_parameters.grid->Cell_Size();
-        double kinetic_energy=0;
-        for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
-            int simplex=test_43_triangulated_area->Inside(iterator.Location(),1e-4);
-            FACE_INDEX<2> face_index=iterator.Full_Index();
-            if(simplex!=0){
-                TRIANGLE_2D<T> triangle=test_43_triangulated_area->Get_Element(simplex);
-                VECTOR<T,3> barycentric_weights=TRIANGLE_2D<T>::Barycentric_Coordinates(iterator.Location(),triangle.X);
-                VECTOR<int,3> triangle_indices=test_43_triangulated_area->mesh.elements(simplex);
-                T scalar_velocity=0;
-                for(int i=0;i<3;i++)
-                    scalar_velocity+=barycentric_weights(i)*particles.V(triangle_indices(i))(face_index.axis);
-                face_velocities_copy(face_index)=scalar_velocity;
-            }
-            if(face_index.index(face_index.axis)<=domain_indices.max_corner(face_index.axis)) // avoid double counting wrapped faces
-                kinetic_energy+=sqr(face_velocities_copy(face_index));
-        }
-        kinetic_energy*=.5*volume;
-        LOG::cout<<"Total kinetic energy at frame "<<frame<<" is "<<kinetic_energy<<std::endl;
-
-        T potential_energy=0,solid_kinetic_energy=0;
-        solid_body_collection.Compute_Energy(frame/frame_rate,solid_kinetic_energy,potential_energy);
-        LOG::cout<<"Total potential energy at frame "<<frame<<" is "<<potential_energy<<std::endl;
-
-        ARRAY<T,TV_INT> stream_function(RANGE<TV_INT>(domain_indices.min_corner,domain_indices.max_corner+1));
-        stream_function(1,1)=0;
-        std::ofstream out(LOG::sprintf("%s/%i/stream_function.dat",output_directory.c_str(),frame).c_str());
-        TV dX=fluids_parameters.grid->DX();
-        // use nodes so the derivatives are central
-        for(int i=0;i<domain_indices.max_corner.x+1;i++){
-            for(int j=0;j<domain_indices.max_corner.y+1;j++){
-                int count=0;
-                T estimate=0;
-                if(i>1){ // integrate v_y in the x direction
-                    estimate+=stream_function(i-1,j)+dX.x*face_velocities_copy.Component(1)(i-1,j);
-                    count++;}
-                if(j>1){ // integrate v_x in the y direction
-                    estimate+=stream_function(i,j-1)-dX.y*face_velocities_copy.Component(0)(i,j-1);
-                    count++;}
-                if(count)
-                    stream_function(i,j)=estimate/count;
-                out<<i<<" "<<j<<" "<<stream_function(i,j)<<std::endl;
-            }
-            out<<std::endl;
-        }
-    }
-}
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################

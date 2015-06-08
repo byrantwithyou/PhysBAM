@@ -43,13 +43,20 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SOLIDS_EXAMPLE<TV>::
-SOLIDS_EXAMPLE(const STREAM_TYPE stream_type)
-    :BASE(stream_type),use_melting(false),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>),
+SOLIDS_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
+    :BASE(stream_type,parse_args),use_melting(false),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>),
     solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),opt_solidssymmqmr(false),opt_solidscr(false),
     opt_solidscg(false),debug_particles(*new DEBUG_PARTICLES<TV>),opt_skip_debug_data(false)
 {
     Set_Minimum_Collision_Thickness();
     Set_Write_Substeps_Level(-1);
+
+    parse_args.Add("-solidscfl",&solids_parameters.cfl,"cfl","solids CFL");
+    parse_args.Add("-solidscg",&opt_solidscg,"Use CG for time integration");
+    parse_args.Add("-solidscr",&opt_solidscr,"Use CONJUGATE_RESIDUAL for time integration");
+    parse_args.Add("-solidssymmqmr",&opt_solidssymmqmr,"Use SYMMQMR for time integration");
+    parse_args.Add("-rigidcfl",&solids_parameters.rigid_body_evolution_parameters.rigid_cfl,"cfl","rigid CFL");
+    parse_args.Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
 }
 //#####################################################################
 // Destructor
@@ -86,29 +93,12 @@ Log_Parameters() const
     LOG::cout<<"use_melting="<<use_melting<<std::endl;
 }
 //#####################################################################
-// Function Register_Options
+// Function After_Initialization
 //#####################################################################
 template<class TV> void SOLIDS_EXAMPLE<TV>::
-Register_Options()
+After_Initialization()
 {
-    if(!parse_args) return;
-    BASE::Register_Options();
-    parse_args->Add("-solidscfl",&solids_parameters.cfl,"cfl","solids CFL");
-    parse_args->Add("-solidscg",&opt_solidscg,"Use CG for time integration");
-    parse_args->Add("-solidscr",&opt_solidscr,"Use CONJUGATE_RESIDUAL for time integration");
-    parse_args->Add("-solidssymmqmr",&opt_solidssymmqmr,"Use SYMMQMR for time integration");
-    parse_args->Add("-rigidcfl",&solids_parameters.rigid_body_evolution_parameters.rigid_cfl,"cfl","rigid CFL");
-    BASE::Register_Options();
-    parse_args->Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
-}
-//#####################################################################
-// Function Parse_Late_Options
-//#####################################################################
-template<class TV> void SOLIDS_EXAMPLE<TV>::
-Parse_Late_Options()
-{
-    if(!parse_args) return;
-    BASE::Parse_Late_Options();
+    BASE::After_Initialization();
 
     if(opt_solidscg) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
     if(opt_solidscr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;

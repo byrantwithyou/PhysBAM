@@ -44,7 +44,7 @@ public:
     T scale_speed;
     RANDOM_NUMBERS<T> random;
 
-    STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
+    STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
 //#####################################################################
 };

@@ -85,7 +85,7 @@ public:
     typedef typename TV::SPIN T_SPIN;
 
     using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::last_frame;
-    using BASE::stream_type;using BASE::frame_rate;using BASE::solid_body_collection;using BASE::test_number;using BASE::parse_args;
+    using BASE::stream_type;using BASE::frame_rate;using BASE::solid_body_collection;using BASE::test_number;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     int cluster_id;
@@ -105,8 +105,8 @@ public:
     };
     NONLINEAR_PENDULUM nonlinear_pendulum;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),peak_force(10),parameter(3),use_prestab_iterations(false)
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),peak_force(10),parameter(3),use_prestab_iterations(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
 
@@ -115,6 +115,22 @@ public:
 
         solids_parameters.rigid_body_collision_parameters.use_push_out=true;
         solids_parameters.use_rigid_deformable_contact=true;
+        ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
+        parse_args.Add("-parameter",&parameter,"value","general use parameter");
+        parse_args.Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+        parse_args.Add_Not("-disable_prestab",&arb.use_prestab,"disable prestabilization");
+        parse_args.Add_Not("-disable_poststab",&arb.use_poststab,"disable poststabilization");
+        parse_args.Add("-use_krylov_poststab",&arb.use_krylov_poststab,"use krylov poststabilization");
+        parse_args.Add("-use_krylov_prestab",&arb.use_krylov_prestab,"use krylov prestabilization");
+        parse_args.Add("-test_arb_system",&solids_parameters.implicit_solve_parameters.test_system,"test arb system properties");
+        parse_args.Add("-print_arb_matrix",&solids_parameters.implicit_solve_parameters.print_matrix,"print arb system");
+        parse_args.Add("-prestab_iterations",&arb.max_iterations,&use_prestab_iterations,"iterations","prestabilization iterations");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        if(arb.use_krylov_poststab) arb.use_poststab_in_cg=false;
+        if(use_prestab_iterations) solids_parameters.rigid_body_collision_parameters.contact_iterations=arb.max_iterations;
     }
 
     ~STANDARD_TESTS()
@@ -147,30 +163,7 @@ public:
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return false;}
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
 
-    void Register_Options() PHYSBAM_OVERRIDE
-    {
-        BASE::Register_Options();
-        ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-        parse_args->Add("-parameter",&parameter,"value","general use parameter");
-        parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
-        parse_args->Add_Not("-disable_prestab",&arb.use_prestab,"disable prestabilization");
-        parse_args->Add_Not("-disable_poststab",&arb.use_poststab,"disable poststabilization");
-        parse_args->Add("-use_krylov_poststab",&arb.use_krylov_poststab,"use krylov poststabilization");
-        parse_args->Add("-use_krylov_prestab",&arb.use_krylov_prestab,"use krylov prestabilization");
-        parse_args->Add("-test_arb_system",&solids_parameters.implicit_solve_parameters.test_system,"test arb system properties");
-        parse_args->Add("-print_arb_matrix",&solids_parameters.implicit_solve_parameters.print_matrix,"print arb system");
-        parse_args->Add("-prestab_iterations",&arb.max_iterations,&use_prestab_iterations,"iterations","prestabilization iterations");
-    }
-    void Parse_Options() PHYSBAM_OVERRIDE
-    {
-        ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-        BASE::Parse_Options();
-        tests.data_directory=data_directory;
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-        if(arb.use_krylov_poststab) arb.use_poststab_in_cg=false;
-        if(use_prestab_iterations) solids_parameters.rigid_body_collision_parameters.contact_iterations=arb.max_iterations;
-    }
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################

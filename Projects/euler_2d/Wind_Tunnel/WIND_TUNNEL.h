@@ -45,7 +45,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef BOUNDARY<TV,TV_DIMENSION> BASE_BOUNDARY;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
-    using BASE::data_directory;using BASE::solid_body_collection;using BASE_BOUNDARY::Boundary;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
+    using BASE::data_directory;using BASE::solid_body_collection;using BASE_BOUNDARY::Boundary;using BASE::test_number;using BASE::resolution;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     T rho_initial,u_vel_initial,v_vel_initial,p_initial,velocity_uniform;
@@ -76,78 +76,66 @@ public:
     7. Double Mach Reflection of a Strong Shock
     ***************/
 
-    WIND_TUNNEL(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(stream_type,data_directory,solid_body_collection),rigid_body_collection(solid_body_collection.rigid_body_collection),
+    WIND_TUNNEL(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args,0,fluids_parameters.COMPRESSIBLE),tests(stream_type_input,data_directory,solid_body_collection),rigid_body_collection(solid_body_collection.rigid_body_collection),
         rho_left(0),u_left(0),v_left(0),p_left(0),woodward_fix_entropy(false),woodward_fix_enthalpy(true),isobaric_fix_only_6_cells(true),
         eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).6),timesplit(false),implicit_rk(false),exact(false)
     {
+        parse_args.Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+        parse_args.Add("-eno_order",&eno_order,"eno_order","eno order");
+        parse_args.Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+        parse_args.Add("-cfl",&cfl_number,"CFL","cfl number");
+        parse_args.Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+        parse_args.Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
+        parse_args.Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+
+        timesplit=timesplit && !exact;
+        //grid
+        int cells=resolution;
+        if(test_number==1) fluids_parameters.grid->Initialize(TV_INT(3,1)*cells,RANGE<TV>(TV(),TV(3,1)),true);
+        else if(test_number==7) fluids_parameters.grid->Initialize(TV_INT(4,1)*cells,RANGE<TV>(TV(),TV(4,1)),true);
+        else if(test_number==4) fluids_parameters.grid->Initialize(TV_INT(3,3)*cells,RANGE<TV>(TV(),TV(3,3)));
+        else fluids_parameters.grid->Initialize(TV_INT(3,1)*cells,RANGE<TV>(TV(),TV(3,1)));
+        if(test_number!=1 && test_number!=7) *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+        if(test_number==4){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
+        if(test_number==7){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
+        //time
+        initial_time=(T)0.;last_frame=1000;frame_rate=(T)80.;
+        if(test_number==1) last_frame=320;
+        if(test_number==7) last_frame=16;
+        fluids_parameters.cfl=cfl_number;
+        //custom stuff . . . 
+        fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
+        if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
+        else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
+        else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
+        fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
+        fluids_parameters.compressible_conservation_method->Save_Fluxes();
+        fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
+        fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
+        fluids_parameters.compressible_rungekutta_order=rk_order;
+        rho_initial=(T)1.4;u_vel_initial=(T)3.;v_vel_initial=(T)0.;p_initial=(T)1.;
+        if(test_number==6){rho_initial=(T)1.4;u_vel_initial=-(T)3.;v_vel_initial=(T)0.;p_initial=(T)1.;}
+        if(test_number==4){rho_initial=1;u_vel_initial=(T)0.;v_vel_initial=(T)0.;p_initial=(T)1.;velocity_uniform=3;}
+        if(test_number==7){u_vel_initial=(T)0;rho_left=(T)8;u_left=(T)7.145;v_left=(T)-4.125;p_left=(T)116.5;}
+        fluids_parameters.compressible_timesplit=timesplit;
+
+        wall_thickness=(T).1;
+        if(timesplit)
+            output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+        else
+            output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+        if(eno_scheme==2) output_directory+="_density_weighted";
+        else if(eno_scheme==3) output_directory+="_velocity_weighted";
     }
     
     virtual ~WIND_TUNNEL() {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
-    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
-    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
-    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
-    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
-    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-
-    timesplit=timesplit && !exact;
-    //grid
-    int cells=resolution;
-    if(test_number==1) fluids_parameters.grid->Initialize(TV_INT(3,1)*cells,RANGE<TV>(TV(),TV(3,1)),true);
-    else if(test_number==7) fluids_parameters.grid->Initialize(TV_INT(4,1)*cells,RANGE<TV>(TV(),TV(4,1)),true);
-    else if(test_number==4) fluids_parameters.grid->Initialize(TV_INT(3,3)*cells,RANGE<TV>(TV(),TV(3,3)));
-    else fluids_parameters.grid->Initialize(TV_INT(3,1)*cells,RANGE<TV>(TV(),TV(3,1)));
-    if(test_number!=1 && test_number!=7) *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
-    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-    if(test_number==4){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
-    if(test_number==7){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
-    //time
-    initial_time=(T)0.;last_frame=1000;frame_rate=(T)80.;
-    if(test_number==1) last_frame=320;
-    if(test_number==7) last_frame=16;
-    fluids_parameters.cfl=cfl_number;
-    //custom stuff . . . 
-    fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
-    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
-    fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
-    fluids_parameters.compressible_conservation_method->Save_Fluxes();
-    fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
-    fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
-    fluids_parameters.compressible_rungekutta_order=rk_order;
-    rho_initial=(T)1.4;u_vel_initial=(T)3.;v_vel_initial=(T)0.;p_initial=(T)1.;
-    if(test_number==6){rho_initial=(T)1.4;u_vel_initial=-(T)3.;v_vel_initial=(T)0.;p_initial=(T)1.;}
-    if(test_number==4){rho_initial=1;u_vel_initial=(T)0.;v_vel_initial=(T)0.;p_initial=(T)1.;velocity_uniform=3;}
-    if(test_number==7){u_vel_initial=(T)0;rho_left=(T)8;u_left=(T)7.145;v_left=(T)-4.125;p_left=(T)116.5;}
-    fluids_parameters.compressible_timesplit=timesplit;
-
-    wall_thickness=(T).1;
-    if(timesplit)
-        output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-    else
-        output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-    if(eno_scheme==2) output_directory+="_density_weighted";
-    else if(eno_scheme==3) output_directory+="_velocity_weighted";
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################
@@ -232,7 +220,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 {
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Set_Dirichlet_Boundary_Conditions(time);
-    EULER_UNIFORM<TV >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV >&>(fluids_parameters)).euler);
+    EULER_UNIFORM<TV>& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters)).euler);
     ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=euler.euler_projection.elliptic_solver->psi_N;
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=euler.euler_projection.face_velocities;
     RANGE<TV> domain=fluids_parameters.euler->grid.Domain();
@@ -264,7 +252,7 @@ void Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& u_
     T time=time_input;
     static T last_time_used=0;  // Hack to get around the fact that fluid_parameters.Write_Output_Files doesn't know what time it is...
     if(time) last_time_used=time; else time=last_time_used;
-    const EULER_UNIFORM<TV >& euler=*((const_cast<FLUIDS_PARAMETERS_UNIFORM<TV >&>(fluids_parameters)).euler);
+    const EULER_UNIFORM<TV>& euler=*((const_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters)).euler);
     assert(test_number==7);
     if(side==3){
         int axis=(side+1)/2;
@@ -296,7 +284,7 @@ void Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& u_
 //#####################################################################
 void Woodward_Collela_Fix(bool fix_entropy,bool fix_enthalpy)
 {
-    EULER_UNIFORM<TV >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV >&>(fluids_parameters)).euler);
+    EULER_UNIFORM<TV>& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters)).euler);
     EOS_GAMMA<T>* gamma_law=dynamic_cast<EOS_GAMMA<T>*>(euler.eos);  // This isobaric fix depends on the EOS being a gamma law
     static TV_INT reference_cell=fluids_parameters.grid->Closest_Node(TV((T).6-fluids_parameters.grid->dX.x,(T).2-fluids_parameters.grid->dX.y));
     const T rho_a=euler.U(reference_cell)(1);
@@ -338,7 +326,7 @@ void Woodward_Collela_Fix(bool fix_entropy,bool fix_enthalpy)
 }
 void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
 {
-    EULER_UNIFORM<TV >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV >&>(fluids_parameters)).euler);
+    EULER_UNIFORM<TV>& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters)).euler);
     ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=euler.euler_projection.elliptic_solver->psi_N;
     EOS_GAMMA<T>* gamma_law=dynamic_cast<EOS_GAMMA<T>*>(euler.eos);  // This isobaric fix depends on the EOS being a gamma law
     const T gamma=gamma_law->gamma;

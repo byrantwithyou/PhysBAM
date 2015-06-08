@@ -85,7 +85,7 @@ public:
     int number_of_threads;
     bool override_output_directory;
 
-    FLUID_STRESS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
+    FLUID_STRESS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     ~FLUID_STRESS_BASE();
 
     void After_Initialize_Example();

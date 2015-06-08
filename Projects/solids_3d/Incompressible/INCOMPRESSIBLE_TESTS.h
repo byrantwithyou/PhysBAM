@@ -65,7 +65,7 @@ class INCOMPRESSIBLE_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
-    using BASE::Time_At_Frame;using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;using BASE::parse_args;using BASE::mpi_world;
+    using BASE::Time_At_Frame;using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;using BASE::mpi_world;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -105,11 +105,46 @@ public:
     T tori_max_angular_velocity;
     ARRAY<RIGID_BODY_STATE<TV> > tori_initial_states;
 
-    INCOMPRESSIBLE_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),test_poissons_ratio((T).5),hittime(1),
+    INCOMPRESSIBLE_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),test_poissons_ratio((T).5),hittime(1),
         minimum_volume_recovery_time_scale(0),high_resolution(false),stiffen(1),max_cg_iterations(20),solids_cg_tolerance((T)1e-3),
         ground_friction(0),merge_at_boundary(false),tori_m(2),tori_n(2),tori_mn(2),tori_base_height((T)1.5),tori_max_angular_velocity(2)
     {
+        parse_args.Add("-poisson",&test_poissons_ratio,"","poisson's ratio for test 24");
+        parse_args.Add("-stiffen",&stiffen,"","stiffness multiplier for various tests");
+        parse_args.Add_Not("-noself",&solids_parameters.triangle_collision_parameters.perform_self_collision,"disable self-collisions");
+        parse_args.Add("-hittime",&hittime,"time","time required for splat");
+        parse_args.Add("-hires",&high_resolution,"use high resolution objects");
+        parse_args.Add("-cgincomp",&max_cg_iterations,"iterations","maximum number of CG iterations for incompressible pressure solves");
+        parse_args.Add("-project",&merge_at_boundary,"Combine boundary one-rings with neighbors");
+        parse_args.Add("-cgsolids",&solids_cg_tolerance,"tol","CG tolerance for backward Euler");
+        parse_args.Add("-min_volume_recovery_time_scale",&minimum_volume_recovery_time_scale,"value","Minimum dt over which entire volume may be recovered");
+        parse_args.Add_Not("-noneumann",&use_neumann,"Do not apply Neumann boundary conditions");
+        parse_args.Add("-ground_friction",&ground_friction,"value","Ground friction");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+        LOG::cout<<"Running Incompressible Test Number "<<test_number<<std::endl;
+        output_directory=LOG::sprintf("Incompressible/Test_%d",test_number);
+        if(frame_rate!=24) output_directory+=LOG::sprintf("_fr%g",frame_rate);
+        if(minimum_volume_recovery_time_scale) output_directory+=LOG::sprintf("_mvrts%g",minimum_volume_recovery_time_scale);
+    
+        if(test_poissons_ratio!=(T).5) output_directory+=LOG::sprintf("_p%g",test_poissons_ratio);
+        if(hittime!=1) output_directory+=LOG::sprintf("_ht%g",hittime);
+        if(high_resolution) output_directory+="_hires";
+        LOG::Stat("stiffen",stiffen);
+        if(stiffen!=1) output_directory+=LOG::sprintf("_stiff%g",stiffen);
+        if(max_cg_iterations!=20) output_directory+=LOG::sprintf("_cgi%d",max_cg_iterations);
+        if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7) output_directory+=LOG::sprintf("_cgs%g",solids_cg_tolerance);
+        if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7 && (test_number==7 || test_number==8 || test_number==10)) solids_cg_tolerance=(T)1e-2;
+        if(merge_at_boundary) output_directory+="_bound";
+        if(!use_neumann) output_directory+="_noneumann";
+        if(ground_friction) output_directory+=LOG::sprintf("_fric%g",ground_friction);
+    
+        if(hittime!=1) tori_n=(int)hittime;
+
+        solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+        LOG::cout<<"perform self collisions: "<<solids_parameters.triangle_collision_parameters.perform_self_collision<<std::endl;
     }
 
     virtual ~INCOMPRESSIBLE_TESTS()
@@ -130,54 +165,7 @@ public:
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
     void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options()
-{
-    BASE::Register_Options();
-    parse_args->Add("-poisson",&test_poissons_ratio,"","poisson's ratio for test 24");
-    parse_args->Add("-stiffen",&stiffen,"","stiffness multiplier for various tests");
-    parse_args->Add_Not("-noself",&solids_parameters.triangle_collision_parameters.perform_self_collision,"disable self-collisions");
-    parse_args->Add("-hittime",&hittime,"time","time required for splat");
-    parse_args->Add("-hires",&high_resolution,"use high resolution objects");
-    parse_args->Add("-cgincomp",&max_cg_iterations,"iterations","maximum number of CG iterations for incompressible pressure solves");
-    parse_args->Add("-project",&merge_at_boundary,"Combine boundary one-rings with neighbors");
-    parse_args->Add("-cgsolids",&solids_cg_tolerance,"tol","CG tolerance for backward Euler");
-    parse_args->Add("-min_volume_recovery_time_scale",&minimum_volume_recovery_time_scale,"value","Minimum dt over which entire volume may be recovered");
-    parse_args->Add_Not("-noneumann",&use_neumann,"Do not apply Neumann boundary conditions");
-    parse_args->Add("-ground_friction",&ground_friction,"value","Ground friction");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options()
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    LOG::cout<<"Running Incompressible Test Number "<<test_number<<std::endl;
-    output_directory=LOG::sprintf("Incompressible/Test_%d",test_number);
-    if(frame_rate!=24) output_directory+=LOG::sprintf("_fr%g",frame_rate);
-    if(minimum_volume_recovery_time_scale) output_directory+=LOG::sprintf("_mvrts%g",minimum_volume_recovery_time_scale);
-    
-    if(test_poissons_ratio!=(T).5) output_directory+=LOG::sprintf("_p%g",test_poissons_ratio);
-    if(hittime!=1) output_directory+=LOG::sprintf("_ht%g",hittime);
-    if(high_resolution) output_directory+="_hires";
-    LOG::Stat("stiffen",stiffen);
-    if(stiffen!=1) output_directory+=LOG::sprintf("_stiff%g",stiffen);
-    if(max_cg_iterations!=20) output_directory+=LOG::sprintf("_cgi%d",max_cg_iterations);
-    if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7) output_directory+=LOG::sprintf("_cgs%g",solids_cg_tolerance);
-    if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7 && (test_number==7 || test_number==8 || test_number==10)) solids_cg_tolerance=(T)1e-2;
-    if(merge_at_boundary) output_directory+="_bound";
-    if(!use_neumann) output_directory+="_noneumann";
-    if(ground_friction) output_directory+=LOG::sprintf("_fric%g",ground_friction);
-    
-    if(hittime!=1) tori_n=(int)hittime;
-
-    solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-    LOG::cout<<"perform self collisions: "<<solids_parameters.triangle_collision_parameters.perform_self_collision<<std::endl;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Collide_With_Soft_Bound_Copy
 //#####################################################################

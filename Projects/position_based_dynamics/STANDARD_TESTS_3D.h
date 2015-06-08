@@ -23,7 +23,7 @@ class STANDARD_TESTS<VECTOR<T,3> >:public STANDARD_TESTS_BASE<VECTOR<T,3> >
 public:
     using BASE::test_number;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 
     void Write_Output_Files(const int frame) PHYSBAM_OVERRIDE;

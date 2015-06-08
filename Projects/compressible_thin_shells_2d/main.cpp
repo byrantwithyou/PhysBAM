@@ -12,9 +12,9 @@ int main(int argc,char* argv[]){
 
     typedef float T;
     if(run_strawman_example){
-        STRAWMAN_EXAMPLE<VECTOR<T,2> > example;
         PARSE_ARGS parse_args(argc,argv);
-        example.Parse(parse_args);
+        STRAWMAN_EXAMPLE<VECTOR<T,2> > example(parse_args);
+        example.After_Construction();
         STRAWMAN_DRIVER<VECTOR<T,2> > driver(example);
         example.Initialize();
         driver.Execute_Main_Program();}

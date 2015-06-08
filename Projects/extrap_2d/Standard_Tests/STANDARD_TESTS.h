@@ -88,7 +88,7 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solids_evolution;
-    using BASE::parse_args;using BASE::test_number;using BASE::data_directory;
+    using BASE::test_number;using BASE::data_directory;
 
     std::ofstream svout;
 
@@ -138,8 +138,8 @@ public:
     T ether_drag;
     bool project_nullspace,opt_residuals;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
         use_extended_neohookean2(false),use_extended_neohookean3(false),use_rc_ext(false),use_rc2_ext(false),use_extended_neohookean_refined(false),
         use_corotated(false),use_corotated_fixed(false),
         dump_sv(false),kinematic_id(0),kinematic_id2(0),print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),
@@ -147,6 +147,120 @@ public:
         input_poissons_ratio(-1),input_youngs_modulus(0),test_model_only(false),plot_energy_density(false),energy_mesh(0),energy_profile_plot(false),energy_profile_plot_min(0),
         energy_profile_plot_range(0),plot_scale(1),ether_drag(0),project_nullspace(false),opt_residuals(false)
     {
+        solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
+        parse_args.Add("-semi_implicit",&semi_implicit,"use semi implicit forces");
+        parse_args.Add("-test_forces",&test_forces,"use fully implicit forces");
+        parse_args.Add("-use_ext_neo",&use_extended_neohookean,"use_extended_neohookean");
+        parse_args.Add("-use_ext_neo2",&use_extended_neohookean2,"use_extended_neohookean2");
+        parse_args.Add("-use_ext_neo3",&use_extended_neohookean3,"use_extended_neohookean3");
+        parse_args.Add("-use_rc_ext",&use_rc_ext,"use_rc_ext");
+        parse_args.Add("-use_rc2_ext",&use_rc2_ext,"use_rc2_ext");
+        parse_args.Add("-use_ext_neo_ref",&use_extended_neohookean_refined,"use_extended_neohookean_refined");
+        parse_args.Add("-use_corotated",&use_corotated,"use_corotated");
+        parse_args.Add("-use_corotated_fixed",&use_corotated_fixed,"use_corotated_fixed");
+        parse_args.Add("-dump_sv",&dump_sv,"dump_sv");
+        parse_args.Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
+        parse_args.Add("-stiffen",&stiffness_multiplier,"","stiffness multiplier for various tests");
+        parse_args.Add("-dampen",&damping_multiplier,"","damping multiplier for various tests");
+        parse_args.Add("-residuals",&opt_residuals,"print residuals during timestepping");
+        parse_args.Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+        parse_args.Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"value","CG tolerance for backward Euler");
+        parse_args.Add_Not("-use_be",&solids_parameters.use_trapezoidal_rule_for_velocities,"use backward euler");
+        parse_args.Add("-print_matrix",&print_matrix,"print_matrix");
+        parse_args.Add("-project_nullspace",&project_nullspace,"project out nullspace");
+        parse_args.Add("-projection_iterations",&solids_parameters.implicit_solve_parameters.cg_projection_iterations,"value","number of iterations used for projection in cg");
+        parse_args.Add("-solver_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"value","number of iterations used for solids system");
+        parse_args.Add("-use_constant_ife",&use_constant_ife,"use constant extrapolation on inverting finite element fix");
+        parse_args.Add("-stretch",&stretch,"value","stretch");
+        parse_args.Add("-plot_contour",&primary_contour,"value","plot primary contour");
+        parse_args.Add("-energy_profile_plot",&energy_profile_plot,"plot energy profiles");
+        parse_args.Add("-image_size",&image_size,"value","image size for plots");
+        parse_args.Add("-sigma_range",&sigma_range,"value","sigma range for plots");
+        parse_args.Add("-poissons_ratio",&poissons_ratio,"value","poisson's ratio");
+        parse_args.Add("-scatter_plot",&scatter_plot,"Create contrail plot with singular values");
+        parse_args.Add("-use_contrails",&use_contrails,"Show contrails in plot");
+        parse_args.Add("-cutoff",&input_cutoff,"value","cutoff");
+        parse_args.Add("-efc",&input_efc,"value","efc");
+        parse_args.Add("-poissons_ratio",&input_poissons_ratio,"value","poissons_ratio");
+        parse_args.Add("-youngs_modulus",&input_youngs_modulus,"value","youngs modulus, only for test 41 so far");
+        parse_args.Add("-test_model_only",&test_model_only,"test_model_only");
+        parse_args.Add("-test_system",&solids_parameters.implicit_solve_parameters.test_system,"test_system");
+        parse_args.Add("-plot_scale",&plot_scale,"value","Scale height of energy plot");
+        parse_args.Add("-ether_drag",&ether_drag,"value","Ether drag");
+        parse_args.Add("-plot_energy_density",&plot_energy_density,"plot_energy_density");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+        LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        last_frame=1000;
+        if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
+        solid_body_collection.Print_Residuals(opt_residuals);
+    
+        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+
+        switch(test_number){
+            case 20: case 21: case 26: 
+                mattress_grid=GRID<TV>(TV_INT(40,8),RANGE<TV>(TV((T)-2,(T)-.4),TV((T)2,(T).4)));
+                break;
+            case 22: case 23: case 24: case 25: case 27: case 30:
+                mattress_grid=GRID<TV>(TV_INT(parameter?parameter+1:11,parameter?parameter+1:11),RANGE<TV>(TV((T)-.9,(T)-.9),TV((T).9,(T).9)));
+                break;
+            case 28: 
+                mattress_grid=GRID<TV>(TV_INT(80,16),RANGE<TV>(TV((T)-2,(T)-.4),TV((T)2,(T).4)));
+                break;
+            default:
+                mattress_grid=GRID<TV>(TV_INT(parameter?parameter+1:11,parameter?parameter+1:11),RANGE<TV>(TV((T)-1,(T)-1),TV((T)1,(T)1)));
+                break;
+        }
+
+        switch(test_number){
+            case 24:
+            case 25:
+            case 26:
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.implicit_solve_parameters.cg_iterations=900;
+                solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+                last_frame=1500;
+                break;
+            case 8: 
+            case 13:
+            case 14:
+            case 16:
+            case 22:
+            case 21:
+            case 17:
+            case 18:
+            case 19:
+            case 29:
+            case 34:
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                last_frame=200;
+                break;
+            case 23: 
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                last_frame=500;
+                break;
+            case 20: case 28:
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.implicit_solve_parameters.cg_iterations=900;
+                solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
+                //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+                attachment_velocity=TV((T).8,0);
+                last_frame=480;
+                break;         
+            case 27: case 270: case 30: case 31: case 32: case 33: case 100:
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.implicit_solve_parameters.cg_iterations=900;
+                solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+                last_frame=2000;
+                if(test_number==33) last_frame=1;
+                if(test_number==31) last_frame=250;
+                break;
+            default:
+                LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
+
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     }
 
     // Unused callbacks
@@ -250,133 +364,7 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     //void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
-    parse_args->Add("-semi_implicit",&semi_implicit,"use semi implicit forces");
-    parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
-    parse_args->Add("-use_ext_neo",&use_extended_neohookean,"use_extended_neohookean");
-    parse_args->Add("-use_ext_neo2",&use_extended_neohookean2,"use_extended_neohookean2");
-    parse_args->Add("-use_ext_neo3",&use_extended_neohookean3,"use_extended_neohookean3");
-    parse_args->Add("-use_rc_ext",&use_rc_ext,"use_rc_ext");
-    parse_args->Add("-use_rc2_ext",&use_rc2_ext,"use_rc2_ext");
-    parse_args->Add("-use_ext_neo_ref",&use_extended_neohookean_refined,"use_extended_neohookean_refined");
-    parse_args->Add("-use_corotated",&use_corotated,"use_corotated");
-    parse_args->Add("-use_corotated_fixed",&use_corotated_fixed,"use_corotated_fixed");
-    parse_args->Add("-dump_sv",&dump_sv,"dump_sv");
-    parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
-    parse_args->Add("-stiffen",&stiffness_multiplier,"","stiffness multiplier for various tests");
-    parse_args->Add("-dampen",&damping_multiplier,"","damping multiplier for various tests");
-    parse_args->Add("-residuals",&opt_residuals,"print residuals during timestepping");
-    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
-    parse_args->Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"value","CG tolerance for backward Euler");
-    parse_args->Add_Not("-use_be",&solids_parameters.use_trapezoidal_rule_for_velocities,"use backward euler");
-    parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
-    parse_args->Add("-project_nullspace",&project_nullspace,"project out nullspace");
-    parse_args->Add("-projection_iterations",&solids_parameters.implicit_solve_parameters.cg_projection_iterations,"value","number of iterations used for projection in cg");
-    parse_args->Add("-solver_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"value","number of iterations used for solids system");
-    parse_args->Add("-use_constant_ife",&use_constant_ife,"use constant extrapolation on inverting finite element fix");
-    parse_args->Add("-stretch",&stretch,"value","stretch");
-    parse_args->Add("-plot_contour",&primary_contour,"value","plot primary contour");
-    parse_args->Add("-energy_profile_plot",&energy_profile_plot,"plot energy profiles");
-    parse_args->Add("-image_size",&image_size,"value","image size for plots");
-    parse_args->Add("-sigma_range",&sigma_range,"value","sigma range for plots");
-    parse_args->Add("-poissons_ratio",&poissons_ratio,"value","poisson's ratio");
-    parse_args->Add("-scatter_plot",&scatter_plot,"Create contrail plot with singular values");
-    parse_args->Add("-use_contrails",&use_contrails,"Show contrails in plot");
-    parse_args->Add("-cutoff",&input_cutoff,"value","cutoff");
-    parse_args->Add("-efc",&input_efc,"value","efc");
-    parse_args->Add("-poissons_ratio",&input_poissons_ratio,"value","poissons_ratio");
-    parse_args->Add("-youngs_modulus",&input_youngs_modulus,"value","youngs modulus, only for test 41 so far");
-    parse_args->Add("-test_model_only",&test_model_only,"test_model_only");
-    parse_args->Add("-test_system",&solids_parameters.implicit_solve_parameters.test_system,"test_system");
-    parse_args->Add("-plot_scale",&plot_scale,"value","Scale height of energy plot");
-    parse_args->Add("-ether_drag",&ether_drag,"value","Ether drag");
-    parse_args->Add("-plot_energy_density",&plot_energy_density,"plot_energy_density");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-    last_frame=1000;
-    if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
-    solid_body_collection.Print_Residuals(opt_residuals);
-    
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-
-    switch(test_number){
-    case 20: case 21: case 26: 
-            mattress_grid=GRID<TV>(TV_INT(40,8),RANGE<TV>(TV((T)-2,(T)-.4),TV((T)2,(T).4)));
-        break;
-        case 22: case 23: case 24: case 25: case 27: case 30:
-            mattress_grid=GRID<TV>(TV_INT(parameter?parameter+1:11,parameter?parameter+1:11),RANGE<TV>(TV((T)-.9,(T)-.9),TV((T).9,(T).9)));
-        break;
-        case 28: 
-            mattress_grid=GRID<TV>(TV_INT(80,16),RANGE<TV>(TV((T)-2,(T)-.4),TV((T)2,(T).4)));
-            break;
-            default:
-            mattress_grid=GRID<TV>(TV_INT(parameter?parameter+1:11,parameter?parameter+1:11),RANGE<TV>(TV((T)-1,(T)-1),TV((T)1,(T)1)));
-            break;
-    }
-
-    switch(test_number){
-        case 24:
-        case 25:
-        case 26:
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=900;
-            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            last_frame=1500;
-            break;
-        case 8: 
-        case 13:
-        case 14:
-        case 16:
-        case 22:
-        case 21:
-        case 17:
-        case 18:
-        case 19:
-        case 29:
-        case 34:
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            last_frame=200;
-            break;
-        case 23: 
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            last_frame=500;
-            break;
-        case 20: case 28:
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=900;
-            solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
-            //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            attachment_velocity=TV((T).8,0);
-            last_frame=480;
-            break;         
-        case 27: case 270: case 30: case 31: case 32: case 33: case 100:
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=900;
-            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            last_frame=2000;
-            if(test_number==33) last_frame=1;
-            if(test_number==31) last_frame=250;
-            break;
-        default:
-            LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
-
-    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

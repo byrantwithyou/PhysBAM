@@ -53,7 +53,7 @@ public:
     T epsilon,radius;
     int mode;
 
-    FLUID_STRESS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
+    FLUID_STRESS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     ~FLUID_STRESS();
 
     void Initialize_Example();

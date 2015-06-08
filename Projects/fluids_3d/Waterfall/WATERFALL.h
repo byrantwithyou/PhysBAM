@@ -36,10 +36,45 @@ public:
     TV source_velocity;
     MATRIX<T,4> world_to_source;
 
-    WATERFALL(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER),
+    WATERFALL(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,1,fluids_parameters.WATER),
         rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid)
     {
+        parse_args.Parse();
+
+        first_frame=0;last_frame=1000;
+        frame_rate=36;
+        restart=false;restart_frame=18;
+        int cells=1*resolution;
+        fluids_parameters.grid->Initialize(TV_INT(2*cells+1,3*cells+1,2*cells+1),RANGE<TV>(TV(-4,-8,0),TV(4,4,8)));
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.number_particles_per_cell=32;
+        fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
+        fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;
+        fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
+        fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.write_debug_data=true;
+        output_directory=LOG::sprintf("Waterfall/Test_%d_Waterfall_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
+            (fluids_parameters.grid->counts.z-1));
+        fluids_parameters.delete_fluid_inside_objects=true;
+        fluids_parameters.enforce_divergence_free_extrapolation=false;
+        fluids_parameters.store_particle_ids=true;
+        fluids_parameters.second_order_cut_cell_method=true;
+        fluids_parameters.cfl=(T)1.9;
+        fluids_parameters.incompressible_iterations=40;
+        fluids_parameters.solid_affects_fluid=true;
+
+        // MacCormack parameters
+        fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
+        fluids_parameters.use_maccormack_compute_mask=true;
+        fluids_parameters.use_maccormack_for_incompressible=true;
+        fluids_parameters.bandwidth_without_maccormack_near_interface=1;
+
+        // Source parameters
+        source_velocity=TV(0,-1,1);
+        source_box=RANGE<TV>(TV(-2,2,-1),TV(2,3.9,1.5));
+        world_to_source=MATRIX<T,4>::Identity_Matrix();
     }
 
     ~WATERFALL() 
@@ -54,54 +89,7 @@ public:
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    first_frame=0;last_frame=1000;
-    frame_rate=36;
-    restart=false;restart_frame=18;
-    int cells=1*resolution;
-    fluids_parameters.grid->Initialize(TV_INT(2*cells+1,3*cells+1,2*cells+1),RANGE<TV>(TV(-4,-8,0),TV(4,4,8)));
-    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-    fluids_parameters.number_particles_per_cell=32;
-    fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
-    fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;
-    fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
-    fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
-    fluids_parameters.write_debug_data=true;
-    output_directory=LOG::sprintf("Waterfall/Test_%d_Waterfall_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
-        (fluids_parameters.grid->counts.z-1));
-    fluids_parameters.delete_fluid_inside_objects=true;
-    fluids_parameters.enforce_divergence_free_extrapolation=false;
-    fluids_parameters.store_particle_ids=true;
-    fluids_parameters.second_order_cut_cell_method=true;
-    fluids_parameters.cfl=(T)1.9;
-    fluids_parameters.incompressible_iterations=40;
-    fluids_parameters.solid_affects_fluid=true;
-
-    // MacCormack parameters
-    fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
-    fluids_parameters.use_maccormack_compute_mask=true;
-    fluids_parameters.use_maccormack_for_incompressible=true;
-    fluids_parameters.bandwidth_without_maccormack_near_interface=1;
-
-    // Source parameters
-    source_velocity=TV(0,-1,1);
-    source_box=RANGE<TV>(TV(-2,2,-1),TV(2,3.9,1.5));
-    world_to_source=MATRIX<T,4>::Identity_Matrix();
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################

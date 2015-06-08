@@ -61,7 +61,7 @@ public:
     bool use_sound_speed_based_dt_multiple_for_cfl;
     T multiplication_factor_for_sound_speed_based_dt;
 
-    COMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input);
+    COMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~COMPRESSIBLE_EXAMPLE();
     
     T Time_At_Frame(const int frame) const

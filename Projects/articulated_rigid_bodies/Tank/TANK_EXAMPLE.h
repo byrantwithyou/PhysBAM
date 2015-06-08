@@ -29,7 +29,7 @@ class TANK_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
     typedef VECTOR<T,3> TV;typedef SOLIDS_EXAMPLE<TV> BASE;
 public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::solids_parameters;using BASE::data_directory;using BASE::stream_type;
-    using BASE::test_number;using BASE::parse_args;using BASE::solid_body_collection;using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
+    using BASE::test_number;using BASE::solid_body_collection;using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
 
     ARTICULATED_RIGID_BODY<TV>* arb;
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -43,8 +43,8 @@ public:
     int next_slot[68],next_gear[68];
     FRAME<TV> parent_to_joint[10];
 
-    TANK_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),turn_in_place(false),start_on_fridge(false)
+    TANK_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),turn_in_place(false),start_on_fridge(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
@@ -56,6 +56,11 @@ public:
         accelerate_time=(T).8;
         speed=12;
         gear_radius=(T).7;
+        parse_args.Add("-tank_on_fridge",&start_on_fridge,"For the tank example, start on fridge blocks");
+        parse_args.Add("-tank_turn",&turn_in_place,"For the tank example, turn in place instead of move forward");
+        parse_args.Parse();
+        tests.data_directory=data_directory;
+        output_directory="Tank/output";
     }
 
     virtual ~TANK_EXAMPLE()
@@ -77,19 +82,7 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
 
-    void Register_Options() PHYSBAM_OVERRIDE
-    {
-        BASE::Register_Options();
-        parse_args->Add("-tank_on_fridge",&start_on_fridge,"For the tank example, start on fridge blocks");
-        parse_args->Add("-tank_turn",&turn_in_place,"For the tank example, turn in place instead of move forward");
-    }
-    void Parse_Options() PHYSBAM_OVERRIDE
-    {
-        BASE::Parse_Options();
-        tests.data_directory=data_directory;
-        output_directory="Tank/output";
-    }
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Rigid_Bodies
 //#####################################################################

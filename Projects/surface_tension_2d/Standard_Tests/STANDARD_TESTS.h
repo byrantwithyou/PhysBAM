@@ -72,7 +72,7 @@ public:
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;
-    using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::data_directory;
+    using BASE::test_number;using BASE::resolution;using BASE::data_directory;
 
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
 
@@ -115,7 +115,7 @@ public:
     T solid_density,solid_width,analytic_solution,linear_force,rand;
     bool use_viscosity;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type);
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 
     // Unused callbacks
@@ -146,9 +146,7 @@ public:
 //#####################################################################
     void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE;
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
-    void Parse_Late_Options() PHYSBAM_OVERRIDE;
+    void After_Initialization() PHYSBAM_OVERRIDE;
     void Initialize_Advection() PHYSBAM_OVERRIDE;
     void Initialize_Phi() PHYSBAM_OVERRIDE;
     void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE;

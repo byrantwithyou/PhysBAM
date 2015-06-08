@@ -46,36 +46,22 @@ class STANDARD_TESTS<VECTOR<T_input,3> >:public STANDARD_TESTS_BASE<VECTOR<T_inp
     typedef VECTOR<int,2> IV;
 public:
     typedef STANDARD_TESTS_BASE<TV> BASE;
-    using BASE::solid_body_collection;using BASE::stream_type;using BASE::solids_evolution;using BASE::parse_args;
+    using BASE::solid_body_collection;using BASE::stream_type;using BASE::solids_evolution;
     using BASE::test_number;using BASE::data_directory;using BASE::m;using BASE::s;using BASE::kg;
     using BASE::tests;using BASE::density;using BASE::Get_Initial_Data_After;using BASE::use_penalty_self_collisions;
     using BASE::Initialize_Bodies_After;using BASE::point_curves;using BASE::kinematic_points;
     using BASE::thickness_multiplier;using BASE::stiffness_multiplier;using BASE::resolution;
     using BASE::rand;using BASE::gauss_order;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type_input)
-        :BASE(stream_type_input)
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args)
     {
+        parse_args.Parse();
     }
 
     virtual ~STANDARD_TESTS()
     {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-//    parse_args->Add("-opt",&here,"meaning");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

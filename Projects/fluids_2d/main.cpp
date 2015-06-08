@@ -72,17 +72,17 @@ int main(int argc,char* argv[])
     parse_args.Parse(true);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
-    if(opt_sph) example=new STANDARD_TESTS_SPH<T>(stream_type);
-    else if(opt_multiphase) example=new STANDARD_TESTS_MULTIPHASE<T>(stream_type);
-    else if(opt_twophase) example=new TWO_PHASE<T>(stream_type);
-    else if(opt_fire) example=new MULTIPHASE_FIRE_EXAMPLES<T>(stream_type);
-    else if(opt_density) example=new DENSITY_TARGETTING<T>(stream_type);
-    else if(opt_glass) example=new GLASS<T>(stream_type);
-    else if(opt_smoke) example=new STANDARD_TESTS_SMOKE<T>(stream_type);
-    else if(opt_spinning_bar) example=new SPINNING_BAR<T>(stream_type);
-    else if(opt_refinement) example=new REFINEMENT<T>(stream_type);
-    else if(opt_flow_cylinder) example=new FLOW_PAST_CIRCLE<T>(stream_type);
-    else example=new STANDARD_TESTS<T>(stream_type);
+    if(opt_sph) example=new STANDARD_TESTS_SPH<T>(stream_type,parse_args);
+    else if(opt_multiphase) example=new STANDARD_TESTS_MULTIPHASE<T>(stream_type,parse_args);
+    else if(opt_twophase) example=new TWO_PHASE<T>(stream_type,parse_args);
+    else if(opt_fire) example=new MULTIPHASE_FIRE_EXAMPLES<T>(stream_type,parse_args);
+    else if(opt_density) example=new DENSITY_TARGETTING<T>(stream_type,parse_args);
+    else if(opt_glass) example=new GLASS<T>(stream_type,parse_args);
+    else if(opt_smoke) example=new STANDARD_TESTS_SMOKE<T>(stream_type,parse_args);
+    else if(opt_spinning_bar) example=new SPINNING_BAR<T>(stream_type,parse_args);
+    else if(opt_refinement) example=new REFINEMENT<T>(stream_type,parse_args);
+    else if(opt_flow_cylinder) example=new FLOW_PAST_CIRCLE<T>(stream_type,parse_args);
+    else example=new STANDARD_TESTS<T>(stream_type,parse_args);
     //BREAKING_WAVE<T> example(stream_type,omega,epsilon,depth);;
     //RISING_BUBBLE<T> example(stream_type);
     //IMPLICIT_VISCOSITY<T> example(stream_type);
@@ -102,10 +102,10 @@ int main(int argc,char* argv[])
     //MERGING_FLAME<T> example(stream_type);
     //PLANE_JUMP<T> example(stream_type);
     //SOLID_FLUID_COUPLING_TEST<T> example(stream_type,example_number);
-    //example=new ELASTIC_DRIP<T>(stream_type);
-    //example=new FLUID_CONTROL<T>(stream_type);
-    example->want_mpi_world=true;
-    example->Parse(parse_args);
+    //example=new ELASTIC_DRIP<T>(stream_type,parse_args);
+    //example=new FLUID_CONTROL<T>(stream_type,parse_args);
+    example->mpi_world=new MPI_WORLD(parse_args);
+    example->After_Construction();
     
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example->fluids_parameters;
     if(example->mpi_world->initialized)

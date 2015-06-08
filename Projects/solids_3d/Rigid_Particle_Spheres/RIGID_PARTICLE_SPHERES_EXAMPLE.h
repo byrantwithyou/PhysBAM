@@ -27,15 +27,17 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::data_directory;
     using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;
-    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
+    using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     SEGMENT_MESH segment_mesh;
 
-    RIGID_PARTICLE_SPHERES_EXAMPLE(const STREAM_TYPE stream_type):
-        BASE(stream_type),tests(stream_type,data_directory,solid_body_collection)
+    RIGID_PARTICLE_SPHERES_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args):
+        BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection)
     {
+        parse_args.Parse();
+        tests.data_directory=data_directory;
     }
 
     // unused callbacks
@@ -52,22 +54,7 @@ public:
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options()
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options()
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Initialize_Bodies
 //#####################################################################

@@ -35,7 +35,7 @@ class SIMPLE_HARD_BINDING_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
-    using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
+    using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -50,10 +50,16 @@ public:
     ARRAY<BINDING<TV>*> redgreen_bindings;
     ARRAY<T> refinement_distance;
 
-    SIMPLE_HARD_BINDING_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),surface(0),redgreen(0),subsamples(6),sphere_scale((T).05),dynamic_subsampling(false),
+    SIMPLE_HARD_BINDING_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),surface(0),redgreen(0),subsamples(6),sphere_scale((T).05),dynamic_subsampling(false),
         refinement_level(3),refinement_distance(2)
     {
+        parse_args.Add("-subsamples",&subsamples,"value","subsamples");
+        parse_args.Add("-sphere_scale",&sphere_scale,"value","sphere scale");
+        parse_args.Add("-radius",&refinement_distance(1),"value","radius");
+        parse_args.Add("-dynamic",&dynamic_subsampling,"dynamic");
+        parse_args.Parse();
+        tests.data_directory=data_directory;
     }
 
     virtual ~SIMPLE_HARD_BINDING_EXAMPLE()
@@ -73,26 +79,7 @@ public:
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options()
-{
-    BASE::Register_Options();
-    parse_args->Add("-subsamples",&subsamples,"value","subsamples");
-    parse_args->Add("-sphere_scale",&sphere_scale,"value","sphere scale");
-    parse_args->Add("-radius",&refinement_distance(1),"value","radius");
-    parse_args->Add("-dynamic",&dynamic_subsampling,"dynamic");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options()
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-}    
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Redgreen
 //#####################################################################

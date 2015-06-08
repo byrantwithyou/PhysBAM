@@ -23,14 +23,17 @@ public:
     typedef VECTOR<T,3> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
-    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
+    using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
 
     WATER_STANDARD_TESTS_3D<TV> tests;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER),
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,1,fluids_parameters.WATER),
         tests(*this,fluids_parameters,solid_body_collection.rigid_body_collection)
     {
+        parse_args.Parse();
+        tests.Initialize(test_number,resolution);
+        *fluids_parameters.grid=tests.grid;
     }
 
     ~STANDARD_TESTS()
@@ -49,23 +52,7 @@ public:
     void Initialize_Euler_State() PHYSBAM_OVERRIDE {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.Initialize(test_number,resolution);
-    *fluids_parameters.grid=tests.grid;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

@@ -49,7 +49,7 @@ protected:
     MULTIPLE_LEVELSET_IMPLICIT_SURFACE<T> multiple_levelset_implicit_surface;
 public:
 
-    MESHING_EXAMPLE(const STREAM_TYPE stream_type)
+    MESHING_EXAMPLE(const STREAM_TYPE stream_type_input)
         :stream_type(stream_type),tetrahedral_meshing(stream_type),use_multiple_levelset_implicit_surface(false),
         bcc_lattice_cell_size(0),use_adaptive_refinement(true),max_subdivision_levels(7),
         use_optimization(true),use_dynamics(true),

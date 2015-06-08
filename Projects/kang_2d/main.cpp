@@ -23,9 +23,9 @@ int main(int argc,char* argv[])
     STREAM_TYPE stream_type((RW()));
 
     PLS_FSI_EXAMPLE<TV>* example=0;
-    example=new KANG<T>(stream_type);
     PARSE_ARGS parse_args(argc,argv);
-    example->Parse(parse_args);
+    example=new KANG<T>(stream_type,parse_args);
+    example->After_Construction();
     PLS_FSI_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();
     delete example;

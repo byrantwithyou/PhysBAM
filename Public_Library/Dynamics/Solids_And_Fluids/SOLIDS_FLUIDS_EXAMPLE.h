@@ -31,7 +31,7 @@ class SOLIDS_FLUIDS_EXAMPLE:public EXAMPLE<TV>,public EXTERNAL_STRAIN_ADJUSTMENT
     typedef typename TV::SPIN T_SPIN;
     typedef EXAMPLE<TV> BASE;
 public:
-    using EXAMPLE_FORCES_AND_VELOCITIES<TV>::Set_External_Positions;using BASE::parse_args; // silence -Woverloaded-virtual
+    using EXAMPLE_FORCES_AND_VELOCITIES<TV>::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::output_directory;using BASE::frame_title;using BASE::stream_type;using BASE::initial_time;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;
     using BASE::write_last_frame;using BASE::write_time;using BASE::write_substeps_level;using BASE::Set_Write_Substeps_Level;//using BASE::data_directory;
     using BASE::restart;
@@ -46,7 +46,7 @@ public:
     SOLIDS_EVOLUTION<TV>* solids_evolution; // defaults to newmark
     bool opt_solidssymmqmr,opt_solidscr,opt_solidscg;
 
-    SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type);
+    SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
     virtual ~SOLIDS_FLUIDS_EXAMPLE();
 
     void Set_Minimum_Collision_Thickness(const T minimum_collision_thickness_input=1e-6)
@@ -79,8 +79,7 @@ public:
     virtual void Melting_Substep(const T dt,const T time);
     virtual void Modify_Fluid_For_Melting(const T dt,const T time);
     virtual void Update_Melting_Substep_Parameters(const T dt,const T time);
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Late_Options() PHYSBAM_OVERRIDE;
+    void After_Initialization() PHYSBAM_OVERRIDE;
     template<class T_MPI> void Adjust_Output_Directory_For_MPI(const T_MPI mpi);
 //#####################################################################
 };

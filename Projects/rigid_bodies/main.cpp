@@ -22,10 +22,10 @@ int main(int argc,char* argv[])
     parse_args.Add("-testmpi",&opt_testmpi,"Use testmpi test");
     parse_args.Parse(true);
 
-    if(opt_testmpi) example=new MPI_EXAMPLE<T>(stream_type);
-    else example=new STANDARD_TESTS<T>(stream_type);
-    example->want_mpi_world=true;
-    example->Parse(parse_args);
+    if(opt_testmpi) example=new MPI_EXAMPLE<T>(stream_type,parse_args);
+    else example=new STANDARD_TESTS<T>(stream_type,parse_args);
+    example->mpi_world=new MPI_WORLD(parse_args);
+    example->After_Construction();
 
     SOLIDS_EXAMPLE<TV>* solid_fluid_example=dynamic_cast<SOLIDS_EXAMPLE<TV>*>(example);
     SOLIDS_DRIVER<TV> driver(*solid_fluid_example);

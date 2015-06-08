@@ -18,7 +18,7 @@ EULER()
     use_force=false;
     boundary=&boundary_default;
     conservation=&conservation_default;
-    if(use_solid_velocity_in_ghost_cells) conservation->Set_Custom_Object_Boundary(*new BOUNDARY_OBJECT_SOLID_VELOCITY<TV >);
+    if(use_solid_velocity_in_ghost_cells) conservation->Set_Custom_Object_Boundary(*new BOUNDARY_OBJECT_SOLID_VELOCITY<TV>);
     else conservation->Set_Custom_Object_Boundary(*new BOUNDARY_OBJECT_EULER<TV>);
     eos=&eos_default;
     Set_Max_Time_Step();

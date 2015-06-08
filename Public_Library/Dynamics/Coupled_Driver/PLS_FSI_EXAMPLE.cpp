@@ -62,8 +62,8 @@ namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const 
 #pragma warning(disable:4355) // 'this' : used in base member initializer list
 #endif
 template<class TV_input> PLS_FSI_EXAMPLE<TV_input>::
-PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
-    :BASE(stream_type),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
+PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int number_of_regions)
+    :BASE(stream_type,parse_args),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
     solid_body_collection(*new SOLID_BODY_COLLECTION<TV>),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
     fluids_parameters(number_of_regions,FLUIDS_PARAMETERS<TV>::WATER),fluid_collection(*fluids_parameters.grid),resolution(8),convection_order(1),
     use_pls_evolution_for_structure(false),two_phase(false),use_kang(false),print_matrix(false),test_system(false),kang_poisson_viscosity(0),
@@ -71,6 +71,14 @@ PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
 {
     Set_Minimum_Collision_Thickness();
     Set_Write_Substeps_Level(-1);
+
+    parse_args.Add("-solidscfl",&solids_parameters.cfl,"cfl","solids CFL");
+    parse_args.Add("-solidscg",&opt_solidscg,"Use CG for time integration");
+    parse_args.Add("-solidscr",&opt_solidscr,"Use CONJUGATE_RESIDUAL for time integration");
+    parse_args.Add("-solidssymmqmr",&opt_solidssymmqmr,"Use SYMMQMR for time integration");
+    parse_args.Add("-rigidcfl",&solids_parameters.rigid_body_evolution_parameters.rigid_cfl,"cfl","rigid CFL");
+    parse_args.Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
+    parse_args.Add("-resolution",&resolution,"resolution","simulation resolution");
 }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -88,28 +96,12 @@ template<class TV_input> PLS_FSI_EXAMPLE<TV_input>::
     delete &solids_fluids_parameters;
 }
 //#####################################################################
-// Function Register_Options
+// Function After_Construction
 //#####################################################################
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
-Register_Options()
+After_Construction()
 {
-    if(!parse_args) return;
-    BASE::Register_Options();
-    parse_args->Add("-solidscfl",&solids_parameters.cfl,"cfl","solids CFL");
-    parse_args->Add("-solidscg",&opt_solidscg,"Use CG for time integration");
-    parse_args->Add("-solidscr",&opt_solidscr,"Use CONJUGATE_RESIDUAL for time integration");
-    parse_args->Add("-solidssymmqmr",&opt_solidssymmqmr,"Use SYMMQMR for time integration");
-    parse_args->Add("-rigidcfl",&solids_parameters.rigid_body_evolution_parameters.rigid_cfl,"cfl","rigid CFL");
-    parse_args->Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
-    parse_args->Add("-resolution",&resolution,"resolution","simulation resolution");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
-Parse_Options()
-{
-    BASE::Parse_Options();
+    BASE::After_Construction();
     fluids_parameters.write_debug_data=!opt_skip_debug_data;
 }
 //#####################################################################
@@ -354,13 +346,12 @@ Read_Output_Files_Solids(const int frame)
     //    newmark->Read_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
 }
 //#####################################################################
-// Function Parse_Late_Options
+// Function After_Initialization
 //#####################################################################
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
-Parse_Late_Options()
+After_Initialization()
 {
-    if(!parse_args) return;
-    BASE::Parse_Late_Options();
+    BASE::After_Initialization();
     if(opt_solidscg) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
     if(opt_solidscr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
     if(opt_solidssymmqmr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;

@@ -47,14 +47,14 @@ int main(int argc,char** argv)
     parse_args.Parse(true);
 
     EXAMPLE<TV>* example=0;
-    if(opt_tank) example=new TANK_EXAMPLE<T>(stream_type);
-    else if(opt_mesh) example=new MESH_EXAMPLE<T>(stream_type);
-    else if(opt_chains) example=new CHAINS_EXAMPLE<T>(stream_type);
-    else if(opt_bridge) example=new BRIDGE_EXAMPLE<T>(stream_type);
-    else if(opt_magnets) example=new MAGNETS_EXAMPLE<T>(stream_type);
-    else if(opt_curl) example=new CURL_EXAMPLE<T>(stream_type);
-    else example=new STANDARD_TESTS<T>(stream_type);
-    example->Parse(parse_args);
+    if(opt_tank) example=new TANK_EXAMPLE<T>(stream_type,parse_args);
+    else if(opt_mesh) example=new MESH_EXAMPLE<T>(stream_type,parse_args);
+    else if(opt_chains) example=new CHAINS_EXAMPLE<T>(stream_type,parse_args);
+    else if(opt_bridge) example=new BRIDGE_EXAMPLE<T>(stream_type,parse_args);
+    else if(opt_magnets) example=new MAGNETS_EXAMPLE<T>(stream_type,parse_args);
+    else if(opt_curl) example=new CURL_EXAMPLE<T>(stream_type,parse_args);
+    else example=new STANDARD_TESTS<T>(stream_type,parse_args);
+    example->After_Construction();
 
     SOLIDS_EXAMPLE<TV>* solid_fluid_example=dynamic_cast<SOLIDS_EXAMPLE<TV>*>(example);
     SOLIDS_DRIVER<TV> driver(*solid_fluid_example);

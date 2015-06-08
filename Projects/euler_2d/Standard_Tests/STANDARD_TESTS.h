@@ -46,7 +46,7 @@ public:
 
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
     using BASE::solids_fluids_parameters;using BASE::Add_To_Fluid_Simulation;
-    using BASE::stream_type;using BASE::data_directory;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
+    using BASE::stream_type;using BASE::data_directory;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     SEGMENTED_CURVE_2D<T>* boundary;
@@ -74,10 +74,95 @@ public:
     4. Rigid Diamond lift-off.
     ***************/
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(stream_type,data_directory,solid_body_collection),boundary(0),spring_factor(1),rigid_body_collection(solid_body_collection.rigid_body_collection),
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args,0,fluids_parameters.COMPRESSIBLE),tests(stream_type_input,data_directory,solid_body_collection),boundary(0),spring_factor(1),rigid_body_collection(solid_body_collection.rigid_body_collection),
         eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).6),timesplit(false),exact(false),use_slip(false)
-    {}
+    {
+        parse_args.Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+        parse_args.Add("-eno_order",&eno_order,"eno_order","eno order");
+        parse_args.Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+        parse_args.Add("-cfl",&cfl_number,"CFL","cfl number");
+        parse_args.Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+        parse_args.Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
+        parse_args.Add("-spring_factor",&spring_factor,"factor","spring factor");
+        parse_args.Add("-slip",&use_slip,"use slip/spd for coupling");
+        parse_args.Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"Do not use preconditioner for slip system");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+        timesplit=timesplit && !exact;
+        if(resolution==1) resolution=50; // Stupid hack for a bad default parameter.
+
+        //grid
+        int cells=resolution;
+        if(test_number==1 || test_number==3 || test_number==4){
+            fluids_parameters.grid->Initialize(TV_INT(5,1)*cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).2)));
+            *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
+            fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+            fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+    
+            initial_time=(T)0.;last_frame=350;frame_rate=(T)1000.;}
+        else{
+            fluids_parameters.grid->Initialize(TV_INT(4,3)*cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).75)));
+            *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
+            fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;
+            fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+
+            initial_time=(T)0.;last_frame=10;frame_rate=(T)10000.;}
+
+        fluids_parameters.cfl=cfl_number;
+        //custom stuff . . . 
+        fluids_parameters.compressible_eos=new EOS_GAMMA<T>;
+
+        if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
+        else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
+        else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
+        fluids_parameters.compressible_spatial_order=eno_order;
+        //fluids_parameters.compressible_conservation_method->Save_Fluxes();
+        //fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,1e-6);
+        fluids_parameters.compressible_rungekutta_order=rk_order;
+        fluids_parameters.compressible_timesplit=timesplit;
+        fluids_parameters.solve_neumann_regions=false;
+
+        fluids_parameters.use_slip=use_slip;
+        fluids_parameters.use_preconditioner_for_slip_system=true;
+
+        if(test_number==1 || test_number==2 || test_number==3 || test_number==4){
+            fluids_parameters.solid_affects_fluid=true;
+            fluids_parameters.fluid_affects_solid=true;
+            solids_fluids_parameters.use_leakproof_solve=false;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+            solids_parameters.rigid_body_collision_parameters.use_push_out=true;
+            solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1;
+            solids_parameters.use_trapezoidal_rule_for_velocities=false;
+            solids_parameters.verbose_dt=true;
+            solid_body_collection.print_residuals=false;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-16;
+            solids_parameters.implicit_solve_parameters.cg_projection_iterations=0; // TODO: check this
+            solids_parameters.implicit_solve_parameters.cg_iterations=400;
+        }
+
+        if(test_number==1 || test_number==3 || test_number==4){
+            state_left=TV_DIMENSION((T)5.4,(T)2.2222222222222,(T)0,(T)10.3333333333333);
+            state_right=TV_DIMENSION((T)1.4,(T)0,(T)0,(T)1);}
+        else if(test_number==2){
+            state_left=TV_DIMENSION((T)4.333333333333333,(T)3.2817*(T)sqrt(1e5),(T)0,(T)1.5e6);
+            state_right=TV_DIMENSION((T)1,(T)0,(T)0,(T)1.5e5);}
+
+
+        if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+        else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+        if(eno_scheme==2) output_directory+="_density_weighted";
+        else if(eno_scheme==3) output_directory+="_velocity_weighted";
+        if(spring_factor!=(T)1) output_directory=LOG::sprintf("%s_spring_factor_%lf",output_directory.c_str(),spring_factor);
+    }
+    void After_Initialization() PHYSBAM_OVERRIDE {
+        BASE::After_Initialization();
+        std::string gnuplot_file=output_directory+"/common/gnuplot_data.dat";
+        gnuplot_file_stream.open(gnuplot_file.c_str());
+        LOG::cout<<"writing to file "<<gnuplot_file<<std::endl;
+    }
     
     virtual ~STANDARD_TESTS()
     {
@@ -110,102 +195,7 @@ public:
     void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,FACE_INDEX<2> >& psi_N,const T time) PHYSBAM_OVERRIDE {}
     bool Get_Solid_Source_Velocities(ARRAY<int>& deformable_simplices,ARRAY<T>& deformable_simplex_forces,ARRAY<PAIR<int,int> >& rigid_simplices,ARRAY<T>& rigid_simplex_forces,
         TV& orientation,const T time) PHYSBAM_OVERRIDE {return false;}
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
-    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
-    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
-    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
-    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
-    parse_args->Add("-spring_factor",&spring_factor,"factor","spring factor");
-    parse_args->Add("-slip",&use_slip,"use slip/spd for coupling");
-    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"Do not use preconditioner for slip system");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    timesplit=timesplit && !exact;
-    if(resolution==1) resolution=50; // Stupid hack for a bad default parameter.
 
-    //grid
-    int cells=resolution;
-    if(test_number==1 || test_number==3 || test_number==4){
-        fluids_parameters.grid->Initialize(TV_INT(5,1)*cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).2)));
-        *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
-        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
-        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-    
-        initial_time=(T)0.;last_frame=350;frame_rate=(T)1000.;}
-    else{
-        fluids_parameters.grid->Initialize(TV_INT(4,3)*cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).75)));
-        *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
-        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;
-        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-
-        initial_time=(T)0.;last_frame=10;frame_rate=(T)10000.;}
-
-    fluids_parameters.cfl=cfl_number;
-    //custom stuff . . . 
-    fluids_parameters.compressible_eos=new EOS_GAMMA<T>;
-
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
-    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
-    fluids_parameters.compressible_spatial_order=eno_order;
-    //fluids_parameters.compressible_conservation_method->Save_Fluxes();
-    //fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,1e-6);
-    fluids_parameters.compressible_rungekutta_order=rk_order;
-    fluids_parameters.compressible_timesplit=timesplit;
-    fluids_parameters.solve_neumann_regions=false;
-
-    fluids_parameters.use_slip=use_slip;
-    fluids_parameters.use_preconditioner_for_slip_system=true;
-
-    if(test_number==1 || test_number==2 || test_number==3 || test_number==4){
-        fluids_parameters.solid_affects_fluid=true;
-        fluids_parameters.fluid_affects_solid=true;
-        solids_fluids_parameters.use_leakproof_solve=false;
-        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-        solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-        solids_parameters.rigid_body_collision_parameters.use_push_out=true;
-        solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1;
-        solids_parameters.use_trapezoidal_rule_for_velocities=false;
-        solids_parameters.verbose_dt=true;
-        solid_body_collection.print_residuals=false;
-        solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-16;
-        solids_parameters.implicit_solve_parameters.cg_projection_iterations=0; // TODO: check this
-        solids_parameters.implicit_solve_parameters.cg_iterations=400;
-    }
-
-    if(test_number==1 || test_number==3 || test_number==4){
-        state_left=TV_DIMENSION((T)5.4,(T)2.2222222222222,(T)0,(T)10.3333333333333);
-        state_right=TV_DIMENSION((T)1.4,(T)0,(T)0,(T)1);}
-    else if(test_number==2){
-        state_left=TV_DIMENSION((T)4.333333333333333,(T)3.2817*(T)sqrt(1e5),(T)0,(T)1.5e6);
-        state_right=TV_DIMENSION((T)1,(T)0,(T)0,(T)1.5e5);}
-
-
-    if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-    else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-    if(eno_scheme==2) output_directory+="_density_weighted";
-    else if(eno_scheme==3) output_directory+="_velocity_weighted";
-    if(spring_factor!=(T)1) output_directory=LOG::sprintf("%s_spring_factor_%lf",output_directory.c_str(),spring_factor);
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {
-    BASE::Parse_Late_Options();
-    std::string gnuplot_file=output_directory+"/common/gnuplot_data.dat";
-    gnuplot_file_stream.open(gnuplot_file.c_str());
-    LOG::cout<<"writing to file "<<gnuplot_file<<std::endl;
-}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

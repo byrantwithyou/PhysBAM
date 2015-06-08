@@ -27,8 +27,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> BRIDGE_EXAMPLE<T>::
-BRIDGE_EXAMPLE(const STREAM_TYPE stream_type)
-    :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),box1(0),box2(0),start_rolling(100),num_rolling_frames(1000),start_drop(2000),num_rungs(10),
+BRIDGE_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),box1(0),box2(0),start_rolling(100),num_rolling_frames(1000),start_drop(2000),num_rungs(10),
     selection(0)
 {
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
@@ -39,6 +39,10 @@ BRIDGE_EXAMPLE(const STREAM_TYPE stream_type)
     frame_rate=24*4;
     last_frame=4000;
     write_last_frame=true;
+    parse_args.Add("-selection",&selection,"value","selection");
+    parse_args.Parse();
+    tests.data_directory=data_directory;
+    output_directory=LOG::sprintf("Bridge/%s%s",output_directory.c_str(),(selection==0?"_blocks":"_lathe_chains"));
 }
 //#####################################################################
 // Destructor
@@ -46,19 +50,6 @@ BRIDGE_EXAMPLE(const STREAM_TYPE stream_type)
 template<class T> BRIDGE_EXAMPLE<T>::
 ~BRIDGE_EXAMPLE()
 {
-}
-template<class T> void BRIDGE_EXAMPLE<T>::
-Register_Options()
-{
-    BASE::Register_Options();
-    parse_args->Add("-selection",&selection,"value","selection");
-}
-template<class T> void BRIDGE_EXAMPLE<T>::
-Parse_Options()
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    output_directory=LOG::sprintf("Bridge/%s%s",output_directory.c_str(),(selection==0?"_blocks":"_lathe_chains"));
 }
 //#####################################################################
 // Function Initialize_Bodies

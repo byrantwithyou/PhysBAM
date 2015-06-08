@@ -25,15 +25,17 @@ class BODY_TEST:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
-    using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;
+    using BASE::stream_type;using BASE::solid_body_collection;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     RIGID_BODY<TV>* body0;
     RIGID_BODY<TV>* ground;
 
-    BODY_TEST(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection)
+    BODY_TEST(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection)
     {
+        parse_args.Parse();
+        tests.data_directory=data_directory;
     }
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     {
@@ -67,19 +69,7 @@ public:
         deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
         deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
     }
-
-    void Register_Options()
-    {
-        BASE::Register_Options();
-    }
-
-    void Parse_Options()
-    {
-        BASE::Parse_Options();
-        tests.data_directory=data_directory;
-    }
-
-    void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 
     void Initialize_Bodies() PHYSBAM_OVERRIDE
     {

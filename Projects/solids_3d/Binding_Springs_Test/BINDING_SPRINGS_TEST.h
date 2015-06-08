@@ -28,7 +28,7 @@ class BINDING_SPRINGS_TEST:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
     typedef VECTOR<T,3> TV;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::parse_args;using BASE::test_number;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solid_body_collection; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -38,9 +38,14 @@ public:
     T stiffness;
     T overdamping_fraction;
 
-    BINDING_SPRINGS_TEST(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),stiffness(1100),overdamping_fraction(0)
+    BINDING_SPRINGS_TEST(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),stiffness(1100),overdamping_fraction(0)
     {
+        parse_args.Add("-binding_stiffness",&stiffness,"value","bending stiffness");
+        parse_args.Add("-binding_overdamping_fraction",&overdamping_fraction,"value","overdamping fraction");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
     }
 
     virtual ~BINDING_SPRINGS_TEST()
@@ -61,24 +66,7 @@ public:
     void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options()
-{
-    BASE::Register_Options();
-    parse_args->Add("-binding_stiffness",&stiffness,"value","bending stiffness");
-    parse_args->Add("-binding_overdamping_fraction",&overdamping_fraction,"value","overdamping fraction");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options()
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-} 
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################

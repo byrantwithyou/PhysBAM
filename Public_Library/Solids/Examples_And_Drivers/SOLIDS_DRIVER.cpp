@@ -96,7 +96,7 @@ Initialize()
     solids_evolution.Set_Solids_Evolution_Callbacks(example);
     example.Initialize_Bodies();
 
-    example.Parse_Late_Options();
+    example.After_Initialization();
 
     solids_evolution.time=time;
 

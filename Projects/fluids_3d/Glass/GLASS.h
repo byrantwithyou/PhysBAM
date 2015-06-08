@@ -28,7 +28,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::solid_body_collection;
-    using BASE::stream_type;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
+    using BASE::stream_type;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
@@ -57,10 +57,102 @@ public:
     3. SPH source and levelset source with TWC VD SPH
     ***************/
 
-    GLASS(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER),
+    GLASS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,1,fluids_parameters.WATER),
         rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid),particle_id(0)
     {
+        parse_args.Parse();
+        random.Set_Seed(1);
+        // set up the standard fluid environment
+        frame_rate=96;
+        restart=false;restart_frame=0;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.number_particles_per_cell=16;
+        fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
+        fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
+        fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.delete_fluid_inside_objects=true;
+        fluids_parameters.incompressible_iterations=40;
+        fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
+        fluids_parameters.second_order_cut_cell_method=true;
+        fluids_parameters.store_particle_ids=true;
+        fluids_parameters.use_vorticity_confinement=false;
+        fluids_parameters.use_vorticity_confinement_fuel=false;
+        fluids_parameters.cfl=(T)1.9;
+
+        // MacCormack parameters
+        fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
+        fluids_parameters.use_maccormack_compute_mask=true;
+        fluids_parameters.use_maccormack_for_incompressible=true;
+        fluids_parameters.bandwidth_without_maccormack_near_interface=1;
+
+        int cells=1*resolution;
+        first_frame=0;last_frame=10;
+        GRID<TV>& grid=*fluids_parameters.grid;
+        grid.Initialize(TV_INT(10*cells+1,20*cells+1,10*cells+1),RANGE<TV>(TV(-(T).05,0,-(T).05),TV((T).05,(T).2,(T).05)));
+
+        last_frame=1000;
+        
+        // SPH paramters
+        fluids_parameters.use_sph_for_removed_negative_particles=true;
+        use_variable_density_for_sph=true;
+        use_two_way_coupling_for_sph=true;
+        convert_sph_particles_to_fluid=false;
+        use_analytic_divergence=false;
+        use_analytic_divergence_for_expansion_only=false;
+        adjust_cell_weights_on_neumann_boundaries=false;
+        ballistic_particles_as_percentage_of_target=(T).1;
+        particle_targeting_time=(T).25;
+        convert_sph_particles_to_fluid=true;
+        flip_ratio=1;
+        fraction_of_particles_for_sph=1;
+
+        if(test_number==2){
+            fluids_parameters.second_order_cut_cell_method=false;
+            convert_sph_particles_to_fluid=true;
+            use_two_way_coupling_for_sph=true;
+            use_variable_density_for_sph=true;
+            flip_ratio=(T)0;
+            use_analytic_divergence=true;
+            use_analytic_divergence_for_expansion_only=false;}
+        if(test_number==3){
+            use_analytic_divergence_for_expansion_only=false;
+            use_two_way_coupling_for_sph=true;
+            fraction_of_particles_for_sph=(T).25;}
+
+        time_pour=4;
+        
+        output_directory=LOG::sprintf("Glass/Glass_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
+        LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
+
+        CYLINDER<T> source1;
+        source1.Set_Endpoints(TV(-(T).0025,(T).174,0),TV((T).0077,(T).1875,0));
+        source1.radius=(T).01;
+        VECTOR<T,3> source1_velocity=(T)1.2*source1.plane1.normal;
+
+        CYLINDER<T> source2;
+        source2.Set_Endpoints(TV(-(T).04,(T).1875,-(T).01),TV(-(T).02,(T).1725,-(T).01));
+        source2.radius=(T).01;
+        VECTOR<T,3> source2_velocity=-(T).35*source2.plane1.normal;
+
+        CYLINDER<T> source3;
+        source3.Set_Endpoints(TV((T).02,(T).1725,(T).01),TV((T).04,(T).1875,(T).01));
+        source3.radius=(T).01;
+        VECTOR<T,3> source3_velocity=(T).35*source3.plane1.normal;
+
+        world_to_sources.Append(MATRIX<T,4>::Identity_Matrix());
+        if(test_number==1){
+            sph_sources.Append(source1);
+            sph_sources_velocity.Append(source1_velocity);}
+        else if(test_number==2){
+            sources.Append(source1);
+            sources_velocity.Append(source1_velocity);}
+        else if(test_number==3){
+            sph_sources.Append(source2);
+            sph_sources_velocity.Append(source2_velocity);
+            sources.Append(source3);
+            sources_velocity.Append(source3_velocity);}
     }
 
     ~GLASS()
@@ -75,112 +167,7 @@ public:
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    random.Set_Seed(1);
-    // set up the standard fluid environment
-    frame_rate=96;
-    restart=false;restart_frame=0;
-    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-    fluids_parameters.number_particles_per_cell=16;
-    fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
-    fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
-    fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
-    fluids_parameters.delete_fluid_inside_objects=true;
-    fluids_parameters.incompressible_iterations=40;
-    fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
-    fluids_parameters.second_order_cut_cell_method=true;
-    fluids_parameters.store_particle_ids=true;
-    fluids_parameters.use_vorticity_confinement=false;
-    fluids_parameters.use_vorticity_confinement_fuel=false;
-    fluids_parameters.cfl=(T)1.9;
-
-    // MacCormack parameters
-    fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
-    fluids_parameters.use_maccormack_compute_mask=true;
-    fluids_parameters.use_maccormack_for_incompressible=true;
-    fluids_parameters.bandwidth_without_maccormack_near_interface=1;
-
-    int cells=1*resolution;
-    first_frame=0;last_frame=10;
-    GRID<TV>& grid=*fluids_parameters.grid;
-    grid.Initialize(TV_INT(10*cells+1,20*cells+1,10*cells+1),RANGE<TV>(TV(-(T).05,0,-(T).05),TV((T).05,(T).2,(T).05)));
-
-    last_frame=1000;
-        
-    // SPH paramters
-    fluids_parameters.use_sph_for_removed_negative_particles=true;
-    use_variable_density_for_sph=true;
-    use_two_way_coupling_for_sph=true;
-    convert_sph_particles_to_fluid=false;
-    use_analytic_divergence=false;
-    use_analytic_divergence_for_expansion_only=false;
-    adjust_cell_weights_on_neumann_boundaries=false;
-    ballistic_particles_as_percentage_of_target=(T).1;
-    particle_targeting_time=(T).25;
-    convert_sph_particles_to_fluid=true;
-    flip_ratio=1;
-    fraction_of_particles_for_sph=1;
-
-    if(test_number==2){
-        fluids_parameters.second_order_cut_cell_method=false;
-        convert_sph_particles_to_fluid=true;
-        use_two_way_coupling_for_sph=true;
-        use_variable_density_for_sph=true;
-        flip_ratio=(T)0;
-        use_analytic_divergence=true;
-        use_analytic_divergence_for_expansion_only=false;}
-    if(test_number==3){
-        use_analytic_divergence_for_expansion_only=false;
-        use_two_way_coupling_for_sph=true;
-        fraction_of_particles_for_sph=(T).25;}
-
-    time_pour=4;
-        
-    output_directory=LOG::sprintf("Glass/Glass_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
-    LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
-
-    CYLINDER<T> source1;
-    source1.Set_Endpoints(TV(-(T).0025,(T).174,0),TV((T).0077,(T).1875,0));
-    source1.radius=(T).01;
-    VECTOR<T,3> source1_velocity=(T)1.2*source1.plane1.normal;
-
-    CYLINDER<T> source2;
-    source2.Set_Endpoints(TV(-(T).04,(T).1875,-(T).01),TV(-(T).02,(T).1725,-(T).01));
-    source2.radius=(T).01;
-    VECTOR<T,3> source2_velocity=-(T).35*source2.plane1.normal;
-
-    CYLINDER<T> source3;
-    source3.Set_Endpoints(TV((T).02,(T).1725,(T).01),TV((T).04,(T).1875,(T).01));
-    source3.radius=(T).01;
-    VECTOR<T,3> source3_velocity=(T).35*source3.plane1.normal;
-
-    world_to_sources.Append(MATRIX<T,4>::Identity_Matrix());
-    if(test_number==1){
-        sph_sources.Append(source1);
-        sph_sources_velocity.Append(source1_velocity);}
-    else if(test_number==2){
-        sources.Append(source1);
-        sources_velocity.Append(source1_velocity);}
-    else if(test_number==3){
-        sph_sources.Append(source2);
-        sph_sources_velocity.Append(source2_velocity);
-        sources.Append(source3);
-        sources_velocity.Append(source3_velocity);}
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

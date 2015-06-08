@@ -22,12 +22,12 @@ using namespace PhysBAM;
 template<class TV> MPI_UNIFORM_GRID<TV>::
 MPI_UNIFORM_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization,const TV_INT& processes_per_dimension,
     const VECTOR<bool,TV::m>& periodic_input,MPI::Group* group_input)
-    :MPI_GRID<TV >(local_grid_input,number_of_ghost_cells_input,skip_initialization,processes_per_dimension,periodic_input,group_input)
+    :MPI_GRID<TV>(local_grid_input,number_of_ghost_cells_input,skip_initialization,processes_per_dimension,periodic_input,group_input)
 {}
 template<class TV> MPI_UNIFORM_GRID<TV>::
 MPI_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,const int number_of_threads,GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,
     const bool skip_mpi,const bool skip_initialization,const TV_INT& processes_per_dimension,const VECTOR<bool,TV::m>& periodic_input,MPI::Group* group_input)
-    :MPI_GRID<TV >(local_grid_input,number_of_ghost_cells_input,skip_mpi,processes_per_dimension,periodic_input,group_input)
+    :MPI_GRID<TV>(local_grid_input,number_of_ghost_cells_input,skip_mpi,processes_per_dimension,periodic_input,group_input)
 {
     PHYSBAM_ASSERT(skip_mpi); //If using threading can't use mpi yet
     assert(!skip_mpi || !group_input);

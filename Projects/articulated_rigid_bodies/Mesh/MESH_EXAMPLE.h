@@ -33,9 +33,10 @@ public:
     PARAMETER_LIST parameter_list;
     SOLIDS_STANDARD_TESTS<TV> tests;
 
-    MESH_EXAMPLE(const STREAM_TYPE stream_type):
-        BASE(stream_type),tests(stream_type,data_directory,solid_body_collection)
+    MESH_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args):
+        BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection)
     {
+        parse_args.Parse();
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
 
@@ -43,24 +44,15 @@ public:
         frame_rate=24;
         std::cout<<"Frame rate: "<<frame_rate<<std::endl;
         increment=0;
+        tests.data_directory=data_directory;
+        output_directory="Mesh/output";
     }
 
     virtual ~MESH_EXAMPLE()
     {
         delete arb;
     }
-
-    void Register_Options() PHYSBAM_OVERRIDE
-    {
-        BASE::Register_Options();
-    }
-    void Parse_Options() PHYSBAM_OVERRIDE
-    {
-        BASE::Parse_Options();
-        tests.data_directory=data_directory;
-        output_directory="Mesh/output";
-    }
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}

@@ -116,7 +116,7 @@ class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
-    using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;
+    using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     int parameter;
@@ -201,8 +201,8 @@ public:
     bool opt_repulsion_pair_update_frequency;
     bool opt_residuals;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),parameter(0),use_forces_for_drift(false),
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),parameter(0),use_forces_for_drift(false),
         number_side_panels(40),aspect_ratio((T)1.7),side_length((T)1.0),cloth_triangles(INT_MAX),constrained_particle(0),
         suspended_particle(0),drifting_particle(0),test_24_poissons_ratio((T).5),no_altitude_springs(false),stiffness_multiplier(1),
         damping_multiplier(1),bending_stiffness_multiplier(1),bending_damping_multiplier(1),planar_damping_multiplier(1),
@@ -213,6 +213,394 @@ public:
         opt_side_panels(false),opt_topological_hierarchy_build_frequency(false),opt_repulsion_pair_update_frequency(false),
         opt_residuals(false)
     {
+        solids_parameters.implicit_solve_parameters.cg_projection_iterations=4;
+        solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=(T)1e-2;
+        solids_parameters.triangle_collision_parameters.collisions_collision_thickness=(T)1e-6;
+        solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+        solids_parameters.triangle_collision_parameters.repulsion_pair_attractions_threshold=-(T).3;
+
+        parse_args.Add("-parameter",&parameter,"parameter","parameter used by multiple tests to change the parameters of the test");
+        parse_args.Add("-poisson",&test_24_poissons_ratio,"value","poisson's ratio for test 24");
+        parse_args.Add("-stiffen",&stiffness_multiplier,"value","stiffness multiplier for various tests");
+        parse_args.Add("-stiffen_bending",&bending_stiffness_multiplier,"value","stiffness multiplier for bending springs in various cloth tests");
+        parse_args.Add("-dampen_bending",&bending_damping_multiplier,"value","damping multiplier for bending springs in various cloth tests");
+        parse_args.Add("-dampen_planar_bending",&planar_damping_multiplier,"value","planar damping multiplier for bending springs in various cloth tests");
+        parse_args.Add("-dampen_axial_bending",&axial_bending_damping_multiplier,"value","axial damping multiplier for bending springs in various cloth tests");
+        parse_args.Add("-stiffen_axial_bending",&axial_bending_stiffness_multiplier,"value","axial stiffness multiplier for bending springs in various cloth tests");
+        parse_args.Add("-dampen",&damping_multiplier,"value","damping multiplier for various tests");
+        parse_args.Add("-noself",&opt_noself,"disable self-collisions");
+        parse_args.Add("-noglobalrepulsions",&opt_noglobalrepulsions,"disable global repulsions");
+        parse_args.Add("-nopertimesteprepulsions",&opt_nopertimesteprepulsions,"disable per time step repulsions");
+        parse_args.Add("-repulsion_pair_update_frequency",&solids_parameters.triangle_collision_parameters.repulsion_pair_update_frequency,
+            &opt_repulsion_pair_update_frequency,"steps","How many time steps before repulsion pairs are recomputed");
+        parse_args.Add("-topological_hierarchy_build_frequency",&solids_parameters.triangle_collision_parameters.topological_hierarchy_build_frequency,
+            &opt_topological_hierarchy_build_frequency,"steps","How many collision steps before a hierarchy topology rebuild");
+        parse_args.Add("-side_panels",&number_side_panels,&opt_side_panels,"number","Cloth side panels");
+        parse_args.Add("-cloth_triangles",&cloth_triangles,&opt_cloth_triangles,"number ","Cloth number of triangles");
+        parse_args.Add("-noalt",&no_altitude_springs,"don't use altitude springs");
+        parse_args.Add("-backward",&opt_backward,"use backward Euler evolution");
+        parse_args.Add("-printpairs",&solids_parameters.triangle_collision_parameters.output_interaction_pairs,"output interaction pairs");
+        parse_args.Add("-spectrum",&solids_parameters.implicit_solve_parameters.spectral_analysis,"run spectral analysis during timestepping");
+        parse_args.Add("-residuals",&opt_residuals,"print residuals during timestepping");
+        parse_args.Add("-binding_springs",&use_forces_for_drift,"use binding springs for drift particles");
+        parse_args.Add("-velocity_prune",&opt_velocity_prune,"turn on velocity culling for collision pairs");
+        parse_args.Add("-totalloops",&total_loops,"loops","set total loops");
+        parse_args.Add("-noattractions",&opt_noattractions,"disable attractions on repulsion pair inversions");
+        parse_args.Add("-attractionthreshold",&solids_parameters.triangle_collision_parameters.repulsion_pair_attractions_threshold,"value","threshold for attractions of inverted repulsion pairs");
+        parse_args.Add("-clothcfl",&cloth_cfl,"value","Cloth CFL");
+        parse_args.Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+        parse_args.Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"tol","CG tolerance for backward Euler");
+        parse_args.Add("-fully_implicit",&fully_implicit,"use fully implicit forces");
+        parse_args.Add("-half_fully_implicit",&solids_parameters.implicit_solve_parameters.use_half_fully_implicit,"use fully implicit forces for position update");
+        parse_args.Add("-use_be",&use_be,"use backward euler");
+        parse_args.Add("-print_matrix",&print_matrix,"Print Krylov matrix");
+        parse_args.Add("-project_nullspace",&project_nullspace,"project out nullspace");
+        parse_args.Add("-use_axial",&use_axial,"use axial bending springs");
+        parse_args.Add("-extra_cg",&solids_parameters.use_projections_in_position_update,"use extra projected cg for position update");
+        parse_args.Add("-no_friction",&opt_no_friction,"no friction");
+        parse_args.Add("-projection_iterations",&solids_parameters.implicit_solve_parameters.cg_projection_iterations,"number","number of iterations used for projection in cg");
+        parse_args.Add("-substitute_springs",&substitute_springs,"instead of finite volume, use springs");
+        parse_args.Add("-solver_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"iterations","number of iterations used for solids system");
+        parse_args.Add("-test_forces",&test_forces,"use fully implicit forces");
+        parse_args.Add("-model",&model_mesh,"file","use this mesh");
+        parse_args.Add("-repulsion_threshold",&solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness,"value","threshold for repulsions");
+        parse_args.Add("-collision_threshold",&solids_parameters.triangle_collision_parameters.collisions_collision_thickness,"value","threshold for collisions");
+        parse_args.Parse();
+        tests.data_directory=data_directory;
+        LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        frame_rate=24;
+    
+        T cloth_clamp_fraction=(T).03; // from curtain and ball
+    
+        if(total_loops!=0) solids_parameters.triangle_collision_parameters.total_collision_loops=total_loops;
+
+        if(no_altitude_springs){
+            if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=19 && test_number!=22){
+                LOG::cerr<<"-noalt not supported for example "<<test_number<<std::endl;exit(1);}
+            output_directory+="_noalt";}
+        if(stiffness_multiplier!=1){
+            if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=22 && test_number !=30 && test_number!=1){
+                LOG::cerr<<"-stiffen not supported for example "<<test_number<<std::endl;exit(1);}
+            output_directory+=LOG::sprintf("_stiffen%g",stiffness_multiplier);}
+        if(damping_multiplier!=1){
+            if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=22 && test_number!=1){
+                LOG::cerr<<"-dampen not supported for example "<<test_number<<std::endl;exit(1);}
+            output_directory+=LOG::sprintf("_dampen%g",damping_multiplier);}
+
+        solids_parameters.use_trapezoidal_rule_for_velocities=!use_be;
+        solids_parameters.use_rigid_deformable_contact=true;
+        solids_parameters.rigid_body_collision_parameters.use_push_out=true;
+        solids_parameters.triangle_collision_parameters.use_gauss_jacobi=false;
+        solids_parameters.triangle_collision_parameters.repulsions_limiter_fraction=1;
+        solids_parameters.triangle_collision_parameters.collisions_final_repulsion_limiter_fraction=.1;
+        solids_parameters.triangle_collision_parameters.repulsion_pair_attractions_threshold=solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness;
+        if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
+        solid_body_collection.Print_Residuals(opt_residuals);
+
+        //solids_parameters.triangle_collision_parameters.collisions_nonrigid_collision_attempts=20;
+        //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
+        //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
+    
+
+        switch(test_number){
+            case 1:
+            case 2:
+            case 3:
+            case 49:
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            case 4:
+                solids_parameters.cfl=(T)5;
+                break;
+            case 50:
+            case 51:
+                solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+                break;
+            case 5:
+            case 29:
+            case 30:
+            case 31:
+            case 32:
+            case 35:
+            case 45:
+                solids_parameters.cfl=(T)50;
+                frame_rate=60;
+                last_frame=(int)(7*frame_rate);
+                if(test_number==30){frame_rate=120;last_frame=(int)(20*frame_rate);}
+                if(test_number==31) aspect_ratio=(T)1;
+                if(test_number==32){last_frame=(int)(15*frame_rate);aspect_ratio=(T)4;}
+                solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
+                solids_parameters.cfl=cloth_cfl; // was 4
+                solids_parameters.triangle_collision_parameters.self_collision_friction_coefficient=(T)3.2;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                solids_parameters.implicit_solve_parameters.cg_iterations=200;
+                solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+                solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
+                if(test_number==30){
+                    test_30_constrained_off=(T).3;
+                    test_30_friction_off=(T)3;
+                    test_30_wind_off=(T)1000;}
+                if(test_number==32){
+                    test_32_wind_drag_on=(T)2.83;
+                    test_32_wind_drag_ramp_off=(T)3.017;}
+                LOG::printf("Basic settings: %P %P %P",solids_parameters.cfl,solids_parameters.implicit_solve_parameters.cg_tolerance,solids_parameters.implicit_solve_parameters.cg_iterations);
+                break;
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                if(test_number==6) last_frame=(int)frame_rate; else if(test_number==9) last_frame=(int)(10*frame_rate); else last_frame=(int)(5*frame_rate);
+                delete solids_evolution;
+                solids_evolution=new QUASISTATIC_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.implicit_solve_parameters.cg_iterations=900;
+                if(test_number==6) solids_parameters.newton_iterations=1; else solids_parameters.newton_iterations=10;
+                solids_parameters.newton_tolerance=(T)1e-2;
+                solids_parameters.use_partially_converged_result=true;
+                solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                if(test_number==7) attachment_twist.linear=TV(0,0,(T).1); else if(test_number==8) attachment_twist.linear=TV(0,0,(T)-.1);
+                if(test_number==9) attachment_twist.angular=TV(0,0,(T).1);
+                break;
+            case 10:
+                test_10_frame_velocity=TV();
+            case 11:
+                last_frame=(int)(14*frame_rate);
+                solids_parameters.cfl=(T)5.9;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.deformable_object_collision_parameters.maximum_levelset_collision_projection_velocity=(T)2;
+                solids_parameters.deformable_object_collision_parameters.use_spatial_partition_for_levelset_collision_objects=false;
+                solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
+                break;
+            case 12:
+            case 13:
+                frame_rate=60;
+                solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
+                last_frame=(int)(20*frame_rate);
+                solids_parameters.cfl=cloth_cfl;
+                solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                LOG::cout<<"CFL="<<solids_parameters.cfl<<" cg tolerance="<<solids_parameters.implicit_solve_parameters.cg_tolerance<<std::endl;
+                aspect_ratio=(T)1.0;
+                solids_parameters.implicit_solve_parameters.cg_iterations=200;
+                solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
+                solids_parameters.deformable_object_collision_parameters.disable_multiple_levelset_collisions=false;
+                LOG::printf("Basic settings: %P %P\n",solids_parameters.cfl,solids_parameters.implicit_solve_parameters.cg_tolerance,solids_parameters.implicit_solve_parameters.cg_iterations);
+                break;
+            case 14:
+                last_frame=(int)(7*frame_rate);
+                solids_parameters.cfl=(T)5.9;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                solids_evolution=new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
+                break;
+            case 15:
+                break;
+            case 16:
+            case 17:
+            case 18:
+                solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                break;
+            case 19:
+            case 46:
+                frame_rate=60;
+                last_frame=(int)(3*frame_rate);
+                solids_parameters.cfl=(T)5.9;
+                solids_parameters.implicit_solve_parameters.cg_iterations=300;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                break;
+            case 20:
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                break;
+            case 21:
+                last_frame=(int)(3*frame_rate);
+                solids_parameters.cfl=(T)5.9;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
+                break;
+            case 22:
+                last_frame=(int)(7*frame_rate);
+                solids_parameters.cfl=(T)5.9;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
+                break;
+            case 23:
+                last_frame=(int)(10*frame_rate);
+                solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+                solids_parameters.cfl=(T)5.9;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                //solids_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
+                solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
+                solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+                solids_parameters.triangle_collision_parameters.turn_off_all_collisions=true;
+                break;
+            case 24:{
+                if(test_24_poissons_ratio!=(T).5) output_directory+=LOG::sprintf("_p%g",test_24_poissons_ratio);
+                break;}
+            case 25:
+                last_frame=(int)(6*frame_rate);
+                solids_parameters.cfl=(T)5.9;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
+                aspect_ratio=3;
+                solids_parameters.triangle_collision_parameters.turn_off_all_collisions=true;
+                solid_body_collection.deformable_body_collection.triangle_repulsions.hierarchy_repulsion_thickness_multiplier=10;
+            
+                //solids_parameters.collisions_repulsion_clamp_fraction=(T1;
+            
+                //solids_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
+                //solids_parameters.collisions_repulsion_clamp_fraction=(T).9;
+                //solids_parameters.collision_repulsion_spring_multiplier=(T)100;
+                //solids_parameters.collisions_repulsion_thickness=(T).1;
+                break;
+            case 27:
+                last_frame=(int)(6*frame_rate);
+                solids_parameters.cfl=(T)5.9;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                aspect_ratio=3;
+                break;
+            case 28:
+                solids_parameters.use_trapezoidal_rule_for_velocities=true;
+                frame_rate=30;last_frame=(int)(120*frame_rate);
+                solids_parameters.cfl=(T)1;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
+                solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
+                //solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-4;
+                break;
+            case 33:
+            case 34:
+                frame_rate=1;
+                last_frame=(int)(7*frame_rate);
+                aspect_ratio=1;
+                solids_parameters.cfl=(T)4.0;
+                solids_parameters.triangle_collision_parameters.self_collision_friction_coefficient=(T)3.2;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+                solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=(T).1;
+                solids_parameters.triangle_collision_parameters.clamp_repulsion_thickness=false;
+                break;
+            case 36:
+                frame_rate=24;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T).3;
+                last_frame=(int)(64*frame_rate);
+                aspect_ratio=16;
+                side_length=(T)1/8;
+                if(!opt_side_panels) number_side_panels=1;
+                solids_parameters.cfl=(T)10.0;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                break;
+            case 37:
+                last_frame=(int)(5*frame_rate);
+                solids_parameters.cfl=(T)2.0;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+                solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+                break;
+            case 38:
+                frame_rate=24;
+                last_frame=(int)(64*frame_rate);
+                solids_parameters.cfl=(T)1;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                break;
+            case 41:
+                frame_rate=24;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T).01;
+                last_frame=200;//(int)(200*frame_rate);
+                aspect_ratio=1;
+                side_length=(T)1;
+                if(!opt_side_panels) number_side_panels=50;
+                solids_parameters.cfl=(T)1;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                break;
+            case 47:
+            case 48:
+                frame_rate=24;
+                solids_parameters.implicit_solve_parameters.cg_iterations=600;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T).01;
+                last_frame=200;//(int)(200*frame_rate);
+                aspect_ratio=1;
+                side_length=(T)1;
+                if(!opt_side_panels) number_side_panels=2;
+                solids_parameters.cfl=(T)1;
+                solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                break;
+            case 42:
+                frame_rate=24;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T).01;
+                last_frame=200;
+                aspect_ratio=1;
+                side_length=.5;
+                if(!opt_side_panels) number_side_panels=1;
+                solids_parameters.cfl=(T)10;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                break;
+            case 44:
+                frame_rate=24;
+                last_frame=200;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+                break;
+            default:
+                LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
+
+        if(opt_backward){
+            if(typeid(*solids_evolution)!=typeid(NEWMARK_EVOLUTION<TV>)){
+                LOG::cerr<<"refusing to replace non-Newmark evolution with -backward"<<std::endl;exit(1);}
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+            solids_parameters.cfl*=10;
+            delete solids_evolution;
+            solids_evolution=new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
+            output_directory+="_backward";}
+    
+        if(opt_noself){
+            if(!solids_parameters.triangle_collision_parameters.perform_self_collision){LOG::cerr<<"-noself invalid for examples without self-collisions"<<std::endl;exit(1);}
+            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
+            solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
+            output_directory+="_noself";}
+    
+        if(opt_noglobalrepulsions){
+            solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
+            output_directory+="_noglobalrepulsions";}
+    
+        if(opt_nopertimesteprepulsions){
+            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
+            output_directory+="_nopertimesteprepulsions";}
+    
+        if(opt_noattractions){
+            solids_parameters.triangle_collision_parameters.perform_repulsion_pair_attractions=false;
+            output_directory+="_noattractions";}
+    
+        if(opt_repulsion_pair_update_frequency){
+            output_directory+=LOG::sprintf("_repulsionpairupdatefrequency=%d",solids_parameters.triangle_collision_parameters.repulsion_pair_update_frequency);}
+    
+        if(opt_velocity_prune){
+            //solids_parameters.collision_pair_velocity_pruning=true;
+            output_directory+="_velocityprune";}
+    
+        if(opt_topological_hierarchy_build_frequency){
+            output_directory+=LOG::sprintf("_topologicalhierarchybuildfrequency=%d",solids_parameters.triangle_collision_parameters.topological_hierarchy_build_frequency);}
+    
+        if(opt_side_panels){
+            output_directory+=LOG::sprintf("_sidepanels=%d",number_side_panels);}
+        cloth_triangles=2*number_side_panels*(int)(number_side_panels*aspect_ratio);
+    
+        if(opt_cloth_triangles){
+            if(opt_side_panels) throw std::runtime_error("Cannot have both side panels and cloth triangles set");
+            if(test_number==35) cloth_triangles/=100;
+            number_side_panels=(int)ceil(sqrt((T).5*(T)cloth_triangles/aspect_ratio));
+            int actual_cloth_triangles=2*((int)(aspect_ratio*number_side_panels))*number_side_panels;
+            LOG::printf("cloth resolution: %P, %P, %P\n",cloth_triangles,actual_cloth_triangles,number_side_panels);
+            cloth_triangles=actual_cloth_triangles;
+            if(test_number==35) cloth_triangles*=100;}
+
+        if(opt_no_friction){
+            solids_parameters.no_contact_friction=true;
+            solids_parameters.triangle_collision_parameters.self_collision_friction_coefficient=(T)0;}
     }
 
     ~STANDARD_TESTS()
@@ -263,408 +651,7 @@ T Test_32_Find_Parameter(const T desired_s,const T t_guess)
         if(abs(t_old-t)<1e-7) return t;}
     return t;
 }
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options()
-{
-    BASE::Register_Options();
-    solids_parameters.implicit_solve_parameters.cg_projection_iterations=4;
-    solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=(T)1e-2;
-    solids_parameters.triangle_collision_parameters.collisions_collision_thickness=(T)1e-6;
-    solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-    solids_parameters.triangle_collision_parameters.repulsion_pair_attractions_threshold=-(T).3;
-
-    parse_args->Add("-parameter",&parameter,"parameter","parameter used by multiple tests to change the parameters of the test");
-    parse_args->Add("-poisson",&test_24_poissons_ratio,"value","poisson's ratio for test 24");
-    parse_args->Add("-stiffen",&stiffness_multiplier,"value","stiffness multiplier for various tests");
-    parse_args->Add("-stiffen_bending",&bending_stiffness_multiplier,"value","stiffness multiplier for bending springs in various cloth tests");
-    parse_args->Add("-dampen_bending",&bending_damping_multiplier,"value","damping multiplier for bending springs in various cloth tests");
-    parse_args->Add("-dampen_planar_bending",&planar_damping_multiplier,"value","planar damping multiplier for bending springs in various cloth tests");
-    parse_args->Add("-dampen_axial_bending",&axial_bending_damping_multiplier,"value","axial damping multiplier for bending springs in various cloth tests");
-    parse_args->Add("-stiffen_axial_bending",&axial_bending_stiffness_multiplier,"value","axial stiffness multiplier for bending springs in various cloth tests");
-    parse_args->Add("-dampen",&damping_multiplier,"value","damping multiplier for various tests");
-    parse_args->Add("-noself",&opt_noself,"disable self-collisions");
-    parse_args->Add("-noglobalrepulsions",&opt_noglobalrepulsions,"disable global repulsions");
-    parse_args->Add("-nopertimesteprepulsions",&opt_nopertimesteprepulsions,"disable per time step repulsions");
-    parse_args->Add("-repulsion_pair_update_frequency",&solids_parameters.triangle_collision_parameters.repulsion_pair_update_frequency,
-        &opt_repulsion_pair_update_frequency,"steps","How many time steps before repulsion pairs are recomputed");
-    parse_args->Add("-topological_hierarchy_build_frequency",&solids_parameters.triangle_collision_parameters.topological_hierarchy_build_frequency,
-        &opt_topological_hierarchy_build_frequency,"steps","How many collision steps before a hierarchy topology rebuild");
-    parse_args->Add("-side_panels",&number_side_panels,&opt_side_panels,"number","Cloth side panels");
-    parse_args->Add("-cloth_triangles",&cloth_triangles,&opt_cloth_triangles,"number ","Cloth number of triangles");
-    parse_args->Add("-noalt",&no_altitude_springs,"don't use altitude springs");
-    parse_args->Add("-backward",&opt_backward,"use backward Euler evolution");
-    parse_args->Add("-printpairs",&solids_parameters.triangle_collision_parameters.output_interaction_pairs,"output interaction pairs");
-    parse_args->Add("-spectrum",&solids_parameters.implicit_solve_parameters.spectral_analysis,"run spectral analysis during timestepping");
-    parse_args->Add("-residuals",&opt_residuals,"print residuals during timestepping");
-    parse_args->Add("-binding_springs",&use_forces_for_drift,"use binding springs for drift particles");
-    parse_args->Add("-velocity_prune",&opt_velocity_prune,"turn on velocity culling for collision pairs");
-    parse_args->Add("-totalloops",&total_loops,"loops","set total loops");
-    parse_args->Add("-noattractions",&opt_noattractions,"disable attractions on repulsion pair inversions");
-    parse_args->Add("-attractionthreshold",&solids_parameters.triangle_collision_parameters.repulsion_pair_attractions_threshold,"value","threshold for attractions of inverted repulsion pairs");
-    parse_args->Add("-clothcfl",&cloth_cfl,"value","Cloth CFL");
-    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
-    parse_args->Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"tol","CG tolerance for backward Euler");
-    parse_args->Add("-fully_implicit",&fully_implicit,"use fully implicit forces");
-    parse_args->Add("-half_fully_implicit",&solids_parameters.implicit_solve_parameters.use_half_fully_implicit,"use fully implicit forces for position update");
-    parse_args->Add("-use_be",&use_be,"use backward euler");
-    parse_args->Add("-print_matrix",&print_matrix,"Print Krylov matrix");
-    parse_args->Add("-project_nullspace",&project_nullspace,"project out nullspace");
-    parse_args->Add("-use_axial",&use_axial,"use axial bending springs");
-    parse_args->Add("-extra_cg",&solids_parameters.use_projections_in_position_update,"use extra projected cg for position update");
-    parse_args->Add("-no_friction",&opt_no_friction,"no friction");
-    parse_args->Add("-projection_iterations",&solids_parameters.implicit_solve_parameters.cg_projection_iterations,"number","number of iterations used for projection in cg");
-    parse_args->Add("-substitute_springs",&substitute_springs,"instead of finite volume, use springs");
-    parse_args->Add("-solver_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"iterations","number of iterations used for solids system");
-    parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
-    parse_args->Add("-model",&model_mesh,"file","use this mesh");
-    parse_args->Add("-repulsion_threshold",&solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness,"value","threshold for repulsions");
-    parse_args->Add("-collision_threshold",&solids_parameters.triangle_collision_parameters.collisions_collision_thickness,"value","threshold for collisions");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options()
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-    frame_rate=24;
-    
-    T cloth_clamp_fraction=(T).03; // from curtain and ball
-    
-    if(total_loops!=0) solids_parameters.triangle_collision_parameters.total_collision_loops=total_loops;
-
-    if(no_altitude_springs){
-        if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=19 && test_number!=22){
-            LOG::cerr<<"-noalt not supported for example "<<test_number<<std::endl;exit(1);}
-        output_directory+="_noalt";}
-    if(stiffness_multiplier!=1){
-        if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=22 && test_number !=30 && test_number!=1){
-            LOG::cerr<<"-stiffen not supported for example "<<test_number<<std::endl;exit(1);}
-        output_directory+=LOG::sprintf("_stiffen%g",stiffness_multiplier);}
-    if(damping_multiplier!=1){
-        if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=22 && test_number!=1){
-            LOG::cerr<<"-dampen not supported for example "<<test_number<<std::endl;exit(1);}
-        output_directory+=LOG::sprintf("_dampen%g",damping_multiplier);}
-
-    solids_parameters.use_trapezoidal_rule_for_velocities=!use_be;
-    solids_parameters.use_rigid_deformable_contact=true;
-    solids_parameters.rigid_body_collision_parameters.use_push_out=true;
-    solids_parameters.triangle_collision_parameters.use_gauss_jacobi=false;
-    solids_parameters.triangle_collision_parameters.repulsions_limiter_fraction=1;
-    solids_parameters.triangle_collision_parameters.collisions_final_repulsion_limiter_fraction=.1;
-    solids_parameters.triangle_collision_parameters.repulsion_pair_attractions_threshold=solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness;
-    if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
-    solid_body_collection.Print_Residuals(opt_residuals);
-
-    //solids_parameters.triangle_collision_parameters.collisions_nonrigid_collision_attempts=20;
-    //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
-    //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
-    
-
-    switch(test_number){
-        case 1:
-        case 2:
-        case 3:
-        case 49:
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-        case 4:
-            solids_parameters.cfl=(T)5;
-            break;
-        case 50:
-        case 51:
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            break;
-        case 5:
-        case 29:
-        case 30:
-        case 31:
-        case 32:
-        case 35:
-        case 45:
-            solids_parameters.cfl=(T)50;
-            frame_rate=60;
-            last_frame=(int)(7*frame_rate);
-            if(test_number==30){frame_rate=120;last_frame=(int)(20*frame_rate);}
-            if(test_number==31) aspect_ratio=(T)1;
-            if(test_number==32){last_frame=(int)(15*frame_rate);aspect_ratio=(T)4;}
-            solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
-            solids_parameters.cfl=cloth_cfl; // was 4
-            solids_parameters.triangle_collision_parameters.self_collision_friction_coefficient=(T)3.2;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            solids_parameters.implicit_solve_parameters.cg_iterations=200;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
-            if(test_number==30){
-                test_30_constrained_off=(T).3;
-                test_30_friction_off=(T)3;
-                test_30_wind_off=(T)1000;}
-            if(test_number==32){
-                test_32_wind_drag_on=(T)2.83;
-                test_32_wind_drag_ramp_off=(T)3.017;}
-            LOG::printf("Basic settings: %P %P %P",solids_parameters.cfl,solids_parameters.implicit_solve_parameters.cg_tolerance,solids_parameters.implicit_solve_parameters.cg_iterations);
-            break;
-        case 6:
-        case 7:
-        case 8:
-        case 9:
-            if(test_number==6) last_frame=(int)frame_rate; else if(test_number==9) last_frame=(int)(10*frame_rate); else last_frame=(int)(5*frame_rate);
-            delete solids_evolution;
-            solids_evolution=new QUASISTATIC_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=900;
-            if(test_number==6) solids_parameters.newton_iterations=1; else solids_parameters.newton_iterations=10;
-            solids_parameters.newton_tolerance=(T)1e-2;
-            solids_parameters.use_partially_converged_result=true;
-            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            if(test_number==7) attachment_twist.linear=TV(0,0,(T).1); else if(test_number==8) attachment_twist.linear=TV(0,0,(T)-.1);
-            if(test_number==9) attachment_twist.angular=TV(0,0,(T).1);
-            break;
-        case 10:
-            test_10_frame_velocity=TV();
-        case 11:
-            last_frame=(int)(14*frame_rate);
-            solids_parameters.cfl=(T)5.9;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.deformable_object_collision_parameters.maximum_levelset_collision_projection_velocity=(T)2;
-            solids_parameters.deformable_object_collision_parameters.use_spatial_partition_for_levelset_collision_objects=false;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
-            break;
-        case 12:
-        case 13:
-            frame_rate=60;
-            solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
-            last_frame=(int)(20*frame_rate);
-            solids_parameters.cfl=cloth_cfl;
-            solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            LOG::cout<<"CFL="<<solids_parameters.cfl<<" cg tolerance="<<solids_parameters.implicit_solve_parameters.cg_tolerance<<std::endl;
-            aspect_ratio=(T)1.0;
-            solids_parameters.implicit_solve_parameters.cg_iterations=200;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
-            solids_parameters.deformable_object_collision_parameters.disable_multiple_levelset_collisions=false;
-            LOG::printf("Basic settings: %P %P\n",solids_parameters.cfl,solids_parameters.implicit_solve_parameters.cg_tolerance,solids_parameters.implicit_solve_parameters.cg_iterations);
-            break;
-        case 14:
-            last_frame=(int)(7*frame_rate);
-            solids_parameters.cfl=(T)5.9;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            solids_evolution=new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
-            break;
-        case 15:
-            break;
-        case 16:
-        case 17:
-        case 18:
-            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            break;
-        case 19:
-        case 46:
-            frame_rate=60;
-            last_frame=(int)(3*frame_rate);
-            solids_parameters.cfl=(T)5.9;
-            solids_parameters.implicit_solve_parameters.cg_iterations=300;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            break;
-        case 20:
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            break;
-        case 21:
-            last_frame=(int)(3*frame_rate);
-            solids_parameters.cfl=(T)5.9;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
-            break;
-        case 22:
-            last_frame=(int)(7*frame_rate);
-            solids_parameters.cfl=(T)5.9;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
-            break;
-        case 23:
-            last_frame=(int)(10*frame_rate);
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            solids_parameters.cfl=(T)5.9;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            //solids_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
-            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
-            solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-            solids_parameters.triangle_collision_parameters.turn_off_all_collisions=true;
-            break;
-        case 24:{
-            if(test_24_poissons_ratio!=(T).5) output_directory+=LOG::sprintf("_p%g",test_24_poissons_ratio);
-            break;}
-        case 25:
-            last_frame=(int)(6*frame_rate);
-            solids_parameters.cfl=(T)5.9;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
-            aspect_ratio=3;
-            solids_parameters.triangle_collision_parameters.turn_off_all_collisions=true;
-            solid_body_collection.deformable_body_collection.triangle_repulsions.hierarchy_repulsion_thickness_multiplier=10;
-            
-            //solids_parameters.collisions_repulsion_clamp_fraction=(T1;
-            
-            //solids_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
-            //solids_parameters.collisions_repulsion_clamp_fraction=(T).9;
-            //solids_parameters.collision_repulsion_spring_multiplier=(T)100;
-            //solids_parameters.collisions_repulsion_thickness=(T).1;
-            break;
-        case 27:
-            last_frame=(int)(6*frame_rate);
-            solids_parameters.cfl=(T)5.9;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            aspect_ratio=3;
-            break;
-        case 28:
-            solids_parameters.use_trapezoidal_rule_for_velocities=true;
-            frame_rate=30;last_frame=(int)(120*frame_rate);
-            solids_parameters.cfl=(T)1;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
-            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
-            //solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-4;
-            break;
-        case 33:
-        case 34:
-            frame_rate=1;
-            last_frame=(int)(7*frame_rate);
-            aspect_ratio=1;
-            solids_parameters.cfl=(T)4.0;
-            solids_parameters.triangle_collision_parameters.self_collision_friction_coefficient=(T)3.2;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=(T).1;
-            solids_parameters.triangle_collision_parameters.clamp_repulsion_thickness=false;
-            break;
-        case 36:
-            frame_rate=24;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T).3;
-            last_frame=(int)(64*frame_rate);
-            aspect_ratio=16;
-            side_length=(T)1/8;
-            if(!opt_side_panels) number_side_panels=1;
-            solids_parameters.cfl=(T)10.0;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            break;
-        case 37:
-            last_frame=(int)(5*frame_rate);
-            solids_parameters.cfl=(T)2.0;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-            break;
-        case 38:
-            frame_rate=24;
-            last_frame=(int)(64*frame_rate);
-            solids_parameters.cfl=(T)1;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            break;
-        case 41:
-            frame_rate=24;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T).01;
-            last_frame=200;//(int)(200*frame_rate);
-            aspect_ratio=1;
-            side_length=(T)1;
-            if(!opt_side_panels) number_side_panels=50;
-            solids_parameters.cfl=(T)1;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            break;
-        case 47:
-        case 48:
-            frame_rate=24;
-            solids_parameters.implicit_solve_parameters.cg_iterations=600;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T).01;
-            last_frame=200;//(int)(200*frame_rate);
-            aspect_ratio=1;
-            side_length=(T)1;
-            if(!opt_side_panels) number_side_panels=2;
-            solids_parameters.cfl=(T)1;
-            solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            break;
-        case 42:
-            frame_rate=24;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T).01;
-            last_frame=200;
-            aspect_ratio=1;
-            side_length=.5;
-            if(!opt_side_panels) number_side_panels=1;
-            solids_parameters.cfl=(T)10;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            break;
-        case 44:
-            frame_rate=24;
-            last_frame=200;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            break;
-        default:
-            LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
-
-    if(opt_backward){
-        if(typeid(*solids_evolution)!=typeid(NEWMARK_EVOLUTION<TV>)){
-            LOG::cerr<<"refusing to replace non-Newmark evolution with -backward"<<std::endl;exit(1);}
-        solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-        solids_parameters.cfl*=10;
-        delete solids_evolution;
-        solids_evolution=new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
-        output_directory+="_backward";}
-    
-    if(opt_noself){
-        if(!solids_parameters.triangle_collision_parameters.perform_self_collision){LOG::cerr<<"-noself invalid for examples without self-collisions"<<std::endl;exit(1);}
-        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-        solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
-        solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
-        output_directory+="_noself";}
-    
-    if(opt_noglobalrepulsions){
-        solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
-        output_directory+="_noglobalrepulsions";}
-    
-    if(opt_nopertimesteprepulsions){
-        solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
-        output_directory+="_nopertimesteprepulsions";}
-    
-    if(opt_noattractions){
-        solids_parameters.triangle_collision_parameters.perform_repulsion_pair_attractions=false;
-        output_directory+="_noattractions";}
-    
-    if(opt_repulsion_pair_update_frequency){
-        output_directory+=LOG::sprintf("_repulsionpairupdatefrequency=%d",solids_parameters.triangle_collision_parameters.repulsion_pair_update_frequency);}
-    
-    if(opt_velocity_prune){
-        //solids_parameters.collision_pair_velocity_pruning=true;
-        output_directory+="_velocityprune";}
-    
-    if(opt_topological_hierarchy_build_frequency){
-        output_directory+=LOG::sprintf("_topologicalhierarchybuildfrequency=%d",solids_parameters.triangle_collision_parameters.topological_hierarchy_build_frequency);}
-    
-    if(opt_side_panels){
-        output_directory+=LOG::sprintf("_sidepanels=%d",number_side_panels);}
-    cloth_triangles=2*number_side_panels*(int)(number_side_panels*aspect_ratio);
-    
-    if(opt_cloth_triangles){
-        if(opt_side_panels) throw std::runtime_error("Cannot have both side panels and cloth triangles set");
-        if(test_number==35) cloth_triangles/=100;
-        number_side_panels=(int)ceil(sqrt((T).5*(T)cloth_triangles/aspect_ratio));
-        int actual_cloth_triangles=2*((int)(aspect_ratio*number_side_panels))*number_side_panels;
-        LOG::printf("cloth resolution: %P, %P, %P\n",cloth_triangles,actual_cloth_triangles,number_side_panels);
-        cloth_triangles=actual_cloth_triangles;
-        if(test_number==35) cloth_triangles*=100;}
-
-    if(opt_no_friction){
-        solids_parameters.no_contact_friction=true;
-        solids_parameters.triangle_collision_parameters.self_collision_friction_coefficient=(T)0;}
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################

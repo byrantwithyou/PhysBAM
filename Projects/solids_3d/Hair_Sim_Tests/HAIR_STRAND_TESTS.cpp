@@ -41,27 +41,13 @@ using namespace PhysBAM;
 // Function HAIR_STRAND_TESTS
 //#####################################################################
 template<class T_input> HAIR_STRAND_TESTS<T_input>::
-HAIR_STRAND_TESTS(const STREAM_TYPE stream_type)
-    :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),use_adhesion(false),reset(false)
+HAIR_STRAND_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),use_adhesion(false),reset(false)
 {
-}
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-template<class T_input> void HAIR_STRAND_TESTS<T_input>::
-Register_Options()
-{
-    BASE::Register_Options();
-    parse_args->Add("-hairsim",&sim_folder,"dir","the hair sime to run");
-    parse_args->Add("-params",&param_file,"file","parameter file");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-template<class T_input> void HAIR_STRAND_TESTS<T_input>::
-Parse_Options()
-{
-    BASE::Parse_Options();
+    parse_args.Add("-hairsim",&sim_folder,"dir","the hair sime to run");
+    parse_args.Add("-params",&param_file,"file","parameter file");
+    parse_args.Parse();
+
     tests.data_directory=data_directory;
     std::string parameter_file=data_directory+"/"+sim_folder+"/"+param_file;
     LOG::cout<<"PARAM FILE is "<<parameter_file<<std::endl;

@@ -28,20 +28,62 @@ public:
     typedef VECTOR<T,3> TV;
     typedef VECTOR<int,TV::m> TV_INT;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
-    using BASE::solid_body_collection;using BASE::stream_type;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
+    using BASE::solid_body_collection;using BASE::stream_type;using BASE::test_number;using BASE::resolution;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
     bool use_inaccurate_body_collisions;
     int sphere;
 
-    TWO_PHASE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >(stream_type,2,fluids_parameters.WATER),
+    TWO_PHASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,2,fluids_parameters.WATER),
         rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid),use_inaccurate_body_collisions(true),sphere(0)
     {
+        parse_args.Parse();
+
+        int cells=1*resolution;
+        // set up the standard fluid environment
+        frame_rate=24;
+        restart=false;restart_frame=0;
+        first_frame=0;last_frame=300;frame_rate=400;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.number_particles_per_cell=16;
+        fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
+        fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
+        fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.delete_fluid_inside_objects=true;
+        fluids_parameters.incompressible_iterations=100;
+        fluids_parameters.use_removed_positive_particles=false;fluids_parameters.use_removed_negative_particles=false;
+        fluids_parameters.write_removed_positive_particles=false;fluids_parameters.write_removed_negative_particles=false;
+        fluids_parameters.second_order_cut_cell_method=true;
+        fluids_parameters.store_particle_ids=true;
+        fluids_parameters.use_vorticity_confinement=false;
+        fluids_parameters.use_vorticity_confinement_fuel=false;
+ 
+        // set up the example parameters
+        if(test_number!=1 && test_number!=2 && test_number!=3){LOG::cout<<"Unrecognized example: "<<test_number<<std::endl;PHYSBAM_FATAL_ERROR();}
+        fluids_parameters.densities(1)=(T)1.226;fluids_parameters.densities(2)=1000;
+        fluids_parameters.surface_tensions(1,2)=fluids_parameters.surface_tensions(2,1)=(T).0728;
+        fluids_parameters.viscosities(1)=(T).0000178;
+        fluids_parameters.viscosities(2)=(T).001137;
+        fluids_parameters.implicit_viscosity=false;
+        fluids_parameters.incompressible_iterations=200;
+        fluids_parameters.implicit_viscosity_iterations=200;
+        fluids_parameters.solve_neumann_regions=true;
+
+        // set up the domain
+        GRID<TV>& grid=*fluids_parameters.grid;
+        grid.Initialize(TV_INT(10*cells+1,20*cells+1,10*cells+1),RANGE<TV>(TV((T)-.01,(T)-.01,(T)-.01),TV((T).01,(T).02,(T).01)));
+
+        output_directory=LOG::sprintf("Two_Phase/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+        LOG::cout<<"output directory="<<output_directory<<std::endl;
+
+        // set example-specific parameters
+        fluids_parameters.object_friction=(test_number==2||test_number==3)?(T)1:0;
     }
 
     ~TWO_PHASE()
@@ -58,61 +100,7 @@ public:
     void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE {}
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    int cells=1*resolution;
-    // set up the standard fluid environment
-    frame_rate=24;
-    restart=false;restart_frame=0;
-    first_frame=0;last_frame=300;frame_rate=400;
-    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-    fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-    fluids_parameters.number_particles_per_cell=16;
-    fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
-    fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
-    fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
-    fluids_parameters.delete_fluid_inside_objects=true;
-    fluids_parameters.incompressible_iterations=100;
-    fluids_parameters.use_removed_positive_particles=false;fluids_parameters.use_removed_negative_particles=false;
-    fluids_parameters.write_removed_positive_particles=false;fluids_parameters.write_removed_negative_particles=false;
-    fluids_parameters.second_order_cut_cell_method=true;
-    fluids_parameters.store_particle_ids=true;
-    fluids_parameters.use_vorticity_confinement=false;
-    fluids_parameters.use_vorticity_confinement_fuel=false;
- 
-    // set up the example parameters
-    if(test_number!=1 && test_number!=2 && test_number!=3){LOG::cout<<"Unrecognized example: "<<test_number<<std::endl;PHYSBAM_FATAL_ERROR();}
-    fluids_parameters.densities(1)=(T)1.226;fluids_parameters.densities(2)=1000;
-    fluids_parameters.surface_tensions(1,2)=fluids_parameters.surface_tensions(2,1)=(T).0728;
-    fluids_parameters.viscosities(1)=(T).0000178;
-    fluids_parameters.viscosities(2)=(T).001137;
-    fluids_parameters.implicit_viscosity=false;
-    fluids_parameters.incompressible_iterations=200;
-    fluids_parameters.implicit_viscosity_iterations=200;
-    fluids_parameters.solve_neumann_regions=true;
-
-    // set up the domain
-    GRID<TV>& grid=*fluids_parameters.grid;
-    grid.Initialize(TV_INT(10*cells+1,20*cells+1,10*cells+1),RANGE<TV>(TV((T)-.01,(T)-.01,(T)-.01),TV((T).01,(T).02,(T).01)));
-
-    output_directory=LOG::sprintf("Two_Phase/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
-    LOG::cout<<"output directory="<<output_directory<<std::endl;
-
-    // set example-specific parameters
-    fluids_parameters.object_friction=(test_number==2||test_number==3)?(T)1:0;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initial_Phi
 //#####################################################################
@@ -183,14 +171,14 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Construct_Levelsets_For_Objects(const T time)
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >::Construct_Levelsets_For_Objects(time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Construct_Levelsets_For_Objects(time);
 }
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
 }
 //#####################################################################
 };

@@ -16,8 +16,8 @@ template<class TV> void Add_Debug_Particle(const TV& X){Add_Debug_Particle(X,VEC
 #pragma warning(disable:4355) // 'this' : used in base member initializer list
 #endif
 template<class T> STANDARD_TESTS<T>::
-STANDARD_TESTS(const STREAM_TYPE stream_type)
-    :BASE(stream_type,1,fluids_parameters.WATER),solids_tests(stream_type,data_directory,solid_body_collection),run_self_tests(false),print_poisson_matrix(false),print_index_map(false),
+STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :BASE(stream_type_input,parse_args,1,fluids_parameters.WATER),solids_tests(stream_type_input,data_directory,solid_body_collection),run_self_tests(false),print_poisson_matrix(false),print_index_map(false),
     print_matrix(false),print_each_matrix(false),use_full_ic(false),output_iterators(false),use_viscous_forces(false),max_dt(0),exact_dt(0),current_dt(0),implicit_solid(false),
     front_tracked_structure(0),rebuild_curve(0),deformable_collisions(0),fsi(0),number_surface_particles(0),rebuild_surface(false),free_particles(0),psi_D(0),
     circle_radius(0),circle_perturbation((T).05),oscillation_mode(2),use_massless_structure(false),coupled_particles(0),make_ellipse(false),m(1),s(1),kg(1),solid_refinement(7),
@@ -27,65 +27,42 @@ STANDARD_TESTS(const STREAM_TYPE stream_type)
     debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     debug_particles.Store_Velocity(true);
     Store_Debug_Particles(&debug_particles);
-}
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-template<class T> STANDARD_TESTS<T>::
-~STANDARD_TESTS()
-{
-    delete deformable_collisions;
-}
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-template<class T> void STANDARD_TESTS<T>::
-Register_Options()
-{
-    BASE::Register_Options();
 
     fluids_parameters.use_preconditioner_for_slip_system=false;
     solids_parameters.implicit_solve_parameters.cg_iterations=3000;
     solids_fluids_parameters.use_leakproof_solve=false;
     fluids_parameters.surface_tension=(T).0728;
 
-    parse_args->Add("-use_viscous_forces",&use_viscous_forces,"use_viscous_forces");
-    parse_args->Add("-implicit_solid",&implicit_solid,"implicit_solid");
-    parse_args->Add("-cg_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"iterations","cg iterations");
-    parse_args->Add("-viscosity",&fluids_parameters.viscosity,&use_viscosity,"viscosity","Viscosity");
-    parse_args->Add("-test_system",&run_self_tests,"run_self_tests");
-    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
-    parse_args->Add("-print_index_map",&print_index_map,"print_index_map");
-    parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
-    parse_args->Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
-    parse_args->Add("-use_full_ic",&use_full_ic,"use_full_ic");
-    parse_args->Add("-output_iterators",&output_iterators,"output_iterators");
-    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
-    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"use preconditioner");
-    parse_args->Add("-leakproof",&solids_fluids_parameters.use_leakproof_solve,"use leakproof solve");
-    parse_args->Add("-max_dt",&max_dt,"dt","maximum dt");
-    parse_args->Add("-dt",&exact_dt,"dt","use this constand dt");
-    parse_args->Add("-build_surface",&rebuild_surface,"rebuild surface");
-    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
-    parse_args->Add("-surface_tension",&fluids_parameters.surface_tension,"coeff","surface tension coefficient");
-    parse_args->Add("-cut_cell",&fluids_parameters.second_order_cut_cell_method,"use second order cut cell");
-    parse_args->Add("-oscillation_mode",&oscillation_mode,"modes","number of oscillation nodes");
-    parse_args->Add("-solid_refinement",&solid_refinement,"level","solid refinement");
-    parse_args->Add("-make_ellipse",&make_ellipse,"use ellipse for initial configuration");
-    parse_args->Add("-epsilon",&circle_perturbation,"eps","circle perturbation");
-    parse_args->Add("-m",&m,"unit","length unit");
-    parse_args->Add("-s",&s,"unit","time unit");
-    parse_args->Add("-kg",&kg,"unit","mass unit");
-    parse_args->Add("-linear_force",&linear_force,"force","linear force");
-    parse_args->Add("-rand",&rand,"rand","rand");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-template<class T> void STANDARD_TESTS<T>::
-Parse_Options()
-{
-    BASE::Parse_Options();
+    parse_args.Add("-use_viscous_forces",&use_viscous_forces,"use_viscous_forces");
+    parse_args.Add("-implicit_solid",&implicit_solid,"implicit_solid");
+    parse_args.Add("-cg_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"iterations","cg iterations");
+    parse_args.Add("-viscosity",&fluids_parameters.viscosity,&use_viscosity,"viscosity","Viscosity");
+    parse_args.Add("-test_system",&run_self_tests,"run_self_tests");
+    parse_args.Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
+    parse_args.Add("-print_index_map",&print_index_map,"print_index_map");
+    parse_args.Add("-print_matrix",&print_matrix,"print_matrix");
+    parse_args.Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
+    parse_args.Add("-use_full_ic",&use_full_ic,"use_full_ic");
+    parse_args.Add("-output_iterators",&output_iterators,"output_iterators");
+    parse_args.Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
+    parse_args.Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"use preconditioner");
+    parse_args.Add("-leakproof",&solids_fluids_parameters.use_leakproof_solve,"use leakproof solve");
+    parse_args.Add("-max_dt",&max_dt,"dt","maximum dt");
+    parse_args.Add("-dt",&exact_dt,"dt","use this constand dt");
+    parse_args.Add("-build_surface",&rebuild_surface,"rebuild surface");
+    parse_args.Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args.Add("-surface_tension",&fluids_parameters.surface_tension,"coeff","surface tension coefficient");
+    parse_args.Add("-cut_cell",&fluids_parameters.second_order_cut_cell_method,"use second order cut cell");
+    parse_args.Add("-oscillation_mode",&oscillation_mode,"modes","number of oscillation nodes");
+    parse_args.Add("-solid_refinement",&solid_refinement,"level","solid refinement");
+    parse_args.Add("-make_ellipse",&make_ellipse,"use ellipse for initial configuration");
+    parse_args.Add("-epsilon",&circle_perturbation,"eps","circle perturbation");
+    parse_args.Add("-m",&m,"unit","length unit");
+    parse_args.Add("-s",&s,"unit","time unit");
+    parse_args.Add("-kg",&kg,"unit","mass unit");
+    parse_args.Add("-linear_force",&linear_force,"force","linear force");
+    parse_args.Add("-rand",&rand,"rand","rand");
+    parse_args.Parse();
     solids_tests.data_directory=data_directory;
     last_frame=100;
     frame_rate=24;
@@ -178,8 +155,16 @@ Parse_Options()
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
     output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
 }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+template<class T> STANDARD_TESTS<T>::
+~STANDARD_TESTS()
+{
+    delete deformable_collisions;
+}
 template<class T> void STANDARD_TESTS<T>::
-Parse_Late_Options() {BASE::Parse_Late_Options();}
+After_Initialization() {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

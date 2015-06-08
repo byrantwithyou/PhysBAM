@@ -160,8 +160,8 @@ public:
     T snake_radius,snake_length;
     ARRAY<IMPLICIT_OBJECT<TV>*> levelsets;
 
-    GENERIC_EXAMPLE(const STREAM_TYPE stream_type,const std::string& parameter_file)
-        :BASE(stream_type),data_directory("../../Public_Data"),variable_max_edge_length_tet_field(0),variable_max_edge_length_tetsurf_field(0)
+    GENERIC_EXAMPLE(const STREAM_TYPE stream_type_input,const std::string& parameter_file)
+        :BASE(stream_type_input),data_directory("../../Public_Data"),variable_max_edge_length_tet_field(0),variable_max_edge_length_tetsurf_field(0)
     {
         PARAMETER_LIST parameter_list;parameter_list.Begin_Parse(parameter_file);
 
@@ -221,7 +221,7 @@ public:
         if(!variable_max_edge_length_file.empty()){
             subdivide_tets_near_boundary_only=parameter_list.Get_Parameter("variable_max_edge_length_boundary_only",false);
             if(subdivide_tets_near_boundary_only){
-                variable_max_edge_length_tetsurf_field=new TETRAHEDRALIZED_VOLUME_SURFACE_FIELD<T>(stream_type,variable_max_edge_length_file);
+                variable_max_edge_length_tetsurf_field=new TETRAHEDRALIZED_VOLUME_SURFACE_FIELD<T>(stream_type_input,variable_max_edge_length_file);
                 variable_max_edge_length_tetsurf_field->field*=parameter_list.Get_Parameter("variable_max_edge_length_scale",(T)1);
                 variable_max_edge_length_tetsurf_field->field+=parameter_list.Get_Parameter("variable_max_edge_length_offset",(T)0);
                 variable_max_edge_length_tetsurf_field->default_value=(T)FLT_MAX;
@@ -229,7 +229,7 @@ public:
                          <<", "<<variable_max_edge_length_tetsurf_field->field.Max()
                          <<"], subdivide tetrahedra near boundary only: "<<subdivide_tets_near_boundary_only<<std::endl;}
             else{
-                variable_max_edge_length_tet_field=new TETRAHEDRALIZED_VOLUME_FIELD<T>(stream_type,variable_max_edge_length_file);
+                variable_max_edge_length_tet_field=new TETRAHEDRALIZED_VOLUME_FIELD<T>(stream_type_input,variable_max_edge_length_file);
                 variable_max_edge_length_tet_field->field*=parameter_list.Get_Parameter("variable_max_edge_length_scale",(T)1);
                 variable_max_edge_length_tet_field->field+=parameter_list.Get_Parameter("variable_max_edge_length_offset",(T)0);
                 variable_max_edge_length_tet_field->default_value=(T)FLT_MAX;

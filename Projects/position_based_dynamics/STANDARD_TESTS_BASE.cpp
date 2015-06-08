@@ -12,8 +12,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> STANDARD_TESTS_BASE<TV>::
-STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-    :PBD_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),
+STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :PBD_EXAMPLE<TV>(stream_type_input,parse_args),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),
     user_last_frame(false),seed(1234),scale_mass(1),scale_stiffness(1),scale_speed(1)
 {
     T framerate=24;

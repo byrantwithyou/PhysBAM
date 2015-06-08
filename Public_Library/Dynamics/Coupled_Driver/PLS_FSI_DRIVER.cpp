@@ -158,7 +158,7 @@ Initialize()
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
     INCOMPRESSIBLE_UNIFORM<TV>* incompressible=example.fluids_parameters.incompressible;
 
-    example.Parse_Late_Options();
+    example.After_Initialization();
 
     Initialize_Fluids_Grids(); // this needs to be here because the arrays have to be resized for multiphase
 

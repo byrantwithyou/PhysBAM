@@ -48,6 +48,7 @@ MPI_WORLD(PARSE_ARGS& parse_args)
 {
     bool opt_mpi=false;
     parse_args.Add("-mpi",&opt_mpi,"Use MPI");
+    parse_args.Parse(true);
     Initialize(opt_mpi);
 }
 //#####################################################################

@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -20,25 +21,10 @@ using namespace PhysBAM;
 // Function MASS_WEIGHTED_SELF_COLLISIONS
 //#####################################################################
 template<class T_input> MASS_WEIGHTED_SELF_COLLISIONS<T_input>::
-MASS_WEIGHTED_SELF_COLLISIONS(const STREAM_TYPE stream_type)
-    :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection)
+MASS_WEIGHTED_SELF_COLLISIONS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection)
 {
-}
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-template<class T_input> void MASS_WEIGHTED_SELF_COLLISIONS<T_input>::
-Register_Options()
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-template<class T_input> void MASS_WEIGHTED_SELF_COLLISIONS<T_input>::
-Parse_Options()
-{
-    BASE::Parse_Options();
+    parse_args.Parse();
     tests.data_directory=data_directory;
 }
 //#####################################################################

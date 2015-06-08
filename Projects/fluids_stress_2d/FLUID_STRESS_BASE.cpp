@@ -36,8 +36,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> FLUID_STRESS_BASE<TV>::
-FLUID_STRESS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-    :STRESS_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),parameter(0),stored_last_frame(0),user_last_frame(false),
+FLUID_STRESS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :STRESS_EXAMPLE<TV>(stream_type_input,parse_args),test_number(0),resolution(32),parameter(0),stored_last_frame(0),user_last_frame(false),
     unit_mu(0),unit_rho(0),unit_st(0),unit_p(0),weiss(1),weiss_inv(1),m(1),s(1),kg(1),
     bc_n(false),bc_d(false),test_analytic_diff(false),refine(1),use_inv_Wi(true),
     analytic_initial_only(false),number_of_threads(1),override_output_directory(false)

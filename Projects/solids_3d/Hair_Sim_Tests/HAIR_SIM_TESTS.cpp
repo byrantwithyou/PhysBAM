@@ -49,29 +49,15 @@ using namespace PhysBAM;
 // Function HAIR_SIM_TESTS
 //#####################################################################
 template<class T_input> HAIR_SIM_TESTS<T_input>::
-HAIR_SIM_TESTS(const STREAM_TYPE stream_type)
-    :BASE(stream_type),start_time(2.),tests(stream_type,data_directory,solid_body_collection),segment_adhesion(0),guide_adhesion(0),guide_object1(0),guide_object2(0),current_levelset(0)
+HAIR_SIM_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :BASE(stream_type_input,parse_args),start_time(2.),tests(stream_type_input,data_directory,solid_body_collection),segment_adhesion(0),guide_adhesion(0),guide_object1(0),guide_object2(0),current_levelset(0)
 {
-}
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-template<class T_input> void HAIR_SIM_TESTS<T_input>::
-Register_Options()
-{
-    BASE::Register_Options();
-    parse_args->Add("-hairsim",&sim_folder,"dir","the hair sime to run");
-    parse_args->Add("-modelname",&rigid_model,"file","the rigid model to bind to");
-    parse_args->Add("-guide",&guide_sim_folder,"dir","the guide hair sim to read from");
-    parse_args->Add("-params",&param_file,"file","parameter file");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-template<class T_input> void HAIR_SIM_TESTS<T_input>::
-Parse_Options()
-{
-    BASE::Parse_Options();
+    parse_args.Add("-hairsim",&sim_folder,"dir","the hair sime to run");
+    parse_args.Add("-modelname",&rigid_model,"file","the rigid model to bind to");
+    parse_args.Add("-guide",&guide_sim_folder,"dir","the guide hair sim to read from");
+    parse_args.Add("-params",&param_file,"file","parameter file");
+    parse_args.Parse();
+
     tests.data_directory=data_directory;
 
     std::string parameter_file=data_directory+"/"+sim_folder+"/"+param_file;

@@ -13,18 +13,50 @@ using namespace PhysBAM;
 // EXAMPLE
 //#####################################################################
 template<class TV> EXAMPLE<TV>::
-EXAMPLE(const STREAM_TYPE stream_type_input)
+EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(120),frame_rate(24),frame_title(""),
     write_substeps_level(-1),write_first_frame(true),write_last_frame(true),write_time(true),
     output_directory("output"),data_directory("../../Public_Data"),auto_restart(false),restart(false),
-    restart_frame(0),write_output_files(true),write_frame_title(true),abort_when_dt_below(0),parse_args(0),
-    mpi_world(0),want_mpi_world(false),need_finish_logging(false),test_number(0),fixed_dt(0),max_dt(0),
+    restart_frame(0),write_output_files(true),write_frame_title(true),abort_when_dt_below(0),
+    mpi_world(0),need_finish_logging(true),test_number(0),fixed_dt(0),max_dt(0),
     substeps_delay_frame(-1),substeps_delay_level(-1),use_test_output(false),test_output_prefix(""),
     stored_data_directory(data_directory),stored_output_directory(output_directory),opt_all_verbose(false),user_dt(false),
     user_frame_rate(false),user_max_dt(false),user_first_frame(false),user_last_frame(false),user_data_directory(false),
     user_output_directory(false),opt_query_output(false),opt_nolog(false),opt_verbosity(1<<30),stored_first_frame(0),
     stored_last_frame(0),stored_dt(0),stored_frame_rate(24),stored_max_dt(0),m(1),s(1),kg(1)
 {
+    stored_args=parse_args.Print_Arguments();
+    PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
+    PROCESS_UTILITIES::Set_Backtrace(true);
+
+    parse_args.Extra_Optional(&test_number,"example number","example number to run");
+    parse_args.Add("-dt",&stored_dt,&user_dt,"size","fix the time step size to this value.");
+    parse_args.Add("-framerate",&stored_frame_rate,&user_frame_rate,"rate","frame rate");
+    parse_args.Add("-max_dt",&stored_max_dt,&user_max_dt,"size","fix the time step size to be no larger than this value.");
+    parse_args.Add("-delay_substeps",&substeps_delay_frame,"frame","delay substeps until later frame");
+    parse_args.Add("-first_frame",&stored_first_frame,&user_first_frame,"frame","first frame");
+    parse_args.Add("-last_frame",&stored_last_frame,&user_last_frame,"frame","last frame");
+    parse_args.Add("-restart",&restart_frame,&restart,"frame","restart frame");
+    parse_args.Add("-substeps",&substeps_delay_level,"level","substep output level");
+    parse_args.Add("-v",&opt_verbosity,"level","verbosity level");
+    parse_args.Add("-auto_restart",&auto_restart,"restart from last_frame");
+    parse_args.Add("-nolog",&opt_nolog,"disable log.txt");
+    parse_args.Add("-query_output",&opt_query_output,"print the output directory and exit");
+    parse_args.Add("-d",&stored_data_directory,&user_data_directory,"dir","data directory");
+    parse_args.Add("-o",&stored_output_directory,&user_output_directory,"dir","output directory");
+    parse_args.Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
+    parse_args.Add("-m",&m,"scale","length unit");
+    parse_args.Add("-s",&s,"scale","time unit");
+    parse_args.Add("-kg",&kg,"scale","mass unit");
+    parse_args.Add("-all_verbose",&opt_all_verbose,"all mpi processes write to stdout (not just the first)");
+    parse_args.Parse(true);
+
+    if(mpi_world && !opt_all_verbose && mpi_world->initialized && mpi_world->rank) opt_verbosity=0;
+    LOG::Initialize_Logging(opt_verbosity<10,false,opt_verbosity,!opt_nolog);
+    stored_dt*=s;
+    stored_frame_rate/=s;
+    stored_max_dt*=s;
+    frame_rate/=s;
 }
 //#####################################################################
 // ~EXAMPLE
@@ -89,53 +121,10 @@ Log_Parameters() const
     LOG::cout<<"abort_when_dt_below="<<abort_when_dt_below<<std::endl;
 }
 //#####################################################################
-// Function Register_Options
+// Function After_Construction
 //#####################################################################
 template<class TV> void EXAMPLE<TV>::
-Register_Options()
-{
-    if(!parse_args) return;
-    parse_args->Extra_Optional(&test_number,"example number","example number to run");
-    parse_args->Add("-dt",&stored_dt,&user_dt,"size","fix the time step size to this value.");
-    parse_args->Add("-framerate",&stored_frame_rate,&user_frame_rate,"rate","frame rate");
-    parse_args->Add("-max_dt",&stored_max_dt,&user_max_dt,"size","fix the time step size to be no larger than this value.");
-    parse_args->Add("-delay_substeps",&substeps_delay_frame,"frame","delay substeps until later frame");
-    parse_args->Add("-first_frame",&stored_first_frame,&user_first_frame,"frame","first frame");
-    parse_args->Add("-last_frame",&stored_last_frame,&user_last_frame,"frame","last frame");
-    parse_args->Add("-restart",&restart_frame,&restart,"frame","restart frame");
-    parse_args->Add("-substeps",&substeps_delay_level,"level","substep output level");
-    parse_args->Add("-v",&opt_verbosity,"level","verbosity level");
-    parse_args->Add("-auto_restart",&auto_restart,"restart from last_frame");
-    parse_args->Add("-nolog",&opt_nolog,"disable log.txt");
-    parse_args->Add("-query_output",&opt_query_output,"print the output directory and exit");
-    parse_args->Add("-d",&stored_data_directory,&user_data_directory,"dir","data directory");
-    parse_args->Add("-o",&stored_output_directory,&user_output_directory,"dir","output directory");
-    parse_args->Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
-    parse_args->Add("-m",&m,"scale","length unit");
-    parse_args->Add("-s",&s,"scale","time unit");
-    parse_args->Add("-kg",&kg,"scale","mass unit");
-    if(mpi_world) parse_args->Add("-all_verbose",&opt_all_verbose,"all mpi processes write to stdout (not just the first)");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-template<class TV> void EXAMPLE<TV>::
-Parse_Options()
-{
-    if(!parse_args) return;
-    if(mpi_world && !opt_all_verbose && mpi_world->initialized && mpi_world->rank) opt_verbosity=0;
-    need_finish_logging=true;
-    LOG::Initialize_Logging(opt_verbosity<10,false,opt_verbosity,!opt_nolog);
-    stored_dt*=s;
-    stored_frame_rate/=s;
-    stored_max_dt*=s;
-    frame_rate/=s;
-}
-//#####################################################################
-// Function Override_Options
-//#####################################################################
-template<class TV> void EXAMPLE<TV>::
-Override_Options()
+After_Construction()
 {
     if(user_output_directory) output_directory=stored_output_directory;
     if(user_data_directory) data_directory=stored_data_directory;
@@ -151,35 +140,16 @@ Override_Options()
         if(!restart && !auto_restart) FILE_UTILITIES::Create_Directory(output_directory);
         FILE_UTILITIES::Create_Directory(output_directory+"/common");
         LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",restart);}
+
+    LOG::cout<<stored_args<<std::endl;
 }
 //#####################################################################
-// Function Parse_Late_Options
+// Function After_Initialization
 //#####################################################################
 template<class TV> void EXAMPLE<TV>::
-Parse_Late_Options()
+After_Initialization()
 {
-    if(!parse_args) return;
     if(user_last_frame) last_frame=stored_last_frame;
-}
-//#####################################################################
-// Function Parse
-//#####################################################################
-template<class TV> void EXAMPLE<TV>::
-Parse(PARSE_ARGS& parse_args_input)
-{
-    PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
-    PROCESS_UTILITIES::Set_Backtrace(true);
-
-    parse_args=&parse_args_input;
-    if(want_mpi_world) mpi_world=new MPI_WORLD(*parse_args);
-    Register_Options();
-
-    std::string print_args=parse_args->Print_Arguments();
-    parse_args->Parse();
-
-    Parse_Options();
-    LOG::cout<<print_args<<std::endl;
-    Override_Options();
 }
 //#####################################################################
 namespace PhysBAM{

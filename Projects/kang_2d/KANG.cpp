@@ -17,8 +17,8 @@ using namespace PhysBAM;
 #pragma warning(disable:4355) // 'this' : used in base member initializer list
 #endif
 template<class T> KANG<T>::
-KANG(const STREAM_TYPE stream_type)
-    :BASE(stream_type,1),solids_tests(stream_type,data_directory,solid_body_collection),output_iterators(false),max_dt(0),exact_dt(0),
+KANG(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :BASE(stream_type_input,parse_args,1),solids_tests(stream_type_input,data_directory,solid_body_collection),output_iterators(false),max_dt(0),exact_dt(0),
     circle_radius(0),circle_perturbation((T).05),oscillation_mode(2),make_ellipse(false),
     omega(0),laplace_number(0),uleft(0),uright(0)
 {
@@ -26,50 +26,26 @@ KANG(const STREAM_TYPE stream_type)
     debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     debug_particles.Store_Velocity(true);
     Store_Debug_Particles(&debug_particles);
-}
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-//#####################################################################
-// Destructor
-//#####################################################################
-template<class T> KANG<T>::
-~KANG()
-{
-}
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-template<class T> void KANG<T>::
-Register_Options()
-{
-    BASE::Register_Options();
     fluids_parameters.incompressible_iterations=3000;
     fluids_parameters.incompressible_tolerance=(T)1e-14;
     fluids_parameters.surface_tension=(T).0728;
-    parse_args->Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"iterations","Incompressible iterations");
-    parse_args->Add("-solve_tolerance",&fluids_parameters.incompressible_tolerance,"tolerance","Incompressible tolerance");
-    parse_args->Add("-viscosity",&fluids_parameters.viscosity,"viscosity","Viscosity");
-    parse_args->Add("-test_system",&test_system,"Test Krylov system properties");
-    parse_args->Add("-print_matrix",&print_matrix,"Print Krylov system");
-    parse_args->Add("-output_iterators",&output_iterators,"Emit debug information for iterators");
-    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"Do not use preconditioner for slip system");
-    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"Enable preconditioner");
-    parse_args->Add("-max_dt",&max_dt,"value","Use dt no larger than this");
-    parse_args->Add("-dt",&exact_dt,"value","Use exactly this dt");
-    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
-    parse_args->Add("-surface_tension",&fluids_parameters.surface_tension,"value","Surface tension coefficient");
-    parse_args->Add("-oscillation_mode",&oscillation_mode,"mode","Oscillation mode for oscillation test");
-    parse_args->Add("-make_ellipse",&make_ellipse,"Use ellipse for initial configuration instead of circle");
-    parse_args->Add("-epsilon",&circle_perturbation,"eps","fraction by which to purturb modes");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-template<class T> void KANG<T>::
-Parse_Options()
-{
-    BASE::Parse_Options();
+    parse_args.Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"iterations","Incompressible iterations");
+    parse_args.Add("-solve_tolerance",&fluids_parameters.incompressible_tolerance,"tolerance","Incompressible tolerance");
+    parse_args.Add("-viscosity",&fluids_parameters.viscosity,"viscosity","Viscosity");
+    parse_args.Add("-test_system",&test_system,"Test Krylov system properties");
+    parse_args.Add("-print_matrix",&print_matrix,"Print Krylov system");
+    parse_args.Add("-output_iterators",&output_iterators,"Emit debug information for iterators");
+    parse_args.Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"Do not use preconditioner for slip system");
+    parse_args.Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"Enable preconditioner");
+    parse_args.Add("-max_dt",&max_dt,"value","Use dt no larger than this");
+    parse_args.Add("-dt",&exact_dt,"value","Use exactly this dt");
+    parse_args.Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args.Add("-surface_tension",&fluids_parameters.surface_tension,"value","Surface tension coefficient");
+    parse_args.Add("-oscillation_mode",&oscillation_mode,"mode","Oscillation mode for oscillation test");
+    parse_args.Add("-make_ellipse",&make_ellipse,"Use ellipse for initial configuration instead of circle");
+    parse_args.Add("-epsilon",&circle_perturbation,"eps","fraction by which to purturb modes");
+    parse_args.Parse();
+
     solids_tests.data_directory=data_directory;
     last_frame=100;
     frame_rate=24;
@@ -177,8 +153,18 @@ Parse_Options()
 
     output_directory=LOG::sprintf("Test_%d",test_number,resolution);
 }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class T> KANG<T>::
+~KANG()
+{
+}
 template<class T> void KANG<T>::
-Parse_Late_Options() {BASE::Parse_Late_Options();}
+After_Initialization() {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

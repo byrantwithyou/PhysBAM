@@ -23,16 +23,17 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     typedef typename TV::SPIN T_SPIN;
     using BASE::last_frame;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;using BASE::data_directory;
-    using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;
+    using BASE::stream_type;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
 
     T initial_height;
     bool use_ground;
     int ground_id;
 
-    RIGID_PARTICLE_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type),initial_height((T)5),use_ground(true)
+    RIGID_PARTICLE_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),initial_height((T)5),use_ground(true)
     {
+        parse_args.Parse();
     }
 
     ~RIGID_PARTICLE_EXAMPLE()
@@ -49,21 +50,7 @@ public:
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return false;}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options()
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options()
-{
-    BASE::Parse_Options();
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################

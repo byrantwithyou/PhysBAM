@@ -41,12 +41,19 @@ public:
 
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
-    using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;
+    using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
     
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),parameter(0)
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),parameter(0)
     {
+        parse_args.Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
+        parse_args.Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
+        parse_args.Add("-print_energy",&solid_body_collection.rigid_body_collection.print_energy,"print energy statistics");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     }
 
     ~STANDARD_TESTS()
@@ -79,26 +86,7 @@ public:
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return false;}
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
-    parse_args->Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
-    parse_args->Add("-print_energy",&solid_body_collection.rigid_body_collection.print_energy,"print energy statistics");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

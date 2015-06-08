@@ -15,6 +15,7 @@
 #include <Tools/Arrays/IDENTITY_ARRAY.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
@@ -47,7 +48,7 @@ class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
-    using BASE::data_directory;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
+    using BASE::data_directory;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solids_evolution;
     using BASE::Add_To_Fluid_Simulation;using BASE::Add_Thin_Shell_To_Fluid_Simulation;
@@ -78,13 +79,130 @@ public:
     ARRAY<PAIR<int,TV> > constrained_node_positions;
     ARRAY<int> rigid_bodies_to_simulate;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.SMOKE),
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args,0,fluids_parameters.SMOKE),
         smoke_tests(*this,fluids_parameters,fluid_collection.incompressible_fluid_collection,solid_body_collection.rigid_body_collection),
-        solids_tests(stream_type,data_directory,solid_body_collection),deformable_circle_id(0),rigid_body_id(0),velocity_multiplier((T)1),number_side_panels(40),aspect_ratio((T)1.1),side_length((T).5),
+        solids_tests(stream_type_input,data_directory,solid_body_collection),deformable_circle_id(0),rigid_body_id(0),velocity_multiplier((T)1),number_side_panels(40),aspect_ratio((T)1.1),side_length((T).5),
         stiffness_multiplier((T)1),damping_multiplier((T)1),bending_stiffness_multiplier((T)1),bending_damping_multiplier((T)1),heavy_sphere_drop_time((T)1.5),source_velocity((T)0,(T).5,(T)0),
         run_self_tests(false),print_poisson_matrix(false),print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false)
     {
+        parse_args.Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"value","cg iterations");
+        parse_args.Add("-slip",&fluids_parameters.use_slip,"use slip");
+        parse_args.Add("-viscosity",&fluids_parameters.viscosity,"value","fluid viscosity");
+        parse_args.Add("-test_system",&run_self_tests,"Run self tests");
+        parse_args.Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
+        parse_args.Add("-print_index_map",&print_index_map,"print_index_map");
+        parse_args.Add("-print_matrix",&print_matrix,"print_matrix");
+        parse_args.Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
+        parse_args.Add("-output_iterators",&output_iterators,"output_iterators");
+        parse_args.Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
+        parse_args.Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"preconditioner");
+        parse_args.Parse();
+
+        solids_tests.data_directory=data_directory;
+        smoke_tests.Initialize(Smoke_Test_Number(test_number),resolution);
+        LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
+        last_frame=1000;
+
+        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+        solids_parameters.rigid_body_collision_parameters.use_push_out=false;
+        solids_parameters.use_post_cg_constraints=false; // TODO: if this isn't false rigids don't get affected
+        solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
+
+        *fluids_parameters.grid=smoke_tests.grid;
+        fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
+        
+        solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+        solids_parameters.use_trapezoidal_rule_for_velocities=false;
+        solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1.1;
+
+        fluids_parameters.use_vorticity_confinement=false;
+        fluids_parameters.use_preconditioner_for_slip_system=true;
+        if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
+        
+        //if(solid_node || !mpi) solids_parameters.use_rigid_deformable_contact=true;
+
+        switch(test_number){
+            case 1:
+                last_frame=1000;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                solids_parameters.implicit_solve_parameters.cg_iterations=400;
+                fluids_parameters.density=(T)1000;
+                fluids_parameters.gravity.y=-(T)9.8;
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+                source_velocity=TV((T)0,(T)1,(T)0);
+                source_cylinder=CYLINDER<T>(TV((T).5,(T)0,(T).5),TV((T).5,(T).05,(T).5),(T).15);
+                break;
+            case 2:
+                last_frame=1000;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                fluids_parameters.density=(T)1000;
+                velocity_multiplier=(T)4;
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+                break;
+            case 3:
+                last_frame=1000;
+                solids_parameters.implicit_solve_parameters.cg_iterations=400;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                fluids_parameters.density=(T)10;
+                velocity_multiplier=(T)5;
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+                break;
+            case 4:
+                last_frame=1000;
+                //solids_parameters.implicit_solve_parameters.cg_iterations=400;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                fluids_parameters.density=(T)1;
+                velocity_multiplier=(T)15;
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+                balloon_initial_radius=(T).2;
+                light_sphere_drop_time=(T).5;
+                heavy_sphere_drop_time=(T)1.5;
+                heavy_sphere_initial_height=(T).25;
+                light_sphere_initial_height=(T).25;
+                source_velocity=TV((T)0,(T)4,(T)0);
+                source_cylinder=CYLINDER<T>(TV((T).5,(T)0,(T).5),TV((T).5,(T).05,(T).5),(T).05);
+                solids_parameters.implicit_solve_parameters.cg_iterations=1500;
+                break;
+            case 5:
+                last_frame=1000;
+                solids_parameters.implicit_solve_parameters.cg_iterations=400;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                fluids_parameters.density=(T)1;
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+                balloon_initial_radius=(T).2;
+                light_sphere_drop_time=(T).5;
+                heavy_sphere_drop_time=(T)2.5;
+                heavy_sphere_initial_height=(T).35;
+                light_sphere_initial_height=(T).35;
+                source_velocity=TV(2*sqrt((T)2),2*sqrt((T)2),(T)0);
+                source_cylinder=CYLINDER<T>(TV((T).5,(T)0,(T).5),TV((T).5,(T).1,(T).5),(T).05);
+                break;
+            default:
+                LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
+        
+        THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
+
+        switch(test_number){
+            case 1:
+                break;
+            case 2:
+                mattress_grid=GRID<TV>(TV_INT(8,2,2),RANGE<TV>(TV((T)0,(T)2,(T)2),TV((T)4,(T)3,(T)3)));
+                //mattress_grid=GRID<TV>(TV_INT(2,2,2),RANGE<TV>(TV((T).5,(T).5,(T).5),TV((T).6,(T).6,(T).6)));
+                solids_parameters.implicit_solve_parameters.cg_iterations=4000;
+                break;
+            case 3:
+            case 4:
+            case 5:
+                break;
+            default:
+                LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
+
+
+        if(fluids_parameters.use_slip)
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
+        else
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
     }
 
     // Unused callbacks
@@ -107,136 +225,7 @@ public:
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Post_Initialization() PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"value","cg iterations");
-    parse_args->Add("-slip",&fluids_parameters.use_slip,"use slip");
-    parse_args->Add("-viscosity",&fluids_parameters.viscosity,"value","fluid viscosity");
-    parse_args->Add("-test_system",&run_self_tests,"Run self tests");
-    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
-    parse_args->Add("-print_index_map",&print_index_map,"print_index_map");
-    parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
-    parse_args->Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
-    parse_args->Add("-output_iterators",&output_iterators,"output_iterators");
-    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
-    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"preconditioner");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    solids_tests.data_directory=data_directory;
-    smoke_tests.Initialize(Smoke_Test_Number(test_number),resolution);
-    LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-    last_frame=1000;
-
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    solids_parameters.rigid_body_collision_parameters.use_push_out=false;
-    solids_parameters.use_post_cg_constraints=false; // TODO: if this isn't false rigids don't get affected
-    solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
-
-    *fluids_parameters.grid=smoke_tests.grid;
-    fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
-        
-    solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-    solids_parameters.use_trapezoidal_rule_for_velocities=false;
-    solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1.1;
-
-    fluids_parameters.use_vorticity_confinement=false;
-    fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
-        
-    //if(solid_node || !mpi) solids_parameters.use_rigid_deformable_contact=true;
-
-    switch(test_number){
-        case 1:
-            last_frame=1000;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            solids_parameters.implicit_solve_parameters.cg_iterations=400;
-            fluids_parameters.density=(T)1000;
-            fluids_parameters.gravity.y=-(T)9.8;
-            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-            source_velocity=TV((T)0,(T)1,(T)0);
-            source_cylinder=CYLINDER<T>(TV((T).5,(T)0,(T).5),TV((T).5,(T).05,(T).5),(T).15);
-            break;
-        case 2:
-            last_frame=1000;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            fluids_parameters.density=(T)1000;
-            velocity_multiplier=(T)4;
-            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-            break;
-        case 3:
-            last_frame=1000;
-            solids_parameters.implicit_solve_parameters.cg_iterations=400;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            fluids_parameters.density=(T)10;
-            velocity_multiplier=(T)5;
-            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-            break;
-        case 4:
-            last_frame=1000;
-            //solids_parameters.implicit_solve_parameters.cg_iterations=400;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            fluids_parameters.density=(T)1;
-            velocity_multiplier=(T)15;
-            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-            balloon_initial_radius=(T).2;
-            light_sphere_drop_time=(T).5;
-            heavy_sphere_drop_time=(T)1.5;
-            heavy_sphere_initial_height=(T).25;
-            light_sphere_initial_height=(T).25;
-            source_velocity=TV((T)0,(T)4,(T)0);
-            source_cylinder=CYLINDER<T>(TV((T).5,(T)0,(T).5),TV((T).5,(T).05,(T).5),(T).05);
-            solids_parameters.implicit_solve_parameters.cg_iterations=1500;
-            break;
-        case 5:
-            last_frame=1000;
-            solids_parameters.implicit_solve_parameters.cg_iterations=400;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            fluids_parameters.density=(T)1;
-            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-            balloon_initial_radius=(T).2;
-            light_sphere_drop_time=(T).5;
-            heavy_sphere_drop_time=(T)2.5;
-            heavy_sphere_initial_height=(T).35;
-            light_sphere_initial_height=(T).35;
-            source_velocity=TV(2*sqrt((T)2),2*sqrt((T)2),(T)0);
-            source_cylinder=CYLINDER<T>(TV((T).5,(T)0,(T).5),TV((T).5,(T).1,(T).5),(T).05);
-            break;
-        default:
-            LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
-        
-    THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
-
-    switch(test_number){
-        case 1:
-            break;
-        case 2:
-            mattress_grid=GRID<TV>(TV_INT(8,2,2),RANGE<TV>(TV((T)0,(T)2,(T)2),TV((T)4,(T)3,(T)3)));
-            //mattress_grid=GRID<TV>(TV_INT(2,2,2),RANGE<TV>(TV((T).5,(T).5,(T).5),TV((T).6,(T).6,(T).6)));
-            solids_parameters.implicit_solve_parameters.cg_iterations=4000;
-            break;
-        case 3:
-        case 4:
-        case 5:
-            break;
-        default:
-            LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
-
-
-    if(fluids_parameters.use_slip)
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
-    else
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Set_External_Positions
 //#####################################################################

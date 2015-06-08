@@ -70,7 +70,7 @@ Initialize()
     // initialize state variables
     example.Initialize_Euler_State();
 
-    example.Parse_Late_Options();
+    example.After_Initialization();
 
     // Boundary conditions
     example.Set_Boundary_Conditions(time); // get so CFL is correct

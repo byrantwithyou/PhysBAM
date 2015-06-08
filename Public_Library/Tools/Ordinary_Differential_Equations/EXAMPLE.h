@@ -36,9 +36,7 @@ public:
     bool write_output_files,write_frame_title;
 
     T abort_when_dt_below;
-    PARSE_ARGS* parse_args;
     MPI_WORLD* mpi_world;
-    bool want_mpi_world;
     bool need_finish_logging;
     int test_number;
     bool use_default_test;
@@ -53,8 +51,9 @@ public:
     int opt_verbosity,stored_first_frame,stored_last_frame;
     T stored_dt,stored_frame_rate,stored_max_dt;
     T m,s,kg;
+    std::string stored_args;
     
-    EXAMPLE(const STREAM_TYPE stream_type_input);
+    EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~EXAMPLE();
     
 //#####################################################################
@@ -65,11 +64,8 @@ public:
     virtual void Limit_Dt(T& dt,const T time);
     virtual void Write_Output_Files(const int frame) const=0;
     virtual void Log_Parameters() const;
-    void Parse(PARSE_ARGS& parse_args);
-    virtual void Register_Options(); // Call parent first
-    virtual void Parse_Options(); // Call parent first
-    virtual void Override_Options(); // Call parent last
-    virtual void Parse_Late_Options();
+    virtual void After_Construction(); // Call parent first
+    virtual void After_Initialization(); // Call parent last
 //#####################################################################
 };
 }

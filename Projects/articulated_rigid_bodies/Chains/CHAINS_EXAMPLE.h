@@ -29,7 +29,7 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::stream_type;
     using BASE::restart;using BASE::initial_time;using BASE::first_frame;using BASE::last_frame;using BASE::restart_frame;using BASE::frame_rate;using BASE::solid_body_collection;
-    using BASE::test_number;using BASE::parse_args;using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
+    using BASE::test_number;using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
     
     ARTICULATED_RIGID_BODY<TV>* arb;
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -37,8 +37,8 @@ public:
     int num_poles,num_rings,selection;
     bool use_rigid_deformable_evolution_old;
 
-    CHAINS_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type),arb(0),tests(stream_type,data_directory,solid_body_collection),square1(0),square2(0),num_poles(5),num_rings(20),selection(0),
+    CHAINS_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),arb(0),tests(stream_type_input,data_directory,solid_body_collection),square1(0),square2(0),num_poles(5),num_rings(20),selection(0),
         use_rigid_deformable_evolution_old(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
@@ -54,6 +54,10 @@ public:
 
         //artificial_maximum_speed=30;
         std::cout<<"Frame rate: "<<frame_rate<<std::endl;
+        parse_args.Add("-selection",&selection,"value","selection");
+        parse_args.Parse();
+        tests.data_directory=data_directory;
+        output_directory="Chains/output";output_directory+=selection==0?"_blocks_chain":"_lathe_chains";
     }
     
     virtual ~CHAINS_EXAMPLE()
@@ -79,18 +83,7 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
 
-    void Register_Options() PHYSBAM_OVERRIDE
-    {
-        BASE::Register_Options();
-        parse_args->Add("-selection",&selection,"value","selection");
-    }
-    void Parse_Options() PHYSBAM_OVERRIDE
-    {
-        BASE::Parse_Options();
-        tests.data_directory=data_directory;
-        output_directory="Chains/output";output_directory+=selection==0?"_blocks_chain":"_lathe_chains";
-    }
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Rigid_Bodies
 //#####################################################################

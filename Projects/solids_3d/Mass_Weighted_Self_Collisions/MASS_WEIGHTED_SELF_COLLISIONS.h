@@ -24,7 +24,7 @@ class MASS_WEIGHTED_SELF_COLLISIONS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >,TR
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
-    using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
+    using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Set_External_Positions;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
 
     struct COLLISION_PAIR_COMPARATOR{
@@ -50,7 +50,7 @@ public:
     COLLISION_PAIR_COMPARATOR *comparator;
 
 //#####################################################################
-    MASS_WEIGHTED_SELF_COLLISIONS(const STREAM_TYPE stream_type);
+    MASS_WEIGHTED_SELF_COLLISIONS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     void Initialize_Bodies() PHYSBAM_OVERRIDE;
     // overrides from MASS_MODIFIER
     void Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,VECTOR<T,4>& one_over_mass);
@@ -60,9 +60,7 @@ public:
     void Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2>& weights,ARRAY_VIEW<T>& one_over_mass);
     void Edge_Edge_Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass);
     void Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& point_face_pairs);
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
-    void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 };
 }

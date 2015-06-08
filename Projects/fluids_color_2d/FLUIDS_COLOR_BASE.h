@@ -96,8 +96,8 @@ public:
     int number_of_threads;
     bool override_output_directory;
 
-    FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-        :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),rho0(1),
+    FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :PLS_FC_EXAMPLE<TV>(stream_type_input),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),rho0(1),
         rho1(2),unit_mu(0),unit_rho(0),unit_st(0),unit_p(0),weiss(1),weiss_inv(1),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),
         refine(1),surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),
         override_surface_tension(false),use_pls_over_levelset(false),use_levelset_over_pls(false),analytic_initial_only(false),

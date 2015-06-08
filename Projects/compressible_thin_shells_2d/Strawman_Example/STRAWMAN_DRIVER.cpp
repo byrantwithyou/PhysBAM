@@ -28,7 +28,7 @@ template<class TV> void STRAWMAN_DRIVER<TV>::
 Initialize()
 {
     BASE::Initialize();
-    example.Parse_Late_Options();
+    example.After_Initialization();
     if(!example.restart) Write_Output_Files(example.first_frame);
 }
 //#####################################################################

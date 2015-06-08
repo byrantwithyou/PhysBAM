@@ -25,8 +25,8 @@ int main(int argc,char* argv[])
 
     if(0){
 /*        SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
-        example=new STANDARD_TESTS<T>(stream_type);
-        example->want_mpi_world=true;
+        example=new STANDARD_TESTS<T>(stream_type,parse_args);
+        example->mpi_world=new MPI_WORLD(parse_args);
         example->Parse(argc,argv);
 
         if(example->mpi_world->initialized){
@@ -47,9 +47,9 @@ int main(int argc,char* argv[])
         delete example;*/}
     else{
         PLS_FSI_EXAMPLE<TV>* example=0;
-        example=new SURFACE_TENSION<T>(stream_type);
         PARSE_ARGS parse_args(argc,argv);
-        example->Parse(parse_args);
+        example=new SURFACE_TENSION<T>(stream_type,parse_args);
+        example->After_Construction();
         PLS_FSI_DRIVER<TV> driver(*example);
         driver.Execute_Main_Program();
         delete example;}

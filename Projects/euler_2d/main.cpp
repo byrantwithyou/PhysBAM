@@ -44,14 +44,14 @@ int main(int argc,char* argv[])
     parse_args.Parse(true);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
-    if(opt_sod) example=new SOD_ST_2D<T>(stream_type);
-    else if(opt_oblique) example=new OBLIQUE_SOD_ST<T>(stream_type);
-    else if(opt_circle) example=new CIRCLE_EXAMPLE<T>(stream_type,incompressible);
-    else if(opt_tunnel) example=new WIND_TUNNEL<T>(stream_type);
-    else if(opt_drop) example=new INCOMPRESSIBLE_DROP<T>(stream_type);
-    else example=new STANDARD_TESTS<T>(stream_type); //default
-    example->want_mpi_world=true;
-    example->Parse(parse_args);
+    if(opt_sod) example=new SOD_ST_2D<T>(stream_type,parse_args);
+    else if(opt_oblique) example=new OBLIQUE_SOD_ST<T>(stream_type,parse_args);
+    else if(opt_circle) example=new CIRCLE_EXAMPLE<T>(stream_type,parse_args,incompressible);
+    else if(opt_tunnel) example=new WIND_TUNNEL<T>(stream_type,parse_args);
+    else if(opt_drop) example=new INCOMPRESSIBLE_DROP<T>(stream_type,parse_args);
+    else example=new STANDARD_TESTS<T>(stream_type,parse_args); //default
+    example->mpi_world=new MPI_WORLD(parse_args);
+    example->After_Construction();
 
     if(example->mpi_world->initialized){
         example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();

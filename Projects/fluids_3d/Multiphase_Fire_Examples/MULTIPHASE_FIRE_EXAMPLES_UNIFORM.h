@@ -24,7 +24,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;using BASE::Adjust_Phi_With_Source;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;
-    using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
+    using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::test_number;
     
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
 
@@ -38,118 +38,106 @@ public:
     T reaction_bandwidth;
     bool pseudo_dirichlet;
     
-    MULTIPHASE_FIRE_EXAMPLES_UNIFORM(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.FIRE),
+    MULTIPHASE_FIRE_EXAMPLES_UNIFORM(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,0,fluids_parameters.FIRE),
         rigid_body_collection(solid_body_collection.rigid_body_collection),pseudo_dirichlet(false)
     {
+        parse_args.Add("-pseudo_dirichlet",&pseudo_dirichlet,"pseudo_dirichlet");
+        parse_args.Parse();
+
+        fluids_parameters.Initialize_Number_Of_Regions(Number_Of_Regions(test_number));
+        fluids_parameters.write_particles=true;
+        PARAMETER_LIST parameters;
+        fluids_parameters.use_reacting_flow=true;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+        last_frame=512;frame_rate=96;
+        fluids_parameters.temperature_container.Set_Ambient_Temperature(T(283.15));fluids_parameters.temperature_container.Set_Cooling_Constant((T)4000);
+        fluids_parameters.density_container.Set_Ambient_Density(0);
+        fluids_parameters.temperature_products=3000;fluids_parameters.temperature_fuel=298;
+        fluids_parameters.temperature_buoyancy_constant=0;
+        fluids_parameters.use_vorticity_confinement_fuel=fluids_parameters.use_vorticity_confinement=false;
+        fluids_parameters.write_debug_data=fluids_parameters.write_velocity=true;
+
+        if(test_number==1){
+            fluids_parameters.incompressible_iterations=100;
+            fluids_parameters.densities(1)=(T)1000;fluids_parameters.densities(2)=(T)1;
+            fluids_parameters.normal_flame_speeds(1,2)=fluids_parameters.normal_flame_speeds(2,1)=(T).0003;
+            fluids_parameters.fuel_region(1)=true;
+            fluids_parameters.use_flame_speed_multiplier=true;
+            fluids_parameters.confinement_parameters(2)=(T).2;
+            air_region=2;}
+        else if(test_number==2){
+            fluids_parameters.incompressible_iterations=100;
+            fluids_parameters.reseeding_frame_rate=10;
+            fluids_parameters.densities(1)=(T)1000;fluids_parameters.densities(2)=(T)800;fluids_parameters.densities(3)=(T)2000;fluids_parameters.densities(4)=(T)1;
+            fluids_parameters.normal_flame_speeds(2,4)=fluids_parameters.normal_flame_speeds(4,2)=(T).0003;
+            fluids_parameters.normal_flame_speeds(3,4)=fluids_parameters.normal_flame_speeds(4,3)=(T).0001;
+            fluids_parameters.fuel_region(2)=true;fluids_parameters.fuel_region(3)=true;
+            fluids_parameters.viscosities(3)=50;
+            fluids_parameters.implicit_viscosity=true;
+            fluids_parameters.use_flame_speed_multiplier=true;
+            fluids_parameters.confinement_parameters(4)=(T).2;
+            fluids_parameters.temperature_buoyancy_constant=(T)0.01;
+            if(pseudo_dirichlet) fluids_parameters.pseudo_dirichlet_regions(4)=true;
+            inner_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).1,(T).55,(T).3));inner_cylinder1.radius=(T).06;
+            middle_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).1,(T).55,(T).3));middle_cylinder1.radius=(T).09;
+            outer_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).099,(T).55,(T).3));outer_cylinder1.radius=(T).1;
+            source_shutoff_time=(T)2.5+(T)1e-5;
+            sphere_drop_time=(T)2.9+(T)1e-5;
+            air_region=4;}
+        else if(test_number==3){
+            fluids_parameters.implicit_viscosity_iterations=50;
+            fluids_parameters.implicit_viscosity=true;
+            frame_rate=48;
+            fluids_parameters.densities(1)=(T)2000;
+            fluids_parameters.viscosities(1)=(T)200;           
+            fluids_parameters.densities(2)=(T)2000;
+            fluids_parameters.viscosities(2)=(T)200;           
+            fluids_parameters.densities(3)=(T)1000;
+            fluids_parameters.densities(4)=(T)50;
+            //fluids_parameters.surface_tensions(4,1)=fluids_parameters.surface_tensions(1,4)=(T)50;
+            //fluids_parameters.surface_tensions(4,2)=fluids_parameters.surface_tensions(2,4)=(T)50;
+            fluids_parameters.surface_tensions(4,3)=fluids_parameters.surface_tensions(3,4)=(T)10;
+            fluids_parameters.normal_flame_speeds(1,2)=fluids_parameters.normal_flame_speeds(2,1)=(T).01;
+            fluids_parameters.normal_flame_speeds(1,1)=fluids_parameters.normal_flame_speeds(2,2)=(T).01;
+            fluids_parameters.fuel_region(1)=true;
+            fluids_parameters.fuel_region(2)=true;
+
+            fluids_parameters.use_flame_speed_multiplier=true;
+            fluids_parameters.reseeding_frame_rate=5;
+            //fluids_parameters.cfl/=2;
+
+            reaction_bandwidth=2;
+
+            inner_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).2,(T).5),VECTOR<T,3>((T).1,(T).2,(T).5));inner_cylinder1.radius=(T).1;
+            outer_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).2,(T).5),VECTOR<T,3>((T).099,(T).2,(T).5));outer_cylinder1.radius=(T).11;
+            inner_cylinder2.Set_Endpoints(VECTOR<T,3>((T).9,(T).2,(T).5),VECTOR<T,3>((T)1,(T).2,(T).5));inner_cylinder2.radius=(T).1;
+            outer_cylinder2.Set_Endpoints(VECTOR<T,3>((T).899,(T).2,(T).5),VECTOR<T,3>((T)1,(T).2,(T).5));outer_cylinder2.radius=(T).11;}
+        else if(test_number==4){
+            fluids_parameters.incompressible_iterations=100;
+            fluids_parameters.reseeding_frame_rate=10;
+            fluids_parameters.densities(1)=(T)1000;fluids_parameters.densities(2)=(T)800;fluids_parameters.densities(3)=(T)2000;fluids_parameters.densities(4)=(T)1;
+            fluids_parameters.normal_flame_speeds(2,4)=fluids_parameters.normal_flame_speeds(4,2)=(T).0003;
+            fluids_parameters.normal_flame_speeds(3,4)=fluids_parameters.normal_flame_speeds(4,3)=(T).0001;
+            fluids_parameters.fuel_region(2)=true;fluids_parameters.fuel_region(3)=true;
+            fluids_parameters.viscosities(3)=50;
+            fluids_parameters.implicit_viscosity=true;
+            fluids_parameters.use_flame_speed_multiplier=true;
+            fluids_parameters.confinement_parameters(4)=(T).2;
+            fluids_parameters.temperature_buoyancy_constant=(T)0.01;
+            if(pseudo_dirichlet) fluids_parameters.pseudo_dirichlet_regions(4)=true;
+            inner_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).1,(T).55,(T).3));inner_cylinder1.radius=(T).06;
+            middle_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).1,(T).55,(T).3));middle_cylinder1.radius=(T).09;
+            outer_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).099,(T).55,(T).3));outer_cylinder1.radius=(T).1;
+            source_shutoff_time=(T)2.5+(T)1e-5;
+            sphere_drop_time=(T)2.9+(T)1e-5;
+            air_region=4;}
     }
 
     virtual ~MULTIPHASE_FIRE_EXAMPLES_UNIFORM()
     {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-pseudo_dirichlet",&pseudo_dirichlet,"pseudo_dirichlet");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    fluids_parameters.Initialize_Number_Of_Regions(Number_Of_Regions(test_number));
-    fluids_parameters.write_particles=true;
-    PARAMETER_LIST parameters;
-    fluids_parameters.use_reacting_flow=true;
-    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
-    fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-    last_frame=512;frame_rate=96;
-    fluids_parameters.temperature_container.Set_Ambient_Temperature(T(283.15));fluids_parameters.temperature_container.Set_Cooling_Constant((T)4000);
-    fluids_parameters.density_container.Set_Ambient_Density(0);
-    fluids_parameters.temperature_products=3000;fluids_parameters.temperature_fuel=298;
-    fluids_parameters.temperature_buoyancy_constant=0;
-    fluids_parameters.use_vorticity_confinement_fuel=fluids_parameters.use_vorticity_confinement=false;
-    fluids_parameters.write_debug_data=fluids_parameters.write_velocity=true;
-
-    if(test_number==1){
-        fluids_parameters.incompressible_iterations=100;
-        fluids_parameters.densities(1)=(T)1000;fluids_parameters.densities(2)=(T)1;
-        fluids_parameters.normal_flame_speeds(1,2)=fluids_parameters.normal_flame_speeds(2,1)=(T).0003;
-        fluids_parameters.fuel_region(1)=true;
-        fluids_parameters.use_flame_speed_multiplier=true;
-        fluids_parameters.confinement_parameters(2)=(T).2;
-        air_region=2;}
-    else if(test_number==2){
-        fluids_parameters.incompressible_iterations=100;
-        fluids_parameters.reseeding_frame_rate=10;
-        fluids_parameters.densities(1)=(T)1000;fluids_parameters.densities(2)=(T)800;fluids_parameters.densities(3)=(T)2000;fluids_parameters.densities(4)=(T)1;
-        fluids_parameters.normal_flame_speeds(2,4)=fluids_parameters.normal_flame_speeds(4,2)=(T).0003;
-        fluids_parameters.normal_flame_speeds(3,4)=fluids_parameters.normal_flame_speeds(4,3)=(T).0001;
-        fluids_parameters.fuel_region(2)=true;fluids_parameters.fuel_region(3)=true;
-        fluids_parameters.viscosities(3)=50;
-        fluids_parameters.implicit_viscosity=true;
-        fluids_parameters.use_flame_speed_multiplier=true;
-        fluids_parameters.confinement_parameters(4)=(T).2;
-        fluids_parameters.temperature_buoyancy_constant=(T)0.01;
-        if(pseudo_dirichlet) fluids_parameters.pseudo_dirichlet_regions(4)=true;
-        inner_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).1,(T).55,(T).3));inner_cylinder1.radius=(T).06;
-        middle_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).1,(T).55,(T).3));middle_cylinder1.radius=(T).09;
-        outer_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).099,(T).55,(T).3));outer_cylinder1.radius=(T).1;
-        source_shutoff_time=(T)2.5+(T)1e-5;
-        sphere_drop_time=(T)2.9+(T)1e-5;
-        air_region=4;}
-    else if(test_number==3){
-        fluids_parameters.implicit_viscosity_iterations=50;
-        fluids_parameters.implicit_viscosity=true;
-        frame_rate=48;
-        fluids_parameters.densities(1)=(T)2000;
-        fluids_parameters.viscosities(1)=(T)200;           
-        fluids_parameters.densities(2)=(T)2000;
-        fluids_parameters.viscosities(2)=(T)200;           
-        fluids_parameters.densities(3)=(T)1000;
-        fluids_parameters.densities(4)=(T)50;
-        //fluids_parameters.surface_tensions(4,1)=fluids_parameters.surface_tensions(1,4)=(T)50;
-        //fluids_parameters.surface_tensions(4,2)=fluids_parameters.surface_tensions(2,4)=(T)50;
-        fluids_parameters.surface_tensions(4,3)=fluids_parameters.surface_tensions(3,4)=(T)10;
-        fluids_parameters.normal_flame_speeds(1,2)=fluids_parameters.normal_flame_speeds(2,1)=(T).01;
-        fluids_parameters.normal_flame_speeds(1,1)=fluids_parameters.normal_flame_speeds(2,2)=(T).01;
-        fluids_parameters.fuel_region(1)=true;
-        fluids_parameters.fuel_region(2)=true;
-
-        fluids_parameters.use_flame_speed_multiplier=true;
-        fluids_parameters.reseeding_frame_rate=5;
-        //fluids_parameters.cfl/=2;
-
-        reaction_bandwidth=2;
-
-        inner_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).2,(T).5),VECTOR<T,3>((T).1,(T).2,(T).5));inner_cylinder1.radius=(T).1;
-        outer_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).2,(T).5),VECTOR<T,3>((T).099,(T).2,(T).5));outer_cylinder1.radius=(T).11;
-        inner_cylinder2.Set_Endpoints(VECTOR<T,3>((T).9,(T).2,(T).5),VECTOR<T,3>((T)1,(T).2,(T).5));inner_cylinder2.radius=(T).1;
-        outer_cylinder2.Set_Endpoints(VECTOR<T,3>((T).899,(T).2,(T).5),VECTOR<T,3>((T)1,(T).2,(T).5));outer_cylinder2.radius=(T).11;}
-    else if(test_number==4){
-        fluids_parameters.incompressible_iterations=100;
-        fluids_parameters.reseeding_frame_rate=10;
-        fluids_parameters.densities(1)=(T)1000;fluids_parameters.densities(2)=(T)800;fluids_parameters.densities(3)=(T)2000;fluids_parameters.densities(4)=(T)1;
-        fluids_parameters.normal_flame_speeds(2,4)=fluids_parameters.normal_flame_speeds(4,2)=(T).0003;
-        fluids_parameters.normal_flame_speeds(3,4)=fluids_parameters.normal_flame_speeds(4,3)=(T).0001;
-        fluids_parameters.fuel_region(2)=true;fluids_parameters.fuel_region(3)=true;
-        fluids_parameters.viscosities(3)=50;
-        fluids_parameters.implicit_viscosity=true;
-        fluids_parameters.use_flame_speed_multiplier=true;
-        fluids_parameters.confinement_parameters(4)=(T).2;
-        fluids_parameters.temperature_buoyancy_constant=(T)0.01;
-        if(pseudo_dirichlet) fluids_parameters.pseudo_dirichlet_regions(4)=true;
-        inner_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).1,(T).55,(T).3));inner_cylinder1.radius=(T).06;
-        middle_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).1,(T).55,(T).3));middle_cylinder1.radius=(T).09;
-        outer_cylinder1.Set_Endpoints(VECTOR<T,3>(0,(T).55,(T).3),VECTOR<T,3>((T).099,(T).55,(T).3));outer_cylinder1.radius=(T).1;
-        source_shutoff_time=(T)2.5+(T)1e-5;
-        sphere_drop_time=(T)2.9+(T)1e-5;
-        air_region=4;}
-}
 //#####################################################################
 // Function Number_Of_Regions
 //#####################################################################

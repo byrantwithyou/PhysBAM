@@ -25,7 +25,7 @@ public:
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
     using BASE::output_directory;using BASE::data_directory;using BASE::stream_type;using BASE::fluid_collection;using BASE::solid_body_collection;using BASE::resolution;
-    using BASE::Mark_Outside;using BASE::Get_Boundary_Along_Ray;using BASE::parse_args;
+    using BASE::Mark_Outside;using BASE::Get_Boundary_Along_Ray;
 
     RIGIDS_STANDARD_TESTS<TV> solids_tests;
     T rho,rho_bottom,rho_top,buoyancy_constant;
@@ -37,8 +37,8 @@ public:
     ARRAY<TV> sample_points;
     bool shed,opt_enlarge;
     
-    FLOW_PAST_CIRCLE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.SMOKE),solids_tests(stream_type,data_directory,solid_body_collection.rigid_body_collection),
+    FLOW_PAST_CIRCLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,0,fluids_parameters.SMOKE),solids_tests(stream_type_input,data_directory,solid_body_collection.rigid_body_collection),
         levelset_object(*fluids_parameters.grid,phi_object),circle(TV((T)2,(T)2),(T).5),shed(false),opt_enlarge(false)
     {
         //fluids_parameters.cfl=0.75;
@@ -59,6 +59,20 @@ public:
 
         output_directory="Flow_Past_Circle/output";
         debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+
+        parse_args.Add("-viscosity",&fluids_parameters.viscosity,"value","viscosity");
+        parse_args.Add("-enlarge",&opt_enlarge,"value","Enlarge");
+        parse_args.Add("-shed",&shed,"shed");
+        parse_args.Parse();
+
+        solids_tests.data_directory=data_directory;
+        if(shed) fluids_parameters.grid->Initialize(TV_INT((int)(2.5*resolution)+1,resolution+1),RANGE<TV>(TV(-(T)2.5,-(T)3.5),TV(15,(T)3.5)));
+        else fluids_parameters.grid->Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0,0),TV(4,4)));
+        if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
+        if(opt_enlarge) circle.radius+=fluids_parameters.grid->dX.Min();
+        if(shed) fluids_parameters.viscosity=(T).01;
+        else fluids_parameters.viscosity=(T).1;
+        if(shed) circle.center=TV();
     }
     
     ~FLOW_PAST_CIRCLE()
@@ -107,32 +121,7 @@ public:
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-viscosity",&fluids_parameters.viscosity,"value","viscosity");
-    parse_args->Add("-enlarge",&opt_enlarge,"value","Enlarge");
-    parse_args->Add("-shed",&shed,"shed");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    solids_tests.data_directory=data_directory;
-    if(shed) fluids_parameters.grid->Initialize(TV_INT((int)(2.5*resolution)+1,resolution+1),RANGE<TV>(TV(-(T)2.5,-(T)3.5),TV(15,(T)3.5)));
-    else fluids_parameters.grid->Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0,0),TV(4,4)));
-    if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
-    if(opt_enlarge) circle.radius+=fluids_parameters.grid->dX.Min();
-    if(shed) fluids_parameters.viscosity=(T).01;
-    else fluids_parameters.viscosity=(T).1;
-    if(shed) circle.center=TV();
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

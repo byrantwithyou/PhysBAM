@@ -27,7 +27,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
-    using BASE::solid_body_collection;using BASE::stream_type;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
+    using BASE::solid_body_collection;using BASE::stream_type;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
@@ -42,10 +42,55 @@ public:
     ARRAY<MATRIX<T,4> > world_to_source;
     ARRAY<VECTOR<T,3> > source_velocity;
 
-    SHEETING(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER),rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid),
+    SHEETING(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,1,fluids_parameters.WATER),rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid),
         use_variable_density_for_sph(false),use_two_way_coupling_for_sph(false),convert_sph_particles_to_fluid(false),ballistic_particles_as_percentage_of_target((T).03),bowl(0)
     {
+        parse_args.Parse();
+        // set up the standard fluid environment
+        frame_rate=96;
+        restart=false;restart_frame=0;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.number_particles_per_cell=32;
+        fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
+        fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
+        fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.delete_fluid_inside_objects=true;
+        fluids_parameters.incompressible_iterations=40;
+        fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
+        fluids_parameters.second_order_cut_cell_method=true;
+        fluids_parameters.store_particle_ids=true;
+        fluids_parameters.use_vorticity_confinement=false;
+        fluids_parameters.use_vorticity_confinement_fuel=false;
+        fluids_parameters.cfl=(T)1.9;
+        
+        // SPH parameters
+        fluids_parameters.use_sph_for_removed_negative_particles=test_number==2;
+        use_variable_density_for_sph=true;
+        use_two_way_coupling_for_sph=true;
+        convert_sph_particles_to_fluid=false;
+        use_analytic_divergence=true;
+        ballistic_particles_as_percentage_of_target=(T).1;
+
+        // set up the domain
+        first_frame=0;last_frame=5000;
+        int cells=1*resolution;
+        fluids_parameters.grid->Initialize(TV_INT(3*cells+1,4*cells+1,4*cells+1),RANGE<TV>(TV(1,0,0),TV(4,4,4)));
+
+        if(test_number>2){LOG::cerr<<"unrecognized test number "<<test_number<<std::endl;exit(1);}
+
+        output_directory=LOG::sprintf("Sheeting/Test_Sheeting_%d_Resolution_%d_%d_%d",test_number,
+            (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));
+
+        // set up sources for each test case
+        source_center=VECTOR<T,3>((T)2.5,(T)3.7,1);source_radius=(T).10;
+        sources.Resize(1);source_velocity.Resize(1);world_to_source.Resize(1);
+        sources(1)=CYLINDER<T>(VECTOR<T,3>(0,-(T).25,0),VECTOR<T,3>(0,(T).25,0),source_radius);
+        ARRAY<MATRIX<T,4> > source_to_world(1);
+        MATRIX<T,4> translation=MATRIX<T,4>::Translation_Matrix(source_center);
+        source_to_world(1)=translation;
+        source_velocity(1)=VECTOR<T,3>(0,-1,0);world_to_source(1)=source_to_world(1).Inverse();
     }
 
     virtual ~SHEETING()
@@ -60,65 +105,7 @@ public:
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    // set up the standard fluid environment
-    frame_rate=96;
-    restart=false;restart_frame=0;
-    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-    fluids_parameters.number_particles_per_cell=32;
-    fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
-    fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
-    fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
-    fluids_parameters.delete_fluid_inside_objects=true;
-    fluids_parameters.incompressible_iterations=40;
-    fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
-    fluids_parameters.second_order_cut_cell_method=true;
-    fluids_parameters.store_particle_ids=true;
-    fluids_parameters.use_vorticity_confinement=false;
-    fluids_parameters.use_vorticity_confinement_fuel=false;
-    fluids_parameters.cfl=(T)1.9;
-        
-    // SPH parameters
-    fluids_parameters.use_sph_for_removed_negative_particles=test_number==2;
-    use_variable_density_for_sph=true;
-    use_two_way_coupling_for_sph=true;
-    convert_sph_particles_to_fluid=false;
-    use_analytic_divergence=true;
-    ballistic_particles_as_percentage_of_target=(T).1;
-
-    // set up the domain
-    first_frame=0;last_frame=5000;
-    int cells=1*resolution;
-    fluids_parameters.grid->Initialize(TV_INT(3*cells+1,4*cells+1,4*cells+1),RANGE<TV>(TV(1,0,0),TV(4,4,4)));
-
-    if(test_number>2){LOG::cerr<<"unrecognized test number "<<test_number<<std::endl;exit(1);}
-
-    output_directory=LOG::sprintf("Sheeting/Test_Sheeting_%d_Resolution_%d_%d_%d",test_number,
-        (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));
-
-    // set up sources for each test case
-    source_center=VECTOR<T,3>((T)2.5,(T)3.7,1);source_radius=(T).10;
-    sources.Resize(1);source_velocity.Resize(1);world_to_source.Resize(1);
-    sources(1)=CYLINDER<T>(VECTOR<T,3>(0,-(T).25,0),VECTOR<T,3>(0,(T).25,0),source_radius);
-    ARRAY<MATRIX<T,4> > source_to_world(1);
-    MATRIX<T,4> translation=MATRIX<T,4>::Translation_Matrix(source_center);
-    source_to_world(1)=translation;
-    source_velocity(1)=VECTOR<T,3>(0,-1,0);world_to_source(1)=source_to_world(1).Inverse();
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

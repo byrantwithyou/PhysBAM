@@ -28,7 +28,7 @@ class STANDARD_TESTS_SPH:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> 
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::test_number;
-    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;using BASE::solid_body_collection;using BASE::parse_args;
+    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;using BASE::solid_body_collection;
     using BASE::Adjust_Phi_With_Sources;using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::Get_Object_Velocities; // silence -Woverloaded-virtual
     using BASE::stream_type;using BASE::resolution;
 
@@ -40,10 +40,48 @@ public:
     RIGID_BODY<TV>* rigid2; // not used right now
     SPHERE<TV> sphere;
 
-    STANDARD_TESTS_SPH(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.SPH),
+    STANDARD_TESTS_SPH(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,0,fluids_parameters.SPH),
         wall_damping((T).5),sphere(TV((T).5,(T).4),(T).2)
     {
+        parse_args.Parse();
+        fluids_parameters.number_particles_per_cell=16;
+        fluids_parameters.write_ghost_values=true;
+        fluids_parameters.store_particle_ids=true;
+        last_frame=1000;
+
+        int cells=1*resolution;
+        if(test_number==1){
+            first_frame=0;last_frame=200;
+            grid.Initialize(TV_INT(15*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV((T)1.5,1)));}
+        else if(test_number==2){
+            first_frame=0;last_frame=100;
+            grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(0,0),TV(1,(T)1.5)));}
+        else if(test_number==3){
+            first_frame=0;last_frame=150;
+            grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(0,0),TV(1,(T)1.5)));}
+        else if(test_number==5){
+            grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(1,1)));}
+        else if(test_number==6){   
+            grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(1,1)),true);
+            int rigid_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/square_refined",(T).1,true,true,false);
+            rigid=&solid_body_collection.rigid_body_collection.Rigid_Body(rigid_id);
+            //rigid->is_kinematic=true;
+            rigid->Frame().t=TV((T).5,(T).4);
+            rigid->coefficient_of_restitution=(T)0;
+            rigid2=&solid_body_collection.rigid_body_collection.Rigid_Body(rigid_id);
+            //rigid->is_kinematic=true;
+            //rigid2->Frame().t=TV((T).1,(T).4);
+            //rigid2->is_kinematic=true;
+            int ground_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/ground",(T)1,true,true,false);
+            solid_body_collection.rigid_body_collection.Rigid_Body(ground_id).is_static=true;
+            solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+        }
+        else{LOG::cerr<<"unrecognzed SPH test number"<<std::endl;exit(1);}
+        *fluids_parameters.grid=grid;
+
+        output_directory=LOG::sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+        LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
     }
 
     virtual ~STANDARD_TESTS_SPH()
@@ -66,58 +104,7 @@ public:
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    fluids_parameters.number_particles_per_cell=16;
-    fluids_parameters.write_ghost_values=true;
-    fluids_parameters.store_particle_ids=true;
-    last_frame=1000;
-
-    int cells=1*resolution;
-    if(test_number==1){
-        first_frame=0;last_frame=200;
-        grid.Initialize(TV_INT(15*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV((T)1.5,1)));}
-    else if(test_number==2){
-        first_frame=0;last_frame=100;
-        grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(0,0),TV(1,(T)1.5)));}
-    else if(test_number==3){
-        first_frame=0;last_frame=150;
-        grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(0,0),TV(1,(T)1.5)));}
-    else if(test_number==5){
-        grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(1,1)));}
-    else if(test_number==6){   
-        grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(1,1)),true);
-        int rigid_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/square_refined",(T).1,true,true,false);
-        rigid=&solid_body_collection.rigid_body_collection.Rigid_Body(rigid_id);
-        //rigid->is_kinematic=true;
-        rigid->Frame().t=TV((T).5,(T).4);
-        rigid->coefficient_of_restitution=(T)0;
-        rigid2=&solid_body_collection.rigid_body_collection.Rigid_Body(rigid_id);
-        //rigid->is_kinematic=true;
-        //rigid2->Frame().t=TV((T).1,(T).4);
-        //rigid2->is_kinematic=true;
-        int ground_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/ground",(T)1,true,true,false);
-        solid_body_collection.rigid_body_collection.Rigid_Body(ground_id).is_static=true;
-        solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-    }
-    else{LOG::cerr<<"unrecognzed SPH test number"<<std::endl;exit(1);}
-    *fluids_parameters.grid=grid;
-
-    output_directory=LOG::sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
-    LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_SPH_Particles
 //#####################################################################

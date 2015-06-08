@@ -61,8 +61,8 @@ public:
     T epsilon,radius;
     int mode;
 
-    FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-        :FLUIDS_COLOR_BASE<TV>(stream_type,parse_args),epsilon((T).1),radius((T).05),mode(2)
+    FLUIDS_COLOR(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :FLUIDS_COLOR_BASE<TV>(stream_type_input,parse_args),epsilon((T).1),radius((T).05),mode(2)
     {
         parse_args.Add("-mode",&mode,"mode","Oscillation mode for surface tension test");
         parse_args.Add("-radius",&radius,"radius","Radius mode for surface tension test");
@@ -73,6 +73,7 @@ public:
             Initialize_Example();
 
         After_Initialize_Example();
+        parse_args.Parse();
     }
 
     ~FLUIDS_COLOR()

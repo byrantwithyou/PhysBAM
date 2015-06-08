@@ -98,12 +98,24 @@ public:
 
     typedef SOLIDS_EXAMPLE<VECTOR<T_input,3> > BASE;
     using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
-    using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;using BASE::parse_args;
+    using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),small_block_mass(1),
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),small_block_mass(1),
         parameter(0),collision_manager(0),print_matrix(false)
     {
+        parse_args.Add("-small_block_mass",&small_block_mass,"value","mass for small blocks in plank test");
+        parse_args.Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
+        parse_args.Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
+        parse_args.Add("-print_energy",&solid_body_collection.rigid_body_collection.print_energy,"print energy statistics");
+        parse_args.Add("-print_matrix",&print_matrix,"Print Krylov matrix");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+
+        if(small_block_mass!=1) output_directory+=LOG::sprintf("_m%g",small_block_mass);
+        if(parameter) output_directory+=LOG::sprintf("_param%i",parameter);
     }
 
     ~STANDARD_TESTS()
@@ -139,27 +151,8 @@ public:
     void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-
-    void Register_Options() PHYSBAM_OVERRIDE
-    {
-        BASE::Register_Options();
-        parse_args->Add("-small_block_mass",&small_block_mass,"value","mass for small blocks in plank test");
-        parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
-        parse_args->Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
-        parse_args->Add("-print_energy",&solid_body_collection.rigid_body_collection.print_energy,"print energy statistics");
-        parse_args->Add("-print_matrix",&print_matrix,"Print Krylov matrix");
-    }
-    void Parse_Options() PHYSBAM_OVERRIDE
-    {
-        BASE::Parse_Options();
-        tests.data_directory=data_directory;
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-
-        if(small_block_mass!=1) output_directory+=LOG::sprintf("_m%g",small_block_mass);
-        if(parameter) output_directory+=LOG::sprintf("_param%i",parameter);
-    }
     
-    void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 
 //#####################################################################
 // Function Post_Initialization

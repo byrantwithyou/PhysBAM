@@ -5,6 +5,7 @@
 #ifndef __STRESS_EXAMPLE__
 #define __STRESS_EXAMPLE__
 #include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
@@ -47,7 +48,7 @@ public:
     DEBUG_PARTICLES<TV>& debug_particles;
     ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> polymer_stress,prev_polymer_stress;
 
-    STRESS_EXAMPLE(const STREAM_TYPE stream_type_input);
+    STRESS_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STRESS_EXAMPLE();
     
     virtual void Write_Output_Files(const int frame);

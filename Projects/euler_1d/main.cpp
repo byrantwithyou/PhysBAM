@@ -40,13 +40,13 @@ int main(int argc,char* argv[])
     parse_args.Parse(true);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
-    if(opt_sod) example=new SOD_ST<T>(stream_type);
-    else if(opt_bangbang) example=new BANG_BANG_ST<T>(stream_type);
-    else if(opt_smoothflow) example=new SMOOTH_FLOW<T>(stream_type);
-    else if(opt_drop) example=new SOD_ST_DROP<T>(stream_type);
-    else example=new SOD_ST<T>(stream_type); //default
-    example->want_mpi_world=true;
-    example->Parse(parse_args);
+    if(opt_sod) example=new SOD_ST<T>(stream_type,parse_args);
+    else if(opt_bangbang) example=new BANG_BANG_ST<T>(stream_type,parse_args);
+    else if(opt_smoothflow) example=new SMOOTH_FLOW<T>(stream_type,parse_args);
+    else if(opt_drop) example=new SOD_ST_DROP<T>(stream_type,parse_args);
+    else example=new SOD_ST<T>(stream_type,parse_args); //default
+    example->mpi_world=new MPI_WORLD(parse_args);
+    example->After_Construction();
 
     if(example->mpi_world->initialized) example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<TV>(*example->fluids_parameters.grid,3);
     example->Adjust_Output_Directory_For_MPI(example->fluids_parameters.mpi_grid);

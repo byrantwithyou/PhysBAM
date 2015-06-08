@@ -40,7 +40,7 @@ public:
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
 
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
-    using BASE::data_directory;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
+    using BASE::data_directory;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
@@ -58,79 +58,67 @@ public:
     3. Bullet. 1 with a 2-D coupled rigid body on the right and no right wall.
     ***************/
 
-    SOD_ST_2D(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(stream_type,data_directory,solid_body_collection),
+    SOD_ST_2D(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args,0,fluids_parameters.COMPRESSIBLE),tests(stream_type_input,data_directory,solid_body_collection),
         rigid_body_collection(solid_body_collection.rigid_body_collection),eno_scheme(1),eno_order(2),
         rk_order(3),cfl_number((T).6),timesplit(false),exact(false)
     {
+        parse_args.Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+        parse_args.Add("-eno_order",&eno_order,"eno_order","eno order");
+        parse_args.Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+        parse_args.Add("-cfl",&cfl_number,"CFL","cfl number");
+        parse_args.Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+        parse_args.Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+
+        timesplit=timesplit && !exact;
+        //grid
+        int cells=resolution;
+        T grid_size=(T)10.;
+        if(test_number==1 || test_number==3) fluids_parameters.grid->Initialize(TV_INT(cells,cells/5),RANGE<TV>(-TV(grid_size/(T)2,grid_size/(T)10),TV(grid_size/(T)2,grid_size/(T)10)));
+        else if(test_number==2) fluids_parameters.grid->Initialize(TV_INT(cells/5,cells),RANGE<TV>(-TV(grid_size/(T)10,grid_size/(T)2),TV(grid_size/(T)10,grid_size/(T)2)));
+        *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+        if(test_number==3) fluids_parameters.domain_walls[0][1]=false;
+        //time
+        initial_time=(T)0.;last_frame=1000;frame_rate=(T)80.;
+        fluids_parameters.cfl=cfl_number;
+        //custom stuff . . . 
+        fluids_parameters.compressible_eos=new EOS_GAMMA<T>;
+        if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
+        else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
+        else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
+        fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
+        fluids_parameters.compressible_conservation_method->Save_Fluxes();
+        fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
+        fluids_parameters.compressible_rungekutta_order=rk_order;
+        fluids_parameters.compressible_timesplit=timesplit;
+
+        if(test_number==3){
+            fluids_parameters.solid_affects_fluid=true;
+            fluids_parameters.fluid_affects_solid=true;
+            solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            solids_parameters.rigid_body_collision_parameters.use_push_out=false;
+            solids_parameters.use_trapezoidal_rule_for_velocities=false;
+            solids_parameters.verbose_dt=true;
+            solid_body_collection.print_residuals=false;
+            solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-16;
+            solids_parameters.implicit_solve_parameters.cg_projection_iterations=0; // TODO: check this
+            solids_parameters.implicit_solve_parameters.cg_iterations=400;}
+
+        if(timesplit) output_directory=LOG::sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+        else output_directory=LOG::sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+        if(eno_scheme==2) output_directory+="_density_weighted";
+        else if(eno_scheme==3) output_directory+="_velocity_weighted";
     }
     
     virtual ~SOD_ST_2D() {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
-    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
-    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
-    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
-    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-
-    timesplit=timesplit && !exact;
-    //grid
-    int cells=resolution;
-    T grid_size=(T)10.;
-    if(test_number==1 || test_number==3) fluids_parameters.grid->Initialize(TV_INT(cells,cells/5),RANGE<TV>(-TV(grid_size/(T)2,grid_size/(T)10),TV(grid_size/(T)2,grid_size/(T)10)));
-    else if(test_number==2) fluids_parameters.grid->Initialize(TV_INT(cells/5,cells),RANGE<TV>(-TV(grid_size/(T)10,grid_size/(T)2),TV(grid_size/(T)10,grid_size/(T)2)));
-    *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
-    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-    if(test_number==3) fluids_parameters.domain_walls[0][1]=false;
-    //time
-    initial_time=(T)0.;last_frame=1000;frame_rate=(T)80.;
-    fluids_parameters.cfl=cfl_number;
-    //custom stuff . . . 
-    fluids_parameters.compressible_eos=new EOS_GAMMA<T>;
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
-    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
-    fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
-    fluids_parameters.compressible_conservation_method->Save_Fluxes();
-    fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
-    fluids_parameters.compressible_rungekutta_order=rk_order;
-    fluids_parameters.compressible_timesplit=timesplit;
-
-    if(test_number==3){
-        fluids_parameters.solid_affects_fluid=true;
-        fluids_parameters.fluid_affects_solid=true;
-        solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-        solids_parameters.rigid_body_collision_parameters.use_push_out=false;
-        solids_parameters.use_trapezoidal_rule_for_velocities=false;
-        solids_parameters.verbose_dt=true;
-        solid_body_collection.print_residuals=false;
-        solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1;
-        solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-16;
-        solids_parameters.implicit_solve_parameters.cg_projection_iterations=0; // TODO: check this
-        solids_parameters.implicit_solve_parameters.cg_iterations=400;}
-
-    if(timesplit) output_directory=LOG::sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-    else output_directory=LOG::sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-    if(eno_scheme==2) output_directory+="_density_weighted";
-    else if(eno_scheme==3) output_directory+="_velocity_weighted";
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

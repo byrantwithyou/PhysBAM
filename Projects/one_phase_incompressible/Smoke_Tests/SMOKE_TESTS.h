@@ -78,6 +78,7 @@ public:
         if(test_number>1){
             incompressible.Initialize_Grids(mac_grid);
             incompressible.Set_Body_Force(true);}
+        parse_args.Parse();
     }
 
     ~SMOKE_TESTS()

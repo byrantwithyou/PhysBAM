@@ -23,7 +23,7 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_OBJECT;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
     using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
-    using BASE::stream_type;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;using BASE::data_directory;using BASE::m;using BASE::s;using BASE::kg;
+    using BASE::stream_type;using BASE::solids_evolution;using BASE::test_number;using BASE::data_directory;using BASE::m;using BASE::s;using BASE::kg;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
 
@@ -64,7 +64,7 @@ public:
     int gauss_order;
     int threads;
 
-    STANDARD_TESTS_BASE(const STREAM_TYPE stream_type);
+    STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
 
     void Set_Number_Of_Threads(int threads);
@@ -90,8 +90,6 @@ public:
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE;
     void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE;
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
     void Get_Initial_Data_After(bool automatically_add_to_collision_structures);
     void Initialize_Bodies_After();
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE;

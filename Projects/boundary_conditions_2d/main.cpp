@@ -21,10 +21,10 @@ int main(int argc,char* argv[])
     STREAM_TYPE stream_type((RW()));
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
-    example=new STANDARD_TESTS<T>(stream_type);
-    example->want_mpi_world=true;
     PARSE_ARGS parse_args(argc,argv);
-    example->Parse(parse_args);
+    example=new STANDARD_TESTS<T>(stream_type,parse_args);
+    example->mpi_world=new MPI_WORLD(parse_args);
+    example->After_Construction();
 
     if(example->mpi_world->initialized){
         example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();

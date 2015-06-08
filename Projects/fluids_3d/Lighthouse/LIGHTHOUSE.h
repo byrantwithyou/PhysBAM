@@ -49,10 +49,66 @@ public:
     3. SPH two-way coupled, uniform density
     ***************/
 
-    LIGHTHOUSE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER),
+    LIGHTHOUSE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,1,fluids_parameters.WATER),
         rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid)
     {
+        parse_args.Parse();
+        first_frame=0;last_frame=1000;
+        frame_rate=36;
+        restart=false;restart_frame=18;
+        int cells=1*resolution;
+        fluids_parameters.grid->Initialize(TV_INT(14*cells+1,3*cells+1,8*cells+1),RANGE<TV>(TV(-80,0,0),TV(60,30,80)));
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.number_particles_per_cell=32;
+        fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
+        fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;
+        fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
+        fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.write_debug_data=true;
+        fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).save_removed_particle_times=true;
+        output_directory=LOG::sprintf("Lighthouse/Test_%d_Lighthouse_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
+            (fluids_parameters.grid->counts.z-1));
+        fluids_parameters.delete_fluid_inside_objects=true;
+        fluids_parameters.enforce_divergence_free_extrapolation=false;
+        fluids_parameters.store_particle_ids=true;
+        fluids_parameters.second_order_cut_cell_method=true;
+        fluids_parameters.cfl=(T)1.9;
+        fluids_parameters.incompressible_iterations=40;
+
+        // SPH parameters
+        fluids_parameters.use_sph_for_removed_negative_particles=false;
+        use_variable_density_for_sph=false;
+        use_two_way_coupling_for_sph=false;
+        convert_sph_particles_to_fluid=false;
+        ballistic_particles_as_percentage_of_target=(T).25;
+        flip_ratio=1;
+        use_analytic_divergence=false;
+        use_analytic_divergence_for_expansion_only=false;
+        
+        if(test_number==2){
+            fluids_parameters.use_sph_for_removed_negative_particles=true;
+            use_two_way_coupling_for_sph=true;
+            use_variable_density_for_sph=false;
+            flip_ratio=(T).5;
+            use_analytic_divergence=true;
+            use_analytic_divergence_for_expansion_only=true;}
+        if(test_number==3){
+            fluids_parameters.use_sph_for_removed_negative_particles=true;
+            use_two_way_coupling_for_sph=true;}
+
+        // MacCormack parameters
+        fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
+        fluids_parameters.use_maccormack_compute_mask=true;
+        fluids_parameters.use_maccormack_for_incompressible=true;
+        fluids_parameters.bandwidth_without_maccormack_near_interface=1;
+
+        // Wave parameters
+        depth=(T)5.5;
+        epsilon=(T).5;
+        scaled_depth=depth/30;
+        omega=(T)1.5;
     }
 
     ~LIGHTHOUSE() 
@@ -68,76 +124,7 @@ public:
     void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
     void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    first_frame=0;last_frame=1000;
-    frame_rate=36;
-    restart=false;restart_frame=18;
-    int cells=1*resolution;
-    fluids_parameters.grid->Initialize(TV_INT(14*cells+1,3*cells+1,8*cells+1),RANGE<TV>(TV(-80,0,0),TV(60,30,80)));
-    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-    fluids_parameters.number_particles_per_cell=32;
-    fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
-    fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;
-    fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
-    fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
-    fluids_parameters.write_debug_data=true;
-    fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).save_removed_particle_times=true;
-    output_directory=LOG::sprintf("Lighthouse/Test_%d_Lighthouse_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
-        (fluids_parameters.grid->counts.z-1));
-    fluids_parameters.delete_fluid_inside_objects=true;
-    fluids_parameters.enforce_divergence_free_extrapolation=false;
-    fluids_parameters.store_particle_ids=true;
-    fluids_parameters.second_order_cut_cell_method=true;
-    fluids_parameters.cfl=(T)1.9;
-    fluids_parameters.incompressible_iterations=40;
-
-    // SPH parameters
-    fluids_parameters.use_sph_for_removed_negative_particles=false;
-    use_variable_density_for_sph=false;
-    use_two_way_coupling_for_sph=false;
-    convert_sph_particles_to_fluid=false;
-    ballistic_particles_as_percentage_of_target=(T).25;
-    flip_ratio=1;
-    use_analytic_divergence=false;
-    use_analytic_divergence_for_expansion_only=false;
-        
-    if(test_number==2){
-        fluids_parameters.use_sph_for_removed_negative_particles=true;
-        use_two_way_coupling_for_sph=true;
-        use_variable_density_for_sph=false;
-        flip_ratio=(T).5;
-        use_analytic_divergence=true;
-        use_analytic_divergence_for_expansion_only=true;}
-    if(test_number==3){
-        fluids_parameters.use_sph_for_removed_negative_particles=true;
-        use_two_way_coupling_for_sph=true;}
-
-    // MacCormack parameters
-    fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
-    fluids_parameters.use_maccormack_compute_mask=true;
-    fluids_parameters.use_maccormack_for_incompressible=true;
-    fluids_parameters.bandwidth_without_maccormack_near_interface=1;
-
-    // Wave parameters
-    depth=(T)5.5;
-    epsilon=(T).5;
-    scaled_depth=depth/30;
-    omega=(T)1.5;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Wave_Height
 //#####################################################################

@@ -31,8 +31,8 @@ public:
     T normal_velocity;
     T Dn_initial;
 
-    DSD_FIRE_BALL_EXAMPLE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,2,fluids_parameters.FIRE),source_sphere(TV(1,(T)0.5,1),(T)0.2),source_end_time((T)3),normal_velocity(4),Dn_initial((T)0.1)
+    DSD_FIRE_BALL_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,2,fluids_parameters.FIRE),source_sphere(TV(1,(T)0.5,1),(T)0.2),source_end_time((T)3),normal_velocity(4),Dn_initial((T)0.1)
     {
         frame_rate=96;
         fluids_parameters.grid->Initialize(TV_INT(151,226,151),RANGE<TV>(TV(),TV(2,3,2)));
@@ -67,6 +67,7 @@ public:
         fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
         fluids_parameters.use_maccormack_for_level_set=true;
         fluids_parameters.use_maccormack_compute_mask=true;
+        parse_args.Parse();
     }
 
     virtual ~DSD_FIRE_BALL_EXAMPLE()
@@ -84,21 +85,7 @@ public:
     void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE {}
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Flame_Speed_Multiplier
 //#####################################################################

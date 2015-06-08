@@ -26,7 +26,7 @@ class HAIR_STRAND_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
-    using BASE::stream_type;using BASE::write_substeps_level;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
+    using BASE::stream_type;using BASE::write_substeps_level;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Set_External_Positions;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
 
     ARRAY<TV> init_positions_start,init_positions_end;
@@ -63,7 +63,7 @@ public:
     ARRAY<T> project_restlengths; // restlengths of the mesh
 
 //#####################################################################
-    HAIR_STRAND_TESTS(const STREAM_TYPE stream_type);
+    HAIR_STRAND_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     void Initialize_Bodies() PHYSBAM_OVERRIDE;
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE;
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE;
@@ -75,9 +75,7 @@ public:
     void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE;    
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
     void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
-    void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 };
 }

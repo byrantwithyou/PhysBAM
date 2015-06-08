@@ -70,7 +70,7 @@ public:
 
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::restart;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solids_fluids_parameters;
-    using BASE::solid_body_collection; using BASE::data_directory;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
+    using BASE::solid_body_collection; using BASE::data_directory;using BASE::test_number;using BASE::resolution;
     using BASE::solids_evolution; using BASE::stream_type;using BASE::Add_To_Fluid_Simulation;
 
     enum SHOCK_TYPE {SPHERICAL,VERTICAL};
@@ -153,9 +153,9 @@ public:
     21. Smoke hit by shock
     ***************/
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type,const bool incompressible_input)
-        :BASE(stream_type,0,incompressible_input?fluids_parameters.SMOKE:fluids_parameters.COMPRESSIBLE),
-        solid_tests(stream_type,data_directory,solid_body_collection),eno_scheme(2),eno_order(2),rk_order(3),cfl_number((T).6),fp(0),weak_shock(false),
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args,const bool incompressible_input)
+        :BASE(stream_type_input,parse_args,0,incompressible_input?fluids_parameters.SMOKE:fluids_parameters.COMPRESSIBLE),
+        solid_tests(stream_type_input,data_directory,solid_body_collection),eno_scheme(2),eno_order(2),rk_order(3),cfl_number((T).6),fp(0),weak_shock(false),
         timesplit(false),use_slip(false),use_incompressible_gravity(false),faster_frame_rate(false),exact(false),no_soot(false),
         no_solids_gravity(false),createpattern(false),solid_mass((T).0625),
         rigid_body_collection(solid_body_collection.rigid_body_collection),fracture_walls(false),collision_manager(0),
@@ -165,371 +165,358 @@ public:
         print_matrix(false),print_rhs(false),print_each_matrix(false),output_iterators(false),time_start_transition((T).5),
         time_end_transition((T).7),one_over_c_incompressible((T)0),burn_temperature_threshold((T)600),burn_rate((T)100),
         soot_fuel_calorific_value((T)54000)
-    {
-    }
+        {
+            parse_args.Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+            parse_args.Add("-eno_order",&eno_order,"eno_order","eno order");
+            parse_args.Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+            parse_args.Add("-cfl",&cfl_number,"CFL","cfl number");
+            parse_args.Add("-weak_shock",&weak_shock,"Use stronger shock with temperature ratio 2900:290, p ratio 1000:1");
+            parse_args.Add("-no_solids",&no_solids,"ensure no solid is added");
+            parse_args.Add("-mass",&solid_mass,"solid_mass","the mass of the solid in the simulation");
+            parse_args.Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+            parse_args.Add("-slip",&use_slip,"use slip/spd for coupling");
+            parse_args.Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
+
+            parse_args.Add("-test_system",&run_self_tests,"Run self tests");
+            parse_args.Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
+            parse_args.Add("-print_index_map",&print_index_map,"print_index_map");
+            parse_args.Add("-print_matrix",&print_matrix,"print_matrix");
+            parse_args.Add("-print_rhs",&print_rhs,"print_rhs");
+            parse_args.Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
+            parse_args.Add("-output_iterators",&output_iterators,"output_iterators");
+            parse_args.Add("-no_preconditioner",&no_preconditioner,"Disable preconditioner");
+            parse_args.Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"preconditioner");
+
+            parse_args.Add("-transition_to_incompressible",&transition_to_incompressible,"value","transition to incompressible in a time window");
+            parse_args.Add("-time_start_transition",&time_start_transition,"value","time to start transitioning to incompressible flow");
+            parse_args.Add("-time_end_transition",&time_end_transition,"value","time to end transitioning to incompressible flow");
+            parse_args.Add("-one_over_c_incompressible",&one_over_c_incompressible,"value","one over incompressible sound speed");
+            parse_args.Add("-vorticity_confinement",&vorticity_confinement,"value","Vorticity Confinement");
+            parse_args.Add("-no_soot",&no_soot,"value","advect around soot");
+            parse_args.Add("-use_soot_sourcing",&use_soot_sourcing,"value","source soot");
+            parse_args.Add("-use_soot_sourcing_from_shock",&use_soot_sourcing_from_shock,"value","source soot from initial shock place");
+            parse_args.Add("-combustion",&use_soot_fuel_combustion,"source soot");
+
+            parse_args.Add("-burn_temperature_threshold",&burn_temperature_threshold,"temp","temperature above which fuel will burn");
+            parse_args.Add("-burn_rate",&burn_rate,"rate","rate of fuel burning");
+            parse_args.Add("-calorific_value",&soot_fuel_calorific_value,"value","heat generated per fuel burnt");
+
+            parse_args.Add("-use_smoke_sourcing",&use_smoke_sourcing,"source smoke (denisty,temperature,velocity)");
+
+            parse_args.Add("-read_soot_from_file",&read_soot_from_file,"read soot from input file");
+            parse_args.Add("-soot_data_dir",&soot_data_dir,"dir","directory containing grid, soot, velocity files");
+    
+            parse_args.Add("-use_fixed_farfield_boundary",&use_fixed_farfield_boundary,"use fixed farfield values for outflow boundaries");
+            parse_args.Add("-use_incompressible_gravity",&use_incompressible_gravity,"add gravity on incompressible fluid");
+            parse_args.Add("-no_solids_gravity",&no_solids_gravity,"add gravity on solids");
+
+            parse_args.Add("-fp",&fp,"fracture pattern","fracture pattern");
+            parse_args.Add("-createpattern",&createpattern,"createpattern");
+            parse_args.Add("-fracture_walls",&fracture_walls,"fracture_walls");
+    
+            parse_args.Add("-faster_frame_rate",&faster_frame_rate,"faster_frame_rate");
+            parse_args.Parse();
+
+            solid_tests.data_directory=data_directory;
+
+            if(createpattern){
+                if(test_number==11) Create_Wall_Pattern();
+                exit(0);}
+
+            timesplit=timesplit&&!exact;
+            use_soot=!no_soot;
+            use_solids_gravity=!no_solids_gravity;
+            bool strong_shock=!weak_shock;
+
+            //grid
+            int cells=resolution;
+            T grid_size=(T)1.;
+            if(test_number==7||test_number==17){
+                fluids_parameters.grid->Initialize(TV_INT(3,2,2)*cells+1,RANGE<TV>(TV((T)-4.5,(T)-3,(T)-3),TV((T)4.5,(T)3,(T)3))*grid_size);}
+            else if(test_number==3){
+                fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-10,(T)-10,(T)-10),TV((T)10,(T)10,(T)10))*grid_size);}
+            else if(test_number==9||test_number==10||test_number==11){
+                fluids_parameters.grid->Initialize(TV_INT(3,2,2)*cells+1,RANGE<TV>(TV((T)-1.5,(T)-1,(T)-1),TV((T)1.5,(T)1,(T)1))*grid_size);}
+            else if(test_number==12){
+                fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2,(T)1))*grid_size);}
+            else if(test_number==13){
+                fluids_parameters.grid->Initialize(TV_INT(2,3,2)*cells+1,RANGE<TV>(TV((T)-3,(T)0,(T)-3),TV((T)5,(T)12,(T)5))*grid_size);}
+            else if(test_number==16){
+                fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-3,(T)0,(T)-3),TV((T)5,(T)8,(T)5))*grid_size);}
+            else if(test_number==14||test_number==15){
+                fluids_parameters.grid->Initialize(TV_INT(3,2,2)*cells+1,RANGE<TV>(TV((T)-120,(T)-80,(T)-80),TV((T)120,(T)80,(T)80))*grid_size);}
+            else if(test_number==18){
+                fluids_parameters.grid->Initialize(TV_INT(2,1,2)*cells+1,RANGE<TV>(TV((T)-100,(T)0,(T)-100),TV((T)100,(T)100,(T)100))*grid_size);}
+            else if(test_number==19){
+                fluids_parameters.grid->Initialize(TV_INT(5,2,2)*cells+1,RANGE<TV>(TV((T)-8,(T)-10,(T)-10),TV((T)42,(T)10,(T)10))*grid_size);}
+            else if(test_number==20){
+                fluids_parameters.grid->Initialize(TV_INT(2,2,1)*cells+1,RANGE<TV>(TV((T)-5,(T)-7.5,(T)-5),TV((T)5,(T)7.5,(T)5))*grid_size);}
+            else if(test_number==21){
+                fluids_parameters.grid->Initialize(TV_INT(2,1,1)*cells+1,RANGE<TV>(TV((T)-1,(T)0,(T)-.25),TV((T)1,(T)1,(T).75))*grid_size);}
+            else{
+                fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1))*grid_size);}
+
+            *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
+            fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;
+            fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=false;
+            if(test_number==3 || test_number==4 || test_number==5) fluids_parameters.domain_walls[1][0]=true;
+            if(test_number==6){
+                fluids_parameters.domain_walls[0][1]=true;
+                fluids_parameters.domain_walls[1][0]=true;}
+            if(test_number==7||test_number==8||test_number==9||test_number==10||test_number==11||test_number==14||test_number==15||test_number==17){
+                fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;
+                fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+                fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;}
+            if(test_number==13||test_number==16||test_number==18||test_number==19){
+                fluids_parameters.domain_walls[1][0]=true;}
+            if(test_number==19){
+                fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;}
+            if(test_number==20){
+                fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
+                fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;
+                fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;}
+            if(test_number==21){
+                fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+                fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+                fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;}
+
+
+            //time
+            initial_time=(T)0.;last_frame=1000;frame_rate=(T)1e4;
+
+            switch(test_number){
+                case 3: last_frame=1;
+                    frame_rate=(T)75;
+                    break;
+                case 7: frame_rate=(T)5e4;
+                    break;
+                case 14:
+                case 15: frame_rate=(T)1e4;
+                    break;
+                case 17: frame_rate=(T)1e5;
+                    break;
+                case 18:last_frame=200;frame_rate=(T)2.5e4;
+                    break;
+                case 19:frame_rate=(T)1e4;
+                    break;
+                case 20:frame_rate=32;
+                    break;
+                case 21:frame_rate=(T)6e5;
+                    break;
+                default:frame_rate=(T)1e4;last_frame=1000;}
+
+            if(faster_frame_rate) frame_rate=96;
+            fluids_parameters.cfl=cfl_number;
+            //custom stuff . . . 
+            if(transition_to_incompressible){
+                eos_smooth_transition=new EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE<EOS_GAMMA<T> >(time_start_transition,time_end_transition,one_over_c_incompressible,true,3);
+                fluids_parameters.compressible_eos=eos_smooth_transition;}
+            else fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
+            if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
+            else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
+            else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
+            fluids_parameters.compressible_spatial_order=eno_order;
+            fluids_parameters.compressible_conservation_method->Save_Fluxes();
+            //fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
+            fluids_parameters.compressible_rungekutta_order=rk_order;
+            fluids_parameters.compressible_timesplit=timesplit;
+            fluids_parameters.use_slip=use_slip;
+
+            fluids_parameters.use_preconditioner_for_slip_system=true;
+            if(no_preconditioner) fluids_parameters.use_preconditioner_for_slip_system=false;
+
+            if(use_soot){
+                fluids_parameters.use_soot=true;
+                if(use_soot_fuel_combustion){
+                    fluids_parameters.use_soot_fuel_combustion=true;
+                    fluids_parameters.burn_temperature_threshold=burn_temperature_threshold;
+                    fluids_parameters.burn_rate=burn_rate;
+                    fluids_parameters.soot_fuel_calorific_value=soot_fuel_calorific_value;}
+                else fluids_parameters.use_soot_fuel_combustion=false;
+                fluids_parameters.use_fixed_soot_boundary=true;
+                fluids_parameters.ambient_soot=(T)0;
+                fluids_parameters.soot_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_soot,(T)1);}
+
+            if(incompressible){
+                if(vorticity_confinement>0){
+                    fluids_parameters.use_vorticity_confinement=true;
+                    fluids_parameters.confinement_parameter=vorticity_confinement*fluids_parameters.grid->dX.Min();}
+                else fluids_parameters.use_vorticity_confinement=false;
+                solids_fluids_parameters.use_leakproof_solve=false;
+                fluids_parameters.use_body_force=false;
+                fluids_parameters.density=(T)1; // not used
+                fluids_parameters.use_density=true;
+                fluids_parameters.use_temperature=true;
+                fluids_parameters.use_fixed_density_boundary=true;
+                fluids_parameters.use_fixed_temperature_boundary=true;
+                if(use_incompressible_gravity) fluids_parameters.gravity.y=-(T)9.8;
+                else fluids_parameters.gravity.y=-(T)0;}
+
+            // setup solids
+            bool simulate_rigids=(test_number==2||test_number==4||test_number==5||test_number==6||test_number==7||test_number==8||test_number==9||test_number==10||test_number==11||test_number==12||test_number==13||test_number==14||test_number==15||test_number==16||test_number==21);
+            if(use_slip) simulate_rigids=true;
+            bool simulate_deformable=(test_number==17);
+
+            if(simulate_rigids||simulate_deformable){
+                solids_fluids_parameters.use_leakproof_solve=false;
+                fluids_parameters.solid_affects_fluid=true;
+                fluids_parameters.fluid_affects_solid=true;
+                solids_parameters.use_post_cg_constraints=true;
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+                solids_parameters.rigid_body_collision_parameters.use_push_out=false;
+                solids_parameters.rigid_body_collision_parameters.use_legacy_push_out=true;
+                solids_parameters.rigid_body_collision_parameters.use_fracture_particle_optimization=false;
+                solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1;
+                solids_parameters.use_trapezoidal_rule_for_velocities=false;
+                solids_parameters.verbose_dt=true;
+                solid_body_collection.print_residuals=false;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-16;
+                solids_parameters.implicit_solve_parameters.cg_restart_iterations=200;
+                solids_parameters.implicit_solve_parameters.cg_iterations=1000;
+    
+                solids_parameters.use_rigid_deformable_contact=true;
+                solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=true;
+
+                if(solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg){
+                    solids_parameters.implicit_solve_parameters.cg_projection_iterations=20;}
+                else solids_parameters.implicit_solve_parameters.cg_projection_iterations=0;
+                solids_parameters.rigid_body_collision_parameters.contact_iterations=20;
+                solids_parameters.rigid_body_collision_parameters.contact_project_iterations=20;
+                solids_parameters.rigid_body_collision_parameters.perform_contact=true;
+                solids_parameters.rigid_body_collision_parameters.use_shock_propagation=true;
+
+                if(simulate_deformable) solid_body_collection.deformable_body_collection.simulate=true;
+        
+                sphere_initial_position=TV((T).65,(T).11,(T)0);
+                sphere_scale=(T).25;
+                solid_gravity=TV(0,-(T)9.8,0);}
+
+            if(fracture_walls) solids_fluids_parameters.use_fluid_rigid_fracture=true;
+
+            if(test_number==4){sphere_initial_position=TV((T)-1+sphere_scale*(T)2,-(T)1+sphere_scale,(T)0);}
+            if(test_number==5){sphere_initial_position=TV((T).2+sphere_scale*(T)2,-(T)1+sphere_scale,(T)0);}
+            if(test_number==6){sphere_initial_position=TV(-sphere_scale*(T)2,-(T)1+sphere_scale,(T)0);}
+ 
+            // shock type
+            if(test_number==1||test_number==2||test_number==3||test_number==4||test_number==11||test_number==12||test_number==13||test_number==14||test_number==15||test_number==16||test_number==17) shock_type=SPHERICAL;
+            else if(test_number==5||test_number==6||test_number==7||test_number==8||test_number==9||test_number==10||test_number==19||test_number==21) shock_type=VERTICAL;
+
+            // spherical shock positioning
+            GRID<TV>& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
+            shock_radius=(T).6;
+            shock_center=TV();
+            if(test_number==3){
+                shock_radius=(T).5;
+                shock_center.y-=6.5;
+                strong_shock=true;}
+            if(test_number==4) shock_radius=(T).1;
+            if(test_number==11)shock_radius=.4;
+            if(test_number==12){
+                shock_radius=.4;
+                shock_center.y=(T)1;}
+            if(test_number==13||test_number==16){
+                shock_center=TV(1,sphere_scale,(T)1);
+                shock_radius=.4;}
+            if(test_number==14||test_number==15){
+                shock_radius=.3*grid.Domain().max_corner.y;
+                shock_center=TV(grid.Domain().max_corner.x*.5-shock_radius*2,grid.Domain().min_corner.y+shock_radius*1.2,0);}
+            if(test_number==17){
+                shock_radius=(T)grid.Domain().max_corner.x*.15;
+                shock_center=TV(-shock_radius*(1.2),-shock_radius,0);}
+            if(test_number==18){
+                shock_radius=(T)6.5;
+                shock_center=TV(0,10,0);}
+
+            // vertical shock positioning
+            if(test_number==5){inside_shock_box=grid.Domain()-TV(1,0,0);}
+            if(test_number==6){inside_shock_box=grid.Domain()-TV(1.7,0,0);}
+            if(test_number==7||test_number==21){
+                T x_delta=grid.Domain().max_corner.x*(T)1.2;
+                inside_shock_box=grid.Domain()-TV(x_delta,0,0);}
+            if(test_number==8){inside_shock_box=grid.Domain()-TV(1.2,0,0);}
+            if(test_number==9||test_number==10){inside_shock_box=grid.Domain()-TV(1.5,0,0);}
+            if(test_number==19) inside_shock_box=RANGE<TV>(TV(36,-2,-2),TV(42,2,2));
+    
+            // shock strength
+            state_inside=TV_DIMENSION((T)1,(T)0,(T)0,(T)0,(T)1);
+            state_outside=TV_DIMENSION((T).125,(T)0,(T)0,(T)0,(T).1);
+            if(strong_shock){
+                T p_atm=(T)101325.;
+                T temperature_inside=(T)2900,temperature_outside=(T)290;
+                T p_inside=(T)1000*p_atm,p_outside=p_atm;
+
+                T rho_inside=fluids_parameters.compressible_eos->rho_From_p_And_T(p_inside,temperature_inside);
+                T rho_outside=fluids_parameters.compressible_eos->rho_From_p_And_T(p_outside,temperature_outside);
+
+                state_inside=TV_DIMENSION(rho_inside,(T)0,(T)0,(T)0,p_inside);
+                state_outside=TV_DIMENSION(rho_outside,(T)0,(T)0,(T)0,p_outside);}
+
+            if(test_number==18){
+                T p_atm=(T)101325.;
+                T temperature_inside=(T)2.62497e8,temperature_outside=(T)290;
+                T p_inside=(T)9.41831e10,p_outside=p_atm;
+
+                T rho_inside=fluids_parameters.compressible_eos->rho_From_p_And_T(p_inside,temperature_inside);
+                T rho_outside=fluids_parameters.compressible_eos->rho_From_p_And_T(p_outside,temperature_outside);
+
+                state_inside=TV_DIMENSION(rho_inside,(T)0,(T)0,(T)0,p_inside);
+                state_outside=TV_DIMENSION(rho_outside,(T)0,(T)0,(T)0,p_outside);}
+
+
+            if(incompressible){
+                // Set ambient density and temperature
+                EOS<T>& eos=*fluids_parameters.compressible_eos;
+                T rho_outside=state_outside(0);
+                T p_outside=state_outside(4);
+                T e_outside=eos.e_From_p_And_rho(p_outside,rho_outside);
+                T temperature_outside=eos.T(rho_outside,e_outside);
+                fluids_parameters.ambient_density=rho_outside;
+                fluids_parameters.ambient_temperature=temperature_outside;
+                T linear_attenuation;
+                if(use_fixed_farfield_boundary) linear_attenuation=(T)1;
+                else linear_attenuation=(T).1;
+                fluids_parameters.density_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_density,linear_attenuation);
+                fluids_parameters.temperature_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_temperature,linear_attenuation);}
+
+            if(use_smoke_sourcing){
+                if(test_number==20){
+                    smoke_source.radius=(T)1;
+                    smoke_source.Set_Endpoints(TV((T)0,grid.Domain().min_corner.y,0),TV((T)0,grid.Domain().min_corner.y+smoke_source.radius,0));
+
+                    source_density_value=(T)state_outside(0)*.01;
+                    source_temperature_value=(T)1000;
+                    source_velocity_value=TV(0,0,0);}}
+            if(use_soot_sourcing){
+                if(test_number==20){
+                    soot_source=smoke_source;
+                    source_soot_value=(T)1;}
+                if(test_number==21){
+                    source_soot_value=(T)1;
+                    soot_source.radius=T(.05);
+                    VECTOR<T,3> endpoint1=VECTOR<T,3>::Constant_Vector(0.25),endpoint2=VECTOR<T,3>::Constant_Vector(0.25);
+                    endpoint1(1)=T(0);endpoint2(1)=T(0.05);
+                    soot_source.Set_Endpoints(endpoint1,endpoint2);}}
+
+            // output directory
+            if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_semiimplicit",
+                test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
+            else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_explicit",test_number,
+                (fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
+            if(eno_scheme==2) output_directory+="_density_weighted";
+            else if(eno_scheme==3) output_directory+="_velocity_weighted";
+            if(use_slip) output_directory+="_slip";
+            if(transition_to_incompressible) output_directory+="_transition_incompressible";
+            if(use_soot) output_directory+="_soot";
+            if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
+            if(strong_shock) output_directory+="_strong";
+            if(fracture_walls) output_directory+="_fracture";
+            output_directory+=LOG::sprintf("_mass_%f",solid_mass);
+            output_directory+=LOG::sprintf("_fp_%d",fp);
+        }
     virtual ~STANDARD_TESTS() {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-
-    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
-    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
-    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
-    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
-    parse_args->Add("-weak_shock",&weak_shock,"Use stronger shock with temperature ratio 2900:290, p ratio 1000:1");
-    parse_args->Add("-no_solids",&no_solids,"ensure no solid is added");
-    parse_args->Add("-mass",&solid_mass,"solid_mass","the mass of the solid in the simulation");
-    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add("-slip",&use_slip,"use slip/spd for coupling");
-    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
-
-    parse_args->Add("-test_system",&run_self_tests,"Run self tests");
-    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
-    parse_args->Add("-print_index_map",&print_index_map,"print_index_map");
-    parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
-    parse_args->Add("-print_rhs",&print_rhs,"print_rhs");
-    parse_args->Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
-    parse_args->Add("-output_iterators",&output_iterators,"output_iterators");
-    parse_args->Add("-no_preconditioner",&no_preconditioner,"Disable preconditioner");
-    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"preconditioner");
-
-    parse_args->Add("-transition_to_incompressible",&transition_to_incompressible,"value","transition to incompressible in a time window");
-    parse_args->Add("-time_start_transition",&time_start_transition,"value","time to start transitioning to incompressible flow");
-    parse_args->Add("-time_end_transition",&time_end_transition,"value","time to end transitioning to incompressible flow");
-    parse_args->Add("-one_over_c_incompressible",&one_over_c_incompressible,"value","one over incompressible sound speed");
-    parse_args->Add("-vorticity_confinement",&vorticity_confinement,"value","Vorticity Confinement");
-    parse_args->Add("-no_soot",&no_soot,"value","advect around soot");
-    parse_args->Add("-use_soot_sourcing",&use_soot_sourcing,"value","source soot");
-    parse_args->Add("-use_soot_sourcing_from_shock",&use_soot_sourcing_from_shock,"value","source soot from initial shock place");
-    parse_args->Add("-combustion",&use_soot_fuel_combustion,"source soot");
-
-    parse_args->Add("-burn_temperature_threshold",&burn_temperature_threshold,"temp","temperature above which fuel will burn");
-    parse_args->Add("-burn_rate",&burn_rate,"rate","rate of fuel burning");
-    parse_args->Add("-calorific_value",&soot_fuel_calorific_value,"value","heat generated per fuel burnt");
-
-    parse_args->Add("-use_smoke_sourcing",&use_smoke_sourcing,"source smoke (denisty,temperature,velocity)");
-
-    parse_args->Add("-read_soot_from_file",&read_soot_from_file,"read soot from input file");
-    parse_args->Add("-soot_data_dir",&soot_data_dir,"dir","directory containing grid, soot, velocity files");
-    
-    parse_args->Add("-use_fixed_farfield_boundary",&use_fixed_farfield_boundary,"use fixed farfield values for outflow boundaries");
-    parse_args->Add("-use_incompressible_gravity",&use_incompressible_gravity,"add gravity on incompressible fluid");
-    parse_args->Add("-no_solids_gravity",&no_solids_gravity,"add gravity on solids");
-
-    parse_args->Add("-fp",&fp,"fracture pattern","fracture pattern");
-    parse_args->Add("-createpattern",&createpattern,"createpattern");
-    parse_args->Add("-fracture_walls",&fracture_walls,"fracture_walls");
-    
-    parse_args->Add("-faster_frame_rate",&faster_frame_rate,"faster_frame_rate");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    solid_tests.data_directory=data_directory;
-
-    if(createpattern){
-       if(test_number==11) Create_Wall_Pattern();
-       exit(0);}
-
-    timesplit=timesplit&&!exact;
-    use_soot=!no_soot;
-    use_solids_gravity=!no_solids_gravity;
-    bool strong_shock=!weak_shock;
-
-    //grid
-    int cells=resolution;
-    T grid_size=(T)1.;
-    if(test_number==7||test_number==17){
-        fluids_parameters.grid->Initialize(TV_INT(3,2,2)*cells+1,RANGE<TV>(TV((T)-4.5,(T)-3,(T)-3),TV((T)4.5,(T)3,(T)3))*grid_size);}
-    else if(test_number==3){
-        fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-10,(T)-10,(T)-10),TV((T)10,(T)10,(T)10))*grid_size);}
-    else if(test_number==9||test_number==10||test_number==11){
-        fluids_parameters.grid->Initialize(TV_INT(3,2,2)*cells+1,RANGE<TV>(TV((T)-1.5,(T)-1,(T)-1),TV((T)1.5,(T)1,(T)1))*grid_size);}
-    else if(test_number==12){
-        fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2,(T)1))*grid_size);}
-    else if(test_number==13){
-        fluids_parameters.grid->Initialize(TV_INT(2,3,2)*cells+1,RANGE<TV>(TV((T)-3,(T)0,(T)-3),TV((T)5,(T)12,(T)5))*grid_size);}
-    else if(test_number==16){
-        fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-3,(T)0,(T)-3),TV((T)5,(T)8,(T)5))*grid_size);}
-    else if(test_number==14||test_number==15){
-        fluids_parameters.grid->Initialize(TV_INT(3,2,2)*cells+1,RANGE<TV>(TV((T)-120,(T)-80,(T)-80),TV((T)120,(T)80,(T)80))*grid_size);}
-    else if(test_number==18){
-        fluids_parameters.grid->Initialize(TV_INT(2,1,2)*cells+1,RANGE<TV>(TV((T)-100,(T)0,(T)-100),TV((T)100,(T)100,(T)100))*grid_size);}
-    else if(test_number==19){
-        fluids_parameters.grid->Initialize(TV_INT(5,2,2)*cells+1,RANGE<TV>(TV((T)-8,(T)-10,(T)-10),TV((T)42,(T)10,(T)10))*grid_size);}
-    else if(test_number==20){
-        fluids_parameters.grid->Initialize(TV_INT(2,2,1)*cells+1,RANGE<TV>(TV((T)-5,(T)-7.5,(T)-5),TV((T)5,(T)7.5,(T)5))*grid_size);}
-    else if(test_number==21){
-        fluids_parameters.grid->Initialize(TV_INT(2,1,1)*cells+1,RANGE<TV>(TV((T)-1,(T)0,(T)-.25),TV((T)1,(T)1,(T).75))*grid_size);}
-    else{
-        fluids_parameters.grid->Initialize(TV_INT()+cells+1,RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1))*grid_size);}
-
-    *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
-    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=false;
-    if(test_number==3 || test_number==4 || test_number==5) fluids_parameters.domain_walls[1][0]=true;
-    if(test_number==6){
-        fluids_parameters.domain_walls[0][1]=true;
-        fluids_parameters.domain_walls[1][0]=true;}
-    if(test_number==7||test_number==8||test_number==9||test_number==10||test_number==11||test_number==14||test_number==15||test_number==17){
-        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;
-        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-        fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;}
-    if(test_number==13||test_number==16||test_number==18||test_number==19){
-        fluids_parameters.domain_walls[1][0]=true;}
-    if(test_number==19){
-        fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;}
-    if(test_number==20){
-        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
-        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;
-        fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;}
-    if(test_number==21){
-        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
-        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
-        fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;}
-
-
-    //time
-    initial_time=(T)0.;last_frame=1000;frame_rate=(T)1e4;
-
-    switch(test_number){
-        case 3: last_frame=1;
-                frame_rate=(T)75;
-                break;
-        case 7: frame_rate=(T)5e4;
-                break;
-        case 14:
-        case 15: frame_rate=(T)1e4;
-                 break;
-        case 17: frame_rate=(T)1e5;
-                 break;
-        case 18:last_frame=200;frame_rate=(T)2.5e4;
-                break;
-        case 19:frame_rate=(T)1e4;
-                break;
-        case 20:frame_rate=32;
-                break;
-        case 21:frame_rate=(T)6e5;
-                break;
-        default:frame_rate=(T)1e4;last_frame=1000;}
-
-    if(faster_frame_rate) frame_rate=96;
-    fluids_parameters.cfl=cfl_number;
-    //custom stuff . . . 
-    if(transition_to_incompressible){
-        eos_smooth_transition=new EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE<EOS_GAMMA<T> >(time_start_transition,time_end_transition,one_over_c_incompressible,true,3);
-        fluids_parameters.compressible_eos=eos_smooth_transition;}
-    else fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
-    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
-    fluids_parameters.compressible_spatial_order=eno_order;
-    fluids_parameters.compressible_conservation_method->Save_Fluxes();
-    //fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
-    fluids_parameters.compressible_rungekutta_order=rk_order;
-    fluids_parameters.compressible_timesplit=timesplit;
-    fluids_parameters.use_slip=use_slip;
-
-    fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(no_preconditioner) fluids_parameters.use_preconditioner_for_slip_system=false;
-
-    if(use_soot){
-        fluids_parameters.use_soot=true;
-        if(use_soot_fuel_combustion){
-            fluids_parameters.use_soot_fuel_combustion=true;
-            fluids_parameters.burn_temperature_threshold=burn_temperature_threshold;
-            fluids_parameters.burn_rate=burn_rate;
-            fluids_parameters.soot_fuel_calorific_value=soot_fuel_calorific_value;}
-        else fluids_parameters.use_soot_fuel_combustion=false;
-        fluids_parameters.use_fixed_soot_boundary=true;
-        fluids_parameters.ambient_soot=(T)0;
-        fluids_parameters.soot_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_soot,(T)1);}
-
-    if(incompressible){
-        if(vorticity_confinement>0){
-            fluids_parameters.use_vorticity_confinement=true;
-            fluids_parameters.confinement_parameter=vorticity_confinement*fluids_parameters.grid->dX.Min();}
-        else fluids_parameters.use_vorticity_confinement=false;
-        solids_fluids_parameters.use_leakproof_solve=false;
-        fluids_parameters.use_body_force=false;
-        fluids_parameters.density=(T)1; // not used
-        fluids_parameters.use_density=true;
-        fluids_parameters.use_temperature=true;
-        fluids_parameters.use_fixed_density_boundary=true;
-        fluids_parameters.use_fixed_temperature_boundary=true;
-        if(use_incompressible_gravity) fluids_parameters.gravity.y=-(T)9.8;
-        else fluids_parameters.gravity.y=-(T)0;}
-
-    // setup solids
-    bool simulate_rigids=(test_number==2||test_number==4||test_number==5||test_number==6||test_number==7||test_number==8||test_number==9||test_number==10||test_number==11||test_number==12||test_number==13||test_number==14||test_number==15||test_number==16||test_number==21);
-    if(use_slip) simulate_rigids=true;
-    bool simulate_deformable=(test_number==17);
-
-    if(simulate_rigids||simulate_deformable){
-        solids_fluids_parameters.use_leakproof_solve=false;
-        fluids_parameters.solid_affects_fluid=true;
-        fluids_parameters.fluid_affects_solid=true;
-        solids_parameters.use_post_cg_constraints=true;
-        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-        solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-        solids_parameters.rigid_body_collision_parameters.use_push_out=false;
-        solids_parameters.rigid_body_collision_parameters.use_legacy_push_out=true;
-        solids_parameters.rigid_body_collision_parameters.use_fracture_particle_optimization=false;
-        solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1;
-        solids_parameters.use_trapezoidal_rule_for_velocities=false;
-        solids_parameters.verbose_dt=true;
-        solid_body_collection.print_residuals=false;
-        solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-16;
-        solids_parameters.implicit_solve_parameters.cg_restart_iterations=200;
-        solids_parameters.implicit_solve_parameters.cg_iterations=1000;
-    
-        solids_parameters.use_rigid_deformable_contact=true;
-        solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=true;
-
-        if(solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg){
-            solids_parameters.implicit_solve_parameters.cg_projection_iterations=20;}
-        else solids_parameters.implicit_solve_parameters.cg_projection_iterations=0;
-        solids_parameters.rigid_body_collision_parameters.contact_iterations=20;
-        solids_parameters.rigid_body_collision_parameters.contact_project_iterations=20;
-        solids_parameters.rigid_body_collision_parameters.perform_contact=true;
-        solids_parameters.rigid_body_collision_parameters.use_shock_propagation=true;
-
-        if(simulate_deformable) solid_body_collection.deformable_body_collection.simulate=true;
-        
-        sphere_initial_position=TV((T).65,(T).11,(T)0);
-        sphere_scale=(T).25;
-        solid_gravity=TV(0,-(T)9.8,0);}
-
-    if(fracture_walls) solids_fluids_parameters.use_fluid_rigid_fracture=true;
-
-    if(test_number==4){sphere_initial_position=TV((T)-1+sphere_scale*(T)2,-(T)1+sphere_scale,(T)0);}
-    if(test_number==5){sphere_initial_position=TV((T).2+sphere_scale*(T)2,-(T)1+sphere_scale,(T)0);}
-    if(test_number==6){sphere_initial_position=TV(-sphere_scale*(T)2,-(T)1+sphere_scale,(T)0);}
- 
-    // shock type
-    if(test_number==1||test_number==2||test_number==3||test_number==4||test_number==11||test_number==12||test_number==13||test_number==14||test_number==15||test_number==16||test_number==17) shock_type=SPHERICAL;
-    else if(test_number==5||test_number==6||test_number==7||test_number==8||test_number==9||test_number==10||test_number==19||test_number==21) shock_type=VERTICAL;
-
-    // spherical shock positioning
-    GRID<TV>& grid=(fluids_parameters.mpi_grid)?fluids_parameters.mpi_grid->global_grid:*fluids_parameters.grid;
-    shock_radius=(T).6;
-    shock_center=TV();
-    if(test_number==3){
-        shock_radius=(T).5;
-        shock_center.y-=6.5;
-        strong_shock=true;}
-    if(test_number==4) shock_radius=(T).1;
-    if(test_number==11)shock_radius=.4;
-    if(test_number==12){
-        shock_radius=.4;
-        shock_center.y=(T)1;}
-    if(test_number==13||test_number==16){
-        shock_center=TV(1,sphere_scale,(T)1);
-        shock_radius=.4;}
-    if(test_number==14||test_number==15){
-        shock_radius=.3*grid.Domain().max_corner.y;
-        shock_center=TV(grid.Domain().max_corner.x*.5-shock_radius*2,grid.Domain().min_corner.y+shock_radius*1.2,0);}
-    if(test_number==17){
-        shock_radius=(T)grid.Domain().max_corner.x*.15;
-        shock_center=TV(-shock_radius*(1.2),-shock_radius,0);}
-    if(test_number==18){
-        shock_radius=(T)6.5;
-        shock_center=TV(0,10,0);}
-
-    // vertical shock positioning
-    if(test_number==5){inside_shock_box=grid.Domain()-TV(1,0,0);}
-    if(test_number==6){inside_shock_box=grid.Domain()-TV(1.7,0,0);}
-    if(test_number==7||test_number==21){
-        T x_delta=grid.Domain().max_corner.x*(T)1.2;
-        inside_shock_box=grid.Domain()-TV(x_delta,0,0);}
-    if(test_number==8){inside_shock_box=grid.Domain()-TV(1.2,0,0);}
-    if(test_number==9||test_number==10){inside_shock_box=grid.Domain()-TV(1.5,0,0);}
-    if(test_number==19) inside_shock_box=RANGE<TV>(TV(36,-2,-2),TV(42,2,2));
-    
-    // shock strength
-    state_inside=TV_DIMENSION((T)1,(T)0,(T)0,(T)0,(T)1);
-    state_outside=TV_DIMENSION((T).125,(T)0,(T)0,(T)0,(T).1);
-    if(strong_shock){
-        T p_atm=(T)101325.;
-        T temperature_inside=(T)2900,temperature_outside=(T)290;
-        T p_inside=(T)1000*p_atm,p_outside=p_atm;
-
-        T rho_inside=fluids_parameters.compressible_eos->rho_From_p_And_T(p_inside,temperature_inside);
-        T rho_outside=fluids_parameters.compressible_eos->rho_From_p_And_T(p_outside,temperature_outside);
-
-        state_inside=TV_DIMENSION(rho_inside,(T)0,(T)0,(T)0,p_inside);
-        state_outside=TV_DIMENSION(rho_outside,(T)0,(T)0,(T)0,p_outside);}
-
-    if(test_number==18){
-        T p_atm=(T)101325.;
-        T temperature_inside=(T)2.62497e8,temperature_outside=(T)290;
-        T p_inside=(T)9.41831e10,p_outside=p_atm;
-
-        T rho_inside=fluids_parameters.compressible_eos->rho_From_p_And_T(p_inside,temperature_inside);
-        T rho_outside=fluids_parameters.compressible_eos->rho_From_p_And_T(p_outside,temperature_outside);
-
-        state_inside=TV_DIMENSION(rho_inside,(T)0,(T)0,(T)0,p_inside);
-        state_outside=TV_DIMENSION(rho_outside,(T)0,(T)0,(T)0,p_outside);}
-
-
-    if(incompressible){
-         // Set ambient density and temperature
-         EOS<T>& eos=*fluids_parameters.compressible_eos;
-         T rho_outside=state_outside(0);
-         T p_outside=state_outside(4);
-         T e_outside=eos.e_From_p_And_rho(p_outside,rho_outside);
-         T temperature_outside=eos.T(rho_outside,e_outside);
-         fluids_parameters.ambient_density=rho_outside;
-         fluids_parameters.ambient_temperature=temperature_outside;
-         T linear_attenuation;
-         if(use_fixed_farfield_boundary) linear_attenuation=(T)1;
-         else linear_attenuation=(T).1;
-         fluids_parameters.density_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_density,linear_attenuation);
-         fluids_parameters.temperature_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_temperature,linear_attenuation);}
-
-     if(use_smoke_sourcing){
-         if(test_number==20){
-            smoke_source.radius=(T)1;
-            smoke_source.Set_Endpoints(TV((T)0,grid.Domain().min_corner.y,0),TV((T)0,grid.Domain().min_corner.y+smoke_source.radius,0));
-
-            source_density_value=(T)state_outside(0)*.01;
-            source_temperature_value=(T)1000;
-            source_velocity_value=TV(0,0,0);}}
-    if(use_soot_sourcing){
-        if(test_number==20){
-            soot_source=smoke_source;
-            source_soot_value=(T)1;}
-        if(test_number==21){
-            source_soot_value=(T)1;
-            soot_source.radius=T(.05);
-            VECTOR<T,3> endpoint1=VECTOR<T,3>::Constant_Vector(0.25),endpoint2=VECTOR<T,3>::Constant_Vector(0.25);
-            endpoint1(1)=T(0);endpoint2(1)=T(0.05);
-            soot_source.Set_Endpoints(endpoint1,endpoint2);}}
-
-    // output directory
-    if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_semiimplicit",
-        test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
-    else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_explicit",test_number,
-        (fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
-    if(eno_scheme==2) output_directory+="_density_weighted";
-    else if(eno_scheme==3) output_directory+="_velocity_weighted";
-    if(use_slip) output_directory+="_slip";
-    if(transition_to_incompressible) output_directory+="_transition_incompressible";
-    if(use_soot) output_directory+="_soot";
-    if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
-    if(strong_shock) output_directory+="_strong";
-    if(fracture_walls) output_directory+="_fracture";
-    output_directory+=LOG::sprintf("_mass_%f",solid_mass);
-    output_directory+=LOG::sprintf("_fp_%d",fp);
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();
     if(!(test_number==13 || test_number==19))
         fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 }

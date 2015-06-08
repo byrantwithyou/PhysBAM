@@ -43,19 +43,25 @@ class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,2> >
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
-    using BASE::parse_args;using BASE::test_number;using BASE::Set_External_Positions;using BASE::data_directory; // silence -Woverloaded-virtual
+    using BASE::test_number;using BASE::Set_External_Positions;using BASE::data_directory; // silence -Woverloaded-virtual
 
     ARTICULATED_RIGID_BODY<TV>* arb;
     SOLIDS_STANDARD_TESTS<TV> tests;
     int njoints;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),njoints(6)
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),njoints(6)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=1;
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         solids_parameters.use_rigid_deformable_contact=false;
+        parse_args.Add("-njoints",&njoints,"num","number of joints to use");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     }
 
     virtual ~STANDARD_TESTS()
@@ -90,25 +96,7 @@ public:
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return false;}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-njoints",&njoints,"num","number of joints to use");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-    LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

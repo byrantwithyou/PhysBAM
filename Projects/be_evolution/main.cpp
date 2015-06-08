@@ -20,9 +20,9 @@ void Run(PARSE_ARGS& parse_args)
 {
     RW rw=RW();STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
     SOLIDS_EXAMPLE<TV>* example;
-    example=new STANDARD_TESTS<TV>(stream_type);
-    example->want_mpi_world=true;
-    example->Parse(parse_args);
+    example=new STANDARD_TESTS<TV>(stream_type,parse_args);
+    example->mpi_world=new MPI_WORLD(parse_args);
+    example->After_Construction();
     if(example->mpi_world->initialized) example->solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
     example->Adjust_Output_Directory_For_MPI(example->solid_body_collection.deformable_body_collection.mpi_solids);
     SOLIDS_DRIVER<TV> driver(*example);

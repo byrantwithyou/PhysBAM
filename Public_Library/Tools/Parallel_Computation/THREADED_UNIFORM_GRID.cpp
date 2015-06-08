@@ -48,7 +48,7 @@ template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,3> >& process_gri
 template<class TV> THREADED_UNIFORM_GRID<TV>::
 THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,const int number_of_threads,GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,
     const bool skip_initialization,const TV_INT& processes_per_dimension,const VECTOR<bool,TV::m>& periodic_input)
-    :MPI_GRID<TV >(local_grid_input,number_of_ghost_cells_input,true,processes_per_dimension,periodic_input,0),tid(tid_input),buffers(buffers_input)
+    :MPI_GRID<TV>(local_grid_input,number_of_ghost_cells_input,true,processes_per_dimension,periodic_input,0),tid(tid_input),buffers(buffers_input)
 {
     number_of_processes=number_of_threads;rank=tid-1;
     if(skip_initialization) return;

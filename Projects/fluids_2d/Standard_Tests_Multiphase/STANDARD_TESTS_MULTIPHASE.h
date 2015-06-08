@@ -21,14 +21,20 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;
-    using BASE::solid_body_collection;using BASE::test_number;using BASE::parse_args;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
+    using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
 
     WATER_STANDARD_TESTS_MULTIPHASE_2D<TV> tests;
 
-    STANDARD_TESTS_MULTIPHASE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.WATER),
+    STANDARD_TESTS_MULTIPHASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,0,fluids_parameters.WATER),
         tests(*this,fluids_parameters,fluid_collection,solid_body_collection.rigid_body_collection)
     {
+        parse_args.Parse();
+        fluids_parameters.Initialize_Number_Of_Regions(WATER_STANDARD_TESTS_MULTIPHASE_2D<TV>::Number_Of_Regions(test_number));
+        tests.Initialize(test_number,resolution);
+        *fluids_parameters.grid=tests.grid;
+        fluids_parameters.number_particles_per_cell=16;
+        fluids_parameters.solve_neumann_regions=true;
     }
 
     ~STANDARD_TESTS_MULTIPHASE()
@@ -41,26 +47,7 @@ public:
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    fluids_parameters.Initialize_Number_Of_Regions(WATER_STANDARD_TESTS_MULTIPHASE_2D<TV>::Number_Of_Regions(test_number));
-    tests.Initialize(test_number,resolution);
-    *fluids_parameters.grid=tests.grid;
-    fluids_parameters.number_particles_per_cell=16;
-    fluids_parameters.solve_neumann_regions=true;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initial_Phi
 //#####################################################################

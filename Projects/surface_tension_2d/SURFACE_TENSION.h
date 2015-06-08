@@ -83,7 +83,7 @@ public:
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::two_phase;
-    using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::convection_order;using BASE::use_pls_evolution_for_structure;
+    using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::convection_order;using BASE::use_pls_evolution_for_structure;
     using BASE::Mark_Outside;using BASE::Add_Thin_Shell_To_Fluid_Simulation;using BASE::Add_To_Fluid_Simulation;
 
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
@@ -132,7 +132,7 @@ public:
     T linear_force,rand;
     int cut_order;
 
-    SURFACE_TENSION(const STREAM_TYPE stream_type);
+    SURFACE_TENSION(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~SURFACE_TENSION();
 
     // Unused callbacks
@@ -164,10 +164,8 @@ public:
 //#####################################################################
     void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE;
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
     void Add_Rigid_Body_Walls(const T coefficient_of_restitution=(T).5,const T coefficient_of_friction=(T).5,ARRAY<int>* walls_added=0);
-    void Parse_Late_Options() PHYSBAM_OVERRIDE;
+    void After_Initialization() PHYSBAM_OVERRIDE;
     void Initialize_Advection() PHYSBAM_OVERRIDE;
     void Initialize_Phi() PHYSBAM_OVERRIDE;
     void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE;

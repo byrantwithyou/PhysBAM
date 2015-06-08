@@ -22,13 +22,11 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class T> STANDARD_TESTS<VECTOR<T,3> >::
-STANDARD_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
+STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type,parse_args),case11_w1(0),case11_w2(0)
 {
     parse_args.Add("-w1",&case11_w1,"angular velocity","initial angular speed of simulated object");
     parse_args.Add("-w2",&case11_w2,"angular velocity","initial angular speed of simulated object");
-    parse_args.Parse(true);
-
     parse_args.Parse();
 }
 //#####################################################################

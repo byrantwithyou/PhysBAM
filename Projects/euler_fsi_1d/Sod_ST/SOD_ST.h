@@ -44,7 +44,7 @@ public:
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
-    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Add_To_Fluid_Simulation;using BASE::data_directory;
+    using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;using BASE::Add_To_Fluid_Simulation;using BASE::data_directory;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
@@ -89,13 +89,144 @@ public:
     T time_end_transition;
     T one_over_c_incompressible;
 
-    SOD_ST(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(stream_type,data_directory,solid_body_collection),
+    SOD_ST(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args,0,fluids_parameters.COMPRESSIBLE),tests(stream_type_input,data_directory,solid_body_collection),
         rigid_body_collection(solid_body_collection.rigid_body_collection),solid_mass(1),write_transparency_output(false),
         transition_to_incompressible(false),eos_smooth_transition(0),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),
         implicit_rk(false),use_sound_speed_based_cfl(false),multiplication_factor_for_sound_speed_based_dt(false),exact(false),
         use_glf(true),all_walls(false),no_walls(false),time_start_transition((T).5),time_end_transition((T).7),one_over_c_incompressible(0)
     {
+        parse_args.Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+        parse_args.Add("-eno_order",&eno_order,"eno_order","eno order");
+        parse_args.Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+        parse_args.Add("-cfl",&cfl_number,"CFL","cfl number");
+        parse_args.Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+        parse_args.Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
+        parse_args.Add("-cfl_sound_speed",&use_sound_speed_based_cfl,"use sound speed based cfl condition");
+        parse_args.Add("-cfl_sound_speed_multiple",&multiplication_factor_for_sound_speed_based_dt,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
+        parse_args.Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
+        parse_args.Add_Not("-noglf",&use_glf,"don't use GLF and use LLF for ENO");
+        parse_args.Add("-solid_mass",&solid_mass,"solid_mass","the mass of the solid in the simulation");
+        parse_args.Add("-all_walls",&all_walls,"Add walls on all sides");
+        parse_args.Add("-no_walls",&no_walls,"No walls on all sides");
+        parse_args.Add("-write_transparency_output",&write_transparency_output,"Akin to Ariente's tests, this allows us to visualize a rigid body as though it were 0-D.");
+        parse_args.Add("-transition_to_incompressible",&transition_to_incompressible,"transition to incompressible in a time window");
+        parse_args.Add("-time_start_transition",&time_start_transition,"value","time to start transitioning to incompressible flow");
+        parse_args.Add("-time_end_transition",&time_end_transition,"value","time to end transitioning to incompressible flow");
+        parse_args.Add("-one_over_c_incompressible",&one_over_c_incompressible,"value","incompressible sound speed");
+        parse_args.Add("-apply_cavitation_correction",&fluids_parameters.compressible_apply_cavitation_correction,"compressible_apply_cavitation_correction");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+        implicit_rk=implicit_rk && !exact;
+
+        LOG::cout<<"use_glf="<<use_glf<<std::endl;
+
+        //grid
+        if(test_number==12) fluids_parameters.grid->Initialize(TV_INT(resolution),RANGE<TV>(TV(-1),TV(2)));
+        else fluids_parameters.grid->Initialize(TV_INT(resolution),RANGE<TV>::Unit_Box());
+        *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+        if(test_number==1 || test_number==2) fluids_parameters.domain_walls[0][1]=false;
+        if(test_number==10){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
+        if(test_number==11 || test_number==12) fluids_parameters.domain_walls[0][1]=false;
+        if(test_number==13 || test_number==14){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
+        if(all_walls){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
+        else if(no_walls){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;}
+        //time
+        initial_time=(T)0.;last_frame=1500;frame_rate=(T)100.;
+        if(test_number==9) last_frame=4000;
+        if(test_number==5){frame_rate=(T)5/(T)2.5e-6;last_frame=500;}
+        else if(test_number==8){frame_rate=(T)10/(T)1.75e-4;last_frame=1000;}
+        else if(test_number==10){frame_rate=(T)10/(T).038;last_frame=500;}
+        fluids_parameters.cfl=cfl_number;
+        fluids_parameters.compressible_use_sound_speed_for_cfl=use_sound_speed_based_cfl;
+        if(multiplication_factor_for_sound_speed_based_dt>0){
+            fluids_parameters.compressible_use_sound_speed_based_dt_multiple_for_cfl=true;
+            fluids_parameters.compressible_multiplication_factor_for_sound_speed_based_dt=multiplication_factor_for_sound_speed_based_dt;}
+        //custom stuff . . .
+        if(transition_to_incompressible){
+            eos_smooth_transition=new EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE<EOS_GAMMA<T> >(time_start_transition,time_end_transition,one_over_c_incompressible);
+            fluids_parameters.compressible_eos=eos_smooth_transition;}
+        else fluids_parameters.compressible_eos=new EOS_GAMMA<T>;
+        if(eno_scheme==1) fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(use_glf,false,false);
+        else if(eno_scheme==2) fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(use_glf,true,false);
+        else fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(use_glf,true,true);
+        fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
+        fluids_parameters.compressible_conservation_method->Save_Fluxes();
+        fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
+        fluids_parameters.compressible_rungekutta_order=rk_order;
+        //fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_RF<T,TV::m+2>;
+        fluids_parameters.compressible_timesplit=timesplit;
+        fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
+        solid_body_collection.deformable_body_collection.simulate=false;
+        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+
+        if(test_number==11 || test_number==12 || test_number==13 || test_number==14 || test_number==15 || test_number==16){
+            fluids_parameters.solid_affects_fluid=true;
+            fluids_parameters.fluid_affects_solid=true;
+            if(test_number==15 || test_number==16){
+                solid_body_collection.deformable_body_collection.simulate=true;}
+            else{
+                solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+                solids_parameters.rigid_body_collision_parameters.use_push_out=false;
+                solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1;}
+            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            solids_parameters.use_trapezoidal_rule_for_velocities=false;
+            solids_parameters.verbose_dt=true;
+            solid_body_collection.print_residuals=false;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-16;
+            solids_parameters.implicit_solve_parameters.cg_projection_iterations=0; // TODO: check this
+            solids_parameters.implicit_solve_parameters.cg_iterations=400;}
+
+        if(timesplit) output_directory=LOG::sprintf("Sod_ST/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
+        else output_directory=LOG::sprintf("Sod_ST/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
+        if(eno_scheme==2) output_directory+="_density_weighted";
+        else if(eno_scheme==3) output_directory+="_velocity_weighted";
+
+        if(test_number==11 || test_number==12 || test_number==13 || test_number==14 || test_number==15 || test_number==16){
+            output_directory+=LOG::sprintf("_mass_%f",solid_mass);}
+        if(transition_to_incompressible) output_directory+="_transition_incompressible";
+        if(fluids_parameters.compressible_apply_cavitation_correction) output_directory+="_cavitation";
+
+        middle_state_start_point=0.5;right_state_start_point=0;
+        if(test_number==1||test_number==11 || test_number==12 || test_number==13 || test_number==15 || test_number==16){
+            state_left=TV_DIMENSION((T)1,(T)0,(T)1);
+            state_right=TV_DIMENSION((T).125,(T)0,(T).1);}
+        else if(test_number==2){
+            state_left=TV_DIMENSION((T).125,(T)0,(T).1);
+            state_right=TV_DIMENSION((T)1,(T)0,(T)1);}
+        else if(test_number==3){
+            state_left=TV_DIMENSION((T)1,(T)-3,(T)1);
+            state_right=TV_DIMENSION((T)1,(T)3,(T)1);}
+        else if(test_number==4){
+            state_left=TV_DIMENSION((T).445,(T).698,(T)3.528);
+            state_right=TV_DIMENSION((T).5,(T)0,(T).571);}
+        else if(test_number==5){
+            state_left=TV_DIMENSION((T)1,(T)0,(T)1e10);
+            state_right=TV_DIMENSION((T).125,(T)0,(T).1);}
+        else if(test_number==6){
+            state_left=TV_DIMENSION((T)1,(T)-2,(T).4);
+            state_right=TV_DIMENSION((T)1,(T)2,(T).4);}
+        else if(test_number==7){
+            state_left=TV_DIMENSION((T)3.857,(T).92,(T)10.333);
+            state_right=TV_DIMENSION((T)1,(T)3.55,(T)1);}
+        else if(test_number==8){
+            state_left=TV_DIMENSION((T)10,(T)2000,(T)500);
+            state_right=TV_DIMENSION((T)20,(T)0,(T)500);}
+        else if(test_number==9){
+            state_left=TV_DIMENSION((T).125,(T)0,(T).1);
+            state_middle=TV_DIMENSION((T)1,(T)0,(T)1);
+            state_right=TV_DIMENSION((T).125,(T)0,(T).1);
+            middle_state_start_point=(T).4;right_state_start_point=(T).6;}
+        else if(test_number==10){
+            state_left=TV_DIMENSION((T)1,(T)0,(T)1e3);
+            state_middle=TV_DIMENSION((T)1,(T)0,(T)1e-2);
+            state_right=TV_DIMENSION((T)1,(T)0,(T)1e2);
+            middle_state_start_point=(T).1;right_state_start_point=(T).9;}
+        else if(test_number==14){
+            state_left=TV_DIMENSION((T).125,(T)0,(T).1);
+            state_right=TV_DIMENSION((T).125,(T)0,(T).1);}
     }
 
     virtual ~SOD_ST() {}
@@ -124,150 +255,7 @@ public:
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
-    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
-    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
-    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
-    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
-    parse_args->Add("-cfl_sound_speed",&use_sound_speed_based_cfl,"use sound speed based cfl condition");
-    parse_args->Add("-cfl_sound_speed_multiple",&multiplication_factor_for_sound_speed_based_dt,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
-    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
-    parse_args->Add_Not("-noglf",&use_glf,"don't use GLF and use LLF for ENO");
-    parse_args->Add("-solid_mass",&solid_mass,"solid_mass","the mass of the solid in the simulation");
-    parse_args->Add("-all_walls",&all_walls,"Add walls on all sides");
-    parse_args->Add("-no_walls",&no_walls,"No walls on all sides");
-    parse_args->Add("-write_transparency_output",&write_transparency_output,"Akin to Ariente's tests, this allows us to visualize a rigid body as though it were 0-D.");
-    parse_args->Add("-transition_to_incompressible",&transition_to_incompressible,"transition to incompressible in a time window");
-    parse_args->Add("-time_start_transition",&time_start_transition,"value","time to start transitioning to incompressible flow");
-    parse_args->Add("-time_end_transition",&time_end_transition,"value","time to end transitioning to incompressible flow");
-    parse_args->Add("-one_over_c_incompressible",&one_over_c_incompressible,"value","incompressible sound speed");
-    parse_args->Add("-apply_cavitation_correction",&fluids_parameters.compressible_apply_cavitation_correction,"compressible_apply_cavitation_correction");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    implicit_rk=implicit_rk && !exact;
-
-    LOG::cout<<"use_glf="<<use_glf<<std::endl;
-
-    //grid
-    if(test_number==12) fluids_parameters.grid->Initialize(TV_INT(resolution),RANGE<TV>(TV(-1),TV(2)));
-    else fluids_parameters.grid->Initialize(TV_INT(resolution),RANGE<TV>::Unit_Box());
-    *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
-    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
-    if(test_number==1 || test_number==2) fluids_parameters.domain_walls[0][1]=false;
-    if(test_number==10){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
-    if(test_number==11 || test_number==12) fluids_parameters.domain_walls[0][1]=false;
-    if(test_number==13 || test_number==14){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
-    if(all_walls){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
-    else if(no_walls){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;}
-    //time
-    initial_time=(T)0.;last_frame=1500;frame_rate=(T)100.;
-    if(test_number==9) last_frame=4000;
-    if(test_number==5){frame_rate=(T)5/(T)2.5e-6;last_frame=500;}
-    else if(test_number==8){frame_rate=(T)10/(T)1.75e-4;last_frame=1000;}
-    else if(test_number==10){frame_rate=(T)10/(T).038;last_frame=500;}
-    fluids_parameters.cfl=cfl_number;
-    fluids_parameters.compressible_use_sound_speed_for_cfl=use_sound_speed_based_cfl;
-    if(multiplication_factor_for_sound_speed_based_dt>0){
-        fluids_parameters.compressible_use_sound_speed_based_dt_multiple_for_cfl=true;
-        fluids_parameters.compressible_multiplication_factor_for_sound_speed_based_dt=multiplication_factor_for_sound_speed_based_dt;}
-    //custom stuff . . .
-    if(transition_to_incompressible){
-        eos_smooth_transition=new EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE<EOS_GAMMA<T> >(time_start_transition,time_end_transition,one_over_c_incompressible);
-        fluids_parameters.compressible_eos=eos_smooth_transition;}
-    else fluids_parameters.compressible_eos=new EOS_GAMMA<T>;
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(use_glf,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(use_glf,true,false);
-    else fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_LLF<TV,TV::m+2>(use_glf,true,true);
-    fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
-    fluids_parameters.compressible_conservation_method->Save_Fluxes();
-    fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
-    fluids_parameters.compressible_rungekutta_order=rk_order;
-    //fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_RF<T,TV::m+2>;
-    fluids_parameters.compressible_timesplit=timesplit;
-    fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
-    solid_body_collection.deformable_body_collection.simulate=false;
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-
-    if(test_number==11 || test_number==12 || test_number==13 || test_number==14 || test_number==15 || test_number==16){
-        fluids_parameters.solid_affects_fluid=true;
-        fluids_parameters.fluid_affects_solid=true;
-        if(test_number==15 || test_number==16){
-            solid_body_collection.deformable_body_collection.simulate=true;}
-        else{
-            solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-            solids_parameters.rigid_body_collision_parameters.use_push_out=false;
-            solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1;}
-        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-        solids_parameters.use_trapezoidal_rule_for_velocities=false;
-        solids_parameters.verbose_dt=true;
-        solid_body_collection.print_residuals=false;
-        solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-16;
-        solids_parameters.implicit_solve_parameters.cg_projection_iterations=0; // TODO: check this
-        solids_parameters.implicit_solve_parameters.cg_iterations=400;}
-
-    if(timesplit) output_directory=LOG::sprintf("Sod_ST/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
-    else output_directory=LOG::sprintf("Sod_ST/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
-    if(eno_scheme==2) output_directory+="_density_weighted";
-    else if(eno_scheme==3) output_directory+="_velocity_weighted";
-
-    if(test_number==11 || test_number==12 || test_number==13 || test_number==14 || test_number==15 || test_number==16){
-        output_directory+=LOG::sprintf("_mass_%f",solid_mass);}
-    if(transition_to_incompressible) output_directory+="_transition_incompressible";
-    if(fluids_parameters.compressible_apply_cavitation_correction) output_directory+="_cavitation";
-
-    middle_state_start_point=0.5;right_state_start_point=0;
-    if(test_number==1||test_number==11 || test_number==12 || test_number==13 || test_number==15 || test_number==16){
-        state_left=TV_DIMENSION((T)1,(T)0,(T)1);
-        state_right=TV_DIMENSION((T).125,(T)0,(T).1);}
-    else if(test_number==2){
-        state_left=TV_DIMENSION((T).125,(T)0,(T).1);
-        state_right=TV_DIMENSION((T)1,(T)0,(T)1);}
-    else if(test_number==3){
-        state_left=TV_DIMENSION((T)1,(T)-3,(T)1);
-        state_right=TV_DIMENSION((T)1,(T)3,(T)1);}
-    else if(test_number==4){
-        state_left=TV_DIMENSION((T).445,(T).698,(T)3.528);
-        state_right=TV_DIMENSION((T).5,(T)0,(T).571);}
-    else if(test_number==5){
-        state_left=TV_DIMENSION((T)1,(T)0,(T)1e10);
-        state_right=TV_DIMENSION((T).125,(T)0,(T).1);}
-    else if(test_number==6){
-        state_left=TV_DIMENSION((T)1,(T)-2,(T).4);
-        state_right=TV_DIMENSION((T)1,(T)2,(T).4);}
-    else if(test_number==7){
-        state_left=TV_DIMENSION((T)3.857,(T).92,(T)10.333);
-        state_right=TV_DIMENSION((T)1,(T)3.55,(T)1);}
-    else if(test_number==8){
-        state_left=TV_DIMENSION((T)10,(T)2000,(T)500);
-        state_right=TV_DIMENSION((T)20,(T)0,(T)500);}
-    else if(test_number==9){
-        state_left=TV_DIMENSION((T).125,(T)0,(T).1);
-        state_middle=TV_DIMENSION((T)1,(T)0,(T)1);
-        state_right=TV_DIMENSION((T).125,(T)0,(T).1);
-        middle_state_start_point=(T).4;right_state_start_point=(T).6;}
-    else if(test_number==10){
-        state_left=TV_DIMENSION((T)1,(T)0,(T)1e3);
-        state_middle=TV_DIMENSION((T)1,(T)0,(T)1e-2);
-        state_right=TV_DIMENSION((T)1,(T)0,(T)1e2);
-        middle_state_start_point=(T).1;right_state_start_point=(T).9;}
-    else if(test_number==14){
-        state_left=TV_DIMENSION((T).125,(T)0,(T).1);
-        state_right=TV_DIMENSION((T).125,(T)0,(T).1);}
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

@@ -31,7 +31,7 @@ public:
     SOLIDS_STANDARD_TESTS<TV> tests;
     int parent_id;
 
-    MAGNETS_EXAMPLE(const STREAM_TYPE stream_type);
+    MAGNETS_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~MAGNETS_EXAMPLE();
 
     // Unused callbacks
@@ -52,9 +52,7 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
 
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
-    void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
     void Initialize_Bodies() PHYSBAM_OVERRIDE;
     void Drop_Letter(std::string letter,int parent_id,TV start,ROTATION<TV> orient,bool stop_in_middle);

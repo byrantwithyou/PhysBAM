@@ -4,8 +4,9 @@
 //#####################################################################
 #ifndef __PBD_EXAMPLE__
 #define __PBD_EXAMPLE__
-#include <Tools/Vectors/VECTOR.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
+#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class TV> class DEBUG_PARTICLES;
@@ -40,7 +41,7 @@ public:
     bool test_diff;
     int threads;
 
-    PBD_EXAMPLE(const STREAM_TYPE stream_type_input);
+    PBD_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~PBD_EXAMPLE();
     
     virtual void Write_Output_Files(const int frame);

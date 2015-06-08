@@ -22,14 +22,29 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
-    using BASE::solid_body_collection;using BASE::Time_At_Frame;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
+    using BASE::solid_body_collection;using BASE::Time_At_Frame;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
 
     WATER_STANDARD_TESTS_MULTIPHASE_3D<TV> tests;
 
-    STANDARD_TESTS_MULTIPHASE(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.WATER),
+    STANDARD_TESTS_MULTIPHASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,0,fluids_parameters.WATER),
         tests(*this,fluids_parameters,fluid_collection,solid_body_collection.rigid_body_collection)
     {
+        parse_args.Parse();
+
+        tests.Initialize(test_number,resolution,restart_frame);
+        fluids_parameters.Initialize_Number_Of_Regions(WATER_STANDARD_TESTS_MULTIPHASE_3D<TV>::Number_Of_Regions(test_number));
+        *fluids_parameters.grid=tests.grid;
+/*
+  fluids_parameters.viscosities(0)=(T)100;
+  fluids_parameters.implicit_viscosity=true;
+  fluids_parameters.incompressible_iterations=200;
+  fluids_parameters.implicit_viscosity_iterations=200;
+
+  fluids_parameters.use_multiphase_strain(0)=true;
+  fluids_parameters.elastic_moduli(0)=10000;
+  fluids_parameters.plasticity_alphas(0)=1;
+  fluids_parameters.cfl/=4;*/
     }
 
     ~STANDARD_TESTS_MULTIPHASE()
@@ -48,34 +63,7 @@ public:
     void Initialize_Euler_State() PHYSBAM_OVERRIDE {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.Initialize(test_number,resolution,restart_frame);
-    fluids_parameters.Initialize_Number_Of_Regions(WATER_STANDARD_TESTS_MULTIPHASE_3D<TV>::Number_Of_Regions(test_number));
-    *fluids_parameters.grid=tests.grid;
-/*
-  fluids_parameters.viscosities(0)=(T)100;
-  fluids_parameters.implicit_viscosity=true;
-  fluids_parameters.incompressible_iterations=200;
-  fluids_parameters.implicit_viscosity_iterations=200;
-
-  fluids_parameters.use_multiphase_strain(0)=true;
-  fluids_parameters.elastic_moduli(0)=10000;
-  fluids_parameters.plasticity_alphas(0)=1;
-  fluids_parameters.cfl/=4;*/
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initial_Advection
 //#####################################################################

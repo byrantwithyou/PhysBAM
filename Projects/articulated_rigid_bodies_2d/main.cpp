@@ -29,9 +29,9 @@ int main(int argc,char** argv)
     parse_args.Add("-arb",&opt_arb,"Use arb test");
     parse_args.Parse(true);
 
-    if(opt_arb) example=new ARB_EXAMPLE<float,float>(stream_type);
-    else example=new STANDARD_TESTS<T>(stream_type);
-    example->Parse(parse_args);
+    if(opt_arb) example=new ARB_EXAMPLE<float,float>(stream_type,parse_args);
+    else example=new STANDARD_TESTS<T>(stream_type,parse_args);
+    example->After_Construction();
 
     SOLIDS_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();

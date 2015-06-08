@@ -22,7 +22,7 @@ class STANDARD_TESTS_SPH:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> 
 public:
     typedef VECTOR<T,3> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;
-    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
+    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Adjust_Phi_With_Sources;using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::Get_Object_Velocities; // silence -Woverloaded-virtual
     using BASE::resolution;
 
@@ -30,10 +30,24 @@ public:
     int number_of_particles;
     T wall_damping;
 
-    STANDARD_TESTS_SPH(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.SPH),
+    STANDARD_TESTS_SPH(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,0,fluids_parameters.SPH),
         tests(*this,fluids_parameters,solid_body_collection.rigid_body_collection),wall_damping((T).5)
     {
+        parse_args.Parse();
+        tests.Initialize(test_number,resolution);
+        *fluids_parameters.grid=tests.grid;
+        fluids_parameters.number_particles_per_cell=16;
+        fluids_parameters.write_ghost_values=true;
+        fluids_parameters.store_particle_ids=true;
+        last_frame=1000;
+
+        if(tests.test_number==1) number_of_particles=100000;
+        else if(tests.test_number==2) number_of_particles=15000;
+        else{LOG::cerr<<"unrecognzed SPH test number"<<std::endl;exit(1);}
+
+        output_directory=LOG::sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(tests.grid.counts.x-1),(tests.grid.counts.y-1));
+        LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
     }
 
     virtual ~STANDARD_TESTS_SPH()
@@ -52,34 +66,7 @@ public:
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.Initialize(test_number,resolution);
-    *fluids_parameters.grid=tests.grid;
-    fluids_parameters.number_particles_per_cell=16;
-    fluids_parameters.write_ghost_values=true;
-    fluids_parameters.store_particle_ids=true;
-    last_frame=1000;
-
-    if(tests.test_number==1) number_of_particles=100000;
-    else if(tests.test_number==2) number_of_particles=15000;
-    else{LOG::cerr<<"unrecognzed SPH test number"<<std::endl;exit(1);}
-
-    output_directory=LOG::sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(tests.grid.counts.x-1),(tests.grid.counts.y-1));
-    LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################

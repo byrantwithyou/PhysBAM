@@ -25,19 +25,64 @@ public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV > BASE;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
-    using BASE::parse_args;using BASE::test_number;using BASE::resolution;
+    using BASE::test_number;using BASE::resolution;
 
     ARRAY<SPHERE<TV> > sources;
     T source_end_time;
     T normal_velocity;
     T Dn_initial;
 
-    DSD_NO_NAVIER_STOKES(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >(stream_type,1,fluids_parameters.FIRE),source_end_time(3.0),normal_velocity(4),Dn_initial((T)0.2)
+    DSD_NO_NAVIER_STOKES(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,1,fluids_parameters.FIRE),source_end_time(3.0),normal_velocity(4),Dn_initial((T)0.2)
     {
+        parse_args.Parse();
+
+        // set up the standard fluid environment
+        frame_rate=30;
+        restart=false;restart_frame=0;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.number_particles_per_cell=16;
+        fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
+        fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
+        fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.delete_fluid_inside_objects=true;
+        fluids_parameters.incompressible_iterations=40;
+        fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
+        fluids_parameters.second_order_cut_cell_method=true;
+        fluids_parameters.store_particle_ids=true;
+        fluids_parameters.use_vorticity_confinement=false;
+        fluids_parameters.use_vorticity_confinement_fuel=false;
+        fluids_parameters.cfl=(T)1.9;
+        fluids_parameters.gravity=TV();
+        fluids_parameters.fuel_region(1)=true;
+
+        //DSD parameters
+        fluids_parameters.analytic_test=true;
+        fluids_parameters.use_dsd=true;
+
+        int cells=1*resolution;
+        first_frame=0;last_frame=10;
+        GRID<TV>& grid=*fluids_parameters.grid;
+        grid.Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(8,8,8)));
+
+        last_frame=1000;
+        
+        output_directory=LOG::sprintf("DSD_No_Navier_Stokes/DSD_No_Navier_Stokes_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
+        LOG::cout<<"Running DSD simulation to "<<output_directory<<std::endl;
+
+        //sources
+        sources.Append(SPHERE<TV>(TV(3.75,4,4),(T)0.2));
+        sources.Append(SPHERE<TV>(TV(4.25,4,4),(T)0.2));
+        sources.Append(SPHERE<TV>(TV(4,3.75,4),(T)0.2));
+        sources.Append(SPHERE<TV>(TV(4,4,3.75),(T)0.2));
+        sources.Append(SPHERE<TV>(TV(4,4,4.25),(T)0.2));
+        sources.Append(SPHERE<TV>(TV(4,3.75,4),(T)0.2));
+        sources.Append(SPHERE<TV>(TV(4,4,4),(T)0.2));
+        //sources.Append(SPHERE<TV>(TV(4,4.25,4),(T)0.2));
     }
 
     ~DSD_NO_NAVIER_STOKES()
@@ -55,64 +100,7 @@ public:
     bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE {return false;}
     void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    // set up the standard fluid environment
-    frame_rate=30;
-    restart=false;restart_frame=0;
-    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-    fluids_parameters.number_particles_per_cell=16;
-    fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
-    fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
-    fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
-    fluids_parameters.delete_fluid_inside_objects=true;
-    fluids_parameters.incompressible_iterations=40;
-    fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
-    fluids_parameters.second_order_cut_cell_method=true;
-    fluids_parameters.store_particle_ids=true;
-    fluids_parameters.use_vorticity_confinement=false;
-    fluids_parameters.use_vorticity_confinement_fuel=false;
-    fluids_parameters.cfl=(T)1.9;
-    fluids_parameters.gravity=TV();
-    fluids_parameters.fuel_region(1)=true;
-
-    //DSD parameters
-    fluids_parameters.analytic_test=true;
-    fluids_parameters.use_dsd=true;
-
-    int cells=1*resolution;
-    first_frame=0;last_frame=10;
-    GRID<TV>& grid=*fluids_parameters.grid;
-    grid.Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(8,8,8)));
-
-    last_frame=1000;
-        
-    output_directory=LOG::sprintf("DSD_No_Navier_Stokes/DSD_No_Navier_Stokes_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
-    LOG::cout<<"Running DSD simulation to "<<output_directory<<std::endl;
-
-    //sources
-    sources.Append(SPHERE<TV>(TV(3.75,4,4),(T)0.2));
-    sources.Append(SPHERE<TV>(TV(4.25,4,4),(T)0.2));
-    sources.Append(SPHERE<TV>(TV(4,3.75,4),(T)0.2));
-    sources.Append(SPHERE<TV>(TV(4,4,3.75),(T)0.2));
-    sources.Append(SPHERE<TV>(TV(4,4,4.25),(T)0.2));
-    sources.Append(SPHERE<TV>(TV(4,3.75,4),(T)0.2));
-    sources.Append(SPHERE<TV>(TV(4,4,4),(T)0.2));
-    //sources.Append(SPHERE<TV>(TV(4,4.25,4),(T)0.2));
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
@@ -159,7 +147,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
     DETONATION_SHOCK_DYNAMICS<TV>& dsd=*fluids_parameters.incompressible->projection.dsd;
     dsd.order=3;
     dsd.Dcj=(T)0.2;

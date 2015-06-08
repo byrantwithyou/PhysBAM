@@ -35,7 +35,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;
-    using BASE::parse_args;using BASE::test_number;using BASE::resolution;
+    using BASE::test_number;using BASE::resolution;
 
     /* 1: Shock impinging on rho=1000kg/m^3 drop
        2: Shock impinging on rho=10kg/m^3 drop
@@ -50,79 +50,67 @@ public:
     bool implicit_rk;
     bool exact;
 
-    SOD_ST_DROP(const STREAM_TYPE stream_type)
-        :BASE(stream_type,1,fluids_parameters.COMPRESSIBLE),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),
+    SOD_ST_DROP(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args,1,fluids_parameters.COMPRESSIBLE),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),
         implicit_rk(false),exact(false)
     {
+        parse_args.Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+        parse_args.Add("-eno_order",&eno_order,"eno_order","eno order");
+        parse_args.Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+        parse_args.Add("-cfl",&cfl_number,"CFL","cfl number");
+        parse_args.Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+        parse_args.Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
+        parse_args.Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
+        parse_args.Parse();
+
+        implicit_rk=implicit_rk && !exact;
+
+        fluids_parameters.number_particles_per_cell=16;
+        fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
+        fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
+        fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.delete_fluid_inside_objects=true;
+        fluids_parameters.incompressible_iterations=40;
+        fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
+        fluids_parameters.second_order_cut_cell_method=false;
+        fluids_parameters.store_particle_ids=true;
+        fluids_parameters.use_vorticity_confinement=false;
+        fluids_parameters.use_vorticity_confinement_fuel=false;
+
+        //grid
+        fluids_parameters.grid->Initialize(TV_INT()+20*resolution+1,RANGE<TV>::Centered_Box()*(T).5);
+        *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+        //time
+        initial_time=0.;last_frame=500;frame_rate=133333;
+        fluids_parameters.cfl=cfl_number;;
+        //custom stuff . . . 
+        fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
+        if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
+        else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
+        else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
+        fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
+        fluids_parameters.compressible_conservation_method->Save_Fluxes();
+        fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
+        fluids_parameters.compressible_rungekutta_order=rk_order;
+        //fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_RF<T,TV::m+2>;
+        fluids_parameters.compressible_timesplit=timesplit;
+        fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
+
+        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+
+        if(test_number==1||test_number==3) fluids_parameters.density=(T)1e3;
+        else if(test_number==2||test_number==4) fluids_parameters.density=(T)10;
+        
+        if(timesplit) output_directory=LOG::sprintf("Sod_ST_Drop/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
+        else output_directory=LOG::sprintf("Sod_ST_Drop/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
+        if(eno_scheme==2) output_directory+="_density_weighted";
+        else if(eno_scheme==3) output_directory+="_velocity_weighted";
     }
     
     virtual ~SOD_ST_DROP() {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
-    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
-    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
-    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
-    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
-    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    implicit_rk=implicit_rk && !exact;
-
-    fluids_parameters.number_particles_per_cell=16;
-    fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
-    fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
-    fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
-    fluids_parameters.delete_fluid_inside_objects=true;
-    fluids_parameters.incompressible_iterations=40;
-    fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
-    fluids_parameters.second_order_cut_cell_method=false;
-    fluids_parameters.store_particle_ids=true;
-    fluids_parameters.use_vorticity_confinement=false;
-    fluids_parameters.use_vorticity_confinement_fuel=false;
-
-    //grid
-    fluids_parameters.grid->Initialize(TV_INT()+20*resolution+1,RANGE<TV>::Centered_Box()*(T).5);
-    *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
-    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
-    //time
-    initial_time=0.;last_frame=500;frame_rate=133333;
-    fluids_parameters.cfl=cfl_number;;
-    //custom stuff . . . 
-    fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
-    else fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
-    fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
-    fluids_parameters.compressible_conservation_method->Save_Fluxes();
-    fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
-    fluids_parameters.compressible_rungekutta_order=rk_order;
-    //fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_RF<T,TV::m+2>;
-    fluids_parameters.compressible_timesplit=timesplit;
-    fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
-
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-
-    if(test_number==1||test_number==3) fluids_parameters.density=(T)1e3;
-    else if(test_number==2||test_number==4) fluids_parameters.density=(T)10;
-        
-    if(timesplit) output_directory=LOG::sprintf("Sod_ST_Drop/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
-    else output_directory=LOG::sprintf("Sod_ST_Drop/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
-    if(eno_scheme==2) output_directory+="_density_weighted";
-    else if(eno_scheme==3) output_directory+="_velocity_weighted";
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

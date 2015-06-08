@@ -17,8 +17,8 @@ using namespace PhysBAM;
 #pragma warning(disable:4355) // 'this' : used in base member initializer list
 #endif
 template<class T> SURFACE_TENSION<T>::
-SURFACE_TENSION(const STREAM_TYPE stream_type)
-    :BASE(stream_type,1),solids_tests(stream_type,data_directory,solid_body_collection),run_self_tests(false),print_poisson_matrix(false),print_index_map(false),
+SURFACE_TENSION(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :BASE(stream_type_input,parse_args,1),solids_tests(stream_type_input,data_directory,solid_body_collection),run_self_tests(false),print_poisson_matrix(false),print_index_map(false),
     print_matrix(false),print_each_matrix(false),use_full_ic(false),output_iterators(false),use_decoupled_viscosity(false),max_dt(0),exact_dt(0),
     current_dt(0),implicit_solid(true),no_implicit_solid(false),use_cut_volume(false),use_low_order_advection(false),
     front_tracked_structure(0),rebuild_curve(0),deformable_collisions(0),fsi(0),number_surface_particles(0),rebuild_surface(false),free_particles(0),psi_D(0),
@@ -27,77 +27,50 @@ SURFACE_TENSION(const STREAM_TYPE stream_type)
 
 {
     LOG::cout<<std::setprecision(16);
-}
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-//#####################################################################
-// Destructor
-//#####################################################################
-template<class T> SURFACE_TENSION<T>::
-~SURFACE_TENSION()
-{
-    delete deformable_collisions;
-    if(!use_low_order_advection) delete fluids_parameters.incompressible->advection;
-}
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-template<class T> void SURFACE_TENSION<T>::
-Register_Options()
-{
-    BASE::Register_Options();
-
     fluids_parameters.use_preconditioner_for_slip_system=false;
     solids_parameters.implicit_solve_parameters.cg_iterations=3000;
     solids_fluids_parameters.use_leakproof_solve=false;
     fluids_parameters.surface_tension=(T).0728;
 
-    parse_args->Add("-cg_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"iterations","cg iterations");
-    parse_args->Add("-viscosity",&fluids_parameters.viscosity,&use_viscosity,"viscosity","Viscosity");
-    parse_args->Add("-test_system",&run_self_tests,"run_self_tests");
-    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
-    parse_args->Add("-print_index_map",&print_index_map,"print_index_map");
-    parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
-    parse_args->Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
-    parse_args->Add("-use_full_ic",&use_full_ic,"use_full_ic");
-    parse_args->Add("-output_iterators",&output_iterators,"output_iterators");
-    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
-    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"use preconditioner");
-    parse_args->Add("-leakproof",&solids_fluids_parameters.use_leakproof_solve,"use leakproof solve");
-    parse_args->Add("-use_decoupled_viscosity",&use_decoupled_viscosity,"use decoupled viscosity");
-    parse_args->Add("-max_dt",&max_dt,"dt","maximum dt");
-    parse_args->Add("-dt",&exact_dt,"dt","use this constand dt");
-    parse_args->Add("-explicit_solid",&no_implicit_solid,"explicit solids");
-    parse_args->Add("-build_surface",&rebuild_surface,"rebuild surface");
-    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
-    parse_args->Add("-surface_tension",&fluids_parameters.surface_tension,"coeff","surface tension coefficient");
-    parse_args->Add("-cut_cell",&fluids_parameters.second_order_cut_cell_method,"use second order cut cell");
-    parse_args->Add("-oscillation_mode",&oscillation_mode,"modes","number of oscillation nodes");
-    parse_args->Add("-solid_refinement",&solid_refinement,"level","solid refinement");
-    parse_args->Add("-make_ellipse",&make_ellipse,"use ellipse for initial configuration");
-    parse_args->Add("-epsilon",&circle_perturbation,"eps","circle perturbation");
-    parse_args->Add("-m",&m,"unit","length unit");
-    parse_args->Add("-s",&s,"unit","time unit");
-    parse_args->Add("-kg",&kg,"unit","mass unit");
-    parse_args->Add("-linear_force",&linear_force,"force","linear force");
-    parse_args->Add("-rand",&rand,"rand","rand");
-    parse_args->Add("-phi",&use_phi,"use phi for interface representation");
-    parse_args->Add("-two_phase",&two_phase,"use two-phase");
-    parse_args->Add("-cut_mass",&use_cut_volume,"use cut volume mass");
-    parse_args->Add("-cut_order",&cut_order,"order","cut order");
-    parse_args->Add("-remesh",&remesh,"perform remeshing");
-    parse_args->Add("-low_order_advection",&use_low_order_advection,"use low order advection");
-    parse_args->Add("-la",&laplace_number,"number","Laplace number");
-    parse_args->Add("-tnu",&use_T_nu,"use t_nu");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-template<class T> void SURFACE_TENSION<T>::
-Parse_Options()
-{
-    BASE::Parse_Options();
+    parse_args.Add("-cg_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"iterations","cg iterations");
+    parse_args.Add("-viscosity",&fluids_parameters.viscosity,&use_viscosity,"viscosity","Viscosity");
+    parse_args.Add("-test_system",&run_self_tests,"run_self_tests");
+    parse_args.Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
+    parse_args.Add("-print_index_map",&print_index_map,"print_index_map");
+    parse_args.Add("-print_matrix",&print_matrix,"print_matrix");
+    parse_args.Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
+    parse_args.Add("-use_full_ic",&use_full_ic,"use_full_ic");
+    parse_args.Add("-output_iterators",&output_iterators,"output_iterators");
+    parse_args.Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
+    parse_args.Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"use preconditioner");
+    parse_args.Add("-leakproof",&solids_fluids_parameters.use_leakproof_solve,"use leakproof solve");
+    parse_args.Add("-use_decoupled_viscosity",&use_decoupled_viscosity,"use decoupled viscosity");
+    parse_args.Add("-max_dt",&max_dt,"dt","maximum dt");
+    parse_args.Add("-dt",&exact_dt,"dt","use this constand dt");
+    parse_args.Add("-explicit_solid",&no_implicit_solid,"explicit solids");
+    parse_args.Add("-build_surface",&rebuild_surface,"rebuild surface");
+    parse_args.Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args.Add("-surface_tension",&fluids_parameters.surface_tension,"coeff","surface tension coefficient");
+    parse_args.Add("-cut_cell",&fluids_parameters.second_order_cut_cell_method,"use second order cut cell");
+    parse_args.Add("-oscillation_mode",&oscillation_mode,"modes","number of oscillation nodes");
+    parse_args.Add("-solid_refinement",&solid_refinement,"level","solid refinement");
+    parse_args.Add("-make_ellipse",&make_ellipse,"use ellipse for initial configuration");
+    parse_args.Add("-epsilon",&circle_perturbation,"eps","circle perturbation");
+    parse_args.Add("-m",&m,"unit","length unit");
+    parse_args.Add("-s",&s,"unit","time unit");
+    parse_args.Add("-kg",&kg,"unit","mass unit");
+    parse_args.Add("-linear_force",&linear_force,"force","linear force");
+    parse_args.Add("-rand",&rand,"rand","rand");
+    parse_args.Add("-phi",&use_phi,"use phi for interface representation");
+    parse_args.Add("-two_phase",&two_phase,"use two-phase");
+    parse_args.Add("-cut_mass",&use_cut_volume,"use cut volume mass");
+    parse_args.Add("-cut_order",&cut_order,"order","cut order");
+    parse_args.Add("-remesh",&remesh,"perform remeshing");
+    parse_args.Add("-low_order_advection",&use_low_order_advection,"use low order advection");
+    parse_args.Add("-la",&laplace_number,"number","Laplace number");
+    parse_args.Add("-tnu",&use_T_nu,"use t_nu");
+    parse_args.Parse();
+
     solids_tests.data_directory=data_directory;
     last_frame=100;
     frame_rate=24;
@@ -221,6 +194,18 @@ Parse_Options()
     Add_Rigid_Body_Walls();
     output_directory=LOG::sprintf("Test_%d",test_number,resolution);
 }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class T> SURFACE_TENSION<T>::
+~SURFACE_TENSION()
+{
+    delete deformable_collisions;
+    if(!use_low_order_advection) delete fluids_parameters.incompressible->advection;
+}
 //#####################################################################
 // Function Add_Rigid_Body_Walls
 //#####################################################################
@@ -271,7 +256,7 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         if(walls_added) walls_added->Append(id);}
 }
 template<class T> void SURFACE_TENSION<T>::
-Parse_Late_Options() {BASE::Parse_Late_Options();}
+After_Initialization() {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

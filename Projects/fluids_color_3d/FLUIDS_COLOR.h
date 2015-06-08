@@ -57,8 +57,8 @@ public:
     using BASE::analytic_initial_only;using BASE::Set_Level_Set;using BASE::Level_Set_Error;
     using BASE::Velocity_Error;using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
 
-    FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-        :FLUIDS_COLOR_BASE<TV>(stream_type,parse_args)
+    FLUIDS_COLOR(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :FLUIDS_COLOR_BASE<TV>(stream_type_input,parse_args)
     {
         parse_args.Parse();
 
@@ -66,6 +66,7 @@ public:
             Initialize_Example();
 
         After_Initialize_Example();
+        parse_args.Parse();
     }
 
     ~FLUIDS_COLOR()

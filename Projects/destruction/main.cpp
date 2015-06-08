@@ -16,9 +16,9 @@ int main(int argc,char* argv[])
 
     SOLIDS_EXAMPLE<TV>* example;
 
-    example=new STANDARD_TESTS<T>(stream_type);
     PARSE_ARGS parse_args(argc,argv);
-    example->Parse(parse_args);
+    example=new STANDARD_TESTS<T>(stream_type,parse_args);
+    example->After_Construction();
 
     SOLIDS_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();

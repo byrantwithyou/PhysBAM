@@ -80,7 +80,7 @@ Initialize()
     example.Initialize_Bodies();
 
     if(fluids) example.fluids_parameters.Initialize_Fluid_Evolution(example.fluid_collection.incompressible_fluid_collection.face_velocities);
-    example.Parse_Late_Options();
+    example.After_Initialization();
 
     int number_of_regions=example.fluids_parameters.number_of_regions;
     GRID<TV>& grid=*example.fluids_parameters.grid;

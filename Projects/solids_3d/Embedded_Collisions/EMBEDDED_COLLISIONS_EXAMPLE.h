@@ -30,7 +30,7 @@ class EMBEDDED_COLLISIONS_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
-    using BASE::solid_body_collection;using BASE::Set_External_Positions;using BASE::parse_args; // silence -Woverloaded-virtual
+    using BASE::solid_body_collection;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     RED_GREEN_TRIANGLES<TV>* redgreen;
@@ -39,10 +39,13 @@ public:
     T refinement_ratio;
     T sphere_scale;
 
-    EMBEDDED_COLLISIONS_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),redgreen(0),maximum_number_of_boundary_refinements(4),refinement_ratio(.5),
+    EMBEDDED_COLLISIONS_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),redgreen(0),maximum_number_of_boundary_refinements(4),refinement_ratio(.5),
         sphere_scale(.5)
     {
+        parse_args.Add("-sphere_scale",&sphere_scale,"scale","sphere scale");
+        parse_args.Parse();
+        tests.data_directory=data_directory;
     }
 
     virtual ~EMBEDDED_COLLISIONS_EXAMPLE()
@@ -60,23 +63,7 @@ public:
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options()
-{
-    BASE::Register_Options();
-    parse_args->Add("-sphere_scale",&sphere_scale,"scale","sphere scale");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options()
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################

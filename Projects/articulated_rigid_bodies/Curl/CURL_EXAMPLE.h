@@ -31,7 +31,7 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::stream_type;
     using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solid_body_collection;
-    using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::parse_args;
+    using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Position_Nodes; // silence -Woverloaded-virtual
 
     ARTICULATED_RIGID_BODY<TV>* arb;
@@ -49,9 +49,10 @@ public:
     TV max_jitter_body_move;
     std::string parameter_file;
 
-    CURL_EXAMPLE(const STREAM_TYPE stream_type,std::string parameter_file_input="")
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),parameter_file(parameter_file_input)
+    CURL_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args,std::string parameter_file_input="")
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),parameter_file(parameter_file_input)
     {
+        parse_args.Parse();
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
 
@@ -64,6 +65,8 @@ public:
         start_move=5;end_move=40;
         shelf00=shelf01=shelf10=shelf11=0;
         write_last_frame=true;
+        tests.data_directory=data_directory;
+        output_directory="Curl/output";
     }
 
     virtual ~CURL_EXAMPLE()
@@ -88,17 +91,7 @@ public:
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return false;}
 
-    void Register_Options() PHYSBAM_OVERRIDE
-    {
-        BASE::Register_Options();
-    }
-    void Parse_Options() PHYSBAM_OVERRIDE
-    {
-        BASE::Parse_Options();
-        tests.data_directory=data_directory;
-        output_directory="Curl/output";
-    }
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

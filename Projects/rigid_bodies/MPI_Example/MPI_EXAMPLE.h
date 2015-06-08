@@ -42,21 +42,27 @@ public:
 
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;using BASE::frame_rate;
-    using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;using BASE::parse_args;
+    using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     int kinematic_body_id;
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
 
-    MPI_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type),width(2),height(4),num_bodies(6),tests(stream_type,data_directory,solid_body_collection)
+    MPI_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),width(2),height(4),num_bodies(6),tests(stream_type_input,data_directory,solid_body_collection)
     {
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.rigid_body_collision_parameters.use_legacy_push_out=true;
         //solids_parameters.rigid_body_collision_parameters.use_shock_propagation=false;
         solids_parameters.cfl=1;
+        parse_args.Add("-width",&width,"value","number of stacks");
+        parse_args.Add("-height",&height,"value","height of each stack");
+        parse_args.Add("-num_bodies",&num_bodies,"value","number of total bodies");
+        parse_args.Parse();
+        tests.data_directory=data_directory;
+        output_directory=LOG::sprintf("MPI_Example/Test_%d",test_number);
     }
 
     ~MPI_EXAMPLE()
@@ -124,26 +130,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         solids_parameters.rigid_body_collision_parameters.contact_iterations=0;
         collisions.Set_Shock_Propagation_Iterations(0);}
 }
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-width",&width,"value","number of stacks");
-    parse_args->Add("-height",&height,"value","height of each stack");
-    parse_args->Add("-num_bodies",&num_bodies,"value","number of total bodies");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    output_directory=LOG::sprintf("MPI_Example/Test_%d",test_number);
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

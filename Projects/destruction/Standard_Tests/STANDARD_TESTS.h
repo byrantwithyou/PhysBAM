@@ -99,12 +99,40 @@ public:
 
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::frame_rate;
-    using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;
+    using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),parameter(0),prune_stacks_from_contact(false),prune_contact_using_velocity(false),
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),parameter(0),prune_stacks_from_contact(false),prune_contact_using_velocity(false),
         use_nonanalytic_levelsets(false),rigid_body_collection(solid_body_collection.rigid_body_collection),createpattern(false)
     {
+        parse_args.Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
+        parse_args.Add("-fp",&fracture_pattern_index,"index","specify fracture pattern");
+        parse_args.Add("-prunestacks",&prune_stacks_from_contact,"Do something quick for stacks during contact");
+        parse_args.Add("-velocityprune",&prune_contact_using_velocity,"Let collisions handle pairs with high velocity");
+        parse_args.Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
+        parse_args.Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+        parse_args.Add("-noanalyticlevelsets",&use_nonanalytic_levelsets,"prevent usage of analytic levelsets");
+        parse_args.Add("-createpattern",&createpattern,"create a fracture pattern");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+
+        if(createpattern){
+            if(test_number==1) Create_Box_Split_Pattern();
+            else if(test_number==2) Create_Crossing_Planes_Pattern();
+            else if(test_number==3) Create_Grain_Boundary_Surfaces();
+            else if(test_number==4) Create_Pyramid_Pattern(RANGE<TV>(TV(-1,-1,-1),TV(1,1,1)),100,2);
+            else if(test_number==5) Create_Wall_Pattern();
+            else if(test_number==6) Create_Bunny_Pattern();
+            else if(test_number==7) Create_Cylinder_Pattern();
+            else if(test_number==8) Create_Raining_Spheres_Pattern();
+            else Create_Pattern(test_number);
+            exit(0);}
+
+        frame_rate=30;
+
+        if(parameter) output_directory+=LOG::sprintf("_param%i",parameter);
     }
 
     ~STANDARD_TESTS()
@@ -134,47 +162,7 @@ public:
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
-    parse_args->Add("-fp",&fracture_pattern_index,"index","specify fracture pattern");
-    parse_args->Add("-prunestacks",&prune_stacks_from_contact,"Do something quick for stacks during contact");
-    parse_args->Add("-velocityprune",&prune_contact_using_velocity,"Let collisions handle pairs with high velocity");
-    parse_args->Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
-    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
-    parse_args->Add("-noanalyticlevelsets",&use_nonanalytic_levelsets,"prevent usage of analytic levelsets");
-    parse_args->Add("-createpattern",&createpattern,"create a fracture pattern");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-
-    if(createpattern){
-        if(test_number==1) Create_Box_Split_Pattern();
-        else if(test_number==2) Create_Crossing_Planes_Pattern();
-        else if(test_number==3) Create_Grain_Boundary_Surfaces();
-        else if(test_number==4) Create_Pyramid_Pattern(RANGE<TV>(TV(-1,-1,-1),TV(1,1,1)),100,2);
-        else if(test_number==5) Create_Wall_Pattern();
-        else if(test_number==6) Create_Bunny_Pattern();
-        else if(test_number==7) Create_Cylinder_Pattern();
-        else if(test_number==8) Create_Raining_Spheres_Pattern();
-        else Create_Pattern(test_number);
-        exit(0);}
-
-    frame_rate=30;
-
-    if(parameter) output_directory+=LOG::sprintf("_param%i",parameter);
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

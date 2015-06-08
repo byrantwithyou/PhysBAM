@@ -32,11 +32,11 @@ template<class T> void main_program(PARSE_ARGS& parse_args){
     parse_args.Parse();
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
-    if(opt_sphere) example=new SPHERE_EXAMPLE<T>(stream_type);
-    else if(opt_drop) example=new INCOMPRESSIBLE_DROP<T>(stream_type);
-    else example=new STANDARD_TESTS<T>(stream_type,incompressible);
-    example->want_mpi_world=true;
-    example->Parse(parse_args);
+    if(opt_sphere) example=new SPHERE_EXAMPLE<T>(stream_type,parse_args);
+    else if(opt_drop) example=new INCOMPRESSIBLE_DROP<T>(stream_type,parse_args);
+    else example=new STANDARD_TESTS<T>(stream_type,parse_args,incompressible);
+    example->mpi_world=new MPI_WORLD(parse_args);
+    example->After_Construction();
 
     if(example->mpi_world->initialized){
         example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();

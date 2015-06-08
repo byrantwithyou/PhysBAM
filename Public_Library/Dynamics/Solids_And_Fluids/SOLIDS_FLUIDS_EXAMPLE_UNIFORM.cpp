@@ -51,10 +51,15 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
-SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<TV>::TYPE type)
-    :SOLIDS_FLUIDS_EXAMPLE<TV>(stream_type),fluids_parameters(number_of_regions,type),fluid_collection(*fluids_parameters.grid),resolution(8),
+SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int number_of_regions,const typename FLUIDS_PARAMETERS<TV>::TYPE type)
+    :SOLIDS_FLUIDS_EXAMPLE<TV>(stream_type,parse_args),fluids_parameters(number_of_regions,type),fluid_collection(*fluids_parameters.grid),resolution(8),
     debug_particles(*new DEBUG_PARTICLES<TV>),opt_skip_debug_data(false)
-{}
+{
+    parse_args.Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
+    parse_args.Add("-use_fmm_extrapolation",&fluids_parameters.euler_solid_fluid_coupling_utilities->use_fast_marching,
+        "use fast marching to extrapolate compressible flow data into solid state.");
+    parse_args.Add("-resolution",&resolution,"resolution","simulation resolution");
+}
 //#####################################################################
 // Destructor
 //#####################################################################
@@ -65,24 +70,12 @@ template<class TV> SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
     delete &debug_particles;
 }
 //#####################################################################
-// Function Register_Options
+// Function After_Construction
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
-Register_Options()
+After_Construction()
 {
-    BASE::Register_Options();
-    this->parse_args->Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
-    this->parse_args->Add("-use_fmm_extrapolation",&fluids_parameters.euler_solid_fluid_coupling_utilities->use_fast_marching,
-        "use fast marching to extrapolate compressible flow data into solid state.");
-    this->parse_args->Add("-resolution",&resolution,"resolution","simulation resolution");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-template<class TV> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
-Parse_Options()
-{
-    BASE::Parse_Options();
+    BASE::After_Construction();
     fluids_parameters.write_debug_data=!opt_skip_debug_data;
 }
 //#####################################################################
@@ -611,9 +604,8 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Get_Object_Veloci
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Initialize_Swept_Occupied_Blocks_For_Advection(float,float,float,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Parse_Options();
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::After_Construction();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Read_Output_Files_Fluids(int);
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Register_Options();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Revalidate_Fluid_Scalars();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Revalidate_Fluid_Velocity(ARRAY<float,FACE_INDEX<2> >&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Revalidate_Phi_After_Modify_Levelset();
@@ -629,19 +621,18 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Initialize_Solid_
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Initialize_Swept_Occupied_Blocks_For_Advection(float,float,float,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Parse_Options();
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::After_Construction();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Read_Output_Files_Fluids(int);
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Register_Options();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Revalidate_Fluid_Scalars();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Revalidate_Fluid_Velocity(ARRAY<float,FACE_INDEX<3> >&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Revalidate_Phi_After_Modify_Levelset();
-template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,int,FLUIDS_PARAMETERS<VECTOR<float,3> >::TYPE);
+template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<float,3> >::TYPE);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Set_Dirichlet_Boundary_Conditions(float);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Write_Output_Files(int) const;
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<VECTOR<float,2> >&,bool,bool);
-template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,int,FLUIDS_PARAMETERS<VECTOR<float,2> >::TYPE);
+template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<float,2> >::TYPE);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Adjust_Density_And_Temperature_With_Sources<RANGE<VECTOR<float,2> > >(RANGE<VECTOR<float,2> > const&,MATRIX<float,3,3> const&,float,float);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Adjust_Phi_With_Source<RANGE<VECTOR<float,2> > >(RANGE<VECTOR<float,2> > const&,MATRIX<float,3,3> const&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Adjust_Phi_With_Source<RANGE<VECTOR<float,2> > >(RANGE<VECTOR<float,2> > const&,int,MATRIX<float,3,3> const&);
@@ -656,10 +647,9 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Initialize_MPI();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Initialize_Solid_Fluid_Coupling_After_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Parse_Options();
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::After_Construction();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Read_Output_Files_Fluids(int);
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Register_Options();
-template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,int,FLUIDS_PARAMETERS<VECTOR<float,1> >::TYPE);
+template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<float,1> >::TYPE);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Set_Dirichlet_Boundary_Conditions(float);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Write_Output_Files(int) const;
@@ -690,9 +680,8 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Get_Object_Veloc
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Initialize_Swept_Occupied_Blocks_For_Advection(double,double,double,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Parse_Options();
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::After_Construction();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Read_Output_Files_Fluids(int);
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Register_Options();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Revalidate_Fluid_Scalars();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Revalidate_Fluid_Velocity(ARRAY<double,FACE_INDEX<2> >&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Revalidate_Phi_After_Modify_Levelset();
@@ -708,19 +697,18 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Initialize_Solid
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Initialize_Swept_Occupied_Blocks_For_Advection(double,double,double,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Parse_Options();
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::After_Construction();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Read_Output_Files_Fluids(int);
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Register_Options();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Revalidate_Fluid_Scalars();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Revalidate_Fluid_Velocity(ARRAY<double,FACE_INDEX<3> >&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Revalidate_Phi_After_Modify_Levelset();
-template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,int,FLUIDS_PARAMETERS<VECTOR<double,3> >::TYPE);
+template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<double,3> >::TYPE);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Set_Dirichlet_Boundary_Conditions(double);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Write_Output_Files(int) const;
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<VECTOR<double,2> >&,bool,bool);
-template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,int,FLUIDS_PARAMETERS<VECTOR<double,2> >::TYPE);
+template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<double,2> >::TYPE);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Adjust_Density_And_Temperature_With_Sources<RANGE<VECTOR<double,2> > >(RANGE<VECTOR<double,2> > const&,MATRIX<double,3,3> const&,double,double);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Adjust_Phi_With_Source<RANGE<VECTOR<double,2> > >(RANGE<VECTOR<double,2> > const&,MATRIX<double,3,3> const&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Adjust_Phi_With_Source<RANGE<VECTOR<double,2> > >(RANGE<VECTOR<double,2> > const&,int,MATRIX<double,3,3> const&);
@@ -735,10 +723,9 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Initialize_MPI()
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Initialize_Solid_Fluid_Coupling_After_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Parse_Options();
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::After_Construction();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Read_Output_Files_Fluids(int);
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Register_Options();
-template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,int,FLUIDS_PARAMETERS<VECTOR<double,1> >::TYPE);
+template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<double,1> >::TYPE);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Set_Dirichlet_Boundary_Conditions(double);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Write_Output_Files(int) const;

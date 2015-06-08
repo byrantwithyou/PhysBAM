@@ -39,7 +39,7 @@ class MASS_CONSERVATION:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
     typedef VECTOR<T,2> TV;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;typedef VECTOR<int,2> TV_INT;
 public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::fluids_parameters;
-    using BASE::fluid_collection;using BASE::parse_args;
+    using BASE::fluid_collection;
     using BASE::solids_parameters;using BASE::write_time;using BASE::write_frame_title;using BASE::data_directory;using BASE::abort_when_dt_below;using BASE::Set_External_Velocities;
     using BASE::resolution;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::test_number; // silence -Woverloaded-virtual
 
@@ -55,9 +55,108 @@ public:
     PARAMETER_LIST parameter_list;
     T period;
 
-    MASS_CONSERVATION(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >(stream_type,1,fluids_parameters.WATER)
+    MASS_CONSERVATION(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,1,fluids_parameters.WATER)
     {
+        parse_args.Parse();
+        LOG::cout<<"Example number "<<test_number<<std::endl;
+        std::string filename=LOG::sprintf("Mass_Conservation/example_%d.param",test_number);
+        if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading parameter file '"<<filename<<"'"<<std::endl;parameter_list.Read(filename);}
+        random.Set_Seed(7411);
+
+        // Common parameters
+        output_directory=LOG::sprintf("Mass_Conservation/example_%d_resolution_%d",test_number%resolution);
+        first_frame=0;restart=false;restart_frame=0;frame_rate=300;
+
+        // Fluids parameters
+        fluids_parameters.number_particles_per_cell=16;
+        fluids_parameters.reseeding_frame_rate=last_frame/5;
+        fluids_parameters.incompressible_iterations=50;
+        fluids_parameters.cfl=(T).5;
+        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][0]=fluids_parameters.domain_walls[1][1]=true;
+        fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
+        fluids_parameters.bias_towards_negative_particles=false;
+        fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;fluids_parameters.variable_viscosity=false;
+        fluids_parameters.second_order_cut_cell_method=true;
+        fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_removed_positive_particles=true;
+        fluids_parameters.write_flattened_particles=true;        
+        fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.store_particle_ids=true;
+        fluids_parameters.delete_fluid_inside_objects=false;
+        fluids_parameters.gravity=TV();
+        fluids_parameters.enforce_divergence_free_extrapolation=false;
+        fluids_parameters.incompressible_tolerance=(T)1e-12;
+        fluids_parameters.use_maccormack_for_level_set=false;
+        fluids_parameters.use_maccormack_for_incompressible=false;
+        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+
+        period=8;
+        T final_time=period;
+        last_frame=628;
+        world_to_source=MATRIX<T,3>::Identity_Matrix();
+
+        if(test_number==1 || test_number==2){
+            initial_water_level=-1; // no initial height
+            box=RANGE<TV>((T).4,(T).6,(T).4,(T).6);
+            fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());}
+        else if(test_number==3){
+            final_time=15;frame_rate=(T).5;
+            zalesak_center=TV(50,75);
+            zalesak_velocity_center=TV(50,50);
+            fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
+        else if(test_number==4){
+            final_time=628;frame_rate=(T).5;
+            zalesak_center=TV(25,25);
+            zalesak_velocity_center=TV(50,75);
+            fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
+        else if(test_number==5 || test_number==13){
+            fluids_parameters.grid->Initialize(TV_INT()+(1<<resolution)+1,RANGE<TV>::Unit_Box());
+            initial_water_level=-1;
+            fluids_parameters.cfl=(T).5;
+            last_frame=100;
+            frame_rate=(T)last_frame/final_time;
+            source=SPHERE<TV>(TV((T).5,(T).75),(T).15);}
+        else if(test_number==6){
+            fluids_parameters.number_particles_per_cell=128;
+            period=final_time=2;
+            fluids_parameters.grid->Initialize(TV_INT((1<<resolution)+1,3*(1<<resolution)+1),RANGE<TV>(TV((T)0,(T)-1),TV((T)1,(T)2)));
+            initial_water_level=-2;
+            fluids_parameters.cfl=(T).5;
+            last_frame=100;
+            frame_rate=(T)last_frame/final_time;
+            source=SPHERE<TV>(TV((T).5,(T).75),(T).15);}
+        else if(test_number==7){
+            frame_rate=500;
+            fluids_parameters.grid->Initialize(TV_INT(10*resolution,(int)(7.5*resolution)),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1.5)));
+            source_velocity=TV(0,-40);
+            initial_water_level=(T).02;
+            source=SPHERE<TV>(TV(1,initial_water_level+(T).15),(T).05);
+            fluids_parameters.surface_tension=(T)5e-6;}
+        else if(test_number==8){
+            frame_rate=100;
+            fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());
+            fluids_parameters.gravity=TV();
+            source=SPHERE<TV>(TV((T).1,(T).5),(T).08);
+            other_source=SPHERE<TV>(TV((T).9,(T).5),(T).08);
+            source_velocity=TV((T)2,(T)0);
+            initial_water_level=-1;}
+        else if(test_number==9){
+            fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());
+            fluids_parameters.gravity=TV();
+            fluids_parameters.surface_tension=(T)1e-5;}
+        else if(test_number==10){
+            fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());}
+        else if(test_number==11 || test_number==12){
+            final_time=628;frame_rate=(T).5;
+            zalesak_center=TV(25,25);
+            zalesak_velocity_center=TV(50,50);
+            fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
+
+        // Debugging
+        fluids_parameters.write_debug_data=true;
+        abort_when_dt_below=(T)1e-7;
+        write_time=true;
+        write_frame_title=true;
     }
 
     virtual ~MASS_CONSERVATION() 
@@ -83,119 +182,7 @@ public:
     void Extrapolate_Phi_Into_Objects(const T time) PHYSBAM_OVERRIDE {}
     void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    LOG::cout<<"Example number "<<test_number<<std::endl;
-    std::string filename=LOG::sprintf("Mass_Conservation/example_%d.param",test_number);
-    if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading parameter file '"<<filename<<"'"<<std::endl;parameter_list.Read(filename);}
-    random.Set_Seed(7411);
-
-    // Common parameters
-    output_directory=LOG::sprintf("Mass_Conservation/example_%d_resolution_%d",test_number%resolution);
-    first_frame=0;restart=false;restart_frame=0;frame_rate=300;
-
-    // Fluids parameters
-    fluids_parameters.number_particles_per_cell=16;
-    fluids_parameters.reseeding_frame_rate=last_frame/5;
-    fluids_parameters.incompressible_iterations=50;
-    fluids_parameters.cfl=(T).5;
-    fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][0]=fluids_parameters.domain_walls[1][1]=true;
-    fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
-    fluids_parameters.bias_towards_negative_particles=false;
-    fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;fluids_parameters.variable_viscosity=false;
-    fluids_parameters.second_order_cut_cell_method=true;
-    fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_removed_positive_particles=true;
-    fluids_parameters.write_flattened_particles=true;        
-    fluids_parameters.write_removed_negative_particles=true;
-    fluids_parameters.store_particle_ids=true;
-    fluids_parameters.delete_fluid_inside_objects=false;
-    fluids_parameters.gravity=TV();
-    fluids_parameters.enforce_divergence_free_extrapolation=false;
-    fluids_parameters.incompressible_tolerance=(T)1e-12;
-    fluids_parameters.use_maccormack_for_level_set=false;
-    fluids_parameters.use_maccormack_for_incompressible=false;
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-
-    period=8;
-    T final_time=period;
-    last_frame=628;
-    world_to_source=MATRIX<T,3>::Identity_Matrix();
-
-    if(test_number==1 || test_number==2){
-        initial_water_level=-1; // no initial height
-        box=RANGE<TV>((T).4,(T).6,(T).4,(T).6);
-        fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());}
-    else if(test_number==3){
-        final_time=15;frame_rate=(T).5;
-        zalesak_center=TV(50,75);
-        zalesak_velocity_center=TV(50,50);
-        fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
-    else if(test_number==4){
-        final_time=628;frame_rate=(T).5;
-        zalesak_center=TV(25,25);
-        zalesak_velocity_center=TV(50,75);
-        fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
-    else if(test_number==5 || test_number==13){
-        fluids_parameters.grid->Initialize(TV_INT()+(1<<resolution)+1,RANGE<TV>::Unit_Box());
-        initial_water_level=-1;
-        fluids_parameters.cfl=(T).5;
-        last_frame=100;
-        frame_rate=(T)last_frame/final_time;
-        source=SPHERE<TV>(TV((T).5,(T).75),(T).15);}
-    else if(test_number==6){
-        fluids_parameters.number_particles_per_cell=128;
-        period=final_time=2;
-        fluids_parameters.grid->Initialize(TV_INT((1<<resolution)+1,3*(1<<resolution)+1),RANGE<TV>(TV((T)0,(T)-1),TV((T)1,(T)2)));
-        initial_water_level=-2;
-        fluids_parameters.cfl=(T).5;
-        last_frame=100;
-        frame_rate=(T)last_frame/final_time;
-        source=SPHERE<TV>(TV((T).5,(T).75),(T).15);}
-    else if(test_number==7){
-        frame_rate=500;
-        fluids_parameters.grid->Initialize(TV_INT(10*resolution,(int)(7.5*resolution)),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1.5)));
-        source_velocity=TV(0,-40);
-        initial_water_level=(T).02;
-        source=SPHERE<TV>(TV(1,initial_water_level+(T).15),(T).05);
-        fluids_parameters.surface_tension=(T)5e-6;}
-    else if(test_number==8){
-        frame_rate=100;
-        fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());
-        fluids_parameters.gravity=TV();
-        source=SPHERE<TV>(TV((T).1,(T).5),(T).08);
-        other_source=SPHERE<TV>(TV((T).9,(T).5),(T).08);
-        source_velocity=TV((T)2,(T)0);
-        initial_water_level=-1;}
-    else if(test_number==9){
-        fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());
-        fluids_parameters.gravity=TV();
-        fluids_parameters.surface_tension=(T)1e-5;}
-    else if(test_number==10){
-        fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());}
-    else if(test_number==11 || test_number==12){
-        final_time=628;frame_rate=(T).5;
-        zalesak_center=TV(25,25);
-        zalesak_velocity_center=TV(50,50);
-        fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
-
-    // Debugging
-    fluids_parameters.write_debug_data=true;
-    abort_when_dt_below=(T)1e-7;
-    write_time=true;
-    write_frame_title=true;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
@@ -264,7 +251,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV >::Update_Fluid_Parameters(dt,time);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
 }
 //#####################################################################
 // Function Initialize_Phi

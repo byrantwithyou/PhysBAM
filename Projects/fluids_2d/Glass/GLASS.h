@@ -27,7 +27,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;
-    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
+    using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
 
     ARRAY<VECTOR<T,3> ,VECTOR<int,2> > target_image;
     GRID<TV> grid_image;
@@ -60,9 +60,121 @@ public:
     3. SPH source and levelset source with TWC VD SPH
     ***************/
 
-    GLASS(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,1,fluids_parameters.WATER)
+    GLASS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,1,fluids_parameters.WATER)
     {
+        parse_args.Parse();
+        int cells=1*resolution;
+        frame_rate=24;
+        restart=false;restart_frame=0;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[3][0]=true;fluids_parameters.domain_walls[3][1]=true;
+        fluids_parameters.number_particles_per_cell=4;
+        fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
+        fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
+        fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.delete_fluid_inside_objects=true;
+        fluids_parameters.incompressible_iterations=40;
+        fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
+        fluids_parameters.second_order_cut_cell_method=true;
+        fluids_parameters.store_particle_ids=true;
+        fluids_parameters.use_vorticity_confinement=false;
+        fluids_parameters.use_vorticity_confinement_fuel=false;
+        fluids_parameters.write_ghost_values=true;
+        fluids_parameters.store_particle_ids=true;
+        first_frame=0;last_frame=1000;
+        GRID<TV>& grid=*fluids_parameters.grid;
+
+        grid.Initialize(TV_INT(10*cells+1,20*cells+1),RANGE<TV>(TV((T)-.05,0),TV((T).05,(T).2)));
+        //grid.Initialize(TV_INT(15*cells+1,20*cells+1),RANGE<TV>(TV((T)-.075,0),TV((T).075,(T).2)));
+
+        output_directory=LOG::sprintf("Glass/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+        
+        random.Set_Seed(1);
+        particle_id=0;
+        // SPH paramters
+        fluids_parameters.use_sph_for_removed_negative_particles=true;
+        use_variable_density_for_sph=true;
+        use_two_way_coupling_for_sph=true;
+        convert_sph_particles_to_fluid=false;
+        use_analytic_divergence=false;
+        use_analytic_divergence_for_expansion_only=false;
+        adjust_cell_weights_on_neumann_boundaries=false;
+        ballistic_particles_as_percentage_of_target=(T).1;
+        particle_targeting_time=(T).25;
+        flip_ratio=1;
+        fraction_of_particles_for_sph=1;
+
+        if(test_number==2){
+            convert_sph_particles_to_fluid=true;
+            use_two_way_coupling_for_sph=true;
+            use_variable_density_for_sph=false;
+            flip_ratio=(T).2;
+            use_analytic_divergence=true;
+            use_analytic_divergence_for_expansion_only=false;}
+        if(test_number==3){
+            use_analytic_divergence=true;
+            use_analytic_divergence_for_expansion_only=false;
+            use_two_way_coupling_for_sph=true;
+            fraction_of_particles_for_sph=(T).8;}
+
+
+        time_pour_start_sph=(T).7;
+        time_pour_end_sph=1000;
+        time_pour_end_pls=1000;
+        source1=RANGE<TV>(TV((T)-.01,(T)-.0075),TV((T).01,(T).0075));
+        MATRIX<T,3> rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis(-(T)pi/4);
+        MATRIX<T,3> translation=MATRIX<T,3>::Translation_Matrix(TV((T)-.01,(T).175));
+        MATRIX<T,3> source1_to_world=translation*rotation;
+        world_to_source1=source1_to_world.Inverse();
+        source1_velocity=source1_to_world.Extract_Rotation()*TV(0,-1)*(T).5;
+        source1_bounding_box=source1;
+
+        rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis(-(T)pi/4);
+        translation=MATRIX<T,3>::Translation_Matrix(TV((T)-.01,(T).175));
+        MATRIX<T,3> source2_to_world=translation*rotation;
+        source2=ORIENTED_BOX<TV>(source1,source2_to_world);
+        source2_velocity=source2.edges.Column(2).Normalized()*(T)-.5;
+        source2_bounding_box=source2.Axis_Aligned_Bounding_Box();
+
+        rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis(-(T)pi/3);
+        translation=MATRIX<T,3>::Translation_Matrix(TV((T)-.03,(T).175));
+        MATRIX<T,3> source3_to_world=translation*rotation;
+        source3=ORIENTED_BOX<TV>(source1,source3_to_world);
+        source3_velocity=source3.edges.Column(2).Normalized()*(T)-.2;
+        source3_bounding_box=source3.Axis_Aligned_Bounding_Box();
+
+        source4=source1;
+        rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis((T)pi/3);
+        translation=MATRIX<T,3>::Translation_Matrix(TV((T).03,(T).175));
+        MATRIX<T,3> source4_to_world=translation*rotation;
+        world_to_source4=source4_to_world.Inverse();
+        source4_velocity=source4_to_world.Extract_Rotation()*TV(0,-1)*(T).3;
+        source4_bounding_box=source4;
+
+        if(test_number==1){
+            sources.Append(source1);
+            world_to_source.Append(world_to_source1);
+            sources_velocity.Append(source1_velocity);
+            sources_bounding_box.Append(source1_bounding_box);}
+        else if(test_number==2){
+            sph_sources.Append(source2);
+            sph_sources_velocity.Append(source2_velocity);
+            sph_sources_bounding_box.Append(source2_bounding_box);}
+        else if(test_number==3){
+            frame_rate=192;
+            time_pour_end_pls=(T)1.6;
+            time_pour_end_sph=(T)1.6;
+            time_pour_end_pls=(T)1.12;
+            time_pour_end_sph=(T)1.12;
+            sph_sources.Append(source3);
+            sph_sources_velocity.Append(source3_velocity);
+            sph_sources_bounding_box.Append(source3_bounding_box);
+
+            sources.Append(source4);
+            world_to_source.Append(world_to_source4);
+            sources_velocity.Append(source4_velocity);
+            sources_bounding_box.Append(source4_bounding_box);}
     }
 
     ~GLASS()
@@ -77,132 +189,7 @@ public:
     void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Extrapolate_Phi_Into_Objects(const T time) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    int cells=1*resolution;
-    frame_rate=24;
-    restart=false;restart_frame=0;
-    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[3][0]=true;fluids_parameters.domain_walls[3][1]=true;
-    fluids_parameters.number_particles_per_cell=4;
-    fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
-    fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
-    fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
-    fluids_parameters.delete_fluid_inside_objects=true;
-    fluids_parameters.incompressible_iterations=40;
-    fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
-    fluids_parameters.second_order_cut_cell_method=true;
-    fluids_parameters.store_particle_ids=true;
-    fluids_parameters.use_vorticity_confinement=false;
-    fluids_parameters.use_vorticity_confinement_fuel=false;
-    fluids_parameters.write_ghost_values=true;
-    fluids_parameters.store_particle_ids=true;
-    first_frame=0;last_frame=1000;
-    GRID<TV>& grid=*fluids_parameters.grid;
-
-    grid.Initialize(TV_INT(10*cells+1,20*cells+1),RANGE<TV>(TV((T)-.05,0),TV((T).05,(T).2)));
-    //grid.Initialize(TV_INT(15*cells+1,20*cells+1),RANGE<TV>(TV((T)-.075,0),TV((T).075,(T).2)));
-
-    output_directory=LOG::sprintf("Glass/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
-        
-    random.Set_Seed(1);
-    particle_id=0;
-    // SPH paramters
-    fluids_parameters.use_sph_for_removed_negative_particles=true;
-    use_variable_density_for_sph=true;
-    use_two_way_coupling_for_sph=true;
-    convert_sph_particles_to_fluid=false;
-    use_analytic_divergence=false;
-    use_analytic_divergence_for_expansion_only=false;
-    adjust_cell_weights_on_neumann_boundaries=false;
-    ballistic_particles_as_percentage_of_target=(T).1;
-    particle_targeting_time=(T).25;
-    flip_ratio=1;
-    fraction_of_particles_for_sph=1;
-
-    if(test_number==2){
-        convert_sph_particles_to_fluid=true;
-        use_two_way_coupling_for_sph=true;
-        use_variable_density_for_sph=false;
-        flip_ratio=(T).2;
-        use_analytic_divergence=true;
-        use_analytic_divergence_for_expansion_only=false;}
-    if(test_number==3){
-        use_analytic_divergence=true;
-        use_analytic_divergence_for_expansion_only=false;
-        use_two_way_coupling_for_sph=true;
-        fraction_of_particles_for_sph=(T).8;}
-
-
-    time_pour_start_sph=(T).7;
-    time_pour_end_sph=1000;
-    time_pour_end_pls=1000;
-    source1=RANGE<TV>(TV((T)-.01,(T)-.0075),TV((T).01,(T).0075));
-    MATRIX<T,3> rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis(-(T)pi/4);
-    MATRIX<T,3> translation=MATRIX<T,3>::Translation_Matrix(TV((T)-.01,(T).175));
-    MATRIX<T,3> source1_to_world=translation*rotation;
-    world_to_source1=source1_to_world.Inverse();
-    source1_velocity=source1_to_world.Extract_Rotation()*TV(0,-1)*(T).5;
-    source1_bounding_box=source1;
-
-    rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis(-(T)pi/4);
-    translation=MATRIX<T,3>::Translation_Matrix(TV((T)-.01,(T).175));
-    MATRIX<T,3> source2_to_world=translation*rotation;
-    source2=ORIENTED_BOX<TV>(source1,source2_to_world);
-    source2_velocity=source2.edges.Column(2).Normalized()*(T)-.5;
-    source2_bounding_box=source2.Axis_Aligned_Bounding_Box();
-
-    rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis(-(T)pi/3);
-    translation=MATRIX<T,3>::Translation_Matrix(TV((T)-.03,(T).175));
-    MATRIX<T,3> source3_to_world=translation*rotation;
-    source3=ORIENTED_BOX<TV>(source1,source3_to_world);
-    source3_velocity=source3.edges.Column(2).Normalized()*(T)-.2;
-    source3_bounding_box=source3.Axis_Aligned_Bounding_Box();
-
-    source4=source1;
-    rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis((T)pi/3);
-    translation=MATRIX<T,3>::Translation_Matrix(TV((T).03,(T).175));
-    MATRIX<T,3> source4_to_world=translation*rotation;
-    world_to_source4=source4_to_world.Inverse();
-    source4_velocity=source4_to_world.Extract_Rotation()*TV(0,-1)*(T).3;
-    source4_bounding_box=source4;
-
-    if(test_number==1){
-        sources.Append(source1);
-        world_to_source.Append(world_to_source1);
-        sources_velocity.Append(source1_velocity);
-        sources_bounding_box.Append(source1_bounding_box);}
-    else if(test_number==2){
-        sph_sources.Append(source2);
-        sph_sources_velocity.Append(source2_velocity);
-        sph_sources_bounding_box.Append(source2_bounding_box);}
-    else if(test_number==3){
-        frame_rate=192;
-        time_pour_end_pls=(T)1.6;
-        time_pour_end_sph=(T)1.6;
-        time_pour_end_pls=(T)1.12;
-        time_pour_end_sph=(T)1.12;
-        sph_sources.Append(source3);
-        sph_sources_velocity.Append(source3_velocity);
-        sph_sources_bounding_box.Append(source3_bounding_box);
-
-        sources.Append(source4);
-        world_to_source.Append(world_to_source4);
-        sources_velocity.Append(source4_velocity);
-        sources_bounding_box.Append(source4_bounding_box);}
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

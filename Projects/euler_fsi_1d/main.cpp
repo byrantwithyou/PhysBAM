@@ -46,14 +46,14 @@ int main(int argc,char* argv[])
     parse_args.Parse(true);
     
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
-    if(opt_sod) example=new SOD_ST<T>(stream_type);
-    else if(opt_piston) example=new PISTON<T>(stream_type);
-    else if(opt_bangbang) example=new BANG_BANG_ST<T>(stream_type);
-    else if(opt_smoothflow) example=new SMOOTH_FLOW<T>(stream_type);
-    else if(opt_drop) example=new SOD_ST_DROP<T>(stream_type);
-    else example=new STANDARD_TESTS<T>(stream_type);
-    example->want_mpi_world=true;
-    example->Parse(parse_args);
+    if(opt_sod) example=new SOD_ST<T>(stream_type,parse_args);
+    else if(opt_piston) example=new PISTON<T>(stream_type,parse_args);
+    else if(opt_bangbang) example=new BANG_BANG_ST<T>(stream_type,parse_args);
+    else if(opt_smoothflow) example=new SMOOTH_FLOW<T>(stream_type,parse_args);
+    else if(opt_drop) example=new SOD_ST_DROP<T>(stream_type,parse_args);
+    else example=new STANDARD_TESTS<T>(stream_type,parse_args);
+    example->mpi_world=new MPI_WORLD(parse_args);
+    example->After_Construction();
 
     if(example->mpi_world->initialized){
         example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();

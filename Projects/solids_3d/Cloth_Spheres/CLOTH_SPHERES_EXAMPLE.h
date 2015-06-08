@@ -25,7 +25,7 @@ public:
     typedef T_input T;typedef VECTOR<T,3> TV;
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::frame_rate;using BASE::last_frame;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;
-    using BASE::data_directory;using BASE::solid_body_collection;using BASE::parse_args;
+    using BASE::data_directory;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
 
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -35,10 +35,12 @@ public:
     ARRAY<T> binding_stiffness;
     ARRAY<COLLISION_GEOMETRY_ID> collision_body_ids;
 
-    CLOTH_SPHERES_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),sphere_scale((T).5),sphere_x_position((T).7),aspect_ratio((T)1.0),side_length(2),
+    CLOTH_SPHERES_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),sphere_scale((T).5),sphere_x_position((T).7),aspect_ratio((T)1.0),side_length(2),
         number_side_panels(150)
     {
+        parse_args.Parse();
+        tests.data_directory=data_directory;
     }
 
     virtual ~CLOTH_SPHERES_EXAMPLE()
@@ -59,22 +61,7 @@ public:
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
     void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options()
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options()
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################

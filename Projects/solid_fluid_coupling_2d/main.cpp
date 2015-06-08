@@ -27,10 +27,10 @@ int main(int argc,char* argv[])
     parse_args.Parse(true);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
-    if(opt_water) example=new STANDARD_TESTS_WATER<T>(stream_type);
-    else example=new STANDARD_TESTS<T>(stream_type);
-    example->want_mpi_world=true;
-    example->Parse(parse_args);
+    if(opt_water) example=new STANDARD_TESTS_WATER<T>(stream_type,parse_args);
+    else example=new STANDARD_TESTS<T>(stream_type,parse_args);
+    example->mpi_world=new MPI_WORLD(parse_args);
+    example->After_Construction();
 
     if(example->mpi_world->initialized){
         example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();

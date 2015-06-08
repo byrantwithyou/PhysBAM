@@ -26,7 +26,7 @@ class HAIR_SIM_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >,TRIANGLE_REPULSIO
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
-    using BASE::stream_type;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
+    using BASE::stream_type;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Set_External_Positions;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
 protected:
     using BASE::write_substeps_level;
@@ -124,7 +124,7 @@ public:
     ARRAY<T> collision_tolerances;
 
 //#####################################################################
-    HAIR_SIM_TESTS(const STREAM_TYPE stream_type);
+    HAIR_SIM_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     void Initialize_Bodies() PHYSBAM_OVERRIDE;
     void Update_Keyframed_Parameters_For_Time_Update(const T time);
     template<class T_IMPLICIT_COMBINED> void Update_Keyframed_Parameters_For_Time_Update_Helper(const T time,T_IMPLICIT_COMBINED& combined);
@@ -153,9 +153,7 @@ public:
     void Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& point_face_pairs) PHYSBAM_OVERRIDE;
     void Compute_Binding_Velocities();
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE;
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
-    void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 };
 }

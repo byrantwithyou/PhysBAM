@@ -19,15 +19,21 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
     using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::data_directory;using BASE::fluid_collection;using BASE::solid_body_collection;
-    using BASE::resolution;using BASE::test_number;using BASE::parse_args;using BASE::Get_Object_Velocities; // silence -Woverloaded-virtual
+    using BASE::resolution;using BASE::test_number;using BASE::Get_Object_Velocities; // silence -Woverloaded-virtual
 
     SMOKE_STANDARD_TESTS_2D<TV> tests;
     T angle_fraction;
 
-    REFINEMENT(const STREAM_TYPE stream_type)
-        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type,0,fluids_parameters.SMOKE),
+    REFINEMENT(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,0,fluids_parameters.SMOKE),
         tests(*this,fluids_parameters,fluid_collection.incompressible_fluid_collection,solid_body_collection.rigid_body_collection),angle_fraction(0)
     {
+        parse_args.Add("-angle_fraction",&angle_fraction,"fraction","Angle fraction");
+        parse_args.Parse();
+        tests.Initialize(test_number,resolution,angle_fraction);
+        output_directory="Refinement/output";
+        *fluids_parameters.grid=tests.grid;
+        last_frame=100;
     }
 
     virtual ~REFINEMENT()
@@ -40,26 +46,7 @@ public:
     void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-angle_fraction",&angle_fraction,"fraction","Angle fraction");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.Initialize(test_number,resolution,angle_fraction);
-    output_directory="Refinement/output";
-    *fluids_parameters.grid=tests.grid;
-    last_frame=100;
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {}
+void After_Initialization() PHYSBAM_OVERRIDE {}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

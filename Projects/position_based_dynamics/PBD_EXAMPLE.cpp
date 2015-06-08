@@ -12,7 +12,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> PBD_EXAMPLE<TV>::
-PBD_EXAMPLE(const STREAM_TYPE stream_type)
+PBD_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :stream_type(stream_type),
     debug_particles(*new DEBUG_PARTICLES<TV>),
     initial_time(0),last_frame(100),
@@ -20,6 +20,7 @@ PBD_EXAMPLE(const STREAM_TYPE stream_type)
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(1e-8),max_dt(frame_dt),
     print_stats(false),solver_iterations(1),test_diff(false),threads(1)
 {
+    parse_args.Parse();
 }
 //#####################################################################
 // Destructor

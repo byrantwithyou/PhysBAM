@@ -62,7 +62,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 
     for(int i=0;i<collisions.m;i++){
         const COLLISION& c=collisions(i);
-        TV& v=F.V.array(c.p),tt=t.V.array(c.p);
+        TV& v=F.V.array(c.p),tt=V.V.array(c.p);
         v-=c.n*c.n.Dot(v)+dt*c.n_dE*(c.H*tt)+dt*c.n.Dot(tt)*c.H_dE+dt*c.H_dE.Dot(tt)*c.n;}
 
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(F.V.array);

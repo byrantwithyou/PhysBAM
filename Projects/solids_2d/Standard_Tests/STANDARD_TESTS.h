@@ -78,7 +78,7 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solids_evolution; // silence -Woverloaded-virtual
-    using BASE::parse_args;using BASE::test_number;using BASE::data_directory;
+    using BASE::test_number;using BASE::data_directory;
 
     std::ofstream svout;
 
@@ -107,10 +107,131 @@ public:
     T damping_multiplier;
     bool project_nullspace,print_residuals;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean_refined(false),use_corotated(false),dump_sv(false),
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean_refined(false),use_corotated(false),dump_sv(false),
         print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1),project_nullspace(false),print_residuals(false)
     {
+        solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
+        solids_parameters.implicit_solve_parameters.cg_iterations=1000;
+        solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+
+        parse_args.Add("-fully_implicit",&fully_implicit,"use fully implicit forces");
+        parse_args.Add("-test_forces",&test_forces,"use fully implicit forces");
+        parse_args.Add("-use_ext_neo",&use_extended_neohookean,"use_ext_neo");
+        parse_args.Add("-use_ext_neo_ref",&use_extended_neohookean_refined,"use_ext_neo_ref");
+        parse_args.Add("-use_corotated",&use_corotated,"use_corotated");
+        parse_args.Add("-dump_sv",&dump_sv,"Dump singular values");
+        parse_args.Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
+        parse_args.Add("-stiffen",&stiffness_multiplier,"scale","stiffness multiplier for various tests");
+        parse_args.Add("-dampen",&damping_multiplier,"scale","damping multiplier for various tests");
+        parse_args.Add("-residuals",&print_residuals,"print residuals during timestepping");
+        parse_args.Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+        parse_args.Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"tol","CG tolerance for backward Euler");
+        parse_args.Add_Not("-use_be",&solids_parameters.use_trapezoidal_rule_for_velocities,"use backward euler");
+        parse_args.Add("-print_matrix",&print_matrix,"Print Krylov matrix");
+        parse_args.Add("-project_nullspace",&project_nullspace,"project out nullspace");
+        parse_args.Add("-projection_iterations",&solids_parameters.implicit_solve_parameters.cg_projection_iterations,"iterations","number of iterations used for projection in cg");
+        parse_args.Add("-solver_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"iterations","number of iterations used for solids system");
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+        LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        last_frame=1000;
+
+        switch(test_number){
+            case 20: case 21: case 26:
+                mattress_grid=GRID<TV>(TV_INT(40,8),RANGE<TV>(TV((T)-2,(T)-.4),TV((T)2,(T).4)));
+                break;
+            case 22: case 23: case 24: case 25: case 27:
+                mattress_grid=GRID<TV>(TV_INT(20,20),RANGE<TV>(TV((T)-.9,(T)-.9),TV((T).9,(T).9)));
+                break;
+            default:
+                mattress_grid=GRID<TV>(TV_INT(20,10),RANGE<TV>(TV((T)-1,(T)-.5),TV((T)1,(T).5)));
+        }
+    
+        processes_per_dimension=VECTOR<int,2>(2,1);
+
+        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+        solid_body_collection.Print_Residuals(print_residuals);
+        if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
+
+        switch(test_number){
+            case 1:
+            case 2:
+            case 3:
+                delete solids_evolution;
+                solids_evolution=new QUASISTATIC_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
+                solids_parameters.newton_iterations=10;
+                solids_parameters.newton_tolerance=(T)1e-2;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.implicit_solve_parameters.cg_iterations=900;
+                solids_parameters.use_partially_converged_result=true;
+                solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+                attachment_velocity=TV((T).1,0);
+                last_frame=120;
+                break;
+            case 4:
+            case 5:
+            case 6:
+            case 24:
+            case 25:
+            case 26:
+            case 27:
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.implicit_solve_parameters.cg_iterations=900;
+                solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+                attachment_velocity=TV((T).1,0);
+                last_frame=1500;
+                break;
+            case 7:
+                solids_parameters.cfl=(T).5;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                last_frame=120;
+                break;
+            case 8: 
+            case 13:
+            case 14:
+            case 16:
+            case 22:
+            case 21:
+            case 17:
+            case 18:
+            case 19:
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                last_frame=200;
+                break;
+            case 23: 
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                last_frame=500;
+                break;
+            case 9:
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                solids_parameters.cfl=1;
+                solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
+                last_frame=120;
+                break;
+            case 10:
+            case 11:
+            case 12:
+                solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+                solids_parameters.cfl=(T)4.9;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                last_frame=500;
+                frame_rate=120;
+                break;
+            case 20:
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+                solids_parameters.implicit_solve_parameters.cg_iterations=900;
+                solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
+                //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+                attachment_velocity=TV((T).8,0);
+                last_frame=400;
+                break;            
+            default:
+                LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
+
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     }
 
     // Unused callbacks
@@ -148,140 +269,7 @@ public:
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
-    solids_parameters.implicit_solve_parameters.cg_iterations=1000;
-    solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-
-    parse_args->Add("-fully_implicit",&fully_implicit,"use fully implicit forces");
-    parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
-    parse_args->Add("-use_ext_neo",&use_extended_neohookean,"use_ext_neo");
-    parse_args->Add("-use_ext_neo_ref",&use_extended_neohookean_refined,"use_ext_neo_ref");
-    parse_args->Add("-use_corotated",&use_corotated,"use_corotated");
-    parse_args->Add("-dump_sv",&dump_sv,"Dump singular values");
-    parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
-    parse_args->Add("-stiffen",&stiffness_multiplier,"scale","stiffness multiplier for various tests");
-    parse_args->Add("-dampen",&damping_multiplier,"scale","damping multiplier for various tests");
-    parse_args->Add("-residuals",&print_residuals,"print residuals during timestepping");
-    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
-    parse_args->Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"tol","CG tolerance for backward Euler");
-    parse_args->Add_Not("-use_be",&solids_parameters.use_trapezoidal_rule_for_velocities,"use backward euler");
-    parse_args->Add("-print_matrix",&print_matrix,"Print Krylov matrix");
-    parse_args->Add("-project_nullspace",&project_nullspace,"project out nullspace");
-    parse_args->Add("-projection_iterations",&solids_parameters.implicit_solve_parameters.cg_projection_iterations,"iterations","number of iterations used for projection in cg");
-    parse_args->Add("-solver_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"iterations","number of iterations used for solids system");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-    last_frame=1000;
-
-    switch(test_number){
-        case 20: case 21: case 26:
-            mattress_grid=GRID<TV>(TV_INT(40,8),RANGE<TV>(TV((T)-2,(T)-.4),TV((T)2,(T).4)));
-        break;
-        case 22: case 23: case 24: case 25: case 27:
-            mattress_grid=GRID<TV>(TV_INT(20,20),RANGE<TV>(TV((T)-.9,(T)-.9),TV((T).9,(T).9)));
-        break;
-            default:
-            mattress_grid=GRID<TV>(TV_INT(20,10),RANGE<TV>(TV((T)-1,(T)-.5),TV((T)1,(T).5)));
-    }
-    
-    processes_per_dimension=VECTOR<int,2>(2,1);
-
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    solid_body_collection.Print_Residuals(print_residuals);
-    if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
-
-    switch(test_number){
-        case 1:
-        case 2:
-        case 3:
-            delete solids_evolution;
-            solids_evolution=new QUASISTATIC_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
-            solids_parameters.newton_iterations=10;
-            solids_parameters.newton_tolerance=(T)1e-2;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=900;
-            solids_parameters.use_partially_converged_result=true;
-            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            attachment_velocity=TV((T).1,0);
-            last_frame=120;
-            break;
-        case 4:
-        case 5:
-        case 6:
-        case 24:
-        case 25:
-        case 26:
-        case 27:
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=900;
-            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            attachment_velocity=TV((T).1,0);
-            last_frame=1500;
-            break;
-        case 7:
-            solids_parameters.cfl=(T).5;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            last_frame=120;
-            break;
-        case 8: 
-        case 13:
-        case 14:
-        case 16:
-        case 22:
-        case 21:
-        case 17:
-        case 18:
-        case 19:
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            last_frame=200;
-            break;
-        case 23: 
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            last_frame=500;
-            break;
-        case 9:
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            solids_parameters.cfl=1;
-            solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
-            last_frame=120;
-            break;
-        case 10:
-        case 11:
-        case 12:
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            solids_parameters.cfl=(T)4.9;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            last_frame=500;
-            frame_rate=120;
-            break;
-        case 20:
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=900;
-            solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
-            //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            attachment_velocity=TV((T).8,0);
-            last_frame=400;
-            break;            
-        default:
-            LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
-
-    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

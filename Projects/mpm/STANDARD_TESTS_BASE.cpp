@@ -30,12 +30,12 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> STANDARD_TESTS_BASE<TV>::
-STANDARD_TESTS_BASE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-    :MPM_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),
+STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :MPM_EXAMPLE<TV>(stream_type_input),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     scale_mass(1),scale_E(1),scale_speed(1),
     penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),
-    tests(stream_type,deformable_body_collection)
+    tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
     parse_args.Extra(&test_number,"example number","example number to run");

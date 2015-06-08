@@ -46,7 +46,7 @@ public:
     DEBUG_PARTICLES<TV>& debug_particles;
     bool opt_skip_debug_data;
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<TV>::TYPE type);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int number_of_regions,const typename FLUIDS_PARAMETERS<TV>::TYPE type);
     virtual ~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
 
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
@@ -95,8 +95,7 @@ public:
     virtual void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;
     void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time) PHYSBAM_OVERRIDE;
     void Log_Parameters() const PHYSBAM_OVERRIDE;
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
+    void After_Construction() PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

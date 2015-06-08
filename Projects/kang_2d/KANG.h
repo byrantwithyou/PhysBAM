@@ -78,7 +78,7 @@ public:
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::two_phase;
-    using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::convection_order;using BASE::use_pls_evolution_for_structure;
+    using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::convection_order;using BASE::use_pls_evolution_for_structure;
     using BASE::Mark_Outside;using BASE::use_kang;using BASE::print_matrix;using BASE::test_system;
     using BASE::m;using BASE::s;using BASE::kg;
 
@@ -103,7 +103,7 @@ public:
     // for tests 7 and 8
     T r_n,r_I,r_p,u_n0,u_p0;
 
-    KANG(const STREAM_TYPE stream_type);
+    KANG(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~KANG();
 
     // Unused callbacks
@@ -135,9 +135,7 @@ public:
 //#####################################################################
     void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE;
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
-    void Parse_Late_Options() PHYSBAM_OVERRIDE;
+    void After_Initialization() PHYSBAM_OVERRIDE;
     void Initialize_Advection() PHYSBAM_OVERRIDE;
     void Initialize_Phi() PHYSBAM_OVERRIDE;
     void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE;

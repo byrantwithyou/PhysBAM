@@ -18,13 +18,13 @@ int main(int argc,char *argv[])
     typedef VECTOR<T,1> TV;
     STREAM_TYPE stream_type((RW()));
 
-    STANDARD_TESTS<T> example(stream_type);
+    PARSE_ARGS parse_args(argc,argv);
+    STANDARD_TESTS<T> example(stream_type,parse_args);
     //TEST_EXAMPLE<float> example(stream_type,example_number);
     //KINEMATIC_EXAMPLE<float> example(stream_type,example_number);
     //ARB_EXAMPLE<float> example(stream_type,example_number);
-    example.want_mpi_world=true;
-    PARSE_ARGS parse_args(argc,argv);
-    example.Parse(parse_args);
+    example.mpi_world=new MPI_WORLD(parse_args);
+    example.After_Construction();
 
     if(example.mpi_world->initialized) example.solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
     example.Adjust_Output_Directory_For_MPI(example.solid_body_collection.deformable_body_collection.mpi_solids);

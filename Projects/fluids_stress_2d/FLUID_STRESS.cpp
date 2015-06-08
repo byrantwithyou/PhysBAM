@@ -33,8 +33,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class T> FLUID_STRESS<VECTOR<T,2> >::
-FLUID_STRESS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-    :FLUID_STRESS_BASE<TV>(stream_type,parse_args),epsilon((T).1),radius((T).05),mode(2)
+FLUID_STRESS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+    :FLUID_STRESS_BASE<TV>(stream_type_input,parse_args),epsilon((T).1),radius((T).05),mode(2)
 {
     parse_args.Parse();
     

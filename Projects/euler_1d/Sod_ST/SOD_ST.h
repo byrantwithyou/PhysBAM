@@ -36,7 +36,7 @@ public:
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
-    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
+    using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
 
     TV_DIMENSION state_left,state_middle,state_right; // (density,velocity,pressure)
     T middle_state_start_point,right_state_start_point;
@@ -66,10 +66,94 @@ public:
     10.Interaction of blast waves (same as bang-bang)
     ***************/
 
-    SOD_ST(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),
+    SOD_ST(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args,0,fluids_parameters.COMPRESSIBLE),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),
         implicit_rk(false),use_sound_speed_based_cfl(false),multiplication_factor_for_sound_speed_based_dt(false),exact(false)
     {
+        parse_args.Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+        parse_args.Add("-eno_order",&eno_order,"eno_order","eno order");
+        parse_args.Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+        parse_args.Add("-cfl",&cfl_number,"CFL","cfl number");
+        parse_args.Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+        parse_args.Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
+        parse_args.Add("-cfl_sound_speed",&use_sound_speed_based_cfl,"use sound speed based cfl condition");
+        parse_args.Add("-cfl_sound_speed_multiple",&multiplication_factor_for_sound_speed_based_dt,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
+        parse_args.Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
+        parse_args.Parse();
+
+        timesplit=timesplit && !exact;
+        //grid
+        if(test_number==12) fluids_parameters.grid->Initialize(TV_INT(resolution),RANGE<TV>(TV(-1),TV(2)));
+        else fluids_parameters.grid->Initialize(TV_INT(resolution),RANGE<TV>(TV(0),TV(1)));
+        *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+        if(test_number==1 || test_number==2) fluids_parameters.domain_walls[0][1]=true;
+        if(test_number==10){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
+        //time
+        initial_time=(T)0.;last_frame=1500;frame_rate=(T)100.;
+        if(test_number==9) last_frame=4000;
+        if(test_number==5){frame_rate=(T)5/(T)2.5e-6;last_frame=500;}
+        else if(test_number==8){frame_rate=(T)10/(T)1.75e-4;last_frame=1000;}
+        else if(test_number==10){frame_rate=(T)10/(T).038;last_frame=500;}
+        fluids_parameters.cfl=cfl_number;
+        fluids_parameters.compressible_use_sound_speed_for_cfl=use_sound_speed_based_cfl;
+        if(multiplication_factor_for_sound_speed_based_dt>0){
+            fluids_parameters.compressible_use_sound_speed_based_dt_multiple_for_cfl=true;
+            fluids_parameters.compressible_multiplication_factor_for_sound_speed_based_dt=multiplication_factor_for_sound_speed_based_dt;}
+        //custom stuff . . .
+        fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
+        if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
+        else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
+        else if(eno_scheme==3) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
+        else if(eno_scheme==4) fluids_parameters.compressible_conservation_method = new HYBRID_SL_ENO_CONSERVATION<TV,TV::m+2>(flux_face,new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false));
+        fluids_parameters.compressible_spatial_order=eno_order;
+        fluids_parameters.compressible_conservation_method->Save_Fluxes();
+        fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
+        fluids_parameters.compressible_rungekutta_order=rk_order;
+        //fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_RF<T,TV::m+2>;
+        fluids_parameters.compressible_timesplit=timesplit;
+        fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
+
+        if(timesplit) output_directory=LOG::sprintf("Sod_ST/Test_%d_%d_semiimplicit_%d_%1.2f",test_number,(fluids_parameters.grid->counts.x),eno_scheme,cfl_number);
+        else output_directory=LOG::sprintf("Sod_ST/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
+        if(eno_scheme==2) output_directory+="_density_weighted";
+        else if(eno_scheme==3) output_directory+="_velocity_weighted";
+
+        middle_state_start_point=0.5;right_state_start_point=0;
+        if(test_number==1){
+            state_left=TV_DIMENSION((T)1,(T)0,(T)1);
+            state_right=TV_DIMENSION((T).125,(T)0,(T).1);}
+        else if(test_number==2){
+            state_left=TV_DIMENSION((T).125,(T)0,(T).1);
+            state_right=TV_DIMENSION((T)1,(T)0,(T)1);}
+        else if(test_number==3){
+            state_left=TV_DIMENSION((T)1,(T)-3,(T)1);
+            state_right=TV_DIMENSION((T)1,(T)3,(T)1);}
+        else if(test_number==4){
+            state_left=TV_DIMENSION((T).445,(T).698,(T)3.528);
+            state_right=TV_DIMENSION((T).5,(T)0,(T).571);}
+        else if(test_number==5){
+            state_left=TV_DIMENSION((T)1,(T)0,(T)1e10);
+            state_right=TV_DIMENSION((T).125,(T)0,(T).1);}
+        else if(test_number==6){
+            state_left=TV_DIMENSION((T)1,(T)-2,(T).4);
+            state_right=TV_DIMENSION((T)1,(T)2,(T).4);}
+        else if(test_number==7){
+            state_left=TV_DIMENSION((T)3.857,(T).92,(T)10.333);
+            state_right=TV_DIMENSION((T)1,(T)3.55,(T)1);}
+        else if(test_number==8){
+            state_left=TV_DIMENSION((T)10,(T)2000,(T)500);
+            state_right=TV_DIMENSION((T)20,(T)0,(T)500);}
+        else if(test_number==9){
+            state_left=TV_DIMENSION((T).125,(T)0,(T).1);
+            state_middle=TV_DIMENSION((T)1,(T)0,(T)1);
+            state_right=TV_DIMENSION((T).125,(T)0,(T).1);
+            middle_state_start_point=(T).4;right_state_start_point=(T).6;}
+        else if(test_number==10){
+            state_left=TV_DIMENSION((T)1,(T)0,(T)1e3);
+            state_middle=TV_DIMENSION((T)1,(T)0,(T)1e-2);
+            state_right=TV_DIMENSION((T)1,(T)0,(T)1e2);
+            middle_state_start_point=(T).1;right_state_start_point=(T).9;}
     }
 
     virtual ~SOD_ST() {}
@@ -107,104 +191,7 @@ public:
 void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
 }
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
-    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
-    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
-    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
-    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
-    parse_args->Add("-cfl_sound_speed",&use_sound_speed_based_cfl,"use sound speed based cfl condition");
-    parse_args->Add("-cfl_sound_speed_multiple",&multiplication_factor_for_sound_speed_based_dt,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
-    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-
-    timesplit=timesplit && !exact;
-    //grid
-    if(test_number==12) fluids_parameters.grid->Initialize(TV_INT(resolution),RANGE<TV>(TV(-1),TV(2)));
-    else fluids_parameters.grid->Initialize(TV_INT(resolution),RANGE<TV>(TV(0),TV(1)));
-    *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
-    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
-    if(test_number==1 || test_number==2) fluids_parameters.domain_walls[0][1]=true;
-    if(test_number==10){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
-    //time
-    initial_time=(T)0.;last_frame=1500;frame_rate=(T)100.;
-    if(test_number==9) last_frame=4000;
-    if(test_number==5){frame_rate=(T)5/(T)2.5e-6;last_frame=500;}
-    else if(test_number==8){frame_rate=(T)10/(T)1.75e-4;last_frame=1000;}
-    else if(test_number==10){frame_rate=(T)10/(T).038;last_frame=500;}
-    fluids_parameters.cfl=cfl_number;
-    fluids_parameters.compressible_use_sound_speed_for_cfl=use_sound_speed_based_cfl;
-    if(multiplication_factor_for_sound_speed_based_dt>0){
-        fluids_parameters.compressible_use_sound_speed_based_dt_multiple_for_cfl=true;
-        fluids_parameters.compressible_multiplication_factor_for_sound_speed_based_dt=multiplication_factor_for_sound_speed_based_dt;}
-    //custom stuff . . .
-    fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
-    if(eno_scheme==1) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false);
-    else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,false);
-    else if(eno_scheme==3) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,true,true);
-    else if(eno_scheme==4) fluids_parameters.compressible_conservation_method = new HYBRID_SL_ENO_CONSERVATION<TV,TV::m+2>(flux_face,new CONSERVATION_ENO_LLF<TV,TV::m+2>(true,false,false));
-    fluids_parameters.compressible_spatial_order=eno_order;
-    fluids_parameters.compressible_conservation_method->Save_Fluxes();
-    fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
-    fluids_parameters.compressible_rungekutta_order=rk_order;
-    //fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_RF<T,TV::m+2>;
-    fluids_parameters.compressible_timesplit=timesplit;
-    fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
-
-    if(timesplit) output_directory=LOG::sprintf("Sod_ST/Test_%d_%d_semiimplicit_%d_%1.2f",test_number,(fluids_parameters.grid->counts.x),eno_scheme,cfl_number);
-    else output_directory=LOG::sprintf("Sod_ST/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
-    if(eno_scheme==2) output_directory+="_density_weighted";
-    else if(eno_scheme==3) output_directory+="_velocity_weighted";
-
-    middle_state_start_point=0.5;right_state_start_point=0;
-    if(test_number==1){
-        state_left=TV_DIMENSION((T)1,(T)0,(T)1);
-        state_right=TV_DIMENSION((T).125,(T)0,(T).1);}
-    else if(test_number==2){
-        state_left=TV_DIMENSION((T).125,(T)0,(T).1);
-        state_right=TV_DIMENSION((T)1,(T)0,(T)1);}
-    else if(test_number==3){
-        state_left=TV_DIMENSION((T)1,(T)-3,(T)1);
-        state_right=TV_DIMENSION((T)1,(T)3,(T)1);}
-    else if(test_number==4){
-        state_left=TV_DIMENSION((T).445,(T).698,(T)3.528);
-        state_right=TV_DIMENSION((T).5,(T)0,(T).571);}
-    else if(test_number==5){
-        state_left=TV_DIMENSION((T)1,(T)0,(T)1e10);
-        state_right=TV_DIMENSION((T).125,(T)0,(T).1);}
-    else if(test_number==6){
-        state_left=TV_DIMENSION((T)1,(T)-2,(T).4);
-        state_right=TV_DIMENSION((T)1,(T)2,(T).4);}
-    else if(test_number==7){
-        state_left=TV_DIMENSION((T)3.857,(T).92,(T)10.333);
-        state_right=TV_DIMENSION((T)1,(T)3.55,(T)1);}
-    else if(test_number==8){
-        state_left=TV_DIMENSION((T)10,(T)2000,(T)500);
-        state_right=TV_DIMENSION((T)20,(T)0,(T)500);}
-    else if(test_number==9){
-        state_left=TV_DIMENSION((T).125,(T)0,(T).1);
-        state_middle=TV_DIMENSION((T)1,(T)0,(T)1);
-        state_right=TV_DIMENSION((T).125,(T)0,(T).1);
-        middle_state_start_point=(T).4;right_state_start_point=(T).6;}
-    else if(test_number==10){
-        state_left=TV_DIMENSION((T)1,(T)0,(T)1e3);
-        state_middle=TV_DIMENSION((T)1,(T)0,(T)1e-2);
-        state_right=TV_DIMENSION((T)1,(T)0,(T)1e2);
-        middle_state_start_point=(T).1;right_state_start_point=(T).9;}
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

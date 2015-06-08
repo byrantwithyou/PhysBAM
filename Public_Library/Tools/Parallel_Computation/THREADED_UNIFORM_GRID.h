@@ -29,7 +29,7 @@ class THREADED_UNIFORM_GRID:public MPI_GRID<TV>
 public:
     typedef GRID<TV> GRID_T;
 
-    typedef MPI_GRID<TV > BASE;
+    typedef MPI_GRID<TV> BASE;
     using BASE::number_of_processes;using BASE::global_grid;using BASE::local_grid;using BASE::coordinates;using BASE::boundaries;using BASE::periodic;
     using BASE::side_neighbor_ranks;using BASE::side_neighbor_directions;using BASE::all_neighbor_ranks;using BASE::all_neighbor_directions;using BASE::rank;
     using BASE::local_to_global_offset;using BASE::all_coordinates;using BASE::local_cell_index_to_global_column_index_map;using BASE::process_ranks;using BASE::process_grid;

@@ -70,9 +70,36 @@ public:
     bool push_out;
     FRACTURE_OBJECT<TV,3>* fracture_object;
 
-    STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(stream_type,data_directory,solid_body_collection),fracture_object(0)
+    STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),fracture_object(0)
     {
+        parse_args.Parse();
+
+        tests.data_directory=data_directory;
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+        solids_parameters.cfl=1;
+        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+        solids_parameters.triangle_collision_parameters.allow_intersections=true;
+        solids_parameters.triangle_collision_parameters.allow_intersections_tolerance=(T)1e-7;
+        solids_parameters.triangle_collision_parameters.collisions_nonrigid_collision_attempts=3;
+        solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
+        solids_parameters.use_post_cg_constraints=false;
+        solids_parameters.triangle_collision_parameters.output_interaction_pairs=true;
+        solids_parameters.rigid_body_collision_parameters.use_push_out=true;
+        solids_parameters.use_rigid_deformable_contact=true;
+        solids_parameters.rigid_body_collision_parameters.collision_bounding_box_thickness=(T)1e-3;
+        solids_parameters.triangle_collision_parameters.collisions_output_number_checked=false;
+        solids_parameters.verbose_dt=true;
+        solids_parameters.fracture=true;
+        solids_parameters.write_static_variables_every_frame=true;
+        solids_parameters.triangle_collision_parameters.collisions_final_repulsion_youngs_modulus=(T)20;
+        solids_parameters.triangle_collision_parameters.repulsions_youngs_modulus=(T)20;
+
+        switch(test_number){
+            case 1: last_frame=240;break;
+            case 2: last_frame=240;break;
+            default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
     }
 
     ~STANDARD_TESTS()
@@ -105,46 +132,7 @@ public:
     void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE {}
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return true;}
 
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options() PHYSBAM_OVERRIDE
-{
-    BASE::Parse_Options();
-    tests.data_directory=data_directory;
-    output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-    solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-    solids_parameters.cfl=1;
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    solids_parameters.triangle_collision_parameters.allow_intersections=true;
-    solids_parameters.triangle_collision_parameters.allow_intersections_tolerance=(T)1e-7;
-    solids_parameters.triangle_collision_parameters.collisions_nonrigid_collision_attempts=3;
-    solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
-    solids_parameters.use_post_cg_constraints=false;
-    solids_parameters.triangle_collision_parameters.output_interaction_pairs=true;
-    solids_parameters.rigid_body_collision_parameters.use_push_out=true;
-    solids_parameters.use_rigid_deformable_contact=true;
-    solids_parameters.rigid_body_collision_parameters.collision_bounding_box_thickness=(T)1e-3;
-    solids_parameters.triangle_collision_parameters.collisions_output_number_checked=false;
-    solids_parameters.verbose_dt=true;
-    solids_parameters.fracture=true;
-    solids_parameters.write_static_variables_every_frame=true;
-    solids_parameters.triangle_collision_parameters.collisions_final_repulsion_youngs_modulus=(T)20;
-    solids_parameters.triangle_collision_parameters.repulsions_youngs_modulus=(T)20;
-
-    switch(test_number){
-        case 1: last_frame=240;break;
-        case 2: last_frame=240;break;
-        default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

@@ -26,18 +26,18 @@ int main(int argc,char* argv[])
     STREAM_TYPE stream_type((RW()));
     typedef VECTOR<T,2> TV;
 
-    STANDARD_TESTS<T> example(stream_type);
-    //MATTRESS_EXAMPLE<T> example(stream_type);
-    //FILAMENT_EXAMPLE<T> example(stream_type);
-    //EMBEDDED_CIRCLE_EXAMPLE<T> example(stream_type);
-    //MELTING_CIRCLE<T> example(stream_type);
-    //SOFT_CONSTRAINTS_TEST<T> example(stream_type);
-    //RIGID_BODIES_TEST<T> example(stream_type);
-    //RIGID_PARTICLE_EXAMPLE<T> example(stream_type)_rigid;
-    //CUTTING_EXAMPLE<T> example(stream_type)_cutting;
-    example.want_mpi_world=true;
     PARSE_ARGS parse_args(argc,argv);
-    example.Parse(parse_args);
+    STANDARD_TESTS<T> example(stream_type,parse_args);
+    //MATTRESS_EXAMPLE<T> example(stream_type,parse_args);
+    //FILAMENT_EXAMPLE<T> example(stream_type,parse_args);
+    //EMBEDDED_CIRCLE_EXAMPLE<T> example(stream_type,parse_args);
+    //MELTING_CIRCLE<T> example(stream_type,parse_args);
+    //SOFT_CONSTRAINTS_TEST<T> example(stream_type,parse_args);
+    //RIGID_BODIES_TEST<T> example(stream_type,parse_args);
+    //RIGID_PARTICLE_EXAMPLE<T> example(stream_type,parse_args);
+    //CUTTING_EXAMPLE<T> example(stream_type,parse_args);
+    example.mpi_world=new MPI_WORLD(parse_args);
+    example.After_Construction();
 
     if(example.mpi_world->initialized) example.solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
     example.Adjust_Output_Directory_For_MPI(example.solid_body_collection.deformable_body_collection.mpi_solids);

@@ -25,7 +25,7 @@ class FRAGMENT_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
-    using BASE::stream_type;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
+    using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
 
     GRID<TV> hair_layout_grid;
@@ -34,9 +34,10 @@ public:
     bool use_single_mesh;
 
 
-    FRAGMENT_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type),unite_fragments(false),unite_some_fragments(false),use_single_mesh(false)
+    FRAGMENT_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :BASE(stream_type_input,parse_args),unite_fragments(false),unite_some_fragments(false),use_single_mesh(false)
     {
+        parse_args.Parse();
     }
 
     // Unused callbacks
@@ -92,21 +93,7 @@ void Get_Initial_Data()
     particles.Compute_Auxiliary_Attributes(soft_bindings);
     soft_bindings.Set_Mass_From_Effective_Mass();
 }
-//#####################################################################
-// Function Register_Options
-//#####################################################################
-void Register_Options()
-{
-    BASE::Register_Options();
-}
-//#####################################################################
-// Function Parse_Options
-//#####################################################################
-void Parse_Options()
-{
-    BASE::Parse_Options();
-}
-void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
+void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
