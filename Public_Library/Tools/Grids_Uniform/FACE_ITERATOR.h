@@ -22,10 +22,10 @@ public:
     using GRID_ITERATOR_BASE<TV>::Reset;using GRID_ITERATOR_BASE<TV>::current_region;using GRID_ITERATOR_BASE<TV>::Add_Region;
     using GRID_ITERATOR_BASE<TV>::Reset_Regions;
 
+    int axis;
 protected:
     T_REGION region_type;
     int side;
-    int axis;
     bool single_axis;
     int number_of_ghost_cells;
     T face_size;
