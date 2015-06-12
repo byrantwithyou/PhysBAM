@@ -587,8 +587,12 @@ public:
     const T* end() const // for stl
     {return Derived().end();}
 
-    ID Binary_Search(const T& value) const// lower_bound binary search
+    ID Binary_Search(const T& value) const // lower_bound binary search
     {return ID(std::lower_bound(begin(),end(),value)-begin());}
+
+    template<class T_COMPARE>
+    ID Binary_Search(const T& value,const T_COMPARE comparison) const // lower_bound binary search
+    {return ID(std::lower_bound(begin(),end(),value,comparison)-begin());}
 
     void Write_Raw(std::ostream& output) const
     {const T_ARRAY& a=Derived();ID m=a.Size();for(ID i(0);i<m;i++){output<<a(i);if(i<m-1) output<<" ";}}
