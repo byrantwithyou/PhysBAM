@@ -8,6 +8,9 @@
 #include <Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_COLOR.h>
 #include <Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h>
 using namespace PhysBAM;
+//#####################################################################
+// Function Initialize
+//#####################################################################
 template<class TV,int static_degree> template<int d0,int d1> void SYSTEM_VOLUME_BLOCK_COLOR<TV,static_degree>::
 Initialize(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,
     const BASIS_STENCIL_UNIFORM<TV,d1>& s1,const ARRAY<T>& scale_input)
@@ -28,11 +31,17 @@ Initialize(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCI
                 op.polynomial=diced0.polynomial*diced1.polynomial;
                 overlap_polynomials.Append(op);}}
 }
+//#####################################################################
+// Function Add_Open_Entries
+//#####################################################################
 template<class TV,int static_degree> void SYSTEM_VOLUME_BLOCK_COLOR<TV,static_degree>::
 Add_Open_Entries(int flat_index,int color)
 {
     for(int j=0;j<open_entries.m;j++) Add_Open_Entry(flat_index,color,open_entries(j));
 }
+//#####################################################################
+// Function Add_Open_Subcell_Entries
+//#####################################################################
 template<class TV,int static_degree> void SYSTEM_VOLUME_BLOCK_COLOR<TV,static_degree>::
 Add_Open_Subcell_Entries(int flat_index,int subcell,int color)
 {
