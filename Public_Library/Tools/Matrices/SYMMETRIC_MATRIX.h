@@ -260,5 +260,10 @@ Outer_Product_Helper(const TV& u)
 template<class T,int d> inline std::ostream&
 operator<<(std::ostream& o,const SYMMETRIC_MATRIX<T,d>& A)
 {o<<"[";for(int i=0;i<d;i++){for(int j=0;j<d;j++){o<<A(i,j);if(j<d-1) o<<" ";}if(i<d-1) o<<"; ";}o<<"]";return o;}
+
+template<class T,int d> struct SUM<SYMMETRIC_MATRIX<T,d>,SYMMETRIC_MATRIX<T,d> > {typedef SYMMETRIC_MATRIX<T,d> TYPE;};
+template<class T,int d> struct DIFFERENCE<SYMMETRIC_MATRIX<T,d>,SYMMETRIC_MATRIX<T,d> > {typedef SYMMETRIC_MATRIX<T,d> TYPE;};
+template<class T,int d> struct NEGATION<SYMMETRIC_MATRIX<T,d> > {typedef SYMMETRIC_MATRIX<T,d> TYPE;};
+template<class T,int d> struct QUOTIENT<SYMMETRIC_MATRIX<T,d>,T> {typedef SYMMETRIC_MATRIX<T,d> TYPE;};
 }
 #endif
