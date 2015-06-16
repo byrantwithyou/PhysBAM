@@ -193,6 +193,12 @@ Test_2()
     Test_Transposed<1,2>(Fill_it<m-1,n>());
     Test_Transposed<2,1>(Fill_it<m-1,n>());
 
+    Test_Twice_Symmetric_Part<m-1,m%3>(Fill_st<m-1,m,m>());
+    Test_Twice_Symmetric_Part<m-1,m%3>(Fill_vt<m-1,m,m>());
+
+    Test_Twice_Symmetric_Part<m-1,(m+1)%3>(Fill_st<m-1,m,m>());
+    Test_Twice_Symmetric_Part<m-1,(m+1)%3>(Fill_vt<m-1,m,m>());
+
     Test_Twice_Symmetric_Part<0,1>(Fill_gt<m,m,n>());
     Test_Twice_Symmetric_Part<1,0>(Fill_gt<m,m,n>());
     Test_Twice_Symmetric_Part<0,2>(Fill_gt<m,n,m>());
@@ -206,19 +212,6 @@ Test_2()
     Test_Twice_Symmetric_Part<2,0>(Fill_zt<m,n,m>());
     Test_Twice_Symmetric_Part<1,2>(Fill_zt<m,n,n>());
     Test_Twice_Symmetric_Part<2,1>(Fill_zt<m,n,n>());
-
-    Test_Twice_Symmetric_Part<0,1>(Fill_st<m-1,n,n>());
-    Test_Twice_Symmetric_Part<1,0>(Fill_st<m-1,n,n>());
-    Test_Twice_Symmetric_Part<0,2>(Fill_st<m-1,n,n>());
-    Test_Twice_Symmetric_Part<2,0>(Fill_st<m-1,n,n>());
-    Test_Twice_Symmetric_Part<1,2>(Fill_st<m-1,n,n>());
-    Test_Twice_Symmetric_Part<2,1>(Fill_st<m-1,n,n>());
-    Test_Twice_Symmetric_Part<0,1>(Fill_vt<m-1,n,n>());
-    Test_Twice_Symmetric_Part<1,0>(Fill_vt<m-1,n,n>());
-    Test_Twice_Symmetric_Part<0,2>(Fill_vt<m-1,n,n>());
-    Test_Twice_Symmetric_Part<2,0>(Fill_vt<m-1,n,n>());
-    Test_Twice_Symmetric_Part<1,2>(Fill_vt<m-1,n,n>());
-    Test_Twice_Symmetric_Part<2,1>(Fill_vt<m-1,n,n>());
 
     Test_Twice_Symmetric_Part<0,1>(Fill_st<2,m,n>());
     Test_Twice_Symmetric_Part<1,0>(Fill_st<2,m,n>());
@@ -581,7 +574,7 @@ Test_Twice_Symmetric_Part(const T_TENSOR& m)
     gm+=m;
     auto u=Twice_Symmetric_Part<r,s>(m);
     auto gu=Twice_Symmetric_Part<r,s>(gm);
-    TENSOR<T,decltype(gu)::m,decltype(gu)::n,decltype(gu)::p> m0,m1;
+    SYMMETRIC_TENSOR<T,3-r-s,decltype(gu)::um,decltype(gu)::un> m0,m1;
     m0+=u;
     m1+=gu;
     if(!Assert_Equal_Tensor(m0,m1,"Twice_Symmetric_Part",1e-10)) LOG::cout<<"TYPE: "<<s<<" "<<typeid(m).name()<<std::endl;

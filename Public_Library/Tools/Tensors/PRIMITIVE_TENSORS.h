@@ -378,18 +378,78 @@ Transposed(const PERMUTATION_TENSOR<T>& t)
 //##################################################################### 
 
 template<int r,int s,class TEN>
-typename ENABLE_IF<IS_SYM_TENSOR<3-r-s,TEN()>::value,decltype(TEN()*2)>::TYPE
+typename ENABLE_IF<IS_SYM_TENSOR<3-r-s,TEN>::value,decltype(TEN()*2)>::TYPE
 Twice_Symmetric_Part(const TEN& M)
 {
     return M*2;
 }
 
-template<int r,int s,class TEN>
-typename DISABLE_IF<IS_SYM_TENSOR<3-r-s,TEN()>::value,decltype(TEN()+Transposed<r,s>(TEN()))>::TYPE
-Twice_Symmetric_Part(const TEN& M)
+// template<int r,int s,class TEN>
+// typename DISABLE_IF<IS_SYM_TENSOR<3-r-s,TEN()>::value,decltype(TEN()+Transposed<r,s>(TEN()))>::TYPE
+// Twice_Symmetric_Part(const TEN& M)
+// {
+//     return M+Transposed<r,s>(M);
+// }
+
+template<int r,int s,class T,int m,int n>
+typename ENABLE_IF<r+s==1,SYMMETRIC_TENSOR<T,3-r-s,m,n> >::TYPE
+Twice_Symmetric_Part(const TENSOR<T,n,n,m>& M)
 {
-    return M+Transposed<r,s>(M);
+    SYMMETRIC_TENSOR<T,3-r-s,m,n> sm;
+    for(int k=0;k<m;k++)
+        for(int i=0;i<n;i++)
+            for(int j=i;j<n;j++)
+                sm.x(k)(i,j)=M.x(i)(j,k)+M.x(j)(i,k);
+    return sm;
 }
+
+template<int r,int s,class T,int m,int n>
+typename ENABLE_IF<r+s==2,SYMMETRIC_TENSOR<T,3-r-s,m,n> >::TYPE
+Twice_Symmetric_Part(const TENSOR<T,n,m,n>& M)
+{
+    SYMMETRIC_TENSOR<T,3-r-s,m,n> sm;
+    for(int j=0;j<m;j++)
+        for(int i=0;i<n;i++)
+            for(int k=i;k<n;k++)
+                sm.x(j)(i,k)=M.x(i)(j,k)+M.x(k)(j,i);
+    return sm;
+}
+
+template<int r,int s,class T,int m,int n>
+typename ENABLE_IF<r+s==3,SYMMETRIC_TENSOR<T,3-r-s,m,n> >::TYPE
+Twice_Symmetric_Part(const TENSOR<T,m,n,n>& M)
+{
+    SYMMETRIC_TENSOR<T,3-r-s,m,n> sm;
+    for(int i=0;i<m;i++)
+        sm.x(i)=M.x(i).Twice_Symmetric_Part();
+    return sm;
+}
+
+template<int r,int s,int u,class T,int m>
+typename DISABLE_IF<3-r-s==u,SYMMETRIC_TENSOR<T,3-r-s,m,m> >::TYPE
+Twice_Symmetric_Part(const SYMMETRIC_TENSOR<T,u,m,m>& M)
+{
+    SYMMETRIC_TENSOR<T,3-r-s,m,m> sm;
+    for(int i=0;i<m;i++)
+        for(int j=0;j<m;j++)
+            for(int k=j;k<m;k++)
+                sm.x(i)(j,k)=M.x(j)(i,k)+M.x(k)(i,j);
+    return sm;
+}
+
+template<int r,int s,int u,class T,int m>
+typename DISABLE_IF<3-r-s==u,SYMMETRIC_TENSOR<T,3-r-s,m,m> >::TYPE
+Twice_Symmetric_Part(const VEC_ID_SYM_TENSOR<T,u,m>& M)
+{
+    return VEC_ID_SYM_TENSOR<T,3-r-s,m>(M.v)+VEC_ID_TENSOR<T,3-r-s,m,m>(M.v*2);
+}
+
+// template<int r,int s,class T,int m,int n,int p>
+// typename ENABLE_IF<r+s==1?m==n:r+s==2?m==p:n==p,ZERO_TENSOR<T,m,n,p> >::TYPE
+// Twice_Symmetric_Part(const ZERO_TENSOR<T,m,n,p>& M)
+// {
+//     return M;
+// }
 
 template<int r,int s,class T,int m,int n> VEC_ID_TENSOR<T,3-r-s,m,n>
 Twice_Symmetric_Part(const VEC_ID_TENSOR<T,3-r-s,m,n>& M)
