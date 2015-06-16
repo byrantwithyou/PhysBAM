@@ -57,6 +57,7 @@ public:
     bool use_pls;
     bool dump_largest_eigenvector;
     bool save_pressure;
+    bool test_system;
     bool use_polymer_stress;
 
     int num_multigrid_levels;

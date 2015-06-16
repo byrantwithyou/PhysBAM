@@ -387,6 +387,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     if(example.use_multigrid) solver=&gr;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
+    if(example.test_system) iss.Test_System(sol);
     if(example.dump_matrix){
         KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
         OCTAVE_OUTPUT<T>(LOG::sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,*vectors(0),*vectors(1));

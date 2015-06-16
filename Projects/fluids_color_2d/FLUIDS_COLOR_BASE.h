@@ -60,7 +60,7 @@ public:
     using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
     using BASE::particle_levelset_evolution_multiple;using BASE::face_color;using BASE::substeps_delay_frame;
     using BASE::dump_largest_eigenvector;using BASE::save_pressure;using BASE::use_polymer_stress;using BASE::pressure;
-    using BASE::polymer_stress;
+    using BASE::polymer_stress;using BASE::test_system;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -138,6 +138,7 @@ public:
         parse_args.Add("-dump_eigen",&dump_largest_eigenvector,"Dump largest few eigenvectors");
         parse_args.Add("-use_mg",&use_multigrid,"Use multigrid preconditioning");
         parse_args.Add("-mg_levels",&num_multigrid_levels,"levels","Number of multigrid levels");
+        parse_args.Add("-test_system",&test_system,"Run basic Krylov system tests");
         parse_args.Parse(true);
 
 #ifdef USE_OPENMP
