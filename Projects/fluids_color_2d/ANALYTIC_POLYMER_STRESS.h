@@ -167,7 +167,7 @@ struct ANALYTIC_POLYMER_STRESS_QUADRATIC:public ANALYTIC_POLYMER_STRESS<TV>
         for(int i=0;i<3;i++)
             for(int j=0;j<3;j++)
                 for(int k=0;k<3;k++){
-                    for(int dim=0;dim<3;dim++){
+                    for(int dim=0;dim<TV::m;dim++){
                         T ij=(dim==0)?i:j;
                         if(ij>0){
                             ten.x(dim)(0,0)+=a(i)(j)(k)*ij*pow(X.x,i-1+dim)*pow(X.y,j-dim)*pow(t,k);
