@@ -23,8 +23,7 @@
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include "MG_PRECONDITIONED_CONJUGATE_GRADIENT.h"
 #include "MULTIGRID_POISSON_SOLVER.h"
-#include <boost/lexical_cast.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 namespace PhysBAM{
 
 template<class T,int d>
@@ -42,7 +41,7 @@ public:
     ARRAY<T,TV_INT> x;
     ARRAY<T,TV_INT> b;
     ARRAY<T,TV_INT> tmp;
-    boost::scoped_ptr<MULTIGRID_POISSON_SOLVER<T,d> > multigrid_poisson_solver;
+    std::unique_ptr<MULTIGRID_POISSON_SOLVER<T,d> > multigrid_poisson_solver;
 
     MULTIGRID_POISSON_TESTS(int test_number_input,int number_of_threads,int resolution=256)
         :test_number(test_number_input)
@@ -206,7 +205,7 @@ public:
     {
         LOG::SCOPE scope("Write frame","Write frame %d",frame);
         MULTIGRID_POISSON<T,d>& multigrid_poisson=multigrid_poisson_solver->Discretization();
-        std::string f=boost::lexical_cast<std::string>(frame);
+        std::string f=LOG::sprintf("%i",frame);
 
         FILE_UTILITIES::Write_To_File<float>(output_dir+"/common/grid",multigrid_poisson.grid);
         ARRAY<T,TV_INT> x_as_density(x);
@@ -233,8 +232,8 @@ public:
     {
         LOG::SCOPE scope("Write substep");
         MULTIGRID_POISSON<T,d>& multigrid_poisson=multigrid_poisson_solver->Discretization();
-        std::string f=boost::lexical_cast<std::string>(frame);
-        std::string s=boost::lexical_cast<std::string>(substep);
+        std::string f=LOG::sprintf("%i",frame);
+        std::string s=LOG::sprintf("%i",substep);
 
         FILE_UTILITIES::Create_Directory(output_dir+"/Frame_"+f+"_x");        
         FILE_UTILITIES::Create_Directory(output_dir+"/Frame_"+f+"_residual");
