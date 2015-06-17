@@ -13,7 +13,7 @@
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
-#include <boost/function.hpp>
+#include <functional>
 namespace PhysBAM{
 
 // TODO: Limit to near interface
@@ -39,15 +39,15 @@ public:
     EXTRAPOLATION_HIGHER_ORDER(const GRID<TV>& grid,const LEVELSET<TV>& phi,int iterations,int order,int fill_width);
     ~EXTRAPOLATION_HIGHER_ORDER();
 
-    void Extrapolate_Node(boost::function<bool(const TV_INT& index)> inside_mask,ARRAYS_ND_BASE<T2,TV_INT>& x);
-    void Extrapolate_Cell(boost::function<bool(const TV_INT& index)> inside_mask,ARRAYS_ND_BASE<T2,TV_INT>& x);
-    void Extrapolate_Face(boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,ARRAY<T2,FACE_INDEX<TV::m> >& x);
+    void Extrapolate_Node(std::function<bool(const TV_INT& index)> inside_mask,ARRAYS_ND_BASE<T2,TV_INT>& x);
+    void Extrapolate_Cell(std::function<bool(const TV_INT& index)> inside_mask,ARRAYS_ND_BASE<T2,TV_INT>& x);
+    void Extrapolate_Face(std::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,ARRAY<T2,FACE_INDEX<TV::m> >& x);
     int Lookup_Index(TV_INT index) const;
     int Register_Index(TV_INT index,int only_neg=0);
     void Periodic_Index(TV_INT& index) const;
 protected:
     void Add_Neighbors(ARRAY<TV_INT>& next,const ARRAY<TV_INT>& neighbors,const TV_INT& index,int unregistered,int registered);
-    void Register_Nodes(boost::function<bool(const TV_INT& index)> inside_mask,ARRAY<VECTOR<STENCIL,TV::m> >& stencil);
+    void Register_Nodes(std::function<bool(const TV_INT& index)> inside_mask,ARRAY<VECTOR<STENCIL,TV::m> >& stencil);
     void Extrapolate_FE(const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,const ARRAY<T2>& x,ARRAY<T2>& y,const ARRAY<T2>* z,int o,T dt,T alpha);
     void Extrapolate_RK2(const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,ARRAY<T2>& x,const ARRAY<T2>* z,ARRAY<T2>& tmp,int o,T dt);
     void Fill_un(const TV& one_over_dx,const ARRAY<T2>& x,ARRAY<T2>& xn,int o,int mo);

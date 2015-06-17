@@ -3,12 +3,12 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
 #include <OpenGL/OpenGL/OPENGL_FREE_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_3D.h>
 #include <OpenGL/OpenGL/OPENGL_SHAPES.h>

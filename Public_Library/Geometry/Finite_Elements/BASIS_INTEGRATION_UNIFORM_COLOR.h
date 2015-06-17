@@ -66,12 +66,12 @@ public:
     void Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper,const ARRAY<T>& scale,Args&& ...args);
     template<int d>
     void Add_Surface_Block(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        bool use_discontinuous_velocity,boost::function<TV(const TV& X,int color0,int color1)> u_jump,
-        boost::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<ARRAY<T> >& f_surface,int axis,T scale);
+        bool use_discontinuous_velocity,std::function<TV(const TV& X,int color0,int color1)> u_jump,
+        std::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<ARRAY<T> >& f_surface,int axis,T scale);
     template<int d>
     void Add_Surface_Block_Scalar(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        bool use_discontinuous_scalar_field,boost::function<T(const TV& X,int color0,int color1)> u_jump,
-        boost::function<T(const TV& X,int color0,int color1)> j_surface,ARRAY<ARRAY<T> >& f_surface,T scale);
+        bool use_discontinuous_scalar_field,std::function<T(const TV& X,int color0,int color1)> u_jump,
+        std::function<T(const TV& X,int color0,int color1)> j_surface,ARRAY<ARRAY<T> >& f_surface,T scale);
 };
 }
 #endif

@@ -12,7 +12,7 @@
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 #include <Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
-#include <boost/function.hpp>
+#include <functional>
 
 namespace PhysBAM{
 
@@ -72,9 +72,9 @@ public:
 
 //#####################################################################
     void Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_scalar_field,
-        boost::function<T(const TV& X,int color0,int color1)> u_jump,
-        boost::function<T(const TV& X,int color0,int color1)> j_surface);
-    void Set_RHS(VECTOR_T& rhs,boost::function<T(const TV& X,int color)> body_force);
+        std::function<T(const TV& X,int color0,int color1)> u_jump,
+        std::function<T(const TV& X,int color0,int color1)> j_surface);
+    void Set_RHS(VECTOR_T& rhs,std::function<T(const TV& X,int color)> body_force);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;

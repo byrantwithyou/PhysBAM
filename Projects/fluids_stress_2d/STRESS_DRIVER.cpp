@@ -32,10 +32,10 @@
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
+#include <functional>
 #include "ADVECTION_UPWIND.h"
 #include "STRESS_DRIVER.h"
 #include "STRESS_EXAMPLE.h"
-#include <boost/function.hpp>
 using namespace PhysBAM;
 namespace{
     template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)

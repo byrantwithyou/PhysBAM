@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Log/LOG.h>
+#include <Tools/Read_Write/TYPED_STREAM.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Tools/Read_Write/TYPED_STREAM.h>
 #include "PBD_EXAMPLE.h"
 using namespace PhysBAM;
 //#####################################################################

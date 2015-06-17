@@ -9,7 +9,7 @@
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
-#include <boost/function.hpp>
+#include <functional>
 
 namespace PhysBAM{
 
@@ -232,9 +232,9 @@ struct ANALYTIC_VELOCITY_ELLIPSE_FLOW:public ANALYTIC_VELOCITY_F<TV>
     typedef typename TV::SCALAR T;
     T st,mu_j;
     bool sub_pj;
-    boost::function<T(T t)> a,da,dda;
+    std::function<T(T t)> a,da,dda;
 
-    ANALYTIC_VELOCITY_ELLIPSE_FLOW(T rho,T mu,bool use_advection,T st,T mu_j,bool sub_pj,boost::function<T(T t)> a,boost::function<T(T t)> da,boost::function<T(T t)> dda):
+    ANALYTIC_VELOCITY_ELLIPSE_FLOW(T rho,T mu,bool use_advection,T st,T mu_j,bool sub_pj,std::function<T(T t)> a,std::function<T(T t)> da,std::function<T(T t)> dda):
         ANALYTIC_VELOCITY_F<TV>(rho,mu,use_advection),st(st),mu_j(mu_j),sub_pj(sub_pj),a(a),da(da),dda(dda) {}
     virtual TV u(const TV& X,T t) const {return da(t)/a(t)*TV(X.x,-X.y);}
     virtual MATRIX<T,TV::m> du(const TV& X,T t) const {return da(t)/a(t)*MATRIX<T,TV::m>(1,0,0,-1);}

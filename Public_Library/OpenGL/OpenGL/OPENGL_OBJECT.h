@@ -21,7 +21,7 @@
 #include <OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h> // just so we get gl in the right order
 #include <OpenGL/OpenGL/OPENGL_SLICE.h>
-#include <boost/function.hpp>
+#include <functional>
 namespace PhysBAM{
 
 template<class T> class OPENGL_SELECTION;

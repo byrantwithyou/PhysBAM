@@ -6,14 +6,14 @@
 //##################################################################### 
 #ifndef __OPENGL_CALLBACK__
 #define __OPENGL_CALLBACK__
+#include <functional>
 #include <iostream>
 #include <string>
-#include <boost/function.hpp>
 namespace PhysBAM{
 
 struct OPENGL_CALLBACK
 {
-    boost::function<void()> func;
+    std::function<void()> func;
     const char* help;
 };
 }

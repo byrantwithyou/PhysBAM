@@ -84,8 +84,8 @@ template<class TV,class CELL_ELEMENTS> void Dump(const GRID<TV>& grid,const HASH
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
 Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_scalar_field,
-    boost::function<T(const TV& X,int color0,int color1)> u_jump,
-    boost::function<T(const TV& X,int color0,int color1)> j_surface)
+    std::function<T(const TV& X,int color0,int color1)> u_jump,
+    std::function<T(const TV& X,int color0,int color1)> j_surface)
 {
     // SET UP STENCILS
 
@@ -169,7 +169,7 @@ Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_scalar_field,
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
-Set_RHS(VECTOR_T& rhs,boost::function<T(const TV& X,int color)> body_force)
+Set_RHS(VECTOR_T& rhs,std::function<T(const TV& X,int color)> body_force)
 {
     ARRAY<ARRAY<T> > F_volume;
 

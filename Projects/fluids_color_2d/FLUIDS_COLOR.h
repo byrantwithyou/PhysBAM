@@ -272,7 +272,7 @@ public:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
                 {
                     T outer_radius=(T).9,ellipse_mean_radius=(T).5;
-                    boost::function<T(T t)> a,da,dda;
+                    std::function<T(T t)> a,da,dda;
                     if(mode==0){a=[](T t){return (T)1;};da=[](T t){return (T)0;};dda=[](T t){return (T)0;};}
                     else if(mode==1){a=[](T t){return (T)1.1;};da=[](T t){return (T)0;};dda=[](T t){return (T)0;};}
                     else if(mode==2){a=[](T t){return t+1;};da=[](T t){return (T)1;};dda=[](T t){return (T)0;};}

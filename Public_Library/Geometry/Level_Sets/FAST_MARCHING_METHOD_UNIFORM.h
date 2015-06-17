@@ -10,7 +10,7 @@
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
-#include <boost/function.hpp>
+#include <functional>
 namespace PhysBAM{
 
 template<class TV>
@@ -25,7 +25,7 @@ protected:
     int ghost_cells;
 public:
     THREAD_QUEUE* thread_queue;
-    boost::function<bool(const int axis,const TV_INT& current_index)> Neighbor_Visible;
+    std::function<bool(const int axis,const TV_INT& current_index)> Neighbor_Visible;
 
     FAST_MARCHING_METHOD_UNIFORM(const LEVELSET<TV>& levelset,const int ghost_cells,THREAD_QUEUE* thread_queue_input=0);
     ~FAST_MARCHING_METHOD_UNIFORM();

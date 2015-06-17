@@ -2,8 +2,8 @@
 // Copyright 2015
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include "STANDARD_TESTS_2D.h"
 #include "PBD_CONSTRAINTS.h"
+#include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
 //#####################################################################
 // Constructor

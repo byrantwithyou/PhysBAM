@@ -10,7 +10,7 @@
 #include <Tools/Advection/ADVECTION.h>
 #include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
 #include <Tools/Vectors/VECTOR.h>
-#include <boost/function.hpp>
+#include <functional>
 namespace PhysBAM{
 
 template<class TV> class LEVELSET;
@@ -27,10 +27,10 @@ public:
     const LEVELSET<TV>& levelset;
     const T_FACE_LOOKUP& face_velocities;
     T max_in,max_out,time,dt;
-    boost::function<T2(const TV& X,T time)> bc_Z;
+    std::function<T2(const TV& X,T time)> bc_Z;
 
     ADVECTION_UPWIND(const LEVELSET<TV>& levelset,const T_FACE_LOOKUP& face_velocities,T max_in,T max_out,
-        boost::function<T2(const TV& X,T time)> bc_Z,T time);
+        std::function<T2(const TV& X,T time)> bc_Z,T time);
     virtual ~ADVECTION_UPWIND();
 
     void Update_Advection_Equation_Cell_Lookup(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,

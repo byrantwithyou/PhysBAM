@@ -15,8 +15,8 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <functional>
 #include "PROJECT.h"
-#include <boost/function.hpp>
 
 using namespace PhysBAM;
 
@@ -46,8 +46,8 @@ int main(int argc,char* argv[])
 
     T unit_p=kg/(s*s)*pow(m,2-TV::m);
 
-    boost::function<T(TV X)> phi,p;
-    boost::function<TV(TV X)> u_star,u_projected;
+    std::function<T(TV X)> phi,p;
+    std::function<TV(TV X)> u_star,u_projected;
 
     RANGE<TV> domain=RANGE<TV>::Unit_Box();
 

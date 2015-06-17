@@ -8,7 +8,7 @@
 #define __ANALYTIC_LEVELSET_MOVING_ELLIPSOID__
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_IMPLICIT_SURFACE_LEVELSET.h>
-#include <boost/function.hpp>
+#include <functional>
 
 namespace PhysBAM{
 template<class TV>
@@ -16,8 +16,8 @@ struct ANALYTIC_LEVELSET_MOVING_ELLIPSOID:public ANALYTIC_IMPLICIT_SURFACE_LEVEL
 {
     typedef typename TV::SCALAR T;
     TV cen;
-    boost::function<TV(T t)> r;
-    ANALYTIC_LEVELSET_MOVING_ELLIPSOID(TV cc,boost::function<TV(T t)> r,int c_i,int c_o): ANALYTIC_IMPLICIT_SURFACE_LEVELSET<TV>(c_i,c_o),cen(cc),r(r) {}
+    std::function<TV(T t)> r;
+    ANALYTIC_LEVELSET_MOVING_ELLIPSOID(TV cc,std::function<TV(T t)> r,int c_i,int c_o): ANALYTIC_IMPLICIT_SURFACE_LEVELSET<TV>(c_i,c_o),cen(cc),r(r) {}
     virtual T f(const TV& X,T t) const {return ((X-cen)/r(t)).Magnitude_Squared()-1;}
     virtual TV df(const TV& X,T t) const {return (T)2*(X-cen)/sqr(r(t));}
     virtual MATRIX<T,TV::m> ddf(const TV& X,T t) const {return DIAGONAL_MATRIX<T,2>((T)2/sqr(r(t)));}

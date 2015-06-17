@@ -2,9 +2,9 @@
 // Copyright 2015.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
 #include <Tools/Auto_Diff/AUTO_DIFF_EXT.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
+#include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
 namespace PhysBAM{
 
 //#####################################################################

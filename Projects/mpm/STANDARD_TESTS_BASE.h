@@ -10,7 +10,7 @@
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Deformables/Standard_Tests/DEFORMABLES_STANDARD_TESTS.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
-#include <boost/function.hpp>
+#include <functional>
 
 namespace PhysBAM{
 
@@ -60,40 +60,40 @@ public:
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
 
-    void Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
-        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell);
+    void Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
+        std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell);
 
     template<class T_OBJECT> typename enable_if<!is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::type
-    Seed_Particles(const T_OBJECT& object,boost::function<TV(const TV&)> V,
-        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
+    Seed_Particles(const T_OBJECT& object,std::function<TV(const TV&)> V,
+        std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,particles_per_cell);}
 
-    void Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
-        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid);
+    void Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
+        std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid);
 
     template<class T_OBJECT> typename enable_if<!is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::type
-    Seed_Particles(const T_OBJECT& object,boost::function<TV(const TV&)> V,
-        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid)
+    Seed_Particles(const T_OBJECT& object,std::function<TV(const TV&)> V,
+        std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,seed_grid);}
 
-    void Seed_Particles_Helper(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
-        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell);
+    void Seed_Particles_Helper(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
+        std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell);
 
     template<class T_OBJECT> typename enable_if<!is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::type
-    Seed_Particles_Helper(const T_OBJECT& object,boost::function<TV(const TV&)> V,
-        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
+    Seed_Particles_Helper(const T_OBJECT& object,std::function<TV(const TV&)> V,
+        std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles_Helper(obj,V,dV,density,particles_per_cell);}
 
     template<class T_STRUCTURE>
-    T_STRUCTURE& Seed_Lagrangian_Particles(T_STRUCTURE& object,boost::function<TV(const TV&)> V,
-        boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass,bool destroy_after=true);
+    T_STRUCTURE& Seed_Lagrangian_Particles(T_STRUCTURE& object,std::function<TV(const TV&)> V,
+        std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass,bool destroy_after=true);
 
     void Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io);
     template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type
     Add_Penalty_Collision_Object(const OBJECT& object)
     {Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object));}
 
-    void Add_Particle(const TV& X,boost::function<TV(const TV&)> V,boost::function<MATRIX<T,TV::m>(const TV&)> dV,
+    void Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
         const T mass,const T volume);
     int Add_Gravity(TV g);
     int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0,bool no_mu=false);

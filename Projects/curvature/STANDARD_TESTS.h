@@ -15,6 +15,7 @@
 #include <Geometry/Implicit_Objects_Uniform/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES.h>
@@ -23,18 +24,17 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_PENALTY.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
-#include <Deformables/Forces/ELASTIC_ETHER_DRAG.h>
-#include <Deformables/Forces/RALEIGH_DAMPING_FORCE.h>
 #include <Deformables/Forces/B_SPLINE_PATCH_CURVATURE_FORCE.h>
+#include <Deformables/Forces/ELASTIC_ETHER_DRAG.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
-#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Deformables/Forces/RALEIGH_DAMPING_FORCE.h>
 #include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <string>
 #include <fstream>
+#include <string>
 #include "STANDARD_TESTS_BASE.h"
 namespace PhysBAM{
 

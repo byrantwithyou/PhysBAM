@@ -9,11 +9,11 @@
 
 #include <Tools/Data_Structures/FORCE_ELEMENTS.h>
 #include <Tools/Matrices/MATRIX.h>
-#include <Tools/Tensors/TENSOR.h>
 #include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Tools/Tensors/TENSOR.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
-#include <Deformables/Forces/LAZY_HESSIAN_FORCE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
+#include <Deformables/Forces/LAZY_HESSIAN_FORCE.h>
 namespace PhysBAM{
 
 template<class T,int gauss_order>

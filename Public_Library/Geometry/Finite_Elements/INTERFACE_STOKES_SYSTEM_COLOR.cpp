@@ -54,8 +54,8 @@ template<class TV> INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,boost::function<TV(const TV& X,int color0,int color1)> u_jump,
-    boost::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<T>* inertia,bool use_rhs,T dt)
+Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,std::function<TV(const TV& X,int color0,int color1)> u_jump,
+    std::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<T>* inertia,bool use_rhs,T dt)
 {
     // SET UP STENCILS
 
@@ -245,7 +245,7 @@ Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,boost::function<TV
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_RHS(VECTOR_T& rhs,boost::function<TV(const TV& X,int color)> body_force,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction)
+Set_RHS(VECTOR_T& rhs,std::function<TV(const TV& X,int color)> body_force,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction)
 {
     VECTOR<ARRAY<ARRAY<T> >,TV::m> F_volume;
 

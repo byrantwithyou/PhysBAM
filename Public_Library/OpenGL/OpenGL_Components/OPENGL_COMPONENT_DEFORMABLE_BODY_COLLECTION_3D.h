@@ -10,6 +10,7 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
+#include <OpenGL/OpenGL/OPENGL_B_SPLINE_PATCH.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
 #include <OpenGL/OpenGL/OPENGL_HEXAHEDRALIZED_VOLUME.h>
 #include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
@@ -21,7 +22,6 @@
 #include <OpenGL/OpenGL/OPENGL_TETRAHEDRALIZED_VOLUME.h>
 #include <OpenGL/OpenGL/OPENGL_TRIANGULATED_SURFACE.h>
 #include <OpenGL/OpenGL/OPENGL_VECTOR_FIELD_3D.h>
-#include <OpenGL/OpenGL/OPENGL_B_SPLINE_PATCH.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D.h>
 namespace PhysBAM{

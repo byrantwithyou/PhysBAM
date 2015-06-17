@@ -18,8 +18,8 @@
 #include <Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE.h>
-#include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
+#include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>

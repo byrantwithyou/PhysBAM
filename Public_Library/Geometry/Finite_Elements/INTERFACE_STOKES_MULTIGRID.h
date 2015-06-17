@@ -73,8 +73,8 @@ public:
 
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const PHYSBAM_OVERRIDE;
     void Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,
-        boost::function<TV(const TV& X,int color0,int color1)> u_jump,
-        boost::function<TV(const TV& X,int color0,int color1)> j_surface,
+        std::function<TV(const TV& X,int color0,int color1)> u_jump,
+        std::function<TV(const TV& X,int color0,int color1)> j_surface,
         ARRAY<T>* inertia,bool use_rhs,T dt) PHYSBAM_OVERRIDE;
 //#####################################################################
 };

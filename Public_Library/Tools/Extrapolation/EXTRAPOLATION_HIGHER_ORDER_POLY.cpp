@@ -26,7 +26,7 @@ template<class TV,class T2> EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T2>::
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T2>::
-Extrapolate_Node(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int order,int fill_width,int order_reduction_penalty)
+Extrapolate_Node(const GRID<TV>& grid,std::function<bool(const TV_INT& index)> inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int order,int fill_width,int order_reduction_penalty)
 {
     PHYSBAM_ASSERT(!grid.Is_MAC_Grid());
     PHYSBAM_ASSERT(fill_width<=ghost);
@@ -156,7 +156,7 @@ Extrapolate_Node(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)>
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T2>::
-Extrapolate_Cell(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)> inside_mask,
+Extrapolate_Cell(const GRID<TV>& grid,std::function<bool(const TV_INT& index)> inside_mask,
     int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int order,int fill_width,int order_reduction_penalty)
 {
     GRID<TV> node_grid(grid.Get_Regular_Grid_At_MAC_Positions());
@@ -166,7 +166,7 @@ Extrapolate_Cell(const GRID<TV>& grid,boost::function<bool(const TV_INT& index)>
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T2>::
-Extrapolate_Face(const GRID<TV>& grid,boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,
+Extrapolate_Face(const GRID<TV>& grid,std::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,
     int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& u,int order,int fill_width,int order_reduction_penalty)
 {
     for(int i=0;i<TV::m;i++){

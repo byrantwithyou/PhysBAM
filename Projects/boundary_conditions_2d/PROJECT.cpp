@@ -36,8 +36,8 @@ TV Centroid(const ARRAY<VECTOR<TV,TV::m> >& ar,T& A,TV& N)
 
 // phi at nodes
 template<class T,class TV,class TV_INT>
-void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::function<TV(TV X)> u_star,
-    boost::function<TV(TV X)> u_projected,boost::function<T(TV X)> p,T density,T theta_threshold,T cg_tolerance,
+void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,std::function<TV(TV X)> u_star,
+    std::function<TV(TV X)> u_projected,std::function<T(TV X)> p,T density,T theta_threshold,T cg_tolerance,
     bool use_p_null_mode,bool use_bc,bool print_matrix)
 {
     ARRAY<TV> u_loc,p_loc;
@@ -169,14 +169,14 @@ void Project(const GRID<TV>& grid,int ghost,const ARRAY<T,TV_INT>& phi,boost::fu
     Flush_Frame(u_error,"errors");
 }
 template void Project<float,VECTOR<float,2>,VECTOR<int,2> >(GRID<VECTOR<float,2> > const&,int,ARRAY<float,VECTOR<int,2> > const&,
-    boost::function<VECTOR<float,2> (VECTOR<float,2>)>,boost::function<VECTOR<float,2> (VECTOR<float,2>)>,
-    boost::function<float (VECTOR<float,2>)>,float,float,float,bool,bool,bool);
+    std::function<VECTOR<float,2> (VECTOR<float,2>)>,std::function<VECTOR<float,2> (VECTOR<float,2>)>,
+    std::function<float (VECTOR<float,2>)>,float,float,float,bool,bool,bool);
 template void Project<float,VECTOR<float,3>,VECTOR<int,3> >(GRID<VECTOR<float,3> > const&,int,ARRAY<float,VECTOR<int,3> > const&,
-    boost::function<VECTOR<float,3> (VECTOR<float,3>)>,boost::function<VECTOR<float,3> (VECTOR<float,3>)>,
-    boost::function<float (VECTOR<float,3>)>,float,float,float,bool,bool,bool);
+    std::function<VECTOR<float,3> (VECTOR<float,3>)>,std::function<VECTOR<float,3> (VECTOR<float,3>)>,
+    std::function<float (VECTOR<float,3>)>,float,float,float,bool,bool,bool);
 template void Project<double,VECTOR<double,2>,VECTOR<int,2> >(GRID<VECTOR<double,2> > const&,int,ARRAY<double,VECTOR<int,2> > const&,
-    boost::function<VECTOR<double,2> (VECTOR<double,2>)>,boost::function<VECTOR<double,2> (VECTOR<double,2>)>,
-    boost::function<double (VECTOR<double,2>)>,double,double,double,bool,bool,bool);
+    std::function<VECTOR<double,2> (VECTOR<double,2>)>,std::function<VECTOR<double,2> (VECTOR<double,2>)>,
+    std::function<double (VECTOR<double,2>)>,double,double,double,bool,bool,bool);
 template void Project<double,VECTOR<double,3>,VECTOR<int,3> >(GRID<VECTOR<double,3> > const&,int,ARRAY<double,VECTOR<int,3> > const&,
-    boost::function<VECTOR<double,3> (VECTOR<double,3>)>,boost::function<VECTOR<double,3> (VECTOR<double,3>)>,
-    boost::function<double (VECTOR<double,3>)>,double,double,double,bool,bool,bool);
+    std::function<VECTOR<double,3> (VECTOR<double,3>)>,std::function<VECTOR<double,3> (VECTOR<double,3>)>,
+    std::function<double (VECTOR<double,3>)>,double,double,double,bool,bool,bool);

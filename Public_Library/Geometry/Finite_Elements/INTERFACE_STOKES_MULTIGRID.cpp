@@ -496,8 +496,8 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,boost::function<TV(const TV& X,int color0,int color1)> u_jump,
-    boost::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<T>* inertia,bool use_rhs,T dt)
+Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,std::function<TV(const TV& X,int color0,int color1)> u_jump,
+    std::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<T>* inertia,bool use_rhs,T dt)
 {
     INTERFACE_STOKES_SYSTEM_COLOR<TV>::Set_Matrix(mu,use_discontinuous_velocity,u_jump,j_surface,inertia,use_rhs,dt);
     for(int i=0;i<levels.m;i++) Construct_Level(i,mu,inertia,dt);

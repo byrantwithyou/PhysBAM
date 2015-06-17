@@ -27,7 +27,6 @@
 #include <Hybrid_Methods/System/FLUID_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
-#include <boost/function.hpp>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif

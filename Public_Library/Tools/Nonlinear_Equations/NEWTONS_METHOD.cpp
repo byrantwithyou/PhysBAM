@@ -10,7 +10,7 @@
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Nonlinear_Equations/PARAMETRIC_LINE.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <boost/function.hpp>
+#include <functional>
 using namespace PhysBAM;
 //#####################################################################
 // Function Newtons_Method

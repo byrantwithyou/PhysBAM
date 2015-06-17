@@ -11,7 +11,7 @@
 #include <Tools/Symbolics/STATIC_POLYNOMIAL.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_HELPER_COLOR.h>
-#include <boost/function.hpp>
+#include <functional>
 
 namespace PhysBAM{
 
@@ -40,13 +40,13 @@ public:
     ARRAY<ARRAY<T> >* rhs;
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
     bool use_discontinuous_velocity;
-    boost::function<TV(const TV& X,int color0,int color1)> u_jump;
-    boost::function<TV(const TV& X,int color0,int color1)> j_surface;
+    std::function<TV(const TV& X,int color0,int color1)> u_jump;
+    std::function<TV(const TV& X,int color0,int color1)> j_surface;
 
     template<int d>
     void Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        bool use_discontinuous_velocity_input,boost::function<TV(const TV& X,int color0,int color1)> u_jump_input,
-        boost::function<TV(const TV& X,int color0,int color1)> j_surface_input,
+        bool use_discontinuous_velocity_input,std::function<TV(const TV& X,int color0,int color1)> u_jump_input,
+        std::function<TV(const TV& X,int color0,int color1)> j_surface_input,
         ARRAY<ARRAY<T> >& rhs_input,int axis_input,T scale_input);
 
     void Add_Entry(int constraint_index,int orientation,int flat_index_diff_ref,int color,T value)

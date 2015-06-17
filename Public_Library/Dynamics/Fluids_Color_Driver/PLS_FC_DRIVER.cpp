@@ -40,7 +40,7 @@
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION_MULTIPLE.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
-#include <boost/function.hpp>
+#include <functional>
 using namespace PhysBAM;
 namespace{
     template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)

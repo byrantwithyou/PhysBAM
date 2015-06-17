@@ -12,7 +12,7 @@
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Tensors/SYMMETRIC_TENSOR.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
-#include <boost/function.hpp>
+#include <functional>
 
 namespace PhysBAM{
 

@@ -74,7 +74,7 @@ Add_Neighbors(ARRAY<TV_INT>& next,const ARRAY<TV_INT>& neighbors,const TV_INT& i
 // Function Register_Nodes
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
-Register_Nodes(boost::function<bool(const TV_INT& index)> inside_mask,ARRAY<VECTOR<STENCIL,TV::m> >& stencil)
+Register_Nodes(std::function<bool(const TV_INT& index)> inside_mask,ARRAY<VECTOR<STENCIL,TV::m> >& stencil)
 {
     node_to_index.Resize(grid.Domain_Indices(periodic?0:fill_width+1)); // Need an extra ring for the sentinals
     index_to_node.Append(TV_INT()+INT_MAX); // First index is the "outside" index.
@@ -213,7 +213,7 @@ Extrapolate_RK2(const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,ARRAY<T2>& u,const 
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
-Extrapolate_Node(boost::function<bool(const TV_INT& index)> inside_mask,ARRAYS_ND_BASE<T2,TV_INT>& u)
+Extrapolate_Node(std::function<bool(const TV_INT& index)> inside_mask,ARRAYS_ND_BASE<T2,TV_INT>& u)
 {
     PHYSBAM_ASSERT(order>=1 && order<=3);
     PHYSBAM_ASSERT(!grid.Is_MAC_Grid());
@@ -247,7 +247,7 @@ Extrapolate_Node(boost::function<bool(const TV_INT& index)> inside_mask,ARRAYS_N
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
-Extrapolate_Cell(boost::function<bool(const TV_INT& index)> inside_mask,ARRAYS_ND_BASE<T2,TV_INT>& u)
+Extrapolate_Cell(std::function<bool(const TV_INT& index)> inside_mask,ARRAYS_ND_BASE<T2,TV_INT>& u)
 {
     grid=grid.Get_Regular_Grid_At_MAC_Positions();
     Extrapolate_Node(inside_mask,u);
@@ -256,7 +256,7 @@ Extrapolate_Cell(boost::function<bool(const TV_INT& index)> inside_mask,ARRAYS_N
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
-Extrapolate_Face(boost::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,ARRAY<T2,FACE_INDEX<TV::m> >& u)
+Extrapolate_Face(std::function<bool(const FACE_INDEX<TV::m>& index)> inside_mask,ARRAY<T2,FACE_INDEX<TV::m> >& u)
 {
     GRID<TV> mac_grid(grid);
     for(int i=0;i<TV::m;i++){

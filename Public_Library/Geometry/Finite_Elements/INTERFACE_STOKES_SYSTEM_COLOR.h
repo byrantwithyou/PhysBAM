@@ -13,7 +13,7 @@
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
-#include <boost/function.hpp>
+#include <functional>
 
 namespace PhysBAM{
 
@@ -97,10 +97,10 @@ public:
 
 //#####################################################################
     virtual void Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,
-        boost::function<TV(const TV& X,int color0,int color1)> u_jump,
-        boost::function<TV(const TV& X,int color0,int color1)> j_surface,
+        std::function<TV(const TV& X,int color0,int color1)> u_jump,
+        std::function<TV(const TV& X,int color0,int color1)> j_surface,
         ARRAY<T>* inertia,bool use_rhs,T dt);
-    virtual void Set_RHS(VECTOR_T& rhs,boost::function<TV(const TV& X,int color)> body_force,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction);
+    virtual void Set_RHS(VECTOR_T& rhs,std::function<TV(const TV& X,int color)> body_force,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction);
     void Add_Polymer_Stress_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,T dt);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;

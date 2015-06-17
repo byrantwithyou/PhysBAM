@@ -6,7 +6,6 @@
 #define __MPM_COLLISION_IMPLICIT_OBJECT__
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
-#include <boost/function.hpp>
 namespace PhysBAM{
 
 template<class TV>
@@ -18,8 +17,8 @@ class MPM_COLLISION_IMPLICIT_OBJECT:public MPM_COLLISION_OBJECT<TV>
 public:
     using typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE;
     IMPLICIT_OBJECT<TV>* io;
-    boost::function<FRAME<TV>(T)> func_frame;
-    boost::function<TWIST<TV>(T)> func_twist;
+    std::function<FRAME<TV>(T)> func_frame;
+    std::function<TWIST<TV>(T)> func_twist;
 
     MPM_COLLISION_IMPLICIT_OBJECT(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type_input,T friction_input);
     virtual ~MPM_COLLISION_IMPLICIT_OBJECT();

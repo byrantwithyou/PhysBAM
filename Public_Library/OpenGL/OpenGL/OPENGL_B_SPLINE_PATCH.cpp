@@ -6,10 +6,10 @@
 #include <Tools/Matrices/MATRIX_4X4.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
+#include <OpenGL/OpenGL/OPENGL_B_SPLINE_PATCH.h>
 #include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 #include <OpenGL/OpenGL/OPENGL_SHAPES.h>
-#include <OpenGL/OpenGL/OPENGL_B_SPLINE_PATCH.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor from geometry, two-sided

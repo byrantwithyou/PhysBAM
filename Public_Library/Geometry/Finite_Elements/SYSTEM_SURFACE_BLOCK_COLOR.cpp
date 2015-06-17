@@ -13,8 +13,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV,int static_degree> template<int d> void SYSTEM_SURFACE_BLOCK_COLOR<TV,static_degree>::
 Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-    bool use_discontinuous_velocity_input,boost::function<TV(const TV& X,int color0,int color1)> u_jump_input,
-    boost::function<TV(const TV& X,int color0,int color1)> j_surface_input,
+    bool use_discontinuous_velocity_input,std::function<TV(const TV& X,int color0,int color1)> u_jump_input,
+    std::function<TV(const TV& X,int color0,int color1)> j_surface_input,
     ARRAY<ARRAY<T> >& rhs_input,int axis_input,T scale_input)
 {
     use_discontinuous_velocity=use_discontinuous_velocity_input;
@@ -35,8 +35,8 @@ Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENC
         op.polynomial=diced.polynomial;}
 }
 namespace PhysBAM{
-template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<double,2>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,bool,boost::function<VECTOR<double,2> (VECTOR<double,2> const&,int,int)>,boost::function<VECTOR<double,2> (VECTOR<double,2> const&,int,int)>,ARRAY<ARRAY<double,int>,int>&,int,double);
-template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<double,3>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,bool,boost::function<VECTOR<double,3> (VECTOR<double,3> const&,int,int)>,boost::function<VECTOR<double,3> (VECTOR<double,3> const&,int,int)>,ARRAY<ARRAY<double,int>,int>&,int,double);
-template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<float,2>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,bool,boost::function<VECTOR<float,2> (VECTOR<float,2> const&,int,int)>,boost::function<VECTOR<float,2> (VECTOR<float,2> const&,int,int)>,ARRAY<ARRAY<float,int>,int>&,int,float);
-template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<float,3>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,bool,boost::function<VECTOR<float,3> (VECTOR<float,3> const&,int,int)>,boost::function<VECTOR<float,3> (VECTOR<float,3> const&,int,int)>,ARRAY<ARRAY<float,int>,int>&,int,float);
+template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<double,2>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,bool,std::function<VECTOR<double,2> (VECTOR<double,2> const&,int,int)>,std::function<VECTOR<double,2> (VECTOR<double,2> const&,int,int)>,ARRAY<ARRAY<double,int>,int>&,int,double);
+template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<double,3>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,bool,std::function<VECTOR<double,3> (VECTOR<double,3> const&,int,int)>,std::function<VECTOR<double,3> (VECTOR<double,3> const&,int,int)>,ARRAY<ARRAY<double,int>,int>&,int,double);
+template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<float,2>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,bool,std::function<VECTOR<float,2> (VECTOR<float,2> const&,int,int)>,std::function<VECTOR<float,2> (VECTOR<float,2> const&,int,int)>,ARRAY<ARRAY<float,int>,int>&,int,float);
+template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<float,3>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,bool,std::function<VECTOR<float,3> (VECTOR<float,3> const&,int,int)>,std::function<VECTOR<float,3> (VECTOR<float,3> const&,int,int)>,ARRAY<ARRAY<float,int>,int>&,int,float);
 }

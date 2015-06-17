@@ -20,7 +20,7 @@ namespace PhysBAM{
 template<class TV,class T2,class Z_INTERP,class T_AVERAGING,class U_INTERP,class T_FACE_LOOKUP>
 ADVECTION_UPWIND<TV,T2,Z_INTERP,T_AVERAGING,U_INTERP,T_FACE_LOOKUP>::
 ADVECTION_UPWIND(const LEVELSET<TV>& levelset,const T_FACE_LOOKUP& face_velocities,
-    T max_in,T max_out,boost::function<T2(const TV& X,T time)> bc_Z,T time)
+    T max_in,T max_out,std::function<T2(const TV& X,T time)> bc_Z,T time)
     :levelset(levelset),face_velocities(face_velocities),max_in(max_in),max_out(max_out),time(time),bc_Z(bc_Z)
 {
 }

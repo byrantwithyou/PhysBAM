@@ -3,10 +3,10 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Log/LOG.h>
+#include <Tools/Math_Tools/Is_NaN.h>
 #include <Tools/Matrices/BANDED_MATRIX.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <cassert>
-#include <Tools/Math_Tools/Is_NaN.h>
 namespace PhysBAM{
 namespace{
 //#####################################################################
