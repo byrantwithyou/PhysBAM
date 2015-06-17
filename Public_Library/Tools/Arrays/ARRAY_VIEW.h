@@ -15,13 +15,13 @@ namespace PhysBAM{
 
 template<class T,class ID> struct IS_ARRAY<ARRAY_VIEW<T,ID> > {static const bool value=true;};
 template<class T,class ID> struct IS_ARRAY_VIEW<ARRAY_VIEW<T,ID> > {static const bool value=true;};
-template<class T,class ID,class T_NEW> struct REBIND<ARRAY_VIEW<T,ID>,T_NEW>{typedef ARRAY_VIEW<typename IF<is_const<T>::value,const T_NEW,T_NEW>::TYPE,ID> TYPE;};
+template<class T,class ID,class T_NEW> struct REBIND<ARRAY_VIEW<T,ID>,T_NEW>{typedef ARRAY_VIEW<typename conditional<is_const<T>::value,const T_NEW,T_NEW>::type,ID> TYPE;};
 
 template<class T,class ID>
 class ARRAY_VIEW:public ARRAY_BASE<typename remove_const<T>::type,ARRAY_VIEW<T,ID>,ID>
 {
     struct UNUSABLE{};
-    template<class S> struct COPY_CONST:public IF<is_const<T>::value,typename add_const<S>::type,S>{};
+    template<class S> struct COPY_CONST{typedef typename conditional<is_const<T>::value,typename add_const<S>::type,S>::type TYPE;};
     typedef ARRAY_BASE<typename remove_const<T>::type,ARRAY_VIEW<T,ID>,ID> BASE;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
@@ -30,7 +30,7 @@ public:
 
     // m and base_pointer inherit constness of T
     typename COPY_CONST<ID>::TYPE m;
-    friend class ARRAY_VIEW<typename IF<is_const<T>::value,ELEMENT,const ELEMENT>::TYPE,ID>;
+    friend class ARRAY_VIEW<typename conditional<is_const<T>::value,ELEMENT,const ELEMENT>::type,ID>;
     typename COPY_CONST<T*>::TYPE base_pointer;
 
     using BASE::Same_Array;
@@ -47,7 +47,7 @@ public:
         :m(array.m),base_pointer(array.base_pointer)
     {}
 
-    ARRAY_VIEW(const ARRAY_VIEW<typename IF<is_const<T>::value,typename remove_const<T>::type,UNUSABLE>::TYPE,ID>& array)
+    ARRAY_VIEW(const ARRAY_VIEW<typename conditional<is_const<T>::value,typename remove_const<T>::type,UNUSABLE>::type,ID>& array)
         :m(array.m),base_pointer(array.base_pointer)
     {}
 
@@ -120,7 +120,7 @@ public:
     void Set(const ARRAY_VIEW<T,ID>& array)
     {Set(array.m,array.base_pointer);}
 
-    void Set(const ARRAY_VIEW<typename IF<is_const<T>::value,typename remove_const<T>::type,UNUSABLE>::TYPE,ID>& array)
+    void Set(const ARRAY_VIEW<typename conditional<is_const<T>::value,typename remove_const<T>::type,UNUSABLE>::type,ID>& array)
     {Set(array.m,array.base_pointer);}
 
     template<class T_ARRAY>

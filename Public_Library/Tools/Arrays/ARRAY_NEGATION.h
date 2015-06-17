@@ -20,7 +20,7 @@ template<class T_ARRAY>
 class ARRAY_NEGATION:public ARRAY_EXPRESSION<typename T_ARRAY::ELEMENT,ARRAY_NEGATION<T_ARRAY>,typename T_ARRAY::INDEX>
 {
     typedef typename T_ARRAY::ELEMENT T;
-    typedef typename IF<IS_ARRAY_VIEW<T_ARRAY>::value,const T_ARRAY,const T_ARRAY&>::TYPE T_ARRAY_VIEW; // if it's an array view we can copy it, otherwise store a reference
+    typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY>::value,const T_ARRAY,const T_ARRAY&>::type T_ARRAY_VIEW; // if it's an array view we can copy it, otherwise store a reference
 public:
     typedef typename NEGATION<T>::TYPE ELEMENT;typedef typename T_ARRAY::INDEX INDEX;
 

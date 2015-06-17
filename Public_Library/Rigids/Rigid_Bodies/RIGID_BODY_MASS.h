@@ -21,7 +21,7 @@ template<class TV,bool world_space> // world_space=false
 class RIGID_BODY_MASS
 {
     typedef typename TV::SCALAR T;
-    typedef typename IF<world_space,SYMMETRIC_MATRIX<T,TV::SPIN::m>,DIAGONAL_MATRIX<T,TV::SPIN::m> >::TYPE T_INERTIA_TENSOR;
+    typedef typename conditional<world_space,SYMMETRIC_MATRIX<T,TV::SPIN::m>,DIAGONAL_MATRIX<T,TV::SPIN::m> >::type T_INERTIA_TENSOR;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;

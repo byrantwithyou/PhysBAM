@@ -21,7 +21,7 @@ class ARRAY_VIEW<T,VECTOR<int,d> >:public ARRAYS_ND_BASE<typename remove_const<T
 {
     typedef VECTOR<int,d> TV_INT;
     struct UNUSABLE{};
-    template<class S> struct COPY_CONST:public IF<is_const<T>::value,typename add_const<S>::type,S>{};
+    template<class S> struct COPY_CONST{typedef typename conditional<is_const<T>::value,typename add_const<S>::type,S>::type TYPE;};
     typedef ARRAYS_ND_BASE<typename remove_const<T>::type,VECTOR<int,d> > BASE;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
@@ -30,7 +30,7 @@ public:
 
     using BASE::domain;using BASE::array;
 private:
-    friend class ARRAY_VIEW<typename IF<is_const<T>::value,ELEMENT,const ELEMENT>::TYPE,TV_INT>;
+    friend class ARRAY_VIEW<typename conditional<is_const<T>::value,ELEMENT,const ELEMENT>::type,TV_INT>;
 
     using BASE::Calculate_Acceleration_Constants;
 

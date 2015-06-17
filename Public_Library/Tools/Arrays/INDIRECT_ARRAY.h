@@ -26,13 +26,13 @@ class INDIRECT_ARRAY:public INDIRECT_ARRAY_BASE<T_INDICES>,
                      public ARRAY_BASE<typename T_ARRAY::ELEMENT,INDIRECT_ARRAY<T_ARRAY,T_INDICES>,typename remove_reference<T_INDICES>::type::INDEX>
 {
     typedef typename remove_reference<T_INDICES>::type T_INDICES_NO_REFERENCE;
-    typedef typename IF<is_reference<T_INDICES>::value,const T_INDICES_NO_REFERENCE&,const T_INDICES_NO_REFERENCE>::TYPE CONST_T_INDICES;
+    typedef typename conditional<is_reference<T_INDICES>::value,const T_INDICES_NO_REFERENCE&,const T_INDICES_NO_REFERENCE>::type CONST_T_INDICES;
     STATIC_ASSERT(is_same<typename T_ARRAY::INDEX,typename T_INDICES_NO_REFERENCE::ELEMENT>::value);
 //    STATIC_ASSERT((!is_const<T_INDICES_NO_REFERENCE>::value));
     typedef typename T_ARRAY::ELEMENT T;typedef typename T_INDICES_NO_REFERENCE::INDEX ID;
     typedef ARRAY_BASE<T,INDIRECT_ARRAY<T_ARRAY,T_INDICES>,ID> BASE;
     struct UNUSABLE{};
-    typedef typename IF<IS_ARRAY_VIEW<T_ARRAY>::value,T_ARRAY,T_ARRAY&>::TYPE T_ARRAY_VIEW;
+    typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY>::value,T_ARRAY,T_ARRAY&>::type T_ARRAY_VIEW;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     typedef T ELEMENT;typedef ID INDEX;
@@ -80,7 +80,7 @@ public:
     INDIRECT_ARRAY& operator=(const T_OTHER_ARRAY& source)
     {return BASE::operator=(source);}
 
-    typename IF<is_const<T_ARRAY>::value,const T*,T*>::TYPE Get_Array_Pointer()
+    typename conditional<is_const<T_ARRAY>::value,const T*,T*>::type Get_Array_Pointer()
     {return array.Get_Array_Pointer()+Offset_If_Contiguous(indices);}
 
     const T* Get_Array_Pointer() const

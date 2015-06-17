@@ -59,7 +59,7 @@ public:
     INDEX Size() const
     {return array.Size();}
 
-    typename IF<is_const<T_ARRAY>::value,RESULT_CONST,RESULT_NONCONST>::TYPE operator()(const INDEX i)
+    typename conditional<is_const<T_ARRAY>::value,RESULT_CONST,RESULT_NONCONST>::type operator()(const INDEX i)
     {return T_PROJECTOR::operator()(array(i));}
 
     RESULT_CONST operator()(const INDEX i) const
@@ -78,7 +78,7 @@ public:
 template<class T_STRUCT,class T_FIELD,T_FIELD T_STRUCT::* field>
 struct FIELD_PROJECTOR
 {
-    template<class U> struct RESULT:public IF<is_const<U>::value,const T_FIELD&,T_FIELD&>{};
+    template<class U> struct RESULT{typedef typename conditional<is_const<U>::value,const T_FIELD&,T_FIELD&>::type TYPE;};
 
     const T_FIELD& operator()(const T_STRUCT& element) const
     {return element.*field;}
@@ -91,7 +91,7 @@ struct FIELD_PROJECTOR
 //#####################################################################
 struct INDEX_PROJECTOR
 {
-    template<class T_ARRAY> struct RESULT:public IF<is_const<T_ARRAY>::value,const typename T_ARRAY::ELEMENT&,typename T_ARRAY::ELEMENT&>{};
+    template<class T_ARRAY> struct RESULT{typedef typename conditional<is_const<T_ARRAY>::value,const typename T_ARRAY::ELEMENT&,typename T_ARRAY::ELEMENT&>::type TYPE;};
     int index;
 
     INDEX_PROJECTOR(const int index)

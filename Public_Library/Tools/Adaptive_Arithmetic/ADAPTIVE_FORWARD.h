@@ -43,7 +43,7 @@ template<class T_ADAPTIVE,int d> class ADAPTIVE_SIGNED_VOLUME;
 struct GEOMETRIC_DEGENERACY{}; // exception
 
 template<class T_EXACT,class T> struct ADAPTIVE_POLICY
-{typedef typename IF<IS_ADAPTIVE<T>::value,T,ADAPTIVE_ATOM<T,T_EXACT> >::TYPE ADAPTIVE;};
+{typedef typename conditional<IS_ADAPTIVE<T>::value,T,ADAPTIVE_ATOM<T,T_EXACT> >::type ADAPTIVE;};
 
 }
 using ADAPTIVE_DETAIL::ADAPTIVE_SUM;

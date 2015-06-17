@@ -46,7 +46,7 @@ public:
     typedef ARRAY_BASE<T,VECTOR<T,1> > BASE;
     using BASE::Assert_Same_Size;
     template<class T2> struct REBIND{typedef VECTOR<T2,1> TYPE;};
-    typedef typename IF<is_scalar<T>::value,T,UNUSABLE>::TYPE SCALAR;
+    typedef typename conditional<is_scalar<T>::value,T,UNUSABLE>::type SCALAR;
     typedef T ELEMENT;
     typedef VECTOR<T,0> SPIN;
     typedef int INDEX;

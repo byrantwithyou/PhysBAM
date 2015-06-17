@@ -33,7 +33,7 @@ class RIGID_BODY:public NONCOPYABLE
     typedef typename TV::SPIN T_SPIN;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SIMPLICIAL_OBJECT;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
-    typedef typename IF<TV::m==2,SEGMENT_HIERARCHY<TV>,TRIANGLE_HIERARCHY<T> >::TYPE T_SIMPLEX_HIERARCHY;
+    typedef typename conditional<TV::m==2,SEGMENT_HIERARCHY<TV>,TRIANGLE_HIERARCHY<T> >::type T_SIMPLEX_HIERARCHY;
 
 public:
     IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* implicit_object; // implicit representation of geometry

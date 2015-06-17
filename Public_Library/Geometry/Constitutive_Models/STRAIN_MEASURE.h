@@ -57,15 +57,15 @@ public:
     T Minimum_Rest_Altitude() const
     {T altitude=FLT_MAX;for(int t=0;t<Dm_inverse.m;t++)altitude=min(altitude,Rest_Altitude(t));return altitude;}
 
-    T_MATRIX Ds(ARRAY_VIEW<const TV> X,const typename IF<d==1,int,UNUSABLE<1> >::TYPE simplex) const
+    T_MATRIX Ds(ARRAY_VIEW<const TV> X,const typename conditional<d==1,int,UNUSABLE<1> >::type simplex) const
     {int i,j;mesh.elements(simplex).Get(i,j);
     return T_MATRIX(X(j)-X(i));}
 
-    T_MATRIX Ds(ARRAY_VIEW<const TV> X,const typename IF<d==2,int,UNUSABLE<2> >::TYPE simplex) const
+    T_MATRIX Ds(ARRAY_VIEW<const TV> X,const typename conditional<d==2,int,UNUSABLE<2> >::type simplex) const
     {int i,j,k;mesh.elements(simplex).Get(i,j,k);
     return T_MATRIX(X(j)-X(i),X(k)-X(i));}
 
-    T_MATRIX Ds(ARRAY_VIEW<const TV> X,const typename IF<d==3,int,UNUSABLE<3> >::TYPE simplex) const
+    T_MATRIX Ds(ARRAY_VIEW<const TV> X,const typename conditional<d==3,int,UNUSABLE<3> >::type simplex) const
     {int i,j,k,l;mesh.elements(simplex).Get(i,j,k,l);
     return T_MATRIX(X(j)-X(i),X(k)-X(i),X(l)-X(i));}
 

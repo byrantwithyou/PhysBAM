@@ -16,6 +16,7 @@ namespace PhysBAM{
 using std::add_const;
 using std::add_lvalue_reference;
 using std::add_pointer;
+using std::conditional;
 using std::enable_if;
 using std::is_base_of;
 using std::is_class;
@@ -34,9 +35,6 @@ using std::is_scalar;
 using std::remove_const;
 using std::remove_pointer;
 using std::remove_reference;
-
-template<bool b,class T1,class T2> struct IF{typedef T1 TYPE;};
-template<class T1,class T2> struct IF<false,T1,T2>{typedef T2 TYPE;};
 
 template<class T1,class T2> struct ASSERT_SAME_HELPER{static const bool value=false;};
 template<class T> struct ASSERT_SAME_HELPER<T,T>{static const bool value=true;};

@@ -47,10 +47,10 @@ template<int line,class A,class B=void> struct ASSERT_EFFICIENT
     static const bool efficient=EFFICIENT_OR_VOID<A>::value && EFFICIENT_OR_VOID<B>::value;
     struct UNUSABLE{};
 
-    ASSERT_EFFICIENT(typename IF<efficient,UNUSABLE,const char*>::TYPE str)
+    ASSERT_EFFICIENT(typename conditional<efficient,UNUSABLE,const char*>::type str)
     {}
 
-    ASSERT_EFFICIENT(typename IF<efficient,const char*,UNUSABLE>::TYPE str)
+    ASSERT_EFFICIENT(typename conditional<efficient,const char*,UNUSABLE>::type str)
     {PHYSBAM_WARNING(std::string("Base implementation used for: ")+str+".");}
 };
 

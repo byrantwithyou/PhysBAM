@@ -22,8 +22,8 @@ class HASHTABLE_ITERATOR
 {
     struct UNUSABLE{};
     typedef typename remove_const<T>::type RAW_T;
-    typedef typename IF<is_same<RAW_T,void>::value,UNUSABLE,T>::TYPE T_UNLESS_VOID;
-    typedef typename IF<is_same<RAW_T,void>::value || is_const<T>::value,const HASHTABLE<TK,RAW_T>,HASHTABLE<TK,T> >::TYPE T_HASHTABLE;
+    typedef typename conditional<is_same<RAW_T,void>::value,UNUSABLE,T>::type T_UNLESS_VOID;
+    typedef typename conditional<is_same<RAW_T,void>::value || is_const<T>::value,const HASHTABLE<TK,RAW_T>,HASHTABLE<TK,T> >::type T_HASHTABLE;
 public:
     T_HASHTABLE& hashtable;
 private:

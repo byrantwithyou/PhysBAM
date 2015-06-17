@@ -18,7 +18,7 @@ struct TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR
 {
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
-    typedef typename IF<d==2,int,VECTOR<int,2> >::TYPE T_EDGE;
+    typedef typename conditional<d==2,int,VECTOR<int,2> >::type T_EDGE;
 
     ARRAY<REPULSION_PAIR<TV> >& pairs;
     ARRAY_VIEW<const T_EDGE> edges1,edges2;

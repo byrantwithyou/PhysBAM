@@ -21,8 +21,8 @@ template<class T_ARRAY0,class T_ARRAY1>
 class ARRAY_PRODUCT:public ARRAY_EXPRESSION<typename PRODUCT<typename T_ARRAY0::ELEMENT,typename T_ARRAY1::ELEMENT>::TYPE,ARRAY_PRODUCT<T_ARRAY0,T_ARRAY1>,typename T_ARRAY0::INDEX>
 {
     typedef typename T_ARRAY0::ELEMENT T0;typedef typename T_ARRAY1::ELEMENT T2;
-    typedef typename IF<IS_ARRAY_VIEW<T_ARRAY0>::value,const T_ARRAY0,const T_ARRAY0&>::TYPE T_ARRAY1_VIEW; // if it's an array view we can copy it, otherwise store a reference
-    typedef typename IF<IS_ARRAY_VIEW<T_ARRAY1>::value,const T_ARRAY1,const T_ARRAY1&>::TYPE T_ARRAY2_VIEW;
+    typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY0>::value,const T_ARRAY0,const T_ARRAY0&>::type T_ARRAY1_VIEW; // if it's an array view we can copy it, otherwise store a reference
+    typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY1>::value,const T_ARRAY1,const T_ARRAY1&>::type T_ARRAY2_VIEW;
     typedef typename PRODUCT<T0,T2>::TYPE T_PRODUCT;
 public:
     typedef T_PRODUCT ELEMENT;typedef typename T_ARRAY0::INDEX INDEX;

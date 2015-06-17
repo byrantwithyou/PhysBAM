@@ -25,7 +25,7 @@ class HASHTABLE
 private:
     struct UNUSABLE{};
     typedef HASHTABLE_ENTRY_TEMPLATE<TK,T> ENTRY; // don't store data if T is void
-    typedef typename IF<is_same<T,void>::value,UNUSABLE,T>::TYPE T_UNLESS_VOID;
+    typedef typename conditional<is_same<T,void>::value,UNUSABLE,T>::type T_UNLESS_VOID;
 public:
     typedef TK KEY;
     typedef T ELEMENT;
@@ -244,19 +244,19 @@ public:
     const ENTRY* end() const
     {return table.Get_Array_Pointer()+table.Size();}
 
-    template<class RW> void Read(typename IF<is_same<T,void>::value,std::istream&,UNUSABLE>::TYPE input) // void version
+    template<class RW> void Read(typename conditional<is_same<T,void>::value,std::istream&,UNUSABLE>::type input) // void version
     {int entries;Read_Binary<RW>(input,entries);Initialize_New_Table(entries);
     for(int i=0;i<entries;i++){TK key;Read_Binary<RW>(input,key);Insert(key);}}
 
-    template<class RW> void Read(typename IF<is_same<T,void>::value,UNUSABLE,std::istream&>::TYPE input) // non-void version
+    template<class RW> void Read(typename conditional<is_same<T,void>::value,UNUSABLE,std::istream&>::type input) // non-void version
     {int entries;Read_Binary<RW>(input,entries);Initialize_New_Table(entries);
     for(int i=0;i<entries;i++){TK key;T value;Read_Binary<RW>(input,key,value);Insert(key,value);}}
 
-    template<class RW> void Write(typename IF<is_same<T,void>::value,std::ostream&,UNUSABLE>::TYPE output) const // void version
+    template<class RW> void Write(typename conditional<is_same<T,void>::value,std::ostream&,UNUSABLE>::type output) const // void version
     {Write_Binary<RW>(output,number_of_entries);
     for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) Write_Binary<RW>(output,table(h).key);}
 
-    template<class RW> void Write(typename IF<is_same<T,void>::value,UNUSABLE,std::ostream&>::TYPE output) const // non-void version
+    template<class RW> void Write(typename conditional<is_same<T,void>::value,UNUSABLE,std::ostream&>::type output) const // non-void version
     {Write_Binary<RW>(output,number_of_entries);
     for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) Write_Binary<RW>(output,table(h).key,table(h).data);}
 

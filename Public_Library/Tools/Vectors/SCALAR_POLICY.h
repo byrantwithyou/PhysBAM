@@ -17,7 +17,7 @@ template<class T> struct is_scalar_VECTOR_SPACE {static const bool value=is_scal
 
 template<class T,class ENABLER=void> struct SCALAR_POLICY{typedef struct UNUSABLE{} TYPE;};
 template<class T> struct SCALAR_POLICY<T,typename enable_if<is_scalar<T>::value>::type>{typedef T TYPE;};
-template<class T> struct SCALAR_POLICY<T,typename IF<true,void,typename T::SCALAR>::TYPE> {typedef typename T::SCALAR TYPE;};
+template<class T> struct SCALAR_POLICY<T,typename conditional<true,void,typename T::SCALAR>::type> {typedef typename T::SCALAR TYPE;};
 
 }
 #endif

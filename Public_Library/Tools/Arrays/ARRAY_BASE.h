@@ -66,8 +66,8 @@ public:
     typedef const T* const_iterator; // for stl
     typedef int difference_type; // for stl
 
-    typedef typename IF<CAN_REFERENCE_ELEMENTS<T_ARRAY>::value,T&,T>::TYPE T_REF_IF_POSSIBLE;
-    typedef typename IF<CAN_REFERENCE_ELEMENTS<T_ARRAY>::value,const T&,const T>::TYPE CONST_T_REF_IF_POSSIBLE;
+    typedef typename conditional<CAN_REFERENCE_ELEMENTS<T_ARRAY>::value,T&,T>::type T_REF_IF_POSSIBLE;
+    typedef typename conditional<CAN_REFERENCE_ELEMENTS<T_ARRAY>::value,const T&,const T>::type CONST_T_REF_IF_POSSIBLE;
     typedef T& RESULT_TYPE;
     typedef const T& CONST_RESULT_TYPE;
     typedef typename SCALAR_POLICY<T>::TYPE SCALAR;
@@ -126,7 +126,7 @@ public:
     {assert(prefix_size<=Derived().Size());return INDIRECT_ARRAY<const T_ARRAY,IDENTITY_ARRAY<> >(Derived(),IDENTITY_ARRAY<>(prefix_size));}
 
 private:
-    typedef typename IF<is_class<T>::value,T,UNUSABLE>::TYPE T_IF_CLASS;
+    typedef typename conditional<is_class<T>::value,T,UNUSABLE>::type T_IF_CLASS;
 public:
 
     template<int d>

@@ -20,8 +20,8 @@ template<class T0,class T_ARRAY1>
 class ARRAY_LEFT_MULTIPLE:public ARRAY_EXPRESSION<typename PRODUCT<T0,typename T_ARRAY1::ELEMENT>::TYPE,ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1>,typename T_ARRAY1::INDEX>
 {
     typedef typename T_ARRAY1::ELEMENT T2;
-    typedef typename IF<HAS_CHEAP_COPY<T0>::value,const T0,const T0&>::TYPE T1_VIEW; // copy if cheap, otherwise store a reference
-    typedef typename IF<IS_ARRAY_VIEW<T_ARRAY1>::value,const T_ARRAY1,const T_ARRAY1&>::TYPE T_ARRAY2_VIEW; // if it's an array view we can copy it, otherwise store a reference
+    typedef typename conditional<HAS_CHEAP_COPY<T0>::value,const T0,const T0&>::type T1_VIEW; // copy if cheap, otherwise store a reference
+    typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY1>::value,const T_ARRAY1,const T_ARRAY1&>::type T_ARRAY2_VIEW; // if it's an array view we can copy it, otherwise store a reference
     typedef typename PRODUCT<T0,T2>::TYPE T_PRODUCT;
 public:
     typedef T_PRODUCT ELEMENT;typedef typename T_ARRAY1::INDEX INDEX;

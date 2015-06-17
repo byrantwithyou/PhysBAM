@@ -61,7 +61,7 @@ public:
     subset.array.Exchange(tmp_view);
     particle_hierarchy.Initialize_Hierarchy_Using_KD_Tree();}
 
-    const typename IF<d==2,ARRAY<int>,typename IF<d==3,ARRAY<VECTOR<int,2> >,UNUSABLE>::TYPE>::TYPE& Edges() const
+    const typename conditional<d==2,ARRAY<int>,typename conditional<d==3,ARRAY<VECTOR<int,2> >,UNUSABLE>::type>::type& Edges() const
     {return choice<d-1>(unusable,active_indices,segmented_curve->mesh.elements);}
 
     const typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d-1>::OBJECT* Face_Mesh_Object() const
@@ -79,7 +79,7 @@ public:
     bool Has_Edges() const
     {return d==2 || segmented_curve!=0;}
 
-    const typename IF<(d<2),UNUSABLE,typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d<2?0:d-2>::HIERARCHY>::TYPE& Edge_Hierarchy() const
+    const typename conditional<(d<2),UNUSABLE,typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d<2?0:d-2>::HIERARCHY>::type& Edge_Hierarchy() const
     {return choice<d-1>(unusable,particle_hierarchy,*segmented_curve->hierarchy);}
 
     const ARRAY<char>& Edge_Processor_Masks() const

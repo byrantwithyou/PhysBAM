@@ -19,7 +19,7 @@ class PAIR
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
 
-    template<int i> struct GET:public IF<i==0,T1,T2>{};
+    template<int i> struct GET{typedef typename conditional<i==0,T1,T2>::type TYPE;};
 
     T1 x;T2 y;
 
