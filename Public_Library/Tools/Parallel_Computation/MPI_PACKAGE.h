@@ -152,7 +152,7 @@ public:
 
     template<class T_ARRAY>
     static MPI_PACKAGE Union(const T_ARRAY& packages)
-    {STATIC_ASSERT((IS_SAME<MPI_PACKAGE,typename T_ARRAY::ELEMENT>::value));
+    {STATIC_ASSERT((is_same<MPI_PACKAGE,typename T_ARRAY::ELEMENT>::value));
     ARRAY<MPI::Datatype> datatypes(packages.template Project<MPI::Datatype,&MPI_PACKAGE::type>());
     ARRAY<int> lengths(CONSTANT_ARRAY<int>(packages.Size(),1));ARRAY<void*> pointers(packages.template Project<void*,&MPI_PACKAGE::data>());
     return MPI_PACKAGE(MPI::Datatype::Create_struct(packages.Size(),lengths.Get_Array_Pointer(),(MPI::Aint*)pointers.Get_Array_Pointer(),datatypes.Get_Array_Pointer()));}

@@ -48,7 +48,7 @@ DATATYPE_HELPER<PAIR<VECTOR<int,2>,VECTOR<T,2> > >::Datatype()
 //#####################################################################
 template<class T,int d> MPI::Datatype Scalar_Block_Datatype()
 {
-    STATIC_ASSERT((IS_SCALAR<T>::value && (d>1)));
+    STATIC_ASSERT((is_scalar<T>::value && (d>1)));
     static MPI::Datatype datatype=MPI::DATATYPE_NULL;
     if(datatype==MPI::DATATYPE_NULL){datatype=MPI_UTILITIES::Datatype<T>().Create_contiguous(d);datatype.Commit();}
     return datatype;

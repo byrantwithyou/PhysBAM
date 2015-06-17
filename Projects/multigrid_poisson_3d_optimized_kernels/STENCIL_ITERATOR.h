@@ -13,7 +13,7 @@ namespace PhysBAM{
 template<class T,int d>
 class STENCIL_ITERATOR
 {
-    typedef typename IF<IS_CONST<T>::value,const STENCIL<typename REMOVE_CONST<T>::TYPE,d>,STENCIL<T,d> >::TYPE T_STENCIL;
+    typedef typename IF<is_const<T>::value,const STENCIL<typename remove_const<T>::type,d>,STENCIL<T,d> >::TYPE T_STENCIL;
 
     T_STENCIL& stencil;
     int current_index;

@@ -175,7 +175,7 @@ Exchange_Boundary_Particles_Threaded(const THREADED_UNIFORM_GRID<TV>& threaded_g
 {
 #ifdef USE_PTHREADS
     typedef VECTOR<int,TV::m> TV_INT;
-    STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
+    STATIC_ASSERT((is_same<T_PARTICLES,typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
     ARRAY<RANGE<TV_INT> > send_regions;
     // this way Find_Boundary_Regions will return block indices which for uniform grids are the node index not minimum corner cell
     RANGE<TV_INT> sentinels=RANGE<TV_INT>(TV_INT(),TV_INT::All_Ones_Vector());
@@ -221,7 +221,7 @@ Exchange_Boundary_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICL
 {
     if(mpi_grid.threaded_grid){Exchange_Boundary_Particles_Threaded(*mpi_grid.threaded_grid,template_particles,particles,bandwidth,particle_levelset);return;}
     typedef VECTOR<int,TV::m> TV_INT;
-    STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
+    STATIC_ASSERT((is_same<T_PARTICLES,typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
     int tag=mpi_grid.Get_Unique_Tag();
     ARRAY<RANGE<TV_INT> > send_regions;
     // this way Find_Boundary_Regions will return block indices which for uniform grids are the node index not minimum corner cell
@@ -256,7 +256,7 @@ Exchange_Overlapping_Block_Particles_Threaded(const THREADED_UNIFORM_GRID<TV>& t
 {
 #ifdef USE_PTHREADS
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
+    STATIC_ASSERT((is_same<T_PARTICLES,typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
     ARRAY<RANGE<TV_INT> > send_regions;
     // this way Find_Boundary_Regions will return block indices which for uniform grids are the node index not minimum corner cell
     RANGE<TV_INT> sentinels=RANGE<TV_INT>(TV_INT(),TV_INT::All_Ones_Vector());
@@ -302,7 +302,7 @@ Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const 
 {
     if(mpi_grid.threaded_grid){Exchange_Overlapping_Block_Particles_Threaded(*mpi_grid.threaded_grid,template_particles,particles,bandwidth,particle_levelset);return;}
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
+    STATIC_ASSERT((is_same<T_PARTICLES,typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
     int tag=mpi_grid.Get_Unique_Tag();
     ARRAY<RANGE<TV_INT> > send_regions;
     // this way Find_Boundary_Regions will return block indices which for uniform grids are the node index not minimum corner cell
@@ -336,7 +336,7 @@ template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
 Exchange_Ghost_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
+    STATIC_ASSERT((is_same<T_PARTICLES,typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
     int tag=mpi_grid.Get_Unique_Tag();
     ARRAY<RANGE<TV_INT> > send_regions;
     // this way Find_Boundary_Regions will return block indices which for uniform grids are the node index not minimum corner cell

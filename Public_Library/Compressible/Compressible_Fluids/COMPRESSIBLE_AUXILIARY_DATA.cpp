@@ -22,8 +22,8 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
 
-    STATIC_ASSERT((IS_SAME<T_ARRAYS,T_ARRAYS_DIMENSION_SCALAR>::value));
-    STATIC_ASSERT((IS_SAME<T_ARRAYS_BOOL_INPUT,ARRAY<bool,TV_INT> >::value));
+    STATIC_ASSERT((is_same<T_ARRAYS,T_ARRAYS_DIMENSION_SCALAR>::value));
+    STATIC_ASSERT((is_same<T_ARRAYS_BOOL_INPUT,ARRAY<bool,TV_INT> >::value));
 
     RANGE<TV_INT> domain_indices=grid.Domain_Indices(number_of_ghost_cells);
     ARRAY<TV,TV_INT> velocity(domain_indices),velocity_plus_c(domain_indices),velocity_minus_c(domain_indices),momentum(domain_indices);

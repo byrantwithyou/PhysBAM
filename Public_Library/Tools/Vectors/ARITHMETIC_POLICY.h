@@ -77,9 +77,9 @@ template<> struct NEGATION<double>{typedef double TYPE;};
 template<> struct NEGATION<float>{typedef float TYPE;};
 template<> struct NEGATION<int>{typedef int TYPE;};
 
-//template<class T,class TV> struct SUM<T,TV,typename ENABLE_IF<IS_SCALAR<T>::value && !IS_SCALAR<TV>::value>::TYPE>{typedef TV TYPE;};
-//template<class T,class TV> struct SUM<TV,T,typename ENABLE_IF<IS_SCALAR<T>::value && !IS_SCALAR<TV>::value>::TYPE>{typedef TV TYPE;};
-//template<class T,class TV> struct PRODUCT<T,TV,typename ENABLE_IF<IS_SCALAR<T>::value>::TYPE>{typedef TV TYPE;};
+//template<class T,class TV> struct SUM<T,TV,typename ENABLE_IF<is_scalar<T>::value && !is_scalar<TV>::value>::TYPE>{typedef TV TYPE;};
+//template<class T,class TV> struct SUM<TV,T,typename ENABLE_IF<is_scalar<T>::value && !is_scalar<TV>::value>::TYPE>{typedef TV TYPE;};
+//template<class T,class TV> struct PRODUCT<T,TV,typename ENABLE_IF<is_scalar<T>::value>::TYPE>{typedef TV TYPE;};
 
 }
 #endif

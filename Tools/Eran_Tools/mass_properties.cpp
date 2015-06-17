@@ -30,7 +30,7 @@ Get_Mass_Properties(PARSE_ARGS& parse_args)
 
     LOG::SCOPE scope("mass properties","mass properties");
     LOG::cout<<"filename = "<<filename<<std::endl;
-    LOG::cout<<"using "<<(IS_SAME<T,float>::value?"floats":"doubles")<<std::endl;
+    LOG::cout<<"using "<<(is_same<T,float>::value?"floats":"doubles")<<std::endl;
 
     TRIANGLE_MESH mesh;
     DEFORMABLE_PARTICLES<TV> particles;

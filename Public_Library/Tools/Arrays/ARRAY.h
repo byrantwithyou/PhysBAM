@@ -47,14 +47,14 @@ public:
         :base_pointer(0),buffer_size(m_input),m(m_input)
     {
         assert(m>=ID());base_pointer=new T[Value(m)];
-        if(!IS_CLASS<T>::value && initialize_new_elements){ID m=Size();for(ID i(0);i<m;i++) (*this)(i)=initialization_value;}
+        if(!is_class<T>::value && initialize_new_elements){ID m=Size();for(ID i(0);i<m;i++) (*this)(i)=initialization_value;}
     }
 
     explicit ARRAY(const INITIAL_SIZE m_input,const bool initialize_new_elements=true,const T& initialization_value=T())
         :base_pointer(0),buffer_size(Value(m_input)),m(Value(m_input))
     {
         assert(Value(m)>=0);base_pointer=new T[Value(m)];
-        if(!IS_CLASS<T>::value && initialize_new_elements){ID m=Size();for(ID i(0);i<m;i++) (*this)(i)=initialization_value;}
+        if(!is_class<T>::value && initialize_new_elements){ID m=Size();for(ID i(0);i<m;i++) (*this)(i)=initialization_value;}
     }
 
     ARRAY(const ARRAY& array)
@@ -65,7 +65,7 @@ public:
     }
 
     template<class T_ARRAY>
-    explicit ARRAY(const T_ARRAY& array,typename ENABLE_IF<IS_SAME<T,typename T_ARRAY::ELEMENT>::value,UNUSABLE>::TYPE unused=UNUSABLE())
+    explicit ARRAY(const T_ARRAY& array,typename ENABLE_IF<is_same<T,typename T_ARRAY::ELEMENT>::value,UNUSABLE>::TYPE unused=UNUSABLE())
         :base_pointer(0),buffer_size(array.Size()),m(array.Size())
     {
         base_pointer=new T[Value(m)];
@@ -125,7 +125,7 @@ private:
     T* p=new T[Value(buffer_new)];
     int m_end=Value(PhysBAM::min(m,buffer_new));
     if(copy_existing_elements) for(int i=0;i<m_end;i++) p[i]=base_pointer[i];
-    if(!IS_CLASS<T>::value && initialize_new_elements) for(int i=m_end;i<Value(buffer_new);i++) p[i]=initialization_value;
+    if(!is_class<T>::value && initialize_new_elements) for(int i=m_end;i<Value(buffer_new);i++) p[i]=initialization_value;
     delete[] base_pointer;
     base_pointer=p;
     buffer_size=buffer_new;}
@@ -225,7 +225,7 @@ private:
 
 public:
     void Exchange(ARRAY<T,ID>& other)
-    {STATIC_ASSERT(!IS_CONST<T>::value); // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
+    {STATIC_ASSERT(!is_const<T>::value); // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
     exchange(m,other.m);exchange(base_pointer,other.base_pointer);exchange(buffer_size,other.buffer_size);}
 
     template<class RW> void Read(std::istream& input)

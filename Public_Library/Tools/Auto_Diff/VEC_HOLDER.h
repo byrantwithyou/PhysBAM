@@ -16,7 +16,7 @@
 namespace PhysBAM{
 namespace HETERO_DIFF{
 
-template<class OP,class ...Args> struct RET {typedef decltype(OP()(typename REMOVE_REFERENCE<Args>::TYPE()...)) TYPE;};
+template<class OP,class ...Args> struct RET {typedef decltype(OP()(typename remove_reference<Args>::type()...)) TYPE;};
 
 template<int n> struct ARG {template<class T,class ...Args> auto operator()(const T& t,Args&&... args)->decltype(ARG<n-1>()(args...)){return ARG<n-1>()(args...);}};
 template<> struct ARG<0> {template<class T,class ...Args> const T&operator()(const T& t,Args&&... args){return t;}};
@@ -109,21 +109,21 @@ struct TYPE_VEC_MAP_1<OP,VEC_END>
 template<class OP,class OBJ,class BASE>
 struct TYPE_VEC_MAP_1<OP,VEC_HOLDER<OBJ,BASE> >
 {
-    template<class ...Args> static VEC_HOLDER<decltype(OP()(OBJ(),typename REMOVE_REFERENCE<Args>::TYPE()...)),decltype(TYPE_VEC_MAP_1<OP,BASE>::Type(typename REMOVE_REFERENCE<Args>::TYPE()...))>Type(Args...);
-    template<class ...Args> static void Type_Debug(Args...){OP()(OBJ(),typename REMOVE_REFERENCE<Args>::TYPE()...);TYPE_VEC_MAP_1<OP,BASE>::Type_Debug(typename REMOVE_REFERENCE<Args>::TYPE()...);}
+    template<class ...Args> static VEC_HOLDER<decltype(OP()(OBJ(),typename remove_reference<Args>::type()...)),decltype(TYPE_VEC_MAP_1<OP,BASE>::Type(typename remove_reference<Args>::type()...))>Type(Args...);
+    template<class ...Args> static void Type_Debug(Args...){OP()(OBJ(),typename remove_reference<Args>::type()...);TYPE_VEC_MAP_1<OP,BASE>::Type_Debug(typename remove_reference<Args>::type()...);}
 };
 
 template<class OP> struct VEC_MAP_1
 {
-    template<class OBJ,class BASE,class ...Args> static decltype(TYPE_VEC_MAP_1<OP,VEC_HOLDER<OBJ,BASE> >::Type(typename REMOVE_REFERENCE<Args>::TYPE()...))
+    template<class OBJ,class BASE,class ...Args> static decltype(TYPE_VEC_MAP_1<OP,VEC_HOLDER<OBJ,BASE> >::Type(typename remove_reference<Args>::type()...))
     Type(VEC_HOLDER<OBJ,BASE>,Args...);
     template<class ...Args> static VEC_END Type(VEC_END,Args...);
     template<class OBJ,class BASE,class ...Args> static void Type_Debug(VEC_HOLDER<OBJ,BASE>,Args...)
-    {TYPE_VEC_MAP_1<OP,VEC_HOLDER<OBJ,BASE> >::Type_Debug(typename REMOVE_REFERENCE<Args>::TYPE()...);}
+    {TYPE_VEC_MAP_1<OP,VEC_HOLDER<OBJ,BASE> >::Type_Debug(typename remove_reference<Args>::type()...);}
     template<class ...Args> static void Type_Debug(VEC_END,Args...){}
 
     template<class ...Args> void operator()(VEC_END& out,const VEC_END& in,Args&&... args) const {}
-    template<class OBJ,class BASE,class ...Args> void operator()(decltype(Type(VEC_HOLDER<OBJ,BASE>(),typename REMOVE_REFERENCE<Args>::TYPE()...))& out,const VEC_HOLDER<OBJ,BASE>& in,Args&&... args) const
+    template<class OBJ,class BASE,class ...Args> void operator()(decltype(Type(VEC_HOLDER<OBJ,BASE>(),typename remove_reference<Args>::type()...))& out,const VEC_HOLDER<OBJ,BASE>& in,Args&&... args) const
     {
         out.x=OP()(in.x,args...);
         (*this)(out.z,in.z,args...);
@@ -142,24 +142,24 @@ struct TYPE_VEC_MAP_2<OP,VEC_END,VEC_END>
 template<class OP,class OBJ0,class BASE0,class OBJ1,class BASE1>
 struct TYPE_VEC_MAP_2<OP,VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1> >
 {
-    template<class ...Args> static VEC_HOLDER<decltype(OP()(OBJ0(),OBJ1(),typename REMOVE_REFERENCE<Args>::TYPE()...)),decltype(TYPE_VEC_MAP_2<OP,BASE0,BASE1>::Type(typename REMOVE_REFERENCE<Args>::TYPE()...))>Type(Args...);
-    template<class ...Args> static void Type_Debug(Args...){OP()(OBJ0(),OBJ1(),typename REMOVE_REFERENCE<Args>::TYPE()...);TYPE_VEC_MAP_2<OP,BASE0,BASE1>::Type_Debug(typename REMOVE_REFERENCE<Args>::TYPE()...);}
+    template<class ...Args> static VEC_HOLDER<decltype(OP()(OBJ0(),OBJ1(),typename remove_reference<Args>::type()...)),decltype(TYPE_VEC_MAP_2<OP,BASE0,BASE1>::Type(typename remove_reference<Args>::type()...))>Type(Args...);
+    template<class ...Args> static void Type_Debug(Args...){OP()(OBJ0(),OBJ1(),typename remove_reference<Args>::type()...);TYPE_VEC_MAP_2<OP,BASE0,BASE1>::Type_Debug(typename remove_reference<Args>::type()...);}
 };
 
 template<class OP> struct VEC_MAP_2
 {
-    template<class OBJ0,class BASE0,class OBJ1,class BASE1,class ...Args> static decltype(TYPE_VEC_MAP_2<OP,VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1> >::Type(typename REMOVE_REFERENCE<Args>::TYPE()...))
+    template<class OBJ0,class BASE0,class OBJ1,class BASE1,class ...Args> static decltype(TYPE_VEC_MAP_2<OP,VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1> >::Type(typename remove_reference<Args>::type()...))
     Type(VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1>,Args...);
     template<class ...Args> static VEC_END Type(VEC_END,VEC_END,Args...);
 
     template<class OBJ0,class BASE0,class OBJ1,class BASE1,class ...Args> static void
     Type_Debug(VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1>,Args...)
-    {TYPE_VEC_MAP_2<OP,VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1> >::Type_Debug(typename REMOVE_REFERENCE<Args>::TYPE()...);}
+    {TYPE_VEC_MAP_2<OP,VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1> >::Type_Debug(typename remove_reference<Args>::type()...);}
     template<class ...Args> static void Type_Debug(VEC_END,VEC_END,Args...){}
 
     template<class ...Args> void operator()(VEC_END& out,const VEC_END& in0,const VEC_END& in1,Args&&... args) const {}
     template<class OBJ0,class BASE0,class OBJ1,class BASE1,class ...Args> void
-    operator()(decltype(Type(VEC_HOLDER<OBJ0,BASE0>(),VEC_HOLDER<OBJ1,BASE1>(),typename REMOVE_REFERENCE<Args>::TYPE()...))& out,const VEC_HOLDER<OBJ0,BASE0>& in0,const VEC_HOLDER<OBJ1,BASE1>& in1,Args&&... args) const
+    operator()(decltype(Type(VEC_HOLDER<OBJ0,BASE0>(),VEC_HOLDER<OBJ1,BASE1>(),typename remove_reference<Args>::type()...))& out,const VEC_HOLDER<OBJ0,BASE0>& in0,const VEC_HOLDER<OBJ1,BASE1>& in1,Args&&... args) const
     {
         out.x=OP()(in0.x,in1.x,args...);
         (*this)(out.z,in0.z,in1.z,args...);

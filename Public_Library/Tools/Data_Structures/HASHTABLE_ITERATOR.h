@@ -21,9 +21,9 @@ template<class TK,class T> // T = void
 class HASHTABLE_ITERATOR
 {
     struct UNUSABLE{};
-    typedef typename REMOVE_CONST<T>::TYPE RAW_T;
-    typedef typename IF<IS_SAME<RAW_T,void>::value,UNUSABLE,T>::TYPE T_UNLESS_VOID;
-    typedef typename IF<IS_SAME<RAW_T,void>::value || IS_CONST<T>::value,const HASHTABLE<TK,RAW_T>,HASHTABLE<TK,T> >::TYPE T_HASHTABLE;
+    typedef typename remove_const<T>::type RAW_T;
+    typedef typename IF<is_same<RAW_T,void>::value,UNUSABLE,T>::TYPE T_UNLESS_VOID;
+    typedef typename IF<is_same<RAW_T,void>::value || is_const<T>::value,const HASHTABLE<TK,RAW_T>,HASHTABLE<TK,T> >::TYPE T_HASHTABLE;
 public:
     T_HASHTABLE& hashtable;
 private:

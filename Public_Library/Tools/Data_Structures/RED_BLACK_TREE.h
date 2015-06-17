@@ -153,7 +153,7 @@ template<class K,class T> // K=key,T=data (=void)
 class RED_BLACK_TREE
 {
     struct UNUSABLE{};
-    typedef typename IF<IS_SAME<T,void>::value,UNUSABLE,T>::TYPE T_OR_UNUSABLE;
+    typedef typename IF<is_same<T,void>::value,UNUSABLE,T>::TYPE T_OR_UNUSABLE;
     typedef RED_BLACK_TREE_CORE CORE;
 public:
     CORE core;

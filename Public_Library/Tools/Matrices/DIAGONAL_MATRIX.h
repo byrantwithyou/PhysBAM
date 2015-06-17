@@ -14,8 +14,8 @@ namespace PhysBAM{
 
 template<class T,int d_input> class DIAGONAL_MATRIX;
 
-template<class T,int d> struct IS_SCALAR_BLOCK<DIAGONAL_MATRIX<T,d> >:public IS_SCALAR_BLOCK<T>{};
-template<class T,int d> struct IS_SCALAR_VECTOR_SPACE<DIAGONAL_MATRIX<T,d> >:public IS_SCALAR_VECTOR_SPACE<T>{};
+template<class T,int d> struct is_scalar_BLOCK<DIAGONAL_MATRIX<T,d> >:public is_scalar_BLOCK<T>{};
+template<class T,int d> struct is_scalar_VECTOR_SPACE<DIAGONAL_MATRIX<T,d> >:public is_scalar_VECTOR_SPACE<T>{};
 template<class T,int d,class RW> struct IS_BINARY_IO_SAFE<DIAGONAL_MATRIX<T,d>,RW>:public IS_BINARY_IO_SAFE<T,RW>{};
 
 template<class T,int d_input>

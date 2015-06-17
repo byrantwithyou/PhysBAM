@@ -18,7 +18,7 @@ namespace PhysBAM{
 template<class T>
 class LEVELSET_UTILITIES:public NONCOPYABLE
 {
-    STATIC_ASSERT((IS_SCALAR<T>::value));
+    STATIC_ASSERT((is_scalar<T>::value));
 protected:
     LEVELSET_UTILITIES() {};
     virtual ~LEVELSET_UTILITIES() {};

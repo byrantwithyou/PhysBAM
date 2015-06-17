@@ -18,7 +18,7 @@ class OPENGL_VECTOR_FIELD_2D:public OPENGL_OBJECT<typename T_ARRAY::SCALAR>
 {
     typedef typename T_ARRAY::SCALAR T;
     typedef VECTOR<T,2> TV;
-    STATIC_ASSERT(IS_SAME<typename T_ARRAY::ELEMENT,TV>::value);
+    STATIC_ASSERT(is_same<typename T_ARRAY::ELEMENT,TV>::value);
 public:
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Point;
     const T_ARRAY& vector_field;

@@ -26,7 +26,7 @@ public:
     typedef int HAS_UNTYPED_READ_WRITE;
     enum WORKAROUND1 {dimension=0};
     enum WORKAROUND2 {m=0};
-    typedef typename IF<IS_SCALAR<T>::value,T,UNUSABLE>::TYPE SCALAR;
+    typedef typename IF<is_scalar<T>::value,T,UNUSABLE>::TYPE SCALAR;
     template<class T2> struct REBIND{typedef VECTOR<T2,0> TYPE;};
     typedef T ELEMENT;
     typedef UNUSABLE SPIN;
@@ -155,11 +155,11 @@ public:
 
     template<class T_ARRAY>
     bool Contains_All(const T_ARRAY& elements) const
-    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));return !elements.Size();}
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,T>::value));return !elements.Size();}
 
     template<class T_ARRAY>
     bool Contains_Any(const T_ARRAY& elements) const
-    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));return false;}
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,T>::value));return false;}
 
     T Magnitude_Squared() const
     {return 0;}
@@ -276,7 +276,7 @@ public:
     {PHYSBAM_FATAL_ERROR();}
 
     int Number_True() const
-    {STATIC_ASSERT((IS_SAME<T,bool>::value));return 0;}
+    {STATIC_ASSERT((is_same<T,bool>::value));return 0;}
 
     int Find(const T& element) const
     {return -1;}

@@ -71,17 +71,17 @@ public:
 
     template<class T_ARRAY>
     static T_MATRIX Ds(const T_ARRAY& X,const VECTOR<int,2>& nodes)
-    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,TV>::value));
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,TV>::value));
     int i,j;nodes.Get(i,j);return T_MATRIX(X(j)-X(i));}
 
     template<class T_ARRAY>
     static T_MATRIX Ds(const T_ARRAY& X,const VECTOR<int,3>& nodes)
-    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,TV>::value));
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,TV>::value));
     int i,j,k;nodes.Get(i,j,k);return T_MATRIX(X(j)-X(i),X(k)-X(i));}
 
     template<class T_ARRAY>
     static T_MATRIX Ds(const T_ARRAY& X,const VECTOR<int,4>& nodes)
-    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,TV>::value));
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,TV>::value));
     int i,j,k,l;nodes.Get(i,j,k,l);return T_MATRIX(X(j)-X(i),X(k)-X(i),X(l)-X(i));}
 
     void Distribute_Force(ARRAY_VIEW<TV> F,const int element,const T_MATRIX& forces) const

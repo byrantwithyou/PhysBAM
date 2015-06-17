@@ -25,7 +25,7 @@ public:
 protected:
     TRANSPOSE_MATRIX()
     {
-        STATIC_ASSERT((IS_BASE_OF<TRANSPOSE_MATRIX,DERIVED>::value));
+        STATIC_ASSERT((is_base_of<TRANSPOSE_MATRIX,DERIVED>::value));
     }
 
     TRANSPOSE_MATRIX(INITIAL_SIZE mm,INITIAL_SIZE nn)

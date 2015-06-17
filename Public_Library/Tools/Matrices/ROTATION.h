@@ -18,7 +18,7 @@ using ::std::atan2;
 
 template<class TV> class ROTATION;
 
-template<class TV> struct IS_SCALAR_BLOCK<ROTATION<TV> > {static const bool value=(TV::m>1) && IS_SCALAR_BLOCK<TV>::value;};
+template<class TV> struct is_scalar_BLOCK<ROTATION<TV> > {static const bool value=(TV::m>1) && is_scalar_BLOCK<TV>::value;};
 template<class TV,class RW> struct IS_BINARY_IO_SAFE<ROTATION<TV>,RW> {static const bool value=(TV::m>1) && IS_BINARY_IO_SAFE<TV,RW>::value;};
 template<class TV> struct HAS_CHEAP_COPY<ROTATION<TV> > {static const bool value=true;};
 
@@ -279,8 +279,8 @@ public:
     template<class T2> explicit ROTATION(const ROTATION<T2>& r)
         :q(r.Quaternion())
     {
-        STATIC_ASSERT(!IS_SAME<T,T2>::value);
-        if(!IS_SAME<T,int>::value) Normalize();
+        STATIC_ASSERT(!is_same<T,T2>::value);
+        if(!is_same<T,int>::value) Normalize();
     }
 
     ROTATION(const T angle,const TV& direction);
@@ -353,7 +353,7 @@ public:
     {assert((unsigned)axis<3);if(axis==0) return Rotated_X_Axis();if(axis==1) return Rotated_Y_Axis();return Rotated_Z_Axis();}
 
     template<class RW> void Read(std::istream& input)
-    {Read_Binary<RW>(input,q);if(!IS_SAME<T,int>::value && !Is_Normalized()) PHYSBAM_FATAL_ERROR("Read nonnormalized rotation");}
+    {Read_Binary<RW>(input,q);if(!is_same<T,int>::value && !Is_Normalized()) PHYSBAM_FATAL_ERROR("Read nonnormalized rotation");}
 
     template<class RW> void Write(std::ostream& output) const
     {Write_Binary<RW>(output,q);}

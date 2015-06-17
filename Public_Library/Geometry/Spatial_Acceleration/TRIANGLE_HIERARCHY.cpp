@@ -73,7 +73,7 @@ Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes)
 template<class T> template<class T_ARRAY_TV> void TRIANGLE_HIERARCHY<T>::
 Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >& bounding_boxes,T_ARRAY_TV X) 
 {
-    STATIC_ASSERT((IS_SAME<TV,typename T_ARRAY_TV::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY_TV>::value));
+    STATIC_ASSERT((is_same<TV,typename T_ARRAY_TV::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY_TV>::value));
     if(triangles_per_group) for(int k=0;k<leaves;k++){
         if(triangles_in_group(k).m) bounding_boxes(k)=RANGE<TV>::Bounding_Box(X.Subset(triangle_mesh.elements(triangles_in_group(k)(0))));
         for(int i=1;i<triangles_in_group(k).m;i++) bounding_boxes(k).Enlarge_Nonempty_Box_To_Include_Points(X.Subset(triangle_mesh.elements(triangles_in_group(k)(i))));}
@@ -86,7 +86,7 @@ Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >& bounding_boxes,T_ARRAY_TV X)
 template<class T> template<class T_ARRAY_TV> void TRIANGLE_HIERARCHY<T>::
 Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >& bounding_boxes,T_ARRAY_TV start_X,T_ARRAY_TV end_X)
 {
-    STATIC_ASSERT((IS_SAME<TV,typename T_ARRAY_TV::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY_TV>::value));
+    STATIC_ASSERT((is_same<TV,typename T_ARRAY_TV::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY_TV>::value));
     if(triangles_per_group) for(int k=0;k<leaves;k++){
         if(triangles_in_group(k).m){const VECTOR<int,3>& nodes=triangle_mesh.elements(triangles_in_group(k)(0));
             bounding_boxes(k)=RANGE<TV>::Bounding_Box(start_X.Subset(nodes));bounding_boxes(k).Enlarge_Nonempty_Box_To_Include_Points(end_X.Subset(nodes));}

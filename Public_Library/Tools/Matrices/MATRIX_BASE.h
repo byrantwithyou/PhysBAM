@@ -43,7 +43,7 @@ template<class T,int d> struct VECTOR_TYPE<VECTOR<T,d> > {typedef VECTOR<T,d> TY
 namespace{
 template<int line,class A,class B=void> struct ASSERT_EFFICIENT
 {
-    template<class T> struct EFFICIENT_OR_VOID {static const bool value=EFFICIENT_MATRIX<T>::value || IS_SAME<T,void>::value;};
+    template<class T> struct EFFICIENT_OR_VOID {static const bool value=EFFICIENT_MATRIX<T>::value || is_same<T,void>::value;};
     static const bool efficient=EFFICIENT_OR_VOID<A>::value && EFFICIENT_OR_VOID<B>::value;
     struct UNUSABLE{};
 

@@ -15,7 +15,7 @@ using namespace PhysBAM;
 template<class T> void MATRIX<T,3,2>::
 Fast_Singular_Value_Decomposition(MATRIX<T,3,2>& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX<T,2>& V) const
 {
-    if(!IS_SAME<T,double>::value){
+    if(!is_same<T,double>::value){
         MATRIX<double,3,2> U_double;DIAGONAL_MATRIX<double,2> singular_values_double;MATRIX<double,2> V_double;
         MATRIX<double,3,2>(*this).Fast_Singular_Value_Decomposition(U_double,singular_values_double,V_double);
         U=MATRIX<T,3,2>(U_double);singular_values=DIAGONAL_MATRIX<T,2>(singular_values_double);V=MATRIX<T,2>(V_double);return;}

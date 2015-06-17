@@ -79,7 +79,7 @@ template<> struct HASH_REDUCE<double>
 template<int s> inline int Hash_Reduce_Helper(const void* key);
 template<> inline int Hash_Reduce_Helper<1>(const void* key){union {const void* p;int i;} raw;raw.p=key;return raw.i;}
 template<> inline int Hash_Reduce_Helper<2>(const void* key){union {const void* p;int i[2];} raw;raw.p=key;return int_hash(raw.i[0],raw.i[1]);}
-template<class T> struct HASH_REDUCE<T*>{static int H(const T* key){STATIC_ASSERT((!IS_SAME<T,char>::value && !IS_SAME<T,const char>::value));return Hash_Reduce_Helper<sizeof(T*)/sizeof(int)>(key);}};
+template<class T> struct HASH_REDUCE<T*>{static int H(const T* key){STATIC_ASSERT((!is_same<T,char>::value && !is_same<T,const char>::value));return Hash_Reduce_Helper<sizeof(T*)/sizeof(int)>(key);}};
 
 //#####################################################################
 // Function Hash

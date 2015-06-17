@@ -24,7 +24,7 @@
 namespace PhysBAM{
 
 template<class TV> class RANGE;
-template<class TV> struct IS_SCALAR_BLOCK<RANGE<TV> >:public IS_SCALAR_BLOCK<TV>{};
+template<class TV> struct is_scalar_BLOCK<RANGE<TV> >:public is_scalar_BLOCK<TV>{};
 template<class TV,class RW> struct IS_BINARY_IO_SAFE<RANGE<TV>,RW> {static const bool value=false;}; // required since memory format differs from disk format
 
 template<class TV>
@@ -84,13 +84,13 @@ public:
 
     RANGE<TV> To_Half_Opened() const
     {
-        STATIC_ASSERT((IS_SAME<typename TV::ELEMENT,int>::value));
+        STATIC_ASSERT((is_same<typename TV::ELEMENT,int>::value));
         return RANGE<TV>(min_corner,max_corner+1);
     }
 
     RANGE<TV> To_Closed() const
     {
-        STATIC_ASSERT((IS_SAME<typename TV::ELEMENT,int>::value));
+        STATIC_ASSERT((is_same<typename TV::ELEMENT,int>::value));
         return RANGE<TV>(min_corner,max_corner-1);
     }
 
@@ -180,7 +180,7 @@ public:
 
     template<class T_ARRAY>
     void Enlarge_Nonempty_Box_To_Include_Points(const T_ARRAY& points)
-    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,TV>::value));
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,TV>::value));
     for(int i=0;i<points.Size();i++) Enlarge_Nonempty_Box_To_Include_Point(points(i));}
 
     void Enlarge_To_Include_Box(const RANGE<TV>& box)
@@ -304,7 +304,7 @@ public:
 
     template<class T_ARRAY>
     static RANGE<TV> Bounding_Box(const T_ARRAY& points)
-    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,TV>::value));
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,TV>::value));
     if(!points.Size()) return Empty_Box();
     RANGE<TV> box(points(0));for(int i=1;i<points.Size();i++) box.Enlarge_Nonempty_Box_To_Include_Point(points(i));return box;}
 

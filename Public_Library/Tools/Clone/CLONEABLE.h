@@ -16,8 +16,8 @@ namespace PhysBAM{
 class CLONEABLE_BASE; // cloneable abstract base classes inherit from this directly
 template<class T> class CLONE_ARRAY;
 
-template<class T> struct IS_CLONEABLE{static const bool value=IS_BASE_OF<CLONEABLE_BASE,T>::value && // must eventually derive from CLONEABLE_BASE
-        IS_CONVERTIBLE<T*,CLONEABLE_BASE*>::value;}; // ensure derivation isn't ambiguous
+template<class T> struct IS_CLONEABLE{static const bool value=is_base_of<CLONEABLE_BASE,T>::value && // must eventually derive from CLONEABLE_BASE
+        is_convertible<T*,CLONEABLE_BASE*>::value;}; // ensure derivation isn't ambiguous
 
 //#####################################################################
 // Class CLONEABLE_BASE

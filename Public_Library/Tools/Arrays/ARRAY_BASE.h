@@ -31,7 +31,7 @@ template<class T,class T_ARRAY,class ID> class ARRAY_BASE;
 template<class T_ARRAY,class ENABLER=void> struct CANONICALIZE_CONST_ARRAY:public FIRST<T_ARRAY>{};
 
 template<class T_ARRAY0,class T_ARRAY1> struct SAME_ARRAY_CANONICAL{static bool Same_Array(const T_ARRAY0& array0,const T_ARRAY1& array1)
-{STATIC_ASSERT(!IS_SAME<T_ARRAY0,T_ARRAY1>::value);return false;}};
+{STATIC_ASSERT(!is_same<T_ARRAY0,T_ARRAY1>::value);return false;}};
 
 template<class T_ARRAY> struct SAME_ARRAY_CANONICAL<T_ARRAY,T_ARRAY>{static bool Same_Array(const T_ARRAY& array0,const T_ARRAY& array1)
 {return T_ARRAY::Same_Array(array0,array1);}};
@@ -126,7 +126,7 @@ public:
     {assert(prefix_size<=Derived().Size());return INDIRECT_ARRAY<const T_ARRAY,IDENTITY_ARRAY<> >(Derived(),IDENTITY_ARRAY<>(prefix_size));}
 
 private:
-    typedef typename IF<IS_CLASS<T>::value,T,UNUSABLE>::TYPE T_IF_CLASS;
+    typedef typename IF<is_class<T>::value,T,UNUSABLE>::TYPE T_IF_CLASS;
 public:
 
     template<int d>
@@ -246,7 +246,7 @@ public:
     Inner_Product(const ARRAY_BASE<SCALAR,T_ARRAY1,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
     {assert(Size()==a2.Size());return (m*(*this*a2)).Sum();}
 
-    template<class T2,class T_ARRAY1> typename DISABLE_IF<IS_SCALAR<T2>::value,SCALAR>::TYPE
+    template<class T2,class T_ARRAY1> typename DISABLE_IF<is_scalar<T2>::value,SCALAR>::TYPE
     Inner_Product(const ARRAY_BASE<T2,T_ARRAY1,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
     {assert(Size()==a2.Size());typename T_ARRAY1::SCALAR result(0);ID size=Size();for(ID i(0);i<size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
 
@@ -254,7 +254,7 @@ public:
     Inner_Product_Double_Precision(const ARRAY_BASE<SCALAR,T_ARRAY1,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
     {assert(Size()==a2.Size());double d=0;for(ID i(0);i<Size();i++) d+=m(i)*(*this)(i).Dot(a2(i));return d;}
 
-    template<class T2,class T_ARRAY1> typename DISABLE_IF<IS_SCALAR<T2>::value,double>::TYPE
+    template<class T2,class T_ARRAY1> typename DISABLE_IF<is_scalar<T2>::value,double>::TYPE
     Inner_Product_Double_Precision(const ARRAY_BASE<T2,T_ARRAY1,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
     {assert(Size()==a2.Size());double result(0);ID size=Size();for(ID i(0);i<size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
 
@@ -335,7 +335,7 @@ public:
 
 private:
     template<class U>
-    typename ENABLE_IF<IS_SCALAR<T>::value,U>::TYPE Maximum_Magnitude(U*) const
+    typename ENABLE_IF<is_scalar<T>::value,U>::TYPE Maximum_Magnitude(U*) const
     {T result=(T)0;for(int i=0;i<Size();i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
 
     template<class U>
@@ -343,14 +343,14 @@ private:
     {typename T::SCALAR result(0);for(int i=0;i<Size();i++) result=PhysBAM::max(result,PhysBAM::Magnitude_Squared((*this)(i)));return sqrt(result);}
 
     template<class U>
-    typename ENABLE_IF<IS_SCALAR<T>::value,U>::TYPE Arg_Maximum_Magnitude(U*) const
+    typename ENABLE_IF<is_scalar<T>::value,U>::TYPE Arg_Maximum_Magnitude(U*) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
     T maximum=-1;ID argmax=ID();
     for(ID i(0);i<m;i++){T current=abs(self(i));if(maximum<current){maximum=current;argmax=i;}}
     return argmax;}
 
     template<class U>
-    typename DISABLE_IF<IS_SCALAR<T>::value,U>::TYPE Arg_Maximum_Magnitude(U*) const
+    typename DISABLE_IF<is_scalar<T>::value,U>::TYPE Arg_Maximum_Magnitude(U*) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
     typename T::SCALAR maximum=-1;ID argmax=ID();
     for(ID i(0);i<m;i++){
@@ -603,7 +603,7 @@ template<class T,class T_ARRAY,class ID>
 inline std::ostream& operator<<(std::ostream& output,const ARRAY_BASE<T,T_ARRAY,ID>& a)
 {output<<"(";a.Write_Raw(output);output<<")";return output;}
 //#####################################################################
-template<class T_ARRAY0,class T_ARRAY1> struct CAN_ASSIGN<T_ARRAY0,T_ARRAY1,typename ENABLE_IF<IS_ARRAY<T_ARRAY0>::value && IS_ARRAY<T_ARRAY1>::value && IS_SAME<typename T_ARRAY0::ELEMENT,typename T_ARRAY1::ELEMENT>::value && !IS_SAME<T_ARRAY0,T_ARRAY1>::value>::TYPE>
+template<class T_ARRAY0,class T_ARRAY1> struct CAN_ASSIGN<T_ARRAY0,T_ARRAY1,typename ENABLE_IF<IS_ARRAY<T_ARRAY0>::value && IS_ARRAY<T_ARRAY1>::value && is_same<typename T_ARRAY0::ELEMENT,typename T_ARRAY1::ELEMENT>::value && !is_same<T_ARRAY0,T_ARRAY1>::value>::TYPE>
 {static const bool value=true;};
 
 template<class T,class T_ARRAY,class ID>

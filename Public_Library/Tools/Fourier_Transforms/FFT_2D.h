@@ -33,7 +33,7 @@ public:
     GRID<TV> grid;
 private:
     // for fftw
-    typedef typename IF<IS_SAME<T,float>::value,fftwf_plan_s*,fftw_plan_s*>::TYPE T_FFTW_PLAN;
+    typedef typename IF<is_same<T,float>::value,fftwf_plan_s*,fftw_plan_s*>::TYPE T_FFTW_PLAN;
     mutable ARRAY<COMPLEX<T>,TV_INT> u_hat_copy;
     mutable T_FFTW_PLAN plan_u_to_u_hat,plan_u_hat_to_u;
     mutable TV_INT plan_u_to_u_hat_counts,plan_u_hat_to_u_counts;

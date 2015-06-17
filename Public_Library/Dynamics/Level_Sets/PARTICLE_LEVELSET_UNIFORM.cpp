@@ -473,8 +473,8 @@ Second_Order_Runge_Kutta_Step_Particles_Threaded(RANGE<TV_INT>& domain,const ARR
 template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<TV>::
 Update_Particle_Cells(T_ARRAYS_PARTICLES& particles)
 {
-    typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
-    const T_PARTICLES& template_particles=choice<(1-IS_SAME<T_PARTICLES,PARTICLE_LEVELSET_PARTICLES<TV> >::value)>(this->template_particles,this->template_removed_particles);
+    typedef typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::type T_PARTICLES;
+    const T_PARTICLES& template_particles=choice<(1-is_same<T_PARTICLES,PARTICLE_LEVELSET_PARTICLES<TV> >::value)>(this->template_particles,this->template_removed_particles);
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices());domain.max_corner+=TV_INT::All_Ones_Vector();
     Consistency_Check(domain,particles);
     if(mpi_grid){
@@ -551,8 +551,8 @@ Update_Particle_Cells_Part_Two_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES
 Update_Particle_Cells_Part_Two_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index)
 #endif
 {
-    typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
-    const T_PARTICLES& template_particles=choice<(1-IS_SAME<T_PARTICLES,PARTICLE_LEVELSET_PARTICLES<TV> >::value)>(this->template_particles,this->template_removed_particles);
+    typedef typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::type T_PARTICLES;
+    const T_PARTICLES& template_particles=choice<(1-is_same<T_PARTICLES,PARTICLE_LEVELSET_PARTICLES<TV> >::value)>(this->template_particles,this->template_removed_particles);
     for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
         for(int i=0;i<list_to_process(final_block).m;i++){
             T_PARTICLES* cell_particles=list_to_process(final_block)(i).y;int k=list_to_process(final_block)(i).z;
@@ -569,7 +569,7 @@ Update_Particle_Cells_Part_Three_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICL
 Update_Particle_Cells_Part_Three_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index)
 #endif
 {
-    typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
+    typedef typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::type T_PARTICLES;
     for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
         for(int i=0;i<list_to_process(final_block).m;i++){
             T_PARTICLES* cell_particles=list_to_process(final_block)(i).y;int k=list_to_process(final_block)(i).z;

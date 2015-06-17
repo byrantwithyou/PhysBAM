@@ -606,7 +606,7 @@ template<class TV,class T_ARRAY_PAIR> void Distribute_Repulsion_Pairs_Helper(con
 {
     typedef typename T_ARRAY_PAIR::ELEMENT T_PAIR;
     typedef typename T_PAIR::SCALAR T_DATA;
-    typedef typename IF<IS_SAME<T_PAIR,REPULSION_PAIR<VECTOR<T_DATA,T_PAIR::d> > >::value,VECTOR<PARTITION_ID,T_PAIR::d+1>,VECTOR<PARTITION_ID,T_PAIR::d*2-2> >::TYPE PROCESSOR_VECTOR;
+    typedef typename IF<is_same<T_PAIR,REPULSION_PAIR<VECTOR<T_DATA,T_PAIR::d> > >::value,VECTOR<PARTITION_ID,T_PAIR::d+1>,VECTOR<PARTITION_ID,T_PAIR::d*2-2> >::TYPE PROCESSOR_VECTOR;
     STATIC_ASSERT(sizeof(int)==4);PHYSBAM_ASSERT(mpi_solids.particles_of_partition.Size()<=PARTITION_ID(32));
 
     LOG::SCOPE scope("Repulsion Pair Distribution","Repulsion Pair Distribution");

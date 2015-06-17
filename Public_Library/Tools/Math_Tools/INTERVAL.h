@@ -16,7 +16,7 @@
 #include <cfloat>
 namespace PhysBAM{
 
-template<class TV> struct IS_SCALAR_BLOCK<INTERVAL<TV> >:public IS_SCALAR_BLOCK<TV>{};
+template<class TV> struct is_scalar_BLOCK<INTERVAL<TV> >:public is_scalar_BLOCK<TV>{};
 template<class TV,class RW> struct IS_BINARY_IO_SAFE<INTERVAL<TV>,RW> {static const bool value=true;};
 
 template<class T>
@@ -113,7 +113,7 @@ public:
 
     template<class T_ARRAY>
     void Enlarge_Nonempty_Box_To_Include_Points(const T_ARRAY& points)
-    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,T>::value));
     for(int i=0;i<points.Size();i++) Enlarge_Nonempty_Box_To_Include_Point(points(i));}
 
     void Enlarge_To_Include_Box(const INTERVAL& interval)
@@ -191,7 +191,7 @@ public:
 
     template<class T_ARRAY>
     static INTERVAL Bounding_Box(const T_ARRAY& points)
-    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,T>::value));
     if(!points.Size()) return Empty_Box();
     INTERVAL interval(points(0));for(int i=1;i<points.Size();i++) interval.Enlarge_Nonempty_Box_To_Include_Point(points(i));return interval;}
 

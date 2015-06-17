@@ -110,17 +110,17 @@ struct TYPE_MAT_MAP_1<OP,VEC_OP,MAT_END>
 
 template<class OP,class VEC_OP,class OBJ,class COL,class BASE>
 struct TYPE_MAT_MAP_1<OP,VEC_OP,MAT_HOLDER<OBJ,COL,BASE> >
-{template<class ...Args> static MAT_HOLDER<decltype(OP()(OBJ(),typename REMOVE_REFERENCE<Args>::TYPE()...)),decltype(VEC_OP::Type(COL(),typename REMOVE_REFERENCE<Args>::TYPE()...)),decltype(TYPE_MAT_MAP_1<OP,VEC_OP,BASE>::Type(typename REMOVE_REFERENCE<Args>::TYPE()...))> Type(Args&&...);};
+{template<class ...Args> static MAT_HOLDER<decltype(OP()(OBJ(),typename remove_reference<Args>::type()...)),decltype(VEC_OP::Type(COL(),typename remove_reference<Args>::type()...)),decltype(TYPE_MAT_MAP_1<OP,VEC_OP,BASE>::Type(typename remove_reference<Args>::type()...))> Type(Args&&...);};
 
 template<class OP,class VEC_OP> struct MAT_MAP_1
 {
     template<class OBJ,class COL,class BASE,class ...Args>
-    static decltype(TYPE_MAT_MAP_1<OP,VEC_OP,MAT_HOLDER<OBJ,COL,BASE> >::Type(typename REMOVE_REFERENCE<Args>::TYPE()...))
+    static decltype(TYPE_MAT_MAP_1<OP,VEC_OP,MAT_HOLDER<OBJ,COL,BASE> >::Type(typename remove_reference<Args>::type()...))
     Type(const MAT_HOLDER<OBJ,COL,BASE>&,Args&&...);
     template<class ...Args> static MAT_END Type(MAT_END,Args&&...);
 
     template<class ...Args> void operator()(MAT_END& out,const MAT_END& in,Args&&... args) const {}
-    template<class OBJ,class COL,class BASE,class ...Args> void operator()(decltype(Type(MAT_HOLDER<OBJ,COL,BASE>(),typename REMOVE_REFERENCE<Args>::TYPE()...))& out,const MAT_HOLDER<OBJ,COL,BASE>& in,Args&&... args) const
+    template<class OBJ,class COL,class BASE,class ...Args> void operator()(decltype(Type(MAT_HOLDER<OBJ,COL,BASE>(),typename remove_reference<Args>::type()...))& out,const MAT_HOLDER<OBJ,COL,BASE>& in,Args&&... args) const
     {
         out.x=OP()(in.x,args...);
         VEC_OP()(out.y,in.y,args...);
@@ -136,18 +136,18 @@ struct TYPE_MAT_MAP_2<OP,VEC_OP,MAT_END,MAT_END>
 
 template<class OP,class VEC_OP,class OBJ0,class COL0,class BASE0,class OBJ1,class COL1,class BASE1>
 struct TYPE_MAT_MAP_2<OP,VEC_OP,MAT_HOLDER<OBJ0,COL0,BASE0>,MAT_HOLDER<OBJ1,COL1,BASE1> >
-{template<class ...Args> static MAT_HOLDER<decltype(OP()(OBJ0(),OBJ1(),typename REMOVE_REFERENCE<Args>::TYPE()...)),decltype(VEC_OP::Type(COL0(),COL1(),typename REMOVE_REFERENCE<Args>::TYPE()...)),decltype(TYPE_MAT_MAP_2<OP,VEC_OP,BASE0,BASE1>::Type(typename REMOVE_REFERENCE<Args>::TYPE()...))>Type(Args&&...);};
+{template<class ...Args> static MAT_HOLDER<decltype(OP()(OBJ0(),OBJ1(),typename remove_reference<Args>::type()...)),decltype(VEC_OP::Type(COL0(),COL1(),typename remove_reference<Args>::type()...)),decltype(TYPE_MAT_MAP_2<OP,VEC_OP,BASE0,BASE1>::Type(typename remove_reference<Args>::type()...))>Type(Args&&...);};
 
 template<class OP,class VEC_OP> struct MAT_MAP_2
 {
     template<class OBJ0,class COL0,class BASE0,class OBJ1,class COL1,class BASE1,class ...Args>
-    static decltype(TYPE_MAT_MAP_2<OP,VEC_OP,MAT_HOLDER<OBJ0,COL0,BASE0>,MAT_HOLDER<OBJ1,COL1,BASE1> >::Type(typename REMOVE_REFERENCE<Args>::TYPE()...))
+    static decltype(TYPE_MAT_MAP_2<OP,VEC_OP,MAT_HOLDER<OBJ0,COL0,BASE0>,MAT_HOLDER<OBJ1,COL1,BASE1> >::Type(typename remove_reference<Args>::type()...))
     Type(const MAT_HOLDER<OBJ0,COL0,BASE0>&,const MAT_HOLDER<OBJ1,COL1,BASE1>&,Args&&...);
     template<class ...Args> static MAT_END Type(MAT_END,MAT_END,Args&&...);
 
     template<class ...Args> void operator()(MAT_END& out,const MAT_END& in0,const MAT_END& in1,Args&&... args) const {}
     template<class OBJ0,class COL0,class BASE0,class OBJ1,class COL1,class BASE1,class ...Args> void
-    operator()(decltype(Type(MAT_HOLDER<OBJ0,COL0,BASE0>(),MAT_HOLDER<OBJ1,COL1,BASE1>(),typename REMOVE_REFERENCE<Args>::TYPE()...))& out,const MAT_HOLDER<OBJ0,COL0,BASE0>& in0,const MAT_HOLDER<OBJ1,COL1,BASE1>& in1,Args&&... args) const
+    operator()(decltype(Type(MAT_HOLDER<OBJ0,COL0,BASE0>(),MAT_HOLDER<OBJ1,COL1,BASE1>(),typename remove_reference<Args>::type()...))& out,const MAT_HOLDER<OBJ0,COL0,BASE0>& in0,const MAT_HOLDER<OBJ1,COL1,BASE1>& in1,Args&&... args) const
     {
         out.x=OP()(in0.x,in1.x,args...);
         VEC_OP()(out.y,in0.y,in1.y,args...);
@@ -163,17 +163,17 @@ struct TYPE_SYM_OUTER_MAP<OP,VEC_OP,VEC_END,VEC_END>
 
 template<class OP,class VEC_OP,class OBJ0,class BASE0,class OBJ1,class BASE1>
 struct TYPE_SYM_OUTER_MAP<OP,VEC_OP,VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1> >
-{template<class ...Args> static MAT_HOLDER<decltype(OP()(OBJ0(),OBJ1(),typename REMOVE_REFERENCE<Args>::TYPE()...)),decltype(VEC_OP::Type(BASE0(),BASE1(),OBJ0(),OBJ1(),typename REMOVE_REFERENCE<Args>::TYPE()...)),decltype(TYPE_SYM_OUTER_MAP<OP,VEC_OP,BASE0,BASE1>::Type(typename REMOVE_REFERENCE<Args>::TYPE()...))> Type(Args&&...);};
+{template<class ...Args> static MAT_HOLDER<decltype(OP()(OBJ0(),OBJ1(),typename remove_reference<Args>::type()...)),decltype(VEC_OP::Type(BASE0(),BASE1(),OBJ0(),OBJ1(),typename remove_reference<Args>::type()...)),decltype(TYPE_SYM_OUTER_MAP<OP,VEC_OP,BASE0,BASE1>::Type(typename remove_reference<Args>::type()...))> Type(Args&&...);};
 
 template<class OP,class VEC_OP> struct SYM_OUTER_MAP
 {
     template<class ...Args> static MAT_END Type(VEC_END,VEC_END,Args&&... args);
     template<class OBJ0,class BASE0,class OBJ1,class BASE1,class ...Args> static
-    decltype(TYPE_SYM_OUTER_MAP<OP,VEC_OP,VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1> >::Type(typename REMOVE_REFERENCE<Args>::TYPE()...)) Type(const VEC_HOLDER<OBJ0,BASE0>&,const VEC_HOLDER<OBJ1,BASE1>&,Args&&...);
+    decltype(TYPE_SYM_OUTER_MAP<OP,VEC_OP,VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1> >::Type(typename remove_reference<Args>::type()...)) Type(const VEC_HOLDER<OBJ0,BASE0>&,const VEC_HOLDER<OBJ1,BASE1>&,Args&&...);
 
     template<class ...Args> void operator()(MAT_END& out,const VEC_END& in0,const VEC_END& in1,Args&&... args) const {}
     template<class OBJ0,class BASE0,class OBJ1,class BASE1,class ...Args> void
-    operator()(decltype(Type(VEC_HOLDER<OBJ0,BASE0>(),VEC_HOLDER<OBJ1,BASE1>(),typename REMOVE_REFERENCE<Args>::TYPE()...))& out,const VEC_HOLDER<OBJ0,BASE0>& in0,const VEC_HOLDER<OBJ1,BASE1>& in1,Args&&... args) const
+    operator()(decltype(Type(VEC_HOLDER<OBJ0,BASE0>(),VEC_HOLDER<OBJ1,BASE1>(),typename remove_reference<Args>::type()...))& out,const VEC_HOLDER<OBJ0,BASE0>& in0,const VEC_HOLDER<OBJ1,BASE1>& in1,Args&&... args) const
     {
         out.x=OP()(in0.x,in1.x,args...);
         VEC_OP()(out.y,in0.z,in1.z,in0.x,in1.x,args...);
@@ -189,17 +189,17 @@ struct TYPE_OUTER_MAP<OP,VEC_OP,VEC_END>
 
 template<class OP,class VEC_OP,class OBJ,class BASE>
 struct TYPE_OUTER_MAP<OP,VEC_OP,VEC_HOLDER<OBJ,BASE> >
-{template<class ...Args> static MAT_HOLDER<decltype(OP()(OBJ(),typename REMOVE_REFERENCE<Args>::TYPE()...)),decltype(VEC_OP::Type(BASE(),OBJ(),typename REMOVE_REFERENCE<Args>::TYPE()...)),decltype(TYPE_OUTER_MAP<OP,VEC_OP,BASE>::Type(typename REMOVE_REFERENCE<Args>::TYPE()...))> Type(Args&&...);};
+{template<class ...Args> static MAT_HOLDER<decltype(OP()(OBJ(),typename remove_reference<Args>::type()...)),decltype(VEC_OP::Type(BASE(),OBJ(),typename remove_reference<Args>::type()...)),decltype(TYPE_OUTER_MAP<OP,VEC_OP,BASE>::Type(typename remove_reference<Args>::type()...))> Type(Args&&...);};
 
 template<class OP,class VEC_OP> struct OUTER_MAP
 {
     template<class ...Args> static MAT_END Type(VEC_END,VEC_END,Args&&... args);
     template<class OBJ,class BASE,class ...Args> static
-    decltype(TYPE_OUTER_MAP<OP,VEC_OP,VEC_HOLDER<OBJ,BASE> >::Type(typename REMOVE_REFERENCE<Args>::TYPE()...)) Type(const VEC_HOLDER<OBJ,BASE>&,Args&&...);
+    decltype(TYPE_OUTER_MAP<OP,VEC_OP,VEC_HOLDER<OBJ,BASE> >::Type(typename remove_reference<Args>::type()...)) Type(const VEC_HOLDER<OBJ,BASE>&,Args&&...);
 
     template<class ...Args> void operator()(MAT_END& out,const VEC_END& in,Args&&... args) const {}
     template<class OBJ,class BASE,class ...Args> void
-    operator()(decltype(Type(VEC_HOLDER<OBJ,BASE>(),typename REMOVE_REFERENCE<Args>::TYPE()...))& out,const VEC_HOLDER<OBJ,BASE>& in,Args&&... args) const
+    operator()(decltype(Type(VEC_HOLDER<OBJ,BASE>(),typename remove_reference<Args>::type()...))& out,const VEC_HOLDER<OBJ,BASE>& in,Args&&... args) const
     {
         out.x=OP()(in.x,args...);
         VEC_OP()(out.y,in.z,in.x,args...);

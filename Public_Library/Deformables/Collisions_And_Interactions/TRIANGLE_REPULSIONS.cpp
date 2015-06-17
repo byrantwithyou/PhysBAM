@@ -599,7 +599,7 @@ Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& point_face_precomp
     ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY<REPULSION_PAIR<VECTOR<T,3> > >& point_face_pairs,
     ARRAY<REPULSION_PAIR<TV2> >& edge_edge_pairs,const T repulsion_thickness_multiplier)
 {
-    STATIC_ASSERT((IS_SAME<VECTOR<T,3>,TV2>::value));
+    STATIC_ASSERT((is_same<VECTOR<T,3>,TV2>::value));
     point_face_pairs.Remove_All();
     edge_edge_pairs.Remove_All();
     point_face_pairs.Append_Elements(point_face_interaction_pairs);

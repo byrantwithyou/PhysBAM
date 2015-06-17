@@ -63,7 +63,7 @@ public:
     void Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
         boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell);
 
-    template<class T_OBJECT> typename DISABLE_IF<IS_BASE_OF<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::TYPE
+    template<class T_OBJECT> typename DISABLE_IF<is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::TYPE
     Seed_Particles(const T_OBJECT& object,boost::function<TV(const TV&)> V,
         boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,particles_per_cell);}
@@ -71,7 +71,7 @@ public:
     void Seed_Particles(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
         boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid);
 
-    template<class T_OBJECT> typename DISABLE_IF<IS_BASE_OF<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::TYPE
+    template<class T_OBJECT> typename DISABLE_IF<is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::TYPE
     Seed_Particles(const T_OBJECT& object,boost::function<TV(const TV&)> V,
         boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,seed_grid);}
@@ -79,7 +79,7 @@ public:
     void Seed_Particles_Helper(IMPLICIT_OBJECT<TV>& object,boost::function<TV(const TV&)> V,
         boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell);
 
-    template<class T_OBJECT> typename DISABLE_IF<IS_BASE_OF<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::TYPE
+    template<class T_OBJECT> typename DISABLE_IF<is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::TYPE
     Seed_Particles_Helper(const T_OBJECT& object,boost::function<TV(const TV&)> V,
         boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles_Helper(obj,V,dV,density,particles_per_cell);}
@@ -89,7 +89,7 @@ public:
         boost::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass,bool destroy_after=true);
 
     void Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io);
-    template<class OBJECT> typename DISABLE_IF<IS_POINTER<OBJECT>::value>::TYPE
+    template<class OBJECT> typename DISABLE_IF<is_pointer<OBJECT>::value>::TYPE
     Add_Penalty_Collision_Object(const OBJECT& object)
     {Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object));}
 

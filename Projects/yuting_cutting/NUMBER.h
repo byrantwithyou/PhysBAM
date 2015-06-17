@@ -237,7 +237,7 @@ template<> struct IS_SCALAR<NUMBER> {static const int value=true;};
 template<> struct IS_FLOAT_OR_DOUBLE<NUMBER> {static const int value=true;};
 
 
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  abs(const T& v)
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  abs(const T& v)
 {
     NUMBER n;
     n.val="ABS("+v.val+")";
@@ -254,18 +254,18 @@ template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  abs
     if(v.inv) n.valid=false;
     return n;
 }
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  floor(const T& v){NUMBER n;n.val="FLOOR("+v.val+")";return n;}
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  ceil(const T& v){NUMBER n;n.val="CEIL("+v.val+")";return n;}
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  rint(const T& v){NUMBER n;n.val="RINT("+v.val+")";return n;}
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  exp(const T& v){NUMBER n;n.val="EXP("+v.val+")";return n;}
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  log(const T& v){NUMBER n;n.val="LOG("+v.val+")";return n;}
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  sin(const T& v){NUMBER n;n.val="SIN("+v.val+")";return n;}
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  cos(const T& v){NUMBER n;n.val="COS("+v.val+")";return n;}
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  tan(const T& v){NUMBER n;n.val="TAN("+v.val+")";return n;}
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  asin(const T& v){NUMBER n;n.val="ASIN("+v.val+")";return n;}
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  acos(const T& v){NUMBER n;n.val="ACOS("+v.val+")";return n;}
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  atan(const T& v){NUMBER n;n.val="ATAN("+v.val+")";return n;}
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  sqrt(const T& v)
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  floor(const T& v){NUMBER n;n.val="FLOOR("+v.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  ceil(const T& v){NUMBER n;n.val="CEIL("+v.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  rint(const T& v){NUMBER n;n.val="RINT("+v.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  exp(const T& v){NUMBER n;n.val="EXP("+v.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  log(const T& v){NUMBER n;n.val="LOG("+v.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  sin(const T& v){NUMBER n;n.val="SIN("+v.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  cos(const T& v){NUMBER n;n.val="COS("+v.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  tan(const T& v){NUMBER n;n.val="TAN("+v.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  asin(const T& v){NUMBER n;n.val="ASIN("+v.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  acos(const T& v){NUMBER n;n.val="ACOS("+v.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  atan(const T& v){NUMBER n;n.val="ATAN("+v.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  sqrt(const T& v)
 {
     NUMBER n;
     n.val="SQRT("+v.val+")";
@@ -282,11 +282,11 @@ template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  sqr
     if(v.inv) n.valid=false;
     return n;
 }
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE  Inverse(const T& v){NUMBER n;n.val="INV("+v.val+")";return n;}
-template<class T,class U> typename ENABLE_IF<IS_SAME<NUMBER,T>::value||IS_SAME<NUMBER,U>::value,NUMBER>::TYPE  min(const T& a,const U& b){NUMBER n;n.val="MIN("+a.val+","+b.val+")";return n;}
-template<class T,class U> typename ENABLE_IF<IS_SAME<NUMBER,T>::value||IS_SAME<NUMBER,U>::value,NUMBER>::TYPE  max(const T& a,const U& b){NUMBER n;n.val="MAX("+a.val+","+b.val+")";return n;}
-template<class T,class U> typename ENABLE_IF<IS_SAME<NUMBER,T>::value||IS_SAME<NUMBER,U>::value,NUMBER>::TYPE pow(const T& a,const U& b){NUMBER n;n.val="POW("+a.val+","+b.val+")";return n;}
-template<class T,class U> typename ENABLE_IF<IS_SAME<NUMBER,T>::value||IS_SAME<NUMBER,U>::value,NUMBER>::TYPE atan2(const T& a,const U& b){NUMBER n;n.val="ATAN2("+a.val+","+b.val+")";return n;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE  Inverse(const T& v){NUMBER n;n.val="INV("+v.val+")";return n;}
+template<class T,class U> typename ENABLE_IF<is_same<NUMBER,T>::value||is_same<NUMBER,U>::value,NUMBER>::TYPE  min(const T& a,const U& b){NUMBER n;n.val="MIN("+a.val+","+b.val+")";return n;}
+template<class T,class U> typename ENABLE_IF<is_same<NUMBER,T>::value||is_same<NUMBER,U>::value,NUMBER>::TYPE  max(const T& a,const U& b){NUMBER n;n.val="MAX("+a.val+","+b.val+")";return n;}
+template<class T,class U> typename ENABLE_IF<is_same<NUMBER,T>::value||is_same<NUMBER,U>::value,NUMBER>::TYPE pow(const T& a,const U& b){NUMBER n;n.val="POW("+a.val+","+b.val+")";return n;}
+template<class T,class U> typename ENABLE_IF<is_same<NUMBER,T>::value||is_same<NUMBER,U>::value,NUMBER>::TYPE atan2(const T& a,const U& b){NUMBER n;n.val="ATAN2("+a.val+","+b.val+")";return n;}
 inline NUMBER clamp(const NUMBER& v,const NUMBER& vmin,const NUMBER& vmax){NUMBER n;n.val="MAX("+vmin.val+"MIN("+vmax.val+","+v.val+"))";return n;}
 
 inline NUMBER operator* (double a,const NUMBER& b) {return NUMBER(a)*b;}
@@ -301,7 +301,7 @@ inline BOOL_NUMBER operator>= (double a,const NUMBER& b) {return NUMBER(a)>=b;}
 inline BOOL_NUMBER operator== (double a,const NUMBER& b) {return NUMBER(a)==b;}
 inline BOOL_NUMBER operator!= (double a,const NUMBER& b) {return NUMBER(a)!=b;}
 
-template<class T> typename ENABLE_IF<IS_SAME<NUMBER,T>::value,NUMBER>::TYPE Magnitude_Squared(const T& a){return a*a;}
+template<class T> typename ENABLE_IF<is_same<NUMBER,T>::value,NUMBER>::TYPE Magnitude_Squared(const T& a){return a*a;}
 inline NUMBER Magnitude_Squared(const NUMBER& a){return a*a;}
 
 inline std::ostream& operator<<(std::ostream& output,const NUMBER& n)

@@ -79,7 +79,7 @@ public:
 
     template<class T_ARRAY1>
     ARRAY& operator=(const T_ARRAY1& source)
-    {STATIC_ASSERT(IS_SAME<ELEMENT,typename T_ARRAY1::ELEMENT>::value);
+    {STATIC_ASSERT(is_same<ELEMENT,typename T_ARRAY1::ELEMENT>::value);
     Resize_In_Place(source.Domain_Indices());
     ARRAY_BASE<T,BASE,TV_INT>::operator=(source);return *this;}
 

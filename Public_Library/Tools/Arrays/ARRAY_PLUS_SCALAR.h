@@ -52,7 +52,7 @@ public:
 
 template<class T0,class T2,class ENABLE=void> struct ARRAY_PLUS_SCALAR_VALID {static const bool value=false;};
 template<class T0,class T_ARRAY1> struct ARRAY_PLUS_SCALAR_VALID<T0,T_ARRAY1,typename FIRST<void,typename SUM<T0,typename T_ARRAY1::ELEMENT>::TYPE>::TYPE>
-{static const bool value=!FIXED_SIZE_VECTOR<T_ARRAY1>::value && IS_ARRAY<T_ARRAY1>::value && (IS_SAME<T0,typename T_ARRAY1::ELEMENT>::value || IS_SCALAR<T0>::value);};
+{static const bool value=!FIXED_SIZE_VECTOR<T_ARRAY1>::value && IS_ARRAY<T_ARRAY1>::value && (is_same<T0,typename T_ARRAY1::ELEMENT>::value || is_scalar<T0>::value);};
 
 template<class T0,class T,class T_ARRAY1> typename ENABLE_IF<ARRAY_PLUS_SCALAR_VALID<T0,T_ARRAY1>::value,ARRAY_PLUS_SCALAR<T0,T_ARRAY1> >::TYPE
 operator+(const T0& c,const ARRAY_BASE<T,T_ARRAY1,typename T_ARRAY1::INDEX>& array)

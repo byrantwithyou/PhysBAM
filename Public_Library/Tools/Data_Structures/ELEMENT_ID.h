@@ -100,7 +100,7 @@ public:
 //#####################################################################
 };
 
-template<class T> inline typename ENABLE_IF<IS_FUNDAMENTAL<T>::value,T>::TYPE
+template<class T> inline typename ENABLE_IF<is_fundamental<T>::value,T>::TYPE
 Value(T i)
 {return i;}
 

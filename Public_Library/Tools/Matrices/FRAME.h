@@ -15,7 +15,7 @@
 namespace PhysBAM{
 
 template<class TV> struct HAS_CHEAP_COPY<FRAME<TV> > {static const bool value=true;};
-template<class TV> struct IS_SCALAR_BLOCK<FRAME<TV> >:public IS_SCALAR_BLOCK<TV>{};
+template<class TV> struct is_scalar_BLOCK<FRAME<TV> >:public is_scalar_BLOCK<TV>{};
 template<class TV,class RW> struct IS_BINARY_IO_SAFE<FRAME<TV>,RW>:public IS_BINARY_IO_SAFE<TV,RW>{};
 
 template<class TV>

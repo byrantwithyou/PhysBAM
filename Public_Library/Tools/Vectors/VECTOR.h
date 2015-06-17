@@ -39,7 +39,7 @@ class VECTOR:public ARRAY_BASE<T,VECTOR<T,d> >
 public:
     typedef ARRAY_BASE<T,VECTOR<T,d> > BASE;
     template<class T2> struct REBIND{typedef VECTOR<T2,d> TYPE;};
-    typedef typename IF<IS_SCALAR<T>::value,T,UNUSABLE>::TYPE SCALAR;
+    typedef typename IF<is_scalar<T>::value,T,UNUSABLE>::TYPE SCALAR;
     typedef T ELEMENT;
     typedef UNUSABLE SPIN;
     typedef int INDEX;
@@ -214,7 +214,7 @@ public:
     {*this-=Dot_Product(*this,direction)*direction;}
 
     int Number_True() const
-    {STATIC_ASSERT((IS_SAME<T,bool>::value));int count=0;for(int i=0;i<d;i++)if(array[i]) count++;return count;}
+    {STATIC_ASSERT((is_same<T,bool>::value));int count=0;for(int i=0;i<d;i++)if(array[i]) count++;return count;}
 
     static VECTOR Axis_Vector(const int axis)
     {VECTOR r;r(axis)=(T)1;return r;}
@@ -248,13 +248,13 @@ public:
 
     template<class T_ARRAY>
     bool Contains_All(const T_ARRAY& elements) const
-    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,T>::value));
     for(int i=0;i<elements.Size();i++) if(!Contains(elements(i))) return false;
     return true;}
 
     template<class T_ARRAY>
     bool Contains_Any(const T_ARRAY& elements) const
-    {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,T>::value));
     for(int i=0;i<elements.Size();i++) if(Contains(elements(i))) return true;
     return false;}
 

@@ -168,7 +168,7 @@ inline void Write_To_Text_File(const std::string& filename,Args&& ...args)
 //#####################################################################
 template<class T>
 inline void Create_From_File(const STREAM_TYPE stream_type,const std::string& filename,T*& d)
-{typename REMOVE_CONST<T>::TYPE* read=T::Create();Read_From_File(stream_type,filename,*read);d=read;}
+{typename remove_const<T>::type* read=T::Create();Read_From_File(stream_type,filename,*read);d=read;}
 
 template<class RW,class T>
 inline void Create_From_File(const std::string& filename,T*& d)
@@ -176,7 +176,7 @@ inline void Create_From_File(const std::string& filename,T*& d)
 
 template<class T>
 inline T* Create_From_File(const STREAM_TYPE stream_type,const std::string& filename)
-{typename REMOVE_CONST<T>::TYPE* d=T::Create();Read_From_File(stream_type,filename,*d);return d;}
+{typename remove_const<T>::type* d=T::Create();Read_From_File(stream_type,filename,*d);return d;}
 
 void Ignore(std::istream& input,char c);
 //#####################################################################

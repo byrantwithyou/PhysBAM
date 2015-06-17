@@ -21,7 +21,7 @@ template<class T_input>
 class POINT_SIMPLICES_1D:public MESH_OBJECT<VECTOR<T_input,1>,POINT_SIMPLEX_MESH>
 {
     typedef T_input T;
-    STATIC_ASSERT(IS_FLOAT_OR_DOUBLE<T>::value);
+    STATIC_ASSERT(is_same<T,float>::value || is_same<T,double>::value);
     typedef VECTOR<T,1> TV;
 public:
     typedef MESH_OBJECT<TV,POINT_SIMPLEX_MESH> BASE;
@@ -64,7 +64,7 @@ public:
     {Update_Point_Simplex_List(particles.X);}
 
     template<class T_ARRAY_TV> void Update_Point_Simplex_List(const T_ARRAY_TV& X)
-    {STATIC_ASSERT((IS_SAME<TV,typename T_ARRAY_TV::ELEMENT>::value));
+    {STATIC_ASSERT((is_same<TV,typename T_ARRAY_TV::ELEMENT>::value));
     int number_point_simplices=mesh.elements.m;
     if(!point_simplex_list) point_simplex_list=new ARRAY<POINT_SIMPLEX_1D<T> >(number_point_simplices);else point_simplex_list->Resize(number_point_simplices);
     for(int k=0;k<number_point_simplices;k++){

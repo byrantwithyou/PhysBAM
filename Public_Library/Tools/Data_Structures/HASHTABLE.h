@@ -25,7 +25,7 @@ class HASHTABLE
 private:
     struct UNUSABLE{};
     typedef HASHTABLE_ENTRY_TEMPLATE<TK,T> ENTRY; // don't store data if T is void
-    typedef typename IF<IS_SAME<T,void>::value,UNUSABLE,T>::TYPE T_UNLESS_VOID;
+    typedef typename IF<is_same<T,void>::value,UNUSABLE,T>::TYPE T_UNLESS_VOID;
 public:
     typedef TK KEY;
     typedef T ELEMENT;
@@ -92,14 +92,14 @@ private:
     void Insert(const HASHTABLE_ENTRY_TEMPLATE<TK,void>& entry)
     {Insert(entry.key);}
 
-    template<class T2> typename DISABLE_IF<IS_SAME<T2,void>::value>::TYPE
+    template<class T2> typename DISABLE_IF<is_same<T2,void>::value>::TYPE
     Insert(const HASHTABLE_ENTRY_TEMPLATE<TK,T2>& entry)
     {Insert(entry.key,entry.data);}
 
 public:
 
     void Insert(const TK& v) // assumes no entry with v exists
-    {STATIC_ASSERT((IS_SAME<T,void>::value));
+    {STATIC_ASSERT((is_same<T,void>::value));
     if(number_of_entries>next_resize) Resize_Table();
     number_of_entries++;
     int h=Hash_Index(v);assert(!Contains(v,h));
@@ -107,7 +107,7 @@ public:
     ENTRY& entry=table(h);entry.key=v;entry.state=ENTRY_ACTIVE;}
 
     T_UNLESS_VOID& Insert(const TK& v,const T_UNLESS_VOID& value) // assumes no entry with v exists
-    {STATIC_ASSERT((!IS_SAME<T,void>::value));
+    {STATIC_ASSERT((!is_same<T,void>::value));
     if(number_of_entries>next_resize) Resize_Table();
     number_of_entries++;
     int h=Hash_Index(v);assert(!Contains(v,h));
@@ -150,7 +150,7 @@ public:
     return false;}
 
     bool Set(const TK& v) // insert entry if doesn't already exists, returns whether it added a new entry
-    {STATIC_ASSERT((IS_SAME<T,void>::value));
+    {STATIC_ASSERT((is_same<T,void>::value));
     if(number_of_entries>next_resize) Resize_Table();
     int h=Hash_Index(v);
     for(;table(h).state!=ENTRY_FREE;h=Next_Index(h))
@@ -159,7 +159,7 @@ public:
     ENTRY& entry=table(h);entry.key=v;entry.state=ENTRY_ACTIVE;return true;}
 
     bool Set(const TK& v,const T_UNLESS_VOID& value) // if v doesn't exist insert value, else sets its value, returns whether it added a new entry
-    {STATIC_ASSERT((!IS_SAME<T,void>::value));
+    {STATIC_ASSERT((!is_same<T,void>::value));
     if(number_of_entries>next_resize) Resize_Table(); // if over load average, have to grow (must do this before computing hash index)
     int h=Hash_Index(v);
     for(;table(h).state!=ENTRY_FREE;h=Next_Index(h))
@@ -169,13 +169,13 @@ public:
 
     template<class T_ARRAY>
     void Set_All(const T_ARRAY& array)
-    {STATIC_ASSERT(IS_SAME<typename T_ARRAY::ELEMENT,TK>::value);
+    {STATIC_ASSERT(is_same<typename T_ARRAY::ELEMENT,TK>::value);
     for(typename T_ARRAY::INDEX i(0);i<array.Size();i++) Set(array(i));}
 
     template<class T_KEY,class T_ARRAY>
     void Set_All(const T_KEY& key,const T_ARRAY& array)
-    {STATIC_ASSERT(IS_SAME<typename T_ARRAY::ELEMENT,T>::value);
-    STATIC_ASSERT(IS_SAME<typename T_KEY::ELEMENT,TK>::value);
+    {STATIC_ASSERT(is_same<typename T_ARRAY::ELEMENT,T>::value);
+    STATIC_ASSERT(is_same<typename T_KEY::ELEMENT,TK>::value);
     for(typename T_ARRAY::INDEX i(0);i<array.Size();i++) Set(key(i),array(i));}
 
     bool Delete_If_Present(const TK& v)
@@ -222,7 +222,7 @@ public:
 
     template<class T_ARRAY0,class T_ARRAY1>
     void Get_Complementary_Keys(const T_ARRAY0& keys_universe,T_ARRAY1& keys_complementary) const
-    {STATIC_ASSERT(IS_SAME<typename T_ARRAY0::ELEMENT,TK>::value && IS_SAME<typename T_ARRAY1::ELEMENT,TK>::value);
+    {STATIC_ASSERT(is_same<typename T_ARRAY0::ELEMENT,TK>::value && is_same<typename T_ARRAY1::ELEMENT,TK>::value);
     keys_complementary.Remove_All();keys_complementary.Preallocate(keys_universe.Size()-Size());
     for(typename T_ARRAY0::INDEX i(0);i<keys_universe.Size();i++) if(!Contains(keys_universe(i))) keys_complementary.Append(keys_universe(i));}
 
@@ -244,19 +244,19 @@ public:
     const ENTRY* end() const
     {return table.Get_Array_Pointer()+table.Size();}
 
-    template<class RW> void Read(typename IF<IS_SAME<T,void>::value,std::istream&,UNUSABLE>::TYPE input) // void version
+    template<class RW> void Read(typename IF<is_same<T,void>::value,std::istream&,UNUSABLE>::TYPE input) // void version
     {int entries;Read_Binary<RW>(input,entries);Initialize_New_Table(entries);
     for(int i=0;i<entries;i++){TK key;Read_Binary<RW>(input,key);Insert(key);}}
 
-    template<class RW> void Read(typename IF<IS_SAME<T,void>::value,UNUSABLE,std::istream&>::TYPE input) // non-void version
+    template<class RW> void Read(typename IF<is_same<T,void>::value,UNUSABLE,std::istream&>::TYPE input) // non-void version
     {int entries;Read_Binary<RW>(input,entries);Initialize_New_Table(entries);
     for(int i=0;i<entries;i++){TK key;T value;Read_Binary<RW>(input,key,value);Insert(key,value);}}
 
-    template<class RW> void Write(typename IF<IS_SAME<T,void>::value,std::ostream&,UNUSABLE>::TYPE output) const // void version
+    template<class RW> void Write(typename IF<is_same<T,void>::value,std::ostream&,UNUSABLE>::TYPE output) const // void version
     {Write_Binary<RW>(output,number_of_entries);
     for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) Write_Binary<RW>(output,table(h).key);}
 
-    template<class RW> void Write(typename IF<IS_SAME<T,void>::value,UNUSABLE,std::ostream&>::TYPE output) const // non-void version
+    template<class RW> void Write(typename IF<is_same<T,void>::value,UNUSABLE,std::ostream&>::TYPE output) const // non-void version
     {Write_Binary<RW>(output,number_of_entries);
     for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) Write_Binary<RW>(output,table(h).key,table(h).data);}
 

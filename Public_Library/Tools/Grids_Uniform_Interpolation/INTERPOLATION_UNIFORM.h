@@ -18,7 +18,7 @@ template<class TV,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_UNI
 class INTERPOLATION_UNIFORM:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    STATIC_ASSERT((IS_SAME<typename GRID<TV>::GRID_TAG,UNIFORM_TAG<TV> >::value));
+    STATIC_ASSERT((is_same<typename GRID<TV>::GRID_TAG,UNIFORM_TAG<TV> >::value));
 public:
     template<class T3> struct REBIND{typedef INTERPOLATION_UNIFORM<TV,T3,T_FACE_LOOKUP> TYPE;};
 

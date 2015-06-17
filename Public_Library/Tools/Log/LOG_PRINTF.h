@@ -52,7 +52,7 @@ int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_F
 
 extern int fprintf_formatted_item_string(std::ostream& out,const PRINTF_FORMAT_FLAGS& flags,const std::string& str);
 
-template<typename T> typename DISABLE_IF<IS_FUNDAMENTAL<typename REMOVE_REFERENCE<T>::TYPE>::value,int>::TYPE
+template<typename T> typename DISABLE_IF<is_fundamental<typename remove_reference<T>::type>::value,int>::TYPE
 fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,T&& value)
 {
     std::ostringstream stream;
@@ -70,13 +70,13 @@ extern int fprintf_rewrite_flags(const char *format,char* new_format,int len,con
 int fprintf(std::ostream& out,const char *format);
 template<typename T,typename... Args> int fprintf(std::ostream& out,const char *format,T&& value,Args&&... args);
 
-template<typename T> typename DISABLE_IF<IS_FUNDAMENTAL<typename REMOVE_REFERENCE<T>::TYPE>::value,int>::TYPE
+template<typename T> typename DISABLE_IF<is_fundamental<typename remove_reference<T>::type>::value,int>::TYPE
 fprintf_with_format(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,T&& value)
 {
     return fprintf_formatted_item(out,format,len,flags,value);
 }
 
-template<typename T> typename ENABLE_IF<IS_FUNDAMENTAL<typename REMOVE_REFERENCE<T>::TYPE>::value,int>::TYPE
+template<typename T> typename ENABLE_IF<is_fundamental<typename remove_reference<T>::type>::value,int>::TYPE
 fprintf_with_format(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,T&& value)
 {
     if(format[len-1]!='P')
@@ -96,7 +96,7 @@ fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_F
     throw std::runtime_error("invalid format string.");
 }
 
-template<typename T,typename U,typename... Args> typename DISABLE_IF<IS_INTEGRAL<typename REMOVE_REFERENCE<T>::TYPE>::value,int>::TYPE
+template<typename T,typename U,typename... Args> typename DISABLE_IF<is_integral<typename remove_reference<T>::type>::value,int>::TYPE
 fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_FLAGS& flags,T&& param,
     U&& value,Args&&... args)
 {

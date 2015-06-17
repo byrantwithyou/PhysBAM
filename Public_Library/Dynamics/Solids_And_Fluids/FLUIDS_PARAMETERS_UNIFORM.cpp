@@ -623,7 +623,7 @@ template<class TV> template<class T_PARTICLES,class T_ARRAYS_PARTICLES> void FLU
 Read_Particles(const STREAM_TYPE stream_type,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const std::string& output_directory,const std::string& prefix,
     const int frame)
 {
-    STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value)); 
+    STATIC_ASSERT((is_same<T_PARTICLES,typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::type>::value)); 
     FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
     if(typeid(template_particles)!=typeid(T_PARTICLES)) // swap in clones of template_particle for pure T_PARTICLESs
         for(int i=0;i<particles.array.Size();i++) if(particles.array(i)){

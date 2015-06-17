@@ -124,11 +124,11 @@ public:
     ARRAYS_ND_BASE& operator*=(const T& a)
     {array*=a;return *this;}
 
-    template<class T2> typename ENABLE_IF<IS_CONVERTIBLE<T2,T>::value,ARRAYS_ND_BASE&>::TYPE
+    template<class T2> typename ENABLE_IF<is_convertible<T2,T>::value,ARRAYS_ND_BASE&>::TYPE
     operator*=(const T2 a)
     {array*=(T)a;return *this;}
 
-    template<class T2> typename ENABLE_IF<IS_SCALAR<T2>::value && !IS_CONVERTIBLE<T2,T>::value,ARRAYS_ND_BASE&>::TYPE
+    template<class T2> typename ENABLE_IF<is_scalar<T2>::value && !is_convertible<T2,T>::value,ARRAYS_ND_BASE&>::TYPE
     operator*=(const T2 a)
     {array*=a;return *this;}
 
@@ -214,7 +214,7 @@ public:
 
     template<class TV2>
     static typename SCALAR_POLICY<T>::TYPE Maximum_Magnitude(const ARRAYS_ND_BASE<TV2,VECTOR<int,d> >& a)
-    {STATIC_ASSERT(IS_SAME<T,TV2>::value);
+    {STATIC_ASSERT(is_same<T,TV2>::value);
     return ARRAY_VIEW<T>::Maximum_Magnitude(a.array);}
 
     T& operator()(const int i,const int j,const int k)

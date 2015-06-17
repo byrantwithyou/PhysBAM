@@ -47,7 +47,7 @@ public:
 };
 
 template<class T_ARRAY0,class T_ARRAY1,class ENABLE=void> struct ARRAY_PRODUCT_VALID {static const bool value=false;};
-template<class T_ARRAY0,class T_ARRAY1> struct ARRAY_PRODUCT_VALID<T_ARRAY0,T_ARRAY1,typename ENABLE_IF<IS_SAME<typename T_ARRAY0::ELEMENT,typename T_ARRAY1::ELEMENT>::value>::TYPE>
+template<class T_ARRAY0,class T_ARRAY1> struct ARRAY_PRODUCT_VALID<T_ARRAY0,T_ARRAY1,typename ENABLE_IF<is_same<typename T_ARRAY0::ELEMENT,typename T_ARRAY1::ELEMENT>::value>::TYPE>
 {static const bool value=IS_ARRAY<T_ARRAY0>::value && IS_ARRAY<T_ARRAY1>::value && (!FIXED_SIZE_VECTOR<T_ARRAY0>::value || !FIXED_SIZE_VECTOR<T_ARRAY1>::value);};
 
 template<class T0,class T2,class T_ARRAY0,class T_ARRAY1> typename ENABLE_IF<ARRAY_PRODUCT_VALID<T_ARRAY0,T_ARRAY1>::value,ARRAY_PRODUCT<T_ARRAY0,T_ARRAY1> >::TYPE

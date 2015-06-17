@@ -76,7 +76,7 @@ Read_Binary(TYPED_ISTREAM& input,T& d)
 //#####################################################################
 // Write_Binary
 //#####################################################################
-template<class RW,class T> inline typename ENABLE_IF<!HAS_TYPED_WRITE<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value && !IS_POINTER<T>::value>::TYPE
+template<class RW,class T> inline typename ENABLE_IF<!HAS_TYPED_WRITE<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value && !is_pointer<T>::value>::TYPE
 Write_Binary(std::ostream& output,const T& d)
 {d.template Write<RW>(output);}
 

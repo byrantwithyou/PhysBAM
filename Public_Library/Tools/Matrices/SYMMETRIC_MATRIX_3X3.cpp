@@ -25,7 +25,7 @@ using namespace PhysBAM;
 template<class T> DIAGONAL_MATRIX<T,3> SYMMETRIC_MATRIX<T,3>::
 Fast_Eigenvalues() const // 24 mults, 20 adds, 1 atan2, 1 sincos, 2 sqrts
 {
-    if(!IS_SAME<T,double>::value) return DIAGONAL_MATRIX<T,3>(SYMMETRIC_MATRIX<double,3>(*this).Fast_Eigenvalues());
+    if(!is_same<T,double>::value) return DIAGONAL_MATRIX<T,3>(SYMMETRIC_MATRIX<double,3>(*this).Fast_Eigenvalues());
     // now T is double
     T m=((T)1/3)*(x00+x11+x22);
     T a00=x00-m,a11=x11-m,a22=x22-m,a12_sqr=x10*x10,a13_sqr=x20*x20,a23_sqr=x21*x21;
@@ -44,7 +44,7 @@ namespace{
 template<class T> MATRIX<T,3>
 Fast_Eigenvectors(const SYMMETRIC_MATRIX<T,3>& A,const DIAGONAL_MATRIX<T,3>& lambda) // 71 mults, 44 adds, 3 divs, 3 sqrts
 {
-    if(!IS_SAME<T,double>::value) PHYSBAM_FATAL_ERROR();
+    if(!is_same<T,double>::value) PHYSBAM_FATAL_ERROR();
     // T is now always double
 
     // flip if necessary so that first eigenvalue is the most different
@@ -76,7 +76,7 @@ Fast_Eigenvectors(const SYMMETRIC_MATRIX<T,3>& A,const DIAGONAL_MATRIX<T,3>& lam
 template<class T> void SYMMETRIC_MATRIX<T,3>::
 Fast_Solve_Eigenproblem(DIAGONAL_MATRIX<T,3>& eigenvalues,MATRIX<T,3>& eigenvectors) const // roughly 95 mults, 64 adds, 3 divs, 5 sqrts, 1 atan2, 1 sincos
 {
-    if(!IS_SAME<T,double>::value){
+    if(!is_same<T,double>::value){
         DIAGONAL_MATRIX<double,3> eigenvalues_double;MATRIX<double,3> eigenvectors_double;
         SYMMETRIC_MATRIX<double,3>(*this).Fast_Solve_Eigenproblem(eigenvalues_double,eigenvectors_double);
         eigenvalues=DIAGONAL_MATRIX<T,3>(eigenvalues_double);eigenvectors=MATRIX<T,3>(eigenvectors_double);return;}

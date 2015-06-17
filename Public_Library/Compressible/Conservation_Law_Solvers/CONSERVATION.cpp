@@ -249,7 +249,7 @@ template<class TV,int d> template<class T_ARRAYS> void CONSERVATION<TV,d>::
 Update_Conservation_Law_For_Specialized_Shallow_Water_Equations(GRID<TV>& grid,T_ARRAYS& U,const T_ARRAYS& U_ghost,const ARRAY<bool,VECTOR<int,2> >& psi,const T dt,
     EIGENSYSTEM<T,VECTOR<T,2> >& eigensystem_F,EIGENSYSTEM<T,VECTOR<T,2> >& eigensystem_G,CONSERVATION<TV,2>& solver,const VECTOR<bool,2*TV::m>& outflow_boundaries)
 {
-    STATIC_ASSERT((IS_SAME<T_ARRAYS,ARRAY<VECTOR<T,3> ,VECTOR<int,2> > >::value));
+    STATIC_ASSERT((is_same<T_ARRAYS,ARRAY<VECTOR<T,3> ,VECTOR<int,2> > >::value));
     if(save_fluxes!=solver.save_fluxes) PHYSBAM_FATAL_ERROR();
 
     int i,j;int m=grid.counts.x,n=grid.counts.y;T dx=grid.dX.x,dy=grid.dX.y;

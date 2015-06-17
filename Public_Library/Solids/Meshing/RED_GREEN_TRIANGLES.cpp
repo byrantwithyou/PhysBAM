@@ -51,7 +51,7 @@ Clean_Memory()
 template<class TV> template<class T_ARRAY> void RED_GREEN_TRIANGLES<TV>::
 Refine_Simplex_List(const T_ARRAY& triangle_list)
 {
-    STATIC_ASSERT((IS_SAME<int,typename T_ARRAY::ELEMENT>::value));
+    STATIC_ASSERT((is_same<int,typename T_ARRAY::ELEMENT>::value));
     object.particles.Preallocate(object.particles.Size()+3*triangle_list.Size());
     for(int level=0;level<index_in_stack.m;level++) index_in_stack(level)->Fill(0);
     for(int i=0;i<triangle_list.Size();i++){

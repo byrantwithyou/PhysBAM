@@ -19,7 +19,7 @@ template<class T> class EXACT_RATIONAL;
 template<class T>
 class EXACT_FLOAT
 {
-    STATIC_ASSERT(IS_FLOATING_POINT<T>::value);
+    STATIC_ASSERT(is_floating_point<T>::value);
     friend class EXACT_RATIONAL<T>;
 
     ARRAY<T> expansion;

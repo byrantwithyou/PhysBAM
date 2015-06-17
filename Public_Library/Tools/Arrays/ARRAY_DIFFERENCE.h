@@ -50,7 +50,7 @@ public:
 };
 
 template<class T_ARRAY0,class T_ARRAY1,class ENABLE=void> struct ARRAY_DIFFERENCE_VALID {static const bool value=false;};
-template<class T_ARRAY0,class T_ARRAY1> struct ARRAY_DIFFERENCE_VALID<T_ARRAY0,T_ARRAY1,typename ENABLE_IF<IS_SAME<typename EQUIVALENT_ARRAY<T_ARRAY0>::TYPE,typename EQUIVALENT_ARRAY<T_ARRAY1>::TYPE>::value>::TYPE>
+template<class T_ARRAY0,class T_ARRAY1> struct ARRAY_DIFFERENCE_VALID<T_ARRAY0,T_ARRAY1,typename ENABLE_IF<is_same<typename EQUIVALENT_ARRAY<T_ARRAY0>::TYPE,typename EQUIVALENT_ARRAY<T_ARRAY1>::TYPE>::value>::TYPE>
 {static const bool value=IS_ARRAY<T_ARRAY0>::value && IS_ARRAY<T_ARRAY1>::value && (!FIXED_SIZE_VECTOR<T_ARRAY0>::value || !FIXED_SIZE_VECTOR<T_ARRAY1>::value);};
 
 template<class T0,class T2,class T_ARRAY0,class T_ARRAY1> typename ENABLE_IF<ARRAY_DIFFERENCE_VALID<T_ARRAY0,T_ARRAY1>::value,ARRAY_DIFFERENCE<T_ARRAY0,T_ARRAY1> >::TYPE

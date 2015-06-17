@@ -84,13 +84,13 @@ public:
     {return ATTRIBUTE_ID(Hash(typeid(ARRAY_COLLECTION_ELEMENT<typename REPLACE_FLOATING_POINT<T,double>::TYPE>).name())*0x10000+Value(id));}
 
     virtual void Read(TYPED_ISTREAM& input)
-    {if(!IS_POINTER<T>::value) Read_Binary(input,*array);}
+    {if(!is_pointer<T>::value) Read_Binary(input,*array);}
 
     virtual void Write(TYPED_OSTREAM& output) const
-    {if(!IS_POINTER<T>::value) Write_Binary(output,*array);}
+    {if(!is_pointer<T>::value) Write_Binary(output,*array);}
 
     virtual int Write_Size(bool use_doubles) const
-    {return IS_POINTER<T>::value?0:(use_doubles?sizeof(double):sizeof(float))*array->Size()+sizeof(int);}
+    {return is_pointer<T>::value?0:(use_doubles?sizeof(double):sizeof(float))*array->Size()+sizeof(int);}
 
     virtual void Print(std::ostream& output,const int p) const
     {if(const char* name=Get_Attribute_Name(id)) output<<name;

@@ -13,8 +13,8 @@
 #endif
 namespace PhysBAM{
 
-template<class TV> struct IS_SCALAR_BLOCK<TWIST<TV> >:public IS_SCALAR_BLOCK<TV>{using IS_SCALAR_BLOCK<TV>::value;};
-template<class TV> struct IS_SCALAR_VECTOR_SPACE<TWIST<TV> >:public IS_SCALAR_VECTOR_SPACE<TV>{};
+template<class TV> struct is_scalar_BLOCK<TWIST<TV> >:public is_scalar_BLOCK<TV>{using is_scalar_BLOCK<TV>::value;};
+template<class TV> struct is_scalar_VECTOR_SPACE<TWIST<TV> >:public is_scalar_VECTOR_SPACE<TV>{};
 template<class TV,class RW> struct IS_BINARY_IO_SAFE<TWIST<TV>,RW>:public IS_BINARY_IO_SAFE<TV,RW>{};
 
 template<class TV>

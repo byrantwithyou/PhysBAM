@@ -23,12 +23,12 @@ template<class T_ARRAY,class T_INDICES> struct INDIRECT_ARRAY_BASE<INDIRECT_ARRA
 
 template<class T_ARRAY,class T_INDICES> // T_INDICES=ARRAY<int>&
 class INDIRECT_ARRAY:public INDIRECT_ARRAY_BASE<T_INDICES>,
-                     public ARRAY_BASE<typename T_ARRAY::ELEMENT,INDIRECT_ARRAY<T_ARRAY,T_INDICES>,typename REMOVE_REFERENCE<T_INDICES>::TYPE::INDEX>
+                     public ARRAY_BASE<typename T_ARRAY::ELEMENT,INDIRECT_ARRAY<T_ARRAY,T_INDICES>,typename remove_reference<T_INDICES>::type::INDEX>
 {
-    typedef typename REMOVE_REFERENCE<T_INDICES>::TYPE T_INDICES_NO_REFERENCE;
-    typedef typename IF<IS_REFERENCE<T_INDICES>::value,const T_INDICES_NO_REFERENCE&,const T_INDICES_NO_REFERENCE>::TYPE CONST_T_INDICES;
-    STATIC_ASSERT(IS_SAME<typename T_ARRAY::INDEX,typename T_INDICES_NO_REFERENCE::ELEMENT>::value);
-//    STATIC_ASSERT((!IS_CONST<T_INDICES_NO_REFERENCE>::value));
+    typedef typename remove_reference<T_INDICES>::type T_INDICES_NO_REFERENCE;
+    typedef typename IF<is_reference<T_INDICES>::value,const T_INDICES_NO_REFERENCE&,const T_INDICES_NO_REFERENCE>::TYPE CONST_T_INDICES;
+    STATIC_ASSERT(is_same<typename T_ARRAY::INDEX,typename T_INDICES_NO_REFERENCE::ELEMENT>::value);
+//    STATIC_ASSERT((!is_const<T_INDICES_NO_REFERENCE>::value));
     typedef typename T_ARRAY::ELEMENT T;typedef typename T_INDICES_NO_REFERENCE::INDEX ID;
     typedef ARRAY_BASE<T,INDIRECT_ARRAY<T_ARRAY,T_INDICES>,ID> BASE;
     struct UNUSABLE{};
@@ -46,7 +46,7 @@ public:
 //     INDIRECT_ARRAY(T_OTHER_ARRAY& array,typename ADD_REFERENCE<CONST_T_INDICES>::TYPE indices,typename DISABLE_IF<IS_ARRAY_VIEW<T_OTHER_ARRAY>::value,UNUSABLE>::TYPE unusable=UNUSABLE())
 //         :array(array),indices(indices)
 //     {
-//         STATIC_ASSERT(IS_BASE_OF<T_ARRAY,T_OTHER_ARRAY>::value); // avoid grabbing reference to temporary
+//         STATIC_ASSERT(is_base_of<T_ARRAY,T_OTHER_ARRAY>::value); // avoid grabbing reference to temporary
 //     }
 
 //     template<class T_OTHER_ARRAY>
@@ -55,12 +55,12 @@ public:
 //     {
 //     }
 
-    INDIRECT_ARRAY(T_ARRAY_VIEW array,typename ADD_REFERENCE<CONST_T_INDICES>::TYPE indices)
+    INDIRECT_ARRAY(T_ARRAY_VIEW array,typename add_lvalue_reference<CONST_T_INDICES>::type indices)
         :array(array),indices(indices)
     {
     }
 
-    INDIRECT_ARRAY(const INDIRECT_ARRAY<typename REMOVE_CONST<T_ARRAY>::TYPE,T_INDICES>& indirect)
+    INDIRECT_ARRAY(const INDIRECT_ARRAY<typename remove_const<T_ARRAY>::type,T_INDICES>& indirect)
         :array(indirect.array),indices(indirect.indices)
     {}
 
@@ -80,7 +80,7 @@ public:
     INDIRECT_ARRAY& operator=(const T_OTHER_ARRAY& source)
     {return BASE::operator=(source);}
 
-    typename IF<IS_CONST<T_ARRAY>::value,const T*,T*>::TYPE Get_Array_Pointer()
+    typename IF<is_const<T_ARRAY>::value,const T*,T*>::TYPE Get_Array_Pointer()
     {return array.Get_Array_Pointer()+Offset_If_Contiguous(indices);}
 
     const T* Get_Array_Pointer() const
