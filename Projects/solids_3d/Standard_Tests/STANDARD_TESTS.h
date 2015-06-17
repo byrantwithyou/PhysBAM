@@ -103,10 +103,7 @@
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Solids_Evolution/QUASISTATIC_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <boost/math/special_functions/asinh.hpp>
 namespace PhysBAM{
-
-using boost::math::asinh;
 
 template<class T_input>
 class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
