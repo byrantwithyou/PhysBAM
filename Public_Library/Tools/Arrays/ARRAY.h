@@ -65,7 +65,7 @@ public:
     }
 
     template<class T_ARRAY>
-    explicit ARRAY(const T_ARRAY& array,typename ENABLE_IF<is_same<T,typename T_ARRAY::ELEMENT>::value,UNUSABLE>::TYPE unused=UNUSABLE())
+    explicit ARRAY(const T_ARRAY& array,typename enable_if<is_same<T,typename T_ARRAY::ELEMENT>::value,UNUSABLE>::type unused=UNUSABLE())
         :base_pointer(0),buffer_size(array.Size()),m(array.Size())
     {
         base_pointer=new T[Value(m)];

@@ -16,6 +16,7 @@ namespace PhysBAM{
 using std::add_const;
 using std::add_lvalue_reference;
 using std::add_pointer;
+using std::enable_if;
 using std::is_base_of;
 using std::is_class;
 using std::is_const;
@@ -33,12 +34,6 @@ using std::is_scalar;
 using std::remove_const;
 using std::remove_pointer;
 using std::remove_reference;
-
-template<bool b,class T=void> struct ENABLE_IF{};
-template<class T> struct ENABLE_IF<true,T>{typedef T TYPE;};
-
-template<bool b,class T=void> struct DISABLE_IF{};
-template<class T> struct DISABLE_IF<false,T>{typedef T TYPE;};
 
 template<bool b,class T1,class T2> struct IF{typedef T1 TYPE;};
 template<class T1,class T2> struct IF<false,T1,T2>{typedef T2 TYPE;};
@@ -67,8 +62,8 @@ template<class T> struct HAS_TRIVIAL_DESTRUCTOR {static const bool value=is_pod<
 template<class T,class RW,class ENABLER=void> struct IS_BINARY_IO_SAFE;
 
 template<class T,class SCALAR,class ENABLER=void> struct REPLACE_FLOATING_POINT{};
-template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename ENABLE_IF<(is_same<T,float>::value || is_same<T,double>::value) && (is_same<SCALAR,float>::value || is_same<SCALAR,double>::value)>::TYPE>{typedef SCALAR TYPE;};
-template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename ENABLE_IF<!(is_same<T,float>::value || is_same<T,double>::value) && is_fundamental<T>::value && (is_same<SCALAR,float>::value || is_same<SCALAR,double>::value)>::TYPE>{typedef T TYPE;};
-template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename ENABLE_IF<is_pointer<T>::value>::TYPE> {typedef typename REPLACE_FLOATING_POINT<typename remove_pointer<T>::type,SCALAR>::TYPE* TYPE;};
+template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename enable_if<(is_same<T,float>::value || is_same<T,double>::value) && (is_same<SCALAR,float>::value || is_same<SCALAR,double>::value)>::type>{typedef SCALAR TYPE;};
+template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename enable_if<!(is_same<T,float>::value || is_same<T,double>::value) && is_fundamental<T>::value && (is_same<SCALAR,float>::value || is_same<SCALAR,double>::value)>::type>{typedef T TYPE;};
+template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename enable_if<is_pointer<T>::value>::type> {typedef typename REPLACE_FLOATING_POINT<typename remove_pointer<T>::type,SCALAR>::type* TYPE;};
 }
 #endif

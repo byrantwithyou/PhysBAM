@@ -46,13 +46,13 @@ template<class T_ARRAY1,class ENABLE=void> struct ARRAY_NEGATION_VALID {static c
 template<class T_ARRAY1> struct ARRAY_NEGATION_VALID<T_ARRAY1,typename FIRST<void,typename NEGATION<typename T_ARRAY1::ELEMENT>::TYPE>::TYPE>
 {static const bool value=!FIXED_SIZE_VECTOR<T_ARRAY1>::value && IS_ARRAY<T_ARRAY1>::value;};
 
-template<class T,class T_ARRAY> typename ENABLE_IF<ARRAY_NEGATION_VALID<T_ARRAY>::value,ARRAY_NEGATION<T_ARRAY> >::TYPE
+template<class T,class T_ARRAY> typename enable_if<ARRAY_NEGATION_VALID<T_ARRAY>::value,ARRAY_NEGATION<T_ARRAY> >::type
 operator-(const ARRAY_BASE<T,T_ARRAY,typename T_ARRAY::INDEX>& array)
 {return ARRAY_NEGATION<T_ARRAY>(array.Derived());}
 
 //#####################################################################
 
-template<class T_ARRAY> struct NEGATION<T_ARRAY,typename ENABLE_IF<ARRAY_NEGATION_VALID<T_ARRAY>::value>::TYPE>
+template<class T_ARRAY> struct NEGATION<T_ARRAY,typename enable_if<ARRAY_NEGATION_VALID<T_ARRAY>::value>::type>
 {typedef ARRAY_NEGATION<T_ARRAY> TYPE;};
 
 //#####################################################################

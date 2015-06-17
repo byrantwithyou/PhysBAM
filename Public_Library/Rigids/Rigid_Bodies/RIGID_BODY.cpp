@@ -492,7 +492,7 @@ Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<VECTOR<T,1> >& body0,co
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }
-template<class T,class TV> typename ENABLE_IF<(TV::m>1),TWIST<TV> >::TYPE
+template<class T,class TV> typename enable_if<(TV::m>1),TWIST<TV> >::type
 Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,const TV& location,const TWIST<TV>& delta_relative_twist_at_location,
     const MATRIX_MXN<T>& angular_constraint_matrix,const MATRIX_MXN<T>& prismatic_constraint_matrix)
 {

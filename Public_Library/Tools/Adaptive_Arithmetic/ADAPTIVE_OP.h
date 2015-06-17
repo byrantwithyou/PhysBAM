@@ -63,7 +63,7 @@ operator+(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,
 }
 
 template<class T_ADAPTIVE0,class T>
-typename ENABLE_IF<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,ADAPTIVE_SUM<T_ADAPTIVE0,ADAPTIVE_ATOM<T,typename T_ADAPTIVE0::EXACT_TYPE> > >::TYPE
+typename enable_if<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,ADAPTIVE_SUM<T_ADAPTIVE0,ADAPTIVE_ATOM<T,typename T_ADAPTIVE0::EXACT_TYPE> > >::type
 operator+(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,const T& t)
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));
@@ -74,7 +74,7 @@ operator+(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,
 }
 
 template<class T,class T_ADAPTIVE0>
-typename ENABLE_IF<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,ADAPTIVE_SUM<ADAPTIVE_ATOM<T,typename T_ADAPTIVE0::EXACT_TYPE>,T_ADAPTIVE0> >::TYPE
+typename enable_if<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,ADAPTIVE_SUM<ADAPTIVE_ATOM<T,typename T_ADAPTIVE0::EXACT_TYPE>,T_ADAPTIVE0> >::type
 operator+(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));
@@ -97,7 +97,7 @@ operator-(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,
 }
 
 template<class T_ADAPTIVE0,class T>
-typename ENABLE_IF<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
+typename enable_if<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
 ADAPTIVE_DIFFERENCE<T_ADAPTIVE0,ADAPTIVE_ATOM<T,typename T_ADAPTIVE0::EXACT_TYPE> > >::TYPE
 operator-(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,const T& t)
 {
@@ -109,7 +109,7 @@ operator-(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,
 }
 
 template<class T,class T_ADAPTIVE0>
-typename ENABLE_IF<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
+typename enable_if<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
 ADAPTIVE_DIFFERENCE<ADAPTIVE_ATOM<T,typename T_ADAPTIVE0::EXACT_TYPE>,T_ADAPTIVE0> >::TYPE
 operator-(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
@@ -133,7 +133,7 @@ operator*(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,
 }
 
 template<class T_ADAPTIVE0,class T>
-typename ENABLE_IF<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
+typename enable_if<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
 ADAPTIVE_PRODUCT<T_ADAPTIVE0,ADAPTIVE_ATOM<T,typename T_ADAPTIVE0::EXACT_TYPE> > >::TYPE
 operator*(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,const T& t)
 {
@@ -145,7 +145,7 @@ operator*(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,
 }
 
 template<class T,class T_ADAPTIVE0>
-typename ENABLE_IF<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
+typename enable_if<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
 ADAPTIVE_PRODUCT<ADAPTIVE_ATOM<T,typename T_ADAPTIVE0::EXACT_TYPE>,T_ADAPTIVE0> >::TYPE
 operator*(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
@@ -170,7 +170,7 @@ operator/(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,
 }
 
 template<class T_ADAPTIVE0,class T>
-typename ENABLE_IF<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
+typename enable_if<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
 ADAPTIVE_QUOTIENT<T_ADAPTIVE0,ADAPTIVE_ATOM<T,typename T_ADAPTIVE0::EXACT_TYPE> > >::TYPE
 operator/(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,const T& t)
 {
@@ -182,7 +182,7 @@ operator/(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,
 }
 
 template<class T,class T_ADAPTIVE0>
-typename ENABLE_IF<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
+typename enable_if<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,
 ADAPTIVE_QUOTIENT<ADAPTIVE_ATOM<T,typename T_ADAPTIVE0::EXACT_TYPE>,T_ADAPTIVE0> >::TYPE
 operator/(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
@@ -211,7 +211,7 @@ int Compare(ZERO zero,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXAC
 }
 
 template<class T_ADAPTIVE0,class T>
-typename ENABLE_IF<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,int>::TYPE
+typename enable_if<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,int>::type
 Compare(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,const T& t)
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));
@@ -219,7 +219,7 @@ Compare(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,co
 }
 
 template<class T,class T_ADAPTIVE0>
-typename ENABLE_IF<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,int>::TYPE
+typename enable_if<IS_ATOMIZABLE<T,typename T_ADAPTIVE0::EXACT_TYPE>::value,int>::type
 Compare(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));
@@ -245,7 +245,7 @@ bool operator<(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>
 }
 
 template<class T,class T_ADAPTIVE0>
-typename ENABLE_IF<IS_NOT_ADAPTIVE<T>::value,bool>::TYPE operator<(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
+typename enable_if<IS_NOT_ADAPTIVE<T>::value,bool>::type operator<(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));
     return (Compare(t,a1)<0);
@@ -262,7 +262,7 @@ bool operator<=(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE
 }
 
 template<class T,class T_ADAPTIVE0>
-typename ENABLE_IF<IS_NOT_ADAPTIVE<T>::value,bool>::TYPE 
+typename enable_if<IS_NOT_ADAPTIVE<T>::value,bool>::type 
 operator<=(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));
@@ -280,7 +280,7 @@ bool operator>=(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE
 }
 
 template<class T,class T_ADAPTIVE0>
-typename ENABLE_IF<IS_NOT_ADAPTIVE<T>::value,
+typename enable_if<IS_NOT_ADAPTIVE<T>::value,
 bool>::TYPE
 operator>=(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
@@ -300,7 +300,7 @@ operator>(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,
 }
 
 template<class T,class T_ADAPTIVE0>
-typename ENABLE_IF<IS_NOT_ADAPTIVE<T>::value,bool>::TYPE
+typename enable_if<IS_NOT_ADAPTIVE<T>::value,bool>::type
 operator>(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));
@@ -318,7 +318,7 @@ bool operator==(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE
 }
 
 template<class T,class T_ADAPTIVE0>
-typename ENABLE_IF<IS_NOT_ADAPTIVE<T>::value,bool>::TYPE
+typename enable_if<IS_NOT_ADAPTIVE<T>::value,bool>::type
 operator==(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));
@@ -336,7 +336,7 @@ bool operator!=(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE
 }
 
 template<class T,class T_ADAPTIVE0>
-typename ENABLE_IF<IS_NOT_ADAPTIVE<T>::value,bool>::TYPE
+typename enable_if<IS_NOT_ADAPTIVE<T>::value,bool>::type
 operator!=(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));

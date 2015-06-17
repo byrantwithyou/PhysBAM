@@ -52,12 +52,12 @@ public:
     {}
 
     template<class T_ARRAY>
-    ARRAY_VIEW(T_ARRAY& array,typename ENABLE_IF<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && !IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::TYPE unusable=UNUSABLE())
+    ARRAY_VIEW(T_ARRAY& array,typename enable_if<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && !IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
         :m(array.Size()),base_pointer(array.Get_Array_Pointer())
     {}
 
     template<class T_ARRAY>
-    ARRAY_VIEW(T_ARRAY array,typename ENABLE_IF<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::TYPE unusable=UNUSABLE())
+    ARRAY_VIEW(T_ARRAY array,typename enable_if<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
         :m(array.Size()),base_pointer(array.Get_Array_Pointer())
     {}
 
@@ -124,11 +124,11 @@ public:
     {Set(array.m,array.base_pointer);}
 
     template<class T_ARRAY>
-    void Set(T_ARRAY& array,typename ENABLE_IF<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && !IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::TYPE unusable=UNUSABLE())
+    void Set(T_ARRAY& array,typename enable_if<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && !IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
     {Set(array.m,array.Get_Array_Pointer());}
 
     template<class T_ARRAY>
-    void Set(T_ARRAY array,typename ENABLE_IF<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::TYPE unusable=UNUSABLE())
+    void Set(T_ARRAY array,typename enable_if<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
     {Set(array.m,array.Get_Array_Pointer());}
 
     template<class RW>

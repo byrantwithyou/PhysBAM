@@ -52,7 +52,7 @@ operator/(const ARRAY_BASE<T0,T_ARRAY0,typename T_ARRAY0::INDEX>& array0,const A
 
 //#####################################################################
 
-template<class T_ARRAY0,class T_ARRAY1> struct QUOTIENT<T_ARRAY0,T_ARRAY1,typename ENABLE_IF<IS_ARRAY<T_ARRAY0>::value && IS_ARRAY<T_ARRAY1>::value>::TYPE>
+template<class T_ARRAY0,class T_ARRAY1> struct QUOTIENT<T_ARRAY0,T_ARRAY1,typename enable_if<IS_ARRAY<T_ARRAY0>::value && IS_ARRAY<T_ARRAY1>::value>::type>
 {typedef ARRAY_QUOTIENT<T_ARRAY0,T_ARRAY1> TYPE;};
 
 //#####################################################################

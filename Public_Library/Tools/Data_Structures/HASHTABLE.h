@@ -92,7 +92,7 @@ private:
     void Insert(const HASHTABLE_ENTRY_TEMPLATE<TK,void>& entry)
     {Insert(entry.key);}
 
-    template<class T2> typename DISABLE_IF<is_same<T2,void>::value>::TYPE
+    template<class T2> typename enable_if<!is_same<T2,void>::value>::type
     Insert(const HASHTABLE_ENTRY_TEMPLATE<TK,T2>& entry)
     {Insert(entry.key,entry.data);}
 

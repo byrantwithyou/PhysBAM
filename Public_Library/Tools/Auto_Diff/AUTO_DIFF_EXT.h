@@ -330,7 +330,7 @@ decltype(Make_Diff_Vec(TV(),MATRIX<T,3>()*VDX2-MATRIX<T,3>()*VDX1))
 Cross_Helper(const AUTO_DIFF_EXT_VEC<VECTOR<T,3>,VEC1>& a,const AUTO_DIFF_EXT_VEC<TV,VEC2>& b);
 
 template<class TV,class VEC1,class VEC2>
-typename DISABLE_IF<TV::m==3,const AUTO_DIFF_EXT_VEC<TV,VEC1> >::TYPE
+typename enable_if<TV::m!=3,const AUTO_DIFF_EXT_VEC<TV,VEC1> >::type
 Cross_Helper(const AUTO_DIFF_EXT_VEC<TV,VEC1>& a,const AUTO_DIFF_EXT_VEC<TV,VEC2>& b);
 
 template<class TV,class VEC>
@@ -421,7 +421,7 @@ Cross_Helper(const AUTO_DIFF_EXT_VEC<VECTOR<T,3>,VEC1>& a,const AUTO_DIFF_EXT_VE
 }
 
 template<class TV,class VEC1,class VEC2>
-typename DISABLE_IF<TV::m==3,const AUTO_DIFF_EXT_VEC<TV,VEC1> >::TYPE
+typename enable_if<TV::m!=3,const AUTO_DIFF_EXT_VEC<TV,VEC1> >::type
 Cross_Helper(const AUTO_DIFF_EXT_VEC<TV,VEC1>& a,const AUTO_DIFF_EXT_VEC<TV,VEC2>& b)
 {
     PHYSBAM_FATAL_ERROR("Cross product not defined except in 3D.");

@@ -337,7 +337,7 @@ decltype(Make_Hess_Vec(TV(),MATRIX<T,3>()*VDX2-MATRIX<T,3>()*VDX1,Contract_0(VDD
 Cross_Helper(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2>& b);
 
 template<class TV,class VEC1,class MAT1,class VEC2,class MAT2>
-typename DISABLE_IF<TV::m==3,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1> >::TYPE
+typename enable_if<TV::m!=3,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1> >::type
 Cross_Helper(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2>& b);
 
 template<class TV,class VEC,class MAT>
@@ -429,7 +429,7 @@ Cross_Helper(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1>& a,const AUTO_HESS_E
 }
 
 template<class TV,class VEC1,class MAT1,class VEC2,class MAT2>
-typename DISABLE_IF<TV::m==3,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1> >::TYPE
+typename enable_if<TV::m!=3,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1> >::type
 Cross_Helper(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2>& b)
 {
     PHYSBAM_FATAL_ERROR("Cross product not defined except in 3D.");

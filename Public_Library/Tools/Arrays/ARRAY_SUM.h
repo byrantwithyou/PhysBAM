@@ -49,16 +49,16 @@ public:
 };
 
 template<class T_ARRAY0,class T_ARRAY1,class ENABLE=void> struct ARRAY_SUM_VALID {static const bool value=false;};
-template<class T_ARRAY0,class T_ARRAY1> struct ARRAY_SUM_VALID<T_ARRAY0,T_ARRAY1,typename ENABLE_IF<is_same<typename EQUIVALENT_ARRAY<T_ARRAY0>::TYPE,typename EQUIVALENT_ARRAY<T_ARRAY1>::TYPE>::value>::TYPE>
+template<class T_ARRAY0,class T_ARRAY1> struct ARRAY_SUM_VALID<T_ARRAY0,T_ARRAY1,typename enable_if<is_same<typename EQUIVALENT_ARRAY<T_ARRAY0>::TYPE,typename EQUIVALENT_ARRAY<T_ARRAY1>::TYPE>::value>::type>
 {static const bool value=IS_ARRAY<T_ARRAY0>::value && IS_ARRAY<T_ARRAY1>::value && (!FIXED_SIZE_VECTOR<T_ARRAY0>::value || !FIXED_SIZE_VECTOR<T_ARRAY1>::value);};
 
-template<class T0,class T2,class T_ARRAY0,class T_ARRAY1> typename ENABLE_IF<ARRAY_SUM_VALID<T_ARRAY0,T_ARRAY1>::value,ARRAY_SUM<T_ARRAY0,T_ARRAY1> >::TYPE
+template<class T0,class T2,class T_ARRAY0,class T_ARRAY1> typename enable_if<ARRAY_SUM_VALID<T_ARRAY0,T_ARRAY1>::value,ARRAY_SUM<T_ARRAY0,T_ARRAY1> >::type
 operator+(const ARRAY_BASE<T0,T_ARRAY0,typename T_ARRAY1::INDEX>& array0,const ARRAY_BASE<T2,T_ARRAY1,typename T_ARRAY1::INDEX>& array1)
 {return ARRAY_SUM<T_ARRAY0,T_ARRAY1>(array0.Derived(),array1.Derived());}
 
 //#####################################################################
 
-template<class T_ARRAY0,class T_ARRAY1> struct SUM<T_ARRAY0,T_ARRAY1,typename ENABLE_IF<ARRAY_SUM_VALID<T_ARRAY0,T_ARRAY1>::value>::TYPE>
+template<class T_ARRAY0,class T_ARRAY1> struct SUM<T_ARRAY0,T_ARRAY1,typename enable_if<ARRAY_SUM_VALID<T_ARRAY0,T_ARRAY1>::value>::type>
 {typedef ARRAY_SUM<T_ARRAY0,T_ARRAY1> TYPE;};
 
 //#####################################################################

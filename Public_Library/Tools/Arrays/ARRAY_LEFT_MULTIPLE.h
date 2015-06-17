@@ -49,27 +49,27 @@ template<class T0,class T_ARRAY1,class ENABLE=void> struct ARRAY_LEFT_MULTIPLE_V
 template<class T0,class T_ARRAY1> struct ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1,typename FIRST<void,typename PRODUCT<T0,typename T_ARRAY1::ELEMENT>::TYPE>::TYPE>
 {static const bool value=!FIXED_SIZE_VECTOR<T_ARRAY1>::value && IS_ARRAY<T_ARRAY1>::value && (is_same<T0,typename T_ARRAY1::ELEMENT>::value || is_scalar<T0>::value);};
 
-template<class T0,class T,class T_ARRAY1,class ID> typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value,ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1> >::TYPE
+template<class T0,class T,class T_ARRAY1,class ID> typename enable_if<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value,ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1> >::type
 operator*(const T0& c,const ARRAY_BASE<T,T_ARRAY1,ID>& array)
 {return ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1>(c,array.Derived());}
 
-template<class T0,class T,class T_ARRAY1,class ID> typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value,ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1> >::TYPE
+template<class T0,class T,class T_ARRAY1,class ID> typename enable_if<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value,ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1> >::type
 operator/(const ARRAY_BASE<T,T_ARRAY1,ID>& array,const T0& c)
 {STATIC_ASSERT(is_same<T0,float>::value || is_same<T0,double>::value);return ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1>(1/c,array.Derived());}
 
-template<class T0,class T,class T_ARRAY1,class ID> typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value,ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1> >::TYPE
+template<class T0,class T,class T_ARRAY1,class ID> typename enable_if<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value,ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1> >::type
 operator*(const ARRAY_BASE<T,T_ARRAY1,ID>& array,const T0& c)
 {STATIC_ASSERT(is_scalar<T0>::value);return ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1>(c,array.Derived());}
 
 //#####################################################################
 
-template<class T0,class T_ARRAY1> struct PRODUCT<T0,T_ARRAY1,typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value>::TYPE>
+template<class T0,class T_ARRAY1> struct PRODUCT<T0,T_ARRAY1,typename enable_if<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value>::type>
 {typedef ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1> TYPE;};
 
-template<class T0,class T_ARRAY1> struct PRODUCT<T_ARRAY1,T0,typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value>::TYPE>
+template<class T0,class T_ARRAY1> struct PRODUCT<T_ARRAY1,T0,typename enable_if<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value>::type>
 {typedef ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1> TYPE;};
 
-template<class T0,class T_ARRAY1> struct QUOTIENT<T_ARRAY1,T0,typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value>::TYPE>
+template<class T0,class T_ARRAY1> struct QUOTIENT<T_ARRAY1,T0,typename enable_if<ARRAY_LEFT_MULTIPLE_VALID<T0,T_ARRAY1>::value>::type>
 {typedef ARRAY_LEFT_MULTIPLE<T0,T_ARRAY1> TYPE;};
 
 //#####################################################################

@@ -33,13 +33,13 @@ template<> struct PLATFORM_INDEPENDENT_SIZE<int>{static const int value=4;};
 template<> struct PLATFORM_INDEPENDENT_SIZE<unsigned int>{static const int value=4;};
 template<> struct PLATFORM_INDEPENDENT_SIZE<float>{static const int value=4;};
 template<> struct PLATFORM_INDEPENDENT_SIZE<double>{static const int value=8;};
-template<class T> struct PLATFORM_INDEPENDENT_SIZE<T,typename ENABLE_IF<is_enum<T>::value>::TYPE>{static const int value=4;};
+template<class T> struct PLATFORM_INDEPENDENT_SIZE<T,typename enable_if<is_enum<T>::value>::type>{static const int value=4;};
 
 template<class T> struct IS_PRIMITIVE_BINARY_IO_SAFE {static const bool value=!big_endian && (sizeof(T)==PLATFORM_INDEPENDENT_SIZE<T>::value);};
 
 // classify types which can be written directly to files without conversion
 template<class T,class RW,class ENABLER> struct IS_BINARY_IO_SAFE {static const bool value=false;};
-template<class T,class RW> struct IS_BINARY_IO_SAFE<T,RW,typename ENABLE_IF<is_integral<T>::value || is_enum<T>::value>::TYPE>:public IS_PRIMITIVE_BINARY_IO_SAFE<T>{};
+template<class T,class RW> struct IS_BINARY_IO_SAFE<T,RW,typename enable_if<is_integral<T>::value || is_enum<T>::value>::type>:public IS_PRIMITIVE_BINARY_IO_SAFE<T>{};
 template<> struct IS_BINARY_IO_SAFE<float,float>:public IS_PRIMITIVE_BINARY_IO_SAFE<float>{};
 template<> struct IS_BINARY_IO_SAFE<double,double>:public IS_PRIMITIVE_BINARY_IO_SAFE<double>{};
 

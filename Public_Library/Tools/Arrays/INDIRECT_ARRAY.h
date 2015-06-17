@@ -43,14 +43,14 @@ public:
     CONST_T_INDICES indices;
 
 //     template<class T_OTHER_ARRAY>
-//     INDIRECT_ARRAY(T_OTHER_ARRAY& array,typename ADD_REFERENCE<CONST_T_INDICES>::TYPE indices,typename DISABLE_IF<IS_ARRAY_VIEW<T_OTHER_ARRAY>::value,UNUSABLE>::TYPE unusable=UNUSABLE())
+//     INDIRECT_ARRAY(T_OTHER_ARRAY& array,typename ADD_REFERENCE<CONST_T_INDICES>::TYPE indices,typename enable_if<:IS_ARRAY_VIEW<T_OTHER_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
 //         :array(array),indices(indices)
 //     {
 //         STATIC_ASSERT(is_base_of<T_ARRAY,T_OTHER_ARRAY>::value); // avoid grabbing reference to temporary
 //     }
 
 //     template<class T_OTHER_ARRAY>
-//     INDIRECT_ARRAY(T_OTHER_ARRAY array,typename ADD_REFERENCE<CONST_T_INDICES>::TYPE indices,typename ENABLE_IF<IS_ARRAY_VIEW<T_OTHER_ARRAY>::value,UNUSABLE>::TYPE unusable=UNUSABLE())
+//     INDIRECT_ARRAY(T_OTHER_ARRAY array,typename ADD_REFERENCE<CONST_T_INDICES>::TYPE indices,typename enable_if<IS_ARRAY_VIEW<T_OTHER_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
 //         :array(array),indices(indices)
 //     {
 //     }

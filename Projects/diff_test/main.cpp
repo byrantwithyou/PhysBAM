@@ -108,7 +108,7 @@ void Test(const char* name,TV dx[2],TV a[2],TV b[2],TV da[2],TV db[2])
     LOG::printf("DIFF %s: %.16g %.16g -> %.16g\n",name,x.Flattened().Magnitude()/eps,y.Flattened().Magnitude()/eps,(x-y).Flattened().Magnitude()/max(max(x.Flattened().Magnitude(),y.Flattened().Magnitude()),1e-30));
 }
 
-template<class T_MATRIX0,class T_MATRIX1> typename ENABLE_IF<IS_MATRIX<T_MATRIX0>::value && IS_MATRIX<T_MATRIX1>::value>::TYPE
+template<class T_MATRIX0,class T_MATRIX1> typename enable_if<IS_MATRIX<T_MATRIX0>::value && IS_MATRIX<T_MATRIX1>::value>::type
 Test(const char* name,TV dx[2],T_MATRIX0 a[2],T_MATRIX0 b[2],T_MATRIX1 da[2],T_MATRIX1 db[2])
 {
     MATRIX<T,TV::m> x[2],y[2],z[2];
@@ -122,7 +122,7 @@ Test(const char* name,TV dx[2],T_MATRIX0 a[2],T_MATRIX0 b[2],T_MATRIX1 da[2],T_M
     LOG::printf("DIFF %s: %.16g %.16g -> %.16g\n",name,Mx/eps,My/eps,Mz/max(max(Mx,My),1e-30));
 }
 
-template<class T_TENSOR0,class T_TENSOR1> typename ENABLE_IF<IS_TENSOR<T_TENSOR0>::value && IS_TENSOR<T_TENSOR1>::value>::TYPE
+template<class T_TENSOR0,class T_TENSOR1> typename enable_if<IS_TENSOR<T_TENSOR0>::value && IS_TENSOR<T_TENSOR1>::value>::type
 Test(const char* name,TV dx[2],T_TENSOR0 a[2],T_TENSOR0 b[2],T_TENSOR1 da[2],T_TENSOR1 db[2])
 {
     TENSOR<T,TV::m> x[2],y[2],z[2];

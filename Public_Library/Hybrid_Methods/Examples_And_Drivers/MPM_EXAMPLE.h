@@ -124,7 +124,7 @@ public:
     int Add_Force(DEFORMABLES_FORCES<TV>& force);
     void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction);
-    template<class OBJECT> typename DISABLE_IF<is_pointer<OBJECT>::value>::TYPE
+    template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type
     Add_Collision_Object(const OBJECT& object,COLLISION_TYPE type,T friction)
     {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),type,friction);}
 
