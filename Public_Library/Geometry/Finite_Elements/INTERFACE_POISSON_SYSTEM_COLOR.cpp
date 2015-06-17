@@ -119,18 +119,18 @@ Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_scalar_field,
     SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV> helper_uu,helper_rhs_uu;
     SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV> helper_qu;
 
-    helper_uu.Initialize(u_stencil,u_stencil,*cm_u,*cm_u,*cdi);
-    helper_rhs_uu.Initialize(u_stencil,u_stencil,*cm_u,*cm_u,*cdi);
-    helper_qu.Initialize(u_stencil,*cm_u,*cdi);
+    helper_uu.Initialize(*cdi,u_stencil,*cm_u,u_stencil,*cm_u);
+    helper_rhs_uu.Initialize(*cdi,u_stencil,*cm_u,u_stencil,*cm_u);
+    helper_qu.Initialize(*cdi,u_stencil,*cm_u);
 
     rhs_surface.Resize(cdi->colors);
     for(int c=0;c<cdi->colors;c++)
         rhs_surface(c).Resize(cdi->flat_size);
 
     for(int i=0;i<TV::m;i++)
-        biu.Add_Volume_Block(helper_uu,udx_stencil(i),udx_stencil(i),mu);
+        biu.Add_Volume_Block(helper_uu,mu,udx_stencil(i),udx_stencil(i));
     biu.Add_Surface_Block_Scalar(helper_qu,u_stencil,use_discontinuous_scalar_field,u_jump,j_surface,rhs_surface,1);
-    biu.Add_Volume_Block(helper_rhs_uu,u_stencil,u_stencil,ARRAY<T>(CONSTANT_ARRAY<T>(mu.m,(T)1)));
+    biu.Add_Volume_Block(helper_rhs_uu,ARRAY<T>(CONSTANT_ARRAY<T>(mu.m,(T)1)),u_stencil,u_stencil);
 
     biu.Compute_Entries();
         

@@ -62,9 +62,8 @@ public:
     void Add_Uncut_Fine_Cell(const TV_INT& cell,int subcell,int color);
     void Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,const CELL_ELEMENTS& cell_elements,
         const ARRAY<MATRIX<T,TV::m> >& base_orientation,const ARRAY<int>& constraint_offsets,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs);
-    template<int d0,int d1>
-    void Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,
-        const BASIS_STENCIL_UNIFORM<TV,d1>& s1,const ARRAY<T>& scale);
+    template<class ...Args>
+    void Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper,const ARRAY<T>& scale,Args&& ...args);
     template<int d>
     void Add_Surface_Block(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
         bool use_discontinuous_velocity,boost::function<TV(const TV& X,int color0,int color1)> u_jump,

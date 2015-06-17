@@ -51,7 +51,7 @@ template<class TV> INTERFACE_STOKES_MULTIGRID<TV>::
 // Function Construct_Level
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
-Construct_Level(int l,const ARRAY<T>& mu,ARRAY<T>* inertia)
+Construct_Level(int l,const ARRAY<T>& mu,ARRAY<T>* inertia,T dt)
 {
     ARRAY<ARRAY<T,TV_INT> >& cr_phis=levels(l).phi_per_color;
     ARRAY<ARRAY<T,TV_INT> >& bc_phis=levels(l).phi_boundary;
@@ -68,7 +68,7 @@ Construct_Level(int l,const ARRAY<T>& mu,ARRAY<T>* inertia)
 
         levels(l).iss=new INTERFACE_STOKES_SYSTEM_COLOR<TV>(coarse_grid,levels(l).color_levelset_phi,
             levels(l).color_levelset_color,true);
-        levels(l).iss->Set_Matrix(mu,false,0,0,inertia,false);}
+        levels(l).iss->Set_Matrix(mu,false,0,0,inertia,false,dt);}
 
     levels(l).Initialize();
 }
@@ -497,10 +497,10 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_MULTIGRID<TV>::
 Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,boost::function<TV(const TV& X,int color0,int color1)> u_jump,
-    boost::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<T>* inertia,bool use_rhs)
+    boost::function<TV(const TV& X,int color0,int color1)> j_surface,ARRAY<T>* inertia,bool use_rhs,T dt)
 {
-    INTERFACE_STOKES_SYSTEM_COLOR<TV>::Set_Matrix(mu,use_discontinuous_velocity,u_jump,j_surface,inertia,use_rhs);
-    for(int i=0;i<levels.m;i++) Construct_Level(i,mu,inertia);
+    INTERFACE_STOKES_SYSTEM_COLOR<TV>::Set_Matrix(mu,use_discontinuous_velocity,u_jump,j_surface,inertia,use_rhs,dt);
+    for(int i=0;i<levels.m;i++) Construct_Level(i,mu,inertia,dt);
 }
 namespace PhysBAM{
 template class INTERFACE_STOKES_MULTIGRID<VECTOR<float,2> >;

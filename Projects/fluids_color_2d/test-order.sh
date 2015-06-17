@@ -17,8 +17,8 @@ for t in 02 03 04 05 06 10 11 16 17 18 19 24 28 ; do
         ./test-order-one.sh -b 2 $max new_test_order/conv-$t-$b.png nice ./fluids_color_2d -resolution 8 -last_frame 1 -s 1.3 -m .8 -kg 1.2 -bc_$b -dt .05 $t
     done
 done
-for t in 00 01 08 09 12 13 14 20 21 ; do
-    ./test-order-one.sh -b 2 $max new_test_order/conv-$t-$b.png nice ./fluids_color_2d -resolution 8 -last_frame 1 -s 1.3 -m .8 -kg 1.2 -dt .05 $t
+for t in 00 01 08 09 12 13 14 20 21  250 251 252 253 254 255 256 257  ; do
+    ./test-order-one.sh -b 2 $max new_test_order/conv-$t.png nice ./fluids_color_2d -resolution 8 -last_frame 1 -s 1.3 -m .8 -kg 1.2 -dt .05 $t
 done
 
 $SLAVE -k

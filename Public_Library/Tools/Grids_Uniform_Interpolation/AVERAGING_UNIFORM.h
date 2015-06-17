@@ -79,6 +79,25 @@ public:
         value[other_axis]=(T).25*(u_face(other_axis,grid.First_Face_Index_In_Cell(other_axis,cell1))+u_face(other_axis,grid.Second_Face_Index_In_Cell(other_axis,cell1))+
                             u_face(other_axis,grid.First_Face_Index_In_Cell(other_axis,cell2))+u_face(other_axis,grid.Second_Face_Index_In_Cell(other_axis,cell2)));}
     return value;}
+
+    template<class T_FACE_LOOKUP_LOOKUP>
+    static MATRIX<T,TV::m> Cell_Centered_Gradient(const GRID<TV>& grid,const T_FACE_LOOKUP_LOOKUP& u,const TV_INT& index)
+    {
+        MATRIX<T,TV::m> du;
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> f0(a,index),f1(f0);
+            f1.index(a)++;
+            du(a,a)=u(f1)-u(f0);
+            for(int b=0;b<TV::m;b++)
+                if(a!=b){
+                    FACE_INDEX<TV::m> f00(f0),f01(f0),f10(f1),f11(f1);
+                    f00.index(b)--;
+                    f10.index(b)--;
+                    f01.index(b)++;
+                    f11.index(b)++;
+                    du(a,b)=(u(f01)+u(f11)-u(f00)-u(f10))/4;}}
+        return du*DIAGONAL_MATRIX<T,TV::m>(grid.one_over_dX);
+    }
 //#####################################################################
 };
 }

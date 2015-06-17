@@ -60,7 +60,8 @@ public:
     using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
     using BASE::particle_levelset_evolution_multiple;using BASE::face_color;using BASE::substeps_delay_frame;
     using BASE::dump_largest_eigenvector;using BASE::save_pressure;using BASE::use_polymer_stress;using BASE::pressure;
-    using BASE::polymer_stress;using BASE::test_system;
+    using BASE::polymer_stress;using BASE::polymer_stress_coefficient;using BASE::inv_Wi;using BASE::max_iter;
+    using BASE::test_system;using BASE::use_preconditioner;using BASE::solver_tolerance;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -70,6 +71,8 @@ public:
     bool user_last_frame;
     T mu0,mu1;
     T rho0,rho1;
+    T inv_Wi0,inv_Wi1;
+    T beta0,beta1;
     T unit_mu,unit_rho,unit_st,unit_p;
     T weiss,weiss_inv;
     T m,s,kg;
@@ -83,6 +86,8 @@ public:
     bool override_rho1;
     bool override_mu0;
     bool override_mu1;
+    bool override_inv_Wi0,override_inv_Wi1;
+    bool override_beta0,override_beta1;
     bool override_surface_tension;
     bool use_pls_over_levelset;
     bool use_levelset_over_pls;
@@ -97,11 +102,13 @@ public:
     bool override_output_directory;
 
     FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-        :PLS_FC_EXAMPLE<TV>(stream_type_input),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),rho0(1),
-        rho1(2),unit_mu(0),unit_rho(0),unit_st(0),unit_p(0),weiss(1),weiss_inv(1),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),
+        :PLS_FC_EXAMPLE<TV>(stream_type_input),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),
+        mu0(1),mu1(2),rho0(1),rho1(2),inv_Wi0(1.2),inv_Wi1(1.4),beta0(1.3),beta1(1.7),unit_mu(0),unit_rho(0),unit_st(0),
+        unit_p(0),weiss(1),weiss_inv(1),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),
         refine(1),surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),
-        override_surface_tension(false),use_pls_over_levelset(false),use_levelset_over_pls(false),analytic_initial_only(false),
-        number_of_threads(1),override_output_directory(false)
+        override_inv_Wi0(false),override_inv_Wi1(false),override_beta0(false),override_beta1(false),
+        override_surface_tension(false),use_pls_over_levelset(false),use_levelset_over_pls(false),
+        analytic_initial_only(false),number_of_threads(1),override_output_directory(false)
     {
         last_frame=16;
         parse_args.Extra(&test_number,"example number","example number to run");
@@ -120,6 +127,10 @@ public:
         parse_args.Add("-mu1",&mu1,&override_mu1,"viscosity","viscosity for second fluid region");
         parse_args.Add("-rho0",&rho0,&override_rho0,"density","density for first fluid region");
         parse_args.Add("-rho1",&rho1,&override_rho1,"density","density for second fluid region");
+        parse_args.Add("-inv_Wi0",&inv_Wi0,&override_inv_Wi0,"inv_Wi","1/Wi for first fluid region");
+        parse_args.Add("-inv_Wi1",&inv_Wi1,&override_inv_Wi1,"inv_Wi","1/Wi for second fluid region");
+        parse_args.Add("-beta0",&beta0,&override_beta0,"beta","stress coefficient for first fluid region");
+        parse_args.Add("-beta1",&beta1,&override_beta1,"beta","stress coefficient for second fluid region");
         parse_args.Add("-surface_tension",&surface_tension,&override_surface_tension,"density","density for second fluid region");
         parse_args.Add("-m",&m,"scale","meter scale");
         parse_args.Add("-s",&s,"scale","second scale");
@@ -138,7 +149,10 @@ public:
         parse_args.Add("-dump_eigen",&dump_largest_eigenvector,"Dump largest few eigenvectors");
         parse_args.Add("-use_mg",&use_multigrid,"Use multigrid preconditioning");
         parse_args.Add("-mg_levels",&num_multigrid_levels,"levels","Number of multigrid levels");
+        parse_args.Add("-max_iter",&max_iter,"number","Number of Krylov iterations");
+        parse_args.Add("-solver_tolerance",&solver_tolerance,"tol","Krylov tolerance");
         parse_args.Add("-test_system",&test_system,"Run basic Krylov system tests");
+        parse_args.Add_Not("-no_preconditioner",&use_preconditioner,"disable Jacobi preconditioner");
         parse_args.Parse(true);
 
 #ifdef USE_OPENMP
@@ -164,6 +178,10 @@ public:
         mu1*=unit_mu;
         rho0*=unit_rho;
         rho1*=unit_rho;
+        inv_Wi0/=s;
+        inv_Wi1/=s;
+        beta0*=unit_p;
+        beta1*=unit_p;
         surface_tension*=unit_st;
         dt*=s;
         PHYSBAM_ASSERT(bc_n+bc_d+bc_s<2);
@@ -443,6 +461,8 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
                 analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_CONST<TV>());
+                if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
+                if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 use_p_null_mode=true;
                 use_polymer_stress=true;
                 break;
@@ -452,6 +472,8 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
                 analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_CONST<TV>());
+                if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
+                if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 use_polymer_stress=true;
                 break;
@@ -464,18 +486,33 @@ public:
                 analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
                 analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_LINEAR<TV>(rho0,a));
+                if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
+                if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 use_p_null_mode=true;
                 use_polymer_stress=true;
                 break;
-        }
+            }
             case 255:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
 //                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV()+(T).5,spin_count+1,rho0/unit_rho));
                 analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_CONST_DECAY<TV>(weiss_inv));
+                if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
+                if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                  if(bc_type!=NEUMANN) use_p_null_mode=true;
+                use_polymer_stress=true;
+                break;
+            }
+            case 258:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
+                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_PERIODIC<TV>(grid.domain));
+                if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
+                if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
+                use_p_null_mode=true;
                 use_polymer_stress=true;
                 break;
             }
@@ -545,20 +582,23 @@ public:
         if(!analytic_velocity.m || analytic_initial_only) return;
         T u_inf=0,u_2=0,p_inf=0,p_2=0,p_ave=0,a=0,b=0,pa=0,pb=0,l_inf=0,l_2=0;
         int num_u=0,num_p=0,num_l=0;
+        
+        ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > saved_face_velocities(face_velocities);
+        face_velocities*=(T)0;
         for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             int c=levelset_color.Color(it.Location());
             if(c<0) continue;
-            T A=face_velocities(c)(it.Full_Index()),B=analytic_velocity(c)->u(it.Location()/m,time/s)(it.Axis())*m/s;
+            T A=saved_face_velocities(c)(it.Full_Index()),B=analytic_velocity(c)->u(it.Location()/m,time/s)(it.Axis())*m/s;
             a=max(a,abs(A));
             b=max(b,abs(B));
             u_inf=max(u_inf,abs(A-B));
             u_2+=sqr(A-B);
             num_u++;
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(A-B));}
+            face_velocities(c)(it.Full_Index())=A-B;}
         if(num_u) u_2/=num_u;
         u_2=sqrt(u_2);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("velocity error",0,1);
+        face_velocities=saved_face_velocities;
         if(use_p_null_mode){
             int cnt=0;
             for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
@@ -584,7 +624,6 @@ public:
         if(num_p) p_2/=num_p;
         p_2=sqrt(p_2);
 
-
         for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
             int c=-4;
             T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
@@ -596,10 +635,21 @@ public:
         if(num_l) l_2/=num_l;
         l_2=sqrt(l_2);
 
-        char buff[1000];
-        sprintf(buff, "max_error %-22.16g %-22.16g %-22.16g %-22.16g  p %-22.16g %-22.16g %-22.16g %-22.16g  l %-22.16g %-22.16g", u_inf, u_2, a, b, p_inf, p_2, pa, pb, l_inf, l_2);
-        LOG::cout<<buff<<std::endl;
+        LOG::printf("max_error %-22.16g %-22.16g %-22.16g %-22.16g  p %-22.16g %-22.16g %-22.16g %-22.16g  l %-22.16g %-22.16g", u_inf, u_2, a, b, p_inf, p_2, pa, pb, l_inf, l_2);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("pressure error",0,1);
+
+        if(use_polymer_stress){
+            T max_S=0;
+            for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
+                int c=levelset_color.Color(it.Location());
+                if(c<0) continue;
+                SYMMETRIC_MATRIX<T,TV::m> A=polymer_stress(c)(it.index),B=analytic_polymer_stress(c)->S(it.Location()/m,time/s)*unit_p,D=A-B;
+                T norm=D.Frobenius_Norm();
+                max_S=max(max_S,norm);
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,norm);}
+            LOG::printf("S error: %-22.16g\n",max_S);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("polymer stress error",0,1);}
     }
 
     void Dump_Analytic_Levelset(T time)
@@ -631,13 +681,13 @@ public:
         PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (N)",0,1);
     }
 
-    void Get_Initial_Velocities()
+    void Get_Initial_Velocities(T time)
     {
         if(analytic_levelset && analytic_velocity.m)
             for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
                 int c=face_color(it.Full_Index());
                 if(c<0) continue;
-                face_velocities(c)(it.Full_Index())=analytic_velocity(c)->u(it.Location()/m,0)(it.Axis())*m/s;}
+                face_velocities(c)(it.Full_Index())=analytic_velocity(c)->u(it.Location()/m,time/s)(it.Axis())*m/s;}
     }
 
     void Get_Initial_Polymer_Stresses()
@@ -646,16 +696,20 @@ public:
         if(analytic_levelset && analytic_velocity.m)
             for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
                 for(int c=0;c<analytic_velocity.m;c++)
-                    polymer_stress(c)(it.index)=analytic_polymer_stress(c)->S(it.Location()/m,0)*unit_p;}
+                    polymer_stress(c)(it.index)=analytic_polymer_stress(c)->S(it.Location()/m,0);}
     }
 
     void Analytic_Test()
     {
         mu.Append(mu0);
         rho.Append(rho0);
+        inv_Wi.Append(inv_Wi0);
+        polymer_stress_coefficient.Append(beta0);
         for(int i=1;i<number_of_colors;i++){
             mu.Append(mu1);
-            rho.Append(rho1);}
+            rho.Append(rho1);
+            inv_Wi.Append(inv_Wi1);
+            polymer_stress_coefficient.Append(beta1);}
 
         Set_Level_Set(0);
         Dump_Analytic_Levelset(0);
@@ -669,7 +723,8 @@ public:
                 X=rand.Get_Uniform_Vector(grid.domain);
                 analytic_levelset->phi(X/m,0,c);}
             while(c<0);
-            analytic_velocity(c)->Test(X);}
+            analytic_velocity(c)->Test(X);
+            analytic_polymer_stress(c)->Test(X);}
     }
 
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE
@@ -701,13 +756,22 @@ public:
     SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress(const TV& X,int color,T time)
     {
         PHYSBAM_ASSERT(use_polymer_stress);
-        return analytic_polymer_stress(color)->S(X/m,time/s)*unit_p;
+        return analytic_polymer_stress(color)->S(X/m,time/s);
     }
 
     SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress_Forcing_Term(const TV& X,int color,T time)
     {
         PHYSBAM_ASSERT(use_polymer_stress);
-        return analytic_polymer_stress(color)->F_S(X/m,time/s)*unit_p;
+        TV Z=X/m;
+        time/=s;
+        ANALYTIC_POLYMER_STRESS<TV>& as=*analytic_polymer_stress(color);
+        ANALYTIC_VELOCITY<TV>& au=*analytic_velocity(color);
+        TV u=au.u(Z,time);
+        MATRIX<T,TV::m> du=au.du(Z,time);
+        SYMMETRIC_MATRIX<T,TV::m> S=as.S(Z,time);
+        SYMMETRIC_MATRIX<T,TV::m> f=as.dSdt(Z,time)+Contract<2>(as.dSdX(Z,time),u);
+        f-=(du*S).Twice_Symmetric_Part()+inv_Wi(color)*s*((T)1-S);
+        return f/s;
     }
 
     TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
@@ -729,8 +793,8 @@ public:
             return k*surface_tension*n;}
 
         if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
-            MATRIX<T,TV::m> jump_stress=Stress(X,color1,time); if(use_polymer_stress) jump_stress+=Polymer_Stress(X,color1,time);
-            if(color0>=0){ jump_stress-=Stress(X,color0,time); if(use_polymer_stress) jump_stress-=Polymer_Stress(X,color0,time);}
+            MATRIX<T,TV::m> jump_stress=Stress(X,color1,time); if(use_polymer_stress) jump_stress+=polymer_stress_coefficient(color1)*Polymer_Stress(X,color1,time);
+            if(color0>=0){ jump_stress-=Stress(X,color0,time); if(use_polymer_stress) jump_stress-=polymer_stress_coefficient(color0)*Polymer_Stress(X,color0,time);}
             TV n=analytic_levelset->N(X/m,time/s,color1);
             return jump_stress*n;}
 
@@ -740,8 +804,9 @@ public:
     TV Volume_Force(const TV& X,int color,T time) PHYSBAM_OVERRIDE
     {
         if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
-            if(use_polymer_stress) {return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s)-analytic_polymer_stress(color)->divS(X/m,time/s)*kg/(m*s*s);}
-            else return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s);}
+            TV f=analytic_velocity(color)->F(X/m,time/s)*unit_p/m;
+            if(use_polymer_stress) f-=polymer_stress_coefficient(color)*Contract<1,2>(analytic_polymer_stress(color)->dSdX(X/m,time/s))/m;
+            return f;}
         return gravity;
     }
 

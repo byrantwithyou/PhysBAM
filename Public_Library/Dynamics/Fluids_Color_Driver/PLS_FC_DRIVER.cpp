@@ -7,6 +7,7 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
+#include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
 #include <Tools/Krylov_Solvers/GMRES.h>
@@ -15,7 +16,9 @@
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Log/SCOPE.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -89,6 +92,8 @@ Initialize()
     example.levelset_color.color.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
     example.face_color.Resize(example.grid,example.number_of_ghost_cells);
     example.prev_face_color.Resize(example.grid,example.number_of_ghost_cells);
+    example.cell_color.Resize(example.grid.Cell_Indices(example.number_of_ghost_cells));
+    example.prev_cell_color.Resize(example.grid.Cell_Indices(example.number_of_ghost_cells));
     example.face_velocities.Resize(example.number_of_colors);
     example.prev_face_velocities.Resize(example.number_of_colors);
     for(int i=0;i<example.number_of_colors;i++){
@@ -139,10 +144,13 @@ Initialize()
         example.Rebuild_Levelset_Color();
         for(FACE_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next())
             example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
+        for(CELL_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next())
+            example.cell_color(it.index)=example.levelset_color.Color(it.Location());
         example.prev_face_color.Fill(-9);
+        example.prev_cell_color.Fill(-9);
         example.particle_levelset_evolution_multiple.Make_Signed_Distance();
         example.Make_Levelsets_Consistent();
-        example.Get_Initial_Velocities();
+        example.Get_Initial_Velocities(0);
         if(example.use_polymer_stress) example.Get_Initial_Polymer_Stresses();}
 
     example.collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
@@ -229,6 +237,7 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Advance_One_Time_Step(bool first_step)
 {
     Extrapolate_Velocity(example.face_velocities,example.face_color);
+    if(example.use_polymer_stress) Extrapolate_Polymer_Stress(example.polymer_stress,example.cell_color);
     example.Begin_Time_Step(time);
     T dt=example.dt;
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before levelset evolution",0,1);
@@ -236,17 +245,22 @@ Advance_One_Time_Step(bool first_step)
     if(example.use_level_set_method) Update_Level_Set(dt,first_step);
     else if(example.use_pls) Update_Pls(dt);
 
-    if(example.use_polymer_stress) Update_Polymer_Stress(dt);
-
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before velocity advection",0,1);
     Extrapolate_Velocity(example.face_velocities,example.face_color);
+    if(example.use_polymer_stress) Extrapolate_Polymer_Stress(example.polymer_stress,example.cell_color);
     Advection_And_BDF(dt,first_step);
     Extrapolate_Velocity(example.face_velocities,example.face_color);
+    if(example.use_polymer_stress) Extrapolate_Polymer_Stress(example.polymer_stress,example.cell_color);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before solve",0,1);
     Apply_Pressure_And_Viscosity(dt,first_step);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after solve",0,1);
+
     example.time=time+=dt;
     Extrapolate_Velocity(example.face_velocities,example.face_color);
+    if(example.use_polymer_stress){
+        Update_Polymer_Stress(dt);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after update polymer stress",0,1);}
+    if(example.use_polymer_stress) Extrapolate_Polymer_Stress(example.polymer_stress,example.cell_color);
     example.End_Time_Step(time);
 }
 //#####################################################################
@@ -279,7 +293,9 @@ Advection_And_BDF(T dt,bool first_step)
         for(int c=0;c<example.number_of_colors;c++)
             RK2_Advection_And_BDF(dt,first_step,c);
     example.prev_face_velocities.Exchange(example.face_velocities);
+    if(example.use_polymer_stress) example.prev_polymer_stress.Exchange(example.polymer_stress);
     example.prev_face_color=example.face_color;
+    example.prev_cell_color=example.cell_color;
 }
 //#####################################################################
 // Function Advection_And_BDF
@@ -289,6 +305,8 @@ No_Advection_And_BDF(T dt,bool first_step,int c)
 {
     if(!first_step) example.prev_face_velocities(c).Copy((T)2/(T)1.5,example.face_velocities(c),-(T).5/(T)1.5,example.prev_face_velocities(c));
     else example.prev_face_velocities(c)=example.face_velocities(c);
+
+    if(example.use_polymer_stress) example.prev_polymer_stress(c)=example.polymer_stress(c);
 }
 //#####################################################################
 // Function Assert_Advection_CFL
@@ -307,16 +325,20 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Reduced_Advection_And_BDF(T dt,bool first_step,int c)
 {
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T,AVERAGING_UNIFORM<TV>,QUADRATIC_INTERPOLATION_UNIFORM<TV,T> > quadratic_advection;
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m>,AVERAGING_UNIFORM<TV>,QUADRATIC_INTERPOLATION_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m> > > quadratic_advection_polymer_stress;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
+    BOUNDARY_MAC_GRID_PERIODIC<TV,SYMMETRIC_MATRIX<T,TV::m> > boundary_polymer_stress;
     FACE_LOOKUP_UNIFORM<TV> lookup_face_velocities(example.face_velocities(c)),lookup_prev_face_velocities(example.prev_face_velocities(c));
     PHYSBAM_DEBUG_ONLY(Assert_Advection_CFL(example.face_velocities(c),example.face_color,c,dt));
     if(!first_step){
         PHYSBAM_DEBUG_ONLY(Assert_Advection_CFL(example.prev_face_velocities(c),example.prev_face_color,c,dt));
-        ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,example.number_of_ghost_cells);
+        ARRAY<T,FACE_INDEX<TV::m> > temp(example.grid,example.number_of_ghost_cells);
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp,lookup_prev_face_velocities,lookup_prev_face_velocities,boundary,2*dt,time+dt);
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
         example.prev_face_velocities(c).Copy((T)2/(T)1.5,example.prev_face_velocities(c),-(T).5/(T)1.5,temp);}
     else quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
+
+    if(example.use_polymer_stress) quadratic_advection_polymer_stress.Update_Advection_Equation_Cell_Lookup(example.grid,example.prev_polymer_stress(c),example.polymer_stress(c),lookup_face_velocities,boundary_polymer_stress,dt,time+dt);
 }
 //#####################################################################
 // Function Advection_And_BDF
@@ -325,9 +347,11 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 RK2_Advection_And_BDF(T dt,bool first_step,int c)
 {
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T,AVERAGING_UNIFORM<TV>,QUADRATIC_INTERPOLATION_UNIFORM<TV,T> > quadratic_advection;
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m>,AVERAGING_UNIFORM<TV>,QUADRATIC_INTERPOLATION_UNIFORM<TV,SYMMETRIC_MATRIX<T,TV::m> > > quadratic_advection_polymer_stress;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T,AVERAGING_UNIFORM<TV>,LINEAR_INTERPOLATION_UNIFORM<TV,T> > linear_advection;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
-    ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,example.number_of_ghost_cells),temp2(example.grid,example.number_of_ghost_cells),
+    BOUNDARY_MAC_GRID_PERIODIC<TV,SYMMETRIC_MATRIX<T,TV::m> > boundary_polymer_stress;
+    ARRAY<T,FACE_INDEX<TV::m> > temp(example.grid,example.number_of_ghost_cells),temp2(example.grid,example.number_of_ghost_cells),
     temp3(example.grid,example.number_of_ghost_cells),temp4(example.grid,example.number_of_ghost_cells),temp5(example.grid,example.number_of_ghost_cells);
     FACE_LOOKUP_UNIFORM<TV> lookup_temp(temp),lookup_temp2(temp2),lookup_temp3(temp3),lookup_temp4(temp4),lookup_temp5(temp5);
     FACE_LOOKUP_UNIFORM<TV> lookup_face_velocities(example.face_velocities(c)),lookup_prev_face_velocities(example.prev_face_velocities(c));
@@ -341,6 +365,8 @@ RK2_Advection_And_BDF(T dt,bool first_step,int c)
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp5,lookup_prev_face_velocities,lookup_temp3,boundary,2*dt,time+dt);
         example.prev_face_velocities(c).Copy((T)2/(T)1.5,temp4,-(T).5/(T)1.5,temp5);}
     else quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
+
+    if(example.use_polymer_stress) quadratic_advection_polymer_stress.Update_Advection_Equation_Cell_Lookup(example.grid,example.prev_polymer_stress(c),example.polymer_stress(c),lookup_face_velocities,boundary_polymer_stress,dt,time+dt);
 }
 //#####################################################################
 // Function Apply_Pressure_And_Viscosity
@@ -362,12 +388,17 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     iss.use_preconditioner=example.use_preconditioner;
     iss.use_p_null_mode=example.use_p_null_mode;
     iss.use_polymer_stress=example.use_polymer_stress;
+    if(example.use_polymer_stress){
+        iss.polymer_stress_coefficient=example.polymer_stress_coefficient;
+        iss.inv_Wi=example.inv_Wi;
+        iss.stored_polymer_stress=&example.polymer_stress;}
+
     ARRAY<T> inertia=example.rho,dt_mu(example.mu*dt);
     if(!first_step) inertia*=(T)1.5;
     iss.Set_Matrix(dt_mu,example.use_discontinuous_velocity,
         [=](const TV& X,int color0,int color1){return example.Velocity_Jump(X,color0,color1,time+dt);},
         [=](const TV& X,int color0,int color1){return example.Jump_Interface_Condition(X,color0,color1,time+dt)*dt;},
-        &inertia,true);
+        &inertia,true,dt);
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
@@ -378,7 +409,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 
     INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
     iss.Set_RHS(rhs,[=](const TV& X,int color){return example.Volume_Force(X,color,time+dt)*dt;},&example.face_velocities,false);
-    if(example.use_polymer_stress) iss.Add_Polymer_Stress_RHS(rhs,example.polymer_stress,dt); //if needed
+    if(example.use_polymer_stress) iss.Add_Polymer_Stress_RHS(rhs,example.polymer_stress,dt);
     iss.Resize_Vector(sol);
 
     MINRES<T> mr;
@@ -399,7 +430,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         iss.Get_Sparse_Matrix(M);
         OCTAVE_OUTPUT<T>(LOG::sprintf("M-%d.txt",solve_id).c_str()).Write("M",M);
         OCTAVE_OUTPUT<T>(LOG::sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
-    solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
+    solver->Solve(iss,sol,rhs,vectors,example.solver_tolerance,0,example.max_iter);
 
     if(example.dump_matrix){
         OCTAVE_OUTPUT<T>(LOG::sprintf("x-%d.txt",solve_id).c_str()).Write("x",sol);}
@@ -421,8 +452,14 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         assert(k>=0);
         example.face_velocities(c)(it.Full_Index())=sol.u(it.Axis())(c)(k);}
 
+    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        int c=example.levelset_color.Color(it.Location());
+        example.cell_color(it.index)=c;}
+
     for(FACE_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
+    for(CELL_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+        example.cell_color(it.index)=example.levelset_color.Color(it.Location());
     vectors.Delete_Pointers_And_Clean_Memory();
 
     for(int c=0;c<example.face_velocities.m;c++){
@@ -430,6 +467,8 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         example.boundary.Fill_Ghost_Faces(example.grid,example.face_velocities(c),example.face_velocities(c),0,example.number_of_ghost_cells);}
     example.boundary_int.Apply_Boundary_Condition_Face(example.grid,example.face_color,time+example.dt);
     example.boundary_int.Fill_Ghost_Faces(example.grid,example.face_color,example.face_color,0,example.number_of_ghost_cells);
+    example.boundary_int.Apply_Boundary_Condition(example.grid,example.cell_color,time+example.dt);
+    example.boundary_int.Fill_Ghost_Cells(example.grid,example.cell_color,example.cell_color,0,example.number_of_ghost_cells);
 
     if(example.save_pressure){
         for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
@@ -446,20 +485,20 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Update_Polymer_Stress(T dt)
 {
-
-    example.prev_polymer_stress.Exchange(example.polymer_stress);
-        //Right now we are filling in for all colors. We may not want to do that in the future.
-
-            for(CELL_ITERATOR<TV> it(example.grid,1);it.Valid();it.Next()){
-                for(int c=0;c<example.polymer_stress.m;c++)
-                    example.polymer_stress(c)(it.index)=example.Polymer_Stress(it.Location(),c,time+dt);}
-
+    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        int c=example.cell_color(it.index);
+        if(c<0) continue;
+        SYMMETRIC_MATRIX<T,TV::m>& S=example.polymer_stress(c)(it.index);
+        MATRIX<T,TV::m> du=AVERAGING_UNIFORM<TV>::Cell_Centered_Gradient(example.grid,example.face_velocities(c),it.index);
+        MATRIX<T,TV::m> A=du*dt+1;
+        SYMMETRIC_MATRIX<T,TV::m> f=example.Polymer_Stress_Forcing_Term(it.Location(),c,example.time+example.dt/2);
+        S=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,S)+dt*example.inv_Wi(c)+dt*f)/(1+dt*example.inv_Wi(c));}
 }
 //#####################################################################
 // Function Extrapolate_Velocity
 //#####################################################################
 template<class TV> void PLS_FC_DRIVER<TV>::
-Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color,int c)
+Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& u,const ARRAY<int,FACE_INDEX<TV::m> >& color,int c)
 {
     for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next())
         if(color(it.Full_Index())!=c)
@@ -480,10 +519,40 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE
 // Function Extrapolate_Velocity
 //#####################################################################
 template<class TV> void PLS_FC_DRIVER<TV>::
-Extrapolate_Velocity(ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > >& u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color)
+Extrapolate_Velocity(ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& S,const ARRAY<int,FACE_INDEX<TV::m> >& color)
 {
     for(int c=0;c<example.number_of_colors;c++)
-        Extrapolate_Velocity(u(c),color,c);
+        Extrapolate_Velocity(S(c),color,c);
+}
+//#####################################################################
+// Function Extrapolate_Polymer_Stress
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Extrapolate_Polymer_Stress(ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& S,const ARRAY<int,TV_INT>& color,int c)
+{
+    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next())
+        if(color(it.index)!=c)
+            S(it.index)=SYMMETRIC_MATRIX<T,TV::m>()+1e20;
+    for(CELL_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+        S(it.index)=SYMMETRIC_MATRIX<T,TV::m>()+1e20;
+
+    const LEVELSET<TV>& phi=*example.particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(c);
+    EXTRAPOLATION_HIGHER_ORDER<TV,SYMMETRIC_MATRIX<T,TV::m> > eho(example.grid,phi,example.number_of_ghost_cells*10,3,example.number_of_ghost_cells);
+    eho.periodic=true;
+
+    eho.Extrapolate_Cell([&](const TV_INT& index){return color(index)==c;},S);
+
+    example.boundary_symmetric.Apply_Boundary_Condition(example.grid,S,time+example.dt);
+    example.boundary_symmetric.Fill_Ghost_Cells(example.grid,S,S,0,example.number_of_ghost_cells);
+}
+//#####################################################################
+// Function Extrapolate_Polymer_Stress
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Extrapolate_Polymer_Stress(ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& S,const ARRAY<int,TV_INT>& color)
+{
+    for(int c=0;c<example.number_of_colors;c++)
+        Extrapolate_Polymer_Stress(S(c),color,c);
 }
 //#####################################################################
 // Simulate_To_Frame
@@ -588,7 +657,7 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Dump_Vector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const KRYLOV_VECTOR_BASE<T>& u,const char* str) const
 {
     const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v=static_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>&>(u);
-    ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > fv=example.face_velocities;
+    ARRAY<ARRAY<T,FACE_INDEX<TV::m> > > fv=example.face_velocities;
     for(int i=0;i<example.face_velocities.m;i++)
         for(int j=0;j<TV::m;j++)
             example.face_velocities(i).Component(j).Fill(0);

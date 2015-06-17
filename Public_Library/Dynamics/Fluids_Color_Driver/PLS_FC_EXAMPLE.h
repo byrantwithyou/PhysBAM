@@ -44,6 +44,7 @@ public:
     int time_steps_per_frame;
     bool use_preconditioner;
     int max_iter;
+    T solver_tolerance;
     bool dump_matrix;
     bool sparse_dump_matrix;
     bool use_advection;
@@ -59,6 +60,7 @@ public:
     bool save_pressure;
     bool test_system;
     bool use_polymer_stress;
+    ARRAY<T> polymer_stress_coefficient,inv_Wi;
 
     int num_multigrid_levels;
     bool use_multigrid;
@@ -67,6 +69,7 @@ public:
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid;
     PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>& particle_levelset_evolution_multiple;
     VECTOR<ARRAY<T,TV_INT>,num_bc> bc_phis; // 0=Neumann, 1=Dirichlet, 2=Slip
+    ARRAY<int,TV_INT> cell_color,prev_cell_color;
     ARRAY<int,FACE_INDEX<TV::dimension> > face_color,prev_face_color;
     ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > face_velocities,prev_face_velocities;
     ARRAY<int,TV_INT> pressure_color;
@@ -74,6 +77,7 @@ public:
     ADVECTION<TV,T>& advection_scalar;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
     BOUNDARY_MAC_GRID_PERIODIC<TV,int> boundary_int;
+    BOUNDARY_MAC_GRID_PERIODIC<TV,SYMMETRIC_MATRIX<T,TV::m> > boundary_symmetric;
     LEVELSET_COLOR<TV> levelset_color;
     DEBUG_PARTICLES<TV>& debug_particles;
     ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> > polymer_stress,prev_polymer_stress;
@@ -95,7 +99,7 @@ public:
     virtual TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time)=0;
     virtual TV Volume_Force(const TV& X,int color,T time)=0;
     virtual TV Velocity_Jump(const TV& X,int color0,int color1,T time)=0;
-    virtual void Get_Initial_Velocities()=0;
+    virtual void Get_Initial_Velocities(T time)=0;
     virtual void Get_Initial_Polymer_Stresses()=0;
     int Color_At_Cell(const TV_INT& index) const;
     int Color_At_Cell(const TV_INT& index,T& phi) const;

@@ -66,6 +66,7 @@ public:
     VECTOR<ARRAY<ARRAY<T> >,TV::m> rhs_surface;
     ARRAY<T> q_rhs;
     VECTOR<VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m>,TV::m> matrix_polymer_stress_rhs;
+    VECTOR<VECTOR<VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m>,TV::m>,TV::m> matrix_polymer_stress;
 
     ARRAY<VECTOR_T*> null_modes;
     VECTOR<ARRAY<ARRAY<int> >,TV::m> inactive_u;
@@ -84,6 +85,8 @@ public:
     bool use_p_null_mode;
     bool use_u_null_mode;
     bool use_polymer_stress;
+    ARRAY<T> polymer_stress_coefficient,inv_Wi;
+    const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >* stored_polymer_stress;
 
     VECTOR<CELL_MANAGER_COLOR<TV>*,TV::m> cm_u;
     CELL_MANAGER_COLOR<TV> *cm_p;
@@ -96,7 +99,7 @@ public:
     virtual void Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,
         boost::function<TV(const TV& X,int color0,int color1)> u_jump,
         boost::function<TV(const TV& X,int color0,int color1)> j_surface,
-        ARRAY<T>* inertia,bool use_rhs);
+        ARRAY<T>* inertia,bool use_rhs,T dt);
     virtual void Set_RHS(VECTOR_T& rhs,boost::function<TV(const TV& X,int color)> body_force,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction);
     void Add_Polymer_Stress_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,T dt);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;

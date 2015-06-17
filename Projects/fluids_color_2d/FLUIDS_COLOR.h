@@ -53,10 +53,12 @@ public:
     using BASE::rho1;using BASE::bc_type;using BASE::SLIP;using BASE::DIRICHLET;using BASE::NEUMANN;
     using BASE::unit_rho;using BASE::unit_mu;using BASE::unit_st;using BASE::surface_tension;
     using BASE::override_rho0;using BASE::override_rho1;using BASE::override_mu0;using BASE::override_mu1;
+    using BASE::override_inv_Wi0;using BASE::override_beta0;
     using BASE::test_analytic_diff;using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
     using BASE::use_discontinuous_velocity;using BASE::gravity;using BASE::analytic_initial_only;
     using BASE::override_surface_tension;using BASE::unit_p;using BASE::use_advection;
     using BASE::use_polymer_stress;using BASE::analytic_polymer_stress;
+    using BASE::polymer_stress_coefficient;using BASE::inv_Wi;
 
     T epsilon,radius;
     int mode;
@@ -348,6 +350,8 @@ public:
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
 //                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),VECTOR<T,1>(1),rho0/unit_rho));
                 analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_LINEAR<TV>(rho0/unit_rho,a));
+                if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
+                if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 use_polymer_stress=true;
                 break;
@@ -357,6 +361,8 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).6,0,-4);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),VECTOR<T,1>(1),rho0/unit_rho));
                 analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_MAGNITUDE<TV>(rho0/unit_rho));
+                if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
+                if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 use_polymer_stress=true;
                 break;
@@ -366,6 +372,8 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).6,0,-4);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),VECTOR<T,1>(1),rho0/unit_rho));
                 analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_WAVES<TV>(rho0/unit_rho));
+                if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
+                if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 use_polymer_stress=true;
                 break;
@@ -375,6 +383,8 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).6,0,-4);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION<TV>(TV(),VECTOR<T,1>(1),rho0/unit_rho));
                 analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_QUADRATIC<TV>(rho0/unit_rho));
+                if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
+                if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
                 use_polymer_stress=true;
                 break;
