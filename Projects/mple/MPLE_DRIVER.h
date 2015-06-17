@@ -28,7 +28,6 @@
 #include "MPLE_DOUBLE_WELL.h"
 #include "MPLE_ITERATOR.h"
 #include "MPLE_POINT.h"
-#include <boost/format.hpp>
 
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -203,7 +202,7 @@ public:
         sprintf(buff,"Frame %d",frame);
 
         FILE_UTILITIES::Create_Directory(output_directory);
-        FILE_UTILITIES::Create_Directory(str(boost::format("%s/%d")%output_directory%frame));
+        FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%d",output_directory,frame));
 
         for(int i=0;i<points.m;i++)
             Add_Debug_Particle<TV>(points(i).X,VECTOR<T,3>(1,0,0));
@@ -216,7 +215,7 @@ public:
         
         T_SURFACE surface;
         MARCHING_CUBES<TV>::Create_Surface(surface,grid,u,contour_value);
-        std::ofstream out(str(boost::format("%s/%d/surface")%output_directory%frame));
+        std::ofstream out(LOG::sprintf("%s/%d/surface",output_directory,frame).c_str());
         Dump_Surface(surface,out);
         out.close();
 
@@ -301,7 +300,7 @@ public:
     void Dump_Points()
     {
         FILE_UTILITIES::Create_Directory(output_directory);
-        std::ofstream out(str(boost::format("%s/particles")%output_directory));
+        std::ofstream out(LOG::sprintf("%s/particles",output_directory).c_str());
         for(int i=0;i<points.m;i++){
             const MPLE_POINT<TV,w>& point=points(i);
             out<<"sphere{<";

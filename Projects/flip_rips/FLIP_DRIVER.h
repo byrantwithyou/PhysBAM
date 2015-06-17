@@ -18,7 +18,6 @@
 #include "FLIP_ITERATOR.h"
 #include "FLIP_KRYLOV_SYSTEM.h"
 #include "FLIP_KRYLOV_VECTOR.h"
-#include <boost/format.hpp>
 
 namespace PhysBAM{
 
@@ -113,7 +112,7 @@ public:
         for(int k=1;k<=frames;k++){
             LOG::cout<<"Frame "<<k<<std::endl;
             Advance_Frame();
-            Write((boost::format("Frame %d")%k).str().c_str());
+            Write(LOG::sprintf("Frame %d",k).c_str());
         }
     }
     
@@ -247,8 +246,6 @@ public:
             // end timestep
             time=new_time;
             LOG::cout<<(int)((time-initial_time)*1000/frame_dt)/(T)10<<"%\t  dt="<<dt<<std::endl;
-
-            // Write((boost::format("step")).str().c_str());
         }
     }
 
@@ -383,13 +380,13 @@ public:
     {
         FILE_UTILITIES::Create_Directory(output_directory);
         FILE_UTILITIES::Create_Directory(output_directory+"/common");
-        FILE_UTILITIES::Create_Directory((boost::format("%s/%d")%output_directory%output_number).str());
+        FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%d",output_directory,output_number));
         
-        FILE_UTILITIES::Write_To_File<T>((boost::format("%s/%d/mac_velocities")%output_directory%output_number).str(),velocity);
+        FILE_UTILITIES::Write_To_File<T>(LOG::sprintf("%s/%d/mac_velocities",output_directory,output_number),velocity);
 
-        FILE_UTILITIES::Write_To_File<T>((boost::format("%s/%d/time")%output_directory%output_number).str(),time);
+        FILE_UTILITIES::Write_To_File<T>(LOG::sprintf("%s/%d/time",output_directory,output_number),time);
         FILE_UTILITIES::Write_To_File<T>(output_directory+"/common/grid",grid);
-        FILE_UTILITIES::Write_To_File<T>((boost::format("%s/%d/grid")%output_directory%output_number).str(),grid);
+        FILE_UTILITIES::Write_To_File<T>(LOG::sprintf("%s/%d/grid",output_directory,output_number),grid);
 
         for(T_CELL_ITERATOR it(grid,ghost);it.Valid();it.Next()){
             switch(cell_type(it.Cell_Index())){
@@ -397,7 +394,7 @@ public:
             case CELL_NEUMANN: density(it.Cell_Index())=0.333; break;
             case CELL_INTERIOR: density(it.Cell_Index())=0.666; break;
             default: PHYSBAM_FATAL_ERROR();}}
-        FILE_UTILITIES::Write_To_File<T>((boost::format("%s/%d/density.gz")%output_directory%output_number).str(),density);
+        FILE_UTILITIES::Write_To_File<T>(LOG::sprintf("%s/%d/density.gz",output_directory,output_number),density);
 
         GEOMETRY_PARTICLES<TV> geometry_particles;
         geometry_particles.Store_Velocity();
@@ -406,9 +403,9 @@ public:
             geometry_particles.X(out_index)=particles(i).X;
             geometry_particles.V(out_index)=particles(i).V;}
 
-        FILE_UTILITIES::Write_To_File<T>((boost::format("%s/%d/debug_particles")%output_directory%output_number).str(),geometry_particles);
+        FILE_UTILITIES::Write_To_File<T>(LOG::sprintf("%s/%d/debug_particles",output_directory,output_number),geometry_particles);
         
-        FILE_UTILITIES::Write_To_Text_File((boost::format("%s/%d/frame_title")%output_directory%output_number).str(),text);
+        FILE_UTILITIES::Write_To_Text_File(LOG::sprintf("%s/%d/frame_title",output_directory,output_number),text);
         FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/last_frame",output_number);
         output_number++;
     }

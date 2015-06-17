@@ -23,7 +23,6 @@
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include "MG_PRECONDITIONED_CONJUGATE_GRADIENT.h"
 #include "MULTIGRID_POISSON_SOLVER.h"
-#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_ptr.hpp>
 namespace PhysBAM{
@@ -78,7 +77,7 @@ public:
         else
             write_substeps=true;
 
-        output_dir=str(boost::format("Test_%d_Resolution_%d")%test_number%resolution);
+        output_dir=LOG::sprintf("Test_%d_Resolution_%d",test_number,resolution);
 
         FILE_UTILITIES::Create_Directory(output_dir);
         FILE_UTILITIES::Create_Directory(output_dir+"/common");
