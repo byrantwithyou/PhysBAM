@@ -92,8 +92,8 @@ Potential_Energy_Helper(const T1& a1,const T2& a2,const T3& da11,const T4& da12,
    auto da32=da12.Cross(a2)+a1.Cross(da22);
 
    auto m_sqr=a3.Magnitude_Squared();
-   auto dm_sqr1=2*da31.Dot(a3);
-   auto dm_sqr2=2*da32.Dot(a3);
+   auto dm_sqr1=(T)2*da31.Dot(a3);
+   auto dm_sqr2=(T)2*da32.Dot(a3);
 
    T J0=G0_det(1);
    auto beta=J0/m_sqr;
@@ -116,11 +116,12 @@ Potential_Energy_Helper(const T1& a1,const T2& a2,const T3& da11,const T4& da12,
 template<class T> T MOONEY_RIVLIN_CURVATURE<T>::
 Potential_Energy(TV A1,TV A2,TV dA11,TV dA12,TV dA22,const VECTOR<TM,3>& G0_inv,const VECTOR<T,3>& G0_det,TM2& ge,TT& he,T weight) const
 {
-    auto a1=Hess_From_Var<5,0>(A1);
-    auto a2=Hess_From_Var<5,1>(A2);
-    auto da11=Hess_From_Var<5,2>(dA11);
-    auto da12=Hess_From_Var<5,3>(dA12);
-    auto da22=Hess_From_Var<5,4>(dA22);
+    typedef DIFF_LAYOUT<T,TV::m,TV::m,TV::m,TV::m,TV::m> LAYOUT;
+    auto a1=Hess_From_Var<LAYOUT,0>(A1);
+    auto a2=Hess_From_Var<LAYOUT,1>(A2);
+    auto da11=Hess_From_Var<LAYOUT,2>(dA11);
+    auto da12=Hess_From_Var<LAYOUT,3>(dA12);
+    auto da22=Hess_From_Var<LAYOUT,4>(dA22);
     he=TT();
     return Potential_Energy_Helper(a1,a2,da11,da12,da22,G0_inv,G0_det,ge,&he,weight);
 }
@@ -130,11 +131,12 @@ Potential_Energy(TV A1,TV A2,TV dA11,TV dA12,TV dA22,const VECTOR<TM,3>& G0_inv,
 template<class T> T MOONEY_RIVLIN_CURVATURE<T>::
 Potential_Energy(TV A1,TV A2,TV dA11,TV dA12,TV dA22,const VECTOR<TM,3>& G0_inv,const VECTOR<T,3>& G0_det,TM2& ge,T weight) const
 {
-    auto a1=Diff_From_Var<5,0>(A1);
-    auto a2=Diff_From_Var<5,1>(A2);
-    auto da11=Diff_From_Var<5,2>(dA11);
-    auto da12=Diff_From_Var<5,3>(dA12);
-    auto da22=Diff_From_Var<5,4>(dA22);
+    typedef DIFF_LAYOUT<T,TV::m,TV::m,TV::m,TV::m,TV::m> LAYOUT;
+    auto a1=Diff_From_Var<LAYOUT,0>(A1);
+    auto a2=Diff_From_Var<LAYOUT,1>(A2);
+    auto da11=Diff_From_Var<LAYOUT,2>(dA11);
+    auto da12=Diff_From_Var<LAYOUT,3>(dA12);
+    auto da22=Diff_From_Var<LAYOUT,4>(dA22);
     return Potential_Energy_Helper(a1,a2,da11,da12,da22,G0_inv,G0_det,ge,0,weight);
 }
 template class MOONEY_RIVLIN_CURVATURE<float>;

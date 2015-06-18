@@ -102,29 +102,33 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
         const VECTOR<int,4>& nodes1=spline.control_points(i+1);
         DATA& dat=data(i);
         dat.pts=VECTOR<int,4>(nodes0(1),nodes0(2),nodes1(1),nodes1(2));
-        auto Z0=Hess_From_Var<4,0>(particles.X(nodes0(1)));
-        auto Z1=Hess_From_Var<4,1>(particles.X(nodes0(2)));
-        auto Z2=Hess_From_Var<4,2>(particles.X(nodes1(1)));
-        auto Z3=Hess_From_Var<4,3>(particles.X(nodes1(2)));
+        typedef DIFF_LAYOUT<T,TV::m,TV::m,TV::m,TV::m> LAYOUT;
+        auto Z0=Hess_From_Var<LAYOUT,0>(particles.X(nodes0(1)));
+        auto Z1=Hess_From_Var<LAYOUT,1>(particles.X(nodes0(2)));
+        auto Z2=Hess_From_Var<LAYOUT,2>(particles.X(nodes1(1)));
+        auto Z3=Hess_From_Var<LAYOUT,3>(particles.X(nodes1(2)));
         auto dev=Z0-Z1*2+Z2*2-Z3;
         auto new_pe=stiffness/2*dev.Magnitude_Squared();
         pe+=new_pe.x;
         Extract(dat.ge,new_pe.dx);
-        Extract(dat.he,new_pe.ddx);}
+        Extract(dat.he,new_pe.ddx);
+}
 
     const VECTOR<int,4>& n0=spline.control_points(0);
     const VECTOR<int,4>& n1=spline.control_points.Last();
     end_pts[0]={n0(0),n0(1),n0(2)};
     end_pts[1]={n1(3),n1(2),n1(1)};
     for(int i=0;i<2;i++){
-        auto Z0=Hess_From_Var<3,0>(particles.X(end_pts[i][0]));
-        auto Z1=Hess_From_Var<3,1>(particles.X(end_pts[i][1]));
-        auto Z2=Hess_From_Var<3,2>(particles.X(end_pts[i][2]));
+        typedef DIFF_LAYOUT<T,TV::m,TV::m,TV::m> LAYOUT;
+        auto Z0=Hess_From_Var<LAYOUT,0>(particles.X(end_pts[i][0]));
+        auto Z1=Hess_From_Var<LAYOUT,1>(particles.X(end_pts[i][1]));
+        auto Z2=Hess_From_Var<LAYOUT,2>(particles.X(end_pts[i][2]));
         auto dev=Z0-Z1*2+Z2;
         auto new_pe=stiffness/2*dev.Magnitude_Squared();
         pe+=new_pe.x;
         Extract(end_ge[i],new_pe.dx);
-        Extract(end_he[i],new_pe.ddx);}
+        Extract(end_he[i],new_pe.ddx);
+}
 }
 //#####################################################################
 // Function Potential_Energy

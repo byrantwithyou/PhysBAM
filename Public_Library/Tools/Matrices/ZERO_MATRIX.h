@@ -39,6 +39,10 @@ public:
 
     ZERO_MATRIX Transposed() const
     {return *this;}
+
+    template<class OBJ>
+    auto Transpose_Times(const OBJ& o) const -> decltype(this->Transposed()*o)
+    {return Transposed()*o;}
 };
 
 template<class T,int m,int n> ZERO_MATRIX<T,m,n> operator+ (const ZERO_MATRIX<T,m,n>& a,const ZERO_MATRIX<T,m,n>& b) {return a;}
@@ -81,14 +85,26 @@ template<class T,int m,int n> ZERO_MATRIX<T,m,n> operator*(const ZERO_MATRIX<T,m
 template<class T,int m,int n,int p> ZERO_MATRIX<T,m,p> operator*(const MATRIX<T,m,n>& a,const ZERO_MATRIX<T,n,p>& b) {return b;}
 template<class T,int m,int n> ZERO_MATRIX<T,m,n> operator*(const SYMMETRIC_MATRIX<T,m>& a,const ZERO_MATRIX<T,m,n>& b) {return b;}
 
-template<class T,int d> ZERO_MATRIX<T,d> Symmetric_Outer_Product_Helper(ZERO_VECTOR<T,d> u,const VECTOR<T,d>& v) {return ZERO_MATRIX<T,d>();}
-template<class T,int d> ZERO_MATRIX<T,d> Symmetric_Outer_Product_Helper(ZERO_VECTOR<T,d> u,ZERO_VECTOR<T,d> v) {return ZERO_MATRIX<T,d>();}
-template<class T,int d> ZERO_MATRIX<T,d> Symmetric_Outer_Product_Helper(const VECTOR<T,d>& u,ZERO_VECTOR<T,d> v) {return ZERO_MATRIX<T,d>();}
+template<class T,int d> ZERO_MATRIX<T,d> Symmetric_Outer_Product(ZERO_VECTOR<T,d> u,const VECTOR<T,d>& v) {return ZERO_MATRIX<T,d>();}
+template<class T,int d> ZERO_MATRIX<T,d> Symmetric_Outer_Product(ZERO_VECTOR<T,d> u,ZERO_VECTOR<T,d> v) {return ZERO_MATRIX<T,d>();}
+template<class T,int d> ZERO_MATRIX<T,d> Symmetric_Outer_Product(const VECTOR<T,d>& u,ZERO_VECTOR<T,d> v) {return ZERO_MATRIX<T,d>();}
 
-template<class T,int d> ZERO_MATRIX<T,d> Outer_Product_Helper(const ZERO_VECTOR<T,d>& u) {return ZERO_MATRIX<T,d>();}
-template<class T,int d> ZERO_MATRIX<T,d> Outer_Product_Helper(const ZERO_VECTOR<T,d>& u,const VECTOR<T,d>& v) {return ZERO_MATRIX<T,d>();}
-template<class T,int d> ZERO_MATRIX<T,d> Outer_Product_Helper(const VECTOR<T,d>& u,const ZERO_VECTOR<T,d>& v) {return ZERO_MATRIX<T,d>();}
-template<class T,int d> ZERO_MATRIX<T,d> Outer_Product_Helper(const ZERO_VECTOR<T,d>& u,const ZERO_VECTOR<T,d>& v) {return ZERO_MATRIX<T,d>();}
+template<class T,int d> ZERO_MATRIX<T,d> Outer_Product(const ZERO_VECTOR<T,d>& u) {return ZERO_MATRIX<T,d>();}
+template<class T,int d> ZERO_MATRIX<T,d> Outer_Product(const ZERO_VECTOR<T,d>& u,const VECTOR<T,d>& v) {return ZERO_MATRIX<T,d>();}
+template<class T,int d> ZERO_MATRIX<T,d> Outer_Product(const VECTOR<T,d>& u,const ZERO_VECTOR<T,d>& v) {return ZERO_MATRIX<T,d>();}
+template<class T,int d> ZERO_MATRIX<T,d> Outer_Product(const ZERO_VECTOR<T,d>& u,const ZERO_VECTOR<T,d>& v) {return ZERO_MATRIX<T,d>();}
+
+template<class T,int d,class OP> auto
+Transpose_Times(const ZERO_MATRIX<T,d>& a,const OP& b) -> decltype(a*b)
+{return a*b;}
+
+template<class T,int m,int n,int p> ZERO_MATRIX<T,n,p>
+Transpose_Times(const MATRIX<T,m,n>& a,const ZERO_MATRIX<T,m,p>& b)
+{return ZERO_MATRIX<T,n,p>();}
+
+template<class T,int m,int n> ZERO_MATRIX<T,m,n>
+Transpose_Times(const SYMMETRIC_MATRIX<T,m>& a,const ZERO_MATRIX<T,m,n>& b)
+{return ZERO_MATRIX<T,m,n>();}
 
 }
 #endif

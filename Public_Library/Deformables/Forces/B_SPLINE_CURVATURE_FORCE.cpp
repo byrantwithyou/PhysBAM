@@ -165,10 +165,11 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
             T t=quadrature_loc[gauss_order][j];
             t=k[2]+(k[3]-k[2])*t;
             
-            auto x00=Hess_From_Var<4,0>(XX(0));
-            auto x01=Hess_From_Var<4,1>(XX(1));
-            auto x02=Hess_From_Var<4,2>(XX(2));
-            auto x03=Hess_From_Var<4,3>(XX(3));
+            typedef DIFF_LAYOUT<T,TV::m,TV::m,TV::m,TV::m> LAYOUT;
+            auto x00=Hess_From_Var<LAYOUT,0>(XX(0));
+            auto x01=Hess_From_Var<LAYOUT,1>(XX(1));
+            auto x02=Hess_From_Var<LAYOUT,2>(XX(2));
+            auto x03=Hess_From_Var<LAYOUT,3>(XX(3));
 
             auto x10=x00+(x01-x00)*(t-k[0])/(k[3]-k[0]);
             auto x11=x01+(x02-x01)*(t-k[1])/(k[4]-k[1]);
@@ -188,17 +189,17 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
             auto phi_pp=x20_pp+(x21_pp-x20_pp)*(t-k[2])/(k[3]-k[2])+(x21_p-x20_p)/(k[3]-k[2])+(x21_p-x20_p)/(k[3]-k[2]);
 
             auto length=phi_p.Magnitude();
-            auto m_bar=1/length;
+            auto m_bar=(T)1/length;
             auto m_hat=cube(m_bar);
             auto N=rot*phi_p;
             auto xi=N.Dot(phi_pp);
             auto kappa=m_hat*xi;
 //            auto tau=kappa-dat.kappa0(j);
-            auto tau=atan2(kappa,1)-atan2(dat.kappa0(j),1);
+            auto tau=atan2(kappa,(T)1)-atan2(dat.kappa0(j),(T)1);
             auto curvature_pe=curvature_stiffness/2*sqr(tau);
             auto dl=length/dat.length0(j)-1;
             auto length_pe=length_stiffness/2*sqr(dl);
-            auto new_pe=quadrature_weight[gauss_order][j]/spline.control_points.m*(curvature_pe+length_pe);
+            auto new_pe=(T)quadrature_weight[gauss_order][j]/spline.control_points.m*(curvature_pe+length_pe);
             pe+=new_pe.x;
             Extract(ge,new_pe.dx);
             Extract(he,new_pe.ddx);

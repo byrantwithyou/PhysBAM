@@ -11,10 +11,11 @@ namespace PhysBAM{
 template<class T> SYMMETRIC_MATRIX<T,3> TORUS<T>::
 Hessian(const TV& X) const
 {
-    auto x=Hess_From_Var<1,0>(X)-center;
+    typedef DIFF_LAYOUT<T,TV::m> LAYOUT;
+    auto x=Hess_From_Var<LAYOUT,0>(X)-center;
     auto axial=x.Dot(axis);
     auto ret=hypot((x-axial*axis).Magnitude()-outer_radius,axial)-inner_radius;
-    return ret.ddx(0);
+    return ret.ddx.template Get_Diag_Block<3>(0);
 }
 template class TORUS<float>;
 template class TORUS<double>;

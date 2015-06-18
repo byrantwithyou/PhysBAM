@@ -167,10 +167,11 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
             T t=quadrature_loc[gauss_order][j];
             t=k[2]+(k[3]-k[2])*t;
             
-            auto x00=Hess_From_Var<4,0>(XX(0));
-            auto x01=Hess_From_Var<4,1>(XX(1));
-            auto x02=Hess_From_Var<4,2>(XX(2));
-            auto x03=Hess_From_Var<4,3>(XX(3));
+            typedef DIFF_LAYOUT<T,TV::m,TV::m,TV::m,TV::m> LAYOUT;
+            auto x00=Hess_From_Var<LAYOUT,0>(XX(0));
+            auto x01=Hess_From_Var<LAYOUT,1>(XX(1));
+            auto x02=Hess_From_Var<LAYOUT,2>(XX(2));
+            auto x03=Hess_From_Var<LAYOUT,3>(XX(3));
 
             auto x10=x00+(x01-x00)*(t-k[0])/(k[3]-k[0]);
             auto x11=x01+(x02-x01)*(t-k[1])/(k[4]-k[1]);
@@ -190,7 +191,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
             auto phi_pp=x20_pp+(x21_pp-x20_pp)*(t-k[2])/(k[3]-k[2])+(x21_p-x20_p)/(k[3]-k[2])+(x21_p-x20_p)/(k[3]-k[2]);
 
             auto length=phi_p.Magnitude();
-            auto m_bar=1/length;
+            auto m_bar=(T)1/length;
             auto m_hat=cube(m_bar);
             auto N=rot*phi_p;
             auto xi=N.Dot(phi_pp);
@@ -203,10 +204,10 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
                 T v=epsilon*k;
                 T mu=(1-v*dat.kappa0(j))*dat.length0(j);
                 T denom=sqr(mu);
-                auto numer=sqr((1-v*kappa)*length)+sqr(v*lambda_p);
+                auto numer=sqr(((T)1-v*kappa)*length)+sqr(v*lambda_p);
                 auto I1=numer/denom+sqr(lambda);
                 auto psi=stiffness*(I1-2)*mu;
-                auto new_pe=simpson_weight(k+1)*quadrature_weight[gauss_order][j]/spline.control_points.m*(psi);
+                auto new_pe=simpson_weight(k+1)*(T)quadrature_weight[gauss_order][j]/spline.control_points.m*(psi);
                 pe+=new_pe.x;
                 Extract(ge,new_pe.dx);
                 Extract(he,new_pe.ddx);

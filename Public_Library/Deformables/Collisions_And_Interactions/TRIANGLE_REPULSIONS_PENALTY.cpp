@@ -128,13 +128,15 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
 template<class TV> void TRIANGLE_REPULSIONS_PENALTY<TV>::
 Penalty(T original_volume,const VECTOR<int,4>& nodes,const ARRAY_VIEW<TV>&X,T& e,VECTOR<TV,4>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he)
 {
-    auto u=Hess_From_Var<3,0>(X(nodes(1))-X(nodes(0)));
-    auto v=Hess_From_Var<3,1>(X(nodes(2))-X(nodes(0)));
-    auto w=Hess_From_Var<3,2>(X(nodes(3))-X(nodes(0)));
+    typedef DIFF_LAYOUT<T,TV::m,TV::m,TV::m> LAYOUT;
+    auto u=Hess_From_Var<LAYOUT,0>(X(nodes(1))-X(nodes(0)));
+    auto v=Hess_From_Var<LAYOUT,1>(X(nodes(2))-X(nodes(0)));
+    auto w=Hess_From_Var<LAYOUT,2>(X(nodes(3))-X(nodes(0)));
     auto a=u.Dot(v.Cross(w));
-    auto d=1-a/Hess_From_Const<TV,3>(original_volume);
+    auto d=(T)1-a/Hess_From_Const<LAYOUT>(original_volume);
     auto ee=stiffness*sqr(d)*d;
     e=ee.x;
+#if 0
     for(int i=1;i<4;i++){
         TV t=ee.dx(i-1);
         de(i)=t;
@@ -146,6 +148,7 @@ Penalty(T original_volume,const VECTOR<int,4>& nodes,const ARRAY_VIEW<TV>&X,T& e
             he(i)(0)-=t;
             he(0)(0)+=t;}
         he(0)(i)=he(i)(0).Transposed();}
+#endif
 }
 namespace PhysBAM{
 template class TRIANGLE_REPULSIONS_PENALTY<VECTOR<float,3> >;

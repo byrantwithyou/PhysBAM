@@ -185,9 +185,10 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class T,class TV> void
 Penalty(VECTOR<int,4> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,TV::m+1>& >&X,T& e,VECTOR<TV,TV::m+1>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+1>,TV::m+1>& he,ARRAY<VECTOR<T,TV::m+1> >& stored_weights,T stiffness)
 {
-    auto w=Hess_From_Var<3,0>(X(nodes(0))-X(nodes(3)));
-    auto v=Hess_From_Var<3,1>(X(nodes(1))-X(nodes(3)));
-    auto u=Hess_From_Var<3,2>(X(nodes(2))-X(nodes(3)));
+    typedef DIFF_LAYOUT<T,TV::m,TV::m,TV::m> LAYOUT;
+    auto w=Hess_From_Var<LAYOUT,0>(X(nodes(0))-X(nodes(3)));
+    auto v=Hess_From_Var<LAYOUT,1>(X(nodes(1))-X(nodes(3)));
+    auto u=Hess_From_Var<LAYOUT,2>(X(nodes(2))-X(nodes(3)));
     auto uu=u.Dot(u);
     auto vv=v.Dot(v);
     auto uv=u.Dot(v);
@@ -203,12 +204,12 @@ Penalty(VECTOR<int,4> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,T
     auto ee=stiffness*phi_sq*sqrt(phi_sq+1e-15);
     e=ee.x;
     for(int i=0;i<3;i++){
-        TV t=ee.dx(i);
+        TV t=ee.dx.template Get_Block<TV::m>(i);
         de(nodes(i))=t;
         de(nodes(3))-=t;}
     for(int i=0;i<3;i++){
         for(int j=0;j<3;j++){
-            MATRIX<T,TV::m> t=ee.ddx(i,j);
+            MATRIX<T,TV::m> t=ee.ddx.template Get_Block<TV::m>(i,j);
             he(nodes(i))(nodes(j))=t;
             he(nodes(i))(nodes(3))-=t;
             he(nodes(3))(nodes(3))+=t;}
@@ -226,22 +227,23 @@ Penalty(VECTOR<int,4> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,T
 template<class T,class TV> void
 Penalty(VECTOR<int,3> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,TV::m+1>& >&X,T& e,VECTOR<TV,TV::m+1>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+1>,TV::m+1>& he,ARRAY<VECTOR<T,TV::m+1> >& stored_weights,T stiffness)
 {
-    auto w=Hess_From_Var<2,0>(X(nodes(0))-X(nodes(2)));
-    auto v=Hess_From_Var<2,1>(X(nodes(1))-X(nodes(2)));
+    typedef DIFF_LAYOUT<T,TV::m,TV::m> LAYOUT;
+    auto w=Hess_From_Var<LAYOUT,0>(X(nodes(0))-X(nodes(2)));
+    auto v=Hess_From_Var<LAYOUT,1>(X(nodes(1))-X(nodes(2)));
     auto vv=v.Dot(v);
     auto vw=v.Dot(w);
-    auto a=min(max(vw/vv,0),1);
+    auto a=min(max(vw/vv,(T)0),(T)1);
     auto z=a*v-w;
     auto phi_sq=z.Magnitude_Squared();
     auto ee=stiffness*phi_sq*sqrt(phi_sq+1e-15);
     e=ee.x;
     for(int i=0;i<2;i++){
-        TV t=ee.dx(i);
+        TV t=ee.dx.template Get_Block<TV::m>(i);
         de(nodes(i))=t;
         de(nodes(2))-=t;}
     for(int i=0;i<2;i++){
         for(int j=0;j<2;j++){
-            MATRIX<T,TV::m> t=ee.ddx(i,j);
+            MATRIX<T,TV::m> t=ee.ddx.template Get_Block<TV::m>(i,j);
             he(nodes(i))(nodes(j))=t;
             he(nodes(i))(nodes(2))-=t;
             he(nodes(2))(nodes(2))+=t;}
@@ -258,14 +260,15 @@ Penalty(VECTOR<int,3> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,T
 template<class T,class TV> void
 Penalty(VECTOR<int,2> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,TV::m+1>& >&X,T& e,VECTOR<TV,TV::m+1>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,TV::m+1>,TV::m+1>& he,ARRAY<VECTOR<T,TV::m+1> >& stored_weights,T stiffness)
 {
-    auto w=Hess_From_Var<1,0>(X(nodes(0))-X(nodes(1)));
+    typedef DIFF_LAYOUT<T,TV::m> LAYOUT;
+    auto w=Hess_From_Var<LAYOUT,0>(X(nodes(0))-X(nodes(1)));
     auto phi_sq=w.Magnitude_Squared();
     auto ee=stiffness*phi_sq*sqrt(phi_sq+1e-15);
     e=ee.x;
-    TV t=ee.dx(0);
+    TV t=ee.dx.template Get_Block<TV::m>(0);
     de(nodes(0))=t;
     de(nodes(1))=-t;
-    MATRIX<T,TV::m> m=ee.ddx(0,0);
+    MATRIX<T,TV::m> m=ee.ddx.template Get_Block<TV::m>(0,0);
     he(nodes(0))(nodes(0))=m;
     he(nodes(0))(nodes(1))=-m;
     he(nodes(1))(nodes(1))=m;

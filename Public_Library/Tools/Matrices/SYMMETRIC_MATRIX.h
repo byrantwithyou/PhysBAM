@@ -221,6 +221,10 @@ template<class T,int d> SYMMETRIC_MATRIX<T,d>
 Symmetric_Transpose_Times(const MATRIX<T,d>& a,const SYMMETRIC_MATRIX<T,d>& b)
 {return a.Transpose_Times(b).Twice_Symmetric_Part();}
 
+template<class T,int d> VECTOR<T,d>
+Transpose_Times(const SYMMETRIC_MATRIX<T,d>& a,const VECTOR<T,d>& b)
+{return a.Transpose_Times(b);}
+
 //#####################################################################
 // Function Times_Self_Transpose
 //#####################################################################
@@ -244,17 +248,17 @@ Transpose_Times_Self(const SYMMETRIC_MATRIX<T,d>& a)
 {return a*a;}
 
 //#####################################################################
-// Function Symmetric_Outer_Product_Helper
+// Function Symmetric_Outer_Product
 //#####################################################################
 template<class T,int d> SYMMETRIC_MATRIX<T,d>
-Symmetric_Outer_Product_Helper(const VECTOR<T,d>& u,const VECTOR<T,d>& v)
+Symmetric_Outer_Product(const VECTOR<T,d>& u,const VECTOR<T,d>& v)
 {return SYMMETRIC_MATRIX<T,d>::Symmetric_Outer_Product(u,v);}
 
 //#####################################################################
-// Function Outer_Product_Helper
+// Function Outer_Product
 //#####################################################################
 template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m>
-Outer_Product_Helper(const TV& u)
+Outer_Product(const TV& u)
 {return SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m>::Outer_Product(u);}
 
 template<class T,int d> inline std::ostream&

@@ -144,14 +144,15 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
         dat.he=he;
         for(int j=0;j<gauss_order;j++){
             T t=quadrature_loc[gauss_order][j];
-            auto Z0=Hess_From_Var<4,0>(XX(0));
-            auto Z1=Hess_From_Var<4,1>(XX(1));
-            auto Z2=Hess_From_Var<4,2>(XX(2));
-            auto Z3=Hess_From_Var<4,3>(XX(3));
+            typedef DIFF_LAYOUT<T,TV::m,TV::m,TV::m,TV::m> LAYOUT;
+            auto Z0=Hess_From_Var<LAYOUT,0>(XX(0));
+            auto Z1=Hess_From_Var<LAYOUT,1>(XX(1));
+            auto Z2=Hess_From_Var<LAYOUT,2>(XX(2));
+            auto Z3=Hess_From_Var<LAYOUT,3>(XX(3));
             auto phi_p=-3*sqr(t-1)*Z0+3*(t-1)*(3*t-1)*Z1-3*t*(3*t-2)*Z2+3*sqr(t)*Z3;
             auto phi_pp=-6*(t-1)*Z0+6*(3*t-2)*Z1-6*(3*t-1)*Z2+6*t*Z3;
             auto length=phi_p.Magnitude();
-            auto m_bar=1/length;
+            auto m_bar=(T)1/length;
             auto m_hat=cube(m_bar);
             auto N=rot*phi_p;
             auto xi=N.Dot(phi_pp);
@@ -160,7 +161,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
             auto curvature_pe=curvature_stiffness/2*sqr(tau);
             auto dl=length/dat.length0(j)-1;
             auto length_pe=length_stiffness/2*sqr(dl);
-            auto new_pe=quadrature_weight[gauss_order][j]/spline.control_points.m*(curvature_pe+length_pe);
+            auto new_pe=(T)quadrature_weight[gauss_order][j]/spline.control_points.m*(curvature_pe+length_pe);
             pe+=new_pe.x;
             Extract(ge,new_pe.dx);
             Extract(he,new_pe.ddx);

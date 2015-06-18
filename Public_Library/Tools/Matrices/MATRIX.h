@@ -229,11 +229,31 @@ public:
 };
 
 //#####################################################################
-// Function Outer_Product_Helper
+// Function Outer_Product
 //#####################################################################
 template<class TV> MATRIX<typename TV::SCALAR,TV::m>
-Outer_Product_Helper(const TV& u,const TV& v)
+Outer_Product(const TV& u,const TV& v)
 {return MATRIX<typename TV::SCALAR,TV::m>::Outer_Product(u,v);}
+
+template<class T,int m,int n> MATRIX<T,m,n>
+Transpose_Times(const SYMMETRIC_MATRIX<T,m>& a,const MATRIX<T,m,n>& b)
+{return a.Transpose_Times(b);}
+
+template<class T,int d> MATRIX<T,d>
+Transpose_Times(const SYMMETRIC_MATRIX<T,d>& a,const SYMMETRIC_MATRIX<T,d>& b)
+{return a.Transpose_Times(b);}
+
+template<class T,int m,int n,int p> MATRIX<T,n,p>
+Transpose_Times(const MATRIX<T,m,n>& a,const MATRIX<T,m,p>& b)
+{return a.Transpose_Times(b);}
+
+template<class T,int m,int n> MATRIX<T,n,m>
+Transpose_Times(const MATRIX<T,m,n>& a,const SYMMETRIC_MATRIX<T,m>& b)
+{return a.Transpose_Times(b);}
+
+template<class T,int m,int n> VECTOR<T,n>
+Transpose_Times(const MATRIX<T,m,n>& a,const VECTOR<T,m>& b)
+{return a.Transpose_Times(b);}
 
 template<class T,int m,int n>
 inline MATRIX<T,m,n> operator*(const T a,const MATRIX<T,m,n>& A)
