@@ -509,7 +509,7 @@ public:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST<TV>(TV()+1));
-                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_PERIODIC<TV>(grid.domain));
+                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_PERIODIC<TV>(grid.domain/m));
                 if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
                 if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 use_p_null_mode=true;
@@ -690,13 +690,13 @@ public:
                 face_velocities(c)(it.Full_Index())=analytic_velocity(c)->u(it.Location()/m,time/s)(it.Axis())*m/s;}
     }
 
-    void Get_Initial_Polymer_Stresses()
+    void Get_Initial_Polymer_Stresses(T time)
     {
         //Right now we are filling in for all colors. We may not want to do that in the future.
         if(analytic_levelset && analytic_velocity.m)
             for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
                 for(int c=0;c<analytic_velocity.m;c++)
-                    polymer_stress(c)(it.index)=analytic_polymer_stress(c)->S(it.Location()/m,0);}
+                    polymer_stress(c)(it.index)=analytic_polymer_stress(c)->S(it.Location()/m,time/s);}
     }
 
     void Analytic_Test()

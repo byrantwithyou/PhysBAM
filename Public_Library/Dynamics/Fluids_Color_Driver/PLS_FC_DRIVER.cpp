@@ -151,7 +151,7 @@ Initialize()
         example.particle_levelset_evolution_multiple.Make_Signed_Distance();
         example.Make_Levelsets_Consistent();
         example.Get_Initial_Velocities(0);
-        if(example.use_polymer_stress) example.Get_Initial_Polymer_Stresses();}
+        if(example.use_polymer_stress) example.Get_Initial_Polymer_Stresses(0);}
 
     example.collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
     example.collision_bodies_affecting_fluid.Rasterize_Objects();
