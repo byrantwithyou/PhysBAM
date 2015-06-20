@@ -185,6 +185,9 @@ public:
     VECTOR operator/(const T& a) const
     {return *this*Inverse(a);}
 
+    FIXED_NUMBER<T,0> Dot(const ZERO_VECTOR<T,m>&) const
+    {return FIXED_NUMBER<T,0>();}
+
     T Magnitude_Squared() const
     {return sqr(x)+sqr(y);}
 

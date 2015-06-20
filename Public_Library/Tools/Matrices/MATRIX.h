@@ -15,6 +15,7 @@
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/MATRIX_4X4.h>
 #include <Tools/Vectors/VECTOR.h>
+#include <Tools/Vectors/ZERO_VECTOR.h>
 namespace PhysBAM{
 
 template<class T,int m_input,int n_input> // n_input=m_input
@@ -150,6 +151,9 @@ public:
     VECTOR<T,n> Transpose_Times(const VECTOR<T,m>& y) const
     {VECTOR<T,n> result;for(int j=0;j<n;j++) for(int i=0;i<m;i++) result(j)+=(*this)(i,j)*y(i);return result;}
 
+    ZERO_VECTOR<T,n> Transpose_Times(const ZERO_VECTOR<T,m>& y) const
+    {return ZERO_VECTOR<T,n>();}
+
     template<int p>
     MATRIX<T,n,p> Transpose_Times(const MATRIX<T,m,p>& A) const
     {MATRIX<T,n,p> matrix;for(int j=0;j<p;j++) for(int i=0;i<n;i++) for(int k=0;k<m;k++) matrix(i,j)+=(*this)(k,i)*A(k,j);return matrix;}
@@ -231,9 +235,9 @@ public:
 //#####################################################################
 // Function Outer_Product
 //#####################################################################
-template<class TV> MATRIX<typename TV::SCALAR,TV::m>
-Outer_Product(const TV& u,const TV& v)
-{return MATRIX<typename TV::SCALAR,TV::m>::Outer_Product(u,v);}
+template<class T,int m,int n> MATRIX<T,m,n>
+Outer_Product(const VECTOR<T,m>& u,const VECTOR<T,n>& v)
+{return MATRIX<T,m,n>::Outer_Product(u,v);}
 
 template<class T,int m,int n> MATRIX<T,m,n>
 Transpose_Times(const SYMMETRIC_MATRIX<T,m>& a,const MATRIX<T,m,n>& b)
@@ -254,6 +258,10 @@ Transpose_Times(const MATRIX<T,m,n>& a,const SYMMETRIC_MATRIX<T,m>& b)
 template<class T,int m,int n> VECTOR<T,n>
 Transpose_Times(const MATRIX<T,m,n>& a,const VECTOR<T,m>& b)
 {return a.Transpose_Times(b);}
+
+template<class T,int m,int n> ZERO_VECTOR<T,n>
+Transpose_Times(const MATRIX<T,m,n>& a,const ZERO_VECTOR<T,m>& b)
+{return ZERO_VECTOR<T,n>();}
 
 template<class T,int m,int n>
 inline MATRIX<T,m,n> operator*(const T a,const MATRIX<T,m,n>& A)

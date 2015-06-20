@@ -8,8 +8,8 @@
 #define __EXACT_FLOAT__
 
 #include <Tools/Arrays/ARRAY.h>
+#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Math_Tools/sign.h>
-#include <Tools/Math_Tools/ZERO.h>
 #include <Tools/Utilities/STATIC_ASSERT.h>
 
 namespace PhysBAM{
@@ -45,37 +45,37 @@ public:
     EXACT_FLOAT operator-() const
     {EXACT_FLOAT result(*this);result.expansion*=-1;return result;}
 
-    bool operator<(ZERO zero) const
+    bool operator<(FIXED_NUMBER<T,0> zero) const
     {return sign(*this)<0;}
 
     bool operator<(const EXACT_FLOAT& exact_float) const
     {return sign(*this-exact_float)<0;}
 
-    bool operator<=(ZERO zero) const
+    bool operator<=(FIXED_NUMBER<T,0> zero) const
     {return sign(*this)<=0;}
 
     bool operator<=(const EXACT_FLOAT& exact_float) const
     {return sign(*this-exact_float)<=0;}
 
-    bool operator>=(ZERO zero) const
+    bool operator>=(FIXED_NUMBER<T,0> zero) const
     {return sign(*this)>=0;}
 
     bool operator>=(const EXACT_FLOAT& exact_float) const
     {return sign(*this-exact_float)>=0;}
 
-    bool operator>(ZERO zero) const
+    bool operator>(FIXED_NUMBER<T,0> zero) const
     {return sign(*this)>0;}
 
     bool operator>(const EXACT_FLOAT& exact_float) const
     {return sign(*this-exact_float)>0;}
 
-    bool operator==(ZERO zero) const
+    bool operator==(FIXED_NUMBER<T,0> zero) const
     {return sign(*this)==0;}
 
     bool operator==(const EXACT_FLOAT& exact_float) const
     {return sign(*this-exact_float)==0;}
 
-    bool operator!=(ZERO zero) const
+    bool operator!=(FIXED_NUMBER<T,0> zero) const
     {return sign(*this)!=0;}
 
     bool operator!=(const EXACT_FLOAT& exact_float) const

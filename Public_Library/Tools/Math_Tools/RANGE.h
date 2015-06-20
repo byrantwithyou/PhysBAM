@@ -9,9 +9,9 @@
 #define __RANGE__
 
 #include <Tools/Math_Tools/clamp.h>
+#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Math_Tools/max.h>
 #include <Tools/Math_Tools/min.h>
-#include <Tools/Math_Tools/ZERO.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Utilities/STATIC_ASSERT.h>
 #include <Tools/Vectors/SCALAR_POLICY.h>
@@ -240,7 +240,7 @@ public:
     bool Inside(const TV& location,const T thickness_over_two) const
     {return Thickened(-thickness_over_two).Lazy_Inside(location);}
 
-    bool Inside(const TV& location,const ZERO thickness_over_two) const
+    bool Inside(const TV& location,const FIXED_NUMBER<T,0> thickness_over_two) const
     {return Lazy_Inside(location);}
 
     bool Lazy_Outside(const TV& location) const
@@ -252,7 +252,7 @@ public:
     bool Outside(const TV& location,const T thickness_over_two) const
     {return Thickened(thickness_over_two).Lazy_Outside(location);}
 
-    bool Outside(const TV& location,const ZERO thickness_over_two) const
+    bool Outside(const TV& location,const FIXED_NUMBER<T,0> thickness_over_two) const
     {return Lazy_Outside(location);}
 
     bool Boundary(const TV& location,const T thickness_over_two) const
@@ -280,7 +280,7 @@ public:
     bool Intersection(const RANGE<TV>& box,const T thickness_over_two) const
     {return Thickened(thickness_over_two).Lazy_Intersection(box);}
 
-    bool Intersection(const RANGE<TV>& box,const ZERO thickness_over_two) const
+    bool Intersection(const RANGE<TV>& box,const FIXED_NUMBER<T,0> thickness_over_two) const
     {return Lazy_Intersection(box);}
 
     bool Intersection(const RANGE<TV>& box) const

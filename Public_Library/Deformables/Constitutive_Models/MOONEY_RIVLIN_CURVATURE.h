@@ -17,7 +17,7 @@ class MOONEY_RIVLIN_CURVATURE
     typedef VECTOR<T,3> TV;
     typedef MATRIX<T,3> TM;
     typedef SYMMETRIC_MATRIX<T,3> SM;
-    typedef MATRIX<T,3,5> TM2;
+    typedef VECTOR<VECTOR<T,3>,5> TM2;
     typedef MATRIX<MATRIX<T,3,3>,5,5> TT;
 
 public:

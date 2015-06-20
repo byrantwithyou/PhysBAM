@@ -1635,11 +1635,11 @@ template<class T,int m,class T_TEN> T_TEN Choose(const T_TEN& a,const ZERO_TENSO
 template<class T,int m,class T_TEN> T_TEN Choose(const ZERO_TENSOR<T,T_TEN::m,T_TEN::n,T_TEN::p>& a,const T_TEN& b);
 template<class T,int m,int n,int p> ZERO_TENSOR<T,m> Choose(const ZERO_TENSOR<T,m,n,p>& a,const ZERO_TENSOR<T,m,n,p>& b);
 
-template<class T_TEN> typename enable_if<IS_TENSOR<T_TEN>::value>::type Fill_From(T_TEN& a,const T_TEN& b){a=b;}
-
 //#####################################################################
 // operator=
 //##################################################################### 
+
+template<class T> typename enable_if<IS_TENSOR<T>::value>::type Fill_From(T& a,const T& b){a=b;}
 
 template<class T,int m,int n,int p> void
 Fill_From(TENSOR<T,m,n,p>& a,const ZERO_TENSOR<T,m,n,p>& b)

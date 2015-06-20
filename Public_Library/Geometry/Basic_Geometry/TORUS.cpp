@@ -15,7 +15,9 @@ Hessian(const TV& X) const
     auto x=Hess_From_Var<LAYOUT,0>(X)-center;
     auto axial=x.Dot(axis);
     auto ret=hypot((x-axial*axis).Magnitude()-outer_radius,axial)-inner_radius;
-    return ret.ddx.template Get_Diag_Block<3>(0);
+    SYMMETRIC_MATRIX<T,3> sm;
+    Get<0,0>(sm,ret.ddx);
+    return sm;
 }
 template class TORUS<float>;
 template class TORUS<double>;

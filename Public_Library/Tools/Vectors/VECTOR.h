@@ -48,7 +48,7 @@ public:
     enum WORKAROUND1 {dimension=d};
     enum WORKAROUND2 {m=d};
     typedef int HAS_UNTYPED_READ_WRITE;
-    using BASE::Assert_Same_Size;
+    using BASE::Assert_Same_Size;using BASE::Dot;
 
     T array[d];
 
@@ -176,6 +176,9 @@ public:
 
     VECTOR operator*(const INT_INVERSE a) const
     {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]*a;return r;}
+
+    FIXED_NUMBER<T,0> Dot(const ZERO_VECTOR<T,m>&) const
+    {return FIXED_NUMBER<T,0>();}
 
     VECTOR Normalized() const
     {VECTOR r(*this);r.Normalize();return r;}

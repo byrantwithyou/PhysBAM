@@ -9,7 +9,7 @@
 
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/ONE.h>
+#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR_1D.h>
@@ -62,21 +62,21 @@ public:
     SYMMETRIC_MATRIX<T,1> Hessian(const TV& X) const
     {return SYMMETRIC_MATRIX<T,1>();}
 
-    static ONE Clamped_Barycentric_Coordinates(const TV& location,const TV& x0)
-    {return ONE();}
+    static FIXED_NUMBER<T,1> Clamped_Barycentric_Coordinates(const TV& location,const TV& x0)
+    {return FIXED_NUMBER<T,1>();}
 
     template<class T_ARRAY>
-    static typename enable_if<is_same<typename T_ARRAY::ELEMENT,TV>::value && T_ARRAY::m==1,ONE>::type
+    static typename enable_if<is_same<typename T_ARRAY::ELEMENT,TV>::value && T_ARRAY::m==1,FIXED_NUMBER<T,1>>::type
     Clamped_Barycentric_Coordinates(const TV& location,const T_ARRAY& X)
-    {return ONE();}
+    {return FIXED_NUMBER<T,1>();}
 
     TV Sum_Barycentric_Coordinates(const POINT_SIMPLEX_1D<T>& embedded_point_simplex) const
     {return TV::All_Ones_Vector();} // TODO
 
-    ONE Barycentric_Coordinates(const TV& location) const
-    {return ONE();}
+    FIXED_NUMBER<T,1> Barycentric_Coordinates(const TV& location) const
+    {return FIXED_NUMBER<T,1>();}
 
-    static TV Point_From_Barycentric_Coordinates(const ONE,const TV& x0)
+    static TV Point_From_Barycentric_Coordinates(const FIXED_NUMBER<T,1>,const TV& x0)
     {return x0;}
 
     TV Point_From_Barycentric_Coordinates(const TV& weights)
@@ -84,10 +84,10 @@ public:
 
     template<class T_ARRAY>
     static typename enable_if<is_same<typename T_ARRAY::ELEMENT,TV>::value && T_ARRAY::m==1,TV>::type
-    Point_From_Barycentric_Coordinates(const ONE,const T_ARRAY& X)
+    Point_From_Barycentric_Coordinates(const FIXED_NUMBER<T,1>,const T_ARRAY& X)
     {return X(1);}
 
-    TV Point_From_Barycentric_Coordinates(const ONE) const
+    TV Point_From_Barycentric_Coordinates(const FIXED_NUMBER<T,1>) const
     {return X.x;}
 
     RANGE<TV> Bounding_Box() const

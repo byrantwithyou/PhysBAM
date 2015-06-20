@@ -9,8 +9,8 @@
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/STACK.h>
+#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Math_Tools/ZERO.h>
 #include <Tools/Matrices/MATRIX_1X1.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Utilities/NONCOPYABLE.h>

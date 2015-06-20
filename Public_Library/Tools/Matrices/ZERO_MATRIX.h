@@ -106,5 +106,18 @@ template<class T,int m,int n> ZERO_MATRIX<T,m,n>
 Transpose_Times(const SYMMETRIC_MATRIX<T,m>& a,const ZERO_MATRIX<T,m,n>& b)
 {return ZERO_MATRIX<T,m,n>();}
 
+template<class T,int m,int n> inline ZERO_MATRIX<T,m,n> operator*(const FIXED_NUMBER<T,0>&,const MATRIX<T,m,n>&) {return ZERO_MATRIX<T,m,n>();}
+template<class T,int m,int n> inline ZERO_MATRIX<T,m,n> operator/(const FIXED_NUMBER<T,0>&,const MATRIX<T,m,n>&) {return ZERO_MATRIX<T,m,n>();}
+template<class T,int m,int n> inline ZERO_MATRIX<T,m,n> operator*(const MATRIX<T,m,n>&,const FIXED_NUMBER<T,0>&) {return ZERO_MATRIX<T,m,n>();}
+template<class T,int m,int n,int p> inline ZERO_MATRIX<T,m,n> operator*(const FIXED_NUMBER<T,p>&,const ZERO_MATRIX<T,m,n>&) {return ZERO_MATRIX<T,m,n>();}
+template<class T,int m,int n,int p> inline ZERO_MATRIX<T,m,n> operator/(const FIXED_NUMBER<T,p>&,const ZERO_MATRIX<T,m,n>&) {return ZERO_MATRIX<T,m,n>();}
+template<class T,int m,int n,int p> inline ZERO_MATRIX<T,m,n> operator*(const ZERO_MATRIX<T,m,n>&,const FIXED_NUMBER<T,p>&) {return ZERO_MATRIX<T,m,n>();}
+
+template<class T,int m,int n> inline ZERO_MATRIX<T,m,n> operator*(const FIXED_NUMBER<T,1>&,const ZERO_MATRIX<T,m,n>&) {return ZERO_MATRIX<T,m,n>();}
+template<class T,int m,int n> inline ZERO_MATRIX<T,m,n> operator*(const ZERO_MATRIX<T,m,n>&,const FIXED_NUMBER<T,1>&) {return ZERO_MATRIX<T,m,n>();}
+
+template<class T,int m> inline ZERO_MATRIX<T,m> operator*(const FIXED_NUMBER<T,0>&,const SYMMETRIC_MATRIX<T,m>&) {return ZERO_MATRIX<T,m>();}
+template<class T,int m> inline ZERO_MATRIX<T,m> operator/(const FIXED_NUMBER<T,0>&,const SYMMETRIC_MATRIX<T,m>&) {return ZERO_MATRIX<T,m>();}
+template<class T,int m> inline ZERO_MATRIX<T,m> operator*(const SYMMETRIC_MATRIX<T,m>&,const FIXED_NUMBER<T,0>&) {return ZERO_MATRIX<T,m>();}
 }
 #endif

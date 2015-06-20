@@ -12,6 +12,7 @@
 #include <Tools/Matrices/MATRIX_BASE.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR_3D.h>
+#include <Tools/Vectors/ZERO_VECTOR.h>
 #include <cfloat>
 namespace PhysBAM{
 
@@ -335,6 +336,9 @@ public:
 
     VECTOR<T,3> Transpose_Times(const VECTOR<T,3>& v) const
     {return VECTOR<T,3>(x[0]*v.x+x[1]*v.y+x[2]*v.z,x[3]*v.x+x[4]*v.y+x[5]*v.z,x[6]*v.x+x[7]*v.y+x[8]*v.z);}
+
+    ZERO_VECTOR<T,3> Transpose_Times(const ZERO_VECTOR<T,3>& y) const
+    {return ZERO_VECTOR<T,3>();}
 
     MATRIX Times_Transpose(const MATRIX& A) const
     {return MATRIX(x[0]*A.x[0]+x[3]*A.x[3]+x[6]*A.x[6],x[1]*A.x[0]+x[4]*A.x[3]+x[7]*A.x[6],x[2]*A.x[0]+x[5]*A.x[3]+x[8]*A.x[6],

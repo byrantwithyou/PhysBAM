@@ -23,7 +23,7 @@ template<class T,int d> inline SYMMETRIC_MATRIX<T,d> Cast_Helper(IDENTITY_MATRIX
 template<class T,int d> inline SYMMETRIC_MATRIX<T,d> Cast_Helper(SYMMETRIC_MATRIX<T,d> z){return z;}
 template<class T,int d> inline MATRIX<T,d> Cast_Helper(const MATRIX<T,d>& z){return z;}
 
-template<class T> typename enable_if<IS_MATRIX<T>::value>::type Fill_From(T& a,const T& b){a=b;}
+template<class T> typename enable_if<is_scalar<T>::value || IS_VECTOR<T>::value || IS_MATRIX<T>::value>::type Fill_From(T& a,const T& b){a=b;}
 template<class T,int d> void Fill_From(MATRIX<T,d>& m,const SYMMETRIC_MATRIX<T,d>& z){m=z;}
 template<class T,int d> void Fill_From(MATRIX<T,d>& m,const ZERO_MATRIX<T,d>& z){m=MATRIX<T,d>();}
 template<class T,int d> void Fill_From(MATRIX<T,d>& m,const IDENTITY_MATRIX<T,d>& i){m=MATRIX<T,d>::Identity_Matrix();}
@@ -42,5 +42,7 @@ template<class T,int d,class T_MAT> T_MAT Choose(const ZERO_MATRIX<T,d>& a,const
 template<class T,int d> ZERO_MATRIX<T,d> Choose(const ZERO_MATRIX<T,d>& a,const ZERO_MATRIX<T,d>& b);
 template<class T,int d> SCALE_MATRIX<T,d> Choose(const SCALE_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b);
 template<class T,int d> SCALE_MATRIX<T,d> Choose(const IDENTITY_MATRIX<T,d>& a,const SCALE_MATRIX<T,d>& b);
+template<class T,int d> SCALE_MATRIX<T,d> Choose(const IDENTITY_MATRIX<T,d>& a,const ZERO_MATRIX<T,d>& b);
+template<class T,int d> SCALE_MATRIX<T,d> Choose(const ZERO_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b);
 }
 #endif

@@ -158,7 +158,8 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
                     local_pe+=model.Potential_Energy(a(0),a(1),a(2),a(3),a(4),surf.face_data(face).G0_inv(i,j),surf.face_data(face).G0_det(i,j),ge,weight);
 
                 for(int al=0;al<nodes.m;al++)
-                    data(face).ge(al)+=ge*A(al)(i,j);}}}
+                    for(int five=0;five<5;five++)
+                        data(face).ge(al)+=ge(five)*A(al)(i,j)(five);}}}
     pe=local_pe;
 }
 //#####################################################################

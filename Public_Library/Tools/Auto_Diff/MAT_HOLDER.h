@@ -30,6 +30,18 @@ struct MAT_HOLDER
     BASE z;
 };
 
+template<class V>
+struct ASSERT_VALID_BLOCK_TYPES_MAT
+{
+    static const bool value=ASSERT_SAME_BLOCK_TYPES_VEC<typename V::OBJ,typename V::COL>::value&&ASSERT_VALID_BLOCK_TYPES_MAT<typename V::BASE>::value;
+};
+
+template<>
+struct ASSERT_VALID_BLOCK_TYPES_MAT<MAT_END>
+{
+    static const bool value=true;
+};
+
 inline void Fill_From(MAT_END& o,const MAT_END& m) {}
 template<class OBJ,class COL,class BASE,class OBJ1,class COL1,class BASE1>
 void Fill_From(MAT_HOLDER<OBJ1,COL1,BASE1>& o,const MAT_HOLDER<OBJ,COL,BASE>& m)
@@ -39,60 +51,96 @@ void Fill_From(MAT_HOLDER<OBJ1,COL1,BASE1>& o,const MAT_HOLDER<OBJ,COL,BASE>& m)
     Fill_From(o.z,m.z);
 }
 
-template<class OUT,class OBJ,class COL,class BASE>
-void Get(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& m,int i,int j)
+template<int i,int j>
+struct GET_MAT_HELPER
 {
-    if(i<j){Get_Helper(o,m,j,i);o=o.Transposed();}
-    else Get_Helper(o,m,i,j);
+    template<class OUT,class OBJ,class COL,class BASE>
+    static void f(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& h){GET_MAT_HELPER<i-1,j-1>::f(o,h.z);}
+};
+
+template<int i>
+struct GET_MAT_HELPER<i,0>
+{
+    template<class OUT,class OBJ,class COL,class BASE>
+    static void f(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& h){GET_VEC_HELPER<i-1>::ft(o,h.y);}
+};
+
+template<int j>
+struct GET_MAT_HELPER<0,j>
+{
+    template<class OUT,class OBJ,class COL,class BASE>
+    static void f(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& h){GET_VEC_HELPER<j-1>::f(o,h.y);}
+};
+
+template<>
+struct GET_MAT_HELPER<0,0>
+{
+    template<class OUT,class OBJ,class COL,class BASE>
+    static void f(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& h){Fill_From(o,h.x.obj);}
+};
+
+template<int i,int j,class OUT,class OBJ,class COL,class BASE>
+void Get(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& v)
+{
+    GET_MAT_HELPER<i,j>(o,v);
 }
-template<class OUT> void Get_Helper(OUT& o,const MAT_END& v,int i,int j) {PHYSBAM_FATAL_ERROR();}
-template<class OUT,class OBJ,class COL,class BASE>
-void Get_Helper(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& m,int i,int j)
+
+template<int i,int j,int ni,int nj,class A,class OBJ>
+inline typename enable_if<(i>=0 && i<ni && j>=0 && j<nj)>::type
+Extract_Entry_Helper(MATRIX<A,ni,nj>& ddx,const OBJ& h)
 {
-    if(j>0) return Get_Helper(o,m.z,i-1,j-1);
-    if(i>0) return Get(o,m.y,i-1);
-    Fill_From(o,m.x.obj);
+    Fill_From(ddx(i,j),h.obj);
+}
+template<int i,int j,int ni,int nj,class A,class OBJ>
+inline typename enable_if<!(i>=0 && i<ni && j>=0 && j<nj)>::type
+Extract_Entry_Helper(MATRIX<A,ni,nj>& ddx,const OBJ& h) {}
+
+template<int i,int j,int ni,int nj,class A,class OBJ>
+inline typename enable_if<(i>=0 && i<ni && j>=0 && j<nj)>::type
+Extract_Entry_Transpose_Helper(MATRIX<A,ni,nj>& ddx,const OBJ& h)
+{
+    Fill_From_Transpose(ddx(i,j),h.obj);
 }
 
-template<class OUT> void Get_Diag(OUT& o,const MAT_END& v,int i) {PHYSBAM_FATAL_ERROR();}
-template<class OUT,class OBJ,class COL,class BASE>
-void Get_Diag(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& m,int i)
+template<int i,int j,int ni,int nj,class A,class OBJ>
+inline typename enable_if<!(i>=0 && i<ni && j>=0 && j<nj)>::type
+Extract_Entry_Transpose_Helper(MATRIX<A,ni,nj>& ddx,const OBJ& h) {}
+
+template<int i,int j,int ni,int nj,class A,class OBJ,class BASE> inline void
+Extract_Matrix_Row_Helper(MATRIX<A,ni,nj>& ddx,const VEC_HOLDER<OBJ,BASE>& h)
 {
-    if(i>0) return Get_Diag(o,m.z,i-1);
-    Fill_From(o,m.x.obj);
+    Extract_Entry_Helper<i,j>(ddx,h.x);
+    Extract_Matrix_Row_Helper<i,j+1>(ddx,h.z);
 }
 
-template<int d,int i,int j> struct EXTRACT_MAT_HELPER
-{
-    template<class T,int m,class OBJ,class BASE> inline void
-    static f(MATRIX<MATRIX<T,m>,d>& ddx,const VEC_HOLDER<OBJ,BASE>& v)
-    {MATRIX<T,m> o;Fill_From(o,v.x.obj);ddx(i,j)=o;ddx(j,i)=o.Transposed();EXTRACT_MAT_HELPER<d,i+1,j>::f(ddx,v.z);}
-};
+template<int i,int j,int ni,int nj,class A> inline void
+Extract_Matrix_Row_Helper(MATRIX<A,ni,nj>& ddx,const VEC_END& h) {}
 
-template<int d,int i> struct EXTRACT_MAT_HELPER<d,i,i>
+template<int i,int j,int ni,int nj,class A,class OBJ,class BASE> inline void
+Extract_Matrix_Column_Helper(MATRIX<A,ni,nj>& ddx,const VEC_HOLDER<OBJ,BASE>& h)
 {
-    template<class T,int m,class OBJ,class COL,class BASE> inline void
-    static f(MATRIX<MATRIX<T,m>,d>& ddx,const MAT_HOLDER<OBJ,COL,BASE>& h)
-    {Fill_From(ddx(i,i),h.x.obj);EXTRACT_MAT_HELPER<d,i+1,i>::f(ddx,h.y);EXTRACT_MAT_HELPER<d,i+1,i+1>::f(ddx,h.z);}
-};
+    Extract_Entry_Transpose_Helper<i,j>(ddx,h.x);
+    Extract_Matrix_Column_Helper<i+1,j>(ddx,h.z);
+}
 
-template<int d,int i> struct EXTRACT_MAT_HELPER<d,d,i>
+template<int i,int j,int ni,int nj,class A> inline void
+Extract_Matrix_Column_Helper(MATRIX<A,ni,nj>& ddx,const VEC_END& h) {}
+
+template<int i,int j,int ni,int nj,class A,class OBJ,class COL,class BASE> inline void
+Extract_Matrix_Helper(MATRIX<A,ni,nj>& ddx,const MAT_HOLDER<OBJ,COL,BASE>& h)
 {
-    template<class T,int m>
-    static void f(MATRIX<MATRIX<T,m>,d>& ddx,const VEC_END& v)
-    {}
-};
+    Extract_Entry_Helper<i,j>(ddx,h.x);
+    Extract_Matrix_Row_Helper<i,j+1>(ddx,h.y);
+    Extract_Matrix_Column_Helper<i+1,j>(ddx,h.y);
+    Extract_Matrix_Helper<i+1,j+1>(ddx,h.z);
+}
 
-template<int d> struct EXTRACT_MAT_HELPER<d,d,d>
-{
-    template<class T,int m>
-    static void f(MATRIX<MATRIX<T,m>,d>& ddx,const MAT_END& v)
-    {}
-};
+template<int i,int j,int ni,int nj,class A> inline void
+Extract_Matrix_Helper(MATRIX<A,ni,nj>& ddx,const MAT_END& h) {}
 
-template<class T,int m,int d,class OBJ,class COL,class BASE> inline void
-Extract(MATRIX<MATRIX<T,m>,d>& ddx,const MAT_HOLDER<OBJ,COL,BASE>& h)
-{EXTRACT_MAT_HELPER<d,0,0>::f(ddx,h);}
+template<int i,int j,int ni,int nj,class A,class OBJ,class COL,class BASE> inline void
+Extract(MATRIX<A,ni,nj>& ddx,const MAT_HOLDER<OBJ,COL,BASE>& h)
+{Extract_Matrix_Helper<-i,-j>(ddx,h);}
 
 template<class LAYOUT,int... lead_dims> struct EMPTY_MAT;
 template<class T,int d,int... dims,int... lead_dims> struct EMPTY_MAT<DIFF_LAYOUT<T,d,dims...>,lead_dims...>
@@ -124,6 +172,7 @@ template<class OP,class VEC_OP> struct MAT_MAP_1
     static decltype(TYPE_MAT_MAP_1<OP,VEC_OP,MAT_HOLDER<OBJ,COL,BASE> >::Type(typename remove_reference<Args>::type()...))
     Type(const MAT_HOLDER<OBJ,COL,BASE>&,Args&&...);
     template<class ...Args> static MAT_END Type(MAT_END,Args&&...);
+    template<class ...Args> static DIFF_UNUSED Type(DIFF_UNUSED,Args&&...);
 
     template<class ...Args> void operator()(MAT_END& out,const MAT_END& in,Args&&... args) const {}
     template<class OBJ,class COL,class BASE,class ...Args> void operator()(decltype(Type(MAT_HOLDER<OBJ,COL,BASE>(),typename remove_reference<Args>::type()...))& out,const MAT_HOLDER<OBJ,COL,BASE>& in,Args&&... args) const
@@ -150,6 +199,7 @@ template<class OP,class VEC_OP> struct MAT_MAP_2
     static decltype(TYPE_MAT_MAP_2<OP,VEC_OP,MAT_HOLDER<OBJ0,COL0,BASE0>,MAT_HOLDER<OBJ1,COL1,BASE1> >::Type(typename remove_reference<Args>::type()...))
     Type(const MAT_HOLDER<OBJ0,COL0,BASE0>&,const MAT_HOLDER<OBJ1,COL1,BASE1>&,Args&&...);
     template<class ...Args> static MAT_END Type(MAT_END,MAT_END,Args&&...);
+    template<class ...Args> static DIFF_UNUSED Type(DIFF_UNUSED,DIFF_UNUSED,Args&&...);
 
     template<class ...Args> void operator()(MAT_END& out,const MAT_END& in0,const MAT_END& in1,Args&&... args) const {}
     template<class OBJ0,class COL0,class BASE0,class OBJ1,class COL1,class BASE1,class ...Args> void
@@ -226,15 +276,15 @@ typedef MAT_MAP_2<ADD<ARG<0>,ARG<1> >,VEC_ADD> MAT_ADD;
 typedef MAT_MAP_2<SUB<ARG<0>,ARG<1> >,VEC_SUB> MAT_SUB;
 typedef MAT_MAP_1<MUL<ARG<0>,ARG<1> >,VEC_SCALE> MAT_SCALE;
 typedef MAT_MAP_1<DIV<ARG<0>,ARG<1> >,VEC_SCALE_DIV> MAT_SCALE_DIV;
-typedef OUTER_MAP<OUTER_PRODUCT_EQ<ARG<0> >,VEC_OUTER_PRODUCT> MAT_OUTER_PRODUCT;
-typedef SYM_OUTER_MAP<SYMMETRIC_OUTER_PRODUCT<ARG<0>,ARG<1> >,VEC_MAP_2<ADD<OUTER_PRODUCT<ARG<0>,ARG<3> >,OUTER_PRODUCT<ARG<1>,ARG<2> > > > > MAT_SYM_OUTER_PRODUCT;
-typedef SYM_OUTER_MAP<SYMMETRIC_TRANSPOSE_TIMES<ARG<0>,ARG<1> >,VEC_MAP_2<ADD<TRANS_MUL<ARG<0>,ARG<3> >,TRANS_MUL<ARG<1>,ARG<2> > > > > MAT_SYM_TRANSPOSE_TIMES;
-typedef OUTER_MAP<TRANSPOSE_TIMES_SELF<ARG<0> >,VEC_MAP_1<TRANS_MUL<ARG<0>,ARG<1> > > > MAT_TRANSPOSE_TIMES_SELF;
+typedef OUTER_MAP<OUTER_PRODUCT_EQ<ARG<0> >,VEC_OUTER_PRODUCT_REV> MAT_OUTER_PRODUCT;
+typedef SYM_OUTER_MAP<SYMMETRIC_OUTER_PRODUCT<ARG<0>,ARG<1> >,VEC_MAP_2<ADD<OUTER_PRODUCT<ARG<3>,ARG<0> >,OUTER_PRODUCT<ARG<2>,ARG<1> > > > > MAT_SYM_OUTER_PRODUCT;
+typedef SYM_OUTER_MAP<SYMMETRIC_TRANSPOSE_TIMES<ARG<0>,ARG<1> >,VEC_MAP_2<ADD<TRANS_MUL<ARG<3>,ARG<0> >,TRANS_MUL<ARG<2>,ARG<1> > > > > MAT_SYM_TRANSPOSE_TIMES;
+typedef OUTER_MAP<TRANSPOSE_TIMES_SELF<ARG<0> >,VEC_MAP_1<TRANS_MUL<ARG<1>,ARG<0> > > > MAT_TRANSPOSE_TIMES_SELF;
 typedef MAT_MAP_1<TENSOR_PRODUCT_0<ARG<0>,ARG<1> >,TENSOR_PRODUCT_0_VM_V> MAT_TENSOR_PRODUCT_0;
-typedef SYM_OUTER_MAP<SYMMETRIC_TENSOR_PRODUCT_12<ARG<0>,ARG<1> >,VEC_MAP_2<ADD<TENSOR_PRODUCT_2<ARG<0>,ARG<3> >,TENSOR_PRODUCT_1<ARG<2>,ARG<1> > > > > MAT_SYM_TENSOR_PRODUCT_12;
+typedef SYM_OUTER_MAP<SYMMETRIC_TENSOR_PRODUCT_12<ARG<0>,ARG<1> >,VEC_MAP_2<ADD<TENSOR_PRODUCT_1<ARG<0>,ARG<3> >,TENSOR_PRODUCT_2<ARG<2>,ARG<1> > > > > MAT_SYM_TENSOR_PRODUCT_12;
 typedef MAT_MAP_1<CONTRACT_00<ARG<0>,ARG<1> >,CONTRACT_0_VT_M> MAT_CONTRACT_0M;
 typedef MAT_MAP_1<CONTRACT_0<ARG<0>,ARG<1> >,CONTRACT_0_VT_V> MAT_CONTRACT_0V;
-typedef SYM_OUTER_MAP<SYMMETRIC_DOUBLE_CONTRACT_12<ARG<2>,ARG<0>,ARG<1> >,VEC_MAP_2<SUB<DOUBLE_CONTRACT_12<ARG<4>,ARG<0>,ARG<3> >,DOUBLE_CONTRACT_12<ARG<4>,ARG<1>,ARG<2> > > > > MAT_SYM_DOUBLE_CONTRACT_12;
+typedef SYM_OUTER_MAP<SYMMETRIC_DOUBLE_CONTRACT_12<ARG<2>,ARG<0>,ARG<1> >,VEC_MAP_2<SUB<DOUBLE_CONTRACT_12<ARG<4>,ARG<2>,ARG<1> >,DOUBLE_CONTRACT_12<ARG<4>,ARG<3>,ARG<0> > > > > MAT_SYM_DOUBLE_CONTRACT_12;
 typedef MAT_MAP_2<CHOOSE<ARG<0>,ARG<1> >,VEC_CHOOSE> MAT_CHOOSE;
 
 }

@@ -20,6 +20,8 @@ template<class TV,class VEC>
 struct GRADIENT_VEC
 {
     typedef typename TV::SCALAR T;
+    static_assert(ASSERT_VALID_BLOCK_TYPES_VEC<VEC>::value,"GRADIENT_VEC object is constructed from inconsistent block types");
+    static_assert(!is_same<VEC,DIFF_UNUSED>::value,"GRADIENT_VEC DIFF_UNUSED");
     VEC x;
 
     GRADIENT_VEC operator+ () const {return *this;}
@@ -56,6 +58,17 @@ Outer_Product(const VECTOR<T,d>& u,const GRADIENT<T,VEC>& v)
 template<class TV,class VEC,class T_MAT> typename enable_if<IS_MATRIX<T_MAT>::value,GRADIENT_VEC<TV,decltype(VEC_SCALE_REV::Type(VEC(),T_MAT()))> >::type
 operator* (const T_MAT& a,const GRADIENT_VEC<TV,VEC>& u)
 {GRADIENT_VEC<TV,decltype(VEC_SCALE_REV::Type(VEC(),T_MAT()))> r;VEC_SCALE_REV()(r.x,u.x,a);return r;}
+
+template<int i,class TV,class A,int d,class VEC> inline void
+Extract(VECTOR<A,d>& dx,const GRADIENT_VEC<TV,VEC>& v)
+{Extract<i>(dx,v.x);}
+
+template<int i,class TV,class OUT,class VEC>
+void Get(OUT& o,const GRADIENT_VEC<TV,VEC>& g)
+{
+    GET_VEC_HELPER<i>::f(o,g.x);
+}
+
 }
 }
 #endif

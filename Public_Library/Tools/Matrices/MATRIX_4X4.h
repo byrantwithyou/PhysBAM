@@ -10,6 +10,7 @@
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
+#include <Tools/Vectors/ZERO_VECTOR.h>
 namespace PhysBAM{
 
 template<class T>
@@ -142,6 +143,9 @@ public:
     MATRIX operator/(const T a) const
     {assert(a!=0);T s=1/a;
     return MATRIX(s*x[0],s*x[1],s*x[2],s*x[3],s*x[4],s*x[5],s*x[6],s*x[7],s*x[8],s*x[9],s*x[10],s*x[11],s*x[12],s*x[13],s*x[14],s*x[15]);}
+
+    ZERO_VECTOR<T,4> Transpose_Times(const ZERO_VECTOR<T,4>& y) const
+    {return ZERO_VECTOR<T,4>();}
 
     VECTOR<T,3> Homogeneous_Times(const VECTOR<T,3>& v) const // assumes w=1 is the 4th coordinate of v
     {T w=x[3]*v.x+x[7]*v.y+x[11]*v.z+x[15];assert(w!=0);

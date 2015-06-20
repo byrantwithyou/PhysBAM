@@ -10,7 +10,7 @@
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Data_Structures/ELEMENT_ID.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/ONE.h>
+#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Read_Write/TYPED_STREAM.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>

@@ -51,7 +51,7 @@ template<class TV> TV DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
 Pointwise_Object_Pseudo_Velocity(const int simplex_id,const TV& location,const int state1,const int state2) const
 {
     VECTOR<int,TV::dimension> nodes=object.mesh.elements(simplex_id);
-    typename conditional<TV::m==1,ONE,TV>::type weights=T_SIMPLEX::Clamped_Barycentric_Coordinates(location,object.particles.X.Subset(nodes));
+    typename conditional<TV::m==1,FIXED_NUMBER<T,1>,TV>::type weights=T_SIMPLEX::Clamped_Barycentric_Coordinates(location,object.particles.X.Subset(nodes));
     TV dX=T_SIMPLEX::Point_From_Barycentric_Coordinates(weights,(saved_states(state2).x->X-saved_states(state1).x->X).Subset(nodes));
     return dX/(saved_states(state2).y-saved_states(state1).y);
 }
@@ -234,7 +234,7 @@ Pointwise_Object_Velocity(const int simplex_id,const TV& location) const
         return T_VOLUME_SIMPLEX::Point_From_Barycentric_Coordinates(weights,particles.V.Subset(nodes));}
     else{
         VECTOR<int,TV::dimension> nodes=object.mesh.elements(simplex_id);
-        typename conditional<TV::m==1,ONE,TV>::type weights=T_SIMPLEX::Clamped_Barycentric_Coordinates(location,particles.X.Subset(nodes));
+        typename conditional<TV::m==1,FIXED_NUMBER<T,1>,TV>::type weights=T_SIMPLEX::Clamped_Barycentric_Coordinates(location,particles.X.Subset(nodes));
         return T_SIMPLEX::Point_From_Barycentric_Coordinates(weights,particles.V.Subset(nodes));}
 }
 //##################################################################### 

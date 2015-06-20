@@ -13,7 +13,7 @@
 #include <Tools/Adaptive_Arithmetic/ADAPTIVE_SUM.h>
 #include <Tools/Adaptive_Arithmetic/ADAPTIVE_VECTOR_OPERATION_POLICY.h>
 #include <Tools/Adaptive_Arithmetic/EXACT_ARITHMETIC_POLICY.h>
-#include <Tools/Math_Tools/ZERO.h>
+#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Utilities/STATIC_ASSERT.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 #include <iostream>
@@ -196,15 +196,15 @@ operator/(const T& t,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT
 //#####################################################################
 // Compare
 //#####################################################################
-template<class T_ADAPTIVE0>
-int Compare(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,ZERO zero)
+template<class T_ADAPTIVE0,class T>
+int Compare(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1,FIXED_NUMBER<T,0> zero)
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));
     return a1.Sign();
 }
 
-template<class T_ADAPTIVE0>
-int Compare(ZERO zero,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
+template<class T_ADAPTIVE0,class T>
+int Compare(FIXED_NUMBER<T,0> zero,const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a1)
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));
     return -Compare(a1,zero);
@@ -231,7 +231,7 @@ int Compare(const ADAPTIVE_BASE<T_ADAPTIVE0,typename T_ADAPTIVE0::EXACT_TYPE>& a
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE0>::value));
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE1>::value));
-    return Compare(a1-a2,ZERO());
+    return Compare(a1-a2,FIXED_NUMBER<double,0>());
 }
 
 //#####################################################################

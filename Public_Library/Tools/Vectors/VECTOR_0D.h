@@ -150,6 +150,9 @@ public:
     VECTOR& operator*=(const INT_INVERSE a)
     {return *this;}
 
+    FIXED_NUMBER<T,0> Dot(const ZERO_VECTOR<T,m>&) const
+    {return FIXED_NUMBER<T,0>();}
+
     bool Contains(const T&) const
     {return false;}
 

@@ -19,10 +19,14 @@ namespace HETERO_DIFF{
 template<class T,int m> struct GRADIENT_GET_HELPER {typedef VECTOR<T,m> V;};
 template<class T> struct GRADIENT_GET_HELPER<T,-1> {typedef T V;};
 
+struct DIFF_UNUSED;
+
 template<class T,class VEC_IN>
 struct GRADIENT
 {
     static_assert(is_scalar<T>::value,"This definition of GRADIENT is only for scalars");
+    static_assert(ASSERT_VALID_BLOCK_TYPES_VEC<VEC_IN>::value,"GRADIENT object is constructed from inconsistent block types");
+    static_assert(!is_same<VEC_IN,DIFF_UNUSED>::value,"GRADIENT DIFF_UNUSED");
     typedef VEC_IN VEC;
     VEC x;
 
@@ -36,15 +40,6 @@ struct GRADIENT
 
     template<class VEC1>
     GRADIENT<T,decltype(VEC_SUB::Type(VEC(),VEC1()))> operator- (const GRADIENT<T,VEC1>& z) const {GRADIENT<T,decltype(VEC_SUB::Type(VEC(),VEC1()))> r;VEC_SUB()(r.x,x,z.x);return r;}
-
-    template<int m>
-    typename GRADIENT_GET_HELPER<T,m>::V Get_Block(int i) const {typename GRADIENT_GET_HELPER<T,m>::V v;Get(v,x,i);return v;}
-
-    template<int i,int m>
-    void Set_Block(const VECTOR<T,m>& v) const {Set<i>(v,x);}
-
-    template<int i>
-    void Set_Block(const T& v) const {Set<i>(v,x);}
 };
 
 template<class T,class VEC,class VEC1>
@@ -55,13 +50,15 @@ template<class T,class VEC>
 auto operator* (T a,const GRADIENT<T,VEC>& u) -> decltype(u*a)
 {return u*a;}
 
-template<class T,int m,int d,class VEC> inline void
-Extract(VECTOR<VECTOR<T,m>,d>& dx,const GRADIENT<T,VEC>& v)
-{Extract(dx,v.x);}
+template<int i,class T,class A,int d,class VEC> inline void
+Extract(VECTOR<A,d>& dx,const GRADIENT<T,VEC>& v)
+{Extract<i>(dx,v.x);}
 
-template<class T,int m,int d,class VEC> inline void
-Extract(MATRIX<T,m,d>& dx,const GRADIENT<T,VEC>& v)
-{VECTOR<T,m> w;for(int i=0;i<d;i++){Get(w,v.x,i);dx.Set_Column(i,w);}}
+template<int i,class T,class OUT,class VEC>
+void Get(OUT& o,const GRADIENT<T,VEC>& g)
+{
+    GET_VEC_HELPER<i>::f(o,g.x);
+}
 
 }
 }

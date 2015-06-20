@@ -218,7 +218,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
                 for(int al=0;al<nodes.m;al++)
                     for(int dim=0;dim<3;dim++)
                         for(int five=0;five<5;five++)
-                            dat.ge(dim,al)+=ge(dim,five)*Aij(five)(al);}}}
+                            dat.ge(dim,al)+=ge(five)(dim)*Aij(five)(al);}}}
     pe=local_pe;
 }
 //#####################################################################

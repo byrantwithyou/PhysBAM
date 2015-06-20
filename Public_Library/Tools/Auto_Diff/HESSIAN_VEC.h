@@ -22,6 +22,8 @@ template<class TV,class MAT>
 struct HESSIAN_VEC
 {
     typedef typename TV::SCALAR T;
+    static_assert(!is_same<MAT,DIFF_UNUSED>::value,"HESSIAN_VEC DIFF_UNUSED");
+    static_assert(ASSERT_VALID_BLOCK_TYPES_MAT<MAT>::value,"HESSIAN_VEC object is constructed from inconsistent block types");
     MAT x;
 
     HESSIAN_VEC operator+ () const {return *this;}
@@ -39,6 +41,16 @@ struct HESSIAN_VEC
 template<class TV,class MAT,class MAT1>
 void Fill_From(HESSIAN_VEC<TV,MAT>& out,const HESSIAN_VEC<TV,MAT1>& in)
 {Fill_From(out.x,in.x);}
+
+template<int i,int j,class TV,class A,int d,class MAT> inline void
+Extract(MATRIX<A,d>& ddx,const HESSIAN_VEC<TV,MAT>& h)
+{Extract<i,j>(ddx,h.x);}
+
+template<int i,int j,class TV,class OUT,class MAT>
+void Get(OUT& o,const HESSIAN_VEC<TV,MAT>& h)
+{
+    GET_MAT_HELPER<i,j>::f(o,h.x);
+}
 
 template<class TV,class MAT>
 HESSIAN_VEC<TV,decltype(MAT_SCALE::Type(MAT(),typename TV::SCALAR()))> operator* (typename TV::SCALAR a,const HESSIAN_VEC<TV,MAT>& h){return h*a;}

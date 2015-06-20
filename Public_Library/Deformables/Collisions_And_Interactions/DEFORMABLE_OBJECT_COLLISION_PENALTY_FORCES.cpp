@@ -203,13 +203,17 @@ Penalty(VECTOR<int,4> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,T
     auto phi_sq=z.Magnitude_Squared();
     auto ee=stiffness*phi_sq*sqrt(phi_sq+1e-15);
     e=ee.x;
+    VECTOR<TV,3> dee;
+    MATRIX<MATRIX<T,TV::m>,3> ddee;
+    Extract<0>(dee,ee.dx);
+    Extract<0,0>(ddee,ee.ddx);
     for(int i=0;i<3;i++){
-        TV t=ee.dx.template Get_Block<TV::m>(i);
+        TV t=dee(i);
         de(nodes(i))=t;
         de(nodes(3))-=t;}
     for(int i=0;i<3;i++){
         for(int j=0;j<3;j++){
-            MATRIX<T,TV::m> t=ee.ddx.template Get_Block<TV::m>(i,j);
+            MATRIX<T,TV::m> t=ddee(i,j);
             he(nodes(i))(nodes(j))=t;
             he(nodes(i))(nodes(3))-=t;
             he(nodes(3))(nodes(3))+=t;}
@@ -237,13 +241,16 @@ Penalty(VECTOR<int,3> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,T
     auto phi_sq=z.Magnitude_Squared();
     auto ee=stiffness*phi_sq*sqrt(phi_sq+1e-15);
     e=ee.x;
+    VECTOR<TV,2> dee;
+    MATRIX<MATRIX<T,TV::m>,2> ddee;
+    Extract<0>(dee,ee.dx);
+    Extract<0,0>(ddee,ee.ddx);
     for(int i=0;i<2;i++){
-        TV t=ee.dx.template Get_Block<TV::m>(i);
-        de(nodes(i))=t;
-        de(nodes(2))-=t;}
+        de(nodes(i))=dee(i);
+        de(nodes(2))-=dee(i);}
     for(int i=0;i<2;i++){
         for(int j=0;j<2;j++){
-            MATRIX<T,TV::m> t=ee.ddx.template Get_Block<TV::m>(i,j);
+            MATRIX<T,TV::m> t=ddee(i,j);
             he(nodes(i))(nodes(j))=t;
             he(nodes(i))(nodes(2))-=t;
             he(nodes(2))(nodes(2))+=t;}
@@ -265,10 +272,10 @@ Penalty(VECTOR<int,2> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,T
     auto phi_sq=w.Magnitude_Squared();
     auto ee=stiffness*phi_sq*sqrt(phi_sq+1e-15);
     e=ee.x;
-    TV t=ee.dx.template Get_Block<TV::m>(0);
+    TV t/*=ee.dx.template Get_Block<TV::m>(0)*/;
     de(nodes(0))=t;
     de(nodes(1))=-t;
-    MATRIX<T,TV::m> m=ee.ddx.template Get_Block<TV::m>(0,0);
+    MATRIX<T,TV::m> m/*=ee.ddx.template Get_Block<TV::m>(0,0)*/;
     he(nodes(0))(nodes(0))=m;
     he(nodes(0))(nodes(1))=-m;
     he(nodes(1))(nodes(1))=m;

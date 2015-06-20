@@ -6,8 +6,7 @@
 //##################################################################### 
 #ifndef __DIFF_BLOCK__
 #define __DIFF_BLOCK__
-#include <Tools/Math_Tools/ONE.h>
-#include <Tools/Math_Tools/ZERO.h>
+#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Tensors/PRIMITIVE_TENSORS.h>
 #include <Tools/Vectors/VECTOR_FORWARD.h>
 #include <type_traits>
@@ -15,13 +14,12 @@ using std::enable_if;
 
 namespace PhysBAM{
 template<class T> struct IS_SCALAR{static const bool value=is_scalar<T>::value;};
-template<> struct IS_SCALAR<ZERO>{static const bool value=true;};
-template<> struct IS_SCALAR<ONE>{static const bool value=true;};
-#define DECLARE_BLOCK(name,type) \
+template<class T,int m> struct IS_SCALAR<FIXED_NUMBER<T,m> >{static const bool value=true;};
+#define DECLARE_BLOCK(name,check_type) \
 template<class OBJ> \
 struct BLOCK_##name \
 { \
-    static_assert(IS_##type<OBJ>::value,"BLOCK_"#name" must be templatized over a "#type); \
+    static_assert(IS_##check_type<OBJ>::value,"BLOCK_"#name" must be templatized over a "#check_type); \
     const static bool block_tag=true; \
     OBJ obj; \
     BLOCK_##name() {} \
@@ -44,42 +42,49 @@ DECLARE_BLOCK(vVV,TENSOR);
 
 template<template<class OBJ> class BLOCK,class OBJ0,class OBJ1>
 auto operator + (const BLOCK<OBJ0>& b0,const BLOCK<OBJ1>& b1)
-    -> typename enable_if<BLOCK<OBJ0>::block_tag,BLOCK<decltype(b0.obj+b1.obj)> >::type
+    -> typename enable_if<BLOCK<OBJ0>::block_tag,BLOCK<typename remove_const<typename remove_reference<decltype(b0.obj+b1.obj)>::type>::type> >::type
 {
-    return BLOCK<decltype(b0.obj+b1.obj)>(b0.obj+b1.obj);
+    return BLOCK<typename remove_const<typename remove_reference<decltype(b0.obj+b1.obj)>::type>::type>(b0.obj+b1.obj);
 }
 
 template<template<class OBJ> class BLOCK,class OBJ0,class OBJ1>
 auto operator - (const BLOCK<OBJ0>& b0,const BLOCK<OBJ1>& b1)
-    -> typename enable_if<BLOCK<OBJ0>::block_tag,BLOCK<decltype(b0.obj-b1.obj)> >::type
+    -> typename enable_if<BLOCK<OBJ0>::block_tag,BLOCK<typename remove_const<typename remove_reference<decltype(b0.obj-b1.obj)>::type>::type> >::type
 {
-    return BLOCK<decltype(b0.obj-b1.obj)>(b0.obj-b1.obj);
+    return BLOCK<typename remove_const<typename remove_reference<decltype(b0.obj-b1.obj)>::type>::type>(b0.obj-b1.obj);
 }
 
 template<template<class OBJ> class BLOCK,class OBJ>
 auto operator - (const BLOCK<OBJ>& b)
-    -> typename enable_if<BLOCK<OBJ>::block_tag,BLOCK<decltype(-b.obj)> >::type
+    -> typename enable_if<BLOCK<OBJ>::block_tag,BLOCK<typename remove_const<typename remove_reference<decltype(-b.obj)>::type>::type> >::type
 {
-    return BLOCK<decltype(-b.obj)>(-b.obj);
+    return BLOCK<typename remove_const<typename remove_reference<decltype(-b.obj)>::type>::type>(-b.obj);
 }
 
 template<template<class OBJ> class BLOCK,class OBJ,class T>
 auto operator * (const BLOCK<OBJ>& b,const T& s)
-    -> typename enable_if<BLOCK<OBJ>::block_tag && IS_SCALAR<T>::value,BLOCK<decltype(b.obj*s)> >::type
+    -> typename enable_if<BLOCK<OBJ>::block_tag && IS_SCALAR<T>::value,BLOCK<typename remove_const<typename remove_reference<decltype(b.obj*s)>::type>::type> >::type
 {
-    return BLOCK<decltype(b.obj*s)>(b.obj*s);
+    return BLOCK<typename remove_const<typename remove_reference<decltype(b.obj*s)>::type>::type>(b.obj*s);
+}
+
+template<template<class OBJ> class BLOCK,class OBJ,class T>
+auto operator * (const T& s,const BLOCK<OBJ>& b)
+    -> typename enable_if<BLOCK<OBJ>::block_tag && IS_SCALAR<T>::value,BLOCK<typename remove_const<typename remove_reference<decltype(s*b.obj)>::type>::type> >::type
+{
+    return BLOCK<typename remove_const<typename remove_reference<decltype(s*b.obj)>::type>::type>(s*b.obj);
 }
 
 template<template<class OBJ> class BLOCK,class OBJ,class T>
 auto operator / (const BLOCK<OBJ>& b,const T& s)
-    -> typename enable_if<BLOCK<OBJ>::block_tag && IS_SCALAR<T>::value,BLOCK<decltype(b.obj/s)> >::type
+    -> typename enable_if<BLOCK<OBJ>::block_tag && IS_SCALAR<T>::value,BLOCK<typename remove_const<typename remove_reference<decltype(b.obj/s)>::type>::type> >::type
 {
-    return BLOCK<decltype(b.obj/s)>(b.obj/s);
+    return BLOCK<typename remove_const<typename remove_reference<decltype(b.obj/s)>::type>::type>(b.obj/s);
 }
 
 template<class OBJ,class VEC>
 auto Contract_0(const BLOCK_vSS<OBJ>& block,const VEC& vec)
-    -> typename enable_if<IS_VECTOR<VEC>::value,decltype(Make_sSS(Transpose_Times(block.obj,vec)))>::type
+    -> typename enable_if<IS_VECTOR<VEC>::value,decltype(Make_sSS(block.obj.Dot(vec)))>::type
 {
     return Make_sSS(block.obj.Dot(vec));
 }
@@ -135,7 +140,7 @@ auto Contract_00(const BLOCK_vVV<OBJ>& block,const MAT& mat)
 
 template<class OBJ>
 auto Transpose_Times_Self(const BLOCK_vS<OBJ>& block)
-    -> decltype(Make_sSS(Transpose_Times_Self(block.obj)))
+    -> decltype(Make_sSS(block.obj.Dot(block.obj)))
 {
     return Make_sSS(block.obj.Dot(block.obj));
 }
@@ -198,16 +203,16 @@ auto Tensor_Product_1(const BLOCK_vV<OBJ0>& block0,const BLOCK_sV<OBJ1>& block1)
 
 template<class OBJ0,class OBJ1>
 auto Tensor_Product_1(const BLOCK_vV<OBJ0>& block0,const BLOCK_sS<OBJ1>& block1)
-    -> decltype(Make_vVS(block0.obj*block1.obj))
+    -> decltype(Make_vSV(block0.obj*block1.obj))
 {
-    return Make_vVS(block0.obj*block1.obj);
+    return Make_vSV(block0.obj*block1.obj);
 }
 
 template<class OBJ0,class OBJ1>
 auto Tensor_Product_1(const BLOCK_vS<OBJ0>& block0,const BLOCK_sV<OBJ1>& block1)
-    -> decltype(Make_vSV(Outer_Product(block0.obj,block1.obj)))
+    -> decltype(Make_vVS(Outer_Product(block0.obj,block1.obj)))
 {
-    return Make_vSV(Outer_Product(block0.obj,block1.obj));
+    return Make_vVS(Outer_Product(block0.obj,block1.obj));
 }
 
 template<class OBJ0,class OBJ1>
@@ -261,14 +266,14 @@ auto Outer_Product(const BLOCK_sS<OBJ>& block)
 
 template<class OBJ,class VEC>
 auto Outer_Product(const VEC& vec,const BLOCK_sV<OBJ>& block)
-    -> decltype(Make_vV(Outer_Product(vec,block.obj)))
+    -> typename enable_if<IS_VECTOR<VEC>::value,decltype(Make_vV(Outer_Product(vec,block.obj)))>::type
 {
     return Make_vV(Outer_Product(vec,block.obj));
 }
 
 template<class OBJ,class VEC>
 auto Outer_Product(const VEC& vec,const BLOCK_sS<OBJ>& block)
-    -> decltype(Make_vS(block.obj*vec))
+    -> typename enable_if<IS_VECTOR<VEC>::value,decltype(Make_vS(block.obj*vec))>::type
 {
     return Make_vS(block.obj*vec);
 }
@@ -310,9 +315,10 @@ auto Symmetric_Outer_Product(const BLOCK_sV<OBJ0>& block0,const BLOCK_sV<OBJ1>& 
 
 template<class OBJ0,class OBJ1>
 auto Symmetric_Outer_Product(const BLOCK_sS<OBJ0>& block0,const BLOCK_sS<OBJ1>& block1)
-    -> decltype(Make_sSS(block0.obj*block1.obj))
+    -> decltype(Make_sSS(block0.obj*block1.obj+block0.obj*block1.obj))
 {
-    return Make_sSS(block0.obj*block1.obj*2);
+    auto a=block0.obj*block1.obj;
+    return Make_sSS(a+a);
 }
 
 template<class OBJ,class MAT>
@@ -366,9 +372,10 @@ auto Symmetric_Transpose_Times(const BLOCK_vV<OBJ0>& block0,const BLOCK_vV<OBJ1>
 
 template<class OBJ0,class OBJ1>
 auto Symmetric_Transpose_Times(const BLOCK_vS<OBJ0>& block0,const BLOCK_vS<OBJ1>& block1)
-    -> decltype(Make_sSS(block0.obj.Dot(block1.obj)))
+    -> decltype(Make_sSS(block0.obj.Dot(block1.obj)+block0.obj.Dot(block1.obj)))
 {
-    return Make_sSS(block0.obj.Dot(block1.obj)*2);
+    auto a=block0.obj.Dot(block1.obj);
+    return Make_sSS(a+a);
 }
 
 template<class OBJ0,class OBJ1>
@@ -380,9 +387,10 @@ auto Symmetric_Tensor_Product_12(const BLOCK_vV<OBJ0>& block0,const BLOCK_sV<OBJ
 
 template<class OBJ0,class OBJ1>
 auto Symmetric_Tensor_Product_12(const BLOCK_vS<OBJ0>& block0,const BLOCK_sS<OBJ1>& block1)
-    -> decltype(Make_vSS(block0.obj*block1.obj*2))
+    -> decltype(Make_vSS(block0.obj*block1.obj+block0.obj*block1.obj))
 {
-    return Make_vSS(block0.obj*block1.obj*2);
+    auto a=block0.obj*block1.obj;
+    return Make_vSS(a+a);
 }
 
 template<class T,class OBJ0,class OBJ1>
@@ -408,9 +416,9 @@ auto Double_Contract_12(const PERMUTATION_TENSOR<T>& a,const BLOCK_vS<OBJ0>& blo
 
 template<class T,class OBJ0,class OBJ1>
 auto Double_Contract_12(const PERMUTATION_TENSOR<T>& a,const BLOCK_vS<OBJ0>& block0,const BLOCK_vS<OBJ1>& block1)
-    -> decltype(Make_vSS(block0.obj*block1.obj*2))
+    -> decltype(Make_vSS(a.x*Cross_Product(block0.obj,block1.obj)))
 {
-    return Make_vSS(a.x*block0.obj.Cross(block1.obj));
+    return Make_vSS(a.x*Cross_Product(block0.obj,block1.obj));
 }
 
 template<class T,class OBJ0,class OBJ1>
@@ -422,68 +430,22 @@ auto Symmetric_Double_Contract_12(const PERMUTATION_TENSOR<T>& a,const BLOCK_vV<
 
 template<class T,class OBJ0,class OBJ1>
 auto Symmetric_Double_Contract_12(const PERMUTATION_TENSOR<T>& a,const BLOCK_vS<OBJ0>& block0,const BLOCK_vS<OBJ1>& block1)
-    -> decltype(Make_vSS(a.x*2*block0.obj.Cross(block1.obj)))
+    -> decltype(Make_vSS(a.x*2*Cross_Product(block0.obj,block1.obj)))
 {
-    return Make_vSS(a.x*2*block0.obj.Cross(block1.obj));
+    return Make_vSS(a.x*2*Cross_Product(block0.obj,block1.obj));
 }
 
-template<class OBJ,class MAT>
-auto Contract_10(const BLOCK_vSS<OBJ>& block,const MAT& mat,int)
-    -> typename enable_if<IS_MATRIX<MAT>::value,decltype(Make_vSS(Transpose_Times(mat,block.obj)))>::type
-{
-    return Make_vSS(Transpose_Times(mat,block.obj));
-}
-
-template<class OBJ,class MAT>
-auto Contract_10(const BLOCK_vVS<OBJ>& block,const MAT& mat,int)
-    -> typename enable_if<IS_MATRIX<MAT>::value,decltype(Make_vVS(Transpose_Times(mat,block.obj)))>::type
-{
-    return Make_vVS(Transpose_Times(mat,block.obj));
-}
-
-template<class OBJ,class MAT>
-auto Contract_10(const BLOCK_vSV<OBJ>& block,const MAT& mat,int)
-    -> typename enable_if<IS_MATRIX<MAT>::value,decltype(Make_vSV(Transpose_Times(mat,block.obj)))>::type
-{
-    return Make_vSV(Transpose_Times(mat,block.obj));
-}
-
-template<class OBJ,class MAT>
-auto Contract_10(const BLOCK_vVV<OBJ>& block,const MAT& mat,int)
-    -> typename enable_if<IS_MATRIX<MAT>::value,decltype(Make_vVV(Contract<0,0>(block.obj,mat)))>::type
-{
-    return Make_vVV(Contract<0,0>(block.obj,mat));
-}
-
-template<class OBJ0,class OBJ1>
-auto Choose(const BLOCK_sV<OBJ0>& block0,const BLOCK_sV<OBJ1>& block1)
-    -> decltype(Make_sV(Choose(block0.obj,block1.obj)));
-
-template<class OBJ0,class OBJ1>
-BLOCK_sS<OBJ0> Choose(const BLOCK_sS<OBJ0>& block0,const BLOCK_sS<OBJ1>& block1);
-
-template<class OBJ0,class OBJ1>
-auto Choose(const BLOCK_sVV<OBJ0>& block0,const BLOCK_sVV<OBJ1>& block1)
-    -> decltype(Make_sVV(Choose(block0.obj,block1.obj)));
-
-template<class OBJ0,class OBJ1>
-auto Choose(const BLOCK_sSV<OBJ0>& block0,const BLOCK_sSV<OBJ1>& block1)
-    -> decltype(Make_sSV(Choose(block0.obj,block1.obj)));
-
-template<class OBJ0,class OBJ1>
-auto Choose(const BLOCK_sVS<OBJ0>& block0,const BLOCK_sVS<OBJ1>& block1)
-    -> decltype(Make_sVS(Choose(block0.obj,block1.obj)));
-
-template<class OBJ0,class OBJ1>
-BLOCK_sSS<OBJ0> Choose(const BLOCK_sSS<OBJ0>& block0,const BLOCK_sSS<OBJ1>& block1);
+template<template<class OBJ> class BLOCK,class OBJ0,class OBJ1>
+auto Choose(const BLOCK<OBJ0>& block0,const BLOCK<OBJ1>& block1)
+    -> BLOCK<decltype(Choose(block0.obj,block1.obj))>;
 
 template<class T,int... dims> struct ZERO_BLOCK_TYPE;
-template<class T> struct ZERO_BLOCK_TYPE<T,-1,-1> {typedef BLOCK_sS<ZERO> TYPE;};
+template<class T> struct ZERO_BLOCK_TYPE<T,-1,-1> {typedef BLOCK_sS<FIXED_NUMBER<T,0> > TYPE;};
 template<class T,int n> struct ZERO_BLOCK_TYPE<T,-1,n> {typedef BLOCK_sV<ZERO_VECTOR<T,n> > TYPE;};
 template<class T,int m> struct ZERO_BLOCK_TYPE<T,m,-1> {typedef BLOCK_vS<ZERO_VECTOR<T,m> > TYPE;};
 template<class T,int m,int n> struct ZERO_BLOCK_TYPE<T,m,n> {typedef BLOCK_vV<ZERO_MATRIX<T,m,n> > TYPE;};
 
-template<class T> struct ZERO_BLOCK_TYPE<T,-1,-1,-1> {typedef BLOCK_sSS<ZERO> TYPE;};
+template<class T> struct ZERO_BLOCK_TYPE<T,-1,-1,-1> {typedef BLOCK_sSS<FIXED_NUMBER<T,0> > TYPE;};
 template<class T,int n> struct ZERO_BLOCK_TYPE<T,-1,n,-1> {typedef BLOCK_sVS<ZERO_VECTOR<T,n> > TYPE;};
 template<class T,int m> struct ZERO_BLOCK_TYPE<T,m,-1,-1> {typedef BLOCK_vSS<ZERO_VECTOR<T,m> > TYPE;};
 template<class T,int m,int n> struct ZERO_BLOCK_TYPE<T,m,n,-1> {typedef BLOCK_vVS<ZERO_MATRIX<T,m,n> > TYPE;};
@@ -494,11 +456,43 @@ template<class T,int m,int p> struct ZERO_BLOCK_TYPE<T,m,-1,p> {typedef BLOCK_vS
 template<class T,int m,int n,int p> struct ZERO_BLOCK_TYPE<T,m,n,p> {typedef BLOCK_vVV<ZERO_TENSOR<T,m,n,p> > TYPE;};
 
 template<class T,int... dims> struct IDENTITY_BLOCK_TYPE;
-template<class T> struct IDENTITY_BLOCK_TYPE<T,-1,-1> {typedef BLOCK_sS<ONE> TYPE;};
+template<class T> struct IDENTITY_BLOCK_TYPE<T,-1,-1> {typedef BLOCK_sS<FIXED_NUMBER<T,1> > TYPE;};
 template<class T,int m> struct IDENTITY_BLOCK_TYPE<T,m,m> {typedef BLOCK_vV<IDENTITY_MATRIX<T,m> > TYPE;};
 
-template<class T> struct IDENTITY_BLOCK_TYPE<T,-1,-1,-1> {typedef BLOCK_sSS<ONE> TYPE;};
+template<class T> struct IDENTITY_BLOCK_TYPE<T,-1,-1,-1> {typedef BLOCK_sSS<FIXED_NUMBER<T,1> > TYPE;};
 template<class T,int n> struct IDENTITY_BLOCK_TYPE<T,-1,n,n> {typedef BLOCK_sVV<IDENTITY_MATRIX<T,n> > TYPE;};
+
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES{static const bool value=false;};
+
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sS<A>,BLOCK_sS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sV<A>,BLOCK_sS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sS<A>,BLOCK_sV<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sV<A>,BLOCK_sV<B> >{static const bool value=true;};
+
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vS<A>,BLOCK_vS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vV<A>,BLOCK_vS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vS<A>,BLOCK_vV<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vV<A>,BLOCK_vV<B> >{static const bool value=true;};
+
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sSS<A>,BLOCK_sSS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sSV<A>,BLOCK_sSS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sSS<A>,BLOCK_sSV<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sSV<A>,BLOCK_sSV<B> >{static const bool value=true;};
+
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sVS<A>,BLOCK_sVS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sVV<A>,BLOCK_sVS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sVS<A>,BLOCK_sVV<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_sVV<A>,BLOCK_sVV<B> >{static const bool value=true;};
+
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vSS<A>,BLOCK_vSS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vSV<A>,BLOCK_vSS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vSS<A>,BLOCK_vSV<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vSV<A>,BLOCK_vSV<B> >{static const bool value=true;};
+
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vVS<A>,BLOCK_vVS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vVV<A>,BLOCK_vVS<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vVS<A>,BLOCK_vVV<B> >{static const bool value=true;};
+template<class A,class B> struct ASSERT_SAME_BLOCK_TYPES<BLOCK_vVV<A>,BLOCK_vVV<B> >{static const bool value=true;};
 
 }
 #endif

@@ -8,6 +8,7 @@
 #include <Tools/Matrices/MATRIX_BASE.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR_0D.h>
+#include <Tools/Vectors/ZERO_VECTOR.h>
 #include <cfloat>
 namespace PhysBAM{
 
@@ -88,6 +89,9 @@ public:
 
     void Transpose()
     {}
+
+    ZERO_VECTOR<T,0> Transpose_Times(const ZERO_VECTOR<T,0>& y) const
+    {return ZERO_VECTOR<T,0>();}
 
     MATRIX Inverse() const
     {return *this;}

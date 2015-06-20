@@ -155,11 +155,8 @@ Add_Plane_Edge_Intersection(const VECTOR<int,5>& nodes, const TV_VECTOR& X, VECT
     auto lambda=d0/(d0-d1);
     auto z=e0+lambda*(e1-e0);
     v=z.x;
-    for(int i=0;i<5;i++)
-        Get(dv(i),z.dx.x,i);
-    for(int i=0;i<5;i++)
-        for(int j=0;j<5;j++)
-            Get(ddv(i,j),z.ddx.x,i,j);
+    Extract<0>(dv,z.dx);
+    Extract<0,0>(ddv,z.ddx);
 }
 //#####################################################################
 // Function Add_Plane_Edge_Intersection
@@ -234,11 +231,8 @@ Integrate_Levelset_Interior(const VECTOR<VECTOR<T,3>,4>& v,T phi,T stiffness,T& 
     auto C=c-d;
     auto integral=stiffness*abs(A.Dot(B.Cross(C))*phi);
     pe+=integral.x;
-    for(int i=0;i<4;i++)
-        dpe(i)=integral.dx.template Get_Block<3>(i);
-    for(int i=0;i<4;i++)
-        for(int j=0;j<4;j++)
-            ddpe(i,j)=integral.ddx.template Get_Block<3>(i,j);
+    Extract<0>(dpe,integral.dx);
+    Extract<0,0>(ddpe,integral.ddx);
 }
 //#####################################################################
 // Function Integrate_Levelset
@@ -272,11 +266,8 @@ Integrate_Levelset(const VECTOR<VECTOR<T,3>,8>& v,const T_VECTOR& undeformed_phi
     auto phi=undeformed_phi(0)*wA+undeformed_phi(1)*wB+undeformed_phi(2)*wC+undeformed_phi(3)*wD;
     auto integral=stiffness*abs((e-h).Dot((f-h).Cross(g-h))*phi);
     pe+=integral.x;
-    for(int i=0;i<8;i++)
-        dpe(i)=integral.dx.template Get_Block<3>(i);
-    for(int i=0;i<8;i++)
-        for(int j=0;j<8;j++)
-            ddpe(i,j)=integral.ddx.template Get_Block<3>(i,j);
+    Extract<0>(dpe,integral.dx);
+    Extract<0,0>(ddpe,integral.ddx);
 }
 //#####################################################################
 // Function Calculate_Vertex_Dependencies

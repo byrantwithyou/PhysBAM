@@ -163,8 +163,8 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
             auto length_pe=length_stiffness/2*sqr(dl);
             auto new_pe=(T)quadrature_weight[gauss_order][j]/spline.control_points.m*(curvature_pe+length_pe);
             pe+=new_pe.x;
-            Extract(ge,new_pe.dx);
-            Extract(he,new_pe.ddx);
+            Extract<0>(ge,new_pe.dx);
+            Extract<0,0>(he,new_pe.ddx);
             dat.ge+=ge;
             dat.he+=he;}}
 }

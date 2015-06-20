@@ -45,9 +45,9 @@ operator*=(const EXACT_RATIONAL& exact_rational)
 template<class T> inline EXACT_RATIONAL<T>& EXACT_RATIONAL<T>::
 operator/=(const EXACT_RATIONAL& exact_rational)
 {
-    if(exact_rational==ZERO()) throw DIVISION_BY_ZERO();
+    if(exact_rational==FIXED_NUMBER<T,0>()) throw DIVISION_BY_ZERO();
     if(denominator==exact_rational.denominator) denominator=exact_rational.numerator;else{numerator*=exact_rational.denominator;denominator*=exact_rational.numerator;}
-    if(exact_rational<ZERO()){numerator.Negate();denominator.Negate();}
+    if(exact_rational<FIXED_NUMBER<T,0>()){numerator.Negate();denominator.Negate();}
     Normalize();
     return *this;
 }
@@ -115,7 +115,7 @@ namespace{
 template<class T> inline void EXACT_RATIONAL<T>::
 Normalize() const
 {
-    if(numerator==ZERO()){const_cast<EXACT_FLOAT<T>&>(denominator)=EXACT_FLOAT<T>(1);return;}
+    if(numerator==FIXED_NUMBER<T,0>()){const_cast<EXACT_FLOAT<T>&>(denominator)=EXACT_FLOAT<T>(1);return;}
     numerator.Compress();denominator.Compress();
 #ifdef _DEBUG_EXACT_RATIONAL_
     // TODO: determine whether normalization is necessary.

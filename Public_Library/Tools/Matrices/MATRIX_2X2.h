@@ -13,6 +13,7 @@
 #include <Tools/Matrices/MATRIX_BASE.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR_2D.h>
+#include <Tools/Vectors/ZERO_VECTOR.h>
 namespace PhysBAM{
 
 template<class T>
@@ -280,6 +281,9 @@ public:
 
     VECTOR<T,2> Transpose_Times(const VECTOR<T,2>& v) const
     {return VECTOR<T,2>(x[0]*v.x+x[1]*v.y,x[2]*v.x+x[3]*v.y);}
+
+    ZERO_VECTOR<T,2> Transpose_Times(const ZERO_VECTOR<T,2>& y) const
+    {return ZERO_VECTOR<T,2>();}
 
     UPPER_TRIANGULAR_MATRIX<T,2> R_From_QR_Factorization() const
     {if(x[1]==0) return UPPER_TRIANGULAR_MATRIX<T,2>(x[0],x[2],x[3]);T c,s;

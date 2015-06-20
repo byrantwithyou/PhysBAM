@@ -6,6 +6,7 @@
 //##################################################################### 
 #include <Tools/Auto_Diff/AUTO_DIFF.h>
 #include <Tools/Auto_Diff/AUTO_HESS.h>
+#include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Tools/Auto_Diff/AUTO_NO_DIFF.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Polynomials/QUADRATIC.h>

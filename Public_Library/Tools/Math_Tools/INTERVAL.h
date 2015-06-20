@@ -8,9 +8,9 @@
 #define __INTERVAL__
 
 #include <Tools/Math_Tools/clamp.h>
+#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Math_Tools/max.h>
 #include <Tools/Math_Tools/min.h>
-#include <Tools/Math_Tools/ZERO.h>
 #include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <Tools/Vectors/SCALAR_POLICY.h>
 #include <cfloat>
@@ -143,7 +143,7 @@ public:
     bool Inside(const T& location,const T thickness_over_two) const
     {return Thickened(-thickness_over_two).Lazy_Inside(location);}
 
-    bool Inside(const T& location,const ZERO thickness_over_two) const
+    bool Inside(const T& location,const FIXED_NUMBER<T,0> thickness_over_two) const
     {return Lazy_Inside(location);}
 
     bool Lazy_Outside(const T& location) const
@@ -155,7 +155,7 @@ public:
     bool Outside(const T& location,const T thickness_over_two) const
     {return Thickened(thickness_over_two).Lazy_Outside(location);}
 
-    bool Outside(const T& location,const ZERO thickness_over_two) const
+    bool Outside(const T& location,const FIXED_NUMBER<T,0> thickness_over_two) const
     {return Lazy_Outside(location);}
 
     bool Boundary(const T& location,const T thickness_over_two) const
@@ -174,7 +174,7 @@ public:
     bool Intersection(const INTERVAL& interval,const T thickness_over_two) const
     {return Thickened(thickness_over_two).Lazy_Intersection(interval);}
 
-    bool Intersection(const INTERVAL& interval,const ZERO thickness_over_two) const
+    bool Intersection(const INTERVAL& interval,const FIXED_NUMBER<T,0> thickness_over_two) const
     {return Lazy_Intersection(interval);}
 
     bool Intersection(const INTERVAL& interval) const

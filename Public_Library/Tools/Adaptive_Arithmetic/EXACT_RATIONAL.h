@@ -28,8 +28,8 @@ public:
     EXACT_RATIONAL(const EXACT_FLOAT<T>& numerator_input,const EXACT_FLOAT<T>& denominator_input)
         : numerator(numerator_input),denominator(denominator_input)
     {
-        if(denominator==ZERO()) throw DIVISION_BY_ZERO();
-        if(denominator<ZERO()){numerator.Negate();denominator.Negate();}
+        if(denominator==FIXED_NUMBER<T,0>()) throw DIVISION_BY_ZERO();
+        if(denominator<FIXED_NUMBER<T,0>()){numerator.Negate();denominator.Negate();}
         Normalize();
     }
 
@@ -45,10 +45,10 @@ public:
     EXACT_RATIONAL operator/(const EXACT_RATIONAL& exact_rational) const
     {EXACT_RATIONAL result(*this);result/=exact_rational;return result;}
     
-    bool operator<(ZERO zero) const
+    bool operator<(FIXED_NUMBER<T,0> zero) const
     {return sign(numerator)<0;}
 
-    bool operator==(ZERO zero) const
+    bool operator==(FIXED_NUMBER<T,0> zero) const
     {return sign(numerator)==0;}
 
     friend inline int sign(const EXACT_RATIONAL& exact_rational)

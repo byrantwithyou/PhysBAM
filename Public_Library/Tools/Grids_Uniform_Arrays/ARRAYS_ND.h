@@ -8,7 +8,7 @@
 #define __ARRAYS_ND__
 
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND_BASE.h>
-#include <Tools/Math_Tools/ONE.h>
+#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Utilities/EXCEPTIONS.h>
 #include <Tools/Vectors/VECTOR.h>

@@ -110,8 +110,8 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
         auto dev=Z0-Z1*2+Z2*2-Z3;
         auto new_pe=stiffness/2*dev.Magnitude_Squared();
         pe+=new_pe.x;
-        Extract(dat.ge,new_pe.dx);
-        Extract(dat.he,new_pe.ddx);
+        Extract<0>(dat.ge,new_pe.dx);
+        Extract<0,0>(dat.he,new_pe.ddx);
 }
 
     const VECTOR<int,4>& n0=spline.control_points(0);
@@ -126,8 +126,8 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
         auto dev=Z0-Z1*2+Z2;
         auto new_pe=stiffness/2*dev.Magnitude_Squared();
         pe+=new_pe.x;
-        Extract(end_ge[i],new_pe.dx);
-        Extract(end_he[i],new_pe.ddx);
+        Extract<0>(end_ge[i],new_pe.dx);
+        Extract<0,0>(end_he[i],new_pe.ddx);
 }
 }
 //#####################################################################

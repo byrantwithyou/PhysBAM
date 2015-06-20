@@ -2,7 +2,6 @@
 // Copyright 2015.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Auto_Diff/AUTO_DIFF_EXT.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
 namespace PhysBAM{
@@ -21,7 +20,7 @@ template<class T> template<class T1> void MOONEY_RIVLIN_CURVATURE<T>::
 Extract_Helper(const T1& in,TT* he) const
 {
     TT h;
-    Extract(h,in.ddx);
+    Extract<0,0>(h,in.ddx);
     *he+=h;
 }
 //#####################################################################
@@ -76,7 +75,7 @@ Helper(const T1& a1,const T2& a2,const T3& lambda_n,const T4& dlambda_n1,const T
     T C2=scale*c2;
     auto psi=C1*(i1-3)+C2*(i1-3);
     TM2 g;
-    Extract(g,psi.dx);
+    Extract<0>(g,psi.dx);
     ge+=g;
     Extract_Helper(psi,he);
     return psi.x;

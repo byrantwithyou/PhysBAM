@@ -28,6 +28,8 @@ template<class T,class MAT>
 struct HESSIAN
 {
     static_assert(is_scalar<T>::value,"This definition of HESSIAN is only for scalars");
+    static_assert(ASSERT_VALID_BLOCK_TYPES_MAT<MAT>::value,"HESSIAN object is constructed from inconsistent block types");
+    static_assert(!is_same<MAT,DIFF_UNUSED>::value,"HESSIAN DIFF_UNUSED");
     MAT x;
 
     HESSIAN operator+ () const {return *this;}
@@ -40,21 +42,21 @@ struct HESSIAN
 
     template<class MAT1>
     HESSIAN<T,decltype(MAT_SUB::Type(MAT(),MAT1()))> operator- (const HESSIAN<T,MAT1>& z) const {HESSIAN<T,decltype(MAT_SUB::Type(MAT(),MAT1()))> r;MAT_SUB()(r.x,x,z.x);return r;}
-
-    template<int m,int n=m>
-    typename HESSIAN_GET_HELPER<T,m,n>::M Get_Block(int i,int j) const {typename HESSIAN_GET_HELPER<T,m,n>::M m;Get(m,x,i,j);return m;}
-
-    template<int d>
-    typename HESSIAN_GET_HELPER<T,d,d>::SM Get_Diag_Block(int i) const {typename HESSIAN_GET_HELPER<T,d,d>::SM m;Get_Diag(m,x,i);return m;}
 };
 
 template<class T,class MAT,class MAT1>
 void Fill_From(HESSIAN<T,MAT>& out,const HESSIAN<T,MAT1>& in)
 {Fill_From(out.x,in.x);}
 
-template<class T,int m,int d,class MAT> inline void
-Extract(MATRIX<MATRIX<T,m>,d>& ddx,const HESSIAN<T,MAT>& h)
-{Extract(ddx,h.x);}
+template<int i,int j,class T,class A,int d,class MAT> inline void
+Extract(MATRIX<A,d>& ddx,const HESSIAN<T,MAT>& h)
+{Extract<i,j>(ddx,h.x);}
+
+template<int i,int j,class T,class OUT,class MAT>
+void Get(OUT& o,const HESSIAN<T,MAT>& h)
+{
+    GET_MAT_HELPER<i,j>::f(o,h.x);
+}
 
 template<class T,class MAT>
 HESSIAN<T,decltype(MAT_SCALE::Type(MAT(),T()))> operator* (T a,const HESSIAN<T,MAT>& h){return h*a;}

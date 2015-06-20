@@ -9,6 +9,7 @@
 #include <Tools/Matrices/MATRIX_BASE.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR_1D.h>
+#include <Tools/Vectors/ZERO_VECTOR.h>
 namespace PhysBAM{
 
 using std::log;
@@ -196,6 +197,9 @@ public:
 
     VECTOR<T,1> Transpose_Times(const VECTOR<T,1>& v) const
     {return VECTOR<T,1>(x00*v.x);}
+
+    ZERO_VECTOR<T,1> Transpose_Times(const ZERO_VECTOR<T,1>& y) const
+    {return ZERO_VECTOR<T,1>();}
 
     template<class T_MATRIX>
     T_MATRIX Transpose_Times(const MATRIX_BASE<T,T_MATRIX>& A) const

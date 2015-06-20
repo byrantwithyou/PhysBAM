@@ -17,6 +17,9 @@
 #include <cmath>
 namespace PhysBAM{
 namespace HETERO_DIFF{
+using ::PhysBAM::Fill_From;
+
+struct DIFF_UNUSED;
 
 template<class OP,class ...Args> struct RET {typedef decltype(OP()(typename remove_reference<Args>::type()...)) TYPE;};
 
@@ -47,6 +50,30 @@ struct VEC_HOLDER
     BASE z;
 };
 
+template<class A,class V>
+struct ASSERT_SAME_BLOCK_TYPES_VEC
+{
+    static const bool value=ASSERT_SAME_BLOCK_TYPES<A,typename V::OBJ>::value&&ASSERT_SAME_BLOCK_TYPES_VEC<A,typename V::BASE>::value;
+};
+
+template<class A>
+struct ASSERT_SAME_BLOCK_TYPES_VEC<A,VEC_END>
+{
+    static const bool value=true;
+};
+
+template<class V>
+struct ASSERT_VALID_BLOCK_TYPES_VEC
+{
+    static const bool value=ASSERT_SAME_BLOCK_TYPES_VEC<typename V::OBJ,typename V::BASE>::value;
+};
+
+template<>
+struct ASSERT_VALID_BLOCK_TYPES_VEC<VEC_END>
+{
+    static const bool value=true;
+};
+
 inline void Fill_From(VEC_END& o,const VEC_END& v) {}
 template<class OBJ,class BASE,class OBJ1,class BASE1>
 void Fill_From(VEC_HOLDER<OBJ1,BASE1>& o,const VEC_HOLDER<OBJ,BASE>& v)
@@ -55,31 +82,76 @@ void Fill_From(VEC_HOLDER<OBJ1,BASE1>& o,const VEC_HOLDER<OBJ,BASE>& v)
     Fill_From(o.z,v.z);
 }
 
-template<class OUT> void Get(OUT& o,const VEC_END& v,int i) {PHYSBAM_FATAL_ERROR();}
-template<class OUT,class OBJ,class BASE>
-void Get(OUT& o,const VEC_HOLDER<OBJ,BASE>& v,int i)
+template<int i,class A,int d,class OBJ>
+inline typename enable_if<!(i>=0 && i<d)>::type
+Extract_Entry_Helper(VECTOR<A,d>& dx,const OBJ& c) {}
+
+template<int i,class A,int d,class OBJ>
+inline typename enable_if<(i>=0 && i<d)>::type
+Extract_Entry_Helper(VECTOR<A,d>& dx,const OBJ& c)
 {
-    if(i>0) return Get(o,v.z,i-1);
-    Fill_From(o,v.x.obj);
+    Fill_From(dx(i),c.obj);
 }
 
-template<int d,int i> struct EXTRACT_VEC_HELPER
+template<int i,class A,int d,class OBJ,class BASE> inline void
+Extract_Vector_Helper(VECTOR<A,d>& dx,const VEC_HOLDER<OBJ,BASE>& c)
 {
-    template<class TV,class OBJ,class BASE>
-    static void f(VECTOR<TV,d>& dx,const VEC_HOLDER<OBJ,BASE>& v)
-    {Fill_From(dx(i),v.x.obj);EXTRACT_VEC_HELPER<d,i+1>::f(dx,v.z);}
+    Extract_Entry_Helper<i>(dx,c.x);
+    Extract_Vector_Helper<i+1>(dx,c.z);
+}
+
+template<int i,class A,int d> inline void
+Extract_Vector_Helper(VECTOR<A,d>& dx,const VEC_END& c) {}
+
+template<int i,class A,int d,class OBJ,class BASE> inline void
+Extract(VECTOR<A,d>& dx,const VEC_HOLDER<OBJ,BASE>& c)
+{Extract_Vector_Helper<-i>(dx,c);}
+
+template<class OBJ,class T,int mm,int nn> inline void
+Fill_From_Transpose(MATRIX<T,mm,nn>& ddx,const OBJ& h)
+{
+    MATRIX<T,nn,mm> mat;
+    Fill_From(mat,h);
+    ddx=mat.Transposed();
+}
+
+template<class OBJ,class T,int mm,int nn,int pp> inline void
+Fill_From_Transpose(TENSOR<T,mm,nn,pp>& ddx,const OBJ& h)
+{
+    TENSOR<T,mm,pp,nn> ten;
+    Fill_From(ten,h);
+    ddx=Transposed<1,2>(ten);
+}
+
+template<class T,class OBJ> inline void
+Fill_From_Transpose(T& ddx,const OBJ& h)
+{
+    Fill_From(ddx,h);
+}
+
+template<int i>
+struct GET_VEC_HELPER
+{
+    template<class OUT,class OBJ,class BASE>
+    static void f(OUT& o,const VEC_HOLDER<OBJ,BASE>& h){GET_VEC_HELPER<i-1>::f(o,h.z);}
+    template<class OUT,class OBJ,class BASE>
+    static void ft(OUT& o,const VEC_HOLDER<OBJ,BASE>& h){GET_VEC_HELPER<i-1>::ft(o,h.z);}
 };
 
-template<int d> struct EXTRACT_VEC_HELPER<d,d>
+template<>
+struct GET_VEC_HELPER<0>
 {
-    template<class TV>
-    static void f(VECTOR<TV,d>& dx,const VEC_END& v)
-    {}
+    template<class OUT,class OBJ,class BASE>
+    static void f(OUT& o,const VEC_HOLDER<OBJ,BASE>& h){Fill_From(o,h.x.obj);}
+    template<class OUT,class OBJ,class BASE>
+    static void ft(OUT& o,const VEC_HOLDER<OBJ,BASE>& h){Fill_From_Transpose(o,h.x.obj);}
 };
 
-template<class TV,int d,class OBJ,class BASE> inline void
-Extract(VECTOR<TV,d>& dx,const VEC_HOLDER<OBJ,BASE>& v)
-{EXTRACT_VEC_HELPER<d,0>::f(dx,v);}
+template<int i,class OUT,class OBJ,class BASE>
+void Get(OUT& o,const VEC_HOLDER<OBJ,BASE>& v)
+{
+    GET_VEC_HELPER<i>(o,v);
+}
 
 template<int n,class IN,class OBJ,class BASE> void Set(VEC_HOLDER<OBJ,BASE>& out,const IN& in) {Set_Helper(out,in,(VECTOR<int,n>*)0);}
 template<int n,class IN,class OBJ,class BASE> void Set_Helper(VEC_HOLDER<OBJ,BASE>& out,const IN& in,VECTOR<int,n>*) {Set_Helper(out.z,in,(VECTOR<int,n-1>*)0);}
@@ -188,7 +260,6 @@ MK_FUN_2(CONTRACT_0,Contract_0);
 MK_FUN_2(CONTRACT_1,Contract_1);
 MK_FUN_2(CONTRACT_2,Contract_2);
 MK_FUN_2(CONTRACT_00,Contract_00);
-MK_FUN_2(CONTRACT_10,Contract_10);
 MK_FUN_2(CONTRACT_01,Contract_01);
 MK_FUN_2(CONTRACT_20,Contract_20);
 MK_FUN_2(OUTER_PRODUCT,Outer_Product);
@@ -210,7 +281,6 @@ typedef VEC_MAP_1<CONTRACT_00<ARG<1>,ARG<0> > > CONTRACT_0_VM_T;
 typedef VEC_MAP_1<CONTRACT_01<ARG<1>,ARG<0> > > TRANSPOSE_CONTRACT_0_VM_T;
 typedef VEC_MAP_1<CONTRACT_01<ARG<0>,ARG<1> > > VEC_SCALE_REV;
 
-typedef VEC_MAP_1<OUTER_PRODUCT<ARG<0>,ARG<1> > > VEC_OUTER_PRODUCT;
 typedef VEC_MAP_1<OUTER_PRODUCT<ARG<1>,ARG<0> > > VEC_OUTER_PRODUCT_REV;
 typedef VEC_MAP_2<CHOOSE<ARG<0>,ARG<1> > > VEC_CHOOSE;
 }

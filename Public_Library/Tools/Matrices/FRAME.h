@@ -7,7 +7,7 @@
 #ifndef __FRAME__
 #define __FRAME__
 
-#include <Tools/Math_Tools/ONE.h>
+#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Matrices/ROTATION.h>
 #include <Tools/Vectors/COMPLEX.h>

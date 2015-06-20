@@ -24,7 +24,7 @@ public:
     typedef VECTOR<int,2> IV;
     typedef DEFORMABLES_FORCES<TV> BASE;
     typedef MATRIX<T,3> TM;
-    typedef MATRIX<T,3,5> TM2;
+    typedef VECTOR<VECTOR<T,3>,5> TM2;
     typedef MATRIX<MATRIX<T,3,3>,5,5> TT;
 
     using BASE::particles;
