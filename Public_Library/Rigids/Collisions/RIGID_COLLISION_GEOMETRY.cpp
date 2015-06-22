@@ -4,12 +4,12 @@
 //#####################################################################
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
+#include <Geometry/Intersections/RAY_POINT_SIMPLICES_1D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_SEGMENTED_CURVE_2D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Geometry/Topology_Based_Geometry_Intersections/RAY_POINT_SIMPLICES_1D_INTERSECTION.h>
-#include <Geometry/Topology_Based_Geometry_Intersections/RAY_SEGMENTED_CURVE_2D_INTERSECTION.h>
-#include <Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 //using namespace PhysBAM;

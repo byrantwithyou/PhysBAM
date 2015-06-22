@@ -10,9 +10,9 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
-#include <Tools/Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE.h>
+#include <Incompressible/Projection/LAPLACE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;

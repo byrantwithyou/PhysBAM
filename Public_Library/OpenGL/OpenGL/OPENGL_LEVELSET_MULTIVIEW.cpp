@@ -4,7 +4,7 @@
 //#####################################################################
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>

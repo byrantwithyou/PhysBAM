@@ -1,7 +1,7 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <cstring>
 #include <fstream>

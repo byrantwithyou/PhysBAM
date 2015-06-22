@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __RENDERING_HOMOGENEOUS_VOLUME_SHADER__
 #define __RENDERING_HOMOGENEOUS_VOLUME_SHADER__
-#include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_VOXELS.h>
 #include <Ray_Tracing/Rendering_Shaders/VOLUMETRIC_SHADER.h>
 namespace PhysBAM{

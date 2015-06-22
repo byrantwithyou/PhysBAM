@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Boundaries/BOUNDARY.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY_DEBUG.h>
 #include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>

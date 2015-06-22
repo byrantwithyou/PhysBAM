@@ -8,7 +8,7 @@
 #define __REMOVED_PARTICLES_IMPLICIT_OBJECT__
 
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Dynamics/Level_Sets/REMOVED_PARTICLES_PROCESSING.h>
 namespace PhysBAM{
 

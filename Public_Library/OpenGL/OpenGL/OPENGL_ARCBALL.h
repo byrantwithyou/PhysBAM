@@ -11,9 +11,9 @@
 #include <Tools/Matrices/ROTATION.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_CYLINDER_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_PLANE_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_SPHERE_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_CYLINDER_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_PLANE_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_SPHERE_INTERSECTION.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 #include <OpenGL/OpenGL/OPENGL_WINDOW.h>

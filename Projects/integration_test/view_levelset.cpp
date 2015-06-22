@@ -12,7 +12,7 @@
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

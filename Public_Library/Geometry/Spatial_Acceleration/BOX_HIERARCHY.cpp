@@ -11,10 +11,10 @@
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
-#include <Geometry/Basic_Geometry_Intersections/BOX_LINE_2D_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/BOX_PLANE_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/BOX_POINT_SIMPLEX_1D_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Intersections/BOX_LINE_2D_INTERSECTION.h>
+#include <Geometry/Intersections/BOX_PLANE_INTERSECTION.h>
+#include <Geometry/Intersections/BOX_POINT_SIMPLEX_1D_INTERSECTION.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
 using namespace PhysBAM;

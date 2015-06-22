@@ -4,7 +4,7 @@
 //#####################################################################
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Finite_Elements/LEVELSET_COLOR.h>
-#include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
+#include <Geometry/Level_Sets/REINITIALIZATION.h>
 using namespace PhysBAM;
 template<class T> static T Phi_And_Color_Helper(VECTOR<T,1>& phi,VECTOR<int,1>& color,const VECTOR<T,0>&,int& c)
 {

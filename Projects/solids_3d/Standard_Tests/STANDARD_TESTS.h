@@ -67,7 +67,7 @@
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>

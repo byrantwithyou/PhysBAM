@@ -4,7 +4,7 @@
 //#####################################################################
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_IMPLICIT_SURFACE.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.h>

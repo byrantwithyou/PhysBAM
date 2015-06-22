@@ -12,7 +12,7 @@
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Geometry/Implicit_Objects_Uniform/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

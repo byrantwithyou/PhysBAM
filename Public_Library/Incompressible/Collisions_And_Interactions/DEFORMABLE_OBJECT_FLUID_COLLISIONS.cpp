@@ -11,6 +11,9 @@
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <Geometry/Intersections/RAY_POINT_SIMPLICES_1D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_SEGMENTED_CURVE_2D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
@@ -20,9 +23,6 @@
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Geometry/Topology_Based_Geometry_Intersections/RAY_POINT_SIMPLICES_1D_INTERSECTION.h>
-#include <Geometry/Topology_Based_Geometry_Intersections/RAY_SEGMENTED_CURVE_2D_INTERSECTION.h>
-#include <Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
 #include <Incompressible/Collisions_And_Interactions/RIGID_BODY_RASTERIZATION_UNIFORM.h>
 namespace PhysBAM{

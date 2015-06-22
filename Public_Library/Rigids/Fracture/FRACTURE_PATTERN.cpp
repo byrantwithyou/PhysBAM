@@ -5,7 +5,7 @@
 // Class FRACTURE_PATTERN
 //##################################################################### 
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Rigids/Fracture/FRACTURE_PATTERN.h>
 #include <Rigids/Fracture/FRACTURE_REGION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>

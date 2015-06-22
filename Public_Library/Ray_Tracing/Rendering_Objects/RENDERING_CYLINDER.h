@@ -8,7 +8,7 @@
 #define __RENDERING_CYLINDER__
 
 #include <Geometry/Basic_Geometry/CYLINDER.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_CYLINDER_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_CYLINDER_INTERSECTION.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 namespace PhysBAM{
 

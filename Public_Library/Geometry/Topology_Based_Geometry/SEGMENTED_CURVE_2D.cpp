@@ -8,7 +8,7 @@
 #include <Tools/Math_Tools/constants.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <Geometry/Basic_Geometry_Intersections/SEGMENT_2D_SEGMENT_2D_INTERSECTION.h>
+#include <Geometry/Intersections/SEGMENT_2D_SEGMENT_2D_INTERSECTION.h>
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>

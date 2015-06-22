@@ -5,7 +5,7 @@
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Math_Tools/cube.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Dynamics/Level_Sets/REMOVED_PARTICLES_BLENDER_3D.h>
 #include <Dynamics/Level_Sets/UNIFORM_REMOVED_PARTICLES_PROCESSING.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>

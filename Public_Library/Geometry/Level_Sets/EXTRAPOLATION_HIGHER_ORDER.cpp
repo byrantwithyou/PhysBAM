@@ -11,10 +11,10 @@
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-#include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
+#include <Geometry/Level_Sets/REINITIALIZATION.h>
 #include <climits>
 using namespace PhysBAM;
 static void set_if_abs_less(float a,float b,float& x,float y,float z){if(abs(a)<abs(b)) x=y;else x=z;}

@@ -13,9 +13,9 @@
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Log/PROGRESS_INDICATOR.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 namespace PhysBAM{
 

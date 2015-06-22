@@ -7,7 +7,7 @@
 #ifndef __MULTIPLE_LEVELSET_IMPLICIT_SURFACE__
 #define __MULTIPLE_LEVELSET_IMPLICIT_SURFACE__
 
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 
 namespace PhysBAM{
 

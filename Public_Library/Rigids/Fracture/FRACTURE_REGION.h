@@ -16,7 +16,7 @@
 #include <Tools/Read_Write/READ_WRITE_FORWARD.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_PARTITION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 

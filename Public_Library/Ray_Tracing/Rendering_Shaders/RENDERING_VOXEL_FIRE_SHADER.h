@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __RENDERING_VOXEL_FIRE_SHADER__
 #define __RENDERING_VOXEL_FIRE_SHADER__
-#include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Ray_Tracing/Rendering/BLACKBODY.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_VOXELS.h>

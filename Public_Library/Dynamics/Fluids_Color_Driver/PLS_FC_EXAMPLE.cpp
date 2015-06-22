@@ -5,7 +5,7 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
+#include <Geometry/Level_Sets/REINITIALIZATION.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Forces/FLUID_GRAVITY.h>
 #include <Incompressible/Forces/INCOMPRESSIBILITY.h>

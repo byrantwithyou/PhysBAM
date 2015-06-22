@@ -6,9 +6,9 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_POINT_SIMPLEX_1D_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_SEGMENT_2D_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_POINT_SIMPLEX_1D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_SEGMENT_2D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h>

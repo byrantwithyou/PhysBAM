@@ -14,8 +14,8 @@
 #include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>

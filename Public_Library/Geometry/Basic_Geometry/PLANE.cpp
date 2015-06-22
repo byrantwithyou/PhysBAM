@@ -6,7 +6,7 @@
 //##################################################################### 
 #include <Tools/Math_Tools/RANGE.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_PLANE_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_PLANE_INTERSECTION.h>
 using namespace PhysBAM;
 //#####################################################################
 // Segment_Plane_Intersection

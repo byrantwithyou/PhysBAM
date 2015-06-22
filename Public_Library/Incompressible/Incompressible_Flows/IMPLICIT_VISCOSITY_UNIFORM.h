@@ -7,6 +7,7 @@
 #ifndef __IMPLICIT_VISCOSITY_UNIFORM__
 #define __IMPLICIT_VISCOSITY_UNIFORM__
 
+#include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{

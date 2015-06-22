@@ -18,8 +18,8 @@
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTOR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_INTERSECTOR.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>

@@ -7,12 +7,12 @@
 #include <Tools/Boundaries/BOUNDARY.h>
 #include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <Incompressible/Projection/PROJECTION_UNIFORM.h>
 namespace PhysBAM{
 
 template<class TV>

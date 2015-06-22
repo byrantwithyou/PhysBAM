@@ -9,7 +9,7 @@
 
 #include <Tools/Arrays/PROJECTED_ARRAY.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_CYLINDER_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_CYLINDER_INTERSECTION.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 namespace PhysBAM{

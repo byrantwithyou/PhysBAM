@@ -4,7 +4,7 @@
 //#####################################################################
 #include <Tools/Grids_Uniform_Computations/GRADIENT_UNIFORM.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
-#include <Geometry/Implicit_Objects_Uniform/SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>

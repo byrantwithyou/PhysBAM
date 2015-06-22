@@ -6,11 +6,11 @@
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
-#include <Tools/Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #include <Incompressible/Incompressible_Flows/IMPLICIT_VISCOSITY_UNIFORM.h>
+#include <Incompressible/Projection/LAPLACE_UNIFORM.h>
 #include <Dynamics/Heat_Flows/HEAT_LAPLACE.h>
 using namespace PhysBAM;
 //#####################################################################

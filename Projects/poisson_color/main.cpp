@@ -30,8 +30,8 @@
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-#include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
+#include <Geometry/Level_Sets/REINITIALIZATION.h>
 #include <iostream>
 #ifdef USE_OPENMP
 #include <omp.h>

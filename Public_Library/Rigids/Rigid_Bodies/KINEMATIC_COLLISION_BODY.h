@@ -8,7 +8,7 @@
 #define __KINEMATIC_COLLISION_BODY__
 
 #include <Tools/Grids_Uniform/GRID.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 namespace PhysBAM{
 

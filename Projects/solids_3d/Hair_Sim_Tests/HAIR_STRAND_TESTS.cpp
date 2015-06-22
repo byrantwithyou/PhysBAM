@@ -8,7 +8,7 @@
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_COMBINED.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>

@@ -10,18 +10,18 @@
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_SPHERE_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_SPHERE_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
+#include <Geometry/Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGLE_SUBDIVISION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

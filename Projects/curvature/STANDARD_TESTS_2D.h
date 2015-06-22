@@ -17,7 +17,7 @@
 #include <Tools/Matrices/BANDED_MATRIX.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Geometry/Implicit_Objects_Uniform/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>

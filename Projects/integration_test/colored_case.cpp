@@ -10,9 +10,9 @@
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
-#include <Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
+#include <Geometry/Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 using namespace PhysBAM;
 
 typedef double T;

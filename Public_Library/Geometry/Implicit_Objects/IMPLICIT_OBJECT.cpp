@@ -8,8 +8,8 @@
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/RAY.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
 #include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY_SECONDARY_INTERPOLATION.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>

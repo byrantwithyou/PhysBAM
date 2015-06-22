@@ -11,7 +11,7 @@
 #include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <Geometry/Basic_Geometry/POLYGON.h>
 #include <Geometry/Basic_Geometry/RAY.h>
-#include <Geometry/Basic_Geometry_Computations/BOX_POLYGON_INTERSECTION_AREA.h>
+#include <Geometry/Intersections/BOX_POLYGON_INTERSECTION_AREA.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>

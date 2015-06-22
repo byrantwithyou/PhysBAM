@@ -9,8 +9,8 @@
 
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_SPHERE_INTERSECTION.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
+#include <Geometry/Intersections/RAY_SPHERE_INTERSECTION.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 namespace PhysBAM {
 

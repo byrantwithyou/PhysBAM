@@ -19,11 +19,11 @@
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_COMBINED.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_COMBINED_EULERIAN.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED.h>
-#include <Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED_EULERIAN.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Tessellation/BOUNDED_HORIZONTAL_PLANE_TESSELLATION.h>
 #include <Geometry/Tessellation/BOWL_TESSELLATION.h>

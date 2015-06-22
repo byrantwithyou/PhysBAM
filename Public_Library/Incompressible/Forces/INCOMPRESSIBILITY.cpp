@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <Tools/Log/LOG.h>
 #include <Incompressible/Forces/INCOMPRESSIBILITY.h>
+#include <Incompressible/Projection/PROJECTION_UNIFORM.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

@@ -9,9 +9,9 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
+#include <Incompressible/Projection/PROJECTION_UNIFORM.h>
 namespace PhysBAM{
 
 template<class TV>

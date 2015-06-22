@@ -4,9 +4,9 @@
 //#####################################################################
 #include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Data_Structures/PAIR.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_PARTITION.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>

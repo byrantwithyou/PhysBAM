@@ -8,10 +8,10 @@
 #include <Tools/Arrays/ARRAY_VIEW.h>
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
+#include <Geometry/Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_PARTITION.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>

@@ -8,9 +8,9 @@
 #define __LEVELSET_ADVECTION__
 
 #include <Tools/Advection/ADVECTION.h>
-#include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
+#include <Geometry/Level_Sets/REINITIALIZATION.h>
 #include <Incompressible/Advection_Collidable/ADVECTION_COLLIDABLE_FORWARD.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
 

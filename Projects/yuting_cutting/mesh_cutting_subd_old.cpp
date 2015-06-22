@@ -10,7 +10,7 @@
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
+#include <Geometry/Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>

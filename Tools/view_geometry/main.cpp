@@ -8,7 +8,7 @@
 #include <Tools/Particles/PARTICLES_FORWARD.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Grids_Uniform_Computations/DUALCONTOUR_2D.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>

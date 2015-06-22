@@ -6,8 +6,8 @@
 //##################################################################### 
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <Geometry/Basic_Geometry_Intersections/SEGMENT_2D_SEGMENT_2D_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
+#include <Geometry/Intersections/SEGMENT_2D_SEGMENT_2D_INTERSECTION.h>
+#include <Geometry/Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
 #include <Deformables/Collisions_And_Interactions/INTERSECTING_PAIRS_VISITOR.h>
 #include <Deformables/Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h>

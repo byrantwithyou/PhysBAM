@@ -13,7 +13,10 @@
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Grids_Uniform_Computations/TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Intersections/RAY_POINT_SIMPLICES_1D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_SEGMENTED_CURVE_2D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <Geometry/Level_Sets/LEVELSET_MAKER.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
@@ -22,9 +25,6 @@
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Geometry/Topology_Based_Geometry_Intersections/RAY_POINT_SIMPLICES_1D_INTERSECTION.h>
-#include <Geometry/Topology_Based_Geometry_Intersections/RAY_SEGMENTED_CURVE_2D_INTERSECTION.h>
-#include <Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/COLLISION_HELPER.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>

@@ -11,8 +11,8 @@
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_SEGMENT_2D_INTERSECTION.h>
 #include <Geometry/Images/EPS_FILE.h>
+#include <Geometry/Intersections/RAY_SEGMENT_2D_INTERSECTION.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>

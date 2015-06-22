@@ -12,7 +12,7 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Geometry/Basic_Geometry/RAY.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 namespace PhysBAM{
 
 template<class T,class DATA_T>

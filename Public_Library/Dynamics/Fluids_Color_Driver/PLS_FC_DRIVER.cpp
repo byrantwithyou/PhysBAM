@@ -29,8 +29,8 @@
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
+#include <Geometry/Level_Sets/REINITIALIZATION.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>

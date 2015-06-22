@@ -30,8 +30,8 @@
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
-#include <Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
+#include <Geometry/Level_Sets/REINITIALIZATION.h>
 #include <functional>
 #include "ADVECTION_UPWIND.h"
 #include "STRESS_DRIVER.h"

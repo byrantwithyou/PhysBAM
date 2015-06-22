@@ -5,7 +5,6 @@
 // Class FLUIDS_PARAMETERS_UNIFORM
 //#####################################################################
 #include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Fourier_Transforms_Calculations/TURBULENCE.h>
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
@@ -37,6 +36,7 @@
 #include <Dynamics/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
 #include <Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
+#include <Dynamics/Incompressible_Flows/TURBULENCE.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>

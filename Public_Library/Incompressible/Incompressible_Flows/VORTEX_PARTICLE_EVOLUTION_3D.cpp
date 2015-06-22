@@ -12,8 +12,8 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Ordinary_Differential_Equations/EULER_STEP_PARTICLES.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Incompressible/Incompressible_Flows/EULER_STEP_PARTICLES.h>
 #include <Incompressible/Incompressible_Flows/VORTEX_PARTICLE_EVOLUTION_3D.h>
 #include <Dynamics/Parallel_Computation/MPI_UNIFORM_PARTICLES.h>
 using namespace PhysBAM;

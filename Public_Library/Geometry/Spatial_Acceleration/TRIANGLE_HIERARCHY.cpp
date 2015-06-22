@@ -7,9 +7,9 @@
 #include <Tools/Matrices/FRAME.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
+#include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>
 using namespace PhysBAM;

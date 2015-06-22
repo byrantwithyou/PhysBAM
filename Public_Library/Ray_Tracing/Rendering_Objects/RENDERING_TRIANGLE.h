@@ -8,7 +8,7 @@
 #define __RENDERING_TRIANGLE__
 
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_PLANE.h>
 namespace PhysBAM{
 

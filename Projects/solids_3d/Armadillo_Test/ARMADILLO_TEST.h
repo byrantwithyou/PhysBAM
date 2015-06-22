@@ -8,7 +8,7 @@
 #define __ARMADILLO_TEST__
 #include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET_MAKER.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>

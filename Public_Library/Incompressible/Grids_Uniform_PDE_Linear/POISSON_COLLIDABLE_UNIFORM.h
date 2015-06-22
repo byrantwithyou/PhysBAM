@@ -7,10 +7,10 @@
 #ifndef __POISSON_COLLIDABLE_UNIFORM__
 #define __POISSON_COLLIDABLE_UNIFORM__
 
-#include <Tools/Grids_Uniform_PDE_Linear/POISSON_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_UNIFORM.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>
+#include <Incompressible/Projection/POISSON_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T> class SPARSE_MATRIX_FLAT_MXN;

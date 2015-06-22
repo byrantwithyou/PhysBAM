@@ -14,7 +14,7 @@
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
-#include <Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <Rigids/Collisions/RIGID_BODY_PARTICLE_INTERSECTION.h>

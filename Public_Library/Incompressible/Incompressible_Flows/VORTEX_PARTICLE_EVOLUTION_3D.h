@@ -6,8 +6,8 @@
 #define __VORTEX_PARTICLE_EVOLUTION_3D__
 
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Particles_Interpolation/SCATTERED_INTERPOLATION.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Incompressible/Incompressible_Flows/SCATTERED_INTERPOLATION.h>
 #include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 namespace PhysBAM{
 template<class T> class MPI_UNIFORM_GRID;

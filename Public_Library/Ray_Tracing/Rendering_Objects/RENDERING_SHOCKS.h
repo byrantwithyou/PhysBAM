@@ -8,8 +8,8 @@
 #define __RENDERING_SHOCKS__
 
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_VOXELS.h>

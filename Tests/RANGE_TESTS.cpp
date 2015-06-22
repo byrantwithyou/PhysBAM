@@ -20,8 +20,8 @@
 #include <Tools/Utilities/TEST_BASE.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
-#include <Geometry/Basic_Geometry_Intersections/BOX_SPHERE_INTERSECTION.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
+#include <Geometry/Intersections/BOX_SPHERE_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <limits>
 namespace PhysBAM{
 

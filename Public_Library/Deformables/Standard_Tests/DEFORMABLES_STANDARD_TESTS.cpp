@@ -9,12 +9,12 @@
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
-#include <Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <Geometry/Grids_Uniform_Computations/SEGMENTED_CURVE_2D_SIGNED_DISTANCE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <Geometry/Tessellation/RANGE_TESSELLATION.h>

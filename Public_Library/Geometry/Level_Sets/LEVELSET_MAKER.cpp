@@ -8,7 +8,7 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Vectors/VECTOR_3D.h>
-#include <Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
+#include <Geometry/Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_MAKER.h>

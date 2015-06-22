@@ -8,7 +8,7 @@
 #define __RENDERING_PLANE__
 
 #include <Geometry/Basic_Geometry/PLANE.h>
-#include <Geometry/Basic_Geometry_Intersections/RAY_PLANE_INTERSECTION.h>
+#include <Geometry/Intersections/RAY_PLANE_INTERSECTION.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 namespace PhysBAM{

@@ -8,11 +8,11 @@
 #include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
-#include <Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Finite_Elements/LEVELSET_COLOR.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
+#include <Incompressible/Projection/PROJECTION_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 namespace PhysBAM{
 
