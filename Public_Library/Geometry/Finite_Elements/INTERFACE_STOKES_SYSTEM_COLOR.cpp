@@ -173,7 +173,7 @@ Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,std::function<TV(c
             helper_inertial_rhs(i).Mark_Active_Cells();}
     if(use_polymer_stress && use_rhs)
         for(int i=0;i<TV::m;i++)
-            for(int j=i;j<TV::m;j++){
+            for(int j=0;j<TV::m;j++){
                 for(int k=0;k<TV::m;k++)
                     helper_polymer_stress(i)(j)(k).Mark_Active_Cells();
                 helper_polymer_stress_rhs(i)(j).Mark_Active_Cells();}
@@ -209,7 +209,7 @@ Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,std::function<TV(c
                         for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
                             int n=cm_p->Get_Index(it.index,c);
                             if(n>=0)
-                                vec(c)(n)=(*stored_polymer_stress)(c)(it.index)(j,i);}
+                                vec(c)(n)=(*stored_polymer_stress)(c)(it.index)(j,i)*sqr(dt);}
                     for(int k=0;k<TV::m;k++)
                         helper_polymer_stress(k)(j)(i).Build_Matrix_With_Contract(matrix_polymer_stress(k)(j)(i),2,vec);
                     helper_polymer_stress_rhs(i)(j).Build_Matrix(matrix_polymer_stress_rhs(i)(j));}}}
