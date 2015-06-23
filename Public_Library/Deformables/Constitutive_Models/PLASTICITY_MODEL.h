@@ -11,7 +11,6 @@
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class T,int d>

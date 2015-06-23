@@ -42,7 +42,7 @@ public:
     virtual ~RENDERING_WALL()
     {}
     
-    bool Intersection(RAY<TV>& ray) const  PHYSBAM_OVERRIDE
+    bool Intersection(RAY<TV>& ray) const  override
     {RAY<TV> object_space_ray=Object_Space_Ray(ray);
     if(Intersection_With_Shown_Planes(object_space_ray)){ray.semi_infinite=false;ray.t_max=object_space_ray.t_max;ray.aggregate_id=object_space_ray.aggregate_id;return true;}
     else return false;}
@@ -91,7 +91,7 @@ public:
                 if(point.x >= xmin_minus && point.x <= xmax_plus &&  point.y >= ymin_minus && point.y <= ymax_plus){intersected=true;temp_ray.aggregate_id=6;temp_ray.Save_Intersection_Information(ray);}}}}
     return intersected;}
 
-    TV Normal(const TV& location,const int aggregate) const PHYSBAM_OVERRIDE
+    TV Normal(const TV& location,const int aggregate) const override
     {assert(aggregate>=0 && aggregate<6);
     if(aggregate == 0) return World_Space_Vector(xmin.Normal());
     else if(aggregate == 1) return World_Space_Vector(xmax.Normal());
@@ -100,16 +100,16 @@ public:
     else if(aggregate == 4) return World_Space_Vector(zmin.Normal());
     else return World_Space_Vector(zmax.Normal());}
     
-    bool Inside(const TV& location) const  PHYSBAM_OVERRIDE
+    bool Inside(const TV& location) const  override
     {return box.Inside(Object_Space_Point(location),small_number);}
 
-    bool Outside(const TV& location) const PHYSBAM_OVERRIDE
+    bool Outside(const TV& location) const override
     {return box.Outside(Object_Space_Point(location),small_number);}
 
-    bool Boundary(const TV& location) const PHYSBAM_OVERRIDE
+    bool Boundary(const TV& location) const override
     {return box.Boundary(Object_Space_Point(location),small_number);}
 
-    TV Surface(const TV& world_location) const PHYSBAM_OVERRIDE
+    TV Surface(const TV& world_location) const override
     {TV location=Object_Space_Point(world_location);
     if(box.Lazy_Inside(location)){
         int side=0;T distance=FLT_MAX;
@@ -129,7 +129,7 @@ public:
           default: return TV(clamp(location.x,box.min_corner.x,box.max_corner.x),clamp(location.y,box.min_corner.y,box.max_corner.y),clamp(location.z,box.min_corner.z,box.max_corner.z));}}
     else return TV(clamp(location.x,box.min_corner.x,box.max_corner.x),clamp(location.y,box.min_corner.y,box.max_corner.y),clamp(location.z,box.min_corner.z,box.max_corner.z));}
     
-    TRIANGULATED_SURFACE<T>* Generate_Triangles()const PHYSBAM_OVERRIDE
+    TRIANGULATED_SURFACE<T>* Generate_Triangles()const override
     {TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
    
     GEOMETRY_PARTICLES<TV>& particles=surface->particles;

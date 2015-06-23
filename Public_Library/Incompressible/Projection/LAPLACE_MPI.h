@@ -14,7 +14,6 @@
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Parallel_Computation/PCG_SPARSE_THREADED.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;

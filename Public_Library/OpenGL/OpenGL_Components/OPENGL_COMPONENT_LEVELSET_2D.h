@@ -21,16 +21,16 @@ public:
     OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset_filename_input,const std::string filename_set_input="");
     virtual ~OPENGL_COMPONENT_LEVELSET_2D();
 
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
 
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
 
-    void Display() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const PHYSBAM_OVERRIDE;
-    bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE {return valid && frame_loaded == frame;}
+    void Display() const override;
+    bool Use_Bounding_Box() const override { return draw && valid; }
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const override;
+    bool Is_Up_To_Date(int frame) const override {return valid && frame_loaded == frame;}
 
     void Toggle_Color_Mode();
     void Toggle_Smooth();

@@ -31,12 +31,12 @@ public:
     ~BOUNDARY_MPI();
 
     void Set_Constant_Extrapolation(const TV_SIDES& constant_extrapolation_input=TV_SIDES::Constant_Vector(TV_BOOL2::Constant_Vector(true)));
-    bool Constant_Extrapolation(const int side) const PHYSBAM_OVERRIDE;
+    bool Constant_Extrapolation(const int side) const override;
     void Set_Fixed_Boundary(const bool use_fixed_boundary_input=true,const T2 fixed_boundary_value_input=T2());
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells_input) const PHYSBAM_OVERRIDE;
-    void Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells_input) const PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) const PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition_Face(const GRID<TV>& grid,T_FACE_ARRAYS_T2& u,const T time) const PHYSBAM_OVERRIDE;
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells_input) const override;
+    void Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells_input) const override;
+    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) const override;
+    void Apply_Boundary_Condition_Face(const GRID<TV>& grid,T_FACE_ARRAYS_T2& u,const T time) const override;
 //#####################################################################
 };
 }

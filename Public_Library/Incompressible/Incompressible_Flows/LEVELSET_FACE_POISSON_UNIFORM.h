@@ -10,7 +10,6 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;

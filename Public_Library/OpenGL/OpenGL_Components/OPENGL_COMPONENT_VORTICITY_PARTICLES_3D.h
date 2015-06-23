@@ -21,7 +21,7 @@ public:
 
     OPENGL_COMPONENT_VORTICITY_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename,bool use_ids_input=true);
 private:
-    void Reinitialize(bool force=false) PHYSBAM_OVERRIDE;
+    void Reinitialize(bool force=false) override;
 //#####################################################################
 };
 }

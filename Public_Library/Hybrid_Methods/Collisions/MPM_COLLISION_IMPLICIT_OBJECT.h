@@ -22,11 +22,11 @@ public:
 
     MPM_COLLISION_IMPLICIT_OBJECT(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type_input,T friction_input);
     virtual ~MPM_COLLISION_IMPLICIT_OBJECT();
-    T Phi(const TV& X,T time) const PHYSBAM_OVERRIDE;
-    TV Normal(const TV& X,T time) const PHYSBAM_OVERRIDE;
-    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X,T time) const PHYSBAM_OVERRIDE;
-    TV Velocity(const TV& X,T time) const PHYSBAM_OVERRIDE;
-    IMPLICIT_OBJECT<TV>* Get_Implicit_Object(T time) PHYSBAM_OVERRIDE;
+    T Phi(const TV& X,T time) const override;
+    TV Normal(const TV& X,T time) const override;
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X,T time) const override;
+    TV Velocity(const TV& X,T time) const override;
+    IMPLICIT_OBJECT<TV>* Get_Implicit_Object(T time) override;
 //#####################################################################
 };
 }

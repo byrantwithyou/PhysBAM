@@ -26,27 +26,27 @@ public:
     OPENGL_COMPONENT_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename, const std::string &filename_set_input="", bool use_ids_input = true, bool particles_stored_per_cell_input = false);
     virtual ~OPENGL_COMPONENT_PARTICLES_3D();
 
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
 
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
 
-    void Display() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid && opengl_points->Use_Bounding_Box(); }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    bool Use_Bounding_Box() const override { return draw && valid && opengl_points->Use_Bounding_Box(); }
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
     virtual OPENGL_SELECTION<T>* Get_Selection_By_Id(int id);
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Selection_Bounding_Box(OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Clear_Highlight() override;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
+    virtual RANGE<VECTOR<T,3> > Selection_Bounding_Box(OPENGL_SELECTION<T>* selection) const override;
     int Get_Current_Index_Of_Selection(OPENGL_SELECTION<T>* selection) const;
 
     void Select_Particle_By_Id(int id);
     void Select_Particles_By_Ids(const ARRAY<int> &ids);
     void Clear_Id_Selection();
-    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
+    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) override;
 
     void Toggle_Draw_Point_Numbers();
     void Toggle_Draw_Velocities();
@@ -102,7 +102,7 @@ public:
     VECTOR<T,3> location;
 
     OPENGL_SELECTION_COMPONENT_PARTICLES_3D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D, object) {}
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

@@ -34,8 +34,8 @@ public:
     virtual ~OPENGL_VECTOR_FIELD_2D();
 
 //##################################################################### 
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
     void Scale_Vector_Size(const T scale);
 //##################################################################### 
 };

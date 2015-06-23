@@ -24,10 +24,10 @@ public:
         direction.Normalize();
     }
 
-    void Sample_Points(const VECTOR<T,3>& surface_position,const VECTOR<T,3>& surface_normal,ARRAY<RAY<VECTOR<T,3> > >& sample_array)const PHYSBAM_OVERRIDE
+    void Sample_Points(const VECTOR<T,3>& surface_position,const VECTOR<T,3>& surface_normal,ARRAY<RAY<VECTOR<T,3> > >& sample_array)const override
     {sample_array.Resize(1);sample_array(0)=RAY<VECTOR<T,3> >(surface_position,-direction,true);}
 
-    VECTOR<T,3> Emitted_Light(const RENDERING_RAY<T>& ray)const PHYSBAM_OVERRIDE
+    VECTOR<T,3> Emitted_Light(const RENDERING_RAY<T>& ray)const override
     {return brightness*color;}
 
 //#####################################################################

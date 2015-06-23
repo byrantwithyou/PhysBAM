@@ -81,26 +81,26 @@ public:
     {}
 
     // Unused callbacks
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
-    void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-    void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
+    void Preprocess_Frame(const int frame) override {}
+    void Limit_Dt(T& dt,const T time) override {}
+    void Postprocess_Phi(const T time) override {}
+    void Apply_Constraints(const T dt,const T time) override {}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
+    void Limit_Solids_Dt(T& dt,const T time) override {}
+    void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) override {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) override
 {
     BASE::Get_Source_Velocities(source_box,world_to_source,source_velocity);
 }
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################
-void Initialize_Phi() PHYSBAM_OVERRIDE
+void Initialize_Phi() override
 {
     ARRAY<T,VECTOR<int,3> >& phi=fluids_parameters.particle_levelset_evolution->phi;
     phi.Fill(1);
@@ -108,7 +108,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Adjust_Phi_With_Sources
 //#####################################################################
-bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
+bool Adjust_Phi_With_Sources(const T time) override
 {
     BASE::Adjust_Phi_With_Source(source_box,world_to_source);
     return true;
@@ -116,7 +116,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     fluids_parameters.Use_Fluid_Coupling_Defaults();
 }
@@ -130,7 +130,7 @@ T Initial_Phi_Object(const VECTOR<T,3>& X) const
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {    
     waterfall=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/fractal_box_mesh",(T)2,true,true,false);
     rigid_body_collection.rigid_body_particles.frame(waterfall).t=VECTOR<T,3>((T)25,(T)-2,(T)30);rigid_body_collection.Rigid_Body(waterfall).Is_Kinematic()=true;

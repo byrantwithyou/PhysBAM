@@ -8,7 +8,6 @@
 #define __KRYLOV_VECTOR_BASE__
 
 #include <Tools/Utilities/DEBUG_CAST.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <iostream>
 namespace PhysBAM{
 

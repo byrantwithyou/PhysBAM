@@ -66,7 +66,7 @@ public:
     {collision_body_list=&collision_body_list_input;}
 
 //#####################################################################
-    void Initialize_Grids(const GRID<TV>& grid_input) PHYSBAM_OVERRIDE;
+    void Initialize_Grids(const GRID<TV>& grid_input) override;
     void Set_Body_Force(const bool use_force_input=true);
     void Set_Variable_Surface_Tension(const bool use_variable_surface_tension_input=true);
     void Set_Variable_Viscosity(const bool use_variable_viscosity_input=true);

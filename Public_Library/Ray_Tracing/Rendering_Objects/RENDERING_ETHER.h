@@ -25,16 +25,16 @@ public:
         support_transparent_overlapping_objects=true;
     }
 
-    bool Inside(const VECTOR<T,3>& location) const PHYSBAM_OVERRIDE
+    bool Inside(const VECTOR<T,3>& location) const override
     {return true;}
 
-    bool Outside(const VECTOR<T,3>& location) const PHYSBAM_OVERRIDE
+    bool Outside(const VECTOR<T,3>& location) const override
     {return false;}
 
-    bool Intersection(RAY<VECTOR<T,3> >& ray) const PHYSBAM_OVERRIDE
+    bool Intersection(RAY<VECTOR<T,3> >& ray) const override
     {return false;}
 
-    TRIANGULATED_SURFACE<T>* Generate_Triangles() const PHYSBAM_OVERRIDE
+    TRIANGULATED_SURFACE<T>* Generate_Triangles() const override
     {return 0;}
 
 //#####################################################################

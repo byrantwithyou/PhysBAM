@@ -38,9 +38,9 @@ public:
         viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
     }
 
-    void Display() const PHYSBAM_OVERRIDE;
+    void Display() const override;
     virtual void Set_Frame(int frame_input);
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     void Toggle_Draw_Ghost_Values();
 };
@@ -57,7 +57,7 @@ public:
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::GRID_CELL_1D,object),index(index)
     {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

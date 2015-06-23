@@ -64,18 +64,18 @@ public:
 
 //#####################################################################
     HAIR_STRAND_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
-    void Initialize_Bodies() PHYSBAM_OVERRIDE;
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE;
-    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE;
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE;
-    void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE;
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE;
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE;
+    void Initialize_Bodies() override;
+    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override;
+    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override;
+    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override;
+    void Update_Time_Varying_Material_Properties(const T time) override;
+    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override;
+    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override;
     void Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_momentum_conserving,bool use_non_momentum_conserving);
-    void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE;    
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
-    void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;
-    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+    void Preprocess_Solids_Substep(const T time,const int substep) override;    
+    void Postprocess_Frame(const int frame) override;
+    void Write_Output_Files(const int frame) const override;
+    void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 };
 }

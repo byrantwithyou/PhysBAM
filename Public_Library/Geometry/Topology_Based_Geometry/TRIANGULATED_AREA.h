@@ -51,11 +51,11 @@ public:
     T Element_Size(const int triangle) const
     {return Area(triangle);}
 
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
     {return "SIMPLICIAL_OBJECT<T,VECTOR<T,2>,2>";}
 
-    virtual std::string Extension() const PHYSBAM_OVERRIDE {return Static_Extension();}
+    virtual std::string Extension() const override {return Static_Extension();}
     static std::string Static_Extension()
     {return "tri2d";}
 
@@ -69,7 +69,7 @@ public:
     {return Signed_Area(triangle);}
 
 //#####################################################################
-    void Clean_Memory() PHYSBAM_OVERRIDE;
+    void Clean_Memory() override;
     void Initialize_Hierarchy(const bool update_boxes=true); // creates and updates the boxes as well
     void Initialize_Square_Mesh_And_Particles(const GRID<TV>& grid,const bool reverse_triangles=false);
     void Initialize_Circle_Mesh_And_Particles(const T outer_radius,const T inner_radius,const int num_radial,const int num_tangential);
@@ -80,7 +80,7 @@ public:
     void Check_Signed_Area_And_Make_Consistent(const int triangle,const bool verbose);
     void Check_Signed_Areas_And_Make_Consistent(const bool verbose=true);
     TV Centroid(const int triangle) const;
-    void Rescale(const T scaling_factor) PHYSBAM_OVERRIDE;
+    void Rescale(const T scaling_factor) override;
     void Rescale(const T scaling_x,const T scaling_y);
     T Area(const int triangle) const;
     T Signed_Area(const int triangle) const;
@@ -102,7 +102,7 @@ public:
     int Triangle_Walk_Uninverted(const int start_node,const TV& dX) const;
     bool Fix_Pair_For_Delaunay(const int triangle1,const int triangle2);
 private:
-    void Refresh_Auxiliary_Structures_Helper() PHYSBAM_OVERRIDE;
+    void Refresh_Auxiliary_Structures_Helper() override;
 //#####################################################################
 };
 }

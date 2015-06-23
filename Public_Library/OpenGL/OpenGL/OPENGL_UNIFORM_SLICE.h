@@ -37,7 +37,7 @@ public:
         Initialize(GRID<TV>(TV_INT()+2,RANGE<TV>::Unit_Box()));
     }
 
-    bool Is_Slice_Mode() PHYSBAM_OVERRIDE
+    bool Is_Slice_Mode() override
     {
         return mode==NODE_SLICE || mode==CELL_SLICE;
     }
@@ -59,7 +59,7 @@ public:
         Update_Clip_Planes();
     }
 
-    void Set_Slice_Mode(OPENGL_SLICE::SLICE_MODE mode_input) PHYSBAM_OVERRIDE
+    void Set_Slice_Mode(OPENGL_SLICE::SLICE_MODE mode_input) override
     {
         mode=mode_input;
         if(Is_Slice_Mode()) {
@@ -70,12 +70,12 @@ public:
         Update_Clip_Planes();
     }
 
-    void Toggle_Slice_Mode() PHYSBAM_OVERRIDE
+    void Toggle_Slice_Mode() override
     {
         Set_Slice_Mode((OPENGL_SLICE::SLICE_MODE)(((int)mode+1)%3));
     }
     
-    void Toggle_Slice_Axis() PHYSBAM_OVERRIDE
+    void Toggle_Slice_Axis() override
     {
         if(Is_Slice_Mode()) {
             axis=(axis+1)%3;
@@ -84,7 +84,7 @@ public:
         }
     }
 
-    void Increment_Slice() PHYSBAM_OVERRIDE
+    void Increment_Slice() override
     {
         if(Is_Slice_Mode()) {
             index=min(index+1,Maximum_Slice_Index_In_Current_Mode());
@@ -92,7 +92,7 @@ public:
         }
     }
 
-    void Decrement_Slice() PHYSBAM_OVERRIDE
+    void Decrement_Slice() override
     {
         if(Is_Slice_Mode()) {
             index=max(index-1,1);
@@ -100,7 +100,7 @@ public:
         }
     }
     
-    void Enable_Clip_Planes() PHYSBAM_OVERRIDE
+    void Enable_Clip_Planes() override
     {
         glEnable(clip_plane_id1);
         glEnable(clip_plane_id2);
@@ -141,9 +141,9 @@ public:
         return slice_grid;
     }
 
-    void Print_Slice_Info(std::ostream& output_stream) PHYSBAM_OVERRIDE;
+    void Print_Slice_Info(std::ostream& output_stream) override;
 private:
-    void Update_Clip_Planes() PHYSBAM_OVERRIDE;
+    void Update_Clip_Planes() override;
 };
 }
 #endif

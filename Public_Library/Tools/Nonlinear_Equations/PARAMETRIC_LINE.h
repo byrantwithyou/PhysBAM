@@ -9,7 +9,6 @@
 
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class T,class F> class PARAMETRIC_LINE; // F must be a two argument function type
@@ -28,7 +27,7 @@ public:
         :f(f),x_not(x),direction_x(a),y_not(y),direction_y(b)
     {}
 
-    virtual void Compute(const T1 t,R* ddg,R* dg,R* g) const PHYSBAM_OVERRIDE
+    virtual void Compute(const T1 t,R* ddg,R* dg,R* g) const override
     {assert(g && !dg && !ddg);*g=f(x_not+t*direction_x,y_not+t*direction_y);}
 
 //#####################################################################
@@ -48,7 +47,7 @@ public:
         :f(f),x(x),dx(dx),tmp(tmp)
     {}
 
-    virtual void Compute(const T t,T* ddg,T* dg,T* g) const PHYSBAM_OVERRIDE
+    virtual void Compute(const T t,T* ddg,T* dg,T* g) const override
     {assert(g && !dg && !ddg);tmp.Op(1,x,t,dx);*g=f(tmp);}
 
 //#####################################################################
@@ -71,7 +70,7 @@ public:
     }
 
     virtual ~PARAMETRIC_LINE();
-    void Compute(const T t,T* ddg,T* dg,T* g) const PHYSBAM_OVERRIDE;
+    void Compute(const T t,T* ddg,T* dg,T* g) const override;
 //#####################################################################
 };
 

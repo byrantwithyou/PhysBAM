@@ -298,5 +298,7 @@ Dump_Log()
     LOG_CLASS& instance=*Instance();
     Dump_Log_Helper(instance,instance.suppress_cout);
 }
+std::ostream& cout =::PhysBAM::LOG::cout_Helper();
+std::ostream& cerr =::PhysBAM::LOG::cerr_Helper();
 }
 }

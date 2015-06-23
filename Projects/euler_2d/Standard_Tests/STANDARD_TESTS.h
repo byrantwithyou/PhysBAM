@@ -157,7 +157,7 @@ public:
         else if(eno_scheme==3) output_directory+="_velocity_weighted";
         if(spring_factor!=(T)1) output_directory=LOG::sprintf("%s_spring_factor_%lf",output_directory.c_str(),spring_factor);
     }
-    void After_Initialization() PHYSBAM_OVERRIDE {
+    void After_Initialization() override {
         BASE::After_Initialization();
         std::string gnuplot_file=output_directory+"/common/gnuplot_data.dat";
         gnuplot_file_stream.open(gnuplot_file.c_str());
@@ -169,37 +169,37 @@ public:
         gnuplot_file_stream.close();
     }
 
-    void Initialize_Velocities() PHYSBAM_OVERRIDE {}
-    void Post_Initialization() PHYSBAM_OVERRIDE {}
-    void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-    void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
-    void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
-    void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
-    void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE {}
-    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return false;}
-    void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,FACE_INDEX<2> >& psi_N,const T time) PHYSBAM_OVERRIDE {}
+    void Initialize_Velocities() override {}
+    void Post_Initialization() override {}
+    void Limit_Dt(T& dt,const T time) override {}
+    void Limit_Solids_Dt(T& dt,const T time) override {}
+    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
+    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
+    void Apply_Constraints(const T dt,const T time) override {}
+    void Preprocess_Frame(const int frame) override {}
+    void Preprocess_Substep(const T dt,const T time) override {}
+    void Preprocess_Solids_Substep(const T time,const int substep) override {}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
+    void Filter_Velocities(const T dt,const T time,const bool velocity_update) override {}
+    void Update_Time_Varying_Material_Properties(const T time) override {}
+    void Update_Solids_Parameters(const T time) override {}
+    void Adjust_Density_And_Temperature_With_Sources(const T time) override {}
+    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
+    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
+    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
+    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
+    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
+    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override {}
+    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return false;}
+    void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,FACE_INDEX<2> >& psi_N,const T time) override {}
     bool Get_Solid_Source_Velocities(ARRAY<int>& deformable_simplices,ARRAY<T>& deformable_simplex_forces,ARRAY<PAIR<int,int> >& rigid_simplices,ARRAY<T>& rigid_simplex_forces,
-        TV& orientation,const T time) PHYSBAM_OVERRIDE {return false;}
+        TV& orientation,const T time) override {return false;}
 
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     //set custom boundary
     VECTOR<VECTOR<bool,2>,TV::m> valid_wall;
@@ -220,7 +220,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Intialize_Euler_State
 //#####################################################################
-void Initialize_Euler_State() PHYSBAM_OVERRIDE
+void Initialize_Euler_State() override
 {
     GRID<TV>& grid=fluids_parameters.euler->grid;
     ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& U=fluids_parameters.euler->U;
@@ -243,7 +243,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Intialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {   
     if(test_number==1){
         int sphere=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/circle",(T).05,true,true,false);
@@ -352,21 +352,21 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
-void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE 
+void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override 
 {
     V.Subset(bound_particles).Fill(TV());
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
-void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE 
+void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override 
 {
     V.Subset(bound_particles).Fill(TV());
 }
 //#####################################################################
 // Function Postprocess_Substep
 //#####################################################################
-void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE 
+void Postprocess_Substep(const T dt,const T time) override 
 {
     T rotation=0;
     TV position(0,0),velocity(0,0);
@@ -392,7 +392,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Postprocess_Frame
 //#####################################################################
-void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+void Postprocess_Frame(const int frame) override
 {
     if(test_number!=3) return;
     std::string gnuplot_file=LOG::sprintf("%s/common/gnuplot_data_%d.dat",output_directory.c_str(),frame);

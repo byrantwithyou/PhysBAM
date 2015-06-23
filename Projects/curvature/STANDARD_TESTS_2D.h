@@ -70,7 +70,7 @@ public:
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {
     bool automatically_add_to_collision_structures=true;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;

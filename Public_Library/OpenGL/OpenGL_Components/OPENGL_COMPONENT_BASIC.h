@@ -34,43 +34,43 @@ public:
     void Use_Clip_Planes(bool use=true) 
     {use_clip_planes=use;}
 
-    void Display() const PHYSBAM_OVERRIDE
+    void Display() const override
     {if(draw){
         if(use_clip_planes){glEnable(GL_CLIP_PLANE0);glEnable(GL_CLIP_PLANE1);}
         object.Display();
         if(use_clip_planes){glDisable(GL_CLIP_PLANE0);glDisable(GL_CLIP_PLANE1);}}}
 
-    bool Use_Bounding_Box() const  PHYSBAM_OVERRIDE
+    bool Use_Bounding_Box() const  override
     {if(draw) return object.Use_Bounding_Box();else return false;}
 
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override
     {if(draw) return object.Bounding_Box();return RANGE<VECTOR<T,3> >::Centered_Box();}
 
-    bool Is_Transparent() const PHYSBAM_OVERRIDE
+    bool Is_Transparent() const override
     {return object.Is_Transparent();}
 
-    virtual void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE
+    virtual void Turn_Smooth_Shading_Off() override
     {object.Turn_Smooth_Shading_Off();}
 
-    virtual void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE
+    virtual void Turn_Smooth_Shading_On() override
     {object.Turn_Smooth_Shading_On();}
 
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer,int buffer_size)
     {return object.Get_Selection(buffer,buffer_size);}
 
-    virtual void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE
+    virtual void Highlight_Selection(OPENGL_SELECTION<T>* selection) override
     {object.Highlight_Selection(selection);}
 
-    virtual void Clear_Highlight() PHYSBAM_OVERRIDE
+    virtual void Clear_Highlight() override
     {object.Clear_Highlight();}
 
-    virtual void Set_Slice(OPENGL_SLICE *slice_input) PHYSBAM_OVERRIDE
+    virtual void Set_Slice(OPENGL_SLICE *slice_input) override
     {slice=slice_input;object.Set_Slice(slice_input);}
 
-    virtual void Slice_Has_Changed() PHYSBAM_OVERRIDE
+    virtual void Slice_Has_Changed() override
     {object.Slice_Has_Changed();}
 
-    void Print_Selection_Info(std::ostream& ostream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE
+    void Print_Selection_Info(std::ostream& ostream,OPENGL_SELECTION<T>* selection) const override
     {object.Print_Selection_Info(ostream,selection);}
 };
 }

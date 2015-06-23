@@ -79,10 +79,10 @@ public:
     {absorption_shadow=absorption_shadow_input;}
 
 //#####################################################################
-    TV Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const TV& color) PHYSBAM_OVERRIDE;
-    TV Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const TV& light_color) PHYSBAM_OVERRIDE;
-    bool Scatter_Photon_Ray(const RENDERING_OBJECT<T>& object,RENDERING_RAY<T>& ray,TV& photon_power,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type,const T fixed_step_size) PHYSBAM_OVERRIDE;
-    TV Attenuate_Photon(const RENDERING_RAY<T>& ray, const RENDERING_OBJECT<T>& object, const TV& photon_power, bool& should_throw) PHYSBAM_OVERRIDE {return TV(photon_power);}
+    TV Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const TV& color) override;
+    TV Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const TV& light_color) override;
+    bool Scatter_Photon_Ray(const RENDERING_OBJECT<T>& object,RENDERING_RAY<T>& ray,TV& photon_power,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type,const T fixed_step_size) override;
+    TV Attenuate_Photon(const RENDERING_RAY<T>& ray, const RENDERING_OBJECT<T>& object, const TV& photon_power, bool& should_throw) override {return TV(photon_power);}
 //#####################################################################
 };
 }

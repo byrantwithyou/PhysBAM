@@ -55,8 +55,8 @@ public:
     void Own_Particles()
     {need_destroy_particles=true;}
 
-    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE;
-    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
+    void Read(TYPED_ISTREAM& input) override;
+    void Write(TYPED_OSTREAM& output) const override;
     void Read_Obj(const std::string& filename);
     void Write_Obj(const std::string& filename) const;
 
@@ -64,15 +64,15 @@ public:
     virtual void Clean_Memory();
     static T_DERIVED_OBJECT* Create();
     static T_DERIVED_OBJECT* Create(GEOMETRY_PARTICLES<TV>& particles);
-    virtual void Refresh_Auxiliary_Structures() PHYSBAM_SEALED;
-    void Update_Number_Nodes() PHYSBAM_OVERRIDE;
+    virtual void Refresh_Auxiliary_Structures() final;
+    void Update_Number_Nodes() override;
     void Update_Bounding_Box();
     void Initialize_Particle_Partition(const TV_INT& counts=TV_INT());
-    STRUCTURE<TV>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices=0) const PHYSBAM_OVERRIDE; // number_nodes must be set elsewhere
+    STRUCTURE<TV>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices=0) const override; // number_nodes must be set elsewhere
     void Discard_Valence_Zero_Particles_And_Renumber(ARRAY<int>& condensation_mapping);
     static T_DERIVED_OBJECT* Union_Mesh_Objects_Relatively(const ARRAY<T_DERIVED_OBJECT*>& object_list,const ARRAY<FRAME<TV> >& relative_frames);
     static void Union_Mesh_Objects_Relatively(T_DERIVED_OBJECT* object,const ARRAY<T_DERIVED_OBJECT*>& object_list,const ARRAY<FRAME<TV> >& relative_frames);
-    void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const PHYSBAM_OVERRIDE;
+    void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const override;
     T Volumetric_Volume();
     void Merge_Overlapping_Particles_And_Renumber(ARRAY<int>& condensation_mapping,T tol=0);
     

@@ -72,19 +72,19 @@ public:
         ARRAY<int>& coupled_deformable_particle_indices_input,
         GENERALIZED_VELOCITY<TV>& solid_velocity_input);
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const PHYSBAM_OVERRIDE;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const override;
     void Apply(const VECTOR_T& V,ARRAY<T>& result_dual_cells_size_vector) const;
 
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE // only nullspace stuff for fluids - leave out for now
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const override // only nullspace stuff for fluids - leave out for now
     {}
 
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BR) const PHYSBAM_OVERRIDE; // solve MR=V
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BR) const override; // solve MR=V
     
-    void Project(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
+    void Project(KRYLOV_VECTOR_BASE<T>& x) const override
     {}
 
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const PHYSBAM_OVERRIDE;
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BV) const PHYSBAM_OVERRIDE;
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const override;
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BV) const override;
 
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const {}
 

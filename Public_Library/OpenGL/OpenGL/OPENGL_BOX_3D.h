@@ -27,8 +27,8 @@ public:
         :OPENGL_OBJECT<T>(stream_type),box(box_input),color(color_input)
     {}
 
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<TV> Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
 };
 
 }

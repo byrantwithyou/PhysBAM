@@ -27,7 +27,7 @@ public:
         :levelset_multiple(levelset_multiple_input),ray(ray_input),region(region_input)
     {}
 
-    void Compute(const T x,T* ddf,T* df,T* f) const PHYSBAM_OVERRIDE
+    void Compute(const T x,T* ddf,T* df,T* f) const override
     {assert(f && !df && !ddf);
     VECTOR<T,3> X=ray.Point(x);int minimum_region,second_minimum_region;T minimum_phi,second_minimum_phi;
     levelset_multiple.Two_Minimum_Regions(X,minimum_region,second_minimum_region,minimum_phi,second_minimum_phi);

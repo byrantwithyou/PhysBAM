@@ -104,7 +104,7 @@ public:
     T CFL_Using_Sound_Speed() const;
     T CFL(const T time) const;
     void Set_Eigensystems(const bool advection_only);
-    void Log_Parameters() const PHYSBAM_OVERRIDE;
+    void Log_Parameters() const override;
 //#####################################################################
 };
 }

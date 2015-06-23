@@ -24,9 +24,9 @@ public:
     TRIANGLES_OF_MATERIAL(T_EMBEDDED_OBJECT& embedded_object_input);
 
 //#####################################################################
-    void Perturb_Nodes_For_Collision_Freeness(const T perturb_amount=1e-6) PHYSBAM_OVERRIDE;
+    void Perturb_Nodes_For_Collision_Freeness(const T perturb_amount=1e-6) override;
 private:
-    void Construct_Material_Surface_Mesh() PHYSBAM_OVERRIDE;
+    void Construct_Material_Surface_Mesh() override;
     void Add_To_Material_Surface_Mesh_Triangle(const int material_node1,const int material_node2,const int material_node3);
     void Add_To_Material_Surface_Mesh_Quad(const int x0,const int x1,const int x2,const int x3);
     void Add_To_Material_Surface_Mesh_Face_Triangle(const int triangle);

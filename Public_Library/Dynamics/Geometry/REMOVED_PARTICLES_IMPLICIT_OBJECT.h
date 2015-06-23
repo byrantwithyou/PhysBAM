@@ -34,17 +34,17 @@ public:
     ~REMOVED_PARTICLES_IMPLICIT_OBJECT()
     {delete particle_processing;delete levelset;}
     
-    void Update_Box() PHYSBAM_OVERRIDE
+    void Update_Box() override
     {box=particle_processing->particle_domain;box.Enlarge_To_Include_Box(levelset->box);}
     
-    T operator()(const TV& location) const PHYSBAM_OVERRIDE
+    T operator()(const TV& location) const override
     {return particle_processing->Phi(location);}
     
-    TV Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE
+    TV Normal(const TV& location,const int aggregate=-1) const override
     {assert((aggregate >= 1 && aggregate <= 6) || aggregate == -1);
     if(aggregate != -1)return box.Normal(aggregate);else return particle_processing->Normal(location);}
     
-    T Integration_Step(const T phi) const PHYSBAM_OVERRIDE
+    T Integration_Step(const T phi) const override
     {return max(phi,particle_processing->tolerance);}
     
     virtual void Read(TYPED_ISTREAM& input) {PHYSBAM_FATAL_ERROR();}

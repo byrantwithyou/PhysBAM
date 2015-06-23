@@ -35,8 +35,8 @@ public:
     JOINT_FUNCTION<TV>* Create_Joint_Function(const JOINT_ID joint_id);
     void Post_Stabilization_With_Actuation(const JOINT_ID joint_id);
     VECTOR<T,1> Compute_Target_PD_Angular_Impulse(const JOINT_ID joint_id);
-    void Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matrix) PHYSBAM_OVERRIDE;
-    void Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const PHYSBAM_OVERRIDE;
+    void Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matrix) override;
+    void Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const override;
 //#####################################################################
 };
 }

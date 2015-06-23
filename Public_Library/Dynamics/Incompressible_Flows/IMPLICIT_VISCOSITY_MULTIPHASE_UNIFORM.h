@@ -38,9 +38,9 @@ public:
 
 //#####################################################################
 private:
-    void Allocate_Heat_Solver() PHYSBAM_OVERRIDE;
-    void Setup_Viscosity(const T dt) PHYSBAM_OVERRIDE;
-    void Setup_Boundary_Conditions(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) PHYSBAM_OVERRIDE;
+    void Allocate_Heat_Solver() override;
+    void Setup_Viscosity(const T dt) override;
+    void Setup_Boundary_Conditions(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) override;
     void Calculate_Velocity_Jump();
     void Debug_Write(const std::string& output_directory_input);
 //#####################################################################

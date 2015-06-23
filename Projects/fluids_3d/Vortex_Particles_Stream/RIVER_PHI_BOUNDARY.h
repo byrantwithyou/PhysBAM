@@ -25,7 +25,7 @@ public:
     Fill_Front_Ghost_Cells(grid,u_ghost,time);Fill_Back_Ghost_Cells(grid,u_ghost,time);
 
     const int m=grid.m,n=grid.n,mn=grid.mn;int i,j,ij;
-    // PHYSBAM_OVERRIDE at the inflow
+    // override at the inflow
     for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
         if(grid.y(j) > inflow_height+initial_base) u_ghost(-2,j,ij)=u_ghost(-1,j,ij)=u_ghost(0,j,ij)=grid.dx;
         else u_ghost(-2,j,ij)=u_ghost(-1,j,ij)=u_ghost(0,j,ij)=-grid.dx;

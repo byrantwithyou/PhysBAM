@@ -58,7 +58,7 @@ public:
     {return LOG::sprintf(filename_input.c_str(),substitution_frame);}
 
 //#####################################################################
-    void Initialize_Scene(RENDER_WORLD<T>& world,const int frame) PHYSBAM_OVERRIDE;
+    void Initialize_Scene(RENDER_WORLD<T>& world,const int frame) override;
     void Camera(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters);
     void Get_Camera_Frame(const int camera_frame,const std::string& motion_filename,TV& current_location,TV& current_look_at,TV& current_pseudo_up);
     void Options(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters);

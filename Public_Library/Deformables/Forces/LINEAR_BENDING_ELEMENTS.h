@@ -39,21 +39,21 @@ public:
     void Set_Damping(const T damping_input)
     {damping=damping_input;}
 
-    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override
     {}
 
-    T CFL_Strain_Rate() const PHYSBAM_OVERRIDE// linear bending elements require large edge spring stiffness to work, so we assume those dominate the CFL
+    T CFL_Strain_Rate() const override// linear bending elements require large edge spring stiffness to work, so we assume those dominate the CFL
     {return FLT_MAX;}
 
-    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE
+    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) override
     {}
 
 //#####################################################################
     void Compute_Stiffness_Matrix(ARRAY_VIEW<const TV> X);
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
     T Compute_Energy() const;
 private:
     void Add_Force(const T scale,ARRAY_VIEW<const TV> X,ARRAY_VIEW<TV> F) const;

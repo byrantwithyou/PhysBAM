@@ -73,7 +73,7 @@ public:
 // Function p_rho
 //#####################################################################
 // partial derivative of the pressure - rho is not needed
-    TS p_rho(const TS rho,const TS e,const TS Y) PHYSBAM_OVERRIDE
+    TS p_rho(const TS rho,const TS e,const TS Y) override
     {
         return (gamma(Y)-1)*(e-e_not(Y));
     }
@@ -81,7 +81,7 @@ public:
 // Function p_e
 //#####################################################################
 // partial derivative of the pressure - e is not needed
-    TS p_e(const TS rho,const TS e,const TS Y) PHYSBAM_OVERRIDE
+    TS p_e(const TS rho,const TS e,const TS Y) override
     {
         return (gamma(Y)-1)*rho;
     }
@@ -89,21 +89,21 @@ public:
 // Function p
 //#####################################################################
 // pressure
-    TS p(const TS rho,const TS e,const TS Y) PHYSBAM_OVERRIDE
+    TS p(const TS rho,const TS e,const TS Y) override
     {
         return (gamma(Y)-1)*rho*(e-e_not(Y));
     }
 //#####################################################################
 // Function rho_From_p_And_e
 //#####################################################################   
-    TS rho_From_p_And_e(const TS p,const TS e,const TS Y) PHYSBAM_OVERRIDE
+    TS rho_From_p_And_e(const TS p,const TS e,const TS Y) override
     {
         return p/((gamma(Y)-1)*(e-e_not(Y)));
     }
 //#####################################################################
 // Function e_From_p_And_rho
 //#####################################################################   
-    TS e_From_p_And_rho(const TS p,const TS rho,const TS Y) PHYSBAM_OVERRIDE
+    TS e_From_p_And_rho(const TS p,const TS rho,const TS Y) override
     {
         return p/((gamma(Y)-1)*rho)+e_not(Y);
     } 
@@ -111,7 +111,7 @@ public:
 // Function T
 //#####################################################################   
 // temperature - rho is not needed
-    TS T(const TS rho,const TS e,const TS Y) PHYSBAM_OVERRIDE
+    TS T(const TS rho,const TS e,const TS Y) override
     {
         return (e-e_not(Y))/Cv(Y);
     }       
@@ -119,14 +119,14 @@ public:
 // Function e_From_T_And_rho
 //#####################################################################   
 // rho is not needed
-    TS e_From_T_And_rho(const TS T,const TS rho,const TS Y) PHYSBAM_OVERRIDE
+    TS e_From_T_And_rho(const TS T,const TS rho,const TS Y) override
     {
         return e_not(Y)+Cv(Y)*T;
     }  
 //#####################################################################
 // Function rho_From_p_And_T
 //#####################################################################
-    TS rho_From_p_And_T(const TS p,const TS T,const TS Y) PHYSBAM_OVERRIDE
+    TS rho_From_p_And_T(const TS p,const TS T,const TS Y) override
     {
         return p/(R(Y)*T);
     }
@@ -134,7 +134,7 @@ public:
 // Function e_From_p_And_T
 //#####################################################################
 // p is not needed
-    TS e_From_p_And_T(const TS p,const TS T,const TS Y) PHYSBAM_OVERRIDE
+    TS e_From_p_And_T(const TS p,const TS T,const TS Y) override
     {
         return e_not(Y)+Cv(Y)*T;
     }

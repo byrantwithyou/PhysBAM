@@ -10,7 +10,6 @@
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
@@ -28,13 +27,13 @@ struct MATRIX_SYSTEM:public KRYLOV_SYSTEM_BASE<T>
     virtual ~MATRIX_SYSTEM();
 
     void Set_Preconditioner(const T_MATRIX_PRECON& preconditioner,VECTOR_T& vector);
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const PHYSBAM_OVERRIDE;
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const PHYSBAM_OVERRIDE;
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE;
-    void Project(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE;
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE;
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE;
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const PHYSBAM_OVERRIDE;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const override;
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const override;
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const override;
+    void Project(KRYLOV_VECTOR_BASE<T>& x) const override;
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const override;
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const override;
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const override;
 };
 //#####################################################################
 }

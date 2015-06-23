@@ -40,31 +40,31 @@ public:
     virtual ~RENDERING_IMPLICIT_SURFACE()
     {delete implicit_surface;}
 
-    bool Intersection(RAY<TV>& ray) const PHYSBAM_OVERRIDE
+    bool Intersection(RAY<TV>& ray) const override
     {RAY<TV> object_space_ray=Object_Space_Ray(ray);
     if(implicit_surface->Intersection(object_space_ray,small_number)){
         ray.semi_infinite=false;ray.t_max=object_space_ray.t_max;ray.aggregate_id=object_space_ray.aggregate_id;return true;}
     else return false;}
 
-    TV Normal(const TV& location,const int aggregate=0) const PHYSBAM_OVERRIDE
+    TV Normal(const TV& location,const int aggregate=0) const override
     {return World_Space_Vector(implicit_surface->Normal(Object_Space_Point(location),aggregate));}
 
-    bool Inside(const TV& location) const PHYSBAM_OVERRIDE
+    bool Inside(const TV& location) const override
     {return implicit_surface->Inside(Object_Space_Point(location),small_number);}
 
-    bool Outside(const TV& location) const PHYSBAM_OVERRIDE
+    bool Outside(const TV& location) const override
     {return implicit_surface->Outside(Object_Space_Point(location),small_number);}
 
-    bool Boundary(const TV& location) const PHYSBAM_OVERRIDE
+    bool Boundary(const TV& location) const override
     {return implicit_surface->Boundary(Object_Space_Point(location),small_number);}
 
-    T Signed_Distance(const TV& location) const PHYSBAM_OVERRIDE
+    T Signed_Distance(const TV& location) const override
     {return (*implicit_surface)(Object_Space_Point(location));}
 
-    TRIANGULATED_SURFACE<T>* Generate_Triangles() const PHYSBAM_OVERRIDE
+    TRIANGULATED_SURFACE<T>* Generate_Triangles() const override
     {TRIANGULATED_SURFACE<T>* surface=TESSELLATION::Generate_Triangles(*implicit_surface);surface->Update_Triangle_List();return surface;}
 
-    RANGE<TV> Object_Space_Bounding_Box() const PHYSBAM_OVERRIDE
+    RANGE<TV> Object_Space_Bounding_Box() const override
     {return implicit_surface->box;}
 
 //#####################################################################

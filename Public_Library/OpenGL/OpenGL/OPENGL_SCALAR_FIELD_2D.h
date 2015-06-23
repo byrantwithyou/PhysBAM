@@ -53,14 +53,14 @@ public:
 
     void Set_Uniform_Contour_Values(const T2 min_avlue,const T2 max_value,const T2 increment);
 
-    void Display() const PHYSBAM_OVERRIDE;
+    void Display() const override;
     void Display_2D() const;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     void Set_Draw_Mode(DRAW_MODE draw_mode);
     virtual void Update();  // Call when values or other attributes have changed
 
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const override;
 
     // convenience functions
     void Toggle_Draw_Mode();

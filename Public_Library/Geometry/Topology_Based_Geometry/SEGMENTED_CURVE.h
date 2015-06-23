@@ -37,17 +37,17 @@ public:
     T_SEGMENT Get_Element(const int aggregate_id) const
     {return T_SEGMENT(particles.X(mesh.elements(aggregate_id)(0)),particles.X(mesh.elements(aggregate_id)(1)));}
 
-    void Rescale(const T scaling_factor) PHYSBAM_OVERRIDE
+    void Rescale(const T scaling_factor) override
     {Rescale(scaling_factor*TV::All_Ones_Vector());}
 
     SEGMENT_MESH& Get_Segment_Mesh()
     {return mesh;}
 
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
     {return LOG::sprintf("SIMPLICIAL_OBJECT<T,VECTOR<T,%d>,1>",TV::dimension);}
 
-    virtual std::string Extension() const PHYSBAM_OVERRIDE {return Static_Extension();}
+    virtual std::string Extension() const override {return Static_Extension();}
     static std::string Static_Extension()
     {return TV::dimension==2?"curve2d":(TV::dimension==1?"curve1d":"curve");}
 
@@ -66,7 +66,7 @@ public:
 
 //#####################################################################
     POINT_SIMPLICES_1D<T>& Get_Boundary_Object();
-    void Clean_Memory() PHYSBAM_OVERRIDE;
+    void Clean_Memory() override;
     void Update_Segment_List();
     void Initialize_Hierarchy(const bool update_boxes=true); // creates and updates the boxes as well
     void Initialize_Straight_Mesh_And_Particles(const GRID<VECTOR<T,1> >& grid);
@@ -77,7 +77,7 @@ public:
     T Total_Length() const;
     bool Inside_Any_Simplex(const TV& location,int& segment_id,const T thickness_over_two) const;
 private:
-    void Refresh_Auxiliary_Structures_Helper() PHYSBAM_OVERRIDE;
+    void Refresh_Auxiliary_Structures_Helper() override;
 //#####################################################################
 };
 }

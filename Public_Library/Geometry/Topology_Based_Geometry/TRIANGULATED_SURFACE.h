@@ -68,7 +68,7 @@ public:
     T Signed_Area(const int triangle) const
     {return Area(triangle);}
 
-    void Rescale(const T scaling_factor) PHYSBAM_OVERRIDE
+    void Rescale(const T scaling_factor) override
     {Rescale(scaling_factor,scaling_factor,scaling_factor);}
 
     SEGMENT_MESH& Get_Segment_Mesh()
@@ -83,11 +83,11 @@ public:
     bool Inside_Any_Simplex(const TV& location,int& triangle_id,const T thickness_over_two=0) const
     {return Inside_Any_Triangle(location,triangle_id,thickness_over_two);}
 
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
     {return "SIMPLICIAL_OBJECT<T,VECTOR<T,3>,2>";}
 
-    virtual std::string Extension() const PHYSBAM_OVERRIDE {return Static_Extension();}
+    virtual std::string Extension() const override {return Static_Extension();}
     static std::string Static_Extension()
     {return "tri";}
 
@@ -104,7 +104,7 @@ public:
     {return Face_Normal(aggregate);}
 
 //#####################################################################
-    void Clean_Memory() PHYSBAM_OVERRIDE;
+    void Clean_Memory() override;
     void Initialize_Hierarchy(const bool update_boxes=true,const int triangles_per_group=0); // creates and updates the boxes as well
     void Initialize_Particle_Hierarchy(const INDIRECT_ARRAY<ARRAY_VIEW<TV> >& particle_subset_input,const bool update_boxes=true,const int particles_per_group=10);
     void Rescale(const T scaling_x,const T scaling_y,const T scaling_z);
@@ -154,7 +154,7 @@ public:
     TRIANGULATED_SURFACE* Create_Compact_Copy() const;
     void Print_Statistics(std::ostream& output,const T thickness_over_2=(T)1e-8);
 private:
-    void Refresh_Auxiliary_Structures_Helper() PHYSBAM_OVERRIDE;
+    void Refresh_Auxiliary_Structures_Helper() override;
 //#####################################################################
 };
 }

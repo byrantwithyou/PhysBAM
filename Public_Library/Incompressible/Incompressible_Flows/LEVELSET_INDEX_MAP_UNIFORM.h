@@ -12,7 +12,6 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;

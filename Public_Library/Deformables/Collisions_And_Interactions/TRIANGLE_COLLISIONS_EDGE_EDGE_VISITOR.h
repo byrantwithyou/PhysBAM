@@ -8,7 +8,7 @@
 #define __TRIANGLE_COLLISIONS_EDGE_EDGE_VISITOR__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
+#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
 

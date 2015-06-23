@@ -13,6 +13,7 @@
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
 
 namespace PhysBAM{
 
@@ -211,51 +212,51 @@ public:
     static std::string Static_Name()
     {return Name_Helper();}
 
-    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    void Read(TYPED_ISTREAM& input) override
     {Read_Transform_Helper(input);std::string name;Read_Binary(input,name);
     object_space_implicit_object=dynamic_cast<IMPLICIT_OBJECT<TV>*>(STRUCTURE<TV>::Create_From_Name(name));
     object_space_implicit_object->Read(input);}
 
-    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    void Write(TYPED_OSTREAM& output) const override
     {Write_Transform_Helper(output);Write_Binary(output,object_space_implicit_object->Name(),*object_space_implicit_object);}
 
-    bool Intersection(RAY<TV>& ray,const T thickness) const PHYSBAM_OVERRIDE;
-    TV Closest_Point_On_Boundary(const TV& location,const T tolerance=0,const int max_iterations=1,T* distance=0) const PHYSBAM_OVERRIDE;
-    virtual std::string Name() const PHYSBAM_OVERRIDE;
-    RANGE<TV>& Box() PHYSBAM_OVERRIDE;
-    void Update_Box() PHYSBAM_OVERRIDE;
-    void Update_Minimum_Cell_Size(const int maximum_depth=0) PHYSBAM_OVERRIDE;
-    T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const PHYSBAM_OVERRIDE;
-    T operator()(const TV& location) const PHYSBAM_OVERRIDE;
-    T Signed_Distance(const TV& location) const PHYSBAM_OVERRIDE;
-    T Extended_Phi(const TV& location) const PHYSBAM_OVERRIDE;
-    T Phi_Secondary(const TV& location) const PHYSBAM_OVERRIDE;
-    TV Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE;
-    TV Extended_Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE;
-    void Compute_Normals() PHYSBAM_OVERRIDE;
-    void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true) PHYSBAM_OVERRIDE;
-    void Rescale(const T scaling_factor) PHYSBAM_OVERRIDE;
-    void Inflate(const T inflation_distance) PHYSBAM_OVERRIDE;
-    bool Inside(const TV& location,const T thickness_over_two=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Inside(const TV& location,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Inside_And_Value(const TV& location,T& phi,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Inside_Extended_Levelset(const TV& location,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Inside_Extended_Levelset_And_Value(const TV& location,T& phi_value,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Outside(const TV& location,const T thickness_over_two=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Outside(const TV& location,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Outside_Extended_Levelset(const TV& location,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T& phi_value,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    T Min_Phi() const PHYSBAM_OVERRIDE;
-    TV Velocity(const TV& location) const PHYSBAM_OVERRIDE;
-    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const PHYSBAM_OVERRIDE;
-    VECTOR<T,d-1> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE
+    bool Intersection(RAY<TV>& ray,const T thickness) const override;
+    TV Closest_Point_On_Boundary(const TV& location,const T tolerance=0,const int max_iterations=1,T* distance=0) const override;
+    virtual std::string Name() const override;
+    RANGE<TV>& Box() override;
+    void Update_Box() override;
+    void Update_Minimum_Cell_Size(const int maximum_depth=0) override;
+    T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const override;
+    T operator()(const TV& location) const override;
+    T Signed_Distance(const TV& location) const override;
+    T Extended_Phi(const TV& location) const override;
+    T Phi_Secondary(const TV& location) const override;
+    TV Normal(const TV& location,const int aggregate=-1) const override;
+    TV Extended_Normal(const TV& location,const int aggregate=-1) const override;
+    void Compute_Normals() override;
+    void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true) override;
+    void Rescale(const T scaling_factor) override;
+    void Inflate(const T inflation_distance) override;
+    bool Inside(const TV& location,const T thickness_over_two=0) const override;
+    bool Lazy_Inside(const TV& location,const T contour_value=0) const override;
+    bool Lazy_Inside_And_Value(const TV& location,T& phi,const T contour_value=0) const override;
+    bool Lazy_Inside_Extended_Levelset(const TV& location,const T contour_value=0) const override;
+    bool Lazy_Inside_Extended_Levelset_And_Value(const TV& location,T& phi_value,const T contour_value=0) const override;
+    bool Outside(const TV& location,const T thickness_over_two=0) const override;
+    bool Lazy_Outside(const TV& location,const T contour_value=0) const override;
+    bool Lazy_Outside_Extended_Levelset(const TV& location,const T contour_value=0) const override;
+    bool Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T& phi_value,const T contour_value=0) const override;
+    T Min_Phi() const override;
+    TV Velocity(const TV& location) const override;
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const override;
+    VECTOR<T,d-1> Principal_Curvatures(const TV& X) const override
     {
         VECTOR<T,d-1> curvatures=object_space_implicit_object->Principal_Curvatures(Object_Space_Point(X));
         for(int i=0;i<d-1;i++) curvatures(i)=Object_Space_Length(curvatures(i)); // Note: Curvatures transform "backwards"
         return curvatures;
     }
-    T Integration_Step(const T phi) const PHYSBAM_OVERRIDE;
-    T Minimum_Cell_Size() const PHYSBAM_OVERRIDE;
+    T Integration_Step(const T phi) const override;
+    T Minimum_Cell_Size() const override;
 //#####################################################################
 };
 }

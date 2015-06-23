@@ -51,8 +51,8 @@ public:
     virtual ~BW_MATERIAL_SPACE_FORCES();
 
 //#####################################################################
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
     void Compute_UV_Deformation(const int c);
 //#####################################################################
 };

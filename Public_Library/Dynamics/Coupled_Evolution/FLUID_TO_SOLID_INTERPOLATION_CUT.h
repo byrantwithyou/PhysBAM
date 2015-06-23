@@ -8,7 +8,6 @@
 #define __FLUID_TO_SOLID_INTERPOLATION_CUT__
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_BASE.h>
 
@@ -72,14 +71,14 @@ public:
     void Add_Cut_Gradient_Entry(int fi,const FACE_INDEX<TV::m>& f,int side);
     void Compute_Beta();
     FACE_TYPE Face_Type(int f) const;
-    void Compute(const int ghost_cells) PHYSBAM_OVERRIDE;
-    void Times_Add(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const PHYSBAM_OVERRIDE;
-    void Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,ARRAY<T>& fluid_force) const PHYSBAM_OVERRIDE;
-    void Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const PHYSBAM_OVERRIDE;
+    void Compute(const int ghost_cells) override;
+    void Times_Add(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const override;
+    void Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,ARRAY<T>& fluid_force) const override;
+    void Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const override;
     void Cut_Face(FACE_INDEX<TV::m>& f,const TV& normal,const SEGMENT_2D<T>& segment);
     void Fill_Extra_Velocities(ARRAY<T>& fluid_velocity_vector) const;
     void Dump_Extra_Velocities(const ARRAY<T>& fluid_velocity_vector);
-    void Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const PHYSBAM_OVERRIDE;
+    void Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const override;
 //#####################################################################
 };
 }

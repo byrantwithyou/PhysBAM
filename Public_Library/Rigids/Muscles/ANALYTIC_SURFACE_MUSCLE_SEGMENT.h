@@ -42,19 +42,19 @@ public:
     virtual ~ANALYTIC_SURFACE_MUSCLE_SEGMENT();
 
 //#####################################################################
-    void Initialize() PHYSBAM_OVERRIDE;
-    void Read_And_Set_Parameters(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE;
-    void Write_Parameters(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
-    T Maximum_Radius() const PHYSBAM_OVERRIDE;
+    void Initialize() override;
+    void Read_And_Set_Parameters(TYPED_ISTREAM& input) override;
+    void Write_Parameters(TYPED_OSTREAM& output) const override;
+    T Maximum_Radius() const override;
     static ANALYTIC_SURFACE_MUSCLE_SEGMENT* Create();
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name();
     T Curve_Length() const;
     T Tendon_Length() const;
     T Get_Fractional_Curve_Value(const T fraction,const bool initial=false) const;
     T Compute_Volume() const;
-    void Set_Current_Activation(const T activation) PHYSBAM_OVERRIDE;
-    void Update_Parameters() PHYSBAM_OVERRIDE;
+    void Set_Current_Activation(const T activation) override;
+    void Update_Parameters() override;
     bool Analytic_Inside_Test(const TV& local_position) const;
     T Get_Elongation_At_Local_Position(const TV& initial_local_position,const int segment_number) const;
     void Get_Local_Positions_For_Particles(const int m,const int n,GEOMETRY_PARTICLES<TV>& particles);

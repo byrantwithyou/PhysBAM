@@ -25,20 +25,20 @@ public:
     using OPENGL_COMPONENT<T>::stream_type;using OPENGL_COMPONENT<T>::viewer_callbacks;
     OPENGL_SCALAR_FIELD_1D<T,T2>  opengl_scalar_field;
 
-    bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE
+    bool Is_Up_To_Date(int frame) const override
     {return valid && frame_loaded==frame;}
 
-    bool Use_Bounding_Box() const  PHYSBAM_OVERRIDE
+    bool Use_Bounding_Box() const  override
     {return draw && valid;}
 
 //##################################################################### 
     OPENGL_COMPONENT_SCALAR_FIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
     virtual ~OPENGL_COMPONENT_SCALAR_FIELD_1D();
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE;
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input=true) override;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
     void Scale(const T scale);
     void Increase_Scale();
     void Decrease_Scale();

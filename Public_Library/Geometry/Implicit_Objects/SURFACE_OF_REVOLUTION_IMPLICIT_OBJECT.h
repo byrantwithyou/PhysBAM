@@ -33,10 +33,10 @@ public:
         Update_Box();
     }
 
-    void Update_Box() PHYSBAM_OVERRIDE
+    void Update_Box() override
     {box=RANGE<TV>(TV(-width,0,-width),TV(width,height,width));}
 
-    T Integration_Step(const T phi) const PHYSBAM_OVERRIDE
+    T Integration_Step(const T phi) const override
     {return max(phi,tolerance);}
 
 private:
@@ -44,10 +44,10 @@ private:
     {return VECTOR<T,2>(sqrt(sqr(X.x)+sqr(X.z)),X.y);}
 public:
 
-    T operator()(const TV& X) const PHYSBAM_OVERRIDE
+    T operator()(const TV& X) const override
     {return slice_levelset.Phi(Slice_Location(X));}
 
-    TV Normal(const TV& X,const int aggregate=-1) const PHYSBAM_OVERRIDE
+    TV Normal(const TV& X,const int aggregate=-1) const override
     {assert((aggregate>=1 && aggregate<=6) || aggregate==-1);if(aggregate!=-1) return box.Normal(aggregate);
     VECTOR<T,2> slice_X=Slice_Location(X),horizontal_direction=VECTOR<T,2>(X.x,X.z).Normalized(); // cse should remove duplicate sqrt
     VECTOR<T,2> slice_normal=slice_levelset.Normal(slice_X);

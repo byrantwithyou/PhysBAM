@@ -19,12 +19,12 @@ public:
         :VOLUMETRIC_SHADER<T>(world_input),density(density_input),fog_color(fog_color_input)
     {}
 
-    VECTOR<T,3> Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const VECTOR<T,3>& color) PHYSBAM_OVERRIDE
+    VECTOR<T,3> Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const VECTOR<T,3>& color) override
     {if(ray.ray.semi_infinite) return VECTOR<T,3>(fog_color);
     T alpha=clamp(exp(-density*ray.ray.t_max),(T)0,(T)1); 
     return color*alpha+fog_color*(1-alpha);}
 
-    VECTOR<T,3> Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const VECTOR<T,3>& light_color) PHYSBAM_OVERRIDE
+    VECTOR<T,3> Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const VECTOR<T,3>& light_color) override
     {return Attenuate_Color(ray,object,light_color);}
 
 //#####################################################################

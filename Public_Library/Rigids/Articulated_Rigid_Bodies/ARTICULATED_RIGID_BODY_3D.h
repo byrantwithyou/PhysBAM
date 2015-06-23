@@ -44,10 +44,10 @@ public:
     void Compute_Position_Based_State(const T dt,const T time);
     static void Solve_Minimum_Norm_Solution_For_Linear_Constraints(MATRIX_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x,const T zero_row_tolerance,const bool verbose=false);
     void Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x,const T dt);
-    void Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matrix) PHYSBAM_OVERRIDE;
+    void Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matrix) override;
     JOINT_FUNCTION<TV>* Create_Joint_Function(const JOINT_ID joint_id);
-    void Compute_Desired_PD_Velocity(const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const PHYSBAM_OVERRIDE;
+    void Compute_Desired_PD_Velocity(const T dt,const T time) override;
+    void Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const override;
 //#####################################################################
 };
 }

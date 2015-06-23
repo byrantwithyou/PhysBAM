@@ -14,7 +14,6 @@
 #include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
 #include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Utilities/TEST_BASE.h>
 #include <limits>
 namespace PhysBAM{
@@ -33,8 +32,8 @@ public:
 
     virtual ~TENSOR_TESTS(){}
 
-    TEST_RESULT Run_Test(int n) PHYSBAM_OVERRIDE;
-    int Number_Of_Tests() const PHYSBAM_OVERRIDE;
+    TEST_RESULT Run_Test(int n) override;
+    int Number_Of_Tests() const override;
     template<class T_VECTOR> bool Assert_Zero_Vector(const T_VECTOR& a,const char* str,T tolerance) const;
     template<class T_VECTOR0,class T_VECTOR1> bool Assert_Equal_Vector(const T_VECTOR0& a,const T_VECTOR1& b,const char* str,T tolerance) const;
     template<class T_MATRIX> bool Assert_Zero_Matrix(const T_MATRIX& a,const char* str,T tolerance) const;

@@ -101,18 +101,18 @@ public:
     INCOMPRESSIBLE_FINITE_VOLUME(STRAIN_MEASURE<TV,d>& strain_measure);
     virtual ~INCOMPRESSIBLE_FINITE_VOLUME();
 
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE {}
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE {}
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE {}
-    T CFL_Strain_Rate() const PHYSBAM_OVERRIDE {return FLT_MAX;}
-    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE {}
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override {}
+    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override {}
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override {}
+    T CFL_Strain_Rate() const override {return FLT_MAX;}
+    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) override {}
 
 //#####################################################################
     static INCOMPRESSIBLE_FINITE_VOLUME* Create(T_OBJECT& object,const bool verbose);
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
-    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
-    void Make_Incompressible(const T dt,const bool correct_volume) PHYSBAM_OVERRIDE;
-    void Test_System() PHYSBAM_OVERRIDE;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override;
+    void Make_Incompressible(const T dt,const bool correct_volume) override;
+    void Test_System() override;
     T Max_Relative_Velocity_Error();
     void Save_Volumes();
     void Check_Improvement();
@@ -122,10 +122,10 @@ private:
     void Project_All_Clamping_Constraints(ARRAY_VIEW<TV> field,const PROJECTION_DATA& data) const;
     void Project_All_Isolated_Clamping_Constraints(ARRAY_VIEW<TV> field,const PROJECTION_DATA& data) const;
     void Project_Vector_Field(ARRAY_VIEW<TV> field) const;
-    void Set_Neumann_Boundary_Conditions(const ARRAY<COLLISION_PARTICLE_STATE<TV> >* particle_states,TRIANGLE_REPULSIONS<TV>* repulsions) PHYSBAM_OVERRIDE;
+    void Set_Neumann_Boundary_Conditions(const ARRAY<COLLISION_PARTICLE_STATE<TV> >* particle_states,TRIANGLE_REPULSIONS<TV>* repulsions) override;
     void Diagonal_Elements(ARRAY<T>& D) const;
     void Update_Preconditioner();
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
 //#####################################################################
 };
 

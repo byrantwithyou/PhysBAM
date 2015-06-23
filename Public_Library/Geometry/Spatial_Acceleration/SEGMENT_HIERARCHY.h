@@ -71,9 +71,9 @@ public:
     {Calculate_Bounding_Boxes_Helper(bounding_boxes,X);}
 
 //#####################################################################
-    void Initialize_Hierarchy_Using_KD_Tree() PHYSBAM_OVERRIDE;
+    void Initialize_Hierarchy_Using_KD_Tree() override;
     void Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const FRAME<TV>& start_frame,const FRAME<TV>& end_frame);
-    void Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) PHYSBAM_OVERRIDE;
+    void Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) override;
 private:
     template<class T_ARRAY_TV> void Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >& bounding_boxes,T_ARRAY_TV X);
     template<class T_ARRAY_TV> void Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >& bounding_boxes,T_ARRAY_TV start_X,T_ARRAY_TV end_X);

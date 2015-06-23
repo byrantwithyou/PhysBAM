@@ -40,14 +40,14 @@ public:
 
 //#####################################################################
     void Force(const VECTOR_T& V,VECTOR_T& F) const;
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F) const PHYSBAM_OVERRIDE;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F) const override;
     void Project_Helper(KRYLOV_VECTOR_BASE<T>& V,const bool negate) const;
-    void Project(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE;
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& V0,const KRYLOV_VECTOR_BASE<T>& V1) const PHYSBAM_OVERRIDE;
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& R) const PHYSBAM_OVERRIDE;
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE;
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const PHYSBAM_OVERRIDE;
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE;
+    void Project(KRYLOV_VECTOR_BASE<T>& V) const override;
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& V0,const KRYLOV_VECTOR_BASE<T>& V1) const override;
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& R) const override;
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& V) const override;
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const override;
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const override;
 //#####################################################################
 };
 }

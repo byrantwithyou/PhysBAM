@@ -27,13 +27,13 @@ public:
         :tension((T).5)
     {}
 
-    T2 Clamped_To_Array(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE
+    T2 Clamped_To_Array(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,const TV& X) const override
     {return From_Base_Node(grid,u,X,Clamped_Index_End_Minus_One(grid,u,X));}
 
     T2 Clamped_To_Array_Derivative(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const VECTOR<bool,TV::m>& derivatives) const
     {return From_Base_Node_Derivative(grid,u,X,Clamped_Index_End_Minus_One(grid,u,X),derivatives);}
 
-    T2 From_Base_Node(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE
+    T2 From_Base_Node(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_INT& index) const override
     {T basis[TV::m][4];T2 sum=T2();TV X_normalized=(X-grid.X(index))*grid.one_over_dX;
     for(int axis=0;axis<TV::m;axis++) Catmull_Rom_Basis(X_normalized[axis],basis[axis]);
     for(CELL_ITERATOR<TV> iterator(grid,RANGE<TV_INT>(index-TV_INT::All_Ones_Vector(),index+2*TV_INT::All_Ones_Vector()));iterator.Valid();iterator.Next()){

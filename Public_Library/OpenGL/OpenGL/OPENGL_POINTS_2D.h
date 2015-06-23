@@ -52,15 +52,15 @@ public:
         for(int i=0;i<point_radii->m;i++)
             (*point_radii)(i)=(*radius_attribute)(i);}}
 
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE {return points.Size()>0;}
+    bool Use_Bounding_Box() const override {return points.Size()>0;}
     virtual int Particle_Index(const int index) const {return index;}
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Display() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    void Display() const override;
 
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Clear_Highlight() override;
+    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const override;
 
     void Store_Point_Colors(bool store_point_colors = true);
     void Store_Point_Ids(bool store_ids=true);
@@ -87,7 +87,7 @@ public:
 
     OPENGL_SELECTION_POINTS_2D(OPENGL_OBJECT<T>* object):OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::POINTS_2D, object) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

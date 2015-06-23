@@ -46,14 +46,14 @@ public:
     OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input);
     virtual ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D();
 
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
-    void Display() const PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
+    bool Is_Up_To_Date(int frame) const override { return valid && frame_loaded == frame; }
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
+    void Display() const override;
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
+    bool Use_Bounding_Box() const override { return draw && valid; }
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     void Set_Psi_N_Psi_D_Basedir_For_Divergence(std::string psi_N_psi_D_basedir_input)
     {psi_N_psi_D_basedir=psi_N_psi_D_basedir_input;}

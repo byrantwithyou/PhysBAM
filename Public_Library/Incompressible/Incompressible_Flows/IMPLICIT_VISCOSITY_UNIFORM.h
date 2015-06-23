@@ -9,7 +9,6 @@
 
 #include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class TV> class LAPLACE_UNIFORM;

@@ -152,13 +152,13 @@ static int Number_Of_Regions(int test_number)
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {
 }
 //#####################################################################
 // Function Get_Flame_Speed_Multiplier
 //#####################################################################
-void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
+void Get_Flame_Speed_Multiplier(const T dt,const T time) override
 {
     ARRAY<T,FACE_INDEX<TV::m> >& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
     flame_speed_multiplier.Fill(0);
@@ -201,7 +201,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Set_Ghost_Density_And_Temperature_Inside_Flame_Core
 //#####################################################################
-void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
+void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() override
 {
     if(test_number==3) return;
 
@@ -227,7 +227,7 @@ void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################
-void Initialize_Phi() PHYSBAM_OVERRIDE
+void Initialize_Phi() override
 {
     ARRAY<ARRAY<T,TV_INT>>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
 
@@ -253,14 +253,14 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
-void Initialize_Advection()    PHYSBAM_OVERRIDE
+void Initialize_Advection()    override
 {
     fluids_parameters.Use_No_Fluid_Coupling_Defaults();
 }
 //#####################################################################
 // Function Adjust_Phi_With_Sources
 //#####################################################################
-bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
+bool Adjust_Phi_With_Sources(const T time) override
 {
     if(test_number==2){
         if(time<source_shutoff_time) Adjust_Phi_With_Source(inner_cylinder1,2,MATRIX<T,4>::Identity_Matrix());
@@ -287,7 +287,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Source_Reseed_Mask
 //#####################################################################
-void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) override
 {
     bool first=true;
     if(test_number==2 && time<source_shutoff_time){
@@ -296,7 +296,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,cons
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override
 {
    if(test_number==2){
        Get_Source_Velocities(outer_cylinder1,MATRIX<T,4>::Identity_Matrix(),VECTOR<T,3>());

@@ -21,22 +21,22 @@ public:
     FREE_PARTICLES();
     virtual ~FREE_PARTICLES();
 
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
     {return LOG::sprintf("FREE_PARTICLES<T,VECTOR<T,%d> >",TV::m);}
 
     static FREE_PARTICLES* Create(GEOMETRY_PARTICLES<TV>& particles)
     {return Create();}
 
-    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    void Read(TYPED_ISTREAM& input) override
     {Read_Binary(input,nodes);}
 
-    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    void Write(TYPED_OSTREAM& output) const override
     {Write_Binary(output,nodes);}
 
 //######################################################################
     static FREE_PARTICLES* Create();
-    void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const PHYSBAM_OVERRIDE;
+    void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const override;
 //######################################################################
 };
 }

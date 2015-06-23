@@ -39,7 +39,7 @@ public:
     absorption_coefficient=(1-weight)*absorption_coefficient1+weight*absorption_coefficient2;
     absorption_spectrum=(1-weight)*absorption_spectrum1+weight*absorption_spectrum2;}
 
-    VECTOR<T,3> Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const VECTOR<T,3>& color) PHYSBAM_OVERRIDE
+    VECTOR<T,3> Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const VECTOR<T,3>& color) override
     {if(ray.ray.semi_infinite||!object.Inside(ray.ray.Point(ray.ray.t_max/2))) return color;
     T absorption_coefficient;VECTOR<T,3> absorption_spectrum;Compute_Absorption(absorption_coefficient,absorption_spectrum,ray,object);
     VECTOR<T,3> attenuation_coefficient=-ray.ray.t_max*absorption_coefficient*absorption_spectrum;
@@ -48,7 +48,7 @@ public:
     if(ray.debug_ray) ray.debug_ray->Add_Comment(LOG::sprintf("attenuation=%f %f %f\n",attenuation.x,attenuation.y,attenuation.z));
     return color*attenuation;}
 
-    VECTOR<T,3> Attenuate_Photon(const RENDERING_RAY<T>& ray, const RENDERING_OBJECT<T>& object, const VECTOR<T,3>& photon_power, bool& should_throw) PHYSBAM_OVERRIDE
+    VECTOR<T,3> Attenuate_Photon(const RENDERING_RAY<T>& ray, const RENDERING_OBJECT<T>& object, const VECTOR<T,3>& photon_power, bool& should_throw) override
     {T absorption_coefficient;VECTOR<T,3> absorption_spectrum;Compute_Absorption(absorption_coefficient,absorption_spectrum,ray,object);
     VECTOR<T,3> attenuation_coefficient=-ray.ray.t_max*absorption_coefficient*absorption_spectrum;
     for(int i=0;i<3;i++) if(absorption_clamp && abs(attenuation_coefficient(i))>absorption_clamp) attenuation_coefficient(i)=sign(attenuation_coefficient(i))*absorption_clamp;
@@ -61,7 +61,7 @@ public:
     T scaling_factor=3/(attenuation.x+attenuation.y+attenuation.z);
     return photon_power*attenuation*scaling_factor;}
 
-    VECTOR<T,3> Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const VECTOR<T,3>& light_color) PHYSBAM_OVERRIDE
+    VECTOR<T,3> Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const VECTOR<T,3>& light_color) override
     {return Attenuate_Color(ray,object,light_color);}
 
 //#####################################################################

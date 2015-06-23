@@ -39,7 +39,7 @@ public:
         return *this;
     }
 
-    BASE& operator+=(const BASE& bv) PHYSBAM_OVERRIDE
+    BASE& operator+=(const BASE& bv) override
     {
         const FLIP_KRYLOV_VECTOR<TV>& v=debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(bv);
 #pragma omp parallel for
@@ -49,7 +49,7 @@ public:
         return *this;
     }
 
-    BASE& operator-=(const BASE& bv) PHYSBAM_OVERRIDE
+    BASE& operator-=(const BASE& bv) override
     {
         const FLIP_KRYLOV_VECTOR<TV>& v=debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(bv);
 #pragma omp parallel for
@@ -59,7 +59,7 @@ public:
         return *this;
     }
 
-    BASE& operator*=(const T a) PHYSBAM_OVERRIDE
+    BASE& operator*=(const T a) override
     {
 #pragma omp parallel for
         for(int k=0;k<interior_cells.m;k++){
@@ -68,7 +68,7 @@ public:
         return *this;
     }
 
-    void Copy(const T c,const BASE& bv) PHYSBAM_OVERRIDE
+    void Copy(const T c,const BASE& bv) override
     {
         const FLIP_KRYLOV_VECTOR<TV>& v=debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(bv);
 #pragma omp parallel for
@@ -77,7 +77,7 @@ public:
             p(index)=c*v.p(index);}
     }
 
-    void Copy(const T c1,const BASE& bv1,const BASE& bv2) PHYSBAM_OVERRIDE
+    void Copy(const T c1,const BASE& bv1,const BASE& bv2) override
     {
         const FLIP_KRYLOV_VECTOR<TV>& v1=debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(bv1);
         const FLIP_KRYLOV_VECTOR<TV>& v2=debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(bv2);
@@ -97,10 +97,10 @@ public:
     void Resize(const KRYLOV_VECTOR_BASE<T>& w)
     {p.Resize(debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(w).p.domain);}
 
-    int Raw_Size() const PHYSBAM_OVERRIDE
+    int Raw_Size() const override
     {return interior_cells.m;}
 
-    T& Raw_Get(int j) PHYSBAM_OVERRIDE
+    T& Raw_Get(int j) override
     {return p(interior_cells(j));}
 };
 }

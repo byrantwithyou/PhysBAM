@@ -8,7 +8,6 @@
 #define __LOG__
 
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <cassert>
 #include <ostream>
 #include <sstream>
@@ -60,10 +59,8 @@ public:
 LOG_CLASS* Instance();
 std::ostream& cout_Helper();
 std::ostream& cerr_Helper();
-namespace{
-    static std::ostream& cout PHYSBAM_UNUSED =::PhysBAM::LOG::cout_Helper();
-    static std::ostream& cerr PHYSBAM_UNUSED =::PhysBAM::LOG::cerr_Helper();
-}
+extern std::ostream& cout;
+extern std::ostream& cerr;
 
 void Initialize_Logging(const bool suppress_cout_input=false,const bool suppress_timing_input=false,const int verbosity_level_input=1<<30,const bool cache_initial_output=false);
 void Finish_Logging();

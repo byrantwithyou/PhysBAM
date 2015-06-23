@@ -57,7 +57,7 @@ public:
     void Transpose_Times(const ARRAY<T>& faces,ARRAY<T>& cells) const;
     void Test_Matrix() const;
     void Print_Each_Matrix(int n) const;
-    void Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const PHYSBAM_OVERRIDE;
+    void Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const override;
 //#####################################################################
 };
 }

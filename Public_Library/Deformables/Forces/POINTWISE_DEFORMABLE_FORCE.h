@@ -53,15 +53,15 @@ public:
     virtual ~POINTWISE_DEFORMABLE_FORCE()
     {if(need_destroy_influenced_particles) delete influenced_particles;}
 
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override
     {}
 
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
 
-    T CFL_Strain_Rate() const PHYSBAM_OVERRIDE
+    T CFL_Strain_Rate() const override
     {return FLT_MAX;}
 
-    void Initialize_CFL(ARRAY_VIEW<DEFORMABLE_FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE
+    void Initialize_CFL(ARRAY_VIEW<DEFORMABLE_FREQUENCY_DATA> frequency) override
     {}
 
     void Own_Influenced_Particles()

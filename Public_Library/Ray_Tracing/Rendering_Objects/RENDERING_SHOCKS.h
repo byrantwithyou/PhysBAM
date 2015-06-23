@@ -58,10 +58,10 @@ public:
     virtual ~RENDERING_SHOCKS()
     {}
 
-    virtual T Volumetric_Integration_Step(const RAY<VECTOR<T,3> > &ray,const T xi) const PHYSBAM_OVERRIDE
+    virtual T Volumetric_Integration_Step(const RAY<VECTOR<T,3> > &ray,const T xi) const override
     {return xi*volumetric_step;}
 
-    virtual T Index_Of_Refraction(const TV& world_space_location) const PHYSBAM_OVERRIDE
+    virtual T Index_Of_Refraction(const TV& world_space_location) const override
     {TV object_space_location=Object_Space_Point(world_space_location);
     return (T)1+dale_constant*refraction_multiplier*Medium_For_Rarefaction(object_space_location);}
 
@@ -79,7 +79,7 @@ public:
     {if(use_pressure_for_rarefaction) return Pressure(location);
     else return Density(location);}
 
-    bool Intersection(RAY<TV>& ray) const PHYSBAM_OVERRIDE
+    bool Intersection(RAY<TV>& ray) const override
     {RAY<TV> object_space_ray=Object_Space_Ray(ray); // TODO: do we need this?
     T start_t,end_t;
     if(!INTERSECTION::Get_Intersection_Range(object_space_ray,box,start_t,end_t)) return false;
@@ -130,7 +130,7 @@ public:
 
     return false;}
 
-    TV Normal(const TV& location,const int aggregate=0) const PHYSBAM_OVERRIDE
+    TV Normal(const TV& location,const int aggregate=0) const override
     {TV object_space_location=Object_Space_Point(location);
 
     TV dX=grid.DX();
@@ -141,7 +141,7 @@ public:
 
     return World_Space_Vector(object_space_normal);}
 
-    RANGE<TV> Object_Space_Bounding_Box() const PHYSBAM_OVERRIDE
+    RANGE<TV> Object_Space_Bounding_Box() const override
     {return box;}
 //#####################################################################
 };

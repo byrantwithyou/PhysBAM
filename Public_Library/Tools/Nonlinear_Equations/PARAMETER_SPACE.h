@@ -8,7 +8,6 @@
 #define __PARAMETER_SPACE__
 
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class T>

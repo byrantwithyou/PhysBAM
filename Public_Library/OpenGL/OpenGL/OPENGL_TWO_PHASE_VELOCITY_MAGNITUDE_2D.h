@@ -33,8 +33,8 @@ public:
 
 //#####################################################################
     void Update();  // Call when grid/V change
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
     // convenience functions
     void Scale_Vector_Size(const T scale);
     void Scale_Height(const T height_scale);

@@ -61,32 +61,32 @@ public:
     }
 
     // Unused callbacks
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
+    void Preprocess_Frame(const int frame) override {}
     void Adjust_Velocity_With_Objects(const T time){}
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
-    bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE {return false;}
-    void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE {}
-    void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
-    void Extrapolate_Phi_Into_Objects(const T time) PHYSBAM_OVERRIDE {}
-    void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-    void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
-    void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
+    void Postprocess_Frame(const int frame) override {}
+    void Postprocess_Phi(const T time) override {}
+    bool Adjust_Phi_With_Sources(const T time) override {return false;}
+    void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override {}
+    void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,const T time) override {}
+    void Extrapolate_Phi_Into_Objects(const T time) override {}
+    void Limit_Dt(T& dt,const T time) override {}
+    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
+    void Preprocess_Solids_Substep(const T time,const int substep) override {}
+    void Apply_Constraints(const T dt,const T time) override {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
-void Initialize_Advection()    PHYSBAM_OVERRIDE
+void Initialize_Advection()    override
 {
     fluids_parameters.Use_No_Fluid_Coupling_Defaults();
 }
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################
-void Initialize_Phi() PHYSBAM_OVERRIDE
+void Initialize_Phi() override
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
@@ -98,7 +98,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Initialize_Velocities
 //#####################################################################
-void Initialize_Velocities() PHYSBAM_OVERRIDE
+void Initialize_Velocities() override
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     TV center=grid.Domain().Center();
@@ -111,7 +111,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_External_Velocity
 //#####################################################################
-void Get_External_Velocity(ARRAY<TV,VECTOR<int,2> >& V_blend,ARRAY<T,VECTOR<int,2> >& blend,const T time) PHYSBAM_OVERRIDE
+void Get_External_Velocity(ARRAY<TV,VECTOR<int,2> >& V_blend,ARRAY<T,VECTOR<int,2> >& blend,const T time) override
 {
     //TV center=grid.Domain().Center();
     //for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)

@@ -26,15 +26,15 @@ public:
     OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D(STREAM_TYPE stream_type,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_minus_component,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_plus_component,OPENGL_COMPONENT_LEVELSET_2D<T>& levelset_component);
     virtual ~OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D();
 
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid; }
+    bool Valid_Frame(int frame_input) const override;
+    bool Is_Up_To_Date(int frame) const override { return valid; }
 
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
 
-    void Display() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    bool Use_Bounding_Box() const override { return draw && valid; }
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     void Toggle_3D_Mode();
     void Increase_Point_Size();

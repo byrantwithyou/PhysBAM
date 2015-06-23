@@ -32,7 +32,7 @@ public:
     virtual ~RENDERING_TRIANGLE()
     {}
 
-    bool Intersection(RAY<TV>& ray) const PHYSBAM_OVERRIDE
+    bool Intersection(RAY<TV>& ray) const override
     {RAY<TV> object_space_ray=Object_Space_Ray(ray);
     if(INTERSECTION::Intersects(object_space_ray,triangle,small_number)){
         ray.semi_infinite=false;ray.t_max=object_space_ray.t_max;ray.aggregate_id=object_space_ray.aggregate_id;return true;}

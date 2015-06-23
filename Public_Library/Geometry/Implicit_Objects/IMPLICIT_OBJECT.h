@@ -46,7 +46,7 @@ public:
     virtual TV Extended_Normal(const TV& location,const int aggregate=-1) const;
     virtual void Compute_Normals();
     virtual void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true);
-    void Rescale(const T scaling_factor) PHYSBAM_OVERRIDE;
+    void Rescale(const T scaling_factor) override;
     virtual void Translate(const TV& translation);
     virtual void Inflate(const T inflation_distance);
     virtual bool Inside(const TV& location,const T thickness_over_two=0) const;

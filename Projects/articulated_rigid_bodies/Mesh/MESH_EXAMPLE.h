@@ -52,20 +52,20 @@ public:
     {
         delete arb;
     }
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
-    void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
+    void Update_Time_Varying_Material_Properties(const T time) override {}
+    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
+    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
+    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
+    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override {}
+    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
+    void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
 //#####################################################################
 // Initialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     int id(0);
@@ -272,7 +272,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Preprocess_Frame
 //#####################################################################
-void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+void Preprocess_Frame(const int frame) override
 {
      
     TV center=(T).25*(pos[0]+pos[1]+pos[2]+pos[3]),top(center.x,15,center.z);

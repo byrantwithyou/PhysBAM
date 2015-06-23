@@ -62,12 +62,12 @@ public:
 
 //#####################################################################
     TV Surface_Normal(const int triangle,const TV& weights) const;
-    bool Implicit_Geometry_Lazy_Inside(const TV& location,T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Implicit_Geometry_Lazy_Inside_And_Value(const TV& location,T& phi,T contour_value=0) const PHYSBAM_OVERRIDE;
+    bool Implicit_Geometry_Lazy_Inside(const TV& location,T contour_value=0) const override;
+    bool Implicit_Geometry_Lazy_Inside_And_Value(const TV& location,T& phi,T contour_value=0) const override;
     bool Implicit_Geometry_Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T& phi_value,T contour_value=0) const;
-    TV Implicit_Geometry_Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE;
-    TV Implicit_Geometry_Normal(const TV& location,T& phi_value,const int aggregate=-1,const int location_particle_index=0) const PHYSBAM_OVERRIDE;
-    TV Implicit_Geometry_Extended_Normal(const TV& location,T& phi_value,const int aggregate=-1,const int location_particle_index=0) const PHYSBAM_OVERRIDE;
+    TV Implicit_Geometry_Normal(const TV& location,const int aggregate=-1) const override;
+    TV Implicit_Geometry_Normal(const TV& location,T& phi_value,const int aggregate=-1,const int location_particle_index=0) const override;
+    TV Implicit_Geometry_Extended_Normal(const TV& location,T& phi_value,const int aggregate=-1,const int location_particle_index=0) const override;
     int Get_Tetrahedron_Near_Point(const TV& point,TV& weights,const ARRAY<int>& particles_to_ignore=ARRAY<int>()) const;
     int Get_Surface_Triangle(const int tetrahedron_index,const TV& tetrahedron_weights,TV& surface_weights,const bool omit_outside_points=false,
         const bool omit_inside_points=false,bool* inside=0) const;
@@ -81,10 +81,10 @@ public:
     int Adjust_Nodes_For_Push_Out(DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,const ARRAY<int>& nodes_to_check,
         const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
         ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const HASHTABLE<int,T> *thickness_table);
-    const RANGE<TV>& Axis_Aligned_Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Update_Bounding_Box() PHYSBAM_OVERRIDE;
-    void Read_State(TYPED_ISTREAM& input,const int state_index) PHYSBAM_OVERRIDE;
-    void Write_State(TYPED_OSTREAM& output,const int state_index) const PHYSBAM_OVERRIDE;
+    const RANGE<TV>& Axis_Aligned_Bounding_Box() const override;
+    void Update_Bounding_Box() override;
+    void Read_State(TYPED_ISTREAM& input,const int state_index) override;
+    void Write_State(TYPED_OSTREAM& output,const int state_index) const override;
 //#####################################################################
 };
 }

@@ -39,13 +39,13 @@ public:
     MPM_KRYLOV_SYSTEM(MPM_EXAMPLE<TV>& example);
     virtual ~MPM_KRYLOV_SYSTEM();
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const PHYSBAM_OVERRIDE;
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const PHYSBAM_OVERRIDE;
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const PHYSBAM_OVERRIDE;
-    void Project(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE;
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE;
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const PHYSBAM_OVERRIDE;
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const override;
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const override;
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const override;
+    void Project(KRYLOV_VECTOR_BASE<T>& V) const override;
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& V) const override;
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const override;
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const override;
 };
 }
 #endif

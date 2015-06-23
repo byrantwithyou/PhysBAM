@@ -46,12 +46,12 @@ public:
 
 //#####################################################################
     void Set_Spring_Phases(const ARRAY<VECTOR<T,2> >& compression_intervals_input,const ARRAY<VECTOR<T,2> >& stretching_intervals_input);
-    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Set_Overdamping_Fraction(const T overdamping_fraction) PHYSBAM_OVERRIDE;
-    void Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) PHYSBAM_OVERRIDE;
-    void Set_Damping(const T damping_input) PHYSBAM_OVERRIDE;
-    void Set_Damping(ARRAY_VIEW<const T> damping_input) PHYSBAM_OVERRIDE;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override;
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
+    void Set_Overdamping_Fraction(const T overdamping_fraction) override;
+    void Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) override;
+    void Set_Damping(const T damping_input) override;
+    void Set_Damping(ARRAY_VIEW<const T> damping_input) override;
     void Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction);
 private:
     void Set_All_Springs_To_Phase(const int phase_index);

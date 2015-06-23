@@ -70,9 +70,9 @@ public:
     // solids
     virtual void Initialize_Bodies();
     virtual void Read_Output_Files_Solids(const int frame);
-    void After_Initialization() PHYSBAM_OVERRIDE;
+    void After_Initialization() override;
     void Post_Velocity_Advection_Callback(const T dt,const T time){}
-    virtual void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;
+    virtual void Write_Output_Files(const int frame) const override;
     void Adjust_Output_Directory_For_MPI(const MPI_SOLIDS<TV>* mpi);
 //#####################################################################
 };

@@ -516,14 +516,14 @@ public:
         }
     virtual ~STANDARD_TESTS() {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();
+void After_Initialization() override {BASE::After_Initialization();
     if(!(test_number==13 || test_number==19))
         fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 }
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     if(incompressible){
         fluids_parameters.Use_Fluid_Coupling_Defaults();
@@ -609,7 +609,7 @@ void Read_Soot_Velocities()
 //#####################################################################
 // Function Adjust_Density_And_Temperature_With_Sources
 //#####################################################################
-void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
+void Adjust_Density_And_Temperature_With_Sources(const T time) override
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     if(!incompressible) PHYSBAM_FATAL_ERROR("this shouldn't be called in compressible case");
@@ -662,7 +662,7 @@ void Clear_Inside_Solid_Soot()
 //#####################################################################
 // Function Adjust_Soot_With_Sources
 //#####################################################################
-void Adjust_Soot_With_Sources(const T time) PHYSBAM_OVERRIDE
+void Adjust_Soot_With_Sources(const T time) override
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     if(!use_soot) PHYSBAM_FATAL_ERROR("this shouldn't be called in non use_soot case");
@@ -709,7 +709,7 @@ void Adjust_Soot_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override
 {
     if(!use_smoke_sourcing) return;
     if(!incompressible) PHYSBAM_FATAL_ERROR("this shouldn't be called in compressible case");
@@ -889,7 +889,7 @@ void Add_Enclosed_Room()
 //#####################################################################
 // Function Post_Initialization
 //#####################################################################
-void Post_Initialization() PHYSBAM_OVERRIDE
+void Post_Initialization() override
 {
     RIGID_BODY_COLLISIONS<TV>& collisions=*solids_evolution->rigid_body_collisions;
     collisions.Set_Push_Out_Level_Iterations(1);
@@ -1124,7 +1124,7 @@ void Finalize_Deformable_Bodies()
 //#####################################################################
 // Function Intialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {   
     if(no_solids || test_number==1 || test_number==20 || test_number==21) return;
 
@@ -1179,7 +1179,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
     for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
 }
-void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+void Preprocess_Frame(const int frame) override
 {
     if(fluids_parameters.use_slip){
         dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution).run_self_tests=run_self_tests;
@@ -1192,7 +1192,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     else if(fluids_parameters.fluid_affects_solid){
         dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION<TV>&>(*solids_evolution).print_matrix_rhs_and_solution=print_matrix;}
 }
-void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
+void Preprocess_Substep(const T dt,const T time) override
 {
     if(transition_to_incompressible){
         eos_smooth_transition->Set_Current_Time(time);
@@ -1202,7 +1202,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Update_Solids_Parameters
 //#####################################################################
-void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
+void Update_Solids_Parameters(const T time) override
 {
 //    if(fracture_walls) FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
     if(fluids_parameters.use_slip && solids_fluids_parameters.use_fluid_rigid_fracture){

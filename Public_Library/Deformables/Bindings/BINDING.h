@@ -10,7 +10,6 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Geometry/Registry/REGISTRY.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{

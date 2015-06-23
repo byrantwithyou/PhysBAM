@@ -66,24 +66,24 @@ public:
     {damping.Copy(damping_input);Invalidate_CFL();}
 
 //#####################################################################
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
     void Initialize();
     void Set_Restlength_From_Particles();
     void Set_Overdamping_Fraction(const T overdamping_fraction=1); // 1 is critically damped
     void Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction); // 1 is critically damped
     void Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction=1); // 1 is critically damped
-    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override;
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
     void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const;
-    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE;
-    T CFL_Strain_Rate() const PHYSBAM_OVERRIDE;
+    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) override;
+    T CFL_Strain_Rate() const override;
     void Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient); // assumes mass and restlength are already defined
     void Axial_Vector(const VECTOR<int,4>& nodes,T& axial_length,TV& axial_direction,VECTOR<T,2>& weights,T& attached_edge_length) const;
 
     T Potential_Energy(int s,const T time) const;
-    T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
+    T Potential_Energy(const T time) const override;
     T Endpoint_Mass(int s,int b) const;
     TV Endpoint_Velocity(int s,int b) const;
     TV Endpoint_Velocity(ARRAY_VIEW<const TV> velocity,int s,int b) const;

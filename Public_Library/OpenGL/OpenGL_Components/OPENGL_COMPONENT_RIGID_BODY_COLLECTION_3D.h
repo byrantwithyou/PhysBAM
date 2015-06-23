@@ -84,23 +84,23 @@ public:
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir, bool use_display_lists=true);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D();
 
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
-    void Draw_All_Objects() PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
+    void Draw_All_Objects() override;
 
-    virtual void Display() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual void Display() const override;
+    bool Use_Bounding_Box() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Clear_Highlight() override;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
 
-    void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
-    void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
-    void Slice_Has_Changed() PHYSBAM_OVERRIDE;
+    void Turn_Smooth_Shading_On() override;
+    void Turn_Smooth_Shading_Off() override;
+    void Slice_Has_Changed() override;
 
     void Set_Draw_Object(int i, bool draw_it);  // Need to call Reinitialize after changing draw objects
     bool Get_Draw_Object(int i) const;
@@ -165,7 +165,7 @@ public:
     virtual typename OPENGL_SELECTION<T>::TYPE Actual_Type() const 
     {return body_selection->Actual_Type();}
 
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 template<class T>
@@ -179,7 +179,7 @@ public:
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_3D,object),joint_id(joint_id)
     {}
 
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 }
 #endif

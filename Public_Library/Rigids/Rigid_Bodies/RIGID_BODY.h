@@ -13,6 +13,7 @@
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/FRAME.h>
 #include <Tools/Utilities/Find_Type.h>
+#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/RAY.h>

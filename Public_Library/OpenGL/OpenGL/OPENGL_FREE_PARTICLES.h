@@ -28,8 +28,8 @@ public:
     ~OPENGL_FREE_PARTICLES(){}
 
 //#####################################################################
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
-    int Particle_Index(const int index) const PHYSBAM_OVERRIDE {return points.indices(index);}
+    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const override;
+    int Particle_Index(const int index) const override {return points.indices(index);}
 //#####################################################################
 };
 }

@@ -8,7 +8,6 @@
 #define __SOLIDS_EVOLUTION_CALLBACKS__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 class RIGID_BODY_COLLISION_MANAGER;

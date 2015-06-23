@@ -9,7 +9,6 @@
 
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
 namespace PhysBAM{
 
@@ -27,10 +26,10 @@ public:
     virtual ~RIGID_BODY_COLLISION_MANAGER_HASH()
     {}
    
-    bool Body_Collides_With_The_Other(int rigid_body_id_1,int rigid_body_id_2) const PHYSBAM_OVERRIDE
+    bool Body_Collides_With_The_Other(int rigid_body_id_1,int rigid_body_id_2) const override
     {return default_collide^hash.Contains(T_PAIR(rigid_body_id_1,rigid_body_id_2));}
 
-    bool Either_Body_Collides_With_The_Other(int rigid_body_id_1,int rigid_body_id_2) const PHYSBAM_OVERRIDE
+    bool Either_Body_Collides_With_The_Other(int rigid_body_id_1,int rigid_body_id_2) const override
     {return Body_Collides_With_The_Other(rigid_body_id_1,rigid_body_id_2) || Body_Collides_With_The_Other(rigid_body_id_2,rigid_body_id_1);}
 
 //#####################################################################

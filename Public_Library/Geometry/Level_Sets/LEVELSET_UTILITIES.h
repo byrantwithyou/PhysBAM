@@ -9,7 +9,6 @@
 
 #include <Tools/Math_Tools/constants.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/SCALAR_POLICY.h>
 #include <cassert>
 #include <cfloat>

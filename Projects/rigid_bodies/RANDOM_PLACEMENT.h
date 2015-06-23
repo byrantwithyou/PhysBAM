@@ -117,12 +117,12 @@ public:
     {velocity_towards_center=true;}
 
 protected:
-    void Assign_Position(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body) PHYSBAM_OVERRIDE
+    void Assign_Position(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body) override
     {T r=(boundary_only)?radius:random_numbers.Get_Uniform_Number((T)0,(T)radius);
     TV d=random_numbers.template Get_Direction<TV>();
     body.frame.t=center+r*d;}
 
-    void Assign_Velocity(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body) PHYSBAM_OVERRIDE
+    void Assign_Velocity(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body) override
     {if(velocity_towards_center) body.velocity=(center-body.frame.t).Normalized()*random_numbers.Get_Uniform_Number((T)min_speed,(T)max_speed);
     else RANDOM_PLACEMENT<T>::Assign_Velocity(random_numbers,body);}
 
@@ -149,7 +149,7 @@ public:
     {boundary_only=boundary_only_in;}
 
 protected:
-    void Assign_Position(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body) PHYSBAM_OVERRIDE
+    void Assign_Position(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body) override
     {T r=(boundary_only)?radius:random_numbers.Get_Uniform_Number((T)0,(T)radius);
     TV d=random_numbers.template Get_Direction<TV>();
     d.y=0;if(d.Magnitude()>0) d.Normalize();
@@ -176,7 +176,7 @@ public:
     {}
 
 protected:
-    void Assign_Position(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body) PHYSBAM_OVERRIDE
+    void Assign_Position(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body) override
     {body.Frame().t.x=random_numbers.Get_Uniform_Number((T)box.min_corner.x,(T)box.max_corner.x);
     body.Frame().t.y=random_numbers.Get_Uniform_Number((T)box.min_corner.y,(T)box.max_corner.y);}
 

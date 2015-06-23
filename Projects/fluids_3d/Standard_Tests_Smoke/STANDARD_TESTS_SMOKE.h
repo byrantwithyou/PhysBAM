@@ -37,24 +37,24 @@ public:
     {}
 
     // Unused callbacks
-    void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
+    void Limit_Dt(T& dt,const T time) override {}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
+    void Preprocess_Frame(const int frame) override {}
+    void Apply_Constraints(const T dt,const T time) override {}
+    void Postprocess_Frame(const int frame) override {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     fluids_parameters.Use_No_Fluid_Coupling_Defaults();
 }
 //#####################################################################
 // Function Initialize_Velocities
 //#####################################################################
-void Initialize_Velocities() PHYSBAM_OVERRIDE
+void Initialize_Velocities() override
 {
     for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=tests.Initial_Velocity(iterator.Location())[iterator.Axis()];
@@ -62,7 +62,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Adjust_Density_And_Temperature_With_Sources
 //#####################################################################
-void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
+void Adjust_Density_And_Temperature_With_Sources(const T time) override
 {
     if(tests.test_number!=3||time<tests.explosion_end_time)
         BASE::Adjust_Density_And_Temperature_With_Sources(tests.source,tests.world_to_source,tests.rho,fluids_parameters.temperature_products);
@@ -70,21 +70,21 @@ void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
-void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
+void Update_Fluid_Parameters(const T dt,const T time) override
 {
     BASE::Update_Fluid_Parameters(dt,time);
 }
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {
     tests.Initialize_Bodies();
 }
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) override
 {
     if(tests.Use_Source())
         BASE::Get_Source_Velocities(tests.source,tests.world_to_source,tests.source_velocity);
@@ -99,14 +99,14 @@ void Construct_Levelsets_For_Objects(const T time)
 //#####################################################################
 // Function Get_Divergence
 //#####################################################################
-void Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time) PHYSBAM_OVERRIDE
+void Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time) override
 {
     tests.Get_Divergence(divergence,dt,time);
 }
 //#####################################################################
 // Function Get_Body_Force
 //#####################################################################
-void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::dimension> >& force,const T dt,const T time) PHYSBAM_OVERRIDE
+void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::dimension> >& force,const T dt,const T time) override
 {
     BASE::Get_Body_Force(force,dt,time);
     tests.Get_Body_Force(force,dt,time);

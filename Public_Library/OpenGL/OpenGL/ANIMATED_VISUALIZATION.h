@@ -7,7 +7,6 @@
 #ifndef __ANIMATED_VISUALIZATION__
 #define __ANIMATED_VISUALIZATION__
 
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <OpenGL/OpenGL/BASIC_VISUALIZATION.h>
 #include <climits>
 
@@ -37,13 +36,13 @@ private:
     void Capture_Frames(const std::string &filename_pattern, int capture_start_frame, int capture_end_frame=INT_MAX, int jpeg_quality=95, bool swap_buffers=true);
 
 protected:
-    void Add_Arguments(PARSE_ARGS &parse_args) PHYSBAM_OVERRIDE;
-    void Parse_Arguments(PARSE_ARGS &parse_args) PHYSBAM_OVERRIDE;
-    void Add_OpenGL_Initialization() PHYSBAM_OVERRIDE;
-    void Initialize_Components_And_Key_Bindings() PHYSBAM_OVERRIDE;
-    void Update_OpenGL_Strings() PHYSBAM_OVERRIDE;
-    void Goto_Start_Frame() PHYSBAM_OVERRIDE;
-    void Render_Offscreen() PHYSBAM_OVERRIDE;
+    void Add_Arguments(PARSE_ARGS &parse_args) override;
+    void Parse_Arguments(PARSE_ARGS &parse_args) override;
+    void Add_OpenGL_Initialization() override;
+    void Initialize_Components_And_Key_Bindings() override;
+    void Update_OpenGL_Strings() override;
+    void Goto_Start_Frame() override;
+    void Render_Offscreen() override;
 
     virtual bool Valid_Frame(int frame_input);
 

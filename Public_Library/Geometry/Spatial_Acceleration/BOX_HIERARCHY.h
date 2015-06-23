@@ -14,7 +14,6 @@
 #include <Tools/Matrices/MATRIX_1X1.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 namespace PhysBAM{

@@ -25,7 +25,7 @@ public:
     TV From_Block_Face(const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
     {u.Set_Reference_Point(X);TV result=interpolation.From_Block_Face(grid,block,u,X);u.Clear_Reference_Point();return result;}
 
-    T From_Block_Face_Component(const int axis,const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const PHYSBAM_OVERRIDE
+    T From_Block_Face_Component(const int axis,const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const override
     {u.Set_Reference_Point(X);T result=interpolation.From_Block_Face_Component(axis,grid,block,u,X);u.Clear_Reference_Point();return result;}
 
     VECTOR<TV,2> Extrema_From_Block_Face(const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u_min,

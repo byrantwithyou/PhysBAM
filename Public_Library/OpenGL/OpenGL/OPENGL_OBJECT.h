@@ -13,7 +13,6 @@
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/ROTATION.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <OpenGL/OpenGL/Convert_1d_To_3d.h>

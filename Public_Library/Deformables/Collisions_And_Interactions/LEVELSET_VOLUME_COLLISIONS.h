@@ -83,22 +83,22 @@ public:
     virtual ~LEVELSET_VOLUME_COLLISIONS();
 
     void Add_Mesh(OBJECT& object,const IMPLICIT_OBJECT<TV>& implicit_surface);
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
-    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override;
     void Update_Position_Based_State_Pair(const OBJECT& o0,OBJECT& o1);
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    int Velocity_Dependent_Forces_Size() const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) const PHYSBAM_OVERRIDE;
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE;
-    T CFL_Strain_Rate() const PHYSBAM_OVERRIDE;
-    void Initialize_CFL(ARRAY_VIEW<typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE;
-    T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
-    void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const PHYSBAM_OVERRIDE;
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    int Velocity_Dependent_Forces_Size() const override;
+    void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const override;
+    void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) const override;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    void Enforce_Definiteness(const bool enforce_definiteness_input) override;
+    T CFL_Strain_Rate() const override;
+    void Initialize_CFL(ARRAY_VIEW<typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA> frequency) override;
+    T Potential_Energy(const T time) const override;
+    void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const override;
 //#####################################################################
     void Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POLYTOPE& polytope) const;
     void Integrate_Simplex(const VECTOR<int,TV::m+1>& simplex,const X_VECTOR& X,const PHI_VECTOR& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf);

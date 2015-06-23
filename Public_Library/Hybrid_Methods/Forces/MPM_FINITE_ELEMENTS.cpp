@@ -6,7 +6,6 @@
 #include <Tools/Log/LOG.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>

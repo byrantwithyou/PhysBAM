@@ -106,37 +106,37 @@ public:
     {}
 
     // Unused callbacks
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > F,const T time) PHYSBAM_OVERRIDE {}
-    void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-    void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Self_Collisions_Begin_Callback(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
-    void Advance_One_Time_Step_End_Callback(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE {}
-    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return true;}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
+    void Apply_Constraints(const T dt,const T time) override {}
+    void Preprocess_Frame(const int frame) override {}
+    void Preprocess_Substep(const T dt,const T time) override {}
+    void Postprocess_Substep(const T dt,const T time) override {}
+    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
+    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
+    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > F,const T time) override {}
+    void Limit_Solids_Dt(T& dt,const T time) override {}
+    void Update_Time_Varying_Material_Properties(const T time) override {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
+    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
+    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
+    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
+    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override {}
+    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
+    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
+    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
+    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
+    void Self_Collisions_Begin_Callback(const T time,const int substep) override {}
+    void Preprocess_Solids_Substep(const T time,const int substep) override {}
+    void Update_Solids_Parameters(const T time) override {}
+    void Advance_One_Time_Step_End_Callback(const T dt,const T time) override {}
+    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override {}
+    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return true;}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
@@ -181,7 +181,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Postprocess_Frame
 //#####################################################################
-void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+void Postprocess_Frame(const int frame) override
 {
     LOG::cout<<"number of fracture initiation points = "<<fracture_object->number_of_fracture_initiations<<std::endl;
     //solids_parameters.fracture_evolution->Rebuild_Topology();
@@ -232,7 +232,7 @@ void Plastic_Mattress(int nx,int ny,int nz,const ROTATION<TV>& rot,const RANGE<T
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
-void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
+void Write_Output_Files(const int frame) const override
 {
     std::string f=LOG::sprintf(".%d",frame);
 
@@ -264,7 +264,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Read_Output_Files_Solids
 //#####################################################################
-void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
+void Read_Output_Files_Solids(const int frame) override
 {
     std::string f=LOG::sprintf(".%d",frame);
 

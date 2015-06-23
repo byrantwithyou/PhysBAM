@@ -37,7 +37,7 @@ public:
     void Compute_For_Two_Phase_Pressure_Jump(const ARRAY<T,TV_INT>& phi,const ARRAY<T,TV_INT>& density);
 
     void Print_Each_Matrix(int n) const;
-    void Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const PHYSBAM_OVERRIDE;
+    void Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const override;
 };
 }
 #endif

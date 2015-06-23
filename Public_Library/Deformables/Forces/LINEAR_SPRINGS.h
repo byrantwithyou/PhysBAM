@@ -65,7 +65,7 @@ public:
     virtual ~LINEAR_SPRINGS();
 
 //#####################################################################
-    void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE;
+    void Enforce_Definiteness(const bool enforce_definiteness_input) override;
     virtual void Set_Stiffness(const T youngs_modulus_input);
     virtual void Set_Stiffness(ARRAY_VIEW<const T> youngs_modulus_input);
     virtual void Set_Restlength(ARRAY_VIEW<const T> restlength_input);
@@ -75,30 +75,30 @@ public:
     virtual void Set_Restlength_From_Particles();
     virtual void Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<TV> material_coordinates);
     virtual void Clamp_Restlength(const T clamped_restlength);
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
     virtual void Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient); // assumes mass and restlength are already defined
     virtual void Set_Stiffness_Based_On_Reduced_Mass(ARRAY_VIEW<const T> scaling_coefficient); // assumes mass and restlength are already defined
     virtual void Set_Overdamping_Fraction(const T overdamping_fraction=1); // 1 is critically damped
     virtual void Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction); // 1 is critically damped
     void Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction=1); // 1 is critically damped
     void Clamp_Restlength_With_Fraction_Of_Springs(const T fraction=.01);
-    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    int Velocity_Dependent_Forces_Size() const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE;
-    T CFL_Strain_Rate() const PHYSBAM_OVERRIDE;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override;
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    int Velocity_Dependent_Forces_Size() const override;
+    void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const override;
+    void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) override;
+    T CFL_Strain_Rate() const override;
     T Average_Restlength() const;
     void Print_Restlength_Statistics() const;
     void Print_Deformation_Statistics() const;
     T Maximum_Compression_Or_Expansion_Fraction(int* index=0) const;
     T Potential_Energy(const int s,const T time) const;
-    T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
-    void Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name="") const PHYSBAM_OVERRIDE;
+    T Potential_Energy(const T time) const override;
+    void Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name="") const override;
 
     TV Endpoint_Velocity(int s,int b) const;
     T Endpoint_Kinetic_Energy(int s,int b) const;

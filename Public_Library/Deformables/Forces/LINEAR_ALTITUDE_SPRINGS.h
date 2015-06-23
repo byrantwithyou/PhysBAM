@@ -92,9 +92,9 @@ public:
     {use_springs_compressed_beyond_threshold=use_springs_compressed_beyond_threshold_input;spring_compression_fraction_threshold=threshold_fraction;}
 
 //#####################################################################
-    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE;
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
+    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) override;
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
     void Compute_Plasticity(const int h,const int t,const T current_length);
     void Clamp_Restlength_With_Fraction_Of_Springs(const T fraction=.01);
     void Print_Restlength_Statistics() const;
@@ -106,7 +106,7 @@ public:
     void Set_Damping(const T damping_input);
     void Enable_Plasticity(const ARRAY<VECTOR<T,d+1> >& plastic_yield_strain_input,const ARRAY<VECTOR<T,d+1> >& plastic_hardening_input,const T plasticity_clamp_ratio_input=4);
     void Enable_Plasticity(const T plastic_yield_strain_input,const T plastic_hardening_input,const T plasticity_clamp_ratio_input=4);
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
 //#####################################################################
 };
 

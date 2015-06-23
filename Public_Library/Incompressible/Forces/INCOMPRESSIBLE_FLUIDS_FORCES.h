@@ -12,7 +12,6 @@
 #include <Tools/Grids_Uniform/FACE_INDEX.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;

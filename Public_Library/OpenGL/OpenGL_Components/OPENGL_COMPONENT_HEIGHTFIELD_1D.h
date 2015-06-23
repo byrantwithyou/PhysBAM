@@ -31,17 +31,17 @@ public:
                                     const std::string& u_filename_input="");
     virtual ~OPENGL_COMPONENT_HEIGHTFIELD_1D();
 
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
 
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
 
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Clear_Highlight() PHYSBAM_OVERRIDE;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Clear_Highlight() override;
 
     void Set_Scale(T scale_input);
 
@@ -91,7 +91,7 @@ public:
 
     OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_HEIGHTFIELD_1D, object) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

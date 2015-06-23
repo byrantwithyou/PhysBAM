@@ -27,12 +27,12 @@ public:
     ~RIGID_COLLISION_GEOMETRY();
 
 //#####################################################################
-    bool Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,VECTOR<T,1>& one,int& segment_id) const PHYSBAM_OVERRIDE;
-    bool Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,VECTOR<T,1>& one,int& segment_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const PHYSBAM_OVERRIDE;
-    bool Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const PHYSBAM_OVERRIDE;
-    void Get_Simplex_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const bool with_body_motion,const T extra_thickness,const T body_thickness_factor) const PHYSBAM_OVERRIDE;
-    void Update_Intersection_Acceleration_Structures(const bool use_swept_triangle_hierarchy,const int state1=0,const int state2=0) PHYSBAM_OVERRIDE;
-    POINT_SIMPLEX_1D<T> World_Space_Simplex(const int point_simplex_id,const bool use_saved_state=false) const PHYSBAM_OVERRIDE;
+    bool Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,VECTOR<T,1>& one,int& segment_id) const override;
+    bool Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,VECTOR<T,1>& one,int& segment_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const override;
+    bool Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const override;
+    void Get_Simplex_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const bool with_body_motion,const T extra_thickness,const T body_thickness_factor) const override;
+    void Update_Intersection_Acceleration_Structures(const bool use_swept_triangle_hierarchy,const int state1=0,const int state2=0) override;
+    POINT_SIMPLEX_1D<T> World_Space_Simplex(const int point_simplex_id,const bool use_saved_state=false) const override;
     POINT_SIMPLEX_1D<T> World_Space_Simplex(const int point_simplex_id,const FRAME<TV>& state) const;
 //#####################################################################
 };

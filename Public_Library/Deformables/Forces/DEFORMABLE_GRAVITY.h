@@ -40,29 +40,29 @@ public:
     virtual ~DEFORMABLE_GRAVITY()
     {}
 
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
+    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override
     {}
 
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override
     {}
 
-    void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE
+    void Enforce_Definiteness(const bool enforce_definiteness_input) override
     {}
 
-    int Velocity_Dependent_Forces_Size() const PHYSBAM_OVERRIDE
+    int Velocity_Dependent_Forces_Size() const override
     {return 0;}
 
-    void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const PHYSBAM_OVERRIDE
+    void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const override
     {}
 
-    void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
+    void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const override
     {}
 
 //#####################################################################
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
     T Potential_Energy(int p,const T time) const;
-    T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
-    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
+    T Potential_Energy(const T time) const override;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override;
 //#####################################################################
 };
 }

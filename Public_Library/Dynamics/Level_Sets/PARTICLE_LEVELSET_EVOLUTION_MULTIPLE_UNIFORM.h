@@ -36,36 +36,36 @@ public:
 //#####################################################################
     virtual PARTICLE_LEVELSET_MULTIPLE_UNIFORM<TV>& Particle_Levelset_Multiple();
     virtual LEVELSET_MULTIPLE<TV>& Levelset_Multiple();
-    virtual PARTICLE_LEVELSET_UNIFORM<TV>& Particle_Levelset(const int i) PHYSBAM_OVERRIDE;
-    virtual LEVELSET<TV>& Levelset(const int i) PHYSBAM_OVERRIDE;
-    virtual LEVELSET_ADVECTION<TV>& Levelset_Advection(const int i) PHYSBAM_OVERRIDE;
-    void Use_Semi_Lagrangian_Advection() PHYSBAM_OVERRIDE;
-    void Use_Hamilton_Jacobi_Weno_Advection() PHYSBAM_OVERRIDE;
-    void Use_Hamilton_Jacobi_Eno_Advection(const int order) PHYSBAM_OVERRIDE;
-    void Track_Mass(const bool track_mass_input=true) PHYSBAM_OVERRIDE;
+    virtual PARTICLE_LEVELSET_UNIFORM<TV>& Particle_Levelset(const int i) override;
+    virtual LEVELSET<TV>& Levelset(const int i) override;
+    virtual LEVELSET_ADVECTION<TV>& Levelset_Advection(const int i) override;
+    void Use_Semi_Lagrangian_Advection() override;
+    void Use_Hamilton_Jacobi_Weno_Advection() override;
+    void Use_Hamilton_Jacobi_Eno_Advection(const int order) override;
+    void Track_Mass(const bool track_mass_input=true) override;
     void Initialize_Domain(const GRID<TV>& grid_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_regions,const bool use_only_negative_particles=true);  // don't call up to the base class here because we don't need those variables initialized OVERRIDE PROBLEM
-    void Initialize_Domain(const GRID<TV>& grid_input) PHYSBAM_OVERRIDE;
-    void Make_Signed_Distance() PHYSBAM_OVERRIDE;
-    void Set_Number_Particles_Per_Cell(const int number_particles_per_cell) PHYSBAM_OVERRIDE;
-    void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<TV>& levelset_callbacks) PHYSBAM_OVERRIDE;
+    void Initialize_Domain(const GRID<TV>& grid_input) override;
+    void Make_Signed_Distance() override;
+    void Set_Number_Particles_Per_Cell(const int number_particles_per_cell) override;
+    void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<TV>& levelset_callbacks) override;
     void Initialize_FMM_Initialization_Iterative_Solver(const bool refine_fmm_initialization_with_iterative_solver_input=true,const int fmm_initialization_iterations_input=10,
         const T fmm_initialization_iterative_tolerance_input=1e-2,const T fmm_initialization_iterative_drift_fraction_input=.1);
-    void Bias_Towards_Negative_Particles(const bool bias_towards_negative_particles) PHYSBAM_OVERRIDE;
-    void Set_Seed(const int seed) PHYSBAM_OVERRIDE;
-    void Seed_Particles(const T time) PHYSBAM_OVERRIDE;
-    void Delete_Particles_Outside_Grid() PHYSBAM_OVERRIDE;
-    void Set_CFL_Number(const T cfl_number_input) PHYSBAM_OVERRIDE;
-    void Advance_To_Time(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T stopping_time,const bool verbose=true) PHYSBAM_OVERRIDE;
-    T Time_Step(const T stopping_time,bool& limited_by_stopping_time) PHYSBAM_OVERRIDE;
-    T CFL(const bool need_to_get_velocity=true,const bool analytic_test=false) PHYSBAM_OVERRIDE;
-    void Advance_One_Time_Step(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T dt) PHYSBAM_OVERRIDE;
-    void Advance_Levelset(const T dt) PHYSBAM_OVERRIDE;
-    void Advance_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const bool analytic_test=false) PHYSBAM_OVERRIDE;
-    T Advance_Particles(ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time) PHYSBAM_OVERRIDE;
-    T Advance_Particles(ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time) PHYSBAM_OVERRIDE;
-    void Modify_Levelset_And_Particles(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities) PHYSBAM_OVERRIDE;
-    void Reseed_Particles(const T time,const int time_step=0,ARRAY<bool,TV_INT>* cell_centered_mask=0,const bool verbose=true) PHYSBAM_OVERRIDE;
-    void Fill_Levelset_Ghost_Cells(const T time) PHYSBAM_OVERRIDE;
+    void Bias_Towards_Negative_Particles(const bool bias_towards_negative_particles) override;
+    void Set_Seed(const int seed) override;
+    void Seed_Particles(const T time) override;
+    void Delete_Particles_Outside_Grid() override;
+    void Set_CFL_Number(const T cfl_number_input) override;
+    void Advance_To_Time(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T stopping_time,const bool verbose=true) override;
+    T Time_Step(const T stopping_time,bool& limited_by_stopping_time) override;
+    T CFL(const bool need_to_get_velocity=true,const bool analytic_test=false) override;
+    void Advance_One_Time_Step(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities,const T dt) override;
+    void Advance_Levelset(const T dt) override;
+    void Advance_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const bool analytic_test=false) override;
+    T Advance_Particles(ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time) override;
+    T Advance_Particles(ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time) override;
+    void Modify_Levelset_And_Particles(ARRAY<T,FACE_INDEX<TV::m> >* face_velocities) override;
+    void Reseed_Particles(const T time,const int time_step=0,ARRAY<bool,TV_INT>* cell_centered_mask=0,const bool verbose=true) override;
+    void Fill_Levelset_Ghost_Cells(const T time) override;
 //#####################################################################
 };
 }

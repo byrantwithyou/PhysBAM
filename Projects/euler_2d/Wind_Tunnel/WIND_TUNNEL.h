@@ -135,11 +135,11 @@ public:
     
     virtual ~WIND_TUNNEL() {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     //set custom boundary
     TV velocity_initial(u_vel_initial,v_vel_initial);
@@ -164,7 +164,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Intialize_Euler_State
 //#####################################################################
-void Initialize_Euler_State() PHYSBAM_OVERRIDE
+void Initialize_Euler_State() override
 {
     ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& U=fluids_parameters.euler->U;
     TV domain_center=fluids_parameters.euler->grid.Domain().Center();
@@ -193,7 +193,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Intialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {
     if(test_number==1){
         RIGID_BODY<TV>& rect=tests.Add_Analytic_Box(TV((T)2.5,(T).3));
@@ -217,7 +217,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Dirichlet_Boundary_Conditions
 //#####################################################################
-void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
+void Set_Dirichlet_Boundary_Conditions(const T time) override
 {
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Set_Dirichlet_Boundary_Conditions(time);
     EULER_UNIFORM<TV>& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters)).euler);
@@ -367,7 +367,7 @@ void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
             break;}}
      PHYSBAM_DEBUG_WRITE_SUBSTEP("after applying isobaric fix",0,1);
 }
-void Apply_Isobaric_Fix(const T dt,const T time) PHYSBAM_OVERRIDE
+void Apply_Isobaric_Fix(const T dt,const T time) override
 {
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before applying isobaric fix",0,1);
     if(test_number==1){

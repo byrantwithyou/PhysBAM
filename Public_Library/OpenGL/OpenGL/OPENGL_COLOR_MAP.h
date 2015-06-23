@@ -7,7 +7,6 @@
 #ifndef __OPENGL_COLOR_MAP__
 #define __OPENGL_COLOR_MAP__
 
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 namespace PhysBAM{
 

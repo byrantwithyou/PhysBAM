@@ -88,27 +88,27 @@ public:
     {}
 
     // Unused callbacks
-    void Initialize_Advection() PHYSBAM_OVERRIDE {}
-    void Initialize_Velocities() PHYSBAM_OVERRIDE {}
-    void Initialize_Bodies() PHYSBAM_OVERRIDE
+    void Initialize_Advection() override {}
+    void Initialize_Velocities() override {}
+    void Initialize_Bodies() override
     {
         solid_body_collection.Add_Force(new GRAVITY<TV>(solid_body_collection.deformable_body_collection.particles,
                 solid_body_collection.rigid_body_collection,true,true));
     }
     void Construct_Levelsets_For_Objects(const T time){}
-    bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE {return false;}
-    void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
+    bool Adjust_Phi_With_Sources(const T time) override {return false;}
+    void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,const T time) override {}
+    void Preprocess_Frame(const int frame) override {}
     void Adjust_Velocity_With_Objects(const T time){}
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
+    void Postprocess_Frame(const int frame) override {}
+    void Postprocess_Phi(const T time) override {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_SPH_Particles
 //#####################################################################
-void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
+void Initialize_SPH_Particles() override
 {
     fluids_parameters.sph_evolution->flip_ratio=(T).9;
     fluids_parameters.sph_evolution->divergence_expansion_multiplier=(T)1;
@@ -170,14 +170,14 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
-void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
+void Update_Fluid_Parameters(const T dt,const T time) override
 {
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
 }
 //#####################################################################
 // Function Get_Source_Velocities
 //######################### ############################################
-void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE
+void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) override
 {
     if(test_number==1 && time<4)
         for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(iterator.Location().x<(T).7){
@@ -195,12 +195,12 @@ void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_IND
 //#####################################################################
 // Function Limit_Dt
 //#####################################################################
-void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
+void Limit_Dt(T& dt,const T time) override
 {}
 //#####################################################################
 // Function Adjust_SPH_Particle_For_Domain_Boundaries
 //#####################################################################
-void Adjust_SPH_Particle_For_Domain_Boundaries(SPH_PARTICLES<TV>& particles,const int index,TV& V,const T dt,const T time)const PHYSBAM_OVERRIDE
+void Adjust_SPH_Particle_For_Domain_Boundaries(SPH_PARTICLES<TV>& particles,const int index,TV& V,const T dt,const T time)const override
 {
     GRID<TV> grid=*fluids_parameters.grid;
     if(test_number==1 && time<4) grid.domain.min_corner.x=(T).7;
@@ -234,14 +234,14 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time)
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
-bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE
+bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override
 {
     return false;
 }
 //#####################################################################
 // Function Set_Kinematic_Positions
 //#####################################################################
-void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE
+void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override
 {
     //if(rigid2->particle_index==id) frame.t=time<2?TV((T).1,.1):TV((T).1,.1+time);
 }

@@ -41,7 +41,7 @@ public:
         :KRYLOV_SYSTEM_BASE<T>(false,true),solid_body_collection(solid_body_collection_input),example_forces_and_velocities(example_forces_and_velocities),time(time_input),mpi_solids(mpi_solids_input)
     {}
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& bdX,KRYLOV_VECTOR_BASE<T>& bdF) const PHYSBAM_OVERRIDE
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& bdX,KRYLOV_VECTOR_BASE<T>& bdF) const override
     {const KRYLOV_VECTOR_T& dX=debug_cast<const KRYLOV_VECTOR_T&>(bdX);KRYLOV_VECTOR_T& dF=debug_cast<KRYLOV_VECTOR_T&>(bdF);
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(dX.v.array);
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions(dX.v.array); // TODO: assumes bindings are linear, consider switching this to clamping velocities
@@ -50,25 +50,25 @@ public:
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(dX.v.array);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(dF.v.array);}
 
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& dX) const PHYSBAM_OVERRIDE
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& dX) const override
     {Project(dX);}
 
-    void Project(KRYLOV_VECTOR_BASE<T>& bdX) const PHYSBAM_OVERRIDE
+    void Project(KRYLOV_VECTOR_BASE<T>& bdX) const override
     {KRYLOV_VECTOR_T& dX=debug_cast<KRYLOV_VECTOR_T&>(bdX);example_forces_and_velocities.Zero_Out_Enslaved_Position_Nodes(dX.v.array,time);}
 
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bdX0,const KRYLOV_VECTOR_BASE<T>& bdX2) const PHYSBAM_OVERRIDE
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bdX0,const KRYLOV_VECTOR_BASE<T>& bdX2) const override
     {const KRYLOV_VECTOR_T& dX0=debug_cast<const KRYLOV_VECTOR_T&>(bdX0),&dX2=debug_cast<const KRYLOV_VECTOR_T&>(bdX2);
     T inner_product=dX0.v.Dot(dX2.v);
     if(mpi_solids) inner_product=mpi_solids->Reduce_Add(inner_product);
     return inner_product;}
 
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bdX) const PHYSBAM_OVERRIDE
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bdX) const override
     {const KRYLOV_VECTOR_T& dX=debug_cast<const KRYLOV_VECTOR_T&>(bdX);
     T convergence_norm=dX.v.Maximum_Magnitude();
     if(mpi_solids) convergence_norm=mpi_solids->Reduce_Max(convergence_norm);
     return convergence_norm;}
 
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& dX) const PHYSBAM_OVERRIDE {}
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& dX) const override {}
 };
 }
 //#####################################################################

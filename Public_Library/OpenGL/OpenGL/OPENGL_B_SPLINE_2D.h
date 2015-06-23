@@ -27,7 +27,7 @@ public:
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
     OPENGL_B_SPLINE_2D(STREAM_TYPE stream_type,const B_SPLINE<TV,d>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan());
 
-    void Display() const PHYSBAM_OVERRIDE;
+    void Display() const override;
 
     TV Evaluate(int id,T t) const; // What is this line doing here?
 };
@@ -41,7 +41,7 @@ public:
     OPENGL_SELECTION_B_SPLINE_VERTEX_2D(OPENGL_OBJECT<T>* object, int index=0) 
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::B_SPLINE_VERTEX_2D, object), index(index) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 template<class T,int d>
@@ -53,7 +53,7 @@ public:
     OPENGL_SELECTION_B_SPLINE_SEGMENT_2D(OPENGL_OBJECT<T>* object, int index=0) 
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::B_SPLINE_SEGMENT_2D, object), index(index) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

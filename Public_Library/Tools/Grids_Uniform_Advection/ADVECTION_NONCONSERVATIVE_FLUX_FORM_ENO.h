@@ -23,11 +23,11 @@ public:
         Set_Order();
     }
 
-    void Set_Order(const int order_input=3)  PHYSBAM_OVERRIDE
+    void Set_Order(const int order_input=3)  override
     {order=order_input;assert(order >=1 && order <=3);}
 
 //#####################################################################
-    void Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const ARRAY<T,VECTOR<int,1> >& u,ARRAY<T2,VECTOR<int,1> >& u_Zx) PHYSBAM_OVERRIDE;
+    void Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const ARRAY<T,VECTOR<int,1> >& u,ARRAY<T2,VECTOR<int,1> >& u_Zx) override;
 //#####################################################################
 };  
 //#####################################################################

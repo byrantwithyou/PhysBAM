@@ -16,7 +16,6 @@
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/sqr.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <cmath>
 namespace PhysBAM{
 

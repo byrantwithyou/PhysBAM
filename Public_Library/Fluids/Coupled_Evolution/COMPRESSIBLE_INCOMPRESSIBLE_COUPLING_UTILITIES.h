@@ -6,7 +6,6 @@
 //#####################################################################
 #ifndef __COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES__
 #define __COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES__
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Compressible/Euler_Equations/INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS.h>
 namespace PhysBAM{
 template<class T> class EOS;
@@ -37,10 +36,10 @@ public:
     static void Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const GRID<TV>& face_grid,
         const ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T incompressible_density,const ARRAY<T,TV_INT>& incompressible_phi,
         const T_ARRAYS_DIMENSION_SCALAR& U,const ARRAY<bool,TV_INT>& euler_psi,const ARRAY<T,TV_INT>& p_cell,ARRAY<T,FACE_INDEX<TV::m> >& p_face);
-    virtual void Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const GRID<TV>& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U,const ARRAY<bool,TV_INT>& euler_psi,const ARRAY<T,TV_INT>& p_cell,ARRAY<T,FACE_INDEX<TV::m> >& p_face) const PHYSBAM_OVERRIDE;
+    virtual void Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const GRID<TV>& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U,const ARRAY<bool,TV_INT>& euler_psi,const ARRAY<T,TV_INT>& p_cell,ARRAY<T,FACE_INDEX<TV::m> >& p_face) const override;
     static void Fill_Incompressible_Beta_Face(const GRID<TV>& grid,const T incompressible_density,const ARRAY<T,TV_INT>& incompressible_phi,
         ARRAY<T,FACE_INDEX<TV::m> >& beta_face);
-    virtual void Fill_Incompressible_Beta_Face(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& beta_face) const PHYSBAM_OVERRIDE;
+    virtual void Fill_Incompressible_Beta_Face(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& beta_face) const override;
     static void Apply_Pressure_At_Incompressible_Faces(const GRID<TV>& face_grid,const T incompressible_density,
         const ARRAY<T,TV_INT>& incompressible_phi,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<T,TV_INT>& p_hat,
         ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities);

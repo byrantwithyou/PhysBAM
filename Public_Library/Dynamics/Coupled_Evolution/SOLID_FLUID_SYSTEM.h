@@ -58,16 +58,16 @@ public:
     const T Solid_Sign() const
     {return (T)-1;}
 
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE {} // TODO
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& V) const override {} // TODO
 
 //#####################################################################
     // void Print_Matrix(VECTOR_T& V,VECTOR_T& F);
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F) const PHYSBAM_OVERRIDE;
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE;
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const PHYSBAM_OVERRIDE;  // solve MR=V
-    void Project(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE;
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& V0,const KRYLOV_VECTOR_BASE<T>& V1) const PHYSBAM_OVERRIDE;
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& R) const PHYSBAM_OVERRIDE;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F) const override;
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const override;
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const override;  // solve MR=V
+    void Project(KRYLOV_VECTOR_BASE<T>& V) const override;
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& V0,const KRYLOV_VECTOR_BASE<T>& V1) const override;
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& R) const override;
     static void Add_J_Deformable_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,const GENERALIZED_VELOCITY<TV>& V,ARRAY<T>& pressure);
     static void Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const GENERALIZED_VELOCITY<TV>& V,ARRAY_VIEW<T> pressure);
     static void Add_J_Deformable_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,const ARRAY<T>& pressure,GENERALIZED_VELOCITY<TV>& V);

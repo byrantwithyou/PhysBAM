@@ -43,7 +43,7 @@ public:
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################
-void Initialize_Phi() PHYSBAM_OVERRIDE
+void Initialize_Phi() override
 {
     GRID<TV>& grid=fluids_parameters.grid;
     VECTOR<T,3> center((T).5,(T).7,(T).5);

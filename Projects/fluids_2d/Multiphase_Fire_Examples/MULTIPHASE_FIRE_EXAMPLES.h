@@ -94,7 +94,7 @@ public:
     virtual ~MULTIPHASE_FIRE_EXAMPLES()
     {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Number_Of_Regions
 //#####################################################################
@@ -108,7 +108,7 @@ static int Number_Of_Regions(int test_number)
 //#####################################################################
 // Function Get_Flame_Speed_Multiplier
 //#####################################################################
-void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
+void Get_Flame_Speed_Multiplier(const T dt,const T time) override
 {
     ARRAY<T,FACE_INDEX<TV::m> >& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
     flame_speed_multiplier.Fill(0);
@@ -152,7 +152,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Set_Ghost_Density_And_Temperature_Inside_Flame_Core
 //#####################################################################
-void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
+void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() override
 {
     ARRAY<T,TV_INT> phi;LEVELSET<TV> levelset(*fluids_parameters.grid,phi);
     ARRAY<T,FACE_INDEX<TV::m> >& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
@@ -174,7 +174,7 @@ void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################
-void Initialize_Phi() PHYSBAM_OVERRIDE
+void Initialize_Phi() override
 {
     ARRAY<ARRAY<T,VECTOR<int,2> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
     if(test_number==1){
@@ -198,7 +198,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Adjust_Phi_With_Sources
 //#####################################################################
-bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
+bool Adjust_Phi_With_Sources(const T time) override
 {
     if(test_number==2){
         Adjust_Phi_With_Source(RANGE<TV>(TV(0,(T).1),TV((T).1,(T).3)),1,MATRIX<T,3>::Identity_Matrix());
@@ -221,7 +221,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override
 {
     if(test_number==2){
         Get_Source_Velocities(RANGE<TV>(TV(0,(T).1),TV((T).1,(T).3)),MATRIX<T,3>::Identity_Matrix(),VECTOR<T,2>((T).2,0));
@@ -230,7 +230,7 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bo
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
-void Initialize_Advection()    PHYSBAM_OVERRIDE
+void Initialize_Advection()    override
 {
     fluids_parameters.Use_No_Fluid_Coupling_Defaults();
 }

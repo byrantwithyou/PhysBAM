@@ -27,10 +27,10 @@ public:
     {speed=speed_input;}
 
 //#####################################################################
-    T H(const T phi_x,const T phi_y,const T phi_z,const int i=0,const int j=0,const int k=0,const T t=0) PHYSBAM_OVERRIDE;
-    T Maxabs_H1(const T phi_x_1,const T phi_x_2,const T phi_y_1,const T phi_y_2,const T phi_z_1,const T phi_z_2,const int i=0,const int j=0,const int k=0,const T t=0) PHYSBAM_OVERRIDE;
-    T Maxabs_H2(const T phi_x_1,const T phi_x_2,const T phi_y_1,const T phi_y_2,const T phi_z_1,const T phi_z_2,const int i=0,const int j=0,const int k=0,const T t=0) PHYSBAM_OVERRIDE;
-    T Maxabs_H3(const T phi_x_1,const T phi_x_2,const T phi_y_1,const T phi_y_2,const T phi_z_1,const T phi_z_2,const int i=0,const int j=0,const int k=0,const T t=0) PHYSBAM_OVERRIDE;
+    T H(const T phi_x,const T phi_y,const T phi_z,const int i=0,const int j=0,const int k=0,const T t=0) override;
+    T Maxabs_H1(const T phi_x_1,const T phi_x_2,const T phi_y_1,const T phi_y_2,const T phi_z_1,const T phi_z_2,const int i=0,const int j=0,const int k=0,const T t=0) override;
+    T Maxabs_H2(const T phi_x_1,const T phi_x_2,const T phi_y_1,const T phi_y_2,const T phi_z_1,const T phi_z_2,const int i=0,const int j=0,const int k=0,const T t=0) override;
+    T Maxabs_H3(const T phi_x_1,const T phi_x_2,const T phi_y_1,const T phi_y_2,const T phi_z_1,const T phi_z_2,const int i=0,const int j=0,const int k=0,const T t=0) override;
 //#####################################################################
 };   
 }

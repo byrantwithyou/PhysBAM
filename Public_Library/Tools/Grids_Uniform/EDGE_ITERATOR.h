@@ -9,6 +9,7 @@
 
 #include <Tools/Grids_Uniform/EDGE_INDEX.h>
 #include <Tools/Grids_Uniform/GRID_ITERATOR_BASE.h>
+#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
 
 namespace PhysBAM{
 

@@ -48,16 +48,16 @@ public:
     if(energy_gradient(4)) result+=(T)2*energy_gradient(4)*(C*SYMMETRIC_MATRIX<T,3>::Outer_Product(V_fiber)).Twice_Symmetric_Part();
     return result;}
 
-    MATRIX<T,3> P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const T scale,const int tetrahedron) const PHYSBAM_OVERRIDE
+    MATRIX<T,3> P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const T scale,const int tetrahedron) const override
     {DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold),C=F_threshold*F_threshold;VECTOR<T,3> V_fiber=V.Transpose_Times(fiber_field(tetrahedron));
     ARRAY<T> invariants(4),energy_gradient(4);SYMMETRIC_MATRIX<T,3> result;Invariants(invariants,C,V_fiber);Energy_Gradient(energy_gradient,invariants,tetrahedron);
     return scale*F_threshold*S(C,V_fiber,invariants,energy_gradient);}
 
-    MATRIX<T,3> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const T scale,const int tetrahedron) const PHYSBAM_OVERRIDE
+    MATRIX<T,3> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const T scale,const int tetrahedron) const override
     {SYMMETRIC_MATRIX<T,3> strain_rate=F_dot.Symmetric_Part(); // Use linear damping by default
     return 2*scale*constant_beta*strain_rate+scale*constant_alpha*strain_rate.Trace();}
 
-    void Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,DIAGONALIZED_STRESS_DERIVATIVE<T,3>& dP_dF,const int tetrahedron=0) const PHYSBAM_OVERRIDE
+    void Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,DIAGONALIZED_STRESS_DERIVATIVE<T,3>& dP_dF,const int tetrahedron=0) const override
     {DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold),C=F_threshold*F_threshold,C_inverse=C.Inverse();VECTOR<T,3> V_fiber=V.Transpose_Times(fiber_field(tetrahedron));
     SYMMETRIC_MATRIX<T,3> C_inverse_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(VECTOR<T,3>(C_inverse.x00,C_inverse.x11,C_inverse.x22));
     SYMMETRIC_MATRIX<T,3> V_fiber_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(V_fiber);

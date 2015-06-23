@@ -30,13 +30,13 @@ public:
 
 //###########################################################################
     static SMOOTH_LEVELSET_IMPLICIT_OBJECT<TV>* Create();
-    TV Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE;
-    TV Extended_Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE;
-    void Compute_Normals() PHYSBAM_OVERRIDE;
-    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const PHYSBAM_OVERRIDE;
-    VECTOR<T,d-1> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE;
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
-    virtual std::string Extension() const PHYSBAM_OVERRIDE {return Static_Extension();}
+    TV Normal(const TV& location,const int aggregate=-1) const override;
+    TV Extended_Normal(const TV& location,const int aggregate=-1) const override;
+    void Compute_Normals() override;
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const override;
+    VECTOR<T,d-1> Principal_Curvatures(const TV& X) const override;
+    virtual std::string Name() const override {return Static_Name();}
+    virtual std::string Extension() const override {return Static_Extension();}
     static std::string Static_Name();
     static std::string Static_Extension();
 //###########################################################################

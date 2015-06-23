@@ -71,11 +71,11 @@ public:
     void Coarsen_Levelset(const GRID<TV>& coarse_grid,const ARRAY<ARRAY<T,TV_INT> >& fine_phi,ARRAY<ARRAY<T,TV_INT> >& phi) const;
     void Fill_Color_Levelset(const GRID<TV>& grid,const ARRAY<ARRAY<T,TV_INT> >& cr_phis,const ARRAY<ARRAY<T,TV_INT> >& bc_phis,ARRAY<T,TV_INT>& color_phi,ARRAY<int,TV_INT>& colors) const;
 
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const PHYSBAM_OVERRIDE;
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const override;
     void Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_velocity,
         std::function<TV(const TV& X,int color0,int color1)> u_jump,
         std::function<TV(const TV& X,int color0,int color1)> j_surface,
-        ARRAY<T>* inertia,bool use_rhs,T dt) PHYSBAM_OVERRIDE;
+        ARRAY<T>* inertia,bool use_rhs,T dt) override;
 //#####################################################################
 };
 }

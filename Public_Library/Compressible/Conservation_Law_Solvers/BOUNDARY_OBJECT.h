@@ -8,7 +8,6 @@
 #define __BOUNDARY_OBJECT__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_CALLBACKS.h>
 namespace PhysBAM{
 

@@ -12,7 +12,6 @@
 #include <Tools/Data_Structures/ELEMENT_ID.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{

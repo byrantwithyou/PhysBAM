@@ -27,9 +27,9 @@ public:
         :OPENGL_OBJECT<T>(stream_type),hierarchy(hierarchy_in),color(color_input),min_height(1),max_height(1)
     {}
 
-    void Display() const PHYSBAM_OVERRIDE;
+    void Display() const override;
     void Display_Helper(const int cell,const int height) const;
-    RANGE<TV> Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<TV> Bounding_Box() const override;
 
     void Increment_Height();
     void Decrement_Height();

@@ -88,7 +88,7 @@ public:
     virtual ~RENDERING_VOXEL_FIRE_LIGHT()
     {}
 
-    void Sample_Points(const VECTOR<T,3>& surface_position,const VECTOR<T,3>& surface_normal,ARRAY<RAY<VECTOR<T,3> > >& sample_array)const PHYSBAM_OVERRIDE
+    void Sample_Points(const VECTOR<T,3>& surface_position,const VECTOR<T,3>& surface_normal,ARRAY<RAY<VECTOR<T,3> > >& sample_array)const override
     {sample_array.Resize(1);sample_array(0)=RAY<VECTOR<T,3> >(surface_position,VECTOR<T,3>(1,0,0),true);} // just give dummy return to avoid division by zero
 
     VECTOR<T,3> Sample_Point_In_Volume(const T xi_x,const T xi_y,const T xi_z,T& probability_of_location)const
@@ -98,10 +98,10 @@ public:
     probability_of_location=pdf(i,j,ij)/total_average_power;
     return VECTOR<T,3>(sample_x.y,sample_y.y,sample_z.y)-VECTOR<T,3>((T).5,(T).5,(T).5)+fire_voxels.grid.X(TV_INT(i,j,ij));}
 
-    VECTOR<T,3> Emitted_Light(const RENDERING_RAY<T>& ray) const PHYSBAM_OVERRIDE
+    VECTOR<T,3> Emitted_Light(const RENDERING_RAY<T>& ray) const override
     {return VECTOR<T,3>(0,0,0);}
 
-    int Emit_Photons(RENDERING_RAY<T>& parent_ray,PHOTON_MAP<T>& photon_map,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type) const  PHYSBAM_OVERRIDE
+    int Emit_Photons(RENDERING_RAY<T>& parent_ray,PHOTON_MAP<T>& photon_map,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type) const  override
     {int number_emitted=0;
     while(photon_map.Light_Emission_Quota_Remains()){
         RANDOM_NUMBERS<T>* random=0;

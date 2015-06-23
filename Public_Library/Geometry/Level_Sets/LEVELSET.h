@@ -15,7 +15,6 @@
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/SCALAR_POLICY.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <cassert>

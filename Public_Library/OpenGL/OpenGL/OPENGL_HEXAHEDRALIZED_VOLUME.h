@@ -45,12 +45,12 @@ public:
     {use_inverted_material=!use_inverted_material;return use_inverted_material;}
 
 //#####################################################################
-    void Display() const PHYSBAM_OVERRIDE;
+    void Display() const override;
     void Draw_Subset_Particles() const;
     void Draw_Vector_At_Hex_Center() const;
     void Draw_Wireframe_Mesh(const HEXAHEDRON_MESH& hexahedron_mesh) const;
     void Draw_Boundary_Triangles(const HEXAHEDRON_MESH& hexahedron_mesh) const;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 //#####################################################################
 };
 }

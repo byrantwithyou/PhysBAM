@@ -37,7 +37,7 @@ public:
         parse_args.Parse();
         tests.data_directory=data_directory;
     }
-    void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
+    void Update_Solids_Parameters(const T time) override
     {
         COLLISION_GEOMETRY_ID body1_collision_geometry_id=
             solid_body_collection.rigid_body_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(body0->particle_index);
@@ -69,9 +69,9 @@ public:
         deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
         deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
     }
-    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+    void After_Initialization() override {BASE::After_Initialization();}
 
-    void Initialize_Bodies() PHYSBAM_OVERRIDE
+    void Initialize_Bodies() override
     {
         DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
 

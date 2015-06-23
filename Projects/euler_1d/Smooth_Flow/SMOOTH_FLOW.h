@@ -98,11 +98,11 @@ public:
     
     virtual ~SMOOTH_FLOW() {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     //set custom boundary
     fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<TV,VECTOR<T,TV::m+2> >();
@@ -112,7 +112,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Intialize_Euler_State
 //#####################################################################
-void Initialize_Euler_State() PHYSBAM_OVERRIDE
+void Initialize_Euler_State() override
 {
     GRID<TV>& grid=fluids_parameters.euler->grid;
     ARRAY<VECTOR<T,3> ,VECTOR<int,1> >& U=fluids_parameters.euler->U;

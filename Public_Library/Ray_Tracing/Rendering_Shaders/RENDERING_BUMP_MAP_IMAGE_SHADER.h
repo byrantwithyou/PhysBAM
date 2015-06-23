@@ -28,7 +28,7 @@ public:
         t0(t0_input),t_min(min(t0_input,t1_input)),t_max(max(t0_input,t1_input)),t_scaling_factor((T)1/(t1_input-t0_input))
     {}
     
-    VECTOR<T,3> Perturbed_Normal(const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& object_space_position,const T s,const T t,const VECTOR<T,3>& object_space_normal,const VECTOR<T,3>& object_space_tangent,const VECTOR<T,3>& object_space_bitangent) const PHYSBAM_OVERRIDE
+    VECTOR<T,3> Perturbed_Normal(const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& object_space_position,const T s,const T t,const VECTOR<T,3>& object_space_normal,const VECTOR<T,3>& object_space_tangent,const VECTOR<T,3>& object_space_bitangent) const override
     {if(s<s_min || s>s_max || t<t_min || t>t_max)return object_space_normal;VECTOR<T,2> location((s-s0)*s_scaling_factor,(t-t0)*t_scaling_factor);
     T fx=(levelset.Phi(VECTOR<T,2>(location.x+grid.dX.x,location.y))-levelset.Phi(VECTOR<T,2>(location.x-grid.dX.x,location.y)))/(2*grid.dX.x),
         fy=(levelset.Phi(VECTOR<T,2>(location.x,location.y+grid.dX.y))-levelset.Phi(VECTOR<T,2>(location.x,location.y-grid.dX.y)))/(2*grid.dX.y);

@@ -8,7 +8,6 @@
 #define __KRYLOV_SYSTEM_BASE__
 
 #include <Tools/Arrays/ARRAY.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class T> class KRYLOV_VECTOR_BASE;

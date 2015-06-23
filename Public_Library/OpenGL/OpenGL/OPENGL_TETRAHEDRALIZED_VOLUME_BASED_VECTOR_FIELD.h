@@ -30,7 +30,7 @@ public:
 
     void Update();  // Call when tetrahedralized volume/V change
 
-    virtual RANGE<TV> Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<TV> Bounding_Box() const override;
 };
 }
 #endif

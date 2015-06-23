@@ -35,14 +35,14 @@ public:
     OPENGL_DEBUG_PARTICLES_2D(STREAM_TYPE stream_type,GEOMETRY_PARTICLES<TV>& particles_input,ARRAY<DEBUG_OBJECT<TV> >& debug_objects_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White());
     ~OPENGL_DEBUG_PARTICLES_2D();
 
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Display() const PHYSBAM_OVERRIDE;
+    bool Use_Bounding_Box() const override;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    void Display() const override;
 
-    OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) PHYSBAM_OVERRIDE;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Clear_Highlight() override;
+    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const override;
 
     void Select_Point(int index);
     void Select_Points(const ARRAY<int> &indices);
@@ -60,7 +60,7 @@ public:
     OPENGL_SELECTION_DEBUG_PARTICLES_2D(OPENGL_OBJECT<T>* object)
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::DEBUG_PARTICLES_2D,object) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

@@ -44,11 +44,11 @@ struct FACTORY:public FACTORY_BASE<T_BASE_OBJECT>
     Get_Create() const
     {return Get_Create_Helper<T_CREATE>(&T_OBJECT::Create);}
 
-    T_OBJECT* Create() const PHYSBAM_OVERRIDE
+    T_OBJECT* Create() const override
     {CREATE_RAW* create=Get_Create<CREATE_RAW>();
     return create?create():0;}
 
-    T_OBJECT* Create(GEOMETRY_PARTICLES<TV>& particles) const PHYSBAM_OVERRIDE
+    T_OBJECT* Create(GEOMETRY_PARTICLES<TV>& particles) const override
     {CREATE_WITH_PARTICLES* create=Get_Create<CREATE_WITH_PARTICLES>();
     return create?create(particles):0;}
 };

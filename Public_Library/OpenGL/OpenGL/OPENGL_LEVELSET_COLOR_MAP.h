@@ -21,7 +21,7 @@ public:
         :negative_color(negative_color_input),positive_color(positive_color_input)
     {}
 
-    virtual OPENGL_COLOR Lookup(T x) const PHYSBAM_OVERRIDE
+    virtual OPENGL_COLOR Lookup(T x) const override
     {if(x<=0) return (1+2*x)*negative_color;else return (1-2*x)*positive_color;}
 };
 }

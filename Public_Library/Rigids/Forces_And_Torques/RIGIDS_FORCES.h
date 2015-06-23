@@ -12,7 +12,6 @@
 #include <Tools/Data_Structures/ELEMENT_ID.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class TV> class RIGID_BODY_COLLECTION;

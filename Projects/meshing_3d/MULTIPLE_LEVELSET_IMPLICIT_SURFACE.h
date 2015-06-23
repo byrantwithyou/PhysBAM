@@ -41,40 +41,40 @@ public:
     TV Surface(const TV& location,const T tolerance=0,const int max_iterations=1) const 
     {return Select(location)->Surface(location,tolerance,max_iterations);}
 
-    T_SYMMETRIC_MATRIX Hessian(const TV& X) const  PHYSBAM_OVERRIDE
+    T_SYMMETRIC_MATRIX Hessian(const TV& X) const  override
     {return Select(X)->Hessian(X);}
 
-    VECTOR<T,2> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE
+    VECTOR<T,2> Principal_Curvatures(const TV& X) const override
     {return Select(X)->Principal_Curvatures(X);}
 
-    TV Normal(const TV& location,const int aggregate=-1) const  PHYSBAM_OVERRIDE
+    TV Normal(const TV& location,const int aggregate=-1) const  override
     {return Select(location)->Normal(location,aggregate);}
     
-    TV Extended_Normal(const TV& location,const int aggregate=-1) const  PHYSBAM_OVERRIDE
+    TV Extended_Normal(const TV& location,const int aggregate=-1) const  override
     {return Select(location)->Extended_Normal(location,aggregate);}
 
-    T operator()(const TV& location) const  PHYSBAM_OVERRIDE
+    T operator()(const TV& location) const  override
     {return Select(location)->operator()(location);}
 
-    T Extended_Phi(const TV& location) const  PHYSBAM_OVERRIDE
+    T Extended_Phi(const TV& location) const  override
     {return Select(location)->Extended_Phi(location);}
 
-    void Compute_Normals() PHYSBAM_OVERRIDE
+    void Compute_Normals() override
     {primary_levelset->Compute_Normals();for(int i=0;i<secondary_levelsets.m;i++)secondary_levelsets(i)->Compute_Normals();}
 
-    void Update_Box() PHYSBAM_OVERRIDE
+    void Update_Box() override
     {primary_levelset->Update_Box();for(int i=0;i<secondary_levelsets.m;i++)secondary_levelsets(i)->Update_Box();box=primary_levelset->box;}
 
-    void Update_Minimum_Cell_Size(const int maximum_depth=0) PHYSBAM_OVERRIDE
+    void Update_Minimum_Cell_Size(const int maximum_depth=0) override
     {primary_levelset->Update_Minimum_Cell_Size();for(int i=0;i<secondary_levelsets.m;i++)secondary_levelsets(i)->Update_Minimum_Cell_Size();
     minimum_cell_size=primary_levelset->Minimum_Cell_Size();for(int i=0;i<secondary_levelsets.m;i++)minimum_cell_size=min(minimum_cell_size,secondary_levelsets(i)->Minimum_Cell_Size());}
 
-    T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box)const PHYSBAM_OVERRIDE
+    T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box)const override
     {T result=primary_levelset->Minimum_Cell_Size();
     for(int i=0;i<secondary_levelsets.m;i++)if(box.Intersection(secondary_levelsets(i)->box,-inside_threshold))result=min(result,secondary_levelsets(i)->Minimum_Cell_Size());
     return result;}
 
-    T Minimum_Cell_Size() const PHYSBAM_OVERRIDE
+    T Minimum_Cell_Size() const override
     {return minimum_cell_size;}
 
     virtual void Read(TYPED_ISTREAM& input) {PHYSBAM_FATAL_ERROR();}

@@ -30,28 +30,28 @@ public:
     virtual ~RENDERING_VOXELS()
     {}
 
-    bool Intersection(RAY<VECTOR<T,3> >& ray)  const PHYSBAM_OVERRIDE
+    bool Intersection(RAY<VECTOR<T,3> >& ray)  const override
     {RAY<VECTOR<T,3> > object_space_ray=Object_Space_Ray(ray);
     bool box_intersection=false;
     if(INTERSECTION::Intersects(object_space_ray,box)){box_intersection=true;ray.semi_infinite=false;ray.t_max=object_space_ray.t_max;ray.aggregate_id=object_space_ray.aggregate_id;}
     return box_intersection;}
 
-    bool Get_Intersection_Range(const RAY<VECTOR<T,3> >& ray,T& start_t,T& end_t) const PHYSBAM_OVERRIDE
+    bool Get_Intersection_Range(const RAY<VECTOR<T,3> >& ray,T& start_t,T& end_t) const override
     {return INTERSECTION::Get_Intersection_Range(Object_Space_Ray(ray),box,start_t,end_t);}
 
-    VECTOR<T,3> Normal(const VECTOR<T,3>& location,const int aggregate=0) const PHYSBAM_OVERRIDE
+    VECTOR<T,3> Normal(const VECTOR<T,3>& location,const int aggregate=0) const override
     {return World_Space_Vector(box.Normal(aggregate));}
 
-    bool Inside(const VECTOR<T,3>& location) const PHYSBAM_OVERRIDE
+    bool Inside(const VECTOR<T,3>& location) const override
     {return box.Inside(Object_Space_Point(location),small_number);}
 
-    bool Outside(const VECTOR<T,3>& location) const PHYSBAM_OVERRIDE
+    bool Outside(const VECTOR<T,3>& location) const override
     {return box.Outside(Object_Space_Point(location),small_number);}
 
-    bool Boundary(const VECTOR<T,3>& location) const PHYSBAM_OVERRIDE
+    bool Boundary(const VECTOR<T,3>& location) const override
     {return box.Boundary(Object_Space_Point(location),small_number);}
 
-    void Preprocess_Efficiency_Structures(RENDER_WORLD<T>& world) PHYSBAM_OVERRIDE
+    void Preprocess_Efficiency_Structures(RENDER_WORLD<T>& world) override
     {if(precompute_single_scattering) Precompute_Light_Data(true,world);}
 
 //#####################################################################

@@ -26,18 +26,18 @@ public:
     OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input);
     virtual ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D();
 
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }
+    bool Valid_Frame(int frame_input) const override;
+    bool Is_Up_To_Date(int frame) const override { return valid && frame_loaded == frame; }
 
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
 
-    void Display() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    virtual void Set_Slice(OPENGL_SLICE *slice_input) PHYSBAM_OVERRIDE {slice=slice_input;opengl_mac_velocity_field.Set_Slice(slice_input);opengl_vorticity_magnitude.Set_Slice(slice_input);}
-    virtual void Slice_Has_Changed() PHYSBAM_OVERRIDE { opengl_mac_velocity_field.Slice_Has_Changed();opengl_vorticity_magnitude.Slice_Has_Changed(); }
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    bool Use_Bounding_Box() const override { return draw && valid; }
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual void Set_Slice(OPENGL_SLICE *slice_input) override {slice=slice_input;opengl_mac_velocity_field.Set_Slice(slice_input);opengl_vorticity_magnitude.Set_Slice(slice_input);}
+    virtual void Slice_Has_Changed() override { opengl_mac_velocity_field.Slice_Has_Changed();opengl_vorticity_magnitude.Slice_Has_Changed(); }
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
 
     void Set_Vector_Size(double size);
 

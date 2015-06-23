@@ -41,35 +41,35 @@ public:
     template<class T_ARRAY_TV> void Update_Leaf_Boxes(const T_ARRAY_TV& X,const T extra_thickness=0)
     {Calculate_Bounding_Boxes(box_hierarchy,X);if(extra_thickness) Thicken_Leaf_Boxes(extra_thickness);}
 
-    void Intersection_List(const TV& point,ARRAY<int>& intersection_list,const T thickness_over_two=0) const PHYSBAM_OVERRIDE
+    void Intersection_List(const TV& point,ARRAY<int>& intersection_list,const T thickness_over_two=0) const override
     {if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,point,group_list,thickness_over_two);
         for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
     else BASE::Intersection_List(root,point,intersection_list,thickness_over_two);}
 
-    void Intersection_List(const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T thickness_over_two=0) const PHYSBAM_OVERRIDE
+    void Intersection_List(const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T thickness_over_two=0) const override
     {if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,test_box,group_list,thickness_over_two);
         for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
     else BASE::Intersection_List(root,test_box,intersection_list,thickness_over_two);}
 
-    void Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const PHYSBAM_OVERRIDE
+    void Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const override
     {if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,test_box,group_list);
         for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
     else BASE::Intersection_List(root,test_box,intersection_list);}
 
-    void Intersection_List(const T_HYPERPLANE& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two=0) const PHYSBAM_OVERRIDE
+    void Intersection_List(const T_HYPERPLANE& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two=0) const override
     {if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,test_plane,group_list,thickness_over_two);
         for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
     else BASE::Intersection_List(root,test_plane,intersection_list,thickness_over_two);}
 
-    void Intersection_List(const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::dimension>& rotation,const TV& translation,ARRAY<int>& intersection_list,const T contour_value=0) const PHYSBAM_OVERRIDE
+    void Intersection_List(const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::dimension>& rotation,const TV& translation,ARRAY<int>& intersection_list,const T contour_value=0) const override
     {if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,implicit_object,rotation,translation,group_list,contour_value);
@@ -77,10 +77,10 @@ public:
     else BASE::Intersection_List(root,implicit_object,rotation,translation,intersection_list,contour_value);}
 
 //#####################################################################
-    void Initialize_Hierarchy_Using_KD_Tree() PHYSBAM_OVERRIDE;
+    void Initialize_Hierarchy_Using_KD_Tree() override;
     void Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes) const;
     template<class T_ARRAY_TV> void Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const T_ARRAY_TV& X) const;
-    void Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) PHYSBAM_OVERRIDE;
+    void Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) override;
 //#####################################################################
 };
 //#####################################################################

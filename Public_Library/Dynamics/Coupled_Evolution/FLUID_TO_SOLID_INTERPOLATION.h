@@ -9,7 +9,6 @@
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Data_Structures/TRIPLE.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_BASE.h>
 
@@ -37,11 +36,11 @@ public:
     virtual ~FLUID_TO_SOLID_INTERPOLATION();
 
 //#####################################################################
-    void Compute(const int ghost_cells) PHYSBAM_OVERRIDE;
+    void Compute(const int ghost_cells) override;
     void Compute_Weights(const TV& X,int axis,ARRAY<ENTRY>& array);
-    void Times_Add(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const PHYSBAM_OVERRIDE;
-    void Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,ARRAY<T>& fluid_force) const PHYSBAM_OVERRIDE;
-    void Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const PHYSBAM_OVERRIDE;
+    void Times_Add(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const override;
+    void Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,ARRAY<T>& fluid_force) const override;
+    void Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const override;
 //#####################################################################
 };
 }

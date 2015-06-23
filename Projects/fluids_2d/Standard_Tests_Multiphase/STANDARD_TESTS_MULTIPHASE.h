@@ -41,24 +41,24 @@ public:
     {}
 
     // Unused callbacks
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
+    void Preprocess_Frame(const int frame) override {}
     void Adjust_Velocity_With_Objects(const T time){}
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
+    void Postprocess_Frame(const int frame) override {}
+    void Postprocess_Phi(const T time) override {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initial_Phi
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     tests.Initialize_Advection();
 }
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################
-void Initialize_Phi() PHYSBAM_OVERRIDE
+void Initialize_Phi() override
 {
     for(int i=0;i<fluids_parameters.number_of_regions;i++)for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
         fluids_parameters.particle_levelset_evolution_multiple->phis(i)(iterator.Cell_Index())=tests.Initial_Phi(i,iterator.Location());        
@@ -66,7 +66,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################
-void Initialize_Velocities() PHYSBAM_OVERRIDE
+void Initialize_Velocities() override
 {
     for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis)(iterator.Face_Index())=tests.Initial_Velocity(iterator.Location())[axis];}
@@ -74,14 +74,14 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {
     tests.Initialize_Bodies();
 }
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
-void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
+void Update_Fluid_Parameters(const T dt,const T time) override
 {
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
     tests.Update_Sources(time);
@@ -89,7 +89,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Adjust_Phi_With_Sources
 //#####################################################################
-bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
+bool Adjust_Phi_With_Sources(const T time) override
 {
     for(int s=0;s<tests.sources.m;s++)Adjust_Phi_With_Source(tests.sources(s),tests.source_region(s),tests.world_to_source(s));
     return false;
@@ -97,7 +97,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Source_Reseed_Mask
 //#####################################################################
-void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,const T time) override
 {
     bool first=true;
     for(int s=0;s<tests.sources.m;s++){Get_Source_Reseed_Mask(tests.sources(s),tests.world_to_source(s),cell_centered_mask,first);first=false;}
@@ -105,7 +105,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,cons
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override
 {
     if(tests.test_number==16&&fabs(fluids_parameters.grid->domain.min_corner.y)<1e-5){
         ARRAY_VIEW<T,VECTOR<int,2> >& u=fluid_collection.incompressible_fluid_collection.face_velocities.Component(1);
@@ -124,7 +124,7 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bo
 //#####################################################################
 // Function Limit_Dt
 //#####################################################################
-void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
+void Limit_Dt(T& dt,const T time) override
 {
     tests.Limit_Dt(dt,time);
 }

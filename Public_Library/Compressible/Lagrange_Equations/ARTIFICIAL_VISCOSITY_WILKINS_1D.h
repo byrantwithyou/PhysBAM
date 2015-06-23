@@ -37,7 +37,7 @@ public:
     {quadratic_constant=quadratic_constant_input;}
 
 //#####################################################################
-    void Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_1D<T>& grid,const ARRAY<T,VECTOR<int,1> >& mass,const ARRAY<T,VECTOR<int,1> >& velocity,const ARRAY<T,VECTOR<int,1> >& energy,ARRAY<T,VECTOR<int,1> >& Q) PHYSBAM_OVERRIDE;
+    void Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_1D<T>& grid,const ARRAY<T,VECTOR<int,1> >& mass,const ARRAY<T,VECTOR<int,1> >& velocity,const ARRAY<T,VECTOR<int,1> >& energy,ARRAY<T,VECTOR<int,1> >& Q) override;
 //#####################################################################
 };
 }    

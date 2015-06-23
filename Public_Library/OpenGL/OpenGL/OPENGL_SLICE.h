@@ -7,7 +7,6 @@
 #ifndef __OPENGL_SLICE__
 #define __OPENGL_SLICE__
 
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <iostream>
 namespace PhysBAM{
 

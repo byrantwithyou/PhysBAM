@@ -46,13 +46,13 @@ public:
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 
-    void Write_Output_Files(const int frame) PHYSBAM_OVERRIDE;
-    void Read_Output_Files(const int frame) PHYSBAM_OVERRIDE;
-    void Initialize() PHYSBAM_OVERRIDE;
-    void Begin_Frame(const int frame) PHYSBAM_OVERRIDE;
-    void End_Frame(const int frame) PHYSBAM_OVERRIDE;
-    void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE;
-    void End_Time_Step(const T time) PHYSBAM_OVERRIDE;
+    void Write_Output_Files(const int frame) override;
+    void Read_Output_Files(const int frame) override;
+    void Initialize() override;
+    void Begin_Frame(const int frame) override;
+    void End_Frame(const int frame) override;
+    void Begin_Time_Step(const T time) override;
+    void End_Time_Step(const T time) override;
 
 //#####################################################################
 };

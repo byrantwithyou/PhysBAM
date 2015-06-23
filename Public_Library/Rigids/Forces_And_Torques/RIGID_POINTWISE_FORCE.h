@@ -40,17 +40,17 @@ public:
     virtual ~RIGID_POINTWISE_FORCE()
     {if(need_destroy_influenced_rigid_body_particles) delete influenced_rigid_body_particles;}
 
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override
     {}
 
-    T CFL_Strain_Rate() const PHYSBAM_OVERRIDE
+    T CFL_Strain_Rate() const override
     {return FLT_MAX;}
 
-    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> rigid_frequency) PHYSBAM_OVERRIDE
+    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> rigid_frequency) override
     {}
 
 protected:
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated) override;
 
     template<class T_ARRAY>
     ARRAY<int> Get_Rigid_Body_Particle_List(const T_ARRAY& array);

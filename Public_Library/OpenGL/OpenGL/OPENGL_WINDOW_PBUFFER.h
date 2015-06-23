@@ -5,7 +5,6 @@
 #ifndef __OPENGL_WINDOW_PBUFFER__
 #define __OPENGL_WINDOW_PBUFFER__
 
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <OpenGL/OpenGL/OPENGL_WINDOW.h>
 namespace PhysBAM{
 class OPENGL_PBUFFER;
@@ -21,14 +20,14 @@ class OPENGL_WINDOW_PBUFFER:public OPENGL_WINDOW<T>
 public:
     OPENGL_WINDOW_PBUFFER(OPENGL_WORLD<T>& world_input,const std::string& window_title_input,const int width_input,const int height_input);
     virtual ~OPENGL_WINDOW_PBUFFER();
-    void Setup_Idle(const bool use) PHYSBAM_OVERRIDE;
-    void Setup_Timer(const float wait_milliseconds) PHYSBAM_OVERRIDE;
-    void Redisplay() PHYSBAM_OVERRIDE;
-    void Main_Loop() PHYSBAM_OVERRIDE;
-    void Request_Resize(const int width,const int height) PHYSBAM_OVERRIDE;
-    void Request_Move(const int x,const int y) PHYSBAM_OVERRIDE;
-    int Width() const PHYSBAM_OVERRIDE;
-    int Height() const PHYSBAM_OVERRIDE;
+    void Setup_Idle(const bool use) override;
+    void Setup_Timer(const float wait_milliseconds) override;
+    void Redisplay() override;
+    void Main_Loop() override;
+    void Request_Resize(const int width,const int height) override;
+    void Request_Move(const int x,const int y) override;
+    int Width() const override;
+    int Height() const override;
 //#####################################################################
 };
 }

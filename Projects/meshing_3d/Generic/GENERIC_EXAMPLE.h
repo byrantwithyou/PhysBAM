@@ -242,7 +242,7 @@ public:
     ~GENERIC_EXAMPLE()
     {levelsets.Delete_Pointers_And_Clean_Memory();delete variable_max_edge_length_tet_field;delete variable_max_edge_length_tetsurf_field;}
 
-    void Initialize_Implicit_Surface() PHYSBAM_OVERRIDE
+    void Initialize_Implicit_Surface() override
     {if(implicit_surface_filename=="<sphere>"){
         T cell_size=bcc_lattice_cell_size/(1<<max_subdivision_levels);
         tetrahedral_meshing.Initialize(new SPHERE_IMPLICIT_SURFACE<T>(cell_size));

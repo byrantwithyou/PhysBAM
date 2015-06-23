@@ -39,7 +39,7 @@ public:
     TEMPERATURE_CONTAINER(GRID<TV>& grid_input);
     ~TEMPERATURE_CONTAINER();
 
-    void Initialize_Array(const int ghost_cells=0,const bool initialize_new_elements=true,const bool copy_existing_elements=true) PHYSBAM_OVERRIDE
+    void Initialize_Array(const int ghost_cells=0,const bool initialize_new_elements=true,const bool copy_existing_elements=true) override
     {GRID_AND_ARRAY_CONTAINER<TV,T>::Initialize_Array(ghost_cells,initialize_new_elements,copy_existing_elements);
     if(semi_lagrangian_collidable){valid_mask_current.Resize(grid.Cell_Indices(3),true,true,true);valid_mask_next.Resize(grid.Cell_Indices(3),false);}}
   
@@ -56,7 +56,7 @@ public:
     {hot_point=hot_point_input;}
 
 //#####################################################################
-    void Euler_Step(const T dt,const T time,const int number_of_ghost_cells) PHYSBAM_OVERRIDE;
+    void Euler_Step(const T dt,const T time,const int number_of_ghost_cells) override;
     void Apply_Cooling(const T dt,const T time);
     void Apply_Individual_Cooling(T& temperature,const T constant);
     void Use_Semi_Lagrangian_Collidable_Advection(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const ARRAY<bool,FACE_INDEX<TV::m> >& face_velocities_valid_mask_input);

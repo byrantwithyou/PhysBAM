@@ -71,10 +71,10 @@ public:
     {Calculate_Bounding_Boxes(bounding_boxes,particles.X);}
        
 //#####################################################################
-    void Initialize_Hierarchy_Using_KD_Tree() PHYSBAM_OVERRIDE;
+    void Initialize_Hierarchy_Using_KD_Tree() override;
     void Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,ARRAY_VIEW<const TV> X);
     void Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,ARRAY_VIEW<const TV> start_X,ARRAY_VIEW<const TV> end_X);
-    void Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) PHYSBAM_OVERRIDE;
+    void Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) override;
 //#####################################################################
 };   
 }

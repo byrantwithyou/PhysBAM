@@ -1275,7 +1275,7 @@ public:
 
     virtual ~FIX_MESH_ENERGY(){}
 
-    void Compute(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const PHYSBAM_OVERRIDE
+    void Compute(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const override
     {
         PHYSBAM_ASSERT(g || !h);
         MARCHING_CUBES_SYSTEM<TV>* mcs=static_cast<MARCHING_CUBES_SYSTEM<TV>*>(h);

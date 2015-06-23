@@ -27,11 +27,11 @@ public:
 //#####################################################################
     OPENGL_FACE_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<3> > &face_values_input,OPENGL_COLOR_MAP<T2> *color_map_input);
     virtual ~OPENGL_FACE_SCALAR_FIELD_3D();
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Slice_Has_Changed() PHYSBAM_OVERRIDE;    
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    void Slice_Has_Changed() override;    
     virtual void Update();  // Call when values or other attributes have changed
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
 //#####################################################################
 };
 }

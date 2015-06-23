@@ -28,31 +28,31 @@ public:
     MARCHING_CUBES_VECTOR(){}
     virtual ~MARCHING_CUBES_VECTOR(){}
 
-    BASE& operator+=(const BASE& bv) PHYSBAM_OVERRIDE
+    BASE& operator+=(const BASE& bv) override
     {x+=debug_cast<const MARCHING_CUBES_VECTOR&>(bv).x;return *this;}
 
-    BASE& operator-=(const BASE& bv) PHYSBAM_OVERRIDE
+    BASE& operator-=(const BASE& bv) override
     {x-=debug_cast<const MARCHING_CUBES_VECTOR&>(bv).x;return *this;}
 
-    BASE& operator*=(const T a) PHYSBAM_OVERRIDE
+    BASE& operator*=(const T a) override
     {x*=a;return *this;}
 
-    void Copy(const T c1,const BASE& bv1) PHYSBAM_OVERRIDE
+    void Copy(const T c1,const BASE& bv1) override
     {x=debug_cast<const MARCHING_CUBES_VECTOR&>(bv1).x*c1;}
 
-    void Copy(const T c1,const BASE& bv1,const BASE& bv2) PHYSBAM_OVERRIDE
+    void Copy(const T c1,const BASE& bv1,const BASE& bv2) override
     {x=debug_cast<const MARCHING_CUBES_VECTOR&>(bv1).x*c1+debug_cast<const MARCHING_CUBES_VECTOR&>(bv2).x;}
 
-    int Raw_Size() const PHYSBAM_OVERRIDE
+    int Raw_Size() const override
     {return x.m*TV::m;}
 
-    T& Raw_Get(int i) PHYSBAM_OVERRIDE
+    T& Raw_Get(int i) override
     {return x(i/TV::m)(i%TV::m);}
 
-    KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE
+    KRYLOV_VECTOR_BASE<T>* Clone_Default() const override
     {MARCHING_CUBES_VECTOR* V=new MARCHING_CUBES_VECTOR;V->x.Resize(x.m);return V;}
 
-    void Resize(const KRYLOV_VECTOR_BASE<T>& bv) PHYSBAM_OVERRIDE
+    void Resize(const KRYLOV_VECTOR_BASE<T>& bv) override
     {x.Resize(debug_cast<const MARCHING_CUBES_VECTOR&>(bv).x.m);}
 };
 }

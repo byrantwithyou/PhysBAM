@@ -34,12 +34,12 @@ public:
 //##################################################################### 
     OPENGL_GRID_3D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White());
     virtual ~OPENGL_GRID_3D();
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Clear_Highlight() PHYSBAM_OVERRIDE;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Clear_Highlight() override;
     void Toggle_Draw_Ghost_Values();
 private:
     void Draw_Subgrid(const TV_INT &node_start,const TV_INT &node_end) const;
@@ -58,7 +58,7 @@ public:
     OPENGL_SELECTION_GRID_CELL_3D(OPENGL_OBJECT<T>* object, const TV_INT &index=TV_INT()) 
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::GRID_CELL_3D, object), index(index) {}
 
-    RANGE<TV> Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<TV> Bounding_Box() const override;
 };
 
 template<class T>
@@ -72,7 +72,7 @@ public:
     OPENGL_SELECTION_GRID_NODE_3D(OPENGL_OBJECT<T>* object, const TV_INT &index=TV_INT())
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::GRID_NODE_3D, object), index(index) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 template<class T>
@@ -86,7 +86,7 @@ public:
     OPENGL_SELECTION_GRID_CELL_LIST_3D(OPENGL_OBJECT<T>* object, const ARRAY<TV_INT> &indicies=ARRAY<TV_INT>()) 
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::GRID_CELL_LIST_3D, object), indicies(indicies) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 template<class T>
@@ -100,7 +100,7 @@ public:
     OPENGL_SELECTION_GRID_NODE_LIST_3D(OPENGL_OBJECT<T>* object, const ARRAY<TV_INT> &indicies=ARRAY<TV_INT>())
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::GRID_NODE_LIST_3D, object), indicies(indicies) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

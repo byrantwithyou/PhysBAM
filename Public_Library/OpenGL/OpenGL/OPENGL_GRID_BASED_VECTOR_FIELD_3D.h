@@ -34,9 +34,9 @@ public:
 
     void Update();  // Call when grid/V change
 
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    virtual void Slice_Has_Changed() PHYSBAM_OVERRIDE { Update(); }
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual void Slice_Has_Changed() override { Update(); }
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
 
 };
 }

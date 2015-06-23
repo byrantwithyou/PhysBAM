@@ -42,20 +42,20 @@ public:
     static EMBEDDING<TV>* Create(GEOMETRY_PARTICLES<TV>& new_particles)
     {EMBEDDING<TV>* embedding=new EMBEDDING<TV>(new_particles);return embedding;}
 
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
     {return LOG::sprintf("EMBEDDING<VECTOR<T,%d> >",TV::dimension);}
 
-    void Update_Number_Nodes() PHYSBAM_OVERRIDE
+    void Update_Number_Nodes() override
     {material_surface.Update_Number_Nodes();}
 
-    void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const PHYSBAM_OVERRIDE
+    void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const override
     {material_surface.Mark_Nodes_Referenced(marks,mark);}
 
-    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    void Read(TYPED_ISTREAM& input) override
     {material_surface.Clean_Memory();Read_Binary(input,material_surface_mesh);}
 
-    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    void Write(TYPED_OSTREAM& output) const override
     {Write_Binary(output,material_surface_mesh);}
 
 //#####################################################################

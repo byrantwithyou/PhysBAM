@@ -7,7 +7,6 @@
 #ifndef __OPENGL_COMPONENT__
 #define __OPENGL_COMPONENT__
 
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <string>
@@ -25,7 +24,7 @@ public:
 
     void Set_Name(const std::string &name) { component_name = name; }
 
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
+    bool Use_Bounding_Box() const override;
 
     virtual bool Valid_Frame(int frame_input) const;
     virtual bool Is_Up_To_Date(int frame) const;

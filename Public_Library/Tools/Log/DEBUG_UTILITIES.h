@@ -7,7 +7,6 @@
 #ifndef __DEBUG_UTILITIES__
 #define __DEBUG_UTILITIES__
 
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <string>
 #include <typeinfo>
 
@@ -42,16 +41,16 @@ namespace DEBUG_UTILITIES{
 void Debug_Breakpoint();
 void Warn_If_Not_Overridden(const char* function,const char* file,unsigned int line,const std::type_info& type);
 void Warning(const std::string& message,const char* function,const char* file,unsigned int line);
-void PHYSBAM_NORETURN(Function_Is_Not_Defined(const char* function,const char* file,unsigned int line,const std::type_info& type));
-void PHYSBAM_NORETURN(Not_Implemented(const char* function,const char* file,unsigned int line)); // three different versions to minimize caller code
-void PHYSBAM_NORETURN(Not_Implemented(const char* function,const char* file,unsigned int line,const char* message));
-void PHYSBAM_NORETURN(Not_Implemented(const char* function,const char* file,unsigned int line,const std::string& message));
-void PHYSBAM_NORETURN(Fatal_Error(const char* function,const char* file,unsigned int line)); // three different versions to minimize caller code
-void PHYSBAM_NORETURN(Fatal_Error(const char* function,const char* file,unsigned int line,const char* message));
-void PHYSBAM_NORETURN(Fatal_Error(const char* function,const char* file,unsigned int line,const std::string& message));
-void PHYSBAM_NORETURN(Assertion_Failed(const char* function,const char* file,unsigned int line,const char* condition)); // three different versions to minimize caller code
-void PHYSBAM_NORETURN(Assertion_Failed(const char* function,const char* file,unsigned int line,const char* condition,const char* message));
-void PHYSBAM_NORETURN(Assertion_Failed(const char* function,const char* file,unsigned int line,const char* condition,const std::string& message));
+[[noreturn]] void Function_Is_Not_Defined(const char* function,const char* file,unsigned int line,const std::type_info& type);
+[[noreturn]] void Not_Implemented(const char* function,const char* file,unsigned int line); // three different versions to minimize caller code
+[[noreturn]] void Not_Implemented(const char* function,const char* file,unsigned int line,const char* message);
+[[noreturn]] void Not_Implemented(const char* function,const char* file,unsigned int line,const std::string& message);
+[[noreturn]] void Fatal_Error(const char* function,const char* file,unsigned int line); // three different versions to minimize caller code
+[[noreturn]] void Fatal_Error(const char* function,const char* file,unsigned int line,const char* message);
+[[noreturn]] void Fatal_Error(const char* function,const char* file,unsigned int line,const std::string& message);
+[[noreturn]] void Assertion_Failed(const char* function,const char* file,unsigned int line,const char* condition); // three different versions to minimize caller code
+[[noreturn]] void Assertion_Failed(const char* function,const char* file,unsigned int line,const char* condition,const char* message);
+[[noreturn]] void Assertion_Failed(const char* function,const char* file,unsigned int line,const char* condition,const std::string& message);
 }
 }
 #endif

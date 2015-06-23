@@ -31,7 +31,7 @@ public:
     if(object->volumetric_shader)volumetric_shader=object->volumetric_shader;
     objects->Append(object);}
 
-    bool Intersection(RAY<TV>& ray,const int lowest_priority,RENDERING_OBJECT<T>** intersected_object)const PHYSBAM_OVERRIDE
+    bool Intersection(RAY<TV>& ray,const int lowest_priority,RENDERING_OBJECT<T>** intersected_object)const override
     {bool hit=false;
     for(int i=0;i<primitives.m;i++){
         if(primitives(i).object->priority>=lowest_priority){
@@ -39,14 +39,14 @@ public:
             if(primitive_i_hit){hit=true;*intersected_object=primitives(i).object;}}}
     return hit;}
 
-    void Preprocess_Efficiency_Structures() PHYSBAM_OVERRIDE
+    void Preprocess_Efficiency_Structures() override
     {for(int i=0;i<objects.m;i++)objects(i)->Get_Aggregate_World_Space_Bounding_Boxes(primitives);
     if(primitives.m>0){
         // construct total bounding box...
         bounding_box.Reset_Bounds(primitives(0).bounding_box);
         for(int i=1;i<objects.m;i++)bounding_box.Enlarge_To_Include_Box(primitives(i).bounding_box);}}
 
-    bool Inside(const TV& location,RENDERING_OBJECT<T>** intersected_object) const PHYSBAM_OVERRIDE
+    bool Inside(const TV& location,RENDERING_OBJECT<T>** intersected_object) const override
     {for(int i=0;i<objects.m;i++){
         if(objects(i)->support_transparent_overlapping_objects&&objects(i)->Inside(location)){
             *intersected_object=(RENDERING_OBJECT<T>*)this;return true;}}

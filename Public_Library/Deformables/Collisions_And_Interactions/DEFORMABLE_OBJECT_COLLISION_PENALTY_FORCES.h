@@ -50,20 +50,20 @@ public:
         T stiffness=(T)1e4,T separation_parameter=(T)1e-4);
     virtual ~DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES();
 
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
-    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    int Velocity_Dependent_Forces_Size() const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) const PHYSBAM_OVERRIDE;
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE;
-    T CFL_Strain_Rate() const PHYSBAM_OVERRIDE;
-    void Initialize_CFL(ARRAY_VIEW<typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE;
-    T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override;
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    int Velocity_Dependent_Forces_Size() const override;
+    void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const override;
+    void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) const override;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    void Enforce_Definiteness(const bool enforce_definiteness_input) override;
+    T CFL_Strain_Rate() const override;
+    void Initialize_CFL(ARRAY_VIEW<typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA> frequency) override;
+    T Potential_Energy(const T time) const override;
     void Update_Position_Based_State_Particle(int p);
     void Update_Penetrating_Particles(int p);
     void Update_Surface_Triangles();
@@ -71,7 +71,7 @@ public:
     void Penalty(VECTOR<int,3> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,4>&>& X,T& e,VECTOR<TV,4>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
     void Penalty(VECTOR<int,2> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,4>&>& X,T& e,VECTOR<TV,4>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
     int Estimate_Closest_Undeformed_Surface_Triangle(const TV& X,int p) const;
-    void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const PHYSBAM_OVERRIDE;
+    void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const override;
 //#####################################################################
 };
 }

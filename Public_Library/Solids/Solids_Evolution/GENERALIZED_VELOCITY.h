@@ -36,19 +36,19 @@ public:
     ~GENERALIZED_VELOCITY();
 
     GENERALIZED_VELOCITY& operator=(const GENERALIZED_VELOCITY& gv);
-    BASE& operator+=(const BASE& bv) PHYSBAM_OVERRIDE;
-    BASE& operator-=(const BASE& bv) PHYSBAM_OVERRIDE;
-    BASE& operator*=(const T a) PHYSBAM_OVERRIDE;
-    void Copy(const T c,const BASE& bv) PHYSBAM_OVERRIDE;
-    void Copy(const T c1,const BASE& bv1,const BASE& bv2) PHYSBAM_OVERRIDE;
+    BASE& operator+=(const BASE& bv) override;
+    BASE& operator-=(const BASE& bv) override;
+    BASE& operator*=(const T a) override;
+    void Copy(const T c,const BASE& bv) override;
+    void Copy(const T c1,const BASE& bv1,const BASE& bv2) override;
     void Pack(ARRAY<T> &velocities) const;
     void Unpack(ARRAY<T> &velocities);
     void Unpack_And_Add(ARRAY<T> &velocities);
-    int Raw_Size() const PHYSBAM_OVERRIDE;
-    T& Raw_Get(int i) PHYSBAM_OVERRIDE;
+    int Raw_Size() const override;
+    T& Raw_Get(int i) override;
     void Exchange(GENERALIZED_VELOCITY<TV>& gv);
-    KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE;
-    void Resize(const KRYLOV_VECTOR_BASE<T>& v) PHYSBAM_OVERRIDE;
+    KRYLOV_VECTOR_BASE<T>* Clone_Default() const override;
+    void Resize(const KRYLOV_VECTOR_BASE<T>& v) override;
 };
 }
 #endif

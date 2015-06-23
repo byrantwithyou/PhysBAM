@@ -44,23 +44,23 @@ public:
     const T Solid_Sign() const
     {return (T)-1;}
 
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const PHYSBAM_OVERRIDE
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const override
     {R=V;}
 
-    void Project(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE
+    void Project(KRYLOV_VECTOR_BASE<T>& V) const override
     {solid_system.Project(V);}
 
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& R) const PHYSBAM_OVERRIDE
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& R) const override
     {return solid_system.Convergence_Norm(R);}
 
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE {}
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& V) const override {}
 
 //#####################################################################
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& BV) const PHYSBAM_OVERRIDE;
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& BV) const override;
     void Send_Generalized_Velocity_To_Fluid(const GENERALIZED_VELOCITY<TV>& V) const;
     void Get_Generalized_Velocity_From_Fluid(GENERALIZED_VELOCITY<TV>& V) const;
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F) const PHYSBAM_OVERRIDE;
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& V0,const KRYLOV_VECTOR_BASE<T>& V1) const PHYSBAM_OVERRIDE;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F) const override;
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& V0,const KRYLOV_VECTOR_BASE<T>& V1) const override;
 //#####################################################################
 };
 }

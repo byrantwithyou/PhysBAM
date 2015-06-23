@@ -10,7 +10,6 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Matrices/MATRIX_FORWARD.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Deformables/Constitutive_Models/CONSTITUTIVE_MODELS_FORWARD.h>
 namespace PhysBAM{
 

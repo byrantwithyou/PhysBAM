@@ -159,31 +159,31 @@ public:
     {}
 
     // Unused callbacks
-    void Initialize_Bodies() PHYSBAM_OVERRIDE {}
-    void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
+    void Initialize_Bodies() override {}
+    void Update_Solids_Parameters(const T time) override {}
     void Update_Rigid_Bodies(const T time) {}
-    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
-    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE {}
-    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return true;}
-    void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
-    void Initialize_Velocities() PHYSBAM_OVERRIDE {}
-    void Initialize_Euler_State() PHYSBAM_OVERRIDE {}
-    void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
-    void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Extrapolate_Phi_Into_Objects(const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
+    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
+    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
+    void Update_Time_Varying_Material_Properties(const T time) override {}
+    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override {}
+    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return true;}
+    void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) override {}
+    void Initialize_Velocities() override {}
+    void Initialize_Euler_State() override {}
+    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
+    void Preprocess_Solids_Substep(const T time,const int substep) override {}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
+    void Apply_Constraints(const T dt,const T time) override {}
+    void Preprocess_Frame(const int frame) override {}
+    void Extrapolate_Phi_Into_Objects(const T time) override {}
+    void Postprocess_Phi(const T time) override {}
+    void Postprocess_Frame(const int frame) override {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     fluids_parameters.Use_No_Fluid_Coupling_Defaults();
     if(test_number==1 || test_number==2 || test_number==3 || test_number==4 || test_number==5 || test_number==6){
@@ -203,14 +203,14 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
-void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
+void Update_Fluid_Parameters(const T dt,const T time) override
 {
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
 }
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################
-void Initialize_Phi() PHYSBAM_OVERRIDE
+void Initialize_Phi() override
 {
     // Not so good to set up a heaviside function here because then the interface will be exactly between the two nodes which can lead to roundoff issues when setting dirichlet cells, etc.
     GRID<TV>& grid=*fluids_parameters.grid;
@@ -275,7 +275,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Analytic_Velocities
 //#####################################################################
-void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
+void Get_Analytic_Velocities(const T time) const override
 {
     PHYSBAM_FATAL_ERROR("broken");
 #if 0
@@ -316,7 +316,7 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Analytic_Velocity
 //#####################################################################
-VECTOR<T,3> Get_Analytic_Velocity(const VECTOR<T,3>& location,const T time) const PHYSBAM_OVERRIDE
+VECTOR<T,3> Get_Analytic_Velocity(const VECTOR<T,3>& location,const T time) const override
 {
     if(test_number==1) return TV((T).5,(T)0,(T)0);
     else if (test_number==2) return TV(root_three_over_three,root_three_over_three,root_three_over_three);
@@ -329,7 +329,7 @@ VECTOR<T,3> Get_Analytic_Velocity(const VECTOR<T,3>& location,const T time) cons
 //#####################################################################
 // Function Adjust_Particle_For_Objects
 //#####################################################################
-bool Adjust_Particle_For_Objects(TV& X,TV& V,const T r, const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE
+bool Adjust_Particle_For_Objects(TV& X,TV& V,const T r, const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) override
 {
     return true;
 }

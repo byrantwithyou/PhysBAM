@@ -46,12 +46,12 @@ public:
         tension=max(tension,eigenvalues.Max());compression=min(compression,eigenvalues.Min());}
     LOG::cout<<"Maximum goal expansion = "<<exp(tension)<<", compression = "<<exp(compression)<<std::endl;}
     
-    bool Project_Fe(const DIAGONAL_MATRIX<T,3>& Fe_trial,DIAGONAL_MATRIX<T,3>& Fe_project) const PHYSBAM_OVERRIDE
+    bool Project_Fe(const DIAGONAL_MATRIX<T,3>& Fe_trial,DIAGONAL_MATRIX<T,3>& Fe_project) const override
     {DIAGONAL_MATRIX<T,3> Fe_log=log(Fe_trial.Max((T)1e-5));T sqr_norm=Fe_log.Frobenius_Norm_Squared();
     if(sqr_norm<=sqr_log_yield_ratio)return false;Fe_log*=sqrt(sqr_log_yield_ratio/sqr_norm);
     Fe_project=exp(Fe_log);return true;}
     
-    void Project_Fp(const int tetrahedron,const MATRIX<T,3>& Fp_trial) PHYSBAM_OVERRIDE
+    void Project_Fp(const int tetrahedron,const MATRIX<T,3>& Fp_trial) override
     {MATRIX<T,3> U,V;DIAGONAL_MATRIX<T,3> Fp_trial_hat;Fp_trial.Fast_Singular_Value_Decomposition(U,Fp_trial_hat,V);
     SYMMETRIC_MATRIX<T,3> log_Fp_trial=SYMMETRIC_MATRIX<T,3>::Conjugate(V,log(Fp_trial_hat.Max((T)1e-5)));
     SYMMETRIC_MATRIX<T,3> log_Fp_trial_minus_log_Fp=log_Fp_trial-log_Fp(tetrahedron);
@@ -60,7 +60,7 @@ public:
     if(t<1)log_Fp_trial=t*log_Fp_trial_minus_log_Fp+log_Fp(tetrahedron);
     log_Fp(tetrahedron)=log_Fp_trial;Fp_inverse(tetrahedron)=exp(-log_Fp_trial);}
     
-    void Read_State(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    void Read_State(TYPED_ISTREAM& input) override
     {PLASTICITY_MODEL<T,3>::Read_State(input);
     for(int t=0;t<Fp_inverse.m;t++)log_Fp(t)=-log(Fp_inverse(t));}
     

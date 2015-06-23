@@ -35,8 +35,8 @@ public:
     virtual ~OPENGL_VECTOR_FIELD_3D();
 
 //#####################################################################
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Display() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    void Display() const override;
     void Scale_Vector_Size(const T scale);
     void Toggle_Arrowhead_Mode();
 //#####################################################################

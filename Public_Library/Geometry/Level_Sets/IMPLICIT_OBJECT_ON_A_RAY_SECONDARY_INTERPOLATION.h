@@ -25,7 +25,7 @@ public:
         :implicit_object(implicit_object_input),ray(ray_input)
     {}
 
-    T operator()(const T x) const PHYSBAM_OVERRIDE
+    T operator()(const T x) const override
     {return implicit_object.Phi_Secondary(ray.Point(x));}
 
 //#####################################################################

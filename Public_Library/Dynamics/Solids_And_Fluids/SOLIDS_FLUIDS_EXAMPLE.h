@@ -79,7 +79,7 @@ public:
     virtual void Melting_Substep(const T dt,const T time);
     virtual void Modify_Fluid_For_Melting(const T dt,const T time);
     virtual void Update_Melting_Substep_Parameters(const T dt,const T time);
-    void After_Initialization() PHYSBAM_OVERRIDE;
+    void After_Initialization() override;
     template<class T_MPI> void Adjust_Output_Directory_For_MPI(const T_MPI mpi);
 //#####################################################################
 };

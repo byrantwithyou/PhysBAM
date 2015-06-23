@@ -9,7 +9,6 @@
 
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Nonlinear_Equations/PARAMETER_SPACE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class F> class NONLINEAR_FUNCTION; // F must be a function type (e.g., T(T) or T(T1,T2))

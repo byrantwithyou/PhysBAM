@@ -9,7 +9,6 @@
 
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
 namespace PhysBAM{
@@ -40,10 +39,10 @@ public:
     virtual ~MPM_FINITE_ELEMENTS();
 
 //#####################################################################
-    void Precompute(const T time,const T dt) PHYSBAM_OVERRIDE;
-    T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
-    void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const PHYSBAM_OVERRIDE;
+    void Precompute(const T time,const T dt) override;
+    T Potential_Energy(const T time) const override;
+    void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const override;
+    void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const override;
 //#####################################################################
 };
 }

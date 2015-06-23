@@ -31,29 +31,29 @@ public:
     virtual ~RENDERING_RING()
     {}
 
-    bool Intersection(RAY<TV>& ray) const    PHYSBAM_OVERRIDE
+    bool Intersection(RAY<TV>& ray) const    override
     {RAY<TV> object_space_ray=Object_Space_Ray(ray);
     if(ring.Intersection(object_space_ray,small_number)){
         ray.semi_infinite=false;ray.t_max=object_space_ray.t_max;ray.aggregate_id=object_space_ray.aggregate_id;return true;}
     else return false;}
 
-    TV Normal(const TV& location,const int aggregate=0) const PHYSBAM_OVERRIDE
+    TV Normal(const TV& location,const int aggregate=0) const override
     {return World_Space_Vector(ring.Normal(Object_Space_Point(location),aggregate));}
 
-    bool Inside(const TV& location) const PHYSBAM_OVERRIDE
+    bool Inside(const TV& location) const override
     {return ring.Inside(Object_Space_Point(location),small_number);}
 
-    bool Outside(const TV& location) const PHYSBAM_OVERRIDE
+    bool Outside(const TV& location) const override
     {return ring.Outside(Object_Space_Point(location),small_number);}
 
-    bool Boundary(const TV& location) const PHYSBAM_OVERRIDE
+    bool Boundary(const TV& location) const override
     {return ring.Boundary(Object_Space_Point(location),small_number);}
 
-    bool Has_Bounding_Box() const  PHYSBAM_OVERRIDE
+    bool Has_Bounding_Box() const  override
     {return true;}
     
     // This is wrong in general!!!  Only works if the two ring points are aligned along the y axis and have x=z=0
-    RANGE<TV> Object_Space_Bounding_Box() const PHYSBAM_OVERRIDE
+    RANGE<TV> Object_Space_Bounding_Box() const override
     {return RANGE<TV>(-ring.outer_radius,ring.outer_radius,min(ring.plane1.x0.y,ring.plane2.x0.y),max(ring.plane1.x0.y,ring.plane2.x0.y),-ring.outer_radius,ring.outer_radius);}
 
 //#####################################################################

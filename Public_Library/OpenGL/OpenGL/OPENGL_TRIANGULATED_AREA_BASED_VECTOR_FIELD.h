@@ -33,7 +33,7 @@ public:
 
     void Update();  // Call when triangulated area/V change
 
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 }
 #endif

@@ -26,7 +26,7 @@ public:
     virtual ~RENDERING_SPHERE_PARTITION()
     {}
 
-    bool Intersection(RAY<VECTOR<T,3> >& ray) const PHYSBAM_OVERRIDE
+    bool Intersection(RAY<VECTOR<T,3> >& ray) const override
     {RAY<VECTOR<T,3> > object_space_ray=Object_Space_Ray(ray);
     if(sphere_partition.Intersection(object_space_ray,small_number)){ray.semi_infinite=false;
         if(material.volumetric && sphere_partition.Inside(object_space_ray.Point((T).5*object_space_ray.t_max),small_number)){
@@ -35,16 +35,16 @@ public:
         ray.t_max=object_space_ray.t_max;ray.aggregate_id=object_space_ray.aggregate_id;return true;}
     else return false;}
 
-    VECTOR<T,3> Normal(const VECTOR<T,3>& location,const int aggregate=0) const PHYSBAM_OVERRIDE
+    VECTOR<T,3> Normal(const VECTOR<T,3>& location,const int aggregate=0) const override
     {return World_Space_Vector(sphere_partition.Normal(Object_Space_Point(location),aggregate));}
 
-    bool Inside(const VECTOR<T,3>& location) const  PHYSBAM_OVERRIDE
+    bool Inside(const VECTOR<T,3>& location) const  override
     {return sphere_partition.Inside(Object_Space_Point(location),small_number);}
 
-    bool Outside(const VECTOR<T,3>& location) const PHYSBAM_OVERRIDE
+    bool Outside(const VECTOR<T,3>& location) const override
     {return sphere_partition.Outside(Object_Space_Point(location),small_number);}
 
-    bool Boundary(const VECTOR<T,3>& location) const PHYSBAM_OVERRIDE
+    bool Boundary(const VECTOR<T,3>& location) const override
     {return sphere_partition.Boundary(Object_Space_Point(location),small_number);}
 
 //#####################################################################

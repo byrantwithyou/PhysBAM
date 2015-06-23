@@ -108,21 +108,21 @@ private:
     return sine_half_psi;}
 public:
 
-    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE
+    void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) override
     {} // TODO: Implement Me?
 
 //#####################################################################
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) PHYSBAM_OVERRIDE;
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
     void Set_Area_Cutoff_With_Fraction_Of_Triangles(TRIANGULATED_SURFACE<T>& triangulated_surface,const T fraction=.01);
     void Set_Quadruples_From_Triangle_Mesh(TRIANGLE_MESH& mesh);
     void Set_Quadruples_From_Reference_Triangle_Mesh(TRIANGLE_MESH& mesh,const ARRAY<int>& triangle_map_to_reference);
     void Set_Constants_From_Particles(const T material_stiffness,const T material_damping);
-    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE;
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
-    T CFL_Strain_Rate() const PHYSBAM_OVERRIDE;
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override;
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    T CFL_Strain_Rate() const override;
     T Compute_Discrete_Shell_Energy();
     void Initialize_Reference_Quantities(const int hash_multiple=2);
     void Copy_Back_Reference_Quantities(const ARRAY<int>& corresponding_node_in_reference_embedded_triangulated_surface);

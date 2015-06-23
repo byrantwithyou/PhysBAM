@@ -59,7 +59,7 @@ public:
 // Function p_rho
 //#####################################################################
 // partial derivative of the pressure - e is not needed
-    T p_rho(const T rho,const T e) const PHYSBAM_OVERRIDE
+    T p_rho(const T rho,const T e) const override
     {
         if(p(rho,e) == p_min) return 0; // pressure no longer depends on density
         else return A*gamma*pow(rho,gamma-1)/pow(rho_not,gamma);
@@ -68,7 +68,7 @@ public:
 // Function p_e
 //#####################################################################
 // partial derivative of the pressure - neither rho nor p is needed
-    T p_e(const T rho,const T e) const PHYSBAM_OVERRIDE
+    T p_e(const T rho,const T e) const override
     {
         return 0; // pressure doesn't depend on internal energy
     }
@@ -76,7 +76,7 @@ public:
 // Function p
 //#####################################################################
 // pressure - e is not needed
-    T p(const T rho,const T e) const PHYSBAM_OVERRIDE
+    T p(const T rho,const T e) const override
     {
         return max(A*(pow(rho/rho_not,gamma)-1)+p_not,p_min);
 
@@ -85,7 +85,7 @@ public:
 // Function rho_From_p_And_e
 //#####################################################################   
 // e is not needed
-    T rho_From_p_And_e(const T p,const T e) const PHYSBAM_OVERRIDE
+    T rho_From_p_And_e(const T p,const T e) const override
     {
         if(p <= p_min){
             LOG::cout << "rho_From_p_And_e ERROR: WHEN p<=p_min, rho IS UNKNOWN!" << std::endl; 
@@ -96,7 +96,7 @@ public:
 // Function e_From_p_And_rho
 //#####################################################################
 // p is not needed
-    T e_From_p_And_rho(const T p,const T rho) const PHYSBAM_OVERRIDE
+    T e_From_p_And_rho(const T p,const T rho) const override
     {
         return A/pow(rho_not,gamma)*pow(rho,gamma-1)/(gamma-1)+(A-p_not)/rho;
     }  

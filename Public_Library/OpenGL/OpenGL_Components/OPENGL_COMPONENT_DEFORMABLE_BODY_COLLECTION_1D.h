@@ -47,30 +47,30 @@ public:
     OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D();
     
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE;
-    void Draw_All_Objects() PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input=true) override;
+    void Draw_All_Objects() override;
 
-    virtual void Display() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual void Display() const override;
+    bool Use_Bounding_Box() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Set_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Set_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Clear_Highlight() override;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
     
-    void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE
+    void Turn_Smooth_Shading_On() override
     {smooth_shading=true;
     for(int i=0;i<point_simplices_1d_objects.m;i++)if(point_simplices_1d_objects(i))point_simplices_1d_objects(i)->Turn_Smooth_Shading_On();}
     
-    void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE
+    void Turn_Smooth_Shading_Off() override
     {smooth_shading=false;
     for(int i=0;i<point_simplices_1d_objects.m;i++)if(point_simplices_1d_objects(i))point_simplices_1d_objects(i)->Turn_Smooth_Shading_Off();}
 
-    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
+    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) override;
 
 
     void Toggle_Active_Value();
@@ -106,7 +106,7 @@ public:
     OPENGL_SELECTION<T>* saved_selection;
 
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D,object) {}
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
     virtual typename OPENGL_SELECTION<T>::TYPE Actual_Type() const {return body_selection->Actual_Type();}
 };
 

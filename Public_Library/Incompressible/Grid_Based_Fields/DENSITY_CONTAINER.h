@@ -49,8 +49,8 @@ public:
     {Set_To_Constant_Value(ambient_density);}
 
 //#####################################################################
-    void Euler_Step(const T dt,const T time,const int number_of_ghost_cells) PHYSBAM_OVERRIDE;
-    void Initialize_Array(const int ghost_cells=0,const bool initialize_new_elements=true,const bool copy_existing_elements=true) PHYSBAM_OVERRIDE;
+    void Euler_Step(const T dt,const T time,const int number_of_ghost_cells) override;
+    void Initialize_Array(const int ghost_cells=0,const bool initialize_new_elements=true,const bool copy_existing_elements=true) override;
     void Use_Semi_Lagrangian_Collidable_Advection(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& body_list,const ARRAY<bool,FACE_INDEX<TV::m> >& face_velocities_valid_mask_input);
     void Fill_Beta_At_Faces(const T dt,const T time,ARRAY<T,FACE_INDEX<TV::m> >& beta_face) const;
     void Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,ARRAY<T,TV_INT>& density_ghost) const;

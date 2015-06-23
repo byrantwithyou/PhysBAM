@@ -1,7 +1,6 @@
 #ifndef Fl_ToggleTree_H
 #define Fl_ToggleTree_H
 
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include "Fl_ToggleNode.h"
 #include "Fl_Tree.h"
 #include <FL/Fl_Pixmap.H>
@@ -25,7 +24,7 @@ public:
   Fl_ToggleTree(int x, int y, int w, int h,const char *label=0);
   virtual ~Fl_ToggleTree();
 
-  int handle(int event) PHYSBAM_OVERRIDE;
+  int handle(int event) override;
 
   void resize(int x,int y,int w,int h)
   {

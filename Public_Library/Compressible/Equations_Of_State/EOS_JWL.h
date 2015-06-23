@@ -55,7 +55,7 @@ public:
 // Function p_rho
 //#####################################################################
 // partial derivative of the pressure 
-    T p_rho(const T rho,const T e) const PHYSBAM_OVERRIDE
+    T p_rho(const T rho,const T e) const override
     {
         return (gamma-1)*e+A0*(R0*rho_not/sqr(rho)-(gamma-1)*(1/rho+1/(R0*rho_not)))*exp(-R0*rho_not/rho)+
                                         A1*(R1*rho_not/sqr(rho)-(gamma-1)*(1/rho+1/(R1*rho_not)))*exp(-R1*rho_not/rho);
@@ -64,7 +64,7 @@ public:
 // Function p_e
 //#####################################################################
 // partial derivative of the pressure - e is not needed
-    T p_e(const T rho,const T e) const PHYSBAM_OVERRIDE
+    T p_e(const T rho,const T e) const override
     {
         return (gamma-1)*rho;
     }
@@ -72,7 +72,7 @@ public:
 // Function p
 //#####################################################################
 // pressure
-    T p(const T rho,const T e) const PHYSBAM_OVERRIDE
+    T p(const T rho,const T e) const override
     {
         return (gamma-1)*rho*e+A0*(1-(gamma-1)*rho/(R0*rho_not))*exp(-R0*rho_not/rho)+
                                                A1*(1-(gamma-1)*rho/(R1*rho_not))*exp(-R1*rho_not/rho);
@@ -80,7 +80,7 @@ public:
 //#####################################################################
 // Function e_From_p_And_rho
 //#####################################################################   
-    T e_From_p_And_rho(const T p,const T rho) const PHYSBAM_OVERRIDE
+    T e_From_p_And_rho(const T p,const T rho) const override
     {
         return (p-A0*(1-(gamma-1)*rho/(R0*rho_not))*exp(-R0*rho_not/rho)
                       -A1*(1-(gamma-1)*rho/(R1*rho_not))*exp(-R1*rho_not/rho))/((gamma-1)*rho);

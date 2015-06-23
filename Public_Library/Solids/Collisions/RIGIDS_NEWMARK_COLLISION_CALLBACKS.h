@@ -7,7 +7,6 @@
 #ifndef __RIGIDS_NEWMARK_COLLISION_CALLBACKS__
 #define __RIGIDS_NEWMARK_COLLISION_CALLBACKS__
 
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Rigids/Collisions/RIGIDS_COLLISION_CALLBACKS.h>
 
 namespace PhysBAM{
@@ -31,24 +30,24 @@ public:
     virtual ~RIGIDS_NEWMARK_COLLISION_CALLBACKS();
 
 //#####################################################################
-    void Reevolve_Body_With_Saved_State(const int p,const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Restore_Positions() PHYSBAM_OVERRIDE;
-    void Restore_Position(const int p) PHYSBAM_OVERRIDE;
-    void Save_Position(const int p) PHYSBAM_OVERRIDE;
-    void Restore_Velocity(const int p) PHYSBAM_OVERRIDE;
-    void Save_Velocity(const int p) PHYSBAM_OVERRIDE;
+    void Reevolve_Body_With_Saved_State(const int p,const T dt,const T time) override;
+    void Restore_Positions() override;
+    void Restore_Position(const int p) override;
+    void Save_Position(const int p) override;
+    void Restore_Velocity(const int p) override;
+    void Save_Velocity(const int p) override;
     void Euler_Step_Position(const int id,const T dt,const T time);
-    void Euler_Step_Position_With_New_Velocity(const int id,const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Swap_State(const int id) PHYSBAM_OVERRIDE;
-    FRAME<TV> Saved_Particle_To_Levelset_Body_Transform(const int levelset_body,const int particle_body) PHYSBAM_OVERRIDE;
-    void Exchange_Frame(const int id) PHYSBAM_OVERRIDE;
+    void Euler_Step_Position_With_New_Velocity(const int id,const T dt,const T time) override;
+    void Swap_State(const int id) override;
+    FRAME<TV> Saved_Particle_To_Levelset_Body_Transform(const int levelset_body,const int particle_body) override;
+    void Exchange_Frame(const int id) override;
     TWIST<TV> Compute_Collision_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,const TV& location,const TV& normal,const TV& relative_velocity,const T coefficient_of_restitution,
-        const T coefficient_of_friction,const bool clamp_friction_magnitude,const bool rolling_friction,const bool clamp_energy) PHYSBAM_OVERRIDE;
-    void Subtract_Stored_Difference(TV& velocity,T_SPIN& momentum,const int particle_index) PHYSBAM_OVERRIDE;
-    void Begin_Fracture(const int body_id) PHYSBAM_OVERRIDE;
-    void End_Fracture(const int body_id,ARRAY<int>& added_bodies) PHYSBAM_OVERRIDE;
-    void Begin_Asymmetric_Collisions(const int body_1,const int body_2) PHYSBAM_OVERRIDE;
-    void End_Asymmetric_Collisions(const int body_1,const int body_2,VECTOR<ARRAY<int>,2>& added_bodies) PHYSBAM_OVERRIDE;
+        const T coefficient_of_friction,const bool clamp_friction_magnitude,const bool rolling_friction,const bool clamp_energy) override;
+    void Subtract_Stored_Difference(TV& velocity,T_SPIN& momentum,const int particle_index) override;
+    void Begin_Fracture(const int body_id) override;
+    void End_Fracture(const int body_id,ARRAY<int>& added_bodies) override;
+    void Begin_Asymmetric_Collisions(const int body_1,const int body_2) override;
+    void End_Asymmetric_Collisions(const int body_1,const int body_2,VECTOR<ARRAY<int>,2>& added_bodies) override;
 //#####################################################################
 };
 }

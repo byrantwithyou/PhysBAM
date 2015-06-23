@@ -74,28 +74,28 @@ public:
         delete arb;
     }
 
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
-    void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
-    void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return false;}
+    void Postprocess_Frame(const int frame) override {}
+    void Preprocess_Solids_Substep(const T time,const int substep) override {}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
+    void Apply_Constraints(const T dt,const T time) override {}
+    void Update_Time_Varying_Material_Properties(const T time) override {}
+    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
+    void Limit_Solids_Dt(T& dt,const T time) override {}
+    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
+    void Preprocess_Frame(const int frame) override {}
+    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
+    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
+    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override {}
+    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
+    void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
+    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return false;}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {
     add_ground=parameter_list.Get_Parameter("add_ground",false);
     RIGID_BODY<TV>* rigid_body=0;
@@ -506,7 +506,7 @@ void PD_Plank_Test(int& num_joints,int& num_rigid_bodies,const TV& shift,const R
 //#####################################################################
 //
 //#####################################################################
-/*void Add_External_Forces(TV& F,TV& torque,const T time) PHYSBAM_OVERRIDE
+/*void Add_External_Forces(TV& F,TV& torque,const T time) override
 {
     if(traditional_pd){
         LOG::cout<<"Adding torque "<<precomputed_pd_torques(fragment_id)<<" to "<<fragment_id<<std::endl;
@@ -517,7 +517,7 @@ void PD_Plank_Test(int& num_joints,int& num_rigid_bodies,const TV& shift,const R
 //#####################################################################
 // Function Set_Kinematic_Positions
 //#####################################################################
-void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE
+void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override
 {
     INTERPOLATION_CURVE<T,TV> motion_curve;
     motion_curve.Add_Control_Point(0,TV(0,0,0));
@@ -527,7 +527,7 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM
 //#####################################################################
 // Update_Solids_Parameters
 //#####################################################################
-void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
+void Update_Solids_Parameters(const T time) override
 {
     if(selection==7){//jitter test
         //jitter_body->Frame().t=TV(0,(T)-.1+(T).2*sin(fmod(100*time,(T)pi)),0);
@@ -556,7 +556,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
             precomputed_pd_torques(parent->particle_index)-=acceleration;
             precomputed_pd_torques(child->particle_index)+=acceleration;}}
 }
-void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
+void Write_Output_Files(const int frame) const override
 {
     BASE::Write_Output_Files(frame);
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;

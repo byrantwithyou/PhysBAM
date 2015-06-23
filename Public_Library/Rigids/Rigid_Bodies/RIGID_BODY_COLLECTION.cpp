@@ -28,7 +28,7 @@ struct ALLOCATE_BODY_HELPER:public ALLOCATE_HELPER<TV>
 {
     RIGID_BODY_COLLECTION<TV>& collection;
     ALLOCATE_BODY_HELPER(RIGID_BODY_COLLECTION<TV>& collection_input):collection(collection_input) {}
-    RIGID_BODY<TV>* Create(int index=0) PHYSBAM_OVERRIDE {return new RIGID_BODY<TV>(collection,true,index);}
+    RIGID_BODY<TV>* Create(int index=0) override {return new RIGID_BODY<TV>(collection,true,index);}
     virtual ~ALLOCATE_BODY_HELPER(){}
 };
 //#####################################################################

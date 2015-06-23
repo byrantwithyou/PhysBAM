@@ -51,13 +51,13 @@ public:
     {return *this;}
 
 //#####################################################################
-    void Delete_Auxiliary_Structures() PHYSBAM_OVERRIDE;
-    void Refresh_Auxiliary_Structures() PHYSBAM_OVERRIDE;
+    void Delete_Auxiliary_Structures() override;
+    void Refresh_Auxiliary_Structures() override;
     void Initialize_Connected_Segments();
     void Initialize_Ordered_Loop_Nodes();
     void Initialize_Straight_Mesh(const int number_of_points,bool loop=false);
     void Initialize_Boundary_Mesh();
-    bool Assert_Consistent() const PHYSBAM_OVERRIDE;
+    bool Assert_Consistent() const override;
 //#####################################################################
 };
 }

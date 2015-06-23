@@ -15,7 +15,6 @@
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>
 #include <Dynamics/Advection_Equations/FIRE_ADVECTION_POLICY.h>
 namespace PhysBAM{

@@ -40,13 +40,13 @@ public:
     void Reset_Scale_Range();
     T2 Pre_Map_Value(const T2 value) const;
 
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Slice_Has_Changed() PHYSBAM_OVERRIDE;    
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    void Slice_Has_Changed() override;    
 
     void Set_Draw_Mode(DRAW_MODE draw_mode);
     virtual void Update();  // Call when values or other attributes have changed
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const override;
 
     // convenience functions
     void Toggle_Draw_Mode();

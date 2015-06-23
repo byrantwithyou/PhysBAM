@@ -68,7 +68,7 @@ T f(const T rho)
 // Function p_rho
 //#####################################################################
 // partial derivative of the pressure
-    T p_rho(const T rho,const T e) const PHYSBAM_OVERRIDE
+    T p_rho(const T rho,const T e) const override
     {
         return (gamma-1)*e+f_prime(rho);
     }
@@ -76,7 +76,7 @@ T f(const T rho)
 // Function p_e
 //#####################################################################
 // partial derivative of the pressure - e is not needed
-    T p_e(const T rho,const T e) const PHYSBAM_OVERRIDE
+    T p_e(const T rho,const T e) const override
     {
         return (gamma-1)*rho;
     }
@@ -84,14 +84,14 @@ T f(const T rho)
 // Function p
 //#####################################################################
 // pressure
-    T p(const T rho,const T e) const PHYSBAM_OVERRIDE
+    T p(const T rho,const T e) const override
     {
         return (gamma-1)*rho*e+f(rho);
     }
 //#####################################################################
 // Function e_From_p_And_rho
 //#####################################################################   
-    T e_From_p_And_rho(const T p,const T rho) const PHYSBAM_OVERRIDE
+    T e_From_p_And_rho(const T p,const T rho) const override
     {
         return (p-f(rho))/((gamma-1)*rho);
     } 

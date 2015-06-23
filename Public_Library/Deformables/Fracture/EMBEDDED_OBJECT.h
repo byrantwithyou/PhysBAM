@@ -154,18 +154,18 @@ public:
     int Add_Embedded_Particle_If_Not_Already_There(const int node1,const int node2,const T interpolation_fraction_input)
     {return Add_Embedded_Particle_If_Not_Already_There(VECTOR<int,2>(node1,node2),interpolation_fraction_input);}
 
-    void Update_Number_Nodes() PHYSBAM_OVERRIDE
+    void Update_Number_Nodes() override
     {simplicial_object.Update_Number_Nodes();embedded_mesh.Set_Number_Nodes(particles.Size());embedded_particles.Update_Number_Nodes();}
 
-    void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const PHYSBAM_OVERRIDE
+    void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const override
     {simplicial_object.Mark_Nodes_Referenced(marks,mark);embedded_object.Mark_Nodes_Referenced(marks,mark);}
 
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
     {return LOG::sprintf("EMBEDDED_OBJECT<T,VECTOR<T,%d>,%d>",TV::dimension,d);}
 
-    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE;
-    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
+    void Read(TYPED_ISTREAM& input) override;
+    void Write(TYPED_OSTREAM& output) const override;
 
 //#####################################################################
     virtual void Clean_Memory();

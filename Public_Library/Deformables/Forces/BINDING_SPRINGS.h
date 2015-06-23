@@ -22,7 +22,7 @@ public:
     ~BINDING_SPRINGS()
     {}
 
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override
     {}
 };
 

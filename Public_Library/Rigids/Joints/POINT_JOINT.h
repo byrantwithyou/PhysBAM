@@ -63,13 +63,13 @@ public:
     {return T_SPIN::Componentwise_Greater_Equal(rotation_limits.min_corner,rotation_limits.max_corner);}
 
 //#####################################################################
-    void Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const PHYSBAM_OVERRIDE;
-    TV Prismatic_Component_Translation() const PHYSBAM_OVERRIDE;
-    void Constrain_Prismatically(TV& translation) const PHYSBAM_OVERRIDE;
-    bool Has_Angular_Constraint() const PHYSBAM_OVERRIDE;
-    void Constrain_Angles(T_SPIN& angles_input) const PHYSBAM_OVERRIDE;
-    void Update_State_From_Joint_Frame(const bool enforce_constraints=true) PHYSBAM_OVERRIDE;
-    void Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix=0) const PHYSBAM_OVERRIDE;
+    void Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const override;
+    TV Prismatic_Component_Translation() const override;
+    void Constrain_Prismatically(TV& translation) const override;
+    bool Has_Angular_Constraint() const override;
+    void Constrain_Angles(T_SPIN& angles_input) const override;
+    void Update_State_From_Joint_Frame(const bool enforce_constraints=true) override;
+    void Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix=0) const override;
 //#####################################################################
 };
 

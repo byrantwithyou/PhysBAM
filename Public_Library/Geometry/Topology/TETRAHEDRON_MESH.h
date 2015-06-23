@@ -87,8 +87,8 @@ public:
     PHYSBAM_FATAL_ERROR();}
 
 //#####################################################################
-    void Delete_Auxiliary_Structures() PHYSBAM_OVERRIDE;
-    void Refresh_Auxiliary_Structures() PHYSBAM_OVERRIDE;
+    void Delete_Auxiliary_Structures() override;
+    void Refresh_Auxiliary_Structures() override;
     void Initialize_Octahedron_Mesh(const int m,const int n,const int p);
     void Initialize_Cube_Mesh(const int m,const int n,const int p); // 5 tetrahedrons per cube
     void Initialize_Prismatic_Cube_Mesh(const int m,const int n,const int p); // 6 tetrahedra per cube
@@ -120,8 +120,8 @@ public:
     int Tetrahedrons_Across_Face(const int tetrahedron,const int node1,const int node2,const int node3,ARRAY<int>& tetrahedrons_across_face) const;
     void Identify_Face_Connected_Components(ARRAY<int>& label);
     void Identify_Edge_Connected_Components(ARRAY<int>& label);
-    bool Assert_Consistent() const PHYSBAM_OVERRIDE;
-    void Set_Number_Nodes(const int number_nodes_input) PHYSBAM_OVERRIDE;
+    bool Assert_Consistent() const override;
+    void Set_Number_Nodes(const int number_nodes_input) override;
 //#####################################################################
 };   
 }

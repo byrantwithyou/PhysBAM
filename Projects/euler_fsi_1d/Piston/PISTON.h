@@ -134,11 +134,11 @@ public:
 
     virtual ~PISTON() {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     //set custom boundary
     if(test_number==4){
@@ -153,7 +153,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Intialize_Euler_State
 //#####################################################################
-void Initialize_Euler_State() PHYSBAM_OVERRIDE
+void Initialize_Euler_State() override
 {
     GRID<TV>& grid=fluids_parameters.euler->grid;
     ARRAY<VECTOR<T,3> ,VECTOR<int,1> >& U=fluids_parameters.euler->U;
@@ -179,7 +179,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
 //#####################################################################
-void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
+void Set_Dirichlet_Boundary_Conditions(const T time) override
 {
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Set_Dirichlet_Boundary_Conditions(time);
     EULER_UNIFORM<TV>& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters)).euler);
@@ -212,7 +212,7 @@ void Get_Neumann_Face_Location(const GRID<TV>& grid_1d,const int face_index,T& l
 //#####################################################################
 // Function Intialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {   
     if(test_number==1 || test_number==4) return;
     RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
@@ -245,14 +245,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Set_Kinematic_Positions
 //#####################################################################
-void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE
+void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override
 {
     if((test_number==2||test_number==3)&&id==piston) frame.t=motion_curve.Value(time);
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
-bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE
+bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override
 {
     if((test_number==2||test_number==3)&&id==piston){twist.linear=TV(piston_speed);return true;}
     return false;
@@ -260,7 +260,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBA
 //#####################################################################
 // Function Limit_Dt
 //#####################################################################
-void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
+void Limit_Dt(T& dt,const T time) override
 {
     if(test_number==1 || test_number==4) return;
     GRID<TV>& grid=fluids_parameters.euler->grid;

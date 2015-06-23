@@ -12,8 +12,8 @@
 #include <Tools/Log/LOG_PRINTF.h>
 #include <Tools/Math_Tools/min.h>
 #include <Tools/Utilities/EXCEPTIONS.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>
+#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
 namespace PhysBAM{
 
 template<class T,class ID> class ARRAY;

@@ -10,7 +10,6 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Matrices/MATRIX.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
 
@@ -37,19 +36,19 @@ public:
 
     virtual ~ARTICULATED_SYSTEM();
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const PHYSBAM_OVERRIDE;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const override;
     void Gather(const ARRAY_VIEW<const TWIST<TV>,JOINT_ID> x,ARRAY_VIEW<TWIST<TV> > y) const;
     void Inverse_Mass(ARRAY_VIEW<TWIST<TV> > x) const;
     void Scatter(const ARRAY_VIEW<const TWIST<TV> > x,ARRAY_VIEW<TWIST<TV>,JOINT_ID> y) const;
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const PHYSBAM_OVERRIDE;
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE;
-    void Project(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE;
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE;
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE;
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const override;
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const override;
+    void Project(KRYLOV_VECTOR_BASE<T>& x) const override;
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const override;
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const override;
     void Initialize();
     void Kinetic_Energy() const;
 protected:
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const PHYSBAM_OVERRIDE;
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const override;
 //#####################################################################
 };
 }

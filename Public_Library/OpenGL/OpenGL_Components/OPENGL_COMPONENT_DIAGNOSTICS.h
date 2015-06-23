@@ -25,11 +25,11 @@ public:
     virtual ~OPENGL_COMPONENT_DIAGNOSTICS();
 private:
     void Reinitialize();
-    void Print_Selection_Info(std::ostream& ostream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;    
-    bool Valid_Frame(int frame) const PHYSBAM_OVERRIDE;
-    void Set_Frame(int frame) PHYSBAM_OVERRIDE;
-    //virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& ostream,OPENGL_SELECTION<T>* selection) const override;    
+    bool Valid_Frame(int frame) const override;
+    void Set_Frame(int frame) override;
+    //virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    bool Use_Bounding_Box() const override;
     void Display() const;
 //#####################################################################
 };

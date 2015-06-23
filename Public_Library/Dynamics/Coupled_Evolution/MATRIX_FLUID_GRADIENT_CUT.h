@@ -33,7 +33,7 @@ public:
     virtual ~MATRIX_FLUID_GRADIENT_CUT();
 
 //#####################################################################
-    void Compute(const ARRAY<bool,FACE_INDEX<d> >& psi_N_domain_boundary) PHYSBAM_OVERRIDE;
+    void Compute(const ARRAY<bool,FACE_INDEX<d> >& psi_N_domain_boundary) override;
 //#####################################################################
 };
 }

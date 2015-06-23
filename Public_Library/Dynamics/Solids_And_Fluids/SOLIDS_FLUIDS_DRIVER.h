@@ -37,10 +37,10 @@ public:
     {example.Postprocess_Frame(frame);}
 
 //#####################################################################
-    void Advance_To_Target_Time(const T target_time) PHYSBAM_OVERRIDE {}
-    void Execute_Main_Program() PHYSBAM_OVERRIDE;
-    void Initialize() PHYSBAM_OVERRIDE;
-    void Simulate_To_Frame(const int frame_input) PHYSBAM_OVERRIDE;
+    void Advance_To_Target_Time(const T target_time) override {}
+    void Execute_Main_Program() override;
+    void Initialize() override;
+    void Simulate_To_Frame(const int frame_input) override;
 //#####################################################################
 };
 }

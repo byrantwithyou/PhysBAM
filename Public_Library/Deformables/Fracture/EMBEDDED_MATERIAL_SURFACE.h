@@ -39,25 +39,25 @@ public:
     EMBEDDED_MATERIAL_SURFACE(T_EMBEDDED_OBJECT& embedded_object);
     virtual ~EMBEDDED_MATERIAL_SURFACE();
 
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
     {return LOG::sprintf("EMBEDDED_MATERIAL_SURFACE<VECTOR<T,%d>,%d>",TV::dimension,d);}
 
-    void Update_Number_Nodes() PHYSBAM_OVERRIDE
+    void Update_Number_Nodes() override
     {embedded_object.Update_Number_Nodes();material_surface.Update_Number_Nodes();}
 
 public:
 
-    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    void Read(TYPED_ISTREAM& input) override
     {material_surface.Clean_Memory();Read_Binary(input,material_surface_mesh,previously_perturbed,embedded_object);}
 
-    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    void Write(TYPED_OSTREAM& output) const override
     {Write_Binary(output,material_surface_mesh,previously_perturbed,embedded_object);}
 
 //#####################################################################
     static typename EMBEDDING_POLICY<TV,d>::EMBEDDING* Create();
     static typename EMBEDDING_POLICY<TV,d>::EMBEDDING* Create(GEOMETRY_PARTICLES<TV>& new_particles);
-    STRUCTURE<TV>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>* particle_indices=0) const PHYSBAM_OVERRIDE;
+    STRUCTURE<TV>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>* particle_indices=0) const override;
     virtual void Create_Material_Surface(const bool verbose=true);
     void Update_Binding_List_From_Embedding(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,bool add_soft_bindings);
     virtual void Perturb_Nodes_For_Collision_Freeness(const T perturb_amount)=0;

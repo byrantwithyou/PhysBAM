@@ -384,11 +384,11 @@ public:
         else
             output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
     }
-    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+    void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Postprocess_Frame
 //#####################################################################
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+    void Postprocess_Frame(const int frame) override
     {
         if(debug_particles.Size()){
             FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
@@ -466,35 +466,35 @@ public:
     }
 
     // Unused callbacks
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
-    void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
-    void Initialize_Euler_State() PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
-    void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Post_Initialization() PHYSBAM_OVERRIDE {}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
+    void Apply_Constraints(const T dt,const T time) override {}
+    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
+    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
+    void Update_Time_Varying_Material_Properties(const T time) override {}
+    void Initialize_Euler_State() override {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
+    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
+    void Update_Solids_Parameters(const T time) override {}
+    void Preprocess_Solids_Substep(const T time,const int substep) override {}
+    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override {}
+    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
+    void Filter_Velocities(const T dt,const T time,const bool velocity_update) override {}
+    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
+    void Preprocess_Substep(const T dt,const T time) override {}
+    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
+    void Post_Initialization() override {}
 
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
-void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
+void Postprocess_Substep(const T dt,const T time) override
 {
     if(test_number==40 && solid_body_collection.rigid_body_collection.rigid_body_particles.frame.m>=3) solid_body_collection.rigid_body_collection.rigid_body_particles.frame(2).t=TV(.5,.5)*scale_length;
 }
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
-void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
+void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override
 {
     for(int i=0;i<constrained_node_positions.m;i++){
         PAIR<int,TV>& node_pair=constrained_node_positions(i);
@@ -503,14 +503,14 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
-void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
+void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override
 {
     for(int i=0;i<deformable_object_enslaved_nodes.m;i++) V(deformable_object_enslaved_nodes(i))=TV();
 }
 //#####################################################################
 // Function Set_External_Positions
 //#####################################################################
-void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
+void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override
 {
     for(int i=0;i<constrained_node_positions.m;i++){
         PAIR<int,TV>& node_pair=constrained_node_positions(i);
@@ -519,7 +519,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     fluids_parameters.Use_Fluid_Coupling_Defaults();
     //if(test_number==43) // use semi-Lagrangian and rasterize structure velocity field onto grid
@@ -528,7 +528,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Preprocess_Frame
 //#####################################################################
-void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+void Preprocess_Frame(const int frame) override
 {
     if(fluids_parameters.use_slip){
         dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution).run_self_tests=run_self_tests;
@@ -542,7 +542,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Initialize_Velocities
 //#####################################################################
-void Initialize_Velocities() PHYSBAM_OVERRIDE
+void Initialize_Velocities() override
 {
     if(test_number==35)
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(0).Fill(velocity_multiplier);
@@ -580,7 +580,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Adjust_Density_And_Temperature_With_Sources
 //#####################################################################
-void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
+void Adjust_Density_And_Temperature_With_Sources(const T time) override
 {
     if(test_number>=9) return;
     BASE::Adjust_Density_And_Temperature_With_Sources(RANGE<TV>(TV((T).45,(T)0),TV((T).55,(T).1)),MATRIX<T,3>::Identity_Matrix(),1,fluids_parameters.temperature_products);
@@ -595,7 +595,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time)
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override
 {
     if(test_number==10 || test_number==11){
         // set left wall velocities
@@ -657,7 +657,7 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bo
 //#####################################################################
 // Function Mark_Outside
 //#####################################################################
-void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
+void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) override
 {
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     for(FACE_ITERATOR<TV> it(*fluids_parameters.grid); it.Valid(); it.Next()){
@@ -667,7 +667,7 @@ void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Mark_Outside
 //#####################################################################
-void Mark_Outside(ARRAY<bool,TV_INT>& outside) PHYSBAM_OVERRIDE
+void Mark_Outside(ARRAY<bool,TV_INT>& outside) override
 {
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     for(CELL_ITERATOR<TV> it(*fluids_parameters.grid); it.Valid(); it.Next()){
@@ -677,7 +677,7 @@ void Mark_Outside(ARRAY<bool,TV_INT>& outside) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Viscosity_Boundary_Along_Ray
 //#####################################################################
-typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const FACE_INDEX<TV::m>& f2,T& theta,T& value) PHYSBAM_OVERRIDE
+typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const FACE_INDEX<TV::m>& f2,T& theta,T& value) override
 {
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused;
@@ -721,7 +721,7 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
 //#####################################################################
 // Function Get_Viscosity_Boundary_Along_Ray
 //#####################################################################
-typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(const TV_INT& c1,const TV_INT& c2,T& theta,T& value) PHYSBAM_OVERRIDE
+typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(const TV_INT& c1,const TV_INT& c2,T& theta,T& value) override
 {
     PHYSBAM_FATAL_ERROR();
     return BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused;
@@ -781,7 +781,7 @@ void Balloon()
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
@@ -1686,14 +1686,14 @@ void Sanity_Test_Stokes_No_Viscosity()
 //#####################################################################
 // Function Limit_Dt
 //#####################################################################
-void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
+void Limit_Dt(T& dt,const T time) override
 {
     if(max_dt && dt>max_dt) dt=max_dt;
 }
 //#####################################################################
 // Function Limit_Dt
 //#####################################################################
-void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
+void Limit_Solids_Dt(T& dt,const T time) override
 {
     if(max_dt && dt>max_dt) dt=max_dt;
 }

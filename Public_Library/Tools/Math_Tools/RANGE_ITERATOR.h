@@ -8,6 +8,7 @@
 #ifndef __RANGE_ITERATOR__
 #define __RANGE_ITERATOR__
 #include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
 namespace PhysBAM{
 template<int d>
 struct RANGE_ITERATOR

@@ -81,13 +81,13 @@ public:
     void Resize_Collision_Arrays_From_Check_Collision()
     {collision_force.Resize(check_collision.m);collision_force_derivative.Resize(check_collision.m);}
 
-    void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE
+    void Enforce_Definiteness(const bool enforce_definiteness_input) override
     {}
 
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override
     {}
 
-    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) PHYSBAM_OVERRIDE
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override
     {if(collision_body_list_id>=COLLISION_GEOMETRY_ID(0) && typeid((*collision_body_list)(collision_body_list_id))==typeid(TETRAHEDRON_COLLISION_BODY<T>)){
         TETRAHEDRON_COLLISION_BODY<T>& collision_body=(TETRAHEDRON_COLLISION_BODY<T>&)((*collision_body_list)(collision_body_list_id));
         collision_body.tetrahedralized_volume.hierarchy->Update_Boxes(collision_body.collision_thickness);
@@ -110,16 +110,16 @@ public:
                     collision_force(p)+=stiffness*separation_parameter*exp(-phi_value/separation_parameter)*normal;
                     collision_force_derivative(p)-=scaled_stiffness*exp(-phi_value/separation_parameter)*SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(normal);}}}}}
 
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override
     {for(int p=0;p<check_collision.m;p++) F(check_collision(p))+=collision_force(p);}
 
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
+    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override
     {for(int p=0;p<check_collision.m;p++) F(check_collision(p))+=collision_force_derivative(p)*V(check_collision(p));}
 
-    T CFL_Strain_Rate() const PHYSBAM_OVERRIDE
+    T CFL_Strain_Rate() const override
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 
 //#####################################################################

@@ -29,8 +29,8 @@ public:
     OPENGL_POINT_SIMPLICES_1D(STREAM_TYPE stream_type,const POINT_SIMPLICES_1D<T>& simplices_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan());
 
 //#####################################################################
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 //#####################################################################
 };
 }

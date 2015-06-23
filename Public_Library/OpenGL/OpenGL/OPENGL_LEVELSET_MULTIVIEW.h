@@ -90,11 +90,11 @@ public:
     void Toggle_Slice_Color_Mode();
     void Toggle_Display_Overlay();
     void Toggle_Smooth_Slice_Texture();
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
-    void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
-    void Slice_Has_Changed() PHYSBAM_OVERRIDE;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    void Turn_Smooth_Shading_On() override;
+    void Turn_Smooth_Shading_Off() override;
+    void Slice_Has_Changed() override;
     const LEVELSET<TV> *Levelset() const;
     void Update();
 private:

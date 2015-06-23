@@ -35,13 +35,13 @@ public:
     using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &filename_input);
     
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
-    void Display() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
+    bool Is_Up_To_Date(int frame) const override { return valid && frame_loaded == frame; }
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
+    void Display() const override;
+    bool Use_Bounding_Box() const override { return draw && valid; }
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     void Set_Vector_Size(const T vector_size);
 

@@ -113,14 +113,14 @@ public:
 
     virtual ~SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM();
 
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& bV) const PHYSBAM_OVERRIDE
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& bV) const override
     {if(run_self_tests) Test_Matrix();}
 
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& bV) const PHYSBAM_OVERRIDE// TODO
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& bV) const override// TODO
     {}
 
 //#####################################################################
-    void Project(KRYLOV_VECTOR_BASE<T>& bV) const PHYSBAM_OVERRIDE;
+    void Project(KRYLOV_VECTOR_BASE<T>& bV) const override;
     //void Project() const;
     void Get_Pressure(const VECTOR_T& V,ARRAY<T,TV_INT>& fluid_pressures) const;
     void Zero_Coupling_Faces_Values(ARRAY<T,FACE_INDEX<TV::m> >& face_array) const;
@@ -132,7 +132,7 @@ public:
     void Print_Matrix(const VECTOR_T& vec) const;
     void Print_Each_Matrix(int n) const;
     T Residual_Linf_Norm(const VECTOR_T& x,const VECTOR_T& rhs) const;
-    //void Apply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const PHYSBAM_OVERRIDE;
+    //void Apply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const override;
     void Test_Matrix() const;
     void Test_Incompressibility(const ARRAY<T,FACE_INDEX<TV::dimension> >& fluid_velocity,const ARRAY<T>& constrained_fluid_velocity) const;
     void Test_Viscosity(const VECTOR_T& V,const VECTOR_T& B) const;
@@ -166,11 +166,11 @@ public:
         const bool use_one_sided_face_velocty_interpolation,ARRAY<T,FACE_INDEX<TV::m> >& fluids_velocity,T mu,bool use_second_order_cut_cell,const LEVELSET<TV>* levelset);
     void Set_Up_RHS(VECTOR_T& V,VECTOR_T& F,const GENERALIZED_VELOCITY<TV>& solids_velocity_star,const ARRAY<T,FACE_INDEX<TV::dimension> >& fluids_velocity_star,
         const ARRAY<T,TV_INT>& p_advected_over_rho_c_squared_dt,const ARRAY<T,TV_INT>& p_advected,const ARRAY<T,TV_INT>& fluid_pressures);
-    virtual void Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const PHYSBAM_OVERRIDE;
-    virtual double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bV0,const KRYLOV_VECTOR_BASE<T>& bV1) const PHYSBAM_OVERRIDE;
-    virtual void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bR) const PHYSBAM_OVERRIDE;  // solve MR=V
+    virtual void Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const override;
+    virtual double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bV0,const KRYLOV_VECTOR_BASE<T>& bV1) const override;
+    virtual void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bR) const override;  // solve MR=V
     T Linf_Norm(const VECTOR_T& bR) const;
-    virtual T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bR) const PHYSBAM_OVERRIDE;
+    virtual T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bR) const override;
     void Apply_Velocity_Update(const VECTOR_T& V,ARRAY<T,FACE_INDEX<TV::dimension> >& fluid_velocity,ARRAY<T,TV_INT>& fluid_pressures,GENERALIZED_VELOCITY<TV>& solid_velocity,
         GENERALIZED_VELOCITY<TV>& force_on_solid,bool want_solid,bool want_fluid) const;
     void Mark_Valid_Faces(ARRAY<bool,FACE_INDEX<TV::m> >& valid) const;

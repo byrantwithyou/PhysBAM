@@ -27,7 +27,7 @@ public:
     {}
 
 //#####################################################################
-    void Add_Cut_Based_On_Phi(const int tetrahedron,const VECTOR<T,4>& tetrahedron_phi) PHYSBAM_OVERRIDE;
+    void Add_Cut_Based_On_Phi(const int tetrahedron,const VECTOR<T,4>& tetrahedron_phi) override;
     void Add_Second_Cut(const int tetrahedron,const TV& fracture_normal,const VECTOR<T,4>* tetrahedron_phi=0);
 private:
     void Add_First_Cut_Based_On_Phi(const int tetrahedron,const VECTOR<T,4>& tetrahedron_phi);
@@ -43,7 +43,7 @@ private:
     void Add_Third_Cut(const int tetrahedron,const TV& fracture_normal,const VECTOR<T,4>* tetrahedron_phi=0);
     void Add_Best_Embedded_Triangle_With_Quad_And_Triangle(const TV& fracture_normal,const int tetrahedron,const VECTOR<T,4>* tetrahedron_phi);
     int Add_Best_Embedded_Triangle_Or_Quad_With_Two_Triangles(const TV& fracture_normal,const int tetrahedron,HYPOTHETICAL_CUT_TETRAHEDRONS<T>& hypothetical_cut);
-    void Add_Cut(const int triangle,const TV& fracture_normal) PHYSBAM_OVERRIDE;
+    void Add_Cut(const int triangle,const TV& fracture_normal) override;
 //#####################################################################
 };
 }

@@ -27,8 +27,8 @@ public:
     {}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u,ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u,const T time) const PHYSBAM_OVERRIDE {} // do nothing
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u,ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const override;
+    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u,const T time) const override {} // do nothing
 //#####################################################################
 };
 //#####################################################################

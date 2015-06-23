@@ -189,11 +189,11 @@ public:
     
     virtual ~SPHERE_EXAMPLE() {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     //set custom boundary
     VECTOR<VECTOR<bool,2>,TV::m> valid_wall;
@@ -238,7 +238,7 @@ void Initialize_Euler_State()
 //#####################################################################
 // Function Intialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {   
     if(test_number==1) return;
 
@@ -250,7 +250,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 }
-void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+void Preprocess_Frame(const int frame) override
 {
     if(fluids_parameters.use_slip){
         dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution).run_self_tests=run_self_tests;
@@ -263,7 +263,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     else if(fluids_parameters.fluid_affects_solid){
         dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION<TV>&>(*solids_evolution).print_matrix_rhs_and_solution=print_matrix;}
 }
-void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
+void Preprocess_Substep(const T dt,const T time) override
 {
     if(transition_to_incompressible){
         eos_smooth_transition->Set_Current_Time(time);

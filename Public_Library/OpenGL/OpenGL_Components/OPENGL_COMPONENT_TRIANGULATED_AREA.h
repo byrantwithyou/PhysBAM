@@ -24,13 +24,13 @@ public:
     OPENGL_COMPONENT_TRIANGULATED_AREA(STREAM_TYPE stream_type,const std::string &filename,const std::string &color_map_filename);
     virtual ~OPENGL_COMPONENT_TRIANGULATED_AREA();
     
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
 
-    void Display() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    bool Use_Bounding_Box() const override { return draw && valid; }
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
 private:
     void Reinitialize();    // Needs to be called after some state changes

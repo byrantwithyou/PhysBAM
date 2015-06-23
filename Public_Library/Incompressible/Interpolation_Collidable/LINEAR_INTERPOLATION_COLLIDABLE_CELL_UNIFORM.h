@@ -37,13 +37,13 @@ public:
     {return From_Base_Node(grid,u,X,INTERPOLATION_UNIFORM<TV,T2>::Clamped_Index_End_Minus_One(grid,u,X),interpolation_valid);}
     
 //#####################################################################
-    T2 Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE;
+    T2 Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const override;
     // TODO: this only works for cells, which would ideally be enforced at compile time
-    T2 From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& cell) const PHYSBAM_OVERRIDE;
+    T2 From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& cell) const override;
     // TODO: this only works for cells, which would ideally be enforced at compile time
     T2 From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& cell,bool& interpolation_valid,VECTOR<T2,2>* extrema=0) const;
-    VECTOR<T2,2> Extrema_Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X) const PHYSBAM_OVERRIDE;
-    VECTOR<T2,2> Extrema_From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X,const TV_INT& cell) const PHYSBAM_OVERRIDE;
+    VECTOR<T2,2> Extrema_Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X) const override;
+    VECTOR<T2,2> Extrema_From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X,const TV_INT& cell) const override;
 protected:
     T2 Trace_And_Get_Value(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& cell,TV_INT* cells,int& valid_mask,const int mask_value=0) const;
     virtual T2 Invalid_Value_Replacement(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& cell,const TV& intersection_point,

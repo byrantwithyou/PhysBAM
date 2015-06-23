@@ -13,7 +13,6 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Read_Write/TYPED_STREAM.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/VECTOR_FORWARD.h>
 #include <string>
 #include <typeinfo>

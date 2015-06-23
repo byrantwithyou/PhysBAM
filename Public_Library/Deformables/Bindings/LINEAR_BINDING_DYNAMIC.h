@@ -34,81 +34,81 @@ public:
     static LINEAR_BINDING_DYNAMIC* Create(GEOMETRY_PARTICLES<TV>& particles)
     {return new LINEAR_BINDING_DYNAMIC(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(particles));}
 
-    virtual int Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual int Name() const override {return Static_Name();}
     static int Static_Name()
     {return 3;}
 
-    TV Embedded_Position() const PHYSBAM_OVERRIDE
+    TV Embedded_Position() const override
     {TV result;for(int i=0;i<parents.m;i++) result+=weights(i)*particles.X(parents(i));
     return result;}
 
-    TV Embedded_Position(ARRAY_VIEW<const TV> X) const PHYSBAM_OVERRIDE
+    TV Embedded_Position(ARRAY_VIEW<const TV> X) const override
     {TV result;for(int i=0;i<parents.m;i++) result+=weights(i)*X(parents(i));
     return result;}
 
-    TV Embedded_Velocity() const  PHYSBAM_OVERRIDE
+    TV Embedded_Velocity() const  override
     {TV result;for(int i=0;i<parents.m;i++) result+=weights(i)*particles.V(parents(i));
     return result;}
 
-    TV Embedded_Velocity(ARRAY_VIEW<const TV> V) const  PHYSBAM_OVERRIDE
+    TV Embedded_Velocity(ARRAY_VIEW<const TV> V) const  override
     {TV result;for(int i=0;i<parents.m;i++) result+=weights(i)*V(parents(i));
     return result;}
 
-    TV Embedded_Velocity(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > twist) const  PHYSBAM_OVERRIDE
+    TV Embedded_Velocity(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > twist) const  override
     {TV result;for(int i=0;i<parents.m;i++) result+=weights(i)*V(parents(i));
     return result;}
 
-    TV Embedded_Acceleration(ARRAY_VIEW<const TV> F,ARRAY_VIEW<const TWIST<TV> > wrench) const PHYSBAM_OVERRIDE
+    TV Embedded_Acceleration(ARRAY_VIEW<const TV> F,ARRAY_VIEW<const TWIST<TV> > wrench) const override
     {TV a;for(int i=0;i<parents.m;i++) a+=weights(i)*particles.one_over_mass(parents(i))*F(parents(i));
     return a;}
 
-    T One_Over_Effective_Mass() const PHYSBAM_OVERRIDE
+    T One_Over_Effective_Mass() const override
     {T result=0;for(int i=0;i<parents.m;i++) result+=sqr(weights(i))*particles.one_over_mass(parents(i));
     return result;}
 
-    SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const PHYSBAM_OVERRIDE
+    SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const override
     {return SYMMETRIC_MATRIX<T,TV::m>()+LINEAR_BINDING_DYNAMIC::One_Over_Effective_Mass();}
 
-    void Apply_Impulse(const TV& impulse) PHYSBAM_OVERRIDE
+    void Apply_Impulse(const TV& impulse) override
     {LINEAR_BINDING_DYNAMIC::Apply_Impulse(impulse,particles.V);}
 
-    void Apply_Impulse(const TV& impulse,ARRAY_VIEW<TV> V) const PHYSBAM_OVERRIDE
+    void Apply_Impulse(const TV& impulse,ARRAY_VIEW<TV> V) const override
     {for(int i=0;i<parents.m;i++) V(parents(i))+=particles.one_over_mass(parents(i))*weights(i)*impulse;}
 
-    void Apply_Impulse(const TV& impulse,ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > rigid_V) const PHYSBAM_OVERRIDE
+    void Apply_Impulse(const TV& impulse,ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > rigid_V) const override
     {LINEAR_BINDING_DYNAMIC::Apply_Impulse(impulse,particles.V);}
 
-    void Apply_Push(const TV& impulse) PHYSBAM_OVERRIDE
+    void Apply_Push(const TV& impulse) override
     {for(int i=0;i<parents.m;i++) particles.X(parents(i))+=particles.one_over_mass(parents(i))*weights(i)*impulse;}
 
-    void Apply_Displacement_To_Parents_Based_On_Embedding(const TV& dX,const ARRAY<bool>* skip_particle) PHYSBAM_OVERRIDE
+    void Apply_Displacement_To_Parents_Based_On_Embedding(const TV& dX,const ARRAY<bool>* skip_particle) override
     {T one_over_weights_squared=1/weights.Magnitude_Squared();
     for(int i=0;i<parents.m;i++) if(!skip_particle || !(*skip_particle)(parents(i))) particles.X(parents(i))+=one_over_weights_squared*weights(i)*dX;}
 
-    void Apply_Velocity_Change_To_Parents_Based_On_Embedding(const TV& dV,const ARRAY<bool>* skip_particle) PHYSBAM_OVERRIDE
+    void Apply_Velocity_Change_To_Parents_Based_On_Embedding(const TV& dV,const ARRAY<bool>* skip_particle) override
     {T one_over_weights_squared=1/weights.Magnitude_Squared();
     for(int i=0;i<parents.m;i++) if(!skip_particle || !(*skip_particle)(parents(i))) particles.V(parents(i))+=one_over_weights_squared*weights(i)*dV;}
 
-    void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,const TV& force) const PHYSBAM_OVERRIDE
+    void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,const TV& force) const override
     {for(int i=0;i<parents.m;i++) F_full(parents(i))+=weights(i)*force;}
 
-    void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > wrench_full,const TV& force) const PHYSBAM_OVERRIDE
+    void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > wrench_full,const TV& force) const override
     {for(int i=0;i<parents.m;i++) F_full(parents(i))+=weights(i)*force;}
 
-    void Distribute_Mass_To_Parents(ARRAY_VIEW<T> mass_full) const PHYSBAM_OVERRIDE
+    void Distribute_Mass_To_Parents(ARRAY_VIEW<T> mass_full) const override
     {for(int i=0;i<parents.m;i++) mass_full(parents(i))+=weights(i)*particles.mass(particle_index);}
 
-    void Parents(ARRAY<int>& p) const PHYSBAM_OVERRIDE
+    void Parents(ARRAY<int>& p) const override
     {p.Append_Elements(parents);}
 
-    void Weights(ARRAY<T>& w) const PHYSBAM_OVERRIDE
+    void Weights(ARRAY<T>& w) const override
     {w.Append_Elements(weights);}
 
 private:
-    void Read_Helper(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    void Read_Helper(TYPED_ISTREAM& input) override
     {BINDING<TV>::Read_Helper(input);Read_Binary(input,parents,weights);}
 
-    void Write_Helper(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    void Write_Helper(TYPED_OSTREAM& output) const override
     {BINDING<TV>::Write_Helper(output);Write_Binary(output,parents,weights);}
 
 //#####################################################################

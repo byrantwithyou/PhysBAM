@@ -36,7 +36,7 @@ public:
     T Inverse_Polynomial(const T a,const T alpha) const
     {return a*pow((T)1-alpha,exponent);}
   
-    virtual T one_over_c(const T rho,const T e) const PHYSBAM_OVERRIDE
+    virtual T one_over_c(const T rho,const T e) const override
     {T one_over_c_real=T_EOS::one_over_c(rho,e);
     if(t_current<t_start_transition) return one_over_c_real;
     else if(t_current>t_end_transition) return one_over_c_incompressible;

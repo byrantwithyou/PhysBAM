@@ -23,17 +23,17 @@ public:
     OPENGL_COMPONENT_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,const std::string &filename, bool use_display_list = true);
     virtual ~OPENGL_COMPONENT_TRIANGULATED_SURFACE();
     
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
 
-    void Display() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE { return draw && valid; }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    bool Use_Bounding_Box() const override { return draw && valid; }
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) { return opengl_triangulated_surface.Get_Selection(buffer,buffer_size); }
-    virtual void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE { opengl_triangulated_surface.Highlight_Selection(selection); }
-    virtual void Clear_Highlight() PHYSBAM_OVERRIDE { opengl_triangulated_surface.Clear_Highlight(); }
+    virtual void Highlight_Selection(OPENGL_SELECTION<T>* selection) override { opengl_triangulated_surface.Highlight_Selection(selection); }
+    virtual void Clear_Highlight() override { opengl_triangulated_surface.Clear_Highlight(); }
 
 private:
     void Reinitialize();    // Needs to be called after some state changes

@@ -28,7 +28,7 @@ public:
     ~OPENGL_LEVELSET_1D()
     {}
 
-    void Display() const PHYSBAM_OVERRIDE
+    void Display() const override
     {
         OPENGL_SCALAR_FIELD_1D<T,T>::Display();
     }

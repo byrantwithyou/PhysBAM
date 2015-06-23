@@ -79,7 +79,7 @@ public:
     {if(isotropic_scattering)return VOLUMETRIC_SHADER<T>::Isotropic_Phase_Function(incoming,outgoing);
     else return VOLUMETRIC_SHADER<T>::Henyey_Greenstein_Phase_Function(incoming,outgoing,phase_function_g);}
    
-    VECTOR<T,3> Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const VECTOR<T,3>& color) PHYSBAM_OVERRIDE
+    VECTOR<T,3> Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const VECTOR<T,3>& color) override
     {const RENDERING_VOXELS<T>* voxel_object=(const RENDERING_VOXELS<T>*)&object;
     T start_t,end_t;
     if(!INTERSECTION::Get_Intersection_Range(ray.ray,voxel_object->box,start_t,end_t))return color;
@@ -109,7 +109,7 @@ public:
         current_t-=current_volumetric_step;}
     return attenuated_color;}
 
-    VECTOR<T,3> Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const VECTOR<T,3>& light_color) PHYSBAM_OVERRIDE
+    VECTOR<T,3> Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const VECTOR<T,3>& light_color) override
     {return light_color;}
 
 //#####################################################################

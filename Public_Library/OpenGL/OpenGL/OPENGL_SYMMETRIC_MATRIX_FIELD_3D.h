@@ -31,12 +31,12 @@ public:
         :OPENGL_OBJECT<T>(stream_type),grid(grid_input),field(field_input),positive_color(positive_color_input),negative_color(negative_color_input),size(size_input)
     {}
 
-    void Slice_Has_Changed() PHYSBAM_OVERRIDE
+    void Slice_Has_Changed() override
     {Update();}
 
-    void Display() const PHYSBAM_OVERRIDE;
+    void Display() const override;
     virtual void Update();
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 //##################################################################### 
 };
 }

@@ -29,9 +29,9 @@ public:
     LOG_ENTRY* Get_New_Scope(LOG_CLASS& instance,const std::string& new_scope_identifier,const std::string& new_name);
     LOG_ENTRY* Get_New_Item(LOG_CLASS& instance,const std::string& new_name);
     LOG_ENTRY* Get_Pop_Scope(LOG_CLASS& instance);
-    void Start_XML(LOG_CLASS& instance) PHYSBAM_OVERRIDE;
-    void Dump_Log(FILE* output) PHYSBAM_OVERRIDE;
-    void Dump_Names(FILE* output) PHYSBAM_OVERRIDE;
+    void Start_XML(LOG_CLASS& instance) override;
+    void Dump_Log(FILE* output) override;
+    void Dump_Names(FILE* output) override;
 
 //##################################################################### 
 };

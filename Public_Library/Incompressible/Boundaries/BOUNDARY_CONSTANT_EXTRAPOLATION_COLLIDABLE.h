@@ -24,8 +24,8 @@ public:
     {}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<T2,TV_INT>& u,const T time) const PHYSBAM_OVERRIDE {} // do nothing
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const override;
+    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<T2,TV_INT>& u,const T time) const override {} // do nothing
     void Collision_Aware_Extrapolate(const GRID<TV>& grid,ARRAY<T2,TV_INT>& u_ghost,const TV_INT& source_index,const TV_INT& ghost_index,const TV& direction,const T ray_length);
 //#####################################################################
 };

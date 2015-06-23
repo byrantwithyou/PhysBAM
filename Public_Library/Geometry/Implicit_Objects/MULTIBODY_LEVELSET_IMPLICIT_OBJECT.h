@@ -37,37 +37,37 @@ public:
 
     static MULTIBODY_LEVELSET_IMPLICIT_OBJECT* Create();
     void Delete_Pointers_And_Clean_Memory();
-    void Update_Box() PHYSBAM_OVERRIDE;
-    void Update_Minimum_Cell_Size(const int maximum_depth=0) PHYSBAM_OVERRIDE;
-    T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const  PHYSBAM_OVERRIDE; // TODO: make this check overlap with the grids.
-    T operator()(const TV& location) const PHYSBAM_OVERRIDE;
+    void Update_Box() override;
+    void Update_Minimum_Cell_Size(const int maximum_depth=0) override;
+    T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const  override; // TODO: make this check overlap with the grids.
+    T operator()(const TV& location) const override;
     T Phi_With_Index(const TV& location,int& levelset_index) const;
-    T Extended_Phi(const TV& location) const PHYSBAM_OVERRIDE;
-    T Phi_Secondary(const TV& location) const PHYSBAM_OVERRIDE; // TODO: implement this, but need Phi_Secondary_Extended()!
-    TV Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE;
-    TV Extended_Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE;
-    void Compute_Normals()  PHYSBAM_OVERRIDE;
-    void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true) PHYSBAM_OVERRIDE;
-    void Inflate(const T inflation_distance) PHYSBAM_OVERRIDE;
-    T Integration_Step(const T phi) const PHYSBAM_OVERRIDE;
-    T Minimum_Cell_Size() const  PHYSBAM_OVERRIDE;
-    bool Lazy_Inside(const TV& location,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Inside_And_Value(const TV& location,T& phi_value,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Inside_Extended_Levelset(const TV& unclamped_X,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Inside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Outside(const TV& location,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Outside_Extended_Levelset(const TV& unclamped_X,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value=0) const PHYSBAM_OVERRIDE;
-    T Min_Phi() const PHYSBAM_OVERRIDE;
-    void Rescale(const T scaling_factor) PHYSBAM_OVERRIDE;
-    void Translate(const TV& translation) PHYSBAM_OVERRIDE;
-    VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE;
-    virtual std::string Name() const PHYSBAM_OVERRIDE;
+    T Extended_Phi(const TV& location) const override;
+    T Phi_Secondary(const TV& location) const override; // TODO: implement this, but need Phi_Secondary_Extended()!
+    TV Normal(const TV& location,const int aggregate=-1) const override;
+    TV Extended_Normal(const TV& location,const int aggregate=-1) const override;
+    void Compute_Normals()  override;
+    void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true) override;
+    void Inflate(const T inflation_distance) override;
+    T Integration_Step(const T phi) const override;
+    T Minimum_Cell_Size() const  override;
+    bool Lazy_Inside(const TV& location,const T contour_value=0) const override;
+    bool Lazy_Inside_And_Value(const TV& location,T& phi_value,const T contour_value=0) const override;
+    bool Lazy_Inside_Extended_Levelset(const TV& unclamped_X,const T contour_value=0) const override;
+    bool Lazy_Inside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value=0) const override;
+    bool Lazy_Outside(const TV& location,const T contour_value=0) const override;
+    bool Lazy_Outside_Extended_Levelset(const TV& unclamped_X,const T contour_value=0) const override;
+    bool Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value=0) const override;
+    T Min_Phi() const override;
+    void Rescale(const T scaling_factor) override;
+    void Translate(const TV& translation) override;
+    VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const override;
+    virtual std::string Name() const override;
     static std::string Static_Name();
-    virtual std::string Extension() const PHYSBAM_OVERRIDE;
+    virtual std::string Extension() const override;
     static std::string Static_Extension();
-    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE; // TODO -- fix to read/write levelsets
-    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
+    void Read(TYPED_ISTREAM& input) override; // TODO -- fix to read/write levelsets
+    void Write(TYPED_OSTREAM& output) const override;
 //###########################################################################
 };
 }

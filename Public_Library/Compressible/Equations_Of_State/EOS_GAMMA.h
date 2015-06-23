@@ -60,7 +60,7 @@ public:
 // Function p_rho
 //#####################################################################
 // partial derivative of the pressure - rho is not needed
-    T1 p_rho(const T1 rho,const T1 e) const PHYSBAM_OVERRIDE
+    T1 p_rho(const T1 rho,const T1 e) const override
     {
         return (gamma-1)*(e-e_not);
     }
@@ -68,7 +68,7 @@ public:
 // Function p_e
 //#####################################################################
 // partial derivative of the pressure - e is not needed
-    T1 p_e(const T1 rho,const T1 e) const PHYSBAM_OVERRIDE
+    T1 p_e(const T1 rho,const T1 e) const override
     {
         return (gamma-1)*rho;
     }
@@ -76,21 +76,21 @@ public:
 // Function p
 //#####################################################################
 // pressure
-    T1 p(const T1 rho,const T1 e) const PHYSBAM_OVERRIDE
+    T1 p(const T1 rho,const T1 e) const override
     {
         return (gamma-1)*rho*(e-e_not);
     }
 //#####################################################################
 // Function rho_From_p_And_e
 //#####################################################################   
-    T1 rho_From_p_And_e(const T1 p,const T1 e) const PHYSBAM_OVERRIDE
+    T1 rho_From_p_And_e(const T1 p,const T1 e) const override
     {
         return p/((gamma-1)*(e-e_not));
     }
 //#####################################################################
 // Function e_From_p_And_rho
 //#####################################################################   
-    T1 e_From_p_And_rho(const T1 p,const T1 rho) const PHYSBAM_OVERRIDE
+    T1 e_From_p_And_rho(const T1 p,const T1 rho) const override
     {
         return p/((gamma-1)*rho)+e_not;
     } 
@@ -98,7 +98,7 @@ public:
 // Function T
 //#####################################################################   
 // temperature - rho is not needed
-    T1 T(const T1 rho,const T1 e) const PHYSBAM_OVERRIDE
+    T1 T(const T1 rho,const T1 e) const override
     {
         return (e-e_not)/Cv;
     }       
@@ -106,7 +106,7 @@ public:
 // Function e_From_T_And_rho
 //#####################################################################   
 // rho is not needed
-    T1 e_From_T_And_rho(const T1 T,const T1 rho) const PHYSBAM_OVERRIDE
+    T1 e_From_T_And_rho(const T1 T,const T1 rho) const override
     {
         return e_not+Cv*T;
     }  
@@ -114,28 +114,28 @@ public:
 // Function S
 //#####################################################################   
 // entropy
-    T1 S(const T1 rho,const T1 e) const PHYSBAM_OVERRIDE
+    T1 S(const T1 rho,const T1 e) const override
     {
         return p(rho,e)/pow(rho,gamma);
     }     
 //#####################################################################
 // Function rho_From_S_And_e
 //#####################################################################
-    T1 rho_From_S_And_e(const T1 S,const T1 e) const PHYSBAM_OVERRIDE
+    T1 rho_From_S_And_e(const T1 S,const T1 e) const override
     {
         return pow((gamma-1)*e/S,1/(gamma-1));
     }
 //#####################################################################
 // Function e_From_S_And_rho
 //#####################################################################
-    T1 e_From_S_And_rho(const T1 S,const T1 rho) const PHYSBAM_OVERRIDE
+    T1 e_From_S_And_rho(const T1 S,const T1 rho) const override
     {
         return e_not+S*pow(rho,gamma-1)/(gamma-1);
     } 
 //#####################################################################
 // Function rho_From_p_And_T
 //#####################################################################
-    T1 rho_From_p_And_T(const T1 p,const T1 T) const PHYSBAM_OVERRIDE
+    T1 rho_From_p_And_T(const T1 p,const T1 T) const override
     {
         return p/(R*T);
     }
@@ -143,21 +143,21 @@ public:
 // Function e_From_p_And_T
 //#####################################################################
 // p is not needed
-    T1 e_From_p_And_T(const T1 p,const T1 T) const PHYSBAM_OVERRIDE
+    T1 e_From_p_And_T(const T1 p,const T1 T) const override
     {
         return e_not+Cv*T;
     }
 //#####################################################################
 // Function rho_From_p_And_S
 //#####################################################################
-    T1 rho_From_p_And_S(const T1 p,const T1 S) const PHYSBAM_OVERRIDE
+    T1 rho_From_p_And_S(const T1 p,const T1 S) const override
     {
         return pow(p/S,1/gamma);
     }
 //#####################################################################
 // Function e_From_p_And_S
 //#####################################################################
-    T1 e_From_p_And_S(const T1 p,const T1 S) const PHYSBAM_OVERRIDE
+    T1 e_From_p_And_S(const T1 p,const T1 S) const override
     {
         return e_From_S_And_rho(S,rho_From_p_And_S(p,S));
     }  

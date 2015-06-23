@@ -56,11 +56,11 @@ public:
         output_directory=LOG::sprintf("ARB_Example/output_%d",test_number);
     }
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {
     arb=&solid_body_collection.rigid_body_collection.articulated_rigid_body;
 
@@ -265,7 +265,7 @@ void Five_Blocks()
 //#####################################################################
 // Function Update_Solids_Parameters
 //#####################################################################
-void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE{
+void Update_Solids_Parameters(const T time) override{
 #if 0
     collision_manager.hash.Insert(PAIR<int,int>(id1,id2));
     collision_manager.hash.Insert(PAIR<int,int>(id2,id1));

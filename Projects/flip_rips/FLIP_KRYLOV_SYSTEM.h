@@ -43,7 +43,7 @@ public:
 
     virtual ~FLIP_KRYLOV_SYSTEM(){}
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const PHYSBAM_OVERRIDE
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const override
     {
         const FLIP_KRYLOV_VECTOR<TV>& xx=debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(x);
         FLIP_KRYLOV_VECTOR<TV>& r=debug_cast<FLIP_KRYLOV_VECTOR<TV>&>(result);
@@ -65,7 +65,7 @@ public:
             r.p(index)*=-dt*one_over_dx_squared;}
     }
 
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const PHYSBAM_OVERRIDE
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const override
     {
         const FLIP_KRYLOV_VECTOR<TV>& xx=debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(x);
         const FLIP_KRYLOV_VECTOR<TV>& yy=debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(y);
@@ -82,7 +82,7 @@ public:
         return result;
     }
 
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const override
     {
         const FLIP_KRYLOV_VECTOR<TV>& xx=debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(x);
 
@@ -99,13 +99,13 @@ public:
         return result;
     }
 
-    void Project(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE{}
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE {}
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE {}
+    void Project(KRYLOV_VECTOR_BASE<T>& x) const override{}
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const override {}
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const override {}
 
 protected:
 
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const PHYSBAM_OVERRIDE
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const override
     {
         const FLIP_KRYLOV_VECTOR<TV>& xx=debug_cast<const FLIP_KRYLOV_VECTOR<TV>&>(x);
         FLIP_KRYLOV_VECTOR<TV>& r=debug_cast<FLIP_KRYLOV_VECTOR<TV>&>(result);

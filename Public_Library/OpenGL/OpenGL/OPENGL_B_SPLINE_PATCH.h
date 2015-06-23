@@ -29,13 +29,13 @@ public:
                                 const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input);
     virtual ~OPENGL_B_SPLINE_PATCH();
 
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Clear_Highlight() override;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
     void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,4>* transform) const;
 
     OPENGL_SELECTION<T>* Get_Vertex_Selection(int index);
@@ -92,7 +92,7 @@ public:
     OPENGL_SELECTION_B_SPLINE_PATCH_VERTEX(OPENGL_OBJECT<T>* object, int index=0) 
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::B_SPLINE_PATCH_VERTEX, object), index(index) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 template<class T>
@@ -104,7 +104,7 @@ public:
     OPENGL_SELECTION_B_SPLINE_PATCH_ELEMENT(OPENGL_OBJECT<T>* object, int index=0) 
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::B_SPLINE_PATCH_ELEMENT, object), index(index) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

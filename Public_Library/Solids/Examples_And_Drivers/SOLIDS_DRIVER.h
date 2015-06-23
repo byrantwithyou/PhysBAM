@@ -37,13 +37,13 @@ public:
 
 //#####################################################################
     virtual void Preprocess_Frame(const int frame);
-    void Execute_Main_Program() PHYSBAM_OVERRIDE;
-    void Simulate_To_Frame(const int frame_input) PHYSBAM_OVERRIDE;
-    void Initialize() PHYSBAM_OVERRIDE;
-    void Advance_To_Target_Time(const T target_time) PHYSBAM_OVERRIDE;
+    void Execute_Main_Program() override;
+    void Simulate_To_Frame(const int frame_input) override;
+    void Initialize() override;
+    void Advance_To_Target_Time(const T target_time) override;
     void Postprocess_Frame(const int frame);
     T Compute_Dt(const T time,const T target_time,bool& done);
-    void Write_Output_Files(const int frame) PHYSBAM_OVERRIDE;
+    void Write_Output_Files(const int frame) override;
     void Setup_Solids(const T time,const int substep);
     void Solid_Position_Update(const T dt,const int substep);
     void Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep);

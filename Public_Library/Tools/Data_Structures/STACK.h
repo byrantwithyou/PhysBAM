@@ -8,6 +8,7 @@
 #define __STACK__
 
 #include <Tools/Arrays/ARRAY.h>
+#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
 namespace PhysBAM{
 
 template<class T>

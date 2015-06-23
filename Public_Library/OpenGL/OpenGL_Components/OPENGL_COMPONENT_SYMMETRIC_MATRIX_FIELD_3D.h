@@ -39,31 +39,31 @@ public:
     virtual ~OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D()
     {}
 
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE
+    bool Valid_Frame(int frame_input) const override
     {return FILE_UTILITIES::Frame_File_Exists(field_filename,frame_input);}
 
-    bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE
+    bool Is_Up_To_Date(int frame) const override
     {return valid && frame_loaded==frame;}
 
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE
+    void Set_Frame(int frame_input) override
     {OPENGL_COMPONENT<T>::Set_Frame(frame_input);Reinitialize();}
 
-    void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE
+    void Set_Draw(bool draw_input=true) override
     {OPENGL_COMPONENT<T>::Set_Draw(draw_input);Reinitialize();}
 
-    void Display() const PHYSBAM_OVERRIDE
+    void Display() const override
     {if(valid&&draw)opengl_symmetric_matrix_field.Display();}
     
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE
+    bool Use_Bounding_Box() const override
     {return draw&&valid;}
 
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override
     {if(valid&&draw)return opengl_symmetric_matrix_field.Bounding_Box();return RANGE<VECTOR<T,3> >::Centered_Box();}
 
-    void Set_Slice(OPENGL_SLICE* slice_input) PHYSBAM_OVERRIDE
+    void Set_Slice(OPENGL_SLICE* slice_input) override
     {slice=slice_input;opengl_symmetric_matrix_field.Set_Slice(slice_input);}
 
-    void Slice_Has_Changed() PHYSBAM_OVERRIDE
+    void Slice_Has_Changed() override
     {opengl_symmetric_matrix_field.Slice_Has_Changed();} 
 
     void Increase_Size()

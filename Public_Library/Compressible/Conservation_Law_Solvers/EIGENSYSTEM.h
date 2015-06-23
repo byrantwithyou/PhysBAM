@@ -10,7 +10,6 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Matrices/MATRIX.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 

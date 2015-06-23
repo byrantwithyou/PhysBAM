@@ -112,8 +112,8 @@ public:
     bool Simulate_Compressible_Fluids() const;
     bool Simulate_Fluids() const;
     bool Simulate_Solids() const;
-    void Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update) PHYSBAM_OVERRIDE;
-    void Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies) PHYSBAM_OVERRIDE;
+    void Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update) override;
+    void Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies) override;
     void Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt=false);
     BACKWARD_EULER_SYSTEM<TV>* Setup_Solids(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update,const bool leakproof_solve);
     void Setup_Fluids(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T current_position_time,const T dt,const bool leakproof_solve);

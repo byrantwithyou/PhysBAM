@@ -11,7 +11,6 @@
 #include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM_FORWARD.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class TV,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<TV>

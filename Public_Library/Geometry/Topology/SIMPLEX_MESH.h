@@ -10,7 +10,6 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 

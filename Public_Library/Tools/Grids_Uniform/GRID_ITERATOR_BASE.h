@@ -9,6 +9,7 @@
 #ifndef __GRID_ITERATOR_BASE__
 #define __GRID_ITERATOR_BASE__
 #include <Tools/Grids_Uniform/GRID.h>
+#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
 
 namespace PhysBAM{
 

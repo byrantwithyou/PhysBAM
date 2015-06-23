@@ -74,28 +74,28 @@ public:
     {}
 
     // unused callbacks
-    void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Extrapolate_Phi_Into_Objects(const T time) PHYSBAM_OVERRIDE {}
-    void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE {}
-    void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
+    void Limit_Solids_Dt(T& dt,const T time) override {}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
+    void Apply_Constraints(const T dt,const T time) override {}
+    void Preprocess_Frame(const int frame) override {}
+    void Extrapolate_Phi_Into_Objects(const T time) override {}
+    void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time) override {}
+    void Postprocess_Phi(const T time) override {}
+    void Postprocess_Frame(const int frame) override {}
+    void Adjust_Density_And_Temperature_With_Sources(const T time) override {}
+    void Limit_Dt(T& dt,const T time) override {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Flame_Speed_Multiplier
 //#####################################################################
-void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
+void Get_Flame_Speed_Multiplier(const T dt,const T time) override
 {
 }
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################
-void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
+void Update_Fluid_Parameters(const T dt,const T time) override
 {
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Update_Fluid_Parameters(dt,time);
     DETONATION_SHOCK_DYNAMICS<TV>& dsd=*fluids_parameters.incompressible_multiphase->projection.dsd;
@@ -115,14 +115,14 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
-void Initialize_Advection()    PHYSBAM_OVERRIDE
+void Initialize_Advection()    override
 {
     fluids_parameters.Use_No_Fluid_Coupling_Defaults();
 }
 //#####################################################################
 // Function Initialize_Velocities
 //#####################################################################
-void Initialize_Velocities() PHYSBAM_OVERRIDE
+void Initialize_Velocities() override
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -140,7 +140,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
-void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) PHYSBAM_OVERRIDE
+void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) override
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -153,7 +153,7 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,F
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################
-void Initialize_Phi() PHYSBAM_OVERRIDE
+void Initialize_Phi() override
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<ARRAY<T,TV_INT>>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
@@ -163,7 +163,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Adjust_Phi_With_Sources
 //#####################################################################
-bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
+bool Adjust_Phi_With_Sources(const T time) override
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<ARRAY<T,TV_INT>>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;

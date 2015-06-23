@@ -28,10 +28,10 @@ public:
 //#####################################################################
     void Create_Material_Surface_From_Manifold_Embedded_Surface(bool verbose=true);
     void Conservative_Perturb_Nodes_For_Collision_Freeness(const T perturb_amount,const ARRAY<bool>& particle_on_surface);
-    void Perturb_Nodes_For_Collision_Freeness(const T perturb_amount) PHYSBAM_OVERRIDE;
+    void Perturb_Nodes_For_Collision_Freeness(const T perturb_amount) override;
 private:
     bool Center_Octahedron_In_Material(const int tetrahedron);
-    void Construct_Material_Surface_Mesh() PHYSBAM_OVERRIDE;
+    void Construct_Material_Surface_Mesh() override;
     void Merge_Or_Cancel_Duplicate_Triangles();
     void Add_To_Material_Surface_Tetrahedron(const int i,const int j,const int k,const int l);
     void Add_To_Material_Surface_Tetrahedron_Face(const int i,const int j,const int l,const bool is_clockwise);

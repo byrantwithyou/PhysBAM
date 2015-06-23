@@ -50,12 +50,12 @@ public:
         const OPENGL_MATERIAL& inverted_material_input,bool initialize=true,ARRAY<OPENGL_COLOR>* color_map_input=0);
     ~OPENGL_TETRAHEDRALIZED_VOLUME();
 
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint* buffer,int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Clear_Highlight() PHYSBAM_OVERRIDE;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Clear_Highlight() override;
 
     OPENGL_SELECTION<T>* Get_Vertex_Selection(int index);
     OPENGL_SELECTION<T>* Get_Tetrahedron_Selection(int index);
@@ -104,11 +104,11 @@ public:
     void Highlight_Nodes_Of_Minimum_Valence() const;
     void Highlight_Boundary_Normal_Vectors_Of_Current_Tetrahedron() const;
     void Highlight_Current_Boundary_Triangle() const;
-    void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
-    void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
+    void Turn_Smooth_Shading_On() override;
+    void Turn_Smooth_Shading_Off() override;
     void Display_Subset();
     void Update_Cutaway_Plane();
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
     void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,4>* transform) const;
     void Initialize_Vertex_Normals();
 protected:
@@ -128,7 +128,7 @@ public:
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX,object),index(index)
     {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 template<class T>
@@ -141,7 +141,7 @@ public:
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON,object),index(index)
     {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 }
 #endif

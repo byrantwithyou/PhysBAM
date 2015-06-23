@@ -28,7 +28,7 @@ public:
     void Add_Color(T x,const OPENGL_COLOR& color,const OPENGL_COLOR& exact_color)
     {Add_Color(x,color,exact_color,color);}
 
-    OPENGL_COLOR Lookup(T x) const PHYSBAM_OVERRIDE;
+    OPENGL_COLOR Lookup(T x) const override;
     void Add_Color(T x,const OPENGL_COLOR& less_color,const OPENGL_COLOR& exact_color,const OPENGL_COLOR& greater_color);
     static OPENGL_COLOR_RAMP<T> *Matlab_Jet(T value_min,T value_max);
     static OPENGL_COLOR_RAMP<T> *Matlab_Hot(T value_min,T value_max);

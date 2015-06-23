@@ -30,7 +30,7 @@ public:
     T Discriminant() const
     {return sqr(b)-4*a*c;}
 
-    void Compute(const T x,T* ddf,T* df,T* f) const PHYSBAM_OVERRIDE;
+    void Compute(const T x,T* ddf,T* df,T* f) const override;
     void Coefficients_From_Interpolation(T x0,T y0,T x1,T y1,T x2,T y2);
     void Compute_Roots();
     void Compute_Roots_In_Interval(const T xmin,const T xmax);

@@ -50,11 +50,11 @@ public:
     T Element_Size(const int tetrahedron) const
     {return Volume(tetrahedron);}
 
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
     {return "SIMPLICIAL_OBJECT<T,VECTOR<T,3>,3>";}
 
-    virtual std::string Extension() const PHYSBAM_OVERRIDE {return Static_Extension();}
+    virtual std::string Extension() const override {return Static_Extension();}
     static std::string Static_Extension()
     {return "tet";}
 
@@ -68,7 +68,7 @@ public:
     {return Signed_Volume(tetrahedron);}
 
 //#####################################################################
-    void Clean_Memory() PHYSBAM_OVERRIDE;
+    void Clean_Memory() override;
     void Update_Tetrahedron_List(); // updates the tets assuming the particle positions are already updated
     void Initialize_Hierarchy(const bool update_boxes=true); // creates and updates the boxes as well
     void Initialize_Octahedron_Mesh_And_Particles(const GRID<TV>& grid);
@@ -98,7 +98,7 @@ public:
     T Minimum_Edge_Length(int* index=0);
     void Advance_Interior_Laplacian_Smoothing();
     TV Centroid(const int tetrahedron) const;
-    void Rescale(const T scaling_factor) PHYSBAM_OVERRIDE;
+    void Rescale(const T scaling_factor) override;
     void Rescale(const T scaling_x,const T scaling_y,const T scaling_z);
     T Volume(const int tetrahedron) const;
     T Signed_Volume(const int tetrahedron) const;
@@ -123,7 +123,7 @@ public:
     void Compute_Nodal_Volumes(bool save_tetrahedron_volumes=false);
     void Print_Statistics(std::ostream& output);
 private:
-    void Refresh_Auxiliary_Structures_Helper() PHYSBAM_OVERRIDE;
+    void Refresh_Auxiliary_Structures_Helper() override;
 //#####################################################################
 };
 }

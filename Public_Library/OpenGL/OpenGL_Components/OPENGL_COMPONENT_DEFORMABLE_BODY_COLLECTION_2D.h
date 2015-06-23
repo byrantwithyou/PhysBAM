@@ -54,19 +54,19 @@ public:
     OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D();
     
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input=true) override;
 
-    virtual void Display() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual void Display() const override;
+    bool Use_Bounding_Box() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint* buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
-    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Clear_Highlight() override;
+    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const override;
+    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) override;
 
     void Set_Vector_Size(const T vector_size);
 
@@ -92,8 +92,8 @@ public:
     OPENGL_SELECTION<T>* body_selection;
 
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D(OPENGL_OBJECT<T>* object):OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_OBJECT_2D, object){}
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    typename OPENGL_SELECTION<T>::TYPE Actual_Type() const PHYSBAM_OVERRIDE {return body_selection->Actual_Type();}
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    typename OPENGL_SELECTION<T>::TYPE Actual_Type() const override {return body_selection->Actual_Type();}
 };
 
 }

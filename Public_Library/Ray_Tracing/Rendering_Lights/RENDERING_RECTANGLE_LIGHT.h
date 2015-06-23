@@ -59,19 +59,19 @@ public:
     virtual ~RENDERING_RECTANGLE_LIGHT()
     {delete &triangulated_surface;}
 
-    void Sample_Points(const VECTOR<T,3>& surface_position,const VECTOR<T,3>& surface_normal,ARRAY<RAY<VECTOR<T,3> > >& sample_array)const PHYSBAM_OVERRIDE
+    void Sample_Points(const VECTOR<T,3>& surface_position,const VECTOR<T,3>& surface_normal,ARRAY<RAY<VECTOR<T,3> > >& sample_array)const override
     {sample_array.Resize(u_samples*v_samples);
     for(int u=0;u<u_samples;u++)for(int v=0;v<v_samples;v++){
         T u_jitter_offset=sample_points_random.Get_Uniform_Number(T(-.5),T(.5)),v_jitter_offset=sample_points_random.Get_Uniform_Number(T(-.5),T(.5));
         sample_array(u+u_samples*v+1)=
             RAY<VECTOR<T,3> >(SEGMENT_3D<T>(surface_position,position+(u+u_jitter_offset+T(.5))*one_over_u_samples*u_direction+(v+v_jitter_offset+T(.5))*one_over_v_samples*v_direction));}}
 
-    VECTOR<T,3> Emitted_Light(const RENDERING_RAY<T>& ray) const PHYSBAM_OVERRIDE
+    VECTOR<T,3> Emitted_Light(const RENDERING_RAY<T>& ray) const override
     {T cosine_of_angle=-VECTOR<T,3>::Dot_Product(ray.ray.direction,normal);
     if(cosine_of_angle<0)return VECTOR<T,3>(0,0,0);
     else return (1/((T)pi*4))*cosine_of_angle*color*brightness/sqr(ray.ray.t_max);}
 
-    int Emit_Photons(RENDERING_RAY<T>& parent_ray,PHOTON_MAP<T>& photon_map,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type) const  PHYSBAM_OVERRIDE
+    int Emit_Photons(RENDERING_RAY<T>& parent_ray,PHOTON_MAP<T>& photon_map,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type) const  override
     {int number_emitted=0;
     RANDOM_NUMBERS<T>* random=0;
     if(type==PHOTON_MAP<T>::GLOBAL_PHOTON_MAP) random=&global_photon_random;

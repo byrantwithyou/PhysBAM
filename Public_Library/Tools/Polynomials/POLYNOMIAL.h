@@ -24,7 +24,7 @@ public:
         :degree(degree_input),c(degree+1)
     {}
 
-    T operator()(const T x_input) const PHYSBAM_OVERRIDE
+    T operator()(const T x_input) const override
     {T y=c(degree);for(int i=degree-1;i>=0;i--) y=c(i)+x_input*y;return y;}
 
     void Compute_Coefficients(const ARRAY<T>& x,const ARRAY<T>& y)

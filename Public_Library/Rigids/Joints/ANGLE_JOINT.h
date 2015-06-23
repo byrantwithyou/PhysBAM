@@ -38,12 +38,12 @@ public:
     {VECTOR<bool,T_SPIN::dimension> constrain(VECTOR<bool,T_SPIN::dimension>::All_Ones_Vector());constrain.x=constrain_angle && angle_min>=angle_max;return constrain;}
 
 //#####################################################################
-    bool Has_Angular_Constraint() const PHYSBAM_OVERRIDE;
-    void Constrain_Prismatically(TV& translation) const PHYSBAM_OVERRIDE;
-    void Constrain_Angles(T_SPIN& angles) const PHYSBAM_OVERRIDE;
-    void Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix=0) const PHYSBAM_OVERRIDE;
-    void Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const PHYSBAM_OVERRIDE;
-    void Update_State_From_Joint_Frame(const bool enforce_constraints=true) PHYSBAM_OVERRIDE;
+    bool Has_Angular_Constraint() const override;
+    void Constrain_Prismatically(TV& translation) const override;
+    void Constrain_Angles(T_SPIN& angles) const override;
+    void Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix=0) const override;
+    void Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const override;
+    void Update_State_From_Joint_Frame(const bool enforce_constraints=true) override;
 //#####################################################################
 };
 

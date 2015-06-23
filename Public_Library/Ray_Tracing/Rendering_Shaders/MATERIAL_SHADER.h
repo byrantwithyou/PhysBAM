@@ -8,7 +8,6 @@
 #define __MATERIAL_SHADER__
 
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
 template<class T,int d> class VECTOR;

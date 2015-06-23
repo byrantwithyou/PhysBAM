@@ -36,11 +36,11 @@ public:
     virtual ~OPENGL_MAC_VELOCITY_FIELD_2D();
 
     void Update();  // Call when grid/u/v change
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
 
     void Set_Velocity_Mode(VELOCITY_MODE velocity_mode_input);
 
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     // convenience functions
     void Toggle_Velocity_Mode();

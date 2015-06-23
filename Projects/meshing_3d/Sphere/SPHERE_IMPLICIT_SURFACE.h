@@ -36,40 +36,40 @@ public:
         Update_Box();
     }
 
-    void Update_Box() PHYSBAM_OVERRIDE
+    void Update_Box() override
     {box.Reset_Bounds(sphere.center);box.Change_Size(sphere.radius);}
 
-    T Minimum_Cell_Size() const PHYSBAM_OVERRIDE
+    T Minimum_Cell_Size() const override
     {return minimum_cell_size;}
 
-    T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const PHYSBAM_OVERRIDE
+    T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const override
     {return minimum_cell_size;}
 
-    T operator()(const TV& location) const PHYSBAM_OVERRIDE
+    T operator()(const TV& location) const override
     {return Extended_Phi(location);}
 
-    T Extended_Phi(const TV& location) const PHYSBAM_OVERRIDE
+    T Extended_Phi(const TV& location) const override
     {return sphere.Signed_Distance(location);}
 
-    TV Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE
+    TV Normal(const TV& location,const int aggregate=-1) const override
     {return sphere.Normal(location);}
 
-    TV Extended_Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE
+    TV Extended_Normal(const TV& location,const int aggregate=-1) const override
     {return sphere.Normal(location);}
 
-    VECTOR<T,2> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE
+    VECTOR<T,2> Principal_Curvatures(const TV& X) const override
     {return sphere.Principal_Curvatures(X);}
 
-    bool Lazy_Inside(const TV& location,const T contour_value=0) const PHYSBAM_OVERRIDE
+    bool Lazy_Inside(const TV& location,const T contour_value=0) const override
     {return Extended_Phi(location)<=contour_value;}
 
-    bool Lazy_Inside_And_Value(const TV& location,T& phi_value,const T contour_value=0) const PHYSBAM_OVERRIDE
+    bool Lazy_Inside_And_Value(const TV& location,T& phi_value,const T contour_value=0) const override
     {phi_value=Extended_Phi(location);return phi_value<=contour_value;}
 
-    bool Lazy_Outside(const TV& location,const T contour_value=0) const PHYSBAM_OVERRIDE
+    bool Lazy_Outside(const TV& location,const T contour_value=0) const override
     {return Extended_Phi(location)>=contour_value;}
 
-    T Min_Phi() const PHYSBAM_OVERRIDE
+    T Min_Phi() const override
     {return -sphere.radius;}
 
     virtual void Read(TYPED_ISTREAM& input) {PHYSBAM_FATAL_ERROR();}

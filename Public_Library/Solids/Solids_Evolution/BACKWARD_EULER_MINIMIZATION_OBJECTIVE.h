@@ -45,11 +45,11 @@ public:
     virtual ~BACKWARD_EULER_MINIMIZATION_OBJECTIVE();
 
     void Reset();
-    void Compute(const KRYLOV_VECTOR_BASE<T>& dv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const PHYSBAM_OVERRIDE;
+    void Compute(const KRYLOV_VECTOR_BASE<T>& dv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const override;
     void Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& dv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const;
     void Initial_Guess(KRYLOV_VECTOR_BASE<T>& dv) const;
     void Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const;
-    void Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const PHYSBAM_OVERRIDE;
+    void Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const override;
     void Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& dv,bool allow_sep) const;
     void Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv);
     void Disable_Current_Colliding_Pairs(T thickness=0);

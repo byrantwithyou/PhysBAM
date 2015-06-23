@@ -326,13 +326,13 @@ public:
 
     virtual ~CIRCLE_EXAMPLE() {}
 
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
+    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
 
-void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################
-void Initialize_Advection() PHYSBAM_OVERRIDE
+void Initialize_Advection() override
 {
     if(incompressible){
         fluids_parameters.Use_Fluid_Coupling_Defaults();
@@ -356,7 +356,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Intialize_Euler_State
 //#####################################################################
-void Initialize_Euler_State() PHYSBAM_OVERRIDE
+void Initialize_Euler_State() override
 {
     if(incompressible) return;
 
@@ -383,7 +383,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Adjust_Density_And_Temperature_With_Sources
 //#####################################################################
-void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
+void Adjust_Density_And_Temperature_With_Sources(const T time) override
 {
     if(!incompressible) PHYSBAM_FATAL_ERROR("this shouldn't be called in compressible case");
     if(time>0) return;
@@ -400,7 +400,7 @@ void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Adjust_Soot_With_Sources
 //#####################################################################
-void Adjust_Soot_With_Sources(const T time) PHYSBAM_OVERRIDE
+void Adjust_Soot_With_Sources(const T time) override
 {
     if(!use_soot) PHYSBAM_FATAL_ERROR("this shouldn't be called in non use_soot case");
     if(time>0) return;
@@ -455,7 +455,7 @@ void Add_Wall()
 //#####################################################################
 // Function Intialize_Bodies
 //#####################################################################
-void Initialize_Bodies() PHYSBAM_OVERRIDE
+void Initialize_Bodies() override
 {   
     if(test_number==1) return;
 
@@ -516,7 +516,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Set_Kinematic_Positions
 //#####################################################################
-void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE
+void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override
 {
     if(test_number==3 && id==sphere) frame.t=motion_curve.Value(time);
     else if (test_number==2 && id==sphere) frame.t=motion_curve.Value(0);
@@ -524,7 +524,7 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
-bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE
+bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override
 {
     if(test_number==3 && id==sphere){twist.linear=motion_curve.Derivative(time);return true;}
     return false;
@@ -532,7 +532,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBA
 //#####################################################################
 // Function Limit_Dt
 //#####################################################################
-void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
+void Limit_Dt(T& dt,const T time) override
 {
     if(test_number==3){
         GRID<TV>& grid=fluids_parameters.euler->grid;
@@ -543,7 +543,7 @@ void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Add_External_Forces
 //#####################################################################
-void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE
+void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override
 {
     if(test_number==7 && time>=(T)1 && time<=(T)1.01){
         wrench(0).linear=(T)10*TV(-1,0);}
@@ -551,7 +551,7 @@ void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVE
 //#####################################################################
 // Function Preprocess_Frame
 //#####################################################################
-void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+void Preprocess_Frame(const int frame) override
 {   
     if(fluids_parameters.use_slip){
         dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution).run_self_tests=run_self_tests;
@@ -567,14 +567,14 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Preprocess_Substep
 //#####################################################################
-void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
+void Preprocess_Substep(const T dt,const T time) override
 {
     if(transition_to_incompressible){
         eos_smooth_transition->Set_Current_Time(time);
         //if(time>eos_smooth_transition->t_start_transition) fluids_parameters.euler->euler_projection.Set_Transition_To_Using_Implicit_Pressure(true);
     }
 }
-/*void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
+/*void Set_Dirichlet_Boundary_Conditions(const T time) override
 {
     LAPLACE_UNIFORM<TV>* elliptic_solver=fluids_parameters.euler->euler_projection.elliptic_solver;
     BASE::Set_Dirichlet_Boundary_Conditions(time);

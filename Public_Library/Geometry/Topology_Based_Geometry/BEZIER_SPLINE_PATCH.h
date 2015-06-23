@@ -31,11 +31,11 @@ public:
     static BEZIER_SPLINE_PATCH* Create(GEOMETRY_PARTICLES<TV>& particles);
     TV Evaluate(int id,T s,T t) const;
     BEZIER_SPLINE_PATCH<TV,d>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const;
-    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE;
-    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
-    std::string Name() const PHYSBAM_OVERRIDE;
+    void Read(TYPED_ISTREAM& input) override;
+    void Write(TYPED_OSTREAM& output) const override;
+    std::string Name() const override;
     static std::string Static_Name();
-    std::string Extension() const PHYSBAM_OVERRIDE;
+    std::string Extension() const override;
     static std::string Static_Extension();
 //#####################################################################
 };

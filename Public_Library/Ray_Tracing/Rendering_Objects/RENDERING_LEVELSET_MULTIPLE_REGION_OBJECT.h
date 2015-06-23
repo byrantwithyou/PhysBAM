@@ -30,11 +30,11 @@ public:
     virtual ~RENDERING_LEVELSET_MULTIPLE_REGION_OBJECT()
     {}
 
-    TV Normal(const TV& location,const int aggregate=0) const PHYSBAM_OVERRIDE
+    TV Normal(const TV& location,const int aggregate=0) const override
     {assert((aggregate >= 1 && aggregate <= 6) || aggregate == -1);
     if(aggregate != -1) return RANGE<TV>(levelset_multiple.grid.domain).Normal(aggregate);else return levelset_multiple.levelsets(region)->Normal(location);}
 
-    bool Inside(const TV& location) const PHYSBAM_OVERRIDE
+    bool Inside(const TV& location) const override
     {if(!levelset_multiple.grid.domain.Inside(location,small_number)) return false;
     return region==levelset_multiple.Inside_Region(location);}
 

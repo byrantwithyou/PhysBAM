@@ -103,7 +103,7 @@ public:
     if(strain_abs<.4)active_tension_derivative=-2*scale*activation*density*strain;else if(strain_abs<.6)active_tension_derivative=4*scale*activation*density*(strain-sign(strain)*(T).6);
     return fiber_max_stress(tet_muscles(tet_index)(tet_muscle_index))*(active_tension_derivative+passive_tension_derivative);}
 
-    MATRIX<T,3> P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const T scale,const int tetrahedron_index) const PHYSBAM_OVERRIDE
+    MATRIX<T,3> P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const T scale,const int tetrahedron_index) const override
     {T mu_10=(tet_mu_10)?(*tet_mu_10)(tetrahedron_index):constant_mu_10,mu_01=(tet_mu_01)?(*tet_mu_01)(tetrahedron_index):constant_mu_01,kappa=(tet_kappa)?(*tet_kappa)(tetrahedron_index):constant_kappa;
     if(single_activation_used_for_force_derivative&&(*single_activation_used_for_force_derivative))return P_From_Strain_Unit_Activation(F,V,scale,tetrahedron_index,*single_activation_used_for_force_derivative);
     DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold),C=F_threshold*F_threshold,F_cube=C*F_threshold,F_inverse=F_threshold.Inverse(),isotropic_part;
@@ -121,11 +121,11 @@ public:
     VECTOR<T,3> fiber=V.Transpose_Times(tet_fibers(tetrahedron_index)(tet_muscle_index)),F_fiber=F_threshold*fiber;
     return scale*(active_tension_unit_activation(tetrahedron_index)(tet_muscle_index)/F_fiber.Magnitude())*MATRIX<T,3>::Outer_Product(F_fiber,fiber);}
 
-    MATRIX<T,3> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const T scale,const int tetrahedron) const PHYSBAM_OVERRIDE
+    MATRIX<T,3> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const T scale,const int tetrahedron) const override
     {SYMMETRIC_MATRIX<T,3> strain_rate=F_dot.Symmetric_Part(); 
     return 2*scale*constant_beta*strain_rate+scale*constant_alpha*strain_rate.Trace();}
 
-    void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron_index=0) const PHYSBAM_OVERRIDE
+    void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron_index=0) const override
     {T mu_10=(tet_mu_10)?(*tet_mu_10)(tetrahedron_index):constant_mu_10,mu_01=(tet_mu_01)?(*tet_mu_01)(tetrahedron_index):constant_mu_01,kappa=(tet_kappa)?(*tet_kappa)(tetrahedron_index):constant_kappa;
     DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold),C=F_threshold*F_threshold,F_cube=C*F_threshold,F_inverse=F_threshold.Inverse();
     T I_C=C.Trace(),II_C=(C*C).Trace(),J=F_threshold.Determinant(),Jcc=pow(J,-((T)2/3));
@@ -152,7 +152,7 @@ public:
     dPi_dF.x1001=beta.x10;dPi_dF.x2002=beta.x20;dPi_dF.x2112=beta.x20;
     if(enforce_definiteness) dPi_dF.Enforce_Definiteness();}
 
-    void Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,DIAGONALIZED_STRESS_DERIVATIVE<T,3>& dP_dF,const int simplex) const PHYSBAM_OVERRIDE
+    void Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,DIAGONALIZED_STRESS_DERIVATIVE<T,3>& dP_dF,const int simplex) const override
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 
     MATRIX<T,3> dP_From_dF(const MATRIX<T,3>& dF,const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const T scale,
@@ -167,7 +167,7 @@ public:
         dP+=scale*MATRIX<T,3>::Outer_Product(dPw,fiber);}
     return dP;}
 
-    void Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const int tetrahedron_index) PHYSBAM_OVERRIDE
+    void Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const int tetrahedron_index) override
     {DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold);
     for(int m=0;m<tet_muscles(tetrahedron_index).m;m++){
         VECTOR<T,3> fiber=V.Transpose_Times(tet_fibers(tetrahedron_index)(m)),F_fiber=F_threshold*fiber;T stretch=F_fiber.Magnitude();

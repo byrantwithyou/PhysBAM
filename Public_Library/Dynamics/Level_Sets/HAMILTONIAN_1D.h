@@ -8,7 +8,6 @@
 #define __HAMILTONIAN_1D__
 
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/VECTOR_1D.h>
 namespace PhysBAM{
 

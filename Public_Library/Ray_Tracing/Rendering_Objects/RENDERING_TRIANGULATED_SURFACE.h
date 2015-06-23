@@ -55,47 +55,47 @@ public:
     {
     delete texture_coordinates;delete triangle_texture_coordinates;delete tangent_vectors;}
 
-    bool Intersection(RAY<TV>& ray) const PHYSBAM_OVERRIDE
+    bool Intersection(RAY<TV>& ray) const override
     {RAY<TV> object_space_ray=Object_Space_Ray(ray);
     if(INTERSECTION::Intersects(object_space_ray,*base_triangulated_surface,small_number)){
         ray.semi_infinite=false;ray.t_max=object_space_ray.t_max;ray.aggregate_id=object_space_ray.aggregate_id;return true;}
     else return false;}
 
-    TV Normal(const TV& location,const int aggregate=0) const PHYSBAM_OVERRIDE
+    TV Normal(const TV& location,const int aggregate=0) const override
     {return World_Space_Vector(triangulated_surface.Normal(Object_Space_Point(location),aggregate));}
 
-    bool Inside(const TV& location) const PHYSBAM_OVERRIDE
+    bool Inside(const TV& location) const override
     {return closed_volume && triangulated_surface.Inside(Object_Space_Point(location),small_number);}
 
-    bool Outside(const TV& location) const PHYSBAM_OVERRIDE
+    bool Outside(const TV& location) const override
     {return !closed_volume || triangulated_surface.Outside(Object_Space_Point(location),small_number);}
 
-    bool Boundary(const TV& location) const PHYSBAM_OVERRIDE
+    bool Boundary(const TV& location) const override
     {return triangulated_surface.Boundary(Object_Space_Point(location),small_number);}
 
-    TV Surface(const TV& location) const PHYSBAM_OVERRIDE
+    TV Surface(const TV& location) const override
     {return World_Space_Point(triangulated_surface.Surface(Object_Space_Point(location)));}
 
-    bool Has_Bounding_Box() const  PHYSBAM_OVERRIDE
+    bool Has_Bounding_Box() const  override
     {return true;}
     
-    RANGE<TV> Object_Space_Bounding_Box() const PHYSBAM_OVERRIDE
+    RANGE<TV> Object_Space_Bounding_Box() const override
     {if(!triangulated_surface.bounding_box) triangulated_surface.Update_Bounding_Box();
     return *triangulated_surface.bounding_box;}
 
-    bool Closed_Volume() const PHYSBAM_OVERRIDE
+    bool Closed_Volume() const override
     {return closed_volume;}
 
-    bool Close_To_Open_Surface(const TV& location,const T threshold_distance) const PHYSBAM_OVERRIDE
+    bool Close_To_Open_Surface(const TV& location,const T threshold_distance) const override
     {assert(!Closed_Volume());int closest_triangle;T distance;
     triangulated_surface.Surface(Object_Space_Point(location),threshold_distance,small_number,&closest_triangle,&distance);
     return distance<=threshold_distance;}
 
-    bool Intersection(RAY<TV>& ray,const int aggregate) const PHYSBAM_OVERRIDE
+    bool Intersection(RAY<TV>& ray,const int aggregate) const override
     {if(!add_triangles_to_acceleration_structure) return Intersection(ray);
     if(INTERSECTION::Intersects(ray,(world_space_triangles)(aggregate),small_number)){ray.aggregate_id=aggregate;return true;}else return false;}
     
-    void Get_Aggregate_World_Space_Bounding_Boxes(ARRAY<RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T> >& primitives) const PHYSBAM_OVERRIDE
+    void Get_Aggregate_World_Space_Bounding_Boxes(ARRAY<RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T> >& primitives) const override
     {if(add_triangles_to_acceleration_structure){
         world_space_triangles.Remove_All();
         for(int i=0;i<triangulated_surface.mesh.elements.m;i++){
@@ -107,10 +107,10 @@ public:
         triangulated_surface.Update_Bounding_Box();
         primitives.Append(RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>(World_Space_Bounding_Box(),this,1));}}
 
-    TRIANGULATED_SURFACE<T>* Generate_Triangles() const PHYSBAM_OVERRIDE
+    TRIANGULATED_SURFACE<T>* Generate_Triangles() const override
     {return triangulated_surface.Create_Compact_Copy();}
     
-    void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const PHYSBAM_OVERRIDE
+    void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const override
     {assert(texture_coordinates);
     int node1,node2,node3;triangulated_surface.mesh.elements(aggregate).Get(node1,node2,node3);
     int uv1,uv2,uv3;(*triangle_texture_coordinates)(aggregate).Get(uv1,uv2,uv3);
@@ -119,7 +119,7 @@ public:
     VECTOR<T,2> coordinates=(*texture_coordinates)(uv1)*weights.x+(*texture_coordinates)(uv2)*weights.y+(*texture_coordinates)(uv3)*weights.z;
     s=coordinates.x;t=coordinates.y;}
 
-    void Get_Object_Space_Tangent_And_Bitangent(const TV& object_space_point,const TV& object_space_normal,const int aggregate,TV& object_tangent,TV& object_bitangent) const PHYSBAM_OVERRIDE
+    void Get_Object_Space_Tangent_And_Bitangent(const TV& object_space_point,const TV& object_space_normal,const int aggregate,TV& object_tangent,TV& object_bitangent) const override
     {assert(tangent_vectors);
     int node1,node2,node3;triangulated_surface.mesh.elements(aggregate).Get(node1,node2,node3);
     TV weights=TRIANGLE_3D<T>::Barycentric_Coordinates(object_space_point,triangulated_surface.particles.X(node1),triangulated_surface.particles.X(node2),triangulated_surface.particles.X(node3));
@@ -127,7 +127,7 @@ public:
     object_tangent=(interpolated_tangent-object_space_normal*TV::Dot_Product(object_space_normal,interpolated_tangent)).Normalized();
     object_bitangent=-TV::Cross_Product(object_space_normal,object_tangent);}
 
-    void Get_World_Space_Tangent_And_Bitangent(const TV& world_space_point,const TV& world_space_normal,const int aggregate,TV& world_tangent,TV& world_bitangent) const PHYSBAM_OVERRIDE
+    void Get_World_Space_Tangent_And_Bitangent(const TV& world_space_point,const TV& world_space_normal,const int aggregate,TV& world_tangent,TV& world_bitangent) const override
     {TV object_tangent,object_bitangent;
     Get_Object_Space_Tangent_And_Bitangent(Object_Space_Point(world_space_point),Object_Space_Vector(world_space_normal),aggregate,object_tangent,object_bitangent);
     world_tangent=World_Space_Vector(object_tangent);world_bitangent=World_Space_Vector(object_bitangent);}

@@ -727,13 +727,13 @@ public:
             analytic_polymer_stress(c)->Test(X);}
     }
 
-    void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE
+    void Begin_Time_Step(const T time) override
     {
         if(analytic_velocity.m && analytic_levelset && !use_level_set_method && !use_pls && !analytic_initial_only)
             Set_Level_Set(time+dt);
     }
 
-    void End_Time_Step(const T time) PHYSBAM_OVERRIDE
+    void End_Time_Step(const T time) override
     {
         Level_Set_Error(time);
         Velocity_Error(time);
@@ -774,7 +774,7 @@ public:
         return f/s;
     }
 
-    TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
+    TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time) override
     {
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
 
@@ -801,7 +801,7 @@ public:
         return TV();
     }
 
-    TV Volume_Force(const TV& X,int color,T time) PHYSBAM_OVERRIDE
+    TV Volume_Force(const TV& X,int color,T time) override
     {
         if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
             TV f=analytic_velocity(color)->F(X/m,time/s)*unit_p/m;
@@ -810,7 +810,7 @@ public:
         return gravity;
     }
 
-    TV Velocity_Jump(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
+    TV Velocity_Jump(const TV& X,int color0,int color1,T time) override
     {
         Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
         if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){

@@ -58,7 +58,7 @@ public:
     T CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool inviscid=false,const bool viscous_only=false) const;
     void Set_Dirichlet_Boundary_Conditions(ARRAY<ARRAY<T,TV_INT>>& phis,const ARRAY<bool>& dirichlet_regions,const ARRAY<T>* pressures=0);
     void Add_Surface_Tension(LEVELSET<TV>& levelset,const T time);
-    void Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& F) PHYSBAM_OVERRIDE;
+    void Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& F) override;
 protected:
     void Discretize_Explicit_Viscous_Terms(const T dt){PHYSBAM_NOT_IMPLEMENTED();}
     void Implicit_Viscous_Update(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);

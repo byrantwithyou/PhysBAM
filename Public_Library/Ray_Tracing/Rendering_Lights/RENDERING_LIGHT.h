@@ -8,7 +8,6 @@
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Math_Tools/constants.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 namespace PhysBAM{
 

@@ -41,8 +41,8 @@ public:
     ~SHU_OSHER_ST() {}
 
 //#####################################################################
-    void Initialize_U(const GRID<TV>& grid, ARRAY<T,VECTOR<int,1> >& u) PHYSBAM_OVERRIDE;
-    void Write_Matlab_Data_File(const int stepnumber, const GRID<TV>& grid, const ARRAY<T,VECTOR<int,1> >& u) PHYSBAM_OVERRIDE;
+    void Initialize_U(const GRID<TV>& grid, ARRAY<T,VECTOR<int,1> >& u) override;
+    void Write_Matlab_Data_File(const int stepnumber, const GRID<TV>& grid, const ARRAY<T,VECTOR<int,1> >& u) override;
 //#####################################################################    
 };
 //#####################################################################

@@ -125,35 +125,35 @@ public:
 
 //#####################################################################
     HAIR_SIM_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
-    void Initialize_Bodies() PHYSBAM_OVERRIDE;
+    void Initialize_Bodies() override;
     void Update_Keyframed_Parameters_For_Time_Update(const T time);
     template<class T_IMPLICIT_COMBINED> void Update_Keyframed_Parameters_For_Time_Update_Helper(const T time,T_IMPLICIT_COMBINED& combined);
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE;
-    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE;
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE;
-    void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE;    
-    void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE;
-    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE;
-    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE;
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE;
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE;
+    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override;
+    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override;
+    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override;
+    void Preprocess_Solids_Substep(const T time,const int substep) override;    
+    void Update_Time_Varying_Material_Properties(const T time) override;
+    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override;
+    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override;
+    void Postprocess_Frame(const int frame) override;
+    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override;
+    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override;
     void Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_momentum_conserving,bool use_non_momentum_conserving);
-    void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;
+    void Write_Output_Files(const int frame) const override;
     template<class T_IMPLICIT_COMBINED> void Write_Interpolated_Level_Set(const int frame,T_IMPLICIT_COMBINED& combined) const;
     void Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,T& one_over_mass1,T& one_over_mass2,T& one_over_mass3,T& one_over_mass4);
-    void Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,VECTOR<T,4>& one_over_mass) PHYSBAM_OVERRIDE;
-    void Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,ARRAY_VIEW<T>& one_over_mass) PHYSBAM_OVERRIDE;
-    void Point_Face_Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass) PHYSBAM_OVERRIDE;
+    void Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,VECTOR<T,4>& one_over_mass) override;
+    void Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,ARRAY_VIEW<T>& one_over_mass) override;
+    void Point_Face_Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass) override;
     void Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2>& weights,T& one_over_mass1,T& one_over_mass2,T& one_over_mass3,T& one_over_mass4);
-    void Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2>& weights,VECTOR<T,4>& one_over_mass) PHYSBAM_OVERRIDE;
-    void Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2>& weights,ARRAY_VIEW<T>& one_over_mass) PHYSBAM_OVERRIDE;
-    void Edge_Edge_Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass) PHYSBAM_OVERRIDE;
+    void Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2>& weights,VECTOR<T,4>& one_over_mass) override;
+    void Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2>& weights,ARRAY_VIEW<T>& one_over_mass) override;
+    void Edge_Edge_Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass) override;
     void Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass);
-    void Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& point_face_pairs) PHYSBAM_OVERRIDE;
+    void Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& point_face_pairs) override;
     void Compute_Binding_Velocities();
-    void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE;
-    void After_Initialization() PHYSBAM_OVERRIDE {BASE::After_Initialization();}
+    void Limit_Solids_Dt(T& dt,const T time) override;
+    void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 };
 }

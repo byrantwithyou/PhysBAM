@@ -28,7 +28,7 @@ public:
     T Phase(const VECTOR<T,3>& incoming, const VECTOR<T,3>& outgoing)
     {return VOLUMETRIC_SHADER<T>::Isotropic_Phase_Function(incoming,outgoing);}
 
-    VECTOR<T,3> Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const VECTOR<T,3>& color) PHYSBAM_OVERRIDE
+    VECTOR<T,3> Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const VECTOR<T,3>& color) override
     {T start_t,end_t;
     if(!object.Get_Intersection_Range(ray.ray,start_t,end_t))return color;
     T current_t=end_t;
@@ -61,12 +61,12 @@ public:
         current_t-=current_volumetric_step;}
     return attenuated_color;}
 
-    VECTOR<T,3> Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const VECTOR<T,3>& light_color) PHYSBAM_OVERRIDE
+    VECTOR<T,3> Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const VECTOR<T,3>& light_color) override
     {const RENDERING_VOXELS<T>* voxel_object=(const RENDERING_VOXELS<T>*)&object;
     T start_t,end_t;if(!INTERSECTION::Get_Intersection_Range(ray.ray,voxel_object->box,start_t,end_t))return light_color;
     T attenuation_length=end_t-start_t;return std::exp(-attenuation_length*extinction)*light_color;}
 
-    bool Scatter_Photon_Ray(const RENDERING_OBJECT<T>& object,RENDERING_RAY<T>& ray,VECTOR<T,3>& photon_power,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type,const T fixed_step_size) PHYSBAM_OVERRIDE
+    bool Scatter_Photon_Ray(const RENDERING_OBJECT<T>& object,RENDERING_RAY<T>& ray,VECTOR<T,3>& photon_power,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type,const T fixed_step_size) override
     {return false;}
 
 //#####################################################################

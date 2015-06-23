@@ -8,7 +8,6 @@
 #define __LOG_ENTRY__
 
 #include <Tools/Log/LOG.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <cstdio>
 #include <string>
 namespace PhysBAM{

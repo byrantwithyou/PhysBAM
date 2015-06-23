@@ -28,12 +28,12 @@ public:
     virtual ~NORMAL_JOINT();
 
 //#####################################################################
-    void Constrain_Prismatically(TV& translation) const PHYSBAM_OVERRIDE; // This is in joint space
-    void Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const PHYSBAM_OVERRIDE; // This is in world space.
-    void Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix=0) const PHYSBAM_OVERRIDE;
-    void Update_State_From_Joint_Frame(const bool enforce_constraints=true) PHYSBAM_OVERRIDE;
-    TV Prismatic_Component_Translation() const PHYSBAM_OVERRIDE;
-    void Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix=0) const PHYSBAM_OVERRIDE;
+    void Constrain_Prismatically(TV& translation) const override; // This is in joint space
+    void Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const override; // This is in world space.
+    void Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix=0) const override;
+    void Update_State_From_Joint_Frame(const bool enforce_constraints=true) override;
+    TV Prismatic_Component_Translation() const override;
+    void Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix=0) const override;
 //#####################################################################
 };
 

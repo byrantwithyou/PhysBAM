@@ -23,14 +23,16 @@ namespace PhysBAM{
 // Function MPI_Error_Handler
 //#####################################################################
 static int global_rank=0;
-static void MPI_Error_Handler(MPI::Comm& comm,int* return_code,...) PHYSBAM_UNUSED;
-static void MPI_Error_Handler(MPI::Comm& comm,int* return_code,...)
+namespace{
+void MPI_Error_Handler(MPI::Comm& comm,int* return_code,...);
+void MPI_Error_Handler(MPI::Comm& comm,int* return_code,...)
 {
     MPI::Exception exception(*return_code);
     LOG::cerr<<"******************************** MPI ERROR ********************************"<<std::endl;
     LOG::cerr<<exception.Get_error_string()<<", global rank "<<global_rank<<std::endl;
     PROCESS_UTILITIES::Backtrace();
     throw std::runtime_error("MPI Error");
+}
 }
 //#####################################################################
 // Constructor

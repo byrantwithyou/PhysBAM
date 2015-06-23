@@ -36,7 +36,7 @@ public:
     HEXAHEDRALIZED_VOLUME(HEXAHEDRON_MESH& mesh_input,GEOMETRY_PARTICLES<TV>& particles_input);
     virtual ~HEXAHEDRALIZED_VOLUME();
 
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
     {return "HEXAHEDRALIZED_VOLUME<T>";}
 
@@ -44,14 +44,14 @@ public:
     {PHYSBAM_NOT_IMPLEMENTED();}
 
 //#####################################################################
-    void Clean_Memory() PHYSBAM_OVERRIDE;
+    void Clean_Memory() override;
     void Update_Hexahedron_List(); // updates the hexahedrons assuming the particle positions are already updated
     void Initialize_Tetrahedralized_Volume();
     void Initialize_Triangulated_Surface();
     void Initialize_Cube_Mesh_And_Particles(const GRID<TV>& grid);
     T Total_Volume() const;
 private:
-    void Refresh_Auxiliary_Structures_Helper() PHYSBAM_OVERRIDE {PHYSBAM_NOT_IMPLEMENTED();}
+    void Refresh_Auxiliary_Structures_Helper() override {PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
 };
 }

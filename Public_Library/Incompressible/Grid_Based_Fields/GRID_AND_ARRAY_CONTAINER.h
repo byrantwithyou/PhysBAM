@@ -11,7 +11,6 @@
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Tools/Vectors/VECTOR_UTILITIES.h>
 namespace PhysBAM{
 

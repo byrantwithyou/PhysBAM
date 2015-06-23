@@ -13,7 +13,6 @@
 #include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Read_Write/TYPED_STREAM.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>

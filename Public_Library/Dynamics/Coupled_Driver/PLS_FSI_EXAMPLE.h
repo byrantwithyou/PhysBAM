@@ -65,10 +65,10 @@ public:
     PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int number_of_regions);
     virtual ~PLS_FSI_EXAMPLE();
 
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const override
     {V_levelset=fluid_collection.incompressible_fluid_collection.face_velocities;}
 
-    void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time) PHYSBAM_OVERRIDE
+    void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time) override
     {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
 
     void Set_Minimum_Collision_Thickness(const T minimum_collision_thickness_input=1e-6)
@@ -86,16 +86,16 @@ public:
     void Revalidate_Fluid_Scalars();
     void Revalidate_Phi_After_Modify_Levelset();
     void Revalidate_Fluid_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
-    void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const PHYSBAM_OVERRIDE;
+    void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) override;
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const override;
     void Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
     void Read_Output_Files_Fluids(const int frame);
-    void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;
-    void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time) PHYSBAM_OVERRIDE;
-    void Log_Parameters() const PHYSBAM_OVERRIDE;
-    void After_Construction() PHYSBAM_OVERRIDE;
+    void Write_Output_Files(const int frame) const override;
+    void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time) override;
+    void Log_Parameters() const override;
+    void After_Construction() override;
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,
-        const T time) PHYSBAM_OVERRIDE;
+        const T time) override;
     virtual void Update_Fluid_Parameters(const T dt,const T time);
 //#####################################################################
     virtual void Post_Initialization(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
@@ -119,7 +119,7 @@ public:
     virtual void Melting_Substep(const T dt,const T time){}
     virtual void Modify_Fluid_For_Melting(const T dt,const T time){}
     virtual void Update_Melting_Substep_Parameters(const T dt,const T time){}
-    void After_Initialization() PHYSBAM_OVERRIDE;
+    void After_Initialization() override;
     template<class T_MPI> void Adjust_Output_Directory_For_MPI(const T_MPI mpi);
     virtual void Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
         ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}

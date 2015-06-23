@@ -40,8 +40,8 @@ public:
     {right_constant_extrapolation=true;}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,const T time) const PHYSBAM_OVERRIDE;
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const override;
+    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,const T time) const override;
 //#####################################################################
 };
 //#####################################################################

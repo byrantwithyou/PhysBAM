@@ -36,17 +36,17 @@ public:
     void Set_Slice_Color(const OPENGL_COLOR &inside_slice_color,
                          const OPENGL_COLOR &outside_slice_color);
 
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
 
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const PHYSBAM_OVERRIDE;
-    void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
-    void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const override;
+    void Turn_Smooth_Shading_On() override;
+    void Turn_Smooth_Shading_Off() override;
     virtual void Slice_Has_Changed() { for(int i=0;i<opengl_levelset_multiviews.m;i++) opengl_levelset_multiviews(i)->Set_Slice(slice); }
 
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
     bool Use_Sets() const {return use_sets;}
 
     void Toggle_Display_Overlay();

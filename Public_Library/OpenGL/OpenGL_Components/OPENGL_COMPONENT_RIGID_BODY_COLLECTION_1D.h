@@ -55,13 +55,13 @@ public:
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D();
     
 //#####################################################################
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input = true) override;
 
-    void Display() const PHYSBAM_OVERRIDE;
-    bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    bool Use_Bounding_Box() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     void Set_Draw_Object(int i, bool draw_it);  // Need to call Reinitialize after changing draw objects
     bool Get_Draw_Object(int i) const;

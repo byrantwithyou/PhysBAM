@@ -7,7 +7,6 @@
 #ifndef __VOLUMETRIC_SHADER__
 #define __VOLUMETRIC_SHADER__
 
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Ray_Tracing/Rendering/PHOTON_MAP.h>
 namespace PhysBAM{
 

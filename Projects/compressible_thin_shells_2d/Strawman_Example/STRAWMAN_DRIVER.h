@@ -22,8 +22,8 @@ class STRAWMAN_DRIVER:public DRIVER<TV>
     virtual ~STRAWMAN_DRIVER();
 
 //#####################################################################
-    void Initialize() PHYSBAM_OVERRIDE;
-    void Advance_To_Target_Time(const T target_time) PHYSBAM_OVERRIDE;
+    void Initialize() override;
+    void Advance_To_Target_Time(const T target_time) override;
 //#####################################################################
 };
 

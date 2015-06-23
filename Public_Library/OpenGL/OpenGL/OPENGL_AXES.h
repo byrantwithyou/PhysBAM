@@ -34,9 +34,9 @@ public:
     {box*=scale;}
 
 //#####################################################################
-    void Display() const PHYSBAM_OVERRIDE;
-    RANGE<TV> Bounding_Box() const PHYSBAM_OVERRIDE;
-    bool Is_Transparent() const PHYSBAM_OVERRIDE {return false;}
+    void Display() const override;
+    RANGE<TV> Bounding_Box() const override;
+    bool Is_Transparent() const override {return false;}
 //#####################################################################
 };
 }

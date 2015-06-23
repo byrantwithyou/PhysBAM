@@ -23,10 +23,10 @@ public:
     BSPLINE_QUATERNION(const ARRAY<T>& control_points_times,const ARRAY<ROTATION<TV> >& control_points,const int order=1);
     ~BSPLINE_QUATERNION();
 
-    ROTATION<TV>  Evaluate(const T t) PHYSBAM_OVERRIDE;
+    ROTATION<TV>  Evaluate(const T t) override;
     T Quaternion_Basis_Function(const int i,const int k,const T t);
     ROTATION<TV> Omega(const int i);
-    void Create_Closed_Points() PHYSBAM_OVERRIDE;
+    void Create_Closed_Points() override;
     void Quaternion_Check();
 //#####################################################################
 };

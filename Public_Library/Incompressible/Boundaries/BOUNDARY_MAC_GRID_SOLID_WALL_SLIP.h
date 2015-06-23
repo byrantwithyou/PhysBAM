@@ -32,8 +32,8 @@ public:
     {phi=&phi_input;}
 
 //#####################################################################
-    void Fill_Ghost_Faces(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& u,ARRAY<T,FACE_INDEX<TV::m> >& u_ghost,const T time,const int number_of_ghost_cells=3) const PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition_Face(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& u,const T time) const PHYSBAM_OVERRIDE;
+    void Fill_Ghost_Faces(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& u,ARRAY<T,FACE_INDEX<TV::m> >& u_ghost,const T time,const int number_of_ghost_cells=3) const override;
+    void Apply_Boundary_Condition_Face(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& u,const T time) const override;
     void Reflect_Single_Ghost_Region(const int face_axis,const GRID<TV>& face_grid,T_ARRAYS_BASE& u_ghost_component,const int side,const RANGE<TV_INT>& region) const;
 protected:
     void Zero_Single_Boundary_Side(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& u,const int side) const;

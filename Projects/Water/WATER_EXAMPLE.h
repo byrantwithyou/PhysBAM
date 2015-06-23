@@ -64,7 +64,7 @@ public:
     T Time_At_Frame(const int frame) const
     {return initial_time+(frame-first_frame)/frame_rate;}
 
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const override
     {V_levelset=face_velocities;}
 
     void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
@@ -78,7 +78,7 @@ public:
     {return false;}
 
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time);
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {}
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const override {}
     void Initialize_Grid(TV_INT counts,RANGE<TV> range);
     void Write_Output_Files(const int frame);
     void Read_Output_Files(const int frame);

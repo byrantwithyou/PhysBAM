@@ -35,11 +35,11 @@ private:
     {return TV::Componentwise_And(constrain,TV::Componentwise_Greater_Equal(prismatic_min,prismatic_max));}
 public:
 //#####################################################################
-    bool Has_Prismatic_Constraint() const PHYSBAM_OVERRIDE;
-    void Constrain_Prismatically(TV& translation) const PHYSBAM_OVERRIDE; // This is in joint space
-    void Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const PHYSBAM_OVERRIDE; // This is in world space.
-    TV Prismatic_Component_Translation() const PHYSBAM_OVERRIDE;
-    void Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix=0) const PHYSBAM_OVERRIDE;
+    bool Has_Prismatic_Constraint() const override;
+    void Constrain_Prismatically(TV& translation) const override; // This is in joint space
+    void Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const override; // This is in world space.
+    TV Prismatic_Component_Translation() const override;
+    void Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix=0) const override;
 //#####################################################################
 };
 

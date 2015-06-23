@@ -28,7 +28,7 @@ public:
     void Set_Color(int index, const OPENGL_COLOR &color)
     {if(index>=color_map.m) color_map.Resize(index+1);color_map(index)=color;}
 
-    OPENGL_COLOR Lookup(int index) const PHYSBAM_OVERRIDE;
+    OPENGL_COLOR Lookup(int index) const override;
     static OPENGL_INDEXED_COLOR_MAP* Basic_16_Color_Map();
     static OPENGL_INDEXED_COLOR_MAP* Levelset_Multiple_Color_Map();
     static OPENGL_INDEXED_COLOR_MAP* Particle_Multiple_Color_Map();

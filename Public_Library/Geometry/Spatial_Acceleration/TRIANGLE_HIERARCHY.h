@@ -60,28 +60,28 @@ public:
     void Update_Leaf_Boxes(const FRAME<TV>& start_frame,const FRAME<TV>& end_frame,const T extra_thickness=0) // for moving triangles
     {Calculate_Bounding_Boxes(box_hierarchy,start_frame,end_frame);if(extra_thickness) Thicken_Leaf_Boxes(extra_thickness);}
 
-    void Intersection_List(const VECTOR<T,3>& point,ARRAY<int>& intersection_list,const T thickness_over_two=0) const PHYSBAM_OVERRIDE
+    void Intersection_List(const VECTOR<T,3>& point,ARRAY<int>& intersection_list,const T thickness_over_two=0) const override
     {if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,point,group_list,thickness_over_two);
         for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
     else Intersection_List(root,point,intersection_list,thickness_over_two);}
     
-    void Intersection_List(const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T thickness_over_two=0) const PHYSBAM_OVERRIDE
+    void Intersection_List(const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T thickness_over_two=0) const override
     {if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,test_box,group_list,thickness_over_two);
         for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
     else Intersection_List(root,test_box,intersection_list,thickness_over_two);}
         
-    void Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const PHYSBAM_OVERRIDE
+    void Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const override
     {if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,test_box,group_list);
         for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
     else Intersection_List(root,test_box,intersection_list);}
     
-    void Intersection_List(const PLANE<T>& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two=0) const PHYSBAM_OVERRIDE
+    void Intersection_List(const PLANE<T>& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two=0) const override
     {if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,test_plane,group_list,thickness_over_two);
@@ -109,10 +109,10 @@ public:
     {Calculate_Bounding_Boxes_Helper(bounding_boxes,start_X,end_X);}
 
 //#####################################################################
-    void Initialize_Hierarchy_Using_KD_Tree() PHYSBAM_OVERRIDE;
+    void Initialize_Hierarchy_Using_KD_Tree() override;
     void Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes);
     void Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const FRAME<TV>& start_frame,const FRAME<TV>& end_frame);
-    void Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) PHYSBAM_OVERRIDE;
+    void Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) override;
     bool Intersection(RAY<VECTOR<T,3> >& ray,const T thickness_over_two=0,const bool use_ray_bounding_box=false) const;
     bool Intersection(RAY<VECTOR<T,3> >& ray,VECTOR<T,3>& weights,const T thickness_over_two=0,const bool use_ray_bounding_box=false) const;
     // for internal use - but octrees use them as well so they're not private

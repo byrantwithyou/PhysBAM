@@ -98,8 +98,8 @@ public:
     void Get_Velocities(T time);
     void Get_Initial_Polymer_Stresses();
     void Analytic_Test();
-    void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE;
-    void End_Time_Step(const T time) PHYSBAM_OVERRIDE;
+    void Begin_Time_Step(const T time) override;
+    void End_Time_Step(const T time) override;
     MATRIX<T,TV::m> Stress(const TV& X,T time);
     SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress(const TV& X,T time);
     SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress_Forcing_Term(const TV& X,T time);

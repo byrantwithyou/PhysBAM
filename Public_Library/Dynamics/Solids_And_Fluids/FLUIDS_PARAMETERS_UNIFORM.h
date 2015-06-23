@@ -114,8 +114,8 @@ public:
 //#####################################################################
     virtual void Initialize_Grids();
     void Initialize_Fluid_Evolution(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
-    void Use_Fluid_Coupling_Defaults() PHYSBAM_OVERRIDE;
-    void Use_No_Fluid_Coupling_Defaults() PHYSBAM_OVERRIDE;
+    void Use_Fluid_Coupling_Defaults() override;
+    void Use_No_Fluid_Coupling_Defaults() override;
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time);
     void Delete_Particles_Inside_Objects(const T time);
     void Initialize_Number_Of_Regions(const int number_of_regions_input);
@@ -145,7 +145,7 @@ public:
         const std::string& output_directory,const std::string& prefix,const int frame);
     void Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame);
     void Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int first_frame,const int frame) const;
-    void Log_Parameters() const PHYSBAM_OVERRIDE;
+    void Log_Parameters() const override;
 //#####################################################################
 };      
 }

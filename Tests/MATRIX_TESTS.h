@@ -51,8 +51,8 @@ public:
 
     virtual ~MATRIX_TESTS(){}
 
-    TEST_RESULT Run_Test(int n) PHYSBAM_OVERRIDE;
-    int Number_Of_Tests() const PHYSBAM_OVERRIDE;
+    TEST_RESULT Run_Test(int n) override;
+    int Number_Of_Tests() const override;
     template<class T_MATRIX> bool Assert_Zero(const T_MATRIX& a,T tolerance=0) const;
     template<class T_MATRIX0,class T_MATRIX1> bool Assert_Equal(const T_MATRIX0& a,const T_MATRIX1& b,T tolerance=0) const;
     template<class T_MATRIX> void Identify_Matrix(const T_MATRIX& a) const;

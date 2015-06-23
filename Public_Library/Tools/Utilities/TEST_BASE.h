@@ -10,7 +10,6 @@
 #include <Tools/Data_Structures/HASHTABLE.h>
 #include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Log/LOG.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <string>
 namespace PhysBAM{
 

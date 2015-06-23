@@ -14,7 +14,6 @@
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 

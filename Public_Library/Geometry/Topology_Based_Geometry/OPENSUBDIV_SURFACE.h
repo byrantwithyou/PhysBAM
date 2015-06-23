@@ -50,13 +50,13 @@ public:
     void Initialize(const std::string& filename,T thickness_in);
     TV Evaluate(T s,T t,VECTOR<TV,2>* tangents=0) const;
     OPENSUBDIV_SURFACE<TV,gauss_order>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const;
-    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE;
-    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
+    void Read(TYPED_ISTREAM& input) override;
+    void Write(TYPED_OSTREAM& output) const override;
     void Compute_G0();
     void Set_Mass(T density,bool use_constant_mass=false) const;
-    std::string Name() const PHYSBAM_OVERRIDE;
+    std::string Name() const override;
     static std::string Static_Name();
-    std::string Extension() const PHYSBAM_OVERRIDE;
+    std::string Extension() const override;
     static std::string Static_Extension();
 //#####################################################################
 };

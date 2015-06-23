@@ -5,7 +5,6 @@
 #ifndef __RENDERING_BLEND_SHADER__
 #define __RENDERING_BLEND_SHADER__
 
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{
 

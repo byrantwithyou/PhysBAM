@@ -33,7 +33,7 @@ public:
     virtual ~RENDERING_LEVELSET_MULTIPLE_OBJECT()
     {for(int i=1;i<rendering_levelset_multiple_region_objects.m;i++) delete rendering_levelset_multiple_region_objects(i);}
 
-    bool Intersection(RAY<VECTOR<T,3> >& ray,const int lowest_priority,const RENDERING_OBJECT<T>** intersected_object) const PHYSBAM_OVERRIDE
+    bool Intersection(RAY<VECTOR<T,3> >& ray,const int lowest_priority,const RENDERING_OBJECT<T>** intersected_object) const override
     {if(priority<lowest_priority) return false;int region_start,region_end;        
     if(Intersection(ray,region_start,region_end,small_number)){
         if(region_end==-1) *intersected_object=rendering_levelset_multiple_region_objects(region_start);
@@ -63,12 +63,12 @@ public:
         if(i!=region_check && inside_region) return false;}
       return true;}
 
-    bool Inside(const VECTOR<T,3>& location,RENDERING_OBJECT<T>** intersected_object) const PHYSBAM_OVERRIDE
+    bool Inside(const VECTOR<T,3>& location,RENDERING_OBJECT<T>** intersected_object) const override
     {for(int i=0;i<number_of_regions;i++) if(rendering_levelset_multiple_region_objects(i)->Inside(location)){
         *intersected_object=(RENDERING_OBJECT<T>*)rendering_levelset_multiple_region_objects(i);return true;}
     return false;}
 
-    RANGE<VECTOR<T,3> > Object_Space_Bounding_Box() const  PHYSBAM_OVERRIDE
+    RANGE<VECTOR<T,3> > Object_Space_Bounding_Box() const  override
     {return levelset_multiple.grid.domain;}
 
     T Integration_Step(const T phi) const
@@ -77,7 +77,7 @@ public:
     else if(distance > levelset_multiple.grid.dX.Min()) return (T).25*distance;
     return (T).1*levelset_multiple.grid.dX.Min();}
 
-    TRIANGULATED_SURFACE<T>* Generate_Triangles()const PHYSBAM_OVERRIDE {return TRIANGULATED_SURFACE<T>::Create();};
+    TRIANGULATED_SURFACE<T>* Generate_Triangles()const override {return TRIANGULATED_SURFACE<T>::Create();};
 
 //#####################################################################
     bool Intersection(RAY<VECTOR<T,3> >& ray,int& region_start,int& region_end,const T thickness=0) const;

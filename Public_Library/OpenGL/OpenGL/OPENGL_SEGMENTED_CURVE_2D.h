@@ -33,13 +33,13 @@ private:
 public:
     OPENGL_SEGMENTED_CURVE_2D(STREAM_TYPE stream_type,const SEGMENTED_CURVE_2D<T>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan());
 
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) PHYSBAM_OVERRIDE;
-    void Clear_Highlight() PHYSBAM_OVERRIDE;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const PHYSBAM_OVERRIDE;
+    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
+    void Clear_Highlight() override;
+    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
     void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,3>* transform) const;
 
     OPENGL_SELECTION<T>* Get_Vertex_Selection(int index);
@@ -59,7 +59,7 @@ public:
     OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_2D(OPENGL_OBJECT<T>* object, int index=0) 
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_2D, object), index(index) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 template<class T>
@@ -71,7 +71,7 @@ public:
     OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_2D(OPENGL_OBJECT<T>* object, int index=0) 
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_2D, object), index(index) {}
 
-    RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

@@ -29,8 +29,8 @@ public:
     virtual ~PROJECTION_COLLIDABLE_UNIFORM();
 
 //#####################################################################
-    virtual void Initialize_Grid(const GRID<TV>& mac_grid) PHYSBAM_OVERRIDE;
-    virtual void Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt=false) PHYSBAM_OVERRIDE;
+    virtual void Initialize_Grid(const GRID<TV>& mac_grid) override;
+    virtual void Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt=false) override;
 //#####################################################################
 };
 }

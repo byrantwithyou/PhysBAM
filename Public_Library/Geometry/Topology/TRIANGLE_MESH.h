@@ -93,8 +93,8 @@ public:
     {Mark_Edge_Connected_Component_Incident_On_A_Node(node,1,marked);}
 
 //#####################################################################
-    void Delete_Auxiliary_Structures() PHYSBAM_OVERRIDE;
-    void Refresh_Auxiliary_Structures() PHYSBAM_OVERRIDE;
+    void Delete_Auxiliary_Structures() override;
+    void Refresh_Auxiliary_Structures() override;
     void Initialize_Square_Mesh(const int m,const int n,const bool reverse_triangles=false); // construct a regular m-by-n rectangular mesh
     void Initialize_Equilateral_Mesh(const int m,const int n); 
     void Initialize_Torus_Mesh(const int m,const int n); 
@@ -121,8 +121,8 @@ public:
     bool Orientations_Consistent();
     void Identify_Connected_Components(ARRAY<int>& label);
     void Label_Connected_Component_With_ID(ARRAY<int>& label,const int triangle,const int id) const;
-    bool Assert_Consistent() const PHYSBAM_OVERRIDE;
-    void Set_Number_Nodes(const int number_nodes_input) PHYSBAM_OVERRIDE;
+    bool Assert_Consistent() const override;
+    void Set_Number_Nodes(const int number_nodes_input) override;
 //#####################################################################
 };
 }

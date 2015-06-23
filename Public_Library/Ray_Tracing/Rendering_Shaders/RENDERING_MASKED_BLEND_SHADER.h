@@ -34,7 +34,7 @@ public:
     {mask_usage=3;}
 
     T Blending_Fraction(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,
-        const RENDERING_OBJECT<T>& intersection_object,const TV& intersection_point,const TV& same_side_normal) const PHYSBAM_OVERRIDE
+        const RENDERING_OBJECT<T>& intersection_object,const TV& intersection_point,const TV& same_side_normal) const override
     {TV mask=mask_shader.Shade_Surface_Using_Direct_Illumination(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal);
     return mask_usage?mask(mask_usage):mask.Average();}
 //#####################################################################

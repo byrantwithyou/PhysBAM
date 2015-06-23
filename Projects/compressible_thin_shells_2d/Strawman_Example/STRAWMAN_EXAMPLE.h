@@ -89,11 +89,11 @@ public:
     inline T solid_position(const T& time) const
     {return initial_distance+solid_velocity*time;}
 
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const override {
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             V_levelset(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());
     }
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const override {
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             V_levelset(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());
     }
@@ -369,7 +369,7 @@ T Compute_Dt(const T time,const T target_time,bool& done) const
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
-void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
+void Write_Output_Files(const int frame) const override
 {
     std::string frame_folder=output_directory+LOG::sprintf("/%d/",frame);
     if(frame==0) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/transverse_velocity",fluid_tangential_velocity);

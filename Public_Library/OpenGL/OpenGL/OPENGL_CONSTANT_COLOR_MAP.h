@@ -20,7 +20,7 @@ public:
         :color(color)
     {}
 
-    virtual OPENGL_COLOR Lookup(T x) const PHYSBAM_OVERRIDE
+    virtual OPENGL_COLOR Lookup(T x) const override
     {return color;}
 };
 }

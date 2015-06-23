@@ -58,15 +58,15 @@ public:
     virtual ~NEWMARK_EVOLUTION();
 
 //#####################################################################
-    bool Use_CFL() const PHYSBAM_OVERRIDE;
-    void Advance_One_Time_Step_Position(const T dt,const T time,const bool solids) PHYSBAM_OVERRIDE;
-    void Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) PHYSBAM_OVERRIDE;
+    bool Use_CFL() const override;
+    void Advance_One_Time_Step_Position(const T dt,const T time,const bool solids) override;
+    void Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) override;
     virtual void Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update);
     void Apply_Constraints(const T dt,const T time);
     void Diagnostics(const T dt,const T time,const int velocity_time,const int position_time,int step,const char* description);
     void Print_Maximum_Velocities(const T time) const;
     void Update_Velocity_Using_Stored_Differences(const T dt,const T time,const int p);
-    void Initialize_Rigid_Bodies(const T frame_rate, const bool restart) PHYSBAM_OVERRIDE;
+    void Initialize_Rigid_Bodies(const T frame_rate, const bool restart) override;
     void Write_Position_Update_Projection_Data(const STREAM_TYPE stream_type,const std::string& prefix);
     void Read_Position_Update_Projection_Data(const STREAM_TYPE stream_type,const std::string& prefix);
 protected:

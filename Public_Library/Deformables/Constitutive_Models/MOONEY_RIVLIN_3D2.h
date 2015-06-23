@@ -43,7 +43,7 @@ public:
         //base.Initialize(constant_mu,constant_lambda);
     }
     
-    T Energy_Density(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const PHYSBAM_OVERRIDE
+    T Energy_Density(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const override
     {
         DIAGONAL_MATRIX<T,3> F_threshold=F.Clamp_Min(failure_threshold),C=F_threshold*F_threshold;
         T I_C=C.Trace(),II_C=(C*C).Trace(),J=F_threshold.Determinant(),Jcc=pow(J,-((T)2/3));
@@ -53,16 +53,16 @@ public:
         
     }
     
-    DIAGONAL_MATRIX<T,3> P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int tetrahedron) const PHYSBAM_OVERRIDE
+    DIAGONAL_MATRIX<T,3> P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int tetrahedron) const override
     {DIAGONAL_MATRIX<T,3> F_threshold=F.Clamp_Min(failure_threshold),C=F_threshold*F_threshold,F_cube=C*F_threshold,F_inverse=F_threshold.Inverse();
     T I_C=C.Trace(),II_C=(C*C).Trace(),J=F_threshold.Determinant(),Jcc=pow(J,-((T)2/3));
     return (scale*2*Jcc*(mu_10+Jcc*mu_01*I_C))*F_threshold-(scale*2*Jcc*Jcc*mu_01)*F_cube+(scale*(kappa*log(J)-((T)2/3)*Jcc*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))))*F_inverse;}
     
-    MATRIX<T,3> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const T scale,const int tetrahedron) const PHYSBAM_OVERRIDE
+    MATRIX<T,3> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const T scale,const int tetrahedron) const override
     {SYMMETRIC_MATRIX<T,3> strain_rate=F_dot.Symmetric_Part(); 
     return 2*scale*constant_beta*strain_rate+scale*constant_alpha*strain_rate.Trace();}
 
-    void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const PHYSBAM_OVERRIDE
+    void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const override
     {DIAGONAL_MATRIX<T,3> F_threshold=F.Clamp_Min(failure_threshold),C=F_threshold*F_threshold,F_cube=C*F_threshold,F_inverse=F_threshold.Inverse();
     T I_C=C.Trace(),II_C=(C*C).Trace(),J=F_threshold.Determinant(),Jcc=pow(J,-((T)2/3));
     SYMMETRIC_MATRIX<T,3> alpha;

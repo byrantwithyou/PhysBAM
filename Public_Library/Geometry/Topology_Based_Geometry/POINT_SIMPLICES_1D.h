@@ -36,7 +36,7 @@ public:
     POINT_SIMPLICES_1D();
     POINT_SIMPLICES_1D(POINT_SIMPLEX_MESH& point_simplex_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input);
 
-    void Clean_Memory() PHYSBAM_OVERRIDE
+    void Clean_Memory() override
     {MESH_OBJECT<TV,POINT_SIMPLEX_MESH>::Clean_Memory();}
 
     bool Boundary(const TV& location,T thickness_over_two=0) const
@@ -52,11 +52,11 @@ public:
     {int node1;mesh.elements(aggregate_id).Get(node1);
     return POINT_SIMPLEX_1D<T>(particles.X(node1),mesh.directions(node1));}
 
-    virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
+    virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
     {return LOG::sprintf("SIMPLICIAL_OBJECT<T,VECTOR<T,%d>,0>",TV::dimension);}
 
-    virtual std::string Extension() const PHYSBAM_OVERRIDE {return Static_Extension();}
+    virtual std::string Extension() const override {return Static_Extension();}
     static std::string Static_Extension() 
     {return "ptsimp";}
 
@@ -88,7 +88,7 @@ public:
     }
     void Initialize_Particle_Partition(const VECTOR<int,1>& counts){PHYSBAM_NOT_IMPLEMENTED();}
 private:
-    void Refresh_Auxiliary_Structures_Helper() PHYSBAM_OVERRIDE {if(point_simplex_list) Update_Point_Simplex_List();}
+    void Refresh_Auxiliary_Structures_Helper() override {if(point_simplex_list) Update_Point_Simplex_List();}
 //#####################################################################
 };
 }

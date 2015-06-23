@@ -154,7 +154,7 @@ public:
         fvm(fvm),dynamic_particles(fvm.force_dynamic_particles_list)
     {}
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& bp,KRYLOV_VECTOR_BASE<T>& bresult) const PHYSBAM_OVERRIDE
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& bp,KRYLOV_VECTOR_BASE<T>& bresult) const override
     {const KRYLOV_VECTOR_T& p=debug_cast<const KRYLOV_VECTOR_T&>(bp);KRYLOV_VECTOR_T& result=debug_cast<KRYLOV_VECTOR_T&>(bresult);
     const KRYLOV_VECTOR_T* use_p=&p;
     INDIRECT_ARRAY<const ARRAY<T> > diagonal_preconditioner(fvm.diagonal_preconditioner_full,dynamic_particles);
@@ -165,20 +165,20 @@ public:
     fvm.Negative_Divergence(fvm.gradient_full,result.v.array);
     if(fvm.use_diagonal_preconditioner) result.v*=diagonal_preconditioner;}
 
-    void Project(KRYLOV_VECTOR_BASE<T>& p) const PHYSBAM_OVERRIDE
+    void Project(KRYLOV_VECTOR_BASE<T>& p) const override
     {}
 
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& p) const PHYSBAM_OVERRIDE
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& p) const override
     {Project(p);}
 
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bx,const KRYLOV_VECTOR_BASE<T>& by) const PHYSBAM_OVERRIDE
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bx,const KRYLOV_VECTOR_BASE<T>& by) const override
     {const KRYLOV_VECTOR_T& x=debug_cast<const KRYLOV_VECTOR_T&>(bx),&y=debug_cast<const KRYLOV_VECTOR_T&>(by);
     assert(x.v.Size()==dynamic_particles.Size());
     T inner_product=x.v.Dot(y.v);
     if(fvm.mpi_solids) inner_product=fvm.mpi_solids->Reduce_Add(inner_product);
     return inner_product;}
 
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bx) const PHYSBAM_OVERRIDE
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bx) const override
     {const KRYLOV_VECTOR_T& x=debug_cast<const KRYLOV_VECTOR_T&>(bx);
     assert(x.v.Size()==dynamic_particles.Size());
     T convergence_norm=x.v.Maximum_Magnitude();

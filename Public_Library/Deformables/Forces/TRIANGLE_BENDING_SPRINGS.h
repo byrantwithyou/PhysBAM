@@ -29,7 +29,7 @@ public:
 
     virtual ~TRIANGLE_BENDING_SPRINGS();
 
-    void Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name="") const PHYSBAM_OVERRIDE
+    void Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name="") const override
     {if(force_name.empty()) BASE::Add_Force_Data(force_data_list,"TRIANGLE_BENDING_SPRINGS");
     else BASE::Add_Force_Data(force_data_list,force_name);}
 

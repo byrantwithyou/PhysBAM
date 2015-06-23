@@ -40,7 +40,7 @@ public:
         local_vector_to_world_vector=MATRIX<T,3>(u,v,spot_direction);
     }
 
-    void Sample_Points(const VECTOR<T,3>& surface_position,const VECTOR<T,3>& surface_normal,ARRAY<RAY<VECTOR<T,3> > >& sample_array) const PHYSBAM_OVERRIDE
+    void Sample_Points(const VECTOR<T,3>& surface_position,const VECTOR<T,3>& surface_normal,ARRAY<RAY<VECTOR<T,3> > >& sample_array) const override
     {sample_array.Resize(1);sample_array(0)=RAY<VECTOR<T,3> >(SEGMENT_3D<T>(surface_position,position));}
 
     T Spotlight_Falloff(const VECTOR<T,3>& direction) const
@@ -49,10 +49,10 @@ public:
     else if(cos_theta>cos_penumbra_angle)return 1;
     else {T alpha=(cos_theta-cos_cone_angle)/(cos_penumbra_angle-cos_cone_angle);return alpha*alpha*alpha*alpha;}}
 
-    VECTOR<T,3> Emitted_Light(const RENDERING_RAY<T>& ray) const PHYSBAM_OVERRIDE
+    VECTOR<T,3> Emitted_Light(const RENDERING_RAY<T>& ray) const override
     {return brightness*color*power_to_intensity*Spotlight_Falloff(-ray.ray.direction)/sqr(ray.ray.t_max);}
 
-    int Emit_Photons(RENDERING_RAY<T>& parent_ray,PHOTON_MAP<T>& photon_map,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type) const  PHYSBAM_OVERRIDE
+    int Emit_Photons(RENDERING_RAY<T>& parent_ray,PHOTON_MAP<T>& photon_map,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type) const  override
     {int photons_emitted=0;
     while(photon_map.Light_Emission_Quota_Remains()){
         printf("photons_emitted %d\n",photons_emitted);

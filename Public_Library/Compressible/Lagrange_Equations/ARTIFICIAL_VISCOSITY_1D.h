@@ -8,7 +8,6 @@
 #define __ARTIFICIAL_VISCOSITY_1D__
 
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <Compressible/Equations_Of_State/EOS.h>
 #include <Compressible/Lagrange_Equations/ARTIFICIAL_VISCOSITY.h>
 #include <Compressible/Lagrange_Equations/GRID_LAGRANGE_1D.h>

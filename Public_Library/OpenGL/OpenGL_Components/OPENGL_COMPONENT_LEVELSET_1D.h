@@ -27,11 +27,11 @@ public:
 //##################################################################### 
     OPENGL_COMPONENT_LEVELSET_1D(STREAM_TYPE stream_type,GRID<TV> &grid,const std::string& levelset_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
     virtual ~OPENGL_COMPONENT_LEVELSET_1D();
-    bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
-    void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
-    void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE;
-    void Display() const PHYSBAM_OVERRIDE;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
+    bool Valid_Frame(int frame_input) const override;
+    void Set_Frame(int frame_input) override;
+    void Set_Draw(bool draw_input=true) override;
+    void Display() const override;
+    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 private:
     void Reinitialize();
 //##################################################################### 

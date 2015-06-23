@@ -97,7 +97,7 @@ public:
     virtual void Fill_Levelset_Ghost_Cells(const T time)
     {particle_levelset->levelset.boundary->Fill_Ghost_Cells(grid,phi,particle_levelset->levelset.phi,0,time,particle_levelset->number_of_ghost_cells);}
 
-    void Set_CFL_Number(const T cfl_number_input) PHYSBAM_OVERRIDE
+    void Set_CFL_Number(const T cfl_number_input) override
     {PARTICLE_LEVELSET_EVOLUTION<T>::Set_CFL_Number(cfl_number_input);
     particle_levelset->cfl_number=cfl_number_input;}
 

@@ -85,13 +85,13 @@ private:
     T Spatially_Varying_Wind_Pressure(const TV& X) const
     {return interpolation.Clamped_To_Array(V_grid,*spatially_varying_wind_pressure,X);}
 
-    void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE
+    void Enforce_Definiteness(const bool enforce_definiteness_input) override
     {}
 
-    T CFL_Strain_Rate() const PHYSBAM_OVERRIDE
+    T CFL_Strain_Rate() const override
     {return FLT_MAX;}
 
-    void Initialize_CFL(ARRAY_VIEW<RIGID_FREQUENCY_DATA> rigid_frequency) PHYSBAM_OVERRIDE
+    void Initialize_CFL(ARRAY_VIEW<RIGID_FREQUENCY_DATA> rigid_frequency) override
     {}
 
     void Update_Mpi(const ARRAY<bool>& particle_is_simulated)
@@ -105,9 +105,9 @@ private:
 public:
 
 //#####################################################################
-    void Update_Position_Based_State(const T time) PHYSBAM_OVERRIDE;
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const PHYSBAM_OVERRIDE;
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const PHYSBAM_OVERRIDE;
+    void Update_Position_Based_State(const T time) override;
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const override;
+    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const override;
 //#####################################################################
 };
 }

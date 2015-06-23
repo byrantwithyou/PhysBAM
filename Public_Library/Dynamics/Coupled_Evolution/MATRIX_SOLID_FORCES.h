@@ -44,7 +44,7 @@ public:
     FORCE_AGGREGATE_ID Velocity_Dependent_Forces_Size() const;
     void Test_Matrix() const;
     void Print_Each_Matrix(int n,const GENERALIZED_VELOCITY<TV>& V,T sqrt_dt) const;
-    void Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const PHYSBAM_OVERRIDE;
+    void Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const override;
 private:
     void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<T,FORCE_AGGREGATE_ID> aggregate,const T time) const;
     void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T,FORCE_AGGREGATE_ID> aggregate,ARRAY_VIEW<TV> V_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;
