@@ -13,7 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> STRESS_EXAMPLE<TV>::
 STRESS_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-    :stream_type(stream_type),initial_time(0),last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
+    :stream_type(stream_type_input),initial_time(0),last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     write_output_files(true),output_directory("output"),restart(0),number_of_ghost_cells(5),dt(1),time(0),
     time_steps_per_frame(1),use_advection(true),use_reduced_advection(true),inv_Wi(0),use_du_terms(true),
     grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
