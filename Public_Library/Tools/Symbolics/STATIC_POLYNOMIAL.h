@@ -391,7 +391,7 @@ struct STATIC_POLYNOMIAL
         
         const QUADRATURE_RULE_SEG& rule=quadrature_rule_seg[o];
         if(rule.use_center) r+=rule.center_weight*Value(vertices.Sum()/2);
-        for(int i=0;i<rule.number;i++){
+        for(int i=0;i<rule.number && i<3;i++){
             T s=0;
             s+=Value(vertices.x+(T)rule.location[i]*a);
             s+=Value(vertices.y-(T)rule.location[i]*a); 

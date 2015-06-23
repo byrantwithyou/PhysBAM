@@ -36,7 +36,7 @@ String_To_Value(const std::string &value_string,OPENGL_COLOR &value,bool command
         else if(!STRING_UTILITIES::Compare_Strings(str,"Cyan",false)) value=OPENGL_COLOR::Cyan();
         else if(!STRING_UTILITIES::Compare_Strings(str,"Magenta",false)) value=OPENGL_COLOR::Magenta();
         else{LOG::cerr<<"Unrecognized color '"<<str<<"'"<<std::endl;return false;}}
-    bool success = value_string_stream!=0;
+    bool success = !value_string_stream.fail();
     if(!(value_string_stream >> value.rgba[3])) {
         value.rgba[3] = 1;
     }
