@@ -57,10 +57,6 @@ namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const 
 //#####################################################################
 // Constructor
 //#####################################################################
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4355) // 'this' : used in base member initializer list
-#endif
 template<class TV_input> PLS_FSI_EXAMPLE<TV_input>::
 PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int number_of_regions)
     :BASE(stream_type,parse_args),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
@@ -80,9 +76,6 @@ PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int n
     parse_args.Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
     parse_args.Add("-resolution",&resolution,"resolution","simulation resolution");
 }
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 //#####################################################################
 // Destructor
 //#####################################################################

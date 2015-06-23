@@ -258,11 +258,7 @@ World_Space_Simplex_Bounding_Box(const int id) const
 //#####################################################################
 // Function World_Space_Simplex
 //#####################################################################
-#if defined(_MSC_VER) && _MSC_VER<=1500
-template<class TV> typename RIGID_BODY<TV>::WORLD_SPACE_SIMPLEX_RESULT RIGID_BODY<TV>::
-#else
 template<class TV> typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX RIGID_BODY<TV>::
-#endif
 World_Space_Simplex(const int id) const
 {
     const VECTOR<int,TV::dimension>& elements=simplicial_object->mesh.elements(id);

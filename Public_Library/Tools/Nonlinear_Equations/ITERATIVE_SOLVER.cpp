@@ -194,14 +194,6 @@ Golden_Parabolic_Minimum(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
     return x2;
 }
 namespace PhysBAM{
-#if defined(_MSC_VER) && _MSC_VER<=1500
-// MSVC9 has issues implicitly instantiating these within
-// ITERATIVE_SOLVER<T>::Conjugate_Gradient.
-template class NONLINEAR_FUNCTION<float(PARAMETER_SPACE<float>)>;
-template class NONLINEAR_FUNCTION<double(PARAMETER_SPACE<double>)>;
-template class PARAMETRIC_LINE<float,float(PARAMETER_SPACE<float>)>;
-template class PARAMETRIC_LINE<double,double(PARAMETER_SPACE<double>)>;
-#endif
 template class ITERATIVE_SOLVER<float>;
 template class ITERATIVE_SOLVER<double>;
 }
