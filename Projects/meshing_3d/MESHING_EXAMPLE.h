@@ -50,7 +50,7 @@ protected:
 public:
 
     MESHING_EXAMPLE(const STREAM_TYPE stream_type_input)
-        :stream_type(stream_type),tetrahedral_meshing(stream_type),use_multiple_levelset_implicit_surface(false),
+        :stream_type(stream_type_input),tetrahedral_meshing(stream_type),use_multiple_levelset_implicit_surface(false),
         bcc_lattice_cell_size(0),use_adaptive_refinement(true),max_subdivision_levels(7),
         use_optimization(true),use_dynamics(true),
         number_of_initial_optimization_steps(3),number_of_final_optimization_steps(0),
