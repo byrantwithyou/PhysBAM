@@ -157,24 +157,25 @@ template<int n,class IN,class OBJ,class BASE> void Set(VEC_HOLDER<OBJ,BASE>& out
 template<int n,class IN,class OBJ,class BASE> void Set_Helper(VEC_HOLDER<OBJ,BASE>& out,const IN& in,VECTOR<int,n>*) {Set_Helper(out.z,in,(VECTOR<int,n-1>*)0);}
 template<class IN,class OBJ,class BASE> void Set_Helper(VEC_HOLDER<OBJ,BASE>& out,const IN& in,VECTOR<int,0>*){out.x=in;}
 
-template<class LAYOUT,int... lead_dims> struct EMPTY_VEC;
-template<class T,int d,int... dims,int... lead_dims> struct EMPTY_VEC<DIFF_LAYOUT<T,d,dims...>,lead_dims...>
+// k=1 for GRADIENT, k=2 for HESSIAN
+template<int k,class LAYOUT,int... lead_dims> struct EMPTY_VEC;
+template<int k,class T,int d,int... dims,int... lead_dims> struct EMPTY_VEC<k,DIFF_LAYOUT<T,d,dims...>,lead_dims...>
 {
-    typedef VEC_HOLDER<typename ZERO_BLOCK_TYPE<T,lead_dims...,d>::TYPE,typename EMPTY_VEC<DIFF_LAYOUT<T,dims...>,lead_dims...>::TYPE> TYPE;
+    typedef VEC_HOLDER<typename ZERO_BLOCK_TYPE<k,T,lead_dims...,d>::TYPE,typename EMPTY_VEC<k,DIFF_LAYOUT<T,dims...>,lead_dims...>::TYPE> TYPE;
 };
-template<class T,int... lead_dims> struct EMPTY_VEC<DIFF_LAYOUT<T>,lead_dims...>
+template<int k,class T,int... lead_dims> struct EMPTY_VEC<k,DIFF_LAYOUT<T>,lead_dims...>
 {
     typedef VEC_END TYPE;
 };
 
-template<int i,class LAYOUT,int... lead_dims> struct ONE_NONZERO_VECTOR;
-template<int i,class T,int d,int... dims,int... lead_dims> struct ONE_NONZERO_VECTOR<i,DIFF_LAYOUT<T,d,dims...>,lead_dims...>
+template<int k,int i,class LAYOUT,int... lead_dims> struct ONE_NONZERO_VECTOR;
+template<int k,int i,class T,int d,int... dims,int... lead_dims> struct ONE_NONZERO_VECTOR<k,i,DIFF_LAYOUT<T,d,dims...>,lead_dims...>
 {
-    typedef VEC_HOLDER<typename ZERO_BLOCK_TYPE<T,lead_dims...,d>::TYPE,typename ONE_NONZERO_VECTOR<i-1,DIFF_LAYOUT<T,dims...>,lead_dims...>::TYPE> TYPE;
+    typedef VEC_HOLDER<typename ZERO_BLOCK_TYPE<k,T,lead_dims...,d>::TYPE,typename ONE_NONZERO_VECTOR<k,i-1,DIFF_LAYOUT<T,dims...>,lead_dims...>::TYPE> TYPE;
 };
-template<class T,int d,int... dims,int... lead_dims> struct ONE_NONZERO_VECTOR<0,DIFF_LAYOUT<T,d,dims...>,lead_dims...>
+template<int k,class T,int d,int... dims,int... lead_dims> struct ONE_NONZERO_VECTOR<k,0,DIFF_LAYOUT<T,d,dims...>,lead_dims...>
 {
-    typedef VEC_HOLDER<typename IDENTITY_BLOCK_TYPE<T,lead_dims...,d>::TYPE,typename EMPTY_VEC<DIFF_LAYOUT<T,dims...>,lead_dims...>::TYPE> TYPE;
+    typedef VEC_HOLDER<typename IDENTITY_BLOCK_TYPE<k,T,lead_dims...,d>::TYPE,typename EMPTY_VEC<k,DIFF_LAYOUT<T,dims...>,lead_dims...>::TYPE> TYPE;
 };
 
 template<class OP,class VEC> struct TYPE_VEC_MAP_1;
@@ -260,8 +261,14 @@ MK_FUN_2(CONTRACT_0,Contract_0);
 MK_FUN_2(CONTRACT_1,Contract_1);
 MK_FUN_2(CONTRACT_2,Contract_2);
 MK_FUN_2(CONTRACT_00,Contract_00);
+MK_FUN_2(DOUBLE_CONTRACT_00_11,Double_Contract_00_11);
+MK_FUN_2(CONTRACT_11,Contract_11);
+MK_FUN_2(CONTRACT_10,Contract_10);
+MK_FUN_1(CONTRACT_01s,Contract_01);
 MK_FUN_2(CONTRACT_01,Contract_01);
 MK_FUN_2(CONTRACT_20,Contract_20);
+MK_FUN_1(TWICE_SYMMETRIC_PART_01,Twice_Symmetric_Part_01);
+MK_FUN_1(TRANSPOSED_01,Transposed_01);
 MK_FUN_2(OUTER_PRODUCT,Outer_Product);
 MK_FUN_2(CHOOSE,Choose);
 
@@ -276,13 +283,22 @@ typedef VEC_MAP_1<TENSOR_PRODUCT_2<ARG<0>,ARG<1> > > TENSOR_PRODUCT_2_VM_V;
 
 typedef VEC_MAP_1<CONTRACT_0<ARG<0>,ARG<1> > > CONTRACT_0_VT_V;
 typedef VEC_MAP_1<CONTRACT_0<ARG<1>,ARG<0> > > CONTRACT_0_VV_T;
-typedef VEC_MAP_1<CONTRACT_00<ARG<0>,ARG<1> > > CONTRACT_0_VT_M;
-typedef VEC_MAP_1<CONTRACT_00<ARG<1>,ARG<0> > > CONTRACT_0_VM_T;
+typedef VEC_MAP_1<CONTRACT_00<ARG<0>,ARG<1> > > CONTRACT_00_VT_M;
+typedef VEC_MAP_1<CONTRACT_11<ARG<0>,ARG<1> > > CONTRACT_11_VT_M;
+typedef VEC_MAP_1<CONTRACT_10<ARG<0>,ARG<1> > > CONTRACT_10_VT_M;
+typedef VEC_MAP_1<CONTRACT_01<ARG<0>,ARG<1> > > CONTRACT_01_VT_M;
+typedef VEC_MAP_1<CONTRACT_00<ARG<1>,ARG<0> > > CONTRACT_00_VM_T;
+typedef VEC_MAP_1<DOUBLE_CONTRACT_00_11<ARG<0>,ARG<1> > > DOUBLE_CONTRACT_00_11_VT_M;
 typedef VEC_MAP_1<CONTRACT_01<ARG<1>,ARG<0> > > TRANSPOSE_CONTRACT_0_VM_T;
 typedef VEC_MAP_1<CONTRACT_01<ARG<0>,ARG<1> > > VEC_SCALE_REV;
 
+typedef VEC_MAP_1<CONTRACT_01s<ARG<0> > > CONTRACT_01_VT;
+
 typedef VEC_MAP_1<OUTER_PRODUCT<ARG<1>,ARG<0> > > VEC_OUTER_PRODUCT_REV;
 typedef VEC_MAP_2<CHOOSE<ARG<0>,ARG<1> > > VEC_CHOOSE;
+
+typedef VEC_MAP_1<TWICE_SYMMETRIC_PART_01<ARG<0> > > TWICE_SYMMETRIC_PART_01_VT;
+typedef VEC_MAP_1<TRANSPOSED_01<ARG<0> > > TRANSPOSED_01_VT;
 }
 }
 #endif

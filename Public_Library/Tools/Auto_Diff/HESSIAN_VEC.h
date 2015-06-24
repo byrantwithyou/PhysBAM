@@ -75,10 +75,10 @@ template<class TV,class MAT,class T_MAT>
 typename enable_if<IS_MATRIX<T_MAT>::value,HESSIAN_VEC<TV,decltype(MAT_CONTRACT_0M::Type(MAT(),T_MAT()))> >::type Contract_00(const HESSIAN_VEC<TV,MAT>& h,const T_MAT& v)
 {HESSIAN_VEC<TV,decltype(MAT_CONTRACT_0M::Type(MAT(),T_MAT()))> r;MAT_CONTRACT_0M()(r.x,h.x,v);return r;}
 
-template<class TV,class VEC,class VEC1>
-HESSIAN_VEC<TV,decltype(MAT_SYM_DOUBLE_CONTRACT_12::Type(VEC(),VEC1(),PERMUTATION_TENSOR<typename TV::SCALAR>()))> 
-Symmetric_Double_Contract_12_With_Tensor(const PERMUTATION_TENSOR<typename TV::SCALAR>& t,const GRADIENT_VEC<TV,VEC>& a,const GRADIENT_VEC<TV,VEC1>& b)
-{HESSIAN_VEC<TV,decltype(MAT_SYM_DOUBLE_CONTRACT_12::Type(VEC(),VEC1(),PERMUTATION_TENSOR<typename TV::SCALAR>()))> r;MAT_SYM_DOUBLE_CONTRACT_12()(r.x,a.x,b.x,t);return r;}
+template<class TV,class VEC,class VEC1,class T_TEN>
+HESSIAN_VEC<TV,decltype(MAT_SYM_DOUBLE_CONTRACT_12::Type(VEC(),VEC1(),T_TEN()))> 
+Symmetric_Double_Contract_12_With_Tensor(const T_TEN& t,const GRADIENT_VEC<TV,VEC>& a,const GRADIENT_VEC<TV,VEC1>& b)
+{HESSIAN_VEC<TV,decltype(MAT_SYM_DOUBLE_CONTRACT_12::Type(VEC(),VEC1(),T_TEN()))> r;MAT_SYM_DOUBLE_CONTRACT_12()(r.x,a.x,b.x,t);return r;}
 }
 }
 
