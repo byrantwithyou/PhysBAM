@@ -31,6 +31,19 @@ else
     exit 1
 fi
 
-gnuplot -p -e "$CMD ; set output '$UFILE' ; plot '$M' u (log10(\$1)):(log10(\$3)) title 'L-inf error' , '$M' u (log10(\$1)):(log10(\$4)) title 'L-2 error' , -2*x , -2*x-1 , -x-2;"
-gnuplot -p -e "$CMD ; set output '$PFILE' ; plot '$M' u (log10(\$1)):(log10(\$8)) title 'L-inf error' , '$M' u (log10(\$1)):(log10(\$9)) title 'L-2 error' , -2*x , -2*x-1 , -x-2;"
+
+gnuplot <<EOF
+$CMD
+min(x,y) = x<y?x:y
+max(x,y) = x<y?y:x
+set output '$UFILE'
+set xrange [1.2:1.9]
+set yrange [-7:-1]
+plot '$M' u (log10(\$1)):(max(-7,min(-1,log10(\$3)))) title 'L-inf error' , '$M' u (log10(\$1)):(max(-7,min(-1,log10(\$4)))) title 'L-2 error' , -2*x , -2*x-1 , -x-2
+
+set output '$PFILE'
+set xrange [1.2:1.9]
+set yrange [-7:-1]
+plot '$M' u (log10(\$1)):(max(-7,min(-1,log10(\$8)))) title 'L-inf error' , '$M' u (log10(\$1)):(max(-7,min(-1,log10(\$9)))) title 'L-2 error' , -2*x , -2*x-1 , -x-2
+EOF
 rm $M
