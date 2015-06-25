@@ -41,6 +41,8 @@ template<class T,int m,int n> struct IS_MATRIX<MATRIX<T,m,n> > {static const boo
 template<class T,int d> struct IS_MATRIX<SYMMETRIC_MATRIX<T,d> > {static const bool value=true;};
 template<class T,int d> struct IS_MATRIX<IDENTITY_MATRIX<T,d> > {static const bool value=true;};
 template<class T,int d> struct IS_MATRIX<SCALE_MATRIX<T,d> > {static const bool value=true;};
+template<class T,int d> struct IS_MATRIX<DIAGONAL_MATRIX<T,d> > {static const bool value=true;};
+template<class T,int d> struct IS_MATRIX<UPPER_TRIANGULAR_MATRIX<T,d> > {static const bool value=true;};
 
 template<class T_MATRIX> struct IS_SYMMETRIC_MATRIX {static const bool value=false;};
 template<class T,int d> struct IS_SYMMETRIC_MATRIX<ZERO_MATRIX<T,d,d> > {static const bool value=true;};
