@@ -46,10 +46,10 @@ public:
     {return Element_Lower(j,i);}
 
     T& Element_Lower(int i,int j)
-    {assert((unsigned)i<n && (unsigned)j<=i);return x[((2*n-j-1)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)n && (unsigned)j<=(unsigned)i);return x[((2*n-j-1)*j>>1)+i];}
 
     const T& Element_Lower(int i,int j) const
-    {assert((unsigned)i<n && (unsigned)j<=i);return x[((2*n-j-1)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)n && (unsigned)j<=(unsigned)i);return x[((2*n-j-1)*j>>1)+i];}
 
     template<class RW> void Read(std::istream& input)
     {delete[] x;

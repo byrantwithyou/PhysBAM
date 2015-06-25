@@ -62,10 +62,10 @@ public:
     {return Element_Lower(j,i);}
 
     T& Element_Lower(int i,int j)
-    {assert((unsigned)i<d && (unsigned)j<=i);return x[((2*d-j-1)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)d && (unsigned)j<=(unsigned)i);return x[((2*d-j-1)*j>>1)+i];}
 
     const T& Element_Lower(int i,int j) const
-    {assert((unsigned)i<d && (unsigned)j<=i);return x[((2*d-j-1)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)d && (unsigned)j<=(unsigned)i);return x[((2*d-j-1)*j>>1)+i];}
 
     VECTOR<T,d> Column(const int axis) const
     {assert((unsigned)axis<(unsigned)d);VECTOR<T,d> v;
