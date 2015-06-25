@@ -37,7 +37,7 @@ Store_Helper(const int segment1,const int segment2,const VECTOR<T,2>* dimension)
 {
     const VECTOR<VECTOR<int,2>,2> nodes(segments(segment1),faces(segment2));
     if(INTERSECTION::Intersects(SEGMENT_2D<T>(X_self_collision_free.Subset(nodes[0])),SEGMENT_2D<T>(X_self_collision_free.Subset(nodes[1])),thickness_over_2)) return;
-    for(int i=0;i<2;i++){int j=3-i;
+    for(int i=0;i<2;i++){int j=1-i;
         for(int a=0;a<2;a++){
             intersecting_point_face_pairs.Set(VECTOR<int,3>(nodes[i][a],nodes[j][0],nodes[j][1]));
             for(int b=0;b<2;b++) intersecting_edge_edge_pairs.Set(VECTOR<int,2>(nodes[i][a],nodes[j][b]));}}

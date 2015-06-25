@@ -21,12 +21,15 @@ using namespace PhysBAM;
 static void Process_Segment(const int m,const ARRAY_VIEW<bool,VECTOR<int,3> >& edge_is_blocked,const ARRAY<bool,VECTOR<int,3> >& is_inside,const VECTOR<int,3>& start_index,const int axis,ARRAY<char,VECTOR<int,3> >& vote)
 {
     typedef VECTOR<int,3> TV_INT;
-    TV_INT index=start_index,increment;increment[axis]=1;
-    int segment_start=1;bool segment_starts_inside=false;
+    TV_INT index=start_index,increment;
+    increment[axis]=1;
+    int segment_start=1;
+    bool segment_starts_inside=false;
     for(index[axis]=0;index[axis]<m;index[axis]++){
         if(index[axis]>0 && edge_is_blocked(index)){segment_start=index[axis];segment_starts_inside=is_inside(index);}
         if(index[axis]==m-1 || (index[axis]<m-1 && edge_is_blocked(index+increment))){
-            int segment_end=index[axis];bool segment_ends_inside=index[axis]<m?is_inside(index):false;
+            int segment_end=index[axis];
+            bool segment_ends_inside=index[axis]<m?is_inside(index):false;
             int vote_increment=(int)segment_starts_inside+(int)segment_ends_inside;
             TV_INT t=start_index;
             for(t[axis]=segment_start;t[axis]<=segment_end;t[axis]++) vote(t)+=vote_increment;}}
@@ -123,9 +126,9 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()){
             if(closest_triangle_index(it.index)) is_inside(it.index)=triangulated_surface.Inside_Relative_To_Triangle(grid.X(it.index),closest_triangle_index(it.index),surface_thickness_over_two);}
         ARRAY<char,TV_INT> vote(grid.Domain_Indices());
-        for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) Process_Segment(grid.counts.x,edge_is_blocked.Component(0),is_inside,TV_INT(1,j,k),1,vote);
-        for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++) Process_Segment(grid.counts.y,edge_is_blocked.Component(1),is_inside,TV_INT(i,1,k),2,vote);
-        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) Process_Segment(grid.counts.z,edge_is_blocked.Component(2),is_inside,TV_INT(i,j,1),3,vote);
+        for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) Process_Segment(grid.counts.x,edge_is_blocked.Component(0),is_inside,TV_INT(0,j,k),0,vote);
+        for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++) Process_Segment(grid.counts.y,edge_is_blocked.Component(1),is_inside,TV_INT(i,0,k),1,vote);
+        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) Process_Segment(grid.counts.z,edge_is_blocked.Component(2),is_inside,TV_INT(i,j,0),2,vote);
         is_inside.Clean_Memory();
         for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) if(vote(it.index)>=3) phi(it.index)*=-1;
 

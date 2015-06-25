@@ -255,7 +255,7 @@ void Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& u_
     const EULER_UNIFORM<TV>& euler=*((const_cast<FLUIDS_PARAMETERS_UNIFORM<TV>&>(fluids_parameters)).euler);
     assert(test_number==7);
     if(side==3){
-        int axis=(side+1)/2;
+        int axis=(side-1)/2;
         int boundary=Boundary(side,region);
         int reflection_times_two;
         if(grid.Is_MAC_Grid())

@@ -527,7 +527,7 @@ void Floppy_Fish()
         bone.Set_Mass(bone_density*bone_unscaled_volume*std::pow(bone_scale,TV::dimension));}
 
     T joint_strengths[4]={(T)500,(T)500,(T)200,(T)100};
-    for(int i=2;i<=bones.m;i++){
+    for(int i=1;i<bones.m;i++){
         JOINT<TV>* joint=new POINT_JOINT<TV>;
         Initialize_Joint_Between(joint,*bones(i-1),*bones(i),TV(0,0,1));
         JOINT_FUNCTION<TV>* joint_function=arb.Create_Joint_Function(joint->id_number);
@@ -955,7 +955,7 @@ void Initialize_Bodies() override
             T flag_width=(T).75;
             // light cloth
             TRIANGULATED_SURFACE<T>& triangulated_surface=solids_tests.Create_Cloth_Panel(70,flag_width,(T)2,
-                RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)2,(T)0),ROTATION<TV>((T)pi/2,TV::Axis_Vector(3)))));
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)2,(T)0),ROTATION<TV>((T)pi/2,TV::Axis_Vector(2)))));
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(triangulated_surface,solid_density,true);
             break;}
         case 20:{
@@ -966,7 +966,7 @@ void Initialize_Bodies() override
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).5,(T)0))));
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(triangulated_surface,solid_density,true);
 
-            for(int i=2*resolution+1;i<=triangulated_surface.particles.Size();i+=2*resolution+1)
+            for(int i=2*resolution+1;i<triangulated_surface.particles.Size();i+=2*resolution+1)
                 constrained_node_positions.Append(PAIR<int,TV>(i,triangulated_surface.particles.X(i)));
 
 //             left_point=triangulated_surface.particles.Size();
@@ -1136,7 +1136,7 @@ void Balloon()
     for(int i=0;i<is_constrained.m;i++)
         if(is_constrained(i)){
             TV& position=triangulated_surface.particles.X(condensation_mapping(i));
-            T angle=atan2(position(3),position(1));
+            T angle=atan2(position(2),position(0));
             position=TV(cos(angle)*dist,height,sin(angle)*dist);
             constrained_node_positions.Append(PAIR<int,TV>(condensation_mapping(i),triangulated_surface.particles.X(condensation_mapping(i))));}
 }
@@ -1186,7 +1186,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override
         for(int i=0;i<constrained_node_positions.m;i++){
             PAIR<int,TV>& node_pair=constrained_node_positions(i);
             X(node_pair.x)=curve.Value(time);
-            X(node_pair.x)(3)=node_pair.y(3);}}
+            X(node_pair.x)(2)=node_pair.y(2);}}
 }
 //#####################################################################
 // Function Set_External_Velocities

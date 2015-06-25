@@ -356,7 +356,7 @@ ARRAY<int> Eliminate_Redundant_Contact_Points(ARRAY<VECTOR<T,3> >& locations,ARR
             for(int k=0;k<region.m;k++)
             {
                 TV offset=locations(region(k))-locations(region(0));
-                for(int c=1;c<TV::dimension;c++)
+                for(int c=0;c<TV::dimension-1;c++)
                     projected_offsets(k)(c)=TV::Dot_Product(offset,tangents(c));
             }
             ARRAY<int> convex_hull=Convex_Hull(projected_offsets);

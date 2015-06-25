@@ -918,7 +918,7 @@ void Create_Pyramid_Pattern(RANGE<TV> boundary,const int min_resolution,const in
     ARRAY<TV> pts;
     for(int i=0;i<8;i++){
         TV pt=boundary.min_corner;
-        for(int j=0;j<3;j++) if(i&(1<<j)) pt(j+1)=boundary.max_corner(j+1);
+        for(int j=0;j<3;j++) if(i&(1<<j)) pt(j)=boundary.max_corner(j);
         pts.Append(pt);}
     TV center=boundary.Center();
     VECTOR<VECTOR<int,4>,6> corners(VECTOR<int,4>(0,1,3,2),VECTOR<int,4>(4,5,7,6),VECTOR<int,4>(0,1,5,4),VECTOR<int,4>(2,3,7,6),VECTOR<int,4>(0,2,6,4),VECTOR<int,4>(1,3,7,5));
@@ -932,18 +932,18 @@ void Create_Pyramid_Pattern(RANGE<TV> boundary,const int min_resolution,const in
         TV pt_inside=pts.Subset(corners(m)).Average();
         phi.Fill(-FLT_MAX);
         for(int i=0;i<4;i++){
-            TRIANGLE_3D<T> tri(pts(corners(m)(i)),pts(corners(m)(i%4+1)),center);
+            TRIANGLE_3D<T> tri(pts(corners(m)(i)),pts(corners(m)((i+1)%4)),center);
             for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
                 phi(iterator.index)=-min(-phi(iterator.index),tri.Distance_To_Triangle(iterator.Location()+jitter));}
         for(int i=0;i<4;i++){
-            PLANE<T> plane(pts(corners(m)(i)),pts(corners(m)(i%4+1)),center);
+            PLANE<T> plane(pts(corners(m)(i)),pts(corners(m)((i+1)%4)),center);
             if(plane.Signed_Distance(pt_inside)>0) plane.normal=-plane.normal;
             for(NODE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
                 if(plane.Signed_Distance(iterator.Location()+jitter)>0) phi(iterator.index)=abs(phi(iterator.index));}
 
         surface->particles.X(surface->particles.Add_Element())=center;
         for(int i=0;i<4;i++){
-            TV A=pts(corners(m)(i)),B=pts(corners(m)(i%4+1)),C=center;
+            TV A=pts(corners(m)(i)),B=pts(corners(m)((i+1)%4)),C=center;
             for(int j=0;j<subdivision;j++){
                 for(int k=0;k<j;k++){
                     TV D=C+(B-C)*((T)k/j);
@@ -986,8 +986,8 @@ void Create_Crossing_Planes_Pattern()
             GRID<TV>& grid=*new GRID<TV>(actual_resolution,box,false);
             ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >(grid.Domain_Indices());phi.Fill(FLT_MAX);
             VECTOR<T,2> x_coords=VECTOR<T,2>((x_index-1)*x_diff-original_half_edge_length.x,x_index*x_diff-original_half_edge_length.x);
-            PLANE<T> plane1(TV(x_coords(1),-original_half_edge_length.y,side*original_half_edge_length.z),TV(x_coords(1),original_half_edge_length.y,side*original_half_edge_length.z),center);
-            PLANE<T> plane2(TV(x_coords(2),original_half_edge_length.y,side*original_half_edge_length.z),TV(x_coords(2),-original_half_edge_length.y,side*original_half_edge_length.z),center);
+            PLANE<T> plane1(TV(x_coords(0),-original_half_edge_length.y,side*original_half_edge_length.z),TV(x_coords(0),original_half_edge_length.y,side*original_half_edge_length.z),center);
+            PLANE<T> plane2(TV(x_coords(1),original_half_edge_length.y,side*original_half_edge_length.z),TV(x_coords(1),-original_half_edge_length.y,side*original_half_edge_length.z),center);
             TV pt_inside=TV(x_coords.Average(),0,side*original_half_edge_length.z);
             if(plane1.Signed_Distance(pt_inside)>0) plane1.normal=-plane1.normal;
             if(plane2.Signed_Distance(pt_inside)>0) plane2.normal=-plane2.normal;
@@ -1006,7 +1006,7 @@ void Create_Crossing_Planes_Pattern()
                     for(T y=-original_half_edge_length.y;y<=original_half_edge_length.y;y+=edge_lengths.y/nodes_per_static_side)
                         surface->particles.X(surface->particles.Add_Element())=TV(x,y,z);
                     x+=x_step;z-=z_step;}}
-            for(T x=x_coords(1);x<=x_coords(2);x+=(x_coords(2)-x_coords(1))/nodes_per_short_side)
+            for(T x=x_coords(0);x<=x_coords(1);x+=(x_coords(1)-x_coords(0))/nodes_per_short_side)
                 for(T y=-original_half_edge_length.y;y<=original_half_edge_length.y;y+=edge_lengths.y/nodes_per_static_side)
                     surface->particles.X(surface->particles.Add_Element())=TV(x,y,side*original_half_edge_length.z);
             surface->Update_Number_Nodes();
@@ -1027,8 +1027,8 @@ void Create_Crossing_Planes_Pattern()
             GRID<TV>& grid=*new GRID<TV>(actual_resolution,box,false);
             ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >(grid.Domain_Indices());phi.Fill(FLT_MAX);
             VECTOR<T,2> z_coords=VECTOR<T,2>((z_index-1)*z_diff-original_half_edge_length.z,z_index*z_diff-original_half_edge_length.z);
-            PLANE<T> plane1(TV(side*original_half_edge_length.x,-original_half_edge_length.y,z_coords(1)),TV(side*original_half_edge_length.x,original_half_edge_length.y,z_coords(1)),center);
-            PLANE<T> plane2(TV(side*original_half_edge_length.x,original_half_edge_length.y,z_coords(2)),TV(side*original_half_edge_length.x,-original_half_edge_length.y,z_coords(2)),center);
+            PLANE<T> plane1(TV(side*original_half_edge_length.x,-original_half_edge_length.y,z_coords(0)),TV(side*original_half_edge_length.x,original_half_edge_length.y,z_coords(0)),center);
+            PLANE<T> plane2(TV(side*original_half_edge_length.x,original_half_edge_length.y,z_coords(1)),TV(side*original_half_edge_length.x,-original_half_edge_length.y,z_coords(1)),center);
             TV pt_inside=TV(side*original_half_edge_length.x,0,z_coords.Average());
             if(plane1.Signed_Distance(pt_inside)>0) plane1.normal=-plane1.normal;
             if(plane2.Signed_Distance(pt_inside)>0) plane2.normal=-plane2.normal;
@@ -1047,7 +1047,7 @@ void Create_Crossing_Planes_Pattern()
                     for(T y=-original_half_edge_length.y;y<=original_half_edge_length.y;y+=edge_lengths.y/nodes_per_static_side)
                         surface->particles.X(surface->particles.Add_Element())=TV(x,y,z);
                     z+=z_step;x-=x_step;}}
-            for(T z=z_coords(1);z<=z_coords(2);z+=(z_coords(2)-z_coords(1))/nodes_per_short_side)
+            for(T z=z_coords(0);z<=z_coords(1);z+=(z_coords(1)-z_coords(0))/nodes_per_short_side)
                 for(T y=-original_half_edge_length.y;y<=original_half_edge_length.y;y+=edge_lengths.y/nodes_per_static_side)
                     surface->particles.X(surface->particles.Add_Element())=TV(side*original_half_edge_length.x,y,z);
             surface->Update_Number_Nodes();
