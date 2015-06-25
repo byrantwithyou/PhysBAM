@@ -5,6 +5,7 @@
 #ifndef __ANALYTIC_POLYMER_STRESS__
 #define __ANALYTIC_POLYMER_STRESS__
 
+#include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/IDENTITY_MATRIX.h>
@@ -24,7 +25,7 @@ struct ANALYTIC_POLYMER_STRESS
     typedef SYMMETRIC_TENSOR<T,2,TV::m,TV::m> T_TENSOR;
     virtual ~ANALYTIC_POLYMER_STRESS(){}
     virtual T_MATRIX S(const TV& X,T t) const=0;
-    virtual T_TENSOR dSdX(const TV& X,T t) const=0;
+    virtual T_TENSOR dS(const TV& X,T t) const=0;
     virtual T_MATRIX dSdt(const TV& X,T t) const=0;
     virtual void Test(const TV& X) const
     {
@@ -33,8 +34,8 @@ struct ANALYTIC_POLYMER_STRESS
         T e=1e-6,t=rand.Get_Uniform_Number(0,1),dt=rand.Get_Uniform_Number(-e,e);
         rand.Fill_Uniform(dX,-e,e);
         SYMMETRIC_MATRIX<T,TV::m> S0=S(X,t),S1=S(X+dX,t);
-        SYMMETRIC_MATRIX<T,TV::m> dS=Contract<2>(dSdX(X,t)+dSdX(X+dX,t),dX)/2;
-        T erru=(dS-(S1-S0)).Frobenius_Norm()/e;
+        SYMMETRIC_MATRIX<T,TV::m> ds=Contract<2>(dS(X,t)+dS(X+dX,t),dX)/2;
+        T erru=(ds-(S1-S0)).Frobenius_Norm()/e;
         LOG::cout<<"analytic stress x diff test "<<erru<<std::endl;
         SYMMETRIC_MATRIX<T,TV::m> R0=S(X,t),R1=S(X,t+dt);
         SYMMETRIC_MATRIX<T,TV::m> dR=(dSdt(X,t)+dSdt(X,t+dt))/2*dt;
@@ -43,96 +44,38 @@ struct ANALYTIC_POLYMER_STRESS
     }
 };
 
-template<class TV>
-struct ANALYTIC_POLYMER_STRESS_CONST:public ANALYTIC_POLYMER_STRESS<TV>
+template<class TV,class F>
+struct ANALYTIC_POLYMER_STRESS_CUSTOM:public ANALYTIC_POLYMER_STRESS<TV>
 {
     typedef typename TV::SCALAR T;
     typedef SYMMETRIC_MATRIX<T,TV::m> T_MATRIX;
     typedef SYMMETRIC_TENSOR<T,2,TV::m,TV::m> T_TENSOR;
-    ANALYTIC_POLYMER_STRESS_CONST() {}
-    virtual T_MATRIX S(const TV& X,T t) const {return T_MATRIX::Identity_Matrix();}
-    virtual T_TENSOR dSdX(const TV& X,T t) const {return T_TENSOR();}
-    virtual T_MATRIX dSdt(const TV& X,T t) const {return T_MATRIX();}
-};
-template<class TV>
-struct ANALYTIC_POLYMER_STRESS_MAGNITUDE:public ANALYTIC_POLYMER_STRESS<TV>
-{
-    typedef typename TV::SCALAR T;
-    typedef SYMMETRIC_MATRIX<T,TV::m> T_MATRIX;
-    typedef SYMMETRIC_TENSOR<T,2,TV::m,TV::m> T_TENSOR;
-    T rho;
-    ANALYTIC_POLYMER_STRESS_MAGNITUDE(T rho): rho(rho){}
-    virtual T_MATRIX S(const TV& X,T t) const {return T_MATRIX::Identity_Matrix()*(rho*X.Magnitude_Squared()+(T)1);}
-    virtual T_TENSOR dSdX(const TV& X,T t) const {return T_TENSOR()+Tensor_Product<2>(IDENTITY_MATRIX<T,TV::m>(),rho*X*(T)2);}
-    virtual T_MATRIX dSdt(const TV& X,T t) const {return T_MATRIX();}
-};
-template<class TV>
-struct ANALYTIC_POLYMER_STRESS_LINEAR:public ANALYTIC_POLYMER_STRESS<TV>
-{
-    typedef typename TV::SCALAR T;
-    typedef SYMMETRIC_MATRIX<T,TV::m> T_MATRIX;
-    typedef SYMMETRIC_TENSOR<T,2,TV::m,TV::m> T_TENSOR;
-    T rho;
-    TV a;
-    ANALYTIC_POLYMER_STRESS_LINEAR(T rho,TV a): rho(rho),a(a){}
-    virtual T_MATRIX S(const TV& X,T t) const {return T_MATRIX::Identity_Matrix()*(rho*X.Dot(a)+(T)1);}
-    virtual T_TENSOR dSdX(const TV& X,T t) const {return T_TENSOR()+Tensor_Product<2>(IDENTITY_MATRIX<T,TV::m>(),rho*a);}
-    virtual T_MATRIX dSdt(const TV& X,T t) const {return T_MATRIX();}
-};
-template<class TV>
-struct ANALYTIC_POLYMER_STRESS_CONST_DECAY:public ANALYTIC_POLYMER_STRESS<TV>
-{
-    typedef typename TV::SCALAR T;
-    typedef SYMMETRIC_MATRIX<T,TV::m> T_MATRIX;
-    typedef SYMMETRIC_TENSOR<T,2,TV::m,TV::m> T_TENSOR;
-    T wi_inv;
-    ANALYTIC_POLYMER_STRESS_CONST_DECAY(T wi_inv): wi_inv(wi_inv){}
-    virtual T_MATRIX S(const TV& X,T t) const {return T_MATRIX::Identity_Matrix()*(exp(-wi_inv*t)+(T)1);}
-    virtual T_TENSOR dSdX(const TV& X,T t) const {return T_TENSOR();}
-    virtual T_MATRIX dSdt(const TV& X,T t) const {return T_MATRIX::Identity_Matrix()*(-wi_inv*exp(-wi_inv*t));}
-};
-template<class TV>
-struct ANALYTIC_POLYMER_STRESS_WAVES:public ANALYTIC_POLYMER_STRESS<TV>
-{
-    typedef typename TV::SCALAR T;
-    typedef SYMMETRIC_MATRIX<T,TV::m> T_MATRIX;
-    typedef SYMMETRIC_TENSOR<T,2,TV::m,TV::m> T_TENSOR;
-    T rho;
-    ANALYTIC_POLYMER_STRESS_WAVES(T rho): rho(rho){}//This one does not need stress forcing if wi_inv=0
-    virtual T_MATRIX S(const TV& X,T t) const {T q=X.Magnitude_Squared()-2*t;T c=cos(q);T s=sin(q);return SYMMETRIC_MATRIX<T,TV::m>(rho*s+1,rho*c,1-rho*s);}
-    virtual T_TENSOR dSdX(const TV& X,T t) const {T q=X.Magnitude_Squared()-2*t;T c=cos(q);T s=sin(q);return Tensor_Product<2>(SYMMETRIC_MATRIX<T,TV::m>(c,-s,-c),X*rho*2);}
-    virtual T_MATRIX dSdt(const TV& X,T t) const {T q=X.Magnitude_Squared()-2*t;T c=cos(q);T s=sin(q);return SYMMETRIC_MATRIX<T,TV::m>(-c,s,c)*2*rho;}
-};
-template<class TV>
-struct ANALYTIC_POLYMER_STRESS_PERIODIC:public ANALYTIC_POLYMER_STRESS<TV>
-{
-    typedef typename TV::SCALAR T;
-    typedef SYMMETRIC_MATRIX<T,TV::m> T_MATRIX;
-    typedef SYMMETRIC_TENSOR<T,2,TV::m,TV::m> T_TENSOR;
-    RANGE<TV> domain;
-    ANALYTIC_POLYMER_STRESS_PERIODIC(const RANGE<TV>& domain): domain(domain){}
-    virtual T_MATRIX S(const TV& X,T t) const
-    {
-        TV Z=(X-domain.min_corner)/domain.Edge_Lengths()*(T)(2*pi);
-        TV W=(cos(Z)+sin(Z))*(1+exp(-t));
-        return SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(W)+1;
-    }
-    virtual T_TENSOR dSdX(const TV& X,T t) const
-    {
-        TV Z=(X-domain.min_corner)/domain.Edge_Lengths()*(T)(2*pi);
-        DIAGONAL_MATRIX<T,TV::m> dZ((T)(2*pi)/domain.Edge_Lengths());
-        TV W=(cos(Z)+sin(Z))*(1+exp(-t));
-        DIAGONAL_MATRIX<T,TV::m> dWdZ((cos(Z)-sin(Z))*(1+exp(-t)));
-        return T_TENSOR()+Symmetric_Tensor_Product<0,1>(SYMMETRIC_MATRIX<T,TV::m>(dWdZ*dZ),W);
-    }
+    F f;
+    ANALYTIC_POLYMER_STRESS_CUSTOM(F f): f(f) {}
+    virtual ~ANALYTIC_POLYMER_STRESS_CUSTOM(){}
+    virtual T_MATRIX S(const TV& X,T t) const {T_MATRIX m;Fill_From(m,f(X,t));return m;}
     virtual T_MATRIX dSdt(const TV& X,T t) const
     {
-        TV Z=(X-domain.min_corner)/domain.Edge_Lengths()*(T)(2*pi);
-        TV W=(cos(Z)+sin(Z))*(1+exp(-t));
-        TV dW=-(cos(Z)+sin(Z))*exp(-t);
-        return SYMMETRIC_MATRIX<T,TV::m>::Symmetric_Outer_Product(W,dW);
+        typedef DIFF_LAYOUT<T,-1> LAYOUT;
+        T_MATRIX ret;
+        Get<0>(ret,(Diff_From_Const<LAYOUT>(T_MATRIX())+f(X,Diff_From_Var<LAYOUT,0>(t))).dx);
+        return ret;
+    }
+    virtual T_TENSOR dS(const TV& X,T t) const
+    {
+        typedef DIFF_LAYOUT<T,TV::m> LAYOUT;
+        T_TENSOR ret;
+        Get<0>(ret,(Diff_From_Const<LAYOUT>(T_MATRIX())+f(Diff_From_Var<LAYOUT,0>(X),t)).dx);
+        return ret;
     }
 };
+
+template<class TV,class F>
+ANALYTIC_POLYMER_STRESS_CUSTOM<TV,F>* Make_Polymer_Stress(F f)
+{
+    return new ANALYTIC_POLYMER_STRESS_CUSTOM<TV,F>(f);
+}
+
 template<class TV>
 struct ANALYTIC_POLYMER_STRESS_QUADRATIC:public ANALYTIC_POLYMER_STRESS<TV>
 {
@@ -162,7 +105,7 @@ struct ANALYTIC_POLYMER_STRESS_QUADRATIC:public ANALYTIC_POLYMER_STRESS<TV>
                     a22+=c(i)(j)(k)*pow(X.x,i)*pow(X.y,j)*pow(t,k);
                 }
         return SYMMETRIC_MATRIX<T,TV::m>(a11,a12,a22);}
-    virtual T_TENSOR dSdX(const TV& X,T t) const {
+    virtual T_TENSOR dS(const TV& X,T t) const {
         T_TENSOR ten;
         for(int i=0;i<3;i++)
             for(int j=0;j<3;j++)

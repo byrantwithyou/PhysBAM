@@ -51,6 +51,7 @@ class FLUIDS_COLOR<VECTOR<T,2> >:public FLUIDS_COLOR_BASE<VECTOR<T,2> >
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,2> TV_INT;
     typedef FLUIDS_COLOR_BASE<TV> BASE;
+    typedef SYMMETRIC_MATRIX<T,TV::m> SM;
 
 public:
     using BASE::grid;using BASE::use_level_set_method;using BASE::use_p_null_mode;using BASE::test_number;
@@ -63,7 +64,7 @@ public:
     using BASE::test_analytic_diff;using BASE::Initialize_Common_Example;using BASE::After_Initialize_Example;
     using BASE::use_discontinuous_velocity;using BASE::gravity;using BASE::analytic_initial_only;
     using BASE::override_surface_tension;using BASE::unit_p;using BASE::use_advection;
-    using BASE::use_polymer_stress;using BASE::analytic_polymer_stress;
+    using BASE::use_polymer_stress;using BASE::analytic_polymer_stress;using BASE::Add_Polymer_Stress;
     using BASE::polymer_stress_coefficient;using BASE::inv_Wi;using BASE::Add_Velocity;using BASE::Add_Pressure;
 
     T epsilon,radius;
@@ -126,6 +127,7 @@ public:
 
     void Initialize_Example()
     {
+        IDENTITY_MATRIX<T,TV::m> id;
         switch(test_number){
             case 1:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
@@ -382,12 +384,12 @@ public:
                 use_p_null_mode=false;                
                 break;}
             case 253:{
-                TV a;a(0)++;
+                TV a;a(0)=rho0/unit_rho;
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).6,0,-4);
                 Add_Velocity([](auto X,auto t){return TV()+1;});
                 Add_Pressure([](auto X,auto t){return 0;});
-                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_LINEAR<TV>(rho0/unit_rho,a));
+                Add_Polymer_Stress([=](auto X,auto t){return id*(X.Dot(a)+(T)1);});
                 if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
                 if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
@@ -400,7 +402,8 @@ public:
                 auto rot=[=](auto X,auto t){return MATRIX<T,2>::Cross_Product_Matrix(VECTOR<T,1>(1))*(X-(TV()+(T).5));};
                 Add_Velocity(rot);
                 Add_Pressure([=](auto X,auto t){return (T).5*(this->rho0/this->unit_rho)*rot(X,t).Magnitude_Squared();});
-                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_MAGNITUDE<TV>(rho0/unit_rho));
+                T k=rho0/unit_rho;
+                Add_Polymer_Stress([=](auto X,auto t){return id*(k*X.Magnitude_Squared()+(T)1);});
                 if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
                 if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
@@ -408,12 +411,13 @@ public:
                 break;
             }
             case 256:{
+                SYMMETRIC_MATRIX<T,TV::m> sms(rho0/unit_rho,0,-rho0/unit_rho),smc(0,rho0/unit_rho,0);
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),(T).6,0,-4);
                 auto rot=[=](auto X,auto t){return MATRIX<T,2>::Cross_Product_Matrix(VECTOR<T,1>(1))*(X-(TV()+(T).5));};
                 Add_Velocity(rot);
                 Add_Pressure([=](auto X,auto t){return (T).5*(this->rho0/this->unit_rho)*rot(X,t).Magnitude_Squared();});
-                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_WAVES<TV>(rho0/unit_rho));
+                Add_Polymer_Stress([=](auto X,auto t){auto q=X.Magnitude_Squared()-t*2;return id+sms*sin(q)+smc*cos(q);});
                 if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
                 if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;

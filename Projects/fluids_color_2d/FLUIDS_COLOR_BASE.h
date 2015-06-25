@@ -50,6 +50,7 @@ class FLUIDS_COLOR_BASE:public PLS_FC_EXAMPLE<TV>
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef PLS_FC_EXAMPLE<TV> BASE;
+    typedef SYMMETRIC_MATRIX<T,TV::m> SM;
 
 public:
     using BASE::grid;using BASE::output_directory;using BASE::face_velocities;using BASE::write_substeps_level;
@@ -217,6 +218,7 @@ public:
         for(int i=0;i<TV::SPIN::m;i++) spin_count(i)=i;
         for(int i=0;i<TV::m;i++) vector_count(i)=i;
         MATRIX<T,TV::m> spin_mat=MATRIX<T,TV::m>::Cross_Product_Matrix(spin_count+1);
+        IDENTITY_MATRIX<T,TV::m> id;
 
         //Tests 0-31: Tests created prior to selection of examples for 2013 JCP paper
         //Tests 101-111: Examples 1-11 in 2013 JCP paper, may coincide with Tests 0-31
@@ -506,7 +508,7 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
                 Add_Velocity([](auto X,auto t){return TV()+1;});
                 Add_Pressure([](auto X,auto t){return 0;});
-                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_CONST<TV>());
+                Add_Polymer_Stress([](auto X,auto t){return SM()+1;});
                 if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
                 if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 use_p_null_mode=true;
@@ -518,7 +520,7 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).5,(T).3,0,-4);
                 Add_Velocity([](auto X,auto t){return TV()+1;});
                 Add_Pressure([](auto X,auto t){return 0;});
-                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_CONST<TV>());
+                Add_Polymer_Stress([](auto X,auto t){return SM()+1;});
                 if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
                 if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
@@ -527,13 +529,13 @@ public:
             }
             case 252:{
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);    
-                T x0=(T).2,x1=(T).5,x2=(T).8;TV a;a(0)++;
+                T x0=(T).2,x1=(T).5,x2=(T).8;TV a;a(0)=rho0/unit_rho;
                 ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x0,TV::Axis_Vector(0),-4,0);
                 ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x2,TV::Axis_Vector(0),0,-4);
                 analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*x1,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
                 Add_Velocity([](auto X,auto t){return TV()+1;});
                 Add_Pressure([](auto X,auto t){return 0;});
-                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_LINEAR<TV>(rho0,a));
+                Add_Polymer_Stress([=](auto X,auto t){return id*(X.Dot(a)+(T)1);});
                 if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
                 if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
@@ -547,7 +549,7 @@ public:
                 auto rot=[=](auto X,auto t){return spin_mat*(X-(TV()+(T).5));};
                 Add_Velocity(rot);
                 Add_Pressure([=](auto X,auto t){return (T).5*(rho0/unit_rho)*rot(X,t).Magnitude_Squared();});
-                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_CONST_DECAY<TV>(weiss_inv));
+                Add_Polymer_Stress([=](auto X,auto t){return id*(exp(-weiss_inv*t)+(T)1);});
                 if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
                 if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                  if(bc_type!=NEUMANN) use_p_null_mode=true;
@@ -559,7 +561,14 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
                 Add_Velocity([](auto X,auto t){return TV()+1;});
                 Add_Pressure([](auto X,auto t){return 0;});
-                analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_PERIODIC<TV>(grid.domain/m));
+                DIAGONAL_MATRIX<T,TV::m> scale((T)(2*pi)/grid.domain.Edge_Lengths());
+                TV v=grid.domain.min_corner;
+                Add_Polymer_Stress(
+                    [=](auto X,auto t)
+                    {
+                        auto Z=scale*(X-v),W=(cos(Z)+sin(Z))*((T)1+exp(-t));
+                        return Outer_Product(W)+id;
+                    });
                 if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
                 if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
                 use_p_null_mode=true;
@@ -714,6 +723,12 @@ public:
         analytic_pressure.Append(Make_Pressure<TV>(f));
     }
 
+    template<class F>
+    void Add_Polymer_Stress(F f)
+    {
+        analytic_polymer_stress.Append(Make_Polymer_Stress<TV>(f));
+    }
+
     void Dump_Analytic_Levelset(T time)
     {
         ARRAY<VECTOR<T,3> > colors;
@@ -830,7 +845,7 @@ public:
         TV u=au.u(Z,time);
         MATRIX<T,TV::m> du=au.du(Z,time);
         SYMMETRIC_MATRIX<T,TV::m> S=as.S(Z,time);
-        SYMMETRIC_MATRIX<T,TV::m> f=as.dSdt(Z,time)+Contract<2>(as.dSdX(Z,time),u);
+        SYMMETRIC_MATRIX<T,TV::m> f=as.dSdt(Z,time)+Contract<2>(as.dS(Z,time),u);
         f-=(du*S).Twice_Symmetric_Part()+inv_Wi(color)*s*((T)1-S);
         return f/s;
     }
@@ -873,7 +888,7 @@ public:
             if(use_advection) f+=rh*av->du(X/m,time/s)*av->u(X/m,time/s);
             if(use_polymer_stress){
                 T beta=polymer_stress_coefficient(color)/unit_p;
-                f-=beta*Contract<1,2>(analytic_polymer_stress(color)->dSdX(X/m,time/s))/m;}
+                f-=beta*Contract<1,2>(analytic_polymer_stress(color)->dS(X/m,time/s))/m;}
             return f*unit_p/m;}
         return gravity;
     }
