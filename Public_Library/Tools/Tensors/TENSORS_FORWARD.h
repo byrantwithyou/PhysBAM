@@ -24,6 +24,7 @@ template<class T,int mm,int nn=mm,int pp=nn> class ZERO_TENSOR;
 template<class T,int uu,int mm,int nn=mm> class VEC_ID_TENSOR;
 template<class T,int uu,int mm> class VEC_ID_SYM_TENSOR;
 template<class T> class PERMUTATION_TENSOR;
+template<class T,int m> class DIAGONAL_TENSOR;
 
 template<class T> struct IS_TENSOR{static const int value=0;};
 template<class T,int m,int n,int p> struct IS_TENSOR<ZERO_TENSOR<T,m,n,p> > {static const int value=1;};
@@ -32,6 +33,7 @@ template<class T,int u,int m,int n> struct IS_TENSOR<SYMMETRIC_TENSOR<T,u,m,n> >
 template<class T,int u,int m,int n> struct IS_TENSOR<VEC_ID_TENSOR<T,u,m,n> > {static const int value=1;};
 template<class T,int u,int m> struct IS_TENSOR<VEC_ID_SYM_TENSOR<T,u,m> > {static const int value=1;};
 template<class T> struct IS_TENSOR<PERMUTATION_TENSOR<T> > {static const int value=1;};
+template<class T,int m> struct IS_TENSOR<DIAGONAL_TENSOR<T,m> > {static const int value=1;};
 
 template<int s,class T> struct IS_SYM_TENSOR{static const int value=0;};
 template<class T,int m,int n> struct IS_SYM_TENSOR<0,ZERO_TENSOR<T,m,n,n> > {static const int value=1;};
