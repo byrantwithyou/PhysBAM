@@ -177,12 +177,12 @@ AUTO_HESS_EXT<T,typename EMPTY_VEC<LAYOUT,-1>::TYPE,typename EMPTY_MAT<LAYOUT,-1
 Hess_From_Const(T a)
 {return AUTO_HESS_EXT<T,typename EMPTY_VEC<LAYOUT,-1>::TYPE,typename EMPTY_MAT<LAYOUT,-1>::TYPE,3>(a);}
 
-template<class T,class LAYOUT>
+template<class LAYOUT,class T>
 AUTO_HESS_EXT<T,typename EMPTY_VEC<LAYOUT,-1>::TYPE,DIFF_UNUSED,1>
 Diff_From_Const(T a)
 {return AUTO_HESS_EXT<T,typename EMPTY_VEC<LAYOUT,-1>::TYPE,DIFF_UNUSED,1>(a);}
 
-template<class T,class LAYOUT>
+template<class LAYOUT,class T>
 AUTO_HESS_EXT<T,DIFF_UNUSED,DIFF_UNUSED,0>
 From_Const(T a)
 {return AUTO_HESS_EXT<T,DIFF_UNUSED,DIFF_UNUSED,0>(a);}
@@ -600,6 +600,21 @@ AUTO_HESS_EXT<T,DIFF_UNUSED,DIFF_UNUSED,0> From_Var(const T& v)
 template<class LAYOUT,int i,class T,int d> inline
 AUTO_HESS_EXT_VEC<VECTOR<T,d>,DIFF_UNUSED,DIFF_UNUSED,0> From_Var(const VECTOR<T,d>& v)
 {return AUTO_HESS_EXT_VEC<VECTOR<T,d>,DIFF_UNUSED,DIFF_UNUSED,0>(v);}
+
+template<class LAYOUT,class T,int d>
+AUTO_HESS_EXT_VEC<VECTOR<T,d>,typename EMPTY_VEC<LAYOUT,d>::TYPE,typename EMPTY_MAT<LAYOUT,d>::TYPE,3>
+Hess_From_Const(VECTOR<T,d> a)
+{return AUTO_HESS_EXT_VEC<VECTOR<T,d>,typename EMPTY_VEC<LAYOUT,d>::TYPE,typename EMPTY_MAT<LAYOUT,d>::TYPE,3>(a);}
+
+template<class LAYOUT,class T,int d>
+AUTO_HESS_EXT_VEC<VECTOR<T,d>,typename EMPTY_VEC<LAYOUT,d>::TYPE,DIFF_UNUSED,1>
+Diff_From_Const(VECTOR<T,d> a)
+{return AUTO_HESS_EXT_VEC<VECTOR<T,d>,typename EMPTY_VEC<LAYOUT,d>::TYPE,DIFF_UNUSED,1>(a);}
+
+template<class LAYOUT,class T,int d>
+AUTO_HESS_EXT_VEC<VECTOR<T,d>,DIFF_UNUSED,DIFF_UNUSED,0>
+From_Const(VECTOR<T,d> a)
+{return AUTO_HESS_EXT_VEC<VECTOR<T,d>,DIFF_UNUSED,DIFF_UNUSED,0>(a);}
 
 template<class T,int d,class VEC,class MAT,int Q> inline auto
 operator*(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a,const VECTOR<T,d>& v)
