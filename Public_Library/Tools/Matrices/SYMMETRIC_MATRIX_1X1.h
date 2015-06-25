@@ -53,7 +53,7 @@ public:
         :x00(matrix_input.x00)
     {}
 
-    SYMMETRIC_MATRIX(const T y00)
+    explicit SYMMETRIC_MATRIX(const T y00)
         :x00(y00)
     {}
 
