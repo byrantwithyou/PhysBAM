@@ -51,7 +51,11 @@ public:
     enum WORKAROUND1 {dimension=3};
     enum WORKAROUND2 {m=3};
 
-    T x,y,z;
+    union
+    {
+        struct{T x,y,z;};
+        T array[3];
+    };
 
     VECTOR()
         :x(),y(),z()
@@ -96,6 +100,20 @@ public:
         Assert_Same_Size(*this,v);
     }
 
+    template<int n>
+    VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,3-n>& v2)
+        :x(),y(),z()
+    {
+        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n;i<3;i++) (*this)(i)=v2(i-n);
+    }
+
+    ~VECTOR()
+    {
+        x.~T();
+        y.~T();
+        z.~T();
+    }
+
     template<class T_VECTOR>
     VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
     {
@@ -110,26 +128,20 @@ public:
         return *this;
     }
 
-    template<int n>
-    VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,3-n>& v2)
-    {
-        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n;i<3;i++) (*this)(i)=v2(i-n);
-    }
-
     int Size() const
     {return 3;}
 
     const T& operator[](const int i) const
-    {assert((unsigned)i<3);return *((const T*)(this)+i);}
+    {assert((unsigned)i<3);return array[i];}
 
     T& operator[](const int i)
-    {assert((unsigned)i<3);return *((T*)(this)+i);}
+    {assert((unsigned)i<3);return array[i];}
 
     const T& operator()(const int i) const
-    {assert((unsigned)i<3);return *((const T*)(this)+i);}
+    {assert((unsigned)i<3);return array[i];}
 
     T& operator()(const int i)
-    {assert((unsigned)i<3);return *((T*)(this)+i);}
+    {assert((unsigned)i<3);return array[i];}
 
     bool operator==(const VECTOR& v) const
     {return x==v.x && y==v.y && z==v.z;}
@@ -405,10 +417,10 @@ public:
     {for(int i=0;i<v.Size();i++) v(i)=(*this)(istart+i);}
 
     T* Get_Array_Pointer()
-    {return (T*)this;}
+    {return array;}
 
     const T* Get_Array_Pointer() const
-    {return (const T*)this;}
+    {return array;}
 
     T* begin() // for stl
     {return &x;}

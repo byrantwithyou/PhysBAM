@@ -24,13 +24,21 @@ public:
     typedef T SCALAR;
     enum WORKAROUND1 {m=2,n=2};
 
-    T x00,x10,x11;
+    union
+    {
+        struct {T x00,x10,x11;};
+        T array[3];
+    };
 
     SYMMETRIC_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(2),INITIAL_SIZE nn=INITIAL_SIZE(2))
         :x00(T()),x10(T()),x11(T())
     {
         assert(mm==INITIAL_SIZE(2) && nn==INITIAL_SIZE(2));
     }
+
+    SYMMETRIC_MATRIX(const SYMMETRIC_MATRIX<T,2>& matrix_input)
+        :x00(matrix_input.x00),x10(matrix_input.x10),x11(matrix_input.x11)
+    {}
 
     template<class T2> explicit
     SYMMETRIC_MATRIX(const SYMMETRIC_MATRIX<T2,2>& matrix_input)
@@ -44,6 +52,13 @@ public:
     SYMMETRIC_MATRIX(const T y00,const T y10,const T y11)
         :x00(y00),x10(y10),x11(y11)
     {}
+
+    ~SYMMETRIC_MATRIX()
+    {
+        x00.~T();
+        x10.~T();
+        x11.~T();
+    }
 
     void From_Matrix(const MATRIX<T,2>& matrix_input)
     {x00=matrix_input(0,0);x10=matrix_input(1,0);x11=matrix_input(1,1);}
@@ -76,10 +91,10 @@ public:
     {return Element_Lower(j,i);}
 
     T& Element_Lower(int i,int j)
-    {assert((unsigned)i<(unsigned)2 && (unsigned)j<=(unsigned)i);return ((T*)this)[((3-j)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)2 && (unsigned)j<=(unsigned)i);return array[((3-j)*j>>1)+i];}
 
     const T& Element_Lower(int i,int j) const
-    {assert((unsigned)i<(unsigned)2 && (unsigned)j<=(unsigned)i);return ((const T*)this)[((3-j)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)2 && (unsigned)j<=(unsigned)i);return array[((3-j)*j>>1)+i];}
 
     bool operator==(const SYMMETRIC_MATRIX& A) const
     {return x00==A.x00 && x10==A.x10 && x11==A.x11;}

@@ -56,7 +56,11 @@ public:
     enum WORKAROUND2 {m=1};
     typedef int HAS_UNTYPED_READ_WRITE;
 
-    T x;
+    union
+    {
+        struct{T x;};
+        T array[1];
+    };
 
     VECTOR()
         :x()
@@ -95,8 +99,14 @@ public:
 
     template<int n>
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,1-n>& v2)
+        :x()
     {
         for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n+1;i<2;i++) (*this)(i)=v2(i-n);
+    }
+
+    ~VECTOR()
+    {
+        x.~T();
     }
 
     template<class T_VECTOR>

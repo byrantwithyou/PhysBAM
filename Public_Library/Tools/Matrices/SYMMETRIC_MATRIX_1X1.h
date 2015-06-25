@@ -24,13 +24,21 @@ public:
     typedef T SCALAR;
     enum WORKAROUND1 {m=1,n=1};
 
-    T x00;
+    union
+    {
+        struct {T x00;};
+        T array[1];
+    };
 
     SYMMETRIC_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(1),INITIAL_SIZE nn=INITIAL_SIZE(1))
         :x00(T())
     {
         assert(mm==INITIAL_SIZE(1) && nn==INITIAL_SIZE(1));
     }
+
+    SYMMETRIC_MATRIX(const SYMMETRIC_MATRIX<T,1>& matrix_input)
+        :x00(matrix_input.x00)
+    {}
 
     template<class T2> explicit
     SYMMETRIC_MATRIX(const SYMMETRIC_MATRIX<T2,1>& matrix_input)
@@ -48,6 +56,11 @@ public:
     SYMMETRIC_MATRIX(const T y00)
         :x00(y00)
     {}
+
+    ~SYMMETRIC_MATRIX()
+    {
+        x00.~T();
+    }
 
     void From_Matrix(const MATRIX<T,1>& matrix_input)
     {x00=matrix_input(0,0);}

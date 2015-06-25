@@ -53,7 +53,11 @@ public:
     enum WORKAROUND2 {m=2};
     typedef int HAS_UNTYPED_READ_WRITE;
 
-    T x,y;
+    union
+    {
+        struct{T x,y;};
+        T array[2];
+    };
 
     VECTOR()
         :x(),y()
@@ -94,6 +98,12 @@ public:
         Assert_Same_Size(*this,v);
     }
 
+    ~VECTOR()
+    {
+        x.~T();
+        y.~T();
+    }
+
     template<class T_VECTOR>
     VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
     {
@@ -111,16 +121,16 @@ public:
     {return 2;}
 
     const T& operator[](const int i) const
-    {assert((unsigned)i<2);return *((const T*)(this)+i);}
+    {assert((unsigned)i<2);return array[i];}
 
     T& operator[](const int i)
-    {assert((unsigned)i<2);return *((T*)(this)+i);}
+    {assert((unsigned)i<2);return array[i];}
 
     const T& operator()(const int i) const
-    {assert((unsigned)i<2);return *((const T*)(this)+i);}
+    {assert((unsigned)i<2);return array[i];}
 
     T& operator()(const int i)
-    {assert((unsigned)i<2);return *((T*)(this)+i);}
+    {assert((unsigned)i<2);return array[i];}
 
     bool operator==(const VECTOR& v) const
     {return x==v.x && y==v.y;}
@@ -419,10 +429,10 @@ public:
     {for(int i=0;i<v.Size();i++) v(i)=(*this)(istart+i);}
 
     T* Get_Array_Pointer()
-    {return (T*)this;}
+    {return array;}
 
     const T* Get_Array_Pointer() const
-    {return (const T*)this;}
+    {return array;}
 
     T* begin() // for stl
     {return &x;}

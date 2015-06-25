@@ -29,13 +29,21 @@ public:
     typedef T SCALAR;
     enum WORKAROUND1 {m=1,n=1};
 
-    T x00;
+    union
+    {
+        struct {T x00;};
+        T array[1];
+    };
 
     UPPER_TRIANGULAR_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(1),INITIAL_SIZE nn=INITIAL_SIZE(1))
         :x00(T())
     {
         STATIC_ASSERT(sizeof(UPPER_TRIANGULAR_MATRIX)==sizeof(T));assert(mm==INITIAL_SIZE(1) && nn==INITIAL_SIZE(1));
     }
+
+    UPPER_TRIANGULAR_MATRIX(const UPPER_TRIANGULAR_MATRIX<T,1>& matrix_input)
+        :x00(matrix_input.x00)
+    {}
 
     template<class T2> explicit
     UPPER_TRIANGULAR_MATRIX(const UPPER_TRIANGULAR_MATRIX<T2,1>& matrix_input)
@@ -45,6 +53,11 @@ public:
     UPPER_TRIANGULAR_MATRIX(const T x11_input)
         :x00(x11_input)
     {}
+
+    ~UPPER_TRIANGULAR_MATRIX()
+    {
+        x00.~T();
+    }
 
     int Rows() const
     {return 1;}

@@ -26,7 +26,11 @@ public:
     typedef T SCALAR;
     enum WORKAROUND1 {m=3,n=3};
 
-    T x00,x01,x11,x02,x12,x22;
+    union
+    {
+        struct {T x00,x01,x11,x02,x12,x22;};
+        T array[6];
+    };
 
     UPPER_TRIANGULAR_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(3),INITIAL_SIZE nn=INITIAL_SIZE(3))
         :x00(T()),x01(T()),x11(T()),x02(T()),x12(T()),x22(T())
@@ -43,6 +47,16 @@ public:
         :x00(x11_input),x01(x12_input),x11(x22_input),x02(x13_input),x12(x23_input),x22(x33_input)
     {}
 
+    ~UPPER_TRIANGULAR_MATRIX()
+    {
+        x00.~T();
+        x01.~T();
+        x11.~T();
+        x02.~T();
+        x12.~T();
+        x22.~T();
+    }
+
     int Rows() const
     {return 3;}
 
@@ -50,10 +64,10 @@ public:
     {return 3;}
 
     T& operator()(const int i,const int j)
-    {assert((unsigned)i<=(unsigned)j && (unsigned)j<3);return ((T*)this)[((j*(j+1))>>1)+i];}
+    {assert((unsigned)i<=(unsigned)j && (unsigned)j<3);return array[((j*(j+1))>>1)+i];}
 
     const T& operator()(const int i,const int j) const
-    {assert((unsigned)i<=(unsigned)j && (unsigned)j<3);return ((const T*)this)[((j*(j+1))>>1)+i];}
+    {assert((unsigned)i<=(unsigned)j && (unsigned)j<3);return array[((j*(j+1))>>1)+i];}
 
     bool Valid_Index(const int i,const int j) const
     {return (unsigned)i<=j && (unsigned)j<3;}
