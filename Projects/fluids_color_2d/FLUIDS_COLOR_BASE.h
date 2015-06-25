@@ -561,12 +561,27 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
                 Add_Velocity([](auto X,auto t){return TV()+1;});
                 Add_Pressure([](auto X,auto t){return 0;});
-                DIAGONAL_MATRIX<T,TV::m> scale((T)(2*pi)/grid.domain.Edge_Lengths());
-                TV v=grid.domain.min_corner;
                 Add_Polymer_Stress(
                     [=](auto X,auto t)
                     {
-                        auto Z=scale*(X-v),W=(cos(Z)+sin(Z))*((T)1+exp(-t));
+                        auto Z=(T)(2*pi)*X,W=(cos(Z)+sin(Z))*((T)1+exp(-t));
+                        return Outer_Product(W)+id;
+                    });
+                if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
+                if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
+                use_p_null_mode=true;
+                use_polymer_stress=true;
+                break;
+            }
+            case 259:{
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),0,0);
+                Add_Velocity([](auto X,auto t){return sin((T)(2*pi)*X*3);});
+                Add_Pressure([](auto X,auto t){return 0;});
+                Add_Polymer_Stress(
+                    [=](auto X,auto t)
+                    {
+                        auto Z=(T)(2*pi)*X,W=(cos(Z)+sin(Z))*((T)1+exp(-t));
                         return Outer_Product(W)+id;
                     });
                 if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
