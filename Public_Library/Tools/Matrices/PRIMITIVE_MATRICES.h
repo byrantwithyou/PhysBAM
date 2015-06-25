@@ -28,9 +28,11 @@ template<class T,int d> void Fill_From(MATRIX<T,d>& m,const SYMMETRIC_MATRIX<T,d
 template<class T,int d> void Fill_From(MATRIX<T,d>& m,const ZERO_MATRIX<T,d>& z){m=MATRIX<T,d>();}
 template<class T,int d> void Fill_From(MATRIX<T,d>& m,const IDENTITY_MATRIX<T,d>& i){m=MATRIX<T,d>::Identity_Matrix();}
 template<class T,int d> void Fill_From(MATRIX<T,d>& m,const SCALE_MATRIX<T,d>& s){m=MATRIX<T,d>()+s.x;}
+template<class T,int d> void Fill_From(MATRIX<T,d>& m,const DIAGONAL_MATRIX<T,d>& s){m=s;}
 template<class T,int d> void Fill_From(SYMMETRIC_MATRIX<T,d>& m,const ZERO_MATRIX<T,d>& z){m=SYMMETRIC_MATRIX<T,d>();}
 template<class T,int d> void Fill_From(SYMMETRIC_MATRIX<T,d>& m,const IDENTITY_MATRIX<T,d>& i){m=SYMMETRIC_MATRIX<T,d>::Identity_Matrix();}
 template<class T,int d> void Fill_From(SYMMETRIC_MATRIX<T,d>& m,const SCALE_MATRIX<T,d>& s){m=SYMMETRIC_MATRIX<T,d>()+s.x;}
+template<class T,int d> void Fill_From(SYMMETRIC_MATRIX<T,d>& m,const DIAGONAL_MATRIX<T,d>& s){m=s;}
 template<class T,int d> void Fill_From(SCALE_MATRIX<T,d>& s,const ZERO_MATRIX<T,d>& z) {s.x=0;}
 template<class T,int d> void Fill_From(SCALE_MATRIX<T,d>& s,const IDENTITY_MATRIX<T,d>& i) {s.x=1;}
 

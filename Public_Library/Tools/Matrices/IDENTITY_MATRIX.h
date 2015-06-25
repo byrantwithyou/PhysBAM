@@ -36,10 +36,11 @@ public:
     IDENTITY_MATRIX Transposed() const
     {return *this;}
 
-    template<class OBJ>
-    auto Transpose_Times(const OBJ& o) const -> decltype(this->Transposed()*o)
-    {return Transposed()*o;}
+    FIXED_NUMBER<T,d> Trace() const
+    {return FIXED_NUMBER<T,d>();}
 };
+
+template<class T,int m> SCALE_MATRIX<T,m> operator*(const T& a,const IDENTITY_MATRIX<T,m>& b) {return b*a;}
 
 template<class T,int d> SCALE_MATRIX<T,d> operator+ (const IDENTITY_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return SCALE_MATRIX<T,d>(2);}
 template<class T,int d> SCALE_MATRIX<T,d> operator+ (const IDENTITY_MATRIX<T,d>& i,const SCALE_MATRIX<T,d>& s) {return s+1;}
@@ -85,17 +86,29 @@ template<class T,int d> IDENTITY_MATRIX<T,d> Times_Self_Transpose(const IDENTITY
 
 template<class T,int d> IDENTITY_MATRIX<T,d> Transpose_Times_Self(const IDENTITY_MATRIX<T,d>& a) {return a;}
 
+template<class T,int d> VECTOR<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,const VECTOR<T,d>& b) {return b;}
+template<class T,int d> ZERO_VECTOR<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,ZERO_VECTOR<T,d> b) {return b;}
+
 template<class T,int d> SCALE_MATRIX<T,d> operator*(const SCALE_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a;}
 template<class T,int d> SCALE_MATRIX<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,const SCALE_MATRIX<T,d>& b) {return b;}
 template<class T,int d> ZERO_MATRIX<T,d> operator*(const ZERO_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a;}
-template<class T,int d> VECTOR<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,const VECTOR<T,d>& b) {return b;}
-template<class T,int d> ZERO_VECTOR<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,ZERO_VECTOR<T,d> b) {return b;}
 template<class T,int d> ZERO_MATRIX<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,const ZERO_MATRIX<T,d>& b) {return b;}
 template<class T,int d> IDENTITY_MATRIX<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return b;}
 template<class T,int d> MATRIX<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,const MATRIX<T,d>& b) {return b;}
 template<class T,int d> SYMMETRIC_MATRIX<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,const SYMMETRIC_MATRIX<T,d>& b) {return b;}
 template<class T,int d> SYMMETRIC_MATRIX<T,d> operator*(const SYMMETRIC_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a;}
 template<class T,int d> MATRIX<T,d> operator*(const MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a;}
+template<class T,int d> DIAGONAL_MATRIX<T,d> operator*(const DIAGONAL_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a;}
+
+template<class T,int d> T Double_Contract(const SCALE_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a.Trace();}
+template<class T,int d> T Double_Contract(const IDENTITY_MATRIX<T,d>& a,const SCALE_MATRIX<T,d>& b) {return b.Trace();}
+template<class T,int d> FIXED_NUMBER<T,0> Double_Contract(const ZERO_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return FIXED_NUMBER<T,0>();}
+template<class T,int d> FIXED_NUMBER<T,0> Double_Contract(const IDENTITY_MATRIX<T,d>& a,const ZERO_MATRIX<T,d>& b) {return FIXED_NUMBER<T,0>();}
+template<class T,int d> FIXED_NUMBER<T,d> Double_Contract(const IDENTITY_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return FIXED_NUMBER<T,d>();}
+template<class T,int d> T Double_Contract(const IDENTITY_MATRIX<T,d>& a,const MATRIX<T,d>& b) {return b.Trace();}
+template<class T,int d> T Double_Contract(const IDENTITY_MATRIX<T,d>& a,const SYMMETRIC_MATRIX<T,d>& b) {return b.Trace();}
+template<class T,int d> T Double_Contract(const SYMMETRIC_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a.Trace();}
+template<class T,int d> T Double_Contract(const MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a.Trace();}
 
 template<class T,int d,class OP> auto
 Transpose_Times(const IDENTITY_MATRIX<T,d>& a,const OP& b) -> decltype(a*b)
@@ -107,6 +120,18 @@ Transpose_Times(const MATRIX<T,m,n>& a,const IDENTITY_MATRIX<T,m>& b)
 
 template<class T,int m> SYMMETRIC_MATRIX<T,m>
 Transpose_Times(const SYMMETRIC_MATRIX<T,m>& a,const IDENTITY_MATRIX<T,m>& b)
+{return a;}
+
+template<class T,int d,class OP> auto
+Times_Transpose(const IDENTITY_MATRIX<T,d>& a,const OP& b) -> decltype(b.Transposed())
+{return b.Transposed();}
+
+template<class T,int m,int n> MATRIX<T,m,n>
+Times_Transpose(const MATRIX<T,m,n>& a,const IDENTITY_MATRIX<T,m>& b)
+{return a;}
+
+template<class T,int m> SYMMETRIC_MATRIX<T,m>
+Times_Transpose(const SYMMETRIC_MATRIX<T,m>& a,const IDENTITY_MATRIX<T,m>& b)
 {return a;}
 }
 #endif

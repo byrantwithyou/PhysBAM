@@ -203,6 +203,9 @@ public:
     SYMMETRIC_MATRIX Transposed() const
     {return *this;}
 
+    SYMMETRIC_MATRIX Twice_Symmetric_Part() const
+    {return *this*2;}
+
     void Transpose()
     {}
 
@@ -232,6 +235,9 @@ public:
 
     static T Inner_Product(const SYMMETRIC_MATRIX& A,const SYMMETRIC_MATRIX& B)
     {return A.x00*B.x00+A.x11*B.x11+A.x22*B.x22+2*(A.x10*B.x10+A.x20*B.x20+A.x21*B.x21);}
+
+    T Double_Contract(const SYMMETRIC_MATRIX& A) const
+    {return Inner_Product(*this,A);}
 
     T Frobenius_Norm_Squared() const
     {return x00*x00+x11*x11+x22*x22+2*(x10*x10+x20*x20+x21*x21);}
@@ -293,6 +299,12 @@ public:
 
     VECTOR<T,3> Off_Diagonal_Part() const
     {return VECTOR<T,3>(x21,x20,x10);}
+
+    SYMMETRIC_MATRIX Outer_Product_Matrix() const
+    {return Squared();}
+
+    SYMMETRIC_MATRIX Normal_Equations_Matrix() const
+    {return Squared();}
 
     static SYMMETRIC_MATRIX Multiply_With_Symmetric_Result(const MATRIX<T,3>& A,const MATRIX<T,3>& B) // A*B and assume symmetric result, 18 mults, 12 adds
     {return SYMMETRIC_MATRIX(A.x[0]*B.x[0]+A.x[3]*B.x[1]+A.x[6]*B.x[2],A.x[1]*B.x[0]+A.x[4]*B.x[1]+A.x[7]*B.x[2],

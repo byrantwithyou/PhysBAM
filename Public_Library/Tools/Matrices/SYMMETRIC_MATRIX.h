@@ -137,6 +137,9 @@ public:
     SYMMETRIC_MATRIX Transposed() const
     {return *this;}
 
+    SYMMETRIC_MATRIX Twice_Symmetric_Part() const
+    {return *this*2;}
+
     void Transpose()
     {}
 
@@ -247,6 +250,18 @@ template<class T,int d> SYMMETRIC_MATRIX<T,d>
 Transpose_Times_Self(const SYMMETRIC_MATRIX<T,d>& a)
 {return a*a;}
 
+template<class T,int m> T
+Double_Contract(const SYMMETRIC_MATRIX<T,m>& a,const SYMMETRIC_MATRIX<T,m>& b)
+{return b.Double_Contract(a);}
+
+template<class T,int m> MATRIX<T,m>
+Times_Transpose(const SYMMETRIC_MATRIX<T,m>& a,const SYMMETRIC_MATRIX<T,m>& b)
+{return a.Times_Transpose(b);}
+
+template<class T,int m> MATRIX<T,m>
+Transpose_Times(const SYMMETRIC_MATRIX<T,m>& a,const SYMMETRIC_MATRIX<T,m>& b)
+{return a.Transpose_Times(b);}
+
 //#####################################################################
 // Function Symmetric_Outer_Product
 //#####################################################################
@@ -257,9 +272,9 @@ Symmetric_Outer_Product(const VECTOR<T,d>& u,const VECTOR<T,d>& v)
 //#####################################################################
 // Function Outer_Product
 //#####################################################################
-template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m>
-Outer_Product(const TV& u)
-{return SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m>::Outer_Product(u);}
+template<class T,int d> SYMMETRIC_MATRIX<T,d>
+Outer_Product(const VECTOR<T,d>& u)
+{return SYMMETRIC_MATRIX<T,d>::Outer_Product(u);}
 
 template<class T,int d> inline std::ostream&
 operator<<(std::ostream& o,const SYMMETRIC_MATRIX<T,d>& A)

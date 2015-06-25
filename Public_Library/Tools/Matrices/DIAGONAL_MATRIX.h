@@ -284,6 +284,15 @@ public:
 //#####################################################################
 };
 // global functions
+
+template<class T,int d> VECTOR<T,d>
+Transpose_Times(const DIAGONAL_MATRIX<T,d>& a,const VECTOR<T,d>& b)
+{return a.Transpose_Times(b);}
+
+template<class T,int d> DIAGONAL_MATRIX<T,d>
+Transpose_Times_Self(const DIAGONAL_MATRIX<T,d>& a)
+{return a*a;}
+
 template<class T,int d>
 inline DIAGONAL_MATRIX<T,d> operator*(const T a,const DIAGONAL_MATRIX<T,d>& A)
 {return A*a;}

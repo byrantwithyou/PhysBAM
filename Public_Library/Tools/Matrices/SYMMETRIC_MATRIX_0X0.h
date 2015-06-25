@@ -146,6 +146,9 @@ public:
     SYMMETRIC_MATRIX Transposed() const
     {return *this;}
 
+    SYMMETRIC_MATRIX Twice_Symmetric_Part() const
+    {return *this*2;}
+
     void Transpose()
     {}
 
@@ -172,6 +175,9 @@ public:
 
     static T Inner_Product(const SYMMETRIC_MATRIX& A,const SYMMETRIC_MATRIX& B)
     {return 0;}
+
+    T Double_Contract(const SYMMETRIC_MATRIX& A) const
+    {return Inner_Product(*this,A);}
 
     T Frobenius_Norm_Squared() const
     {return 0;}
@@ -223,6 +229,15 @@ public:
 
     void Fast_Solve_Eigenproblem(DIAGONAL_MATRIX<T,0>& eigenvalues,MATRIX<T,0>& eigenvectors) const
     {Solve_Eigenproblem(eigenvalues,eigenvectors);}
+
+    SYMMETRIC_MATRIX Squared() const
+    {return SYMMETRIC_MATRIX();}
+
+    SYMMETRIC_MATRIX Outer_Product_Matrix() const
+    {return Squared();}
+
+    SYMMETRIC_MATRIX Normal_Equations_Matrix() const
+    {return Squared();}
 
     static SYMMETRIC_MATRIX Transpose_Times_With_Symmetric_Result(const MATRIX<T,0>& A,const MATRIX<T,0>& B) // A^t*B and assume symmetric result
     {return SYMMETRIC_MATRIX();}
