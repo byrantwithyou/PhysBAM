@@ -47,7 +47,7 @@ public:
 
     template<class T2> explicit
     UPPER_TRIANGULAR_MATRIX(const UPPER_TRIANGULAR_MATRIX<T2,1>& matrix_input)
-        :x00(matrix_input.x00)
+        :x00((T)matrix_input.x00)
     {}
 
     UPPER_TRIANGULAR_MATRIX(const T x11_input)
