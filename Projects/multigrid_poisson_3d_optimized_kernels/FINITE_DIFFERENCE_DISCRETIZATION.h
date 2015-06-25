@@ -7,8 +7,7 @@
 #ifndef __FINITE_DIFFERENCE_DISCRETIZATION__
 #define __FINITE_DIFFERENCE_DISCRETIZATION__
 
-#include "BOX_ITERATOR.h"
-
+#include <Tools/Math_Tools/RANGE_ITERATOR.h>
 namespace PhysBAM{
 
 template<class T,int d> class FINITE_DIFFERENCE_DISCRETIZATION;
@@ -58,8 +57,8 @@ public:
     template<class ValidFunctor,class ExistsFunctor>
     void Set_Offset_Multilinear_Interpolation_Stencil(const T_INDEX& index,T_STENCIL& stencil,const T scale,ValidFunctor valid,ExistsFunctor exists) const
     {stencil.Remove_All();
-    for(BOX_ITERATOR<d> iterator(RANGE<T_INDEX>(-T_INDEX::All_Ones_Vector(),2*T_INDEX::All_Ones_Vector()));iterator.Valid();iterator.Next()){
-        const T_INDEX dindex=iterator.Index();
+    for(RANGE_ITERATOR<d> iterator(RANGE<T_INDEX>(-T_INDEX::All_Ones_Vector(),2*T_INDEX::All_Ones_Vector()));iterator.Valid();iterator.Next()){
+        const T_INDEX dindex=iterator.index;
         T fscale=1;for(int v=0;v<d;v++) switch(dindex(v)){case -1:case 2:fscale*=.25;break;;case 0:case 1:fscale*=.75;}
         Insert(stencil,scale*fscale,index+dindex,valid,exists);}}
 

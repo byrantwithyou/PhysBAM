@@ -55,8 +55,8 @@ public:
         Saxpy_Helper<T> copy_helper(multigrid_poisson.n(1),multigrid_poisson.n(2),multigrid_poisson.n(3),c1,&v1(1,1,1),&result(1,1,1));
         copy_helper.Run_Parallel(multigrid_poisson_solver.number_of_threads);
 #else
-        for(BOX_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
-            const T_INDEX& index=iterator.Index();
+        for(RANGE_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
+            const T_INDEX& index=iterator.index;
             result(index)=c1*v1(index);
         }
 #endif
@@ -69,8 +69,8 @@ public:
         Combined_Saxpy_Helper<T> combined_copy_helper(multigrid_poisson.n(1),multigrid_poisson.n(2),multigrid_poisson.n(3),&x(1,1,1),&p(1,1,1),&z(1,1,1),alpha,beta);
         combined_copy_helper.Run_Parallel(multigrid_poisson_solver.number_of_threads);
 #else
-        for(BOX_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
-            const T_INDEX& index=iterator.Index();
+        for(RANGE_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
+            const T_INDEX& index=iterator.index;
             x(index)+=alpha*p(index);
             p(index)=z(index)+beta*p(index);
         }
@@ -87,8 +87,8 @@ public:
         sum=0;
         minimum=std::numeric_limits<T>::max();
         maximum=-minimum;
-        for(BOX_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
-            const T_INDEX& index=iterator.Index();
+        for(RANGE_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
+            const T_INDEX& index=iterator.index;
             result(index)+=c1*v1(index);
             
             sum+=result(index);
@@ -109,8 +109,8 @@ public:
 #else
         T maxabs=0;
         
-        for(BOX_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
-            const T_INDEX& index=iterator.Index();
+        for(RANGE_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
+            const T_INDEX& index=iterator.index;
             maxabs=std::max(maxabs,u(index)<0?-u(index):u(index));
         }
         return maxabs;
@@ -123,8 +123,8 @@ public:
         LOG::SCOPE scope ("[MULTIGRID_SYSTEM] Interior_Count");
         double count=0;
         bool has_dirichlet=false;
-         for(BOX_ITERATOR<d> iterator(multigrid_poisson.padded_domain);iterator.Valid();iterator.Next()){
-                 const T_INDEX& index=iterator.Index();
+         for(RANGE_ITERATOR<d> iterator(multigrid_poisson.padded_domain);iterator.Valid();iterator.Next()){
+                 const T_INDEX& index=iterator.index;
                  if(multigrid_poisson.cell_type(index)==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE) count+=(T)1.;
                  if(multigrid_poisson.cell_type(index)==MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE) has_dirichlet=true;}
         if(has_dirichlet) return 0;else return ((double)1)/count;

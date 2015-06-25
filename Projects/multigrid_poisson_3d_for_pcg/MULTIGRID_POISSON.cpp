@@ -148,7 +148,7 @@ Initialize_Boundary_Region(){
             index_is_boundary(index)=true;
     }
 
-    for(BOX_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
+    for(RANGE_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
         const T_INDEX& coarse_index=coarse_iterator.Index();
         const T_INDEX base_fine_index=(coarse_index-1)*2;
 
@@ -156,7 +156,7 @@ Initialize_Boundary_Region(){
         // if any are not interior, mark all fine cells with coarse cell 
         // in prolongation stencil as boundary
         if(index_is_interior_coarse_bitmask(coarse_index)!=full_interior_coarse_cell)
-            for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index-1,base_fine_index+2));fine_iterator.Valid();fine_iterator.Next()){
+            for(RANGE_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index-1,base_fine_index+2));fine_iterator.Valid();fine_iterator.Next()){
                 const T_INDEX& fine_index=fine_iterator.Index();
                 if(cell_type(fine_index)==INTERIOR_CELL_TYPE)
                     index_is_boundary(fine_index)=true;}
@@ -165,7 +165,7 @@ Initialize_Boundary_Region(){
     // find extended boundary cells
     // an interior cell is an extended boundary cell if 
     // it or any of its 6 face neighbors are boundary cells
-    for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
+    for(RANGE_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
         const T_INDEX& index=iterator.Index();
         if(cell_type(index)!=INTERIOR_CELL_TYPE) continue;
         if(index_is_boundary(index)){ 
@@ -189,13 +189,13 @@ Initialize_Boundary_Region(){
 
     // find all blocks with boundary and extended boundary nodes.
     // store index of the first node in each block.
-    for(BOX_ITERATOR<d,boundary_block_size> domain_iterator(unpadded_domain);domain_iterator.Valid();domain_iterator.Next()){
+    for(RANGE_ITERATOR<d,boundary_block_size> domain_iterator(unpadded_domain);domain_iterator.Valid();domain_iterator.Next()){
         const T_INDEX& base_index=domain_iterator.Index();
         RANGE<T_INDEX> box=RANGE<T_INDEX>(base_index-boundary_block_padding,base_index+boundary_block_size-1+boundary_block_padding);
 
         bool contains_boundary=false;
         bool contains_extended_boundary=false;
-        for(BOX_ITERATOR<d> box_iterator(box);box_iterator.Valid();box_iterator.Next())
+        for(RANGE_ITERATOR<d> box_iterator(box);box_iterator.Valid();box_iterator.Next())
             if(index_is_boundary(box_iterator.Index())){
                 contains_boundary=true;
                 contains_extended_boundary=true;
@@ -232,7 +232,7 @@ Initialize_Boundary_Region(){
             const T_INDEX& offset=boundary_block_base_index(c)(b);
              boundary_block_start.Append(boundary_indices.m+1); // first boundary_index of the block (1-indexed)
 
-            for(BOX_ITERATOR<d> iterator(RANGE<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
+            for(RANGE_ITERATOR<d> iterator(RANGE<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
                 iterator.Valid();iterator.Next()){
                 const T_INDEX& index=iterator.Index();
                 if(index_is_boundary(index)){
@@ -249,7 +249,7 @@ Initialize_Boundary_Region(){
     for(int b=0;b<extended_boundary_block_base_index.m;b++){
         const T_INDEX& offset=extended_boundary_block_base_index(b);
         
-        for(BOX_ITERATOR<d> iterator(RANGE<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
+        for(RANGE_ITERATOR<d> iterator(RANGE<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
             iterator.Valid();iterator.Next()){
             const T_INDEX& index=iterator.Index();
             if(index_is_extended_boundary(index))
@@ -326,7 +326,7 @@ Initialize_Interior_Bitmaps_And_Diagonal_Entries(){
 
     int full_diagonal=d*2;
     
-    for(BOX_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
+    for(RANGE_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
         const T_INDEX& coarse_index=coarse_iterator.Index();
         const T_INDEX base_fine_index=(coarse_index-1)*2;
         
@@ -334,7 +334,7 @@ Initialize_Interior_Bitmaps_And_Diagonal_Entries(){
         index_has_full_diagonal_coarse_bitmask(coarse_index)=0;
         
         unsigned char mask=0x01;
-        for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+        for(RANGE_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
             const T_INDEX& fine_index=fine_iterator.Index();
             int active_neighbors=0;
             if(cell_type(fine_index)==INTERIOR_CELL_TYPE){
@@ -452,7 +452,7 @@ Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema(const ARRAY<T,TV_
     rmin=std::numeric_limits<T>::max();
     rmax=-std::numeric_limits<T>::max();
     T scale_factor=(T)1/(h*h);
-    for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
+    for(RANGE_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
         const T_INDEX& index=iterator.Index();
         if(diagonal_entries(index)==0)
             continue;
@@ -489,7 +489,7 @@ Multiply_With_System_Matrix_And_Compute_Dot_Product(const ARRAY<T,TV_INT>& x,ARR
 
     T scale_factor=(T)1/(h*h);
     double dot_product=0;
-    for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
+    for(RANGE_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
         const T_INDEX& index=iterator.Index();
         if(diagonal_entries(index)==0)
             continue;
@@ -548,13 +548,13 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
         // compute deltas on first coarse x-slice
         T_INDEX xmin_ymax_zmax=unpadded_coarse_domain.max_corner;
         xmin_ymax_zmax(1)=unpadded_coarse_domain.min_corner(1);
-        for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(unpadded_coarse_domain.min_corner,xmin_ymax_zmax));
+        for(RANGE_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(unpadded_coarse_domain.min_corner,xmin_ymax_zmax));
             coarse_iterator.Valid();coarse_iterator.Next()){
             
             const T_INDEX& coarse_index=coarse_iterator.Index();
             const T_INDEX base_fine_index=(coarse_index-1)*2;
             
-            for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+            for(RANGE_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
                 
                 const T_INDEX& fine_index=fine_iterator.Index();
                 delta(fine_index)=-b(fine_index);
@@ -571,7 +571,7 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
         // apply deltas, lagging by 1 x-slice
         // since write bitmask is based on coarse cells, 
         // we'll iterate over coarse domain
-        for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(unpadded_coarse_domain.min_corner+T_INDEX::Axis_Vector(1),unpadded_coarse_domain.max_corner));
+        for(RANGE_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(unpadded_coarse_domain.min_corner+T_INDEX::Axis_Vector(1),unpadded_coarse_domain.max_corner));
             coarse_iterator.Valid();coarse_iterator.Next()){
             const T_INDEX& coarse_index=coarse_iterator.Index();
             T_INDEX shifted_coarse_index=coarse_index;
@@ -579,7 +579,7 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
             const T_INDEX base_fine_index=(coarse_index-1)*2;
             
             unsigned char mask=0x01;
-            for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+            for(RANGE_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
                 
                 const T_INDEX& fine_index=fine_iterator.Index();                    
                 T_INDEX shifted_fine_index=fine_index;
@@ -607,13 +607,13 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
         // apply deltas to last coarse x-slice
         T_INDEX xmax_ymin_zmin=unpadded_coarse_domain.min_corner;
         xmax_ymin_zmin(1)=unpadded_coarse_domain.max_corner(1);
-        for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(xmax_ymin_zmin,unpadded_coarse_domain.max_corner));
+        for(RANGE_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(xmax_ymin_zmin,unpadded_coarse_domain.max_corner));
             coarse_iterator.Valid();coarse_iterator.Next()){
             const T_INDEX& coarse_index=coarse_iterator.Index();
             const T_INDEX base_fine_index=(coarse_index-1)*2;
             
             unsigned char mask=0x01;
-            for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+            for(RANGE_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
 
                 const T_INDEX& fine_index=fine_iterator.Index();
                 if(index_has_full_diagonal_coarse_bitmask(coarse_index) & mask){
@@ -668,12 +668,12 @@ Relax_And_Compute_Residuals(const int interior_relaxations,const int boundary_po
     const T two_thirds_over_diagonal_part=(T)1/(3*d);
     const T minus_two_thirds_over_diagonal_part=-(T)1/(3*d);
     
-    for(BOX_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
+    for(RANGE_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
         const T_INDEX& coarse_index=coarse_iterator.Index();
         const T_INDEX base_fine_index=(coarse_index-1)*2;
         
         unsigned char mask=0x01;
-        for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+        for(RANGE_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
             const T_INDEX& fine_index=fine_iterator.Index();
 
             // subtract nullspace component from right hand side (interior indices only)
@@ -704,12 +704,12 @@ Relax_And_Compute_Residuals(const int interior_relaxations,const int boundary_po
     }
                 
     if(nullspace_component)
-        for(BOX_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
+        for(RANGE_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
             const T_INDEX& coarse_index=coarse_iterator.Index();
             const T_INDEX base_fine_index=(coarse_index-1)*2;
         
             unsigned char mask=0x01;
-            for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+            for(RANGE_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
                 const T_INDEX& fine_index=fine_iterator.Index();
 
                     delta(fine_index)=0;
@@ -760,8 +760,8 @@ Compute_Residuals_Boundary()
 template<class T,int d> void MULTIGRID_POISSON<T,d>::
 Initialize_Square_Domain()
 {
-    for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next())
-        cell_type(iterator.Index())=INTERIOR_CELL_TYPE;
+    for(RANGE_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next())
+        cell_type(iterator.index)=INTERIOR_CELL_TYPE;
 
     for(BOUNDARY_ITERATOR<d> iterator(padded_domain);iterator.Valid();iterator.Next())
         cell_type(iterator.Index())=NEUMANN_CELL_TYPE;
@@ -779,12 +779,12 @@ Initialize_Square_Minus_Circle_Domain()
     for(BOUNDARY_ITERATOR<d> iterator(padded_domain);iterator.Valid();iterator.Next())
         cell_type(iterator.Index())=NEUMANN_CELL_TYPE;
 
-    for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
-        TV X=grid.Node(iterator.Index());
+    for(RANGE_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
+        TV X=grid.Node(iterator.index);
         if((X-circle_center).Magnitude_Squared()<radius_squared)
-            cell_type(iterator.Index())=NEUMANN_CELL_TYPE;
+            cell_type(iterator.index)=NEUMANN_CELL_TYPE;
         else
-            cell_type(iterator.Index())=INTERIOR_CELL_TYPE;
+            cell_type(iterator.index)=INTERIOR_CELL_TYPE;
     }
 }
 
@@ -793,18 +793,18 @@ Initialize_Test_Domain()
 {
 
     // Sinusoidal dirichlet interface, with 2 Neumann bubbles
-    for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
-        TV X=grid.Node(iterator.Index());
+    for(RANGE_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
+        TV X=grid.Node(iterator.index);
         if((X-TV::All_Ones_Vector()*(T).25).Magnitude()<.125){
-            cell_type(iterator.Index())=NEUMANN_CELL_TYPE;}
+            cell_type(iterator.index)=NEUMANN_CELL_TYPE;}
         else if((X-TV::All_Ones_Vector()*(T).5).Magnitude()<.125){
-            cell_type(iterator.Index())=NEUMANN_CELL_TYPE;}
+            cell_type(iterator.index)=NEUMANN_CELL_TYPE;}
         else if(d==2 && (X(2)<.5+.25*sin((X(1))*2*pi)))
-            cell_type(iterator.Index())=INTERIOR_CELL_TYPE;
+            cell_type(iterator.index)=INTERIOR_CELL_TYPE;
         else if(d==3 && (X(2)<.5+.25*sin((X(1)+X(3))*2*pi)))
-            cell_type(iterator.Index())=INTERIOR_CELL_TYPE;
+            cell_type(iterator.index)=INTERIOR_CELL_TYPE;
         else
-            cell_type(iterator.Index())=DIRICHLET_CELL_TYPE;
+            cell_type(iterator.index)=DIRICHLET_CELL_TYPE;
     }
 
 
@@ -819,13 +819,13 @@ Initialize_Test_Right_Hand_Side(ARRAY<T,TV_INT>& b_input)
     T_INDEX spike_index(n);spike_index(1)/=2;for(int v=2;v<=d;v++) spike_index(v)/=8;
     b_input(spike_index)=-.5;
 #else
-    for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
-        TV X=grid.Node(iterator.Index());
-        if(cell_type(iterator.Index())==INTERIOR_CELL_TYPE){
+    for(RANGE_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
+        TV X=grid.Node(iterator.index);
+        if(cell_type(iterator.index)==INTERIOR_CELL_TYPE){
             if(d==2)
-                b_input(iterator.Index())=sin(X(1)*2*pi)*cos(X(2)*2*pi);
+                b_input(iterator.index)=sin(X(1)*2*pi)*cos(X(2)*2*pi);
             else if(d==3)
-                b_input(iterator.Index())=sin(X(1)*2*pi)*cos(X(2)*2*pi)*sin(X(3)*2*pi);
+                b_input(iterator.index)=sin(X(1)*2*pi)*cos(X(2)*2*pi)*sin(X(3)*2*pi);
         }
     }
 #endif
@@ -843,8 +843,8 @@ Initialize_Test_Initial_Guess(ARRAY<T,TV_INT>& u_input)
     // Randomize initial guess
     RANDOM_NUMBERS<T> random_numbers;
     random_numbers.Set_Seed(1);
-    for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
-        const T_INDEX& index=iterator.Index();
+    for(RANGE_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
+        const T_INDEX& index=iterator.index;
         if(cell_type(index)==INTERIOR_CELL_TYPE)
             u_input(index)=random_numbers.Get_Number();}
 #endif

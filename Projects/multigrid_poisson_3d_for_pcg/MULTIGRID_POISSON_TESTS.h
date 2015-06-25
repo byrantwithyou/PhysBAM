@@ -105,27 +105,27 @@ public:
         switch(test_number){
             case 1:
             case 2:
-                for(BOX_ITERATOR<d> iterator(multigrid_poisson.padded_domain);iterator.Valid();iterator.Next()){
-                    TV X=multigrid_poisson.grid.Node(iterator.Index());
-                    if(multigrid_poisson.cell_type(iterator.Index())==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE){
+                for(RANGE_ITERATOR<d> iterator(multigrid_poisson.padded_domain);iterator.Valid();iterator.Next()){
+                    TV X=multigrid_poisson.grid.Node(iterator.index);
+                    if(multigrid_poisson.cell_type(iterator.index)==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE){
                         if(d==2)
-                            b(iterator.Index())=sin(X(1)*2*pi)*cos(X(2)*2*pi);
+                            b(iterator.index)=sin(X(1)*2*pi)*cos(X(2)*2*pi);
                         else if(d==3)
-                            b(iterator.Index())=sin(X(1)*2*pi)*cos(X(2)*2*pi)*sin(X(3)*2*pi);
+                            b(iterator.index)=sin(X(1)*2*pi)*cos(X(2)*2*pi)*sin(X(3)*2*pi);
                     }
                     else
-                        b(iterator.Index())=0;
+                        b(iterator.index)=0;
                 }
                 break;        
             case 3:
             case 4:
-                for(BOX_ITERATOR<d> iterator(multigrid_poisson.padded_domain);iterator.Valid();iterator.Next()){
-                    TV X=multigrid_poisson.grid.Node(iterator.Index());
-                    if(multigrid_poisson.cell_type(iterator.Index())==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE){ 
-                        b(iterator.Index())=random_numbers.Get_Number();
+                for(RANGE_ITERATOR<d> iterator(multigrid_poisson.padded_domain);iterator.Valid();iterator.Next()){
+                    TV X=multigrid_poisson.grid.Node(iterator.index);
+                    if(multigrid_poisson.cell_type(iterator.index)==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE){ 
+                        b(iterator.index)=random_numbers.Get_Number();
                     }
                     else
-                        b(iterator.Index())=0;
+                        b(iterator.index)=0;
                 }
                 break;
             case 5:
@@ -142,8 +142,8 @@ public:
             case 2:
             case 3:
             case 4:
-                for(BOX_ITERATOR<d> iterator(multigrid_poisson.padded_domain);iterator.Valid();iterator.Next()){
-                    const T_INDEX& index=iterator.Index();
+                for(RANGE_ITERATOR<d> iterator(multigrid_poisson.padded_domain);iterator.Valid();iterator.Next()){
+                    const T_INDEX& index=iterator.index;
                     if(multigrid_poisson.cell_type(index)==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE)
                         x(index)=random_numbers.Get_Number();
                     else
@@ -211,9 +211,9 @@ public:
         ARRAY<T,TV_INT> x_as_density(x);
         T x_min=std::numeric_limits<T>::max();
         T x_max=-x_min;
-        for(BOX_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
-            if(multigrid_poisson.cell_type(iterator.Index())==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE){
-                const T& xi=x(iterator.Index());
+        for(RANGE_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
+            if(multigrid_poisson.cell_type(iterator.index)==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE){
+                const T& xi=x(iterator.index);
                 x_min=min(x_min,xi);
                 x_max=max(x_max,xi);
             }
@@ -242,8 +242,8 @@ public:
         T x_min=std::numeric_limits<T>::max();
         T x_max=-x_min;
         T r_max=x_max;
-        for(BOX_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
-            const T_INDEX& index=iterator.Index();
+        for(RANGE_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
+            const T_INDEX& index=iterator.index;
 
             if(multigrid_poisson.cell_type(index)==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE){
                 const T& xi=x(index);
@@ -282,8 +282,8 @@ public:
             case 1:
             case 2:                
                 if(frame>0) return;
-                for(BOX_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next())
-                    multigrid_poisson.cell_type(iterator.Index())=MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE;
+                for(RANGE_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next())
+                    multigrid_poisson.cell_type(iterator.index)=MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE;
 
                 for(BOUNDARY_ITERATOR<d> iterator(multigrid_poisson.padded_domain);iterator.Valid();iterator.Next())
                     multigrid_poisson.cell_type(iterator.Index())=MULTIGRID_POISSON<T,d>::NEUMANN_CELL_TYPE;
@@ -300,12 +300,12 @@ public:
                 for(BOUNDARY_ITERATOR<d> iterator(multigrid_poisson.padded_domain);iterator.Valid();iterator.Next())
                     multigrid_poisson.cell_type(iterator.Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
 
-                for(BOX_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
-                    TV X=multigrid_poisson.grid.Node(iterator.Index());
+                for(RANGE_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
+                    TV X=multigrid_poisson.grid.Node(iterator.index);
                     if((X-circle_center).Magnitude_Squared()<radius_squared)
-                        multigrid_poisson.cell_type(iterator.Index())=MULTIGRID_POISSON<T,d>::NEUMANN_CELL_TYPE;
+                        multigrid_poisson.cell_type(iterator.index)=MULTIGRID_POISSON<T,d>::NEUMANN_CELL_TYPE;
                     else
-                        multigrid_poisson.cell_type(iterator.Index())=MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE;
+                        multigrid_poisson.cell_type(iterator.index)=MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE;
                 }
             }break;
             case 5:
@@ -321,12 +321,12 @@ public:
                     center(3)=(T).3*cos((T)frame*.03)+.5;
                 T radius=.125;
                 T radius_squared=radius*radius;
-                for(BOX_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
-                    TV X=multigrid_poisson.grid.Node(iterator.Index());
+                for(RANGE_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
+                    TV X=multigrid_poisson.grid.Node(iterator.index);
                     if((X-center).Magnitude_Squared()<radius_squared)
-                        multigrid_poisson.cell_type(iterator.Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
+                        multigrid_poisson.cell_type(iterator.index)=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
                     else
-                        multigrid_poisson.cell_type(iterator.Index())=MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE;
+                        multigrid_poisson.cell_type(iterator.index)=MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE;
                 }
                 break;
                    
@@ -340,8 +340,8 @@ public:
         LOG::SCOPE scope("Set boundary values");
         if(test_number==5 ||test_number==6){
             MULTIGRID_POISSON<T,d>& multigrid_poisson=multigrid_poisson_solver->Discretization();
-            for(BOX_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain.Thickened(-1));iterator.Valid();iterator.Next()){
-                const T_INDEX& index=iterator.Index();
+            for(RANGE_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain.Thickened(-1));iterator.Valid();iterator.Next()){
+                const T_INDEX& index=iterator.index;
 
                 b(index)=0;
                 if(multigrid_poisson.cell_type(index)==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE){
