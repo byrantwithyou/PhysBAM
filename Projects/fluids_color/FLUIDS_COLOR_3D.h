@@ -2,8 +2,8 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef __FLUIDS_COLOR__
-#define __FLUIDS_COLOR__
+#ifndef __FLUIDS_COLOR_3D__
+#define __FLUIDS_COLOR_3D__
 
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
@@ -29,7 +29,7 @@
 #include <Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
-#include "../fluids_color_2d/FLUIDS_COLOR_BASE.h"
+#include "FLUIDS_COLOR_BASE.h"
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif

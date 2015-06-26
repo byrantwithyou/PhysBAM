@@ -2,8 +2,8 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef __FLUIDS_COLOR__
-#define __FLUIDS_COLOR__
+#ifndef __FLUIDS_COLOR_2D__
+#define __FLUIDS_COLOR_2D__
 
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
