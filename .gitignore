@@ -5,7 +5,6 @@ build
 *_nocona_debug
 *_debug
 *_optdebug
-
 *.gz
 *.pyc
 *.ncb
@@ -16,7 +15,6 @@ Release
 .emacs_project_config
 *.o
 Test_[0-9]*
-
 *.bbl
 *.blg
 *.dvi
@@ -30,7 +28,6 @@ tmp-gdb-cmd-args.txt
 Projects/Water/water
 Projects/Smoke/smoke
 output
-
 *.os
 *.so
 Projects/fluids_color_3d/fluids_color_3d
@@ -40,7 +37,6 @@ Projects/integration_test/bending
 Projects/poisson_color_new/poisson_color_new
 Projects/integration_test/marching_tets
 Projects/integration_test/quad
-
 Public_Library/Tools/Symbolics/PROGRAM_LEX.hpp
 Public_Library/Tools/Symbolics/PROGRAM_YACC.hpp
 .DS_Store
@@ -57,3 +53,12 @@ camera_script
 camera_script_render
 Tools/mpm2partio/mpm2partio
 Projects/diff_test/diff_test
+Projects/auto_diff/auto_diff
+Projects/fluids_color/conv
+Projects/fluids_color/convergence/
+Projects/fluids_color/draw_bubble
+Projects/fluids_color/fluids_color
+Projects/fluids_color/oldroyd_test
+Projects/osd_to_obj/osd_to_obj
+Projects/output_geo/output_geo
+Projects/position_based_dynamics/pbd
