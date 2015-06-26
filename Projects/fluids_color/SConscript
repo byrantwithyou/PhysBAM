@@ -2,7 +2,7 @@
 
 Import('env Automatic_Program')
 env=env.Copy(USE_DYNAMICS=1)
-Automatic_Program(env,"fluids_color",["main.cpp","FLUIDS_COLOR_BASE.cpp","FLUIDS_COLOR_2D.cpp","FLUIDS_COLOR_3D.cpp"])
+Automatic_Program(env,"fluids_color",["main.cpp","INSTANTIATION_HELPER_0.cpp","INSTANTIATION_HELPER_1.cpp","INSTANTIATION_HELPER_2.cpp","INSTANTIATION_HELPER_3.cpp","FLUIDS_COLOR_2D.cpp","FLUIDS_COLOR_3D.cpp"])
 Automatic_Program(env,"conv",["conv.cpp"])
 Automatic_Program(env,"draw_bubble",["draw_bubble.cpp"])
 Automatic_Program(env,"oldroyd_test",["oldroyd_test.cpp"])
