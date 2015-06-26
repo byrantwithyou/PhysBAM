@@ -16,7 +16,7 @@ for my $j ((2..2))
             for my $r (32,64)
             {
                 my $pr=80-$s;
-                print `$PHYSBAM/Tools/batch/slave -p $pr -- nice ./fluids_color_2d -resolution $r -last_frame 200 -dt $dt $s -rho0 $rho -mu0 $mu -o shed-stab-$s-$j-$i-$k-$r-fix`;
+                print `$PHYSBAM/Tools/batch/slave -p $pr -- nice ./fluids_color -resolution $r -last_frame 200 -dt $dt $s -rho0 $rho -mu0 $mu -o shed-stab-$s-$j-$i-$k-$r-fix`;
                 sleep(1);
             }
         }

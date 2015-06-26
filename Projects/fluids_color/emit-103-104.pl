@@ -14,7 +14,7 @@ for my $j (0..4)
             my $rho1 = $rho*2;
             for my $r (32,64)
             {
-                print `$PHYSBAM/Tools/batch/slave -p 80 -- nice ./fluids_color_2d -resolution $r -last_frame 1000 -dt $dt 104 -rho0 $rho -rho1 $rho1 -mu0 $mu -mu1 $mu1 -o stab-at-ii-$j-$i-$k-$r`;
+                print `$PHYSBAM/Tools/batch/slave -p 80 -- nice ./fluids_color -resolution $r -last_frame 1000 -dt $dt 104 -rho0 $rho -rho1 $rho1 -mu0 $mu -mu1 $mu1 -o stab-at-ii-$j-$i-$k-$r`;
                 sleep(1);
             }
         }
