@@ -62,6 +62,7 @@ Cubic_MN_Weights(const T alpha) const
 namespace PhysBAM{
 template class CUBIC_MN_INTERPOLATION<float,float>;
 template class CUBIC_MN_INTERPOLATION<float,VECTOR<float,3> >;
+template class CUBIC_MN_INTERPOLATION<float,VECTOR<float,2> >;
 template class CUBIC_MN_INTERPOLATION<double,double>;
 template class CUBIC_MN_INTERPOLATION<double,VECTOR<double,3> >;
 template class CUBIC_MN_INTERPOLATION<double,VECTOR<double,2> >;
