@@ -28,7 +28,6 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
-#include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES_SYSTEM.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 
@@ -1036,7 +1035,6 @@ Get_Elements(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<
 
     // INITIALIZE MESHES
 
-    bool junctions_present=false;
     for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
 
         VECTOR<T,num_corners> cell_phi_value;
@@ -1064,19 +1062,10 @@ Get_Elements(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<
                 node_vertices,boundary,particles,boundary_cell_elements);
 
         if(!junction) continue; // not a junction
-        junctions_present=true;
         junction_cells.Insert(it.index);}
 
     // FIX AND SAVE MESHES
-
-    junctions_present=false; // What follows dies, so don't run it
-    if(junctions_present){
-        ARRAY<int> particle_dofs(particles.number);
-        HASHTABLE<TV_INT> variable_cells;
-        Fix_Mesh(particles,particle_dofs,variable_cells,interface,boundary,index_to_cell_data,
-            edge_vertices,face_vertices,cell_vertices,node_vertices,junction_cells,iterations,verbose);
-        Save_Mesh(index_to_cell_elements,grid,interface,boundary,index_to_cell_data,particles,true,&particle_dofs,&variable_cells);}
-    else Save_Mesh(index_to_cell_elements,grid,interface,boundary,index_to_cell_data,particles);
+    Save_Mesh(index_to_cell_elements,grid,interface,boundary,index_to_cell_data,particles);
 }
 //#####################################################################
 // Function Cut_Elements
@@ -1257,105 +1246,6 @@ Save_Mesh(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_elements,const GRID<TV>
                     BOUNDARY_ELEMENT& element=cell_boundary.Last();
                     for(int i=0;i<TV::m;i++) element.face.X(i)=particles.X(e_index(i));
                     element.color=color;}}}}
-}
-template<class TV>
-class FIX_MESH_ENERGY:public NONLINEAR_FUNCTION<typename TV::SCALAR(KRYLOV_VECTOR_BASE<typename TV::SCALAR>&)>
-{
-public:
-    typedef typename TV::SCALAR T;
-
-    mutable ARRAY<TV> X;
-    const ARRAY<VECTOR<int,TV::m+1> >& active_list;
-    const ARRAY<int>& index_map;
-    const ARRAY<int>& reverse_index_map;
-
-    FIX_MESH_ENERGY(ARRAY_VIEW<const TV> X,const ARRAY<VECTOR<int,TV::m+1> >& active_list,const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map)
-        :X(X),active_list(active_list),index_map(index_map),reverse_index_map(reverse_index_map)
-    {}
-
-    virtual ~FIX_MESH_ENERGY(){}
-
-    void Compute(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const override
-    {
-        PHYSBAM_ASSERT(g || !h);
-        MARCHING_CUBES_SYSTEM<TV>* mcs=static_cast<MARCHING_CUBES_SYSTEM<TV>*>(h);
-        MARCHING_CUBES_VECTOR<TV>* mcv=static_cast<MARCHING_CUBES_VECTOR<TV>*>(g);
-        const MARCHING_CUBES_VECTOR<TV>& mcvx=static_cast<const MARCHING_CUBES_VECTOR<TV>&>(x);
-        X.Subset(index_map)=mcvx.x;
-        T E=0;
-        if(mcs) E=mcs->Set_Matrix_And_Rhs(*mcv,active_list,index_map,reverse_index_map,X);
-        else if(mcv) E=MARCHING_CUBES_SYSTEM<TV>::Set_Rhs(*mcv,active_list,index_map,X);
-        else E=MARCHING_CUBES_SYSTEM<TV>::Compute_Energy(active_list,X);
-
-        if(e) *e=E;
-    }
-};
-//#####################################################################
-// Function Fix_Mesh
-//#####################################################################
-template<class TV> void MARCHING_CUBES_COLOR<TV>::
-Fix_Mesh(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>& particle_dofs,HASHTABLE<TV_INT>& variable_cells,
-    const HASH_INTERFACE& interface,const HASH_BOUNDARY& boundary,const HASHTABLE<TV_INT,HASH_CELL_DATA>& index_to_cell_data,
-    const HASHTABLE<FACE_INDEX<TV::m>,int>& edge_vertices,const HASHTABLE<FACE_INDEX<TV::m>,int>& face_vertices,
-    const HASHTABLE<TV_INT,int>& cell_vertices,const HASHTABLE<TV_INT,int>& node_vertices,
-    const HASHTABLE<TV_INT>& junction_cells,const int iterations,const bool verbose)
-{
-    // INITIALIZE DOFS
-
-    for(typename HASHTABLE<TV_INT,int>::CONST_ITERATOR it(cell_vertices);it.Valid();it.Next()){
-        particle_dofs(it.Data())=(1<<TV::m)-1;}
-
-    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::CONST_ITERATOR it(face_vertices);it.Valid();it.Next()){
-        particle_dofs(it.Data())=(1<<TV::m)-1-(1<<it.Key().axis);}
-
-    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::CONST_ITERATOR it(edge_vertices);it.Valid();it.Next()){
-        RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box());
-        range.max_corner(it.Key().axis)=2;
-        bool trusted=true;
-        for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
-            TV_INT index=it2.index+it.Key().index;
-            if(junction_cells.Contains(index)){
-                trusted=false;break;}}
-        if(!trusted) particle_dofs(it.Data())=1<<it.Key().axis;}
-
-    // PARTICLES TO DOFS CORRESPONDENCE
-
-    ARRAY<int> index_map;                          // maps dofs to particles
-    ARRAY<int> reverse_index_map(particle_dofs.m); // maps particles to dofs
-    for(int i=0;i<particle_dofs.m;i++){
-        reverse_index_map(i)=-1;
-        if(particle_dofs(i))
-            reverse_index_map(i)=index_map.Append(i);}
-
-    ARRAY<VECTOR<int,TV::m+1> > active_list;
-    MARCHING_CUBES_SYSTEM<TV>::Compute_Active_List(active_list,interface,reverse_index_map);
-
-    if(0) MARCHING_CUBES_SYSTEM<TV>::Test_System(active_list,index_map,reverse_index_map);
-
-    MARCHING_CUBES_SYSTEM<TV> system;
-    MARCHING_CUBES_VECTOR<TV> rhs,sol;
-    sol.x=particles.X.Subset(index_map);
-
-    NEWTONS_METHOD<T> newton;
-    newton.progress_tolerance=1e-20;
-    newton.angle_tolerance=(T)1e-6;
-    newton.max_iterations=iterations;
-
-    FIX_MESH_ENERGY<TV> fme(particles.X,active_list,index_map,reverse_index_map);
-    ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
-    newton.Newtons_Method(fme,system,sol,av);
-    av.Delete_Pointers_And_Clean_Memory();
-    particles.X.Subset(index_map)=sol.x;
-
-    // DRAW DEBUG PARTICLES
-
-    for(int p=0;p<particle_dofs.m;p++){
-        switch(particle_dofs(p)){
-            case 0: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(.5,.5,.5)); break;
-            case 1: case 2: case 4: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,1,1)); break;
-            case 3: case 5: case 6: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,1,0)); break;
-            case 7: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,0,0)); break;
-            default: PHYSBAM_FATAL_ERROR();}}
 }
 //#####################################################################
 // Function Get_Elements_For_Cell
