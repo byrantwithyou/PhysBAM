@@ -32,16 +32,16 @@ struct HESSIAN
     static_assert(!is_same<MAT,DIFF_UNUSED>::value,"HESSIAN DIFF_UNUSED");
     MAT x;
 
-    HESSIAN operator+ () const {return *this;}
-    HESSIAN<T,decltype(MAT_NEG::Type(MAT()))> operator- () const {HESSIAN<T,decltype(MAT_NEG::Type(MAT()))> r;MAT_NEG()(r.x,x);return r;}
-    HESSIAN<T,decltype(MAT_SCALE::Type(MAT(),T()))> operator* (T a) const {HESSIAN<T,decltype(MAT_SCALE::Type(MAT(),T()))> r;MAT_SCALE()(r.x,x,a);return r;}
-    HESSIAN<T,decltype(MAT_SCALE_DIV::Type(MAT(),T()))> operator/ (T a) const {HESSIAN<T,decltype(MAT_SCALE_DIV::Type(MAT(),T()))> r;MAT_SCALE_DIV()(r.x,x,a);return r;}
+    auto operator+ () const {return *this;}
+    auto operator- () const {HESSIAN<T,decltype(MAT_NEG_B::Type(x))> r;MAT_NEG_B()(r.x,x);return r;}
+    auto operator* (T a) const {HESSIAN<T,decltype(MAT_MUL_BS::Type(x,a))> r;MAT_MUL_BS()(r.x,x,a);return r;}
+    auto operator/ (T a) const {HESSIAN<T,decltype(MAT_DIV_BS::Type(x,a))> r;MAT_DIV_BS()(r.x,x,a);return r;}
 
     template<class MAT1>
-    HESSIAN<T,decltype(MAT_ADD::Type(MAT(),MAT1()))> operator+ (const HESSIAN<T,MAT1>& z) const {HESSIAN<T,decltype(MAT_ADD::Type(MAT(),MAT1()))> r;MAT_ADD()(r.x,x,z.x);return r;}
+    auto operator+ (const HESSIAN<T,MAT1>& z) const {HESSIAN<T,decltype(MAT_ADD_BB::Type(x,z.x))> r;MAT_ADD_BB()(r.x,x,z.x);return r;}
 
     template<class MAT1>
-    HESSIAN<T,decltype(MAT_SUB::Type(MAT(),MAT1()))> operator- (const HESSIAN<T,MAT1>& z) const {HESSIAN<T,decltype(MAT_SUB::Type(MAT(),MAT1()))> r;MAT_SUB()(r.x,x,z.x);return r;}
+    auto operator- (const HESSIAN<T,MAT1>& z) const {HESSIAN<T,decltype(MAT_SUB_BB::Type(x,z.x))> r;MAT_SUB_BB()(r.x,x,z.x);return r;}
 };
 
 template<class T,class MAT,class MAT1>
@@ -59,26 +59,23 @@ void Get(OUT& o,const HESSIAN<T,MAT>& h)
 }
 
 template<class T,class MAT>
-HESSIAN<T,decltype(MAT_SCALE::Type(MAT(),T()))> operator* (T a,const HESSIAN<T,MAT>& h){return h*a;}
+auto operator* (T a,const HESSIAN<T,MAT>& h){return h*a;}
 
-template<class T,class VEC,class VEC1> HESSIAN<T,decltype(MAT_SYM_OUTER_PRODUCT::Type(VEC(),VEC1()))>
+template<class T,class VEC,class VEC1> auto
 Symmetric_Outer_Product(const GRADIENT<T,VEC>& u,const GRADIENT<T,VEC1>& v)
-{HESSIAN<T,decltype(MAT_SYM_OUTER_PRODUCT::Type(VEC(),VEC1()))> H;MAT_SYM_OUTER_PRODUCT()(H.x,u.x,v.x);return H;}
+{HESSIAN<T,decltype(MAT_SYM_OUTER_PRODUCT::Type(u.x,v.x))> H;MAT_SYM_OUTER_PRODUCT()(H.x,u.x,v.x);return H;}
 
-template<class T,class VEC> HESSIAN<T,decltype(MAT_OUTER_PRODUCT::Type(VEC()))>
+template<class T,class VEC> auto
 Outer_Product(const GRADIENT<T,VEC>& u)
-{HESSIAN<T,decltype(MAT_OUTER_PRODUCT::Type(VEC()))> H;MAT_OUTER_PRODUCT()(H.x,u.x);return H;}
+{HESSIAN<T,decltype(MAT_OUTER_PRODUCT::Type(u.x))> H;MAT_OUTER_PRODUCT()(H.x,u.x);return H;}
 
-template<class TV,class VEC,class VEC1> HESSIAN<typename TV::SCALAR,decltype(MAT_SYM_TRANSPOSE_TIMES::Type(VEC(),VEC1()))>
+template<class TV,class VEC,class VEC1> auto
 Symmetric_Transpose_Times(const GRADIENT_VEC<TV,VEC>& u,const GRADIENT_VEC<TV,VEC1>& v)
-{HESSIAN<typename TV::SCALAR,decltype(MAT_SYM_TRANSPOSE_TIMES::Type(VEC(),VEC1()))> H;MAT_SYM_TRANSPOSE_TIMES()(H.x,u.x,v.x);return H;}
+{HESSIAN<typename TV::SCALAR,decltype(MAT_SYM_TRANSPOSE_TIMES::Type(u.x,v.x))> H;MAT_SYM_TRANSPOSE_TIMES()(H.x,u.x,v.x);return H;}
 
-template<class TV,class VEC> HESSIAN<typename TV::SCALAR,decltype(MAT_TRANSPOSE_TIMES_SELF::Type(VEC()))>
+template<class TV,class VEC> auto
 Transpose_Times_Self(const GRADIENT_VEC<TV,VEC>& u)
-{HESSIAN<typename TV::SCALAR,decltype(MAT_TRANSPOSE_TIMES_SELF::Type(VEC()))> H;MAT_TRANSPOSE_TIMES_SELF()(H.x,u.x);return H;}
-
+{HESSIAN<typename TV::SCALAR,decltype(MAT_TRANSPOSE_TIMES_SELF::Type(u.x))> H;MAT_TRANSPOSE_TIMES_SELF()(H.x,u.x);return H;}
 }
 }
-
-
 #endif

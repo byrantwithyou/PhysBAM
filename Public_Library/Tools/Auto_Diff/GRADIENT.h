@@ -30,16 +30,16 @@ struct GRADIENT
     typedef VEC_IN VEC;
     VEC x;
 
-    GRADIENT operator+ () const {return *this;}
-    GRADIENT<T,decltype(VEC_NEG::Type(VEC()))> operator- () const {GRADIENT<T,decltype(VEC_NEG::Type(VEC()))> r;VEC_NEG()(r.x,x);return r;}
-    GRADIENT<T,decltype(VEC_SCALE::Type(VEC(),T()))> operator* (T a) const {GRADIENT<T,decltype(VEC_SCALE::Type(VEC(),T()))> r;VEC_SCALE()(r.x,x,a);return r;}
-    GRADIENT<T,decltype(VEC_SCALE_DIV::Type(VEC(),T()))> operator/ (T a) const {GRADIENT<T,decltype(VEC_SCALE_DIV::Type(VEC(),T()))> r;VEC_SCALE_DIV()(r.x,x,a);return r;}
+    auto operator+ () const {return *this;}
+    auto operator- () const {GRADIENT<T,decltype(VEC_NEG_B::Type(x))> r;VEC_NEG_B()(r.x,x);return r;}
+    auto operator* (T a) const {GRADIENT<T,decltype(VEC_MUL_BS::Type(x,a))> r;VEC_MUL_BS()(r.x,x,a);return r;}
+    auto operator/ (T a) const {GRADIENT<T,decltype(VEC_DIV_BS::Type(x,a))> r;VEC_DIV_BS()(r.x,x,a);return r;}
 
     template<class VEC1>
-    GRADIENT<T,decltype(VEC_ADD::Type(VEC(),VEC1()))> operator+ (const GRADIENT<T,VEC1>& z) const {GRADIENT<T,decltype(VEC_ADD::Type(VEC(),VEC1()))> r;VEC_ADD()(r.x,x,z.x);return r;}
+    auto operator+ (const GRADIENT<T,VEC1>& z) const {GRADIENT<T,decltype(VEC_ADD_BB::Type(x,z.x))> r;VEC_ADD_BB()(r.x,x,z.x);return r;}
 
     template<class VEC1>
-    GRADIENT<T,decltype(VEC_SUB::Type(VEC(),VEC1()))> operator- (const GRADIENT<T,VEC1>& z) const {GRADIENT<T,decltype(VEC_SUB::Type(VEC(),VEC1()))> r;VEC_SUB()(r.x,x,z.x);return r;}
+    auto operator- (const GRADIENT<T,VEC1>& z) const {GRADIENT<T,decltype(VEC_SUB_BB::Type(x,z.x))> r;VEC_SUB_BB()(r.x,x,z.x);return r;}
 };
 
 template<class T,class VEC,class VEC1>

@@ -1469,7 +1469,7 @@ Contract(const DIAGONAL_TENSOR<T,m>& a,const MATRIX<T,m,p>& M)
     SYMMETRIC_TENSOR<T,r,p,m> t;
     for(int i=0;i<m;i++)
         for(int j=0;j<p;j++)
-            t.x(j)(i,i)+=a.x(i)*M(i,j);
+            t.x(j)(i,i)+=a.v(i)*M(i,j);
     return t;
 }
 
@@ -1480,7 +1480,7 @@ Contract(const DIAGONAL_TENSOR<T,m>& a,const MATRIX<T,p,m>& M)
     SYMMETRIC_TENSOR<T,r,p,m> t;
     for(int i=0;i<m;i++)
         for(int j=0;j<p;j++)
-            t.x(j)(i,i)+=a.x(i)*M(j,i);
+            t.x(j)(i,i)+=a.v(i)*M(j,i);
     return t;
 }
 
@@ -1708,7 +1708,11 @@ template<class T_TEN0,class T_TEN1> typename enable_if<IS_SYM_TENSOR<1,T_TEN0>::
 template<class T_TEN0,class T_TEN1> typename enable_if<IS_SYM_TENSOR<2,T_TEN0>::value && IS_SYM_TENSOR<2,T_TEN1>::value,SYMMETRIC_TENSOR<typename T_TEN0::SCALAR,2,T_TEN0::um,T_TEN0::un> >::type Choose(const T_TEN0& a,const T_TEN1& b);
 template<class T,int m,class T_TEN> T_TEN Choose(const T_TEN& a,const ZERO_TENSOR<T,T_TEN::m,T_TEN::n,T_TEN::p>& b);
 template<class T,int m,class T_TEN> T_TEN Choose(const ZERO_TENSOR<T,T_TEN::m,T_TEN::n,T_TEN::p>& a,const T_TEN& b);
-template<class T,int m,int n,int p> ZERO_TENSOR<T,m> Choose(const ZERO_TENSOR<T,m,n,p>& a,const ZERO_TENSOR<T,m,n,p>& b);
+template<class T,int m,int n,int p> ZERO_TENSOR<T,m,n,p> Choose(const ZERO_TENSOR<T,m,n,p>& a,const ZERO_TENSOR<T,m,n,p>& b);
+
+template<class T> typename enable_if<IS_TENSOR<T>::value||IS_MATRIX<T>::value||IS_VECTOR<T>::value||is_scalar<T>::value,T>::type Choose_Zero(const T& a);
+template<class T,int d> SCALE_MATRIX<T,d> Choose_Zero(const IDENTITY_MATRIX<T,d>& a);
+template<class T,int m> typename conditional<m==0,FIXED_NUMBER<T,m>,T>::type Choose_Zero(const FIXED_NUMBER<T,m>& a);
 
 //#####################################################################
 // operator=

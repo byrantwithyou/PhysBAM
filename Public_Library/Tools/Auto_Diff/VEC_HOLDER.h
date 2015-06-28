@@ -27,15 +27,15 @@ template<int n> struct ARG {template<class T,class ...Args> auto operator()(cons
 template<> struct ARG<0> {template<class T,class ...Args> const T&operator()(const T& t,Args&&... args){return t;}};
 
 #define MK_FUN_1(NAME,fun) template<class A> struct NAME {template<class ...Args> auto operator()(Args&&... args) const -> decltype(fun(A()(args...))) {return fun(A()(args...));}}
-#define MK_OP_2(NAME,op) template<class A,class B> struct NAME {template<class ...Args> auto operator()(Args&&... args) const -> decltype(A()(args...) op B()(args...)) {return A()(args...) op B()(args...);}}
 #define MK_FUN_2(NAME,fun) template<class A,class B> struct NAME {template<class ...Args> auto operator()(Args&&... args) const -> decltype(fun(A()(args...),B()(args...))) {return fun(A()(args...),B()(args...));}}
 #define MK_FUN_3(NAME,fun) template<class A,class B,class C> struct NAME {template<class ...Args> auto operator()(Args&&... args) const -> decltype(fun(A()(args...),B()(args...),C()(args...))) {return fun(A()(args...),B()(args...),C()(args...));}}
 
-MK_FUN_1(NEG,-);
-MK_OP_2(ADD,+);
-MK_OP_2(SUB,-);
-MK_OP_2(MUL,*);
-MK_OP_2(DIV,/);
+MK_FUN_1(NEG_B,Neg_B);
+MK_FUN_2(ADD_BB,Add_BB);
+MK_FUN_2(SUB_BB,Sub_BB);
+MK_FUN_2(MUL_BS,Mul_BS);
+MK_FUN_2(MUL_MB,Mul_MB);
+MK_FUN_2(DIV_BS,Div_BS);
 MK_FUN_2(TRANS_MUL,Transpose_Times);
 
 struct VEC_END {};
@@ -247,11 +247,12 @@ template<class OP> struct VEC_MAP_2
     };
 };
 
-typedef VEC_MAP_1<NEG<ARG<0> > > VEC_NEG;
-typedef VEC_MAP_2<ADD<ARG<0>,ARG<1> > > VEC_ADD;
-typedef VEC_MAP_2<SUB<ARG<0>,ARG<1> > > VEC_SUB;
-typedef VEC_MAP_1<MUL<ARG<0>,ARG<1> > > VEC_SCALE;
-typedef VEC_MAP_1<DIV<ARG<0>,ARG<1> > > VEC_SCALE_DIV;
+typedef VEC_MAP_1<NEG_B<ARG<0> > > VEC_NEG_B;
+typedef VEC_MAP_2<ADD_BB<ARG<0>,ARG<1> > > VEC_ADD_BB;
+typedef VEC_MAP_2<SUB_BB<ARG<0>,ARG<1> > > VEC_SUB_BB;
+typedef VEC_MAP_1<MUL_BS<ARG<0>,ARG<1> > > VEC_MUL_BS;
+typedef VEC_MAP_1<MUL_MB<ARG<1>,ARG<0> > > VEC_MUL_MB;
+typedef VEC_MAP_1<DIV_BS<ARG<0>,ARG<1> > > VEC_DIV_BS;
 typedef VEC_MAP_1<TRANS_MUL<ARG<0>,ARG<1> > > VEC_TRANSPOSE_TIMES;
 
 MK_FUN_2(TENSOR_PRODUCT_0,Tensor_Product_0);
@@ -271,6 +272,7 @@ MK_FUN_1(TWICE_SYMMETRIC_PART_01,Twice_Symmetric_Part_01);
 MK_FUN_1(TRANSPOSED_01,Transposed_01);
 MK_FUN_2(OUTER_PRODUCT,Outer_Product);
 MK_FUN_2(CHOOSE,Choose);
+MK_FUN_1(CHOOSE_ZERO,Choose_Zero);
 
 typedef VEC_MAP_1<TENSOR_PRODUCT_0<ARG<1>,ARG<0> > > TENSOR_PRODUCT_0_VV_M;
 typedef VEC_MAP_1<TENSOR_PRODUCT_0<ARG<0>,ARG<1> > > TENSOR_PRODUCT_0_VM_V;
@@ -290,12 +292,12 @@ typedef VEC_MAP_1<CONTRACT_01<ARG<0>,ARG<1> > > CONTRACT_01_VT_M;
 typedef VEC_MAP_1<CONTRACT_00<ARG<1>,ARG<0> > > CONTRACT_00_VM_T;
 typedef VEC_MAP_1<DOUBLE_CONTRACT_00_11<ARG<0>,ARG<1> > > DOUBLE_CONTRACT_00_11_VT_M;
 typedef VEC_MAP_1<CONTRACT_01<ARG<1>,ARG<0> > > TRANSPOSE_CONTRACT_0_VM_T;
-typedef VEC_MAP_1<CONTRACT_01<ARG<0>,ARG<1> > > VEC_SCALE_REV;
 
 typedef VEC_MAP_1<CONTRACT_01s<ARG<0> > > CONTRACT_01_VT;
 
 typedef VEC_MAP_1<OUTER_PRODUCT<ARG<1>,ARG<0> > > VEC_OUTER_PRODUCT_REV;
 typedef VEC_MAP_2<CHOOSE<ARG<0>,ARG<1> > > VEC_CHOOSE;
+typedef VEC_MAP_1<CHOOSE_ZERO<ARG<0> > > VEC_CHOOSE_ZERO;
 
 typedef VEC_MAP_1<TWICE_SYMMETRIC_PART_01<ARG<0> > > TWICE_SYMMETRIC_PART_01_VT;
 typedef VEC_MAP_1<TRANSPOSED_01<ARG<0> > > TRANSPOSED_01_VT;

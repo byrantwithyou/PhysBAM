@@ -26,16 +26,16 @@ struct HESSIAN_MAT
     static_assert(ASSERT_VALID_BLOCK_TYPES_MAT<MAT>::value,"HESSIAN_MAT object is constructed from inconsistent block types");
     MAT x;
 
-    HESSIAN_MAT operator+ () const {return *this;}
-    HESSIAN_MAT<T_MAT,decltype(MAT_NEG::Type(MAT()))> operator- () const {HESSIAN_MAT<T_MAT,decltype(MAT_NEG::Type(MAT()))> r;MAT_NEG()(r.x,x);return r;}
-    HESSIAN_MAT<T_MAT,decltype(MAT_SCALE::Type(MAT(),T()))> operator* (T a) const {HESSIAN_MAT<T_MAT,decltype(MAT_SCALE::Type(MAT(),T()))> r;MAT_SCALE()(r.x,x,a);return r;}
-    HESSIAN_MAT<T_MAT,decltype(MAT_SCALE_DIV::Type(MAT(),T()))> operator/ (T a) const {HESSIAN_MAT<T_MAT,decltype(MAT_SCALE_DIV::Type(MAT(),T()))> r;MAT_SCALE_DIV()(r.x,x,a);return r;}
+    auto operator+ () const {return *this;}
+    auto operator- () const {HESSIAN_MAT<T_MAT,decltype(MAT_NEG_B::Type(x))> r;MAT_NEG_B()(r.x,x);return r;}
+    auto operator* (T a) const {HESSIAN_MAT<T_MAT,decltype(MAT_MUL_BS::Type(x,a))> r;MAT_MUL_BS()(r.x,x,a);return r;}
+    auto operator/ (T a) const {HESSIAN_MAT<T_MAT,decltype(MAT_DIV_BS::Type(x,a))> r;MAT_DIV_BS()(r.x,x,a);return r;}
 
     template<class MAT1,class T_MAT1>
-    HESSIAN_MAT<T_MAT,decltype(MAT_ADD::Type(MAT(),MAT1()))> operator+ (const HESSIAN_MAT<T_MAT1,MAT1>& z) const {HESSIAN_MAT<decltype(x+z.x),decltype(MAT_ADD::Type(MAT(),MAT1()))> r;MAT_ADD()(r.x,x,z.x);return r;}
+    auto operator+ (const HESSIAN_MAT<T_MAT1,MAT1>& z) const {HESSIAN_MAT<decltype(x+z.x),decltype(MAT_ADD_BB::Type(x,z.x))> r;MAT_ADD_BB()(r.x,x,z.x);return r;}
 
     template<class MAT1,class T_MAT1>
-    HESSIAN_MAT<T_MAT,decltype(MAT_SUB::Type(MAT(),MAT1()))> operator- (const HESSIAN_MAT<T_MAT1,MAT1>& z) const {HESSIAN_MAT<decltype(x-z.x),decltype(MAT_SUB::Type(MAT(),MAT1()))> r;MAT_SUB()(r.x,x,z.x);return r;}
+    auto operator- (const HESSIAN_MAT<T_MAT1,MAT1>& z) const {HESSIAN_MAT<decltype(x-z.x),decltype(MAT_SUB_BB::Type(x,z.x))> r;MAT_SUB_BB()(r.x,x,z.x);return r;}
 };
 
 template<class T_MAT,class T_MAT1,class MAT,class MAT1>
@@ -53,7 +53,7 @@ void Get(OUT& o,const HESSIAN_MAT<T_MAT,MAT>& h)
 }
 
 template<class T_MAT,class MAT>
-auto operator* (typename T_MAT::SCALAR a,const HESSIAN_MAT<T_MAT,MAT>& h) -> decltype(h*a) {return h*a;}
+auto operator* (typename T_MAT::SCALAR a,const HESSIAN_MAT<T_MAT,MAT>& h) {return h*a;}
 }
 }
 #endif
