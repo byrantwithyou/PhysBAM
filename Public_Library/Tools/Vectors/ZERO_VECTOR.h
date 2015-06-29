@@ -18,6 +18,9 @@ class ZERO_VECTOR
 public:
     enum {m=d};
     typedef T SCALAR;
+    ZERO_VECTOR operator+() const
+    {return *this;}
+
     ZERO_VECTOR operator-() const
     {return *this;}
 

@@ -93,6 +93,9 @@ public:
     bool operator!=(const VECTOR& v) const
     {return false;}
 
+    const VECTOR& operator+() const
+    {return *this;};
+
     VECTOR operator-() const
     {return *this;}
 

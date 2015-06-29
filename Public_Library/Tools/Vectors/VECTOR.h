@@ -147,6 +147,9 @@ public:
     bool operator!=(const VECTOR& v) const
     {return !((*this)==v);}
 
+    const VECTOR& operator+() const
+    {return *this;};
+
     VECTOR operator-() const
     {VECTOR r;for(int i=0;i<d;i++) r.array[i]=-array[i];return r;}
 

@@ -212,6 +212,9 @@ public:
     T_ARRAY& operator+=(const T& a)
     {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)+=a;return self;}
 
+    const T_ARRAY& operator+() const
+    {return *this;};
+
     template<class T_ARRAY0>
     T_ARRAY& operator-=(const ARRAY_BASE<T,T_ARRAY0,ID>& v)
     {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY0& v_=v.Derived();assert(m==v_.Size());for(ID i(0);i<m;i++) self(i)-=v_(i);return self;}
