@@ -655,7 +655,7 @@ Sub_Av_V(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a,const TV& b)
     return Make_Hess_Vec(a.x-b,a.dx,a.ddx);
 }
 
-template<class TV,class VEC,class MAT,class VEC1,class MAT1,int Q> auto
+template<class TV,class VEC1,class MAT1,int Q> auto
 Sub_V_Av(const TV& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
 {
     return Make_Hess_Vec(a-b.x,-b.dx,-b.ddx);
@@ -1041,7 +1041,7 @@ template<class T,class U> struct AUTO_HESS_ADD<T,U,true> {typedef decltype(AUTO_
 
 template<class T,class U,int rank0,int rank1> struct AUTO_HESS_DISPATCH_SUB {static_assert(!rank0,"invalid argument types to auto hess sub");};
 template<class T,class U> struct AUTO_HESS_DISPATCH_SUB<T,U,1,4> {static auto f(const T& a,const U& b){return Sub_S_As(a,b);}};
-template<class T,class U> struct AUTO_HESS_DISPATCH_SUB<T,U,2,5> {static auto f(const T& a,const U& b){return Sub_Av_V(b,a);}};
+template<class T,class U> struct AUTO_HESS_DISPATCH_SUB<T,U,2,5> {static auto f(const T& a,const U& b){return Sub_V_Av(a,b);}};
 template<class T,class U> struct AUTO_HESS_DISPATCH_SUB<T,U,3,6> {static auto f(const T& a,const U& b){return Sub_M_Am(a,b);}};
 template<class T,class U> struct AUTO_HESS_DISPATCH_SUB<T,U,4,1> {static auto f(const T& a,const U& b){return Sub_As_S(a,b);}};
 template<class T,class U> struct AUTO_HESS_DISPATCH_SUB<T,U,4,4> {static auto f(const T& a,const U& b){return Sub_As_As(a,b);}};
@@ -1086,7 +1086,7 @@ template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,4,4> {static auto f(
 template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,5,1> {static auto f(const T& a,const U& b){return Div_Av_S(a,b);}};
 template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,5,4> {static auto f(const T& a,const U& b){return Div_Av_As(a,b);}};
 template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,6,1> {static auto f(const T& a,const U& b){return Div_Am_S(a,b);}};
-template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,6,4> {static auto f(const T& a,const U& b){return Div_Am_As(b,a);}};
+template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,6,4> {static auto f(const T& a,const U& b){return Div_Am_As(a,b);}};
 template<class T,class U,bool enable> struct AUTO_HESS_DIV;
 template<class T,class U> struct AUTO_HESS_DIV<T,U,true> {typedef decltype(AUTO_HESS_DISPATCH_DIV<T,U,AUTO_HESS_RANK<T>::value,AUTO_HESS_RANK<U>::value>::f(T(),U())) TYPE;};
 
