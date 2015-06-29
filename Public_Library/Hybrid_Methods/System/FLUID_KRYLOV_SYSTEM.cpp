@@ -34,38 +34,21 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
     FLUID_KRYLOV_VECTOR<TV>& F=debug_cast<FLUID_KRYLOV_VECTOR<TV>&>(BF);
 
     auto safe_p=[&](const TV_INT& index){return example.cell_pressure(index)?V.p(index):(T)0;};
+    
+    const T one_over_dx_squared=example.grid.one_over_dX(0)*example.grid.one_over_dX(0);
 
-    for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
-        TV_INT index=example.valid_pressure_cell_indices(t);
+    for(int t=0;t<example.valid_pressure_cell_dofs.m;t++){
+        TV_INT index=example.valid_pressure_cell_dofs(t);
         T sum=0;
-        T center=0;
         for(int a=0;a<TV_INT::m;++a){
             const TV_INT axis=TV_INT::Axis_Vector(a);
-            FACE_INDEX<TV::m> faceF2(a,example.grid.First_Face_Index_In_Cell(a,index-axis));
             FACE_INDEX<TV::m> faceF(a,example.grid.First_Face_Index_In_Cell(a,index));
             FACE_INDEX<TV::m> faceS(a,example.grid.Second_Face_Index_In_Cell(a,index));
-            FACE_INDEX<TV::m> faceS2(a,example.grid.Second_Face_Index_In_Cell(a,index+axis));
-            if(example.weights->Order()==1){
-                if(example.cell_solid(index-axis)&&example.cell_solid(index+axis))
-                    PHYSBAM_FATAL_ERROR("Fluid trapped between two solids");
-                else if(example.cell_solid(index-axis))
-                    sum+=(T)2*(safe_p(index)-safe_p(index+axis))/example.density_f(faceS);
-                else if(example.cell_solid(index+axis))
-                    sum+=(T)2*(safe_p(index)-safe_p(index-axis))/example.density_f(faceF);
-                else
-                    sum+=(safe_p(index)-safe_p(index+axis))/example.density_f(faceS)+(safe_p(index)-safe_p(index-axis))/example.density_f(faceF);}
-            else if(example.weights->Order()==2){
-                if(example.cell_solid(index-axis)&&example.cell_solid(index+axis))
-                    PHYSBAM_FATAL_ERROR("Fluid trapped between two solids");
-                else if(example.cell_solid(index-axis))
-                    sum+=(T)3*(safe_p(index)-safe_p(index+axis))/example.density_f(faceS)+(safe_p(index+axis)-safe_p(index+2*axis))/example.density_f(faceS2);
-                else if(example.cell_solid(index+axis))
-                    sum+=(T)3*(safe_p(index)-safe_p(index-axis))/example.density_f(faceF)+(safe_p(index-axis)-safe_p(index-2*axis))/example.density_f(faceF2);
-                else
-                    sum+=(safe_p(index)-safe_p(index+axis))/example.density_f(faceS)+(safe_p(index)-safe_p(index-axis))/example.density_f(faceF);}
-            else PHYSBAM_NOT_IMPLEMENTED();
-        }
-        F.p(index)=(center+sum)*example.grid.one_over_dX(0)*example.grid.one_over_dX(0);}
+            if(example.cell_pressure(index+axis)==2||!example.cell_solid(index+3*axis))
+                sum+=(safe_p(index)-safe_p(index+axis))/example.density_f(faceS);
+            if(example.cell_pressure(index-axis)==2||!example.cell_solid(index-3*axis))
+                sum+=(safe_p(index)-safe_p(index-axis))/example.density_f(faceF);}
+       F.p(index)=sum*one_over_dx_squared;}
 }
 //#####################################################################
 // Function Inner_Product
@@ -77,8 +60,8 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
     const FLUID_KRYLOV_VECTOR<TV>& Y=debug_cast<const FLUID_KRYLOV_VECTOR<TV>&>(y);
     T r=0;
 #pragma omp parallel for reduction(+:r)
-    for(int k=0;k<example.valid_pressure_indices.m;k++){
-        int i=example.valid_pressure_indices(k);
+    for(int k=0;k<example.valid_pressure_dofs.m;k++){
+        int i=example.valid_pressure_dofs(k);
         r+=X.p.array(i)*Y.p.array(i);}
     return r;
 }

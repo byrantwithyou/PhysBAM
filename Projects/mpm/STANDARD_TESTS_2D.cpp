@@ -354,11 +354,7 @@ Initialize()
         } break;
         case 22:{ // (fluid test) pool of water 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box;
-            if(order==2)
-                box=RANGE<TV>(grid.dX,TV(1-grid.dX(0),0.25));
-            else
-                box=RANGE<TV>(grid.dX*(T).5,TV(1-grid.dX(0)*(T).5,0.25));
+            RANGE<TV> box(grid.dX*2,TV(1-2*grid.dX(0),0.25));
             T density=2*scale_mass;
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
@@ -366,11 +362,7 @@ Initialize()
         } break;
         case 23:{ // (fluid test) dam break 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box;
-            if(order==2)
-                box=RANGE<TV>(grid.dX,TV(0.2,0.75));
-            else
-                box=RANGE<TV>(grid.dX*(T).5,TV(0.2,0.75));
+            RANGE<TV> box(grid.dX*2,TV(0.2,0.75));
             T density=2*scale_mass;
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
@@ -394,17 +386,20 @@ Initialize()
             Add_Particle(TV(.5,.9),0,0,mass,volume);
             Add_Gravity(TV(0,-1.8));
         } break;
-        case 26:{ // Raleigh Taylor
+        case 26:{ // Rayleigh Taylor
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box;
-            if(order==2)
-                box=RANGE<TV>(grid.dX,TV(1-grid.dX(0),0.20));
-            else
-                box=RANGE<TV>(grid.dX*(T).5,TV(1-grid.dX(0)*(T).5,0.20));
+            RANGE<TV> box(grid.dX*(T)2,TV(1-grid.dX(0),0.20));
             T density=2*scale_mass;
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             density*=10;
             box+=TV(0,0.20);
+            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Add_Gravity(TV(0,-1.8));
+        } break;
+        case 98:{ // full box
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box(grid.dX*(T)2,TV::All_Ones_Vector()-grid.dX*2);
+            T density=2*scale_mass;
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             Add_Gravity(TV(0,-1.8));
         } break;

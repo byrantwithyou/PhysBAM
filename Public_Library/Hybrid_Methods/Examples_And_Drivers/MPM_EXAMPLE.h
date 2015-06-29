@@ -49,6 +49,8 @@ public:
     ARRAY<TV_INT> valid_grid_cell_indices;
     ARRAY<int> valid_pressure_indices;
     ARRAY<TV_INT> valid_pressure_cell_indices;
+    ARRAY<int> valid_pressure_dofs;
+    ARRAY<TV_INT> valid_pressure_cell_dofs;
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
     ARRAY<DEFORMABLES_FORCES<TV>*> lagrangian_forces;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
@@ -65,7 +67,7 @@ public:
     ARRAY<T,FACE_INDEX<TV::m> > velocity_f;
     ARRAY<T,FACE_INDEX<TV::m> > velocity_new_f;
     ARRAY<bool,TV_INT> cell_solid;
-    ARRAY<bool,TV_INT> cell_pressure;
+    ARRAY<int,TV_INT> cell_pressure;
 
     T initial_time;
     int last_frame;
