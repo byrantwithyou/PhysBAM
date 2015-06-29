@@ -11,6 +11,7 @@
 #include <Tools/Matrices/IDENTITY_MATRIX.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Symbolics/PROGRAM_CONTEXT.h>
 #include <Tools/Tensors/SYMMETRIC_TENSOR.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 #include <functional>
@@ -128,6 +129,68 @@ struct ANALYTIC_POLYMER_STRESS_QUADRATIC:public ANALYTIC_POLYMER_STRESS<TV>
         return SYMMETRIC_MATRIX<T,TV::m>(a11,a12,a22);}
 };
 
+template<class TV>
+struct ANALYTIC_POLYMER_STRESS_PROGRAM:public ANALYTIC_POLYMER_STRESS<TV>
+{
+    typedef typename TV::SCALAR T;
+    typedef SYMMETRIC_MATRIX<T,TV::m> T_MATRIX;
+    typedef SYMMETRIC_TENSOR<T,2,TV::m,TV::m> T_TENSOR;
+    PROGRAM<T> prog;
+    mutable PROGRAM_CONTEXT<T> context;
+    enum {n=TV::m*(TV::m+1)/2};
 
+    ANALYTIC_POLYMER_STRESS_PROGRAM(std::string& str)
+    {
+        const char* axes[]={"x","y","z"};
+        for(int i=0;i<TV::m;i++) prog.var_in.Append(axes[i]);
+        prog.var_in.Append("t");
+        char buff[10]="s00";
+        for(int j=0;j<TV::m;j++)
+            for(int i=j;i<TV::m;i++){
+                buff[1]=i+'0';
+                buff[2]=j+'0';
+                LOG::cout<<"var "<<buff<<std::endl;
+                prog.var_out.Append(buff);}
+        prog.Parse(str.c_str(),false);
+        ARRAY<int> out(IDENTITY_ARRAY<>(prog.var_out.m));
+        for(int j=0;j<prog.var_in.m;j++)
+            prog.Diff(out,j);
+        prog.Optimize();
+        prog.Finalize();
+        context.Initialize(prog);
+        LOG::cout<<prog.var_in<<"   "<<prog.var_out<<std::endl;
+    }
+    void Run(const TV& X,T t) const
+    {
+        for(int i=0;i<TV::m;i++) context.data_in(i)=X(i);
+        context.data_in(TV::m)=t;
+        prog.Execute(context);
+    }
+    virtual ~ANALYTIC_POLYMER_STRESS_PROGRAM(){}
+
+    virtual T_MATRIX S(const TV& X,T t) const
+    {
+        Run(X,t);
+        T_MATRIX out;
+        for(int i=0;i<n;i++) out.array[i]=context.data_out(i);
+        return out;
+    }
+    virtual T_MATRIX dSdt(const TV& X,T t) const
+    {
+        Run(X,t);
+        T_MATRIX out;
+        for(int i=0;i<n;i++) out.array[i]=context.data_out(i+(TV::m+1)*n);
+        return out;
+    }
+    virtual T_TENSOR dS(const TV& X,T t) const
+    {
+        Run(X,t);
+        T_TENSOR m;
+        for(int i=0;i<TV::m;i++)
+            for(int j=0;j<n;j++)
+                m.x(i).array[j]=context.data_out(n*(i+1)+j);
+        return m;
+    }
+};
 }
 #endif

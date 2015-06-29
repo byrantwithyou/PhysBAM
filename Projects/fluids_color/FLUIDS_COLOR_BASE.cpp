@@ -37,7 +37,8 @@ FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     refine(1),surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),
     override_inv_Wi0(false),override_inv_Wi1(false),override_beta0(false),override_beta1(false),
     override_surface_tension(false),use_pls_over_levelset(false),use_levelset_over_pls(false),
-    analytic_initial_only(false),number_of_threads(1),override_output_directory(false)
+    analytic_initial_only(false),number_of_threads(1),override_output_directory(false),use_u0(false),
+    use_u1(false),use_p0(false),use_p1(false),use_S0(false),use_S1(false)
 {
     last_frame=16;
     parse_args.Extra(&test_number,"example number","example number to run");
@@ -82,6 +83,12 @@ FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-solver_tolerance",&solver_tolerance,"tol","Krylov tolerance");
     parse_args.Add("-test_system",&test_system,"Run basic Krylov system tests");
     parse_args.Add_Not("-no_preconditioner",&use_preconditioner,"disable Jacobi preconditioner");
+    parse_args.Add("-set_u0",&str_u0,&use_u0,"prog","Override velocity");
+    parse_args.Add("-set_u1",&str_u1,&use_u1,"prog","Override velocity");
+    parse_args.Add("-set_p0",&str_p0,&use_p0,"prog","Override pressure");
+    parse_args.Add("-set_p1",&str_p1,&use_p1,"prog","Override pressure");
+    parse_args.Add("-set_S0",&str_S0,&use_S0,"prog","Override polymer stress");
+    parse_args.Add("-set_S1",&str_S1,&use_S1,"prog","Override polymer stress");
     parse_args.Parse(true);
 
 #ifdef USE_OPENMP
@@ -142,6 +149,30 @@ After_Initialize_Example()
     if(use_levelset_over_pls){if(use_pls) use_level_set_method=true;use_pls=false;}
 
     if(analytic_velocity.m) number_of_colors=analytic_velocity.m;
+
+    if(use_u0 && analytic_velocity.m>=1){
+        delete analytic_velocity(0);
+        analytic_velocity(0)=new ANALYTIC_VELOCITY_PROGRAM<TV>(str_u0);}
+
+    if(use_u1 && analytic_velocity.m>=2){
+        delete analytic_velocity(1);
+        analytic_velocity(1)=new ANALYTIC_VELOCITY_PROGRAM<TV>(str_u1);}
+
+    if(use_p0 && analytic_pressure.m>=1){
+        delete analytic_pressure(0);
+        analytic_pressure(0)=new ANALYTIC_PRESSURE_PROGRAM<TV>(str_p0);}
+
+    if(use_p1 && analytic_pressure.m>=2){
+        delete analytic_pressure(1);
+        analytic_pressure(1)=new ANALYTIC_PRESSURE_PROGRAM<TV>(str_p1);}
+
+    if(use_S0 && analytic_polymer_stress.m>=1){
+        delete analytic_polymer_stress(0);
+        analytic_polymer_stress(0)=new ANALYTIC_POLYMER_STRESS_PROGRAM<TV>(str_S0);}
+
+    if(use_S1 && analytic_polymer_stress.m>=2){
+        delete analytic_polymer_stress(1);
+        analytic_polymer_stress(1)=new ANALYTIC_POLYMER_STRESS_PROGRAM<TV>(str_S1);}
 }
 //#####################################################################
 // Function Initialize_Common_Example

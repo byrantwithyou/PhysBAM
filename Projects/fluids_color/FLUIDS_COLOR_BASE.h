@@ -73,6 +73,9 @@ public:
     int number_of_threads;
     bool override_output_directory;
 
+    bool use_u0,use_u1,use_p0,use_p1,use_S0,use_S1;
+    std::string str_u0,str_u1,str_p0,str_p1,str_S0,str_S1;
+
     FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     ~FLUIDS_COLOR_BASE();
 
