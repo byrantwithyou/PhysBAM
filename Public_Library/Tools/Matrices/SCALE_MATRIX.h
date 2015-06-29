@@ -57,6 +57,10 @@ public:
     {return x*m;}
 };
 
+template<class T,int d>
+inline std::ostream& operator<< (std::ostream& output_stream,const SCALE_MATRIX<T,d>& A)
+{return output_stream<<(SYMMETRIC_MATRIX<T,d>()+A.x);}
+
 template<class T,int m> SCALE_MATRIX<T,m> operator*(const T& a,const SCALE_MATRIX<T,m>& b) {return b*a;}
 
 template<class T,int d> MATRIX<T,d> operator+= (MATRIX<T,d>& m,const SCALE_MATRIX<T,d>& s) {return m+=s.x;}

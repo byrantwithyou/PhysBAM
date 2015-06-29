@@ -40,6 +40,10 @@ public:
     {return FIXED_NUMBER<T,d>();}
 };
 
+template<class T,int d>
+inline std::ostream& operator<< (std::ostream& output_stream,const IDENTITY_MATRIX<T,d>& A)
+{return output_stream<<SCALE_MATRIX<T,d>(1);}
+
 template<class T,int m> SCALE_MATRIX<T,m> operator*(const T& a,const IDENTITY_MATRIX<T,m>& b) {return b*a;}
 
 template<class T,int d> SCALE_MATRIX<T,d> operator+ (const IDENTITY_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return SCALE_MATRIX<T,d>(2);}

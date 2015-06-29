@@ -53,6 +53,10 @@ public:
     {return FIXED_NUMBER<T,0>();}
 };
 
+template<class T,int m,int n>
+inline std::ostream& operator<< (std::ostream& output_stream,const ZERO_MATRIX<T,m,n>& A)
+{return output_stream<<MATRIX<T,m,n>();}
+
 template<class T,int m,int n> ZERO_MATRIX<T,m,n> operator*(const T& a,const ZERO_MATRIX<T,m,n>& b) {return b*a;}
 
 template<class T,int m,int n> ZERO_MATRIX<T,m,n> operator+ (const ZERO_MATRIX<T,m,n>& a,const ZERO_MATRIX<T,m,n>& b) {return a;}
