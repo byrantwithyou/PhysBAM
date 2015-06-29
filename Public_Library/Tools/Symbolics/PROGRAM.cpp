@@ -188,7 +188,7 @@ Add_Raw_Instruction_To_Block_After(CODE_BLOCK* B,CODE_BLOCK_NODE* N,op_type type
 // Function Diff
 //#####################################################################
 template<class T> int PROGRAM<T>::
-Diff(int diff_expr,int diff_var)
+Diff(const ARRAY<int>& diff_expr,int diff_var)
 {
     Optimize();
 
@@ -205,8 +205,9 @@ Diff(int diff_expr,int diff_var)
 
             int d=-1,s0=-1,s1=-1;
             if((o.dest&mem_mask)==mem_out){
-                if(o.dest!=(mem_out|diff_expr)) continue;
-                d=(var_out.m+extra_out)|mem_out;}
+                d=diff_expr.Find(o.dest&~mem_out);
+                if(d<0) continue;
+                d=(var_out.m+extra_out+d)|mem_out;}
             else if(diff_tmp(o.dest)>=0) d=diff_tmp(o.dest);
             else diff_tmp(o.dest)=d=num_tmp++;
 
@@ -315,7 +316,8 @@ Diff(int diff_expr,int diff_var)
     if(debug) LOG::cout<<__FUNCTION__<<std::endl;
     Print();
 
-    return var_out.m+extra_out++;
+    extra_out+=diff_expr.m;
+    return var_out.m+extra_out;
 }
 
 struct FUNCTION_DEFINITION

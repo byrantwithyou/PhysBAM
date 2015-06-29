@@ -64,7 +64,7 @@ struct PROGRAM
     T Evaluate_Op(int type,T in0,T in1) const;
     bool Deduce_Op(int type,T& out,T* in0,T* in1) const;
     void Execute_Op(ARRAY<T>& reg,int& ip) const;
-    int Diff(int diff_expr,int diff_var);
+    int Diff(const ARRAY<int>& diff_expr,int diff_var);
     void Parse(const char* str,bool keep_all_vars=false);
     void Print() const;
     void Print(const INSTRUCTION& I) const;
