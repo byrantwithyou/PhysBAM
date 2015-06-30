@@ -62,6 +62,8 @@ public:
     bool override_surface_tension;
     bool use_pls_over_levelset;
     bool use_levelset_over_pls;
+    std::string test_output_prefix;
+    bool use_test_output;
     
     TV gravity;
 

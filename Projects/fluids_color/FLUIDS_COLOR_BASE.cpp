@@ -6,6 +6,7 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Interpolation/CUBIC_MN_INTERPOLATION_UNIFORM.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
+#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_BOX.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_CONST.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_ELLIPSOID.h>
@@ -36,7 +37,7 @@ FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     unit_p(0),weiss(1),weiss_inv(1),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),
     refine(1),surface_tension(0),override_rho0(false),override_rho1(false),override_mu0(false),override_mu1(false),
     override_inv_Wi0(false),override_inv_Wi1(false),override_beta0(false),override_beta1(false),
-    override_surface_tension(false),use_pls_over_levelset(false),use_levelset_over_pls(false),
+    override_surface_tension(false),use_pls_over_levelset(false),use_levelset_over_pls(false),use_test_output(false),
     analytic_initial_only(false),number_of_threads(1),override_output_directory(false),use_u0(false),
     use_u1(false),use_p0(false),use_p1(false),use_S0(false),use_S1(false)
 {
@@ -62,6 +63,7 @@ FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-beta0",&beta0,&override_beta0,"beta","stress coefficient for first fluid region");
     parse_args.Add("-beta1",&beta1,&override_beta1,"beta","stress coefficient for second fluid region");
     parse_args.Add("-surface_tension",&surface_tension,&override_surface_tension,"density","density for second fluid region");
+    parse_args.Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
     parse_args.Add("-m",&m,"scale","meter scale");
     parse_args.Add("-s",&s,"scale","second scale");
     parse_args.Add("-kg",&kg,"scale","kilogram scale");
@@ -568,6 +570,15 @@ template<class TV> void FLUIDS_COLOR_BASE<TV>::
 Write_Output_Files(const int frame)
 {
     BASE::Write_Output_Files(frame);
+
+    if(use_test_output){
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),test_output_prefix.c_str(),frame);
+        OCTAVE_OUTPUT<T> oo(file.c_str());
+        ARRAY<T> u;
+        for(int c=0;c<face_velocities.m;c++){
+            ARRAY_VIEW<T> a(face_velocities(c).buffer_size,face_velocities(c).base_pointer);
+            u.Append_Elements(a);}
+        oo.Write("u",u);}
 }
 //#####################################################################
 // Function Initialize
