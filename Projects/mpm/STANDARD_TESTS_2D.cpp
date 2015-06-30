@@ -388,11 +388,11 @@ Initialize()
         } break;
         case 26:{ // Rayleigh Taylor
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box(grid.dX*(T)2,TV(1-grid.dX(0),0.20));
+            RANGE<TV> box(grid.dX*2,TV(1-2*grid.dX(0),0.20));
             T density=2*scale_mass;
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             density*=10;
-            box+=TV(0,0.20);
+            box+=TV(0,0.20-2*grid.dX(0));
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             Add_Gravity(TV(0,-1.8));
         } break;
