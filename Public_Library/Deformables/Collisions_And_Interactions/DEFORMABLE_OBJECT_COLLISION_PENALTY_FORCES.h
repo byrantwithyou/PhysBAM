@@ -71,7 +71,7 @@ public:
     void Penalty(VECTOR<int,3> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,4>&>& X,T& e,VECTOR<TV,4>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
     void Penalty(VECTOR<int,2> nodes,const INDIRECT_ARRAY<ARRAY_VIEW<TV,int>,VECTOR<int,4>&>& X,T& e,VECTOR<TV,4>& de,VECTOR<VECTOR<MATRIX<T,TV::m>,4>,4>& he);
     int Estimate_Closest_Undeformed_Surface_Triangle(const TV& X,int p) const;
-    void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const override;
+    void Apply_Friction(ARRAY_VIEW<TV> V,const T time,const T dt) const override;
 //#####################################################################
 };
 }

@@ -23,7 +23,7 @@ public:
 
     virtual ~COLLISION_FORCE() {}
 
-    virtual void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const=0;
+    virtual void Apply_Friction(ARRAY_VIEW<TV> V,const T time,const T dt) const=0;
 };
 }
 #endif

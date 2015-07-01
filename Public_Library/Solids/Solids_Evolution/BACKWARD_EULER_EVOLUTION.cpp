@@ -131,7 +131,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         else v-=coefficient_of_friction/particles.mass(c.p)*normal_force*t;}
     for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
         if(COLLISION_FORCE<TV>* cf=dynamic_cast<COLLISION_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(i)))
-            cf->Apply_Friction(particles.V,time);
+            cf->Apply_Friction(particles.V,time,dt);
     solid_body_collection.Print_Energy(time+dt,2);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after friction",1,1);
 

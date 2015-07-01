@@ -98,7 +98,7 @@ public:
     T CFL_Strain_Rate() const override;
     void Initialize_CFL(ARRAY_VIEW<typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA> frequency) override;
     T Potential_Energy(const T time) const override;
-    void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const override;
+    void Apply_Friction(ARRAY_VIEW<TV> V,const T time,const T dt) const override;
 //#####################################################################
     void Simplex_Intersection(const VECTOR<TV,TV::m+1>& s,const ARRAY<HYPER_PLANE>& f,POLYTOPE& polytope) const;
     void Integrate_Simplex(const VECTOR<int,TV::m+1>& simplex,const X_VECTOR& X,const PHI_VECTOR& nodewise_undeformed_phi,VECTOR<TV,2*TV::m+2>& df,MATRIX<MATRIX<T,TV::m>,2*TV::m+2>& ddf);

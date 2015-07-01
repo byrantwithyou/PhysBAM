@@ -53,7 +53,7 @@ public:
     void Initialize_CFL(ARRAY_VIEW<typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA> frequency) override;
     T Potential_Energy(const T time) const override;
     void Update_Position_Based_State_Particle(int p);
-    void Apply_Friction(ARRAY_VIEW<TV> V,const T time) const override;
+    void Apply_Friction(ARRAY_VIEW<TV> V,const T time,const T dt) const override;
 //#####################################################################
 };
 }

@@ -172,7 +172,7 @@ Potential_Energy(const T time) const
 // Function Apply_Friction
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>::
-Apply_Friction(ARRAY_VIEW<TV> V,const T time) const
+Apply_Friction(ARRAY_VIEW<TV> V,const T time,const T dt) const
 {
     for(int i=0;i<penetrating_particles.m;i++){
         int p=penetrating_particles(i);
@@ -182,7 +182,7 @@ Apply_Friction(ARRAY_VIEW<TV> V,const T time) const
         T t_mag=t.Normalize();
         if(t_mag<=coefficient_of_friction*fn*particles.one_over_mass(p))
             V(p).Project_On_Unit_Direction(f);
-        else V(p)-=coefficient_of_friction*particles.one_over_mass(p)*fn*t;}
+        else V(p)-=coefficient_of_friction*particles.one_over_mass(p)*fn*t*dt;}
 }
 template class IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<VECTOR<float,1> >;
 template class IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<VECTOR<float,2> >;

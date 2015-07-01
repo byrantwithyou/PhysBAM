@@ -651,7 +651,7 @@ Potential_Energy(const T time) const
 // Function Apply_Friction
 //#####################################################################
 template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
-Apply_Friction(ARRAY_VIEW<TV> V,const T time) const
+Apply_Friction(ARRAY_VIEW<TV> V,const T time,const T dt) const
 {
 }
 /* template class LEVELSET_VOLUME_COLLISIONS<VECTOR<float,2> >; */

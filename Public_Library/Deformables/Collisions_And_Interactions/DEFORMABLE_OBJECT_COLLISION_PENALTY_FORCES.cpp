@@ -440,7 +440,7 @@ Potential_Energy(const T time) const
 // Function Apply_Friction
 //#####################################################################
 template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
-Apply_Friction(ARRAY_VIEW<TV> V,const T time) const
+Apply_Friction(ARRAY_VIEW<TV> V,const T time,const T dt) const
 {
     for(int pp=0;pp<penetrating_particles.m;pp++){
         VECTOR<int,TV::m+1> nodes=penetrating_particles(pp);
@@ -452,7 +452,7 @@ Apply_Friction(ARRAY_VIEW<TV> V,const T time) const
         TV force_dir=-1/mass_hat*v_hat.Projected_Orthogonal_To_Unit_Direction(normal);
         T force_mag=force_dir.Normalize();
         TV force=min(force_mag,normal_force*coefficient_of_friction)*force_dir;
-        for(int i=0;i<TV::m+1;i++) V(nodes(i))+=weights(i)*particles.one_over_mass(nodes(i))*force;}
+        for(int i=0;i<TV::m+1;i++) V(nodes(i))+=weights(i)*particles.one_over_mass(nodes(i))*force*dt;}
 }
 template class DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<VECTOR<float,2> >;
 template class DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<VECTOR<float,3> >;
