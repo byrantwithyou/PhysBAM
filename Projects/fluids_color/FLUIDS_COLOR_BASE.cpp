@@ -712,13 +712,14 @@ Velocity_Error(T time)
         for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             int c=levelset_color.Color(it.Location());
             if(c<0) continue;
-            SYMMETRIC_MATRIX<T,TV::m> A=polymer_stress(c)(it.index),B=analytic_polymer_stress(c)->S(it.Location()/m,time/s)*unit_p,D=A-B;
+            SYMMETRIC_MATRIX<T,TV::m> A=polymer_stress(c)(it.index),B=analytic_polymer_stress(c)->S(it.Location()/m,time/s),D=A-B;
             T norm=D.Frobenius_Norm();
             max_S=max(max_S,norm);
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,norm);}
-        LOG::printf("S error: %-22.16g\n",max_S);
+        LOG::printf("S error: %-22.16g",max_S);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("polymer stress error",0,1);}
+    LOG::printf("\n");
 }
 //#####################################################################
 // Function Dump_Analytic_Levelset
@@ -865,7 +866,8 @@ Polymer_Stress_Forcing_Term(const TV& X,int color,T time) -> SYMMETRIC_MATRIX<T,
     TV u=au.u(Z,time);
     MATRIX<T,TV::m> du=au.du(Z,time);
     SYMMETRIC_MATRIX<T,TV::m> S=as.S(Z,time);
-    SYMMETRIC_MATRIX<T,TV::m> f=as.dSdt(Z,time)+Contract<2>(as.dS(Z,time),u);
+    SYMMETRIC_MATRIX<T,TV::m> f=as.dSdt(Z,time);
+    if(use_advection) f+=Contract<2>(as.dS(Z,time),u);
     f-=(du*S).Twice_Symmetric_Part()+inv_Wi(color)*s*((T)1-S);
     return f/s;
 }
@@ -909,12 +911,12 @@ Volume_Force(const TV& X,int color,T time)
         ANALYTIC_VELOCITY<TV>* av=analytic_velocity(color);
         ANALYTIC_PRESSURE<TV>* ap=analytic_pressure(color);
         T rh=rho(color)/unit_rho;
-        T m=mu(color)/unit_mu;
-        TV f=rh*av->dudt(X/m,time/s)+ap->dp(X/m,time/s)-m*av->Lu(X/m,time/s);
+        T mh=mu(color)/unit_mu;
+        TV f=rh*av->dudt(X/m,time/s)+ap->dp(X/m,time/s)-mh*av->Lu(X/m,time/s);
         if(use_advection) f+=rh*av->du(X/m,time/s)*av->u(X/m,time/s);
         if(use_polymer_stress){
             T beta=polymer_stress_coefficient(color)/unit_p;
-            f-=beta*Contract<1,2>(analytic_polymer_stress(color)->dS(X/m,time/s))/m;}
+            f-=beta*Contract<1,2>(analytic_polymer_stress(color)->dS(X/m,time/s));}
         return f*unit_p/m;}
     return gravity;
 }
