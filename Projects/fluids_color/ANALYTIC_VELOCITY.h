@@ -28,6 +28,24 @@ struct ANALYTIC_VELOCITY
     virtual MATRIX<T,TV::m> du(const TV& X,T t) const=0;
     virtual SYMMETRIC_TENSOR<T,0,TV::m> ddu(const TV& X,T t) const=0;
     virtual TV Lu(const TV& X,T t) const {return Contract<1,2>(ddu(X,t));}
+    virtual void Test(const TV& X) const
+    {
+        RANDOM_NUMBERS<T> rand;
+        TV dX;
+        T e=1e-6,t=rand.Get_Uniform_Number(0,1),dt=rand.Get_Uniform_Number(0,e);
+        rand.Fill_Uniform(dX,-e,e);
+        TV u0=u(X,t),u1=u(X+dX,t);
+        MATRIX<T,TV::m> du0=du(X,t),du1=du(X+dX,t);
+        T erru=((du0+du1)*dX/2-(u1-u0)).Magnitude()/e;
+        LOG::cout<<"analytic velocity diff test "<<erru<<std::endl;
+        SYMMETRIC_TENSOR<T,0,TV::m> ddu0=ddu(X,t),ddu1=ddu(X+dX,t);
+        T errdu=(Contract<2>(ddu0+ddu1,dX/2)-(du1-du0)).Frobenius_Norm()/e;
+        LOG::cout<<"analytic velocity hess test "<<errdu<<std::endl;
+        LOG::cout<<"analytic velocity Laplacian test "<<(Lu(X,t)-Contract<1,2>(ddu0))<<std::endl;
+        TV dudt0=dudt(X,t),dudt1=dudt(X,t+dt),u2=u(X,t+dt);
+        T errut=((dudt0+dudt1)*dt/2-(u2-u0)).Magnitude()/e;
+        LOG::cout<<"analytic velocity time tiff test "<<errut<<std::endl;
+    }
 };
 
 template<class TV>
@@ -87,7 +105,6 @@ struct ANALYTIC_VELOCITY_PROGRAM:public ANALYTIC_VELOCITY<TV>
     {
         const char* axes[]={"x","y","z"};
         const char* vel[]={"u","v","w"};
-        for(int i=0;i<TV::m;i++) prog.var_in.Append(axes[i]);
         for(int i=0;i<TV::m;i++){
             prog.var_in.Append(axes[i]);
             prog.var_out.Append(vel[i]);}
@@ -96,10 +113,12 @@ struct ANALYTIC_VELOCITY_PROGRAM:public ANALYTIC_VELOCITY<TV>
         ARRAY<int> out(IDENTITY_ARRAY<>(TV::m));
         for(int j=0;j<prog.var_in.m;j++)
             prog.Diff(out,j);
-        out.Resize(1);
-        for(int j=0;j<TV::m;j++){
-            out(0)=j*(TV::m+1)+TV::m;
-            prog.Diff(out,j);}
+        out.Resize(TV::m*TV::m);
+        for(int i=0;i<TV::m;i++)
+            for(int j=0;j<TV::m;j++)
+                out(i*TV::m+j)=i*TV::m+TV::m+j;
+        for(int j=0;j<TV::m;j++)
+            prog.Diff(out,j);
         prog.Optimize();
         prog.Finalize();
         context.Initialize(prog);
@@ -136,14 +155,21 @@ struct ANALYTIC_VELOCITY_PROGRAM:public ANALYTIC_VELOCITY<TV>
     }
     virtual SYMMETRIC_TENSOR<T,0,TV::m> ddu(const TV& X,T t) const
     {
-        PHYSBAM_FATAL_ERROR("Do not waste time; do not need this.");
+        Run(X,t);
+        SYMMETRIC_TENSOR<T,0,TV::m> out;
+        for(int i=0;i<TV::m;i++)
+            for(int j=0;j<TV::m;j++)
+                for(int k=j;k<TV::m;k++)
+                    out.x(i)(j,k)=context.data_out(i+TV::m*(TV::m*j+k+TV::m+2));
+        return out;
     }
     virtual TV Lu(const TV& X,T t) const
     {
         Run(X,t);
         TV out;
         for(int i=0;i<TV::m;i++)
-            out(i)=context.data_out(i+TV::m*(TV::m+2));
+            for(int j=0;j<TV::m;j++)
+                out(i)+=context.data_out(i+TV::m*((TV::m+1)*j+TV::m+2));
         return out;
     }
 };

@@ -804,6 +804,7 @@ Analytic_Test()
             X=rand.Get_Uniform_Vector(grid.domain);
             analytic_levelset->phi(X/m,0,c);}
         while(c<0);
+        analytic_velocity(c)->Test(X);
         analytic_polymer_stress(c)->Test(X);}
 }
 //#####################################################################
