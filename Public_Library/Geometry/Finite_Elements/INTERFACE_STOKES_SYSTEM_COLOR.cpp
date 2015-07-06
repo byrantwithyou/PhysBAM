@@ -428,7 +428,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
                 for(int j=0;j<TV::m;j++){
                     if(j>=i) matrix_uu(i)(j)(c).Times_Add(xc.u(j)(c),rc.u(i)(c));
                     else matrix_uu(j)(i)(c).Transpose_Times_Add(xc.u(j)(c),rc.u(i)(c));}
-                if(use_polymer_stress && 0)
+                if(use_polymer_stress)
                     for(int j=0;j<TV::m;j++)
                         for(int k=0;k<TV::m;k++)
                             matrix_polymer_stress(i)(j)(k)(c).Times_Add(xc.u(i)(c),rc.u(i)(c));
