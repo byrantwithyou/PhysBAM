@@ -84,6 +84,18 @@ Initialize()
     example.boundary->Set_Constant_Extrapolation(constant_extrapolation);
     example.Set_Boundary_Conditions(time); // get so CFL is correct
 
+    // precompute obstacle faces    
+    for(CELL_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+        bool obs=false;
+        TV X=iterator.Location();
+        for(int i=0;i<example.obstacles.m;i++){
+            if(example.obstacles(i)->Lazy_Inside(X)){
+                obs=true;break;}}
+        if(obs){
+            for(int axis=0;axis<TV::m;axis++){
+                example.obstacle_faces.Append_Unique(FACE_INDEX<TV::m>(axis,iterator.First_Face_Index(axis)));
+                example.obstacle_faces.Append_Unique(FACE_INDEX<TV::m>(axis,iterator.Second_Face_Index(axis)));}}}
+
     if(!example.restart) Write_Output_Files(example.first_frame);
     output_number=example.first_frame;
 }
@@ -135,7 +147,9 @@ Advance_To_Target_Time(const T target_time)
         else if(time+2*dt>=target_time){dt=.5*(target_time-time);}
         Scalar_Advance(dt,time);
         Convect(dt,time);
+        Print_Max_Divergence("Before projection");
         Project(dt,time);
+        Print_Max_Divergence("After projection");
         time+=dt;}
 }
 //#####################################################################
@@ -175,6 +189,22 @@ Write_Output_Files(const int frame)
         FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);
     FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
+}
+//#####################################################################
+// Print_Max_Divergence
+//#####################################################################
+template<class TV> void SMOKE_DRIVER<TV>::
+Print_Max_Divergence(const char* str)
+{
+    if(!example.debug_divergence) return;
+    T max_div=(T)0;
+    for(CELL_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+        T d=0;
+        for(int axis=0;axis<TV::m;axis++)
+            d+=example.face_velocities(FACE_INDEX<TV::m>(axis,iterator.Second_Face_Index(axis)))
+                -example.face_velocities(FACE_INDEX<TV::m>(axis,iterator.First_Face_Index(axis)));
+        T ad=abs(d); if(ad>max_div) max_div=ad;}
+    LOG::cout<<str<<" max(div(v)) "<<max_div<<std::endl;
 }
 //#####################################################################
 namespace PhysBAM{

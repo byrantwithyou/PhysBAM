@@ -11,8 +11,13 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+
 #include <Incompressible/Projection/PROJECTION_UNIFORM.h>
+
 namespace PhysBAM{
+
+template<class TV> class DEBUG_PARTICLES;
 
 template<class TV>
 class SMOKE_EXAMPLE
@@ -23,6 +28,8 @@ class SMOKE_EXAMPLE
 
 public:
     STREAM_TYPE stream_type;
+    DEBUG_PARTICLES<TV>& debug_particles;
+
     T initial_time;
     int first_frame,last_frame;
     T frame_rate;
@@ -32,6 +39,8 @@ public:
     bool write_debug_data;
     std::string output_directory;
     bool N_boundary;
+
+    bool debug_divergence;
 
     T cfl;
 
@@ -45,7 +54,12 @@ public:
     BOUNDARY<TV,T> *boundary;
     ARRAY<T,TV_INT> density;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;    
+
     RANGE<TV> source;
+    
+    ARRAY<IMPLICIT_OBJECT<TV>* > obstacles;
+    ARRAY<FACE_INDEX<TV::m> > obstacle_faces;
+    
     pthread_mutex_t lock;
 
     SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int refine=0);

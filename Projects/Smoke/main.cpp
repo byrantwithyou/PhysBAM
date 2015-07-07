@@ -2,6 +2,8 @@
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include "SMOKE_DRIVER.h"
 #include "SMOKE_EXAMPLE.h"
 
@@ -17,21 +19,31 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     parse_args.Parse(true);
     SMOKE_EXAMPLE<TV>* example=new SMOKE_EXAMPLE<TV>(stream_type,threads);
 
-    RANGE<TV> range(TV(),TV::All_Ones_Vector()*0.5);range.max_corner(2)=1;
-    TV_INT counts=TV_INT::All_Ones_Vector()*scale/2;counts(2)=scale;
+    RANGE<TV> range(TV(),TV::All_Ones_Vector()*0.5);range.max_corner(1)=1;
+    TV_INT counts=TV_INT::All_Ones_Vector()*scale/2;counts(1)=scale;
     example->Initialize_Grid(counts,range);
+    LOG::cout<<"Grid dX "<<example->mac_grid.dX<<std::endl;
     example->last_frame=100;
     parse_args.Add("-restart",&example->restart,"frame","restart frame");
     parse_args.Add("-substeps",&example->write_substeps_level,"level","output-substep level");
     parse_args.Add("-e",&example->last_frame,"frame","last frame");
-    parse_args.Add("-N_boundary",&example->N_boundary,"use Neumann boundary (wall) for grid domain boundary");
+    parse_args.Add("-wall",&example->N_boundary,"use Neumann boundary (wall) for grid domain boundary");
+    parse_args.Add("-d_div",&example->debug_divergence,"output the max velocity divergence after projection");
+
     parse_args.Parse();
 
-    TV point1=TV::All_Ones_Vector()*.2,point2=TV::All_Ones_Vector()*.3;point1(2)=0;point2(2)=.05;
+    TV point1=TV::All_Ones_Vector()*.22,point2=TV::All_Ones_Vector()*.28;
+    point1(1)=0.1;point2(1)=.15;
     example->source.min_corner=point1;
     example->source.max_corner=point2;
 
+    TV center=TV::All_Ones_Vector();
+    center(0)=0.25;center(1)=0.4;
+    SPHERE<TV> sphere(center,0.05);
+    example->obstacles.Append(new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(sphere));
+
     if(mpi_world.initialized){
+        LOG::cout<<"ERROR: MPI initialized? Shouldn't reach here."<<std::endl;
         example->mpi_grid=new MPI_UNIFORM_GRID<TV>(example->mac_grid,3);
         if(example->mpi_grid->Number_Of_Processors()>1) example->output_directory+=LOG::sprintf("/%d",(mpi_world.rank+1));}
 

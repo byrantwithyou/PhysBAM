@@ -37,6 +37,7 @@ public:
     void Simulate_To_Frame(const int frame_input);
     void Write_Output_Files(const int frame);
     void Write_Substep(const std::string& title,const int substep,const int level=0);
+    void Print_Max_Divergence(const char* str);
 
 //#####################################################################
 };
