@@ -36,10 +36,11 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     point1(1)=0.1;point2(1)=.15;
     example->source.min_corner=point1;
     example->source.max_corner=point2;
+    example->source_temperature=10;
 
     TV center=TV::All_Ones_Vector();
     center(0)=0.25;center(1)=0.4;
-    SPHERE<TV> sphere(center,0.05);
+    SPHERE<TV> sphere(center,0.02);
     example->obstacles.Append(new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(sphere));
 
     if(mpi_world.initialized){

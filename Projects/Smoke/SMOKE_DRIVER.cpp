@@ -69,6 +69,7 @@ Initialize()
     example.projection.Initialize_Grid(example.mac_grid);
     example.face_velocities.Resize(example.mac_grid);
     example.density.Resize(example.mac_grid.Domain_Indices(3));
+    example.temperature.Resize(example.mac_grid.Domain_Indices(3));
     example.Initialize_Fields();
 
     // setup laplace
@@ -95,9 +96,23 @@ Initialize()
             for(int axis=0;axis<TV::m;axis++){
                 example.obstacle_faces.Append_Unique(FACE_INDEX<TV::m>(axis,iterator.First_Face_Index(axis)));
                 example.obstacle_faces.Append_Unique(FACE_INDEX<TV::m>(axis,iterator.Second_Face_Index(axis)));}}}
-
     if(!example.restart) Write_Output_Files(example.first_frame);
     output_number=example.first_frame;
+}
+//#####################################################################
+// Add_Buoyancy_Force
+//#####################################################################
+template<class TV> void SMOKE_DRIVER<TV>::
+Add_Buoyancy_Force(const T dt,const T time)
+{
+    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+        if(iterator.axis==1){
+            TV_INT c1,c2;
+            example.mac_grid.Cells_Touching_Face(iterator.axis,iterator.Face_Index(),c1,c2);
+            T rho=(example.density(c1)+example.density(c2))*(T).5;
+            T tem=(example.temperature(c1)+example.temperature(c2))*(T).5;
+            T alpha=0.001,beta=0.001;
+            example.face_velocities(iterator.Full_Index())+=-alpha*rho+beta*tem;}}
 }
 //#####################################################################
 // Scalar_Advance
@@ -109,6 +124,9 @@ Scalar_Advance(const T dt,const T time)
     ARRAY<T,TV_INT> density_ghost(example.mac_grid.Domain_Indices(3));
     example.boundary->Fill_Ghost_Cells(example.mac_grid,example.density,density_ghost,dt,time,3);
     example.advection_scalar.Update_Advection_Equation_Cell(example.mac_grid,example.density,density_ghost,example.face_velocities,*example.boundary,dt,time);    
+    ARRAY<T,TV_INT> temperature_ghost(example.mac_grid.Domain_Indices(3));
+    example.boundary->Fill_Ghost_Cells(example.mac_grid,example.temperature,temperature_ghost,dt,time,3);
+    example.advection_scalar.Update_Advection_Equation_Cell(example.mac_grid,example.temperature,temperature_ghost,example.face_velocities,*example.boundary,dt,time);    
 }
 //#####################################################################
 // Convect
@@ -145,11 +163,12 @@ Advance_To_Target_Time(const T target_time)
         if(example.mpi_grid) example.mpi_grid->Synchronize_Dt(dt);
         if(time+dt>=target_time){dt=target_time-time;done=true;}
         else if(time+2*dt>=target_time){dt=.5*(target_time-time);}
-        Scalar_Advance(dt,time);
         Convect(dt,time);
+        Add_Buoyancy_Force(dt,time);
         Print_Max_Divergence("Before projection");
         Project(dt,time);
         Print_Max_Divergence("After projection");
+        Scalar_Advance(dt,time);
         time+=dt;}
 }
 //#####################################################################
