@@ -60,6 +60,7 @@ public:
     void Face_To_Cell();
     void Make_Incompressible();
     T Pressure_Projection();
+    void Build_KKT_Matrix();
     void Apply_Forces();
     void Perform_Particle_Collision(int p,T time);
     void Apply_Friction();

@@ -162,6 +162,8 @@ Advance_One_Time_Step()
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt,example.velocity_new,&example.velocity);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
+    if(example.kkt)
+        Build_KKT_Matrix();
     if(example.incompressible)
         Make_Incompressible();
     else
@@ -530,6 +532,23 @@ Make_Incompressible()
     else{
         Face_To_Cell();
         Grid_To_Particle();}
+}
+//#####################################################################
+// Function Build_KKT_Matrix
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Build_KKT_Matrix()
+{
+    // Build B    
+    example.kkt_B.Clean_Memory();
+    for(int t=0;t<example.valid_grid_cell_indices.m;t++){
+        TV_INT index=example.valid_grid_cell_indices(t);
+        bool near_solid=false;
+        for(int a=0;a<TV_INT::m;++a){
+            const TV_INT axis=TV_INT::Axis_Vector(a);
+            if(example.cell_solid(index-axis) || example.cell_solid(index+axis)){
+                near_solid=true;break;}}
+        if(near_solid) example.kkt_B.Append(index);}
 }
 //#####################################################################
 // Function Pressure_Projection

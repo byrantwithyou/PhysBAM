@@ -7,6 +7,7 @@
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
@@ -76,6 +77,7 @@ public:
     ARRAY<T,TV_INT> J;
     ARRAY<T,TV_INT> density;
     ARRAY<T,TV_INT> kkt_lagrange_multiplier;
+    ARRAY<TV_INT> kkt_B;
 
     T initial_time;
     int last_frame;
