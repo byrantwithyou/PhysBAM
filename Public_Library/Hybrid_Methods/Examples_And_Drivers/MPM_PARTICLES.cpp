@@ -10,7 +10,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> MPM_PARTICLES<TV>::
 MPM_PARTICLES()
-    :store_B(false),store_S(false),store_C(false),volume(0,0),F(0,0),B(0,0),valid(0,0)
+    :store_B(false),store_S(false),store_C(false),volume(0,0),F(0,0),B(0,0),valid(0,0),one_over_lambda(0,0)
 {
     this->Store_Velocity();
     this->Store_Mass();
@@ -58,6 +58,17 @@ Store_C(bool store)
     else Remove_Array(ATTRIBUTE_ID_C);
 }
 //#####################################################################
+// Function Store_One_Over_Lambda
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Store_One_Over_Lambda(bool store)
+{
+    if(store_one_over_lambda==store) return;
+    store_one_over_lambda=store;
+    if(store) Add_Array(ATTRIBUTE_ID_ONE_OVER_LAMBDA,&one_over_lambda);
+    else Remove_Array(ATTRIBUTE_ID_ONE_OVER_LAMBDA);
+}
+//#####################################################################
 // Function Initialize_MPM_Particles
 //#####################################################################
 static int Initialize_MPM_Particles()
@@ -66,6 +77,7 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_F,"F");
     Register_Attribute_Name(ATTRIBUTE_ID_B,"B");
     Register_Attribute_Name(ATTRIBUTE_ID_C,"C");
+    Register_Attribute_Name(ATTRIBUTE_ID_ONE_OVER_LAMBDA,"one_over_lambda");
     Register_Attribute_Name(ATTRIBUTE_ID_VALID,"valid");
     Register_Attribute_Name(ATTRIBUTE_ID_S,"S");
     return 0;

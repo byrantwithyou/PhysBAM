@@ -75,6 +75,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-regular_seeding",&regular_seeding,"use regular particle seeding");
     parse_args.Add("-use_early_gradient_transfer",&use_early_gradient_transfer,"use early gradient transfer for Cp");
     parse_args.Add("-incompressible",&incompressible,"Make simulated media incompressible");
+    parse_args.Add("-kkt",&kkt,"Use KKT solver");
     parse_args.Parse(true);
 
     frame_dt=1/framerate;
@@ -96,8 +97,9 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     random.Set_Seed(seed);
 
     particles.Store_B(use_affine && !incompressible);
-    particles.Store_C(use_affine && incompressible);
+    particles.Store_C(use_affine && (incompressible || kkt));
     particles.Store_S(use_oldroyd);
+    particles.Store_One_Over_Lambda(kkt);
 
     if(order==1) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,threads));
     else if(order==2) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads));

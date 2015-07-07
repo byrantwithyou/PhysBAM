@@ -103,6 +103,7 @@ Initialize()
     example.particles.Store_B(example.use_affine && !example.incompressible);
     example.particles.Store_C(example.use_affine && example.incompressible);
     example.particles.Store_S(example.use_oldroyd);
+    example.particles.Store_One_Over_Lambda(example.kkt);
 
     if(example.incompressible){
         fluid_p.p.Resize(example.grid.Domain_Indices(example.ghost));
@@ -113,9 +114,15 @@ Initialize()
         example.density_f.Resize(example.grid.Domain_Indices(example.ghost));
         example.velocity_f.Resize(example.grid.Domain_Indices(example.ghost));
         example.velocity_new_f.Resize(example.grid.Domain_Indices(example.ghost));
-        example.cell_solid.Resize(example.grid.Domain_Indices(example.ghost));
         example.cell_pressure.Resize(example.grid.Domain_Indices(example.ghost));
-        example.cell_C.Resize(example.grid.Domain_Indices(example.ghost));
+        example.cell_C.Resize(example.grid.Domain_Indices(example.ghost));}
+    else if(example.kkt){
+        // TODO: resize something like kkt_p, kkt_rhs
+        example.one_over_lambda.Resize(example.grid.Domain_Indices(example.ghost));
+        example.J.Resize(example.grid.Domain_Indices(example.ghost));
+        example.density.Resize(example.grid.Domain_Indices(example.ghost));}
+    if(example.incompressible || example.kkt){
+        example.cell_solid.Resize(example.grid.Domain_Indices(example.ghost));
         for(CELL_ITERATOR<TV> iterator(example.grid,example.ghost,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
             example.cell_solid(iterator.Cell_Index())=true;}
 
@@ -243,27 +250,33 @@ Particle_To_Grid()
 #pragma omp parallel for
     for(int i=0;i<example.mass.array.m;i++){
         example.mass.array(i)=0;
-        if(example.incompressible) example.volume.array(i)=0;
+        if(example.incompressible || example.kkt) example.volume.array(i)=0;
         example.velocity.array(i)=TV();
-        example.velocity_new.array(i)=TV();}
+        example.velocity_new.array(i)=TV();
+        if(example.kkt){
+            example.one_over_lambda.array(i)=0;
+            example.J.array(i)=0;}}
 
     T scale=1;
     if(particles.store_B && !example.weights->use_gradient_transfer)
         scale=example.weights->Constant_Scalar_Inverse_Dp();
-    bool use_gradient=!example.incompressible && example.weights->use_gradient_transfer;
-    ARRAY_VIEW<MATRIX<T,TV::m> > dV(example.incompressible?particles.C:particles.B);
+    bool use_gradient=!example.incompressible && !example.kkt && example.weights->use_gradient_transfer;
+    ARRAY_VIEW<MATRIX<T,TV::m> > dV((example.incompressible || example.kkt)?particles.C:particles.B);
     example.gather_scatter.template Scatter<int>(
         [this,scale,&particles,use_gradient,dV](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {
             T w=it.Weight();
             TV_INT index=it.Index();
             example.mass(index)+=w*particles.mass(p);
-            if(example.incompressible) example.volume(index)+=w*particles.volume(p);
+            if(example.incompressible || example.kkt) example.volume(index)+=w*particles.volume(p);
             TV V=w*particles.V(p);
             if(example.use_affine){
                 if(use_gradient) V+=particles.B(p)*it.Gradient();
                 else V+=dV(p)*(w*scale*(example.grid.Center(index)-particles.X(p)));}
             example.velocity(index)+=particles.mass(p)*V;
+            if(example.kkt){
+                example.one_over_lambda(index)+=particles.mass(p)*particles.one_over_lambda(p);
+                example.J(index)+=particles.mass(p)*particles.F(p).Determinant();}
         },true);
 
     example.valid_grid_indices.Remove_All();
@@ -284,7 +297,10 @@ Particle_To_Grid()
                     example.valid_pressure_cell_indices.Append(it.index);}}
             example.valid_grid_indices.Append(i);
             example.valid_grid_cell_indices.Append(it.index);
-            example.velocity.array(i)/=example.mass.array(i);}
+            example.velocity.array(i)/=example.mass.array(i);
+            if(example.kkt){
+                example.one_over_lambda.array(i)/=example.mass.array(i);
+                example.J.array(i)/=example.mass.array(i);}}
         else example.velocity.array(i)=TV();}
 }
 //#####################################################################

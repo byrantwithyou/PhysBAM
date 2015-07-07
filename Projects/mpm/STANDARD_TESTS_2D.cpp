@@ -359,6 +359,7 @@ Initialize()
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
             Add_Gravity(TV(0,-1.8));
+            // TODO: for kkt, need to assign particle one_over_lambda
         } break;
         case 23:{ // (fluid test) dam break 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
