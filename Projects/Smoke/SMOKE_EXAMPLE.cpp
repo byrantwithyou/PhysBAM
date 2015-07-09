@@ -18,8 +18,7 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     restart(0),write_debug_data(true),output_directory("output"),N_boundary(false),
     debug_divergence(false),
     cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
-    thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(mac_grid,false,false,thread_queue),advection_scalar(thread_queue),boundary(0),
-    source_temperature(0)
+    thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(mac_grid,false,false,thread_queue),advection_scalar(thread_queue),boundary(0)
 {
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     pthread_mutex_init(&lock,0);    
@@ -67,7 +66,6 @@ template<class TV> void SMOKE_EXAMPLE<TV>::
 Set_Boundary_Conditions(const T time)
 {
     projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
-    // bc for grid boundary
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(domain_boundary(axis)(axis_side)){
             TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);    
@@ -78,11 +76,6 @@ Set_Boundary_Conditions(const T time)
                     projection.elliptic_solver->psi_N(face)=true;
                     face_velocities(face)=0;}
                 else projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
-    // bc for obstacle
-    for(int i=0;i<obstacle_faces.m;i++){
-        projection.elliptic_solver->psi_N(obstacle_faces(i))=true;
-        face_velocities(obstacle_faces(i))=0;}
-    // bc for smoke source
     for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         if(source.Lazy_Inside(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;

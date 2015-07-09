@@ -11,10 +11,7 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
-#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
-
 #include <Incompressible/Projection/PROJECTION_UNIFORM.h>
-
 namespace PhysBAM{
 
 template<class TV> class DEBUG_PARTICLES;
@@ -53,15 +50,8 @@ public:
     BOUNDARY<TV,T> boundary_scalar;
     BOUNDARY<TV,T> *boundary;
     ARRAY<T,TV_INT> density;
-    ARRAY<T,TV_INT> temperature;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;    
-
     RANGE<TV> source;
-    T source_temperature;
-    
-    ARRAY<IMPLICIT_OBJECT<TV>* > obstacles;
-    ARRAY<FACE_INDEX<TV::m> > obstacle_faces;
-    
     pthread_mutex_t lock;
 
     SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int refine=0);
@@ -78,14 +68,12 @@ public:
     
     void Initialize_Fields() 
     {for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) face_velocities(iterator.Full_Index())=0;
-    for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) density(iterator.Cell_Index())=0;
-    for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) temperature(iterator.Cell_Index())=0;}
+    for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) density(iterator.Cell_Index())=0;}
     
     void Get_Scalar_Field_Sources(const T time)
-    {for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
-            if(source.Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=1;
-            if(source.Lazy_Inside(iterator.Location())) temperature(iterator.Cell_Index())=source_temperature;}}
-    
+    {for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
+        if(source.Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=1;}
+
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);
     virtual void Set_Boundary_Conditions(const T time);

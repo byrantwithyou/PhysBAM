@@ -27,7 +27,6 @@ public:
     SMOKE_DRIVER(SMOKE_EXAMPLE<TV>& example);
     virtual ~SMOKE_DRIVER();
 
-    void Add_Buoyancy_Force(const T dt,const T time);
     void Scalar_Advance(const T dt,const T time);
     void Convect(const T dt,const T time);
     void Add_Forces(const T dt,const T time);
