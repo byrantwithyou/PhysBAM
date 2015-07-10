@@ -58,6 +58,7 @@ public:
 
     // fluid and kkt shared stuff
     ARRAY<bool,TV_INT> cell_solid;
+    ARRAY<int,TV_INT> cell_pressure;
 
     // fluid stuff
     bool incompressible;
@@ -68,7 +69,6 @@ public:
     ARRAY<T,FACE_INDEX<TV::m> > mass_f,volume_f,density_f;
     ARRAY<T,FACE_INDEX<TV::m> > velocity_f;
     ARRAY<T,FACE_INDEX<TV::m> > velocity_new_f;
-    ARRAY<int,TV_INT> cell_pressure;
     ARRAY<MATRIX<T,TV::m>,TV_INT> cell_C;
 
     // kkt stuff
