@@ -74,13 +74,13 @@ public:
     int Find_Index(const int i,const int j) const;
     int Find_Index_Exists(const int i,const int j) const;
     bool Element_Present(const int i,const int j) const;
-    void Times(const ARRAY<T>& x,ARRAY<T>& result) const;
-    void Transpose_Times(const ARRAY<T>& x,ARRAY<T>& result) const;
-    void Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const;
-    void Times_Add_Row(const ARRAY<T>& x,ARRAY<T>& result,const int row) const;
-    void Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const;
-    void Transpose_Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const;
-    void Transpose_Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const;
+    void Times(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
+    void Transpose_Times(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
+    void Times_Add(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
+    void Times_Add_Row(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result,const int row) const;
+    void Times_Subtract(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
+    void Transpose_Times_Add(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
+    void Transpose_Times_Subtract(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
     void Negate();
     SPARSE_MATRIX_FLAT_MXN<T>& operator*=(const T a);
     SPARSE_MATRIX_FLAT_MXN<T>& operator/=(const T a);
@@ -89,13 +89,13 @@ public:
     void Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed);
     void Transpose(SPARSE_MATRIX_FLAT_MXN<T>& A_transpose) const;
     SPARSE_MATRIX_FLAT_MXN<T> Times_Transpose(const SPARSE_MATRIX_FLAT_MXN<T>& rhs);
-    SPARSE_MATRIX_FLAT_MXN<T> Times_Diagonal_Times(const ARRAY<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>& rhs); // (*this) * diagonal * (rhs)
-    SPARSE_MATRIX_FLAT_MXN<T> Scale_Rows(const ARRAY<T>& d) const;
+    SPARSE_MATRIX_FLAT_MXN<T> Times_Diagonal_Times(ARRAY_VIEW<const T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>& rhs); // (*this) * diagonal * (rhs)
+    SPARSE_MATRIX_FLAT_MXN<T> Scale_Rows(ARRAY_VIEW<const T> d) const;
     SPARSE_MATRIX_FLAT_MXN<T> operator+(const SPARSE_MATRIX_FLAT_MXN<T>& A_rhs) const;
     SPARSE_MATRIX_FLAT_MXN<T> operator-(const SPARSE_MATRIX_FLAT_MXN<T>& A_rhs) const;
     SPARSE_MATRIX_FLAT_MXN<T> operator*(const SPARSE_MATRIX_FLAT_MXN<T>& rhs) const;
-    void Set_Times_Diagonal(const ARRAY<T>& D);
-    void Set_Diagonal_Times(const ARRAY<T>& D);
+    void Set_Times_Diagonal(ARRAY_VIEW<const T> D);
+    void Set_Diagonal_Times(ARRAY_VIEW<const T> D);
     void Write_Row_Lengths();
     void Print_Row(const int row);
     void Reset(const int c);
@@ -114,10 +114,10 @@ public:
     void Construct_Incomplete_Cholesky_Factorization(const bool modified_version=true,const T modified_coefficient=.97,const T zero_tolerance=1e-8,const T zero_replacement=1e-8);
     // actually an LU saving square roots, with an inverted diagonal saving divides
     void In_Place_Incomplete_Cholesky_Factorization(const bool modified_version=true,const T modified_coefficient=.97,const T zero_tolerance=1e-8,const T zero_replacement=1e-8);
-    void Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b);
-    void Gauss_Seidel_Solve(ARRAY<T>& x,const ARRAY<T>& b,const T tolerance=1e-12,const int max_iterations=1000000);
+    void Gauss_Seidel_Single_Iteration(ARRAY_VIEW<T> x,ARRAY_VIEW<const T> b);
+    void Gauss_Seidel_Solve(ARRAY_VIEW<T> x,ARRAY_VIEW<const T> b,const T tolerance=1e-12,const int max_iterations=1000000);
     bool Positive_Diagonal_And_Nonnegative_Row_Sum(const T tolerance=1e-7) const;
-    void Conjugate_With_Diagonal_Matrix(ARRAY<T>& x);
+    void Conjugate_With_Diagonal_Matrix(ARRAY_VIEW<T> x);
 //#####################################################################
 };
 template<class T> std::ostream& operator<<(std::ostream& output_stream,const SPARSE_MATRIX_FLAT_MXN<T>& A);

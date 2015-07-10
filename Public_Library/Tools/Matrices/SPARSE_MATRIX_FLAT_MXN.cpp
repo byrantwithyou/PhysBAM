@@ -116,7 +116,7 @@ Element_Present(const int i,const int j) const
 // Function Times_Add
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const
+Times_Add(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
 {
     int index=offsets(0);
     for(int i=0;i<m;i++){
@@ -128,7 +128,7 @@ Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const
 // Function Times_Add
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Times_Add_Row(const ARRAY<T>& x,ARRAY<T>& result,const int row) const
+Times_Add_Row(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result,const int row) const
 {
     int index=offsets(row);
     int end=offsets(row+1);
@@ -140,7 +140,7 @@ Times_Add_Row(const ARRAY<T>& x,ARRAY<T>& result,const int row) const
 // Function Times_Subtract
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const
+Times_Subtract(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
 {
     int index=offsets(0);
     for(int i=0;i<m;i++){
@@ -152,7 +152,7 @@ Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const
 // Function Times
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Times(const ARRAY<T>& x,ARRAY<T>& result) const
+Times(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
 {
     result.Fill(0);
     Times_Add(x,result);
@@ -161,7 +161,7 @@ Times(const ARRAY<T>& x,ARRAY<T>& result) const
 // Function Transpose_Times_Add
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Transpose_Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const
+Transpose_Times_Add(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
 {
     int index=offsets(0);
     for(int i=0;i<m;i++){
@@ -172,7 +172,7 @@ Transpose_Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const
 // Function Transpose_Times_Subtract
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Transpose_Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const
+Transpose_Times_Subtract(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
 {
     int index=offsets(0);
     for(int i=0;i<m;i++){
@@ -183,7 +183,7 @@ Transpose_Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const
 // Function Times
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Transpose_Times(const ARRAY<T>& x,ARRAY<T>& result) const
+Transpose_Times(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
 {
     result.Fill(0);
     Transpose_Times_Add(x,result);
@@ -307,7 +307,7 @@ Times_Transpose(const SPARSE_MATRIX_FLAT_MXN<T>& rhs)
 // Function Times_Diagonal_Times
 //#####################################################################
 template<class T> SPARSE_MATRIX_FLAT_MXN<T> SPARSE_MATRIX_FLAT_MXN<T>::
-Times_Diagonal_Times(const ARRAY<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>& rhs)
+Times_Diagonal_Times(ARRAY_VIEW<const T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>& rhs)
 {
     assert(rhs.m==n && diagonal.m==n);
     SPARSE_MATRIX_FLAT_MXN result;
@@ -342,7 +342,7 @@ Times_Diagonal_Times(const ARRAY<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>& rh
 // Function Scale_Rows
 //#####################################################################
 template<class T> SPARSE_MATRIX_FLAT_MXN<T> SPARSE_MATRIX_FLAT_MXN<T>::
-Scale_Rows(const ARRAY<T>& d) const
+Scale_Rows(ARRAY_VIEW<const T> d) const
 {
     SPARSE_MATRIX_FLAT_MXN<T> result=*this;
     for(int i=0;i<result.m;i++)
@@ -448,7 +448,7 @@ operator*(const SPARSE_MATRIX_FLAT_MXN& rhs) const
 // Function Set_Times_Diagonal
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Set_Times_Diagonal(const ARRAY<T>& D)
+Set_Times_Diagonal(ARRAY_VIEW<const T> D)
 {
     assert(n==D.m);
     for(int i=0;i<A.m;i++)
@@ -458,7 +458,7 @@ Set_Times_Diagonal(const ARRAY<T>& D)
 // Function Set_Diagonal_Times
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Set_Diagonal_Times(const ARRAY<T>& D)
+Set_Diagonal_Times(ARRAY_VIEW<const T> D)
 {
     assert(m==D.m);
     for(int row=0;row<m;row++){
@@ -761,7 +761,7 @@ In_Place_Incomplete_Cholesky_Factorization(const bool modified_version,const T m
 // Function Gauss_Seidel_Single_Iteration
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b)
+Gauss_Seidel_Single_Iteration(ARRAY_VIEW<T> x,ARRAY_VIEW<const T> b)
 {
     assert(x.m==b.m && x.m==n);
     for(int i=0;i<n;i++){
@@ -775,7 +775,7 @@ Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b)
 // Function Gauss_Seidel_Solve
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Gauss_Seidel_Solve(ARRAY<T>& x,const ARRAY<T>& b,const T tolerance,const int max_iterations)
+Gauss_Seidel_Solve(ARRAY_VIEW<T> x,ARRAY_VIEW<const T> b,const T tolerance,const int max_iterations)
 {
     assert(x.m==b.m && x.m==n);
     ARRAY<T> last_x(x);
@@ -804,7 +804,7 @@ Positive_Diagonal_And_Nonnegative_Row_Sum(const T tolerance) const
 // Function Conjugate_With_Diagonal_Matrix
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Conjugate_With_Diagonal_Matrix(ARRAY<T>& x)
+Conjugate_With_Diagonal_Matrix(ARRAY_VIEW<T> x)
 {
     int index=offsets(0);
     for(int i=0;i<n;i++){
