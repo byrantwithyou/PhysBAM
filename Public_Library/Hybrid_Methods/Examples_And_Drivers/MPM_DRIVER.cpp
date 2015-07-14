@@ -110,7 +110,6 @@ Initialize()
         fluid_p.p.Resize(example.grid.Domain_Indices(example.ghost));
         fluid_rhs.p.Resize(example.grid.Domain_Indices(example.ghost));
         example.mass_f.Resize(example.grid.Domain_Indices(example.ghost));
-        example.volume.Resize(example.grid.Domain_Indices(example.ghost));
         example.volume_f.Resize(example.grid.Domain_Indices(example.ghost));
         example.density_f.Resize(example.grid.Domain_Indices(example.ghost));
         example.velocity_f.Resize(example.grid.Domain_Indices(example.ghost));
@@ -122,6 +121,7 @@ Initialize()
         example.J.Resize(example.grid.Domain_Indices(example.ghost));
         example.density.Resize(example.grid.Domain_Indices(example.ghost));}
     if(example.incompressible || example.kkt){
+        example.volume.Resize(example.grid.Domain_Indices(example.ghost));
         example.cell_solid.Resize(example.grid.Domain_Indices(example.ghost));
         example.cell_pressure.Resize(example.grid.Domain_Indices(example.ghost));
         for(CELL_ITERATOR<TV> iterator(example.grid,example.ghost,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
@@ -284,13 +284,14 @@ Particle_To_Grid()
 
     example.valid_grid_indices.Remove_All();
     example.valid_grid_cell_indices.Remove_All();
-    if(example.incompressible){
-        example.valid_pressure_indices.Remove_All();
-        example.valid_pressure_cell_indices.Remove_All();
-        example.valid_pressure_dofs.Remove_All();
-        example.valid_pressure_cell_dofs.Remove_All();}
-    if(example.incompressible || example.kkt)
+    if(example.incompressible || example.kkt){
         example.cell_pressure.Fill(0);
+        if(!example.kkt){
+            example.valid_pressure_indices.Remove_All();
+            example.valid_pressure_cell_indices.Remove_All();
+            example.valid_pressure_dofs.Remove_All();
+            example.valid_pressure_cell_dofs.Remove_All();}}
+
     for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
         int i=example.mass.Standard_Index(it.index);
         if(example.mass.array(i)){
@@ -552,48 +553,26 @@ Build_KKT_Matrix()
             if(example.cell_solid(id-ej) || example.cell_solid(id+ej)){
                 near_solid=true;break;}}
         if(near_solid) example.kkt_B.Append(id);}
-
+    
     // Build DT
-    Compute_Cell_C();
     ARRAY<T,TV_INT>& m=example.mass;
-    ARRAY<int,TV_INT> cell_ordering;
-    cell_ordering.Resize(example.grid.Domain_Indices(example.ghost));
-    for(int valid_cell=0;valid_cell<example.valid_grid_indices.m;valid_cell++){
-        const TV_INT id=example.valid_grid_cell_indices(valid_cell);
-        cell_ordering(id)=valid_cell;}
-
+    ARRAY<int> row_lengths(example.valid_grid_indices.m,true,3*TV::m+1);
     SPARSE_MATRIX_FLAT_MXN<T> DT;
-    T one_over_dx=example.grid.one_over_dX(0);
-    ARRAY<int> row_lengths(example.valid_grid_indices.m,true,4*TV::m+1);
     DT.Set_Row_Lengths(row_lengths);
-    for(int valid_cell=0;valid_cell<example.valid_grid_indices.m;valid_cell++){
-        const TV_INT id=example.valid_grid_cell_indices(valid_cell);
-        int row=cell_ordering(id);
+    for(int row=0;row<example.valid_grid_indices.m;row++){
+        TV_INT id=example.valid_grid_cell_indices(row);
         for(int a=0;a<TV::m;a++){
-            const TV_INT ej=TV_INT::Axis_Vector(a);
-            if(example.cell_pressure(id+ej)){
-                int l=cell_ordering(id-ej);
-                int c=cell_ordering(id);
-                int r=cell_ordering(id+ej);
-                // minus face_A
-                DT(row,l)-=m(id-ej)/(2*(m(id-ej)+m(id)));
-                DT(row,c)-=(m(id-ej)+3*m(id))/(2*(m(id-ej)+m(id)));
-                DT(row,r)-=m(id)/(2*(m(id-ej)+m(id)));
-                if(example.cell_pressure(id+2*ej)){
-                    int rr=cell_ordering(id+2*ej);
-                    DT(row,rr)+=m(id+ej)/(2*(m(id+ej)+m(id)));
-                    DT(row,r)+=(3*m(id+ej)+m(id))/(2*(m(id+ej)+m(id))); 
-                    DT(row,c)+=m(id)/(2*(m(id+ej)+m(id)));}
-                else{
-                    DT(row,r)+=(T)0.5;
-                    DT(row,c)+=(T)0.5;}}
-                else{
-                int l=cell_ordering(id-ej);
-                int r=cell_ordering(id+ej);
-                // plus face_B
-                DT(row,r)+=(T)0.5;
-                // minus face_A
-                DT(row,l)-=(T)0.5;}}}
+            TV_INT ej=TV_INT::Axis_Vector(a);
+            TV_INT r0=example.cell_pressure(id+ej)?id+ej:id;
+            TV_INT r1=example.cell_pressure(id+2*ej)?id+2*ej:id+ej;
+            DT(row,example.velocity.Standard_Index(id))+=m(id)/(m(id+ej)+m(id))-(m(id-ej)/(T)2+m(id))/(m(id-ej)+m(id)); 
+            DT(row,example.velocity.Standard_Index(id-ej))-=m(id-ej)/((T)2*(m(id-ej)+m(id)));
+            DT(row,example.velocity.Standard_Index(id+ej))+=m(id+ej)/(m(id+ej)+m(id));
+            DT(row,example.velocity.Standard_Index(r0))+=m(id)/((T)2*(m(id+ej)+m(id)))+m(id)/((T)2*(m(id-ej)+m(id)));
+            DT(row,example.velocity.Standard_Index(r0-ej))-=m(id)/((T)2*(m(id+ej)+m(id)))+m(id)/((T)2*(m(id-ej)+m(id)));
+            DT(row,example.velocity.Standard_Index(r1))-=m(id+ej)/((T)2*(m(id+ej)+m(id)));
+            DT(row,example.velocity.Standard_Index(r1-ej))+=m(id+ej)/((T)2*(m(id+ej)+m(id)));}}
+    DT*=example.grid.one_over_dX(0);
 }
 //#####################################################################
 // Function Pressure_Projection
