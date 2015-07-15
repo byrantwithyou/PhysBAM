@@ -29,7 +29,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
 
     parse_args.Parse();
 
-    TV point1=TV::All_Ones_Vector()*.2,point2=TV::All_Ones_Vector()*.3;point1(1)=0;point2(1)=.05;
+    TV point1=TV::All_Ones_Vector()*.23,point2=TV::All_Ones_Vector()*.27;point1(1)=0;point2(1)=.05;
     example->source.min_corner=point1;
     example->source.max_corner=point2;
 
