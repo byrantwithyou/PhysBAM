@@ -57,6 +57,7 @@ my $rmlist = "\"$tmp_prefix.tex\"";
 if($format eq 'pdf' || $format eq 'svg' || $format eq 'sk' || $format eq 'eps' || $format eq 'png')
 {
     $cmd = "pdflatex -halt-on-error $dir_option $opt_g \"$tmp_prefix.tex\"";
+    $cmd .= " && pdfcrop \"$tmp_prefix.pdf\" \"$tmp_prefix.pdf\"";
     $rmlist .= " \"$tmp_prefix.pdf\" \"$tmp_prefix.aux\" \"$tmp_prefix.log\"";
 }
 if($format eq 'svg' || $format eq 'sk' || $format eq 'eps' || $format eq 'png')
