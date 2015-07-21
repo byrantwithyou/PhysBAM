@@ -658,10 +658,7 @@ void Initialize_Bodies() override
         solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection,particles.X,VECTOR<int,2>(2,1));
     solid_body_collection.Update_Simulated_Particles();
 
-    if(!semi_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(!semi_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
-        solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(!semi_implicit) for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    solids_evolution->fully_implicit=!semi_implicit;
 
     if(scatter_plot) Init_Scatter_Plot();
 

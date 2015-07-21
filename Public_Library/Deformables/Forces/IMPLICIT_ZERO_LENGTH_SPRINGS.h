@@ -17,7 +17,7 @@ class IMPLICIT_ZERO_LENGTH_SPRINGS:public DEFORMABLES_FORCES<TV>,public SPRINGS_
     typedef typename TV::SCALAR T;
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
-    using BASE::particles;using BASE::use_implicit_velocity_independent_forces;
+    using BASE::particles;
     typedef typename FORCE_ELEMENTS::ITERATOR SEGMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 

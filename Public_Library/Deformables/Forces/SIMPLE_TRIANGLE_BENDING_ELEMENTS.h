@@ -43,8 +43,8 @@ private:
 public:
     using BASE::force_segments;using BASE::states;using BASE::current_lengths;using BASE::restlength;using BASE::youngs_modulus;using BASE::visual_restlength;
 
-    SIMPLE_TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,BINDING_LIST<TV>& binding_list_input,bool implicit);
-    SIMPLE_TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,ARRAY<VECTOR<int,4> >& bending_quadruples_input,BINDING_LIST<TV>& binding_list_input,bool implicit);
+    SIMPLE_TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,BINDING_LIST<TV>& binding_list_input);
+    SIMPLE_TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,ARRAY<VECTOR<int,4> >& bending_quadruples_input,BINDING_LIST<TV>& binding_list_input);
     virtual ~SIMPLE_TRIANGLE_BENDING_ELEMENTS();
 
     void Print_Number_Ignored(const bool print_number_ignored_input=true)
@@ -74,12 +74,12 @@ public:
 template<class T> SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>*
 Create_Simple_Bending_Elements(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& mesh,BINDING_LIST<VECTOR<T,3> >& binding_list,const T stiffness=(T)1e-3,const T damping=(T)1e-3,
     const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=(T).1,const bool use_plasticity=false,const T plastic_yield=3,const T plastic_hardening=1,
-    const T cutoff_fraction_of_minimum_area=0,const T cutoff_fraction_of_triangles=0,const bool verbose=true,const bool implicit=false);
+    const T cutoff_fraction_of_minimum_area=0,const T cutoff_fraction_of_triangles=0,const bool verbose=true);
 
 template<class T> SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>*
 Create_Simple_Bending_Elements(TRIANGULATED_SURFACE<T>& triangulated_surface,BINDING_LIST<VECTOR<T,3> >& binding_list,const T stiffness=(T)1e-3,
     const T damping=(T)1e-3,const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=(T).1,const bool use_plasticity=false,const T plastic_yield=3,const T plastic_hardening=1,
-    const T cutoff_fraction_of_minimum_area=0,const T cutoff_fraction_of_triangles=0,const bool verbose=true,const bool implicit=false);
+    const T cutoff_fraction_of_minimum_area=0,const T cutoff_fraction_of_triangles=0,const bool verbose=true);
 
 }
 #endif

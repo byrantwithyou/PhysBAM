@@ -299,7 +299,7 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
     ARRAY<TV> V_n(particles.V);ARRAY<TWIST<TV> > twist_n(rigid_body_particles.twist);
     SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>* coupled_system=new SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>(fluids_parameters.use_preconditioner_for_slip_system,
         0,boundary_condition_collection,iterator_info,solid_body_collection,fluid_collection,density,centered_velocity,one_over_rho_c_squared,leakproof_solve,false,
-        fluids_parameters.use_coupled_implicit_viscosity);
+        fluids_parameters.use_coupled_implicit_viscosity,fully_implicit);
     coupled_system->index_map.two_phase=two_phase;
     fluids_parameters.callbacks->Substitute_Coupling_Matrices(*coupled_system,dt,current_velocity_time,current_position_time,velocity_update,leakproof_solve);
     BACKWARD_EULER_SYSTEM<TV>* solid_system=Setup_Solids(dt,current_velocity_time,current_position_time,velocity_update,leakproof_solve);

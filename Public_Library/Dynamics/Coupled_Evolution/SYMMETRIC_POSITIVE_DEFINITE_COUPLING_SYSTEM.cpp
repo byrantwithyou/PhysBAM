@@ -43,13 +43,13 @@ SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM(const bool use_preconditioner_input,
     IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>& boundary_condition_collection,UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info,
     const SOLID_BODY_COLLECTION<TV>& solid_body_collection,
     const FLUID_COLLECTION<TV>& fluid_collection,const ARRAY<T,TV_INT>& density_input,const ARRAY<TV,TV_INT>& centered_velocity_input,
-    const ARRAY<T,TV_INT>& one_over_rho_c_squared_input,const bool leakproof_solve_input,const bool using_slip,const bool using_viscosity)
+    const ARRAY<T,TV_INT>& one_over_rho_c_squared_input,const bool leakproof_solve_input,const bool using_slip,const bool using_viscosity,bool fully_implicit)
     :BASE(use_preconditioner_input,true),outside_fluid(boundary_condition_collection.psi_D),inactive_faces(boundary_condition_collection.psi_N),
     density(density_input),centered_velocity(centered_velocity_input),
     one_over_rho_c_squared(one_over_rho_c_squared_input),
     solid_system(solid_system_input),index_map(*new COLLISION_AWARE_INDEX_MAP<TV>(info,boundary_condition_collection)),
     solid_interpolation(0),fluid_gradient(0),fluid_poisson(0),solid_forces(0),fluid_interpolation(0),fluid_mass(0),fluid_viscous_forces(0),fluid_to_solid_interpolation(0),
-    leakproof_solve(leakproof_solve_input),dt(0),run_self_tests(false),print_poisson_matrix(false),print_matrix(false),print_rhs(false),
+    leakproof_solve(leakproof_solve_input),fully_implicit(fully_implicit),dt(0),run_self_tests(false),print_poisson_matrix(false),print_matrix(false),print_rhs(false),
     print_each_matrix(false),print_index_map(false),use_viscous_forces(using_viscosity),surface_tension_coefficient(0),
     solid_node(true),fluid_node(true),use_full_ic(false),mpi_solid_fluid(0),mpi_grid(0),debug_velocity(0)
 {

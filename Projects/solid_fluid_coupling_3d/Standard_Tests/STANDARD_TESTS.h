@@ -467,8 +467,9 @@ void Initialize_Bodies() override
         fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_surface),0,true);}
     else if(test_number==4 || test_number==5){
         TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
-        solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)5,(T)3,false,(T).1,true,(T)0,true,true));
-        solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,5/(1+sqrt((T)2)),(T)1,false,(T).1,true,(T)0,true,true));
+        solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)5,(T)3,false,(T).1,true,(T)0,true));
+        solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,5/(1+sqrt((T)2)),(T)1,false,(T).1,true,(T)0,true));
+        this->solids_evolution->fully_implicit=true;
 
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_surface);
         deformable_collisions.object.Initialize_Hierarchy();

@@ -42,7 +42,7 @@ Compute(const T dt_input,const T current_velocity_time_input)
     current_velocity_time=current_velocity_time_input;
 
     force_dof_counts.Resize(solid_body_collection.deformable_body_collection.deformables_forces.m);force_dof_counts.Fill(0);
-    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) if(solid_body_collection.deformable_body_collection.deformables_forces(k)->use_velocity_dependent_forces){
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++){
         PHYSBAM_ASSERT(solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces);
         force_dof_counts(k)=solid_body_collection.deformable_body_collection.deformables_forces(k)->Velocity_Dependent_Forces_Size();}
 
@@ -112,7 +112,7 @@ template<class TV> void MATRIX_SOLID_FORCES<TV>::
 Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<T,FORCE_AGGREGATE_ID> aggregate,const T time) const
 {
     FORCE_AGGREGATE_ID aggregate_size(0);
-    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) if(solid_body_collection.deformable_body_collection.deformables_forces(k)->use_velocity_dependent_forces){
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++){
         PHYSBAM_ASSERT(solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces);
         ARRAY_VIEW<T> single_force_aggregate=aggregate.Array_View(aggregate_size,force_dof_counts(k));
         aggregate_size+=force_dof_counts(k);
@@ -126,7 +126,7 @@ template<class TV> void MATRIX_SOLID_FORCES<TV>::
 Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T,FORCE_AGGREGATE_ID> aggregate,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const
 {
     FORCE_AGGREGATE_ID aggregate_size(0);
-    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) if(solid_body_collection.deformable_body_collection.deformables_forces(k)->use_velocity_dependent_forces){
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++){
         PHYSBAM_ASSERT(solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces);
         //ARRAY_VIEW<const T> single_force_aggregate=aggregate.Array_View(aggregate_size,single_aggregate_size);
         ARRAY_VIEW<const T> single_force_aggregate(force_dof_counts(k),aggregate.Get_Array_Pointer()+Value(aggregate_size));
@@ -206,13 +206,12 @@ template<class TV> void MATRIX_SOLID_FORCES<TV>::
 Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 {
     int offset=0;
-    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++)
-        if(solid_body_collection.deformable_body_collection.deformables_forces(k)->use_velocity_dependent_forces){
-            PHYSBAM_ASSERT(solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces);
-            int start=data.m;
-            solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Raw_Velocity_Dependent_Forces_First_Half(data);
-            for(int i=start;i<data.m;i++) data(i).x+=offset;
-            offset+=Value(force_dof_counts(k));}
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++){
+        PHYSBAM_ASSERT(solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces);
+        int start=data.m;
+        solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Raw_Velocity_Dependent_Forces_First_Half(data);
+        for(int i=start;i<data.m;i++) data(i).x+=offset;
+        offset+=Value(force_dof_counts(k));}
 
     // TODO: Correct indices for indirect mapping.
     PHYSBAM_ASSERT(solid_body_collection.deformable_body_collection.dynamic_particles.m==solid_body_collection.deformable_body_collection.particles.V.m);

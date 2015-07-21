@@ -13,8 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> DEFORMABLES_FORCES<TV>::
 DEFORMABLES_FORCES(DEFORMABLE_PARTICLES<TV>& particles)
-    :particles(particles),cfl_number((T)1),allow_external_cfl_number(true),cfl_initialized(false),use_velocity_independent_forces(true),
-    use_velocity_dependent_forces(true),use_force_differential(true),use_implicit_velocity_independent_forces(false),
+    :particles(particles),cfl_number((T)1),allow_external_cfl_number(true),cfl_initialized(false),
     unique_id(Get_Unique_Id()),compute_half_forces(false)
 {
     Use_Rest_State_For_Strain_Rate(false);
@@ -81,7 +80,6 @@ Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) co
 template<class TV> void DEFORMABLES_FORCES<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
 //#####################################################################
 // Function Enforce_Definiteness

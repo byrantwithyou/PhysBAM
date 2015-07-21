@@ -191,7 +191,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     BACKWARD_EULER_SYSTEM<TV> system(this,solid_body_collection,dt,current_velocity_time,current_position_time,
         solids_parameters.enforce_poststabilization_in_cg?&solid_body_collection.rigid_body_collection.articulated_rigid_body:0,
         (velocity_update && solids_parameters.enforce_repulsions_in_cg)?repulsions:0,mpi_solids,velocity_update,
-        (!velocity_update || !solids_parameters.implicit_solve_parameters.use_half_fully_implicit));
+        (!velocity_update || !solids_parameters.implicit_solve_parameters.use_half_fully_implicit) && fully_implicit);
 
     Prepare_Backward_Euler_System(system,dt,current_velocity_time,current_position_time,velocity_update);
 

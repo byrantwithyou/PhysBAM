@@ -2311,12 +2311,7 @@ void Initialize_Bodies() override
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
 
-    for(int i=0;i<solid_body_collection.solids_forces.m;i++)
-        solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
-        solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
-    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++)
-        deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    solids_evolution->fully_implicit=true;
     for(int i=0;i<deformable_body_collection.deformables_forces.m;i++)
         if(COLLISION_FORCE<TV>* cf=dynamic_cast<COLLISION_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(i)))
             cf->coefficient_of_friction=input_friction;
@@ -2740,7 +2735,6 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     if(damping*damping_multiplier){
         DEFORMABLES_FORCES<TV>* force=Create_Finite_Volume(tetrahedralized_volume,new COROTATED_FIXED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier));
-        force->use_implicit_velocity_independent_forces=true;
         force->Update_Position_Based_State(0,true,true);
         solid_body_collection.Add_Force(new RALEIGH_DAMPING_FORCE<TV>(particles,force,damping*damping_multiplier,1,save_dt));}
 }

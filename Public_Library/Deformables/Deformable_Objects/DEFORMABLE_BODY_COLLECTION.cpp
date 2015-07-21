@@ -17,7 +17,6 @@
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <Deformables/Forces/BINDING_SPRINGS.h>
 #include <Deformables/Forces/DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
@@ -326,7 +325,8 @@ template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,const T time) const
 {
     assert(F_full.Size()==particles.Size());
-    for(int k=0;k<deformables_forces.m;k++) if(deformables_forces(k)->use_velocity_independent_forces) deformables_forces(k)->Add_Velocity_Independent_Forces(F_full,time);
+    for(int k=0;k<deformables_forces.m;k++)
+        deformables_forces(k)->Add_Velocity_Independent_Forces(F_full,time);
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -336,7 +336,8 @@ template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T time) const
 {
     assert(F_full.Size()==particles.Size());
-    for(int k=0;k<deformables_forces.m;k++) if(deformables_forces(k)->use_velocity_dependent_forces) deformables_forces(k)->Add_Velocity_Dependent_Forces(V_full,F_full,time);
+    for(int k=0;k<deformables_forces.m;k++)
+        deformables_forces(k)->Add_Velocity_Dependent_Forces(V_full,F_full,time);
 }
 //#####################################################################
 // Function Implicit_Velocity_Independent_Forces
@@ -346,8 +347,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<
 {
     assert(V_full.Size()==particles.Size() && F_full.Size()==particles.Size());
     for(int k=0;k<deformables_forces.m;k++)
-        if(deformables_forces(k)->use_implicit_velocity_independent_forces)
-            deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,time);
+        deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,time);
 }
 //#####################################################################
 // Function Add_Force

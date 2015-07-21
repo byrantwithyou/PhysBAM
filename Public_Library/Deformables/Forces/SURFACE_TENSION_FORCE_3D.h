@@ -25,7 +25,6 @@ public:
     ARRAY<TV> normals;
     T dt;
     bool apply_explicit_forces;
-    bool use_velocity_independent_implicit_forces;
 
     SURFACE_TENSION_FORCE_3D(TRIANGULATED_SURFACE<T>& surface_input,T surface_tension_coefficient_input);
     virtual ~SURFACE_TENSION_FORCE_3D();

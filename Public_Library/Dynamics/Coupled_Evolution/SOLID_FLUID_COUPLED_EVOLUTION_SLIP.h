@@ -43,6 +43,7 @@ protected:
     using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::B_full;using BASE::rigid_B_full;
     using BASE::repulsions;using BASE::rigids_evolution_callbacks;using BASE::rigid_body_collisions;
     using FLUID_BASE::p;using FLUID_BASE::poisson;using BASE::Prepare_Backward_Euler_System;using BASE::krylov_vectors;
+    using BASE::fully_implicit;
 
     COUPLED_SYSTEM_VECTOR<TV> coupled_x,coupled_b;
 

@@ -22,7 +22,7 @@ class RIGID_LINEAR_SPRINGS:public RIGIDS_FORCES<TV>
 public:
     typedef RIGIDS_FORCES<TV> BASE;
     using BASE::Invalidate_CFL;using BASE::cfl_number;using BASE::rigid_body_collection;
-    using BASE::max_strain_per_time_step;using BASE::use_rest_state_for_strain_rate;using BASE::use_implicit_velocity_independent_forces;
+    using BASE::max_strain_per_time_step;using BASE::use_rest_state_for_strain_rate;
     typedef typename FORCE_ELEMENTS::ITERATOR SEGMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 

@@ -68,7 +68,7 @@ public:
     using BASE::stream_type;using BASE::data_directory;using BASE::solid_body_collection;using BASE::Adjust_Phi_With_Source;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::test_number;using BASE::mpi_world;using BASE::resolution;
-    using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::Add_To_Fluid_Simulation;using BASE::Add_Thin_Shell_To_Fluid_Simulation;
+    using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::Add_To_Fluid_Simulation;using BASE::Add_Thin_Shell_To_Fluid_Simulation;using BASE::solids_evolution;
 
     WATER_STANDARD_TESTS_3D<TV> water_tests;
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
@@ -999,9 +999,9 @@ void Initialize_Bodies() override
             //solid_body_collection.Add_Force(Create_Tet_Springs(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume,stiffness_ratio*10,(T)3));
             bool limit_time_step_by_strain_rate=false;
             solid_body_collection.Add_Force(Create_Edge_Springs(tetrahedralized_volume,stiffness_ratio*20,(T)3,
-                limit_time_step_by_strain_rate,(T).5,true,(T)0,true,implicit_springs));
+                limit_time_step_by_strain_rate,(T).5,true,(T)0,true));
             solid_body_collection.Add_Force(Create_Tet_Springs(tetrahedralized_volume,stiffness_ratio*10,(T)3,
-                limit_time_step_by_strain_rate,(T).1,true,(T).5,true,(T)0,true,implicit_springs));
+                limit_time_step_by_strain_rate,(T).1,true,(T).5,true,(T)0,true));
             deformable_objects_to_simulate.Append(new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(tetrahedralized_volume.Get_Boundary_Object()));
             break;}
         case 7:
@@ -1009,16 +1009,18 @@ void Initialize_Bodies() override
         case 16:
         case 17:{
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
-            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,10/(1+sqrt((T)2)),(T)15,false,(T).1,true,(T)0,true,true));
-            solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,10/(1+sqrt((T)2)),(T)15,false,(T).1,true,(T)0,true,true));
+            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,10/(1+sqrt((T)2)),(T)15,false,(T).1,true,(T)0,true));
+            solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,10/(1+sqrt((T)2)),(T)15,false,(T).1,true,(T)0,true));
             deformable_objects_to_simulate.Append(new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_surface));
+            implicit_springs=true;
             break;}
         case 8:
         case 11:{
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
-            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)6e3,(T)5,false,(T).1,true,(T)0,true,true));
-            solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,10/(1+sqrt((T)2)),(T)15,false,(T).1,true,(T)0,true,true));
+            solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)6e3,(T)5,false,(T).1,true,(T)0,true));
+            solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,10/(1+sqrt((T)2)),(T)15,false,(T).1,true,(T)0,true));
             deformable_objects_to_simulate.Append(new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_surface));
+            implicit_springs=true;
             break;}
         case 9:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
@@ -1057,6 +1059,8 @@ void Initialize_Bodies() override
         default: ground=&solids_tests.Add_Ground();break;}
     if(ground){
         if(test_number==9) rigid_bodies_to_collide_against.Append(ground->particle_index);}
+
+    solids_evolution->fully_implicit=implicit_springs;
 
     // collide structures with the ground and walls only
     if(test_number==9){

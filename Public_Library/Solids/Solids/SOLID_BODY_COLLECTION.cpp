@@ -14,7 +14,6 @@
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISIONS.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
-#include <Deformables/Forces/BINDING_SPRINGS.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
@@ -90,11 +89,12 @@ template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const
 {
     assert(F_full.Size()==deformable_body_collection.particles.Size());
-    for(int k=0;k<solids_forces.m;k++) if(solids_forces(k)->use_velocity_independent_forces) solids_forces(k)->Add_Velocity_Independent_Forces(F_full,rigid_F_full,time);
+    for(int k=0;k<solids_forces.m;k++)
+        solids_forces(k)->Add_Velocity_Independent_Forces(F_full,rigid_F_full,time);
     for(int k=0;k<rigid_body_collection.rigids_forces.m;k++)
-        if(rigid_body_collection.rigids_forces(k)->use_velocity_independent_forces) rigid_body_collection.rigids_forces(k)->Add_Velocity_Independent_Forces(rigid_F_full,time);
+        rigid_body_collection.rigids_forces(k)->Add_Velocity_Independent_Forces(rigid_F_full,time);
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++)
-        if(deformable_body_collection.deformables_forces(k)->use_velocity_independent_forces) deformable_body_collection.deformables_forces(k)->Add_Velocity_Independent_Forces(F_full,time);
+        deformable_body_collection.deformables_forces(k)->Add_Velocity_Independent_Forces(F_full,time);
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -104,11 +104,12 @@ template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const
 {
     assert(F_full.Size()==deformable_body_collection.particles.Size());
-    for(int k=0;k<solids_forces.m;k++) if(solids_forces(k)->use_velocity_dependent_forces) solids_forces(k)->Add_Velocity_Dependent_Forces(V_full,rigid_V_full,F_full,rigid_F_full,time);
+    for(int k=0;k<solids_forces.m;k++)
+        solids_forces(k)->Add_Velocity_Dependent_Forces(V_full,rigid_V_full,F_full,rigid_F_full,time);
     for(int k=0;k<rigid_body_collection.rigids_forces.m;k++)
-        if(rigid_body_collection.rigids_forces(k)->use_velocity_dependent_forces) rigid_body_collection.rigids_forces(k)->Add_Velocity_Dependent_Forces(rigid_V_full,rigid_F_full,time);
+        rigid_body_collection.rigids_forces(k)->Add_Velocity_Dependent_Forces(rigid_V_full,rigid_F_full,time);
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++)
-        if(deformable_body_collection.deformables_forces(k)->use_velocity_dependent_forces) deformable_body_collection.deformables_forces(k)->Add_Velocity_Dependent_Forces(V_full,F_full,time);
+        deformable_body_collection.deformables_forces(k)->Add_Velocity_Dependent_Forces(V_full,F_full,time);
 }
 //#####################################################################
 // Function Implicit_Velocity_Independent_Forces
@@ -120,14 +121,11 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<
     assert(V_full.Size()==deformable_body_collection.particles.Size() && F_full.Size()==deformable_body_collection.particles.Size());
     assert(rigid_F_full.Size()==rigid_body_collection.rigid_body_particles.Size());
     for(int k=0;k<solids_forces.m;k++)
-        if(solids_forces(k)->use_implicit_velocity_independent_forces)
-            solids_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,rigid_V_full,F_full,rigid_F_full,time);
+        solids_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,rigid_V_full,F_full,rigid_F_full,time);
     for(int k=0;k<rigid_body_collection.rigids_forces.m;k++)
-        if(rigid_body_collection.rigids_forces(k)->use_implicit_velocity_independent_forces)
-            rigid_body_collection.rigids_forces(k)->Add_Implicit_Velocity_Independent_Forces(rigid_V_full,rigid_F_full,time);
+        rigid_body_collection.rigids_forces(k)->Add_Implicit_Velocity_Independent_Forces(rigid_V_full,rigid_F_full,time);
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++)
-        if(deformable_body_collection.deformables_forces(k)->use_implicit_velocity_independent_forces)
-            deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,time);
+        deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,time);
 }
 //#####################################################################
 // Function Force_Differential
@@ -138,8 +136,7 @@ Force_Differential(ARRAY_VIEW<const TV> dX_full,ARRAY_VIEW<TV> dF_full,const T t
     assert(dX_full.Size()==deformable_body_collection.particles.Size() && dF_full.Size()==deformable_body_collection.particles.Size());
     dF_full.Subset(deformable_body_collection.simulated_particles).Fill(TV());
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++)
-        if(deformable_body_collection.deformables_forces(k)->use_force_differential)
-            deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(dX_full,dF_full,time);
+        deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(dX_full,dF_full,time);
 }
 //#####################################################################
 // Function Enforce_Definiteness
@@ -148,7 +145,7 @@ template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Enforce_Definiteness(const bool enforce_definiteness_input)
 {
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++)
-        if(deformable_body_collection.deformables_forces(k)->use_force_differential) deformable_body_collection.deformables_forces(k)->Enforce_Definiteness(enforce_definiteness_input);
+        deformable_body_collection.deformables_forces(k)->Enforce_Definiteness(enforce_definiteness_input);
 }
 //#####################################################################
 // Function Update_CFL
@@ -232,24 +229,6 @@ CFL_Strain_Rate()
     for(int k=0;k<solids_forces.m;k++) if(solids_forces(k)->limit_time_step_by_strain_rate) dt_strain=min(dt_strain,solids_forces(k)->CFL_Strain_Rate()); // otherwise not included
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++) if(deformable_body_collection.deformables_forces(k)->limit_time_step_by_strain_rate) dt_strain=min(dt_strain,deformable_body_collection.deformables_forces(k)->CFL_Strain_Rate()); // otherwise not included
     return dt_strain;
-}
-//#####################################################################
-// Function Disable_Finite_Volume_Damping
-//#####################################################################
-template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Disable_Finite_Volume_Damping()
-{
-    for(int k=0;k<deformable_body_collection.deformables_forces.m;k++){DEFORMABLES_FORCES<TV>* force=deformable_body_collection.deformables_forces(k);
-        if(dynamic_cast<FINITE_VOLUME_TAG*>(force)) force->use_velocity_dependent_forces=false;}
-}
-//#####################################################################
-// Function Disable_Spring_Elasticity
-//#####################################################################
-template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Disable_Spring_Elasticity()
-{
-    for(int k=0;k<deformable_body_collection.deformables_forces.m;k++){DEFORMABLES_FORCES<TV>* force=deformable_body_collection.deformables_forces(k);
-        if(dynamic_cast<SPRINGS_TAG*>(force)) force->use_velocity_independent_forces=false;}
 }
 //#####################################################################
 // Function Compute_Linear_Momentum 

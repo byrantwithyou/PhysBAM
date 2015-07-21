@@ -1299,6 +1299,7 @@ void Initialize_Bodies() override
         case 14:
         case 22:
         case 45:{
+            fully_implicit=true;
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             if(triangulated_surface.mesh.elements.m != cloth_triangles){
                 LOG::cerr<<"we got "<<triangulated_surface.mesh.elements.m<<" and expected "<<cloth_triangles<<" with side_length="<<side_length<<std::endl;
@@ -1317,10 +1318,10 @@ void Initialize_Bodies() override
                 if(!no_altitude_springs) solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
                 TRIANGLE_BENDING_ELEMENTS<T>* bend=Create_Bending_Elements(triangulated_surface);
                 bend->Set_Area_Cutoff_From_Triangulated_Surface(triangulated_surface,(T).1);
-                bend->use_force_differential=false;
                 solid_body_collection.Add_Force(bend);}
             break;}
         case 30:{
+            fully_implicit=true;
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
@@ -1419,8 +1420,8 @@ void Initialize_Bodies() override
                     if(!no_altitude_springs) solid_body_collection.Add_Force(Create_Altitude_Springs(triangulated_surface,stiffness_multiplier*2*4/(1+sqrt((T)2)),damping_multiplier*4));
                     TRIANGLE_BENDING_ELEMENTS<T>* bend=Create_Bending_Elements(triangulated_surface);
                     bend->Set_Area_Cutoff_From_Triangulated_Surface(triangulated_surface,(T).1);
-                    bend->use_force_differential=false;
                     solid_body_collection.Add_Force(bend);}}
+            fully_implicit=true;
             break;}
         case 20:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
@@ -1513,8 +1514,10 @@ void Initialize_Bodies() override
             solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
             T axial_bending_stiffness=axial_bending_stiffness_multiplier*2/(1+sqrt((T)2)),axial_bending_damping=axial_bending_damping_multiplier*8;
             solid_body_collection.Add_Force(Create_Axial_Bending_Springs(triangulated_surface,(T).01,axial_bending_stiffness,axial_bending_damping));
+            fully_implicit=true;
             break;}
         case 48:{
+            fully_implicit=true;
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             tests.Add_Gravity();
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
@@ -1620,10 +1623,7 @@ void Initialize_Bodies() override
             DEFORMABLES_FORCES<TV>* edge_springs=Create_Edge_Springs(tetrahedralized_volume,(T)linear_stiffness/(1+sqrt((T)2)),(T)linear_damping);
             solid_body_collection.Add_Force(edge_springs);}}
 
-    if(fully_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(fully_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
-        solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(fully_implicit) for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    solids_evolution->fully_implicit=fully_implicit;
 }
 //#####################################################################
 // Function Read_Output_Files_Solids

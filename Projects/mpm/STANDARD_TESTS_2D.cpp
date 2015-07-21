@@ -257,7 +257,6 @@ Initialize()
                 LOG::cout<<sc->mesh.elements(n)<<std::endl;}
             SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*sc,[=](const TV& X){return TV(0.0,0);},0,density,true);
             SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)0.01);
-            stf->use_velocity_independent_implicit_forces=true;
             Add_Force(*stf);
         } break;
         case 14:{ // test dynamic changing lagrangian mesh (in Begin_Frame)
@@ -335,7 +334,7 @@ Initialize()
                 sc->mesh.elements.Append(TV_INT(n,n+1));}
             sc->particles.X(N-1)=E;
             SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*sc,[=](const TV& X){return TV(0.0,0);},0,density,true);
-            LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,new_sc.mesh,true);
+            LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,new_sc.mesh);
             stf->Set_Restlength_From_Particles();
             stf->Set_Stiffness((T)10);
             stf->Set_Damping((T)0);
@@ -553,7 +552,6 @@ Begin_Time_Step(const T time)
 
 
             SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)1e-2);
-            stf->use_velocity_independent_implicit_forces=true;
             Add_Force(*stf);
 
             // Dump_Surface(new_sc,VECTOR<T,3>(1,1,0)); 

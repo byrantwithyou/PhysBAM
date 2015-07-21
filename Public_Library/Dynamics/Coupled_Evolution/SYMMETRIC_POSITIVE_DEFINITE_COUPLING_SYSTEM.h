@@ -67,6 +67,7 @@ public:
 protected:
 
     const bool leakproof_solve;
+    bool fully_implicit;
     T dt;
 
     mutable ARRAY<T,COUPLING_CONSTRAINT_ID> coupling_faces;
@@ -109,7 +110,7 @@ public:
         IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>& boundary_condition_collection,UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info,
         const SOLID_BODY_COLLECTION<TV>& solid_body_collection,
         const FLUID_COLLECTION<TV>& fluid_collection,const ARRAY<T,TV_INT>& density_input,const ARRAY<TV,TV_INT>& centered_velocity_input,
-        const ARRAY<T,TV_INT>& one_over_rho_c_squared_input,const bool leakproof_solve_input,const bool using_slip,const bool using_viscosity);
+        const ARRAY<T,TV_INT>& one_over_rho_c_squared_input,const bool leakproof_solve_input,const bool using_slip,const bool using_viscosity,bool fully_implicit);
 
     virtual ~SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM();
 

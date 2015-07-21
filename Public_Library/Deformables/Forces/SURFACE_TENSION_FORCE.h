@@ -27,7 +27,6 @@ public:
     T dt;
     bool apply_explicit_forces;
     bool apply_implicit_forces;
-    bool use_velocity_independent_implicit_forces;
 
     SURFACE_TENSION_FORCE(SEGMENTED_CURVE_2D<T>& surface_input,T surface_tension_coefficient_input);
     virtual ~SURFACE_TENSION_FORCE();

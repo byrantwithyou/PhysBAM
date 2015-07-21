@@ -311,7 +311,6 @@ Initialize()
             LOG::cout<<"Read mesh "<<surface->particles.number<<std::endl;
             TRIANGULATED_SURFACE<T>& new_sc=Seed_Lagrangian_Particles(*surface,[=](const TV& X){return TV();},0,density,true);
             SURFACE_TENSION_FORCE_3D<TV>* stf=new SURFACE_TENSION_FORCE_3D<TV>(new_sc,(T).1);
-            stf->use_velocity_independent_implicit_forces=true;
             // stf->Test_Diff((T)0);
             Add_Force(*stf);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
@@ -455,7 +454,6 @@ Begin_Frame(const int frame)
                 steal.Append(m);}
 
             SURFACE_TENSION_FORCE_3D<TV>* stf=new SURFACE_TENSION_FORCE_3D<TV>(new_sc,(T)0.01);
-            stf->use_velocity_independent_implicit_forces=true;
             Add_Force(*stf);
 
         } break;
@@ -562,7 +560,6 @@ Begin_Time_Step(const T time)
     //             steal.Append(m);}
 
     //         SURFACE_TENSION_FORCE_3D<TV>* stf=new SURFACE_TENSION_FORCE_3D<TV>(new_sc,(T)0.01);
-    //         stf->use_velocity_independent_implicit_forces=true;
     //         Add_Force(*stf);
 
     //     } break;

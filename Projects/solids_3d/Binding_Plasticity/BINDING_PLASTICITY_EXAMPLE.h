@@ -332,7 +332,6 @@ void Initialize_Bodies() override
     solid_body_collection.Add_Force(Create_Edge_Springs(embedding.material_surface,(T)1e4,(T)1));
     TRIANGLE_BENDING_ELEMENTS<T>* bend=Create_Bending_Elements(embedding.material_surface,(T)1e4);
     bend->Set_Area_Cutoff_From_Triangulated_Surface(embedding.material_surface,(T).1);
-    bend->use_force_differential=false;
     solid_body_collection.Add_Force(bend);
 
     solid_body_collection.Update_Simulated_Particles();

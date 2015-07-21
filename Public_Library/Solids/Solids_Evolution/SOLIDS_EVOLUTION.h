@@ -37,6 +37,7 @@ public:
     RIGID_DEFORMABLE_COLLISIONS<TV>* rigid_deformable_collisions;
     T time;
     SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks;
+    bool fully_implicit;
 protected:
     ARRAY<KRYLOV_VECTOR_BASE<T>*> krylov_vectors;
     ARRAY<TV> B_full;

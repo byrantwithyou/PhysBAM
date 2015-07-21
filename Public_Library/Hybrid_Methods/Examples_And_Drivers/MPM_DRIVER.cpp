@@ -853,9 +853,8 @@ Update_Simulated_Particles()
     example.particle_is_simulated.Resize(example.particles.X.m);
     example.particle_is_simulated.Subset(example.simulated_particles).Fill(true);
 
-    for(int i=0;i<example.lagrangian_forces.m;i++){
-        example.lagrangian_forces(i)->use_implicit_velocity_independent_forces=true;
-        example.lagrangian_forces(i)->Update_Mpi(example.particle_is_simulated,0);}
+    for(int i=0;i<example.lagrangian_forces.m;i++)
+        example.lagrangian_forces(i)->Update_Mpi(example.particle_is_simulated,0);
 }
 //#####################################################################
 // Function Print_Grid_Stats

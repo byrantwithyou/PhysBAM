@@ -13,8 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> RIGIDS_FORCES<TV>::
 RIGIDS_FORCES(RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
-    :rigid_body_collection(rigid_body_collection),cfl_number((T)1),allow_external_cfl_number(true),cfl_initialized(false),use_velocity_independent_forces(true),
-    use_velocity_dependent_forces(true),use_force_differential(true),use_implicit_velocity_independent_forces(false),
+    :rigid_body_collection(rigid_body_collection),cfl_number((T)1),allow_external_cfl_number(true),cfl_initialized(false),
     unique_id(Get_Unique_Id()),compute_half_forces(false)
 {
     Use_Rest_State_For_Strain_Rate(false);
@@ -61,7 +60,6 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
 template<class TV> void RIGIDS_FORCES<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {
-    PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
 template<class TV> void RIGIDS_FORCES<TV>::
 Enforce_Definiteness(const bool enforce_definiteness_input)

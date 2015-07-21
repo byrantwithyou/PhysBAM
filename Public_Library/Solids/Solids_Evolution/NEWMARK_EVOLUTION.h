@@ -26,12 +26,14 @@ class NEWMARK_EVOLUTION:public SOLIDS_EVOLUTION<TV>
     typedef SOLIDS_EVOLUTION<TV> BASE;
     enum WORKAROUND {d=TV::m};
 protected:
-    using BASE::B_full;using BASE::rigid_B_full;using BASE::Save_Position;using BASE::Restore_Position;using BASE::krylov_vectors;
-    using BASE::rigid_deformable_collisions;using BASE::world_space_rigid_mass;using BASE::world_space_rigid_mass_inverse;using BASE::time;
+    using BASE::B_full;using BASE::rigid_B_full;using BASE::Save_Position;using BASE::Restore_Position;
+    using BASE::krylov_vectors;using BASE::rigid_deformable_collisions;using BASE::world_space_rigid_mass;
+    using BASE::world_space_rigid_mass_inverse;using BASE::time;
 public:
     using BASE::solid_body_collection;using BASE::Euler_Step_Position;using BASE::Set_External_Velocities;
-    using BASE::Clamp_Velocities;using BASE::solids_evolution_callbacks;using BASE::rigid_body_collisions;using BASE::Initialize_World_Space_Masses;
-    using BASE::solids_parameters;using BASE::kinematic_evolution;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::example_forces_and_velocities;
+    using BASE::Clamp_Velocities;using BASE::solids_evolution_callbacks;using BASE::rigid_body_collisions;
+    using BASE::Initialize_World_Space_Masses;using BASE::solids_parameters;using BASE::kinematic_evolution;
+    using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::example_forces_and_velocities;using BASE::fully_implicit;
 
     RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>& rigids_evolution_callbacks;
     TRIANGLE_REPULSIONS<TV>* repulsions;

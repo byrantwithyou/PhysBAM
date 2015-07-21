@@ -17,8 +17,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>::
-SIMPLE_TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,BINDING_LIST<TV>& binding_list_input,bool implicit)
-    :LINEAR_SPRINGS<TV>(particles,spring_connectivity,implicit),
+SIMPLE_TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,BINDING_LIST<TV>& binding_list_input)
+    :LINEAR_SPRINGS<TV>(particles,spring_connectivity),
     bending_quadruples(bending_quadruples_default),binding_list(binding_list_input)
 {
     Print_Number_Ignored();
@@ -28,8 +28,8 @@ SIMPLE_TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,BINDING_LIS
 // Constructor
 //#####################################################################
 template<class T> SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>::
-SIMPLE_TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,ARRAY<VECTOR<int,4> >& bending_quadruples_input,BINDING_LIST<TV>& binding_list_input,bool implicit)
-    :LINEAR_SPRINGS<TV>(particles,spring_connectivity,implicit),bending_quadruples(bending_quadruples_input),bending_stiffness(bending_quadruples_input.m),
+SIMPLE_TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,ARRAY<VECTOR<int,4> >& bending_quadruples_input,BINDING_LIST<TV>& binding_list_input)
+    :LINEAR_SPRINGS<TV>(particles,spring_connectivity),bending_quadruples(bending_quadruples_input),bending_stiffness(bending_quadruples_input.m),
     damping(bending_quadruples_input.m),binding_list(binding_list_input)
 {
     Print_Number_Ignored();
@@ -176,9 +176,9 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class T> SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>* PhysBAM::
 Create_Simple_Bending_Elements(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& mesh,BINDING_LIST<VECTOR<T,3> >& binding_list,const T stiffness/*=(T)1e-3*/,const T damping/*=(T)1e-3*/,
     const bool limit_time_step_by_strain_rate/*=true*/,const T max_strain_per_time_step/*=(T).1*/,const bool use_plasticity/*=false*/,const T plastic_yield/*=3*/,const T plastic_hardening/*=1*/,
-    const T cutoff_fraction_of_minimum_area/*=0*/,const T cutoff_fraction_of_triangles/*=0*/,const bool verbose/*=true*/,const bool implicit/*=false*/)
+    const T cutoff_fraction_of_minimum_area/*=0*/,const T cutoff_fraction_of_triangles/*=0*/,const bool verbose/*=true*/)
 {
-    SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>* bend=new SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>(particles,binding_list,implicit);
+    SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>* bend=new SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>(particles,binding_list);
     bend->Set_Quadruples_From_Triangle_Mesh(mesh);
     bend->Set_Constants_From_Particles(stiffness,damping);
     bend->Limit_Time_Step_By_Strain_Rate(limit_time_step_by_strain_rate,max_strain_per_time_step);
@@ -188,17 +188,17 @@ Create_Simple_Bending_Elements(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TRI
 template<class T> SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>* PhysBAM::
 Create_Simple_Bending_Elements(TRIANGULATED_SURFACE<T>& triangulated_surface,BINDING_LIST<VECTOR<T,3> >& binding_list,const T stiffness/*=(T)1e-3*/,
     const T damping/*=(T)1e-3*/,const bool limit_time_step_by_strain_rate/*=true*/,const T max_strain_per_time_step/*=(T).1*/,const bool use_plasticity/*=false*/,const T plastic_yield/*=3*/,const T plastic_hardening/*=1*/,
-    const T cutoff_fraction_of_minimum_area/*=0*/,const T cutoff_fraction_of_triangles/*=0*/,const bool verbose/*=true*/,const bool implicit/*=false*/)
+    const T cutoff_fraction_of_minimum_area/*=0*/,const T cutoff_fraction_of_triangles/*=0*/,const bool verbose/*=true*/)
 {
     return Create_Simple_Bending_Elements(dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles),triangulated_surface.mesh,binding_list,stiffness,damping,limit_time_step_by_strain_rate,max_strain_per_time_step,use_plasticity,
-        plastic_yield,plastic_hardening,cutoff_fraction_of_minimum_area,cutoff_fraction_of_triangles,verbose,implicit);
+        plastic_yield,plastic_hardening,cutoff_fraction_of_minimum_area,cutoff_fraction_of_triangles,verbose);
 }
 //#####################################################################
 namespace PhysBAM{
 template class SIMPLE_TRIANGLE_BENDING_ELEMENTS<float>;
 template SIMPLE_TRIANGLE_BENDING_ELEMENTS<float>* Create_Simple_Bending_Elements<float>(TRIANGULATED_SURFACE<float>&,BINDING_LIST<VECTOR<float,3> >&,float,float,bool,float,bool,
-    float,float,float,float,bool,bool);
+    float,float,float,float,bool);
 template class SIMPLE_TRIANGLE_BENDING_ELEMENTS<double>;
 template SIMPLE_TRIANGLE_BENDING_ELEMENTS<double>* Create_Simple_Bending_Elements<double>(TRIANGULATED_SURFACE<double>&,BINDING_LIST<VECTOR<double,3> >&,double,double,bool,double,bool,
-    double,double,double,double,bool,bool);
+    double,double,double,double,bool);
 }

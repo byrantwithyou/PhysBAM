@@ -391,9 +391,7 @@ void Initialize_Bodies() override
     for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->limit_time_step_by_strain_rate=false;
     for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
 
-    for(int i=0;i<rigid_body_collection.rigids_forces.m;i++) rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
-    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
-    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
+    solids_evolution->fully_implicit=fully_implicit;
 }
 //#####################################################################
 // Function Advance_One_Time_Step_End_Callback

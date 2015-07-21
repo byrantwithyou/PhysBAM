@@ -21,7 +21,7 @@ class LINEAR_SPRINGS:public DEFORMABLES_FORCES<TV>,public SPRINGS_TAG
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     using BASE::particles;using BASE::Invalidate_CFL;using BASE::cfl_number;
-    using BASE::max_strain_per_time_step;using BASE::use_rest_state_for_strain_rate;using BASE::use_implicit_velocity_independent_forces;using BASE::compute_half_forces;
+    using BASE::max_strain_per_time_step;using BASE::use_rest_state_for_strain_rate;using BASE::compute_half_forces;
     typedef typename FORCE_ELEMENTS::ITERATOR SEGMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
     typedef MATRIX<T,TV::dimension> T_MATRIX;
@@ -60,7 +60,7 @@ protected:
 
 public:
     FORCE_ELEMENTS force_segments;
-    LINEAR_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input,const bool implicit);
+    LINEAR_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input);
 
     virtual ~LINEAR_SPRINGS();
 
@@ -110,13 +110,13 @@ public:
 template<class TV> LINEAR_SPRINGS<TV>*
 Create_Edge_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness=2e3,
     const typename TV::SCALAR overdamping_fraction=1,const bool limit_time_step_by_strain_rate=true,const typename TV::SCALAR max_strain_per_time_step=.1,
-    const bool use_rest_state_for_strain_rate=true,const typename TV::SCALAR restlength_enlargement_fraction=0,const bool verbose=true,const bool implicit=false);
+    const bool use_rest_state_for_strain_rate=true,const typename TV::SCALAR restlength_enlargement_fraction=0,const bool verbose=true);
 
 template<class T_OBJECT> LINEAR_SPRINGS<typename T_OBJECT::VECTOR_T>*
 Create_Edge_Springs(T_OBJECT& object,
     const typename T_OBJECT::SCALAR stiffness=2e3,const typename T_OBJECT::SCALAR overdamping_fraction=1,const bool limit_time_step_by_strain_rate=true,
     const typename T_OBJECT::SCALAR max_strain_per_time_step=.1,const bool use_rest_state_for_strain_rate=true,const typename T_OBJECT::SCALAR restlength_enlargement_fraction=0,
-    const bool verbose=true,const bool implicit=false);
+    const bool verbose=true);
 
 }
 #endif

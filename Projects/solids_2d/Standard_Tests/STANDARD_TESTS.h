@@ -565,10 +565,7 @@ void Initialize_Bodies() override
                 LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}}
     solid_body_collection.Update_Simulated_Particles();
 
-    if(fully_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(fully_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
-        solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(fully_implicit) for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    solids_evolution->fully_implicit=fully_implicit;
 
     SOLIDS_EXAMPLE<TV>::Initialize_Bodies();
 }

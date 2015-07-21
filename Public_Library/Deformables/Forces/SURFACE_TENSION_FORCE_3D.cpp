@@ -13,7 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SURFACE_TENSION_FORCE_3D<TV>::
 SURFACE_TENSION_FORCE_3D(TRIANGULATED_SURFACE<T>& surface_input,T surface_tension_coefficient_input)
-    :BASE(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(surface_input.particles)),surface(surface_input),surface_tension_coefficient(surface_tension_coefficient_input),dt(0),apply_explicit_forces(true),use_velocity_independent_implicit_forces(false)
+    :BASE(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(surface_input.particles)),surface(surface_input),surface_tension_coefficient(surface_tension_coefficient_input),dt(0)
 {
 }
 //#####################################################################
@@ -29,7 +29,6 @@ template<class TV> SURFACE_TENSION_FORCE_3D<TV>::
 template<class TV> void SURFACE_TENSION_FORCE_3D<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    if(!apply_explicit_forces) return;
     for(int t=0;t<surface.mesh.elements.m;t++){
         TV_INT node=surface.mesh.elements(t);
         TV x0=surface.particles.X(node(0));
@@ -76,7 +75,6 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 template<class TV> void SURFACE_TENSION_FORCE_3D<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    if(!use_velocity_independent_implicit_forces) return;
     for(int t=0;t<surface.mesh.elements.m;t++){
         TV_INT node=surface.mesh.elements(t);
         TV x0=surface.particles.X(node(0));
@@ -169,11 +167,7 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 template<class TV> typename TV::SCALAR SURFACE_TENSION_FORCE_3D<TV>::
 Potential_Energy(const T time) const
 {
-    T pe=0;
-    if(apply_explicit_forces)
-        for(int i=0;i<surface.mesh.elements.m;i++)
-            pe+=surface_tension_coefficient*areas(i);
-    return pe;
+    return surface_tension_coefficient*areas.Sum();
 }
 //#####################################################################
 // Function Test_Diff

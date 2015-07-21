@@ -710,22 +710,24 @@ void Initialize_Bodies() override
             // Set up cloth forces
             SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
             segmented_curve.Initialize_Hierarchy();
-            solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)3e4,(T)1,false,(T).1,true,(T)0,true,true));
-            solid_body_collection.Add_Force(Create_Segment_Bending_Springs(segmented_curve,(T)2/(1+sqrt((T)2)),(T)2,false,(T).1,true,(T)0,true,true));
+            solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)3e4,(T)1,false,(T).1,true,(T)0,true));
+            solid_body_collection.Add_Force(Create_Segment_Bending_Springs(segmented_curve,(T)2/(1+sqrt((T)2)),(T)2,false,(T).1,true,(T)0,true));
             DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(segmented_curve);
 
             Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(heavy_sphere_index));
             Add_To_Fluid_Simulation(deformable_collisions);
             solids_tests.Add_Ground();
+            this->solids_evolution->fully_implicit=true;
             break;}
         case 8:{
             SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.structures(deformable_object_id));
             segmented_curve.Initialize_Hierarchy();
-            solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)2e3,(T)4,false,(T).1,true,(T)0,true,true));
-            solid_body_collection.Add_Force(Create_Segment_Bending_Springs(segmented_curve,(T)2/(1+sqrt((T)2)),(T)2,false,(T).1,true,(T)0,true,true));
+            solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)2e3,(T)4,false,(T).1,true,(T)0,true));
+            solid_body_collection.Add_Force(Create_Segment_Bending_Springs(segmented_curve,(T)2/(1+sqrt((T)2)),(T)2,false,(T).1,true,(T)0,true));
             DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(segmented_curve);
             Add_To_Fluid_Simulation(deformable_collisions);
             solids_tests.Add_Ground();
+            this->solids_evolution->fully_implicit=true;
             break;}
         case 9:{
             Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(heavy_sphere_index));

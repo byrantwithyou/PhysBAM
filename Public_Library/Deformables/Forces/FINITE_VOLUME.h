@@ -26,7 +26,7 @@ class FINITE_VOLUME:public DEFORMABLES_FORCES<TV>,public FINITE_VOLUME_TAG
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d>::OBJECT T_OBJECT;
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
-    using BASE::particles;using BASE::max_strain_per_time_step;using BASE::use_velocity_independent_forces;using BASE::use_velocity_dependent_forces;
+    using BASE::particles;using BASE::max_strain_per_time_step;
     using BASE::cfl_number;using BASE::compute_half_forces;
     typedef typename FORCE_ELEMENTS::ITERATOR FORCE_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;

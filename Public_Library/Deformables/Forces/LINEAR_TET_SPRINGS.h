@@ -19,7 +19,7 @@ class LINEAR_TET_SPRINGS:public DEFORMABLES_FORCES<VECTOR<T_input,3> >,public SP
     typedef VECTOR<T,3> TV;
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
-    using BASE::Invalidate_CFL;using BASE::particles;using BASE::use_rest_state_for_strain_rate;using BASE::max_strain_per_time_step;using BASE::use_implicit_velocity_independent_forces;
+    using BASE::Invalidate_CFL;using BASE::particles;using BASE::use_rest_state_for_strain_rate;using BASE::max_strain_per_time_step;
 protected:
     using BASE::cfl_number;
     enum WORKAROUND{spring_count=7};
@@ -81,7 +81,7 @@ public:
     for(int i=0;i<spring_parameters.m;i++) for(int s=0;s<spring_count;s++) spring_parameters(i)(s).restlength=max(spring_parameters(i)(s).visual_restlength,clamped_restlength);}
 
 //#####################################################################
-    LINEAR_TET_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRON_MESH& mesh,const bool implicit);
+    LINEAR_TET_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRON_MESH& mesh);
     virtual ~LINEAR_TET_SPRINGS(){}
     void Set_Restlength_From_Particles();
     void Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<const TV> material_coordinates);
@@ -104,11 +104,11 @@ public:
 template<class T> LINEAR_TET_SPRINGS<T>*
 Create_Tet_Springs(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TETRAHEDRON_MESH& mesh,const T stiffness,const T overdamping_fraction,
     const bool use_compressed_by_threshold_only=true,const T fraction_compression=(T).1,const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=(T).1,
-    const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true,const bool implicit=false);
+    const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true);
 
 template<class T> LINEAR_TET_SPRINGS<T>*
 Create_Tet_Springs(TETRAHEDRALIZED_VOLUME<T>& volume,const T stiffness,
     const T overdamping_fraction,const bool use_compressed_by_threshold_only=true,const T fraction_compression=(T).1,const bool limit_time_step_by_strain_rate=true,
-    const T max_strain_per_time_step=(T).1,const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true,const bool implicit=false);
+    const T max_strain_per_time_step=(T).1,const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true);
 }
 #endif

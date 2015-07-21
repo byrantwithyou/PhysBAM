@@ -23,6 +23,7 @@
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Forces_And_Torques/WIND_DRAG_3D.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include "HAIR_STRAND_TESTS.h"
 
 /* STRAND TESTS
@@ -176,19 +177,19 @@ Initialize_Bodies()
     bool strain_limit=false,use_implicit=false;
     solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
 
-    LINEAR_SPRINGS<TV>* edge_springs=Create_Edge_Springs(edges,edge_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
+    LINEAR_SPRINGS<TV>* edge_springs=Create_Edge_Springs(edges,edge_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true);
     edge_springs->Clamp_Restlength(restlength_clamp);
     solid_body_collection.Add_Force(edge_springs);
-    LINEAR_SPRINGS<TV>* extra_edge_springs=Create_Edge_Springs(extra_edges,edge_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
+    LINEAR_SPRINGS<TV>* extra_edge_springs=Create_Edge_Springs(extra_edges,edge_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true);
     extra_edge_springs->Clamp_Restlength(restlength_clamp);
     solid_body_collection.Add_Force(extra_edge_springs);
-    LINEAR_SPRINGS<TV>* bending_springs=Create_Edge_Springs(bending_edges,bending_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
+    LINEAR_SPRINGS<TV>* bending_springs=Create_Edge_Springs(bending_edges,bending_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true);
     bending_springs->Clamp_Restlength(restlength_clamp);
     solid_body_collection.Add_Force(bending_springs);
-    LINEAR_SPRINGS<TV>* torsion_springs=Create_Edge_Springs(torsion_edges,torsion_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
+    LINEAR_SPRINGS<TV>* torsion_springs=Create_Edge_Springs(torsion_edges,torsion_stiffness,overdamping_fraction,strain_limit,cfl_strain_rate,true,(T)0,true);
     torsion_springs->Clamp_Restlength(restlength_clamp);
     solid_body_collection.Add_Force(torsion_springs);
-    LINEAR_TET_SPRINGS<T> *tet_springs=Create_Tet_Springs(*volume,altitude_stiffness,overdamping_fraction,false,(T).1,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
+    LINEAR_TET_SPRINGS<T> *tet_springs=Create_Tet_Springs(*volume,altitude_stiffness,overdamping_fraction,false,(T).1,strain_limit,cfl_strain_rate,true,(T)0,true);
     tet_springs->Clamp_Restlength(restlength_clamp);
     solid_body_collection.Add_Force(tet_springs);
     // drag forces
@@ -245,6 +246,7 @@ Initialize_Bodies()
     for(int i=0;i<project_mesh.elements.m;i++){
         const VECTOR<int,2>& nodes=project_mesh.elements(i);
         project_restlengths(i)=(deformable_body_collection.particles.X(nodes[0])-deformable_body_collection.particles.X(nodes[1])).Magnitude();}
+    this->solids_evolution->fully_implicit=use_implicit;
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes

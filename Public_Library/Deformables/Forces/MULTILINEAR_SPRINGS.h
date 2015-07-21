@@ -32,7 +32,7 @@ public:
     ARRAY<T> correction_force;
 
     MULTILINEAR_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh)
-        :LINEAR_SPRINGS<TV>(particles,segment_mesh,false)
+        :LINEAR_SPRINGS<TV>(particles,segment_mesh)
     {}
 
     int Find_Interval(const T relative_deformation)

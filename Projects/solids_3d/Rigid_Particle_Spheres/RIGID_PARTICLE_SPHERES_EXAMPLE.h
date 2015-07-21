@@ -103,8 +103,7 @@ void Initialize_Bodies() override
     IMPLICIT_ZERO_LENGTH_SPRINGS<TV>& implicit_zero_rest_length_springs=*Create_Edge_Zero_Length_Springs(deformable_body_collection.particles,segment_mesh,stiffness,overdamping_fraction);
 /*    LINEAR_SPRINGS<TV>& implicit_zero_rest_length_springs=*Create_Edge_Springs(segment_mesh,deformable_body_collection.particles,stiffness,overdamping_fraction);
     ARRAY<T>::copy(0,implicit_zero_rest_length_springs.visual_restlength);implicit_zero_rest_length_springs.Clamp_Restlength(1);
-    implicit_zero_rest_length_springs.Set_Overdamping_Fraction(overdamping_fraction);
-    implicit_zero_rest_length_springs.use_implicit_velocity_independent_forces=true;*/
+    implicit_zero_rest_length_springs.Set_Overdamping_Fraction(overdamping_fraction);*/
 
     solid_body_collection.Add_Force(&implicit_zero_rest_length_springs);
 }

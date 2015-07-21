@@ -152,7 +152,6 @@ LINEAR_SPRINGS<TV>* Create_Zero_Length_Linear_Springs(const T youngs_modulus,con
         overdamping_fraction);
     ARRAY<T>::copy(0,spring_force->visual_restlength);spring_force->Clamp_Restlength(1);
     spring_force->Set_Overdamping_Fraction(overdamping_fraction);
-    spring_force->use_implicit_velocity_independent_forces=true;
     return spring_force;
 }
 //#####################################################################

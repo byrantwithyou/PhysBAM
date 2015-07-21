@@ -19,7 +19,6 @@ IMPLICIT_ZERO_LENGTH_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& s
     :DEFORMABLES_FORCES<TV>(particles),segment_mesh(segment_mesh_input)
 {
     Set_Stiffness(0);Set_Damping(0);
-    use_implicit_velocity_independent_forces=true;
 }
 template<class TV> IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 ~IMPLICIT_ZERO_LENGTH_SPRINGS()

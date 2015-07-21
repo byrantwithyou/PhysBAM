@@ -13,7 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SURFACE_TENSION_FORCE<TV>::
 SURFACE_TENSION_FORCE(SEGMENTED_CURVE_2D<T>& surface_input,T surface_tension_coefficient_input)
-    :BASE(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(surface_input.particles)),surface(surface_input),surface_tension_coefficient(surface_tension_coefficient_input),dt(0),apply_explicit_forces(true),apply_implicit_forces(true),use_velocity_independent_implicit_forces(false)
+    :BASE(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(surface_input.particles)),surface(surface_input),surface_tension_coefficient(surface_tension_coefficient_input),dt(0),apply_explicit_forces(true),apply_implicit_forces(true)
 {
 }
 //#####################################################################
@@ -72,11 +72,6 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class TV> void SURFACE_TENSION_FORCE<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    if(apply_implicit_forces)
-        for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
-            TV f=(TV::Dot_Product((V(k.x)-V(k.y)),normal(i))*coefficients(i)*dt)*normal(i);
-            F(k.x)-=f;
-            F(k.y)+=f;}
 }
 //#####################################################################
 // Function Add_Implicit_Velocity_Independent_Forces
@@ -85,11 +80,10 @@ template<class TV> void SURFACE_TENSION_FORCE<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     // this is different from Add_Velocity_Dependent_Forces because there is no dt in the formular
-    if(use_velocity_independent_implicit_forces)
-        for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
-            TV f=(TV::Dot_Product((V(k.x)-V(k.y)),normal(i))*coefficients(i))*normal(i);
-            F(k.x)-=f;
-            F(k.y)+=f;}
+    for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
+        TV f=(TV::Dot_Product((V(k.x)-V(k.y)),normal(i))*coefficients(i))*normal(i);
+        F(k.x)-=f;
+        F(k.y)+=f;}
 }
 //#####################################################################
 // Function Enforce_Definiteness

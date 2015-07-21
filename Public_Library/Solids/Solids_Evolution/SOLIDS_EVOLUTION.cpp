@@ -41,7 +41,7 @@ template<class TV> SOLIDS_EVOLUTION_CALLBACKS<TV> SOLIDS_EVOLUTION<TV>::solids_e
 template<class TV> SOLIDS_EVOLUTION<TV>::
 SOLIDS_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities)
     :solid_body_collection(solid_body_collection_input),solids_parameters(solids_parameters_input),rigid_body_collisions(0),rigid_deformable_collisions(0),time(0),
-    solids_evolution_callbacks(&solids_evolution_callbacks_default),
+    solids_evolution_callbacks(&solids_evolution_callbacks_default),fully_implicit(false),
     kinematic_evolution(solid_body_collection.rigid_body_collection,example_forces_and_velocities,solids_parameters.rigid_body_evolution_parameters.use_kinematic_keyframes),
     example_forces_and_velocities(example_forces_and_velocities)
 {}

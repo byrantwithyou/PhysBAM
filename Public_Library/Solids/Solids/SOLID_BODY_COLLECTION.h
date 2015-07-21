@@ -80,8 +80,6 @@ public:
     T CFL_Elastic();
     T CFL_Damping();
     T CFL_Strain_Rate();
-    void Disable_Finite_Volume_Damping();
-    void Disable_Spring_Elasticity();
     void Update_Simulated_Particles();
     void Delete_Forces();
     void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian);
