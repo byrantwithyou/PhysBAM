@@ -7,14 +7,18 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
+#include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Grids_Uniform_Computations/TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
+#include <Deformables/Forces/SURFACE_TENSION_FORCE_3D.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include "STANDARD_TESTS_3D.h"
 namespace PhysBAM{
@@ -23,7 +27,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-    :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),case11_w1(0),case11_w2(0)
+    :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),Nsurface(0),case11_w1(0),case11_w2(0)
 {
     parse_args.Add("-w1",&case11_w1,"angular velocity","initial angular speed of simulated object");
     parse_args.Add("-w2",&case11_w2,"angular velocity","initial angular speed of simulated object");
@@ -297,6 +301,31 @@ Initialize()
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity2);},density,particles_per_cell);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
+        case 12:{ // surface tension test: fixed topology circle shell
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-1.5,-1.5,-1.5),TV(1.5,1.5,1.5)),true);
+            T density=1*scale_mass;
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(.0f),data_directory+"/Rigid_Bodies/sphere.tri.gz",*surface);
+            LOG::cout<<"Read mesh "<<surface->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh "<<surface->particles.number<<std::endl;
+            TRIANGULATED_SURFACE<T>& new_sc=Seed_Lagrangian_Particles(*surface,[=](const TV& X){return TV();},0,density,true);
+            SURFACE_TENSION_FORCE_3D<TV>* stf=new SURFACE_TENSION_FORCE_3D<TV>(new_sc,(T).1);
+            stf->use_velocity_independent_implicit_forces=true;
+            // stf->Test_Diff((T)0);
+            Add_Force(*stf);
+            Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
+        } break;
+        case 13:{ // surface tension stuff
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            T density=2*scale_mass;
+            RANGE<TV> box(TV(.3,.3,.3),TV(.5,.5,.5));
+            Seed_Particles_Helper(box,[=](const TV& X){return TV();},0,density,particles_per_cell);
+            RANGE<TV> box2(TV(.5,.35,.35),TV(.8,.45,.45));
+            Seed_Particles_Helper(box2,[=](const TV& X){return TV();},0,density,particles_per_cell);
+            ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
+            bool no_mu=true;
+            Add_Fixed_Corotated(scale_E,0.3,&mpm_particles,no_mu);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
@@ -320,6 +349,96 @@ Begin_Frame(const int frame)
                 for(int k=old_m;k<old_m+case10_m;k++) mpm_particles.Append(k);
                 Add_Fixed_Corotated(150*scale_E,0.3,&mpm_particles);}
         } break;
+        case 13:{
+            // Delete old surface partcles and return stolen data
+            int N_non_surface=particles.number-Nsurface;
+            for(int k=N_non_surface;k<particles.number;k++){
+                particles.Add_To_Deletion_List(k);
+                int m=steal(k-N_non_surface);
+                particles.mass(m)+=particles.mass(k);
+                particles.volume(m)+=particles.volume(k);
+                // particles.X(m)=(particles.X(m)+particles.X(k))*0.5;
+                particles.V(m)=(particles.V(m)+particles.V(k))*0.5;
+                if(use_affine) particles.B(m)=(particles.B(m)+particles.B(k))*0.5;}
+            LOG::cout<<"deleting "<<Nsurface<<" particles..."<<std::endl;
+            particles.Delete_Elements_On_Deletion_List();
+            lagrangian_forces.Delete_Pointers_And_Clean_Memory();
+            this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+
+            // Create surface
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+
+            // Mass isocontour approach
+            // T avgmass=0;
+            // for(int k=0;k<particles.number;k++)
+            //     avgmass+=particles.mass(k);
+            // avgmass/=(T)particles.number;
+            // MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,avgmass*.4);
+
+            // Blobby approach
+            T r=grid.DX()(0)*.8;
+            GRID<TV> lsgrid; lsgrid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box());
+            ARRAY<T,TV_INT> phi;
+            phi.Resize(lsgrid.Domain_Indices(ghost));
+            phi.Fill(FLT_MAX);
+            for(int k=0;k<particles.number;k++){
+                TV Xp=particles.X(k);
+                TV_INT cell=lsgrid.Cell(Xp,ghost);
+                for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT()-3,TV_INT()+7));it.Valid();it.Next()){
+                    TV_INT index=cell+it.index;
+                    TV Xi=lsgrid.Node(index);
+                    T d=(Xi-Xp).Magnitude();
+                    if(d<phi(index)) phi(index)=d;}}
+            for(int i=0;i<phi.array.m;i++) phi.array(i)-=r;
+            MARCHING_CUBES<TV>::Create_Surface(*surface,lsgrid,phi,0);
+
+            // Dump_Surface(*surface,VECTOR<T,3>(1,1,0)); 
+
+            // DEBUG
+            T min_marching_length=FLT_MAX;
+            for(int k=0;k<surface->mesh.elements.m;k++){
+                TV A=surface->particles.X(surface->mesh.elements(k).x);
+                TV B=surface->particles.X(surface->mesh.elements(k).y);
+                TV C=surface->particles.X(surface->mesh.elements(k).z);
+                T d=(A-B).Magnitude();
+                d=max(d,(C-B).Magnitude());
+                d=max(d,(C-A).Magnitude());
+                min_marching_length=min(min_marching_length,d);}
+            LOG::cout<<"MIN MARCHING LENGTH: " <<min_marching_length<<std::endl;
+
+            // Seed particles
+            int Nold=particles.number;
+            Nsurface=surface->particles.number;
+            LOG::cout<<"adding "<<Nsurface<<" particles..."<<std::endl;
+            T density=(T)1;
+            TRIANGULATED_SURFACE<T>& new_sc=Seed_Lagrangian_Particles(*surface,0,0,density,true);
+
+            // Steal data
+            steal.Clean_Memory();
+            for(int k=Nold;k<particles.number;k++){
+                T dist=FLT_MAX;
+                int m=-1;
+                for(int q=0;q<Nold;q++){
+                    if(steal.Contains(q)) continue;
+                    T dd=(particles.X(q)-particles.X(k)).Magnitude_Squared();
+                    if(dd<dist){dist=dd;m=q;}}
+                T split_mass=particles.mass(m)*.5;
+                T split_volume=particles.volume(m)*.5;
+                TV com=particles.X(m);
+                particles.mass(m)=split_mass;
+                particles.volume(m)=split_volume;
+                // particles.X(m)=com*(T)2-particles.X(k);
+                particles.mass(k)=split_mass;
+                particles.volume(k)=split_volume;
+                particles.V(k)=particles.V(m);
+                if(use_affine) particles.B(k)=particles.B(m);
+                steal.Append(m);}
+
+            SURFACE_TENSION_FORCE_3D<TV>* stf=new SURFACE_TENSION_FORCE_3D<TV>(new_sc,(T)0.01);
+            stf->use_velocity_independent_implicit_forces=true;
+            Add_Force(*stf);
+
+        } break;
     }
 }
 //#####################################################################
@@ -335,6 +454,99 @@ End_Frame(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Begin_Time_Step(const T time)
 {
+    // switch(test_number)
+    // {
+    //     case 13:{
+    //         // Delete old surface partcles and return stolen data
+    //         int N_non_surface=particles.number-Nsurface;
+    //         for(int k=N_non_surface;k<particles.number;k++){
+    //             particles.Add_To_Deletion_List(k);
+    //             int m=steal(k-N_non_surface);
+    //             particles.mass(m)+=particles.mass(k);
+    //             particles.volume(m)+=particles.volume(k);
+    //             // particles.X(m)=(particles.X(m)+particles.X(k))*0.5;
+    //             particles.V(m)=(particles.V(m)+particles.V(k))*0.5;
+    //             if(use_affine) particles.B(m)=(particles.B(m)+particles.B(k))*0.5;}
+    //         LOG::cout<<"deleting "<<Nsurface<<" particles..."<<std::endl;
+    //         particles.Delete_Elements_On_Deletion_List();
+    //         lagrangian_forces.Delete_Pointers_And_Clean_Memory();
+    //         this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+
+    //         // Create surface
+    //         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+
+    //         // Mass isocontour approach
+    //         // T avgmass=0;
+    //         // for(int k=0;k<particles.number;k++)
+    //         //     avgmass+=particles.mass(k);
+    //         // avgmass/=(T)particles.number;
+    //         // MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,avgmass*.4);
+
+    //         // Blobby approach
+    //         T r=grid.DX()(0)*.8;
+    //         GRID<TV> lsgrid; lsgrid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box());
+    //         ARRAY<T,TV_INT> phi;
+    //         phi.Resize(lsgrid.Domain_Indices(ghost));
+    //         phi.Fill(FLT_MAX);
+    //         for(int k=0;k<particles.number;k++){
+    //             TV Xp=particles.X(k);
+    //             TV_INT cell=lsgrid.Cell(Xp,ghost);
+    //             for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT()-3,TV_INT()+7));it.Valid();it.Next()){
+    //                 TV_INT index=cell+it.index;
+    //                 TV Xi=lsgrid.Node(index);
+    //                 T d=(Xi-Xp).Magnitude();
+    //                 if(d<phi(index)) phi(index)=d;}}
+    //         for(int i=0;i<phi.array.m;i++) phi.array(i)-=r;
+    //         MARCHING_CUBES<TV>::Create_Surface(*surface,lsgrid,phi,0);
+
+    //         // Dump_Surface(*surface,VECTOR<T,3>(1,1,0)); 
+
+    //         // DEBUG
+    //         T min_marching_length=FLT_MAX;
+    //         for(int k=0;k<surface->mesh.elements.m;k++){
+    //             TV A=surface->particles.X(surface->mesh.elements(k).x);
+    //             TV B=surface->particles.X(surface->mesh.elements(k).y);
+    //             TV C=surface->particles.X(surface->mesh.elements(k).z);
+    //             T d=(A-B).Magnitude();
+    //             d=max(d,(C-B).Magnitude());
+    //             d=max(d,(C-A).Magnitude());
+    //             min_marching_length=min(min_marching_length,d);}
+    //         LOG::cout<<"MIN MARCHING LENGTH: " <<min_marching_length<<std::endl;
+
+    //         // Seed particles
+    //         int Nold=particles.number;
+    //         Nsurface=surface->particles.number;
+    //         LOG::cout<<"adding "<<Nsurface<<" particles..."<<std::endl;
+    //         T density=(T)1;
+    //         TRIANGULATED_SURFACE<T>& new_sc=Seed_Lagrangian_Particles(*surface,0,0,density,true);
+
+    //         // Steal data
+    //         steal.Clean_Memory();
+    //         for(int k=Nold;k<particles.number;k++){
+    //             T dist=FLT_MAX;
+    //             int m=-1;
+    //             for(int q=0;q<Nold;q++){
+    //                 if(steal.Contains(q)) continue;
+    //                 T dd=(particles.X(q)-particles.X(k)).Magnitude_Squared();
+    //                 if(dd<dist){dist=dd;m=q;}}
+    //             T split_mass=particles.mass(m)*.5;
+    //             T split_volume=particles.volume(m)*.5;
+    //             TV com=particles.X(m);
+    //             particles.mass(m)=split_mass;
+    //             particles.volume(m)=split_volume;
+    //             // particles.X(m)=com*(T)2-particles.X(k);
+    //             particles.mass(k)=split_mass;
+    //             particles.volume(k)=split_volume;
+    //             particles.V(k)=particles.V(m);
+    //             if(use_affine) particles.B(k)=particles.B(m);
+    //             steal.Append(m);}
+
+    //         SURFACE_TENSION_FORCE_3D<TV>* stf=new SURFACE_TENSION_FORCE_3D<TV>(new_sc,(T)0.01);
+    //         stf->use_velocity_independent_implicit_forces=true;
+    //         Add_Force(*stf);
+
+    //     } break;
+    // }
 }
 //#####################################################################
 // Function End_Time_Step
