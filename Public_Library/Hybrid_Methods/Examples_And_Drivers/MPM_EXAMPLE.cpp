@@ -25,7 +25,7 @@ template<class TV> MPM_EXAMPLE<TV>::
 MPM_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(&particles,0)),
-    debug_particles(*new DEBUG_PARTICLES<TV>),
+    debug_particles(*new DEBUG_PARTICLES<TV>),lagrangian_forces(deformable_body_collection.deformables_forces),
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
     force_helper(*new MPM_FORCE_HELPER<TV>(particles)),incompressible(false),kkt(false),initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),
@@ -50,7 +50,6 @@ template<class TV> MPM_EXAMPLE<TV>::
     delete &force_helper;
     collision_objects.Delete_Pointers_And_Clean_Memory();
     forces.Delete_Pointers_And_Clean_Memory();
-    lagrangian_forces.Delete_Pointers_And_Clean_Memory();
     av.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
@@ -110,8 +109,7 @@ Precompute_Forces(const T time,const T dt,const bool update_hessian)
 {
     for(int i=0;i<forces.m;i++)
         forces(i)->Precompute(time,dt);
-    for(int i=0;i<lagrangian_forces.m;i++)
-        lagrangian_forces(i)->Update_Position_Based_State(time,false,update_hessian);
+    deformable_body_collection.Update_Position_Based_State(time,false,update_hessian);
 }
 //#####################################################################
 // Function Potential_Energy

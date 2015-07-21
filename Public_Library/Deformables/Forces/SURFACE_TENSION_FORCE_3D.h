@@ -44,7 +44,6 @@ public:
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
     void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
     T Potential_Energy(const T time) const override;
-    void Test_Diff(const T time);
 //#####################################################################
 };
 }

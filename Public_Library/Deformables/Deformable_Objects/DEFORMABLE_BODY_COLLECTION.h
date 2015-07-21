@@ -92,6 +92,9 @@ public:
     Find_Force(const int index=0) const
     {return Find_Type<T_FORCE>(deformables_forces,index);}
 
+    void Test_Forces(const T time)
+    {Test_Energy(time);Test_Force_Derivatives(time);}
+
 //#####################################################################
     void Set_CFL_Number(const T cfl_number_input=.5);
     int Add_Force(DEFORMABLES_FORCES<TV>* force);

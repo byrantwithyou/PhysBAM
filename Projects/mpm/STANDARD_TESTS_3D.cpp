@@ -311,8 +311,8 @@ Initialize()
             LOG::cout<<"Read mesh "<<surface->particles.number<<std::endl;
             TRIANGULATED_SURFACE<T>& new_sc=Seed_Lagrangian_Particles(*surface,[=](const TV& X){return TV();},0,density,true);
             SURFACE_TENSION_FORCE_3D<TV>* stf=new SURFACE_TENSION_FORCE_3D<TV>(new_sc,(T).1);
-            // stf->Test_Diff((T)0);
             Add_Force(*stf);
+            this->deformable_body_collection.Test_Forces(0);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
         case 13:{ // surface tension stuff
