@@ -260,7 +260,7 @@ Locate_Nearest_Neighbors_Helper(const KD_TREE_NODE<T>* cell,const TV& location,T
     if(distance_squared_to_query_location<=max_distance_squared){
         if(number_of_points_found<points_found.m){
             number_of_points_found++;
-            points_found(number_of_points_found)=cell->node_index;distance_squared_of_points_found(number_of_points_found)=distance_squared_to_query_location;
+            points_found(number_of_points_found-1)=cell->node_index;distance_squared_of_points_found(number_of_points_found-1)=distance_squared_to_query_location;
             if(number_of_points_found==points_found.m) max_distance_squared=distance_squared_of_points_found.Max();}
         else{
             if(number_of_points_found==points_found.m){ARRAYS_COMPUTATIONS::Heapify(distance_squared_of_points_found,points_found);number_of_points_found++;}
@@ -268,9 +268,9 @@ Locate_Nearest_Neighbors_Helper(const KD_TREE_NODE<T>* cell,const TV& location,T
             int current_index=0;
             int left,right,index_of_largest;
             for(;;){
-                left=2*current_index;right=2*current_index+1;index_of_largest=current_index;
-                if(left>points_found.m) break;
-                else if(right>points_found.m || distance_squared_of_points_found(left)>distance_squared_of_points_found(right)) index_of_largest=left;
+                left=2*current_index+1;right=2*current_index+2;index_of_largest=current_index;
+                if(left>points_found.m-1) break;
+                else if(right>points_found.m-1 || distance_squared_of_points_found(left)>distance_squared_of_points_found(right)) index_of_largest=left;
                 else index_of_largest=right;
                 if(distance_squared_to_query_location>distance_squared_of_points_found(index_of_largest)) break; // we found a place to insert the new point
                 exchange(distance_squared_of_points_found(current_index),distance_squared_of_points_found(index_of_largest));
