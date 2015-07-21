@@ -22,6 +22,7 @@ public:
     TRIANGULATED_SURFACE<T>& surface;
     T surface_tension_coefficient;
     ARRAY<T> areas;
+    ARRAY<TV> normals;
     T dt;
     bool apply_explicit_forces;
     bool use_velocity_independent_implicit_forces;

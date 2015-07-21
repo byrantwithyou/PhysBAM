@@ -38,9 +38,10 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
         TV x10=x1-x0;
         TV x21=x2-x1;
         TV x02=x0-x2;
-        F(node(0))+=(T).25*surface_tension_coefficient/areas(t)*TV::Cross_Product(x21,TV::Cross_Product(x02,x10));
-        F(node(1))+=(T).25*surface_tension_coefficient/areas(t)*TV::Cross_Product(x02,TV::Cross_Product(x10,x21));
-        F(node(2))+=(T).25*surface_tension_coefficient/areas(t)*TV::Cross_Product(x10,TV::Cross_Product(x21,x02));}
+        TV scaled_n=(T).5*surface_tension_coefficient*normals(t);
+        F(node(0))+=x21.Cross(scaled_n);
+        F(node(1))+=x02.Cross(scaled_n);
+        F(node(2))+=x10.Cross(scaled_n);}
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -49,8 +50,19 @@ template<class TV> void SURFACE_TENSION_FORCE_3D<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     areas.Resize(surface.mesh.elements.m);
-    for(int i=0;i<surface.mesh.elements.m;i++)
-        areas(i)=surface.Area(i);
+    normals.Resize(surface.mesh.elements.m);
+    scaled_n.Resize(surface.mesh.elements.m);
+    for(int i=0;i<surface.mesh.elements.m;i++){
+        TV_INT node=surface.mesh.elements(i);
+        TV x0=surface.particles.X(node(0));
+        TV x1=surface.particles.X(node(1));
+        TV x2=surface.particles.X(node(2));
+        TV x10=x1-x0;
+        TV x21=x2-x1;
+        TV x02=x0-x2;
+        TV n=TV::Cross_Product(x02,x10);
+        areas(i)=n.Normalize()/2;
+        normals(i)=n;}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -77,21 +89,14 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
         TV dx0=V(node(0));
         TV dx1=V(node(1));
         TV dx2=V(node(2));
-        TV normal=TV::Cross_Product(x02,x10);
-        normal.Normalize();
-        MATRIX<T,3> norm_norm_transposed=MATRIX<T,3>::Outer_Product(normal,normal);
-
-        F(node(0))+=-(T).25*surface_tension_coefficient/areas(t)*(x21.Dot(x21))*norm_norm_transposed*dx0;
-        F(node(0))+=-(T).25*surface_tension_coefficient/areas(t)*x21.Dot(x02)*norm_norm_transposed*dx1+(T).5*surface_tension_coefficient*TV::Cross_Product(normal,dx1);
-        F(node(0))+=-(T).25*surface_tension_coefficient/areas(t)*(x21.Dot(x10))*norm_norm_transposed*dx2-(T).5*surface_tension_coefficient*TV::Cross_Product(normal,dx2);
-        
-        F(node(1))+=-(T).25*surface_tension_coefficient/areas(t)*(x02.Dot(x21))*norm_norm_transposed*dx0-(T).5*surface_tension_coefficient*TV::Cross_Product(normal,dx0);
-        F(node(1))+=-(T).25*surface_tension_coefficient/areas(t)*(x02.Dot(x02))*norm_norm_transposed*dx1;
-        F(node(1))+=-(T).25*surface_tension_coefficient/areas(t)*(x02.Dot(x10))*norm_norm_transposed*dx2+(T).5*surface_tension_coefficient*TV::Cross_Product(normal,dx2);
-        
-        F(node(2))+=-(T).25*surface_tension_coefficient/areas(t)*(x10.Dot(x21))*norm_norm_transposed*dx0+(T).5*surface_tension_coefficient*TV::Cross_Product(normal,dx0);
-        F(node(2))+=-(T).25*surface_tension_coefficient/areas(t)*(x10.Dot(x02))*norm_norm_transposed*dx1-(T).5*surface_tension_coefficient*TV::Cross_Product(normal,dx1);
-        F(node(2))+=-(T).25*surface_tension_coefficient/areas(t)*(x10.Dot(x10))*norm_norm_transposed*dx2;}
+        TV normal=normals(t);
+        TV scaled_n=(T).5*surface_tension_coefficient*normals(t);
+        MATRIX<T,3> xx(x21,x02,x10);
+        MATRIX<T,3> vv(dx0,dx1,dx2);
+        TV C=-(T).5/areas(t)*xx.Transpose_Times(xx*(vv.Transpose_Times(scaled_n)));
+        F(node(0))+=C(0)*normal+scaled_n.Cross(dx1-dx2);
+        F(node(1))+=C(1)*normal+scaled_n.Cross(dx2-dx0);
+        F(node(2))+=C(2)*normal+scaled_n.Cross(dx0-dx1);}
 }
 //#####################################################################
 // Function Enforce_Definiteness
