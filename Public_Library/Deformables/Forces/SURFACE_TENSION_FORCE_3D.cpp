@@ -51,7 +51,6 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 {
     areas.Resize(surface.mesh.elements.m);
     normals.Resize(surface.mesh.elements.m);
-    scaled_n.Resize(surface.mesh.elements.m);
     for(int i=0;i<surface.mesh.elements.m;i++){
         TV_INT node=surface.mesh.elements(i);
         TV x0=surface.particles.X(node(0));
