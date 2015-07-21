@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Data_Structures/KD_TREE.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
@@ -413,15 +414,34 @@ Begin_Frame(const int frame)
             T density=(T)1;
             TRIANGULATED_SURFACE<T>& new_sc=Seed_Lagrangian_Particles(*surface,0,0,density,true);
 
+            // Build K-d tree for non-surface particles
+            KD_TREE<TV> kdtree;
+            ARRAY<TV> nodes(Nold);
+            for(int p=0;p<Nold;p++) nodes(p)=particles.X(p);
+            kdtree.Create_Left_Balanced_KD_Tree(nodes);
+
             // Steal data
             steal.Clean_Memory();
             for(int k=Nold;k<particles.number;k++){
+
+                // Brute force search nearest particle
                 T dist=FLT_MAX;
                 int m=-1;
                 for(int q=0;q<Nold;q++){
-                    if(steal.Contains(q)) continue;
+                    // if(steal.Contains(q)) continue; // !!! We should allow one particle be stolen more than one time! Consider an isolated particle.
                     T dd=(particles.X(q)-particles.X(k)).Magnitude_Squared();
                     if(dd<dist){dist=dd;m=q;}}
+                
+                // K-d tree search nearest particle
+                int number_of_points_in_estimate=1;
+                ARRAY<int> points_found(number_of_points_in_estimate);
+                ARRAY<T> squared_distance_to_points_found(number_of_points_in_estimate);
+                int number_of_points_found;T max_squared_distance_to_points_found;
+                kdtree.Locate_Nearest_Neighbors(particles.X(k),FLT_MAX,points_found,
+                    squared_distance_to_points_found,number_of_points_found,max_squared_distance_to_points_found,nodes);
+                PHYSBAM_ASSERT(number_of_points_found==number_of_points_in_estimate);
+                if(m!=points_found(0)){ LOG::cout<<"Disagree!"<<std::endl; PHYSBAM_FATAL_ERROR();}
+
                 T split_mass=particles.mass(m)*.5;
                 T split_volume=particles.volume(m)*.5;
                 TV com=particles.X(m);
