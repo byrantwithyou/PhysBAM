@@ -2,9 +2,9 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Tools/Data_Structures/TRIPLE.h>
 #include <Tools/Matrices/MATRIX.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE_3D.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
@@ -29,18 +29,8 @@ template<class TV> SURFACE_TENSION_FORCE_3D<TV>::
 template<class TV> void SURFACE_TENSION_FORCE_3D<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    for(int t=0;t<surface.mesh.elements.m;t++){
-        TV_INT node=surface.mesh.elements(t);
-        TV x0=surface.particles.X(node(0));
-        TV x1=surface.particles.X(node(1));
-        TV x2=surface.particles.X(node(2));
-        TV x10=x1-x0;
-        TV x21=x2-x1;
-        TV x02=x0-x2;
-        TV scaled_n=(T).5*surface_tension_coefficient*normals(t);
-        F(node(0))+=x21.Cross(scaled_n);
-        F(node(1))+=x02.Cross(scaled_n);
-        F(node(2))+=x10.Cross(scaled_n);}
+    for(int t=0;t<surface.mesh.elements.m;t++)
+        F.Subset(surface.mesh.elements(t))-=dE(t).Append(-dE(t).Sum());
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -48,19 +38,21 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class TV> void SURFACE_TENSION_FORCE_3D<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    areas.Resize(surface.mesh.elements.m);
-    normals.Resize(surface.mesh.elements.m);
+    typedef DIFF_LAYOUT<T,TV::m,TV::m> LAYOUT;
+    E.Resize(surface.mesh.elements.m);
+    dE.Resize(surface.mesh.elements.m);
+    ddE.Resize(surface.mesh.elements.m);
     for(int i=0;i<surface.mesh.elements.m;i++){
         TV_INT node=surface.mesh.elements(i);
         TV x0=surface.particles.X(node(0));
         TV x1=surface.particles.X(node(1));
         TV x2=surface.particles.X(node(2));
-        TV x10=x1-x0;
-        TV x21=x2-x1;
-        TV x02=x0-x2;
-        TV n=TV::Cross_Product(x02,x10);
-        areas(i)=n.Normalize()/2;
-        normals(i)=n;}
+        auto X0=Hess_From_Var<LAYOUT,0>(x0-x2);
+        auto X1=Hess_From_Var<LAYOUT,1>(x1-x2);
+        auto phi=surface_tension_coefficient/2*X0.Cross(X1).Magnitude();
+        E(i)=phi.x;
+        Extract<0>(dE(i),phi.dx);
+        Extract<0,0>(ddE(i),phi.ddx);}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -77,23 +69,12 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
 {
     for(int t=0;t<surface.mesh.elements.m;t++){
         TV_INT node=surface.mesh.elements(t);
-        TV x0=surface.particles.X(node(0));
-        TV x1=surface.particles.X(node(1));
-        TV x2=surface.particles.X(node(2));
-        TV x10=x1-x0;
-        TV x21=x2-x1;
-        TV x02=x0-x2;
-        TV dx0=V(node(0));
-        TV dx1=V(node(1));
-        TV dx2=V(node(2));
-        TV normal=normals(t);
-        TV scaled_n=(T).5*surface_tension_coefficient*normals(t);
-        MATRIX<T,3> xx(x21,x02,x10);
-        MATRIX<T,3> vv(dx0,dx1,dx2);
-        TV C=-(T).5/areas(t)*xx.Transpose_Times(xx*(vv.Transpose_Times(scaled_n)));
-        F(node(0))+=C(0)*normal+scaled_n.Cross(dx1-dx2);
-        F(node(1))+=C(1)*normal+scaled_n.Cross(dx2-dx0);
-        F(node(2))+=C(2)*normal+scaled_n.Cross(dx0-dx1);}
+        VECTOR<TV,2> v(V(node(0))-V(node(2)),V(node(1))-V(node(2))),f;
+        const MATRIX<MATRIX<T,TV::m>,2>& M=ddE(t);
+        for(int i=0;i<2;i++)
+            for(int j=0;j<2;j++)
+                f(i)+=M(i,j)*v(j);
+        F.Subset(node)-=f.Append(-f.Sum());}
 }
 //#####################################################################
 // Function Enforce_Definiteness
@@ -167,7 +148,7 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 template<class TV> typename TV::SCALAR SURFACE_TENSION_FORCE_3D<TV>::
 Potential_Energy(const T time) const
 {
-    return surface_tension_coefficient*areas.Sum();
+    return E.Sum();
 }
 namespace PhysBAM{
 template class SURFACE_TENSION_FORCE_3D<VECTOR<float,3> >;

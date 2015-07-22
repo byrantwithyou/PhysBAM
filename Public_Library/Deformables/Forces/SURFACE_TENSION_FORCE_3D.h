@@ -7,7 +7,6 @@
 #ifndef __SURFACE_TENSION_FORCE_3D__
 #define __SURFACE_TENSION_FORCE_3D__
 
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
@@ -21,8 +20,9 @@ public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     TRIANGULATED_SURFACE<T>& surface;
     T surface_tension_coefficient;
-    ARRAY<T> areas;
-    ARRAY<TV> normals;
+    ARRAY<T> E;
+    ARRAY<VECTOR<TV,2> > dE;
+    ARRAY<MATRIX<MATRIX<T,TV::m>,2> > ddE;
     T dt;
     bool apply_explicit_forces;
 
