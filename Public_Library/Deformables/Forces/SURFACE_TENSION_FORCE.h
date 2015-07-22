@@ -7,7 +7,6 @@
 #ifndef __SURFACE_TENSION_FORCE__
 #define __SURFACE_TENSION_FORCE__
 
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
@@ -47,7 +46,6 @@ public:
     void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
     T Potential_Energy(const T time) const override;
     void Dump_Curvatures() const;
-    void Test_Diff(const T time);
 //#####################################################################
 };
 }
