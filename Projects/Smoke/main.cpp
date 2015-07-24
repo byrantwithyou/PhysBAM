@@ -30,13 +30,13 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
 
     parse_args.Parse();
 
-    TV point1=TV::All_Ones_Vector()*.23,point2=TV::All_Ones_Vector()*.27;point1(1)=0;point2(1)=.05;
+    TV point1=TV::All_Ones_Vector()*.23,point2=TV::All_Ones_Vector()*.27;point1(1)=0.05;point2(1)=.15;
     example->source.min_corner=point1;
     example->source.max_corner=point2;
 
     if(mpi_world.initialized){
         LOG::cout<<"ERROR: MPI initialized? Shouldn't reach here."<<std::endl;
-        example->mpi_grid=new MPI_UNIFORM_GRID<TV>(example->mac_grid,3);
+        example->mpi_grid=new MPI_UNIFORM_GRID<TV>(example->mac_grid,5);
         if(example->mpi_grid->Number_Of_Processors()>1) example->output_directory+=LOG::sprintf("/%d",(mpi_world.rank+1));}
 
     FILE_UTILITIES::Create_Directory(example->output_directory+"/common");

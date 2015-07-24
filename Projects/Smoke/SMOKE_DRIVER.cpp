@@ -22,7 +22,7 @@ template<class TV> void Write_Substep_Helper(void* writer,const std::string& tit
 //#####################################################################
 template<class TV> SMOKE_DRIVER<TV>::
 SMOKE_DRIVER(SMOKE_EXAMPLE<TV>& example)
-    :example(example)
+    :ghost(5),example(example)
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
@@ -68,7 +68,7 @@ Initialize()
     // setup grids and velocities
     example.projection.Initialize_Grid(example.mac_grid);
     example.face_velocities.Resize(example.mac_grid);
-    example.density.Resize(example.mac_grid.Domain_Indices(3));
+    example.density.Resize(example.mac_grid.Domain_Indices(ghost));
     example.Initialize_Fields();
 
     // setup laplace
@@ -94,9 +94,9 @@ template<class TV> void SMOKE_DRIVER<TV>::
 Scalar_Advance(const T dt,const T time)
 {
     example.Get_Scalar_Field_Sources(time);
-    ARRAY<T,TV_INT> density_ghost(example.mac_grid.Domain_Indices(3));
+    ARRAY<T,TV_INT> density_ghost(example.mac_grid.Domain_Indices(ghost));
     example.boundary->Set_Fixed_Boundary(true,0);
-    example.boundary->Fill_Ghost_Cells(example.mac_grid,example.density,density_ghost,dt,time,3);
+    example.boundary->Fill_Ghost_Cells(example.mac_grid,example.density,density_ghost,dt,time,ghost);
     example.advection_scalar.Update_Advection_Equation_Cell(example.mac_grid,example.density,density_ghost,example.face_velocities,*example.boundary,dt,time);    
     example.boundary->Set_Fixed_Boundary(false);
 }
@@ -107,8 +107,8 @@ template<class TV> void SMOKE_DRIVER<TV>::
 Convect(const T dt,const T time)
 {
     example.boundary->Set_Fixed_Boundary(true,0);
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,3,false);
-    example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time,3);
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,ghost,false);
+    example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time,ghost);
     example.advection_scalar.Update_Advection_Equation_Face(example.mac_grid,example.face_velocities,face_velocities_ghost,face_velocities_ghost,*example.boundary,dt,time);
     example.boundary->Set_Fixed_Boundary(false);
 }

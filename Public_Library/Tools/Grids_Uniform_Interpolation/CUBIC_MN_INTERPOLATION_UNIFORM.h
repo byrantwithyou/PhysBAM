@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2003-2010, Ronald Fedkiw, Geoffrey Irving, Nipun Kwatra, Michael Lentine, Duc Nguyen, Andrew Selle.
+// Copyright 2003-2010, Ronald Fedkiw, Geoffrey Irving, Nipun Kwatra, Michael Lentine, Duc Nguyen, Andrew Selle, Chenfanfu Jiang
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class CUBIC_MN_INTERPOLATION_UNIFORM 
@@ -11,7 +11,7 @@
 #include <Tools/Interpolation/CUBIC_MN_INTERPOLATION.h>
 namespace PhysBAM{
 
-template<class TV,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<TV>
+template<class TV,class T2,class T_FACE_LOOKUP>
 class CUBIC_MN_INTERPOLATION_UNIFORM:public INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
@@ -42,6 +42,11 @@ public:
     // ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index) const;
     // only works for power of two grids!
 //    T2 From_Base_Node_Periodic(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index) const;
+
+    TV_INT Base_Index(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const;
+    TV_INT Base_Index_Face(const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,int axis,const TV& X) const;
+    T From_Block_Face_Component(const int axis,const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const override;
+
 //#####################################################################
 };
 }

@@ -9,19 +9,23 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Incompressible/Projection/PROJECTION_UNIFORM.h>
 namespace PhysBAM{
 
 template<class TV> class DEBUG_PARTICLES;
+template<class TV> class PARTICLE_GRID_WEIGHTS;
 
 template<class TV>
 class SMOKE_EXAMPLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    enum workaround1{d=TV::m};
+    enum workaround1{d=TV::m,EAPIC_order=1};
+    typedef CUBIC_MN_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_UNIFORM<TV> > T_INTERPOLATION;
+    // typedef LINEAR_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_UNIFORM<TV> > T_INTERPOLATION;
 
 public:
     STREAM_TYPE stream_type;
@@ -36,26 +40,23 @@ public:
     bool write_debug_data;
     std::string output_directory;
     bool N_boundary;
-
     bool debug_divergence;
-
     T cfl;
-
     GRID<TV> mac_grid;
     MPI_UNIFORM_GRID<TV> *mpi_grid;
     THREAD_QUEUE* thread_queue;    
     PROJECTION_UNIFORM<TV> projection;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
-
-    // ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T, AVERAGING_UNIFORM<TV, FACE_LOOKUP_UNIFORM<TV> >,LINEAR_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_UNIFORM<TV> > > advection_scalar;
-    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T, AVERAGING_UNIFORM<TV, FACE_LOOKUP_UNIFORM<TV> >,LINEAR_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_UNIFORM<TV> > > advection_scalar;
-
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T, AVERAGING_UNIFORM<TV, FACE_LOOKUP_UNIFORM<TV> >,T_INTERPOLATION > advection_scalar;
     BOUNDARY<TV,T> boundary_scalar;
     BOUNDARY<TV,T> *boundary;
     ARRAY<T,TV_INT> density;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;    
     RANGE<TV> source;
     pthread_mutex_t lock;
+
+    // EAPIC
+    VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights;
 
     SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int refine=0);
     virtual ~SMOKE_EXAMPLE();

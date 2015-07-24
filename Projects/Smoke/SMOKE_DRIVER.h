@@ -21,6 +21,7 @@ protected:
     int current_frame;
     T time;
     int output_number;
+    int ghost;
 
     SMOKE_EXAMPLE<TV>& example;
 public:

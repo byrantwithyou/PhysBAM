@@ -16,7 +16,6 @@ template<class TV,class T2,class T_FACE_LOOKUP> CUBIC_MN_INTERPOLATION_UNIFORM<T
 ~CUBIC_MN_INTERPOLATION_UNIFORM()
 {
 }
-namespace{
 //#####################################################################
 // Function From_Base_Node
 //#####################################################################
@@ -92,7 +91,6 @@ From_Base_Node(const CUBIC_MN_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>& cub,co
         interpolated_in_y[c]=cub.cubic_mn_interpolation.Cubic_MN(interpolated_in_x[0],interpolated_in_x[1],interpolated_in_x[2],interpolated_in_x[3],alpha.y);}
     return cub.cubic_mn_interpolation.Cubic_MN(interpolated_in_y[0],interpolated_in_y[1],interpolated_in_y[2],interpolated_in_y[3],alpha.z);
 }
-}
 //#####################################################################
 // Function Clamped_To_Array
 //#####################################################################
@@ -109,7 +107,6 @@ Clamped_To_Array_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u
 {
     return ::From_Base_Node_Weights(*this,grid,u,X,INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::Clamped_Index_Interior_End_Minus_One(grid,u,X)-TV_INT::All_Ones_Vector());
 }
-namespace{
 //#####################################################################
 // Function From_Base_Node_Periodic
 //#####################################################################
@@ -176,7 +173,6 @@ template<class T,class TV,class T2,class T_FACE_LOOKUP> T2
         interpolated_in_y[c]=cub.cubic_mn_interpolation.Cubic_MN(interpolated_in_x[0],interpolated_in_x[1],interpolated_in_x[2],interpolated_in_x[3],alpha.y);}
     return cub.cubic_mn_interpolation.Cubic_MN(interpolated_in_y[0],interpolated_in_y[1],interpolated_in_y[2],interpolated_in_y[3],alpha.z);
 }
-}
 //#####################################################################
 // Function Periodic
 //#####################################################################
@@ -185,6 +181,80 @@ Periodic(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) co
 {
     return ::From_Base_Node_Periodic(*this,grid,u,X,grid.Index(X)-1);
 }
+//#####################################################################
+// Function From_Block_Face_Component_Helper
+//#####################################################################
+template<class TV,class TV_INT,class T,class LOOKUP> static T
+From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const LOOKUP& u,const VECTOR<T,1>& X,const TV_INT& index)
+{
+    CUBIC_MN_INTERPOLATION_UNIFORM<TV,T,LOOKUP> cub;
+    TV_INT indicies[4];
+    for(int i=0;i<4;i++) indicies[i]=index+i;
+    return cub.cubic_mn_interpolation.Cubic_MN(u(axis,indicies[0]),u(axis,indicies[1]),u(axis,indicies[2]),u(axis,indicies[3]),(X.x-grid.Face(FACE_INDEX<TV::m>(axis,index+1)).x)*grid.one_over_dX.x);
+}
+//#####################################################################
+// Function From_Block_Face_Component_Helper
+//#####################################################################
+template<class TV,class TV_INT,class T,class LOOKUP> static T
+From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const LOOKUP& u,const VECTOR<T,2>& X,const TV_INT& index)
+{
+    CUBIC_MN_INTERPOLATION_UNIFORM<TV,T,LOOKUP> cub;
+    VECTOR<T,2> alpha=X-grid.Face(FACE_INDEX<TV::m>(axis,index+VECTOR<int,2>::All_Ones_Vector()));
+    alpha*=grid.one_over_dX;
+    T interpolated_in_x[4];
+    T value[4];
+    for(int b=0;b<4;b++){
+        for(int a=0;a<4;a++){
+            VECTOR<int,2> ind(index.x+a,index.y+b);
+            value[a]=u(axis,ind);}
+        interpolated_in_x[b]=cub.cubic_mn_interpolation.Cubic_MN(value[0],value[1],value[2],value[3],alpha.x);}
+    return cub.cubic_mn_interpolation.Cubic_MN(interpolated_in_x[0],interpolated_in_x[1],interpolated_in_x[2],interpolated_in_x[3],alpha.y);
+}
+//#####################################################################
+// Function From_Block_Face_Component_Helper
+//#####################################################################
+template<class TV,class TV_INT,class T,class LOOKUP> static T
+From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const LOOKUP& u,const VECTOR<T,3>& X,const TV_INT& index)
+{
+    CUBIC_MN_INTERPOLATION_UNIFORM<TV,T,LOOKUP> cub;
+    VECTOR<T,3> alpha=X-grid.Face(FACE_INDEX<TV::m>(axis,index+VECTOR<int,3>::All_Ones_Vector()));
+    alpha*=grid.one_over_dX;
+    T interpolated_in_x[4],interpolated_in_y[4];
+    T value[4];
+    for(int c=0;c<4;c++){
+        for(int b=0;b<4;b++){
+            for(int a=0;a<4;a++){
+                VECTOR<int,3> ind(index.x+a,index.y+b,index.z+c);
+                value[a]=u(axis,ind);}
+            interpolated_in_x[b]=cub.cubic_mn_interpolation.Cubic_MN(value[0],value[1],value[2],value[3],alpha.x);}
+        interpolated_in_y[c]=cub.cubic_mn_interpolation.Cubic_MN(interpolated_in_x[0],interpolated_in_x[1],interpolated_in_x[2],interpolated_in_x[3],alpha.y);}
+    return cub.cubic_mn_interpolation.Cubic_MN(interpolated_in_y[0],interpolated_in_y[1],interpolated_in_y[2],interpolated_in_y[3],alpha.z);
+}
+//#####################################################################
+// Function Base_Index
+//#####################################################################
+template<class TV,class T2,class T_FACE_LOOKUP> VECTOR<int,TV::m> CUBIC_MN_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Base_Index(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
+{
+    return INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::Clamped_Index_Interior_End_Minus_One(grid,u,X)-TV_INT::All_Ones_Vector();
+}
+//#####################################################################
+// Function Baes_Index_Face
+//#####################################################################
+template<class TV,class T2,class T_FACE_LOOKUP> VECTOR<int,TV::m> CUBIC_MN_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+Base_Index_Face(const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,int axis,const TV& X) const
+{
+    return grid.Cell(X+(T).5*(TV::Axis_Vector(axis)-3)*grid.dX,10);
+}
+//#####################################################################
+// Function From_Block_Face_Component
+//#####################################################################
+template<class TV,class T2,class T_FACE_LOOKUP> typename TV::SCALAR CUBIC_MN_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
+From_Block_Face_Component(const int axis,const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
+{
+    return From_Block_Face_Component_Helper(axis,grid,u,X,Base_Index_Face(grid,u,axis,X));
+}
+
 namespace PhysBAM{
 template class CUBIC_MN_INTERPOLATION_UNIFORM<VECTOR<float,1>,float,FACE_LOOKUP_UNIFORM<VECTOR<float,1> > >;
 template class CUBIC_MN_INTERPOLATION_UNIFORM<VECTOR<float,2>,float,FACE_LOOKUP_UNIFORM<VECTOR<float,2> > >;
