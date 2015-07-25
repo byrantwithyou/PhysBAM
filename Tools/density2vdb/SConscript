@@ -1,0 +1,13 @@
+# SConscript
+# To success compile this program: OpenVDB, OpenEXR, Half, tbb need to be installed.
+# All of them can be done through synaptic.
+import os
+Import('env Automatic_Program')
+env=env.Copy(USE_TOOLS=1)
+if os.environ.has_key('OPENVDB_INCLUDE_PATH') and os.environ.has_key('OPENVDB_LIB_PATH'):
+    openvdb_include_path=os.environ['OPENVDB_INCLUDE_PATH']
+    openvdb_lib_path=os.environ['OPENVDB_LIB_PATH']
+    env.Append(CPPPATH=[openvdb_include_path])
+    env.Append(LIBPATH=[openvdb_lib_path])
+    env.Append(LIBS=['openvdb','Half','tbb'])
+    Automatic_Program(env,"density2vdb",["main.cpp"])
