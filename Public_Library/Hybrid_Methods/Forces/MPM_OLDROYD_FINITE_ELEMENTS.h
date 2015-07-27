@@ -30,11 +30,11 @@ public:
     GATHER_SCATTER<TV>& gather_scatter;
     mutable ARRAY<MATRIX<T,TV::m> > tmp;
     T stored_dt;
-    T inv_Wi;
+    const T& inv_Wi;
 
     MPM_OLDROYD_FINITE_ELEMENTS(MPM_FORCE_HELPER<TV>& force_helper,
         OLDROYD_CONSTITUTIVE_MODEL<TV>& constitutive_model,
-        GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles);
+        GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,const T& inv_Wi);
     virtual ~MPM_OLDROYD_FINITE_ELEMENTS();
 
 //#####################################################################

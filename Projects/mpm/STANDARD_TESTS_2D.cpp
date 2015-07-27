@@ -307,6 +307,7 @@ Initialize()
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
             use_oldroyd=true;
+            this->inv_Wi=(T)0;
             particles.Store_S(use_oldroyd);            
             Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0.1,0);},0,
                 density,particles_per_cell);
@@ -315,7 +316,7 @@ Initialize()
             OLDROYD_NEO_HOOKEAN<TV> *neo=new OLDROYD_NEO_HOOKEAN<TV>;
             neo->mu=38.462; // E=100, nu=0.3
             neo->lambda=57.692;
-            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0);
+            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi);
             Add_Force(*fe);
         } break;
         case 17:{ // spring test
@@ -411,7 +412,25 @@ Initialize()
             Add_Particle(TV(.8,.5),0,0,mass,volume);
             Add_Gravity(TV(0,-1.8));
         } break;
-
+        case 27:{ // drop an oldroyd-b to a ground
+            grid.Initialize(TV_INT(resolution*2,resolution),RANGE<TV>(TV(-1,0),TV(1,1)),true);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(5,.1)),COLLISION_TYPE::stick,0);
+            SPHERE<TV> sphere(TV(.5,.5),.2);
+            T density=2*scale_mass;
+            use_oldroyd=true;
+            this->inv_Wi=(T)100;
+            particles.Store_S(use_oldroyd);            
+            Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0,0);},0,density,particles_per_cell);
+            particles.F.Fill(MATRIX<T,2>()+1);particles.S.Fill(SYMMETRIC_MATRIX<T,2>()+sqr(1));
+            LOG::cout<<particles.F<<std::endl<<std::endl;;
+            LOG::cout<<particles.S<<std::endl;
+            OLDROYD_NEO_HOOKEAN<TV> *neo=new OLDROYD_NEO_HOOKEAN<TV>;
+            neo->mu=38.462; // E=100, nu=0.3
+            neo->lambda=57.692;
+            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi);
+            Add_Force(*fe);
+            // Add_Gravity(TV(0,-1.8));
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }

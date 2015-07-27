@@ -19,9 +19,9 @@ namespace PhysBAM{
 template<class TV> MPM_OLDROYD_FINITE_ELEMENTS<TV>::
 MPM_OLDROYD_FINITE_ELEMENTS(MPM_FORCE_HELPER<TV>& force_helper,
     OLDROYD_CONSTITUTIVE_MODEL<TV>& constitutive_model,
-    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles)
+    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,const T& inv_Wi)
     :BASE(force_helper),constitutive_model(constitutive_model),affect_all(!affected_particles),
-    gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles))),stored_dt(0),inv_Wi(0)
+    gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles))),stored_dt(0),inv_Wi(inv_Wi)
 {
     if(!affect_all){
         gather_scatter.weights=gather_scatter_input.weights;
