@@ -84,7 +84,7 @@ Initialize()
             Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0.1,0);},0,
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
-            Add_Fixed_Corotated(1e3*scale_E,0.3);
+            Add_Fixed_Corotated(1e2*scale_E,0.3);
         } break;
         case 3:{ // freefall circle
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
@@ -307,14 +307,14 @@ Initialize()
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
             use_oldroyd=true;
+            particles.Store_S(use_oldroyd);            
             Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0.1,0);},0,
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
             particles.S.Fill(SYMMETRIC_MATRIX<T,2>()+sqr(1.5));
-
             OLDROYD_NEO_HOOKEAN<TV> *neo=new OLDROYD_NEO_HOOKEAN<TV>;
-            neo->mu=10000;
-            neo->lambda=10000;
+            neo->mu=38.462; // E=100, nu=0.3
+            neo->lambda=57.692;
             MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0);
             Add_Force(*fe);
         } break;
