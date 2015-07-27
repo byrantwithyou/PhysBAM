@@ -133,7 +133,7 @@ Penalty(T original_volume,const VECTOR<int,4>& nodes,const ARRAY_VIEW<TV>&X,T& e
     auto v=Hess_From_Var<LAYOUT,1>(X(nodes(2))-X(nodes(0)));
     auto w=Hess_From_Var<LAYOUT,2>(X(nodes(3))-X(nodes(0)));
     auto a=u.Dot(v.Cross(w));
-    auto d=(T)1-a/Hess_From_Const<LAYOUT>(original_volume);
+    auto d=(T)1-a/original_volume;
     auto ee=stiffness*sqr(d)*d;
     e=ee.x;
 #if 0
