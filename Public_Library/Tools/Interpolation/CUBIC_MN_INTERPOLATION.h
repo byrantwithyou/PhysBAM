@@ -20,8 +20,8 @@ public:
     CUBIC_MN_INTERPOLATION();
     ~CUBIC_MN_INTERPOLATION();
     void Set_Parameters(const T b=1./3,const T c=1./3);
-    T2 Cubic_MN(const T2& u_0,const T2& u_1,const T2& u_2,const T2& u_3,const T alpha) const;
-
+    T2 Cubic_MN(const T2& u_0,const T2& u_1,const T2& u_2,const T2& u_3,const T alpha,const bool monotonic=false) const;
+    T2 Cubic_MN_Monotonic(const T2& u_0,const T2& u_1,const T2& u_2,const T2& u_3,const T alpha) const;
     ARRAY<T> Cubic_MN_Weights(const T alpha) const;
 
 //#####################################################################
