@@ -9,6 +9,7 @@
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Grids_Uniform_Interpolation/CUBIC_MONOTONIC_INTERPOLATION_UNIFORM.h>
 #include <Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
@@ -24,8 +25,8 @@ class SMOKE_EXAMPLE
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     enum workaround1{d=TV::m,EAPIC_order=1};
-    typedef CUBIC_MN_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_UNIFORM<TV> > T_INTERPOLATION;
-    // typedef LINEAR_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_UNIFORM<TV> > T_INTERPOLATION;
+    // typedef CUBIC_MONOTONIC_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_UNIFORM<TV> > T_INTERPOLATION;
+    typedef LINEAR_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_UNIFORM<TV> > T_INTERPOLATION;
 
 public:
     STREAM_TYPE stream_type;
