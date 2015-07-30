@@ -88,6 +88,22 @@ Initialize()
     output_number=example.first_frame;
 }
 //#####################################################################
+// Add_Buoyancy_Force
+//#####################################################################
+template<class TV> void SMOKE_DRIVER<TV>::
+Add_Buoyancy_Force(const T dt,const T time)
+{
+    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+        if(iterator.axis==1){
+            TV_INT c1,c2;
+            example.mac_grid.Cells_Touching_Face(iterator.axis,iterator.Face_Index(),c1,c2);
+            T rho=(example.density(c1)+example.density(c2))*(T).5;
+            // T tem=(example.temperature(c1)+example.temperature(c2))*(T).5; // no temperature for now
+            T alpha=0.05; 
+            example.face_velocities(iterator.Full_Index())+=-dt*alpha*rho;}}
+}
+
+//#####################################################################
 // Scalar_Advance
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
@@ -139,6 +155,7 @@ Advance_To_Target_Time(const T target_time)
         else if(time+2*dt>=target_time){dt=.5*(target_time-time);}
         Scalar_Advance(dt,time);
         Convect(dt,time);
+        Add_Buoyancy_Force(dt,time);
         Print_Max_Divergence("Before projection");
         Project(dt,time);
         Print_Max_Divergence("After projection");

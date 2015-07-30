@@ -11,7 +11,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
 { 
     typedef VECTOR<int,TV::dimension> TV_INT;
 
-    int threads=1,scale=100;
+    int threads=1,scale=200; // default scale = 100
     parse_args.Add("-threads",&threads,"threads","number of threads");
     parse_args.Add("-scale",&scale,"scale","fine scale grid resolution");
     parse_args.Parse(true);
@@ -21,7 +21,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     TV_INT counts=TV_INT::All_Ones_Vector()*scale/2;counts(1)=scale;
     example->Initialize_Grid(counts,range);
     LOG::cout<<"Grid dX "<<example->mac_grid.dX<<std::endl;
-    example->last_frame=100;
+    example->last_frame=1000;// default last_frame = 100
     parse_args.Add("-restart",&example->restart,"frame","restart frame");
     parse_args.Add("-substeps",&example->write_substeps_level,"level","output-substep level");
     parse_args.Add("-e",&example->last_frame,"frame","last frame");
