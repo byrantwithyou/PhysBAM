@@ -42,6 +42,7 @@ public:
     std::string output_directory;
     bool N_boundary;
     bool debug_divergence;
+    T alpha;
     T cfl;
     GRID<TV> mac_grid;
     MPI_UNIFORM_GRID<TV> *mpi_grid;

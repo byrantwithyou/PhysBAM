@@ -26,6 +26,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     parse_args.Add("-substeps",&example->write_substeps_level,"level","output-substep level");
     parse_args.Add("-e",&example->last_frame,"frame","last frame");
     parse_args.Add("-d_div",&example->debug_divergence,"output the max velocity divergence after projection");
+    parse_args.Add("-a",&example->alpha,"alpha","buoyancy parameter alpha");
     parse_args.Add("-o",&example->output_directory,"dir","output directory");
 
     parse_args.Parse();

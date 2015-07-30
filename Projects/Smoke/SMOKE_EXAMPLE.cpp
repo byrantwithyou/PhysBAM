@@ -16,7 +16,7 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     debug_particles(*new DEBUG_PARTICLES<TV>),
     initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
     restart(0),write_debug_data(true),output_directory("output"),N_boundary(false),
-    debug_divergence(false),
+    debug_divergence(false),alpha(0.1),
     cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(mac_grid,false,false,thread_queue),boundary(0)
 {

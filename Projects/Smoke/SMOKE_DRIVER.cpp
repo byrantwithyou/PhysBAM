@@ -98,9 +98,8 @@ Add_Buoyancy_Force(const T dt,const T time)
             TV_INT c1,c2;
             example.mac_grid.Cells_Touching_Face(iterator.axis,iterator.Face_Index(),c1,c2);
             T rho=(example.density(c1)+example.density(c2))*(T).5;
-            // T tem=(example.temperature(c1)+example.temperature(c2))*(T).5; // no temperature for now
-            T alpha=0.05; 
-            example.face_velocities(iterator.Full_Index())+=-dt*alpha*rho;}}
+            // T tem=(example.temperature(c1)+example.temperature(c2))*(T).5; // no temperature for now 
+            example.face_velocities(iterator.Full_Index())+=-dt*example.alpha*rho;}}
 }
 
 //#####################################################################
