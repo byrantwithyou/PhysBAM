@@ -431,6 +431,16 @@ Initialize()
             Add_Force(*fe);
             // Add_Gravity(TV(0,-1.8));
         } break;
+        case 28:{ // newton convergence problem: ./mpm 28 -affine -max_dt 1e-3 | grep converge
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(5,.1)),COLLISION_TYPE::slip,0);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(.1,5)),COLLISION_TYPE::slip,0);
+            RANGE<TV> box(TV(.21,.21),TV(.6,.5));
+            T density=2*scale_mass;
+            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Add_Gravity(TV(0,-1.8));
+            Add_Fixed_Corotated(1.71*scale_E,0.4);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
