@@ -21,6 +21,8 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_OLDROYD_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/OLDROYD_NEO_HOOKEAN.h>
+#include <Hybrid_Methods/Forces/VOLUME_PRESERVING_OB_NEO_HOOKEAN.h>
+#include <Hybrid_Methods/Forces/TEST_CM.h>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
 //#####################################################################
@@ -429,7 +431,24 @@ Initialize()
             neo->lambda=57.692;
             MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi);
             Add_Force(*fe);
-            // Add_Gravity(TV(0,-1.8));
+            Add_Gravity(TV(0,-1.8));
+        } break;
+        case 29:{ // drop an oldroyd-b to a ground SCA energy
+            grid.Initialize(TV_INT(resolution*2,resolution),RANGE<TV>(TV(-1,0),TV(1,1)),true);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(5,.1)),COLLISION_TYPE::stick,0);
+            SPHERE<TV> sphere(TV(.5,.5),.2);
+            T density=2*scale_mass;
+            use_oldroyd=true;
+            this->inv_Wi=(T)100;
+            particles.Store_S(use_oldroyd);            
+            Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0,0);},0,density,particles_per_cell);
+            particles.F.Fill(MATRIX<T,2>()+1);particles.S.Fill(SYMMETRIC_MATRIX<T,2>()+sqr(1));
+            VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV> *neo=new VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV>;
+            neo->mu=38.462; // E=100, nu=0.3
+            neo->lambda=57.692;
+            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi);
+            Add_Force(*fe);
+            Add_Gravity(TV(0,-1.8));
         } break;
         case 28:{ // newton convergence problem: ./mpm 28 -affine -max_dt 1e-3 | grep converge
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);

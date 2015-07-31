@@ -69,7 +69,7 @@ Gradient(MATRIX<T,TV::m>& dF,SYMMETRIC_MATRIX<T,TV::m>& dS,int p) const
 //#####################################################################
 template<class TV> void OLDROYD_NEO_HOOKEAN<TV>::
 Hessian(const MATRIX<T,TV::m>& F,const SYMMETRIC_MATRIX<T,TV::m>& S,
-    MATRIX<T,TV::m>& dF,SYMMETRIC_MATRIX<T,TV::m>& dS,int p) const
+    MATRIX<T,TV::m>& dF,MATRIX<T,TV::m>& dS,int p) const
 {
     MATRIX<T,TV::m> A=H(p).Transpose_Times(F);
     dF=c(p)*A.Trace()*H(p)-b(p)*H(p).Times_Transpose(A);

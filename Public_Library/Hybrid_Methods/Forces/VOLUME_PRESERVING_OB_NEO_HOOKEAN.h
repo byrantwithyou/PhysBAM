@@ -1,21 +1,22 @@
 //#####################################################################
-// Copyright 2015, Craig Schroeder.
+// Copyright 2015
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class OLDROYD_NEO_HOOKEAN
+// Class VOLUME_PRESERVING_OB_NEO_HOOKEAN
 //#####################################################################
-#ifndef __OLDROYD_NEO_HOOKEAN__
-#define __OLDROYD_NEO_HOOKEAN__
+#ifndef __VOLUME_PRESERVING_OB_NEO_HOOKEAN__
+#define __VOLUME_PRESERVING_OB_NEO_HOOKEAN__
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/IDENTITY_MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Hybrid_Methods/Forces/OLDROYD_CONSTITUTIVE_MODEL.h>
 namespace PhysBAM{
 
 template<class TV>
-class OLDROYD_NEO_HOOKEAN:public OLDROYD_CONSTITUTIVE_MODEL<TV>
+class VOLUME_PRESERVING_OB_NEO_HOOKEAN:public OLDROYD_CONSTITUTIVE_MODEL<TV>
 {
     typedef typename TV::SCALAR T;
 public:
@@ -23,11 +24,11 @@ public:
     T mu,lambda;
 
     ARRAY<T> psi,b,c;
-    ARRAY<MATRIX<T,TV::m> > P,H;
-    ARRAY<SYMMETRIC_MATRIX<T,TV::m> > Q;
+    ARRAY<MATRIX<T,TV::m> > P,H,G,F_mat;
+    ARRAY<SYMMETRIC_MATRIX<T,TV::m> > Q,N,M,S_mat;
 
-    OLDROYD_NEO_HOOKEAN();
-    virtual ~OLDROYD_NEO_HOOKEAN();
+    VOLUME_PRESERVING_OB_NEO_HOOKEAN();
+    virtual ~VOLUME_PRESERVING_OB_NEO_HOOKEAN();
 
 //#####################################################################
     void Resize(int n) override;

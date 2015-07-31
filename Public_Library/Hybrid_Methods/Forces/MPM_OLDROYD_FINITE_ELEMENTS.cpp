@@ -99,12 +99,14 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {tmp(p)+=MATRIX<T,TV::m>::Outer_Product(V(it.Index()),it.Gradient());},
         [this,zeta](int p,int data){
-            SYMMETRIC_MATRIX<T,TV::m> B=(tmp(p)*force_helper.Sn(p)).Twice_Symmetric_Part(),dQ,dQ2;
+            SYMMETRIC_MATRIX<T,TV::m> B=(tmp(p)*force_helper.Sn(p)).Twice_Symmetric_Part(),dQ2;
+            MATRIX<T,TV::m> dQ;
             MATRIX<T,TV::m> C=tmp(p)*force_helper.Fn(p),dP,dP2;
             constitutive_model.Hessian(C,B,dP,dQ,p);
             constitutive_model.Gradient(dP2,dQ2,p);
             MATRIX<T,TV::m> G=dP.Times_Transpose(force_helper.Fn(p));
-            G+=zeta*dQ*force_helper.Sn(p).Times_Transpose(force_helper.A(p));
+            //G+=zeta*dQ*force_helper.Sn(p).Times_Transpose(force_helper.A(p));
+            G+=zeta*dQ*force_helper.A(p)*force_helper.Sn(p);
             G+=zeta*dQ2*tmp(p)*force_helper.Sn(p);
             tmp(p)=G*particles.volume(p);},true);
 
