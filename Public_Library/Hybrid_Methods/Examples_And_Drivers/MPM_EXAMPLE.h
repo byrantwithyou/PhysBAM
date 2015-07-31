@@ -59,6 +59,7 @@ public:
     // fluid and kkt shared stuff
     ARRAY<bool,TV_INT> cell_solid;
     ARRAY<int,TV_INT> cell_pressure;
+    SPARSE_MATRIX_FLAT_MXN<T> DT;
 
     // fluid stuff
     bool incompressible;

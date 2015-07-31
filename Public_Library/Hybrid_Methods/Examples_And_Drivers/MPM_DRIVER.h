@@ -11,6 +11,8 @@ namespace PhysBAM{
 
 template<class TV> class FLUID_KRYLOV_SYSTEM;
 template<class TV> class FLUID_KRYLOV_VECTOR;
+template<class TV> class KKT_KRYLOV_SYSTEM;
+template<class TV> class KKT_KRYLOV_VECTOR;
 template<class TV> class MPM_EXAMPLE;
 template<class TV> class MPM_OBJECTIVE;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
@@ -34,11 +36,15 @@ public:
     FLUID_KRYLOV_SYSTEM<TV>& fluid_sys;
     FLUID_KRYLOV_VECTOR<TV>& fluid_p;
     FLUID_KRYLOV_VECTOR<TV>& fluid_rhs;
+    KKT_KRYLOV_SYSTEM<TV>& kkt_sys;
+    KKT_KRYLOV_VECTOR<TV>& kkt_lhs;
+    KKT_KRYLOV_VECTOR<TV>& kkt_rhs;
     
     // TODO: Implement KKT_KRYLOV_SYSTEM and KKT_KRYLOV_VECTOR
     
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> bv;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> cv;
 
     MPM_DRIVER(MPM_EXAMPLE<TV>& example);
     virtual ~MPM_DRIVER();
@@ -60,7 +66,7 @@ public:
     void Face_To_Cell();
     void Make_Incompressible();
     T Pressure_Projection();
-    void Build_KKT_Matrix();
+    void Solve_KKT_System();
     void Apply_Forces();
     void Perform_Particle_Collision(int p,T time);
     void Apply_Friction();

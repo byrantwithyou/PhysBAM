@@ -26,6 +26,8 @@
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <Hybrid_Methods/System/FLUID_KRYLOV_SYSTEM.h>
 #include <Hybrid_Methods/System/FLUID_KRYLOV_VECTOR.h>
+#include <Hybrid_Methods/System/KKT_KRYLOV_SYSTEM.h>
+#include <Hybrid_Methods/System/KKT_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
 #ifdef USE_OPENMP
@@ -48,7 +50,10 @@ MPM_DRIVER(MPM_EXAMPLE<TV>& example)
     rhs(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
     fluid_sys(*new FLUID_KRYLOV_SYSTEM<TV>(example)),
     fluid_p(*new FLUID_KRYLOV_VECTOR<TV>(example.valid_pressure_dofs)),
-    fluid_rhs(*new FLUID_KRYLOV_VECTOR<TV>(example.valid_pressure_dofs))
+    fluid_rhs(*new FLUID_KRYLOV_VECTOR<TV>(example.valid_pressure_dofs)),
+    kkt_sys(*new KKT_KRYLOV_SYSTEM<TV>(example)),
+    kkt_lhs(*new KKT_KRYLOV_VECTOR<TV>(example.valid_pressure_indices)),
+    kkt_rhs(*new KKT_KRYLOV_VECTOR<TV>(example.valid_pressure_indices))
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
@@ -67,6 +72,7 @@ template<class TV> MPM_DRIVER<TV>::
     delete &fluid_rhs;
     av.Delete_Pointers_And_Clean_Memory();
     bv.Delete_Pointers_And_Clean_Memory();
+    cv.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Execute_Main_Program
@@ -116,7 +122,10 @@ Initialize()
         example.velocity_new_f.Resize(example.grid.Domain_Indices(example.ghost));
         example.cell_C.Resize(example.grid.Domain_Indices(example.ghost));}
     else if(example.kkt){
-        // TODO: resize something like kkt_p, kkt_rhs
+        kkt_lhs.u.Resize(example.grid.Domain_Indices(example.ghost));
+        kkt_lhs.p.Resize(example.grid.Domain_Indices(example.ghost));
+        kkt_rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
+        kkt_rhs.p.Resize(example.grid.Domain_Indices(example.ghost));
         example.one_over_lambda.Resize(example.grid.Domain_Indices(example.ghost));
         example.J.Resize(example.grid.Domain_Indices(example.ghost));
         example.density.Resize(example.grid.Domain_Indices(example.ghost));}
@@ -125,7 +134,16 @@ Initialize()
         example.cell_solid.Resize(example.grid.Domain_Indices(example.ghost));
         example.cell_pressure.Resize(example.grid.Domain_Indices(example.ghost));
         for(CELL_ITERATOR<TV> iterator(example.grid,example.ghost,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
-            example.cell_solid(iterator.Cell_Index())=true;}
+            example.cell_solid(iterator.Cell_Index())=true;
+        if(example.kkt){
+            RANGE<TV_INT> range(example.grid.Cell_Indices(0));
+            TV_INT max_corner=range.max_corner;
+            LOG::printf("max_corner=%P\n",max_corner);
+            for(CELL_ITERATOR<TV> iterator(example.grid,example.ghost,GRID<TV>::WHOLE_REGION);iterator.Valid();iterator.Next()){
+                for(int a=0;a<TV::m;a++){
+                    int max_corner_axis=max_corner(a)-TV_INT::Axis_Vector(a)(a);
+                    if(iterator.Cell_Index()(a)==0 || iterator.Cell_Index()(a)==1 || iterator.Cell_Index()(a)==max_corner_axis || iterator.Cell_Index()(a)==max_corner_axis || iterator.Cell_Index()(a)==max_corner_axis-1)
+                        example.cell_solid(iterator.Cell_Index())=true;}}}}
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
     example.location.Resize(range,false,false);
@@ -164,8 +182,8 @@ Advance_One_Time_Step()
     Print_Grid_Stats("after forces",example.dt,example.velocity_new,&example.velocity);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
     if(example.kkt)
-        Build_KKT_Matrix();
-    if(example.incompressible)
+        Solve_KKT_System();
+    else if(example.incompressible)
         Make_Incompressible();
     else
         Grid_To_Particle();
@@ -278,35 +296,43 @@ Particle_To_Grid()
                 else V+=dV(p)*(w*scale*(example.grid.Center(index)-particles.X(p)));}
             example.velocity(index)+=particles.mass(p)*V;
             if(example.kkt){
-                example.one_over_lambda(index)+=particles.mass(p)*particles.one_over_lambda(p);
-                example.J(index)+=particles.mass(p)*particles.F(p).Determinant();}
+                example.one_over_lambda(index)+=w*particles.mass(p)*particles.one_over_lambda(p);
+                example.J(index)+=w*particles.mass(p)*particles.F(p).Determinant();}
         },true);
 
     example.valid_grid_indices.Remove_All();
     example.valid_grid_cell_indices.Remove_All();
     if(example.incompressible || example.kkt){
         example.cell_pressure.Fill(0);
-        if(!example.kkt){
-            example.valid_pressure_indices.Remove_All();
-            example.valid_pressure_cell_indices.Remove_All();
-            example.valid_pressure_dofs.Remove_All();
-            example.valid_pressure_cell_dofs.Remove_All();}}
+        example.valid_pressure_indices.Remove_All();
+        example.valid_pressure_cell_indices.Remove_All();
+        example.valid_pressure_dofs.Remove_All();
+        example.valid_pressure_cell_dofs.Remove_All();}
 
     for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
         int i=example.mass.Standard_Index(it.index);
         if(example.mass.array(i)){
+            example.valid_grid_indices.Append(i);
+            example.valid_grid_cell_indices.Append(it.index);
+            example.velocity.array(i)/=example.mass.array(i);
             if(example.incompressible){
                 example.cell_pressure.array(i)=1;
                 if(!example.cell_solid.array(i)){
                     example.valid_pressure_indices.Append(i);
                     example.valid_pressure_cell_indices.Append(it.index);}}
-            example.valid_grid_indices.Append(i);
-            example.valid_grid_cell_indices.Append(it.index);
-            example.velocity.array(i)/=example.mass.array(i);
             if(example.kkt){
-                example.cell_pressure.array(i)=1;
                 example.one_over_lambda.array(i)/=example.mass.array(i);
-                example.J.array(i)/=example.mass.array(i);}}
+                example.J.array(i)/=example.mass.array(i);
+                example.density.array(i)=example.mass.array(i)*example.grid.One_Over_Cell_Size();
+                if(!example.cell_solid.array(i)){
+                    example.cell_pressure.array(i)=1;
+                    example.valid_pressure_indices.Append(i);
+                    example.valid_pressure_cell_indices.Append(it.index);}
+                else{ // zero out velocity, 1/lambda, J in solid region
+                    example.velocity.array(i)=TV();
+                    example.one_over_lambda.array(i)=(T)0;
+                    example.J.array(i)=(T)100000;
+                    example.density.array(i)=(T)0;}}}
         else example.velocity.array(i)=TV();}
 }
 //#####################################################################
@@ -538,41 +564,83 @@ Make_Incompressible()
         Grid_To_Particle();}
 }
 //#####################################################################
-// Function Build_KKT_Matrix
+// Function Solve_KKT_System
 //#####################################################################
 template<class TV> void MPM_DRIVER<TV>::
-Build_KKT_Matrix()
+Solve_KKT_System()
 {
-    // Build B    
-    example.kkt_B.Clean_Memory();
-    for(int t=0;t<example.valid_grid_cell_indices.m;t++){
-        TV_INT id=example.valid_grid_cell_indices(t);
-        bool near_solid=false;
-        for(int a=0;a<TV_INT::m;++a){
-            const TV_INT ej=TV_INT::Axis_Vector(a);
-            if(example.cell_solid(id-ej) || example.cell_solid(id+ej)){
-                near_solid=true;break;}}
-        if(near_solid) example.kkt_B.Append(id);}
-    
-    // Build DT
+    // Construct lhs and rhs
+    kkt_lhs.u.Fill(TV());kkt_rhs.u.Fill(TV());
+    kkt_lhs.p.Fill((T)0);kkt_rhs.p.Fill((T)0);
+    T one_over_dt=(T)1/example.dt;
+    int d=TV::m;
+    for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
+        TV_INT valid_cell=example.valid_pressure_cell_indices(t);
+        kkt_rhs.u(valid_cell)=one_over_dt*example.density(valid_cell)*example.velocity_new(valid_cell);
+        kkt_rhs.p(valid_cell)=one_over_dt*((T)1-(T)1/example.J(valid_cell));}
+    // Construct DT
     ARRAY<T,TV_INT>& m=example.mass;
-    ARRAY<int> row_lengths(example.valid_grid_indices.m,true,3*TV::m+1);
-    SPARSE_MATRIX_FLAT_MXN<T> DT;
-    DT.Set_Row_Lengths(row_lengths);
-    for(int row=0;row<example.valid_grid_indices.m;row++){
-        TV_INT id=example.valid_grid_cell_indices(row);
+    example.DT.Reset(d*example.velocity.array.m);
+    for(int row=0;row<example.valid_pressure_indices.m;row++){
+        TV_INT id=example.valid_pressure_cell_indices(row);
+        for(int a=0;a<d;a++){
+            TV_INT ej=TV_INT::Axis_Vector(a);
+            example.DT.Append_Entry_To_Current_Row(d*example.velocity.Standard_Index(id)+a,(T)0);
+            example.DT.Append_Entry_To_Current_Row(d*example.velocity.Standard_Index(id-ej)+a,(T)0);
+            example.DT.Append_Entry_To_Current_Row(d*example.velocity.Standard_Index(id+ej)+a,(T)0);
+            example.DT.Append_Entry_To_Current_Row(d*example.velocity.Standard_Index(id+2*ej)+a,(T)0);}
+        example.DT.Finish_Row();}
+    example.DT.Sort_Entries();
+    
+    for(int row=0;row<example.valid_pressure_indices.m;row++){
+        TV_INT id=example.valid_pressure_cell_indices(row);
         for(int a=0;a<TV::m;a++){
             TV_INT ej=TV_INT::Axis_Vector(a);
             TV_INT r0=example.cell_pressure(id+ej)?id+ej:id;
             TV_INT r1=example.cell_pressure(id+2*ej)?id+2*ej:id+ej;
-            DT(row,example.velocity.Standard_Index(id))+=m(id)/(m(id+ej)+m(id))-(m(id-ej)/(T)2+m(id))/(m(id-ej)+m(id)); 
-            DT(row,example.velocity.Standard_Index(id-ej))-=m(id-ej)/((T)2*(m(id-ej)+m(id)));
-            DT(row,example.velocity.Standard_Index(id+ej))+=m(id+ej)/(m(id+ej)+m(id));
-            DT(row,example.velocity.Standard_Index(r0))+=m(id)/((T)2*(m(id+ej)+m(id)))+m(id)/((T)2*(m(id-ej)+m(id)));
-            DT(row,example.velocity.Standard_Index(r0-ej))-=m(id)/((T)2*(m(id+ej)+m(id)))+m(id)/((T)2*(m(id-ej)+m(id)));
-            DT(row,example.velocity.Standard_Index(r1))-=m(id+ej)/((T)2*(m(id+ej)+m(id)));
-            DT(row,example.velocity.Standard_Index(r1-ej))+=m(id+ej)/((T)2*(m(id+ej)+m(id)));}}
-    DT*=example.grid.one_over_dX(0);
+            example.DT(row,d*example.velocity.Standard_Index(id)+a)+=m(id)/(m(id+ej)+m(id))-(m(id-ej)/(T)2+m(id))/(m(id-ej)+m(id));
+            example.DT(row,d*example.velocity.Standard_Index(id-ej)+a)-=m(id-ej)/((T)2*(m(id-ej)+m(id)));
+            example.DT(row,d*example.velocity.Standard_Index(id+ej)+a)+=m(id+ej)/(m(id+ej)+m(id));
+            example.DT(row,d*example.velocity.Standard_Index(r0)+a)+=m(id)/((T)2*(m(id+ej)+m(id)))+m(id)/((T)2*(m(id-ej)+m(id)));
+            example.DT(row,d*example.velocity.Standard_Index(r0-ej)+a)-=m(id)/((T)2*(m(id+ej)+m(id)))+m(id)/((T)2*(m(id-ej)+m(id)));
+            example.DT(row,d*example.velocity.Standard_Index(r1)+a)-=m(id+ej)/((T)2*(m(id+ej)+m(id)));
+            example.DT(row,d*example.velocity.Standard_Index(r1-ej)+a)+=m(id+ej)/((T)2*(m(id+ej)+m(id)));}}
+    example.DT*=example.grid.one_over_dX(0);
+
+    // For debugging system and rhs
+    // std::ofstream out;
+    // KKT_KRYLOV_SYSTEM<TV> kkt_sys_check(example);
+    // KKT_KRYLOV_VECTOR<TV> kkt_lhs_check(example.valid_pressure_indices);
+    // KKT_KRYLOV_VECTOR<TV> kkt_rhs_check(example.valid_pressure_indices);
+    // kkt_lhs_check.u.Resize(example.grid.Domain_Indices(example.ghost));kkt_rhs_check.u.Resize(example.grid.Domain_Indices(example.ghost));
+    // kkt_lhs_check.p.Resize(example.grid.Domain_Indices(example.ghost));kkt_rhs_check.p.Resize(example.grid.Domain_Indices(example.ghost));
+    // kkt_lhs_check.u.Fill(TV());kkt_rhs_check.u.Fill(TV());
+    // kkt_lhs_check.p.Fill((T)0);kkt_rhs_check.p.Fill((T)0);
+
+    // out.open("system.m");
+    // out<<"system=zeros("<<kkt_lhs_check.Raw_Size()<<","<<kkt_lhs_check.Raw_Size()<<");\n";
+    // int b=kkt_lhs_check.Raw_Size();
+    // for(int i=0;i<b;i++){
+    //     kkt_rhs_check.Raw_Get(i)=1;
+    //     kkt_sys_check.Multiply(kkt_rhs_check,kkt_lhs_check);
+    //     kkt_rhs_check.Raw_Get(i)=0;
+    //     for(int j=0;j<b;j++)
+    //         out<<"system("<<j+1<<","<<i+1<<")="<<kkt_lhs_check.Raw_Get(j)<<";\n";}
+    // out.close();
+    // out.open("rhs.m");
+    // out<<"rhs=zeros("<<kkt_rhs_check.Raw_Size()<<",1);\n";
+    // for(int i=0;i<kkt_rhs_check.Raw_Size();i++){
+    //     out<<"rhs("<<i+1<<")="<<kkt_rhs.Raw_Get(i)<<";\n";}
+    // out.close();
+
+    MINRES<T> mr;
+    int max_iterations=100000;
+    mr.Solve(kkt_sys,kkt_lhs,kkt_rhs,cv,1e-10,0,max_iterations);
+    
+    // update velocity on grid
+    example.velocity_new=kkt_lhs.u;
+    
+    Grid_To_Particle();
 }
 //#####################################################################
 // Function Pressure_Projection
