@@ -226,16 +226,15 @@ Initialize()
             bottom->func_frame=[this](T time){return FRAME<TV>(TV(0,(T).75-abs((T).15*time*scale_speed-(T).75)));};
             bottom->func_twist=[this](T time){return TWIST<TV>(TV(0,-sign((T).15*time*scale_speed-(T).75)*(T).15*scale_speed),typename TV::SPIN());};
         } break;
-        case 12:{ // freefall circle, rising ground, penalty collisions
+        case 12:{ // jello in a shrinking penalty box
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            SPHERE<TV> sphere(TV(.5,.5),.3);
+            RANGE<TV> box(TV(.3,.2),TV(.7,.4));
             T density=2*scale_mass;
-            Seed_Particles_Helper(sphere,0,0,
-                density,particles_per_cell);
+            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
-            Add_Fixed_Corotated(1*scale_E,0.3,&foo);
+            Add_Fixed_Corotated(20*scale_E,0.4,&foo,false);
             Add_Gravity(TV(0,-9.8));
-            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,true);
+            Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1,true);
         } break;
         case 13:{ // surface tension test: fixed topology circle shell
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
@@ -508,6 +507,14 @@ Begin_Time_Step(const T time)
     // static int count=0;
     switch(test_number)
     {
+        case 12:{
+            if(time>=10/24.0){
+                lagrangian_forces.Delete_Pointers_And_Clean_Memory();
+                this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+                this->output_structures_each_frame=true;
+                Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1+(T)(time-10/24.0)*0.08,true);
+                Add_Gravity(TV(0,-9.8));}
+        } break;
         case 15:{
             // if(count++>1 ) break;
             int N_non_surface=particles.number-Nsurface;
