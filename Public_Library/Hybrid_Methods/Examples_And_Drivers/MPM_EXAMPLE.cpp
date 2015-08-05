@@ -25,7 +25,8 @@ template<class TV> MPM_EXAMPLE<TV>::
 MPM_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(&particles,0)),
-    debug_particles(*new DEBUG_PARTICLES<TV>),lagrangian_forces(deformable_body_collection.deformables_forces),
+    debug_particles(*new DEBUG_PARTICLES<TV>),current_velocity(0),
+    lagrangian_forces(deformable_body_collection.deformables_forces),
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
     force_helper(*new MPM_FORCE_HELPER<TV>(particles)),incompressible(false),kkt(false),initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),
@@ -62,7 +63,7 @@ Write_Output_Files(const int frame)
 
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),velocity_new);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),*current_velocity);
     if(incompressible)
         FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),velocity_new_f);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/density",output_directory.c_str(),frame),mass);

@@ -111,6 +111,7 @@ Initialize()
     example.particles.Store_C(example.use_affine && (example.incompressible || example.kkt));
     example.particles.Store_S(example.use_oldroyd);
     example.particles.Store_One_Over_Lambda(example.kkt);
+    example.current_velocity=&example.velocity;
 
     if(example.incompressible){
         fluid_p.p.Resize(example.grid.Domain_Indices(example.ghost));
@@ -267,6 +268,7 @@ template<class TV> void MPM_DRIVER<TV>::
 Particle_To_Grid()
 {
     MPM_PARTICLES<TV>& particles=example.particles;
+    example.current_velocity=&example.velocity;
 
 #pragma omp parallel for
     for(int i=0;i<example.mass.array.m;i++){
@@ -867,6 +869,7 @@ Apply_Forces()
         int j=example.valid_grid_indices(i);
         example.velocity_new.array(j)=dv.u.array(j)+objective.v0.u.array(j);}
     example.velocity_new.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
+    example.current_velocity=&example.velocity_new;
 }
 //#####################################################################
 // Function Perform_Particle_Collision
