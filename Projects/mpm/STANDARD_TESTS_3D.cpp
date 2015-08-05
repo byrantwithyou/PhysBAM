@@ -6,6 +6,7 @@
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -346,6 +347,65 @@ Initialize()
             Add_Force(*fe);
             Add_Gravity(TV(0,-9.8,0));
         } break;
+        case 15:{ // rotating cylinder oldroyd-b SCA energy
+            // ./mpm -3d 15 -max_dt 1e-3 -last_frame 1000 -w1 0 -w2 200 -scale_speed 0 -resolution 10 -framerate 100 -penalty_stiffness 1e4
+            grid.Initialize(TV_INT(resolution*2,resolution*3,resolution*2),RANGE<TV>(TV(-0.06,-0.06,-0.06),TV(0.06,0.12,0.06)),true);
+            LOG::cout<<"GRID DX: "<<grid.dX<<std::endl;
+            Add_Gravity(TV(0,-9.8,0));
+            // Container glass
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/glass.tri.gz",*surface);
+            LOG::cout<<"Read mesh elements "<<surface->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh particles "<<surface->particles.number<<std::endl;
+            surface->mesh.Initialize_Adjacent_Elements();    
+            surface->mesh.Initialize_Neighbor_Nodes();
+            surface->mesh.Initialize_Incident_Elements();
+            surface->Update_Bounding_Box();
+            surface->Initialize_Hierarchy();
+            surface->Update_Triangle_List();
+            LOG::cout<<"Building levelset for the collision object..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,100);
+            LOG::cout<<"...done!"<<std::endl;
+            Add_Penalty_Collision_Object(levelset);
+            // Rotating cylinder
+            surface2=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/cylinder.tri.gz",*surface2);
+            surface_old=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/cylinder.tri.gz",*surface_old);
+            LOG::cout<<"Read mesh elements "<<surface2->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh particles "<<surface2->particles.number<<std::endl;
+            surface2->mesh.Initialize_Adjacent_Elements();    
+            surface2->mesh.Initialize_Neighbor_Nodes();
+            surface2->mesh.Initialize_Incident_Elements();
+            surface2->Update_Bounding_Box();
+            surface2->Initialize_Hierarchy();
+            surface2->Update_Triangle_List();
+            LOG::cout<<"Building levelset for the cylinder stir..."<<std::endl;
+            levelset2=Initialize_Implicit_Surface(*surface2,100);
+            LOG::cout<<"...done!"<<std::endl;
+            Add_Penalty_Collision_Object(levelset2);
+            // Poly ethylene glycol
+            // SPHERE<TV> seeder(TV(0,0.015,0),.03);
+            // RANGE<TV> seeder(TV(-0.06,-0.04,-0.06),TV(0.06,0.007,0.06));
+            T radius=0.03*1.3;TV P1(0,0.014-0.035-0.018,0);TV P2(0,0.014+0.05,0);
+            CYLINDER<T> seeder(P1,P2,radius);
+            T density=1000*scale_mass;
+            use_oldroyd=true;
+            this->inv_Wi=(T)1000*scale_speed;
+            particles.Store_S(use_oldroyd);            
+            Seed_Particles_Helper(seeder,[=](const TV& X){return TV();},0,density,particles_per_cell);
+            for(int k=0;k<particles.number;k++){
+                TV X=particles.X(k);
+                if(sqr(X(0))+sqr(X(2))>=sqr(0.046) || levelset->Extended_Phi(X)<=0 || levelset2->Extended_Phi(X)<=0)
+                    particles.Add_To_Deletion_List(k);}
+            particles.Delete_Elements_On_Deletion_List();
+            particles.F.Fill(MATRIX<T,3>()+1);particles.S.Fill(SYMMETRIC_MATRIX<T,3>()+sqr(1));
+            VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV> *neo=new VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV>;
+            neo->mu=38.462*case11_w1;
+            neo->lambda=57.692*case11_w2;
+            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi);
+            Add_Force(*fe);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
@@ -477,6 +537,23 @@ Begin_Frame(const int frame)
             Add_Force(*stf);
 
         } break;
+        case 15:{
+            LOG::cout<<lagrangian_forces.m<<std::endl;
+            delete lagrangian_forces(lagrangian_forces.m-1);
+            lagrangian_forces.Remove_End();
+            PHYSBAM_ASSERT(this->deformable_body_collection.structures.m==0);
+            LOG::cout<<this->deformable_body_collection.deformables_forces.m<<std::endl;
+            LOG::cout<<"Building levelset for the cylinder stir..."<<std::endl;
+            if(levelset2) delete levelset2;
+            ROTATION<TV> rotator((T)0.02*frame,TV(0,1,0));
+            for(int k=0;k<surface2->particles.number;k++)
+                surface2->particles.X(k)=rotator.Rotate(surface_old->particles.X(k));
+            surface2->Update_Bounding_Box();
+            surface2->Initialize_Hierarchy();
+            levelset2=Initialize_Implicit_Surface(*surface2,100);
+            LOG::cout<<"...done!"<<std::endl;
+            Add_Penalty_Collision_Object(levelset2);
+        } break;
     }
 }
 //#####################################################################
@@ -498,7 +575,6 @@ Begin_Time_Step(const T time)
             if(time>=10/24.0){
                 lagrangian_forces.Delete_Pointers_And_Clean_Memory();
                 this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
-                this->output_structures_each_frame=true;
                 RANGE<TV> ym(TV(-5,0,-5),TV(5,.1+(time-10/24.0)*.5,5));
                 Add_Penalty_Collision_Object(ym);
                 Add_Gravity(TV(0,-9.8,0));}

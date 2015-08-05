@@ -12,6 +12,8 @@
 namespace PhysBAM{
 
 template<class TV> class STANDARD_TESTS;
+template<class T> class TRIANGULATED_SURFACE;
+template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 
 template<class T>
 class STANDARD_TESTS<VECTOR<T,3> >:public STANDARD_TESTS_BASE<VECTOR<T,3> >
@@ -37,7 +39,7 @@ public:
     using BASE::Add_Force;using BASE::Add_Walls;using BASE::data_directory;
     using BASE::stream_type;using BASE::use_oldroyd;using BASE::force_helper;
     using BASE::Seed_Particles_Helper;using BASE::Add_Neo_Hookean;using BASE::Add_Collision_Object;
-    using BASE::Add_Particle;using BASE::Add_Penalty_Collision_Object;
+    using BASE::Add_Particle;using BASE::Add_Penalty_Collision_Object;using BASE::scale_speed;
 
     int Nsurface;
     ARRAY<int> steal;
@@ -55,10 +57,13 @@ public:
 
     LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res);
 
-    // Case private additional storage
+    // additional storage
     int case10_m;
     T case11_w1;
     T case11_w2;
+    TRIANGULATED_SURFACE<T>* surface2;
+    LEVELSET_IMPLICIT_OBJECT<TV>* levelset2;
+    TRIANGULATED_SURFACE<T>* surface_old;
 //#####################################################################
 };
 }
