@@ -550,9 +550,10 @@ Begin_Frame(const int frame)
                 surface2->particles.X(k)=rotator.Rotate(surface_old->particles.X(k));
             surface2->Update_Bounding_Box();
             surface2->Initialize_Hierarchy();
-            levelset2=Initialize_Implicit_Surface(*surface2,100);
+            levelset2=Initialize_Implicit_Surface(*surface2,50);
             LOG::cout<<"...done!"<<std::endl;
             Add_Penalty_Collision_Object(levelset2);
+            Dump_Levelset(levelset2->levelset.grid,*levelset2,VECTOR<T,3>(0,1,0));
         } break;
     }
 }
