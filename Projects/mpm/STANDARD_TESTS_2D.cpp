@@ -376,6 +376,10 @@ Initialize()
             SPHERE<TV> sphere(TV(.5,.7),.2);
             T density=2*scale_mass;
             Seed_Particles_Helper(sphere,0,0,density,particles_per_cell);
+            // for(int k=1;k<particles.number;k++){
+            //     particles.Add_To_Deletion_List(k);}
+            // particles.Delete_Elements_On_Deletion_List();
+            // particles.V(0)=TV(1.234e-16,4.342e-16);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
             Add_Gravity(TV(0,-1.8));
             for(int p=0;p<particles.number;p++)

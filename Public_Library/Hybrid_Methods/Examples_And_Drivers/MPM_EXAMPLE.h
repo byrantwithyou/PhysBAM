@@ -59,7 +59,7 @@ public:
     // fluid and kkt shared stuff
     ARRAY<bool,TV_INT> cell_solid;
     ARRAY<int,TV_INT> cell_pressure;
-    SPARSE_MATRIX_FLAT_MXN<T> DT;
+    ARRAY<MATRIX<T,TV::m>,TV_INT> cell_C;
 
     // fluid stuff
     bool incompressible;
@@ -70,15 +70,13 @@ public:
     ARRAY<T,FACE_INDEX<TV::m> > mass_f,volume_f,density_f;
     ARRAY<T,FACE_INDEX<TV::m> > velocity_f;
     ARRAY<T,FACE_INDEX<TV::m> > velocity_new_f;
-    ARRAY<MATRIX<T,TV::m>,TV_INT> cell_C;
 
     // kkt stuff
     bool kkt;
     ARRAY<T,TV_INT> one_over_lambda;
     ARRAY<T,TV_INT> J;
     ARRAY<T,TV_INT> density;
-    ARRAY<T,TV_INT> kkt_lagrange_multiplier;
-    ARRAY<TV_INT> kkt_B;
+    SPARSE_MATRIX_FLAT_MXN<T> DT;
 
     T initial_time;
     int last_frame;

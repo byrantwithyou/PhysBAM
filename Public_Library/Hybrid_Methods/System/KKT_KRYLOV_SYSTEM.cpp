@@ -35,23 +35,28 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
     const KKT_KRYLOV_VECTOR<TV>& V=debug_cast<const KKT_KRYLOV_VECTOR<TV>&>(BV);
     KKT_KRYLOV_VECTOR<TV>& F=debug_cast<KKT_KRYLOV_VECTOR<TV>&>(BF);
     F.u.Fill(TV());F.p.Fill((T)0);
-    
     // -DT^T*p
+    T dt=example.dt;
+    const ARRAY<T,TV_INT>& r=example.density;
     int index=example.DT.offsets(0);
     for(int i=0;i<example.DT.m;i++){
-        int end=example.DT.offsets(i+1);T y=V.p.array(example.valid_pressure_indices(i));
-        for(;index<end;index++) F.u.array.Flattened()(example.DT.A(index).j)-=example.DT.A(index).a*y;}
+        int end=example.DT.offsets(i+1);T y=V.p.array(example.valid_pressure_indices(i))*sqrt(dt);
+        for(;index<end;index++){
+            int cell=example.DT.A(index).j/TV::m;
+            if(abs(sqrt(r.array(cell))>1e-16)) F.u.array.Flattened()(example.DT.A(index).j)-=example.DT.A(index).a*y/sqrt(r.array(cell));}}
     // (1/dt)*R*u
     T one_over_dt=(T)1/example.dt;
     for(int t=0;t<example.valid_pressure_indices.m;t++){
         int cell=example.valid_pressure_indices(t);
-        F.u.array(cell)+=one_over_dt*example.density.array(cell)*V.u.array(cell);}
+        F.u.array(cell)+=V.u.array(cell);}
     // -DT*u-(1/lambda*dt)*J.Inverse()*p
     index=example.DT.offsets(0);
     for(int i=0;i<example.DT.m;i++){
         int end=example.DT.offsets(i+1);T sum=(T)0;
-        for(;index<end;index++) sum-=example.DT.A(index).a*V.u.array.Flattened()(example.DT.A(index).j);
-        F.p.array(example.valid_pressure_indices(i))=sum;}
+        for(;index<end;index++){
+            int cell=example.DT.A(index).j/TV::m;
+            if(abs(r.array(cell))>1e-16) sum-=example.DT.A(index).a*V.u.array.Flattened()(example.DT.A(index).j)/sqrt(r.array(cell));}
+        F.p.array(example.valid_pressure_indices(i))=sum*sqrt(dt);}
     for(int t=0;t<example.valid_pressure_indices.m;t++){
         TV_INT valid_cell=example.valid_pressure_cell_indices(t); 
         F.p(valid_cell)-=one_over_dt*example.one_over_lambda(valid_cell)/example.J(valid_cell)*V.p(valid_cell);}

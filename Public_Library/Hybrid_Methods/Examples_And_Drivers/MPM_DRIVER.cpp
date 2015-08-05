@@ -108,7 +108,7 @@ Initialize()
     objective.system.tmp.u.Resize(example.grid.Domain_Indices(example.ghost));
 
     example.particles.Store_B(example.use_affine && !example.incompressible);
-    example.particles.Store_C(example.use_affine && example.incompressible);
+    example.particles.Store_C(example.use_affine && (example.incompressible || example.kkt));
     example.particles.Store_S(example.use_oldroyd);
     example.particles.Store_One_Over_Lambda(example.kkt);
 
@@ -119,8 +119,7 @@ Initialize()
         example.volume_f.Resize(example.grid.Domain_Indices(example.ghost));
         example.density_f.Resize(example.grid.Domain_Indices(example.ghost));
         example.velocity_f.Resize(example.grid.Domain_Indices(example.ghost));
-        example.velocity_new_f.Resize(example.grid.Domain_Indices(example.ghost));
-        example.cell_C.Resize(example.grid.Domain_Indices(example.ghost));}
+        example.velocity_new_f.Resize(example.grid.Domain_Indices(example.ghost));}
     else if(example.kkt){
         kkt_lhs.u.Resize(example.grid.Domain_Indices(example.ghost));
         kkt_lhs.p.Resize(example.grid.Domain_Indices(example.ghost));
@@ -133,6 +132,7 @@ Initialize()
         example.volume.Resize(example.grid.Domain_Indices(example.ghost));
         example.cell_solid.Resize(example.grid.Domain_Indices(example.ghost));
         example.cell_pressure.Resize(example.grid.Domain_Indices(example.ghost));
+        example.cell_C.Resize(example.grid.Domain_Indices(example.ghost));
         for(CELL_ITERATOR<TV> iterator(example.grid,example.ghost,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())
             example.cell_solid(iterator.Cell_Index())=true;
         if(example.kkt){
@@ -331,7 +331,7 @@ Particle_To_Grid()
                 else{ // zero out velocity, 1/lambda, J in solid region
                     example.velocity.array(i)=TV();
                     example.one_over_lambda.array(i)=(T)0;
-                    example.J.array(i)=(T)100000;
+                    example.J.array(i)=(T)FLT_MAX;
                     example.density.array(i)=(T)0;}}}
         else example.velocity.array(i)=TV();}
 }
@@ -569,16 +569,15 @@ Make_Incompressible()
 template<class TV> void MPM_DRIVER<TV>::
 Solve_KKT_System()
 {
-    // Construct lhs and rhs
-    kkt_lhs.u.Fill(TV());kkt_rhs.u.Fill(TV());
-    kkt_lhs.p.Fill((T)0);kkt_rhs.p.Fill((T)0);
+    // Zero out variables in solid
+    for(int i=0;i<example.valid_grid_indices.m;i++){
+        TV_INT index=example.valid_grid_cell_indices(i);
+        if(example.cell_solid(index)){
+            example.mass(index)=0;
+            example.density(index)=0;}}
+    // Construct DT
     T one_over_dt=(T)1/example.dt;
     int d=TV::m;
-    for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
-        TV_INT valid_cell=example.valid_pressure_cell_indices(t);
-        kkt_rhs.u(valid_cell)=one_over_dt*example.density(valid_cell)*example.velocity_new(valid_cell);
-        kkt_rhs.p(valid_cell)=one_over_dt*((T)1-(T)1/example.J(valid_cell));}
-    // Construct DT
     ARRAY<T,TV_INT>& m=example.mass;
     example.DT.Reset(d*example.velocity.array.m);
     for(int row=0;row<example.valid_pressure_indices.m;row++){
@@ -591,23 +590,57 @@ Solve_KKT_System()
             example.DT.Append_Entry_To_Current_Row(d*example.velocity.Standard_Index(id+2*ej)+a,(T)0);}
         example.DT.Finish_Row();}
     example.DT.Sort_Entries();
-    
     for(int row=0;row<example.valid_pressure_indices.m;row++){
         TV_INT id=example.valid_pressure_cell_indices(row);
         for(int a=0;a<TV::m;a++){
             TV_INT ej=TV_INT::Axis_Vector(a);
             TV_INT r0=example.cell_pressure(id+ej)?id+ej:id;
             TV_INT r1=example.cell_pressure(id+2*ej)?id+2*ej:id+ej;
-            example.DT(row,d*example.velocity.Standard_Index(id)+a)+=m(id)/(m(id+ej)+m(id))-(m(id-ej)/(T)2+m(id))/(m(id-ej)+m(id));
-            example.DT(row,d*example.velocity.Standard_Index(id-ej)+a)-=m(id-ej)/((T)2*(m(id-ej)+m(id)));
-            example.DT(row,d*example.velocity.Standard_Index(id+ej)+a)+=m(id+ej)/(m(id+ej)+m(id));
-            example.DT(row,d*example.velocity.Standard_Index(r0)+a)+=m(id)/((T)2*(m(id+ej)+m(id)))+m(id)/((T)2*(m(id-ej)+m(id)));
-            example.DT(row,d*example.velocity.Standard_Index(r0-ej)+a)-=m(id)/((T)2*(m(id+ej)+m(id)))+m(id)/((T)2*(m(id-ej)+m(id)));
-            example.DT(row,d*example.velocity.Standard_Index(r1)+a)-=m(id+ej)/((T)2*(m(id+ej)+m(id)));
-            example.DT(row,d*example.velocity.Standard_Index(r1-ej)+a)+=m(id+ej)/((T)2*(m(id+ej)+m(id)));}}
+            T da=example.cell_solid(id-ej)?0:(T)1/(m(id-ej)+m(id));
+            T db=example.cell_solid(id+ej)?0:(T)1/(m(id+ej)+m(id));
+            if(abs(db)<1e-16) Add_Debug_Particle(example.location(id),VECTOR<T,3>(1,0,1));
+            if(abs(da)<1e-16) Add_Debug_Particle(example.location(id),VECTOR<T,3>(1,1,0));
+            example.DT(row,d*example.velocity.Standard_Index(id)+a)+=m(id)*db-(m(id-ej)/(T)2+m(id))*da;
+            example.DT(row,d*example.velocity.Standard_Index(id-ej)+a)-=m(id-ej)*da/(T)2;
+            example.DT(row,d*example.velocity.Standard_Index(id+ej)+a)+=m(id+ej)*db;
+            example.DT(row,d*example.velocity.Standard_Index(r0)+a)+=m(id)*db/(T)2+m(id)*da/(T)2;
+            example.DT(row,d*example.velocity.Standard_Index(r0-ej)+a)-=m(id)*db/(T)2+m(id)*da/(T)2;
+            example.DT(row,d*example.velocity.Standard_Index(r1)+a)-=m(id+ej)*db/(T)2;
+            example.DT(row,d*example.velocity.Standard_Index(r1-ej)+a)+=m(id+ej)*db/(T)2;}}
     example.DT*=example.grid.one_over_dX(0);
-
-    // For debugging system and rhs
+    // Construct lhs and rhs
+    kkt_lhs.u.Fill(TV());kkt_rhs.u.Fill(TV());
+    kkt_lhs.p.Fill((T)0);kkt_rhs.p.Fill((T)0);
+    for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
+        TV_INT valid_cell=example.valid_pressure_cell_indices(t);
+        kkt_rhs.u(valid_cell)=example.velocity_new(valid_cell)*sqrt(example.density(valid_cell)/example.dt);
+        kkt_rhs.p(valid_cell)=one_over_dt*((T)1-(T)1/example.J(valid_cell));}
+    // MINRES 
+    MINRES<T> mr;
+    int max_iterations=100000;
+    mr.Solve(kkt_sys,kkt_lhs,kkt_rhs,cv,1e-12,0,max_iterations);
+    // Update velocity on grid
+    example.velocity_new=kkt_lhs.u;
+    for(int i=0;i<example.valid_pressure_indices.m;i++){
+        TV_INT index=example.valid_pressure_cell_indices(i);
+        example.velocity_new(index)*=sqrt(example.dt/example.density(index));}
+    // Apply BC
+    for(int t=0; t<example.valid_grid_indices.m; t++){
+        TV_INT index=example.valid_grid_cell_indices(t);
+        if(example.cell_solid(index)) for(int b=0;b<TV::m;b++) for(int a=0;a<TV::m; a++){
+            const TV_INT axis=TV_INT::Axis_Vector(a);
+            if(!example.cell_solid(index+axis)&&!example.cell_solid(index+2*axis))
+                example.velocity_new(index)(b)=a==b?-example.velocity_new(index+axis)(b):example.velocity_new(index+axis)(b);
+            else if(example.cell_solid(index+axis)&&!example.cell_solid(index+2*axis))
+                example.velocity_new(index)(b)=a==b?-example.velocity_new(index+2*axis)(b):example.velocity_new(index+2*axis)(b);
+            else if(!example.cell_solid(index-axis)&&!example.cell_solid(index-2*axis))
+                example.velocity_new(index)(b)=a==b?-example.velocity_new(index-axis)(b):example.velocity_new(index-axis)(b);
+            else if(example.cell_solid(index-axis)&&!example.cell_solid(index-2*axis))
+                example.velocity_new(index)(b)=a==b?-example.velocity_new(index-2*axis)(b):example.velocity_new(index-2*axis)(b);}}
+    // Transfer to particles
+    Grid_To_Particle();
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after minres in kkt",0,1);
+    // // For debugging system and rhs
     // std::ofstream out;
     // KKT_KRYLOV_SYSTEM<TV> kkt_sys_check(example);
     // KKT_KRYLOV_VECTOR<TV> kkt_lhs_check(example.valid_pressure_indices);
@@ -616,8 +649,7 @@ Solve_KKT_System()
     // kkt_lhs_check.p.Resize(example.grid.Domain_Indices(example.ghost));kkt_rhs_check.p.Resize(example.grid.Domain_Indices(example.ghost));
     // kkt_lhs_check.u.Fill(TV());kkt_rhs_check.u.Fill(TV());
     // kkt_lhs_check.p.Fill((T)0);kkt_rhs_check.p.Fill((T)0);
-
-    // out.open("system.m");
+    // out.open("system.m",std::ios::out);
     // out<<"system=zeros("<<kkt_lhs_check.Raw_Size()<<","<<kkt_lhs_check.Raw_Size()<<");\n";
     // int b=kkt_lhs_check.Raw_Size();
     // for(int i=0;i<b;i++){
@@ -632,15 +664,27 @@ Solve_KKT_System()
     // for(int i=0;i<kkt_rhs_check.Raw_Size();i++){
     //     out<<"rhs("<<i+1<<")="<<kkt_rhs.Raw_Get(i)<<";\n";}
     // out.close();
-
-    MINRES<T> mr;
-    int max_iterations=100000;
-    mr.Solve(kkt_sys,kkt_lhs,kkt_rhs,cv,1e-10,0,max_iterations);
-    
-    // update velocity on grid
-    example.velocity_new=kkt_lhs.u;
-    
-    Grid_To_Particle();
+    // // debugging C
+    // Compute_Cell_C();
+    // T C_check=0;T x_velocity_check=0;TV_INT index_C, index_v;
+    // for(int i=0;i<example.valid_pressure_indices.m;i++){
+    //     TV_INT index=example.valid_pressure_cell_indices(i);
+    //     if(example.cell_C(index).Max_Abs()>C_check) C_check=example.cell_C(index).Max_Abs();
+    //     if(abs(example.velocity_new(index)(0))>x_velocity_check) x_velocity_check=example.velocity_new(index)(0);}
+    // LOG::printf("C_check=%P\nx_velocity_check=%P\n",C_check,x_velocity_check);
+    // T max_particle_C=0;
+    // for(int i=0;i<example.particles.number;i++){
+    //     if(example.particles.C(i).Max_Abs()>max_particle_C) max_particle_C=example.particles.C(i).Max_Abs();}
+    // LOG::printf("max_particle_C_check=%P\n",max_particle_C);
+    // TV max_vel=TV();
+    // TV min_vel=TV::Constant_Vector(FLT_MAX); 
+    // for(int i=0;i<example.valid_pressure_indices.m;i++){
+    //     TV_INT index=example.valid_pressure_cell_indices(i);
+    //     for(int a=0;a<TV::m;a++){
+    //         if(abs(example.velocity_new(index)(a))>max_vel(a)) max_vel(a)=example.velocity_new(index)(a);
+    //         if(abs(example.velocity_new(index)(a))<min_vel(a)) min_vel(a)=example.velocity_new(index)(a);}}
+    // LOG::printf("max_vel_check=%P\tmin_vel_check=%P\n",max_vel,min_vel);
+    // LOG::printf("dif_max_min_vel_check=%P\n",max_vel-min_vel);
 }
 //#####################################################################
 // Function Pressure_Projection
