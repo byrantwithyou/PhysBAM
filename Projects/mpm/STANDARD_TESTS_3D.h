@@ -58,12 +58,14 @@ public:
     LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res);
 
     // additional storage
-    int case10_m;
-    T case11_w1;
-    T case11_w2;
-    TRIANGULATED_SURFACE<T>* surface2;
-    LEVELSET_IMPLICIT_OBJECT<TV>* levelset2;
-    TRIANGULATED_SURFACE<T>* surface_old;
+    int foo_int1;
+    T foo_T1;
+    T foo_T2;
+    T foo_T3;
+    TRIANGULATED_SURFACE<T>* foo_surface1;
+    TRIANGULATED_SURFACE<T>* foo_surface2;
+    LEVELSET_IMPLICIT_OBJECT<TV>* foo_levelset1;
+
 //#####################################################################
 };
 }
