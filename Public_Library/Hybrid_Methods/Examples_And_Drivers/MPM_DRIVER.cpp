@@ -112,6 +112,7 @@ Initialize()
     example.particles.Store_S(example.use_oldroyd);
     example.particles.Store_One_Over_Lambda(example.kkt);
     example.current_velocity=&example.velocity;
+    PHYSBAM_ASSERT(!example.particles.store_B || !example.particles.store_C);
 
     if(example.incompressible){
         fluid_p.p.Resize(example.grid.Domain_Indices(example.ghost));
