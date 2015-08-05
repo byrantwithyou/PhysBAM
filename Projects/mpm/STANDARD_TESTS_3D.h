@@ -14,6 +14,7 @@ namespace PhysBAM{
 template<class TV> class STANDARD_TESTS;
 template<class T> class TRIANGULATED_SURFACE;
 template<class TV> class LEVELSET_IMPLICIT_OBJECT;
+template<class T> class CYLINDER;
 
 template<class T>
 class STANDARD_TESTS<VECTOR<T,3> >:public STANDARD_TESTS_BASE<VECTOR<T,3> >
@@ -65,6 +66,7 @@ public:
     TRIANGULATED_SURFACE<T>* foo_surface1;
     TRIANGULATED_SURFACE<T>* foo_surface2;
     LEVELSET_IMPLICIT_OBJECT<TV>* foo_levelset1;
+    CYLINDER<T>* foo_cylinder;
 
 //#####################################################################
 };
