@@ -13,11 +13,15 @@
 #include <Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <Incompressible/Projection/PROJECTION_UNIFORM.h>
+
 namespace PhysBAM{
 
 template<class TV> class DEBUG_PARTICLES;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
+template<class TV> class SMOKE_PARTICLES;
+
 
 template<class TV>
 class SMOKE_EXAMPLE
@@ -58,28 +62,20 @@ public:
     pthread_mutex_t lock;
 
     // EAPIC
-    VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights;
+    int eapic_order;
+    PARTICLE_GRID_WEIGHTS<TV>* weights; // cell center weights
+    VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights; // face weights
+    SMOKE_PARTICLES<TV>& particles;
 
     SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int refine=0);
     virtual ~SMOKE_EXAMPLE();
-
     T CFL(ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities);
     void CFL_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,T& dt);
-    
-    T Time_At_Frame(const int frame) const
-    {return initial_time+(frame-first_frame)/frame_rate;}
-
-    void Initialize_Grid(TV_INT counts,RANGE<TV> domain)
-    {mac_grid.Initialize(counts,domain,true);}
-    
-    void Initialize_Fields() 
-    {for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) face_velocities(iterator.Full_Index())=0;
-    for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) density(iterator.Cell_Index())=0;}
-    
-    void Get_Scalar_Field_Sources(const T time)
-    {for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
-        if(source.Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=1;}
-
+    T Time_At_Frame(const int frame) const;
+    void Initialize_Grid(TV_INT counts,RANGE<TV> domain);
+    void Initialize_Fields();
+    void Get_Scalar_Field_Sources(const T time);
+    void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);
     virtual void Set_Boundary_Conditions(const T time);

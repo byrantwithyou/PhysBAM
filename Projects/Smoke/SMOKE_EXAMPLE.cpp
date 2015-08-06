@@ -4,7 +4,10 @@
 //#####################################################################
 #include <Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_WEIGHTS_SPLINE.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include "SMOKE_EXAMPLE.h"
+#include "SMOKE_PARTICLES.h"
 #include <pthread.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -18,7 +21,8 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     restart(0),write_debug_data(true),output_directory("output"),N_boundary(false),
     debug_divergence(false),alpha(0.1),
     cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
-    thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(mac_grid,false,false,thread_queue),boundary(0)
+    thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(mac_grid,false,false,thread_queue),boundary(0),
+    eapic_order(1),weights(0),particles(*new SMOKE_PARTICLES<TV>)
 {
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     pthread_mutex_init(&lock,0);    
@@ -32,6 +36,8 @@ template<class TV> SMOKE_EXAMPLE<TV>::
     if(mpi_grid || thread_queue) delete boundary;
     delete thread_queue;    
     delete &debug_particles;
+    delete weights;
+    delete &particles;
 }
 //#####################################################################
 // CFL 
@@ -58,6 +64,56 @@ CFL_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::dimension> >& face_vel
     pthread_mutex_lock(&lock);
     dt=min(dt,(T)1.0/dt_convection);
     pthread_mutex_unlock(&lock);
+}
+//#####################################################################
+// Time_At_Frame
+//#####################################################################
+template<class TV> typename TV::SCALAR SMOKE_EXAMPLE<TV>::
+Time_At_Frame(const int frame) const 
+{
+    return initial_time+(frame-first_frame)/frame_rate;
+}
+//#####################################################################
+// Initialize_Grid
+//#####################################################################
+template<class TV> void SMOKE_EXAMPLE<TV>::
+Initialize_Grid(TV_INT counts,RANGE<TV> domain) 
+{
+    mac_grid.Initialize(counts,domain,true);
+}
+//#####################################################################
+// Initialize_Fields
+//#####################################################################
+template<class TV> void SMOKE_EXAMPLE<TV>::
+Initialize_Fields() 
+{
+    for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) face_velocities(iterator.Full_Index())=0;
+    for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) density(iterator.Cell_Index())=0;
+}
+//#####################################################################
+// Get_Scalar_Field_Sources
+//#####################################################################
+template<class TV> void SMOKE_EXAMPLE<TV>::
+Get_Scalar_Field_Sources(const T time)
+{
+    for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
+        if(source.Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=1;
+}
+//#####################################################################
+// Set_Weights
+//#####################################################################
+template<class TV> void SMOKE_EXAMPLE<TV>::
+Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input)
+{
+    weights=weights_input;
+    for(int i=0;i<TV::m;++i){
+        if(weights->Order()==1)
+            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,1>(mac_grid,/*threads*/1,i);
+        else if(weights->Order()==2)
+            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,2>(mac_grid,/*threads*/1,i);
+        else if(weights->Order()==3)
+            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,3>(mac_grid,/*threads*/1,i);
+        else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");}
 }
 //#####################################################################
 // Set_Boundary_Conditions
@@ -113,10 +169,8 @@ Read_Output_Files(const int frame)
 }
 //#####################################################################
 namespace PhysBAM{
-template class SMOKE_EXAMPLE<VECTOR<float,1> >;
 template class SMOKE_EXAMPLE<VECTOR<float,2> >;
 template class SMOKE_EXAMPLE<VECTOR<float,3> >;
-template class SMOKE_EXAMPLE<VECTOR<double,1> >;
 template class SMOKE_EXAMPLE<VECTOR<double,2> >;
 template class SMOKE_EXAMPLE<VECTOR<double,3> >;
 }

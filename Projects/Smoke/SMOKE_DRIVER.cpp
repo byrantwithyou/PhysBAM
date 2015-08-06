@@ -216,10 +216,8 @@ Print_Max_Divergence(const char* str)
 }
 //#####################################################################
 namespace PhysBAM{
-template class SMOKE_DRIVER<VECTOR<float,1> >;
 template class SMOKE_DRIVER<VECTOR<float,2> >;
 template class SMOKE_DRIVER<VECTOR<float,3> >;
-template class SMOKE_DRIVER<VECTOR<double,1> >;
 template class SMOKE_DRIVER<VECTOR<double,2> >;
 template class SMOKE_DRIVER<VECTOR<double,3> >;
 }
