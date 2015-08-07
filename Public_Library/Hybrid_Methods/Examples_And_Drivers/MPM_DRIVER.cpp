@@ -584,7 +584,8 @@ Solve_KKT_System()
         TV_INT index=example.valid_grid_cell_indices(i);
         if(example.cell_solid(index)){
             example.mass(index)=0;
-            example.density(index)=0;}}
+            example.density(index)=0;
+            example.velocity_new(index)=TV();}}
     // Construct DT
     T one_over_dt=(T)1/example.dt;
     int d=TV::m;
@@ -594,30 +595,24 @@ Solve_KKT_System()
         TV_INT id=example.valid_pressure_cell_indices(row);
         for(int a=0;a<d;a++){
             TV_INT ej=TV_INT::Axis_Vector(a);
-            example.DT.Append_Entry_To_Current_Row(d*example.velocity.Standard_Index(id)+a,(T)0);
-            example.DT.Append_Entry_To_Current_Row(d*example.velocity.Standard_Index(id-ej)+a,(T)0);
-            example.DT.Append_Entry_To_Current_Row(d*example.velocity.Standard_Index(id+ej)+a,(T)0);
-            example.DT.Append_Entry_To_Current_Row(d*example.velocity.Standard_Index(id+2*ej)+a,(T)0);}
+            for(int i=-1;i<3;i++) example.DT.Append_Entry_To_Current_Row(d*example.velocity.Standard_Index(id+i*ej)+a,(T)0);}
         example.DT.Finish_Row();}
     example.DT.Sort_Entries();
     for(int row=0;row<example.valid_pressure_indices.m;row++){
         TV_INT id=example.valid_pressure_cell_indices(row);
         for(int a=0;a<TV::m;a++){
             TV_INT ej=TV_INT::Axis_Vector(a);
-            TV_INT r0=example.cell_pressure(id+ej)?id+ej:id;
-            TV_INT r1=example.cell_pressure(id+2*ej)?id+2*ej:id+ej;
-            T da=example.cell_solid(id-ej)?0:(T)1/(m(id-ej)+m(id));
-            T db=example.cell_solid(id+ej)?0:(T)1/(m(id+ej)+m(id));
-            if(abs(db)<1e-16) Add_Debug_Particle(example.location(id),VECTOR<T,3>(1,0,1));
-            if(abs(da)<1e-16) Add_Debug_Particle(example.location(id),VECTOR<T,3>(1,1,0));
-            example.DT(row,d*example.velocity.Standard_Index(id)+a)+=m(id)*db-(m(id-ej)/(T)2+m(id))*da;
-            example.DT(row,d*example.velocity.Standard_Index(id-ej)+a)-=m(id-ej)*da/(T)2;
-            example.DT(row,d*example.velocity.Standard_Index(id+ej)+a)+=m(id+ej)*db;
-            example.DT(row,d*example.velocity.Standard_Index(r0)+a)+=m(id)*db/(T)2+m(id)*da/(T)2;
-            example.DT(row,d*example.velocity.Standard_Index(r0-ej)+a)-=m(id)*db/(T)2+m(id)*da/(T)2;
-            example.DT(row,d*example.velocity.Standard_Index(r1)+a)-=m(id+ej)*db/(T)2;
-            example.DT(row,d*example.velocity.Standard_Index(r1-ej)+a)+=m(id+ej)*db/(T)2;}}
+            // Go through face A and face B
+            for(int f=0;f<2;f++){
+                int sign=2*f-1;
+                TV_INT si=id+sign*ej;
+                if(!example.cell_solid(si)){
+                    example.DT(row,d*example.velocity.Standard_Index(id)+a)+=sign*m(id)/(m(id)+m(si));
+                    example.DT(row,d*example.velocity.Standard_Index(si)+a)+=sign*m(si)/(m(id)+m(si));
+                    Add_C_Contribution_To_DT(id,a,row,m(id)/(2*(m(id)+m(si))));
+                    Add_C_Contribution_To_DT(si,a,row,-m(si)/(2*(m(id)+m(si))));}}}}
     example.DT*=example.grid.one_over_dX(0);
+
     // Construct lhs and rhs
     kkt_lhs.u.Fill(TV());kkt_rhs.u.Fill(TV());
     kkt_lhs.p.Fill((T)0);kkt_rhs.p.Fill((T)0);
@@ -650,51 +645,18 @@ Solve_KKT_System()
     // Transfer to particles
     Grid_To_Particle();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after minres in kkt",0,1);
-    // // For debugging system and rhs
-    // std::ofstream out;
-    // KKT_KRYLOV_SYSTEM<TV> kkt_sys_check(example);
-    // KKT_KRYLOV_VECTOR<TV> kkt_lhs_check(example.valid_pressure_indices);
-    // KKT_KRYLOV_VECTOR<TV> kkt_rhs_check(example.valid_pressure_indices);
-    // kkt_lhs_check.u.Resize(example.grid.Domain_Indices(example.ghost));kkt_rhs_check.u.Resize(example.grid.Domain_Indices(example.ghost));
-    // kkt_lhs_check.p.Resize(example.grid.Domain_Indices(example.ghost));kkt_rhs_check.p.Resize(example.grid.Domain_Indices(example.ghost));
-    // kkt_lhs_check.u.Fill(TV());kkt_rhs_check.u.Fill(TV());
-    // kkt_lhs_check.p.Fill((T)0);kkt_rhs_check.p.Fill((T)0);
-    // out.open("system.m",std::ios::out);
-    // out<<"system=zeros("<<kkt_lhs_check.Raw_Size()<<","<<kkt_lhs_check.Raw_Size()<<");\n";
-    // int b=kkt_lhs_check.Raw_Size();
-    // for(int i=0;i<b;i++){
-    //     kkt_rhs_check.Raw_Get(i)=1;
-    //     kkt_sys_check.Multiply(kkt_rhs_check,kkt_lhs_check);
-    //     kkt_rhs_check.Raw_Get(i)=0;
-    //     for(int j=0;j<b;j++)
-    //         out<<"system("<<j+1<<","<<i+1<<")="<<kkt_lhs_check.Raw_Get(j)<<";\n";}
-    // out.close();
-    // out.open("rhs.m");
-    // out<<"rhs=zeros("<<kkt_rhs_check.Raw_Size()<<",1);\n";
-    // for(int i=0;i<kkt_rhs_check.Raw_Size();i++){
-    //     out<<"rhs("<<i+1<<")="<<kkt_rhs.Raw_Get(i)<<";\n";}
-    // out.close();
-    // // debugging C
-    // Compute_Cell_C();
-    // T C_check=0;T x_velocity_check=0;TV_INT index_C, index_v;
-    // for(int i=0;i<example.valid_pressure_indices.m;i++){
-    //     TV_INT index=example.valid_pressure_cell_indices(i);
-    //     if(example.cell_C(index).Max_Abs()>C_check) C_check=example.cell_C(index).Max_Abs();
-    //     if(abs(example.velocity_new(index)(0))>x_velocity_check) x_velocity_check=example.velocity_new(index)(0);}
-    // LOG::printf("C_check=%P\nx_velocity_check=%P\n",C_check,x_velocity_check);
-    // T max_particle_C=0;
-    // for(int i=0;i<example.particles.number;i++){
-    //     if(example.particles.C(i).Max_Abs()>max_particle_C) max_particle_C=example.particles.C(i).Max_Abs();}
-    // LOG::printf("max_particle_C_check=%P\n",max_particle_C);
-    // TV max_vel=TV();
-    // TV min_vel=TV::Constant_Vector(FLT_MAX); 
-    // for(int i=0;i<example.valid_pressure_indices.m;i++){
-    //     TV_INT index=example.valid_pressure_cell_indices(i);
-    //     for(int a=0;a<TV::m;a++){
-    //         if(abs(example.velocity_new(index)(a))>max_vel(a)) max_vel(a)=example.velocity_new(index)(a);
-    //         if(abs(example.velocity_new(index)(a))<min_vel(a)) min_vel(a)=example.velocity_new(index)(a);}}
-    // LOG::printf("max_vel_check=%P\tmin_vel_check=%P\n",max_vel,min_vel);
-    // LOG::printf("dif_max_min_vel_check=%P\n",max_vel-min_vel);
+}
+//#####################################################################
+// Function Add_C_Contribution_To_DT
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Add_C_Contribution_To_DT(TV_INT id,int a,int row,T val)
+{
+    const TV_INT axis=TV_INT::Axis_Vector(a);
+    TV_INT right_index=example.cell_pressure(id+axis)?id+axis:id;
+    int d=TV::m;
+    example.DT(row,d*example.velocity.Standard_Index(right_index)+a)+=val;
+    example.DT(row,d*example.velocity.Standard_Index(right_index-axis)+a)-=val;
 }
 //#####################################################################
 // Function Pressure_Projection

@@ -65,6 +65,7 @@ public:
     void Make_Incompressible();
     T Pressure_Projection();
     void Solve_KKT_System();
+    void Add_C_Contribution_To_DT(TV_INT id,int a,int row,T val);
     void Apply_Forces();
     void Perform_Particle_Collision(int p,T time);
     void Apply_Friction();
