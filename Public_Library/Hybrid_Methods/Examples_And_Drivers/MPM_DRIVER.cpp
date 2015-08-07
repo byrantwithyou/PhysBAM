@@ -161,6 +161,12 @@ Initialize()
         for(RANGE_ITERATOR<TV::m> it(local_range);it.Valid();it.Next())
             example.location.array(i++)=example.grid.Center(it.index);}
 
+    // TODO
+    // for(CELL_ITERATOR<TV> iterator(example.grid,example.ghost,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){
+    //     for(int k=0;k<fluid_walls.m;k++){
+    //         if(fluid_walls(k)->Lazy_Inside(iterator.Location())){
+    //             cell_soli....
+
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
 }

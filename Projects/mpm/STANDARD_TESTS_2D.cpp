@@ -361,6 +361,7 @@ Initialize()
             Add_Gravity(TV(0,-1.8));
             for(int p=0;p<particles.number;p++)
                  particles.one_over_lambda(p)=(T)0;
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(5,0.1))));
         } break;
         case 23:{ // (fluid test) dam break 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);

@@ -50,6 +50,7 @@ template<class TV> MPM_EXAMPLE<TV>::
     delete &gather_scatter;
     delete &force_helper;
     collision_objects.Delete_Pointers_And_Clean_Memory();
+    fluid_walls.Delete_Pointers_And_Clean_Memory();
     forces.Delete_Pointers_And_Clean_Memory();
     av.Delete_Pointers_And_Clean_Memory();
 }
@@ -325,6 +326,14 @@ template<class TV> void MPM_EXAMPLE<TV>::
 Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction)
 {
     collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,type,friction));
+}
+//#####################################################################
+// Function Add_Fluid_Wall
+//#####################################################################
+template<class TV> void MPM_EXAMPLE<TV>::
+Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io)
+{
+    fluid_walls.Append(io);
 }
 //#####################################################################
 namespace PhysBAM{

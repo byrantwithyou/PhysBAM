@@ -53,6 +53,7 @@ public:
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights;
     GATHER_SCATTER<TV>& gather_scatter;
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
+    ARRAY<IMPLICIT_OBJECT<TV>* > fluid_walls;;
     mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
     MPM_FORCE_HELPER<TV>& force_helper;
 
@@ -135,6 +136,7 @@ public:
     int Add_Force(DEFORMABLES_FORCES<TV>& force);
     void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction);
+    void Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io);
     template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type
     Add_Collision_Object(const OBJECT& object,COLLISION_TYPE type,T friction)
     {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),type,friction);}
