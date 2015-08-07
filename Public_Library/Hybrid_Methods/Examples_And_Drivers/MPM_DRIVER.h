@@ -40,8 +40,6 @@ public:
     KKT_KRYLOV_VECTOR<TV>& kkt_lhs;
     KKT_KRYLOV_VECTOR<TV>& kkt_rhs;
     
-    // TODO: Implement KKT_KRYLOV_SYSTEM and KKT_KRYLOV_VECTOR
-    
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> bv;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> cv;

@@ -107,7 +107,7 @@ Initialize()
     rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
     objective.system.tmp.u.Resize(example.grid.Domain_Indices(example.ghost));
 
-    example.particles.Store_B(example.use_affine && !example.incompressible);
+    example.particles.Store_B(example.use_affine && !(example.incompressible || example.kkt));
     example.particles.Store_C(example.use_affine && (example.incompressible || example.kkt));
     example.particles.Store_S(example.use_oldroyd);
     example.particles.Store_One_Over_Lambda(example.kkt);
@@ -362,7 +362,7 @@ Grid_To_Particle()
         for(int k=a;k<b;k++){
             int p=example.simulated_particles(k);
             TV Vn_interpolate,V_pic,V_flip=particles.V(p);
-            MATRIX<T,TV::m> B,grad_Vp;
+            MATRIX<T,TV::m> B,grad_Vp,D;
 
             for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,true,scratch);it.Valid();it.Next()){
                 T w=it.Weight();
@@ -394,12 +394,13 @@ Grid_To_Particle()
                         xi_new=Z+dt*V_grid;
                         xp_new=particles.X(p)+dt*V_pic;}
                     B+=it.Weight()/2*(MATRIX<T,TV::m>::Outer_Product(V_grid,Z-particles.X(p)+xi_new-xp_new)
-                            +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));}
+                        +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));
+                    if(particles.store_C && example.weights->Order()>1) D+=it.Weight()*MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p),Z-particles.X(p));}
 
             particles.V(p)=V_pic;
             Perform_Particle_Collision(p,example.time+example.dt);
             if(particles.store_B) particles.B(p)=B;
-            if(particles.store_C) particles.C(p)=grad_Vp;
+            if(particles.store_C) particles.C(p)=example.weights->Order()==1?grad_Vp:B*D.Inverse();
             if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
             else particles.X(p)+=particles.V(p)*dt;
             particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
