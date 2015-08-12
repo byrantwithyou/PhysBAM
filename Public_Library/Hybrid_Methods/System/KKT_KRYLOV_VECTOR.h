@@ -20,10 +20,12 @@ class KKT_KRYLOV_VECTOR:public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     ARRAY<int>& valid_indices;
+    ARRAY<int>& valid_p_indices;
     ARRAY<TV,TV_INT> u;
     ARRAY<T,TV_INT> p;
+    ARRAY<T> lambda;
 
-    KKT_KRYLOV_VECTOR(ARRAY<int>& valid_indices);
+    KKT_KRYLOV_VECTOR(ARRAY<int>& valid_indices,ARRAY<int>& valid_p_indices);
     virtual ~KKT_KRYLOV_VECTOR();
 
     const KKT_KRYLOV_VECTOR& operator=(const KKT_KRYLOV_VECTOR& bv);

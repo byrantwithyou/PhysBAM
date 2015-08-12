@@ -9,8 +9,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> KKT_KRYLOV_VECTOR<TV>::
-KKT_KRYLOV_VECTOR(ARRAY<int>& valid_indices)
-    :valid_indices(valid_indices)
+KKT_KRYLOV_VECTOR(ARRAY<int>& valid_indices,ARRAY<int>& valid_p_indices)
+    :valid_indices(valid_indices),valid_p_indices(valid_p_indices)
 {
 }
 //#####################################################################
@@ -26,11 +26,17 @@ template<class TV> KKT_KRYLOV_VECTOR<TV>::
 template<class TV> const KKT_KRYLOV_VECTOR<TV>& KKT_KRYLOV_VECTOR<TV>::
 operator= (const KKT_KRYLOV_VECTOR& bv)
 {
+    PHYSBAM_ASSERT(bv.lambda.m==lambda.m);
 #pragma omp parallel for
     for(int k=0;k<valid_indices.m;k++){
         int i=valid_indices(k);
-        u.array(i)=bv.u.array(i);
+        u.array(i)=bv.u.array(i);}
+#pragma omp parallel for
+    for(int k=0;k<valid_p_indices.m;k++){
+        int i=valid_p_indices(k);
         p.array(i)=bv.p.array(i);}
+    for (int k=0;k<lambda.m;k++)
+        lambda(k)=bv.lambda(k);
     return *this;
 }
 //#####################################################################
@@ -40,11 +46,17 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& KKT_KRYLOV_VECTOR<TV
 operator+=(const KRYLOV_VECTOR_BASE<T>& bv)
 {
     const KKT_KRYLOV_VECTOR& v=debug_cast<const KKT_KRYLOV_VECTOR&>(bv);
+    PHYSBAM_ASSERT(v.lambda.m==lambda.m);
 #pragma omp parallel for
     for(int k=0;k<valid_indices.m;k++){
         int i=valid_indices(k);
-        u.array(i)+=v.u.array(i);
+        u.array(i)+=v.u.array(i);}
+#pragma omp parallel for
+    for(int k=0;k<valid_p_indices.m;k++){
+        int i=valid_p_indices(k);
         p.array(i)+=v.p.array(i);}
+    for (int k=0;k<lambda.m;k++)
+        lambda(k)+=v.lambda(k);
     return *this;
 }
 //#####################################################################
@@ -54,11 +66,17 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& KKT_KRYLOV_VECTOR<TV
 operator-=(const KRYLOV_VECTOR_BASE<T>& bv)
 {
     const KKT_KRYLOV_VECTOR& v=debug_cast<const KKT_KRYLOV_VECTOR&>(bv);
+    PHYSBAM_ASSERT(v.lambda.m==lambda.m);
 #pragma omp parallel for
     for(int k=0;k<valid_indices.m;k++){
         int i=valid_indices(k);
-        u.array(i)-=v.u.array(i);
+        u.array(i)-=v.u.array(i);}
+#pragma omp parallel for
+    for(int k=0;k<valid_p_indices.m;k++){
+        int i=valid_p_indices(k);
         p.array(i)-=v.p.array(i);}
+    for (int k=0;k<lambda.m;k++)
+        lambda(k)-=v.lambda(k);
     return *this;
 }
 //#####################################################################
@@ -70,8 +88,13 @@ operator*=(const T a)
 #pragma omp parallel for
     for(int k=0;k<valid_indices.m;k++){
         int i=valid_indices(k);
-        u.array(i)*=a;
+        u.array(i)*=a;}
+#pragma omp parallel for
+    for(int k=0;k<valid_p_indices.m;k++){
+        int i=valid_p_indices(k);
         p.array(i)*=a;}
+    for (int k=0;k<lambda.m;k++)
+        lambda(k)*=a;
     return *this;
 }
 //#####################################################################
@@ -81,11 +104,17 @@ template<class TV> void KKT_KRYLOV_VECTOR<TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 {
     const KKT_KRYLOV_VECTOR& v=debug_cast<const KKT_KRYLOV_VECTOR&>(bv);
+    PHYSBAM_ASSERT(v.lambda.m==lambda.m);
 #pragma omp parallel for
     for(int k=0;k<valid_indices.m;k++){
         int i=valid_indices(k);
-        u.array(i)=c*v.u.array(i);
+        u.array(i)=c*v.u.array(i);}
+#pragma omp parallel for
+    for(int k=0;k<valid_p_indices.m;k++){
+        int i=valid_p_indices(k);
         p.array(i)=c*v.p.array(i);}
+    for (int k=0;k<lambda.m;k++)
+        lambda(k)=c*v.lambda(k);
 }
 //#####################################################################
 // Function Copy
@@ -95,11 +124,16 @@ Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv
 {
     const KKT_KRYLOV_VECTOR& v1=debug_cast<const KKT_KRYLOV_VECTOR&>(bv1);
     const KKT_KRYLOV_VECTOR& v2=debug_cast<const KKT_KRYLOV_VECTOR&>(bv2);
+    PHYSBAM_ASSERT(v1.lambda.m==v2.lambda.m);
 #pragma omp parallel for
     for(int k=0;k<valid_indices.m;k++){
         int i=valid_indices(k);
-        u.array(i)=c1*v1.u.array(i)+v2.u.array(i);
+        u.array(i)=c1*v1.u.array(i)+v2.u.array(i);}
+    for(int k=0;k<valid_p_indices.m;k++){
+        int i=valid_p_indices(k);
         p.array(i)=c1*v1.p.array(i)+v2.p.array(i);}
+    for (int k=0;k<lambda.m;k++)
+        lambda(k)=c1*v1.lambda(k)+v2.lambda(k);
 }
 //#####################################################################
 // Function Raw_Size
@@ -107,7 +141,7 @@ Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv
 template<class TV> int KKT_KRYLOV_VECTOR<TV>::
 Raw_Size() const
 {
-    return (TV::m+1)*valid_indices.m;
+    return (TV::m)*valid_indices.m+valid_p_indices.m+lambda.m;
 }
 //#####################################################################
 // Function Raw_Get
@@ -117,7 +151,8 @@ Raw_Get(int i)
 {
     int velocity_size=TV::m*valid_indices.m;
     if(i<velocity_size) return u.array(valid_indices(i/TV::m))(i%TV::m);
-    else return p.array(valid_indices(i-velocity_size));
+    else if(i<velocity_size+valid_p_indices.m) return p.array(valid_p_indices(i-velocity_size));
+    else return lambda(i-velocity_size-valid_p_indices.m);
 }
 //#####################################################################
 // Function Clone_Default
@@ -128,6 +163,7 @@ Clone_Default() const
     KKT_KRYLOV_VECTOR<TV>* c=new KKT_KRYLOV_VECTOR<TV>(valid_indices);
     c->u.Resize(u.domain);
     c->p.Resize(p.domain);
+    c->lambda.Resize(lambda.m);
     return c;
 }
 //#####################################################################
@@ -138,6 +174,7 @@ Resize(const KRYLOV_VECTOR_BASE<T>& w)
 {
     u.Resize(debug_cast<const KKT_KRYLOV_VECTOR<TV>&>(w).u.domain);
     p.Resize(debug_cast<const KKT_KRYLOV_VECTOR<TV>&>(w).p.domain);
+    lambda.Resize(debug_cast<const KKT_KRYLOV_VECTOR<TV>&>(w).lambda.m);
 }
 namespace PhysBAM{
 template class KKT_KRYLOV_VECTOR<VECTOR<float,2> >;
