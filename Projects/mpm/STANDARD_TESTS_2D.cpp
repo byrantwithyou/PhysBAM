@@ -444,14 +444,14 @@ Initialize()
             SPHERE<TV> sphere(TV(.5,.5),.2);
             T density=2*scale_mass;
             use_oldroyd=true;
-            this->inv_Wi=(T)100;
+            this->inv_Wi=(T)0;
             particles.Store_S(use_oldroyd);            
             Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0,0);},0,density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1);particles.S.Fill(SYMMETRIC_MATRIX<T,2>()+sqr(1));
             VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV> *neo=new VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV>;
-            neo->mu=38.462; // E=100, nu=0.3
+            neo->mu=0;
             neo->lambda=57.692;
-            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi);
+            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi,/*viscosity*/0.001);
             Add_Force(*fe);
             Add_Gravity(TV(0,-1.8));
         } break;

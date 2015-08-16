@@ -29,12 +29,14 @@ public:
     bool affect_all;
     GATHER_SCATTER<TV>& gather_scatter;
     mutable ARRAY<MATRIX<T,TV::m> > tmp;
+    mutable ARRAY<MATRIX<T,TV::m> > tmp2;
     T stored_dt;
     const T& inv_Wi;
+    const T viscosity;
 
     MPM_OLDROYD_FINITE_ELEMENTS(MPM_FORCE_HELPER<TV>& force_helper,
         OLDROYD_CONSTITUTIVE_MODEL<TV>& constitutive_model,
-        GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,const T& inv_Wi);
+        GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,const T& inv_Wi,const T viscosity=(T)0);
     virtual ~MPM_OLDROYD_FINITE_ELEMENTS();
 
 //#####################################################################
