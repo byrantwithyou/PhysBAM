@@ -55,6 +55,7 @@ public:
     T scale_E;
     T scale_speed;
     T penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length;
+    T penalty_damping_stiffness;
     RANDOM_NUMBERS<T> random;
     DEFORMABLES_STANDARD_TESTS<TV> tests;
 

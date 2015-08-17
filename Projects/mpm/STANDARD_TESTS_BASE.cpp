@@ -35,7 +35,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     scale_mass(1),scale_E(1),scale_speed(1),
     penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),
-    tests(stream_type_input,deformable_body_collection)
+    penalty_damping_stiffness(0),tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
     parse_args.Extra(&test_number,"example number","example number to run");
@@ -72,6 +72,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-penalty_stiffness",&penalty_collisions_stiffness,"tol","penalty collisions stiffness");
     parse_args.Add("-penalty_separation",&penalty_collisions_separation,"tol","penalty collisions separation");
     parse_args.Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
+    parse_args.Add("-penalty_damping",&penalty_damping_stiffness,"tol","penalty damping stiffness");
     parse_args.Add("-regular_seeding",&regular_seeding,"use regular particle seeding");
     parse_args.Add("-use_early_gradient_transfer",&use_early_gradient_transfer,"use early gradient transfer for Cp");
     parse_args.Add("-incompressible",&incompressible,"Make simulated media incompressible");

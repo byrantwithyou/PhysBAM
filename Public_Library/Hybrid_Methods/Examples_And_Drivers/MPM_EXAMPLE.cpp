@@ -8,6 +8,7 @@
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
+#include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -334,6 +335,16 @@ template<class TV> void MPM_EXAMPLE<TV>::
 Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io)
 {
     fluid_walls.Append(io);
+}
+//#####################################################################
+// Function Update_Lagged_Forces
+//#####################################################################
+template<class TV> void MPM_EXAMPLE<TV>::
+Update_Lagged_Forces(const T time) const
+{
+    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++)
+        if(LAGGED_FORCE<TV>* lf=dynamic_cast<LAGGED_FORCE<TV>*>(deformable_body_collection.deformables_forces(i)))
+            lf->Lagged_Update_Position_Based_State(time);
 }
 //#####################################################################
 namespace PhysBAM{

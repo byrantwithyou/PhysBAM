@@ -132,6 +132,7 @@ public:
     T Potential_Energy(const T time) const;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const;
     void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const;
+    void Update_Lagged_Forces(const T time) const;
     int Add_Force(PARTICLE_GRID_FORCES<TV>& force);
     int Add_Force(DEFORMABLES_FORCES<TV>& force);
     void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);

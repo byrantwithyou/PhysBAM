@@ -32,9 +32,9 @@ public:
     using BASE::use_midpoint;using BASE::print_stats;using BASE::flip;using BASE::cfl;
     using BASE::newton_tolerance;using BASE::newton_iterations;using BASE::solver_tolerance;
     using BASE::solver_iterations;using BASE::test_diff;using BASE::threads;
-    using BASE::lagrangian_forces;using BASE::use_oldroyd;
+    using BASE::lagrangian_forces;using BASE::use_oldroyd;using BASE::penalty_collisions_stiffness;
     using BASE::test_number;using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Gravity;
-    using BASE::Add_Particle;using BASE::gather_scatter;
+    using BASE::Add_Particle;using BASE::gather_scatter;using BASE::penalty_damping_stiffness;
     using BASE::Add_Fixed_Corotated;using BASE::Add_Neo_Hookean;using BASE::random;
     using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
     using BASE::tests;using BASE::Seed_Lagrangian_Particles;using BASE::Add_Collision_Object;
