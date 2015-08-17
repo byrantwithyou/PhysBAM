@@ -32,13 +32,14 @@ namespace PhysBAM{
 template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),Nsurface(0),
-    foo_int1(0),foo_T1(0),foo_T2(0),foo_T3(0),foo_surface1(0),foo_surface2(0),
+    foo_int1(0),foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),foo_surface1(0),foo_surface2(0),
     foo_levelset1(0),foo_cylinder(0) 
 {
     parse_args.Add("-fooint1",&foo_int1,"int1","a interger");
     parse_args.Add("-fooT1",&foo_T1,"T1","a scalar");
     parse_args.Add("-fooT2",&foo_T2,"T2","a scalar");
     parse_args.Add("-fooT3",&foo_T3,"T3","a scalar");
+    parse_args.Add("-fooT4",&foo_T4,"T4","a scalar");
     parse_args.Parse();
 }
 //#####################################################################
@@ -356,7 +357,7 @@ Initialize()
             Add_Gravity(TV(0,-9.8,0));
         } break;
         case 15:{ // rotating cylinder oldroyd-b SCA energy
-            // ./mpm -3d 15 -affine -max_dt 1e-3 -resolution 10 -fooint1 1 -fooT1 38 -fooT2 57 -fooT3 0.05 -scale_mass 20 -framerate 120
+            //NEWTONIAN ./mpm -3d 15 -affine -max_dt 5e-4 -resolution 15 -fooint1 2 -fooT1 0 -fooT2 100 -fooT3 1e30 -fooT4 2e-4 -scale_mass 20 -last_frame 30
             grid.Initialize(TV_INT(resolution*2,resolution*3,resolution*2),RANGE<TV>(TV(-0.06,-0.06,-0.06),TV(0.06,0.12,0.06)),true);
             LOG::cout<<"GRID DX: "<<grid.dX<<std::endl;
             Add_Gravity(TV(0,-9.8,0));
@@ -417,7 +418,7 @@ Initialize()
             VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV> *neo=new VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV>;
             neo->mu=foo_T1;
             neo->lambda=foo_T2;
-            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi);
+            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi,/*viscosity*/foo_T4);
             Add_Force(*fe);
             LOG::cout<<"Polyethylene glycol added. mu="<<neo->mu<<", lambda="<<neo->lambda<<", Weissenbergi="<<foo_T3<<std::endl;
             LOG::cout<<"Particle count: "<<particles.number<<std::endl;
@@ -609,7 +610,7 @@ Begin_Time_Step(const T time)
                 lagrangian_forces.Remove_End();
                 PHYSBAM_ASSERT(this->deformable_body_collection.structures.m==0);
                 LOG::cout<<"Adding new analytic cylinder stirer..."<<std::endl;
-                ROTATION<TV> rotator((T)3.1415*time,TV(0,1,0));
+                ROTATION<TV> rotator((T)3.1415*10*time,TV(0,1,0));
                 foo_cylinder->Set_Endpoints(rotator.Rotate(TV(-0.025,-0.034,0)),rotator.Rotate(TV(0.025,-0.034,0)));
                 Add_Penalty_Collision_Object(*foo_cylinder);
                 LOG::cout<<"...done!"<<std::endl;}
