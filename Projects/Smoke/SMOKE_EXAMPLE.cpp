@@ -16,7 +16,7 @@ using namespace PhysBAM;
 template<class TV> SMOKE_EXAMPLE<TV>::
 SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     :stream_type(stream_type_input),
-    debug_particles(*new DEBUG_PARTICLES<TV>),ghost(3),
+    debug_particles(*new DEBUG_PARTICLES<TV>),ghost(5),
     initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
     restart(0),write_debug_data(true),output_directory("output"),N_boundary(false),
     debug_divergence(false),alpha(0.1),
