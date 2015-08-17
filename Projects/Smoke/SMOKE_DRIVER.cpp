@@ -9,6 +9,7 @@
 #include <Tools/Parallel_Computation/BOUNDARY_THREADED.h>
 #include "SMOKE_DRIVER.h"
 #include "SMOKE_EXAMPLE.h"
+#include "SMOKE_PARTICLES.h"
 
 using namespace PhysBAM;
 namespace{
@@ -18,7 +19,7 @@ template<class TV> void Write_Substep_Helper(void* writer,const std::string& tit
 }
 };
 //#####################################################################
-// Initialize
+// Constructor
 //#####################################################################
 template<class TV> SMOKE_DRIVER<TV>::
 SMOKE_DRIVER(SMOKE_EXAMPLE<TV>& example)
@@ -27,7 +28,7 @@ SMOKE_DRIVER(SMOKE_EXAMPLE<TV>& example)
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
 //#####################################################################
-// Initialize
+// Destructor
 //#####################################################################
 template<class TV> SMOKE_DRIVER<TV>::
 ~SMOKE_DRIVER()
@@ -35,7 +36,7 @@ template<class TV> SMOKE_DRIVER<TV>::
     DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
 }
 //#####################################################################
-// Initialize
+// Function Execute_Main_Program
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
 Execute_Main_Program()
@@ -44,7 +45,7 @@ Execute_Main_Program()
     Simulate_To_Frame(example.last_frame);
 }
 //#####################################################################
-// Initialize
+// Function Initialize
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
 Initialize()
@@ -84,11 +85,94 @@ Initialize()
     example.boundary->Set_Constant_Extrapolation(constant_extrapolation);
     example.Set_Boundary_Conditions(time); // get so CFL is correct
 
+    // EAPIC
+    if(example.use_eapic){
+        // Resize mass array
+        example.mass.Resize(example.mac_grid.Domain_Indices(example.ghost));
+        example.face_mass.Resize(example.mac_grid.Domain_Indices(example.ghost));
+        // Compute born weights
+        for(int i=0;i<TV::m;++i) example.face_weights0(i)->Update(example.particles.X);}
+
     if(!example.restart) Write_Output_Files(example.first_frame);
     output_number=example.first_frame;
 }
 //#####################################################################
-// Add_Buoyancy_Force
+// Function Update_Particle_Weights
+//#####################################################################
+template<class TV> void SMOKE_DRIVER<TV>::
+Update_Particle_Weights()
+{
+    PHYSBAM_ASSERT(example.use_eapic);
+    example.weights->Update(example.particles.X);
+    for(int i=0;i<TV::m;++i) example.face_weights(i)->Update(example.particles.X);
+}
+//#####################################################################
+// Function Particle_To_Grid
+//#####################################################################
+template<class TV> void SMOKE_DRIVER<TV>::
+Particle_To_Grid()
+{
+    PHYSBAM_ASSERT(example.use_eapic);
+    SMOKE_PARTICLES<TV>& particles=example.particles;
+    // Zero out grid quantities
+    example.mass.Fill((T)0);
+    example.face_mass.Fill((T)0);
+    example.face_velocities.Fill((T)0);
+    // Rasterize mass and momentum to faces
+    typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
+    for(int p=0;p<particles.number;p++){
+        for(int d=0;d<TV::m;++d)
+            for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights(d),p,true,scratch);it.Valid();it.Next()){
+                T w=it.Weight();
+                FACE_INDEX<TV::m> face_index(d,it.Index());
+                example.face_mass(face_index)+=w*particles.mass(p);
+                TV dx=example.mac_grid.Face(face_index)-particles.X(p);
+                T v=particles.V(p)(d)+TV::Dot_Product(particles.C(p).Column(d),dx);
+                example.face_velocities(face_index)+=w*particles.mass(p)*v;}}
+    // Divide out masses
+    for(FACE_ITERATOR<TV> iterator(example.mac_grid,ghost);iterator.Valid();iterator.Next()){
+        FACE_INDEX<TV::m> face_index=iterator.Full_Index();
+        if(example.face_mass(face_index))
+            example.face_velocities(face_index)/=example.face_mass(face_index);}
+    // TODO: Cell center stuff (for density/temperature advection)
+}
+//#####################################################################
+// Function Grid_To_Particle
+//#####################################################################
+template<class TV> void SMOKE_DRIVER<TV>::
+Grid_To_Particle()
+{
+    SMOKE_PARTICLES<TV>& particles=example.particles;
+    typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
+
+#pragma omp parallel for
+    for(int p=0;p<particles.number;p++){
+        // Zero out particle veloicity and C, resample particle positions
+        particles.X(p)=particles.X0(p);
+        particles.V(p)=TV();
+        particles.C(p)=MATRIX<T,TV::m>();
+        // Compute new V and C
+        for(int d=0;d<TV::m;++d)
+            for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights(d),p,true,scratch);it.Valid();it.Next()){
+                T w=it.Weight();
+                FACE_INDEX<TV::m> face_index(d,it.Index());
+                particles.V(p)(d)+=w*example.face_velocities(face_index);
+                particles.C(p).Add_Column(d,example.face_velocities(face_index)*it.Gradient());}}
+}
+//#####################################################################
+// Function Move_Particles
+//#####################################################################
+template<class TV> void SMOKE_DRIVER<TV>::
+Move_Particles(const T dt)
+{
+    PHYSBAM_ASSERT(example.use_eapic);
+    SMOKE_PARTICLES<TV>& particles=example.particles;
+#pragma omp parallel for
+    for(int p=0;p<particles.number;p++)
+        particles.X(p)+=particles.V(p)*dt;
+}
+//#####################################################################
+// Function Add_Buoyancy_Force
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
 Add_Buoyancy_Force(const T dt,const T time)
@@ -101,9 +185,8 @@ Add_Buoyancy_Force(const T dt,const T time)
             // T tem=(example.temperature(c1)+example.temperature(c2))*(T).5; // no temperature for now 
             example.face_velocities(iterator.Full_Index())+=-dt*example.alpha*rho;}}
 }
-
 //#####################################################################
-// Scalar_Advance
+// Function Scalar_Advance
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
 Scalar_Advance(const T dt,const T time)
@@ -116,19 +199,26 @@ Scalar_Advance(const T dt,const T time)
     example.boundary->Set_Fixed_Boundary(false);
 }
 //#####################################################################
-// Convect
+// Function Convect
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
 Convect(const T dt,const T time)
 {
-    example.boundary->Set_Fixed_Boundary(true,0);
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,ghost,false);
-    example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time,ghost);
-    example.advection_scalar.Update_Advection_Equation_Face(example.mac_grid,example.face_velocities,face_velocities_ghost,face_velocities_ghost,*example.boundary,dt,time);
-    example.boundary->Set_Fixed_Boundary(false);
+    if(example.use_eapic){
+        Grid_To_Particle();
+        Move_Particles(dt);
+        Update_Particle_Weights();
+        Particle_To_Grid();}
+    else{
+        example.boundary->Set_Fixed_Boundary(true,0);
+        ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,ghost,false);
+        example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time,ghost);
+        example.advection_scalar.Update_Advection_Equation_Face(
+            example.mac_grid,example.face_velocities,face_velocities_ghost,face_velocities_ghost,*example.boundary,dt,time);
+        example.boundary->Set_Fixed_Boundary(false);}
 }
 //#####################################################################
-// Project
+// Function Project
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
 Project(const T dt,const T time)
@@ -140,7 +230,7 @@ Project(const T dt,const T time)
     example.projection.p*=(1/dt); // unscale pressure
 }
 //#####################################################################
-// Advance_To_Target_Time
+// Function Advance_To_Target_Time
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
 Advance_To_Target_Time(const T target_time)
@@ -161,7 +251,7 @@ Advance_To_Target_Time(const T target_time)
         time+=dt;}
 }
 //#####################################################################
-// Simulate_To_Frame
+// Function Simulate_To_Frame
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
 Simulate_To_Frame(const int frame)
@@ -184,7 +274,7 @@ Write_Substep(const std::string& title,const int substep,const int level)
         Write_Output_Files(++output_number);example.frame_title="";}
 }
 //#####################################################################
-// Write_Output_Files
+// Function Write_Output_Files
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
 Write_Output_Files(const int frame)
@@ -199,7 +289,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
 }
 //#####################################################################
-// Print_Max_Divergence
+// Function Print_Max_Divergence
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
 Print_Max_Divergence(const char* str)

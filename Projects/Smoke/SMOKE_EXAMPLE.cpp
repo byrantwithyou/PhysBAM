@@ -11,24 +11,24 @@
 #include <pthread.h>
 using namespace PhysBAM;
 //#####################################################################
-// SMOKE_EXAMPLE
+// Constructor
 //#####################################################################
 template<class TV> SMOKE_EXAMPLE<TV>::
 SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     :stream_type(stream_type_input),
-    debug_particles(*new DEBUG_PARTICLES<TV>),
+    debug_particles(*new DEBUG_PARTICLES<TV>),ghost(3),
     initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
     restart(0),write_debug_data(true),output_directory("output"),N_boundary(false),
     debug_divergence(false),alpha(0.1),
     cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(mac_grid,false,false,thread_queue),boundary(0),
-    eapic_order(1),weights(0),particles(*new SMOKE_PARTICLES<TV>)
+    use_eapic(false),eapic_order(1),weights(0),particles(*new SMOKE_PARTICLES<TV>)
 {
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     pthread_mutex_init(&lock,0);    
 }
 //#####################################################################
-// ~SMOKE_EXAMPLE
+// Destructor
 //#####################################################################
 template<class TV> SMOKE_EXAMPLE<TV>::
 ~SMOKE_EXAMPLE()
@@ -40,7 +40,7 @@ template<class TV> SMOKE_EXAMPLE<TV>::
     delete &particles;
 }
 //#####################################################################
-// CFL 
+// Function CFL
 //#####################################################################
 template<class TV> typename TV::SCALAR SMOKE_EXAMPLE<TV>::
 CFL(ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities)
@@ -50,7 +50,7 @@ CFL(ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities)
     return dt;
 }
 //#####################################################################
-// CFL_Threaded 
+// Function CFL_Threaded
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
 CFL_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,T& dt)
@@ -66,7 +66,7 @@ CFL_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::dimension> >& face_vel
     pthread_mutex_unlock(&lock);
 }
 //#####################################################################
-// Time_At_Frame
+// Function Time_At_Frame
 //#####################################################################
 template<class TV> typename TV::SCALAR SMOKE_EXAMPLE<TV>::
 Time_At_Frame(const int frame) const 
@@ -74,7 +74,7 @@ Time_At_Frame(const int frame) const
     return initial_time+(frame-first_frame)/frame_rate;
 }
 //#####################################################################
-// Initialize_Grid
+// Function Initialize_Grid
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
 Initialize_Grid(TV_INT counts,RANGE<TV> domain) 
@@ -82,7 +82,7 @@ Initialize_Grid(TV_INT counts,RANGE<TV> domain)
     mac_grid.Initialize(counts,domain,true);
 }
 //#####################################################################
-// Initialize_Fields
+// Function Initialize_Fields
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
 Initialize_Fields() 
@@ -91,7 +91,7 @@ Initialize_Fields()
     for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) density(iterator.Cell_Index())=0;
 }
 //#####################################################################
-// Get_Scalar_Field_Sources
+// Function Get_Scalar_Field_Sources
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
 Get_Scalar_Field_Sources(const T time)
@@ -100,23 +100,26 @@ Get_Scalar_Field_Sources(const T time)
         if(source.Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=1;
 }
 //#####################################################################
-// Set_Weights
+// Function Set_Weights
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
 Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input)
 {
     weights=weights_input;
     for(int i=0;i<TV::m;++i){
-        if(weights->Order()==1)
+        if(weights->Order()==1){
             face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,1>(mac_grid,/*threads*/1,i);
-        else if(weights->Order()==2)
+            face_weights0(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,1>(mac_grid,/*threads*/1,i);}
+        else if(weights->Order()==2){
             face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,2>(mac_grid,/*threads*/1,i);
-        else if(weights->Order()==3)
+            face_weights0(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,2>(mac_grid,/*threads*/1,i);}
+        else if(weights->Order()==3){
             face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,3>(mac_grid,/*threads*/1,i);
+            face_weights0(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,3>(mac_grid,/*threads*/1,i);}
         else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");}
 }
 //#####################################################################
-// Set_Boundary_Conditions
+// Function Set_Boundary_Conditions
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
 Set_Boundary_Conditions(const T time)
@@ -139,7 +142,7 @@ Set_Boundary_Conditions(const T time)
             else face_velocities(iterator.Full_Index())=0;}}
 }
 //#####################################################################
-// 
+// Function Write_Output_Files
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
 Write_Output_Files(const int frame)

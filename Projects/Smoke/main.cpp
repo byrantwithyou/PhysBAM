@@ -30,12 +30,16 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     parse_args.Add("-a",&example->alpha,"alpha","buoyancy parameter alpha");
     parse_args.Add("-o",&example->output_directory,"dir","output directory");
     parse_args.Add("-eapic_order",&example->eapic_order,"frame","last frame");
+    parse_args.Add("-use_eapic",&example->use_eapic,"use EAPIC");
     parse_args.Parse();
     
     if(example->eapic_order==1) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(example->mac_grid,/*threads*/1));
     else if(example->eapic_order==2) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(example->mac_grid,/*threads*/1));
     else if(example->eapic_order==3) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(example->mac_grid,/*threads*/1));
     else PHYSBAM_FATAL_ERROR();
+
+    // INITIALIZE PARTICLES, FILL THE GRID.
+    // TODO: X0, X, V, C, mass(=1)
 
     // SOURCE
     TV point1=TV::All_Ones_Vector()*.23,point2=TV::All_Ones_Vector()*.27;point1(1)=0.05;point2(1)=.15;

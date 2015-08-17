@@ -28,6 +28,12 @@ public:
     SMOKE_DRIVER(SMOKE_EXAMPLE<TV>& example);
     virtual ~SMOKE_DRIVER();
 
+    // EAPIC
+    void Update_Particle_Weights();
+    void Particle_To_Grid();
+    void Grid_To_Particle();
+    void Move_Particles(const T dt);
+
     void Add_Buoyancy_Force(const T dt,const T time);
     void Scalar_Advance(const T dt,const T time);
     void Convect(const T dt,const T time);

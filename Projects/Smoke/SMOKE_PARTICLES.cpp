@@ -14,6 +14,7 @@ SMOKE_PARTICLES()
     this->Store_Velocity();
     this->Store_Mass();
     Add_Array(ATTRIBUTE_ID_SMOKE_C,&C);
+    Add_Array(ATTRIBUTE_ID_SMOKE_X0,&X0);
 }
 //#####################################################################
 // Constructor
@@ -27,6 +28,7 @@ template<class TV> SMOKE_PARTICLES<TV>::
 static int Initialize_Smoke_Particles()
 {
     Register_Attribute_Name(ATTRIBUTE_ID_SMOKE_C,"C");
+    Register_Attribute_Name(ATTRIBUTE_ID_SMOKE_X0,"X0");
     return 0;
 }
 int initialize_deformables_particles=Initialize_Smoke_Particles();

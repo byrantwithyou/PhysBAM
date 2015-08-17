@@ -13,6 +13,7 @@
 namespace PhysBAM{
 
 const ATTRIBUTE_ID ATTRIBUTE_ID_SMOKE_C(47);
+const ATTRIBUTE_ID ATTRIBUTE_ID_SMOKE_X0(48);
 
 template<class TV>
 class SMOKE_PARTICLES:public CLONEABLE<SMOKE_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> >
@@ -23,6 +24,7 @@ public:
     using BASE::Add_Array;using BASE::Remove_Array;
 
     ARRAY_VIEW<MATRIX<T,TV::m> > C;
+    ARRAY_VIEW<TV> X0;
 
     SMOKE_PARTICLES();
     virtual ~SMOKE_PARTICLES();

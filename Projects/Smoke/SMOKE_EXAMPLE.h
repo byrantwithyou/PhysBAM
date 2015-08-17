@@ -28,13 +28,14 @@ class SMOKE_EXAMPLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    enum workaround1{d=TV::m,EAPIC_order=1};
+    enum workaround1{d=TV::m};
     typedef CUBIC_MONOTONIC_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_UNIFORM<TV> > T_INTERPOLATION;
     // typedef LINEAR_INTERPOLATION_UNIFORM<TV,T,FACE_LOOKUP_UNIFORM<TV> > T_INTERPOLATION;
 
 public:
     STREAM_TYPE stream_type;
     DEBUG_PARTICLES<TV>& debug_particles;
+    int ghost;
 
     T initial_time;
     int first_frame,last_frame;
@@ -62,10 +63,14 @@ public:
     pthread_mutex_t lock;
 
     // EAPIC
+    bool use_eapic;
     int eapic_order;
     PARTICLE_GRID_WEIGHTS<TV>* weights; // cell center weights
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights; // face weights
+    VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights0; // face weights of X0
     SMOKE_PARTICLES<TV>& particles;
+    ARRAY<T,TV_INT> mass;
+    ARRAY<T,FACE_INDEX<TV::m> > face_mass;
 
     SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int refine=0);
     virtual ~SMOKE_EXAMPLE();
