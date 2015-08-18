@@ -185,9 +185,6 @@ Move_Particles(const T dt)
 
     for(int p=0;p<particles.number;p++)
         particles.X(p)+=particles.V(p)*dt;
-    for(int p=0;p<particles.number;p++){
-        Add_Debug_Particle(particles.X(p),VECTOR<T,3>(0,1,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(p));}
 }
 //#####################################################################
 // Function Add_Buoyancy_Force

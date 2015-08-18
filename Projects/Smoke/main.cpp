@@ -42,18 +42,26 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
 
     // INITIALIZE PARTICLES, FILL THE GRID.
     // TODO: X0, X, V, C, mass(=1)
-    RANDOM_NUMBERS<typename TV::SCALAR> rand;
-    for(CELL_ITERATOR<TV> iterator(example->mac_grid);iterator.Valid();iterator.Next()){
-        TV X;
-        for(int t=0;t<4;t++){
-            rand.Fill_Uniform(X,iterator.Bounding_Box());
-            int p=example->particles.Add_Element();
-            example->particles.X(p)=X;
-            example->particles.X0(p)=X;
-            example->particles.V(p)=TV();
-            example->particles.C(p)=MATRIX<typename TV::SCALAR,TV::m>();
-            example->particles.mass(p)=(typename TV::SCALAR)1;}}
-
+    // RANDOM_NUMBERS<typename TV::SCALAR> rand;
+    if(example->use_eapic){
+        ARRAY<TV> samples;
+        TV a;
+        a(0)=0.25;a(1)=0.25;samples.Append(a);
+        a(0)=0.75;a(1)=0.25;samples.Append(a);
+        a(0)=0.25;a(1)=0.75;samples.Append(a);
+        a(0)=0.75;a(1)=0.75;samples.Append(a);
+        for(CELL_ITERATOR<TV> iterator(example->mac_grid,2);iterator.Valid();iterator.Next()){
+            TV X;
+            for(int t=0;t<4;t++){
+                // rand.Fill_Uniform(X,iterator.Bounding_Box());
+                X=iterator.Bounding_Box().min_corner+samples(t)*example->mac_grid.dX.Min();
+                int p=example->particles.Add_Element();
+                example->particles.X(p)=X;
+                example->particles.X0(p)=X;
+                example->particles.V(p)=TV();
+                example->particles.C(p)=MATRIX<typename TV::SCALAR,TV::m>();
+                example->particles.mass(p)=(typename TV::SCALAR)1;}}}
+    
     // SOURCE
     TV point1=TV::All_Ones_Vector()*.23,point2=TV::All_Ones_Vector()*.27;point1(1)=0.05;point2(1)=.15;
     example->source.min_corner=point1;
