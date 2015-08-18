@@ -7,6 +7,7 @@
 #include <Tools/Log/SCOPE.h>
 #include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <Tools/Parallel_Computation/BOUNDARY_THREADED.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include "SMOKE_DRIVER.h"
 #include "SMOKE_EXAMPLE.h"
 #include "SMOKE_PARTICLES.h"
@@ -118,6 +119,11 @@ Particle_To_Grid()
     example.mass.Fill((T)0);
     example.face_mass.Fill((T)0);
     example.face_velocities.Fill((T)0);
+
+    example.boundary->Set_Fixed_Boundary(true,0);
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,ghost,false);
+    example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time,ghost);
+
     // Rasterize mass and momentum to faces
     typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
     for(int p=0;p<particles.number;p++){
@@ -128,13 +134,14 @@ Particle_To_Grid()
                 example.face_mass(face_index)+=w*particles.mass(p);
                 TV dx=example.mac_grid.Face(face_index)-particles.X(p);
                 T v=particles.V(p)(d)+TV::Dot_Product(particles.C(p).Column(d),dx);
-                example.face_velocities(face_index)+=w*particles.mass(p)*v;}}
+                face_velocities_ghost(face_index)+=w*particles.mass(p)*v;}}
     // Divide out masses
-    for(FACE_ITERATOR<TV> iterator(example.mac_grid,ghost);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
         if(example.face_mass(face_index))
-            example.face_velocities(face_index)/=example.face_mass(face_index);}
-    // TODO: Cell center stuff (for density/temperature advection)
+            example.face_velocities(face_index)=face_velocities_ghost(face_index)/example.face_mass(face_index);}
+
+    example.boundary->Set_Fixed_Boundary(false);
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -142,10 +149,16 @@ Particle_To_Grid()
 template<class TV> void SMOKE_DRIVER<TV>::
 Grid_To_Particle()
 {
+    example.boundary->Set_Fixed_Boundary(true,0);
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,ghost,false);
+    example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time,ghost);
+
     SMOKE_PARTICLES<TV>& particles=example.particles;
     typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
 
-#pragma omp parallel for
+    LOG::cout<<"G2P"<<std::endl;
+    LOG::cout<<"#p"<<particles.number<<std::endl;
+
     for(int p=0;p<particles.number;p++){
         // Zero out particle veloicity and C, resample particle positions
         particles.X(p)=particles.X0(p);
@@ -153,11 +166,13 @@ Grid_To_Particle()
         particles.C(p)=MATRIX<T,TV::m>();
         // Compute new V and C
         for(int d=0;d<TV::m;++d)
-            for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights(d),p,true,scratch);it.Valid();it.Next()){
+            for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights0(d),p,true,scratch);it.Valid();it.Next()){
                 T w=it.Weight();
                 FACE_INDEX<TV::m> face_index(d,it.Index());
-                particles.V(p)(d)+=w*example.face_velocities(face_index);
-                particles.C(p).Add_Column(d,example.face_velocities(face_index)*it.Gradient());}}
+                particles.V(p)(d)+=w*face_velocities_ghost(face_index);
+                particles.C(p).Add_Column(d,face_velocities_ghost(face_index)*it.Gradient());}}
+
+    example.boundary->Set_Fixed_Boundary(false);
 }
 //#####################################################################
 // Function Move_Particles
@@ -167,9 +182,12 @@ Move_Particles(const T dt)
 {
     PHYSBAM_ASSERT(example.use_eapic);
     SMOKE_PARTICLES<TV>& particles=example.particles;
-#pragma omp parallel for
+
     for(int p=0;p<particles.number;p++)
         particles.X(p)+=particles.V(p)*dt;
+    for(int p=0;p<particles.number;p++){
+        Add_Debug_Particle(particles.X(p),VECTOR<T,3>(0,1,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(p));}
 }
 //#####################################################################
 // Function Add_Buoyancy_Force

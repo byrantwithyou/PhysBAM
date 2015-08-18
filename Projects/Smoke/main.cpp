@@ -2,9 +2,11 @@
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include "SMOKE_DRIVER.h"
 #include "SMOKE_EXAMPLE.h"
+#include "SMOKE_PARTICLES.h"
 
 using namespace PhysBAM;
 
@@ -40,6 +42,17 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
 
     // INITIALIZE PARTICLES, FILL THE GRID.
     // TODO: X0, X, V, C, mass(=1)
+    RANDOM_NUMBERS<typename TV::SCALAR> rand;
+    for(CELL_ITERATOR<TV> iterator(example->mac_grid);iterator.Valid();iterator.Next()){
+        TV X;
+        for(int t=0;t<4;t++){
+            rand.Fill_Uniform(X,iterator.Bounding_Box());
+            int p=example->particles.Add_Element();
+            example->particles.X(p)=X;
+            example->particles.X0(p)=X;
+            example->particles.V(p)=TV();
+            example->particles.C(p)=MATRIX<typename TV::SCALAR,TV::m>();
+            example->particles.mass(p)=(typename TV::SCALAR)1;}}
 
     // SOURCE
     TV point1=TV::All_Ones_Vector()*.23,point2=TV::All_Ones_Vector()*.27;point1(1)=0.05;point2(1)=.15;

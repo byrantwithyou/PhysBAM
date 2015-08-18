@@ -116,7 +116,9 @@ Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input)
         else if(weights->Order()==3){
             face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,3>(mac_grid,/*threads*/1,i);
             face_weights0(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,3>(mac_grid,/*threads*/1,i);}
-        else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");}
+        else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
+        face_weights(i)->use_gradient_transfer=true;
+        face_weights0(i)->use_gradient_transfer=true;}
 }
 //#####################################################################
 // Function Set_Boundary_Conditions
