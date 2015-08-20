@@ -140,7 +140,7 @@ Set_Boundary_Conditions(const T time)
     for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
         if(source.Lazy_Inside(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-            if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=0.5; // 1
+            if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=1;
             else face_velocities(iterator.Full_Index())=0;}}
 }
 //#####################################################################

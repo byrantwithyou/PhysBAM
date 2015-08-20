@@ -35,10 +35,6 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     parse_args.Add("-eapic_order",&example->eapic_order,"frame","last frame");
     parse_args.Add("-use_eapic",&example->use_eapic,"use EAPIC"); 
 
-    parse_args.Add("-use_linear",&example->use_linear,"use LINEAR");
-    parse_args.Add("-use_quadratic",&example->use_quadratic,"use QUAD");
-    parse_args.Add("-use_cubic",&example->use_cubic,"use CUBIC");
-
     parse_args.Parse();
     
     if(example->eapic_order==1) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(example->mac_grid,/*threads*/1));

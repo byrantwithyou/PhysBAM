@@ -64,9 +64,6 @@ public:
 
     // EAPIC
     bool use_eapic;
-    bool use_linear;
-    bool use_quadratic;
-    bool use_cubic;
     int eapic_order;
     PARTICLE_GRID_WEIGHTS<TV>* weights; // cell center weights
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights; // face weights
