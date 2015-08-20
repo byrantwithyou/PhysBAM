@@ -16,7 +16,7 @@ class SMOKE_DRIVER
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-
+ 
 protected:
     int current_frame;
     T time;
