@@ -13,6 +13,7 @@ using namespace PhysBAM;
 template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS& parse_args,MPI_WORLD& mpi_world)
 { 
     typedef VECTOR<int,TV::dimension> TV_INT;
+    // typedef typename TV::SCALAR T;
 
     // ARGS
     int threads=1,scale=200; // default scale = 100
@@ -32,7 +33,12 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     parse_args.Add("-a",&example->alpha,"alpha","buoyancy parameter alpha");
     parse_args.Add("-o",&example->output_directory,"dir","output directory");
     parse_args.Add("-eapic_order",&example->eapic_order,"frame","last frame");
-    parse_args.Add("-use_eapic",&example->use_eapic,"use EAPIC");
+    parse_args.Add("-use_eapic",&example->use_eapic,"use EAPIC"); 
+
+    parse_args.Add("-use_linear",&example->use_linear,"use LINEAR");
+    parse_args.Add("-use_quadratic",&example->use_quadratic,"use QUAD");
+    parse_args.Add("-use_cubic",&example->use_cubic,"use CUBIC");
+
     parse_args.Parse();
     
     if(example->eapic_order==1) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(example->mac_grid,/*threads*/1));
@@ -41,8 +47,37 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     else PHYSBAM_FATAL_ERROR();
 
     // INITIALIZE PARTICLES, FILL THE GRID.
-    // TODO: X0, X, V, C, mass(=1)
+    // TODO: X0, X, V, C, MASS(=1)
+    
+    // 9 POINTS                    
     // RANDOM_NUMBERS<typename TV::SCALAR> rand;
+    //   if(example->use_eapic){
+    //  ARRAY<TV> samples;
+    //  TV a;
+    //  T dx = 1.0/6.0;
+    //  a(0)=dx;a(1)=dx;samples.Append(a);
+    //  a(0)=dx;a(1)=3*dx;samples.Append(a);
+    //  a(0)=dx;a(1)=5*dx;samples.Append(a);
+    //     a(0)=3*dx;a(1)=dx;samples.Append(a);
+    //        a(0)=3*dx;a(1)=3*dx;samples.Append(a);
+    //      a(0)=3*dx;a(1)=5*dx;samples.Append(a);
+    //  a(0)=5*dx;a(1)=dx;samples.Append(a);
+    //  a(0)=5*dx;a(1)=3*dx;samples.Append(a);
+    //  a(0)=5*dx;a(1)=5*dx;samples.Append(a);
+    //  for(CELL_ITERATOR<TV> iterator(example->mac_grid,2);iterator.Valid();iterator.Next()){
+    //      TV X;
+    //      for(int t=0;t<9;t++){
+    //          // rand.Fill_Uniform(X,iterator.Bounding_Box());
+    //          X=iterator.Bounding_Box().min_corner+samples(t)*example->mac_grid.dX.Min();
+    //          int p=example->particles.Add_Element();
+    //          example->particles.X(p)=X;
+    //          example->particles.X0(p)=X;
+    //          example->particles.V(p)=TV();
+    //          example->particles.C(p)=MATRIX<typename TV::SCALAR,TV::m>();
+    //          example->particles.mass(p)=(typename TV::SCALAR)1;}}}
+
+    // // 4 points
+    // // RANDOM_NUMBERS<typename TV::SCALAR> rand;
     if(example->use_eapic){
         ARRAY<TV> samples;
         TV a;
@@ -61,6 +96,21 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
                 example->particles.V(p)=TV();
                 example->particles.C(p)=MATRIX<typename TV::SCALAR,TV::m>();
                 example->particles.mass(p)=(typename TV::SCALAR)1;}}}
+
+
+    // RANDOM_NUMBERS<typename TV::SCALAR> rand;
+    // for(CELL_ITERATOR<TV> iterator(example->mac_grid);iterator.Valid();iterator.Next()){
+    //     TV X;
+    //     for(int t=0;t<4;t++){
+    //         rand.Fill_Uniform(X,iterator.Bounding_Box());
+    //         int p=example->particles.Add_Element();
+    //         example->particles.X(p)=X;
+    //         example->particles.X0(p)=X;
+    //         example->particles.V(p)=TV();
+    //         example->particles.C(p)=MATRIX<typename TV::SCALAR,TV::m>();
+    //         example->particles.mass(p)=(typename TV::SCALAR)1;}}
+
+
     
     // SOURCE
     TV point1=TV::All_Ones_Vector()*.23,point2=TV::All_Ones_Vector()*.27;point1(1)=0.05;point2(1)=.15;
