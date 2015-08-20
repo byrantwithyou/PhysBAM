@@ -170,10 +170,19 @@ Grid_To_Particle()
                 T w=it.Weight();
                 FACE_INDEX<TV::m> face_index(d,it.Index());
                 particles.V(p)(d)+=w*face_velocities_ghost(face_index);
-                particles.C(p).Add_Column(d,face_velocities_ghost(face_index)*it.Gradient());}}
-
+               
+                if(example.use_linear){
+            particles.C(p).Add_Column(d,face_velocities_ghost(face_index)*it.Gradient());}
+                if(example.use_quadratic){
+                TV dx=example.mac_grid.Face(face_index)-particles.X(p);
+                particles.C(p).Add_Column(d,dx*w*4.0/(example.mac_grid.dX(0)*example.mac_grid.dX(0))*face_velocities_ghost(face_index));}
+                if(example.use_cubic){
+                TV dx=example.mac_grid.Face(face_index)-particles.X(p);
+                particles.C(p).Add_Column(d,dx*w*3.0/(example.mac_grid.dX(0)*example.mac_grid.dX(0))*face_velocities_ghost(face_index));}
+            }}
     example.boundary->Set_Fixed_Boundary(false);
 }
+
 //#####################################################################
 // Function Move_Particles
 //#####################################################################
