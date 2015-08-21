@@ -425,7 +425,7 @@ Initialize()
             LOG::cout<<"Particle count: "<<particles.number<<std::endl;
         } break;
         case 16:{ // rotating cylinder oldroyd-b SCA energy with pinned particles as the cylinder
-            // NEWTONIAN ./mpm -3d 16 -affine -max_dt 5e-4 -resolution 15 -fooint1 2 -fooT1 0 -fooT2 100 -fooT3 1e30 -fooT4 2e-4 -scale_mass 20 -last_frame 30
+            // NEWTONIAN ./mpm -3d 16 -affine -max_dt 5e-4 -resolution 15 -fooint1 2 -fooT1 0 -fooT2 100 -fooT3 1e30 -fooT4 1e-4 -scale_mass 20 -last_frame 200 -penalty_stiffness 10 -penalty_damping 0.001 -framerate 72 -cfl .7 -threads 16
             grid.Initialize(TV_INT(resolution*2,resolution*3,resolution*2),RANGE<TV>(TV(-0.06,-0.06,-0.06),TV(0.06,0.12,0.06)),true);
             LOG::cout<<"GRID DX: "<<grid.dX<<std::endl;
             Add_Gravity(TV(0,-9.8,0));
@@ -446,7 +446,7 @@ Initialize()
             Add_Penalty_Collision_Object(levelset);
             // Polyethylene glycol
             SPHERE<TV> seeder1(TV(0,0.015,0),.03);
-            T radius=0.03*1.3;TV P1(0,0.014-0.035-0.018,0);TV P2(0,0.014+0.03,0); CYLINDER<T> seeder2(P1,P2,radius);
+            T radius=0.03*1.3;TV P1(0,0.014-0.035-0.018,0);TV P2(0,0.014+0.04,0); CYLINDER<T> seeder2(P1,P2,radius);
             T density=1*scale_mass;
             use_oldroyd=true;
             this->inv_Wi=(T)1./foo_T3;
