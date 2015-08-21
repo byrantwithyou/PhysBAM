@@ -41,6 +41,7 @@ public:
     using BASE::stream_type;using BASE::use_oldroyd;using BASE::force_helper;
     using BASE::Seed_Particles_Helper;using BASE::Add_Neo_Hookean;using BASE::Add_Collision_Object;
     using BASE::Add_Particle;using BASE::Add_Penalty_Collision_Object;using BASE::scale_speed;
+    using BASE::penalty_collisions_stiffness;using BASE::penalty_damping_stiffness;
 
     int Nsurface;
     ARRAY<int> steal;

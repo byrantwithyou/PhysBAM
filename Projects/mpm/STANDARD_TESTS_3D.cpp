@@ -17,6 +17,7 @@
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
@@ -422,6 +423,64 @@ Initialize()
             Add_Force(*fe);
             LOG::cout<<"Polyethylene glycol added. mu="<<neo->mu<<", lambda="<<neo->lambda<<", Weissenbergi="<<foo_T3<<std::endl;
             LOG::cout<<"Particle count: "<<particles.number<<std::endl;
+        } break;
+        case 16:{ // rotating cylinder oldroyd-b SCA energy with pinned particles as the cylinder
+            // NEWTONIAN ./mpm -3d 16 -affine -max_dt 5e-4 -resolution 15 -fooint1 2 -fooT1 0 -fooT2 100 -fooT3 1e30 -fooT4 2e-4 -scale_mass 20 -last_frame 30
+            grid.Initialize(TV_INT(resolution*2,resolution*3,resolution*2),RANGE<TV>(TV(-0.06,-0.06,-0.06),TV(0.06,0.12,0.06)),true);
+            LOG::cout<<"GRID DX: "<<grid.dX<<std::endl;
+            Add_Gravity(TV(0,-9.8,0));
+            // Container glass
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/glass_tall.tri.gz",*surface);
+            LOG::cout<<"Read mesh elements "<<surface->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh particles "<<surface->particles.number<<std::endl;
+            surface->mesh.Initialize_Adjacent_Elements();    
+            surface->mesh.Initialize_Neighbor_Nodes();
+            surface->mesh.Initialize_Incident_Elements();
+            surface->Update_Bounding_Box();
+            surface->Initialize_Hierarchy();
+            surface->Update_Triangle_List();
+            LOG::cout<<"Building levelset for the collision object..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,100);
+            LOG::cout<<"...done!"<<std::endl;
+            Add_Penalty_Collision_Object(levelset);
+            // Polyethylene glycol
+            SPHERE<TV> seeder1(TV(0,0.015,0),.03);
+            T radius=0.03*1.3;TV P1(0,0.014-0.035-0.018,0);TV P2(0,0.014+0.03,0); CYLINDER<T> seeder2(P1,P2,radius);
+            T density=1*scale_mass;
+            use_oldroyd=true;
+            this->inv_Wi=(T)1./foo_T3;
+            particles.Store_S(use_oldroyd);            
+            if(foo_int1==1) Seed_Particles_Helper(seeder1,[=](const TV& X){return TV();},0,density,particles_per_cell);
+            else if(foo_int1==2) Seed_Particles_Helper(seeder2,[=](const TV& X){return TV();},0,density,particles_per_cell);
+            else PHYSBAM_FATAL_ERROR();
+            for(int k=0;k<particles.number;k++){
+                TV X=particles.X(k);
+                if(sqr(X(0))+sqr(X(2))>=sqr(0.046) || levelset->Extended_Phi(X)<=0)
+                    particles.Add_To_Deletion_List(k);}
+            particles.Delete_Elements_On_Deletion_List();
+            particles.F.Fill(MATRIX<T,3>()+1);particles.S.Fill(SYMMETRIC_MATRIX<T,3>()+sqr(1));
+            VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV> *neo=new VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV>;
+            neo->mu=foo_T1;
+            neo->lambda=foo_T2;
+            MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi,/*viscosity*/foo_T4);
+            Add_Force(*fe);
+            LOG::cout<<"Polyethylene glycol added. mu="<<neo->mu<<", lambda="<<neo->lambda<<", Weissenbergi="<<foo_T3<<std::endl;
+            LOG::cout<<"Particle count: "<<particles.number<<std::endl;
+            // Give particles in cylinder pinning forces
+            foo_cylinder=new CYLINDER<T>(TV(-0.025,-0.028,0),TV(0.025,-0.028,0),0.007);
+            VECTOR<T,3> angular_velocity(0,(T)31.41592653*scale_speed,0);
+            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness,
+                penalty_damping_stiffness);
+            for(int i=0;i<particles.X.m;i++){
+                if(foo_cylinder->Lazy_Inside(particles.X(i))){
+                    particles.mass(i)*=(T)1.1;
+                    TV dx=particles.X(i)-foo_cylinder->Bounding_Box().Center();
+                    pinning_force->Add_Target(i,
+                        [=](T time){
+                            ROTATION<TV> rot=ROTATION<TV>::From_Rotation_Vector(angular_velocity*time);
+                            return rot.Rotate(dx)+foo_cylinder->Bounding_Box().Center();});}}
+            Add_Force(*pinning_force);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
