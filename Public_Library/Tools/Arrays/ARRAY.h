@@ -14,6 +14,7 @@
 #include <Tools/Utilities/EXCEPTIONS.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>
 #include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
+#include <initializer_list>
 namespace PhysBAM{
 
 template<class T,class ID> class ARRAY;
@@ -70,6 +71,13 @@ public:
     {
         base_pointer=new T[Value(m)];
         for(ID i(0);i<m;i++) (*this)(i)=array(i);
+    }
+
+    ARRAY(std::initializer_list<T> init)
+        :base_pointer(0),buffer_size(init.size()),m(init.size())
+    {
+        base_pointer=new T[Value(m)];
+        std::copy(init.begin(),init.end(),begin());
     }
 
     ~ARRAY()
