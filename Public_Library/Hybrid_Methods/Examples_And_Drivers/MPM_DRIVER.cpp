@@ -375,6 +375,7 @@ Grid_To_Particle()
                     V_grid=(T).5*(V_grid+example.velocity(index));
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             MATRIX<T,TV::m> A=dt*grad_Vp+1;
+            if(example.quad_F_coeff) A+=sqr(dt*grad_Vp)*example.quad_F_coeff;
             particles.F(p)=A*particles.F(p);
             if(particles.store_S){
                 T k=example.dt*example.inv_Wi;
@@ -994,6 +995,17 @@ Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u)
     LOG::cout<<str<<" total energy "<<"time " <<example.time<<" value "<<te<<" diff "<<(te-example.last_te)<<std::endl;
     LOG::cout<<str<<" particle total energy "<<"time " <<example.time<<" value "<<(ke2+pe)<<std::endl;
     example.last_te=te;
+}
+//#####################################################################
+// Function Approximate_Exponential
+//#####################################################################
+template<class TV> MATRIX<typename TV::SCALAR,TV::m> MPM_DRIVER<TV>::
+Approximate_Exponential(const MATRIX<T,TV::m>& A)
+{
+    MATRIX<T,TV::m> E=A+1;
+    if(E.Determinant()>0) return E;
+    MATRIX<T,TV::m> G=Approximate_Exponential((T).5*A);
+    return G*G;
 }
 //#####################################################################
 namespace PhysBAM{

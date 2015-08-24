@@ -35,7 +35,7 @@ public:
     T Energy_Density(int p) const override;
     void Gradient(MATRIX<T,TV::m>& dF,SYMMETRIC_MATRIX<T,TV::m>& dS,int p) const override;
     void Hessian(const MATRIX<T,TV::m>& F,const SYMMETRIC_MATRIX<T,TV::m>& S,
-        MATRIX<T,TV::m>& dF,MATRIX<T,TV::m>& dS,int p) const override;
+        MATRIX<T,TV::m>& dF,SYMMETRIC_MATRIX<T,TV::m>& dS,int p) const override;
 //#####################################################################
 };
 }

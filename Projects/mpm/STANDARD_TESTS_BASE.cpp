@@ -38,6 +38,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     penalty_damping_stiffness(0),tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
+    bool use_quasi_exp_F_update=false;
     parse_args.Extra(&test_number,"example number","example number to run");
     parse_args.Add("-restart",&restart,"frame","restart frame");
     parse_args.Add("-resolution",&resolution,&user_resolution,"resolution","grid resolution");
@@ -77,9 +78,12 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-use_early_gradient_transfer",&use_early_gradient_transfer,"use early gradient transfer for Cp");
     parse_args.Add("-incompressible",&incompressible,"Make simulated media incompressible");
     parse_args.Add("-kkt",&kkt,"Use KKT solver");
+    parse_args.Add("-use_exp_F",&use_quasi_exp_F_update,"Use an approximation of the F update that prevents inversion");
+
     parse_args.Parse(true);
 
     frame_dt=1/framerate;
+    if(use_quasi_exp_F_update) quad_F_coeff=(T).5;
 
 #ifdef USE_OPENMP
     omp_set_num_threads(threads);

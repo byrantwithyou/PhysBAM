@@ -2,6 +2,7 @@
 // Copyright 2015
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Math_Tools/pow.h>
 #include <Hybrid_Methods/Forces/VOLUME_PRESERVING_OB_NEO_HOOKEAN.h>
 namespace PhysBAM{
 //#####################################################################
@@ -45,14 +46,15 @@ Precompute(const MATRIX<T,TV::m>& F,const SYMMETRIC_MATRIX<T,TV::m>& S,int p)
     if(K<=0) LOG::cout <<"WARNING: K Det <= 0" << std::endl;
     if(J<=0) LOG::cout <<"WARNING: J Det <= 0" << std::endl;
     
-    psi(p)=(mu/2.0)*pow(sqr(J),e)*pow(K,-e)*S.Trace()-mu*log(J)+(lambda/2)*sqr(J-1);
+    T r=mu*pow<1,TV::m>(sqr(J)/K);
+    psi(p)=(r/2)*S.Trace()-mu*log(J)+(lambda/2)*sqr(J-1);
     G(p)=F.Inverse();
     M(p)=S.Inverse();
     S_mat(p)=S;
     F_mat(p)=F;
-    H(p)=G(p).Transposed()*(mu*e*pow(sqr(J),e)*pow(K,-e)*S.Trace()-mu+lambda*(J-1)*J); //F part
-    N(p)=(M(p)*-e*S.Trace()+IDENTITY_MATRIX<T,TV::m>())*(mu/2)*pow(sqr(J),e)*pow(K,-e); //S part
-    c(p)=mu*e*pow(sqr(J),e)*pow(K,-e);   
+    H(p)=G(p).Transposed()*(r*e*S.Trace()-mu+lambda*(J-1)*J); //F part
+    N(p)=(M(p)*-e*S.Trace()+1)*(r/2); //S part
+    c(p)=r*e;
 }
 //#####################################################################
 // Function Energy_Density
@@ -76,11 +78,11 @@ Gradient(MATRIX<T,TV::m>& dF,SYMMETRIC_MATRIX<T,TV::m>& dS,int p) const
 //#####################################################################
 template<class TV> void VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV>::
 Hessian(const MATRIX<T,TV::m>& F,const SYMMETRIC_MATRIX<T,TV::m>& S,
-    MATRIX<T,TV::m>& dF,MATRIX<T,TV::m>& dS,int p) const
+    MATRIX<T,TV::m>& dF,SYMMETRIC_MATRIX<T,TV::m>& dS,int p) const
 {
     MATRIX<T,TV::m> A=G(p).Transposed()*(G(p).Transposed().Double_Contract(F));
     MATRIX<T,TV::m> B=(G(p)*F*G(p)).Transposed();
-    MATRIX<T,TV::m> D=M(p)*S*M(p);
+    SYMMETRIC_MATRIX<T,TV::m> D=SYMMETRIC_MATRIX<T,TV::m>::Conjugate(M(p),S);
     MATRIX<T,TV::m> E=M(p)*S.Trace();
     T e = 1./(TV::m);
     T d=G(p).Transposed().Double_Contract(F);
@@ -91,10 +93,10 @@ Hessian(const MATRIX<T,TV::m>& F,const SYMMETRIC_MATRIX<T,TV::m>& S,
     T k=F.Trace();
     T J=F_mat(p).Determinant();
     
-    MATRIX<T,TV::m> first= (M(p)*(-e)*(S_mat(p).Trace()) + IDENTITY_MATRIX<T,TV::m>())*g;
-    MATRIX<T,TV::m> secon= M(p)*h;
-    MATRIX<T,TV::m> third= -D*S_mat(p).Trace();
-    MATRIX<T,TV::m> fourt= M(p)*(-e)*(S_mat(p).Trace()) + IDENTITY_MATRIX<T,TV::m>();
+    SYMMETRIC_MATRIX<T,TV::m> fourt= M(p)*(-e)*(S_mat(p).Trace()) + 1;
+    SYMMETRIC_MATRIX<T,TV::m> first= fourt*g;
+    SYMMETRIC_MATRIX<T,TV::m> secon= M(p)*h;
+    SYMMETRIC_MATRIX<T,TV::m> third= -D*S_mat(p).Trace();
 
     dS=(first+secon+third)*(-c(p)/2.0) + (fourt)*c(p)*d;
     

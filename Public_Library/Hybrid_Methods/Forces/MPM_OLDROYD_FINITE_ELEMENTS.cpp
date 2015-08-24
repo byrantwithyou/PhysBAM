@@ -19,9 +19,10 @@ namespace PhysBAM{
 template<class TV> MPM_OLDROYD_FINITE_ELEMENTS<TV>::
 MPM_OLDROYD_FINITE_ELEMENTS(MPM_FORCE_HELPER<TV>& force_helper,
     OLDROYD_CONSTITUTIVE_MODEL<TV>& constitutive_model,
-    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,const T& inv_Wi,const T viscosity)
+    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,
+    const T& inv_Wi,T quad_F_coeff)
     :BASE(force_helper),constitutive_model(constitutive_model),affect_all(!affected_particles),
-    gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles))),stored_dt(0),inv_Wi(inv_Wi),viscosity(viscosity)
+    gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles))),stored_dt(0),inv_Wi(inv_Wi)
 {
     if(!affect_all){
         gather_scatter.weights=gather_scatter_input.weights;
@@ -60,16 +61,10 @@ template<class TV> typename TV::SCALAR MPM_OLDROYD_FINITE_ELEMENTS<TV>::
 Potential_Energy(const T time) const
 {
     T pe=0;
-    T q_scale=(T).5/sqr(stored_dt);
 #pragma omp parallel for reduction(+:pe)
     for(int k=0;k<gather_scatter.simulated_particles.m;k++){
         int p=gather_scatter.simulated_particles(k);
-        pe+=particles.volume(p)*constitutive_model.Energy_Density(p);
-        if(viscosity){
-            MATRIX<T,TV::m> A=force_helper.A(p)-MATRIX<T,TV::m>::Identity_Matrix();
-            T q=(A.Frobenius_Norm_Squared()+MATRIX<T,TV::m>::Inner_Product(A.Transposed(),A))*q_scale;
-            T c=force_helper.Fn(p).Determinant()*viscosity*q;
-            pe+=particles.volume(p)*c;}}
+        pe+=particles.volume(p)*constitutive_model.Energy_Density(p);}
     return pe;
 }
 //#####################################################################
@@ -78,18 +73,20 @@ Potential_Energy(const T time) const
 template<class TV> void MPM_OLDROYD_FINITE_ELEMENTS<TV>:: 
 Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
-    T zeta=2/(1+stored_dt*inv_Wi);
-    T q_scale=(T)1/sqr(stored_dt);
+    T zeta=1/(1+stored_dt*inv_Wi);
+    T c=force_helper.quad_F_coeff;
     gather_scatter.template Scatter<MATRIX<T,TV::m> >(
-        [this,zeta,q_scale](int p,MATRIX<T,TV::m>& A)
+        [this,zeta,c](int p,MATRIX<T,TV::m>& AF)
         {
-            SYMMETRIC_MATRIX<T,TV::m> dQ;
-            MATRIX<T,TV::m> dP;
+            SYMMETRIC_MATRIX<T,TV::m> dQ,S=force_helper.Sn(p);
+            MATRIX<T,TV::m> dP,F=force_helper.Fn(p),B=force_helper.B(p);
             constitutive_model.Gradient(dP,dQ,p);
-            A=(dP.Times_Transpose(force_helper.Fn(p))+zeta*(dQ*force_helper.A(p)*force_helper.Sn(p)))*particles.volume(p);
-            if(viscosity){
-                MATRIX<T,TV::m> Ap=force_helper.A(p)-MATRIX<T,TV::m>::Identity_Matrix();
-                A+=(Ap+Ap.Transposed())*(q_scale*viscosity*force_helper.Fn(p).Determinant()*particles.volume(p));}
+            MATRIX<T,TV::m> A=B+1+c*sqr(B);
+            MATRIX<T,TV::m> N=dP.Times_Transpose(F);
+            MATRIX<T,TV::m> Q=2*zeta*dQ*A*S;
+            MATRIX<T,TV::m> P=N+Q;
+            MATRIX<T,TV::m> TP=(P+c*(P.Times_Transpose(B)+B.Transpose_Times(P)));
+            AF=TP*particles.volume(p);
         },
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,const MATRIX<T,TV::m>& A)
         {F(it.Index())-=A*it.Gradient();},
@@ -102,35 +99,38 @@ template<class TV> void MPM_OLDROYD_FINITE_ELEMENTS<TV>::
 Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const
 {
     tmp.Resize(particles.X.m);
-    tmp2.Resize(particles.X.m);
 
-    T zeta=2/(1+stored_dt*inv_Wi);
-    T q_scale=(T)1/sqr(stored_dt);
+    T zeta=1/(1+stored_dt*inv_Wi);
+    T c=force_helper.quad_F_coeff;
     gather_scatter.template Gather<int>(
-        [this](int p,int data){tmp(p)=MATRIX<T,TV::m>();tmp2(p)=MATRIX<T,TV::m>();},
+        [this](int p,int data){tmp(p)=MATRIX<T,TV::m>();},
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {
             tmp(p)+=MATRIX<T,TV::m>::Outer_Product(V(it.Index()),it.Gradient());
-            if(viscosity){
-                tmp2(p)+=MATRIX<T,TV::m>::Outer_Product(V(it.Index()),it.Gradient());
-                tmp2(p)+=MATRIX<T,TV::m>::Outer_Product(it.Gradient(),V(it.Index()));}
         },
-        [this,zeta,q_scale](int p,int data){
-            SYMMETRIC_MATRIX<T,TV::m> B=(tmp(p)*force_helper.Sn(p)).Twice_Symmetric_Part(),dQ2;
-            MATRIX<T,TV::m> dQ;
-            MATRIX<T,TV::m> C=tmp(p)*force_helper.Fn(p),dP,dP2;
-            constitutive_model.Hessian(C,B,dP,dQ,p);
-            constitutive_model.Gradient(dP2,dQ2,p);
-            MATRIX<T,TV::m> G=dP.Times_Transpose(force_helper.Fn(p));
-            //G+=zeta*dQ*force_helper.Sn(p).Times_Transpose(force_helper.A(p));
-            G+=zeta*dQ*force_helper.A(p)*force_helper.Sn(p);
-            G+=zeta*dQ2*tmp(p)*force_helper.Sn(p);
-            tmp(p)=G*particles.volume(p);
-            if(viscosity) tmp2(p)*=(q_scale*viscosity*force_helper.Fn(p).Determinant()*particles.volume(p));},true);
+        [this,zeta,c](int p,int data){
+            SYMMETRIC_MATRIX<T,TV::m> dQ,S=force_helper.Sn(p),G;
+            MATRIX<T,TV::m> dP,F=force_helper.Fn(p),B=force_helper.B(p),L;
+            constitutive_model.Gradient(dP,dQ,p);
+            MATRIX<T,TV::m> A=B+1+c*sqr(B);
+            MATRIX<T,TV::m> N=dP.Times_Transpose(F);
+            MATRIX<T,TV::m> Q=2*zeta*dQ*A*S;
+            MATRIX<T,TV::m> P=N+Q;
+            MATRIX<T,TV::m> V=(P.Times_Transpose(tmp(p))+tmp(p).Transpose_Times(P))*c;
+            MATRIX<T,TV::m> W=tmp(p)+(tmp(p)*B+B*tmp(p))*c;
+            MATRIX<T,TV::m> D=W*F;
+            SYMMETRIC_MATRIX<T,TV::m> E=zeta*(A*S.Times_Transpose(W)).Twice_Symmetric_Part();
+            constitutive_model.Hessian(D,E,L,G,p);
+            MATRIX<T,TV::m> H=L.Times_Transpose(F);
+            MATRIX<T,TV::m> K=2*zeta*(G*A+dQ*W)*S;
+            MATRIX<T,TV::m> M=H+K;
+            MATRIX<T,TV::m> Z=M+(M.Times_Transpose(B)+B.Transpose_Times(M))*c;
+            tmp(p)=(Z+V)*particles.volume(p);
+        },true);
 
     gather_scatter.template Scatter<int>(
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
-        {F(it.Index())+=tmp(p)*it.Gradient()+tmp2(p)*it.Gradient();},true);
+        {F(it.Index())+=tmp(p)*it.Gradient();},true);
 }
 template class MPM_OLDROYD_FINITE_ELEMENTS<VECTOR<float,2> >;
 template class MPM_OLDROYD_FINITE_ELEMENTS<VECTOR<float,3> >;

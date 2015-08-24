@@ -20,11 +20,12 @@ class MPM_FORCE_HELPER
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     MPM_PARTICLES<TV>& particles;
-    ARRAY<MATRIX<T,TV::m> > Fn,A;
+    ARRAY<MATRIX<T,TV::m> > Fn,B;
     ARRAY<SYMMETRIC_MATRIX<T,TV::m> > Sn;
+    const T& quad_F_coeff;
 
-    MPM_FORCE_HELPER(MPM_PARTICLES<TV>& particles)
-        :particles(particles)
+    MPM_FORCE_HELPER(MPM_PARTICLES<TV>& particles,const T& quad_F_coeff)
+        :particles(particles),quad_F_coeff(quad_F_coeff)
     {
     }
 };

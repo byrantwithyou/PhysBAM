@@ -2,10 +2,10 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class MPM_OLDROYD_FINITE_ELEMENTS
+// Class MPM_VISCOSITY
 //#####################################################################
-#ifndef __MPM_OLDROYD_FINITE_ELEMENTS__
-#define __MPM_OLDROYD_FINITE_ELEMENTS__
+#ifndef __MPM_VISCOSITY__
+#define __MPM_VISCOSITY__
 
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
@@ -18,25 +18,22 @@ template<class TV> class GATHER_SCATTER;
 template<class TV> class MPM_FORCE_HELPER;
 
 template<class TV>
-class MPM_OLDROYD_FINITE_ELEMENTS:public PARTICLE_GRID_FORCES<TV>
+class MPM_VISCOSITY:public PARTICLE_GRID_FORCES<TV>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef PARTICLE_GRID_FORCES<TV> BASE;
 public:
     using BASE::particles;using BASE::force_helper;
-    OLDROYD_CONSTITUTIVE_MODEL<TV>& constitutive_model;
     bool affect_all;
     GATHER_SCATTER<TV>& gather_scatter;
     mutable ARRAY<MATRIX<T,TV::m> > tmp;
     T stored_dt;
-    const T& inv_Wi;
+    T viscosity;
 
-    MPM_OLDROYD_FINITE_ELEMENTS(MPM_FORCE_HELPER<TV>& force_helper,
-        OLDROYD_CONSTITUTIVE_MODEL<TV>& constitutive_model,
-        GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,
-        const T& inv_Wi,T quad_F_coeff);
-    virtual ~MPM_OLDROYD_FINITE_ELEMENTS();
+    MPM_VISCOSITY(MPM_FORCE_HELPER<TV>& force_helper,GATHER_SCATTER<TV>& gather_scatter_input,
+        ARRAY<int>* affected_particles,const T viscosity);
+    virtual ~MPM_VISCOSITY();
 
 //#####################################################################
     void Precompute(const T time,const T dt) override;
