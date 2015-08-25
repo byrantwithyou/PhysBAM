@@ -1,3 +1,4 @@
 env=Environment();
 env.Append(CXXFLAGS='-std=gnu++14');
+env.Append(CXXFLAGS='-g');
 env.Program("diff_test",["main.cpp","symbolic_tensor.cpp"])
