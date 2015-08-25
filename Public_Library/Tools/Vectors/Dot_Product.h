@@ -7,16 +7,15 @@
 #ifndef __Dot_Product__
 #define __Dot_Product__
 
+#include <Tools/Utilities/TYPE_UTILITIES.h>
 namespace PhysBAM{
 
 template<class TV>
 inline typename TV::SCALAR Dot_Product(const TV& v1,const TV& v2)
 {return v1.Dot(v2);}
 
-inline float Dot_Product(const float a1,const float a2)
-{return a1*a2;}
-
-inline double Dot_Product(const double a1,const double a2)
+template<class T>
+inline typename enable_if<is_scalar<T>::value,T>::type Dot_Product(const T a1,const T a2)
 {return a1*a2;}
 
 template<class TV>
@@ -28,19 +27,12 @@ template<class T,int d>
 inline double Dot_Product_Double_Precision(const VECTOR<T,d>& v1,const VECTOR<T,d>& v2)
 {return v1.Dot(v2);}
 
-inline double Dot_Product_Double_Precision(const float a1,const float a2)
+template<class T>
+inline typename enable_if<is_scalar<T>::value,double>::type Dot_Product_Double_Precision(const T a1,const T a2)
 {return a1*a2;}
 
-inline double Dot_Product_Double_Precision(const double a1,const double a2)
-{return a1*a2;}
-
-inline int Magnitude_Squared(const int a)
-{return a*a;}
-
-inline float Magnitude_Squared(const float a)
-{return a*a;}
-
-inline double Magnitude_Squared(const double a)
+template<class T>
+inline typename enable_if<is_scalar<T>::value,T>::type Magnitude_Squared(const T a)
 {return a*a;}
 
 template<class TV>
