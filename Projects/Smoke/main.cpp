@@ -12,16 +12,28 @@ using namespace PhysBAM;
 
 template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS& parse_args,MPI_WORLD& mpi_world)
 { 
-    typedef VECTOR<int,TV::dimension> TV_INT;
-    // typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::dimension> TV_INT;    
 
     // ARGS
-    int threads=1,scale=200; // default scale = 100
+    int threads=1;
     parse_args.Add("-threads",&threads,"threads","number of threads");
-    parse_args.Add("-scale",&scale,"scale","fine scale grid resolution");
+   
     parse_args.Parse(true);
     SMOKE_EXAMPLE<TV>* example=new SMOKE_EXAMPLE<TV>(stream_type,threads);
     RANGE<TV> range(TV(),TV::All_Ones_Vector()*0.5);range.max_corner(1)=1;
+
+    
+    // range.min_corner(0)=-0.5;
+    // range.min_corner(1)=0;
+    // range.max_corner(0)=1;
+    // range.max_corner(1)=3;
+    LOG::cout<<"range.min_corner(0) "<<range.min_corner(0)<<std::endl;
+    LOG::cout<<"range.min_corner(1) "<<range.min_corner(1)<<std::endl;
+    LOG::cout<<"range.max_corner(0) "<<range.max_corner(0)<<std::endl;
+    LOG::cout<<"range.max_corner(1) "<<range.max_corner(1)<<std::endl;
+    int scale = 100*(range.max_corner(1) - range.min_corner(1));
+    parse_args.Add("-scale",&scale,"scale","fine scale grid resolution");
+    
     TV_INT counts=TV_INT::All_Ones_Vector()*scale/2;counts(1)=scale;
     example->Initialize_Grid(counts,range);
     LOG::cout<<"Grid dX "<<example->mac_grid.dX<<std::endl;
@@ -34,6 +46,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     parse_args.Add("-o",&example->output_directory,"dir","output directory");
     parse_args.Add("-eapic_order",&example->eapic_order,"frame","last frame");
     parse_args.Add("-use_eapic",&example->use_eapic,"use EAPIC"); 
+    parse_args.Add("-nrs",&example->nrs,"non resampling"); 
 
     parse_args.Parse();
     
@@ -47,6 +60,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     
     // 9 POINTS                    
     // RANDOM_NUMBERS<typename TV::SCALAR> rand;
+    // typedef typename TV::SCALAR T;
     //   if(example->use_eapic){
     //  ARRAY<TV> samples;
     //  TV a;
@@ -54,6 +68,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     //  a(0)=dx;a(1)=dx;samples.Append(a);
     //  a(0)=dx;a(1)=3*dx;samples.Append(a);
     //  a(0)=dx;a(1)=5*dx;samples.Append(a);
+
     //     a(0)=3*dx;a(1)=dx;samples.Append(a);
     //        a(0)=3*dx;a(1)=3*dx;samples.Append(a);
     //      a(0)=3*dx;a(1)=5*dx;samples.Append(a);
@@ -72,29 +87,45 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     //          example->particles.C(p)=MATRIX<typename TV::SCALAR,TV::m>();
     //          example->particles.mass(p)=(typename TV::SCALAR)1;}}}
 
-    // // 4 points
+    // // // 4 points
     // // RANDOM_NUMBERS<typename TV::SCALAR> rand;
-    if(example->use_eapic){
+    // if(example->use_eapic){
+    //     ARRAY<TV> samples;
+    //     TV a;
+    //     a(0)=0.25;a(1)=0.25;samples.Append(a);
+    //     a(0)=0.75;a(1)=0.25;samples.Append(a);
+    //     a(0)=0.25;a(1)=0.75;samples.Append(a);
+    //     a(0)=0.75;a(1)=0.75;samples.Append(a);
+    //     for(CELL_ITERATOR<TV> iterator(example->mac_grid,2);iterator.Valid();iterator.Next()){
+    //         TV X;
+    //         for(int t=0;t<4;t++){
+    //             // rand.Fill_Uniform(X,iterator.Bounding_Box());
+    //             X=iterator.Bounding_Box().min_corner+samples(t)*example->mac_grid.dX.Min();
+    //             int p=example->particles.Add_Element();
+    //             example->particles.X(p)=X;
+    //             example->particles.X0(p)=X;
+    //             example->particles.V(p)=TV();
+    //             example->particles.C(p)=MATRIX<typename TV::SCALAR,TV::m>();
+    //             example->particles.mass(p)=(typename TV::SCALAR)5;}}}
+    
+    // 1 point
+     if(example->use_eapic){
         ARRAY<TV> samples;
         TV a;
-        a(0)=0.25;a(1)=0.25;samples.Append(a);
-        a(0)=0.75;a(1)=0.25;samples.Append(a);
-        a(0)=0.25;a(1)=0.75;samples.Append(a);
-        a(0)=0.75;a(1)=0.75;samples.Append(a);
+        a(0)=0.5;a(1)=0.5;samples.Append(a);
+      
         for(CELL_ITERATOR<TV> iterator(example->mac_grid,2);iterator.Valid();iterator.Next()){
             TV X;
-            for(int t=0;t<4;t++){
-                // rand.Fill_Uniform(X,iterator.Bounding_Box());
-                X=iterator.Bounding_Box().min_corner+samples(t)*example->mac_grid.dX.Min();
-                int p=example->particles.Add_Element();
-                example->particles.X(p)=X;
-                example->particles.X0(p)=X;
-                example->particles.V(p)=TV();
-                example->particles.C(p)=MATRIX<typename TV::SCALAR,TV::m>();
-                example->particles.mass(p)=(typename TV::SCALAR)1;}}}
+            X=iterator.Bounding_Box().min_corner+samples(0)*example->mac_grid.dX.Min();
+            int p=example->particles.Add_Element();
+            example->particles.X(p)=X;
+            example->particles.X0(p)=X;
+            example->particles.V(p)=TV();
+            example->particles.C(p)=MATRIX<typename TV::SCALAR,TV::m>();
+            example->particles.mass(p)=(typename TV::SCALAR)1;}
+      }
 
-
-    // RANDOM_NUMBERS<typename TV::SCALAR> rand;
+// RANDOM_NUMBERS<typename TV::SCALAR> rand;
     // for(CELL_ITERATOR<TV> iterator(example->mac_grid);iterator.Valid();iterator.Next()){
     //     TV X;
     //     for(int t=0;t<4;t++){

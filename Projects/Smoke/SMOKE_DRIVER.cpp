@@ -159,9 +159,13 @@ Grid_To_Particle()
     LOG::cout<<"G2P"<<std::endl;
     LOG::cout<<"#p"<<particles.number<<std::endl;
 
+    // compute new face weights
+    if(example.nrs)for(int i=0;i<TV::m;++i) example.face_weights0(i)->Update(example.particles.X);
+
     for(int p=0;p<particles.number;p++){
         // Zero out particle veloicity and C, resample particle positions
-        particles.X(p)=particles.X0(p);
+        
+        if(!example.nrs) particles.X(p)=particles.X0(p);
         particles.V(p)=TV();
         particles.C(p)=MATRIX<T,TV::m>();
         // Compute new V and C
