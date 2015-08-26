@@ -142,6 +142,12 @@ Particle_To_Grid()
             example.face_velocities(face_index)=face_velocities_ghost(face_index)/example.face_mass(face_index);}
 
     example.boundary->Set_Fixed_Boundary(false);
+
+    //  LOG::cout<<"max(Vi(p))"<< Max_Grid_Speed()<<std::endl;
+    //LOG::cout<<"Total Grid Linear  Momentum"<<Total_Grid_Linear_Momentum() <<std::endl;
+    LOG::cout<<"Total Grid Kinetic Energy"<<Total_Grid_Kinetic_Energy()<<std::endl;
+    
+
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -183,8 +189,14 @@ Grid_To_Particle()
                     TV dx=example.mac_grid.Face(face_index)-particles.X(p);
                     particles.C(p).Add_Column(d,dx*w*3.0/(example.mac_grid.dX(0)*example.mac_grid.dX(0))*face_velocities_ghost(face_index));}
                 else PHYSBAM_FATAL_ERROR();}}
+  example.boundary->Set_Fixed_Boundary(false);
 
-    example.boundary->Set_Fixed_Boundary(false);
+  //Print vp, C_norm
+    LOG::cout<<"max(V(p))"<< Max_Particle_Speed()<<std::endl;
+    LOG::cout<<"max||C||"<< Max_C()<<std::endl;
+    LOG::cout<<"Total Particle Linear  Momentum"<<Total_Particle_Linear_Momentum() <<std::endl;
+    // LOG::cout<<"Total Kinetic Energy"<<Total_Particle_Kinetic_Energy()<<std::endl;
+
 }
 
 //#####################################################################
@@ -332,6 +344,102 @@ Print_Max_Divergence(const char* str)
         T ad=abs(d); if(ad>max_div) max_div=ad;}
     LOG::cout<<str<<" max(div(v)) "<<max_div<<std::endl;
 }
+
+
+//#####################################################################
+// Function Max_Particle_Speed
+//#####################################################################
+template<class TV> typename TV::SCALAR SMOKE_DRIVER<TV>::
+Max_Particle_Speed() const
+{
+    SMOKE_PARTICLES<TV>& particles=example.particles;
+    T v2=0;
+#pragma omp parallel for reduction(max:v2)
+    for(int p=0;p<particles.number;p++){
+       v2=max(v2,example.particles.V(p).Magnitude_Squared());}
+    return sqrt(v2);
+}
+
+//#####################################################################
+// Function Max_C
+//#####################################################################
+template<class TV> typename TV::SCALAR SMOKE_DRIVER<TV>::
+Max_C() const
+{
+    SMOKE_PARTICLES<TV>& particles=example.particles;
+    T Cnorm=0;
+    
+#pragma omp parallel for reduction(max:v2)
+    for(int p=0;p<particles.number;p++){
+        Cnorm=max(Cnorm,example.particles.C(p).Frobenius_Norm());}
+    return sqrt(Cnorm);
+}
+
+
+//#####################################################################
+// Function Total_Particle_Linear_Momentum
+//#####################################################################
+template<class TV> TV SMOKE_DRIVER<TV>::
+Total_Particle_Linear_Momentum() const
+{
+    TV result;
+    SMOKE_PARTICLES<TV>& particles=example.particles;
+    for(int p=0;p<particles.number;p++){
+        result+=particles.V(p)*particles.mass(p);}
+    return result;
+}
+// //#####################################################################
+// // Function Total_Particle_Kinetic_Energy
+// //#####################################################################
+// template<class TV> typename TV::SCALAR SMOKE_DRIVER<TV>::
+// Total_Particle_Kinetic_Energy() const
+// {
+//     T result=0;
+// // SMOKE_PARTICLES<TV>& particles=example.particles;
+// // #pragma omp parallel for reduction(+:result)
+// //     for(int p=0;p<particles.number;p++){
+// //         T result_local=particles.mass(p)/2*particles.V(p).Magnitude_Squared();
+// //         result+=result_local;}
+//     return result;
+// }
+
+
+//#####################################################################
+// Function Max_Grid_Speed
+//#####################################################################
+// template<class TV> typename TV::SCALAR SMOKE_DRIVER<TV>::
+// Max_Grid_Speed() const
+// {
+
+//   for(int p=0;p<particles.number;p++){
+//         // Zero out particle veloicity and C, resample particle positions
+        
+//         if(!example.nrs) particles.X(p)=particles.X0(p);
+//         particles.V(p)=TV();
+//         particles.C(p)=MATRIX<T,TV::m>();
+//         // Compute new V and C
+//         for(int d=0;d<TV::m;++d)
+//             for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights0(d),p,true,scratch);it.Valid();it.Next()){
+//                 T w=it.Weight();
+//                 FACE_INDEX<TV::m> face_index(d,it.Index());
+//                 particles.V(p)(d)+=w*face_velocities_ghost(face_index);
+
+
+//#####################################################################
+// Function Total_Grid_Kinetic_Energy
+//#####################################################################
+template<class TV> typename TV::SCALAR SMOKE_DRIVER<TV>::
+Total_Grid_Kinetic_Energy() const
+{
+    T result=0;
+
+    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+        FACE_INDEX<TV::m> face_index=iterator.Full_Index();
+        if(example.face_mass(face_index)){
+            result+=(T).5*example.face_velocities(face_index)*example.face_velocities(face_index);}}
+    return result;
+}
+
 //#####################################################################
 namespace PhysBAM{
 template class SMOKE_DRIVER<VECTOR<float,2> >;

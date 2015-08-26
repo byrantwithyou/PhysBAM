@@ -46,7 +46,15 @@ public:
     void Write_Output_Files(const int frame);
     void Write_Substep(const std::string& title,const int substep,const int level=0);
     void Print_Max_Divergence(const char* str);
+    T Max_Particle_Speed() const;
+    
+    T Max_C() const;
+    TV Total_Particle_Linear_Momentum() const;
+    T Total_Particle_Kinetic_Energy() const;
 
+    T Max_Grid_Speed() const;
+    TV Total_Grid_Momentum() const;
+    T Total_Grid_Kinetic_Energy() const;
 //#####################################################################
 };
 }
