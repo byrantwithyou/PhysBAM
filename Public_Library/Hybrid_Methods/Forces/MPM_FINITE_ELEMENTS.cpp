@@ -81,7 +81,6 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
         [this,c](int p,MATRIX<T,TV::m>& AF)
         {
             MATRIX<T,TV::m> B=force_helper.B(p);
-            MATRIX<T,TV::m> A=B+1+c*sqr(B);
             DIAGONAL_MATRIX<T,TV::m> Ph=constitutive_model.P_From_Strain(sigma(p),particles.volume(p),p)/particles.volume(p);
             MATRIX<T,TV::m> P=U(p)*Ph.Times_Transpose(FV(p));
             MATRIX<T,TV::m> TP=(P+c*(P.Times_Transpose(B)+B.Transpose_Times(P)));
@@ -107,13 +106,10 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
             tmp(p)+=MATRIX<T,TV::m>::Outer_Product(V(it.Index()),it.Gradient());
         },
         [this,c](int p,int data){
-            MATRIX<T,TV::m> dP,B=force_helper.B(p),L;
+            MATRIX<T,TV::m> B=force_helper.B(p);
             DIAGONAL_MATRIX<T,TV::m> Ph=constitutive_model.P_From_Strain(sigma(p),particles.volume(p),p)/particles.volume(p);
-            MATRIX<T,TV::m> A=B+1+c*sqr(B);
             MATRIX<T,TV::m> P=U(p)*Ph.Times_Transpose(FV(p));
             MATRIX<T,TV::m> V=(P.Times_Transpose(tmp(p))+tmp(p).Transpose_Times(P))*c;
-            MATRIX<T,TV::m> W=tmp(p)+(tmp(p)*B+B*tmp(p))*c;
-            MATRIX<T,TV::m> D=W*U(p).Transpose_Times(FV(p));
             MATRIX<T,TV::m> dFh=U(p).Transpose_Times(tmp(p)*FV(p));
             MATRIX<T,TV::m> dPh=dPi_dF(p).Differential(dFh);
             MATRIX<T,TV::m> M=U(p)*dPh.Times_Transpose(FV(p));
