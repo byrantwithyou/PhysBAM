@@ -83,6 +83,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Parse(true);
 
     frame_dt=1/framerate;
+
+    quad_F_coeff=(T)0;
     if(use_quasi_exp_F_update) quad_F_coeff=(T).5;
 
 #ifdef USE_OPENMP
@@ -203,7 +205,7 @@ Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles,bool no_mu)
     COROTATED_FIXED<T,TV::m>* coro=new COROTATED_FIXED<T,TV::m>(E,nu);
     if(no_mu) coro->Zero_Out_Mu();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*coro;
-    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
+    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,quad_F_coeff);
     return Add_Force(fe);
 }
 //#####################################################################
@@ -213,7 +215,7 @@ template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles)
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*new NEO_HOOKEAN<T,TV::m>(E,nu);
-    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
+    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,quad_F_coeff);
     return Add_Force(fe);
 }
 //#####################################################################

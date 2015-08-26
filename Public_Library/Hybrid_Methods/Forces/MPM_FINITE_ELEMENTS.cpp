@@ -19,9 +19,9 @@ namespace PhysBAM{
 template<class TV> MPM_FINITE_ELEMENTS<TV>::
 MPM_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
-    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles)
+    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles, T quad_F_coeff)
     :BASE(force_helper),constitutive_model(constitutive_model),affect_all(!affected_particles),
-    gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles)))
+     gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles)))
 {
     if(!affect_all){
         gather_scatter.weights=gather_scatter_input.weights;
@@ -76,13 +76,20 @@ Potential_Energy(const T time) const
 template<class TV> void MPM_FINITE_ELEMENTS<TV>:: 
 Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
+    T c=force_helper.quad_F_coeff;
     gather_scatter.template Scatter<MATRIX<T,TV::m> >(
-        [this](int p,MATRIX<T,TV::m>& V0_P_FT){
-            DIAGONAL_MATRIX<T,TV::m> Ph=constitutive_model.P_From_Strain(sigma(p),particles.volume(p),p);
-            V0_P_FT=U(p)*Ph.Times_Transpose(FV(p));},
-        [&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,const MATRIX<T,TV::m>& V0_P_FT)
-        {F(it.Index())-=V0_P_FT*it.Gradient();},
-        [](int p,const MATRIX<T,TV::m>& V0_P_FT){},true);
+        [this,c](int p,MATRIX<T,TV::m>& AF)
+        {
+            MATRIX<T,TV::m> B=force_helper.B(p);
+            MATRIX<T,TV::m> A=B+1+c*sqr(B);
+            DIAGONAL_MATRIX<T,TV::m> Ph=constitutive_model.P_From_Strain(sigma(p),particles.volume(p),p)/particles.volume(p);
+            MATRIX<T,TV::m> P=U(p)*Ph.Times_Transpose(FV(p));
+            MATRIX<T,TV::m> TP=(P+c*(P.Times_Transpose(B)+B.Transpose_Times(P)));
+            AF=TP*particles.volume(p);
+        },
+        [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,const MATRIX<T,TV::m>& A)
+        {F(it.Index())-=A*it.Gradient();},
+        [](int p,const MATRIX<T,TV::m>& A){},true);
 }
 //#####################################################################
 // Function Add_Hessian_Times
@@ -91,15 +98,28 @@ template<class TV> void MPM_FINITE_ELEMENTS<TV>::
 Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const
 {
     tmp.Resize(particles.X.m);
-
+    
+    T c=force_helper.quad_F_coeff;
     gather_scatter.template Gather<int>(
         [this](int p,int data){tmp(p)=MATRIX<T,TV::m>();},
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
-        {tmp(p)+=MATRIX<T,TV::m>::Outer_Product(V(it.Index()),it.Gradient());},
-        [this](int p,int data){
+        {
+            tmp(p)+=MATRIX<T,TV::m>::Outer_Product(V(it.Index()),it.Gradient());
+        },
+        [this,c](int p,int data){
+            MATRIX<T,TV::m> dP,B=force_helper.B(p),L;
+            DIAGONAL_MATRIX<T,TV::m> Ph=constitutive_model.P_From_Strain(sigma(p),particles.volume(p),p)/particles.volume(p);
+            MATRIX<T,TV::m> A=B+1+c*sqr(B);
+            MATRIX<T,TV::m> P=U(p)*Ph.Times_Transpose(FV(p));
+            MATRIX<T,TV::m> V=(P.Times_Transpose(tmp(p))+tmp(p).Transpose_Times(P))*c;
+            MATRIX<T,TV::m> W=tmp(p)+(tmp(p)*B+B*tmp(p))*c;
+            MATRIX<T,TV::m> D=W*U(p).Transpose_Times(FV(p));
             MATRIX<T,TV::m> dFh=U(p).Transpose_Times(tmp(p)*FV(p));
-            MATRIX<T,TV::m> dPh=dPi_dF(p).Differential(dFh)*particles.volume(p);
-            tmp(p)=U(p)*dPh.Times_Transpose(FV(p));},true);
+            MATRIX<T,TV::m> dPh=dPi_dF(p).Differential(dFh);
+            MATRIX<T,TV::m> M=U(p)*dPh.Times_Transpose(FV(p));
+            MATRIX<T,TV::m> Z=M+(M.Times_Transpose(B)+B.Transpose_Times(M))*c;
+            tmp(p)=(Z+V)*particles.volume(p);
+        },true);
 
     gather_scatter.template Scatter<int>(
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)

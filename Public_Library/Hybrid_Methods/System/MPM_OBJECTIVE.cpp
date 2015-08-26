@@ -99,8 +99,8 @@ Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
         TV Vp,Vn_interpolate;
     };
 
-    if(system.example.particles.store_S)
-        system.example.force_helper.B.Resize(system.example.particles.number);
+    //if(system.example.particles.store_S)
+    system.example.force_helper.B.Resize(system.example.particles.number);
 
     system.example.gather_scatter.template Gather<HELPER>(
         [](int p,HELPER& h)
@@ -118,11 +118,12 @@ Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
         [this](int p,HELPER& h)
         {
             MATRIX<T,TV::m> B=system.example.dt*h.grad_Vp,A=B+1;
+            system.example.force_helper.B(p)=B; //new addition
             if(system.example.quad_F_coeff) A+=sqr(B)*system.example.quad_F_coeff;
             if(system.example.use_midpoint) A=(A+1)/2;
             system.example.particles.F(p)=A*F0(p);
             if(system.example.particles.store_S){
-                system.example.force_helper.B(p)=B;
+                //system.example.force_helper.B(p)=B;
                 system.example.particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,S0(p))+system.example.dt*system.example.inv_Wi)/(1+system.example.dt*system.example.inv_Wi);}
             if(system.example.use_midpoint) system.example.particles.X(p)=X0(p)+system.example.dt/2*(h.Vp+h.Vn_interpolate);
             else system.example.particles.X(p)=X0(p)+system.example.dt*h.Vp;

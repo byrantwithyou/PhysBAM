@@ -35,7 +35,7 @@ public:
 
     MPM_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
         ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
-        GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles);
+        GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,T quad_F_coeff);
     virtual ~MPM_FINITE_ELEMENTS();
 
 //#####################################################################
