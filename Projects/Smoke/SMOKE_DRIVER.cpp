@@ -369,7 +369,7 @@ Max_C() const
     SMOKE_PARTICLES<TV>& particles=example.particles;
     T Cnorm=0;
     
-#pragma omp parallel for reduction(max:v2)
+#pragma omp parallel for reduction(max:Cnorm)
     for(int p=0;p<particles.number;p++){
         Cnorm=max(Cnorm,example.particles.C(p).Frobenius_Norm());}
     return sqrt(Cnorm);
