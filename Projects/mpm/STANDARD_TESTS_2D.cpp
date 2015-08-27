@@ -481,6 +481,31 @@ Initialize()
             Add_Force(*pinning_force);
             Add_Neo_Hookean(1e3*scale_E,0.3);
         } break;
+        case 32:{ // colliding
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-1,-1),TV(2,2)),true);
+            T d_small_1=1*scale_mass,d_small_2=1*scale_mass,d_large_1=d_small_1*.9,d_large_2=d_small_2*.9;
+            SPHERE<TV> large1(TV(.2,.5),.1);
+            Seed_Particles_Helper(large1,[=](const TV& X){return TV(0.75,0);},0,d_large_1,particles_per_cell);
+            SPHERE<TV> large2(TV(.6,.5),.1);
+            Seed_Particles_Helper(large2,[=](const TV& X){return TV();},0,d_large_2,particles_per_cell);
+            for(int k=0;k<particles.number;k++)
+                if((particles.X(k)-large1.center).Magnitude_Squared()<sqr(large1.radius*0.6)
+                    || (particles.X(k)-large2.center).Magnitude_Squared()<sqr(large2.radius*0.6))
+                    particles.deletion_list.Append(k);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(0,1,1);
+            particles.Delete_Elements_On_Deletion_List();
+            ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
+            Add_Neo_Hookean(2*scale_E,0.425,&mpm_particles);
+            int old_pn=particles.number;
+            SPHERE<TV> small1(large1.center,large1.radius*.6);
+            Seed_Particles_Helper(small1,[=](const TV& X){return TV(0.75,0);},0,d_small_1,particles_per_cell);
+            SPHERE<TV> small2(large2.center,large2.radius*.6);
+            Seed_Particles_Helper(small2,[=](const TV& X){return TV();},0,d_small_2,particles_per_cell);
+            ARRAY<int> mpm_particles2;for(int i=old_pn;i<particles.number;i++) mpm_particles2.Append(i);
+            Add_Neo_Hookean(2000*scale_E,0.3,&mpm_particles2);
+            for(int i=old_pn;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(1,1,1);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
