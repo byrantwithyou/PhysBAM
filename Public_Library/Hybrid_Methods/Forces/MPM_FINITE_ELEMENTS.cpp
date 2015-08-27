@@ -19,7 +19,7 @@ namespace PhysBAM{
 template<class TV> MPM_FINITE_ELEMENTS<TV>::
 MPM_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
-    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles, T quad_F_coeff)
+    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles)
     :BASE(force_helper),constitutive_model(constitutive_model),affect_all(!affected_particles),
      gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles)))
 {
