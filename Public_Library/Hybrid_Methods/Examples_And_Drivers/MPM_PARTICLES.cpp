@@ -18,6 +18,7 @@ MPM_PARTICLES()
     Add_Array(ATTRIBUTE_ID_VOLUME,&volume);
     Add_Array(ATTRIBUTE_ID_F,&F);
     Add_Array(ATTRIBUTE_ID_VALID,&valid);
+    this->template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
 }
 //#####################################################################
 // Constructor

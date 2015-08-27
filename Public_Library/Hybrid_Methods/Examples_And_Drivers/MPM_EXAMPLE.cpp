@@ -75,8 +75,9 @@ Write_Output_Files(const int frame)
     bool write_structures=(frame==0 || output_structures_each_frame);
     deformable_body_collection.Write(stream_type,output_directory,output_directory,frame,static_frame,write_structures,false);
 
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     for(int i=0;i<particles.X.m;i++){
-        Add_Debug_Particle(particles.X(i),VECTOR<T,3>(particles.mass(i)==particles.mass(0)?1:0,particles.valid(i),1));
+        Add_Debug_Particle(particles.X(i),particles.valid(i)?(*color_attribute)(i):VECTOR<T,3>(1,0,1));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(i));}
     GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
     for(int i=0;i<collision_objects.m;i++)
