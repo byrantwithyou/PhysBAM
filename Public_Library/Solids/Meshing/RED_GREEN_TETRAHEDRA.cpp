@@ -137,7 +137,7 @@ Resolve_Stack()
 {
     while(stack.m){
         int level,tet;stack.Pop().Get(level,tet);
-        if(level>=0){PHYSBAM_ASSERT(tet);(*index_in_stack(level))(tet)=-1;if(!Regularly_Refined(level,tet)) Refine_If_Necessary(level,tet);}}
+        if(level>=0){PHYSBAM_ASSERT(tet>=0);(*index_in_stack(level))(tet)=-1;if(!Regularly_Refined(level,tet)) Refine_If_Necessary(level,tet);}}
 }
 //#####################################################################
 // Function Refine_If_Necessary
@@ -673,7 +673,7 @@ Initialize()
     segment_midpoints.Resize(segment_mesh.elements.m);
     index_in_stack.Append(new ARRAY<int>(meshes(0)->elements.m));
     leaf_levels_and_indices.Resize(meshes(0)->elements.m);
-    int t;for(t=0;t<meshes(0)->elements.m;t++){leaf_levels_and_indices(t)(0)=1;leaf_levels_and_indices(t)(1)=t;}
+    int t;for(t=0;t<meshes(0)->elements.m;t++){leaf_levels_and_indices(t)(0)=0;leaf_levels_and_indices(t)(1)=t;}
     leaf_number.Append(new ARRAY<int>(meshes(0)->elements.m));
     for(t=0;t<meshes(0)->elements.m;t++) (*leaf_number(0))(t)=t;
 }
