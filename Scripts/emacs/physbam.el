@@ -287,6 +287,12 @@
   (shell-command (format "%s/Scripts/misc/fix_headers_file.sh %s" (getenv "PHYSBAM") (buffer-file-name)))
   (revert-buffer-no-prompt))
 
+(defun grep-cpp-and-headers (querystr)
+  "grep headers and source files recursively in current directory"
+  (interactive "sGrep for:")
+  (grep (concat "(find . -name '*.h' -o -name '*.cpp' | xargs grep -n -e \"" querystr "\") # ")))
+
+
 ;#####################################################################
 ; PhysBAM Formatting Helpers
 ;#####################################################################
