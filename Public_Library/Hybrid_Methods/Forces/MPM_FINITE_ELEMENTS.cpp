@@ -49,12 +49,14 @@ Precompute(const T time,const T dt)
     FV.Resize(particles.X.m);
     sigma.Resize(particles.X.m);
     dPi_dF.Resize(particles.X.m);
+    PFT.Resize(particles.X.m);
 #pragma omp parallel for
     for(int k=0;k<gather_scatter.simulated_particles.m;k++){
         int p=gather_scatter.simulated_particles(k);
         MATRIX<T,TV::m> V_local;
         particles.F(p).Fast_Singular_Value_Decomposition(U(p),sigma(p),V_local);
         FV(p)=force_helper.Fn(p)*V_local;
+        PFT(p)=U(p)*constitutive_model.P_From_Strain(sigma(p),1,p).Times_Transpose(FV(p));
         constitutive_model.Isotropic_Stress_Derivative(sigma(p),dPi_dF(p),p);}
 }
 //#####################################################################
@@ -77,14 +79,13 @@ template<class TV> void MPM_FINITE_ELEMENTS<TV>::
 Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
     T c=force_helper.quad_F_coeff;
+    bool use_c=c!=0;
     gather_scatter.template Scatter<MATRIX<T,TV::m> >(
-        [this,c](int p,MATRIX<T,TV::m>& AF)
+        [this,c,use_c](int p,MATRIX<T,TV::m>& AF)
         {
-            MATRIX<T,TV::m> B=force_helper.B(p);
-            DIAGONAL_MATRIX<T,TV::m> Ph=constitutive_model.P_From_Strain(sigma(p),particles.volume(p),p)/particles.volume(p);
-            MATRIX<T,TV::m> P=U(p)*Ph.Times_Transpose(FV(p));
-            MATRIX<T,TV::m> TP=(P+c*(P.Times_Transpose(B)+B.Transpose_Times(P)));
-            AF=TP*particles.volume(p);
+            MATRIX<T,TV::m> P=PFT(p);
+            if(use_c){MATRIX<T,TV::m> B=force_helper.B(p);P+=(P.Times_Transpose(B)+B.Transpose_Times(P))*c;}
+            AF=P*particles.volume(p);
         },
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,const MATRIX<T,TV::m>& A)
         {F(it.Index())-=A*it.Gradient();},
@@ -94,27 +95,29 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 // Function Add_Hessian_Times
 //#####################################################################
 template<class TV> void MPM_FINITE_ELEMENTS<TV>:: 
-Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const
+Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& Z,const T time) const
 {
     tmp.Resize(particles.X.m);
     
     T c=force_helper.quad_F_coeff;
+    bool use_c=c!=0;
     gather_scatter.template Gather<int>(
         [this](int p,int data){tmp(p)=MATRIX<T,TV::m>();},
-        [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
+        [this,&Z](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {
-            tmp(p)+=MATRIX<T,TV::m>::Outer_Product(V(it.Index()),it.Gradient());
+            tmp(p)+=MATRIX<T,TV::m>::Outer_Product(Z(it.Index()),it.Gradient());
         },
-        [this,c](int p,int data){
-            MATRIX<T,TV::m> B=force_helper.B(p);
-            DIAGONAL_MATRIX<T,TV::m> Ph=constitutive_model.P_From_Strain(sigma(p),particles.volume(p),p)/particles.volume(p);
-            MATRIX<T,TV::m> P=U(p)*Ph.Times_Transpose(FV(p));
-            MATRIX<T,TV::m> V=(P.Times_Transpose(tmp(p))+tmp(p).Transpose_Times(P))*c;
-            MATRIX<T,TV::m> dFh=U(p).Transpose_Times(tmp(p)*FV(p));
-            MATRIX<T,TV::m> dPh=dPi_dF(p).Differential(dFh);
-            MATRIX<T,TV::m> M=U(p)*dPh.Times_Transpose(FV(p));
-            MATRIX<T,TV::m> Z=M+(M.Times_Transpose(B)+B.Transpose_Times(M))*c;
-            tmp(p)=(Z+V)*particles.volume(p);
+        [this,c,use_c](int p,int data){
+            MATRIX<T,TV::m> W=tmp(p);
+            if(use_c){
+                MATRIX<T,TV::m> B=force_helper.B(p);
+                W+=(W*B+B*W)*c;}
+            MATRIX<T,TV::m> UU=U(p),FVV=FV(p),G=UU.Transpose_Times(W*FVV);
+            MATRIX<T,TV::m> M=UU*dPi_dF(p).Differential(G).Times_Transpose(FVV);
+            if(use_c){
+                MATRIX<T,TV::m> B=force_helper.B(p),P=PFT(p);
+                M+=(M.Times_Transpose(B)+B.Transpose_Times(M)+P.Times_Transpose(tmp(p))+tmp(p).Transpose_Times(P))*c;}
+            tmp(p)=M*particles.volume(p);
         },true);
 
     gather_scatter.template Scatter<int>(

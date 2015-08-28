@@ -27,7 +27,7 @@ public:
     using BASE::particles;using BASE::force_helper;
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model;
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > sigma;
-    ARRAY<MATRIX<T,TV::m> > U,FV;
+    ARRAY<MATRIX<T,TV::m> > U,FV,PFT;
     bool affect_all;
     GATHER_SCATTER<TV>& gather_scatter;
     mutable ARRAY<MATRIX<T,TV::m> > tmp;
