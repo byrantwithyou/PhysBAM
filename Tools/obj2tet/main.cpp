@@ -28,7 +28,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
         else if(buffer[0]=='n' && buffer[1]=='v') continue;
         else if(buffer[0]=='f'){
             VECTOR<int,4> f;
-            sscanf(buffer+2,"%d %d %d %d",&f[1],&f[2],&f[3],&f[4]);
+            sscanf(buffer+2,"%d %d %d %d",&f[0],&f[1],&f[2],&f[3]);
             tetrahedra.Append(f);}
     }while(!input->eof());
     delete input;
