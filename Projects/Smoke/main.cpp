@@ -174,16 +174,16 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
 
     
     // SOURCE
-    TV point1=TV::All_Ones_Vector()*.23,point2=TV::All_Ones_Vector()*.27;point1(1)=0.05;point2(1)=.15;
+    TV point1=TV::All_Ones_Vector()*.24,point2=TV::All_Ones_Vector()*.25;point1(1)=0.3;point2(1)=0.31;    //0.23 0.27 point1(1) = 0.05;point2(1) =0.15
     example->source1.min_corner=point1;
     example->source1.max_corner=point2;
 
-    point1=TV::All_Ones_Vector()*.23;point2=TV::All_Ones_Vector()*.27;point1(1)=(1-0.15);point2(1)=(1-.05);
-    example->source2.min_corner=point1;
-    example->source2.max_corner=point2;
+    // point1=TV::All_Ones_Vector()*.23;point2=TV::All_Ones_Vector()*.27;point1(1)=(0.6-0.15);point2(1)=(0.6-.05);  //at top: point1(1) = 1-0.15; point2(1) = (1-0.05)
+    // example->source2.min_corner=point1;
+    // example->source2.max_corner=point2;
 
     LOG::cout<<"example->source1: "<<example->source1<<std::endl;
-    LOG::cout<<"example->source1: "<<example->source2<<std::endl;
+    // LOG::cout<<"example->source1: "<<example->source2<<std::endl;
     
 
     // MPI CRAP

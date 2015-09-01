@@ -212,7 +212,7 @@ Grid_To_Particle()
   // LOG::cout<<"Total Particle Linear  Momentum"<<Total_Particle_Linear_Momentum() <<std::endl;
   // LOG::cout << "Total_Grid_Linear_Momentum(): " << Total_Grid_Linear_Momentum() << std::endl;
   // LOG::cout<<"Total Kinetic Energy"<<Total_Particle_Kinetic_Energy()<<std::endl;
-  // LOG::cout<<"Total_Grid_Mass(): "<<Total_Grid_Mass()<<std::endl;
+  LOG::cout<<"Total_Grid_Mass(): "<<Total_Grid_Mass()<<std::endl;
   // LOG::cout<<"Min_Face_Mass():"<<Min_Face_Mass()<<std::endl;
 
 }
@@ -253,7 +253,7 @@ Add_Buoyancy_Force(const T dt,const T time)
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
 Scalar_Advance(const T dt,const T time)
-{
+{  
     example.Get_Scalar_Field_Sources(time);
     ARRAY<T,TV_INT> density_ghost(example.mac_grid.Domain_Indices(ghost));
     example.boundary->Set_Fixed_Boundary(true,0);
@@ -277,7 +277,7 @@ Convect(const T dt,const T time)
         ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,ghost,false);
         example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time,ghost);
         example.advection_scalar.Update_Advection_Equation_Face(
-            example.mac_grid,example.face_velocities,face_velocities_ghost,face_velocities_ghost,*example.boundary,dt,time);
+        example.mac_grid,example.face_velocities,face_velocities_ghost,face_velocities_ghost,*example.boundary,dt,time);
         example.boundary->Set_Fixed_Boundary(false);}
 }
 //#####################################################################
@@ -286,7 +286,7 @@ Convect(const T dt,const T time)
 template<class TV> void SMOKE_DRIVER<TV>::
 Project(const T dt,const T time)
 {
-    example.Set_Boundary_Conditions(time+dt,1);
+    example.Set_Boundary_Conditions(time+dt,0);
     example.projection.p*=dt; // rescale pressure for guess
     example.boundary->Apply_Boundary_Condition_Face(example.mac_grid,example.face_velocities,time+dt);
     example.projection.Make_Divergence_Free(example.face_velocities,dt,time);

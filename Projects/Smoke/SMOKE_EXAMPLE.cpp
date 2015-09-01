@@ -99,8 +99,9 @@ Get_Scalar_Field_Sources(const T time)
 {
     for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
     {
-        if(source1.Lazy_Inside(iterator.Location())) {density(iterator.Cell_Index())=1;}
-        else if(source2.Lazy_Inside(iterator.Location())) {density(iterator.Cell_Index())=1;}}
+        if(source1.Lazy_Inside(iterator.Location())) {density(iterator.Cell_Index())=1;}    
+        //else if(source2.Lazy_Inside(iterator.Location())) {density(iterator.Cell_Index())=1;}
+    }
 }
 //#####################################################################
 // Function Set_Weights
@@ -145,10 +146,11 @@ Set_Boundary_Conditions(const T time, const T source_velocities)
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
             if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=source_velocities;
             else face_velocities(iterator.Full_Index())=0;}
-        else if(source2.Lazy_Inside(iterator.Location())){
-            projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-            if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=-source_velocities;
-            else face_velocities(iterator.Full_Index())=0;}}
+        // else if(source2.Lazy_Inside(iterator.Location())){   // second source
+        //     projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
+        //     if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=-source_velocities;
+        //     else face_velocities(iterator.Full_Index())=0;}
+    }
 }
 //#####################################################################
 // Function Write_Output_Files
