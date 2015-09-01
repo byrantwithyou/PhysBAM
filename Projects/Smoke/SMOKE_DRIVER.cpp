@@ -84,7 +84,7 @@ Initialize()
     // setup domain boundaries
     VECTOR<VECTOR<bool,2>,TV::dimension> constant_extrapolation;constant_extrapolation.Fill(VECTOR<bool,2>::Constant_Vector(true));
     example.boundary->Set_Constant_Extrapolation(constant_extrapolation);
-    example.Set_Boundary_Conditions(time); // get so CFL is correct
+    example.Set_Boundary_Conditions(time, 1); // get so CFL is correct
 
     // EAPIC
     if(example.use_eapic){
@@ -127,14 +127,15 @@ Particle_To_Grid()
     // Rasterize mass and momentum to faces
     typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
     for(int p=0;p<particles.number;p++){
-        for(int d=0;d<TV::m;++d)
+        for(int d=0;d<TV::m;++d){
+            // LOG::cout << "example.face_weights(d): "<< example.face_weights(d) << std::endl;
             for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights(d),p,true,scratch);it.Valid();it.Next()){
                 T w=it.Weight();
                 FACE_INDEX<TV::m> face_index(d,it.Index());
                 example.face_mass(face_index)+=w*particles.mass(p);
                 TV dx=example.mac_grid.Face(face_index)-particles.X(p);
                 T v=particles.V(p)(d)+TV::Dot_Product(particles.C(p).Column(d),dx);
-                face_velocities_ghost(face_index)+=w*particles.mass(p)*v;}}
+                face_velocities_ghost(face_index)+=w*particles.mass(p)*v;}}}
     // Divide out masses
     for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
@@ -142,10 +143,15 @@ Particle_To_Grid()
             example.face_velocities(face_index)=face_velocities_ghost(face_index)/example.face_mass(face_index);}
 
     example.boundary->Set_Fixed_Boundary(false);
-
-    //  LOG::cout<<"max(Vi(p))"<< Max_Grid_Speed()<<std::endl;
-    //LOG::cout<<"Total Grid Linear  Momentum"<<Total_Grid_Linear_Momentum() <<std::endl;
+    
+    LOG::cout << "particle-to-grid" << std::endl;
+    // LOG::cout<<"max(Vi(p))"<< Max_Grid_Speed()<<std::endl;
+    // LOG::cout<<"Total Grid Linear  Momentum"<<Total_Grid_Linear_Momentum() <<std::endl;
     LOG::cout<<"Total Grid Kinetic Energy"<<Total_Grid_Kinetic_Energy()<<std::endl;
+    // LOG::cout<<"Total_Grid_Mass(): "<<Total_Grid_Mass()<<std::endl;
+    // LOG::cout<<"Total Particle Linear Momentum"<<Total_Particle_Linear_Momentum() <<std::endl;
+    // LOG::cout << "Total_Grid_Linear_Momentum(): " << Total_Grid_Linear_Momentum() << std::endl;
+    // LOG::cout<<"Total_Particle_Mass(): "<<Total_Particle_Mass()<<std::endl;
     
 
 }
@@ -168,12 +174,15 @@ Grid_To_Particle()
     // compute new face weights
     if(example.nrs)for(int i=0;i<TV::m;++i) example.face_weights0(i)->Update(example.particles.X);
 
+    //define max weight gradient
+    T max_gradient = 0;
     for(int p=0;p<particles.number;p++){
         // Zero out particle veloicity and C, resample particle positions
         
         if(!example.nrs) particles.X(p)=particles.X0(p);
         particles.V(p)=TV();
-        particles.C(p)=MATRIX<T,TV::m>();
+        particles.C(p)=MATRIX<T,TV::m>();       
+        
         // Compute new V and C
         for(int d=0;d<TV::m;++d)
             for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights0(d),p,true,scratch);it.Valid();it.Next()){
@@ -181,21 +190,30 @@ Grid_To_Particle()
                 FACE_INDEX<TV::m> face_index(d,it.Index());
                 particles.V(p)(d)+=w*face_velocities_ghost(face_index);
                 if(example.eapic_order==1){
-                    particles.C(p).Add_Column(d,face_velocities_ghost(face_index)*it.Gradient());}
+                    particles.C(p).Add_Column(d,face_velocities_ghost(face_index)*it.Gradient());
+                    // LOG::cout << "it.Gradient().Magnitude_Squared()" << it.Gradient().Magnitude_Squared() << std::endl;
+                    if(it.Gradient().Magnitude_Squared() > max_gradient) max_gradient = it.Gradient().Magnitude_Squared();
+                }
                 else if(example.eapic_order==2){
                     TV dx=example.mac_grid.Face(face_index)-particles.X(p);
                     particles.C(p).Add_Column(d,dx*w*4.0/(example.mac_grid.dX(0)*example.mac_grid.dX(0))*face_velocities_ghost(face_index));}
                 else if(example.eapic_order==3){
                     TV dx=example.mac_grid.Face(face_index)-particles.X(p);
                     particles.C(p).Add_Column(d,dx*w*3.0/(example.mac_grid.dX(0)*example.mac_grid.dX(0))*face_velocities_ghost(face_index));}
-                else PHYSBAM_FATAL_ERROR();}}
+                else PHYSBAM_FATAL_ERROR();}            }
+    LOG::cout << "max_gradient: " << max_gradient<< std::endl;
   example.boundary->Set_Fixed_Boundary(false);
 
   //Print vp, C_norm
-    LOG::cout<<"max(V(p))"<< Max_Particle_Speed()<<std::endl;
-    LOG::cout<<"max||C||"<< Max_C()<<std::endl;
-    LOG::cout<<"Total Particle Linear  Momentum"<<Total_Particle_Linear_Momentum() <<std::endl;
-    // LOG::cout<<"Total Kinetic Energy"<<Total_Particle_Kinetic_Energy()<<std::endl;
+// LOG::cout<<"max(V(p))"<< Max_Particle_Speed()<<std::endl;
+  LOG::cout<<"max||C||"<< Max_C()<<std::endl;
+  LOG::cout << "grid-to-particle" << std::endl;
+  LOG::cout<<"Total Grid Kinetic Energy"<<Total_Grid_Kinetic_Energy()<<std::endl;
+  // LOG::cout<<"Total Particle Linear  Momentum"<<Total_Particle_Linear_Momentum() <<std::endl;
+  // LOG::cout << "Total_Grid_Linear_Momentum(): " << Total_Grid_Linear_Momentum() << std::endl;
+  // LOG::cout<<"Total Kinetic Energy"<<Total_Particle_Kinetic_Energy()<<std::endl;
+  // LOG::cout<<"Total_Grid_Mass(): "<<Total_Grid_Mass()<<std::endl;
+  // LOG::cout<<"Min_Face_Mass():"<<Min_Face_Mass()<<std::endl;
 
 }
 
@@ -210,6 +228,11 @@ Move_Particles(const T dt)
 
     for(int p=0;p<particles.number;p++)
         particles.X(p)+=particles.V(p)*dt;
+    
+  LOG::cout << "Move_Particles: " << std::endl;
+  LOG::cout<<"Total Grid Kinetic Energy"<<Total_Grid_Kinetic_Energy()<<std::endl;
+
+
 }
 //#####################################################################
 // Function Add_Buoyancy_Force
@@ -263,12 +286,16 @@ Convect(const T dt,const T time)
 template<class TV> void SMOKE_DRIVER<TV>::
 Project(const T dt,const T time)
 {
-    example.Set_Boundary_Conditions(time+dt);
+    example.Set_Boundary_Conditions(time+dt,1);
     example.projection.p*=dt; // rescale pressure for guess
     example.boundary->Apply_Boundary_Condition_Face(example.mac_grid,example.face_velocities,time+dt);
     example.projection.Make_Divergence_Free(example.face_velocities,dt,time);
     example.projection.p*=(1/dt); // unscale pressure
-}
+     LOG::cout << "projection" << std::endl;
+     LOG::cout<<"Total Grid Kinetic Energy"<<Total_Grid_Kinetic_Energy()<<std::endl;}
+// LOG::cout<<"Total Particle Linear  Momentum"<<Total_Particle_Linear_Momentum() <<std::endl;
+    // LOG::cout << "Total_Grid_Linear_Momentum(): " << Total_Grid_Linear_Momentum() << std::endl;
+
 //#####################################################################
 // Function Advance_To_Target_Time
 //#####################################################################
@@ -344,8 +371,6 @@ Print_Max_Divergence(const char* str)
         T ad=abs(d); if(ad>max_div) max_div=ad;}
     LOG::cout<<str<<" max(div(v)) "<<max_div<<std::endl;
 }
-
-
 //#####################################################################
 // Function Max_Particle_Speed
 //#####################################################################
@@ -359,7 +384,6 @@ Max_Particle_Speed() const
        v2=max(v2,example.particles.V(p).Magnitude_Squared());}
     return sqrt(v2);
 }
-
 //#####################################################################
 // Function Max_C
 //#####################################################################
@@ -368,14 +392,11 @@ Max_C() const
 {
     SMOKE_PARTICLES<TV>& particles=example.particles;
     T Cnorm=0;
-    
-#pragma omp parallel for reduction(max:Cnorm)
+#pragma omp parallel for reduction(max:v2)
     for(int p=0;p<particles.number;p++){
         Cnorm=max(Cnorm,example.particles.C(p).Frobenius_Norm());}
     return sqrt(Cnorm);
 }
-
-
 //#####################################################################
 // Function Total_Particle_Linear_Momentum
 //#####################################################################
@@ -386,6 +407,18 @@ Total_Particle_Linear_Momentum() const
     SMOKE_PARTICLES<TV>& particles=example.particles;
     for(int p=0;p<particles.number;p++){
         result+=particles.V(p)*particles.mass(p);}
+    return result;
+}
+//#####################################################################
+// Function Total_Particle_Mass
+//#####################################################################
+template<class TV> typename TV::SCALAR SMOKE_DRIVER<TV>::
+Total_Particle_Mass() const
+{
+    T result = 0;
+    SMOKE_PARTICLES<TV>& particles=example.particles;
+    for(int p=0;p<particles.number;p++){
+        result+=particles.mass(p);}
     return result;
 }
 // //#####################################################################
@@ -402,8 +435,6 @@ Total_Particle_Linear_Momentum() const
 // //         result+=result_local;}
 //     return result;
 // }
-
-
 //#####################################################################
 // Function Max_Grid_Speed
 //#####################################################################
@@ -432,15 +463,70 @@ template<class TV> typename TV::SCALAR SMOKE_DRIVER<TV>::
 Total_Grid_Kinetic_Energy() const
 {
     T result=0;
-
     for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
         if(example.face_mass(face_index)){
-            result+=(T).5*example.face_velocities(face_index)*example.face_velocities(face_index);}}
+            result+=(T).5*example.face_mass(face_index)*example.face_velocities(face_index)*example.face_velocities(face_index);}}
+    return result;
+}
+//#####################################################################
+// Function Total_Grid_Mass
+//#####################################################################
+template<class TV> typename TV::SCALAR SMOKE_DRIVER<TV>::
+Total_Grid_Mass() const
+{
+    T result=0;
+    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+        FACE_INDEX<TV::m> face_index=iterator.Full_Index();
+        if(example.face_mass(face_index)){
+            result+=example.face_mass(face_index);}}
+    return result;
+}
+//#####################################################################
+// Function Total_Grid_Linear_Momentum
+//#####################################################################
+template<class TV> TV SMOKE_DRIVER<TV>::
+Total_Grid_Linear_Momentum() const
+
+{
+    TV result;
+    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+        FACE_INDEX<TV::m> face_index=iterator.Full_Index();
+        if(example.face_mass(face_index)){
+            switch(iterator.Axis()){
+                case 0:
+                    result(0)+=example.face_velocities(face_index)*example.face_mass(face_index);
+                break;
+                case 1:
+                    result(1)+=example.face_velocities(face_index)*example.face_mass(face_index);
+                break;
+            }}}
+    return result;
+}
+//#####################################################################
+// Function Min_Face_Mass
+//#####################################################################
+template<class TV> typename TV::SCALAR SMOKE_DRIVER<TV>::
+Min_Face_Mass() const
+{
+    T result=1000;
+    FACE_INDEX<TV::m> min_face_mass_index;
+    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+        FACE_INDEX<TV::m> face_index=iterator.Full_Index();
+        if(example.face_mass(face_index)<result)
+        {
+            min_face_mass_index = face_index;
+            result = example.face_mass(face_index);
+        }
+    }
+    // LOG::cout << "face_index: " << min_face_mass_index << std::endl;
     return result;
 }
 
 //#####################################################################
+
+
+
 namespace PhysBAM{
 template class SMOKE_DRIVER<VECTOR<float,2> >;
 template class SMOKE_DRIVER<VECTOR<float,3> >;

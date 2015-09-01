@@ -55,6 +55,10 @@ public:
     T Max_Grid_Speed() const;
     TV Total_Grid_Momentum() const;
     T Total_Grid_Kinetic_Energy() const;
+    T Total_Grid_Mass() const;
+    T Total_Particle_Mass() const;
+    T Min_Face_Mass()const;
+    TV Total_Grid_Linear_Momentum() const;
 //#####################################################################
 };
 }

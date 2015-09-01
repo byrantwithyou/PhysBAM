@@ -24,6 +24,7 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(mac_grid,false,false,thread_queue),boundary(0),
     use_eapic(false),eapic_order(1),weights(0),particles(*new SMOKE_PARTICLES<TV>)
 {
+    np=1; //number of points per cell
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     pthread_mutex_init(&lock,0);    
 }
@@ -97,7 +98,9 @@ template<class TV> void SMOKE_EXAMPLE<TV>::
 Get_Scalar_Field_Sources(const T time)
 {
     for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
-        if(source.Lazy_Inside(iterator.Location())) density(iterator.Cell_Index())=1;
+    {
+        if(source1.Lazy_Inside(iterator.Location())) {density(iterator.Cell_Index())=1;}
+        else if(source2.Lazy_Inside(iterator.Location())) {density(iterator.Cell_Index())=1;}}
 }
 //#####################################################################
 // Function Set_Weights
@@ -124,7 +127,7 @@ Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input)
 // Function Set_Boundary_Conditions
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
-Set_Boundary_Conditions(const T time)
+Set_Boundary_Conditions(const T time, const T source_velocities)
 {
     projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
@@ -138,9 +141,13 @@ Set_Boundary_Conditions(const T time)
                     face_velocities(face)=0;}
                 else projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
     for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()){
-        if(source.Lazy_Inside(iterator.Location())){
+        if(source1.Lazy_Inside(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-            if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=1;
+            if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=source_velocities;
+            else face_velocities(iterator.Full_Index())=0;}
+        else if(source2.Lazy_Inside(iterator.Location())){
+            projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
+            if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=-source_velocities;
             else face_velocities(iterator.Full_Index())=0;}}
 }
 //#####################################################################

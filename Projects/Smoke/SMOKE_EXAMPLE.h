@@ -59,13 +59,15 @@ public:
     BOUNDARY<TV,T> *boundary;
     ARRAY<T,TV_INT> density;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;    
-    RANGE<TV> source;
+    RANGE<TV> source1;
+    RANGE<TV> source2;
     pthread_mutex_t lock;
 
     // EAPIC
     bool use_eapic;
     int eapic_order;
     bool nrs;
+    int np;
     PARTICLE_GRID_WEIGHTS<TV>* weights; // cell center weights
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights; // face weights
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights0; // face weights of X0
@@ -84,7 +86,7 @@ public:
     void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);
-    virtual void Set_Boundary_Conditions(const T time);
+    virtual void Set_Boundary_Conditions(const T time, const T source_velocities = 0);
 
 //#####################################################################
 };
