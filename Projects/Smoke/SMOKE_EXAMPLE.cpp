@@ -19,7 +19,7 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     debug_particles(*new DEBUG_PARTICLES<TV>),ghost(5),
     initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
     restart(0),write_debug_data(true),output_directory("output"),N_boundary(false),
-    debug_divergence(false),alpha(0.1),
+    debug_divergence(false),alpha(0.1),beta(0.00366),
     cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(mac_grid,false,false,thread_queue),boundary(0),
     use_eapic(false),eapic_order(1),weights(0),particles(*new SMOKE_PARTICLES<TV>)
@@ -90,6 +90,7 @@ Initialize_Fields()
 {
     for(FACE_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) face_velocities(iterator.Full_Index())=0;
     for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) density(iterator.Cell_Index())=0;
+    for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next()) temperature(iterator.Cell_Index())=273; // add temperature
 }
 //#####################################################################
 // Function Get_Scalar_Field_Sources
@@ -99,7 +100,8 @@ Get_Scalar_Field_Sources(const T time)
 {
     for(CELL_ITERATOR<TV> iterator(mac_grid);iterator.Valid();iterator.Next())
     {
-        if(source1.Lazy_Inside(iterator.Location())) {density(iterator.Cell_Index())=1;}    
+        if(source1.Lazy_Inside(iterator.Location())) {density(iterator.Cell_Index())=1;}
+        if(source1.Lazy_Inside(iterator.Location())) {temperature(iterator.Cell_Index())=275;}    
         //else if(source2.Lazy_Inside(iterator.Location())) {density(iterator.Cell_Index())=1;}
     }
 }
@@ -164,6 +166,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/grid",mac_grid);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density",density);
+    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/temperature",temperature);// add temperature
     if(write_debug_data){
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",projection.p);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);

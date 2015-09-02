@@ -48,6 +48,7 @@ public:
     bool N_boundary;
     bool debug_divergence;
     T alpha;
+    T beta;
     T cfl;
     GRID<TV> mac_grid;
     MPI_UNIFORM_GRID<TV> *mpi_grid;
@@ -58,6 +59,7 @@ public:
     BOUNDARY<TV,T> boundary_scalar;
     BOUNDARY<TV,T> *boundary;
     ARRAY<T,TV_INT> density;
+    ARRAY<T,TV_INT> temperature;  //add temperature
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;    
     RANGE<TV> source1;
     RANGE<TV> source2;

@@ -42,6 +42,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     parse_args.Add("-e",&example->last_frame,"frame","last frame");
     parse_args.Add("-d_div",&example->debug_divergence,"output the max velocity divergence after projection");
     parse_args.Add("-a",&example->alpha,"alpha","buoyancy parameter alpha");
+    parse_args.Add("-b",&example->beta,"beta","buoyancy parameter beta");  // add temperature parameter
     parse_args.Add("-o",&example->output_directory,"dir","output directory");
     parse_args.Add("-eapic_order",&example->eapic_order,"frame","last frame");
     parse_args.Add("-use_eapic",&example->use_eapic,"use EAPIC"); 
@@ -174,7 +175,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
 
     
     // SOURCE
-    TV point1=TV::All_Ones_Vector()*.24,point2=TV::All_Ones_Vector()*.25;point1(1)=0.3;point2(1)=0.31;    //0.23 0.27 point1(1) = 0.05;point2(1) =0.15
+    TV point1=TV::All_Ones_Vector()*.23,point2=TV::All_Ones_Vector()*.27;point1(1)=0.05;point2(1)=0.15;    //0.24 0.25 point1(1) = 0.3;point2(1) =0.31
     example->source1.min_corner=point1;
     example->source1.max_corner=point2;
 

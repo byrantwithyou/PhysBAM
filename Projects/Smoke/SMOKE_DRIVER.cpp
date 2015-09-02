@@ -71,6 +71,7 @@ Initialize()
     example.projection.Initialize_Grid(example.mac_grid);
     example.face_velocities.Resize(example.mac_grid);
     example.density.Resize(example.mac_grid.Domain_Indices(ghost));
+    example.temperature.Resize(example.mac_grid.Domain_Indices(ghost));  // add temperature
     example.Initialize_Fields();
 
     // setup laplace
@@ -245,8 +246,8 @@ Add_Buoyancy_Force(const T dt,const T time)
             TV_INT c1,c2;
             example.mac_grid.Cells_Touching_Face(iterator.axis,iterator.Face_Index(),c1,c2);
             T rho=(example.density(c1)+example.density(c2))*(T).5;
-            // T tem=(example.temperature(c1)+example.temperature(c2))*(T).5; // no temperature for now 
-            example.face_velocities(iterator.Full_Index())+=-dt*example.alpha*rho;}}
+            T tem=(example.temperature(c1)+example.temperature(c2))*(T).5; // add temperature 
+            example.face_velocities(iterator.Full_Index())+=-dt*example.alpha*rho+dt*example.beta*tem;}}// add temperature
 }
 //#####################################################################
 // Function Scalar_Advance
@@ -256,9 +257,12 @@ Scalar_Advance(const T dt,const T time)
 {  
     example.Get_Scalar_Field_Sources(time);
     ARRAY<T,TV_INT> density_ghost(example.mac_grid.Domain_Indices(ghost));
+    ARRAY<T,TV_INT> temperature_ghost(example.mac_grid.Domain_Indices(ghost));  // add temperature
     example.boundary->Set_Fixed_Boundary(true,0);
     example.boundary->Fill_Ghost_Cells(example.mac_grid,example.density,density_ghost,dt,time,ghost);
-    example.advection_scalar.Update_Advection_Equation_Cell(example.mac_grid,example.density,density_ghost,example.face_velocities,*example.boundary,dt,time);    
+    example.boundary->Fill_Ghost_Cells(example.mac_grid,example.temperature,temperature_ghost,dt,time,ghost);
+    example.advection_scalar.Update_Advection_Equation_Cell(example.mac_grid,example.density,density_ghost,example.face_velocities,*example.boundary,dt,time);
+    example.advection_scalar.Update_Advection_Equation_Cell(example.mac_grid,example.temperature,temperature_ghost,example.face_velocities,*example.boundary,dt,time);
     example.boundary->Set_Fixed_Boundary(false);
 }
 //#####################################################################
@@ -286,7 +290,7 @@ Convect(const T dt,const T time)
 template<class TV> void SMOKE_DRIVER<TV>::
 Project(const T dt,const T time)
 {
-    example.Set_Boundary_Conditions(time+dt,0);
+    example.Set_Boundary_Conditions(time+dt,1);  // set 0 then it doesn't have velocity after initial
     example.projection.p*=dt; // rescale pressure for guess
     example.boundary->Apply_Boundary_Condition_Face(example.mac_grid,example.face_velocities,time+dt);
     example.projection.Make_Divergence_Free(example.face_velocities,dt,time);
