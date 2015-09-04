@@ -20,12 +20,12 @@ template<class T_ARRAY0,class T_ARRAY1> struct IS_ARRAY<ARRAY_SUM<T_ARRAY0,T_ARR
 template<class T_ARRAY0,class T_ARRAY1> struct IS_ARRAY_VIEW<ARRAY_SUM<T_ARRAY0,T_ARRAY1> > {static const bool value=true;};
 
 template<class T_ARRAY0,class T_ARRAY1>
-class ARRAY_SUM:public ARRAY_EXPRESSION<typename SUM<typename T_ARRAY0::ELEMENT,typename T_ARRAY1::ELEMENT>::TYPE,ARRAY_SUM<T_ARRAY0,T_ARRAY1>,typename T_ARRAY0::INDEX>
+class ARRAY_SUM:public ARRAY_EXPRESSION<decltype(*(typename T_ARRAY0::ELEMENT*)0+*(typename T_ARRAY1::ELEMENT*)0),ARRAY_SUM<T_ARRAY0,T_ARRAY1>,typename T_ARRAY0::INDEX>
 {
     typedef typename T_ARRAY0::ELEMENT T0;typedef typename T_ARRAY1::ELEMENT T2;
     typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY0>::value,const T_ARRAY0,const T_ARRAY0&>::type T_ARRAY1_VIEW; // if it's an array view we can copy it, otherwise store a reference
     typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY1>::value,const T_ARRAY1,const T_ARRAY1&>::type T_ARRAY2_VIEW;
-    typedef typename SUM<T0,T2>::TYPE T_SUM;
+    typedef decltype(*(T0*)0+*(T2*)0) T_SUM;
 public:
     typedef T_SUM ELEMENT;typedef typename T_ARRAY0::INDEX INDEX;
 
@@ -55,11 +55,6 @@ template<class T_ARRAY0,class T_ARRAY1> struct ARRAY_SUM_VALID<T_ARRAY0,T_ARRAY1
 template<class T0,class T2,class T_ARRAY0,class T_ARRAY1> typename enable_if<ARRAY_SUM_VALID<T_ARRAY0,T_ARRAY1>::value,ARRAY_SUM<T_ARRAY0,T_ARRAY1> >::type
 operator+(const ARRAY_BASE<T0,T_ARRAY0,typename T_ARRAY1::INDEX>& array0,const ARRAY_BASE<T2,T_ARRAY1,typename T_ARRAY1::INDEX>& array1)
 {return ARRAY_SUM<T_ARRAY0,T_ARRAY1>(array0.Derived(),array1.Derived());}
-
-//#####################################################################
-
-template<class T_ARRAY0,class T_ARRAY1> struct SUM<T_ARRAY0,T_ARRAY1,typename enable_if<ARRAY_SUM_VALID<T_ARRAY0,T_ARRAY1>::value>::type>
-{typedef ARRAY_SUM<T_ARRAY0,T_ARRAY1> TYPE;};
 
 //#####################################################################
 }

@@ -167,8 +167,8 @@ public:
     {VECTOR<T,d> r;for(int i=0;i<d;i++) r(i)=Robust_Divide(v(i),x(i));return r;}
 
     template<class T_MATRIX>
-    typename PRODUCT_TRANSPOSE<DIAGONAL_MATRIX,T_MATRIX>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& B) const
-    {WARN_IF_NOT_EFFICIENT(T_MATRIX);assert(B.Columns()==3);typename PRODUCT_TRANSPOSE<DIAGONAL_MATRIX,T_MATRIX>::TYPE M((INITIAL_SIZE)B.Columns(),(INITIAL_SIZE)B.Rows());
+    auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& B) const
+    {WARN_IF_NOT_EFFICIENT(T_MATRIX);assert(B.Columns()==3);decltype(*this*B.Derived().Transposed()) M((INITIAL_SIZE)B.Columns(),(INITIAL_SIZE)B.Rows());
     for(int k=0;k<B.Rows();k++) for(int i=0;i<B.Columns();i++) M(i,k)=x(i)*B(k,i);return M;}
 
     DIAGONAL_MATRIX Times_Transpose(const DIAGONAL_MATRIX& M) const
@@ -181,7 +181,7 @@ public:
     {}
 
     template<class T_MATRIX>
-    typename PRODUCT<DIAGONAL_MATRIX,T_MATRIX>::TYPE Transpose_Times(const T_MATRIX& M) const
+    auto Transpose_Times(const T_MATRIX& M) const
     {return *this*M;}
 
     MATRIX<T,d> Times_Transpose(const MATRIX<T,d>& A) const

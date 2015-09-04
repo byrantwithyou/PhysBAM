@@ -18,12 +18,12 @@ template<class T_ARRAY0,class T_ARRAY1> struct IS_ARRAY<ARRAY_PRODUCT<T_ARRAY0,T
 template<class T_ARRAY0,class T_ARRAY1> struct IS_ARRAY_VIEW<ARRAY_PRODUCT<T_ARRAY0,T_ARRAY1> > {static const bool value=true;};
 
 template<class T_ARRAY0,class T_ARRAY1>
-class ARRAY_PRODUCT:public ARRAY_EXPRESSION<typename PRODUCT<typename T_ARRAY0::ELEMENT,typename T_ARRAY1::ELEMENT>::TYPE,ARRAY_PRODUCT<T_ARRAY0,T_ARRAY1>,typename T_ARRAY0::INDEX>
+class ARRAY_PRODUCT:public ARRAY_EXPRESSION<decltype(*(typename T_ARRAY0::ELEMENT*)0**(typename T_ARRAY1::ELEMENT*)0),ARRAY_PRODUCT<T_ARRAY0,T_ARRAY1>,typename T_ARRAY0::INDEX>
 {
     typedef typename T_ARRAY0::ELEMENT T0;typedef typename T_ARRAY1::ELEMENT T2;
     typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY0>::value,const T_ARRAY0,const T_ARRAY0&>::type T_ARRAY1_VIEW; // if it's an array view we can copy it, otherwise store a reference
     typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY1>::value,const T_ARRAY1,const T_ARRAY1&>::type T_ARRAY2_VIEW;
-    typedef typename PRODUCT<T0,T2>::TYPE T_PRODUCT;
+    typedef decltype(*(T0*)0**(T2*)0) T_PRODUCT;
 public:
     typedef T_PRODUCT ELEMENT;typedef typename T_ARRAY0::INDEX INDEX;
 
@@ -53,11 +53,6 @@ template<class T_ARRAY0,class T_ARRAY1> struct ARRAY_PRODUCT_VALID<T_ARRAY0,T_AR
 template<class T0,class T2,class T_ARRAY0,class T_ARRAY1> typename enable_if<ARRAY_PRODUCT_VALID<T_ARRAY0,T_ARRAY1>::value,ARRAY_PRODUCT<T_ARRAY0,T_ARRAY1> >::type
 operator*(const ARRAY_BASE<T0,T_ARRAY0,typename T_ARRAY0::INDEX>& array0,const ARRAY_BASE<T2,T_ARRAY1,typename T_ARRAY0::INDEX>& array1)
 {return ARRAY_PRODUCT<T_ARRAY0,T_ARRAY1>(array0.Derived(),array1.Derived());}
-
-//#####################################################################
-
-template<class T_ARRAY0,class T_ARRAY1> struct PRODUCT<T_ARRAY0,T_ARRAY1,typename enable_if<ARRAY_PRODUCT_VALID<T_ARRAY0,T_ARRAY1>::value>::type>
-{typedef ARRAY_PRODUCT<T_ARRAY0,T_ARRAY1> TYPE;};
 
 //#####################################################################
 

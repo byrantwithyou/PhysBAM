@@ -9,7 +9,6 @@
 
 #include <Tools/Math_Tools/Robust_Arithmetic.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/MATRIX_ARITHMETIC_POLICY.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 
@@ -165,12 +164,12 @@ public:
     {assert(3==A.m);MATRIX_MXN<T> matrix(3,A.n);for(int j=0;j<A.n;j++) matrix.Set_Column(j,(*this)*VECTOR<T,3>(A(0,j),A(1,j),A(2,j)));return matrix;}
 
     template<class T_MATRIX>
-    typename PRODUCT<SYMMETRIC_MATRIX,T_MATRIX>::TYPE Transpose_Times(const T_MATRIX& M) const
+    auto Transpose_Times(const T_MATRIX& M) const
     {return *this*M;}
 
     template<class T_MATRIX>
-    typename PRODUCT_TRANSPOSE<SYMMETRIC_MATRIX,T_MATRIX>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
-    {typename PRODUCT_TRANSPOSE<SYMMETRIC_MATRIX,T_MATRIX>::TYPE M((INITIAL_SIZE)A.Columns(),(INITIAL_SIZE)A.Rows());A.Add_Times_Transpose(*this,A.Derived(),M);return M;}
+    auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
+    {decltype(*this*A.Derived().Transposed()) M((INITIAL_SIZE)A.Columns(),(INITIAL_SIZE)A.Rows());A.Add_Times_Transpose(*this,A.Derived(),M);return M;}
 
     MATRIX<T,3> Times_Transpose(const SYMMETRIC_MATRIX& M) const // 27 mults, 18 adds
     {return *this*M;}

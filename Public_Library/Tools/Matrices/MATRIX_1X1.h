@@ -215,7 +215,7 @@ public:
     {return *this*A;}
 
     template<class T_MATRIX>
-    typename TRANSPOSE<T_MATRIX>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
+    auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
     {return *this*A.Derived().Transposed();}
 
     MATRIX Times_Transpose(const DIAGONAL_MATRIX<T,1>& A) const

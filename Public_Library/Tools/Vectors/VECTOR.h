@@ -560,20 +560,6 @@ Vector(const T& d1,const Args&... d2)
 {return VECTOR<T,1+sizeof...(Args)>(d1,d2...);}
 
 //#####################################################################
-template<class T,int d> struct SUM<VECTOR<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct SUM<VECTOR<T,d>,T>{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct SUM<T,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct DIFFERENCE<VECTOR<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct DIFFERENCE<VECTOR<T,d>,T>{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct DIFFERENCE<T,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct PRODUCT<VECTOR<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct PRODUCT<VECTOR<T,d>,T>{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct PRODUCT<T,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct QUOTIENT<VECTOR<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct QUOTIENT<VECTOR<T,d>,T>{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct QUOTIENT<T,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct NEGATION<VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
-//#####################################################################
 template<class T> struct HASH_REDUCE<VECTOR<T,0> >
 {static int H(const VECTOR<T,0>& key){return missing_element_hash;}};
 template<class T> struct HASH_REDUCE<VECTOR<T,1> >

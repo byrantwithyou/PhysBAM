@@ -8,7 +8,7 @@
 #define __SYMMETRIC_MATRIX_1X1__
 
 #include <Tools/Math_Tools/exchange_sort.h>
-#include <Tools/Matrices/MATRIX_ARITHMETIC_POLICY.h>
+#include <Tools/Matrices/MATRIX_FORWARD.h>
 #include <Tools/Vectors/VECTOR_2D.h>
 namespace PhysBAM{
 
@@ -153,12 +153,12 @@ public:
     {return VECTOR<T,1>(x00*v.x);}
 
     template<class T_MATRIX>
-    typename PRODUCT<SYMMETRIC_MATRIX,T_MATRIX>::TYPE Transpose_Times(const T_MATRIX& M) const
+    auto Transpose_Times(const T_MATRIX& M) const
     {return *this*M;}
 
     template<class T_MATRIX>
-    typename PRODUCT_TRANSPOSE<SYMMETRIC_MATRIX,T_MATRIX>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
-    {typename PRODUCT_TRANSPOSE<SYMMETRIC_MATRIX,T_MATRIX>::TYPE M((INITIAL_SIZE)A.Columns(),(INITIAL_SIZE)A.Rows());A.Add_Times_Transpose(*this,A.Derived(),M);return M;}
+    auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
+    {decltype(*this*A.Derived().Transposed()) M((INITIAL_SIZE)A.Columns(),(INITIAL_SIZE)A.Rows());A.Add_Times_Transpose(*this,A.Derived(),M);return M;}
 
     T Determinant() const
     {return x00;}

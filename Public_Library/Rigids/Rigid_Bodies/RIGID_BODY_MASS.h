@@ -140,8 +140,6 @@ public:
 };
 
 //#####################################################################
-template<class TV,bool b> struct PRODUCT<RIGID_BODY_MASS<TV,b>,TWIST<TV> > {typedef TWIST<TV> TYPE;};
-//#####################################################################
 template<class TV> inline std::istream& operator>>(std::istream& input,RIGID_BODY_MASS<TV>& mass)
 {input>>mass.mass>>mass.inertia_tensor;return input;}
 

@@ -9,7 +9,6 @@
 
 #include <Tools/Data_Structures/ELEMENT_ID.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Matrices/MATRIX_ARITHMETIC_POLICY.h>
 #include <Tools/Matrices/MATRIX_FORWARD.h>
 #include <Tools/Vectors/VECTOR_FORWARD.h>
 #include <cassert>
@@ -122,7 +121,7 @@ public:
     {assert(A.Rows()==0);return A;}
 
     template<class T_MATRIX>
-    typename TRANSPOSE<T_MATRIX>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
+    auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
     {assert(A.Columns()==0);return A.Derived().Transposed();}
 
     template<class T_MATRIX>

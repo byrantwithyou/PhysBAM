@@ -23,7 +23,7 @@ class ARRAY_QUOTIENT:public ARRAY_EXPRESSION<typename T_ARRAY0::ELEMENT,ARRAY_QU
     typedef typename T_ARRAY0::ELEMENT T0;typedef typename T_ARRAY1::ELEMENT T2;
     typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY0>::value,const T_ARRAY0,const T_ARRAY0&>::type T_ARRAY1_VIEW; // if it's an array view we can copy it, otherwise store a reference
     typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY1>::value,const T_ARRAY1,const T_ARRAY1&>::type T_ARRAY2_VIEW;
-    typedef typename QUOTIENT<T0,T2>::TYPE T_RATIO;
+    typedef decltype(*(T0*)0/ *(T2*)0) T_RATIO;
 public:
     typedef T_RATIO ELEMENT;typedef typename T_ARRAY0::INDEX INDEX;
 
@@ -49,11 +49,6 @@ public:
 template<class T0,class T2,class T_ARRAY0,class T_ARRAY1> ARRAY_QUOTIENT<T_ARRAY0,T_ARRAY1>
 operator/(const ARRAY_BASE<T0,T_ARRAY0,typename T_ARRAY0::INDEX>& array0,const ARRAY_BASE<T2,T_ARRAY1,typename T_ARRAY0::INDEX>& array1)
 {return ARRAY_QUOTIENT<T_ARRAY0,T_ARRAY1>(array0.Derived(),array1.Derived());}
-
-//#####################################################################
-
-template<class T_ARRAY0,class T_ARRAY1> struct QUOTIENT<T_ARRAY0,T_ARRAY1,typename enable_if<IS_ARRAY<T_ARRAY0>::value && IS_ARRAY<T_ARRAY1>::value>::type>
-{typedef ARRAY_QUOTIENT<T_ARRAY0,T_ARRAY1> TYPE;};
 
 //#####################################################################
 

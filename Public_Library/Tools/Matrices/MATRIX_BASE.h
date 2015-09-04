@@ -12,7 +12,6 @@
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Math_Tools/max.h>
 #include <Tools/Math_Tools/sqr.h>
-#include <Tools/Matrices/MATRIX_ARITHMETIC_POLICY.h>
 #include <Tools/Matrices/MATRIX_FORWARD.h>
 #include <cmath>
 #include <iomanip>
@@ -39,6 +38,16 @@ template<class T,class T_VECTOR> struct EFFICIENT_MATRIX<ARRAY_BASE<T,T_VECTOR> 
 
 template<class T_VECTOR> struct VECTOR_TYPE {typedef ARRAY<typename T_VECTOR::ELEMENT> TYPE;};
 template<class T,int d> struct VECTOR_TYPE<VECTOR<T,d> > {typedef VECTOR<T,d> TYPE;};
+
+template<class T1,class T2,class ENABLER=void> struct PRODUCT;
+template<class T,int m,int n> struct PRODUCT<MATRIX<T,m,n>,VECTOR<T,n> >{typedef VECTOR<T,m> TYPE;};
+template<class T,int d> struct PRODUCT<MATRIX_MXN<T>,VECTOR<T,d> >{typedef ARRAY<T> TYPE;};
+template<class T,int m,int n,class V> struct PRODUCT<MATRIX<T,m,n>,V,typename enable_if<(IS_ARRAY<V>::value && !FIXED_SIZE_VECTOR<V>::value)>::type>{typedef VECTOR<T,m> TYPE;};
+template<class T,class V> struct PRODUCT<MATRIX_MXN<T>,V,typename enable_if<(IS_ARRAY<V>::value && !FIXED_SIZE_VECTOR<V>::value)>::type>{typedef ARRAY<T> TYPE;};
+template<class T,int m,int n,int k> struct PRODUCT<MATRIX<T,m,k>,MATRIX<T,k,n> >{typedef MATRIX<T,m,n> TYPE;};
+template<class T,int m,int n> struct PRODUCT<MATRIX<T,m,n>,MATRIX_MXN<T> >{typedef MATRIX_MXN<T> TYPE;};
+template<class T,int m,int n> struct PRODUCT<MATRIX_MXN<T>,MATRIX<T,m,n> >{typedef MATRIX_MXN<T> TYPE;};
+template<class T> struct PRODUCT<MATRIX_MXN<T>,MATRIX_MXN<T> >{typedef MATRIX_MXN<T> TYPE;};
 
 namespace{
 template<int line,class A,class B=void> struct ASSERT_EFFICIENT
@@ -177,41 +186,41 @@ public:
     if(Test_Aliased(v,y)){typename VECTOR_TYPE<T_VECTOR>::TYPE u(v);Subtract_Times_Vector_Helper(A,u,y);}else Subtract_Times_Vector_Helper(A,v,y);}
 
     template<class T_MATRIX0>
-    typename TRANSPOSE_PRODUCT<T_MATRIX,T_MATRIX0>::TYPE Transpose_Times(const MATRIX_BASE<T,T_MATRIX0>& A) const
-    {typename TRANSPOSE_PRODUCT<T_MATRIX,T_MATRIX0>::TYPE M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)A.Columns());Add_Transpose_Times(Derived(),A,M);return M;}
+    auto Transpose_Times(const MATRIX_BASE<T,T_MATRIX0>& A) const
+    {decltype(Derived().Transposed()*A) M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)A.Columns());Add_Transpose_Times(Derived(),A,M);return M;}
 
     template<int d>
-    typename TRANSPOSE_PRODUCT<T_MATRIX,SYMMETRIC_MATRIX<T,d> >::TYPE Transpose_Times(const SYMMETRIC_MATRIX<T,d>& A) const
-    {typename TRANSPOSE_PRODUCT<T_MATRIX,SYMMETRIC_MATRIX<T,d> >::TYPE M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);Add_Transpose_Times(Derived(),A,M);return M;}
+    auto Transpose_Times(const SYMMETRIC_MATRIX<T,d>& A) const
+    {decltype(Derived().Transposed()*A) M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);Add_Transpose_Times(Derived(),A,M);return M;}
 
     template<int d>
-    typename TRANSPOSE_PRODUCT<T_MATRIX,DIAGONAL_MATRIX<T,d> >::TYPE Transpose_Times(const DIAGONAL_MATRIX<T,d>& A) const
-    {WARN_IF_NOT_EFFICIENT(T_MATRIX);typename TRANSPOSE_PRODUCT<T_MATRIX,DIAGONAL_MATRIX<T,d> >::TYPE M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);
+    auto Transpose_Times(const DIAGONAL_MATRIX<T,d>& A) const
+    {WARN_IF_NOT_EFFICIENT(T_MATRIX);decltype(Derived().Transposed()*A) M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);
     for(int i=0;i<Columns();i++) for(int k=0;k<Rows();k++) M(i,k)=(*this)(k,i)*A(k,k);return M;}
 
     template<class T_MATRIX0>
-    typename PRODUCT_TRANSPOSE<T_MATRIX,T_MATRIX0>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX0>& A) const
-    {typename PRODUCT_TRANSPOSE<T_MATRIX,T_MATRIX0>::TYPE M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)A.Rows());Add_Times_Transpose(Derived(),A,M);return M;}
+    auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX0>& A) const
+    {decltype(*this*A.Derived().Transposed()) M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)A.Rows());Add_Times_Transpose(Derived(),A,M);return M;}
 
     template<int d>
-    typename PRODUCT<T_MATRIX,DIAGONAL_MATRIX<T,d> >::TYPE Times_Transpose(const DIAGONAL_MATRIX<T,d>& A) const
+    auto Times_Transpose(const DIAGONAL_MATRIX<T,d>& A) const
     {return Derived()*A;}
 
     template<int d>
-    typename PRODUCT<T_MATRIX,SYMMETRIC_MATRIX<T,d> >::TYPE Times_Transpose(const SYMMETRIC_MATRIX<T,d>& A) const
+    auto Times_Transpose(const SYMMETRIC_MATRIX<T,d>& A) const
     {return Derived()*A;}
 
     template<class T_VECTOR>
-    typename TRANSPOSE_PRODUCT<T_MATRIX,typename VECTOR_TYPE<T_VECTOR>::TYPE>::TYPE Transpose_Times(const ARRAY_BASE<T,T_VECTOR>& y) const
-    {assert(y.Size()==Rows());typename TRANSPOSE_PRODUCT<T_MATRIX,typename VECTOR_TYPE<T_VECTOR>::TYPE>::TYPE result((INITIAL_SIZE)Columns());
+    auto Transpose_Times(const ARRAY_BASE<T,T_VECTOR>& y) const
+    {assert(y.Size()==Rows());decltype(Derived().Transposed()*y) result((INITIAL_SIZE)Columns());
     Add_Transpose_Times(Derived(),y.Derived(),result);return result;}
 
     template<class T_MATRIX0>
-    typename PRODUCT<T_MATRIX,T_MATRIX0>::TYPE operator*(const MATRIX_BASE<T,T_MATRIX0>& A) const
+    auto operator*(const MATRIX_BASE<T,T_MATRIX0>& A) const
     {assert(Columns()==A.Rows());typename PRODUCT<T_MATRIX,T_MATRIX0>::TYPE M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)A.Columns());Add_Times(Derived(),A,M);return M;}
 
     template<class T_VECTOR>
-    typename PRODUCT<T_MATRIX,typename VECTOR_TYPE<T_VECTOR>::TYPE>::TYPE operator*(const ARRAY_BASE<T,T_VECTOR>& y) const
+    auto operator*(const ARRAY_BASE<T,T_VECTOR>& y) const
     {assert(y.Size()==Columns());typename PRODUCT<T_MATRIX,typename VECTOR_TYPE<T_VECTOR>::TYPE>::TYPE result((INITIAL_SIZE)Rows());
     Add_Times(Derived(),y.Derived(),result);return result;}
 
@@ -220,13 +229,13 @@ public:
     {z.Fill(T());Add_Times(Derived(),y.Derived(),z.Derived());}
 
     template<int d>
-    typename PRODUCT<T_MATRIX,DIAGONAL_MATRIX<T,d> >::TYPE operator*(const DIAGONAL_MATRIX<T,d>& A) const
-    {WARN_IF_NOT_EFFICIENT(T_MATRIX);typename PRODUCT<T_MATRIX,DIAGONAL_MATRIX<T,d> >::TYPE M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
+    auto operator*(const DIAGONAL_MATRIX<T,d>& A) const
+    {WARN_IF_NOT_EFFICIENT(T_MATRIX);T_MATRIX M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
     for(int k=0;k<Columns();k++) for(int i=0;i<Rows();i++) M(i,k)=(*this)(i,k)*A(k,k);return M;}
 
     template<int d>
-    typename PRODUCT<T_MATRIX,SYMMETRIC_MATRIX<T,d> >::TYPE operator*(const SYMMETRIC_MATRIX<T,d>& A) const
-    {assert(Columns()==A.Rows());typename PRODUCT<T_MATRIX,SYMMETRIC_MATRIX<T,d> >::TYPE M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)A.Columns());Add_Times(Derived(),A,M);return M;}
+    auto operator*(const SYMMETRIC_MATRIX<T,d>& A) const
+    {assert(Columns()==A.Rows());T_MATRIX M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)A.Columns());Add_Times(Derived(),A,M);return M;}
 
     template<int d>
     T_MATRIX operator*(const UPPER_TRIANGULAR_MATRIX<T,d>& A) const
@@ -240,8 +249,8 @@ public:
     for(int j=0;j<Rows();j++) for(int k=0;k<d;k++) for(int i=0;i<=k;i++) M(j,i)+=(*this)(j,k)*A(i,k);return M;}
 
     template<int d>
-    typename TRANSPOSE<T_MATRIX>::TYPE Transpose_Times(const UPPER_TRIANGULAR_MATRIX<T,d>& A) const
-    {assert(Rows()==d);typename TRANSPOSE<T_MATRIX>::TYPE M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);
+    auto Transpose_Times(const UPPER_TRIANGULAR_MATRIX<T,d>& A) const
+    {assert(Rows()==d);decltype(Derived().Transposed()) M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);
     for(int j=0;j<Columns();j++) for(int k=0;k<d;k++) for(int i=0;i<=k;i++) M(j,k)+=(*this)(i,j)*A(i,k);return M;}
 
     T_MATRIX& operator*=(const T a)
@@ -574,13 +583,13 @@ template<class T,class T_MATRIX> inline std::ostream& operator<<(std::ostream& o
 {output_stream<<"[";for(int i=0;i<A.Rows();i++){for(int j=0;j<A.Columns();j++){output_stream<<A(i,j);if(j<A.Columns()-1) output_stream<<" ";}if(i<A.Rows()-1) output_stream<<"; ";}output_stream<<"]";return output_stream;}
 
 template<class T,class T_MATRIX,int d>
-typename PRODUCT<DIAGONAL_MATRIX<T,d>,T_MATRIX>::TYPE operator*(const DIAGONAL_MATRIX<T,d>& A,const MATRIX_BASE<T,T_MATRIX>& B)
-{assert(d==B.Rows());typename PRODUCT<DIAGONAL_MATRIX<T,d>,T_MATRIX>::TYPE M((INITIAL_SIZE)B.Rows(),(INITIAL_SIZE)B.Columns());
+auto operator*(const DIAGONAL_MATRIX<T,d>& A,const MATRIX_BASE<T,T_MATRIX>& B)
+{assert(d==B.Rows());T_MATRIX M((INITIAL_SIZE)B.Rows(),(INITIAL_SIZE)B.Columns());
 for(int i=0;i<B.Rows();i++){T a=A(i,i);for(int k=0;k<B.Columns();k++) M(i,k)=a*B(i,k);}return M;}
 
 template<class T,class T_MATRIX,int d>
-typename PRODUCT<SYMMETRIC_MATRIX<T,d>,T_MATRIX>::TYPE operator*(const SYMMETRIC_MATRIX<T,d>& A,const MATRIX_BASE<T,T_MATRIX>& B)
-{typename PRODUCT<SYMMETRIC_MATRIX<T,d>,T_MATRIX>::TYPE M((INITIAL_SIZE)B.Rows(),(INITIAL_SIZE)B.Columns());B.Add_Times(A,B.Derived(),M);return M;}
+auto operator*(const SYMMETRIC_MATRIX<T,d>& A,const MATRIX_BASE<T,T_MATRIX>& B)
+{T_MATRIX M((INITIAL_SIZE)B.Rows(),(INITIAL_SIZE)B.Columns());B.Add_Times(A,B.Derived(),M);return M;}
 
 template<class T,class T_MATRIX>
 T_MATRIX exp(const MATRIX_BASE<T,T_MATRIX>& M);

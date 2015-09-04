@@ -98,12 +98,6 @@ template<class TV> inline TWIST<TV> operator*(const typename TV::SCALAR a,const 
 
 //#####################################################################
 template<class TV> struct CAN_ASSIGN<TWIST<TV>,TWIST<TV> > {static const bool value=true;};
-template<class TV> struct SUM<TWIST<TV>,TWIST<TV> > {typedef TWIST<TV> TYPE;};
-template<class TV> struct DIFFERENCE<TWIST<TV>,TWIST<TV> > {typedef TWIST<TV> TYPE;};
-template<class TV> struct NEGATION<TWIST<TV> > {typedef TWIST<TV> TYPE;};
-template<class TV> struct PRODUCT<typename TV::SCALAR,TWIST<TV> > {typedef TWIST<TV> TYPE;};
-template<class TV> struct PRODUCT<TWIST<TV>,typename TV::SCALAR> {typedef TWIST<TV> TYPE;};
-template<class TV> struct QUOTIENT<TWIST<TV>,typename TV::SCALAR> {typedef TWIST<TV> TYPE;};
 //#####################################################################
 
 template<class TV> inline std::istream& operator>>(std::istream& input,TWIST<TV>& v)

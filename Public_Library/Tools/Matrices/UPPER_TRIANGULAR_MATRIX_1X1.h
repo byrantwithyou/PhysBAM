@@ -142,8 +142,8 @@ public:
     {assert(A.Rows()==1);return x00*A.Derived();}
 
     template<class T_MATRIX>
-    typename TRANSPOSE<T_MATRIX>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
-    {assert(A.Columns()==1);typename TRANSPOSE<T_MATRIX>::TYPE M((INITIAL_SIZE)1,(INITIAL_SIZE)A.Rows());
+    auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
+    {assert(A.Columns()==1);decltype(A.Derived().Transposed()) M((INITIAL_SIZE)1,(INITIAL_SIZE)A.Rows());
     for(int j=0;j<A.Rows();j++) M(0,j)+=x00*A(j,0);return M;}
 
     template<class T_MATRIX>

@@ -141,8 +141,8 @@ public:
     for(int j=0;j<A.Columns();j++) for(int k=0;k<3;k++) for(int i=0;i<=k;i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
 
     template<class T_MATRIX>
-    typename TRANSPOSE<T_MATRIX>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
-    {assert(A.Columns()==3);typename TRANSPOSE<T_MATRIX>::TYPE M(INITIAL_SIZE(3),INITIAL_SIZE(A.Rows()));
+    auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
+    {assert(A.Columns()==3);decltype(*this*A.Derived().Transposed()) M(INITIAL_SIZE(3),INITIAL_SIZE(A.Rows()));
     for(int j=0;j<A.Rows();j++) for(int k=0;k<3;k++) for(int i=0;i<=k;i++) M(i,j)+=(*this)(i,k)*A(j,k);return M;}
 
     UPPER_TRIANGULAR_MATRIX Times_Transpose(const DIAGONAL_MATRIX<T,3>& A) const
