@@ -26,7 +26,11 @@ public:
     typedef MATRIX_BASE<T,MATRIX<T,1> > BASE;using BASE::operator*;
     typedef int HAS_UNTYPED_READ_WRITE;
 
-    T x00;
+    union
+    {
+        struct{T x00;};
+        T x[1];
+    };
 
     explicit MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(1),INITIAL_SIZE nn=INITIAL_SIZE(1))
         :x00(T())
@@ -68,6 +72,9 @@ public:
 
     MATRIX& operator=(const MATRIX& matrix)
     {x00=matrix.x00;return *this;}
+
+    ~MATRIX()
+    {x00.~T();}
 
     int Rows() const
     {return 1;}
@@ -305,7 +312,7 @@ public:
     static MATRIX Identity_Matrix()
     {return MATRIX((T)1);}
 
-    MATRIX Symmetric_Part() const
+    SYMMETRIC_MATRIX<T,1> Symmetric_Part() const
     {return *this;}
 
     SYMMETRIC_MATRIX<T,1> Twice_Symmetric_Part() const
@@ -316,6 +323,12 @@ public:
 
     static MATRIX Conjugate(const MATRIX& A,const MATRIX& B)
     {return A*B*A;}
+
+    static MATRIX Componentwise_Min(const MATRIX& v1,const MATRIX& v2)
+    {return MATRIX(min(v1.x[0],v2.x[0]));}
+
+    static MATRIX Componentwise_Max(const MATRIX& v1,const MATRIX& v2)
+    {return MATRIX(max(v1.x[0],v2.x[0]));}
 
     void Solve_Eigenproblem(MATRIX& D,MATRIX& V) const
     {Fast_Solve_Eigenproblem(D,V);}

@@ -311,6 +311,12 @@ public:
     T Simplex_Minimum_Altitude() const
     {return Determinant()/sqrt(max(Column(0).Magnitude_Squared(),Column(1).Magnitude_Squared(),(Column(0)-Column(1)).Magnitude_Squared()));}
 
+    static MATRIX Componentwise_Min(const MATRIX& v1,const MATRIX& v2)
+    {return MATRIX(min(v1.x[0],v2.x[0]),min(v1.x[1],v2.x[1]),min(v1.x[2],v2.x[2]),min(v1.x[3],v2.x[3]));}
+
+    static MATRIX Componentwise_Max(const MATRIX& v1,const MATRIX& v2)
+    {return MATRIX(max(v1.x[0],v2.x[0]),max(v1.x[1],v2.x[1]),max(v1.x[2],v2.x[2]),max(v1.x[3],v2.x[3]));}
+
     VECTOR<T,1> Contract_Permutation_Tensor() const
     {return VECTOR<T,1>(x[2]-x[1]);}
 

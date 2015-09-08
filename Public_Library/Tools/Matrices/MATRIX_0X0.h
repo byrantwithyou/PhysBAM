@@ -216,7 +216,16 @@ public:
     T Determinant() const
     {return 1;}
 
-    MATRIX Symmetric_Part() const
+    SYMMETRIC_MATRIX<T,0> Symmetric_Part() const
+    {return MATRIX();}
+
+    SYMMETRIC_MATRIX<T,0> Twice_Symmetric_Part() const
+    {return MATRIX();}
+
+    static MATRIX Componentwise_Min(const MATRIX& v1,const MATRIX& v2)
+    {return MATRIX();}
+
+    static MATRIX Componentwise_Max(const MATRIX& v1,const MATRIX& v2)
     {return MATRIX();}
 
     void Fast_Solve_Eigenproblem(MATRIX&,MATRIX&) const

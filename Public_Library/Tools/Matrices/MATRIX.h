@@ -286,5 +286,17 @@ Double_Contract(const MATRIX<T,m,n>& a,const MATRIX<T,m,n>& b)
 template<class T,int m,int n>
 inline MATRIX<T,m,n> operator*(const T a,const MATRIX<T,m,n>& A)
 {return A*a;}
+
+template<class T,int m,int n>
+inline MATRIX<T,m,n> clamp(const MATRIX<T,m,n>& x,const MATRIX<T,m,n>& xmin,const MATRIX<T,m,n>& xmax)
+{MATRIX<T,m,n> r;for(int i=0;i<m*n;i++) r.x[i]=clamp(x.x[i],xmin.x[i],xmax.x[i]);return r;}
+
+template<class T,int m,int n>
+inline MATRIX<T,m,n> clamp_min(const MATRIX<T,m,n>& x,const MATRIX<T,m,n>& xmin)
+{MATRIX<T,m,n> r;for(int i=0;i<m*n;i++) r.x[i]=clamp_min(x.x[i],xmin.x[i]);return r;}
+
+template<class T,int m,int n>
+inline MATRIX<T,m,n> clamp_max(const MATRIX<T,m,n>& x,const MATRIX<T,m,n>& xmax)
+{MATRIX<T,m,n> r;for(int i=0;i<m*n;i++) r.x[i]=clamp_max(x.x[i],xmax.x[i]);return r;}
 }
 #endif
