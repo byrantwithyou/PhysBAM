@@ -1,5 +1,5 @@
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 using namespace PhysBAM;
@@ -91,15 +91,8 @@ Trilinear_Hessian(const T2& u1,const T2& u2,const T2& u3,const T2& u4,const T2& 
     return SYMMETRIC_MATRIX<T2,3>(T2(),Linear(u4-u3-u2+u1,u8-u7-u6+u5,X.z),Linear(u6-u5-u2+u1,u8-u7-u4+u3,X.y),T2(),Linear(u7-u5-u3+u1,u8-u6-u4+u2,X.x),T2());
 }
 namespace PhysBAM{
-template class LINEAR_INTERPOLATION<float,MATRIX<float,3,3> >;
-template class LINEAR_INTERPOLATION<float,SYMMETRIC_MATRIX<float,2> >;
-template class LINEAR_INTERPOLATION<float,SYMMETRIC_MATRIX<float,3> >;
-template class LINEAR_INTERPOLATION<float,VECTOR<float,2> >;
-template class LINEAR_INTERPOLATION<float,VECTOR<float,3> >;
-template class LINEAR_INTERPOLATION<float,VECTOR<float,4> >;
-template class LINEAR_INTERPOLATION<float,VECTOR<float,5> >;
-template class LINEAR_INTERPOLATION<float,float>;
-template class LINEAR_INTERPOLATION<double,MATRIX<double,3,3> >;
+template class LINEAR_INTERPOLATION<double,MATRIX<double,2> >;
+template class LINEAR_INTERPOLATION<double,MATRIX<double,3> >;
 template class LINEAR_INTERPOLATION<double,SYMMETRIC_MATRIX<double,2> >;
 template class LINEAR_INTERPOLATION<double,SYMMETRIC_MATRIX<double,3> >;
 template class LINEAR_INTERPOLATION<double,VECTOR<double,2> >;
@@ -107,4 +100,13 @@ template class LINEAR_INTERPOLATION<double,VECTOR<double,3> >;
 template class LINEAR_INTERPOLATION<double,VECTOR<double,4> >;
 template class LINEAR_INTERPOLATION<double,VECTOR<double,5> >;
 template class LINEAR_INTERPOLATION<double,double>;
+template class LINEAR_INTERPOLATION<float,MATRIX<float,2> >;
+template class LINEAR_INTERPOLATION<float,MATRIX<float,3> >;
+template class LINEAR_INTERPOLATION<float,SYMMETRIC_MATRIX<float,2> >;
+template class LINEAR_INTERPOLATION<float,SYMMETRIC_MATRIX<float,3> >;
+template class LINEAR_INTERPOLATION<float,VECTOR<float,2> >;
+template class LINEAR_INTERPOLATION<float,VECTOR<float,3> >;
+template class LINEAR_INTERPOLATION<float,VECTOR<float,4> >;
+template class LINEAR_INTERPOLATION<float,VECTOR<float,5> >;
+template class LINEAR_INTERPOLATION<float,float>;
 }

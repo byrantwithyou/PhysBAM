@@ -8,6 +8,7 @@
 #include <Tools/Boundaries/BOUNDARY.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -139,8 +140,11 @@ template class BOUNDARY<VECTOR<float,3>,VECTOR<float,5> >;
 template class BOUNDARY<VECTOR<float,3>,VECTOR<float,6> >;
 template class BOUNDARY<VECTOR<float,3>,bool>;
 template class BOUNDARY<VECTOR<float,1>,SYMMETRIC_MATRIX<float,1> >;
+template class BOUNDARY<VECTOR<float,1>,MATRIX<float,1> >;
 template class BOUNDARY<VECTOR<float,2>,SYMMETRIC_MATRIX<float,2> >;
+template class BOUNDARY<VECTOR<float,2>,MATRIX<float,2> >;
 template class BOUNDARY<VECTOR<float,3>,SYMMETRIC_MATRIX<float,3> >;
+template class BOUNDARY<VECTOR<float,3>,MATRIX<float,3> >;
 template class BOUNDARY<VECTOR<double,1>,double>;
 template class BOUNDARY<VECTOR<double,1>,VECTOR<double,1> >;
 template class BOUNDARY<VECTOR<double,1>,VECTOR<double,2> >;
@@ -157,8 +161,11 @@ template class BOUNDARY<VECTOR<double,3>,VECTOR<double,5> >;
 template class BOUNDARY<VECTOR<double,3>,VECTOR<double,6> >;
 template class BOUNDARY<VECTOR<double,3>,bool>;
 template class BOUNDARY<VECTOR<double,1>,SYMMETRIC_MATRIX<double,1> >;
+template class BOUNDARY<VECTOR<double,1>,MATRIX<double,1> >;
 template class BOUNDARY<VECTOR<double,2>,SYMMETRIC_MATRIX<double,2> >;
+template class BOUNDARY<VECTOR<double,2>,MATRIX<double,2> >;
 template class BOUNDARY<VECTOR<double,3>,SYMMETRIC_MATRIX<double,3> >;
+template class BOUNDARY<VECTOR<double,3>,MATRIX<double,3> >;
 template class BOUNDARY<VECTOR<float,1>,int>;
 template class BOUNDARY<VECTOR<float,2>,int>;
 template class BOUNDARY<VECTOR<float,3>,int>;

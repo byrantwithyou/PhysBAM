@@ -8,6 +8,7 @@
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Math_Tools/INTERVAL.h>
+#include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
@@ -19,27 +20,17 @@
 using namespace PhysBAM;
 static void set_if_abs_less(float a,float b,float& x,float y,float z){if(abs(a)<abs(b)) x=y;else x=z;}
 static void set_if_abs_less(double a,double b,double& x,double y,double z){if(abs(a)<abs(b)) x=y;else x=z;}
-template<class T>
-static void set_if_abs_less(const SYMMETRIC_MATRIX<T,3>& a,const SYMMETRIC_MATRIX<T,3>& b,SYMMETRIC_MATRIX<T,3>& x,const SYMMETRIC_MATRIX<T,3>& y,const SYMMETRIC_MATRIX<T,3>& z)
+template<class T,int d>
+static void set_if_abs_less(const SYMMETRIC_MATRIX<T,d>& a,const SYMMETRIC_MATRIX<T,d>& b,SYMMETRIC_MATRIX<T,d>& x,const SYMMETRIC_MATRIX<T,d>& y,const SYMMETRIC_MATRIX<T,d>& z)
 {
-    set_if_abs_less(a.x00,b.x00,x.x00,y.x00,z.x00);
-    set_if_abs_less(a.x10,b.x10,x.x10,y.x10,z.x10);
-    set_if_abs_less(a.x20,b.x20,x.x20,y.x20,z.x20);
-    set_if_abs_less(a.x11,b.x11,x.x11,y.x11,z.x11);
-    set_if_abs_less(a.x21,b.x21,x.x21,y.x21,z.x21);
-    set_if_abs_less(a.x22,b.x22,x.x22,y.x22,z.x22);
+    for(int i=0;i<d*(d+1)/2;i++)
+        set_if_abs_less(a.array[i],b.array[i],x.array[i],y.array[i],z.array[i]);
 }
-template<class T>
-static void set_if_abs_less(const SYMMETRIC_MATRIX<T,2>& a,const SYMMETRIC_MATRIX<T,2>& b,SYMMETRIC_MATRIX<T,2>& x,const SYMMETRIC_MATRIX<T,2>& y,const SYMMETRIC_MATRIX<T,2>& z)
+template<class T,int m,int n>
+static void set_if_abs_less(const MATRIX<T,m,n>& a,const MATRIX<T,m,n>& b,MATRIX<T,m,n>& x,const MATRIX<T,m,n>& y,const MATRIX<T,m,n>& z)
 {
-    set_if_abs_less(a.x00,b.x00,x.x00,y.x00,z.x00);
-    set_if_abs_less(a.x10,b.x10,x.x10,y.x10,z.x10);
-    set_if_abs_less(a.x11,b.x11,x.x11,y.x11,z.x11);
-}
-template<class T>
-static void set_if_abs_less(const SYMMETRIC_MATRIX<T,1>& a,const SYMMETRIC_MATRIX<T,1>& b,SYMMETRIC_MATRIX<T,1>& x,const SYMMETRIC_MATRIX<T,1>& y,const SYMMETRIC_MATRIX<T,1>& z)
-{
-    set_if_abs_less(a.x00,b.x00,x.x00,y.x00,z.x00);
+    for(int i=0;i<m*n;i++)
+        set_if_abs_less(a.x[i],b.x[i],x.x[i],y.x[i],z.x[i]);
 }
 //#####################################################################
 // Constructor
@@ -301,16 +292,22 @@ Periodic_Index(TV_INT& index) const
         else if(index(i)>=size(i)) index(i)-=size(i);}
 }
 namespace PhysBAM{
-template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,1>,float>;
-template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,2>,float>;
-template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,3>,float>;
-template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,1>,double>;
-template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,2>,double>;
-template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,3>,double>;
-template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,1>,SYMMETRIC_MATRIX<float,1> >;
-template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,2>,SYMMETRIC_MATRIX<float,2> >;
-template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,3>,SYMMETRIC_MATRIX<float,3> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,1>,MATRIX<double,1> >;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,1>,SYMMETRIC_MATRIX<double,1> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,1>,double>;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,2>,MATRIX<double,2> >;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,2>,SYMMETRIC_MATRIX<double,2> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,2>,double>;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,3>,MATRIX<double,3> >;
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,3>,SYMMETRIC_MATRIX<double,3> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<double,3>,double>;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,1>,MATRIX<float,1> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,1>,SYMMETRIC_MATRIX<float,1> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,1>,float>;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,2>,MATRIX<float,2> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,2>,SYMMETRIC_MATRIX<float,2> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,2>,float>;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,3>,MATRIX<float,3> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,3>,SYMMETRIC_MATRIX<float,3> >;
+template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,3>,float>;
 }

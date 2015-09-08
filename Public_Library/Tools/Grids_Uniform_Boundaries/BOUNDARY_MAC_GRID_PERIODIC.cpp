@@ -11,6 +11,7 @@
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
+#include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -66,17 +67,21 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2
 //#####################################################################
 namespace PhysBAM{
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,2>,VECTOR<float,3> >;
-template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,2>,float>;
-template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,3>,float>;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,2>,MATRIX<double,2> >;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,2>,SYMMETRIC_MATRIX<double,2> >;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,2>,VECTOR<double,3> >;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,2>,double>;
-template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,3>,double>;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,2>,int>;
-template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,3>,int>;
-template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,2>,int>;
-template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,3>,int>;
-template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,2>,SYMMETRIC_MATRIX<double,2> >;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,3>,MATRIX<double,3> >;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,3>,SYMMETRIC_MATRIX<double,3> >;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,3>,double>;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<double,3>,int>;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,2>,MATRIX<float,2> >;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,2>,SYMMETRIC_MATRIX<float,2> >;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,2>,float>;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,2>,int>;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,3>,MATRIX<float,3> >;
 template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,3>,SYMMETRIC_MATRIX<float,3> >;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,3>,float>;
+template class BOUNDARY_MAC_GRID_PERIODIC<VECTOR<float,3>,int>;
 }

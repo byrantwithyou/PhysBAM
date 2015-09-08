@@ -5,6 +5,7 @@
 #include <Tools/Data_Structures/PAIR.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
+#include <Tools/Matrices/MATRIX.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -161,18 +162,22 @@ From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV&
 namespace PhysBAM{
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,1>,VECTOR<double,1> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,1>,double>;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,2>,MATRIX<double,2> >;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,2>,SYMMETRIC_MATRIX<double,2> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,2>,VECTOR<double,2> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,2>,double>;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,3>,MATRIX<double,3> >;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,3>,SYMMETRIC_MATRIX<double,3> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,3>,VECTOR<double,3> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,3>,double>;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,1>,VECTOR<float,1> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,1>,float>;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,2>,MATRIX<float,2> >;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,2>,SYMMETRIC_MATRIX<float,2> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,2>,VECTOR<float,2> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,2>,float>;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,3>,MATRIX<float,3> >;
+template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,3>,SYMMETRIC_MATRIX<float,3> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,3>,VECTOR<float,3> >;
 template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,3>,float>;
-template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,2>,SYMMETRIC_MATRIX<double,2> >;
-template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<double,3>,SYMMETRIC_MATRIX<double,3> >;
-template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,2>,SYMMETRIC_MATRIX<float,2> >;
-template class QUADRATIC_INTERPOLATION_UNIFORM<VECTOR<float,3>,SYMMETRIC_MATRIX<float,3> >;
 }
