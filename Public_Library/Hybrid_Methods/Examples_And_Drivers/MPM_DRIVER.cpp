@@ -178,6 +178,9 @@ Advance_One_Time_Step()
 {
     example.Begin_Time_Step(example.time);
 
+    if(example.use_surface_tension)
+        Delete_Surface_Particles_And_Return_Loots();
+
     Update_Simulated_Particles();
     Print_Particle_Stats("particle state",example.dt);
     Update_Particle_Weights();
@@ -256,6 +259,18 @@ Write_Output_Files(const int frame)
         FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);
     FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
+}
+//#####################################################################
+// Function Delete_Surface_Particles_And_Return_Loots
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Delete_Surface_Particles_And_Return_Loots()
+{
+    PHYSBAM_ASSERT(example.use_surface_tension);
+    for(int k=0;k<example.surface_particles.m;k++){
+        int p=example.surface_particles(k);
+        example.particles.Add_To_Deletion_List(p);}
+    // TODO
 }
 //#####################################################################
 // Function Update_Particle_Weights
