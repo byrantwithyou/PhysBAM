@@ -41,6 +41,8 @@ public:
     using BASE::Seed_Particles_Helper;using BASE::Add_Force;using BASE::Add_Fluid_Wall;
     using BASE::quad_F_coeff;
 
+    // surface tension stuff
+    bool use_surface_tension;
     int Nsurface;
     ARRAY<int> steal;
 

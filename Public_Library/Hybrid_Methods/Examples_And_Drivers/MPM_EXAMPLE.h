@@ -79,12 +79,6 @@ public:
     ARRAY<T,TV_INT> density;
     SPARSE_MATRIX_FLAT_MXN<T> DT;
 
-    // surface tension stuff
-    bool use_surface_tension;
-    T surface_tension_coefficient;
-    ARRAY<int> surface_particles;
-    ARRAY<ARRAY<int> > looted_particles; // per surface particle
-
     T initial_time;
     int last_frame;
     std::string frame_title;
