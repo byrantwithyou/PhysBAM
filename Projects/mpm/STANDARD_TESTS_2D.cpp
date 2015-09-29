@@ -25,6 +25,9 @@
 #include <Hybrid_Methods/Forces/MPM_VISCOSITY.h>
 #include <Hybrid_Methods/Forces/OLDROYD_NEO_HOOKEAN.h>
 #include <Hybrid_Methods/Forces/VOLUME_PRESERVING_OB_NEO_HOOKEAN.h>
+#include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
 //#####################################################################
@@ -274,10 +277,10 @@ Initialize()
             //./mpm 15 -affine -resolution 64 -max_dt 1e-3 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             T density=2*scale_mass;
-            RANGE<TV> box(TV(.3,.3),TV(.5,.5));
+            RANGE<TV> box(TV(.3,.11),TV(.5,.31));
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
-            RANGE<TV> box2(TV(.5,.35),TV(.8,.45));
-            Seed_Particles_Helper(box2,0,0,density,particles_per_cell);
+            RANGE<TV> box2(TV(.6,.15),TV(.8,.25));
+            Seed_Particles_Helper(box2,[=](const TV& X){return TV(-0.1,0);},0,density,particles_per_cell);
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
             bool no_mu=true;
             Add_Fixed_Corotated(scale_E*10,0.3,&mpm_particles,no_mu);
@@ -525,7 +528,7 @@ Begin_Time_Step(const T time)
     if(use_surface_tension){
 
         bool use_bruteforce=true;
-        bool use_kdtree=true;
+        bool use_kdtree=false;
 
         // Remove old surface particles
         int N_non_surface=particles.number-Nsurface;
@@ -542,9 +545,31 @@ Begin_Time_Step(const T time)
         lagrangian_forces.Delete_Pointers_And_Clean_Memory();
         this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
 
+        // Dirty hack of rasterizing mass
+        this->simulated_particles.Remove_All();
+        for(int p=0;p<this->particles.number;p++)
+            if(this->particles.valid(p))
+                this->simulated_particles.Append(p);
+        this->particle_is_simulated.Remove_All();
+        this->particle_is_simulated.Resize(this->particles.X.m);
+        this->particle_is_simulated.Subset(this->simulated_particles).Fill(true);
+        this->weights->Update(this->particles.X);
+        this->gather_scatter.Prepare_Scatter(this->particles);
+        MPM_PARTICLES<TV>& my_particles=this->particles;
+#pragma omp parallel for
+        for(int i=0;i<this->mass.array.m;i++)
+            this->mass.array(i)=0;
+        this->gather_scatter.template Scatter<int>(
+            [this,&my_particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
+            {
+                T w=it.Weight();
+                TV_INT index=it.Index();
+                this->mass(index)+=w*my_particles.mass(p);
+            },false);
+
         // Marching cube
         SEGMENTED_CURVE_2D<T>* surface=SEGMENTED_CURVE_2D<T>::Create();
-        MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,particles.mass(0)*1);
+        MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,particles.mass(0)*0.4);
 
         // Seed surface particles
         int Nold=particles.number;
