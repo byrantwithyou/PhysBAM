@@ -1,0 +1,5 @@
+# SConscript
+
+Import('env Automatic_Program')
+env=env.Copy(USE_HYBRID=1)
+Automatic_Program(env,"mpm_kkt",["main.cpp","STANDARD_TESTS_KKT_BASE.cpp","STANDARD_TESTS_KKT_2D.cpp"])

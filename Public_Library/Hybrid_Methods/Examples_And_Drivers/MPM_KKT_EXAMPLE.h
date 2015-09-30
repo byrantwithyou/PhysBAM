@@ -16,7 +16,7 @@ namespace PhysBAM{
 template<class TV> class MPM_PARTICLES;
 template<class TV> class PARTICLE_GRID_FORCES;
 template<class T> class KRYLOV_VECTOR_BASE;
-template<class T> class MPM_KKT_KRYLOV_VECTOR;
+template<class T> class KKT_KRYLOV_VECTOR;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
 template<class TV> class GATHER_SCATTER;
 template<class TV> class DEBUG_PARTICLES;
@@ -35,6 +35,7 @@ class MPM_KKT_EXAMPLE:public NONCOPYABLE
 public:
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
     GRID<TV> grid;
+    GRID<TV> coarse_grid;
     STREAM_TYPE stream_type;
     MPM_PARTICLES<TV>& particles;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
@@ -43,9 +44,10 @@ public:
     ARRAY<bool> particle_is_simulated;
     ARRAY<T,TV_INT> mass,mass_coarse;
     ARRAY<TV,TV_INT> location;
+    ARRAY<TV,TV_INT> coarse_location;
     ARRAY<TV,TV_INT> velocity,velocity_new,*current_velocity;
-    ARRAY<int> valid_grid_indices;
-    ARRAY<TV_INT> valid_grid_cell_indices;
+    ARRAY<int> valid_velocity_indices;
+    ARRAY<int> valid_pressure_indices;
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
     ARRAY<DEFORMABLES_FORCES<TV>*>& lagrangian_forces;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;

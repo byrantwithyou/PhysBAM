@@ -4,7 +4,6 @@
 //#####################################################################
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/GMRES.h>
@@ -24,12 +23,8 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include <Hybrid_Methods/System/FLUID_KRYLOV_SYSTEM.h>
-#include <Hybrid_Methods/System/FLUID_KRYLOV_VECTOR.h>
-#include <Hybrid_Methods/System/KKT_KRYLOV_SYSTEM.h>
-#include <Hybrid_Methods/System/KKT_KRYLOV_VECTOR.h>
+#include <Hybrid_Methods/System/MPM_KKT_KRYLOV_SYSTEM.h>
 #include <Hybrid_Methods/System/MPM_KKT_KRYLOV_VECTOR.h>
-#include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -46,9 +41,9 @@ namespace{
 template<class TV> MPM_KKT_DRIVER<TV>::
 MPM_KKT_DRIVER(MPM_KKT_EXAMPLE<TV>& example)
     :example(example),
-    kkt_sys(*new KKT_KRYLOV_SYSTEM<TV>(example)),
-    kkt_lhs(*new KKT_KRYLOV_VECTOR<TV>(example.valid_indices,example.valid_pressure_indices)),
-    kkt_rhs(*new KKT_KRYLOV_VECTOR<TV>(example.valid_indices,example.valid_pressure_indices))
+    kkt_sys(*new MPM_KKT_KRYLOV_SYSTEM<TV>(example)),
+    kkt_lhs(*new MPM_KKT_KRYLOV_VECTOR<TV>(example.valid_velocity_indices,example.valid_pressure_indices)),
+    kkt_rhs(*new MPM_KKT_KRYLOV_VECTOR<TV>(example.valid_velocity_indices,example.valid_pressure_indices))
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
@@ -83,32 +78,42 @@ Initialize()
     output_number=current_frame=example.restart;
 
     example.Initialize();
-    PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
     if(example.restart)
         example.Read_Output_Files(example.restart);
 
     example.mass.Resize(example.grid.Domain_Indices(example.ghost));
+    example.mass_coarse.Resize(example.coarse_grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity_new.Resize(example.grid.Domain_Indices(example.ghost));
-    dv.u.Resize(example.grid.Domain_Indices(example.ghost));
-    rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
 
-    example.particles.Store_B(example.use_affine && !(example.incompressible || example.kkt));
-    example.particles.Store_C(example.use_affine && (example.incompressible || example.kkt));
+    example.particles.Store_B(example.use_affine);
     example.particles.Store_S(example.use_oldroyd);
-    example.particles.Store_One_Over_Lambda(example.kkt);
+    example.particles.Store_One_Over_Lambda(true);
     example.current_velocity=&example.velocity;
     PHYSBAM_ASSERT(!example.particles.store_B || !example.particles.store_C);
 
     kkt_lhs.u.Resize(example.grid.Domain_Indices(example.ghost));
-    kkt_lhs.p.Resize(example.grid.Domain_Indices(example.ghost));
+    kkt_lhs.p.Resize(example.coarse_grid.Domain_Indices(example.ghost));
     kkt_rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
-    kkt_rhs.p.Resize(example.grid.Domain_Indices(example.ghost));
-    example.one_over_lambda.Resize(example.grid.Domain_Indices(example.ghost));
-    example.J.Resize(example.grid.Domain_Indices(example.ghost));
+    kkt_rhs.p.Resize(example.coarse_grid.Domain_Indices(example.ghost));
+    example.one_over_lambda.Resize(example.coarse_grid.Domain_Indices(example.ghost));
+    example.J.Resize(example.coarse_grid.Domain_Indices(example.ghost));
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
-    example.location.Resize(range,false,false);
+    RANGE<TV_INT> coarse_range(example.coarse_grid.Cell_Indices(example.ghost));
+    Initialize_Location(range,example.grid,example.location);
+    Initialize_Location(coarse_range,example.coarse_grid,example.coarse_location);
+    
+    if(!example.restart) Write_Output_Files(0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
+}
+//#####################################################################
+// Function Initialize_Location 
+//#####################################################################
+template<class TV> void MPM_KKT_DRIVER<TV>::
+Initialize_Location(const RANGE<TV_INT>& range,const GRID<TV>& grid,ARRAY<TV,TV_INT>& location)
+{
+    location.Resize(range,false,false);
 #pragma omp parallel for
     for(int t=0;t<example.threads;t++){
         int a=(range.max_corner.x-range.min_corner.x)*t/example.threads+range.min_corner.x;
@@ -119,10 +124,7 @@ Initialize()
         local_range.min_corner.x=a;
         local_range.max_corner.x=b;
         for(RANGE_ITERATOR<TV::m> it(local_range);it.Valid();it.Next())
-            example.location.array(i++)=example.grid.Center(it.index);}
-
-    if(!example.restart) Write_Output_Files(0);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
+            location.array(i++)=grid.Center(it.index);}
 }
 //#####################################################################
 // Function Advance_One_Time_Step
@@ -131,11 +133,12 @@ template<class TV> void MPM_KKT_DRIVER<TV>::
 Advance_One_Time_Step()
 {
     example.Begin_Time_Step(example.time);
-
+    
     Update_Simulated_Particles();
     Print_Particle_Stats("particle state",example.dt);
     Update_Particle_Weights();
     example.gather_scatter.Prepare_Scatter(example.particles);
+    example.gather_scatter_coarse.Prepare_Scatter(example.particles);
     Particle_To_Grid();
     Print_Grid_Stats("after particle to grid",example.dt,example.velocity,0);
     Print_Energy_Stats("after particle to grid",example.velocity);
@@ -262,16 +265,14 @@ Particle_To_Grid()
             example.J(index)+=w*particles.mass(p)*particles.F(p).Determinant();
         },true);
 
-    example.valid_grid_indices.Remove_All();
-    example.valid_grid_cell_indices.Remove_All();
+    example.valid_velocity_indices.Remove_All();
     example.valid_pressure_indices.Remove_All();
 
     for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
         int i=example.mass.Standard_Index(it.index);
         if(example.mass.array(i)){
-            example.valid_grid_indices.Append(i);
-            example.valid_grid_cell_indices.Append(it.index);
-            example.velocity.array(i)/=example.mass.array(i);
+            example.valid_velocity_indices.Append(i);
+            example.velocity.array(i)/=example.mass.array(i);}
         else example.velocity.array(i)=TV();}
             
     for(RANGE_ITERATOR<TV::m> it(example.mass_coarse.domain);it.Valid();it.Next()){
@@ -358,44 +359,6 @@ Solve_KKT_System()
 template<class TV> void MPM_KKT_DRIVER<TV>::
 Apply_Forces()
 {
-    example.Capture_Stress();
-    objective.Reset();
-    if(example.use_symplectic_euler){
-        objective.tmp2*=0;
-        example.Precompute_Forces(example.time,example.dt,false);
-        example.Add_Forces(objective.tmp2.u,example.time);
-#pragma omp parallel for
-        for(int i=0;i<example.valid_grid_indices.m;i++){
-            int p=example.valid_grid_indices(i);
-            dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}}
-    else{
-        NEWTONS_METHOD<T> newtons_method;
-        newtons_method.tolerance=example.newton_tolerance*example.dt;
-        newtons_method.progress_tolerance=1e-5;
-        newtons_method.max_iterations=example.newton_iterations;
-        newtons_method.krylov_tolerance=example.solver_tolerance;
-        newtons_method.max_krylov_iterations=example.solver_iterations;
-        newtons_method.use_cg=true;
-        newtons_method.debug=true;
-
-        example.Update_Lagged_Forces(example.time);
-        newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance);
-        LOG::printf("max velocity: %P\n",Max_Particle_Speed());
-        if(example.test_diff) objective.Test_Diff(dv);
-
-        objective.system.forced_collisions.Remove_All();
-        bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
-        if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;}
-
-    Apply_Friction();
-    objective.Restore_F();
-
-#pragma omp parallel for
-    for(int i=0;i<example.valid_grid_indices.m;i++){
-        int j=example.valid_grid_indices(i);
-        example.velocity_new.array(j)=dv.u.array(j)+objective.v0.u.array(j);}
-    example.velocity_new.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
-    example.current_velocity=&example.velocity_new;
 }
 //#####################################################################
 // Function Perform_Particle_Collision
@@ -419,25 +382,6 @@ Perform_Particle_Collision(int p,T time)
 template<class TV> void MPM_KKT_DRIVER<TV>::
 Apply_Friction()
 {
-    if(!example.collision_objects.m) return;
-    objective.Adjust_For_Collision(dv);
-    objective.Compute_Unconstrained(dv,0,&objective.tmp0,0);
-    objective.tmp1=objective.tmp0;
-    objective.Project_Gradient_And_Prune_Constraints(objective.tmp1,true);
-
-    objective.v1.u.array.Subset(objective.system.stuck_nodes).Fill(TV());
-    for(int i=0;i<objective.system.collisions.m;i++){
-        const typename MPM_KRYLOV_SYSTEM<TV>::COLLISION& c=objective.system.collisions(i);
-        TV& v=objective.v1.u.array(c.p);
-        T normal_force=TV::Dot_Product(c.n,objective.tmp0.u.array(c.p)-objective.tmp1.u.array(c.p));
-        TV t=v.Projected_Orthogonal_To_Unit_Direction(c.n);
-        T t_mag=t.Normalize();
-        T coefficient_of_friction=example.collision_objects(c.object)->friction;
-        T k=coefficient_of_friction*normal_force/example.mass.array(c.p);
-        if(t_mag<=k)
-            v.Project_On_Unit_Direction(c.n);
-        else v-=k*t;
-        dv.u.array(c.p)=v-objective.v0.u.array(c.p);}
 }
 //#####################################################################
 // Function Compute_Dt

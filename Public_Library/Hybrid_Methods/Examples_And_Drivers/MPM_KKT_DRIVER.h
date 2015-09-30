@@ -9,13 +9,10 @@
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 namespace PhysBAM{
 
-template<class TV> class FLUID_KRYLOV_SYSTEM;
-template<class TV> class FLUID_KRYLOV_VECTOR;
-template<class TV> class KKT_KRYLOV_SYSTEM;
-template<class TV> class KKT_KRYLOV_VECTOR;
+template<class TV> class MPM_KKT_KRYLOV_SYSTEM;
+template<class TV> class MPM_KKT_KRYLOV_VECTOR;
 template<class TV> class MPM_KKT_EXAMPLE;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
-template<class TV> class MPM_KKT_KRYLOV_VECTOR;
 template<class T> class KRYLOV_VECTOR_BASE;
 
 template<class TV>
@@ -30,9 +27,9 @@ public:
     int output_number;
 
     MPM_KKT_EXAMPLE<TV>& example;
-    KKT_KRYLOV_SYSTEM<TV>& kkt_sys;
-    KKT_KRYLOV_VECTOR<TV>& kkt_lhs;
-    KKT_KRYLOV_VECTOR<TV>& kkt_rhs;
+    MPM_KKT_KRYLOV_SYSTEM<TV>& kkt_sys;
+    MPM_KKT_KRYLOV_VECTOR<TV>& kkt_lhs;
+    MPM_KKT_KRYLOV_VECTOR<TV>& kkt_rhs;
     
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
 
@@ -53,6 +50,7 @@ public:
     void Apply_Forces();
     void Perform_Particle_Collision(int p,T time);
     void Apply_Friction();
+    void Initialize_Location(const RANGE<TV_INT>& range,const GRID<TV>& grid,ARRAY<TV,TV_INT>& location);
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
     T Grid_V_Upper_Bound() const;

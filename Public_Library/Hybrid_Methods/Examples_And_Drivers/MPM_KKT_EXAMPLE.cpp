@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2015, Craig Schroeder.
+// Copyright 2015, Craig Schroeder, apt.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Log/LOG.h>
@@ -10,26 +10,27 @@
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
-#include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
+#include <Hybrid_Methods/Examples_And_Drivers/MPM_KKT_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
-#include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_WEIGHTS_SPLINE.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class TV> MPM_EXAMPLE<TV>::
-MPM_EXAMPLE(const STREAM_TYPE stream_type)
+template<class TV> MPM_KKT_EXAMPLE<TV>::
+MPM_KKT_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(&particles,0)),
     debug_particles(*new DEBUG_PARTICLES<TV>),current_velocity(0),
     lagrangian_forces(deformable_body_collection.deformables_forces),
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
-    force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff)),incompressible(false),kkt(false),
+    gather_scatter_coarse(*new GATHER_SCATTER<TV>(coarse_grid,simulated_particles)),
+    force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff)),
     initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),
     mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
@@ -43,14 +44,15 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class TV> MPM_EXAMPLE<TV>::
-~MPM_EXAMPLE()
+template<class TV> MPM_KKT_EXAMPLE<TV>::
+~MPM_KKT_EXAMPLE()
 {
     delete &deformable_body_collection;
     delete &particles;
     delete &debug_particles;
     delete weights;
     delete &gather_scatter;
+    delete &gather_scatter_coarse;
     delete &force_helper;
     collision_objects.Delete_Pointers_And_Clean_Memory();
     fluid_walls.Delete_Pointers_And_Clean_Memory();
@@ -60,7 +62,7 @@ template<class TV> MPM_EXAMPLE<TV>::
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Write_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
@@ -68,8 +70,6 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),*current_velocity);
-    if(incompressible)
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),velocity_new_f);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/density",output_directory.c_str(),frame),mass);
     FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
     int static_frame=output_structures_each_frame?frame:-1;
@@ -80,6 +80,14 @@ Write_Output_Files(const int frame)
     for(int i=0;i<particles.X.m;i++){
         Add_Debug_Particle(particles.X(i),particles.valid(i)?(*color_attribute)(i):VECTOR<T,3>(1,0,1));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(i));}
+    for(int i=0;i<valid_pressure_indices.m;i++){
+        int id=valid_pressure_indices(i);
+        Add_Debug_Particle(coarse_location.array(id),VECTOR<T,3>(0,0,1));}
+    for(int i=0;i<valid_velocity_indices.m;i++){
+        int id=valid_velocity_indices(i);
+        Add_Debug_Particle(location.array(id),VECTOR<T,3>(1,0,0));
+        //Debug_Particle_Set_Attribute<VECTOR<T,1>>(ATTRIBUTE_ID_EFFECTIVE_MASS,VECTOR<T,1>(mass.array(id)));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,velocity.array(id));}
     GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
     for(int i=0;i<collision_objects.m;i++)
         if(IMPLICIT_OBJECT<TV>* io=collision_objects(i)->Get_Implicit_Object(time))
@@ -91,7 +99,7 @@ Write_Output_Files(const int frame)
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
@@ -101,7 +109,7 @@ Read_Output_Files(const int frame)
 //#####################################################################
 // Function Capture_Stress
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Capture_Stress()
 {
     force_helper.Fn=particles.F;
@@ -110,7 +118,7 @@ Capture_Stress()
 //#####################################################################
 // Function Precompute_Forces
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Precompute_Forces(const T time,const T dt,const bool update_hessian)
 {
     for(int i=0;i<forces.m;i++)
@@ -120,7 +128,7 @@ Precompute_Forces(const T time,const T dt,const bool update_hessian)
 //#####################################################################
 // Function Potential_Energy
 //#####################################################################
-template<class TV> typename TV::SCALAR MPM_EXAMPLE<TV>::
+template<class TV> typename TV::SCALAR MPM_KKT_EXAMPLE<TV>::
 Potential_Energy(const T time) const
 {
     typename TV::SCALAR pe=0;
@@ -133,7 +141,7 @@ Potential_Energy(const T time) const
 //#####################################################################
 // Function Add_Forces
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
     for(int i=0;i<forces.m;i++)
@@ -150,7 +158,7 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 //#####################################################################
 // Function Add_Hessian_Times
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const
 {
     for(int i=0;i<forces.m;i++)
@@ -172,7 +180,7 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
 //#####################################################################
 // Function Add_Force
 //#####################################################################
-template<class TV> int MPM_EXAMPLE<TV>::
+template<class TV> int MPM_KKT_EXAMPLE<TV>::
 Add_Force(PARTICLE_GRID_FORCES<TV>& force)
 {
     return forces.Append(&force);
@@ -180,7 +188,7 @@ Add_Force(PARTICLE_GRID_FORCES<TV>& force)
 //#####################################################################
 // Function Add_Force
 //#####################################################################
-template<class TV> int MPM_EXAMPLE<TV>::
+template<class TV> int MPM_KKT_EXAMPLE<TV>::
 Add_Force(DEFORMABLES_FORCES<TV>& force)
 {
     return deformable_body_collection.Add_Force(&force);
@@ -188,22 +196,22 @@ Add_Force(DEFORMABLES_FORCES<TV>& force)
 //#####################################################################
 // Function Set_Weights
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input)
 {
     weights=weights_input;
     gather_scatter.weights=weights;
-    for(int i=0;i<TV::m;++i)
-        if(weights->Order()==2)
-            coarse_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,threads,i);
-        else if(weights->Order()==3)
-            coarse_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads,i);
-        else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
+    if(weights->Order()==2)
+        coarse_weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(coarse_grid,threads);
+    else if(weights->Order()==3)
+        coarse_weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(coarse_grid,threads);
+    else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
+    gather_scatter_coarse.weights=coarse_weights;
 }
 //#####################################################################
 // Function Total_Particle_Linear_Momentum
 //#####################################################################
-template<class TV> TV MPM_EXAMPLE<TV>::
+template<class TV> TV MPM_KKT_EXAMPLE<TV>::
 Total_Particle_Linear_Momentum() const
 {
     TV result;
@@ -222,17 +230,17 @@ Total_Particle_Linear_Momentum() const
 //#####################################################################
 // Function Total_Grid_Linear_Momentum
 //#####################################################################
-template<class TV> TV MPM_EXAMPLE<TV>::
+template<class TV> TV MPM_KKT_EXAMPLE<TV>::
 Total_Grid_Linear_Momentum(const ARRAY<TV,TV_INT>& u) const
 {
     TV result;
 #pragma omp parallel for
     for(int t=0;t<threads;t++){
-        int a=t*valid_grid_indices.m/threads;
-        int b=(t+1)*valid_grid_indices.m/threads;
+        int a=t*valid_velocity_indices.m/threads;
+        int b=(t+1)*valid_velocity_indices.m/threads;
         TV result_local;
         for(int k=a;k<b;k++){
-            int j=valid_grid_indices(k);
+            int j=valid_velocity_indices(k);
             result_local+=mass.array(j)*u.array(j);}
 #pragma omp critical
         result+=result_local;}
@@ -241,7 +249,7 @@ Total_Grid_Linear_Momentum(const ARRAY<TV,TV_INT>& u) const
 //#####################################################################
 // Function Total_Grid_Angular_Momentum
 //#####################################################################
-template<class TV> typename TV::SPIN MPM_EXAMPLE<TV>::
+template<class TV> typename TV::SPIN MPM_KKT_EXAMPLE<TV>::
 Total_Particle_Angular_Momentum() const
 {
     typename TV::SPIN result;
@@ -261,17 +269,17 @@ Total_Particle_Angular_Momentum() const
 //#####################################################################
 // Function Total_Grid_Angular_Momentum
 //#####################################################################
-template<class TV> typename TV::SPIN MPM_EXAMPLE<TV>::
+template<class TV> typename TV::SPIN MPM_KKT_EXAMPLE<TV>::
 Total_Grid_Angular_Momentum(T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0) const
 {
     typename TV::SPIN result;
 #pragma omp parallel for
     for(int t=0;t<threads;t++){
-        int a=t*valid_grid_indices.m/threads;
-        int b=(t+1)*valid_grid_indices.m/threads;
+        int a=t*valid_velocity_indices.m/threads;
+        int b=(t+1)*valid_velocity_indices.m/threads;
         typename TV::SPIN result_local;
         for(int k=a;k<b;k++){
-            int i=valid_grid_indices(k);
+            int i=valid_velocity_indices(k);
             TV X=location.array(i);
             if(use_midpoint && u0) X+=dt/2*u0->array(i);
             result_local+=mass.array(i)*TV::Cross_Product(X,u.array(i));}
@@ -282,20 +290,20 @@ Total_Grid_Angular_Momentum(T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT
 //#####################################################################
 // Function Total_Grid_Kinetic_Energy
 //#####################################################################
-template<class TV> typename TV::SCALAR MPM_EXAMPLE<TV>::
+template<class TV> typename TV::SCALAR MPM_KKT_EXAMPLE<TV>::
 Total_Grid_Kinetic_Energy(const ARRAY<TV,TV_INT>& u) const
 {
     T result=0;
 #pragma omp parallel for reduction(+:result)
-    for(int i=0;i<valid_grid_indices.m;i++){
-        int j=valid_grid_indices(i);
+    for(int i=0;i<valid_velocity_indices.m;i++){
+        int j=valid_velocity_indices(i);
         result+=(T).5*mass.array(j)*u.array(j).Magnitude_Squared();}
     return result;
 }
 //#####################################################################
 // Function Total_Particle_Kinetic_Energy
 //#####################################################################
-template<class TV> typename TV::SCALAR MPM_EXAMPLE<TV>::
+template<class TV> typename TV::SCALAR MPM_KKT_EXAMPLE<TV>::
 Total_Particle_Kinetic_Energy() const
 {
     T result=0,Dp_inverse=0;
@@ -312,7 +320,7 @@ Total_Particle_Kinetic_Energy() const
 //#####################################################################
 // Function Average_Particle_Mass
 //#####################################################################
-template<class TV> typename TV::SCALAR MPM_EXAMPLE<TV>::
+template<class TV> typename TV::SCALAR MPM_KKT_EXAMPLE<TV>::
 Average_Particle_Mass() const
 {
     T result=0;
@@ -324,7 +332,7 @@ Average_Particle_Mass() const
 //#####################################################################
 // Function Add_Collision_Object
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction)
 {
     collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,type,friction));
@@ -332,7 +340,7 @@ Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction)
 //#####################################################################
 // Function Add_Fluid_Wall
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io)
 {
     fluid_walls.Append(io);
@@ -340,7 +348,7 @@ Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io)
 //#####################################################################
 // Function Update_Lagged_Forces
 //#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
+template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Update_Lagged_Forces(const T time) const
 {
     for(int i=0;i<deformable_body_collection.deformables_forces.m;i++)
@@ -349,8 +357,8 @@ Update_Lagged_Forces(const T time) const
 }
 //#####################################################################
 namespace PhysBAM{
-template class MPM_EXAMPLE<VECTOR<float,2> >;
-template class MPM_EXAMPLE<VECTOR<float,3> >;
-template class MPM_EXAMPLE<VECTOR<double,2> >;
-template class MPM_EXAMPLE<VECTOR<double,3> >;
+template class MPM_KKT_EXAMPLE<VECTOR<float,2> >;
+template class MPM_KKT_EXAMPLE<VECTOR<float,3> >;
+template class MPM_KKT_EXAMPLE<VECTOR<double,2> >;
+template class MPM_KKT_EXAMPLE<VECTOR<double,3> >;
 }
