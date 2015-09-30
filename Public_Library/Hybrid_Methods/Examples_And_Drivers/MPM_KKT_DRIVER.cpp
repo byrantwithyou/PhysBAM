@@ -266,12 +266,15 @@ Particle_To_Grid()
         },true);
 
     example.valid_velocity_indices.Remove_All();
+    example.valid_velocity_cell_indices.Remove_All();
     example.valid_pressure_indices.Remove_All();
+    example.valid_pressure_cell_indices.Remove_All();
 
     for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
         int i=example.mass.Standard_Index(it.index);
         if(example.mass.array(i)){
             example.valid_velocity_indices.Append(i);
+            example.valid_velocity_cell_indices.Append(it.index);
             example.velocity.array(i)/=example.mass.array(i);}
         else example.velocity.array(i)=TV();}
             
@@ -279,6 +282,7 @@ Particle_To_Grid()
         int i=example.mass_coarse.Standard_Index(it.index);
         if(example.mass_coarse.array(i)){
             example.valid_pressure_indices.Append(i);
+            example.valid_pressure_cell_indices.Append(it.index);
             example.one_over_lambda.array(i)/=example.mass_coarse.array(i);
             example.J.array(i)/=example.mass_coarse.array(i);}}
 }
@@ -352,6 +356,27 @@ Grid_To_Particle()
 template<class TV> void MPM_KKT_DRIVER<TV>::
 Solve_KKT_System()
 {
+    kkt_sys.Build_Div_Matrix();
+    //OCTAVE_OUTPUT<T> oo("kmatrix.dat");
+    //oo.Write("K",kkt_sys,kkt_lhs,kkt_rhs);
+    kkt_lhs.u.Fill(TV());kkt_rhs.u.Fill(TV());
+    kkt_lhs.p.Fill((T)0);kkt_rhs.p.Fill((T)0);
+    // Add gravity
+    example.Capture_Stress();
+    example.Precompute_Forces(example.time,example.dt,false);
+    example.Add_Forces(kkt_rhs.u,example.time);
+    for(int t=0;t<example.valid_velocity_cell_indices.m;t++){
+        int id=example.valid_velocity_indices(t);
+        kkt_rhs.u.array(id)+=example.mass.array(id)*(example.velocity.array(id)/example.dt);}
+    for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
+        int id=example.valid_pressure_indices(t);
+        kkt_rhs.p.array(id)=((T)1-example.J.array(id))/(example.dt*example.J.array(id));}
+    // MINRES 
+    MINRES<T> mr;
+    int max_iterations=1000;
+    mr.Solve(kkt_sys,kkt_lhs,kkt_rhs,av,1e-12,0,max_iterations);
+    // Update velocity on grid
+    example.velocity_new=kkt_lhs.u;
 }
 //#####################################################################
 // Function Apply_Forces

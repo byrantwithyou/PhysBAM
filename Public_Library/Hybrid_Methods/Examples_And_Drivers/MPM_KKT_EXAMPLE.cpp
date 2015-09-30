@@ -113,7 +113,6 @@ template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Capture_Stress()
 {
     force_helper.Fn=particles.F;
-    if(particles.store_S) force_helper.Sn=particles.S;
 }
 //#####################################################################
 // Function Precompute_Forces

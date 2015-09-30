@@ -47,7 +47,9 @@ public:
     ARRAY<TV,TV_INT> coarse_location;
     ARRAY<TV,TV_INT> velocity,velocity_new,*current_velocity;
     ARRAY<int> valid_velocity_indices;
+    ARRAY<TV_INT> valid_velocity_cell_indices;
     ARRAY<int> valid_pressure_indices;
+    ARRAY<TV_INT> valid_pressure_cell_indices;
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
     ARRAY<DEFORMABLES_FORCES<TV>*>& lagrangian_forces;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
@@ -63,11 +65,8 @@ public:
 
     // kkt stuff
     ARRAY<int,TV_INT> cell_flags;
-    bool kkt;
     ARRAY<T,TV_INT> one_over_lambda;
     ARRAY<T,TV_INT> J;
-    SPARSE_MATRIX_FLAT_MXN<T> DT;
-    SPARSE_MATRIX_FLAT_MXN<T> B;
 
     T initial_time;
     int last_frame;

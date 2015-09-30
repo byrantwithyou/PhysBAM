@@ -22,6 +22,8 @@ class MPM_KKT_KRYLOV_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     const MPM_KKT_EXAMPLE<TV>& example;
+    SPARSE_MATRIX_FLAT_MXN<T> D;
+    SPARSE_MATRIX_FLAT_MXN<T> B;
     MPM_KKT_KRYLOV_SYSTEM(const MPM_KKT_EXAMPLE<TV>& example);
     virtual ~MPM_KKT_KRYLOV_SYSTEM();
 
@@ -32,6 +34,7 @@ public:
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& V) const override;
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const override;
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const override;
+    void Build_Div_Matrix();
 };
 }
 #endif

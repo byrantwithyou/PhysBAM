@@ -82,6 +82,7 @@ Initialize()
             TV total_momentum=particles.V.Weighted_Sum(particles.mass);
             TV dV=total_momentum/total_mass;
             particles.V-=dV;
+            Add_Gravity(TV(0,-0.8));
             Add_Neo_Hookean(1e3*scale_E,0.3);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
