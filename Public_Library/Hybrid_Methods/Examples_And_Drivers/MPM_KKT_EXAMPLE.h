@@ -50,6 +50,8 @@ public:
     ARRAY<TV_INT> valid_velocity_cell_indices;
     ARRAY<int> valid_pressure_indices;
     ARRAY<TV_INT> valid_pressure_cell_indices;
+    ARRAY<int,TV_INT> inv_valid_pressure_cell;
+    ARRAY<int,TV_INT> inv_valid_velocity_cell;
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
     ARRAY<DEFORMABLES_FORCES<TV>*>& lagrangian_forces;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;

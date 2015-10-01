@@ -85,7 +85,8 @@ Initialize()
     example.mass_coarse.Resize(example.coarse_grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity_new.Resize(example.grid.Domain_Indices(example.ghost));
-
+    example.inv_valid_pressure_cell.Resize(example.coarse_grid.Domain_Indices(example.ghost));
+    example.inv_valid_velocity_cell.Resize(example.grid.Domain_Indices(example.ghost));
     example.particles.Store_B(example.use_affine);
     example.particles.Store_S(example.use_oldroyd);
     example.particles.Store_One_Over_Lambda(true);
@@ -133,7 +134,6 @@ template<class TV> void MPM_KKT_DRIVER<TV>::
 Advance_One_Time_Step()
 {
     example.Begin_Time_Step(example.time);
-    
     Update_Simulated_Particles();
     Print_Particle_Stats("particle state",example.dt);
     Update_Particle_Weights();
@@ -269,10 +269,12 @@ Particle_To_Grid()
     example.valid_velocity_cell_indices.Remove_All();
     example.valid_pressure_indices.Remove_All();
     example.valid_pressure_cell_indices.Remove_All();
-
+    example.inv_valid_pressure_cell.Fill(-1);
+    example.inv_valid_velocity_cell.Fill(-1);
     for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
         int i=example.mass.Standard_Index(it.index);
         if(example.mass.array(i)){
+            example.inv_valid_velocity_cell.array(i)=example.valid_velocity_cell_indices.m;
             example.valid_velocity_indices.Append(i);
             example.valid_velocity_cell_indices.Append(it.index);
             example.velocity.array(i)/=example.mass.array(i);}
@@ -281,11 +283,46 @@ Particle_To_Grid()
     for(RANGE_ITERATOR<TV::m> it(example.mass_coarse.domain);it.Valid();it.Next()){
         int i=example.mass_coarse.Standard_Index(it.index);
         if(example.mass_coarse.array(i)){
+            example.inv_valid_pressure_cell.array(i)=example.valid_pressure_cell_indices.m;
             example.valid_pressure_indices.Append(i);
             example.valid_pressure_cell_indices.Append(it.index);
             example.one_over_lambda.array(i)/=example.mass_coarse.array(i);
             example.J.array(i)/=example.mass_coarse.array(i);}}
+    
+    // Add ghost pressure and velocity
+    ARRAY<TV_INT> ghost_velocity,ghost_pressure;
+    RANGE<TV_INT> local_range(TV_INT::Constant_Vector(-1),TV_INT::Constant_Vector(2));
+    int initial_velocity_size=example.valid_velocity_indices.m;
+    int initial_pressure_size=example.valid_pressure_indices.m;
+    LOG::printf("initial_velocity_size=%P\n",initial_velocity_size);
+    LOG::printf("initial_presure_size=%P\n",initial_pressure_size);
+    for(int i=0;i<initial_velocity_size;i++){
+        TV_INT vid=example.valid_velocity_cell_indices(i);
+        for(RANGE_ITERATOR<TV::m> it(local_range);it.Valid();it.Next()){
+            TV_INT index_possible_ghost_velocity=it.index+vid;
+            if(example.inv_valid_velocity_cell(index_possible_ghost_velocity)==-1){
+                example.inv_valid_velocity_cell(index_possible_ghost_velocity)=example.valid_velocity_cell_indices.m;
+                example.valid_velocity_cell_indices.Append(index_possible_ghost_velocity);
+                example.valid_velocity_indices.Append(example.velocity.Standard_Index(index_possible_ghost_velocity));}}
+        TV_INT pressure_min_corner=vid/2;
+        TV_INT pressure_max_corner=TV_INT::Constant_Vector(2);
+        for(int axis=0;axis<TV::m;axis++)
+            if(vid(axis)%2==0){
+                pressure_max_corner(axis)++;
+                pressure_min_corner(axis)--;}
+        RANGE<TV_INT> pressure_range(TV_INT(),pressure_max_corner);
+        for(RANGE_ITERATOR<TV::m> pit(pressure_range);pit.Valid();pit.Next()){
+            TV_INT pid=pit.index;
+            if(example.inv_valid_pressure_cell(pid)==-1){
+                example.inv_valid_pressure_cell(pid)=example.valid_pressure_cell_indices.m;
+                example.valid_pressure_cell_indices.Append(pid);
+                example.valid_pressure_indices.Append(example.mass_coarse.Standard_Index(pid));}}}
+    LOG::printf("final_velocity_size=%P\n",example.valid_velocity_indices.m);
+    LOG::printf("final_presure_size=%P\n",example.valid_pressure_indices.m);
 }
+    
+
+//}
 //#####################################################################
 // Function Grid_To_Particle
 //#####################################################################
@@ -357,8 +394,8 @@ template<class TV> void MPM_KKT_DRIVER<TV>::
 Solve_KKT_System()
 {
     kkt_sys.Build_Div_Matrix();
-    //OCTAVE_OUTPUT<T> oo("kmatrix.dat");
-    //oo.Write("K",kkt_sys,kkt_lhs,kkt_rhs);
+    OCTAVE_OUTPUT<T> oo("kmatrix.dat");
+    oo.Write("K",kkt_sys,kkt_lhs,kkt_rhs);
     kkt_lhs.u.Fill(TV());kkt_rhs.u.Fill(TV());
     kkt_lhs.p.Fill((T)0);kkt_rhs.p.Fill((T)0);
     // Add gravity
@@ -370,12 +407,12 @@ Solve_KKT_System()
         kkt_rhs.u.array(id)+=example.mass.array(id)*(example.velocity.array(id)/example.dt);}
     for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
         int id=example.valid_pressure_indices(t);
-        kkt_rhs.p.array(id)=((T)1-example.J.array(id))/(example.dt*example.J.array(id));}
+        if(example.mass_coarse.array(id))
+            kkt_rhs.p.array(id)=((T)1-example.J.array(id))/(example.dt*example.J.array(id));}
     // MINRES 
     MINRES<T> mr;
     int max_iterations=1000;
     mr.Solve(kkt_sys,kkt_lhs,kkt_rhs,av,1e-12,0,max_iterations);
-    // Update velocity on grid
     example.velocity_new=kkt_lhs.u;
 }
 //#####################################################################

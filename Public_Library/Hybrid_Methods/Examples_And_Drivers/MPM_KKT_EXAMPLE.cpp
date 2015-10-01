@@ -33,7 +33,7 @@ MPM_KKT_EXAMPLE(const STREAM_TYPE stream_type)
     force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff)),
     initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),
-    mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
+    mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(5),
     use_reduced_rasterization(false),use_affine(false),use_f2p(false),use_midpoint(false),use_symplectic_euler(false),
     use_particle_collision(false),use_early_gradient_transfer(false),use_oldroyd(false),print_stats(false),flip(0),
     cfl(1),inv_Wi(0),newton_tolerance(1),newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),

@@ -58,8 +58,9 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
     //-(one_over_lambda/(J*dt))*p
     const T pressure_volume_scale=example.coarse_grid.DX().Product();
     for(int t=0;t<example.valid_pressure_indices.m;t++){
-        TV_INT cell=example.valid_pressure_cell_indices(t); 
-        F.p(cell)-=pressure_volume_scale*one_over_dt*example.one_over_lambda(cell)/example.J(cell)*V.p(cell);}
+        TV_INT cell=example.valid_pressure_cell_indices(t);
+        if(example.mass_coarse(cell))
+            F.p(cell)-=pressure_volume_scale*one_over_dt*example.one_over_lambda(cell)/example.J(cell)*V.p(cell);}
 }
 //#####################################################################
 // Function Inner_Product
@@ -108,13 +109,43 @@ Project_Nullspace(KRYLOV_VECTOR_BASE<T>& V) const
 template<class TV> void MPM_KKT_KRYLOV_SYSTEM<TV>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BR) const
 {
-}
+} 
 //#####################################################################
 // Function Set_Boundary_Conditions
 //#####################################################################
 template<class TV> void MPM_KKT_KRYLOV_SYSTEM<TV>::
 Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const
 {
+}
+//#####################################################################
+// Function Get_Appropriate_DF
+//#####################################################################
+template<class TV> ARRAY<ARRAY<TV,VECTOR<int,TV::m> >,VECTOR<int,TV::m> >
+Get_Appropriate_DF(VECTOR<int,TV::m> element_index)
+{
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
+    static const T dwt1[][3]={{-(5.0/96),1.0/24,1.0/96},{-(7.0/16),0,7.0/16},{-(1.0/96),-(1.0/24),5.0/96}};
+    static const T wt1[][3]={{17.0/768,5.0/128,1.0/768},{55.0/384,113.0/192,55.0/384},{1.0/768,5.0/128,17.0/768}};
+    static const T dwt2[][3]={{-(7.0/24),1.0/12,5.0/24},{-(5.0/24),-(1.0/12),7.0/24}};
+    static const T wt2[][3]={{5.0/48,1.0/3,1.0/16},{1.0/16,1.0/3,5.0/48}};
+    TV_INT pressure_max_corner=TV_INT::Constant_Vector(2);
+    for(int axis=0;axis<TV::m;axis++)
+        if(element_index(axis)%2==0) pressure_max_corner(axis)++;
+    RANGE<TV_INT> pressure_range(TV_INT(),pressure_max_corner);
+    RANGE<TV_INT> velocity_range(TV_INT(),TV_INT::Constant_Vector(3));
+    ARRAY<ARRAY<TV,TV_INT>,TV_INT> wt(pressure_range);
+    for(RANGE_ITERATOR<TV::m> pit(pressure_range);pit.Valid();pit.Next()){
+        wt(pit.index).Resize(velocity_range);
+        wt(pit.index).Fill(TV::All_Ones_Vector());
+        for(RANGE_ITERATOR<TV::m> vit(velocity_range);vit.Valid();vit.Next())
+            for(int xyz=0;xyz<TV::m;xyz++)
+                for(int paxis=0;paxis<TV::m;paxis++){
+                    if(element_index(xyz)%2==0)
+                        wt(pit.index)(vit.index)(xyz)*=xyz==paxis?dwt1[pit.index(paxis)][vit.index(paxis)]:wt1[pit.index(paxis)][vit.index(paxis)];
+                    else
+                        wt(pit.index)(vit.index)(xyz)*=xyz==paxis?dwt2[pit.index(paxis)][vit.index(paxis)]:wt2[pit.index(paxis)][vit.index(paxis)];}}
+    return wt;
 }
 //#####################################################################
 // Function Precompute_Div_Coefficients
@@ -140,20 +171,38 @@ Precompute_Div_Coefficients()
 template<class TV> void MPM_KKT_KRYLOV_SYSTEM<TV>::
 Build_Div_Matrix()
 {
-    PHYSBAM_ASSERT(example.weights->Order());
+    PHYSBAM_ASSERT(example.weights->Order()==2);
     static const ARRAY<TV,TV_INT> wt=Precompute_Div_Coefficients<TV>();
     const T dx_scale=pow(example.grid.DX()(0),TV::m-1);
     D.Reset(TV::m*example.velocity.array.m);
     for(int row=0;row<example.valid_pressure_indices.m;row++){
         TV_INT pid=example.valid_pressure_cell_indices(row);
-        TV_INT vid=2*pid-1;
-        RANGE<TV_INT> local_range(-3*TV_INT::All_Ones_Vector(),4*TV_INT::All_Ones_Vector());
+        TV_INT vid=2*pid;
+        RANGE<TV_INT> local_range(-4*TV_INT::All_Ones_Vector(),5*TV_INT::All_Ones_Vector());
         for(RANGE_ITERATOR<TV::m> it(local_range);it.Valid();it.Next())
-            for(int axis=0;axis<TV::m;axis++)
-                if(example.mass(vid+it.index))
-                    D.Append_Entry_To_Current_Row(TV::m*example.velocity.Standard_Index(vid+it.index)+axis,wt(it.index)(axis)*dx_scale);
+            for(int axis=0;axis<TV::m;axis++){
+                D.Append_Entry_To_Current_Row(TV::m*example.velocity.Standard_Index(vid+it.index)+axis,0);}
         D.Finish_Row();}
     D.Sort_Entries();
+    int skip=0;
+    for(int element=0;element<example.valid_velocity_indices.m;element++){
+        TV_INT vid_cell=example.valid_velocity_cell_indices(element);
+        ARRAY<ARRAY<TV,TV_INT>,TV_INT> wt=Get_Appropriate_DF<TV>(vid_cell);
+        TV_INT min_corner(vid_cell/2);
+        for(int axis=0;axis<TV::m;axis++)
+            if(vid_cell(axis)%2==0) min_corner(axis)--;
+        for(RANGE_ITERATOR<TV::m> pit(wt.domain);pit.Valid();pit.Next()){
+            TV_INT pressure_index=pit.index+min_corner;
+            int row=example.inv_valid_pressure_cell(pressure_index);
+            if(row==-1){
+                skip++;
+                //LOG::printf("skip=%P\n",skip);
+                continue;}
+            for(RANGE_ITERATOR<TV::m> vit(wt(pit.index).domain);vit.Valid();vit.Next()){
+                if(example.inv_valid_velocity_cell(vit.index+vid_cell-1)!=-1)
+                for(int axis=0;axis<TV::m;axis++){
+                    int col=TV::m*example.velocity.Standard_Index(vit.index+vid_cell-1)+axis;
+                        D(row,col)+=wt(pit.index)(vit.index)(axis);}}}}
 } 
 template class MPM_KKT_KRYLOV_SYSTEM<VECTOR<float,1> >;
 template class MPM_KKT_KRYLOV_SYSTEM<VECTOR<float,2> >;
