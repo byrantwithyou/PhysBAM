@@ -7,6 +7,7 @@
 
 #include <Tools/Math_Tools/Robust_Arithmetic.h>
 #include <Tools/Matrices/MATRIX_BASE.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR_1D.h>
 #include <Tools/Vectors/ZERO_VECTOR.h>
@@ -136,8 +137,11 @@ public:
     MATRIX Cofactor_Matrix() const
     {return MATRIX(1);}
 
-    MATRIX Normal_Equations_Matrix() const // 1 mult
-    {return MATRIX(sqr(x00));}
+    SYMMETRIC_MATRIX<T,1> Normal_Equations_Matrix() const // 1 mult
+    {return SYMMETRIC_MATRIX<T,1>(sqr(x00));}
+
+    SYMMETRIC_MATRIX<T,1> Outer_Product_Matrix() const // 1 mult
+    {return SYMMETRIC_MATRIX<T,1>(sqr(x00));}
 
     MATRIX operator-() const
     {return MATRIX(-x00);}
@@ -245,6 +249,9 @@ public:
 
     MATRIX Transposed() const
     {return *this;}
+
+    static MATRIX Cross_Product_Matrix(const VECTOR<T,0>& v)
+    {return MATRIX(0);}
 
     T Trace() const
     {return x00;}
