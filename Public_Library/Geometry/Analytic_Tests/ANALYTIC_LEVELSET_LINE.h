@@ -7,17 +7,16 @@
 #ifndef __ANALYTIC_LEVELSET_LINE__
 #define __ANALYTIC_LEVELSET_LINE__
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SIGNED.h>
-#include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 
 namespace PhysBAM{
 template<class TV>
 struct ANALYTIC_LEVELSET_LINE:public ANALYTIC_LEVELSET_SIGNED<TV>
 {
     typedef typename TV::SCALAR T;
-    typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE plane; // N points outward
-    ANALYTIC_LEVELSET_LINE(const TV& X,const TV& N,int c_i,int c_o): ANALYTIC_LEVELSET_SIGNED<TV>(c_i,c_o),plane(N.Normalized(),X) {}
-    virtual T phi2(const TV& X,T t) const {return plane.Signed_Distance(X);}
-    virtual TV N2(const TV& X,T t) const {return plane.normal;}
+    TV x,n;
+    ANALYTIC_LEVELSET_LINE(const TV& X,const TV& N,int c_i,int c_o): ANALYTIC_LEVELSET_SIGNED<TV>(c_i,c_o),x(X),n(N.Normalized()) {}
+    virtual T phi2(const TV& X,T t) const {return n.Dot(X-x);}
+    virtual TV N2(const TV& X,T t) const {return n;}
 };
 }
 #endif
