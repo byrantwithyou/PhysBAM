@@ -14,6 +14,21 @@ namespace PhysBAM{
 template<class T,int d> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
 
 template<class T>
+class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>
+{
+public:
+    T x0000;
+
+    MATRIX<T,1> Differential(const MATRIX<T,1>& dF) const
+    {return MATRIX<T,1>(x0000*dF.x[0]);}
+
+//#####################################################################
+    void Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,1>& F,const VECTOR<T,1>& dE_ds,const SYMMETRIC_MATRIX<T,1>& dE_dsds); // Not robust
+    void Enforce_Definiteness();
+//#####################################################################
+};
+
+template<class T>
 class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>
 {
 public:

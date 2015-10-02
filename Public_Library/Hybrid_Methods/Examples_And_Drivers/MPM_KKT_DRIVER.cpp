@@ -521,8 +521,10 @@ Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u)
 }
 //#####################################################################
 namespace PhysBAM{
+template class MPM_KKT_DRIVER<VECTOR<float,1> >;
 template class MPM_KKT_DRIVER<VECTOR<float,2> >;
 template class MPM_KKT_DRIVER<VECTOR<float,3> >;
+template class MPM_KKT_DRIVER<VECTOR<double,1> >;
 template class MPM_KKT_DRIVER<VECTOR<double,2> >;
 template class MPM_KKT_DRIVER<VECTOR<double,3> >;
 }

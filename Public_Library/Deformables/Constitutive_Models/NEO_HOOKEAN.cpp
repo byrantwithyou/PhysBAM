@@ -5,8 +5,10 @@
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Tools/Matrices/MATRIX_1X1.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX_1X1.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
@@ -32,6 +34,15 @@ NEO_HOOKEAN(const T youngs_modulus_input,const T poissons_ratio_input,const T Ra
 template<class T,int d> NEO_HOOKEAN<T,d>::
 ~NEO_HOOKEAN()
 {
+}
+//#####################################################################
+// Function Clamp_To_Hyperbola
+//#####################################################################
+template<class T,int d> DIAGONAL_MATRIX<T,1> NEO_HOOKEAN<T,d>::
+Clamp_To_Hyperbola(const DIAGONAL_MATRIX<T,1>& F) const
+{
+    if(sqr(F.x.x)>failure_threshold) return DIAGONAL_MATRIX<T,1>(failure_threshold);
+    else return DIAGONAL_MATRIX<T,1>(dth_root_failure_threshold);
 }
 //#####################################################################
 // Function Clamp_To_Hyperbola
@@ -114,6 +125,18 @@ P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T>
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN<T,d>::
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,1>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>& dP_dF,const int triangle) const
+{
+    DIAGONAL_MATRIX<T,1> F_inverse=(F.Determinant()>=failure_threshold?F:Clamp_To_Hyperbola(F)).Inverse();
+    T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
+    SYMMETRIC_MATRIX<T,1> F_inverse_outer=SYMMETRIC_MATRIX<T,1>::Outer_Product(F_inverse.To_Vector());
+    dP_dF.x0000=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;//alpha+beta+gamma
+    if(enforce_definiteness) dP_dF.Enforce_Definiteness();
+}
+//#####################################################################
+// Function Isotropic_Stress_Derivative
+//#####################################################################
+template<class T,int d> void NEO_HOOKEAN<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
 {
     DIAGONAL_MATRIX<T,2> F_inverse=(F.Determinant()>=failure_threshold?F:Clamp_To_Hyperbola(F)).Inverse();
@@ -159,8 +182,10 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
     return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
 }
 namespace PhysBAM{
+template class NEO_HOOKEAN<float,1>;
 template class NEO_HOOKEAN<float,2>;
 template class NEO_HOOKEAN<float,3>;
+template class NEO_HOOKEAN<double,1>;
 template class NEO_HOOKEAN<double,2>;
 template class NEO_HOOKEAN<double,3>;
 }

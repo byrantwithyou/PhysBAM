@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Tools/Log/LOG.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Tools/Matrices/MATRIX_1X1.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
@@ -65,6 +66,17 @@ Report_Diagnostics(const char* str,T g0,T g1,T dg0,T dg1,T e)
     T av=(dg0+dg1)/2;
     T dif=(g1-g0)/e;
     Report_Diagnostics(str, av, dif);
+}
+//#####################################################################
+// Function Report_Diagnostics
+//#####################################################################
+template<class T> static void
+Report_Diagnostics(const DIAGONAL_MATRIX<T,1>& F,T E0,T* E,const DIAGONAL_MATRIX<T,1>& P0,const DIAGONAL_MATRIX<T,1>* P,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>& dPi_dF0,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>* dPi_dF,T e)
+{
+    Report_Diagnostics("Px",E0,E[0],P0.x.x,P[0].x.x,e);
+
+    Report_Diagnostics("Hxx",P0.x.x,P[0].x.x,dPi_dF0.x0000,dPi_dF[0].x0000,e);
 }
 //#####################################################################
 // Function Report_Diagnostics
@@ -132,8 +144,10 @@ Test(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
     Report_Diagnostics(F,E0,E,P0,P,dPi_dF0,dPi_dF,e);
 }
 namespace PhysBAM{
+template class ISOTROPIC_CONSTITUTIVE_MODEL<float,1>;
 template class ISOTROPIC_CONSTITUTIVE_MODEL<float,2>;
 template class ISOTROPIC_CONSTITUTIVE_MODEL<float,3>;
+template class ISOTROPIC_CONSTITUTIVE_MODEL<double,1>;
 template class ISOTROPIC_CONSTITUTIVE_MODEL<double,2>;
 template class ISOTROPIC_CONSTITUTIVE_MODEL<double,3>;
 }

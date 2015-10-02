@@ -124,8 +124,10 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& Z,const T time) co
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {F(it.Index())+=tmp(p)*it.Gradient();},true);
 }
+template class MPM_FINITE_ELEMENTS<VECTOR<float,1> >;
 template class MPM_FINITE_ELEMENTS<VECTOR<float,2> >;
 template class MPM_FINITE_ELEMENTS<VECTOR<float,3> >;
+template class MPM_FINITE_ELEMENTS<VECTOR<double,1> >;
 template class MPM_FINITE_ELEMENTS<VECTOR<double,2> >;
 template class MPM_FINITE_ELEMENTS<VECTOR<double,3> >;
 }

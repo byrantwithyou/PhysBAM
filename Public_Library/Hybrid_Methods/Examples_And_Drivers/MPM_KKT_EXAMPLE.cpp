@@ -356,8 +356,10 @@ Update_Lagged_Forces(const T time) const
 }
 //#####################################################################
 namespace PhysBAM{
+template class MPM_KKT_EXAMPLE<VECTOR<float,1> >;
 template class MPM_KKT_EXAMPLE<VECTOR<float,2> >;
 template class MPM_KKT_EXAMPLE<VECTOR<float,3> >;
+template class MPM_KKT_EXAMPLE<VECTOR<double,1> >;
 template class MPM_KKT_EXAMPLE<VECTOR<double,2> >;
 template class MPM_KKT_EXAMPLE<VECTOR<double,3> >;
 }

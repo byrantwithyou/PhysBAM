@@ -6,13 +6,23 @@
 //#####################################################################
 #include <Tools/Log/LOG.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Tools/Matrices/MATRIX_1X1.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX_1X1.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 using namespace PhysBAM;
+//#####################################################################
+// Function Enforce_Definiteness
+//#####################################################################
+template<class T> void DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>::
+Enforce_Definiteness()
+{
+    x0000=clamp_min(x0000,(T)0);
+}
 //#####################################################################
 // Function Enforce_Definiteness
 //#####################################################################
@@ -58,6 +68,14 @@ Enforce_Definiteness(const T eigenvalue_clamp_percentage,const T epsilon)
 //#####################################################################
 // Function Compute_From_Singular_Value_Derivatives
 //#####################################################################
+template<class T> void DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>::
+Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,1>& F,const VECTOR<T,1>& dE_ds,const SYMMETRIC_MATRIX<T,1>& dE_dsds)
+{
+    x0000=dE_dsds.x00;
+}
+//#####################################################################
+// Function Compute_From_Singular_Value_Derivatives
+//#####################################################################
 template<class T> void DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>::
 Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,2>& F,const VECTOR<T,2>& dE_ds,const SYMMETRIC_MATRIX<T,2>& dE_dsds)
 {
@@ -94,8 +112,10 @@ Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,3>& F,const VECT
 }
 //#####################################################################
 namespace PhysBAM{
+template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<float,1>;
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<float,2>;
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<float,3>;
+template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<double,1>;
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<double,2>;
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<double,3>;
 }

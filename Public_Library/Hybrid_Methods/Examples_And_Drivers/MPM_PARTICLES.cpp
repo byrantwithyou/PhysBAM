@@ -86,8 +86,10 @@ static int Initialize_MPM_Particles()
 }
 int initialize_deformables_particles=Initialize_MPM_Particles();
 //#####################################################################
+template class MPM_PARTICLES<VECTOR<float,1> >;
 template class MPM_PARTICLES<VECTOR<float,2> >;
 template class MPM_PARTICLES<VECTOR<float,3> >;
+template class MPM_PARTICLES<VECTOR<double,1> >;
 template class MPM_PARTICLES<VECTOR<double,2> >;
 template class MPM_PARTICLES<VECTOR<double,3> >;
 }

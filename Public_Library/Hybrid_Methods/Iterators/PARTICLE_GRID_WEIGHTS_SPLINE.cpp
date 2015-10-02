@@ -150,16 +150,22 @@ Order() const
     return degree;
 }
 //#####################################################################
+template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,1>,1>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,2>,1>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,3>,1>;
+template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,1>,1>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,2>,1>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,3>,1>;
+template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,1>,2>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,2>,2>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,3>,2>;
+template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,1>,2>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,2>,2>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,3>,2>;
+template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,1>,3>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,2>,3>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,3>,3>;
+template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,1>,3>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,2>,3>;
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<double,3>,3>;
 }

@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Matrices/MATRIX_1X1.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Deformables/Constitutive_Models/CONSTITUTIVE_MODEL.h>
@@ -55,8 +56,10 @@ Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input
     constant_beta=Rayleigh_coefficient_input*constant_mu;
 }
 namespace PhysBAM{
+template class CONSTITUTIVE_MODEL<float,1>;
 template class CONSTITUTIVE_MODEL<float,2>;
 template class CONSTITUTIVE_MODEL<float,3>;
+template class CONSTITUTIVE_MODEL<double,1>;
 template class CONSTITUTIVE_MODEL<double,2>;
 template class CONSTITUTIVE_MODEL<double,3>;
 }

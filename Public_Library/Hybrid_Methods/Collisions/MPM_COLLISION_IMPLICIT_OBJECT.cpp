@@ -92,8 +92,10 @@ Get_Implicit_Object(T time)
     return io;
 }
 //#####################################################################
+template class MPM_COLLISION_IMPLICIT_OBJECT<VECTOR<float,1> >;
 template class MPM_COLLISION_IMPLICIT_OBJECT<VECTOR<float,2> >;
 template class MPM_COLLISION_IMPLICIT_OBJECT<VECTOR<float,3> >;
+template class MPM_COLLISION_IMPLICIT_OBJECT<VECTOR<double,1> >;
 template class MPM_COLLISION_IMPLICIT_OBJECT<VECTOR<double,2> >;
 template class MPM_COLLISION_IMPLICIT_OBJECT<VECTOR<double,3> >;
 }

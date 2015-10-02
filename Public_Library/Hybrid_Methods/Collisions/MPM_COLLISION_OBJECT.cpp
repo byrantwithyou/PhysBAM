@@ -12,8 +12,10 @@ template<class TV> MPM_COLLISION_OBJECT<TV>::
 ~MPM_COLLISION_OBJECT()
 {
 }
+template class MPM_COLLISION_OBJECT<VECTOR<float,1> >;
 template class MPM_COLLISION_OBJECT<VECTOR<float,2> >;
 template class MPM_COLLISION_OBJECT<VECTOR<float,3> >;
+template class MPM_COLLISION_OBJECT<VECTOR<double,1> >;
 template class MPM_COLLISION_OBJECT<VECTOR<double,2> >;
 template class MPM_COLLISION_OBJECT<VECTOR<double,3> >;
 }

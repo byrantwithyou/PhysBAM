@@ -20,8 +20,10 @@ template<class TV> PARTICLE_GRID_FORCES<TV>::
 ~PARTICLE_GRID_FORCES()
 {
 }
+template class PARTICLE_GRID_FORCES<VECTOR<float,1> >;
 template class PARTICLE_GRID_FORCES<VECTOR<float,2> >;
 template class PARTICLE_GRID_FORCES<VECTOR<float,3> >;
+template class PARTICLE_GRID_FORCES<VECTOR<double,1> >;
 template class PARTICLE_GRID_FORCES<VECTOR<double,2> >;
 template class PARTICLE_GRID_FORCES<VECTOR<double,3> >;
 }

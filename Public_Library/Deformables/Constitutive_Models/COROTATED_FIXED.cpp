@@ -6,8 +6,10 @@
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Math_Tools/pow.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Tools/Matrices/MATRIX_1X1.h>
 #include <Tools/Matrices/MATRIX_2X2.h>
 #include <Tools/Matrices/MATRIX_3X3.h>
+#include <Tools/Matrices/SYMMETRIC_MATRIX_1X1.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
@@ -108,6 +110,17 @@ P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T>
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void COROTATED_FIXED<T,d>::
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,1>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>& dP_dF,const int triangle) const
+{
+    T mu=constant_mu,la=constant_lambda, mu2=2*mu;
+    
+    dP_dF.x0000=mu2+la;
+    if(enforce_definiteness) dP_dF.Enforce_Definiteness();
+}
+//#####################################################################
+// Function Isotropic_Stress_Derivative
+//#####################################################################
+template<class T,int d> void COROTATED_FIXED<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
 {
     T mu=constant_mu,la=constant_lambda, mu2=2*mu;
@@ -157,8 +170,10 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
     return constant_mu*(Fm1*Fm1).Trace()+(T).5*constant_lambda*sqr(F.Determinant()-1);
 }
 namespace PhysBAM{
+template class COROTATED_FIXED<float,1>;
 template class COROTATED_FIXED<float,2>;
 template class COROTATED_FIXED<float,3>;
+template class COROTATED_FIXED<double,1>;
 template class COROTATED_FIXED<double,2>;
 template class COROTATED_FIXED<double,3>;
 }

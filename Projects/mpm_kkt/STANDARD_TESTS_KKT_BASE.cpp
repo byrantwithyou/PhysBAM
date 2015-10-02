@@ -255,22 +255,6 @@ Seed_Lagrangian_Particles(T_STRUCTURE& object,std::function<TV(const TV&)> V,
     return new_object;
 }
 //#####################################################################
-// Function Add_Fixed_Corotated
-//#####################################################################
-template<class TV> int STANDARD_TESTS_KKT_BASE<TV>::
-Add_Fixed_Corotated(T_VOLUME& object,T E,T nu)
-{
-    return Add_Force(*Create_Finite_Volume(object,new COROTATED_FIXED<T,TV::m>(E,nu,0)));
-}
-//#####################################################################
-// Function Add_Neo_Hookean
-//#####################################################################
-template<class TV> int STANDARD_TESTS_KKT_BASE<TV>::
-Add_Neo_Hookean(T_VOLUME& object,T E,T nu)
-{
-    return Add_Force(*Create_Finite_Volume(object,new NEO_HOOKEAN<T,TV::m>(E,nu,0,(T).25)));
-}
-//#####################################################################
 // Function Add_Penalty_Collision_Object
 //#####################################################################
 template<class TV> void STANDARD_TESTS_KKT_BASE<TV>::
@@ -278,8 +262,10 @@ Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io)
 {
     this->Add_Force(*new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,io,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));
 }
+template class STANDARD_TESTS_KKT_BASE<VECTOR<float,1> >;
 template class STANDARD_TESTS_KKT_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_KKT_BASE<VECTOR<float,3> >;
+template class STANDARD_TESTS_KKT_BASE<VECTOR<double,1> >;
 template class STANDARD_TESTS_KKT_BASE<VECTOR<double,2> >;
 template class STANDARD_TESTS_KKT_BASE<VECTOR<double,3> >;
 template TRIANGULATED_AREA<double>& STANDARD_TESTS_KKT_BASE<VECTOR<double,2> >::Seed_Lagrangian_Particles<TRIANGULATED_AREA<double> >(TRIANGULATED_AREA<double>&,std::function<VECTOR<double,2> (VECTOR<double,2> const&)>,std::function<MATRIX<double,2,2> (VECTOR<double,2> const&)>,double,bool,bool);

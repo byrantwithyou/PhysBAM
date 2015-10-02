@@ -173,8 +173,10 @@ Compute_Optimal_Bins(ARRAY<int>& bin_ends,ARRAY<int>& counts,ARRAY<int>& sum_cou
 
     return best_cost;
 }
+template class GATHER_SCATTER<VECTOR<float,1> >;
 template class GATHER_SCATTER<VECTOR<float,2> >;
 template class GATHER_SCATTER<VECTOR<float,3> >;
+template class GATHER_SCATTER<VECTOR<double,1> >;
 template class GATHER_SCATTER<VECTOR<double,2> >;
 template class GATHER_SCATTER<VECTOR<double,3> >;
 }

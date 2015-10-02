@@ -100,8 +100,6 @@ public:
     int Add_Gravity(TV g);
     int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0,bool no_mu=false);
     int Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles=0);
-    int Add_Fixed_Corotated(T_VOLUME& object,T E,T nu);
-    int Add_Neo_Hookean(T_VOLUME& object,T E,T nu);
     void Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty); // -x +x -y +y [ -z +z ], as bit flags
 //#####################################################################
 };

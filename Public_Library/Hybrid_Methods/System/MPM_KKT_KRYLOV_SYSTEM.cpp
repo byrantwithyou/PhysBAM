@@ -155,8 +155,10 @@ Build_Div_Matrix()
         D.Finish_Row();}
     D.Sort_Entries();
 } 
+template class MPM_KKT_KRYLOV_SYSTEM<VECTOR<float,1> >;
 template class MPM_KKT_KRYLOV_SYSTEM<VECTOR<float,2> >;
 template class MPM_KKT_KRYLOV_SYSTEM<VECTOR<float,3> >;
+template class MPM_KKT_KRYLOV_SYSTEM<VECTOR<double,1> >;
 template class MPM_KKT_KRYLOV_SYSTEM<VECTOR<double,2> >;
 template class MPM_KKT_KRYLOV_SYSTEM<VECTOR<double,3> >;
 }

@@ -313,7 +313,7 @@ public:
     {return MATRIX((T)1);}
 
     SYMMETRIC_MATRIX<T,1> Symmetric_Part() const
-    {return *this;}
+    {return SYMMETRIC_MATRIX<T,1>(x00);}
 
     SYMMETRIC_MATRIX<T,1> Twice_Symmetric_Part() const
     {return SYMMETRIC_MATRIX<T,1>(x00*2);}
@@ -336,8 +336,8 @@ public:
     void Fast_Solve_Eigenproblem(MATRIX& D,MATRIX& V) const
     {V.x00=1;D=*this;}
     
-    void Fast_Singular_Value_Decomposition(MATRIX& U,MATRIX& D,MATRIX& V) const
-    {U.x00=V.x00=1;D=*this;}
+    void Fast_Singular_Value_Decomposition(MATRIX& U,DIAGONAL_MATRIX<T,1>& D,MATRIX& V) const
+    {U.x00=V.x00=1;D.x(0)=x00;}
 
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,x00);}
