@@ -150,25 +150,6 @@ Get_Appropriate_DF(VECTOR<int,TV::m> element_index,typename TV::SCALAR dx_scale)
                         wt(pit.index)(vit.index)(xyz)*=xyz==paxis?dwt2[row][col]:wt2[row][col];}}}
     return wt;
 }
-
-//#####################################################################
-// Function Test
-//#####################################################################
-void Test()
-{
-    typedef double T;
-    typedef VECTOR<int,2> TV_INT;
-    typedef VECTOR<T,2> TV;
-    ARRAY<ARRAY<TV,TV_INT>,TV_INT> wt=Get_Appropriate_DF<TV>(TV_INT(1,0),1);
-    for(RANGE_ITERATOR<TV::m> pit(wt.domain);pit.Valid();pit.Next()){
-        for(RANGE_ITERATOR<TV::m> vit(wt(pit.index).domain);vit.Valid();vit.Next()){
-            T ax=wt(pit.index)(vit.index)(0);
-            T ay=wt(pit.index)(vit.index)(1);
-            T bx=t2AX[2*pit.index(1)+pit.index(0)][3*vit.index(1)+vit.index(0)];
-            T by=t2AY[3*pit.index(1)+pit.index(0)][3*vit.index(1)+vit.index(0)];
-            LOG::printf("w(%P,%P)(0)=%P\t,t1X=%P,\tdiff=%P\n",pit.index,vit.index,ax,bx,ax-bx);
-            LOG::printf("w(%P,%P)(1)=%P\t,t1Y=%P,\tdiff=%P\n",pit.index,vit.index,ay,by,ay-by);}}
-}
 //#####################################################################
 // Function Precompute_Div_Coefficients
 //#####################################################################
