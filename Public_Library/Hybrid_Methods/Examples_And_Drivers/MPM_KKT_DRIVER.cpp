@@ -305,24 +305,33 @@ Particle_To_Grid()
                 example.valid_velocity_cell_indices.Append(index_possible_ghost_velocity);
                 example.valid_velocity_indices.Append(example.velocity.Standard_Index(index_possible_ghost_velocity));}}
         TV_INT pressure_min_corner=vid/2;
-        TV_INT pressure_max_corner=TV_INT::Constant_Vector(2);
+        TV_INT pressure_max_corner=pressure_min_corner+TV_INT::Constant_Vector(2);
         for(int axis=0;axis<TV::m;axis++)
             if(vid(axis)%2==0){
-                pressure_max_corner(axis)++;
                 pressure_min_corner(axis)--;}
-        RANGE<TV_INT> pressure_range(TV_INT(),pressure_max_corner);
+        RANGE<TV_INT> pressure_range(pressure_min_corner,pressure_max_corner);
         for(RANGE_ITERATOR<TV::m> pit(pressure_range);pit.Valid();pit.Next()){
             TV_INT pid=pit.index;
             if(example.inv_valid_pressure_cell(pid)==-1){
                 example.inv_valid_pressure_cell(pid)=example.valid_pressure_cell_indices.m;
                 example.valid_pressure_cell_indices.Append(pid);
                 example.valid_pressure_indices.Append(example.mass_coarse.Standard_Index(pid));}}}
-    LOG::printf("final_velocity_size=%P\n",example.valid_velocity_indices.m);
-    LOG::printf("final_presure_size=%P\n",example.valid_pressure_indices.m);
+    example.valid_pressure_indices.Sort();
+    example.valid_velocity_indices.Sort();
+    auto compare=[](TV_INT a,TV_INT b)->bool{
+        for(int i=0;i<TV::m;i++){
+            if(a(i)<b(i)) return true;
+            if(a(i)>b(i)) return false;}
+        return false;};
+    example.valid_velocity_cell_indices.Sort(compare);
+    example.valid_pressure_cell_indices.Sort(compare);
+    for(int ii=0;ii<example.valid_velocity_indices.m;ii++){
+        int int_id=example.valid_velocity_indices(ii);
+        example.inv_valid_velocity_cell.array(int_id)=ii;}
+    for(int ii=0;ii<example.valid_pressure_indices.m;ii++){
+        int int_id=example.valid_pressure_indices(ii);
+        example.inv_valid_pressure_cell.array(int_id)=ii;}
 }
-    
-
-//}
 //#####################################################################
 // Function Grid_To_Particle
 //#####################################################################
@@ -394,8 +403,8 @@ template<class TV> void MPM_KKT_DRIVER<TV>::
 Solve_KKT_System()
 {
     kkt_sys.Build_Div_Matrix();
-    OCTAVE_OUTPUT<T> oo("kmatrix.dat");
-    oo.Write("K",kkt_sys,kkt_lhs,kkt_rhs);
+    //OCTAVE_OUTPUT<T> oo("kmatrix.dat");
+    //oo.Write("K",kkt_sys,kkt_lhs,kkt_rhs);
     kkt_lhs.u.Fill(TV());kkt_rhs.u.Fill(TV());
     kkt_lhs.p.Fill((T)0);kkt_rhs.p.Fill((T)0);
     // Add gravity

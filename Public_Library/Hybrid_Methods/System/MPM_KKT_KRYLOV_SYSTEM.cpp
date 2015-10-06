@@ -121,7 +121,7 @@ Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const
 // Function Get_Appropriate_DF
 //#####################################################################
 template<class TV> ARRAY<ARRAY<TV,VECTOR<int,TV::m> >,VECTOR<int,TV::m> >
-Get_Appropriate_DF(VECTOR<int,TV::m> element_index)
+Get_Appropriate_DF(VECTOR<int,TV::m> element_index,typename TV::SCALAR dx_scale)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -137,15 +137,37 @@ Get_Appropriate_DF(VECTOR<int,TV::m> element_index)
     ARRAY<ARRAY<TV,TV_INT>,TV_INT> wt(pressure_range);
     for(RANGE_ITERATOR<TV::m> pit(pressure_range);pit.Valid();pit.Next()){
         wt(pit.index).Resize(velocity_range);
-        wt(pit.index).Fill(TV::All_Ones_Vector());
+        wt(pit.index).Fill(TV::Constant_Vector(dx_scale));
         for(RANGE_ITERATOR<TV::m> vit(velocity_range);vit.Valid();vit.Next())
             for(int xyz=0;xyz<TV::m;xyz++)
                 for(int paxis=0;paxis<TV::m;paxis++){
-                    if(element_index(xyz)%2==0)
-                        wt(pit.index)(vit.index)(xyz)*=xyz==paxis?dwt1[pit.index(paxis)][vit.index(paxis)]:wt1[pit.index(paxis)][vit.index(paxis)];
-                    else
-                        wt(pit.index)(vit.index)(xyz)*=xyz==paxis?dwt2[pit.index(paxis)][vit.index(paxis)]:wt2[pit.index(paxis)][vit.index(paxis)];}}
+                    int row=pit.index(paxis);
+                    int col=vit.index(paxis);
+                    if(element_index(paxis)%2==0)
+                        wt(pit.index)(vit.index)(xyz)*=xyz==paxis?dwt1[row][col]:wt1[row][col];
+                    else{
+                        PHYSBAM_ASSERT(row<2);
+                        wt(pit.index)(vit.index)(xyz)*=xyz==paxis?dwt2[row][col]:wt2[row][col];}}}
     return wt;
+}
+
+//#####################################################################
+// Function Test
+//#####################################################################
+void Test()
+{
+    typedef double T;
+    typedef VECTOR<int,2> TV_INT;
+    typedef VECTOR<T,2> TV;
+    ARRAY<ARRAY<TV,TV_INT>,TV_INT> wt=Get_Appropriate_DF<TV>(TV_INT(1,0),1);
+    for(RANGE_ITERATOR<TV::m> pit(wt.domain);pit.Valid();pit.Next()){
+        for(RANGE_ITERATOR<TV::m> vit(wt(pit.index).domain);vit.Valid();vit.Next()){
+            T ax=wt(pit.index)(vit.index)(0);
+            T ay=wt(pit.index)(vit.index)(1);
+            T bx=t2AX[2*pit.index(1)+pit.index(0)][3*vit.index(1)+vit.index(0)];
+            T by=t2AY[3*pit.index(1)+pit.index(0)][3*vit.index(1)+vit.index(0)];
+            LOG::printf("w(%P,%P)(0)=%P\t,t1X=%P,\tdiff=%P\n",pit.index,vit.index,ax,bx,ax-bx);
+            LOG::printf("w(%P,%P)(1)=%P\t,t1Y=%P,\tdiff=%P\n",pit.index,vit.index,ay,by,ay-by);}}
 }
 //#####################################################################
 // Function Precompute_Div_Coefficients
@@ -172,13 +194,12 @@ template<class TV> void MPM_KKT_KRYLOV_SYSTEM<TV>::
 Build_Div_Matrix()
 {
     PHYSBAM_ASSERT(example.weights->Order()==2);
-    static const ARRAY<TV,TV_INT> wt=Precompute_Div_Coefficients<TV>();
-    const T dx_scale=pow(example.grid.DX()(0),TV::m-1);
+    T dx_scale=pow(example.grid.DX()(0),TV::m-1);
     D.Reset(TV::m*example.velocity.array.m);
     for(int row=0;row<example.valid_pressure_indices.m;row++){
         TV_INT pid=example.valid_pressure_cell_indices(row);
         TV_INT vid=2*pid;
-        RANGE<TV_INT> local_range(-4*TV_INT::All_Ones_Vector(),5*TV_INT::All_Ones_Vector());
+        RANGE<TV_INT> local_range(-3*TV_INT::All_Ones_Vector(),4*TV_INT::All_Ones_Vector());
         for(RANGE_ITERATOR<TV::m> it(local_range);it.Valid();it.Next())
             for(int axis=0;axis<TV::m;axis++){
                 D.Append_Entry_To_Current_Row(TV::m*example.velocity.Standard_Index(vid+it.index)+axis,0);}
@@ -187,7 +208,9 @@ Build_Div_Matrix()
     int skip=0;
     for(int element=0;element<example.valid_velocity_indices.m;element++){
         TV_INT vid_cell=example.valid_velocity_cell_indices(element);
-        ARRAY<ARRAY<TV,TV_INT>,TV_INT> wt=Get_Appropriate_DF<TV>(vid_cell);
+        if(example.mass(vid_cell)==0)
+            continue;
+        ARRAY<ARRAY<TV,TV_INT>,TV_INT> wt=Get_Appropriate_DF<TV>(vid_cell,dx_scale);
         TV_INT min_corner(vid_cell/2);
         for(int axis=0;axis<TV::m;axis++)
             if(vid_cell(axis)%2==0) min_corner(axis)--;
@@ -200,8 +223,8 @@ Build_Div_Matrix()
                 continue;}
             for(RANGE_ITERATOR<TV::m> vit(wt(pit.index).domain);vit.Valid();vit.Next()){
                 if(example.inv_valid_velocity_cell(vit.index+vid_cell-1)!=-1)
-                for(int axis=0;axis<TV::m;axis++){
-                    int col=TV::m*example.velocity.Standard_Index(vit.index+vid_cell-1)+axis;
+                    for(int axis=0;axis<TV::m;axis++){
+                        int col=TV::m*example.velocity.Standard_Index(vit.index+vid_cell-1)+axis;
                         D(row,col)+=wt(pit.index)(vit.index)(axis);}}}}
 } 
 template class MPM_KKT_KRYLOV_SYSTEM<VECTOR<float,1> >;

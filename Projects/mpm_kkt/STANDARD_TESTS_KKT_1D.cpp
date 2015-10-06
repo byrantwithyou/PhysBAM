@@ -69,7 +69,7 @@ Initialize()
 {
     switch(test_number)
     {
-        case 201:{ // circle free fall
+        case 1:{ // circle free fall
             grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(TV(.45),TV(.55));
             T density=2*scale_mass;
@@ -83,6 +83,13 @@ Initialize()
             Add_Gravity(TV(-0.8));
             /* Add_Neo_Hookean(1e3*scale_E,0.3); */
         } break;
+        case 2:{ // full box
+            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box(grid.DX(),TV::All_Ones_Vector()-grid.DX());
+            T density=scale_mass;
+            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Add_Gravity(TV(-1.8));
+        } break; 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     // initialize coarse grid

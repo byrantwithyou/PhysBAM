@@ -87,8 +87,8 @@ Initialize()
         } break;
         case 2:{ // full box
             grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box(TV(),TV::All_Ones_Vector());
-            T density=2*scale_mass;
+            RANGE<TV> box(grid.DX(),TV::All_Ones_Vector()-grid.DX());
+            T density=scale_mass;
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             Add_Gravity(TV(0,-1.8));
         } break;
