@@ -83,7 +83,6 @@ Initialize()
             TV dV=total_momentum/total_mass;
             particles.V-=dV;
             Add_Gravity(TV(0,-0.8));
-            Add_Neo_Hookean(1e3*scale_E,0.3);
         } break;
         case 2:{ // full box
             grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);

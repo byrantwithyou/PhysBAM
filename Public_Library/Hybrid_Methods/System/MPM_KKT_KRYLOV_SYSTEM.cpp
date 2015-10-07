@@ -186,22 +186,17 @@ Build_Div_Matrix()
                 D.Append_Entry_To_Current_Row(TV::m*example.velocity.Standard_Index(vid+it.index)+axis,0);}
         D.Finish_Row();}
     D.Sort_Entries();
-    int skip=0;
     for(int element=0;element<example.valid_velocity_indices.m;element++){
         TV_INT vid_cell=example.valid_velocity_cell_indices(element);
-        if(example.mass(vid_cell)==0)
-            continue;
+        if(example.mass(vid_cell)==0) continue;
         ARRAY<ARRAY<TV,TV_INT>,TV_INT> wt=Get_Appropriate_DF<TV>(vid_cell,dx_scale);
-        TV_INT min_corner(vid_cell/2);
+        TV_INT min_corner(floor(TV(vid_cell)/2.0));
         for(int axis=0;axis<TV::m;axis++)
             if(vid_cell(axis)%2==0) min_corner(axis)--;
         for(RANGE_ITERATOR<TV::m> pit(wt.domain);pit.Valid();pit.Next()){
             TV_INT pressure_index=pit.index+min_corner;
             int row=example.inv_valid_pressure_cell(pressure_index);
-            if(row==-1){
-                skip++;
-                //LOG::printf("skip=%P\n",skip);
-                continue;}
+            if(row==-1) continue;
             for(RANGE_ITERATOR<TV::m> vit(wt(pit.index).domain);vit.Valid();vit.Next()){
                 if(example.inv_valid_velocity_cell(vit.index+vid_cell-1)!=-1)
                     for(int axis=0;axis<TV::m;axis++){

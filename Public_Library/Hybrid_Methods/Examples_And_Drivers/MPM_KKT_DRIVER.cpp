@@ -363,7 +363,6 @@ Grid_To_Particle()
                     V_grid=(T).5*(V_grid+example.velocity(index));
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             MATRIX<T,TV::m> A=dt*grad_Vp+1;
-            if(example.quad_F_coeff) A+=sqr(dt*grad_Vp)*example.quad_F_coeff;
             particles.F(p)=A*particles.F(p);
             if(particles.store_S){
                 T k=example.dt*example.inv_Wi;
@@ -403,18 +402,16 @@ template<class TV> void MPM_KKT_DRIVER<TV>::
 Solve_KKT_System()
 {
     kkt_sys.Build_Div_Matrix();
-    //OCTAVE_OUTPUT<T> oo("kmatrix.dat");
-    //oo.Write("K",kkt_sys,kkt_lhs,kkt_rhs);
     kkt_lhs.u.Fill(TV());kkt_rhs.u.Fill(TV());
     kkt_lhs.p.Fill((T)0);kkt_rhs.p.Fill((T)0);
     // Add gravity
     example.Capture_Stress();
     example.Precompute_Forces(example.time,example.dt,false);
     example.Add_Forces(kkt_rhs.u,example.time);
-    for(int t=0;t<example.valid_velocity_cell_indices.m;t++){
+    for(int t=0;t<example.valid_velocity_indices.m;t++){
         int id=example.valid_velocity_indices(t);
         kkt_rhs.u.array(id)+=example.mass.array(id)*(example.velocity.array(id)/example.dt);}
-    for(int t=0;t<example.valid_pressure_cell_indices.m;t++){
+    for(int t=0;t<example.valid_pressure_indices.m;t++){
         int id=example.valid_pressure_indices(t);
         if(example.mass_coarse.array(id))
             kkt_rhs.p.array(id)=((T)1-example.J.array(id))/(example.dt*example.J.array(id));}
@@ -422,6 +419,8 @@ Solve_KKT_System()
     MINRES<T> mr;
     int max_iterations=1000;
     mr.Solve(kkt_sys,kkt_lhs,kkt_rhs,av,1e-12,0,max_iterations);
+    for(int i=0;i<example.av.m;i++){
+        (*av(i))*=0;}
     example.velocity_new=kkt_lhs.u;
 }
 //#####################################################################
