@@ -351,6 +351,13 @@ Grid_To_Particle()
             int p=example.simulated_particles(k);
             TV Vn_interpolate,V_pic,V_flip=particles.V(p);
             MATRIX<T,TV::m> B,grad_Vp,D;
+            T J_pic=0;
+            
+            for(PARTICLE_GRID_ITERATOR<TV> it(example.coarse_weights,p,true,scratch);it.Valid();it.Next()){
+                T w=it.Weight();
+                TV_INT index=it.Index();
+                T p_grid=kkt_lhs.p(index);
+                J_pic+=w*(-p_grid*example.one_over_lambda(index)+1);}
 
             for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,true,scratch);it.Valid();it.Next()){
                 T w=it.Weight();
@@ -364,6 +371,9 @@ Grid_To_Particle()
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             MATRIX<T,TV::m> A=dt*grad_Vp+1;
             particles.F(p)=A*particles.F(p);
+            T scale_J=J_pic/particles.F(p).Determinant();
+            particles.F(p)*=pow(abs(scale_J),1.0/TV::m);
+            if(scale_J<0) LOG::printf("WARNING: scale_J is negative!\n");
             if(particles.store_S){
                 T k=example.dt*example.inv_Wi;
                 particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,particles.S(p))+k)/(1+k);}
