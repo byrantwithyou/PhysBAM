@@ -356,6 +356,7 @@ Grid_To_Particle()
             for(PARTICLE_GRID_ITERATOR<TV> it(example.coarse_weights,p,true,scratch);it.Valid();it.Next()){
                 T w=it.Weight();
                 TV_INT index=it.Index();
+                PHYSBAM_ASSERT(example.inv_valid_pressure_cell(index)!=-1);
                 T p_grid=kkt_lhs.p(index);
                 J_pic+=w*(-p_grid*example.one_over_lambda(index)+1);}
 
@@ -424,7 +425,7 @@ Solve_KKT_System()
     for(int t=0;t<example.valid_pressure_indices.m;t++){
         int id=example.valid_pressure_indices(t);
         if(example.mass_coarse.array(id))
-            kkt_rhs.p.array(id)=((T)1-example.J.array(id))/(example.dt*example.J.array(id));}
+            kkt_rhs.p.array(id)=(example.J.array(id)-(T)1)/(example.dt*example.J.array(id));}
     // MINRES 
     MINRES<T> mr;
     int max_iterations=1000;

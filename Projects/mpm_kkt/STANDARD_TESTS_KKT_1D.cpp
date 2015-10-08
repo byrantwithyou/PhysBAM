@@ -97,6 +97,16 @@ Initialize()
                 [=](const TV&){return MATRIX<T,1>();},
                 density,particles_per_cell);
         } break;
+        case 4:{ // constant velocity
+            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box(TV(.45),TV(.55));
+            T density=2*scale_mass;
+            Seed_Particles_Helper(box,[=](const TV& X){return TV(0.2);},
+                [=](const TV&){return MATRIX<T,1>();},
+                density,particles_per_cell);
+            for(int p=0;p<particles.X.m;p++)
+                particles.one_over_lambda(p)=1;
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     // initialize coarse grid
@@ -122,7 +132,6 @@ End_Frame(const int frame)
 template<class T> void STANDARD_TESTS_KKT<VECTOR<T,1> >::
 Begin_Time_Step(const T time)
 {
-
 }
 //#####################################################################
 // Function End_Time_Step
