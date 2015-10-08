@@ -16,11 +16,11 @@
 namespace PhysBAM{
 
 template<class T>
-inline T minabs(const T a,const T b)
+constexpr inline T minabs(const T a,const T b)
 {return min(abs(a),abs(b));}
 
 template<class T,class ...Args>
-inline T minabs(const T a,const T b,Args&&... c)
+constexpr inline T minabs(const T a,const T b,Args&&... c)
 {return min(abs(a),minabs(b,c...));}
 
 }

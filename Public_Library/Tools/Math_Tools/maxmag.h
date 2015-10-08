@@ -14,11 +14,11 @@
 namespace PhysBAM{
 
 template<class T>
-inline T maxmag(const T a,const T b)
+constexpr inline T maxmag(const T a,const T b)
 {return abs(a)>abs(b)?a:b;}
 
 template<class T,class ...Args>
-inline T maxmag(const T a,const T b,Args&&... c)
+constexpr inline T maxmag(const T a,const T b,Args&&... c)
 {return maxmag(a,maxmag(b,c...));}
 
 }

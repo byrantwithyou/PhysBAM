@@ -8,6 +8,6 @@
 #define __FACTORIAL__
 
 namespace PhysBAM{
-inline int factorial(int d) {return d==0?1:d*factorial(d-1);}
+constexpr inline int factorial(int d) {return d==0?1:d*factorial(d-1);}
 }
 #endif

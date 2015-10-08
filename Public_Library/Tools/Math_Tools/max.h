@@ -10,11 +10,11 @@
 namespace PhysBAM{
 
 template<class T>
-inline T max(const T a, const T b)
+constexpr inline T max(const T a, const T b)
 {return (a>b)?a:b;}
 
 template<class T,class ...Args>
-inline T max(const T a,const T b,Args&&... c)
+constexpr inline T max(const T a,const T b,Args&&... c)
 {return max(a,max(b,c...));}
 
 }

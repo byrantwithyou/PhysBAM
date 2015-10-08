@@ -18,11 +18,11 @@ namespace PhysBAM{
 using ::std::abs;
 
 template<class T>
-inline T maxabs(const T a,const T b)
+constexpr inline T maxabs(const T a,const T b)
 {return max(abs(a),abs(b));}
 
 template<class T,class ...Args>
-inline T maxabs(const T a,const T b,Args&&... c)
+constexpr inline T maxabs(const T a,const T b,Args&&... c)
 {return max(abs(a),maxabs(b,c...));}
 
 }
