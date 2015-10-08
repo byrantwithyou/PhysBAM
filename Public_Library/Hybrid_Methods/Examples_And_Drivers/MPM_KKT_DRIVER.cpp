@@ -419,17 +419,17 @@ Solve_KKT_System()
     example.Capture_Stress();
     example.Precompute_Forces(example.time,example.dt,false);
     example.Add_Forces(kkt_rhs.u,example.time);
+    const T pressure_volume_scale=example.coarse_grid.DX().Product();
     for(int t=0;t<example.valid_velocity_indices.m;t++){
         int id=example.valid_velocity_indices(t);
         kkt_rhs.u.array(id)+=example.mass.array(id)*(example.velocity.array(id)/example.dt);}
     for(int t=0;t<example.valid_pressure_indices.m;t++){
         int id=example.valid_pressure_indices(t);
         if(example.mass_coarse.array(id))
-            kkt_rhs.p.array(id)=(example.J.array(id)-(T)1)/(example.dt*example.J.array(id));}
+            kkt_rhs.p.array(id)=(example.J.array(id)-(T)1)*pressure_volume_scale/(example.dt*example.J.array(id));}
     // MINRES 
     MINRES<T> mr;
-    int max_iterations=1000;
-    mr.Solve(kkt_sys,kkt_lhs,kkt_rhs,av,1e-12,0,max_iterations);
+    mr.Solve(kkt_sys,kkt_lhs,kkt_rhs,av,1e-12,0,example.solver_iterations);
     for(int i=0;i<example.av.m;i++){
         (*av(i))*=0;}
     example.velocity_new=kkt_lhs.u;

@@ -91,6 +91,32 @@ Initialize()
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             Add_Gravity(TV(0,-1.8));
         } break;
+        case 3:{ // circle free fall with lambda
+            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            SPHERE<TV> sphere(TV(.5,.5),.3);
+            T density=scale_mass;
+            Seed_Particles_Helper(sphere,[=](const TV& X){return TV();},
+                [=](const TV&){return MATRIX<T,2>();},
+                density,particles_per_cell);
+            T total_mass=particles.mass.Sum();
+            TV total_momentum=particles.V.Weighted_Sum(particles.mass);
+            TV dV=total_momentum/total_mass;
+            particles.V-=dV;
+            for(int p=0;p<particles.X.m;p++)
+                particles.one_over_lambda(p)=1; 
+            Add_Gravity(TV(0,-0.8));
+        } break;
+        case 4:{ // colliding of two rings
+            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>(TV(),TV(0.48,0.48)),true);
+            ARRAY<SPHERE<TV> > spheres; ARRAY<TV> v0; ARRAY<T> r;
+            spheres.Append(SPHERE<TV>(TV(0.1,0.24),0.04)); spheres.Append(SPHERE<TV>(TV(0.4,0.24),0.04));
+            v0.Append(TV(.5,0)); v0.Append(TV(-.5,0));
+            r.Append(0.03); r.Append(0.03);
+            for(int s=0;s<spheres.m;s++){
+                SPHERE<TV>& sphere=spheres(s);
+                T density=1010*scale_mass;
+                Seed_Particles_Helper(sphere,[=](const TV& X){return v0(s);},0,density,particles_per_cell);}
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     // initialize coarse grid
