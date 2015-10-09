@@ -21,6 +21,9 @@ const ATTRIBUTE_ID ATTRIBUTE_ID_VALID(43);
 const ATTRIBUTE_ID ATTRIBUTE_ID_S(44);
 const ATTRIBUTE_ID ATTRIBUTE_ID_C(45);
 const ATTRIBUTE_ID ATTRIBUTE_ID_ONE_OVER_LAMBDA(46);
+const ATTRIBUTE_ID ATTRIBUTE_ID_FP(49);
+const ATTRIBUTE_ID ATTRIBUTE_ID_MU(50);
+const ATTRIBUTE_ID ATTRIBUTE_ID_LAMBDA(51);
 
 template<class TV>
 class MPM_PARTICLES:public CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> >
@@ -30,19 +33,22 @@ class MPM_PARTICLES:public CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> 
 public:
     using BASE::Add_Array;using BASE::Remove_Array;
 
-    bool store_B,store_S,store_C,store_one_over_lambda;
+    bool store_Fp,store_B,store_S,store_C,store_one_over_lambda,store_mu,store_lambda;
     ARRAY_VIEW<T> volume;
-    ARRAY_VIEW<MATRIX<T,TV::m> > F,B,C;
+    ARRAY_VIEW<MATRIX<T,TV::m> > F,Fp,B,C;
     ARRAY_VIEW<SYMMETRIC_MATRIX<T,TV::m> > S;
     ARRAY_VIEW<bool> valid;
-    ARRAY_VIEW<T> one_over_lambda;
+    ARRAY_VIEW<T> one_over_lambda,mu,lambda;
 
     MPM_PARTICLES();
     virtual ~MPM_PARTICLES();
+    void Store_Fp(bool store=true);
     void Store_B(bool store=true);
     void Store_S(bool store=true);
     void Store_C(bool store=true);
     void Store_One_Over_Lambda(bool store=true);
+    void Store_Mu(bool store=true);
+    void Store_Lambda(bool store=true);
 
 //#####################################################################
 };

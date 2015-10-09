@@ -79,6 +79,11 @@ public:
     ARRAY<T,TV_INT> density;
     SPARSE_MATRIX_FLAT_MXN<T> DT;
 
+    // plasticity
+    bool use_plasticity;
+    T mu0,lambda0,theta_c,theta_s;
+    T hardening_factor, max_hardening;
+
     T initial_time;
     int last_frame;
     std::string frame_title;
@@ -98,6 +103,7 @@ public:
     bool use_particle_collision;
     bool use_early_gradient_transfer;
     bool use_oldroyd;
+    bool use_variable_coefficients;
     bool print_stats;
     T flip;
     T cfl;

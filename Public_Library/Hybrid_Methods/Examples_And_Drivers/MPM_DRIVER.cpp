@@ -13,6 +13,7 @@
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Log/SCOPE.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -196,6 +197,8 @@ Advance_One_Time_Step()
     else
         Grid_To_Particle();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
+    if (example.use_plasticity)
+        Update_Plasticity_And_Hardening();
 
     example.End_Time_Step(example.time);
 }
@@ -646,6 +649,27 @@ Solve_KKT_System()
     // Transfer to particles
     Grid_To_Particle();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after minres in kkt",0,1);
+}
+//#####################################################################
+// Function Update_Plasticity_And_Hardening
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Update_Plasticity_And_Hardening()
+{
+    MPM_PARTICLES<TV>& particles=example.particles;
+    for (int k=0;k<example.simulated_particles.m;++k){
+        int p=example.simulated_particles(k);
+        MATRIX<T,TV::m> Fe=particles.F(p);
+        MATRIX<T,TV::m> U,V;
+        DIAGONAL_MATRIX<T,TV::m> singular_values;
+        Fe.Fast_Singular_Value_Decomposition(U,singular_values,V);
+        singular_values.x=clamp(singular_values.x,1-example.theta_c,1+example.theta_s);
+        particles.F(p)=(U*singular_values).Times_Transpose(V);
+        particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);
+
+        T hardening_coeff=exp(min(example.max_hardening,example.hardening_factor*(1-particles.Fp(p).Determinant())));
+        particles.mu(p)=example.mu0*hardening_coeff;
+        particles.lambda(p)=example.lambda0*hardening_coeff;}
 }
 //#####################################################################
 // Function Add_C_Contribution_To_DT

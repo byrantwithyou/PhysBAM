@@ -494,6 +494,35 @@ Initialize()
             Add_Neo_Hookean(2000*scale_E,0.3,&mpm_particles2);
             for(int i=old_pn;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(1,1,1);
         } break;
+        case 33:{ // sand dam break
+            use_plasticity=true;
+            use_variable_coefficients=true;
+            particles.Store_Fp(true);
+            particles.Store_Mu(true);
+            particles.Store_Lambda(true);
+
+            grid.Initialize(TV_INT(2,2)*resolution+1,RANGE<TV>(TV(-0.5,-0.5),TV(1.5,1.5)),true);
+            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-1,-1),TV(4,.1)));
+            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-1,0.9),TV(2,1)));
+            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-1,-1),TV(0.1,2)));
+            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(0.9,-1),TV(2,2)));
+
+            T density=(T)1281;
+            T E=5000,nu=.4;
+            this->mu0=E/(2*(1+nu));
+            this->lambda0=E*nu/((1+nu)*(1-2*nu));
+            this->theta_c=0.01;
+            this->theta_s=.00001;
+            this->hardening_factor=80;
+            this->max_hardening=5;
+            Add_Fixed_Corotated(E,nu);
+            RANGE<TV> box(TV(.13,.13),TV(.4,.85));
+            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            for(int p=0;p<particles.number;++p){
+                particles.mu(p)=this->mu0;
+                particles.lambda(p)=this->lambda0;}
+            Add_Gravity(TV(0,-9.8));
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }

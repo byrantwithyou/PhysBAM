@@ -79,6 +79,11 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-incompressible",&incompressible,"Make simulated media incompressible");
     parse_args.Add("-kkt",&kkt,"Use KKT solver");
     parse_args.Add("-use_exp_F",&use_quasi_exp_F_update,"Use an approximation of the F update that prevents inversion");
+    parse_args.Add("-use_plasticity",&use_plasticity,"Use plasticity in the F update");
+    parse_args.Add("-theta_c",&theta_c,"theta_c","Critical compression coefficient for plasticity");
+    parse_args.Add("-theta_s",&theta_s,"theta_s","Critical stretch coefficient for plasticity");
+    parse_args.Add("-hardening",&hardening_factor,"hardening factor","Hardening factor for plasticity");
+    parse_args.Add("-max_hardening",&max_hardening,"max hardening coefficient","Maximum hardening coefficient for plasticity");
 
     parse_args.Parse(true);
 
@@ -103,6 +108,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     stored_last_frame=last_frame;
     random.Set_Seed(seed);
 
+    particles.Store_Fp(use_plasticity);
     particles.Store_B(use_affine && !incompressible);
     particles.Store_C(use_affine && (incompressible || kkt));
     particles.Store_One_Over_Lambda(kkt);
@@ -182,6 +188,7 @@ Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,T
     particles.X(p)=X;
     if(V) particles.V(p)=V(X);
     particles.F(p)=MATRIX<T,TV::m>()+1;
+    if(particles.store_Fp) particles.Fp(p).Set_Identity_Matrix();
     if(particles.store_B && dV) particles.B(p)=dV(X)*weights->Dp(X);
     if(particles.store_C && dV) particles.C(p)=dV(X);
     if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
@@ -207,7 +214,7 @@ Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles,bool no_mu)
     COROTATED_FIXED<T,TV::m>* coro=new COROTATED_FIXED<T,TV::m>(E,nu);
     if(no_mu) coro->Zero_Out_Mu();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*coro;
-    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
+    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,use_variable_coefficients);
     return Add_Force(fe);
 }
 //#####################################################################
@@ -217,7 +224,7 @@ template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles)
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*new NEO_HOOKEAN<T,TV::m>(E,nu);
-    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
+    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,use_variable_coefficients);
     return Add_Force(fe);
 }
 //#####################################################################

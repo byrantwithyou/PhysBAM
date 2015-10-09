@@ -19,8 +19,9 @@ namespace PhysBAM{
 template<class TV> MPM_FINITE_ELEMENTS<TV>::
 MPM_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
-    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles)
+    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,bool use_variable_coefficients)
     :BASE(force_helper),constitutive_model(constitutive_model),affect_all(!affected_particles),
+     use_variable_coefficients(use_variable_coefficients),
      gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles)))
 {
     if(!affect_all){
@@ -50,6 +51,9 @@ Precompute(const T time,const T dt)
     sigma.Resize(particles.X.m);
     dPi_dF.Resize(particles.X.m);
     PFT.Resize(particles.X.m);
+    if(use_variable_coefficients){
+        constitutive_model.mu=particles.mu;
+        constitutive_model.lambda=particles.lambda;}
 #pragma omp parallel for
     for(int k=0;k<gather_scatter.simulated_particles.m;k++){
         int p=gather_scatter.simulated_particles(k);

@@ -41,6 +41,8 @@ public:
     using BASE::Add_Force;using BASE::Set_Weights;using BASE::deformable_body_collection;
     using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;using BASE::data_directory;
     using BASE::kkt;using BASE::Add_Fluid_Wall;using BASE::quad_F_coeff;
+    using BASE::use_plasticity;using BASE::theta_c;using BASE::theta_s;using BASE::hardening_factor;
+    using BASE::max_hardening;using BASE::use_variable_coefficients;
 
     int test_number;
     int resolution;
