@@ -2373,7 +2373,7 @@ void Postprocess_Substep(const T dt,const T time) override
             for(int i=0;i<sv.m;i++){
                 svout << sv(i).x.x << " " << sv(i).x.y << " " << sv(i).x.z << std::endl;
                 Add_Debug_Particle(sv(i).To_Vector(),TV(1,1,0));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-force_field->isotropic_model->P_From_Strain(sv(i),1,i).To_Vector());}}}
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-force_field->isotropic_model->P_From_Strain(sv(i),i).To_Vector());}}}
     if(test_number==48){
         stuck_particles.Remove_All();
         T r=std::max((T)0,hole-time*stretch);
@@ -2642,7 +2642,7 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
         for(int j=0;j<image_size;j++){
             T x=(2*i-image_size)*sigma_range/image_size+1e-5;
             T y=(2*j-image_size)*sigma_range/image_size;
-            TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,3>(particles.X(0).y,x,y),1,1).To_Vector();
+            TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,3>(particles.X(0).y,x,y),1).To_Vector();
             DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3> disd;
             icm.Isotropic_Stress_Derivative(DIAGONAL_MATRIX<T,3>(particles.X(0).y,x,y),disd,1);
             SYMMETRIC_MATRIX<T,3> H(disd.x0000,disd.x1100,disd.x2200,disd.x1111,disd.x2211,disd.x2222);
@@ -2702,7 +2702,7 @@ void Plot_Contour_Landscape(int frame)
         for(int j=min;j<max;j++){
             if(is_neo && (i<0 || j<0)) continue;
             VECTOR<T,2> X(2*sigma_range*(i+.5)/image_size+1.1e-5,2*sigma_range*(j+.5)/image_size+1.2e-5);
-            DIAGONAL_MATRIX<T,3> F(X.Insert(particles.X(0).y,1)),P=icm->P_From_Strain(F,1,0);
+            DIAGONAL_MATRIX<T,3> F(X.Insert(particles.X(0).y,1)),P=icm->P_From_Strain(F,0);
             out<<"p "<<X<<" "<<-P.To_Vector().Remove_Index(0).Normalized()<<std::endl;}
 
     for(int i=0;i<fv.Fe_hat.m;i++){

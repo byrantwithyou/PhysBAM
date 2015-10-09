@@ -52,15 +52,15 @@ Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input
 // Function Energy_Density
 //#####################################################################
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
+Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
-    return Energy_Density_Helper(F,simplex);
+    return Energy_Density_Helper(F,id);
 }
 //#####################################################################
 // Function Energy_Density_Helper
 //#####################################################################
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
+Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int id) const
 {
     T x = F.x.x;
     T y = F.x.y;
@@ -73,9 +73,10 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
     
     if((dx >= 0) && (dy >= 0))
     {
+        T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
         T I1=(F*F.Transposed()).Trace(),J=F.Determinant();
         T log_J=log(J);
-        return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
+        return id_mu*((T).5*(I1-TV::m)-log_J)+(T).5*id_lambda*sqr(log_J);
     }
     else if((dx < 0) && (dy >= 0))
     {
@@ -94,8 +95,9 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
 // Function Energy_Density_Helper
 //#####################################################################
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
+Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     T x = F.x.x;
     T y = F.x.y;
     T z = F.x.z;
@@ -104,8 +106,8 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
     T dy = y - extrapolation_cutoff;
     T dz = z - extrapolation_cutoff;
 
-    T mu = constant_mu;
-    T la = constant_lambda;   
+    T mu = id_mu;
+    T la = id_lambda;   
     
     T a = extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
@@ -115,7 +117,7 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
     {
         T I1=(F*F.Transposed()).Trace(),J=F.Determinant();
         T log_J=log(J);
-        return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
+        return id_mu*((T).5*(I1-TV::m)-log_J)+(T).5*id_lambda*sqr(log_J);
     }
     else if((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
@@ -150,16 +152,17 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
 // Function P_From_Strain
 //#####################################################################
 template<class T,int d> DIAGONAL_MATRIX<T,d> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const
+P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
-    return P_From_Strain_Helper(F,scale,simplex);
+    return P_From_Strain_Helper(F,id);
 }
 //#####################################################################
 // Function P_From_Strain_Helper
 //#####################################################################
 template<class T,int d> DIAGONAL_MATRIX<T,2> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) const
+P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     T x = F.x.x;
     T y = F.x.y;
     
@@ -171,37 +174,38 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simpl
     
     if((dx >= 0) && (dy >= 0))
     {  
-        T scale_mu=scale*constant_mu,scale_lambda=scale*constant_lambda,J=F.Determinant();
-        return scale_mu*F-(scale_mu-scale_lambda*log(J))*F.Inverse();
+        T J=F.Determinant();
+        return id_mu*F-(id_mu-id_lambda*log(J))*F.Inverse();
     }
     else if((dx < 0) && (dy >= 0))
     {//[ -(la*(a - s2)^2*(2*a - 2*s1))/a, -(la*(a - s1)^2*(2*a - 2*s2))/a, 0, 0]
         DIAGONAL_MATRIX<T,2> result;
         result.x.x = base.Ex(a,y) + 2*k*dx;
         result.x.y = base.Ey(a,y) + base.Exy(a,y)*dx;
-        return scale*result;
+        return result;
     }
     else if((dx >= 0) && (dy < 0))
     {
         DIAGONAL_MATRIX<T,2> result;
         result.x.x = base.Ex(x,a) + base.Exy(x,a)*dy;
         result.x.y = base.Ey(x,a) + 2*k*dy;
-        return scale*result;
+        return result;
     }
     else // ((dx < 0) && (dy < 0))
     {
         DIAGONAL_MATRIX<T,2> result;
         result.x.x = base.Ex(a,a) + base.Exy(a,a)*dy + 2*k*dx;
         result.x.y = base.Ey(a,a) + base.Exy(a,a)*dx + 2*k*dy;
-        return scale*result;
+        return result;
     }
 }
 //#####################################################################
 // Function P_From_Strain_Helper
 //#####################################################################
 template<class T,int d> DIAGONAL_MATRIX<T,3> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simplex) const
+P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     T x = F.x.x;
     T y = F.x.y;
     T z = F.x.z;
@@ -210,16 +214,16 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
     T dy = y - extrapolation_cutoff;
     T dz = z - extrapolation_cutoff;
 
-    T mu = constant_mu;
-    T la = constant_lambda;
+    T mu = id_mu;
+    T la = id_lambda;
     
     T a = extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
      
     if((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
     {
-        T scale_mu=scale*constant_mu,scale_lambda=scale*constant_lambda,J=F.Determinant();
-        return scale_mu*F-(scale_mu-scale_lambda*log(J))*F.Inverse();
+        T J=F.Determinant();
+        return id_mu*F-(id_mu-id_lambda*log(J))*F.Inverse();
     }
     else if((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
@@ -227,7 +231,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.x=(mu*sqr(a)-mu+la*log(a*y*z)+2*k*a*x-2*k*sqr(a))/a;
         result.x.y=(mu*a*sqr(y)-mu*a+la*log(a*y*z)*a+la*x-la*a)/a/y;
         result.x.z=(mu*a*sqr(z)-mu*a+la*log(a*y*z)*a+la*x-la*a)/a/z;
-        return scale*result;
+        return result;
     }
     else if((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
@@ -235,7 +239,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.x=(mu*a*sqr(x)-mu*a+la*log(x*a*z)*a+la*y-la*a)/x/a;
         result.x.y=(mu*sqr(a)-mu+la*log(x*a*z)+2*k*a*y-2*k*sqr(a))/a;
         result.x.z=(mu*a*sqr(z)-mu*a+la*log(x*a*z)*a+la*y-la*a)/a/z;
-        return scale*result;
+        return result;
     }
     else if((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
@@ -243,7 +247,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.x=(mu*a*sqr(x)-mu*a+la*log(x*y*a)*a+la*z-la*a)/x/a;
         result.x.y=(mu*a*sqr(y)-mu*a+la*log(x*y*a)*a+la*z-la*a)/a/y;
         result.x.z=(mu*sqr(a)-mu+la*log(x*y*a)+2*k*a*z-2*k*sqr(a))/a;
-        return scale*result;
+        return result;
     }
     else if((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
@@ -251,7 +255,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.x=(mu*cube(a)-mu*a+la*log(sqr(a)*z)*a+la*y-la*a+2*k*sqr(a)*x-2*k*cube(a))/sqr(a);
         result.x.y=(mu*cube(a)-mu*a+la*log(sqr(a)*z)*a+la*x-la*a+2*y*k*sqr(a)-2*k*cube(a))/sqr(a);
         result.x.z=(mu*a*sqr(z)-mu*a+la*log(sqr(a)*z)*a+la*x-2*la*a+la*y)/a/z;
-        return scale*result;
+        return result;
     }
     else if((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
     {
@@ -259,7 +263,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.x=(mu*cube(a)-mu*a+la*log(sqr(a)*y)*a+la*z-la*a+2*k*sqr(a)*x-2*k*cube(a))/sqr(a);
         result.x.y=(mu*a*sqr(y)-mu*a+la*log(sqr(a)*y)*a+la*z-2*la*a+la*x)/a/y;
         result.x.z=(mu*cube(a)-mu*a+la*log(sqr(a)*y)*a+la*x-la*a+2*z*k*sqr(a)-2*k*cube(a))/sqr(a);
-        return scale*result;
+        return result;
     }
     else if((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
     {
@@ -267,7 +271,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.x=(mu*a*sqr(x)-mu*a+la*log(x*sqr(a))*a+la*y-2*la*a+la*z)/x/a;
         result.x.y=(mu*cube(a)-mu*a+la*log(x*sqr(a))*a+la*z-la*a+2*y*k*sqr(a)-2*k*cube(a))/sqr(a);
         result.x.z=(mu*cube(a)-mu*a+la*log(x*sqr(a))*a+la*y-la*a+2*z*k*sqr(a)-2*k*cube(a))/sqr(a);
-        return scale*result;
+        return result;
     }
     else // Rxyz
     {
@@ -275,23 +279,24 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
         result.x.x=(mu*cube(a)-mu*a+la*log(cube(a))*a+la*y-2*la*a+la*z+2*k*sqr(a)*x-2*k*cube(a))/sqr(a);
         result.x.y=(mu*cube(a)-mu*a+la*log(cube(a))*a+la*x-2*la*a+la*z+2*y*k*sqr(a)-2*k*cube(a))/sqr(a);
         result.x.z=(mu*cube(a)-mu*a+la*log(cube(a))*a+la*y-2*la*a+la*x+2*z*k*sqr(a)-2*k*cube(a))/sqr(a);
-        return scale*result;
+        return result;
     }
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int triangle) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int id) const
 {
-    return Isotropic_Stress_Derivative_Helper(F,dP_dF,triangle);
+    return Isotropic_Stress_Derivative_Helper(F,dP_dF,id);
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     T x = F.x.x;
     T y = F.x.y;
     
@@ -304,12 +309,12 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     if((dx >= 0) && (dy >= 0))
     {     
         DIAGONAL_MATRIX<T,2> F_inverse=F.Inverse();
-        T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
+        T mu_minus_lambda_logJ=id_mu+id_lambda*log(F_inverse.Determinant());
         SYMMETRIC_MATRIX<T,2> F_inverse_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(F_inverse.To_Vector());
-        dP_dF.x0000=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;//alpha+beta+gamma
-        dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
-        dP_dF.x1100=constant_lambda*F_inverse_outer.x10;//gamma
-        dP_dF.x1010=constant_mu;//alpha
+        dP_dF.x0000=id_mu+(id_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;//alpha+beta+gamma
+        dP_dF.x1111=id_mu+(id_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
+        dP_dF.x1100=id_lambda*F_inverse_outer.x10;//gamma
+        dP_dF.x1010=id_mu;//alpha
         dP_dF.x1001=mu_minus_lambda_logJ*F_inverse_outer.x10;//beta
     }
     else if((dx < 0) && (dy >= 0))
@@ -364,8 +369,9 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 // Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     T x = F.x.x;
     T y = F.x.y;
     T z = F.x.z;
@@ -374,8 +380,8 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
     T dy = y - extrapolation_cutoff;
     T dz = z - extrapolation_cutoff;
 
-    T mu = constant_mu;
-    T la = constant_lambda;
+    T mu = id_mu;
+    T la = id_lambda;
     
     T a = extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
@@ -390,17 +396,17 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
     if((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
     {
         DIAGONAL_MATRIX<T,3> F_inverse=F.Inverse();
-        T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
+        T mu_minus_lambda_logJ=id_mu+id_lambda*log(F_inverse.Determinant());
         SYMMETRIC_MATRIX<T,3> F_inverse_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(F_inverse.To_Vector());
-        dP_dF.x0000=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;
-        dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
-        dP_dF.x2222=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x22;
-        dP_dF.x1100=constant_lambda*F_inverse_outer.x10;
-        dP_dF.x2200=constant_lambda*F_inverse_outer.x20;
-        dP_dF.x2211=constant_lambda*F_inverse_outer.x21;
-        dP_dF.x1010=constant_mu;
-        dP_dF.x2020=constant_mu;
-        dP_dF.x2121=constant_mu;
+        dP_dF.x0000=id_mu+(id_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;
+        dP_dF.x1111=id_mu+(id_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
+        dP_dF.x2222=id_mu+(id_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x22;
+        dP_dF.x1100=id_lambda*F_inverse_outer.x10;
+        dP_dF.x2200=id_lambda*F_inverse_outer.x20;
+        dP_dF.x2211=id_lambda*F_inverse_outer.x21;
+        dP_dF.x1010=id_mu;
+        dP_dF.x2020=id_mu;
+        dP_dF.x2121=id_mu;
         dP_dF.x1001=mu_minus_lambda_logJ*F_inverse_outer.x10;
         dP_dF.x2002=mu_minus_lambda_logJ*F_inverse_outer.x20;
         dP_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;
@@ -517,10 +523,11 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
 // Function P_From_Strain_Rate
 //#####################################################################
 template<class T,int d> MATRIX<T,d> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const
+P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const
 {
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
     SYMMETRIC_MATRIX<T,d> strain_rate=F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    return 2*scale*constant_beta*strain_rate+scale*constant_alpha*strain_rate.Trace();
+    return 2*id_beta*strain_rate+id_alpha*strain_rate.Trace();
 }
 //#####################################################################
 // Function P_From_Strain_Rate_Forces_Size
@@ -534,12 +541,13 @@ P_From_Strain_Rate_Forces_Size() const
 // Function P_From_Strain_Rate_First_Half
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const
+P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const int id) const
 {
-    SYMMETRIC_MATRIX<T,d> strain_rate=scale*F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    T sb=sqrt(2*constant_beta);
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    SYMMETRIC_MATRIX<T,d> strain_rate=F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
+    T sb=sqrt(2*id_beta);
     T dd=sb/TV::dimension;
-    T sa=sqrt(constant_alpha/TV::dimension+dd*dd)-dd;
+    T sa=sqrt(id_alpha/TV::dimension+dd*dd)-dd;
     SYMMETRIC_MATRIX<T,d> s=sb*strain_rate+sa*strain_rate.Trace();
     *(MATRIX<T,d>*)aggregate.Get_Array_Pointer()+=s;
 }
@@ -547,12 +555,13 @@ P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggreg
 // Function P_From_Strain_Rate_Second_Half
 //#####################################################################
 template<class T,int d> MATRIX<T,d> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T> aggregate,const T scale,const int simplex) const
+P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T> aggregate,const int id) const
 {
-    SYMMETRIC_MATRIX<T,d> strain_rate=scale*(*(const MATRIX<T,d>*)aggregate.Get_Array_Pointer()).Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    T sb=sqrt(2*constant_beta);
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    SYMMETRIC_MATRIX<T,d> strain_rate=(*(const MATRIX<T,d>*)aggregate.Get_Array_Pointer()).Symmetric_Part(); // use linear damping because of problems with inverting elements...
+    T sb=sqrt(2*id_beta);
     T dd=sb/TV::dimension;
-    T sa=sqrt(constant_alpha/TV::dimension+dd*dd)-dd;
+    T sa=sqrt(id_alpha/TV::dimension+dd*dd)-dd;
     return sb*strain_rate+sa*strain_rate.Trace();
 }
 namespace PhysBAM{

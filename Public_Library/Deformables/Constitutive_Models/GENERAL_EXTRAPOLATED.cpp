@@ -50,15 +50,15 @@ Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input
 // Function Energy_Density
 //#####################################################################
 template<class T,int d> T GENERAL_EXTRAPOLATED<T,d>::
-Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
+Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
-    return Energy_Density_Helper(F,simplex);
+    return Energy_Density_Helper(F,id);
 }
 //#####################################################################
 // Function Energy_Density_Helper
 //#####################################################################
 template<class T,int d> T GENERAL_EXTRAPOLATED<T,d>::
-Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
+Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int id) const
 {
     T a = extrapolation_cutoff;
     T x = std::max(F.x.x,a);
@@ -66,17 +66,17 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
     T dx = F.x.x - extrapolation_cutoff;
     T dy = F.x.y - extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
-    T E=base.E(x,y,simplex);
-    if(dx < 0) E+=base.Ex(x,y,simplex)*dx + k*dx*dx;
-    if(dy < 0) E+=base.Ey(x,y,simplex)*dy + k*dy*dy;
-    if((dx < 0) && (dy < 0)) E+=base.Exy(x,y,simplex)*dx*dy;
+    T E=base.E(x,y,id);
+    if(dx < 0) E+=base.Ex(x,y,id)*dx + k*dx*dx;
+    if(dy < 0) E+=base.Ey(x,y,id)*dy + k*dy*dy;
+    if((dx < 0) && (dy < 0)) E+=base.Exy(x,y,id)*dx*dy;
     return E;
 }
 //#####################################################################
 // Function Energy_Density_Helper
 //#####################################################################
 template<class T,int d> T GENERAL_EXTRAPOLATED<T,d>::
-Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
+Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int id) const
 {
     T a = extrapolation_cutoff;
     T x = std::max(F.x.x,a);
@@ -86,29 +86,29 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
     T dy = F.x.y - extrapolation_cutoff;
     T dz = F.x.z - extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
-    T E=base.E(x,y,z,simplex);
-    if(dx < 0) E+=base.Ex(x,y,z,simplex)*dx + k*dx*dx;
-    if(dy < 0) E+=base.Ey(x,y,z,simplex)*dy + k*dy*dy;
-    if(dz < 0) E+=base.Ez(x,y,z,simplex)*dz + k*dz*dz;
-    if((dx < 0) && (dy < 0)) E+=base.Exy(x,y,z,simplex)*dx*dy;
-    if((dx < 0) && (dz < 0)) E+=base.Exz(x,y,z,simplex)*dx*dz;
-    if((dy < 0) && (dz < 0)) E+=base.Eyz(x,y,z,simplex)*dy*dz;
-    if((dx < 0) && (dy < 0) && (dz < 0)) E+=base.Exyz(x,y,z,simplex)*dx*dy*dz;
+    T E=base.E(x,y,z,id);
+    if(dx < 0) E+=base.Ex(x,y,z,id)*dx + k*dx*dx;
+    if(dy < 0) E+=base.Ey(x,y,z,id)*dy + k*dy*dy;
+    if(dz < 0) E+=base.Ez(x,y,z,id)*dz + k*dz*dz;
+    if((dx < 0) && (dy < 0)) E+=base.Exy(x,y,z,id)*dx*dy;
+    if((dx < 0) && (dz < 0)) E+=base.Exz(x,y,z,id)*dx*dz;
+    if((dy < 0) && (dz < 0)) E+=base.Eyz(x,y,z,id)*dy*dz;
+    if((dx < 0) && (dy < 0) && (dz < 0)) E+=base.Exyz(x,y,z,id)*dx*dy*dz;
     return E;
 }
 //#####################################################################
 // Function P_From_Strain
 //#####################################################################
 template<class T,int d> DIAGONAL_MATRIX<T,d> GENERAL_EXTRAPOLATED<T,d>::
-P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const
+P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
-    return P_From_Strain_Helper(F,scale,simplex);
+    return P_From_Strain_Helper(F,id);
 }
 //#####################################################################
 // Function P_From_Strain_Helper
 //#####################################################################
 template<class T,int d> DIAGONAL_MATRIX<T,2> GENERAL_EXTRAPOLATED<T,d>::
-P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) const
+P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const int id) const
 {
     T a = extrapolation_cutoff;
     T x = std::max(F.x.x,a);
@@ -118,25 +118,25 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simpl
     T k = extra_force_coefficient*youngs_modulus;
 
     DIAGONAL_MATRIX<T,2> result;
-    result.x.x = base.Ex(x,y,simplex);
-    result.x.y = base.Ey(x,y,simplex);
+    result.x.x = base.Ex(x,y,id);
+    result.x.y = base.Ey(x,y,id);
     if(dx < 0)
     {
         result.x.x += 2*k*dx;
-        result.x.y += base.Exy(x,y,simplex)*dx;
+        result.x.y += base.Exy(x,y,id)*dx;
     }
     if(dy < 0)
     {
-        result.x.x += base.Exy(x,y,simplex)*dy;
+        result.x.x += base.Exy(x,y,id)*dy;
         result.x.y += 2*k*dy;
     }
-    return scale*result;
+    return result;
 }
 //#####################################################################
 // Function P_From_Strain_Helper
 //#####################################################################
 template<class T,int d> DIAGONAL_MATRIX<T,3> GENERAL_EXTRAPOLATED<T,d>::
-P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simplex) const
+P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const int id) const
 {
     T a = extrapolation_cutoff;
     T x = std::max(F.x.x,a);
@@ -148,45 +148,45 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
     T k = extra_force_coefficient*youngs_modulus;
 
     DIAGONAL_MATRIX<T,3> result;
-    result.x.x = base.Ex(x,y,z,simplex);
-    result.x.y = base.Ey(x,y,z,simplex);
-    result.x.z = base.Ez(x,y,z,simplex);
+    result.x.x = base.Ex(x,y,z,id);
+    result.x.y = base.Ey(x,y,z,id);
+    result.x.z = base.Ez(x,y,z,id);
     if(dx < 0)
     {
         result.x.x += 2*k*dx;
-        result.x.y += base.Exy(x,y,z,simplex)*dx;
-        result.x.z += base.Exz(x,y,z,simplex)*dx;
+        result.x.y += base.Exy(x,y,z,id)*dx;
+        result.x.z += base.Exz(x,y,z,id)*dx;
     }
     if(dy < 0)
     {
-        result.x.x += base.Exy(x,y,z,simplex)*dy;
+        result.x.x += base.Exy(x,y,z,id)*dy;
         result.x.y += 2*k*dy;
-        result.x.z += base.Eyz(x,y,z,simplex)*dy;
+        result.x.z += base.Eyz(x,y,z,id)*dy;
     }
     if(dz < 0)
     {
-        result.x.x += base.Exz(x,y,z,simplex)*dz;
-        result.x.y += base.Eyz(x,y,z,simplex)*dz;
+        result.x.x += base.Exz(x,y,z,id)*dz;
+        result.x.y += base.Eyz(x,y,z,id)*dz;
         result.x.z += 2*k*dz;
     }
-    if((dy < 0) && (dz < 0)) result.x.x += base.Exyz(x,y,z,simplex)*dy*dz;
-    if((dx < 0) && (dz < 0)) result.x.y += base.Exyz(x,y,z,simplex)*dx*dz;
-    if((dx < 0) && (dy < 0)) result.x.z += base.Exyz(x,y,z,simplex)*dx*dy;
-    return scale*result;
+    if((dy < 0) && (dz < 0)) result.x.x += base.Exyz(x,y,z,id)*dy*dz;
+    if((dx < 0) && (dz < 0)) result.x.y += base.Exyz(x,y,z,id)*dx*dz;
+    if((dx < 0) && (dy < 0)) result.x.z += base.Exyz(x,y,z,id)*dx*dy;
+    return result;
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void GENERAL_EXTRAPOLATED<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int triangle) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int id) const
 {
-    return Isotropic_Stress_Derivative_Helper(F,dP_dF,triangle);
+    return Isotropic_Stress_Derivative_Helper(F,dP_dF,id);
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T,int d> void GENERAL_EXTRAPOLATED<T,d>::
-Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int simplex) const
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int id) const
 {
     T a = extrapolation_cutoff;
     T x = std::max(F.x.x,a);
@@ -197,13 +197,13 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 
     dP_dF.x0000 = 0;
     dP_dF.x1111 = 0;
-    dP_dF.x1100 = base.Exy(x,y,simplex);
+    dP_dF.x1100 = base.Exy(x,y,id);
 
     if(dx < 0) dP_dF.x0000 += 2*k;
-    else dP_dF.x0000 += base.Exx(x,y,simplex);
+    else dP_dF.x0000 += base.Exx(x,y,id);
 
     if(dy < 0) dP_dF.x1111 += 2*k;
-    else dP_dF.x1111 += base.Eyy(x,y,simplex);
+    else dP_dF.x1111 += base.Eyy(x,y,id);
 
     T xpy = F.x.x+F.x.y; if(fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
     T r=((dx < 0) != (dy < 0))?((F.x.x!=F.x.y)?dx/(F.x.x-F.x.y):1):0;
@@ -211,14 +211,14 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 
     if((dx < 0) && (dy >= 0)) // Rx
     {
-        dP_dF.x1111 += base.Exyy(x,y,simplex)*dx;
+        dP_dF.x1111 += base.Exyy(x,y,id)*dx;
     }
     else if((dx >= 0) && (dy < 0)) // Ry
     {
-        dP_dF.x0000 += base.Exxy(x,y,simplex)*dy;
+        dP_dF.x0000 += base.Exxy(x,y,id)*dy;
     }
 
-    T S=P_From_Strain_Helper(F,1,simplex).Trace()/xpy, D=(2*k-base.Exy(x,y,simplex))*r+(1-r)*base.Ex_Ey_x_y(x,y,simplex);
+    T S=P_From_Strain_Helper(F,id).Trace()/xpy, D=(2*k-base.Exy(x,y,id))*r+(1-r)*base.Ex_Ey_x_y(x,y,id);
     dP_dF.x1001 = (D-S)/2;
     dP_dF.x1010 = (D+S)/2;
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
@@ -227,7 +227,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 // Function Isotropic_Stress_Derivative_Helper_Part
 //#####################################################################
 template<class T,int d> void GENERAL_EXTRAPOLATED<T,d>::
-Isotropic_Stress_Derivative_Helper_Part(T fx,T fy,T fz,const int simplex,T& xxxx,T& yyzz,T& yzyz,T& yzzy) const
+Isotropic_Stress_Derivative_Helper_Part(T fx,T fy,T fz,const int id,T& xxxx,T& yyzz,T& yzyz,T& yzzy) const
 {
     T a = extrapolation_cutoff;
     T x = std::max(fx,a);
@@ -238,28 +238,28 @@ Isotropic_Stress_Derivative_Helper_Part(T fx,T fy,T fz,const int simplex,T& xxxx
     T dz = fz - extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
 
-    yyzz = base.Eyz(x,y,z,simplex);
+    yyzz = base.Eyz(x,y,z,id);
 
     if(dx < 0)
     {
         xxxx = 2*k;
-        yyzz += base.Exyz(x,y,z,simplex)*dx;
+        yyzz += base.Exyz(x,y,z,id)*dx;
     }
     else
     {
-        xxxx = base.Exx(x,y,z,simplex);
-        if(dy < 0) xxxx += base.Exxy(x,y,z,simplex)*dy;
-        if(dz < 0) xxxx += base.Exxz(x,y,z,simplex)*dz;
-        if((dy < 0) && (dz < 0)) xxxx += base.Exxyz(x,y,z,simplex)*dy*dz;
+        xxxx = base.Exx(x,y,z,id);
+        if(dy < 0) xxxx += base.Exxy(x,y,z,id)*dy;
+        if(dz < 0) xxxx += base.Exxz(x,y,z,id)*dz;
+        if((dy < 0) && (dz < 0)) xxxx += base.Exxyz(x,y,z,id)*dy*dz;
     }
 
-    DIAGONAL_MATRIX<T,3> P=P_From_Strain_Helper(DIAGONAL_MATRIX<T,3>(fx,fy,fz),1,simplex);
+    DIAGONAL_MATRIX<T,3> P=P_From_Strain_Helper(DIAGONAL_MATRIX<T,3>(fx,fy,fz),id);
     T ypz = fy+fz; if(fabs(ypz)<panic_threshold) ypz=ypz<0?-panic_threshold:panic_threshold;
     T ryz=((dy < 0) != (dz < 0))?((fy!=fz)?dy/(fy-fz):1):0;
     if(dz<0) ryz=1-ryz;
-    T Cyz=base.Ey_Ez_y_z(x,y,z,simplex);
-    if(dx<0) Cyz+=base.Exy_Exz_y_z(x,y,z,simplex)*dx;
-    T Syz=(P.x.y+P.x.z)/ypz, Dyz=(2*k-base.Eyz(x,y,z,simplex))*ryz+(1-ryz)*Cyz;
+    T Cyz=base.Ey_Ez_y_z(x,y,z,id);
+    if(dx<0) Cyz+=base.Exy_Exz_y_z(x,y,z,id)*dx;
+    T Syz=(P.x.y+P.x.z)/ypz, Dyz=(2*k-base.Eyz(x,y,z,id))*ryz+(1-ryz)*Cyz;
     yzzy = (Dyz-Syz)/2;
     yzyz = (Dyz+Syz)/2;
 }
@@ -267,21 +267,22 @@ Isotropic_Stress_Derivative_Helper_Part(T fx,T fy,T fz,const int simplex,T& xxxx
 // Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T,int d> void GENERAL_EXTRAPOLATED<T,d>::
-Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int simplex) const
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int id) const
 {
-    Isotropic_Stress_Derivative_Helper_Part(F.x.x,F.x.y,F.x.z,simplex,dP_dF.x0000,dP_dF.x2211,dP_dF.x2121,dP_dF.x2112);
-    Isotropic_Stress_Derivative_Helper_Part(F.x.y,F.x.z,F.x.x,simplex,dP_dF.x1111,dP_dF.x2200,dP_dF.x2020,dP_dF.x2002);
-    Isotropic_Stress_Derivative_Helper_Part(F.x.z,F.x.x,F.x.y,simplex,dP_dF.x2222,dP_dF.x1100,dP_dF.x1010,dP_dF.x1001);
+    Isotropic_Stress_Derivative_Helper_Part(F.x.x,F.x.y,F.x.z,id,dP_dF.x0000,dP_dF.x2211,dP_dF.x2121,dP_dF.x2112);
+    Isotropic_Stress_Derivative_Helper_Part(F.x.y,F.x.z,F.x.x,id,dP_dF.x1111,dP_dF.x2200,dP_dF.x2020,dP_dF.x2002);
+    Isotropic_Stress_Derivative_Helper_Part(F.x.z,F.x.x,F.x.y,id,dP_dF.x2222,dP_dF.x1100,dP_dF.x1010,dP_dF.x1001);
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################
 // Function P_From_Strain_Rate
 //#####################################################################
 template<class T,int d> MATRIX<T,d> GENERAL_EXTRAPOLATED<T,d>::
-P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const
+P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const
 {
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
     SYMMETRIC_MATRIX<T,d> strain_rate=F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    return 2*scale*constant_beta*strain_rate+scale*constant_alpha*strain_rate.Trace();
+    return 2*id_beta*strain_rate+id_alpha*strain_rate.Trace();
 }
 //#####################################################################
 // Function P_From_Strain_Rate_Forces_Size
@@ -295,12 +296,13 @@ P_From_Strain_Rate_Forces_Size() const
 // Function P_From_Strain_Rate_First_Half
 //#####################################################################
 template<class T,int d> void GENERAL_EXTRAPOLATED<T,d>::
-P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const
+P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const int id) const
 {
-    SYMMETRIC_MATRIX<T,d> strain_rate=scale*F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    T sb=sqrt(2*constant_beta);
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    SYMMETRIC_MATRIX<T,d> strain_rate=F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
+    T sb=sqrt(2*id_beta);
     T dd=sb/TV::dimension;
-    T sa=sqrt(constant_alpha/TV::dimension+dd*dd)-dd;
+    T sa=sqrt(id_alpha/TV::dimension+dd*dd)-dd;
     SYMMETRIC_MATRIX<T,d> s=sb*strain_rate+sa*strain_rate.Trace();
     *(MATRIX<T,d>*)aggregate.Get_Array_Pointer()+=s;
 }
@@ -308,12 +310,13 @@ P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggreg
 // Function P_From_Strain_Rate_Second_Half
 //#####################################################################
 template<class T,int d> MATRIX<T,d> GENERAL_EXTRAPOLATED<T,d>::
-P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T> aggregate,const T scale,const int simplex) const
+P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T> aggregate,const int id) const
 {
-    SYMMETRIC_MATRIX<T,d> strain_rate=scale*(*(const MATRIX<T,d>*)aggregate.Get_Array_Pointer()).Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    T sb=sqrt(2*constant_beta);
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    SYMMETRIC_MATRIX<T,d> strain_rate=(*(const MATRIX<T,d>*)aggregate.Get_Array_Pointer()).Symmetric_Part(); // use linear damping because of problems with inverting elements...
+    T sb=sqrt(2*id_beta);
     T dd=sb/TV::dimension;
-    T sa=sqrt(constant_alpha/TV::dimension+dd*dd)-dd;
+    T sa=sqrt(id_alpha/TV::dimension+dd*dd)-dd;
     return sb*strain_rate+sa*strain_rate.Trace();
 }
 namespace PhysBAM{

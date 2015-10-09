@@ -28,22 +28,22 @@ template<class T,int d> ISOTROPIC_CONSTITUTIVE_MODEL<T,d>::
 // Function dP_From_dF
 //#####################################################################
 template<class T,int d> MATRIX<T,d> ISOTROPIC_CONSTITUTIVE_MODEL<T,d>::
-dP_From_dF(const MATRIX<T,d>& dF,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const T scale,const int simplex) const
+dP_From_dF(const MATRIX<T,d>& dF,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const int id) const
 {
-    return scale*dPi_dF.Differential(dF);
+    return dPi_dF.Differential(dF);
 }
 //#####################################################################
 // Function Update_State_Dependent_Auxiliary_Variables
 //#####################################################################
 template<class T,int d> void ISOTROPIC_CONSTITUTIVE_MODEL<T,d>::
-Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,d>& F,const int simplex)
+Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,d>& F,const int id)
 {
 }
 //#####################################################################
 // Function Energy_Density
 //#####################################################################
 template<class T,int d> T ISOTROPIC_CONSTITUTIVE_MODEL<T,d>::
-Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
+Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }
@@ -126,21 +126,21 @@ Report_Diagnostics(const DIAGONAL_MATRIX<T,3>& F,T E0,T* E,const DIAGONAL_MATRIX
 // Function Test
 //#####################################################################
 template<class T,int d> void ISOTROPIC_CONSTITUTIVE_MODEL<T,d>::
-Test(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
+Test(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
     PHYSBAM_ASSERT(sizeof(T)==sizeof(double));
     T e=(T)1e-6;
     DIAGONAL_MATRIX<T,d> dF;
 
-    T E0=Energy_Density(F,simplex),E[d];
-    DIAGONAL_MATRIX<T,d> P0=P_From_Strain(F,1,simplex),P[d];
+    T E0=Energy_Density(F,id),E[d];
+    DIAGONAL_MATRIX<T,d> P0=P_From_Strain(F,id),P[d];
     DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d> dPi_dF0,dPi_dF[d];
-    Isotropic_Stress_Derivative(F,dPi_dF0,simplex);
+    Isotropic_Stress_Derivative(F,dPi_dF0,id);
     for(int i=0;i<d;i++){
         DIAGONAL_MATRIX<T,d> Fd=F+DIAGONAL_MATRIX<T,d>(VECTOR<T,d>::Axis_Vector(i+1)*e);
-        E[i]=Energy_Density(Fd,simplex);
-        P[i]=P_From_Strain(Fd,1,simplex);
-        Isotropic_Stress_Derivative(Fd,dPi_dF[i],simplex);}
+        E[i]=Energy_Density(Fd,id);
+        P[i]=P_From_Strain(Fd,id);
+        Isotropic_Stress_Derivative(Fd,dPi_dF[i],id);}
     Report_Diagnostics(F,E0,E,P0,P,dPi_dF0,dPi_dF,e);
 }
 namespace PhysBAM{

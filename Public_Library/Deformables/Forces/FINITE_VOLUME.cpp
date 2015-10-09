@@ -196,19 +196,19 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
             if(dP_dFe) anisotropic_model->Stress_Derivative(Fe_hat(t),V_local,(*dP_dFe)(t),t);
             De_inverse_hat(t)=strain_measure.Dm_inverse(t)*V_local;if(V) (*V)(t)=V_local;
             if(node_stiffness && edge_stiffness){
-                for(int k=0;k<TV::m;k++) for(int l=0;l<d;l++){
-                    T_MATRIX dDs,dG;dDs(k,l)=(T)1;
-                    if(!dPi_dFe && !dP_dFe) // precompute damping matrix
-                        dG=U(t)*constitutive_model.P_From_Strain_Rate(Fe_hat(t),U(t).Transpose_Times(dDs)*De_inverse_hat(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
-                    else if(isotropic_model) // precompute stiffness matrix
-                        dG=U(t)*isotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),(*dPi_dFe)(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
-                    else if(dP_dFe)
-                        dG=U(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dP_dFe)(t),Be_scales(t),t)
-                            .Times_Transpose(De_inverse_hat(t));
-                    else
-                        dG=U(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dPi_dFe)(t),Be_scales(t),t)
-                            .Times_Transpose(De_inverse_hat(t));
-                    for(int i=0;i<TV::m;i++) for(int j=0;j<d;j++) dfdx(l+1,j+1)(k,i)=dG(i,j);}
+                T_MATRIX U_scale=U(t)*Be_scales(t);
+                for(int k=0;k<TV::m;k++)
+                    for(int l=0;l<d;l++){
+                        T_MATRIX dDs,dG;dDs(k,l)=(T)1;
+                        if(!dPi_dFe && !dP_dFe) // precompute damping matrix
+                            dG=U_scale*constitutive_model.P_From_Strain_Rate(Fe_hat(t),U(t).Transpose_Times(dDs)*De_inverse_hat(t),t).Times_Transpose(De_inverse_hat(t));
+                        else if(isotropic_model) // precompute stiffness matrix
+                            dG=U_scale*isotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),(*dPi_dFe)(t),t).Times_Transpose(De_inverse_hat(t));
+                        else if(dP_dFe)
+                            dG=U_scale*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dP_dFe)(t),t).Times_Transpose(De_inverse_hat(t));
+                        else
+                            dG=U_scale*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dPi_dFe)(t),t).Times_Transpose(De_inverse_hat(t));
+                        for(int i=0;i<TV::m;i++) for(int j=0;j<d;j++) dfdx(l+1,j+1)(k,i)=dG(i,j);}
                 for(int i=1;i<d+1;i++){dfdx(i,0)=MATRIX<T,TV::m>();for(int j=1;j<d+1;j++) dfdx(i,0)-=dfdx(i,j);}
                 for(int j=0;j<d+1;j++){dfdx(0,j)=MATRIX<T,TV::m>();for(int i=1;i<d+1;i++) dfdx(0,j)-=dfdx(i,j);}
                 VECTOR<int,d+1> nodes=strain_measure.mesh.elements(t);
@@ -248,11 +248,11 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     if(anisotropic_model)
         for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-            T_MATRIX forces=U(t)*anisotropic_model->P_From_Strain(Fe_hat(t),(*V)(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
+            T_MATRIX forces=U(t)*(Be_scales(t)*anisotropic_model->P_From_Strain(Fe_hat(t),(*V)(t),t)).Times_Transpose(De_inverse_hat(t));
             strain_measure.Distribute_Force(F,t,forces);}
     else
         for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-            T_MATRIX forces=U(t)*isotropic_model->P_From_Strain(Fe_hat(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
+            T_MATRIX forces=U(t)*(Be_scales(t)*isotropic_model->P_From_Strain(Fe_hat(t),t)).Times_Transpose(De_inverse_hat(t));
             strain_measure.Distribute_Force(F,t,forces);}
 }
 //#####################################################################
@@ -272,7 +272,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
     else{
         for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             MATRIX<T,d> Fe_dot_hat=U(t).Transpose_Times(strain_measure.Ds(V,t))*De_inverse_hat(t);
-            T_MATRIX forces=U(t)*constitutive_model.P_From_Strain_Rate(Fe_hat(t),Fe_dot_hat,Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
+            T_MATRIX forces=U(t)*(Be_scales(t)*constitutive_model.P_From_Strain_Rate(Fe_hat(t),Fe_dot_hat,t)).Times_Transpose(De_inverse_hat(t));
             strain_measure.Distribute_Force(F,t,forces);}}
 }
 //#####################################################################
@@ -392,7 +392,7 @@ Add_Semi_Implicit_Impulse(const int element,const T dt,T* time_plus_dt)
     T_MATRIX Q=U.Times_Transpose(V);
     // compute -s dt P^n
     T dt_scale=dt*data.Bm_scale;
-    SYMMETRIC_MATRIX<T,d> P0_cap=SYMMETRIC_MATRIX<T,d>::Conjugate(V,isotropic_model->P_From_Strain(F_hat,dt_scale,element));
+    SYMMETRIC_MATRIX<T,d> P0_cap=SYMMETRIC_MATRIX<T,d>::Conjugate(V,dt_scale*isotropic_model->P_From_Strain(F_hat,element));
     MATRIX<T,d> F_dot_cap=Q.Transpose_Times(STRAIN_MEASURE<TV,d>::Ds(particles.V,data.nodes))*data.Dm_inverse;
     SYMMETRIC_MATRIX<T,d> F_dot_cap_twice_symmetric_part=F_dot_cap.Twice_Symmetric_Part();
     if(time_plus_dt) *time_plus_dt=data.time+min(data.dt_cfl,twice_max_strain_per_time_step/F_dot_cap_twice_symmetric_part.Max_Abs());
@@ -432,8 +432,8 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
     PHYSBAM_ASSERT(!(node_stiffness && edge_stiffness && !dPi_dFe && !dP_dFe) && compute_half_forces);
     int start_force=1;
     for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-        MATRIX<T,d> Fe_dot_hat=U(t).Transpose_Times(strain_measure.Ds(V,t))*De_inverse_hat(t);
-        constitutive_model.P_From_Strain_Rate_First_Half(Fe_hat(t),aggregate.Array_View(start_force,half_force_size),Fe_dot_hat,sqrt_Be_scales(t),t);
+        MATRIX<T,d> Fe_dot_hat=U(t).Transpose_Times(strain_measure.Ds(V,t))*De_inverse_hat(t)*sqrt_Be_scales(t);
+        constitutive_model.P_From_Strain_Rate_First_Half(Fe_hat(t),aggregate.Array_View(start_force,half_force_size),Fe_dot_hat,t);
         start_force+=half_force_size;}
 }
 //#####################################################################
@@ -445,7 +445,7 @@ Add_Velocity_Dependent_Forces_Second_Half(const ARRAY_VIEW<const T> aggregate,AR
     int start_force=1;
     PHYSBAM_ASSERT(!(node_stiffness && edge_stiffness && !dPi_dFe && !dP_dFe) && compute_half_forces);
     for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-        T_MATRIX forces=U(t)*constitutive_model.P_From_Strain_Rate_Second_Half(Fe_hat(t),aggregate.Array_View(start_force,half_force_size),sqrt_Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
+        T_MATRIX forces=U(t)*constitutive_model.P_From_Strain_Rate_Second_Half(Fe_hat(t),aggregate.Array_View(start_force,half_force_size),t).Times_Transpose(De_inverse_hat(t))*sqrt_Be_scales(t);
         strain_measure.Distribute_Force(F,t,forces);
         start_force+=half_force_size;}
 }
@@ -489,14 +489,14 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> VV,ARRAY_VIEW<TV> 
         if(!dPi_dFe && !dP_dFe) PHYSBAM_FATAL_ERROR();
         for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             T_MATRIX dDs=strain_measure.Ds(VV,t),dG;
-            if(dP_dFe) dG=U(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dP_dFe)(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
-            else dG=U(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dPi_dFe)(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
+            if(dP_dFe) dG=U(t)*(Be_scales(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dP_dFe)(t),t)).Times_Transpose(De_inverse_hat(t));
+            else dG=U(t)*(Be_scales(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dPi_dFe)(t),t)).Times_Transpose(De_inverse_hat(t));
             strain_measure.Distribute_Force(F,t,dG);}}
     else{
         if(!dPi_dFe) PHYSBAM_FATAL_ERROR();
         for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             T_MATRIX dDs=strain_measure.Ds(VV,t);
-            T_MATRIX dG=U(t)*isotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),(*dPi_dFe)(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
+            T_MATRIX dG=U(t)*(Be_scales(t)*isotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),(*dPi_dFe)(t),t)).Times_Transpose(De_inverse_hat(t));
             strain_measure.Distribute_Force(F,t,dG);}}
 }
 //#####################################################################

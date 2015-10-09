@@ -35,16 +35,17 @@ public:
 
     virtual ~CONSTITUTIVE_MODEL();
 
-    virtual T Maximum_Elastic_Stiffness(const int simplex) const; // for elastic CFL computation
-    virtual T Maximum_Damping_Stiffness(const int simplex) const; // for damping CFL computation
+    virtual T Maximum_Elastic_Stiffness(const int id) const; // for elastic CFL computation
+    virtual T Maximum_Damping_Stiffness(const int id) const; // for damping CFL computation
 
 //#####################################################################
-    virtual MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const=0;
-    virtual void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const int simplex) const;
+    virtual MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const=0;
+    virtual void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const int id) const;
     virtual int P_From_Strain_Rate_Forces_Size() const;
-    virtual void P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const;
-    virtual MATRIX<T,d> P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,const ARRAY_VIEW<const T> aggregate,const T scale,const int simplex) const;
+    virtual void P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const int id) const;
+    virtual MATRIX<T,d> P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,const ARRAY_VIEW<const T> aggregate,const int id) const;
     virtual void Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input,const T Rayleigh_coefficient_input);
+    void Update_Variable_Coefficients(int size);
 //#####################################################################
 };
 }

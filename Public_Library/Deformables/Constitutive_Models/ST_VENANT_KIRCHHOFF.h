@@ -16,7 +16,9 @@ class ST_VENANT_KIRCHHOFF:public ISOTROPIC_CONSTITUTIVE_MODEL<T,d>
     typedef VECTOR<T,d> TV;
 public:
     typedef ISOTROPIC_CONSTITUTIVE_MODEL<T,d> BASE;
-    using BASE::enforce_definiteness;using BASE::constant_lambda;using BASE::constant_mu;using BASE::constant_alpha;using BASE::constant_beta;
+    using BASE::enforce_definiteness;using BASE::constant_lambda;using BASE::constant_mu;
+    using BASE::constant_alpha;using BASE::constant_beta;
+    using BASE::alpha;using BASE::beta;using BASE::lambda;using BASE::mu;
 
     T youngs_modulus,poissons_ratio;
     T failure_threshold;
@@ -24,10 +26,10 @@ public:
     ST_VENANT_KIRCHHOFF(const T youngs_modulus_input=3e6,const T poissons_ratio_input=.475,const T Rayleigh_coefficient=.05);
     virtual ~ST_VENANT_KIRCHHOFF();
 
-    T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const override;
-    DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const override;
-    MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const override;
-    void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int simplex) const override;
+    T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const override;
+    DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const override;
+    MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const override;
+    void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int id) const override;
 //#####################################################################
 };
 }

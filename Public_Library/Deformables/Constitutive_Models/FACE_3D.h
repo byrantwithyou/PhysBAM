@@ -22,8 +22,10 @@ class FACE_3D:public ANISOTROPIC_CONSTITUTIVE_MODEL<T,3>
     typedef VECTOR<T,3> TV;
 public:
     typedef ANISOTROPIC_CONSTITUTIVE_MODEL<T,3> BASE;
-    using BASE::enforce_definiteness;using BASE::constant_lambda;using BASE::constant_mu;using BASE::constant_alpha;using BASE::constant_beta;
+    using BASE::enforce_definiteness;using BASE::constant_lambda;using BASE::constant_mu;
+    using BASE::constant_alpha;using BASE::constant_beta;
     using BASE::use_isotropic_component_of_stress_derivative_only;
+    using BASE::alpha;using BASE::beta;using BASE::lambda;using BASE::mu;
 
     T constant_mu_10,constant_mu_01,constant_kappa;
     ARRAY<T> *tet_mu_10,*tet_mu_01,*tet_kappa;
@@ -88,42 +90,45 @@ public:
     {T strain=stretch-1,strain_abs=abs(strain),activation=muscle_activations(tet_muscles(tet_index)(tet_muscle_index)),density=tet_densities(tet_index)(tet_muscle_index);
     T active_tension=0,passive_tension=0,scale=(T)25/(T)6;
     if(stretch>fiber_cutoff)passive_tension=fiber_p3*stretch+fiber_p4;else if(stretch>1)passive_tension=fiber_p1*(exp(fiber_p2*strain)-fiber_p2*strain-1);
-    if(strain_abs<.4)active_tension=activation*density*(1-scale*sqr(strain));else if(strain_abs<.6)active_tension=2*scale*activation*density*sqr(strain_abs-(T).6);
+    if(strain_abs<.4)active_tension=activation*density*(1-sqr(strain));else if(strain_abs<.6)active_tension=2*activation*density*sqr(strain_abs-(T).6);
     return fiber_max_stress(tet_muscles(tet_index)(tet_muscle_index))*(active_tension+passive_tension);}
         
     T Active_Tension_Unit_Activation(const int tet_index,const int tet_muscle_index,const T stretch) const
     {T strain=stretch-1,strain_abs=abs(strain),density=tet_densities(tet_index)(tet_muscle_index),active_tension=0,scale=(T)25/(T)6;
-    if(strain_abs<.4)active_tension=density*(1-scale*sqr(strain));else if(strain_abs<.6)active_tension=2*scale*density*sqr(strain_abs-(T).6);
+    if(strain_abs<.4)active_tension=density*(1-sqr(strain));else if(strain_abs<.6)active_tension=2*density*sqr(strain_abs-(T).6);
     return fiber_max_stress(tet_muscles(tet_index)(tet_muscle_index))*active_tension;}
         
     T Tension_Derivative(const int tet_index,const int tet_muscle_index,const T stretch) const
     {T strain=stretch-1,strain_abs=abs(strain),activation=muscle_activations(tet_muscles(tet_index)(tet_muscle_index)),density=tet_densities(tet_index)(tet_muscle_index);
     T active_tension_derivative=0,passive_tension_derivative=0,scale=(T)25/(T)6;
     if(stretch>fiber_cutoff)passive_tension_derivative=fiber_p3;else if(stretch>1)passive_tension_derivative=fiber_p1*fiber_p2*(exp(fiber_p2*strain)-1);
-    if(strain_abs<.4)active_tension_derivative=-2*scale*activation*density*strain;else if(strain_abs<.6)active_tension_derivative=4*scale*activation*density*(strain-sign(strain)*(T).6);
+    if(strain_abs<.4)active_tension_derivative=-2*activation*density*strain;else if(strain_abs<.6)active_tension_derivative=4*activation*density*(strain-sign(strain)*(T).6);
     return fiber_max_stress(tet_muscles(tet_index)(tet_muscle_index))*(active_tension_derivative+passive_tension_derivative);}
 
-    MATRIX<T,3> P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const T scale,const int tetrahedron_index) const override
+    MATRIX<T,3> P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const int tetrahedron_index) const override
     {T mu_10=(tet_mu_10)?(*tet_mu_10)(tetrahedron_index):constant_mu_10,mu_01=(tet_mu_01)?(*tet_mu_01)(tetrahedron_index):constant_mu_01,kappa=(tet_kappa)?(*tet_kappa)(tetrahedron_index):constant_kappa;
-    if(single_activation_used_for_force_derivative&&(*single_activation_used_for_force_derivative))return P_From_Strain_Unit_Activation(F,V,scale,tetrahedron_index,*single_activation_used_for_force_derivative);
+    if(single_activation_used_for_force_derivative&&(*single_activation_used_for_force_derivative))return P_From_Strain_Unit_Activation(F,V,tetrahedron_index,*single_activation_used_for_force_derivative);
     DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold),C=F_threshold*F_threshold,F_cube=C*F_threshold,F_inverse=F_threshold.Inverse(),isotropic_part;
     MATRIX<T,3> anisotropic_part;T I_C=C.Trace(),II_C=(C*C).Trace(),J=F_threshold.Determinant(),Jcc=pow(J,-((T)2/3));
     isotropic_part=(2*Jcc*(mu_10+Jcc*mu_01*I_C))*F_threshold-(2*Jcc*Jcc*mu_01)*F_cube+((kappa*log(J)-((T)2/3)*Jcc*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))))*F_inverse;
     for(int m=0;m<tet_muscles(tetrahedron_index).m;m++){
         VECTOR<T,3> fiber=V.Transpose_Times(tet_fibers(tetrahedron_index)(m)),F_fiber=F_threshold*fiber;
         anisotropic_part+=(tension(tetrahedron_index)(m)/F_fiber.Magnitude())*MATRIX<T,3>::Outer_Product(F_fiber,fiber);}
-    return scale*(anisotropic_part+isotropic_part);}
+    return (anisotropic_part+isotropic_part);}
     
-    MATRIX<T,3> P_From_Strain_Unit_Activation(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const T scale,const int tetrahedron_index,const int muscle_id) const
+    MATRIX<T,3> P_From_Strain_Unit_Activation(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const int tetrahedron_index,const int muscle_id) const
     {assert((unsigned)muscle_id<muscle_activations.m);DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold);
     int tet_muscle_index=tet_muscles(tetrahedron_index).Find(muscle_id);
     if(tet_muscle_index<0)return MATRIX<T,3>();
     VECTOR<T,3> fiber=V.Transpose_Times(tet_fibers(tetrahedron_index)(tet_muscle_index)),F_fiber=F_threshold*fiber;
-    return scale*(active_tension_unit_activation(tetrahedron_index)(tet_muscle_index)/F_fiber.Magnitude())*MATRIX<T,3>::Outer_Product(F_fiber,fiber);}
+    return (active_tension_unit_activation(tetrahedron_index)(tet_muscle_index)/F_fiber.Magnitude())*MATRIX<T,3>::Outer_Product(F_fiber,fiber);}
 
-    MATRIX<T,3> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const T scale,const int tetrahedron) const override
-    {SYMMETRIC_MATRIX<T,3> strain_rate=F_dot.Symmetric_Part(); 
-    return 2*scale*constant_beta*strain_rate+scale*constant_alpha*strain_rate.Trace();}
+    MATRIX<T,3> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const int tetrahedron) const override
+    {
+        T id_alpha=(alpha.m?alpha(tetrahedron):constant_alpha),id_beta=(beta.m?beta(tetrahedron):constant_beta);
+        SYMMETRIC_MATRIX<T,3> strain_rate=F_dot.Symmetric_Part(); 
+        return 2*id_beta*strain_rate+id_alpha*strain_rate.Trace();
+    }
 
     void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron_index=0) const override
     {T mu_10=(tet_mu_10)?(*tet_mu_10)(tetrahedron_index):constant_mu_10,mu_01=(tet_mu_01)?(*tet_mu_01)(tetrahedron_index):constant_mu_01,kappa=(tet_kappa)?(*tet_kappa)(tetrahedron_index):constant_kappa;
@@ -152,19 +157,18 @@ public:
     dPi_dF.x1001=beta.x10;dPi_dF.x2002=beta.x20;dPi_dF.x2112=beta.x20;
     if(enforce_definiteness) dPi_dF.Enforce_Definiteness();}
 
-    void Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,DIAGONALIZED_STRESS_DERIVATIVE<T,3>& dP_dF,const int simplex) const override
+    void Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,DIAGONALIZED_STRESS_DERIVATIVE<T,3>& dP_dF,const int id) const override
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 
-    MATRIX<T,3> dP_From_dF(const MATRIX<T,3>& dF,const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const T scale,
-        const int tetrahedron_index) const
-    {MATRIX<T,3> dP=scale*dPi_dF.Differential(dF);
+    MATRIX<T,3> dP_From_dF(const MATRIX<T,3>& dF,const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron_index) const
+    {MATRIX<T,3> dP=dPi_dF.Differential(dF);
     DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold);
     for(int m=0;m<tet_muscles(tetrahedron_index).m;m++){
         VECTOR<T,3> fiber=V.Transpose_Times(tet_fibers(tetrahedron_index)(m)),F_fiber=F_threshold*fiber,dF_fiber=dF*fiber;
         T stretch_squared=F_fiber.Magnitude_Squared(),stretch=sqrt(stretch_squared);
         T c1=tension(tetrahedron_index)(m)/stretch,c2=(tension_derivative(tetrahedron_index)(m)-c1)/stretch_squared;
         VECTOR<T,3> dPw=c1*dF_fiber+c2*VECTOR<T,3>::Dot_Product(dF_fiber,F_fiber)*F_fiber;
-        dP+=scale*MATRIX<T,3>::Outer_Product(dPw,fiber);}
+        dP+=MATRIX<T,3>::Outer_Product(dPw,fiber);}
     return dP;}
 
     void Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const int tetrahedron_index) override

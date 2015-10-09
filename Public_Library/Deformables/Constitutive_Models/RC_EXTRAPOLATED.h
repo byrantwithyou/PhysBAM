@@ -24,10 +24,8 @@ public:
     typedef ISOTROPIC_CONSTITUTIVE_MODEL<T,d> BASE;
     
     using BASE::enforce_definiteness;
-    using BASE::constant_lambda;
-    using BASE::constant_mu;
-    using BASE::constant_alpha;
-    using BASE::constant_beta;
+    using BASE::constant_lambda;using BASE::constant_mu;using BASE::constant_alpha;using BASE::constant_beta;
+    using BASE::alpha;using BASE::beta;using BASE::lambda;using BASE::mu;
 
     struct HELPER
     {
@@ -38,9 +36,9 @@ public:
         TV dm,dh,dphi,dE,dz,dxi,ds;
         SYMMETRIC_MATRIX<T,d> ddm,ddh,ddphi,ddE,ddz,ddxi,dds,H;
 
-        bool Compute_E(const GENERAL_ENERGY<T>& base,T k,T extrapolation_cutoff,const TV& f,const int simplex);
-        void Compute_dE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex);
-        void Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex);
+        bool Compute_E(const GENERAL_ENERGY<T>& base,T k,T extrapolation_cutoff,const TV& f,const int id);
+        void Compute_dE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int id);
+        void Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int id);
     };
 
     GENERAL_ENERGY<T>& base;
@@ -55,14 +53,14 @@ public:
     virtual ~RC_EXTRAPOLATED();
 
     void Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input,const T Rayleigh_coefficient_input) override;
-    T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const override;
-    DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const override;
-    void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int triangle) const;
+    T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const override;
+    DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const override;
+    void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int id) const;
     
-    MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const override;
+    MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const override;
     int P_From_Strain_Rate_Forces_Size() const override;
-    void P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const override;
-    MATRIX<T,d> P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,const ARRAY_VIEW<const T> aggregate,const T scale,const int simplex) const override;
+    void P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const int id) const override;
+    MATRIX<T,d> P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,const ARRAY_VIEW<const T> aggregate,const int id) const override;
 };
 }
 #endif

@@ -21,11 +21,11 @@ public:
     virtual ~ISOTROPIC_CONSTITUTIVE_MODEL();
 
 //#####################################################################
-    virtual MATRIX<T,d> dP_From_dF(const MATRIX<T,d>& dF,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const T scale,const int simplex) const;
-    virtual DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const=0;
-    virtual void Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,d>& F,const int simplex);
-    virtual T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const;
-    void Test(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const;
+    virtual MATRIX<T,d> dP_From_dF(const MATRIX<T,d>& dF,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const int id) const;
+    virtual DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const=0;
+    virtual void Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,d>& F,const int id);
+    virtual T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const;
+    void Test(const DIAGONAL_MATRIX<T,d>& F,const int id) const;
 //#####################################################################
 };
 }

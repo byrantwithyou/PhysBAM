@@ -51,14 +51,14 @@ public:
     if(sqr_norm<=sqr_log_yield_ratio)return false;Fe_log*=sqrt(sqr_log_yield_ratio/sqr_norm);
     Fe_project=exp(Fe_log);return true;}
     
-    void Project_Fp(const int tetrahedron,const MATRIX<T,3>& Fp_trial) override
+    void Project_Fp(const int id,const MATRIX<T,3>& Fp_trial) override
     {MATRIX<T,3> U,V;DIAGONAL_MATRIX<T,3> Fp_trial_hat;Fp_trial.Fast_Singular_Value_Decomposition(U,Fp_trial_hat,V);
     SYMMETRIC_MATRIX<T,3> log_Fp_trial=SYMMETRIC_MATRIX<T,3>::Conjugate(V,log(Fp_trial_hat.Max((T)1e-5)));
-    SYMMETRIC_MATRIX<T,3> log_Fp_trial_minus_log_Fp=log_Fp_trial-log_Fp(tetrahedron);
-    T goal_dot_trial=SYMMETRIC_MATRIX<T,3>::Inner_Product(log_Fp_goal(tetrahedron)-log_Fp(tetrahedron),log_Fp_trial_minus_log_Fp);if(goal_dot_trial<=0)return;
+    SYMMETRIC_MATRIX<T,3> log_Fp_trial_minus_log_Fp=log_Fp_trial-log_Fp(id);
+    T goal_dot_trial=SYMMETRIC_MATRIX<T,3>::Inner_Product(log_Fp_goal(id)-log_Fp(id),log_Fp_trial_minus_log_Fp);if(goal_dot_trial<=0)return;
     T t=goal_dot_trial/log_Fp_trial_minus_log_Fp.Frobenius_Norm_Squared();
-    if(t<1)log_Fp_trial=t*log_Fp_trial_minus_log_Fp+log_Fp(tetrahedron);
-    log_Fp(tetrahedron)=log_Fp_trial;Fp_inverse(tetrahedron)=exp(-log_Fp_trial);}
+    if(t<1)log_Fp_trial=t*log_Fp_trial_minus_log_Fp+log_Fp(id);
+    log_Fp(id)=log_Fp_trial;Fp_inverse(id)=exp(-log_Fp_trial);}
     
     void Read_State(TYPED_ISTREAM& input) override
     {PLASTICITY_MODEL<T,3>::Read_State(input);

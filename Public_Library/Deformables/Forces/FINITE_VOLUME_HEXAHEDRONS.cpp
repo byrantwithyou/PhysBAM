@@ -107,14 +107,20 @@ template<class T> void FINITE_VOLUME_HEXAHEDRONS<T>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     if(anisotropic_model)
-        for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int e=iterator.Data();for(int g=0;g<8;g++){
-            int gauss_index=8*(e-1)+g;
-            MATRIX<T,3> U_P_hat=U(e)(g)*anisotropic_model->P_From_Strain(Fe_hat(e)(g),(*V)(e)(g),Be_scales(e)(g),gauss_index);
-            for(int k=0;k<8;k++) F(strain_measure.mesh.elements(e)(k))+=U_P_hat*De_inverse_hat(e)(g)(k);}}
+        for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
+            int e=iterator.Data();
+            for(int g=0;g<8;g++){
+                int gauss_index=8*(e-1)+g;
+                MATRIX<T,3> U_P_hat=U(e)(g)*(Be_scales(e)(g)*anisotropic_model->P_From_Strain(Fe_hat(e)(g),(*V)(e)(g),gauss_index));
+                for(int k=0;k<8;k++)
+                    F(strain_measure.mesh.elements(e)(k))+=U_P_hat*De_inverse_hat(e)(g)(k);}}
     else
-        for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int e=iterator.Data();for(int g=0;g<8;g++){
-            MATRIX<T,3> U_P_hat=U(e)(g)*isotropic_model->P_From_Strain(Fe_hat(e)(g),Be_scales(e)(g),e);
-            for(int k=0;k<8;k++) F(strain_measure.mesh.elements(e)(k))+=U_P_hat*De_inverse_hat(e)(g)(k);}}
+        for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
+            int e=iterator.Data();
+            for(int g=0;g<8;g++){
+                MATRIX<T,3> U_P_hat=U(e)(g)*(Be_scales(e)(g)*isotropic_model->P_From_Strain(Fe_hat(e)(g),e));
+            for(int k=0;k<8;k++)
+                F(strain_measure.mesh.elements(e)(k))+=U_P_hat*De_inverse_hat(e)(g)(k);}}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -124,7 +130,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int e=iterator.Data();for(int g=0;g<8;g++){
         MATRIX<T,3> Fe_dot_hat=U(e)(g).Transpose_Times(strain_measure.Gradient(V,De_inverse_hat,g,e));
-        MATRIX<T,3> U_P_hat=U(e)(g)*constitutive_model.P_From_Strain_Rate(Fe_hat(e)(g),Fe_dot_hat,Be_scales(e)(g),e);
+        MATRIX<T,3> U_P_hat=U(e)(g)*(Be_scales(e)(g)*constitutive_model.P_From_Strain_Rate(Fe_hat(e)(g),Fe_dot_hat,e));
         for(int k=0;k<8;k++) F(strain_measure.mesh.elements(e)(k))+=U_P_hat*De_inverse_hat(e)(g)(k);}}
 }
 //#####################################################################
@@ -139,14 +145,14 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> VV,ARRAY_VIEW<TV> 
             int gauss_index=8*(e-1)+g;
             MATRIX<T,3> dF_hat=U(e)(g).Transpose_Times(strain_measure.Gradient(VV,De_inverse_hat,g,e));
             MATRIX<T,3> U_dP_hat;
-            if(dP_dFe) U_dP_hat=U(e)(g)*anisotropic_model->dP_From_dF(dF_hat,Fe_hat(e)(g),(*V)(e)(g),(*dP_dFe)(e)(g),Be_scales(e)(g),gauss_index);
-            else U_dP_hat=U(e)(g)*anisotropic_model->dP_From_dF(dF_hat,Fe_hat(e)(g),(*V)(e)(g),(*dPi_dFe)(e)(g),Be_scales(e)(g),gauss_index);
+            if(dP_dFe) U_dP_hat=U(e)(g)*(Be_scales(e)(g)*anisotropic_model->dP_From_dF(dF_hat,Fe_hat(e)(g),(*V)(e)(g),(*dP_dFe)(e)(g),gauss_index));
+            else U_dP_hat=U(e)(g)*(Be_scales(e)(g)*anisotropic_model->dP_From_dF(dF_hat,Fe_hat(e)(g),(*V)(e)(g),(*dPi_dFe)(e)(g),gauss_index));
             for(int k=0;k<8;k++) F(strain_measure.mesh.elements(e)(k))+=U_dP_hat*De_inverse_hat(e)(g)(k);}}
     else
         for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int e=iterator.Data();for(int g=0;g<8;g++){
             int gauss_index=8*(e-1)+g;
             MATRIX<T,3> dF_hat=U(e)(g).Transpose_Times(strain_measure.Gradient(VV,De_inverse_hat,g,e));
-            MATRIX<T,3> U_dP_hat=U(e)(g)*isotropic_model->dP_From_dF(dF_hat,(*dPi_dFe)(e)(g),Be_scales(e)(g),gauss_index);
+            MATRIX<T,3> U_dP_hat=U(e)(g)*(Be_scales(e)(g)*isotropic_model->dP_From_dF(dF_hat,(*dPi_dFe)(e)(g),gauss_index));
             for(int k=0;k<8;k++) F(strain_measure.mesh.elements(e)(k))+=U_dP_hat*De_inverse_hat(e)(g)(k);}}
 }
 //#####################################################################

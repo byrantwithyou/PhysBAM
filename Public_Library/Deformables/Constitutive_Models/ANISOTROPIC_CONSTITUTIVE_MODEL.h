@@ -21,12 +21,12 @@ public:
 
 //#####################################################################
     virtual MATRIX<T,d> dP_From_dF(const MATRIX<T,d>& dF,const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,
-        const T scale,const int simplex) const;
+        const int id) const;
     virtual MATRIX<T,d> dP_From_dF(const MATRIX<T,d>& dF,const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,const DIAGONALIZED_STRESS_DERIVATIVE<T,d>& dP_dF,
-        const T scale,const int tetrahedron) const;
-    virtual MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,const T scale,const int simplex) const=0;
-    virtual void Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,DIAGONALIZED_STRESS_DERIVATIVE<T,d>& dP_dF,const int simplex) const=0;
-    virtual void Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,const int simplex);
+        const int id) const;
+    virtual MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,const int id) const=0;
+    virtual void Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,DIAGONALIZED_STRESS_DERIVATIVE<T,d>& dP_dF,const int id) const=0;
+    virtual void Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,const int id);
 //#####################################################################
 };
 }

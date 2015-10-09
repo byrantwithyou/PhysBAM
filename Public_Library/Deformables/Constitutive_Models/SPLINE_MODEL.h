@@ -48,27 +48,7 @@ private:
     {parameter=value;}
 public:
 
-    DIAGONAL_MATRIX<T,2> P_From_Strain(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) const
-    {DIAGONAL_MATRIX<T,2> strain=F-1,strain_abs=strain.Abs(),strain_sign=strain.Sign();
-    DIAGONAL_MATRIX<T,2> D;
-    int index=hardening_deformation.m>1?simplex:1;
-    T hardening_deformation_=hardening_deformation(index),hardening_strength_=hardening_strength(index),coefficient_=coefficient(index),base_=base(index);
-    D.x.x=strain_abs.x.x<hardening_deformation_?strain_abs.x.x*(1+coefficient_*sqr(strain_abs.x.x)):hardening_strength_*strain_abs.x.x-base_;
-    D.x.y=strain_abs.x.y<hardening_deformation_?strain_abs.x.y*(1+coefficient_*sqr(strain_abs.x.y)):hardening_strength_*strain_abs.x.y-base_;
-    if(!mu.m) return 2*scale*constant_mu*strain_sign*D+scale*constant_lambda*strain.Trace();
-    else return 2*scale*mu(simplex)*strain_sign*D+scale*lambda(simplex)*strain.Trace();}
-
-    DIAGONAL_MATRIX<T,3> P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simplex) const
-    {DIAGONAL_MATRIX<T,3> strain=F-1,strain_abs=strain.Abs(),strain_sign=strain.Sign();
-    DIAGONAL_MATRIX<T,3> D;
-    int index=hardening_deformation.m>1?simplex:1;
-    T hardening_deformation_=hardening_deformation(index),hardening_strength_=hardening_strength(index),coefficient_=coefficient(index),base_=base(index);
-    D.x.x=strain_abs.x.x<hardening_deformation_?strain_abs.x.x*(1+coefficient_*sqr(strain_abs.x.x)):hardening_strength_*strain_abs.x.x-base_;
-    D.x.y=strain_abs.x.y<hardening_deformation_?strain_abs.x.y*(1+coefficient_*sqr(strain_abs.x.y)):hardening_strength_*strain_abs.x.y-base_;
-    D.x.z=strain_abs.x.z<hardening_deformation_?strain_abs.x.z*(1+coefficient_*sqr(strain_abs.x.z)):hardening_strength_*strain_abs.x.z-base_;
-    if(!mu.m) return 2*scale*constant_mu*strain_sign*D+scale*constant_lambda*strain.Trace();
-    else return 2*scale*mu(simplex)*strain_sign*D+scale*lambda(simplex)*strain.Trace();}
-
+    DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const override;
 //#####################################################################
 };
 }

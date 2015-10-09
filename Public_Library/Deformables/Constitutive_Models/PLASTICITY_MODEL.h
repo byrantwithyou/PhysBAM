@@ -37,7 +37,7 @@ public:
 
 //#####################################################################
     virtual bool Project_Fe(const DIAGONAL_MATRIX<T,d>& Fe_trial,DIAGONAL_MATRIX<T,d>& Fe_project) const=0;
-    virtual void Project_Fp(const int tetrahedron,const MATRIX<T,d>& Fp_trial)=0;
+    virtual void Project_Fp(const int id,const MATRIX<T,d>& Fp_trial)=0;
 //#####################################################################
 };
 }

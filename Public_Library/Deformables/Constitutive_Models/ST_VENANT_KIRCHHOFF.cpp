@@ -34,28 +34,38 @@ template<class T,int d> ST_VENANT_KIRCHHOFF<T,d>::
 // Function Energy_Density
 //#####################################################################
 template<class T,int d> T ST_VENANT_KIRCHHOFF<T,d>::
-Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
+Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold),strain=(F_threshold*F_threshold-1)*(T).5,strain_squared=strain*strain;
-    return (T).5*constant_lambda*strain.Trace()*strain.Trace()+constant_mu*strain_squared.Trace();
+    return (T).5*id_lambda*strain.Trace()*strain.Trace()+id_mu*strain_squared.Trace();
 }
 //#####################################################################
 // Function P_From_Strain
 //#####################################################################
 template<class T,int d> DIAGONAL_MATRIX<T,d> ST_VENANT_KIRCHHOFF<T,d>::
-P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const
+P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold),twice_strain=F_threshold*F_threshold-1;
-    return F_threshold*(scale*constant_mu*twice_strain+(T).5*scale*constant_lambda*twice_strain.Trace());
+    return F_threshold*(id_mu*twice_strain+(T).5*id_lambda*twice_strain.Trace());
 }
+//#####################################################################
+// Function P_From_Strain_Rate
+//#####################################################################
 template<class T,int d> MATRIX<T,d> ST_VENANT_KIRCHHOFF<T,d>::
-P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const
+P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const
 {
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
     DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold);
     SYMMETRIC_MATRIX<T,d> strain_rate=(F_threshold*F_dot).Symmetric_Part();
-    return F_threshold*(2*scale*constant_beta*strain_rate+scale*constant_alpha*strain_rate.Trace());
+    return F_threshold*(2*id_beta*strain_rate+id_alpha*strain_rate.Trace());
 }
-template<class T> static void Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,
+//#####################################################################
+// Function Isotropic_Stress_Derivative_Helper
+//#####################################################################
+template<class T> static void
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,
     T failure_threshold,T mu,T lambda)
 {
     DIAGONAL_MATRIX<T,2> F_threshold=F.Clamp_Min(failure_threshold);
@@ -67,7 +77,11 @@ template<class T> static void Isotropic_Stress_Derivative_Helper(const DIAGONAL_
     dP_dF.x1010=lambda_tr_G_minus_mu+mu*(F_outer.x11+F_outer.x00);//alpha
     dP_dF.x1001=mu*F_outer.x10;//beta
 }
-template<class T> static void Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,
+//#####################################################################
+// Function Isotropic_Stress_Derivative_Helper
+//#####################################################################
+template<class T> static void
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,
     T failure_threshold,T mu,T lambda)
 {
     DIAGONAL_MATRIX<T,3> F_threshold=F.Clamp_Min(failure_threshold);
@@ -90,10 +104,14 @@ template<class T> static void Isotropic_Stress_Derivative_Helper(const DIAGONAL_
     dPi_dF.x2002=mu*F_outer.x20;
     dPi_dF.x2112=mu*F_outer.x21;
 }
+//#####################################################################
+// Function Isotropic_Stress_Derivative
+//#####################################################################
 template<class T,int d> void ST_VENANT_KIRCHHOFF<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int simplex) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int id) const
 {
-    Isotropic_Stress_Derivative_Helper(F,dP_dF,failure_threshold,constant_mu,constant_lambda);
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
+    Isotropic_Stress_Derivative_Helper(F,dP_dF,failure_threshold,id_mu,id_lambda);
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 namespace PhysBAM{

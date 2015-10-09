@@ -48,20 +48,21 @@ Set_Parameters(const T youngs_modulus_input,const T poissons_ratio_input,const T
 //#####################################################################
 // clamp to hyperbola to avoid indefiniteness "automatically"
 template<class T,int d> DIAGONAL_MATRIX<T,d> COROTATED<T,d>::
-P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const
+P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
-    T scale_mu=scale*constant_mu,scale_lambda=scale*constant_lambda;
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     DIAGONAL_MATRIX<T,d> Fm1=F-1;
-    return 2*scale_mu*Fm1+scale_lambda*Fm1.Trace();
+    return 2*id_mu*Fm1+id_lambda*Fm1.Trace();
 }
 //#####################################################################
 // Function P_From_Strain_Rate
 //#####################################################################
 template<class T,int d> MATRIX<T,d> COROTATED<T,d>::
-P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const
+P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const
 {
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
     SYMMETRIC_MATRIX<T,d> strain_rate=F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    return 2*scale*constant_beta*strain_rate+scale*constant_alpha*strain_rate.Trace();
+    return 2*id_beta*strain_rate+id_alpha*strain_rate.Trace();
 }
 //#####################################################################
 // Function P_From_Strain_Rate_Forces_Size
@@ -75,12 +76,13 @@ P_From_Strain_Rate_Forces_Size() const
 // Function P_From_Strain_Rate_First_Half
 //#####################################################################
 template<class T,int d> void COROTATED<T,d>::
-P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const
+P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const int id) const
 {
-    SYMMETRIC_MATRIX<T,d> strain_rate=scale*F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    T sb=sqrt(2*constant_beta);
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    SYMMETRIC_MATRIX<T,d> strain_rate=F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
+    T sb=sqrt(2*id_beta);
     T dd=sb/TV::dimension;
-    T sa=sqrt(constant_alpha/TV::dimension+dd*dd)-dd;
+    T sa=sqrt(id_alpha/TV::dimension+dd*dd)-dd;
     SYMMETRIC_MATRIX<T,d> s=sb*strain_rate+sa*strain_rate.Trace();
     *(MATRIX<T,d>*)aggregate.Get_Array_Pointer()+=s;
 }
@@ -88,21 +90,23 @@ P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggreg
 // Function P_From_Strain_Rate_Second_Half
 //#####################################################################
 template<class T,int d> MATRIX<T,d> COROTATED<T,d>::
-P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T> aggregate,const T scale,const int simplex) const
+P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T> aggregate,const int id) const
 {
-    SYMMETRIC_MATRIX<T,d> strain_rate=scale*(*(const MATRIX<T,d>*)aggregate.Get_Array_Pointer()).Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    T sb=sqrt(2*constant_beta);
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    SYMMETRIC_MATRIX<T,d> strain_rate=(*(const MATRIX<T,d>*)aggregate.Get_Array_Pointer()).Symmetric_Part(); // use linear damping because of problems with inverting elements...
+    T sb=sqrt(2*id_beta);
     T dd=sb/TV::dimension;
-    T sa=sqrt(constant_alpha/TV::dimension+dd*dd)-dd;
+    T sa=sqrt(id_alpha/TV::dimension+dd*dd)-dd;
     return sb*strain_rate+sa*strain_rate.Trace();
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void COROTATED<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int id) const
 {
-    T mu=constant_mu,la=constant_lambda,mu2la=2*mu+la,la2mu2=2*la+2*mu;
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
+    T mu=id_mu,la=id_lambda,mu2la=2*mu+la,la2mu2=2*la+2*mu;
     T d01=F.x.x+F.x.y;if(fabs(d01)<panic_threshold) d01=d01<0?-panic_threshold:panic_threshold;
     T i01=la2mu2/d01;
     dP_dF.x0000=mu2la;
@@ -116,9 +120,10 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void COROTATED<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int id) const
 {
-    T mu=constant_mu,la=constant_lambda,mu2la=2*mu+la,la3mu2=3*la+2*mu;
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
+    T mu=id_mu,la=id_lambda,mu2la=2*mu+la,la3mu2=3*la+2*mu;
     T d01=F.x.x+F.x.y;if(fabs(d01)<panic_threshold) d01=d01<0?-panic_threshold:panic_threshold;
     T d02=F.x.x+F.x.z;if(fabs(d02)<panic_threshold) d02=d02<0?-panic_threshold:panic_threshold;
     T d12=F.x.y+F.x.z;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
@@ -141,10 +146,11 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
 // Function Energy_Density
 //#####################################################################
 template<class T,int d> T COROTATED<T,d>::
-Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
+Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     DIAGONAL_MATRIX<T,d> Fm1=F-1;
-    return constant_mu*(Fm1*Fm1).Trace()+(T).5*constant_lambda*sqr(Fm1.Trace());
+    return id_mu*(Fm1*Fm1).Trace()+(T).5*id_lambda*sqr(Fm1.Trace());
 }
 namespace PhysBAM{
 template class COROTATED<float,2>;

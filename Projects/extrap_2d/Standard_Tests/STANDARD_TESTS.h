@@ -278,7 +278,7 @@ public:
             for(int i=0;i<fv.strain_measure.mesh.elements.m;i++){
                 num_elements.Subset(fv.strain_measure.mesh.elements(i))+=1;
                 F_ave.Subset(fv.strain_measure.mesh.elements(i))+=fv.Fe_hat(i);
-                P_ave.Subset(fv.strain_measure.mesh.elements(i))+=fv.isotropic_model->P_From_Strain(fv.Fe_hat(i),fv.Be_scales(i),i);}
+                P_ave.Subset(fv.strain_measure.mesh.elements(i))+=fv.isotropic_model->P_From_Strain(fv.Fe_hat(i),i)*fv.Be_scales(i);}
 
             ARRAY<T> F_norms(num_elements.m),P_norms(num_elements.m);
             for(int i=0;i<num_elements.m;i++)
@@ -977,7 +977,7 @@ void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
         for(int j=0;j<image_size;j++){
             T x=(2*i-image_size)*sigma_range/image_size+1e-5;
             T y=(2*j-image_size)*sigma_range/image_size;
-            TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,2>(x,y),1,1).To_Vector();
+            TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,2>(x,y),1).To_Vector();
             DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2> disd;
             icm.Isotropic_Stress_Derivative(DIAGONAL_MATRIX<T,2>(x,y),disd,1);
             SYMMETRIC_MATRIX<T,2> H(disd.x0000,disd.x1100,disd.x1111);
@@ -1069,7 +1069,7 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
         for(int j=0;j<image_size;j++){
             T x=(2*i-image_size)*sigma_range/image_size+1e-5;
             T y=(2*j-image_size)*sigma_range/image_size;
-            TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,2>(x,y),1,1).To_Vector();
+            TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,2>(x,y),1).To_Vector();
             DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2> disd;
             icm.Isotropic_Stress_Derivative(DIAGONAL_MATRIX<T,2>(x,y),disd,1);
             SYMMETRIC_MATRIX<T,2> H(disd.x0000,disd.x1100,disd.x1111);
@@ -1123,7 +1123,7 @@ void Plot_Energy_Density(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm,T stiffness)
         X.y+=2.3e-4;
         TV Z=X;
         if((fabs(Z.x)>fabs(Z.y)?Z.x:Z.y)<0) Z=-Z;
-        VECTOR<T,3> Y(X.x,X.y,icm->P_From_Strain(DIAGONAL_MATRIX<T,2>(Z),1,0).x.x/stiffness);
+        VECTOR<T,3> Y(X.x,X.y,icm->P_From_Strain(DIAGONAL_MATRIX<T,2>(Z),0).x.x/stiffness);
         ts.particles.X(i)=Y;}
     FILE_UTILITIES::Write_To_File(this->stream_type,"surface.tri",ts);
 }
@@ -1185,7 +1185,7 @@ void Plot_Contour_Landscape(int frame)
         for(int j=min;j<max;j++){
 //            if(is_neo && (i<0 || j<0)) continue;
             TV X(2*sigma_range*(i+.5)/image_size+1.1e-5,2*sigma_range*(j+.5)/image_size+1.2e-5);
-            DIAGONAL_MATRIX<T,2> F(X),P=icm->P_From_Strain(F,1,0)*plot_scale;
+            DIAGONAL_MATRIX<T,2> F(X),P=icm->P_From_Strain(F,0)*plot_scale;
             out<<"p "<<X<<" "<<-P.To_Vector().Normalized()<<std::endl;}
 
     for(int i=0;i<fv.Fe_hat.m;i++){
@@ -1239,7 +1239,7 @@ void Energy_Profile_Plot(int frame)
     LOG::cout<<energy_particles.X.m<<std::endl;
     for(int i=0;i<energy_particles.X.m;i++){
         TV X=this->debug_particles.debug_particles.X(i);
-        DIAGONAL_MATRIX<T,2> F(X),P=icm->P_From_Strain(F,1,0)*plot_scale;
+        DIAGONAL_MATRIX<T,2> F(X),P=icm->P_From_Strain(F,0)*plot_scale;
         energy_particles.X(i)=X.Append((icm->Energy_Density(F,0)-energy_profile_plot_min)*plot_scale+1e-2);
         energy_particles.V(i)=-P.To_Vector().Append(P.To_Vector().Magnitude_Squared()).Normalized();}
 

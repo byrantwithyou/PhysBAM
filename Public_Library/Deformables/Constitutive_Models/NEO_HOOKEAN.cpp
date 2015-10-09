@@ -70,23 +70,24 @@ Clamp_To_Hyperbola(const DIAGONAL_MATRIX<T,3>& F) const
 //#####################################################################
 // clamp to hyperbola to avoid indefiniteness "automatically"
 template<class T,int d> DIAGONAL_MATRIX<T,d> NEO_HOOKEAN<T,d>::
-P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const
+P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
-    T scale_mu=scale*constant_mu,scale_lambda=scale*constant_lambda,J=F.Determinant();
-    if(J>=failure_threshold) return scale_mu*F-(scale_mu-scale_lambda*log(J))*F.Inverse();
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda),J=F.Determinant();
+    if(J>=failure_threshold) return id_mu*F-(id_mu-id_lambda*log(J))*F.Inverse();
     DIAGONAL_MATRIX<T,d> F_clamp=Clamp_To_Hyperbola(F),dF,F_inverse=F_clamp.Inverse();
     if(!use_constant_ife) dF=F-F_clamp;
-    T scale_mu_minus_lambda_log_J=scale_mu-scale_lambda*log(failure_threshold);
-    return scale_mu*F+scale_mu_minus_lambda_log_J*(sqr(F_inverse)*dF-F_inverse)+scale_lambda*DIAGONAL_MATRIX<T,d>::Inner_Product(F_inverse,dF)*F_inverse;
+    T id_mu_minus_lambda_log_J=id_mu-id_lambda*log(failure_threshold);
+    return id_mu*F+id_mu_minus_lambda_log_J*(sqr(F_inverse)*dF-F_inverse)+id_lambda*DIAGONAL_MATRIX<T,d>::Inner_Product(F_inverse,dF)*F_inverse;
 }
 //#####################################################################
 // Function P_From_Strain_Rate
 //#####################################################################
 template<class T,int d> MATRIX<T,d> NEO_HOOKEAN<T,d>::
-P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const
+P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const
 {
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
     SYMMETRIC_MATRIX<T,d> strain_rate=F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    return 2*scale*constant_beta*strain_rate+scale*constant_alpha*strain_rate.Trace();
+    return 2*id_beta*strain_rate+id_alpha*strain_rate.Trace();
 }
 //#####################################################################
 // Function P_From_Strain_Rate_Forces_Size
@@ -100,12 +101,13 @@ P_From_Strain_Rate_Forces_Size() const
 // Function P_From_Strain_Rate_First_Half
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN<T,d>::
-P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const
+P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const int id) const
 {
-    SYMMETRIC_MATRIX<T,d> strain_rate=scale*F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    T sb=sqrt(2*constant_beta);
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    SYMMETRIC_MATRIX<T,d> strain_rate=F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
+    T sb=sqrt(2*id_beta);
     T dd=sb/TV::dimension;
-    T sa=sqrt(constant_alpha/TV::dimension+dd*dd)-dd;
+    T sa=sqrt(id_alpha/TV::dimension+dd*dd)-dd;
     SYMMETRIC_MATRIX<T,d> s=sb*strain_rate+sa*strain_rate.Trace();
     *(MATRIX<T,d>*)aggregate.Get_Array_Pointer()+=s;
 }
@@ -113,39 +115,42 @@ P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggreg
 // Function P_From_Strain_Rate_Second_Half
 //#####################################################################
 template<class T,int d> MATRIX<T,d> NEO_HOOKEAN<T,d>::
-P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T> aggregate,const T scale,const int simplex) const
+P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T> aggregate,const int id) const
 {
-    SYMMETRIC_MATRIX<T,d> strain_rate=scale*(*(const MATRIX<T,d>*)aggregate.Get_Array_Pointer()).Symmetric_Part(); // use linear damping because of problems with inverting elements...
-    T sb=sqrt(2*constant_beta);
+    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    SYMMETRIC_MATRIX<T,d> strain_rate=(*(const MATRIX<T,d>*)aggregate.Get_Array_Pointer()).Symmetric_Part(); // use linear damping because of problems with inverting elements...
+    T sb=sqrt(2*id_beta);
     T dd=sb/TV::dimension;
-    T sa=sqrt(constant_alpha/TV::dimension+dd*dd)-dd;
+    T sa=sqrt(id_alpha/TV::dimension+dd*dd)-dd;
     return sb*strain_rate+sa*strain_rate.Trace();
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,1>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>& dP_dF,const int triangle) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,1>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>& dP_dF,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     DIAGONAL_MATRIX<T,1> F_inverse=(F.Determinant()>=failure_threshold?F:Clamp_To_Hyperbola(F)).Inverse();
-    T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
+    T mu_minus_lambda_logJ=id_mu+id_lambda*log(F_inverse.Determinant());
     SYMMETRIC_MATRIX<T,1> F_inverse_outer=SYMMETRIC_MATRIX<T,1>::Outer_Product(F_inverse.To_Vector());
-    dP_dF.x0000=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;//alpha+beta+gamma
+    dP_dF.x0000=id_mu+(id_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;//alpha+beta+gamma
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     DIAGONAL_MATRIX<T,2> F_inverse=(F.Determinant()>=failure_threshold?F:Clamp_To_Hyperbola(F)).Inverse();
-    T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
+    T mu_minus_lambda_logJ=id_mu+id_lambda*log(F_inverse.Determinant());
     SYMMETRIC_MATRIX<T,2> F_inverse_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(F_inverse.To_Vector());
-    dP_dF.x0000=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;//alpha+beta+gamma
-    dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
-    dP_dF.x1100=constant_lambda*F_inverse_outer.x10;//gamma
-    dP_dF.x1010=constant_mu;//alpha
+    dP_dF.x0000=id_mu+(id_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;//alpha+beta+gamma
+    dP_dF.x1111=id_mu+(id_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
+    dP_dF.x1100=id_lambda*F_inverse_outer.x10;//gamma
+    dP_dF.x1010=id_mu;//alpha
     dP_dF.x1001=mu_minus_lambda_logJ*F_inverse_outer.x10;//beta
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
@@ -153,18 +158,19 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     DIAGONAL_MATRIX<T,3> F_inverse=(F.Determinant()>=failure_threshold?F:Clamp_To_Hyperbola(F)).Inverse();
-    T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
+    T mu_minus_lambda_logJ=id_mu+id_lambda*log(F_inverse.Determinant());
     SYMMETRIC_MATRIX<T,3> F_inverse_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(F_inverse.To_Vector());
-    dPi_dF.x0000=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;
-    dPi_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
-    dPi_dF.x2222=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x22;
-    dPi_dF.x1100=constant_lambda*F_inverse_outer.x10;
-    dPi_dF.x2200=constant_lambda*F_inverse_outer.x20;
-    dPi_dF.x2211=constant_lambda*F_inverse_outer.x21;
-    dPi_dF.x1010=constant_mu;dPi_dF.x2020=constant_mu;dPi_dF.x2121=constant_mu;
+    dPi_dF.x0000=id_mu+(id_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x00;
+    dPi_dF.x1111=id_mu+(id_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
+    dPi_dF.x2222=id_mu+(id_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x22;
+    dPi_dF.x1100=id_lambda*F_inverse_outer.x10;
+    dPi_dF.x2200=id_lambda*F_inverse_outer.x20;
+    dPi_dF.x2211=id_lambda*F_inverse_outer.x21;
+    dPi_dF.x1010=id_mu;dPi_dF.x2020=id_mu;dPi_dF.x2121=id_mu;
     dPi_dF.x1001=mu_minus_lambda_logJ*F_inverse_outer.x10;
     dPi_dF.x2002=mu_minus_lambda_logJ*F_inverse_outer.x20;
     dPi_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;
@@ -174,12 +180,13 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
 // Function Energy_Density
 //#####################################################################
 template<class T,int d> T NEO_HOOKEAN<T,d>::
-Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
+Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
+    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     T I1=(F*F.Transposed()).Trace(),J=F.Determinant();
     if(J<=0) return (T)1e16; // TODO: Do something smarter here.
     T log_J=log(J);
-    return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
+    return id_mu*((T).5*(I1-TV::m)-log_J)+(T).5*id_lambda*sqr(log_J);
 }
 namespace PhysBAM{
 template class NEO_HOOKEAN<float,1>;
