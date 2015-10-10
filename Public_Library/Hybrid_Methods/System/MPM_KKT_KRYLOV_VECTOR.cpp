@@ -103,6 +103,7 @@ operator*=(const T a)
 template<class TV> void MPM_KKT_KRYLOV_VECTOR<TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 {
+
     const MPM_KKT_KRYLOV_VECTOR& v=debug_cast<const MPM_KKT_KRYLOV_VECTOR&>(bv);
     PHYSBAM_ASSERT(v.lambda.m==lambda.m);
 #pragma omp parallel for
@@ -125,6 +126,7 @@ Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv
     const MPM_KKT_KRYLOV_VECTOR& v1=debug_cast<const MPM_KKT_KRYLOV_VECTOR&>(bv1);
     const MPM_KKT_KRYLOV_VECTOR& v2=debug_cast<const MPM_KKT_KRYLOV_VECTOR&>(bv2);
     PHYSBAM_ASSERT(v1.lambda.m==v2.lambda.m);
+
 #pragma omp parallel for
     for(int k=0;k<valid_indices.m;k++){
         int i=valid_indices(k);
@@ -141,6 +143,7 @@ Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv
 template<class TV> int MPM_KKT_KRYLOV_VECTOR<TV>::
 Raw_Size() const
 {
+
     return (TV::m)*valid_indices.m+valid_p_indices.m+lambda.m;
 }
 //#####################################################################
@@ -149,6 +152,7 @@ Raw_Size() const
 template<class TV> typename TV::SCALAR& MPM_KKT_KRYLOV_VECTOR<TV>::
 Raw_Get(int i)
 {
+
     int velocity_size=TV::m*valid_indices.m;
     if(i<velocity_size) return u.array(valid_indices(i/TV::m))(i%TV::m);
     else if(i<velocity_size+valid_p_indices.m) return p.array(valid_p_indices(i-velocity_size));

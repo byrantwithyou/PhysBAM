@@ -155,8 +155,8 @@ Write(const char* name,const SPARSE_MATRIX_FLAT_MXN<T>& m)
 template<class T> void OCTAVE_OUTPUT<T>::
 Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_MXN<T>& m)
 {
-    out<<"% name: "<<name<<"\n% type: sparse matrix\n% nnz: "<<m.A.m<<"\n% rows: "<<m.n<<"\n% columns: "<<m.n<<"\n";
-    for(int i=0;i<m.n;i++){
+    out<<"% name: "<<name<<"\n% type: sparse matrix\n% nnz: "<<m.A.m<<"\n% rows: "<<m.n<<"\n% columns: "<<m.m<<"\n";
+    for(int i=0;i<m.m;i++){
         int s=m.offsets(i),e=m.offsets(i+1);
         for(int j=s;j<e;j++) out<<(m.A(j).j+1)<<" "<<(i+1)<<" "<<m.A(j).a<<std::endl;}
 }

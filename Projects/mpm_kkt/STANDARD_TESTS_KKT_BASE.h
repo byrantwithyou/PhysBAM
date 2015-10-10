@@ -40,7 +40,7 @@ public:
     using BASE::lagrangian_forces;using BASE::stream_type;
     using BASE::Add_Force;using BASE::Set_Weights;using BASE::deformable_body_collection;
     using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;using BASE::data_directory;
-    using BASE::Add_Fluid_Wall;using BASE::quad_F_coeff;using BASE::coarse_grid;
+    using BASE::Add_Fluid_Wall;using BASE::quad_F_coeff;using BASE::coarse_grid;using BASE::use_FEM_mass;
 
     int test_number;
     int resolution;

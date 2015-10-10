@@ -117,6 +117,27 @@ Initialize()
                 T density=1010*scale_mass;
                 Seed_Particles_Helper(sphere,[=](const TV& X){return v0(s);},0,density,particles_per_cell);}
         } break;
+        case 5:{ // pool of standing water 
+            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box(TV(),TV(1,0.5));
+            T density=scale_mass;
+            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Add_Gravity(TV(0,-1.8));
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(5,0))));
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(0,5))));
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(1,-5),TV(6,5))));
+        } break;
+        case 6:{ // dam break 
+            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box(TV(),TV(0.3,0.75));
+            T density=scale_mass;
+            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Add_Gravity(TV(0,-1.8));
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(5,0))));
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(0,5))));
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(1,-5),TV(6,5))));
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,1),TV(6,5))));
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     // initialize coarse grid

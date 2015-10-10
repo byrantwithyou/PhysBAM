@@ -95,8 +95,10 @@ Initialize()
 
     kkt_lhs.u.Resize(example.grid.Domain_Indices(example.ghost));
     kkt_lhs.p.Resize(example.coarse_grid.Domain_Indices(example.ghost));
+    //kkt_lhs.lambda.Resize(kkt_lhs.p.array.m);
     kkt_rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
     kkt_rhs.p.Resize(example.coarse_grid.Domain_Indices(example.ghost));
+    //kkt_rhs.lambda.Resize(kkt_rhs.p.array.m);
     example.one_over_lambda.Resize(example.coarse_grid.Domain_Indices(example.ghost));
     example.J.Resize(example.coarse_grid.Domain_Indices(example.ghost));
 
@@ -331,6 +333,8 @@ Particle_To_Grid()
     for(int ii=0;ii<example.valid_pressure_indices.m;ii++){
         int int_id=example.valid_pressure_indices(ii);
         example.inv_valid_pressure_cell.array(int_id)=ii;}
+    kkt_lhs.lambda.Resize(example.valid_pressure_indices.m);
+    kkt_rhs.lambda.Resize(example.valid_pressure_indices.m);
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -371,10 +375,10 @@ Grid_To_Particle()
                     V_grid=(T).5*(V_grid+example.velocity(index));
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             MATRIX<T,TV::m> A=dt*grad_Vp+1;
-            particles.F(p)=A*particles.F(p);
-            T scale_J=J_pic/particles.F(p).Determinant();
-            particles.F(p)*=pow(abs(scale_J),1.0/TV::m);
-            if(scale_J<0) LOG::printf("WARNING: scale_J is negative!\n");
+            //particles.F(p)=A*particles.F(p);
+            //T scale_J=J_pic/particles.F(p).Determinant();
+            //particles.F(p)*=pow(abs(scale_J),1.0/TV::m);
+            //if(scale_J<0) LOG::printf("WARNING: scale_J is negative!\n");
             if(particles.store_S){
                 T k=example.dt*example.inv_Wi;
                 particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,particles.S(p))+k)/(1+k);}
@@ -412,27 +416,62 @@ Grid_To_Particle()
 template<class TV> void MPM_KKT_DRIVER<TV>::
 Solve_KKT_System()
 {
+    bool have_non_zero=false;
     kkt_sys.Build_Div_Matrix();
+    kkt_sys.Build_B_Matrix(have_non_zero);
+    Build_FEM_Mass_Matrix();
     kkt_lhs.u.Fill(TV());kkt_rhs.u.Fill(TV());
     kkt_lhs.p.Fill((T)0);kkt_rhs.p.Fill((T)0);
+    kkt_lhs.lambda.Fill((T)0);kkt_rhs.lambda.Fill((T)0);
+
     // Add gravity
     example.Capture_Stress();
     example.Precompute_Forces(example.time,example.dt,false);
     example.Add_Forces(kkt_rhs.u,example.time);
     const T pressure_volume_scale=example.coarse_grid.DX().Product();
-    for(int t=0;t<example.valid_velocity_indices.m;t++){
-        int id=example.valid_velocity_indices(t);
-        kkt_rhs.u.array(id)+=example.mass.array(id)*(example.velocity.array(id)/example.dt);}
+    if(example.use_FEM_mass){
+        int index=example.M.offsets(0);
+        for(int row=0;row<example.M.m;row++){
+            int end=example.M.offsets(row+1); TV sum=TV();
+            for(;index<end;index++){
+                int col=example.M.A(index).j;
+                sum+=example.M.A(index).a*example.velocity.array(col);}
+            kkt_rhs.u.array(example.valid_velocity_indices(row))+=sum/example.dt;}}
+    else{
+        for(int t=0;t<example.valid_velocity_indices.m;t++){
+            int id=example.valid_velocity_indices(t);
+            kkt_rhs.u.array(id)+=example.mass.array(id)*(example.velocity.array(id)/example.dt);}}
     for(int t=0;t<example.valid_pressure_indices.m;t++){
         int id=example.valid_pressure_indices(t);
         if(example.mass_coarse.array(id))
             kkt_rhs.p.array(id)=(example.J.array(id)-(T)1)*pressure_volume_scale/(example.dt*example.J.array(id));}
     // MINRES 
     MINRES<T> mr;
+    mr.print_diagnostics=true;
+    mr.print_residuals=false;
     mr.Solve(kkt_sys,kkt_lhs,kkt_rhs,av,1e-12,0,example.solver_iterations);
     for(int i=0;i<example.av.m;i++){
         (*av(i))*=0;}
     example.velocity_new=kkt_lhs.u;
+    LOG::printf("example.velocity_new=%P\n",example.velocity_new);
+    static int n=0;
+    n++;
+    KRYLOV_VECTOR_BASE<T> *a,*b;
+    a=kkt_lhs.Clone_Default();
+    b=kkt_lhs.Clone_Default();
+    OCTAVE_OUTPUT<T> oo(LOG::sprintf("kmatrix-%i.dat",n).c_str());
+    oo.Write("K",kkt_sys,*a,*b);
+    oo.Write("lhs",kkt_lhs);
+    oo.Write("rhs",kkt_rhs);
+    exit(0);
+//LOG::printf("kkt_lhs.lambda=%P\n",kkt_lhs.lambda);
+//LOG::printf("kkt_lhs.u=%P\n",kkt_lhs.u);
+//LOG::printf("kkt_lhs.p=%P\n",kkt_lhs.p);
+//LOG::printf("example.velocity=%P\n",example.velocity);
+//LOG::printf("kkt_rhs.u=%P\n",kkt_rhs.u);
+//LOG::printf("example.masss=%P\n",example.mass);
+//kkt_sys.Test_System(*a);
+//exit(0); 
 }
 //#####################################################################
 // Function Apply_Forces
@@ -574,6 +613,66 @@ Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u)
     LOG::cout<<str<<" total energy "<<"time " <<example.time<<" value "<<te<<" diff "<<(te-example.last_te)<<std::endl;
     LOG::cout<<str<<" particle total energy "<<"time " <<example.time<<" value "<<(ke2+pe)<<std::endl;
     example.last_te=te;
+}
+//#####################################################################
+// Function Get_Appropriate_Mass_Element
+//#####################################################################
+template<class TV> ARRAY<ARRAY<typename TV::SCALAR,VECTOR<int,TV::m> >,VECTOR<int,TV::m> >
+Get_Appropriate_Mass_Element(typename TV::SCALAR dx_scale)
+{
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
+    const T mass_element[][3]={{1.0/20,13.0/120,1.0/120},{13.0/120,9.0/20,13.0/120},{1.0/120,13.0/120,1.0/20}};
+RANGE<TV_INT> velocity_range(TV_INT(),TV_INT::Constant_Vector(3));
+    ARRAY<ARRAY<T,TV_INT>,TV_INT> wt(velocity_range);
+    for(RANGE_ITERATOR<TV::m> vit1(velocity_range);vit1.Valid();vit1.Next()){
+        wt(vit1.index).Resize(velocity_range);
+        wt(vit1.index).Fill(dx_scale);
+        for(RANGE_ITERATOR<TV::m> vit2(velocity_range);vit2.Valid();vit2.Next()){
+            for(int paxis=0;paxis<TV::m;paxis++){
+                int row=vit1.index(paxis);
+                int col=vit2.index(paxis);
+                wt(vit1.index)(vit2.index)*=mass_element[row][col];}}}
+    return wt;
+}
+//#####################################################################
+// Function Build_FEM_Mass_Matrix
+//#####################################################################
+template<class TV> void MPM_KKT_DRIVER<TV>::
+Build_FEM_Mass_Matrix()
+{
+    T dx_scale=example.grid.DX().Product();
+    ARRAY<ARRAY<T,TV_INT>,TV_INT> wt=Get_Appropriate_Mass_Element<TV>(dx_scale);
+    example.M.Reset(example.velocity.array.m);
+    LOG::printf("example.velocity.array.m=%P\n",example.velocity.array.m);
+    RANGE<TV_INT> local_range(TV_INT::Constant_Vector(-2),TV_INT::Constant_Vector(3));
+    for(int row=0;row<example.valid_velocity_indices.m;row++){
+        TV_INT vid_cell=example.valid_velocity_cell_indices(row);
+        for(RANGE_ITERATOR<TV::m> it(local_range);it.Valid();it.Next())
+            example.M.Append_Entry_To_Current_Row(example.velocity.Standard_Index(vid_cell+it.index),0);
+        example.M.Finish_Row();}
+    example.M.Sort_Entries();
+    
+    for(int element=0;element<example.valid_velocity_indices.m;element++){
+        int eid=example.valid_velocity_indices(element);
+        if(example.mass.array(eid)==0) continue;
+        TV v_loc=example.location.array(eid);
+        bool skip=false;
+        for(int fw=0;fw<example.fluid_walls.m;fw++)
+            if(example.fluid_walls(fw)->Lazy_Inside(v_loc)) skip=true;
+        if(skip) continue;
+        TV_INT eid_cell=example.valid_velocity_cell_indices(element);
+        for(RANGE_ITERATOR<TV::m> rit(wt.domain);rit.Valid();rit.Next()){
+            TV_INT row_index=eid_cell+rit.index-1;
+            int row=example.inv_valid_velocity_cell(row_index);
+            if(row==-1) continue;
+            for(RANGE_ITERATOR<TV::m> cit(wt(rit.index).domain);cit.Valid();cit.Next()){
+                TV_INT col_index=eid_cell+cit.index-1;
+                if(example.inv_valid_velocity_cell(col_index)!=-1){
+                    int col=example.velocity.Standard_Index(col_index);
+                    example.M(row,col)+=wt(rit.index)(cit.index);}}}}
+    OCTAVE_OUTPUT<T> oo("mass.dat");
+    oo.Write("M",example.M);
 }
 //#####################################################################
 namespace PhysBAM{

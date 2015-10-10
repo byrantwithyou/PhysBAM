@@ -24,6 +24,7 @@ public:
     const MPM_KKT_EXAMPLE<TV>& example;
     SPARSE_MATRIX_FLAT_MXN<T> D;
     SPARSE_MATRIX_FLAT_MXN<T> B;
+    SPARSE_MATRIX_FLAT_MXN<T> M;
     MPM_KKT_KRYLOV_SYSTEM(const MPM_KKT_EXAMPLE<TV>& example);
     virtual ~MPM_KKT_KRYLOV_SYSTEM();
 
@@ -35,6 +36,8 @@ public:
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const override;
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const override;
     void Build_Div_Matrix();
+    void Build_B_Matrix(bool& have_non_zero);
+    void Build_FEM_Mass_Matrix();
 };
 }
 #endif

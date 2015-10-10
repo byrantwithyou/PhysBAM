@@ -60,12 +60,12 @@ public:
     GATHER_SCATTER<TV>& gather_scatter;
     GATHER_SCATTER<TV>& gather_scatter_coarse;
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
-    ARRAY<IMPLICIT_OBJECT<TV>* > fluid_walls;;
+    ARRAY<IMPLICIT_OBJECT<TV>* > fluid_walls;
     mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
     MPM_FORCE_HELPER<TV>& force_helper;
-    
 
     // kkt stuff
+    SPARSE_MATRIX_FLAT_MXN<T> M;
     ARRAY<int,TV_INT> cell_flags;
     ARRAY<T,TV_INT> one_over_lambda;
     ARRAY<T,TV_INT> J;
@@ -107,6 +107,7 @@ public:
     T last_grid_ke;
     bool output_structures_each_frame;
     T quad_F_coeff;
+    bool use_FEM_mass;
 
     MPM_KKT_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~MPM_KKT_EXAMPLE();

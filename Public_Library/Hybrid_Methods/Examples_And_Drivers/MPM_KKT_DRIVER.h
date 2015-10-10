@@ -58,6 +58,7 @@ public:
     void Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0);
     void Print_Particle_Stats(const char* str,T dt);
     void Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u);
+    void Build_FEM_Mass_Matrix();
 //#####################################################################
 };
 }

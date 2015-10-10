@@ -81,6 +81,8 @@ Initialize()
             TV dV=total_momentum/total_mass;
             particles.V-=dV;
             Add_Gravity(TV(-0.8));
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5),TV(0))));
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(1),TV(5))));
         } break;
         case 2:{ // full box
             grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
@@ -127,6 +129,14 @@ Initialize()
                 density,particles_per_cell);
             for(int p=0;p<particles.X.m;p++)
                 particles.one_over_lambda(p)=1; 
+        } break;
+        case 7:{ // half box
+            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box(TV(0.5),TV(1));
+            T density=scale_mass;
+            Seed_Particles_Helper(box,[=](const TV& X){return TV(0.5);},0,density,particles_per_cell);
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5),TV(0))));
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(1),TV(5))));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

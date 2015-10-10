@@ -77,6 +77,7 @@ STANDARD_TESTS_KKT_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_ar
     parse_args.Add("-regular_seeding",&regular_seeding,"use regular particle seeding");
     parse_args.Add("-use_early_gradient_transfer",&use_early_gradient_transfer,"use early gradient transfer for Cp");
     parse_args.Add("-use_exp_F",&use_quasi_exp_F_update,"Use an approximation of the F update that prevents inversion");
+    parse_args.Add("-use_FEM_mass",&use_FEM_mass,"Use full FEM mass mass");
 
     parse_args.Parse(true);
 
