@@ -15,7 +15,7 @@ constexpr inline int argmax(const T a,const T b)
 
 template<class T>
 constexpr inline int argmax(const T a,const T b,const T c)
-{if(a>=c) return argmax(a,b);return b>=c?1:2;}
+{return a>=c?argmax(a,b):(b>=c?1:2);}
 
 }
 #endif

@@ -8,10 +8,10 @@
 #define __COMPUTE_EPS__
 
 namespace PhysBAM{
+constexpr inline int compute_eps_helper(int r)
+{return ((0x200880>>r)&1)-((0x088020>>r)&1);}
+
 constexpr inline int compute_eps(int i,int j,int k)
-{
-    int r=i+3*j+9*k;
-    return ((0x200880>>r)&1)-((0x088020>>r)&1);
-}
+{return compute_eps_helper(i+3*j+9*k);}
 }
 #endif

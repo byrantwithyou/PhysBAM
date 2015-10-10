@@ -15,7 +15,7 @@ constexpr inline int argmin(const T a,const T b)
 
 template<class T>
 constexpr inline int argmin(const T a,const T b,const T c)
-{if(a<=c) return a<=b?0:1;return b<=c?1:2;}
+{return a<=c?(a<=b?0:1):(b<=c?1:2);}
 
 }
 #endif
