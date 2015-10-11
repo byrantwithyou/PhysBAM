@@ -110,7 +110,7 @@ struct ANALYTIC_VELOCITY_PROGRAM:public ANALYTIC_VELOCITY<TV>
             prog.var_out.Append(vel[i]);}
         prog.var_in.Append("t");
         prog.Parse(str.c_str(),false);
-        ARRAY<int> out(IDENTITY_ARRAY<>(TV::m));
+        ARRAY<int> out{IDENTITY_ARRAY<>{TV::m}};
         for(int j=0;j<prog.var_in.m;j++)
             prog.Diff(out,j);
         out.Resize(TV::m*TV::m);

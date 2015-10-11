@@ -158,7 +158,7 @@ struct AUTO_HESS_EXT
 {
     static_assert(is_scalar<T>::value,"This definition of AUTO_HESS_EXT is only for scalars");
     typedef typename conditional<Q&1,GRADIENT<T,VEC>,DIFF_UNUSED>::type GRAD;
-    typedef typename conditional<Q&2,HESSIAN<T,MAT>,DIFF_UNUSED>::type HESS;
+    typedef typename conditional<(Q&2)!=0,HESSIAN<T,MAT>,DIFF_UNUSED>::type HESS;
 
     T x;
     GRAD dx;
@@ -215,12 +215,12 @@ template<class TV> AUTO_HESS_EXT_VEC<TV,DIFF_UNUSED,DIFF_UNUSED,0>
 Make_Hess_Vec(const TV& x,const DIFF_UNUSED& dx,const DIFF_UNUSED& ddx);
 
 template<class T,class TV,class VEC1,class MAT1,int Q,class VEC2,class MAT2> auto
-Cross_Helper(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2,Q>& b)
-    -> decltype(Make_Hess_Vec(TV().Cross(TV()),MATRIX<T,TV::m>()*typename conditional<Q&1,GRADIENT_VEC<TV,VEC2>,DIFF_UNUSED>::type()-MATRIX<T,TV::m>()*typename conditional<Q&1,GRADIENT_VEC<TV,VEC1>,DIFF_UNUSED>::type(),Contract_00(typename conditional<Q&2,HESSIAN_VEC<TV,MAT1>,DIFF_UNUSED>::type(),MATRIX<T,TV::m>())-Contract_00(typename conditional<Q&2,HESSIAN_VEC<TV,MAT2>,DIFF_UNUSED>::type(),MATRIX<T,TV::m>())+Symmetric_Double_Contract_12_With_Tensor_Q<Q&2>(PERMUTATION_TENSOR<T>(1),typename conditional<Q&1,GRADIENT_VEC<TV,VEC1>,DIFF_UNUSED>::type(),typename conditional<Q&1,GRADIENT_VEC<TV,VEC2>,DIFF_UNUSED>::type())));
+Cross_Helper_1(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2,Q>& b)
+    -> decltype(Make_Hess_Vec(TV().Cross(TV()),MATRIX<T,TV::m>()*typename conditional<Q&1,GRADIENT_VEC<TV,VEC2>,DIFF_UNUSED>::type()-MATRIX<T,TV::m>()*typename conditional<Q&1,GRADIENT_VEC<TV,VEC1>,DIFF_UNUSED>::type(),Contract_00(typename conditional<(Q&2)!=0,HESSIAN_VEC<TV,MAT1>,DIFF_UNUSED>::type(),MATRIX<T,TV::m>())-Contract_00(typename conditional<(Q&2)!=0,HESSIAN_VEC<TV,MAT2>,DIFF_UNUSED>::type(),MATRIX<T,TV::m>())+Symmetric_Double_Contract_12_With_Tensor_Q<(Q&2)!=0>(PERMUTATION_TENSOR<T>(1),typename conditional<Q&1,GRADIENT_VEC<TV,VEC1>,DIFF_UNUSED>::type(),typename conditional<Q&1,GRADIENT_VEC<TV,VEC2>,DIFF_UNUSED>::type())));
 
 template<class T,class VEC1,class MAT1,int Q> auto
-Cross_Helper(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const VECTOR<T,3>& b)
-    -> decltype(Make_Hess_Vec(VECTOR<T,3>(),-MATRIX<T,3>()*typename conditional<Q&1,GRADIENT_VEC<VECTOR<T,3>,VEC1>,DIFF_UNUSED>::type(),Contract_00(typename conditional<Q&2,HESSIAN_VEC<VECTOR<T,3>,MAT1>,DIFF_UNUSED>::type(),MATRIX<T,3>())));
+Cross_Helper_2(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const VECTOR<T,3>& b)
+    -> decltype(Make_Hess_Vec(VECTOR<T,3>(),-MATRIX<T,3>()*typename conditional<Q&1,GRADIENT_VEC<VECTOR<T,3>,VEC1>,DIFF_UNUSED>::type(),Contract_00(typename conditional<(Q&2)!=0,HESSIAN_VEC<VECTOR<T,3>,MAT1>,DIFF_UNUSED>::type(),MATRIX<T,3>())));
 
 template<class TV,class VEC1,class MAT1,int Q,class TYPE>
 typename enable_if<TV::m!=3,AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q> >::type
@@ -231,7 +231,7 @@ struct AUTO_HESS_EXT_VEC
 {
     typedef typename TV::SCALAR T;
     typedef typename conditional<Q&1,GRADIENT_VEC<TV,VEC>,DIFF_UNUSED>::type GRAD;
-    typedef typename conditional<Q&2,HESSIAN_VEC<TV,MAT>,DIFF_UNUSED>::type HESS;
+    typedef typename conditional<(Q&2)!=0,HESSIAN_VEC<TV,MAT>,DIFF_UNUSED>::type HESS;
 
     TV x;
     GRAD dx;
@@ -250,35 +250,35 @@ struct AUTO_HESS_EXT_VEC
 
     template<class VEC1,class MAT1> auto
     Dot(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& a) const
-    {return Make_Hess(x.Dot(a.x),dx.Transpose_Times(a.x)+a.dx.Transpose_Times(x),Contract_0(ddx,a.x)+Contract_0(a.ddx,x)+Symmetric_Transpose_Times_Q<Q&2>(dx,a.dx));}
+    {return Make_Hess(x.Dot(a.x),dx.Transpose_Times(a.x)+a.dx.Transpose_Times(x),Contract_0(ddx,a.x)+Contract_0(a.ddx,x)+Symmetric_Transpose_Times_Q<(Q&2)!=0>(dx,a.dx));}
 
-    auto Cross(const TV& a) const -> decltype(Cross_Helper(*this,a))
-    {return Cross_Helper(*this,a);}
+    auto Cross(const TV& a) const -> decltype(Cross_Helper_2(*this,a))
+    {return Cross_Helper_2(*this,a);}
 
     template<class VEC1,class MAT1>
-    auto Cross(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& a) const -> decltype(Cross_Helper(*this,a))
-    {return Cross_Helper(*this,a);}
+    auto Cross(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& a) const -> decltype(Cross_Helper_1(*this,a))
+    {return Cross_Helper_1(*this,a);}
 
-    decltype(Make_Hess(x.Magnitude_Squared(),dx.Transpose_Times(x)*2,(Contract_0(ddx,x)+Transpose_Times_Self_Q<Q&2>(dx))*2)) Magnitude_Squared() const
-    {return Make_Hess(x.Magnitude_Squared(),dx.Transpose_Times(x)*2,(Contract_0(ddx,x)+Transpose_Times_Self_Q<Q&2>(dx))*2);}
+    decltype(Make_Hess(x.Magnitude_Squared(),dx.Transpose_Times(x)*2,(Contract_0(ddx,x)+Transpose_Times_Self_Q<(Q&2)!=0>(dx))*2)) Magnitude_Squared() const
+    {return Make_Hess(x.Magnitude_Squared(),dx.Transpose_Times(x)*2,(Contract_0(ddx,x)+Transpose_Times_Self_Q<(Q&2)!=0>(dx))*2);}
 
     auto Magnitude() const
-        -> decltype(Make_Hess(T(),dx.Transpose_Times(x)/T(),(Contract_0(ddx,x)+Transpose_Times_Self_Q<Q&2>(dx))/T()-Outer_Product_Q<Q&2>(dx.Transpose_Times(x)/T())/T()))
-    {T s=x.Magnitude();auto t=dx.Transpose_Times(x)/s;return Make_Hess(s,t,(Contract_0(ddx,x)+Transpose_Times_Self_Q<Q&2>(dx))/s-Outer_Product_Q<Q&2>(t)/s);}
+        -> decltype(Make_Hess(T(),dx.Transpose_Times(x)/T(),(Contract_0(ddx,x)+Transpose_Times_Self_Q<(Q&2)!=0>(dx))/T()-Outer_Product_Q<(Q&2)!=0>(dx.Transpose_Times(x)/T())/T()))
+    {T s=x.Magnitude();auto t=dx.Transpose_Times(x)/s;return Make_Hess(s,t,(Contract_0(ddx,x)+Transpose_Times_Self_Q<(Q&2)!=0>(dx))/s-Outer_Product_Q<(Q&2)!=0>(t)/s);}
 };
 
 
 template<class T,class TV,class VEC1,class MAT1,int Q,class VEC2,class MAT2> auto
-Cross_Helper(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2,Q>& b)
-    -> decltype(Make_Hess_Vec(TV().Cross(TV()),MATRIX<T,TV::m>()*typename conditional<Q&1,GRADIENT_VEC<TV,VEC2>,DIFF_UNUSED>::type()-MATRIX<T,TV::m>()*typename conditional<Q&1,GRADIENT_VEC<TV,VEC1>,DIFF_UNUSED>::type(),Contract_00(typename conditional<Q&2,HESSIAN_VEC<TV,MAT1>,DIFF_UNUSED>::type(),MATRIX<T,TV::m>())-Contract_00(typename conditional<Q&2,HESSIAN_VEC<TV,MAT2>,DIFF_UNUSED>::type(),MATRIX<T,TV::m>())+Symmetric_Double_Contract_12_With_Tensor_Q<Q&2>(PERMUTATION_TENSOR<T>(1),typename conditional<Q&1,GRADIENT_VEC<TV,VEC1>,DIFF_UNUSED>::type(),typename conditional<Q&1,GRADIENT_VEC<TV,VEC2>,DIFF_UNUSED>::type())))
+Cross_Helper_1(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2,Q>& b)
+    -> decltype(Make_Hess_Vec(TV().Cross(TV()),MATRIX<T,TV::m>()*typename conditional<Q&1,GRADIENT_VEC<TV,VEC2>,DIFF_UNUSED>::type()-MATRIX<T,TV::m>()*typename conditional<Q&1,GRADIENT_VEC<TV,VEC1>,DIFF_UNUSED>::type(),Contract_00(typename conditional<(Q&2)!=0,HESSIAN_VEC<TV,MAT1>,DIFF_UNUSED>::type(),MATRIX<T,TV::m>())-Contract_00(typename conditional<(Q&2)!=0,HESSIAN_VEC<TV,MAT2>,DIFF_UNUSED>::type(),MATRIX<T,TV::m>())+Symmetric_Double_Contract_12_With_Tensor_Q<(Q&2)!=0>(PERMUTATION_TENSOR<T>(1),typename conditional<Q&1,GRADIENT_VEC<TV,VEC1>,DIFF_UNUSED>::type(),typename conditional<Q&1,GRADIENT_VEC<TV,VEC2>,DIFF_UNUSED>::type())))
 {
     MATRIX<T,TV::m> cp_t=MATRIX<T,TV::m>::Cross_Product_Matrix(a.x),cp_a=MATRIX<T,TV::m>::Cross_Product_Matrix(b.x);
-    return Make_Hess_Vec(a.x.Cross(b.x),cp_t*b.dx-cp_a*a.dx,Contract_00(a.ddx,cp_a)-Contract_00(b.ddx,cp_t)+Symmetric_Double_Contract_12_With_Tensor_Q<Q&2>(PERMUTATION_TENSOR<T>(1),a.dx,b.dx));
+    return Make_Hess_Vec(a.x.Cross(b.x),cp_t*b.dx-cp_a*a.dx,Contract_00(a.ddx,cp_a)-Contract_00(b.ddx,cp_t)+Symmetric_Double_Contract_12_With_Tensor_Q<(Q&2)!=0>(PERMUTATION_TENSOR<T>(1),a.dx,b.dx));
 }
 
 template<class T,class VEC1,class MAT1,int Q> auto
-Cross_Helper(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const VECTOR<T,3>& b)
-    -> decltype(Make_Hess_Vec(VECTOR<T,3>(),-MATRIX<T,3>()*typename conditional<Q&1,GRADIENT_VEC<VECTOR<T,3>,VEC1>,DIFF_UNUSED>::type(),Contract_00(typename conditional<Q&2,HESSIAN_VEC<VECTOR<T,3>,MAT1>,DIFF_UNUSED>::type(),MATRIX<T,3>())))
+Cross_Helper_2(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const VECTOR<T,3>& b)
+    -> decltype(Make_Hess_Vec(VECTOR<T,3>(),-MATRIX<T,3>()*typename conditional<Q&1,GRADIENT_VEC<VECTOR<T,3>,VEC1>,DIFF_UNUSED>::type(),Contract_00(typename conditional<(Q&2)!=0,HESSIAN_VEC<VECTOR<T,3>,MAT1>,DIFF_UNUSED>::type(),MATRIX<T,3>())))
 {
     MATRIX<T,3> cp_a=MATRIX<T,3>::Cross_Product_Matrix(b);
     return Make_Hess_Vec(a.x.Cross(b),-cp_a*a.dx,Contract_00(a.ddx,cp_a));
@@ -286,7 +286,14 @@ Cross_Helper(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const VECTOR<T,
 
 template<class TV,class VEC1,class MAT1,int Q,class TYPE>
 typename enable_if<TV::m!=3,AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q> >::type
-Cross_Helper(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& a,TYPE)
+Cross_Helper_1(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& a,TYPE)
+{
+    PHYSBAM_FATAL_ERROR("Cross product not defined except in 3D.");
+    return a;
+}
+template<class TV,class VEC1,class MAT1,int Q,class TYPE>
+typename enable_if<TV::m!=3,AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q> >::type
+Cross_Helper_2(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& a,TYPE)
 {
     PHYSBAM_FATAL_ERROR("Cross product not defined except in 3D.");
     return a;
@@ -379,7 +386,7 @@ struct AUTO_HESS_EXT_MAT
 {
     typedef typename T_MAT::SCALAR T;
     typedef typename conditional<Q&1,GRADIENT_MAT<MATRIX<typename T_MAT::SCALAR,T_MAT::m,T_MAT::n>,VEC>,DIFF_UNUSED>::type GRAD;
-    typedef typename conditional<Q&2,HESSIAN_MAT<MATRIX<typename T_MAT::SCALAR,T_MAT::m,T_MAT::n>,MAT>,DIFF_UNUSED>::type HESS;
+    typedef typename conditional<(Q&2)!=0,HESSIAN_MAT<MATRIX<typename T_MAT::SCALAR,T_MAT::m,T_MAT::n>,MAT>,DIFF_UNUSED>::type HESS;
 
     T_MAT x;
     GRAD dx;
@@ -394,9 +401,9 @@ struct AUTO_HESS_EXT_MAT
     {}
     template<class TV,class VEC1,class MAT1>
     auto Transpose_Times(AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& a) const
-        -> decltype(Make_Hess_Vec(Transpose_Times(this->x,a.x),Contract_0(this->dx,a.x)+Transpose_Times(this->x,a.dx),Contract_0(this->ddx,a.x)+Symmetric_Contract_00_12_Q<Q&2>(this->dx,a.dx)+Contract_00(a.ddx,this->x)))
+        -> decltype(Make_Hess_Vec(Transpose_Times(this->x,a.x),Contract_0(this->dx,a.x)+Transpose_Times(this->x,a.dx),Contract_0(this->ddx,a.x)+Symmetric_Contract_00_12_Q<(Q&2)!=0>(this->dx,a.dx)+Contract_00(a.ddx,this->x)))
     {
-        return Make_Hess_Vec(Transpose_Times(x,a.x),Contract_0(dx,a.x)+Transpose_Times(x,a.dx),Contract_0(ddx,a.x)+Symmetric_Contract_00_12_Q<Q&2>(dx,a.dx)+Contract_00(a.ddx,x));
+        return Make_Hess_Vec(Transpose_Times(x,a.x),Contract_0(dx,a.x)+Transpose_Times(x,a.dx),Contract_0(ddx,a.x)+Symmetric_Contract_00_12_Q<(Q&2)!=0>(dx,a.dx)+Contract_00(a.ddx,x));
     }
 
     template<int d>
@@ -406,24 +413,24 @@ struct AUTO_HESS_EXT_MAT
         return Make_Hess_Vec(Transpose_Times(x,a),Contract_0(dx,a),Contract_0(ddx,a));
     }
 
-    auto Trace() const -> decltype(Make_Hess(this->x.Trace(),Contract_01_Q<Q&1>(this->dx),Contract_01_Q<Q&2>(this->ddx)))
-    {return Make_Hess(x.Trace(),Contract_01_Q<Q&1>(dx),Contract_01_Q<Q&2>(ddx));}
+    auto Trace() const -> decltype(Make_Hess(this->x.Trace(),Contract_01_Q<Q&1>(this->dx),Contract_01_Q<(Q&2)!=0>(this->ddx)))
+    {return Make_Hess(x.Trace(),Contract_01_Q<Q&1>(dx),Contract_01_Q<(Q&2)!=0>(ddx));}
 
-    auto Transposed() const -> decltype(Make_Hess_Mat(this->x.Transposed(),Transposed_01_Q<Q&1>(this->dx),Transposed_01_Q<Q&2>(this->ddx)))
-    {return Make_Hess_Mat(x.Transposed(),Transposed_01_Q<Q&1>(dx),Transposed_01_Q<Q&2>(ddx));}
+    auto Transposed() const -> decltype(Make_Hess_Mat(this->x.Transposed(),Transposed_01_Q<Q&1>(this->dx),Transposed_01_Q<(Q&2)!=0>(this->ddx)))
+    {return Make_Hess_Mat(x.Transposed(),Transposed_01_Q<Q&1>(dx),Transposed_01_Q<(Q&2)!=0>(ddx));}
 
-    auto Twice_Symmetric_Part() const -> decltype(Make_Hess_Mat(this->x.Twice_Symmetric_Part(),Twice_Symmetric_Part_01_Q<Q&2>(this->dx),Twice_Symmetric_Part_01_Q<Q&2>(this->ddx)))
-    {return Make_Hess_Mat(x.Twice_Symmetric_Part(),Twice_Symmetric_Part_01_Q<Q&1>(dx),Twice_Symmetric_Part_01_Q<Q&2>(ddx));}
+    auto Twice_Symmetric_Part() const -> decltype(Make_Hess_Mat(this->x.Twice_Symmetric_Part(),Twice_Symmetric_Part_01_Q<(Q&2)!=0>(this->dx),Twice_Symmetric_Part_01_Q<(Q&2)!=0>(this->ddx)))
+    {return Make_Hess_Mat(x.Twice_Symmetric_Part(),Twice_Symmetric_Part_01_Q<Q&1>(dx),Twice_Symmetric_Part_01_Q<(Q&2)!=0>(ddx));}
 
     template<class T_MAT1,class VEC1,class MAT1> auto
     Transpose_Times(const AUTO_HESS_EXT_MAT<T_MAT1,VEC1,MAT1,Q>& a) const
-        -> decltype(Make_Hess_Mat(Transpose_Times(x,a.x),Contract_00(dx,a.x)+Contract_00(a.dx,x),Contract_00(ddx,a.x)+Contract_00(a.ddx,x)+Symmetric_Contract_00_23_Q<Q&2>(dx,a.dx)))
-    {return Make_Hess_Mat(Transpose_Times(x,a.x),Contract_00(dx,a.x)+Contract_00(a.dx,x),Contract_00(ddx,a.x)+Contract_00(a.ddx,x)+Symmetric_Contract_00_23_Q<Q&2>(dx,a.dx));}
+        -> decltype(Make_Hess_Mat(Transpose_Times(x,a.x),Contract_00(dx,a.x)+Contract_00(a.dx,x),Contract_00(ddx,a.x)+Contract_00(a.ddx,x)+Symmetric_Contract_00_23_Q<(Q&2)!=0>(dx,a.dx)))
+    {return Make_Hess_Mat(Transpose_Times(x,a.x),Contract_00(dx,a.x)+Contract_00(a.dx,x),Contract_00(ddx,a.x)+Contract_00(a.ddx,x)+Symmetric_Contract_00_23_Q<(Q&2)!=0>(dx,a.dx));}
 
     template<class T_MAT1,class VEC1,class MAT1> auto
     Times_Transpose(const AUTO_HESS_EXT_MAT<T_MAT1,VEC1,MAT1,Q>& a) const
-        -> decltype(Make_Hess_Mat(x*a.x,Contract_11(dx,a.x)+Contract_11(a.dx,x),Contract_11(ddx,a.x)+Contract_11(a.ddx,x)+Symmetric_Contract_11_23_Q<Q&2>(dx,a.dx)))
-    {return Make_Hess_Mat(x*a.x,Contract_11(dx,a.x)+Contract_11(a.dx,x),Contract_11(ddx,a.x)+Contract_11(a.ddx,x)+Symmetric_Contract_11_23_Q<Q&2>(dx,a.dx));}
+        -> decltype(Make_Hess_Mat(x*a.x,Contract_11(dx,a.x)+Contract_11(a.dx,x),Contract_11(ddx,a.x)+Contract_11(a.ddx,x)+Symmetric_Contract_11_23_Q<(Q&2)!=0>(dx,a.dx)))
+    {return Make_Hess_Mat(x*a.x,Contract_11(dx,a.x)+Contract_11(a.dx,x),Contract_11(ddx,a.x)+Contract_11(a.ddx,x)+Symmetric_Contract_11_23_Q<(Q&2)!=0>(dx,a.dx));}
 
     template<class T_MAT1> auto
     Transpose_Times(const T_MAT1& a) const
@@ -436,17 +443,17 @@ struct AUTO_HESS_EXT_MAT
     {return Make_Hess_Mat(Times_Transpose(x,a),Contract_11(dx,a),Contract_11(ddx,a));}
 
     auto Normal_Equations_Matrix() const
-        -> decltype(Make_Hess_Mat(x.Normal_Equations_Matrix(),Twice_Symmetric_Part_01_Q<Q&1>(Contract_00(dx,x)),Twice_Symmetric_Part_01_Q<Q&2>(Contract_00(ddx,x))+Symmetric_Contract_00_23_Q<Q&2>(dx,dx)))
-    {return Make_Hess_Mat(x.Normal_Equations_Matrix(),Twice_Symmetric_Part_01_Q<Q&1>(Contract_00(dx,x)),Twice_Symmetric_Part_01_Q<Q&2>(Contract_00(ddx,x))+Symmetric_Contract_00_23_Q<Q&2>(dx,dx));}
+        -> decltype(Make_Hess_Mat(x.Normal_Equations_Matrix(),Twice_Symmetric_Part_01_Q<Q&1>(Contract_00(dx,x)),Twice_Symmetric_Part_01_Q<(Q&2)!=0>(Contract_00(ddx,x))+Symmetric_Contract_00_23_Q<(Q&2)!=0>(dx,dx)))
+    {return Make_Hess_Mat(x.Normal_Equations_Matrix(),Twice_Symmetric_Part_01_Q<Q&1>(Contract_00(dx,x)),Twice_Symmetric_Part_01_Q<(Q&2)!=0>(Contract_00(ddx,x))+Symmetric_Contract_00_23_Q<(Q&2)!=0>(dx,dx));}
 
     auto Outer_Product_Matrix() const
-        -> decltype(Make_Hess_Mat(x.Outer_Product_Matrix(),Twice_Symmetric_Part_01_Q<Q&1>(Contract_11(dx,x)),Twice_Symmetric_Part_01_Q<Q&2>(Contract_11(ddx,x))+Symmetric_Contract_11_23_Q<Q&2>(dx,dx)))
-    {return Make_Hess_Mat(x.Outer_Product_Matrix(),Twice_Symmetric_Part_01_Q<Q&1>(Contract_11(dx,x)),Twice_Symmetric_Part_01_Q<Q&2>(Contract_11(ddx,x))+Symmetric_Contract_11_23_Q<Q&2>(dx,dx));}
+        -> decltype(Make_Hess_Mat(x.Outer_Product_Matrix(),Twice_Symmetric_Part_01_Q<Q&1>(Contract_11(dx,x)),Twice_Symmetric_Part_01_Q<(Q&2)!=0>(Contract_11(ddx,x))+Symmetric_Contract_11_23_Q<(Q&2)!=0>(dx,dx)))
+    {return Make_Hess_Mat(x.Outer_Product_Matrix(),Twice_Symmetric_Part_01_Q<Q&1>(Contract_11(dx,x)),Twice_Symmetric_Part_01_Q<(Q&2)!=0>(Contract_11(ddx,x))+Symmetric_Contract_11_23_Q<(Q&2)!=0>(dx,dx));}
 
     template<class T_MAT1,class VEC1,class MAT1> auto
     Double_Contract(const AUTO_HESS_EXT_MAT<T_MAT1,VEC1,MAT1,Q>& a) const
-        -> decltype(Make_Hess(Double_Contract(x,a.x),Double_Contract_00_11(dx,a.x)+Double_Contract_00_11(a.dx,x),Double_Contract_00_11(ddx,a.x)+Double_Contract_00_11(a.ddx,x)+Symmetric_Double_Contract_00_11_01_Q<Q&2>(a.dx,dx)))
-    {return Make_Hess(Double_Contract(x,a.x),Double_Contract_00_11(dx,a.x)+Double_Contract_00_11(a.dx,x),Double_Contract_00_11(ddx,a.x)+Double_Contract_00_11(a.ddx,x)+Symmetric_Double_Contract_00_11_01_Q<Q&2>(a.dx,dx));}
+        -> decltype(Make_Hess(Double_Contract(x,a.x),Double_Contract_00_11(dx,a.x)+Double_Contract_00_11(a.dx,x),Double_Contract_00_11(ddx,a.x)+Double_Contract_00_11(a.ddx,x)+Symmetric_Double_Contract_00_11_01_Q<(Q&2)!=0>(a.dx,dx)))
+    {return Make_Hess(Double_Contract(x,a.x),Double_Contract_00_11(dx,a.x)+Double_Contract_00_11(a.dx,x),Double_Contract_00_11(ddx,a.x)+Double_Contract_00_11(a.ddx,x)+Symmetric_Double_Contract_00_11_01_Q<(Q&2)!=0>(a.dx,dx));}
 
     template<class T_MAT1> auto
     Double_Contract(const T_MAT1& a) const
@@ -562,7 +569,7 @@ Sub_S_As(const T2& a,const AUTO_HESS_EXT<T,VEC1,MAT1,Q>& b)
 template<class T,class VEC,class MAT,class VEC1,class MAT1,int Q> auto
 Mul_As_As(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a,const AUTO_HESS_EXT<T,VEC1,MAT1,Q>& b)
 {
-    return Make_Hess(a.x*b.x,b.x*a.dx+a.x*b.dx,b.x*a.ddx+a.x*b.ddx+Symmetric_Outer_Product_Q<Q&2>(a.dx,b.dx));
+    return Make_Hess(a.x*b.x,b.x*a.dx+a.x*b.dx,b.x*a.ddx+a.x*b.ddx+Symmetric_Outer_Product_Q<(Q&2)!=0>(a.dx,b.dx));
 }
 
 template<class T,class T2,class VEC,class MAT,int Q> auto
@@ -575,7 +582,7 @@ template<class T,class T2,class VEC1,class MAT1,int Q> auto
 Div_S_As(const T2& a,const AUTO_HESS_EXT<T,VEC1,MAT1,Q>& b)
 {
     T z=(T)a/b.x,w=z/b.x;
-    return Make_Hess(z,-w*b.dx,2*w/b.x*Outer_Product_Q<Q&2>(b.dx)-w*b.ddx);
+    return Make_Hess(z,-w*b.dx,2*w/b.x*Outer_Product_Q<(Q&2)!=0>(b.dx)-w*b.ddx);
 }
 
 template<class T,class VEC,class MAT,class VEC1,class MAT1,int Q> auto
@@ -596,7 +603,7 @@ Div_As_S(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a,const T2& b)
 template<class T,class VEC,class MAT,class TV,class VEC1,class MAT1,int Q> auto
 Mul_As_Av(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
 {
-    return Make_Hess_Vec(b.x*a.x,a.x*b.dx+Outer_Product_Q<Q&1>(b.x,a.dx),b.ddx*a.x+Tensor_Product_0(a.ddx,b.x)+Symmetric_Tensor_Product_12_Q<Q&2>(b.dx,a.dx));
+    return Make_Hess_Vec(b.x*a.x,a.x*b.dx+Outer_Product_Q<Q&1>(b.x,a.dx),b.ddx*a.x+Tensor_Product_0(a.ddx,b.x)+Symmetric_Tensor_Product_12_Q<(Q&2)!=0>(b.dx,a.dx));
 }
 
 template<class T,class VEC,class MAT,class TV,int Q> auto
@@ -666,7 +673,7 @@ Sub_V_Av(const TV& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
 template<class T_MAT,class T,class VEC,class MAT,class VEC1,class MAT1,int Q> auto
 Mul_Am_As(const AUTO_HESS_EXT_MAT<T_MAT,VEC,MAT,Q>& a,const AUTO_HESS_EXT<T,VEC1,MAT1,Q>& b)
 {
-    return Make_Hess_Mat(a.x*b.x,b.x*a.dx+Tensor_Product_2_Q<Q&1>(a.x,b.dx),a.ddx*b.x+Tensor_Product_01(a.x,b.ddx)+Symmetric_Tensor_Product_23_Q<Q&2>(a.dx,b.dx));
+    return Make_Hess_Mat(a.x*b.x,b.x*a.dx+Tensor_Product_2_Q<Q&1>(a.x,b.dx),a.ddx*b.x+Tensor_Product_01(a.x,b.ddx)+Symmetric_Tensor_Product_23_Q<(Q&2)!=0>(a.dx,b.dx));
 }
 
 template<class T_MAT,class T,class VEC,class MAT,int Q> auto
@@ -704,7 +711,7 @@ Div_M_As(const T_MAT& a,const AUTO_HESS_EXT<T,VEC1,MAT1,Q>& b)
 template<class T_MAT,class TV,class VEC,class MAT,class VEC1,class MAT1,int Q> auto
 Mul_Am_Av(const AUTO_HESS_EXT_MAT<T_MAT,VEC,MAT,Q>& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
 {
-    return Make_Hess_Vec(a.x*b.x,Contract_1(a.dx,b.x)+a.x*b.dx,Contract_1(a.ddx,b.x)+Symmetric_Contract_10_12_Q<Q&2>(a.dx,b.dx)+Contract_01_Q<Q&2>(b.ddx,a.x));
+    return Make_Hess_Vec(a.x*b.x,Contract_1(a.dx,b.x)+a.x*b.dx,Contract_1(a.ddx,b.x)+Symmetric_Contract_10_12_Q<(Q&2)!=0>(a.dx,b.dx)+Contract_01_Q<(Q&2)!=0>(b.ddx,a.x));
 }
 
 template<class T_MAT,class TV,class VEC,class MAT,int Q> auto
@@ -716,7 +723,7 @@ Mul_Am_V(const AUTO_HESS_EXT_MAT<T_MAT,VEC,MAT,Q>& a,const TV& b)
 template<class T_MAT,class TV,class VEC1,class MAT1,int Q> auto
 Mul_M_Av(const T_MAT& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
 {
-    return Make_Hess_Vec(a*b.x,a*b.dx,Contract_01_Q<Q&2>(b.ddx,a));
+    return Make_Hess_Vec(a*b.x,a*b.dx,Contract_01_Q<(Q&2)!=0>(b.ddx,a));
 }
 
 ///////////// MATRIX MATRIX /////////////
@@ -754,7 +761,7 @@ Sub_M_Am(const T_MAT& a,const AUTO_HESS_EXT_MAT<T_MAT1,VEC1,MAT1,Q>& b)
 template<class T_MAT,class T_MAT1,class VEC,class MAT,class VEC1,class MAT1,int Q> auto
 Mul_Am_Am(const AUTO_HESS_EXT_MAT<T_MAT,VEC,MAT,Q>& a,const AUTO_HESS_EXT_MAT<T_MAT1,VEC1,MAT1,Q>& b)
 {
-    return Make_Hess_Mat(a.x*b.x,Contract_10(a.dx,b.x)+Contract_01_Q<Q&1>(b.dx,a.x),Contract_10(a.ddx,b.x)+Contract_01_Q<Q&2>(b.ddx,a.x)+Symmetric_Contract_01_23_Q<Q&2>(b.dx,a.dx));
+    return Make_Hess_Mat(a.x*b.x,Contract_10(a.dx,b.x)+Contract_01_Q<Q&1>(b.dx,a.x),Contract_10(a.ddx,b.x)+Contract_01_Q<(Q&2)!=0>(b.ddx,a.x)+Symmetric_Contract_01_23_Q<(Q&2)!=0>(b.dx,a.dx));
 }
 
 template<class T_MAT,class T_MAT1,class VEC,class MAT,int Q> auto
@@ -766,20 +773,20 @@ Mul_Am_M(const AUTO_HESS_EXT_MAT<T_MAT,VEC,MAT,Q>& a,const T_MAT1& b)
 template<class T_MAT,class T_MAT1,class VEC1,class MAT1,int Q> auto
 Mul_M_Am(const T_MAT& a,const AUTO_HESS_EXT_MAT<T_MAT1,VEC1,MAT1,Q>& b)
 {
-    return Make_Hess_Mat(a*b.x,Contract_01_Q<Q&1>(b.dx,a),Contract_01_Q<Q&2>(b.ddx,a));
+    return Make_Hess_Mat(a*b.x,Contract_01_Q<Q&1>(b.dx,a),Contract_01_Q<(Q&2)!=0>(b.ddx,a));
 }
 
 template<class T,class VEC,class MAT,int Q> inline auto
 sqrt(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a)
-{T s=sqrt(a.x);auto t=a.dx/(2*s);return Make_Hess(s,t,a.ddx/(2*s)-Outer_Product_Q<Q&2>(t)/s);}
+{T s=sqrt(a.x);auto t=a.dx/(2*s);return Make_Hess(s,t,a.ddx/(2*s)-Outer_Product_Q<(Q&2)!=0>(t)/s);}
 
 template<class T,class VEC,class MAT,int Q> inline auto
 sqr(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a)
-{return Make_Hess(sqr(a.x),2*a.x*a.dx,2*a.x*a.ddx+Outer_Product_Q<Q&2>(a.dx)*2);}
+{return Make_Hess(sqr(a.x),2*a.x*a.dx,2*a.x*a.ddx+Outer_Product_Q<(Q&2)!=0>(a.dx)*2);}
 
 template<class T,class VEC,class MAT,int Q> inline auto
 cube(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a)
-{T sq=sqr(a.x);return Make_Hess(a.x*sq,3*sq*a.dx,3*sq*a.ddx+Outer_Product_Q<Q&2>(a.dx)*(6*a.x));}
+{T sq=sqr(a.x);return Make_Hess(a.x*sq,3*sq*a.dx,3*sq*a.ddx+Outer_Product_Q<(Q&2)!=0>(a.dx)*(6*a.x));}
 
 template<class T,class VEC,class MAT,int Q,class VEC1,class MAT1> inline auto
 max(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a,const AUTO_HESS_EXT<T,VEC1,MAT1,Q>& b)
@@ -846,23 +853,23 @@ min(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a,const AUTO_HESS_EXT<T,VEC,MAT,Q>& b)
 
 template<class T,class VEC,class MAT,int Q> inline auto
 log(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a)
-{auto z=a.dx/a.x;return Make_Hess(::std::log(a.x),z,a.ddx/a.x-Outer_Product_Q<Q&2>(z));}
+{auto z=a.dx/a.x;return Make_Hess(::std::log(a.x),z,a.ddx/a.x-Outer_Product_Q<(Q&2)!=0>(z));}
 
 template<class T,class VEC,class MAT,int Q> inline auto
 exp(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a)
-{T s=exp(a.x);return Make_Hess(s,s*a.dx,s*(a.ddx+Outer_Product_Q<Q&2>(a.dx)));}
+{T s=exp(a.x);return Make_Hess(s,s*a.dx,s*(a.ddx+Outer_Product_Q<(Q&2)!=0>(a.dx)));}
 
 template<class T,class VEC,class MAT,int Q> inline auto
 sin(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a)
-{T s=sin(a.x),c=cos(a.x);return Make_Hess(s,c*a.dx,c*a.ddx-s*Outer_Product_Q<Q&2>(a.dx));}
+{T s=sin(a.x),c=cos(a.x);return Make_Hess(s,c*a.dx,c*a.ddx-s*Outer_Product_Q<(Q&2)!=0>(a.dx));}
 
 template<class T,class VEC,class MAT,int Q> inline auto
 cos(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a)
-{T s=sin(a.x),c=cos(a.x);return Make_Hess(c,-s*a.dx,-s*a.ddx-c*Outer_Product_Q<Q&2>(a.dx));}
+{T s=sin(a.x),c=cos(a.x);return Make_Hess(c,-s*a.dx,-s*a.ddx-c*Outer_Product_Q<(Q&2)!=0>(a.dx));}
 
 template<class T,class VEC,class MAT,int Q> inline auto
 tan(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a)
-{T t=tan(a.x),s=1+t*t;return Make_Hess(t,s*a.dx,s*a.ddx+2*s*t*Outer_Product_Q<Q&2>(a.dx));}
+{T t=tan(a.x),s=1+t*t;return Make_Hess(t,s*a.dx,s*a.ddx+2*s*t*Outer_Product_Q<(Q&2)!=0>(a.dx));}
 
 template<class T,class VEC,class MAT,int Q> inline auto
 abs(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a)
@@ -877,14 +884,14 @@ template<class T,class VEC,class MAT,int Q,class VEC1,class MAT1> inline auto
 hypot(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a,const AUTO_HESS_EXT<T,VEC1,MAT1,Q>& b)
 {
     T c=sqrt(sqr(a.x)+sqr(b.x)),d=a.x/c,e=b.x/c;
-    return Make_Hess(c,d*a.dx+e*b.dx,d*a.ddx+e*b.ddx+Outer_Product_Q<Q&2>(d*b.dx-e*a.dx)/c);
+    return Make_Hess(c,d*a.dx+e*b.dx,d*a.ddx+e*b.ddx+Outer_Product_Q<(Q&2)!=0>(d*b.dx-e*a.dx)/c);
 }
 
 template<class T,class VEC,class MAT,int Q> inline auto
 hypot(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a,T b)
 {
     T c=sqrt(sqr(a.x)+sqr(b)),d=a.x/c,e=b/c;
-    return Make_Hess(c,d*a.dx,d*a.ddx+Outer_Product_Q<Q&2>(e*a.dx)/c);
+    return Make_Hess(c,d*a.dx,d*a.ddx+Outer_Product_Q<(Q&2)!=0>(e*a.dx)/c);
 }
 
 template<class T,class VEC,class MAT,int Q> inline auto
@@ -895,9 +902,9 @@ template<class T,class VEC,class MAT,int Q,class VEC1,class MAT1,class VEC2,clas
 hypot(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a,const AUTO_HESS_EXT<T,VEC1,MAT1,Q>& b,const AUTO_HESS_EXT<T,VEC2,MAT2,Q>& c)
 {
     T s=sqrt(sqr(a.x)+sqr(b.x)+sqr(c.x)),aa=a.x/s,bb=b.x/s,cc=c.x/s;
-    auto ab=Outer_Product_Q<Q&2>(aa*b.dx-bb*a.dx);
-    auto bc=Outer_Product_Q<Q&2>(bb*c.dx-cc*b.dx);
-    auto ca=Outer_Product_Q<Q&2>(cc*a.dx-aa*c.dx);
+    auto ab=Outer_Product_Q<(Q&2)!=0>(aa*b.dx-bb*a.dx);
+    auto bc=Outer_Product_Q<(Q&2)!=0>(bb*c.dx-cc*b.dx);
+    auto ca=Outer_Product_Q<(Q&2)!=0>(cc*a.dx-aa*c.dx);
     return Make_Hess(s,aa*a.dx+bb*b.dx+cc*c.dx,aa*a.ddx+bb*b.ddx+cc*c.ddx+(ab+bc+ca)/s);
 }
 
@@ -905,9 +912,9 @@ template<class T,class VEC,class MAT,int Q,class VEC1,class MAT1> inline auto
 hypot(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a,const AUTO_HESS_EXT<T,VEC1,MAT1,Q>& b,T c)
 {
     T s=sqrt(sqr(a.x)+sqr(b.x)+sqr(c)),aa=a.x/s,bb=b.x/s,cc=c/s;
-    auto ab=Outer_Product_Q<Q&2>(aa*b.dx-bb*a.dx);
-    auto bc=Outer_Product_Q<Q&2>(b.dx);
-    auto ca=Outer_Product_Q<Q&2>(a.dx);
+    auto ab=Outer_Product_Q<(Q&2)!=0>(aa*b.dx-bb*a.dx);
+    auto bc=Outer_Product_Q<(Q&2)!=0>(b.dx);
+    auto ca=Outer_Product_Q<(Q&2)!=0>(a.dx);
     return Make_Hess(s,aa*a.dx+bb*b.dx,aa*a.ddx+bb*b.ddx+ab/s+(bc+ca)*(sqr(cc)/s));
 }
 
@@ -923,7 +930,7 @@ template<class T,class VEC,class MAT,int Q> inline auto
 hypot(const AUTO_HESS_EXT<T,VEC,MAT,Q>& a,T b,T c)
 {
     T t=sqr(b)+sqr(c),s=sqrt(sqr(a.x)+t),d=a.x/s,e=t/(s*s*s);
-    return Make_Hess(s,d*a.dx,d*a.ddx+Outer_Product_Q<Q&2>(a.dx)*e);
+    return Make_Hess(s,d*a.dx,d*a.ddx+Outer_Product_Q<(Q&2)!=0>(a.dx)*e);
 }
 
 template<class T,class VEC,class MAT,int Q> inline auto
@@ -939,7 +946,7 @@ atan2(const AUTO_HESS_EXT<T,VEC,MAT,Q>& y,const AUTO_HESS_EXT<T,VEC1,MAT1,Q>& x)
 {
     T c=sqr(x.x)+sqr(y.x),d=x.x/c,e=y.x/c;
     auto f=d*y.dx-e*x.dx;
-    return Make_Hess(::std::atan2(y.x,x.x),f,d*y.ddx-e*x.ddx-Symmetric_Outer_Product_Q<Q&2>(f,d*x.dx+e*y.dx));
+    return Make_Hess(::std::atan2(y.x,x.x),f,d*y.ddx-e*x.ddx-Symmetric_Outer_Product_Q<(Q&2)!=0>(f,d*x.dx+e*y.dx));
 }
 
 template<class T,class VEC,class MAT,int Q> inline auto
@@ -947,7 +954,7 @@ atan2(const AUTO_HESS_EXT<T,VEC,MAT,Q>& y,T x)
 {
     T c=sqr(x)+sqr(y.x),d=x/c,e=y.x/c;
     auto f=d*y.dx;
-    return Make_Hess(::std::atan2(y.x,x),f,d*y.ddx-Symmetric_Outer_Product_Q<Q&2>(f,e*y.dx));
+    return Make_Hess(::std::atan2(y.x,x),f,d*y.ddx-Symmetric_Outer_Product_Q<(Q&2)!=0>(f,e*y.dx));
 }
 
 template<class T,class VEC,class MAT,int Q> inline auto
@@ -955,16 +962,16 @@ atan2(T y,const AUTO_HESS_EXT<T,VEC,MAT,Q>& x)
 {
     T c=sqr(x.x)+sqr(y),d=x.x/c,e=y/c;
     auto f=-e*x.dx;
-    return Make_Hess(::std::atan2(y,x.x),f,-e*x.ddx-Symmetric_Outer_Product_Q<Q&2>(f,d*x.dx));
+    return Make_Hess(::std::atan2(y,x.x),f,-e*x.ddx-Symmetric_Outer_Product_Q<(Q&2)!=0>(f,d*x.dx));
 }
 
 template<class TV,class VEC,class MAT,int Q> inline auto
 sin(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a)
-{TV s=sin(a.x),c=cos(a.x);return Make_Hess_Vec(s,DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(c)*a.dx,Contract_00(a.ddx,DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(c))-Symmetric_Double_Contract_12_With_Tensor_Q<Q&2>(DIAGONAL_TENSOR<typename TV::SCALAR,TV::m>(s/2),a.dx,a.dx));}
+{TV s=sin(a.x),c=cos(a.x);return Make_Hess_Vec(s,DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(c)*a.dx,Contract_00(a.ddx,DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(c))-Symmetric_Double_Contract_12_With_Tensor_Q<(Q&2)!=0>(DIAGONAL_TENSOR<typename TV::SCALAR,TV::m>(s/2),a.dx,a.dx));}
 
 template<class TV,class VEC,class MAT,int Q> inline auto
 cos(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a)
-{TV s=sin(a.x),c=cos(a.x);return Make_Hess_Vec(c,-DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(s)*a.dx,Contract_00(a.ddx,-DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(s))-Symmetric_Double_Contract_12_With_Tensor_Q<Q&2>(DIAGONAL_TENSOR<typename TV::SCALAR,TV::m>(c/2),a.dx,a.dx));}
+{TV s=sin(a.x),c=cos(a.x);return Make_Hess_Vec(c,-DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(s)*a.dx,Contract_00(a.ddx,-DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(s))-Symmetric_Double_Contract_12_With_Tensor_Q<(Q&2)!=0>(DIAGONAL_TENSOR<typename TV::SCALAR,TV::m>(c/2),a.dx,a.dx));}
 
 template<class T,class VEC1,class MAT1,class T_MAT,int Q>
 auto Matrix_Times_Scalar(const T_MAT& a,const AUTO_HESS_EXT<T,VEC1,MAT1,Q>& b)
@@ -988,7 +995,7 @@ Times_Transpose(const AUTO_HESS_EXT_MAT<T_MAT,VEC,MAT,Q>& a,const T_MAT1& b)
 
 template<class TV,class VEC,class MAT,class VEC1,class MAT1,int Q> auto
 Outer_Product(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
-{return Make_Hess_Mat(Outer_Product(a.x,b.x),Tensor_Product_1_Q<Q&1>(a.dx,b.x)+Tensor_Product_0(b.dx,a.x),Tensor_Product_1_Q<Q&2>(a.ddx,b.x)+Tensor_Product_0(b.ddx,a.x)+Symmetric_Tensor_Product_02_23_Q<Q&2>(a.dx,b.dx));}
+{return Make_Hess_Mat(Outer_Product(a.x,b.x),Tensor_Product_1_Q<Q&1>(a.dx,b.x)+Tensor_Product_0(b.dx,a.x),Tensor_Product_1_Q<(Q&2)!=0>(a.ddx,b.x)+Tensor_Product_0(b.ddx,a.x)+Symmetric_Tensor_Product_02_23_Q<(Q&2)!=0>(a.dx,b.dx));}
 
 template<class TV,class VEC1,class MAT1,int Q> auto
 Outer_Product(const TV& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
@@ -996,11 +1003,11 @@ Outer_Product(const TV& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
 
 template<class TV,class VEC,class MAT,int Q> auto
 Outer_Product(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a,const TV& b)
-{return Make_Hess_Mat(Outer_Product(a.x,b),Tensor_Product_1_Q<Q&1>(a.dx,b),Tensor_Product_1_Q<Q&2>(a.ddx,b));}
+{return Make_Hess_Mat(Outer_Product(a.x,b),Tensor_Product_1_Q<Q&1>(a.dx,b),Tensor_Product_1_Q<(Q&2)!=0>(a.ddx,b));}
 
 template<class TV,class VEC,class MAT,int Q> auto
 Outer_Product(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a)
-{return Make_Hess_Mat(Outer_Product(a.x),Twice_Symmetric_Part_01_Q<Q&1>(Tensor_Product_1_Q<Q&1>(a.dx,a.x)),Twice_Symmetric_Part_01_Q<Q&2>(Tensor_Product_1_Q<Q&2>(a.ddx,a.x))+Symmetric_Tensor_Product_02_23_Q<Q&2>(a.dx,a.dx));}
+{return Make_Hess_Mat(Outer_Product(a.x),Twice_Symmetric_Part_01_Q<Q&1>(Tensor_Product_1_Q<Q&1>(a.dx,a.x)),Twice_Symmetric_Part_01_Q<(Q&2)!=0>(Tensor_Product_1_Q<(Q&2)!=0>(a.ddx,a.x))+Symmetric_Tensor_Product_02_23_Q<(Q&2)!=0>(a.dx,a.dx));}
 
 template<class T> struct IS_AUTO_HESS {static const int value=false;};
 template<class T,class VEC,class MAT,int Q> struct IS_AUTO_HESS<AUTO_HESS_EXT<T,VEC,MAT,Q> > {static const bool value=true;};

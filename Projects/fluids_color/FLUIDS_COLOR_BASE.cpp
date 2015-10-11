@@ -330,7 +330,7 @@ Initialize_Common_Example()
 
                 auto rot=[=](auto X,auto t){return spin_mat*(X-trans_vel*t-(TV()+1));};
                 Add_Velocity([=](auto X,auto t){return rot(X,t)+trans_vel;});
-                Add_Pressure([=](auto X,auto t){return (T).5*(rho0/unit_rho)*rot(X,t).Magnitude_Squared();});
+                Add_Pressure([rho0=rho0,unit_rho=unit_rho,rot=rot](auto X,auto t){return (T).5*(rho0/unit_rho)*rot(X,t).Magnitude_Squared();});
                 if(bc_type!=NEUMANN) use_p_null_mode=true;
             }
             break;
@@ -370,7 +370,7 @@ Initialize_Common_Example()
                 T radius=(T).003,curvature=(TV::m-1)/radius;
                 if(!override_surface_tension) surface_tension=(T)0.07197*unit_st;
                 analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T).005,radius,0,1);
-                Add_Velocity([=](auto X,auto t){return TV();});
+                Add_Velocity([](auto X,auto t){return TV();});
                 Add_Pressure([=](auto X,auto t){return (surface_tension*curvature)/unit_p;});
                 Add_Velocity([](auto X,auto t){return TV();});
                 Add_Pressure([](auto X,auto t){return 0;});
@@ -395,7 +395,7 @@ Initialize_Common_Example()
             Add_Velocity(rot);
             Add_Velocity(rot);
             Add_Pressure([=](auto X,auto t){return (T).5*(rho0/unit_rho)*rot(X,t).Magnitude_Squared();});
-            Add_Pressure([=](auto X,auto t){return (T).5*(rho1/unit_rho)*rot(X,t).Magnitude_Squared();});
+            Add_Pressure([rho1=rho1,unit_rho=unit_rho,rot=rot](auto X,auto t){return (T).5*(rho1/unit_rho)*rot(X,t).Magnitude_Squared();});
             if(bc_type!=NEUMANN) use_p_null_mode=true;
             //use_level_set_method=true;
 
@@ -420,7 +420,7 @@ Initialize_Common_Example()
             Add_Velocity(rot);
             Add_Velocity(rot);
             Add_Pressure([=](auto X,auto t){return (T).5*(rho0/unit_rho)*rot(X,t).Magnitude_Squared();});
-            Add_Pressure([=](auto X,auto t){return (T).5*(rho1/unit_rho)*rot(X,t).Magnitude_Squared();});
+            Add_Pressure([rho1=rho1,unit_rho=unit_rho,rot=rot](auto X,auto t){return (T).5*(rho1/unit_rho)*rot(X,t).Magnitude_Squared();});
             if(bc_type!=NEUMANN) use_p_null_mode=true;
             use_level_set_method=true;
                 
@@ -533,7 +533,8 @@ Initialize_Common_Example()
             Add_Polymer_Stress(
                 [=](auto X,auto t)
                 {
-                    auto Z=(T)(2*pi)*X,W=(cos(Z)+sin(Z))*((T)1+exp(-t));
+                    auto Z=(T)(2*pi)*X;
+                    auto W=(cos(Z)+sin(Z))*((T)1+exp(-t));
                     return Outer_Product(W)+id;
                 });
             if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
@@ -550,7 +551,8 @@ Initialize_Common_Example()
             Add_Polymer_Stress(
                 [=](auto X,auto t)
                 {
-                    auto Z=(T)(2*pi)*X,W=(cos(Z)+sin(Z))*((T)1+exp(-t));
+                    auto Z=(T)(2*pi)*X;
+                    auto W=(cos(Z)+sin(Z))*((T)1+exp(-t));
                     return Outer_Product(W)+id;
                 });
             if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);

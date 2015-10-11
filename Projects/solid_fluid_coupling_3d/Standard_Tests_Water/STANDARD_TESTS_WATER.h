@@ -107,7 +107,7 @@ public:
 
 
     STANDARD_TESTS_WATER(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-        :BASE(stream_type_input,parse_args,solid_node?0:1,fluids_parameters.WATER),
+        :BASE(stream_type_input,parse_args,(mpi_world->initialized && !mpi_world->rank)?0:1,fluids_parameters.WATER),
         water_tests(*this,fluids_parameters,solid_body_collection.rigid_body_collection),
         solids_tests(stream_type_input,data_directory,solid_body_collection),deformable_object_id(0),solid_density((T)2000),stiffness_ratio(1),light_sphere_index(0),heavy_sphere_index(0),
         light_sphere_initial_height((T)1.75),heavy_sphere_initial_height((T)1.75),light_sphere_drop_time((T)1),heavy_sphere_drop_time((T)1.5),balloon_initial_radius((T)0),

@@ -163,7 +163,6 @@ Initialize_Common_Example()
         case 5:
             struct ANALYTIC_VELOCITY_5:public ANALYTIC_VELOCITY<TV>
             {
-                typedef typename TV::SCALAR T;
                 TV c;
                 typename TV::SPIN w;
                 ANALYTIC_VELOCITY_5(TV cc,typename TV::SPIN ww,T rho): c(cc),w(ww){}
@@ -179,7 +178,6 @@ Initialize_Common_Example()
         case 6:
             struct ANALYTIC_VELOCITY_6:public ANALYTIC_VELOCITY<TV>
             {
-                typedef typename TV::SCALAR T;
                 T xl,xq,tl,tq;
                 TV con;
                 MATRIX<T,TV::m> lin;

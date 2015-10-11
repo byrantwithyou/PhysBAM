@@ -43,7 +43,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
         int end=example.DT.offsets(i+1);T y=V.p.array(example.valid_pressure_indices(i))*sqrt(dt);
         for(;index<end;index++){
             int cell=example.DT.A(index).j/TV::m;
-            if(abs(sqrt(r.array(cell))>1e-16)) F.u.array.Flattened()(example.DT.A(index).j)-=example.DT.A(index).a*y/sqrt(r.array(cell));}}
+            if(sqrt(r.array(cell))>1e-16) F.u.array.Flattened()(example.DT.A(index).j)-=example.DT.A(index).a*y/sqrt(r.array(cell));}}
     // (1/dt)*R*u
     T one_over_dt=(T)1/example.dt;
     for(int t=0;t<example.valid_pressure_indices.m;t++){
