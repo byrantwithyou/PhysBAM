@@ -110,10 +110,10 @@ P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T>
     return sb*strain_rate+sa*strain_rate.Trace();
 }
 //#####################################################################
-// Function Isotropic_Stress_Derivative
+// Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T,int d> void COROTATED_FIXED<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,1>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>& dP_dF,const int id) const
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,1>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>& dP_dF,const int id) const
 {
     T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     T mu=id_mu,la=id_lambda, mu2=2*mu;
@@ -122,10 +122,10 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,1>& F,DIAGONALIZED_ISOTROPIC
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################
-// Function Isotropic_Stress_Derivative
+// Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T,int d> void COROTATED_FIXED<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int id) const
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int id) const
 {
     T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     T mu=id_mu,la=id_lambda, mu2=2*mu;
@@ -143,7 +143,7 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void COROTATED_FIXED<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int id) const
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int id) const
 {
     T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     T mu=id_mu,la=id_lambda,mu2=2*mu,J=F.Determinant();
@@ -165,6 +165,14 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
     dPi_dF.x2020=mu2*(1-1/d02);
     dPi_dF.x2121=mu2*(1-1/d12);
     if(enforce_definiteness) dPi_dF.Enforce_Definiteness();
+}
+//#####################################################################
+// Function Isotropic_Stress_Derivative
+//#####################################################################
+template<class T,int d> void COROTATED_FIXED<T,d>::
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const int id) const
+{
+    Isotropic_Stress_Derivative_Helper(F,dPi_dF,id);
 }
 //#####################################################################
 // Function Energy_Density

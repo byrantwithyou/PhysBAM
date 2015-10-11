@@ -2503,7 +2503,7 @@ void Read_Output_Files_Solids(const int frame) override
 //#####################################################################
 // Function Set_Kinematic_Positions
 //#####################################################################
-void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
+void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override
 {
     if(test_number==41)
     {
@@ -2532,7 +2532,7 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
-bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
+bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override
 {
     for(int i=0;i<kinematic_ids.m;i++)
         if(id==kinematic_ids(i)){
@@ -2578,7 +2578,7 @@ void Preprocess_Substep(const T dt,const T time) override
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
 //#####################################################################
-void Update_Time_Varying_Material_Properties(const T time)
+void Update_Time_Varying_Material_Properties(const T time) override
 {
     if(test_number==29 && time > .01){
         if(solids_parameters.triangle_collision_parameters.perform_self_collision && time<=1.3){
@@ -2664,7 +2664,7 @@ void Bind_Intersecting_Particles()
 //#####################################################################
 // Function Preprocess_Frame
 //#####################################################################
-void Preprocess_Frame(const int frame)
+void Preprocess_Frame(const int frame) override
 {
     if(test_number==32 && frame==1100) Bind_Intersecting_Particles();
 

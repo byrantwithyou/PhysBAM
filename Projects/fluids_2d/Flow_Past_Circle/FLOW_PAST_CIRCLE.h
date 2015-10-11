@@ -162,7 +162,7 @@ void Initialize_Advection()    override
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
 //#####################################################################
-void Set_Dirichlet_Boundary_Conditions(const T time)
+void Set_Dirichlet_Boundary_Conditions(const T time) override
 {
     for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
         if(circle.Inside(iterator.Location(),(T).1*fluids_parameters.grid->dX.Max()))

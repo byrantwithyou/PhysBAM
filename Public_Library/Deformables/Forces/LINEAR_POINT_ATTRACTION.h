@@ -39,7 +39,7 @@ public:
     int Velocity_Dependent_Forces_Size() const override;
     void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const override;
     void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const override;
-    void Initialize_CFL(ARRAY_VIEW<typename BASE::FREQUENCY_DATA> frequency);
+    void Initialize_CFL(ARRAY_VIEW<typename BASE::FREQUENCY_DATA> frequency) override;
     T CFL_Strain_Rate() const override;
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
     void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;

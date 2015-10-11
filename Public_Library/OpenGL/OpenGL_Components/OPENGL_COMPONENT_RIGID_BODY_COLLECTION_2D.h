@@ -84,7 +84,7 @@ public:
     bool Use_Bounding_Box() const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
     void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
     void Clear_Highlight() override;
     void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
@@ -132,7 +132,7 @@ public:
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_2D,object),body_id(body_id),body_selection(body_selection)
     {}
 
-    virtual typename OPENGL_SELECTION<T>::TYPE Actual_Type() const 
+    virtual typename OPENGL_SELECTION<T>::TYPE Actual_Type() const override
     {return body_selection->Actual_Type();}
 
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;

@@ -43,7 +43,7 @@ public:
     if(use_weighted_divergence) divergence_face_weights.Resize(grid,1);}
 
 //#####################################################################
-    void Initialize_Grid(const GRID<TV>& grid_input);
+    void Initialize_Grid(const GRID<TV>& grid_input) override;
     void Find_Variable_beta();
     void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index) override;
 //#####################################################################

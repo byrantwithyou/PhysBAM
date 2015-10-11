@@ -31,7 +31,7 @@ public:
     bool Use_Bounding_Box() const override { return draw && valid; }
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) { return opengl_triangulated_surface.Get_Selection(buffer,buffer_size); }
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override { return opengl_triangulated_surface.Get_Selection(buffer,buffer_size); }
     virtual void Highlight_Selection(OPENGL_SELECTION<T>* selection) override { opengl_triangulated_surface.Highlight_Selection(selection); }
     virtual void Clear_Highlight() override { opengl_triangulated_surface.Clear_Highlight(); }
 

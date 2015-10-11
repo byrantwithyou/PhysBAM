@@ -59,7 +59,7 @@ public:
     void Remove_Theta_Constraint()
     {STATIC_ASSERT(dof==3);constrain.z=false;rotation_limits.min_corner.z=-FLT_MAX;rotation_limits.max_corner.z=FLT_MAX;}
 
-    VECTOR<bool,T_SPIN::dimension> Angular_Constraints() const
+    VECTOR<bool,T_SPIN::dimension> Angular_Constraints() const override
     {return T_SPIN::Componentwise_Greater_Equal(rotation_limits.min_corner,rotation_limits.max_corner);}
 
 //#####################################################################

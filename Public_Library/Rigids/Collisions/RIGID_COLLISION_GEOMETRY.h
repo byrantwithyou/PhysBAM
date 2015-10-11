@@ -37,9 +37,9 @@ public:
     TV Pointwise_Object_Velocity(const TV& X) const override;
     TV Pointwise_Object_Velocity(const int simplex_id,const TV& X) const override; // extra simplex_id is not used, but for a virtual function in COLLISION GEOMETRY
     virtual TV Pointwise_Object_Velocity_At_Particle(const TV& X,const int particle_index) const; // overridden in DEFORMABLE_OBJECT_WRAPPER where X is ignored
-    void Update_Bounding_Box();
-    const RANGE<TV>& Axis_Aligned_Bounding_Box() const;
-    bool Has_Volumetric_Geometry() const;
+    void Update_Bounding_Box() override;
+    const RANGE<TV>& Axis_Aligned_Bounding_Box() const override;
+    bool Has_Volumetric_Geometry() const override;
 
     TV Closest_Point_On_Boundary(const TV& location,const T max_distance,const T thickness_over_2=0,const int max_iterations=1,int* simplex_id=0,T* distance=0) const override;
 

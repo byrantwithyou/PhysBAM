@@ -125,10 +125,10 @@ P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T>
     return sb*strain_rate+sa*strain_rate.Trace();
 }
 //#####################################################################
-// Function Isotropic_Stress_Derivative
+// Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,1>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>& dP_dF,const int id) const
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,1>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>& dP_dF,const int id) const
 {
     T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     DIAGONAL_MATRIX<T,1> F_inverse=(F.Determinant()>=failure_threshold?F:Clamp_To_Hyperbola(F)).Inverse();
@@ -138,10 +138,10 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,1>& F,DIAGONALIZED_ISOTROPIC
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################
-// Function Isotropic_Stress_Derivative
+// Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int id) const
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int id) const
 {
     T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     DIAGONAL_MATRIX<T,2> F_inverse=(F.Determinant()>=failure_threshold?F:Clamp_To_Hyperbola(F)).Inverse();
@@ -155,10 +155,10 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################
-// Function Isotropic_Stress_Derivative
+// Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int id) const
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int id) const
 {
     T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
     DIAGONAL_MATRIX<T,3> F_inverse=(F.Determinant()>=failure_threshold?F:Clamp_To_Hyperbola(F)).Inverse();
@@ -175,6 +175,14 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
     dPi_dF.x2002=mu_minus_lambda_logJ*F_inverse_outer.x20;
     dPi_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;
     if(enforce_definiteness) dPi_dF.Enforce_Definiteness();
+}
+//#####################################################################
+// Function Isotropic_Stress_Derivative
+//#####################################################################
+template<class T,int d> void NEO_HOOKEAN<T,d>::
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const int id) const
+{
+    Isotropic_Stress_Derivative_Helper(F,dPi_dF,id);
 }
 //#####################################################################
 // Function Energy_Density

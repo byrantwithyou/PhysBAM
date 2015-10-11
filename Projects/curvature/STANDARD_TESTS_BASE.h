@@ -96,8 +96,8 @@ public:
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override;
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override;
     void Read_Output_Files_Solids(const int frame) override;
-    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id);
-    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id);
+    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override;
+    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override;
     void Preprocess_Substep(const T dt,const T time) override;
     void Add_Constitutive_Model(T_OBJECT& object,T stiffness,T poissons_ratio,T damping);
     GRAVITY<TV>& Add_Gravity();

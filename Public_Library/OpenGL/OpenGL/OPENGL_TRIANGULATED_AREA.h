@@ -39,7 +39,7 @@ public:
     void Display() const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint* buffer, int buffer_size);
+    OPENGL_SELECTION<T>* Get_Selection(GLuint* buffer, int buffer_size) override;
     void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
     void Clear_Highlight() override;
     void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const override;

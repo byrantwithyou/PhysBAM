@@ -66,7 +66,7 @@ public:
     virtual void Postprocess_Frame(const int frame);
     virtual void Preprocess_Substep(const T dt,const T time);
     virtual void Postprocess_Substep(const T dt,const T time);
-    void Log_Parameters() const;
+    void Log_Parameters() const override;
     // solids
     virtual void Initialize_Bodies();
     virtual void Read_Output_Files_Solids(const int frame);

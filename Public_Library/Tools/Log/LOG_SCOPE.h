@@ -25,10 +25,10 @@ public:
         const std::string& name_input,int& verbosity_level_input);
     virtual ~LOG_SCOPE();
 
-    virtual LOG_ENTRY* Get_Stop_Time(LOG_CLASS& instance);
-    LOG_ENTRY* Get_New_Scope(LOG_CLASS& instance,const std::string& new_scope_identifier,const std::string& new_name);
-    LOG_ENTRY* Get_New_Item(LOG_CLASS& instance,const std::string& new_name);
-    LOG_ENTRY* Get_Pop_Scope(LOG_CLASS& instance);
+    virtual LOG_ENTRY* Get_Stop_Time(LOG_CLASS& instance) override;
+    LOG_ENTRY* Get_New_Scope(LOG_CLASS& instance,const std::string& new_scope_identifier,const std::string& new_name) override;
+    LOG_ENTRY* Get_New_Item(LOG_CLASS& instance,const std::string& new_name) override;
+    LOG_ENTRY* Get_Pop_Scope(LOG_CLASS& instance) override;
     void Start_XML(LOG_CLASS& instance) override;
     void Dump_Log(FILE* output) override;
     void Dump_Names(FILE* output) override;

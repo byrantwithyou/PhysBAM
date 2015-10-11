@@ -572,14 +572,14 @@ void Initialize_Bodies() override
 //#####################################################################
 // Function Set_Kinematic_Positions
 //#####################################################################
-void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
+void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override
 {
     if(id==kinematic_id) frame=curve.Value(time);
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
-bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
+bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override
 {
     if(id==kinematic_id) twist=curve.Derivative(time);
     return false;
@@ -694,14 +694,14 @@ void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
-void Write_Output_Files(const int frame) const
+void Write_Output_Files(const int frame) const override
 {
     BASE::Write_Output_Files(frame);
 }
 //#####################################################################
 // Function Preprocess_Frame
 //#####################################################################
-void Preprocess_Frame(const int frame)
+void Preprocess_Frame(const int frame) override
 {
     dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
     

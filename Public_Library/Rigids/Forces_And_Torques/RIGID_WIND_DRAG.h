@@ -94,10 +94,10 @@ private:
     void Initialize_CFL(ARRAY_VIEW<RIGID_FREQUENCY_DATA> rigid_frequency) override
     {}
 
-    void Update_Mpi(const ARRAY<bool>& particle_is_simulated)
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated) override
     {}
 
-    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override
     {}
 
     TV Add_Velocity_Independent_Forces_Helper(TV relative_velocity,int t) const;

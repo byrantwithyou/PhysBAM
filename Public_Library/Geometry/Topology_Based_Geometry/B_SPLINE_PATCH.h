@@ -40,7 +40,7 @@ public:
     void Calculate_Weights(T s,T t,WV& w,WV& dw0,WV& dw1,WV& ddw0,WV& ddw1,WV& ddw2) const;
     VECTOR<int,(d+1)*(d+1)> Control_Points_For_Element(int element) const;
     RANGE<VECTOR<T,2>> Range_For_Element(int element) const;
-    B_SPLINE_PATCH<TV,d>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const;
+    B_SPLINE_PATCH<TV,d>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const override;
     void Read(TYPED_ISTREAM& input) override;
     void Write(TYPED_OSTREAM& output) const override;
     void Wrap(bool new_loop_s,bool new_loop_t);

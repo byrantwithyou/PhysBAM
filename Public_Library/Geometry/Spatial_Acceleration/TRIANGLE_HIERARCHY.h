@@ -89,7 +89,7 @@ public:
     else Intersection_List(root,test_plane,intersection_list,thickness_over_two);}
 
     void Intersection_List(const IMPLICIT_OBJECT<VECTOR<T,3> >& implicit_surface,const MATRIX<T,3>& rotation,const VECTOR<T,3>& translation,ARRAY<int>& intersection_list,
-        const T contour_value=0) const
+        const T contour_value=0) const override
     {if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,implicit_surface,rotation,translation,group_list,contour_value);

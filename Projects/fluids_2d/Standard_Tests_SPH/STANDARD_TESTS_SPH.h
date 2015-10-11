@@ -222,7 +222,7 @@ void Adjust_SPH_Particle_For_Domain_Boundaries(SPH_PARTICLES<TV>& particles,cons
 //#####################################################################
 // Function Add_SPH_Particles_For_Sources
 //#####################################################################
-void Add_SPH_Particles_For_Sources(const T dt,const T time)
+void Add_SPH_Particles_For_Sources(const T dt,const T time) override
 {
     SPH_PARTICLES<TV>& sph_particles=fluids_parameters.sph_evolution->sph_particles;
     if(test_number==5){

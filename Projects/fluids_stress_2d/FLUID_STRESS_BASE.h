@@ -90,19 +90,19 @@ public:
 
     void After_Initialize_Example();
     bool Initialize_Common_Example();
-    void Write_Output_Files(const int frame);
-    void Initialize();
+    void Write_Output_Files(const int frame) override;
+    void Initialize() override;
     void Set_Level_Set(T time);
     void Stress_Error(T time);
     void Dump_Analytic_Levelset(T time);
-    void Get_Velocities(T time);
-    void Get_Initial_Polymer_Stresses();
+    void Get_Velocities(T time) override;
+    void Get_Initial_Polymer_Stresses() override;
     void Analytic_Test();
     void Begin_Time_Step(const T time) override;
     void End_Time_Step(const T time) override;
     MATRIX<T,TV::m> Stress(const TV& X,T time);
-    SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress(const TV& X,T time);
-    SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress_Forcing_Term(const TV& X,T time);
+    SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress(const TV& X,T time) override;
+    SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress_Forcing_Term(const TV& X,T time) override;
 //#####################################################################
 };
 }

@@ -28,7 +28,7 @@ public:
     void Update_Box() override
     {box=analytic.Bounding_Box();if(box!=RANGE<TV>::Empty_Box() && box!=RANGE<TV>::Full_Box()) box.Scale_About_Center((T)1.1);}
 
-    void Update_Minimum_Cell_Size(const int maximum_depth)
+    void Update_Minimum_Cell_Size(const int maximum_depth) override
     {}
 
     T operator()(const TV& location) const override

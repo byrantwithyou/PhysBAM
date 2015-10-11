@@ -502,7 +502,7 @@ void Read_Output_Files_Solids(const int frame) override
 //#####################################################################
 // Function Set_Kinematic_Positions
 //#####################################################################
-void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
+void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override
 {
     for(int i=0;i<kinematic_ids.m;i++)
         if(id==kinematic_ids(i)){
@@ -512,7 +512,7 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
-bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
+bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override
 {
     for(int i=0;i<kinematic_ids.m;i++)
         if(id==kinematic_ids(i)){

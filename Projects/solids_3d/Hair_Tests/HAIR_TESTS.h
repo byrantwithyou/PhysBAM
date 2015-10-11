@@ -142,7 +142,7 @@ void Initialize_Bodies() override
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
 //#####################################################################
-void Update_Time_Varying_Material_Properties(const T time)
+void Update_Time_Varying_Material_Properties(const T time) override
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     switch(test_number) {

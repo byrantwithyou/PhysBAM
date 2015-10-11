@@ -159,7 +159,7 @@ public:
     void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time) override {}
     void Extrapolate_Phi_Into_Objects(const T time) override {}
     bool Adjust_Phi_With_Sources(const T time) override {return false;}
-    void Mark_Outside(ARRAY<bool,TV_INT>& outside) {}
+    void Mark_Outside(ARRAY<bool,TV_INT>& outside) override {}
 
 //#####################################################################
     void Postprocess_Substep(const T dt,const T time) override;
@@ -171,7 +171,7 @@ public:
     void Preprocess_Substep(const T dt,const T time) override;
     void Preprocess_Frame(const int frame) override;
     void Initialize_Velocities() override;
-    void Set_Dirichlet_Boundary_Conditions(const T time);
+    void Set_Dirichlet_Boundary_Conditions(const T time) override;
     void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override;
     void Initialize_Bodies() override;
     void Kang_Circle(bool use_surface);
@@ -179,7 +179,7 @@ public:
     void Test_Analytic_Velocity(T time);
     void Test_Analytic_Pressure(T time);
     void Solid_Circle();
-    void Adjust_Phi_With_Objects(const T time);
+    void Adjust_Phi_With_Objects(const T time) override;
     void Sync_Particle_To_Level_Set(int p);
     void Sync_Front_Tracked_Particles_To_Level_Set();
     void Divide_Segment(int e);
@@ -190,7 +190,7 @@ public:
     void Copy_Front_Tracked_Velocity_From_Fluid();
     void Limit_Dt(T& dt,const T time) override;
     void Limit_Solids_Dt(T& dt,const T time) override;
-    void Write_Output_Files(const int frame) const;
+    void Write_Output_Files(const int frame) const override;
     void Initialize_Surface_Particles(int number);
     void Rebuild_Surface();
     void Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve) override;

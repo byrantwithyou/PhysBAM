@@ -55,7 +55,7 @@ public:
     virtual void Turn_Smooth_Shading_On() override
     {object.Turn_Smooth_Shading_On();}
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer,int buffer_size)
+    OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer,int buffer_size) override
     {return object.Get_Selection(buffer,buffer_size);}
 
     virtual void Highlight_Selection(OPENGL_SELECTION<T>* selection) override

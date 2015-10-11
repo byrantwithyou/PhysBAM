@@ -151,7 +151,7 @@ public:
     surface->mesh.Initialize_Mesh(particles.Size(),triangles);
     surface->Update_Triangle_List();surface->Update_Vertex_Normals();return surface;}
     
-    virtual void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const
+    virtual void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const override
     {assert(aggregate>=0 && aggregate<6);
     TV x0;TV texture_vector1,texture_vector2;
     if(aggregate==0){x0=xmin.x0; texture_vector1=texture_vector_x_1;texture_vector2=texture_vector_x_2;}

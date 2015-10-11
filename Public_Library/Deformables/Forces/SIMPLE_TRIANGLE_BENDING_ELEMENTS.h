@@ -50,16 +50,16 @@ public:
     void Print_Number_Ignored(const bool print_number_ignored_input=true)
     {print_number_ignored=print_number_ignored_input;}
 
-    void Set_Stiffness(const T bending_stiffness_input)
+    void Set_Stiffness(const T bending_stiffness_input) override
     {bending_stiffness.Fill(bending_stiffness_input);}
 
-    void Set_Stiffness(ARRAY_VIEW<const T> bending_stiffness_input)
+    void Set_Stiffness(ARRAY_VIEW<const T> bending_stiffness_input) override
     {bending_stiffness=bending_stiffness_input;}
 
-    void Set_Damping(const T damping_input)
+    void Set_Damping(const T damping_input) override
     {damping.Fill(damping_input);}
 
-    void Set_Damping(ARRAY_VIEW<const T> damping_input)
+    void Set_Damping(ARRAY_VIEW<const T> damping_input) override
     {damping=damping_input;}
 
 //#####################################################################

@@ -64,7 +64,7 @@ public:
     COMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~COMPRESSIBLE_EXAMPLE();
     
-    T Time_At_Frame(const int frame) const
+    T Time_At_Frame(const int frame) const override
     {return initial_time+(frame-first_frame)/frame_rate;}
 
     virtual void Apply_Isobaric_Fix(const T dt,const T time);

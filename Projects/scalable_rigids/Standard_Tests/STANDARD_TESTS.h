@@ -61,7 +61,7 @@ public:
 
     // Unused callbacks
     void Self_Collisions_Begin_Callback(const T time,const int substep) override {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) {}
+    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
     void Post_Initialization() override {}
     void Preprocess_Substep(const T dt,const T time) override {}
     void Postprocess_Substep(const T dt,const T time) override {}

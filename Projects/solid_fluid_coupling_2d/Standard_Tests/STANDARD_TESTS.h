@@ -588,7 +588,7 @@ void Adjust_Density_And_Temperature_With_Sources(const T time) override
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
 //#####################################################################
-void Set_Dirichlet_Boundary_Conditions(const T time)
+void Set_Dirichlet_Boundary_Conditions(const T time) override
 {
     BASE::Set_Dirichlet_Boundary_Conditions(time);
 }

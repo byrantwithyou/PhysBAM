@@ -49,7 +49,7 @@ public:
     void Set_Number_Particles_Per_Cell(const int number_particles_per_cell) override;
     void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<TV>& levelset_callbacks) override;
     void Initialize_FMM_Initialization_Iterative_Solver(const bool refine_fmm_initialization_with_iterative_solver_input=true,const int fmm_initialization_iterations_input=10,
-        const T fmm_initialization_iterative_tolerance_input=1e-2,const T fmm_initialization_iterative_drift_fraction_input=.1);
+        const T fmm_initialization_iterative_tolerance_input=1e-2,const T fmm_initialization_iterative_drift_fraction_input=.1) override;
     void Bias_Towards_Negative_Particles(const bool bias_towards_negative_particles) override;
     void Set_Seed(const int seed) override;
     void Seed_Particles(const T time) override;

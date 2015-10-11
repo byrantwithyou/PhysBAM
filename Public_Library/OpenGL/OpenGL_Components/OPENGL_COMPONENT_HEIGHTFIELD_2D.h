@@ -43,7 +43,7 @@ public:
     void Turn_Smooth_Shading_On() override;
     void Turn_Smooth_Shading_Off() override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
     void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
     void Clear_Highlight() override;
 

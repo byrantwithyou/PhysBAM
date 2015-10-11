@@ -34,7 +34,7 @@ public:
     virtual void Set_Slice(OPENGL_SLICE *slice_input) override
     {slice=slice_input;opengl_scalar_field.Set_Slice(slice_input);}
 
-    virtual void Slice_Has_Changed()
+    virtual void Slice_Has_Changed() override
     {if(draw) opengl_scalar_field.Slice_Has_Changed();}
 
     bool Is_Up_To_Date(int frame) const override

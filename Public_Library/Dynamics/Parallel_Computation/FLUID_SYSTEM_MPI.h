@@ -48,7 +48,7 @@ public:
     void Project(KRYLOV_VECTOR_BASE<T>& x) const override
     {}
 
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const {}
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const override {}
 
     void Send_Generalized_Velocity_To_Solid(const GENERALIZED_VELOCITY<TV>& V) const
     {Send_Generalized_Velocity_To_Solid(V.V.array.Subset(coupled_deformable_particle_indices),V.rigid_V);}

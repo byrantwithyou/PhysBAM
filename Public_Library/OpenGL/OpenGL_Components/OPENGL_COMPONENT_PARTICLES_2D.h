@@ -36,7 +36,7 @@ public:
     bool Use_Bounding_Box() const override { return draw && valid && opengl_points->Use_Bounding_Box(); }
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
     virtual OPENGL_SELECTION<T>* Get_Selection_By_Id(int id,int particle_set);
     void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
     void Clear_Highlight() override;

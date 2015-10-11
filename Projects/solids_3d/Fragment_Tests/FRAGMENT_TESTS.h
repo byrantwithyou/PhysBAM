@@ -129,7 +129,7 @@ void Initialize_Bodies() override
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
-void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
+void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override
 {
     for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
         int index=hair_layout_grid.counts.z*(j-1+(i-1)*hair_layout_grid.counts.y)+1;
@@ -138,7 +138,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
-void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
+void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override
 {
     for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
         int index=hair_layout_grid.counts.z*(j-1+(i-1)*hair_layout_grid.counts.y)+1;

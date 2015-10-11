@@ -26,15 +26,15 @@ class LINEAR_INTERPOLATION_UNIFORM:public INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOO
 public:
     template<class T3> struct REBIND{typedef LINEAR_INTERPOLATION_UNIFORM<TV,T3,T_FACE_LOOKUP> TYPE;};
 
-    TV From_Block_Face(const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
+    TV From_Block_Face(const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const override
     {return LINEAR_INTERPOLATION_MAC_HELPER<TV>::Interpolate_Face(block,u,X);}
 
     VECTOR<TV,2> Extrema_From_Block_Face(const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u_min,
-        const typename T_FACE_LOOKUP::LOOKUP& u_max,const TV& X) const
+        const typename T_FACE_LOOKUP::LOOKUP& u_max,const TV& X) const override
     {return LINEAR_INTERPOLATION_MAC_HELPER<TV>::Extrema_Face(block,u_min,u_max,X);}
 
     VECTOR<T,2> Extrema_From_Block_Face_Component(const int axis,const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,
-        const typename T_FACE_LOOKUP::LOOKUP& u_min,const typename T_FACE_LOOKUP::LOOKUP& u_max,const TV& X) const
+        const typename T_FACE_LOOKUP::LOOKUP& u_min,const typename T_FACE_LOOKUP::LOOKUP& u_max,const TV& X) const override
     {return LINEAR_INTERPOLATION_MAC_HELPER<TV>::Extrema_Face_Component(axis,block,u_min,u_max,X);}
     
     T2 Clamped_To_Array_No_Extrema(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const override;

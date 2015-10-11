@@ -185,14 +185,14 @@ void Initialize_Bodies() override
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
-void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
+void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override
 {
     for(HASHTABLE_ITERATOR<int> i(constrained_nodes);i.Valid();i.Next()) V(i.Key())=TV();
 }
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
-void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
+void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override
 {
     for(HASHTABLE_ITERATOR<int> i(constrained_nodes);i.Valid();i.Next()) V(i.Key())=TV();
 }

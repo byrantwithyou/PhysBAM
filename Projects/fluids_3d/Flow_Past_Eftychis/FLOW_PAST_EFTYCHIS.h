@@ -148,7 +148,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,cons
 //#####################################################################
 // Function Adjust_Density_And_Temperature_With_Sources
 //#####################################################################
-void Adjust_Density_And_Temperature_With_Sources(const T time)
+void Adjust_Density_And_Temperature_With_Sources(const T time) override
 {
     if(test_number==1){
         if(!fluids_parameters.mpi_grid || !fluids_parameters.mpi_grid->Neighbor(3,2))

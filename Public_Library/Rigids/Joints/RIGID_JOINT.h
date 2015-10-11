@@ -30,7 +30,7 @@ public:
     void Set_Prismatic_Component_Translation(const TV& translation)
     {prismatic_translation=translation;prismatic_component=true;}
 
-    VECTOR<bool,T_SPIN::dimension> Angular_Constraints() const
+    VECTOR<bool,T_SPIN::dimension> Angular_Constraints() const override
     {VECTOR<bool,T_SPIN::dimension> constrain(VECTOR<bool,T_SPIN::dimension>::All_Ones_Vector()); return constrain;}
 
 //#####################################################################

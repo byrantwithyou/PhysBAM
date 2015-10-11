@@ -217,7 +217,7 @@ void Initialize_Advection() override
 //#####################################################################
 // Function Intialize_Euler_State
 //#####################################################################
-void Initialize_Euler_State()
+void Initialize_Euler_State() override
 {
     GRID<TV>& grid=fluids_parameters.euler->grid;
     ARRAY<VECTOR<T,5> ,VECTOR<int,3> >& U=fluids_parameters.euler->U;

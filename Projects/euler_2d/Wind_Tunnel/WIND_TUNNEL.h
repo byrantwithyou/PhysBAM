@@ -247,7 +247,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) override
 //#####################################################################
 // Function Fill_Single_Ghost_Region
 //#####################################################################
-void Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& u_ghost,const RANGE<TV_INT>& region,const int side,const T dt,const T time_input,const int number_of_ghost_cells) const
+void Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& u_ghost,const RANGE<TV_INT>& region,const int side,const T dt,const T time_input,const int number_of_ghost_cells) const override
 {
     T time=time_input;
     static T last_time_used=0;  // Hack to get around the fact that fluid_parameters.Write_Output_Files doesn't know what time it is...
@@ -377,7 +377,7 @@ void Apply_Isobaric_Fix(const T dt,const T time) override
 //#####################################################################
 // Function Log_Parameters 
 //#####################################################################
-void Log_Parameters() const
+void Log_Parameters() const override
 {
     LOG::SCOPE scope("WIND_TUNNEL parameters");
     BASE::Log_Parameters();

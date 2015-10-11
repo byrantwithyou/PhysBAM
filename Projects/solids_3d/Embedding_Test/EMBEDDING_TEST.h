@@ -303,7 +303,7 @@ void Initialize_Bodies() override
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
-void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
+void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override
 {
     if(test_number==1) V(target_position?9:8)=TV();
     //else if(test_number==2) V(constrained_point)=TV();
@@ -313,7 +313,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
-void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
+void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override
 {
     if(test_number==1) V(target_position?9:8)=TV();
     //else if(test_number==2) V(constrained_point)=TV();

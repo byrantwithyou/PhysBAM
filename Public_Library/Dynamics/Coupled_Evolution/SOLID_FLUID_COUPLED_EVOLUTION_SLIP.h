@@ -115,11 +115,11 @@ public:
     bool Simulate_Solids() const;
     void Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update) override;
     void Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies) override;
-    void Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt=false);
+    void Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt=false) override;
     BACKWARD_EULER_SYSTEM<TV>* Setup_Solids(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update,const bool leakproof_solve);
     void Setup_Fluids(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T current_position_time,const T dt,const bool leakproof_solve);
     void Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update,const bool leakproof_solve);
-    void Make_Divergence_Free(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
+    void Make_Divergence_Free(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) override;
     void Apply_Second_Order_Cut_Cell_Method(const T_ARRAYS_INT& cell_index_to_divergence_matrix_index,const T_FACE_ARRAYS_INT& face_index_to_matrix_index,ARRAY<T>& b);
     void Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     void Setup_Boundary_Condition_Collection();

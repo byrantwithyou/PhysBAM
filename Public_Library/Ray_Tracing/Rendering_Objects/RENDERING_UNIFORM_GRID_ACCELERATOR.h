@@ -46,7 +46,7 @@ public:
     {return 0;};
 
 //#####################################################################
-    bool Intersection(RAY<VECTOR<T,3> >& ray,const int lowest_priority,const RENDERING_OBJECT<T>** intersected_object) const;
+    bool Intersection(RAY<VECTOR<T,3> >& ray,const int lowest_priority,const RENDERING_OBJECT<T>** intersected_object) const override;
 //#####################################################################
 };   
 }

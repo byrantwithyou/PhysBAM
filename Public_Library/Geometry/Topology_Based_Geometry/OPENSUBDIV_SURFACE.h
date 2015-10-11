@@ -49,7 +49,7 @@ public:
     static OPENSUBDIV_SURFACE* Create(GEOMETRY_PARTICLES<TV>& particles);
     void Initialize(const std::string& filename,T thickness_in);
     TV Evaluate(T s,T t,VECTOR<TV,2>* tangents=0) const;
-    OPENSUBDIV_SURFACE<TV,gauss_order>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const;
+    OPENSUBDIV_SURFACE<TV,gauss_order>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const override;
     void Read(TYPED_ISTREAM& input) override;
     void Write(TYPED_OSTREAM& output) const override;
     void Compute_G0();

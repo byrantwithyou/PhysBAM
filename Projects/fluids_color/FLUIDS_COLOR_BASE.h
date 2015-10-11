@@ -101,20 +101,20 @@ public:
 
     void After_Initialize_Example();
     bool Initialize_Common_Example();
-    void Write_Output_Files(const int frame);
-    void Initialize();
+    void Write_Output_Files(const int frame) override;
+    void Initialize() override;
     void Set_Level_Set(T time);
     void Level_Set_Error(T time);
     void Velocity_Error(T time);
     void Dump_Analytic_Levelset(T time);
-    void Get_Initial_Velocities(T time);
-    void Get_Initial_Polymer_Stresses(T time);
+    void Get_Initial_Velocities(T time) override;
+    void Get_Initial_Polymer_Stresses(T time) override;
     void Analytic_Test();
     void Begin_Time_Step(const T time) override;
     void End_Time_Step(const T time) override;
     MATRIX<T,TV::m> Stress(const TV& X,int color,T time);
-    SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress(const TV& X,int color,T time);
-    SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress_Forcing_Term(const TV& X,int color,T time);
+    SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress(const TV& X,int color,T time) override;
+    SYMMETRIC_MATRIX<T,TV::m> Polymer_Stress_Forcing_Term(const TV& X,int color,T time) override;
     TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time) override;
     TV Volume_Force(const TV& X,int color,T time) override;
     TV Velocity_Jump(const TV& X,int color0,int color1,T time) override;

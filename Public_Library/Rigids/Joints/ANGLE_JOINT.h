@@ -28,13 +28,16 @@ public:
     void Set_Angle_Constraints(const bool use_constraints=true,const T angle_min_input=-pi,const T angle_max_input=pi)
     {constrain_angle=use_constraints;if(constrain_angle){angle_min=angle_min_input;angle_max=angle_max_input;}}
 
-    void Constrain_Relative_Angular_Velocity(const FRAME<VECTOR<T,3> >& parent_frame,VECTOR<T,3>& relative_angular_velocity) const
+    void Constrain_Relative_Angular_Velocity_Helper(const FRAME<VECTOR<T,3> >& parent_frame,VECTOR<T,3>& relative_angular_velocity) const
     {relative_angular_velocity.Project_On_Unit_Direction((parent_frame.r*F_pj().r).Rotated_X_Axis());}
 
-    void Constrain_Relative_Angular_Velocity(const FRAME<VECTOR<T,2> >& parent_frame,VECTOR<T,1>& relative_angular_velocity) const
+    void Constrain_Relative_Angular_Velocity_Helper(const FRAME<VECTOR<T,2> >& parent_frame,VECTOR<T,1>& relative_angular_velocity) const
     {}
 
-    VECTOR<bool,T_SPIN::dimension> Angular_Constraints() const
+    void Constrain_Relative_Angular_Velocity(const FRAME<TV>& parent_frame,T_SPIN& relative_angular_velocity) const override
+    {Constrain_Relative_Angular_Velocity_Helper(parent_frame,relative_angular_velocity);}
+
+    VECTOR<bool,T_SPIN::dimension> Angular_Constraints() const override
     {VECTOR<bool,T_SPIN::dimension> constrain(VECTOR<bool,T_SPIN::dimension>::All_Ones_Vector());constrain.x=constrain_angle && angle_min>=angle_max;return constrain;}
 
 //#####################################################################

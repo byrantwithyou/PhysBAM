@@ -30,7 +30,7 @@ public:
     static BEZIER_SPLINE* Create();
     static BEZIER_SPLINE* Create(GEOMETRY_PARTICLES<TV>& particles);
     TV Evaluate(int id,T t) const;
-    BEZIER_SPLINE<TV,d>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const;
+    BEZIER_SPLINE<TV,d>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const override;
     void Read(TYPED_ISTREAM& input) override;
     void Write(TYPED_OSTREAM& output) const override;
     std::string Name() const override;

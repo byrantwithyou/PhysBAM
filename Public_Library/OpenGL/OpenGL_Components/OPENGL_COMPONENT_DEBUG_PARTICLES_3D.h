@@ -36,7 +36,7 @@ public:
     bool Use_Bounding_Box() const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size);
+    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
     void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
     void Clear_Highlight() override;
     void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
@@ -47,7 +47,7 @@ public:
     void Increase_Vector_Size();
     void Decrease_Vector_Size();
     void Command_Prompt();
-    void Set_Slice(OPENGL_SLICE *slice_input);
+    void Set_Slice(OPENGL_SLICE *slice_input) override;
 
 private:
     void Reinitialize(bool force=false);

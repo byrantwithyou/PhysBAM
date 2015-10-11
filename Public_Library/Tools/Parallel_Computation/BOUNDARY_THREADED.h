@@ -31,13 +31,13 @@ public:
         assert(&boundary);
     }
 
-    void Set_Constant_Extrapolation(const TV_SIDES& constant_extrapolation_input=TV_SIDES::Constant_Vector(TV_BOOL2::Constant_Vector(true)))
+    void Set_Constant_Extrapolation(const TV_SIDES& constant_extrapolation_input=TV_SIDES::Constant_Vector(TV_BOOL2::Constant_Vector(true))) override
     {boundary.Set_Constant_Extrapolation(constant_extrapolation_input);}
 
     bool Constant_Extrapolation(const int side) const override
     {return boundary.Constant_Extrapolation(side);}
 
-    void Set_Fixed_Boundary(const bool use_fixed_boundary_input=true,const T2 fixed_boundary_value_input=T2())
+    void Set_Fixed_Boundary(const bool use_fixed_boundary_input=true,const T2 fixed_boundary_value_input=T2()) override
     {boundary.Set_Fixed_Boundary(use_fixed_boundary_input,fixed_boundary_value_input);}
 
     void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells_input) const override

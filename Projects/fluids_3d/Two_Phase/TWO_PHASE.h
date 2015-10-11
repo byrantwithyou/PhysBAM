@@ -92,7 +92,7 @@ public:
     // Unused callbacks
     void Preprocess_Frame(const int frame) override {}
     void Adjust_Velocity_With_Objects(const T time){}
-    void Postprocess_Solids_Substep(const T time,const int substep){}
+    void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Postprocess_Frame(const int frame) override {}
     void Postprocess_Phi(const T time) override {}
     bool Adjust_Phi_With_Sources(const T time) override {return false;}

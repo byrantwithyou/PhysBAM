@@ -2183,7 +2183,7 @@ void Read_Output_Files_Solids(const int frame) override
 //#####################################################################
 // Function Set_Kinematic_Positions
 //#####################################################################
-void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
+void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override
 {
     if(test_number==41)
     {
@@ -2218,7 +2218,7 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
-bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
+bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override
 {
     if(id==kinematic_id) twist=curve.Derivative(time);
     if(id==kinematic_id2) twist=curve2.Derivative(time);
@@ -2289,7 +2289,7 @@ void Preprocess_Substep(const T dt,const T time) override
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
 //#####################################################################
-void Update_Time_Varying_Material_Properties(const T time)
+void Update_Time_Varying_Material_Properties(const T time) override
 {   if(test_number==29 && time > .01){
     
     if(solids_parameters.triangle_collision_parameters.perform_self_collision && time<=1.3){
@@ -2406,7 +2406,7 @@ void Bind_Intersecting_Particles()
 //#####################################################################
 // Function Preprocess_Frame
 //#####################################################################
-void Preprocess_Frame(const int frame)
+void Preprocess_Frame(const int frame) override
 {
     dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
     if (dump_sv)

@@ -49,7 +49,7 @@ public:
     {TV dX=saved_states(state2).x->X(node_id)-saved_states(state1).x->X(node_id);
     return dX/(saved_states(state2).y-saved_states(state1).y);}
 
-    bool Has_Volumetric_Geometry() const
+    bool Has_Volumetric_Geometry() const override
     {return volume_object!=0;}
 
     virtual void Save_State(PAIR<GEOMETRY_PARTICLES<TV>*,T>& state,const T time=0) const
@@ -96,9 +96,9 @@ public:
     bool Simplex_Intersection(RAY<TV>& ray) const override;
     bool Simplex_Closest_Non_Intersecting_Point(RAY<TV>& ray) const override;
     bool Inside_Any_Simplex(const TV& location,int& simplex_id) const override;
-    bool Inside(const TV& location,const T thickness_over_two) const;
+    bool Inside(const TV& location,const T thickness_over_two) const override;
     bool Implicit_Geometry_Lazy_Inside(const TV& location,T contour_value=0) const override;
-    T Implicit_Geometry_Extended_Value(const TV& location) const;
+    T Implicit_Geometry_Extended_Value(const TV& location) const override;
     TV Simplex_Closest_Point_On_Boundary(const TV& location,const T max_distance,const T thickness_over_2=(T)-1,int* simplex_id=0,T* distance=0) const override;
     TV Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const TV& weights) const override;
     int Number_Of_Simplices() const override;

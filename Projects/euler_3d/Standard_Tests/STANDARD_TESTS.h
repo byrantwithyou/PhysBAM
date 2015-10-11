@@ -560,7 +560,7 @@ bool Inside_Shock(const TV location)
 //#####################################################################
 // Function Initialize_Euler_State
 //#####################################################################
-void Initialize_Euler_State()
+void Initialize_Euler_State() override
 {
     if(incompressible) return;
 

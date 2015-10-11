@@ -86,7 +86,7 @@ public:
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const override;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BV) const override;
 
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const {}
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const override {}
 
     void Send_Generalized_Velocity_To_Solid(const INDIRECT_ARRAY<const ARRAY_VIEW<TV> > V_boundary,const INDIRECT_ARRAY<const ARRAY_VIEW<TWIST<TV> > > rigid_V_boundary) const;
     void Send_Generalized_Velocity_To_Solid(const GENERALIZED_VELOCITY<TV>& V) const

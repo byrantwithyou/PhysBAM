@@ -30,7 +30,7 @@ private:
     void Set_Frame(int frame) override;
     //virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
     bool Use_Bounding_Box() const override;
-    void Display() const;
+    void Display() const override;
 //#####################################################################
 };
 }
