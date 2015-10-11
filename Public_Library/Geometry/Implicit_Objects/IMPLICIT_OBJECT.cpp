@@ -224,10 +224,36 @@ template<class TV> typename TV::SCALAR IMPLICIT_OBJECT<TV>::Minimum_Cell_Size() 
 //#####################################################################
 #define INSTANTIATION_HELPER(T,d) \
     template IMPLICIT_OBJECT<VECTOR<T,d> >::IMPLICIT_OBJECT(); \
-    template IMPLICIT_OBJECT<VECTOR<T,d> >::~IMPLICIT_OBJECT();
+    template IMPLICIT_OBJECT<VECTOR<T,d> >::~IMPLICIT_OBJECT(); \
+    template RANGE<VECTOR<T,d> >& IMPLICIT_OBJECT<VECTOR<T,d> >::Box(); \
+    template void IMPLICIT_OBJECT<VECTOR<T,d> >::Inflate(const T inflation_distance); \
+    template void IMPLICIT_OBJECT<VECTOR<T,d> >::Rescale(const T scaling_factor); \
+    template void IMPLICIT_OBJECT<VECTOR<T,d> >::Translate(const VECTOR<T,d> & translation); \
+    template T IMPLICIT_OBJECT<VECTOR<T,d> >::Phi_Secondary(const VECTOR<T,d> & location) const; \
+    template T IMPLICIT_OBJECT<VECTOR<T,d> >::Signed_Distance(const VECTOR<T,d> & location) const; \
+    template T IMPLICIT_OBJECT<VECTOR<T,d> >::Integration_Step(const T phi) const; \
+    template VECTOR<T,d>  IMPLICIT_OBJECT<VECTOR<T,d> >::Closest_Point_On_Boundary(const VECTOR<T,d> & location,const T tolerance,const int max_iterations,T* distance) const; \
+    template bool IMPLICIT_OBJECT<VECTOR<T,d> >::Inside(const VECTOR<T,d> & location,const T thickness_over_two) const; \
+    template T IMPLICIT_OBJECT<VECTOR<T,d> >::Min_Phi() const; \
+    template bool IMPLICIT_OBJECT<VECTOR<T,d> >::Outside(const VECTOR<T,d> & location,const T thickness_over_two) const; \
+    template bool IMPLICIT_OBJECT<VECTOR<T,d> >::Boundary(const VECTOR<T,d> & location,const T thickness_over_two) const; \
+    template VECTOR<T,d>  IMPLICIT_OBJECT<VECTOR<T,d> >::Velocity(const VECTOR<T,d> & location) const; \
+    template void IMPLICIT_OBJECT<VECTOR<T,d> >::Compute_Normals(); \
+    template void IMPLICIT_OBJECT<VECTOR<T,d> >::Update_Minimum_Cell_Size(const int maximum_depth); \
+    template void IMPLICIT_OBJECT<VECTOR<T,d> >::Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists); \
+    template bool IMPLICIT_OBJECT<VECTOR<T,d> >::Lazy_Inside(const VECTOR<T,d>& X,const T contour_value) const; \
+    template bool IMPLICIT_OBJECT<VECTOR<T,d> >::Lazy_Inside_And_Value(const VECTOR<T,d>& X,T& phi_value,const T contour_value) const; \
+    template bool IMPLICIT_OBJECT<VECTOR<T,d> >::Lazy_Inside_Extended_Levelset(const VECTOR<T,d>& unclamped_X,const T contour_value) const; \
+    template bool IMPLICIT_OBJECT<VECTOR<T,d> >::Lazy_Inside_Extended_Levelset_And_Value(const VECTOR<T,d>& unclamped_X,T& phi_value,const T contour_value) const; \
+    template bool IMPLICIT_OBJECT<VECTOR<T,d> >::Lazy_Outside(const VECTOR<T,d>& X,const T contour_value) const; \
+    template bool IMPLICIT_OBJECT<VECTOR<T,d> >::Lazy_Outside_Extended_Levelset(const VECTOR<T,d>& unclamped_X,const T contour_value) const; \
+    template bool IMPLICIT_OBJECT<VECTOR<T,d> >::Lazy_Outside_Extended_Levelset_And_Value(const VECTOR<T,d>& unclamped_X,T& phi_value,const T contour_value) const; \
+    template SYMMETRIC_MATRIX<T,d> IMPLICIT_OBJECT<VECTOR<T,d> >::Hessian(const VECTOR<T,d>& X) const;
 INSTANTIATION_HELPER(float,1)
 INSTANTIATION_HELPER(float,2)
 INSTANTIATION_HELPER(float,3)
+template bool IMPLICIT_OBJECT<VECTOR<float,1> >::Intersection(RAY<VECTOR<float,1> >&,const float) const;
+template bool IMPLICIT_OBJECT<VECTOR<float,2> >::Intersection(RAY<VECTOR<float,2> >&,const float) const;
 template bool IMPLICIT_OBJECT<VECTOR<float,3> >::Intersection(RAY<VECTOR<float,3> >&,const float) const;
 template void IMPLICIT_OBJECT<VECTOR<float,1> >::Test_Diff(RANGE<VECTOR<float,1> > const&,bool) const;
 template void IMPLICIT_OBJECT<VECTOR<float,2> >::Test_Diff(RANGE<VECTOR<float,2> > const&,bool) const;
@@ -235,6 +261,8 @@ template void IMPLICIT_OBJECT<VECTOR<float,3> >::Test_Diff(RANGE<VECTOR<float,3>
 INSTANTIATION_HELPER(double,1)
 INSTANTIATION_HELPER(double,2)
 INSTANTIATION_HELPER(double,3)
+template bool IMPLICIT_OBJECT<VECTOR<double,1> >::Intersection(RAY<VECTOR<double,1> >&,const double) const;
+template bool IMPLICIT_OBJECT<VECTOR<double,2> >::Intersection(RAY<VECTOR<double,2> >&,const double) const;
 template bool IMPLICIT_OBJECT<VECTOR<double,3> >::Intersection(RAY<VECTOR<double,3> >&,const double) const;
 template void IMPLICIT_OBJECT<VECTOR<double,1> >::Test_Diff(RANGE<VECTOR<double,1> > const&,bool) const;
 template void IMPLICIT_OBJECT<VECTOR<double,2> >::Test_Diff(RANGE<VECTOR<double,2> > const&,bool) const;

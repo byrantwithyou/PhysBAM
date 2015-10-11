@@ -600,6 +600,10 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Revalidate_Fluid_
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Revalidate_Fluid_Velocity(ARRAY<float,FACE_INDEX<1> >&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Revalidate_Phi_After_Modify_Levelset();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,float);
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Get_Levelset_Velocity(GRID<VECTOR<float,2> > const&,LEVELSET_MULTIPLE<VECTOR<float,2> >&,ARRAY<float,FACE_INDEX<2> >&,float) const;
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float, 2> >::Initialize_MPI();
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Initialize_Solid_Fluid_Coupling_After_Grid_Initialization();
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Initialize_Compressible_Incompressible_Coupling();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Get_Object_Velocities(LAPLACE_UNIFORM<VECTOR<float,2> >*,ARRAY<float,FACE_INDEX<2> >&,float,float);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Initialize_Swept_Occupied_Blocks_For_Advection(float,float,float,bool);
@@ -676,6 +680,7 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Revalidate_Fluid
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Revalidate_Fluid_Velocity(ARRAY<double,FACE_INDEX<1> >&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Revalidate_Phi_After_Modify_Levelset();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double);
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Get_Levelset_Velocity(GRID<VECTOR<double,2> > const&,LEVELSET_MULTIPLE<VECTOR<double,2> >&,ARRAY<double,FACE_INDEX<2> >&,double) const;
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Get_Object_Velocities(LAPLACE_UNIFORM<VECTOR<double,2> >*,ARRAY<double,FACE_INDEX<2> >&,double,double);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Initialize_Swept_Occupied_Blocks_For_Advection(double,double,double,bool);
@@ -714,6 +719,9 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Adjust_Phi_With_
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Adjust_Phi_With_Source<RANGE<VECTOR<double,2> > >(RANGE<VECTOR<double,2> > const&,int,MATRIX<double,3,3> const&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Get_Source_Reseed_Mask<RANGE<VECTOR<double,2> > >(RANGE<VECTOR<double,2> > const&,MATRIX<double,3,3> const&,ARRAY<bool,VECTOR<int,2> >*&,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Get_Source_Velocities<RANGE<VECTOR<double,2> > >(RANGE<VECTOR<double,2> > const&,MATRIX<double,3,3> const&,VECTOR<double,2> const&);
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Initialize_Compressible_Incompressible_Coupling();
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Initialize_MPI();
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Initialize_Solid_Fluid_Coupling_After_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<VECTOR<double,3> >&,bool,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Get_Levelset_Velocity(GRID<VECTOR<double,1> > const&,LEVELSET_MULTIPLE<VECTOR<double,1> >&,ARRAY<double,FACE_INDEX<1> >&,double) const;

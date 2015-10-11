@@ -162,7 +162,7 @@ public:
         :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_3D,object),body_id(body_id),body_selection(body_selection)
     {}
 
-    virtual typename OPENGL_SELECTION<T>::TYPE Actual_Type() const override
+    virtual typename OPENGL_SELECTION<T>::TYPE Actual_Type() const override 
     {return body_selection->Actual_Type();}
 
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
