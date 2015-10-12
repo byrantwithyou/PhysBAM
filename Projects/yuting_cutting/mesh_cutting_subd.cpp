@@ -43,7 +43,6 @@ static const int NumEdgesPerTriangle = 3;
 static const int NumFacesPerTet = 4;
 static const int NumNodesPerTet = 4;
 static const int NumEdgesPerTet = 6;
-static const int NumMaterialsPerFace = 6;
 static const int NumSplitTurnOns = 36;
 static const int MaxPieces = 24;
 

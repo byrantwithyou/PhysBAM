@@ -88,9 +88,6 @@ Hessian(const MATRIX<T,TV::m>& F,const SYMMETRIC_MATRIX<T,TV::m>& S,
     T d=G(p).Transposed().Double_Contract(F);
     T g=M(p).Double_Contract(S);
     T h=S.Trace();
-    T m=(G(p).Transposed()*S.Transposed()).Trace();
-    T n=(M(p)*F.Transposed()).Trace();
-    T k=F.Trace();
     T J=F_mat(p).Determinant();
     
     SYMMETRIC_MATRIX<T,TV::m> fourt= M(p)*(-e)*(S_mat(p).Trace()) + 1;

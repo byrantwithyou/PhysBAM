@@ -3,6 +3,8 @@ SConstruct.options
 build
 *_nocona
 *_nocona_debug
+*_darwin
+*_darwin_debug
 *_debug
 *_optdebug
 *.gz

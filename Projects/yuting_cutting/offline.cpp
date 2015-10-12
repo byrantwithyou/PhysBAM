@@ -61,7 +61,7 @@ TETRAHEDRALIZED_VOLUME<T> *sim_volume = NULL;
 TRIANGULATED_SURFACE<T> *cutting_tri_mesh = NULL;
 
 T timestep = 40;
-int ratio = 10;
+int cutting_ratio = 10;
 T K = 10000;
 
 const string dir = "/Users/yutingwang/PhysBAM";
@@ -84,7 +84,7 @@ void Initialize(const string& filename)
     sim_volume->mesh.elements = sim_volume_float->mesh.elements;
     
     Fit_In_Box<TV>(sim_volume->particles.X, RANGE<TV>(TV(-0.6,-0.6,-0.6),TV(0.6,0.6,0.6)));
-    mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, false);
+    mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, false);
     cutting_tri_mesh = new TRIANGULATED_SURFACE<T>();
 }
 
@@ -150,7 +150,7 @@ void initialize_cubes(int width, int height, int depth, T low, T high, T left, T
         tet_index += (width+1);    
     }
     
-    mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, false);
+    mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, false);
     cutting_tri_mesh = new TRIANGULATED_SURFACE<T>();
 }
 
@@ -656,7 +656,7 @@ int main(int argc, char** argv) {
                     TRIANGULATED_SURFACE<T> *ts = new TRIANGULATED_SURFACE<T>();
 //                    if (mcut->sim_volume->mesh.elements.m > 1e5) {
 //                        mcut->ratio *= 40;
-//                        ratio *= 40;
+//                        cutting_ratio *= 40;
 //                    }
                     for (int i = 0; i <= 30; ++i) {
                         if (i <= 15) {
@@ -714,7 +714,7 @@ int main(int argc, char** argv) {
                 }
 
                 VS::start_timer();
-                for (int i = 0; i < ratio; i++) {
+                for (int i = 0; i < cutting_ratio; i++) {
                     mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
                 }
                 VS::stop_timer();
@@ -853,7 +853,7 @@ int main(int argc, char** argv) {
                 laserY=y1;
                 
                 VS::start_timer();
-                for (int i = 0; i < ratio; i++) {
+                for (int i = 0; i < cutting_ratio; i++) {
                     mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
                 }
                 VS::stop_timer();
@@ -908,7 +908,7 @@ int main(int argc, char** argv) {
                 sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>((i+1)%4, i, 4, 5));
             }
             
-            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, false);
+            mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, false);
             mcut->Initialize_Elasticity();
             
             cutting_tri_mesh = new TRIANGULATED_SURFACE<T>();
@@ -1061,7 +1061,7 @@ int main(int argc, char** argv) {
                 }
                 
                 VS::start_timer();
-                for (int i = 0; i < ratio; i++) {
+                for (int i = 0; i < cutting_ratio; i++) {
                     mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
                 }
                 VS::stop_timer();
@@ -1126,7 +1126,7 @@ int main(int argc, char** argv) {
                 }
                 
                 VS::start_timer();
-                for (int i = 0; i < ratio; i++) {
+                for (int i = 0; i < cutting_ratio; i++) {
                     mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
                 }
                 VS::stop_timer();
@@ -1192,7 +1192,7 @@ int main(int argc, char** argv) {
                 }
                 
                 VS::start_timer();
-                for (int i = 0; i < ratio; i++) {
+                for (int i = 0; i < cutting_ratio; i++) {
                     mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
                 }
                 VS::stop_timer();
@@ -1234,7 +1234,7 @@ int main(int argc, char** argv) {
             sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(0, 1, 3, 4));
             //sim_volume->mesh.elements.Append(PhysBAM::VECTOR<int,4>(1, 2, 3, 4));
 
-            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, false);
+            mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, false);
             //simulation setup: dirichlet, initial configuration
             for (int i = 0; i < mcut->sim_volume->particles.X.m; i++) {
                 if (i == 0 || i == 2) {
@@ -1277,7 +1277,7 @@ int main(int argc, char** argv) {
                 }
                 
                 VS::start_timer();
-                for (int i = 0; i < ratio; i++) {
+                for (int i = 0; i < cutting_ratio; i++) {
                    mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
                 }
                 VS::stop_timer();
@@ -1332,7 +1332,7 @@ int main(int argc, char** argv) {
                 }
                 
                 VS::start_timer();
-                for (int i = 0; i < ratio; i++) {
+                for (int i = 0; i < cutting_ratio; i++) {
                     mcut->be->Advance_One_Time_Step(*mcut, K, 1, 1);
                 }
                 VS::stop_timer();
@@ -1368,7 +1368,7 @@ int main(int argc, char** argv) {
             sim_volume = TETRAHEDRALIZED_VOLUME<T>::Create();
             sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(52, 32, 17),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
             
-            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+            mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, true);
             
             TRIANGULATED_SURFACE<float> *ts_float = TRIANGULATED_SURFACE<float>::Create();
             FILE_UTILITIES::Read_From_File<float>(dataDir+"/cow_20k.tri.gz", *ts_float);
@@ -1486,7 +1486,7 @@ int main(int argc, char** argv) {
             
             T total_theta = 4 * pi;
             T init_theta = -pi * 3 / 4;
-            T dtheta = -total_theta / f / ratio;
+            T dtheta = -total_theta / f / cutting_ratio;
             T dtheta_cut = total_theta / f / n;
             T theta = init_theta;
             
@@ -1735,7 +1735,7 @@ int main(int argc, char** argv) {
                 
                 VS::start_timer();
                 PhysBAM::MATRIX<double,2> rotation(cos(dtheta),sin(dtheta),-sin(dtheta),cos(dtheta));
-                for (int r = 0; r < ratio; r++) {
+                for (int r = 0; r < cutting_ratio; r++) {
                     int i = 0;
                     for (HASHTABLE_ITERATOR<int> it(mcut->diri_nodes); it.Valid(); it.Next()) {
                         int fixed_node = it.Key();

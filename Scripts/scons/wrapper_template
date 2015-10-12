@@ -12,7 +12,7 @@ binary="%s"
 base_directory=os.path.dirname(sys.argv[0])
 dirs=":".join(map(lambda x:os.path.join(base_directory,x),library_directories.split(':')))
 libpath='LD_LIBRARY_PATH'
-if sys.platform=='darwin': libpath='DYLD_LIBRARY_PATH'
+if sys.platform=='darwin': libpath='DYLD_FALLBACK_LIBRARY_PATH'
 if os.environ.has_key(libpath):
     os.environ[libpath]=dirs+":"+os.environ[libpath]
 else:

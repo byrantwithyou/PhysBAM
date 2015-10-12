@@ -88,7 +88,7 @@ fstream interaction_file;
 bool writing_interaction_to_file = 0;
 int current_frame = 0;
 bool run_sim = 0;
-int ratio = 10;
+int cutting_ratio = 10;
 
 ARRAY<TV> cutting_curve;
 MESH_CUTTING<T> *mcut = NULL;
@@ -660,7 +660,7 @@ void initialize_volume3()
         if (mcut) {
             delete mcut;
         }
-        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, true);
         
         T rr = (r.Get_Number() - 0.5) * 2;
         cout << "rr" << i << ":" << rr << endl;
@@ -735,7 +735,7 @@ void initialize_volume5()
         if (mcut) {
             delete mcut;
         }
-        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, true);
         
         T rr = (r.Get_Number() - 0.5) * 2;
         cout << "rr" << i << ":" << rr << endl;
@@ -800,7 +800,7 @@ void initialize_volume7()
         if (mcut) {
             delete mcut;
         }
-        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, true);
     
         T rr = (r.Get_Number() - 0.5) * 2;
         cout << "rr" << i << ":" << rr << endl;
@@ -855,7 +855,7 @@ void initialize_volume8()
         if (mcut) {
             delete mcut;
         }
-        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, true);
         
         T rr = (r.Get_Number() - 0.5) * 2;
         cout << "rr" << i << ":" << rr << endl;
@@ -910,7 +910,7 @@ void initialize_volume9()//cubes
         if (mcut) {
             delete mcut;
         }
-        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, true);
         
         T rr = (r.Get_Number() - 0.5) * 2;
         cout << "rr" << i << ":" << rr << endl;
@@ -1028,7 +1028,7 @@ void Initialize(bool reinitialize_cutting_mesh)
     
     if(argc1 == 1) {
         initialize_volume1();
-        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, true);
     }
     else {
         //csg
@@ -1036,7 +1036,7 @@ void Initialize(bool reinitialize_cutting_mesh)
             const std::string filename(argv1[1]);
             FILE_UTILITIES::Read_From_File<T>(filename, *sim_volume);
             //sim_volume->Initialize_Cube_Mesh_And_Particles(GRID<TV>(PhysBAM::VECTOR<int,3>(208, 128, 68),RANGE<TV>(TV(-0.52,-0.32,-0.17),TV(0.52,0.32,0.17))));
-            mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+            mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, true);
             
             const std::string surface_filename(argv1[2]);
             TRIANGULATED_SURFACE<float> *ts_float = TRIANGULATED_SURFACE<float>::Create();
@@ -1119,7 +1119,7 @@ void Initialize(bool reinitialize_cutting_mesh)
 //        FILE_UTILITIES::Read_From_File<T>(filename, *sim_volume);
         
         
-        mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+        mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, true);
         
         if(argc1 == 2) {
             if (writing_interaction_to_file){
@@ -1362,7 +1362,7 @@ void Initialize(bool reinitialize_cutting_mesh)
                     if (mcut) {
                         delete mcut;
                     }
-                    mcut = new MESH_CUTTING<T>(sim_volume, timestep, ratio, true);
+                    mcut = new MESH_CUTTING<T>(sim_volume, timestep, cutting_ratio, true);
                     
                     T rr = (r.Get_Number() - 0.5) * 20;
                     cout << "rr" << i << ":" << rr << endl;

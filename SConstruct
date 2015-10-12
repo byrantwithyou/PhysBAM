@@ -62,7 +62,7 @@ external_libraries={
     'libpng':     {'default':1,'flags':['USE_LIBPNG'],'libs':['png'],'filter':'PNG_FILE'},
     'fftw':       {'default':0,'flags':['USE_FFTW'],'libs':['fftw3f','fftw3'],'filter':'FFT'},
     'gl2ps':      {'libs':['gl2ps']},
-    'OpenGL':     {'libs':['GL','GLU','glut'],'libpath':['/usr/X11R6/lib','/usr/X11R6/lib64']},
+    'OpenGL':     {'libs':['GL','GLU','glut'],'libpath':['/usr/X11R6/lib','/usr/X11R6/lib64'],'cpppath':['/opt/X11/include']},
     'boostpython':{'flags':['USE_BOOSTPYTHON'],'cpppath':['/usr/include/python2.4'],'libs':['boost_python','python2.4'],'filter':''},
     'numpy':      {'flags':['USE_NUMPY'],'cpppath':[],'libs':[],'filter':''},
     'lam':        {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread','filter':''},
