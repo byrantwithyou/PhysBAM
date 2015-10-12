@@ -39,7 +39,9 @@ public:
     using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
     using BASE::tests;using BASE::Seed_Lagrangian_Particles;using BASE::Add_Collision_Object;
     using BASE::Seed_Particles_Helper;using BASE::Add_Force;using BASE::Add_Fluid_Wall;
-    using BASE::quad_F_coeff;using BASE::use_plasticity;using BASE::use_variable_coefficients;
+    using BASE::quad_F_coeff;using BASE::use_plasticity;
+    using BASE::theta_c;using BASE::theta_s;using BASE::hardening_factor;
+    using BASE::max_hardening;using BASE::use_variable_coefficients;
 
     // surface tension stuff
     bool use_surface_tension;

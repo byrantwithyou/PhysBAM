@@ -42,7 +42,9 @@ public:
     using BASE::Seed_Particles_Helper;using BASE::Add_Neo_Hookean;using BASE::Add_Collision_Object;
     using BASE::Add_Particle;using BASE::Add_Penalty_Collision_Object;using BASE::scale_speed;
     using BASE::penalty_collisions_stiffness;using BASE::penalty_damping_stiffness;
-    using BASE::quad_F_coeff;
+    using BASE::quad_F_coeff;using BASE::use_plasticity;
+    using BASE::theta_c;using BASE::theta_s;using BASE::hardening_factor;
+    using BASE::max_hardening;using BASE::use_variable_coefficients;
 
     int Nsurface;
     ARRAY<int> steal;

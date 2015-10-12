@@ -494,29 +494,26 @@ Initialize()
             Add_Neo_Hookean(2000*scale_E,0.3,&mpm_particles2);
             for(int i=old_pn;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(1,1,1);
         } break;
-        case 33:{ // sand dam break
+        case 33:{ // sand box drop
             use_plasticity=true;
             use_variable_coefficients=true;
             particles.Store_Fp(true);
             particles.Store_Mu(true);
             particles.Store_Lambda(true);
 
-            grid.Initialize(TV_INT(2,2)*resolution+1,RANGE<TV>(TV(-0.5,-0.5),TV(1.5,1.5)),true);
-            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-1,-1),TV(4,.1)));
-            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-1,0.9),TV(2,1)));
-            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-1,-1),TV(0.1,2)));
-            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(0.9,-1),TV(2,2)));
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::separate,10);
 
-            T density=(T)1281;
-            T E=5000,nu=.4;
+            T density=(T)1281*scale_mass;
+            T E=5000*scale_E,nu=.4;
             this->mu0=E/(2*(1+nu));
             this->lambda0=E*nu/((1+nu)*(1-2*nu));
-            this->theta_c=0.01;
-            this->theta_s=.00001;
-            this->hardening_factor=80;
-            this->max_hardening=5;
+            if(theta_c==0) theta_c=0.01;
+            if(theta_s==0) theta_s=.00001;
+            if(hardening_factor==0) hardening_factor=80;
+            if(max_hardening) max_hardening=5;
             Add_Fixed_Corotated(E,nu);
-            RANGE<TV> box(TV(.13,.13),TV(.4,.85));
+            RANGE<TV> box(TV(.4,.15),TV(.6,.35));
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             for(int p=0;p<particles.number;++p){
                 particles.mu(p)=this->mu0;

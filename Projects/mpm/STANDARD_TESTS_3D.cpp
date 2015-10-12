@@ -485,6 +485,32 @@ Initialize()
                             return rot.Rotate(dx)+foo_cylinder->Bounding_Box().Center();});}}
             Add_Force(*pinning_force);
         } break;
+        case 17:{ // sand box drop
+            use_plasticity=true;
+            use_variable_coefficients=true;
+            particles.Store_Fp(true);
+            particles.Store_Mu(true);
+            particles.Store_Lambda(true);
+
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            Add_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,1.5)),COLLISION_TYPE::separate,10);
+
+            T density=(T)1281*scale_mass;
+            T E=5000*scale_E,nu=.4;
+            this->mu0=E/(2*(1+nu));
+            this->lambda0=E*nu/((1+nu)*(1-2*nu));
+            if(theta_c==0) theta_c=0.01;
+            if(theta_s==0) theta_s=.00001;
+            if(hardening_factor==0) hardening_factor=80;
+            if(max_hardening) max_hardening=5;
+            Add_Fixed_Corotated(E,nu);
+            RANGE<TV> box(TV(.4,.15,.4),TV(.6,.35,.6));
+            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            for(int p=0;p<particles.number;++p){
+                particles.mu(p)=this->mu0;
+                particles.lambda(p)=this->lambda0;}
+            Add_Gravity(TV(0,-9.8,0));
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
