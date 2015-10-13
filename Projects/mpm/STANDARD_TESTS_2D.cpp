@@ -520,6 +520,23 @@ Initialize()
                 particles.lambda(p)=this->lambda0;}
             Add_Gravity(TV(0,-9.8));
         } break;
+        case 34:{ // drip drop
+            grid.Initialize(TV_INT(1,2)*resolution,RANGE<TV>(TV(0,-1),TV(1,1)),true);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,true);
+            Add_Gravity(TV(0,-1));
+            T density=2*scale_mass;
+            RANGE<TV> box(TV(.4,.5),TV(.6,.85));
+            Seed_Particles_Helper(box,[=](const TV& X){return TV(-0.0,0);},0,density,particles_per_cell);
+            ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
+            bool no_mu=true;
+            Add_Fixed_Corotated(scale_E*20,0.3,&mpm_particles,no_mu);
+            Add_Force(*new MPM_VISCOSITY<TV>(force_helper,gather_scatter,0,0.000001));
+            use_surface_tension=true;
+            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness,penalty_damping_stiffness);
+            for(int i=0;i<particles.X.m;i++)
+                if(particles.X(i)(1)>0.8){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
+            Add_Force(*pinning_force);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
@@ -595,7 +612,17 @@ Begin_Time_Step(const T time)
 
         // Marching cube
         SEGMENTED_CURVE_2D<T>* surface=SEGMENTED_CURVE_2D<T>::Create();
-        MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,particles.mass(0)*0.4);
+        MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,particles.mass(0)*.7);
+
+        // Improve surface quality
+        T min_edge_length=FLT_MAX;
+        for(int k=0;k<surface->mesh.elements.m;k++){
+            int a=surface->mesh.elements(k)(0),b=surface->mesh.elements(k)(1);
+            TV A=surface->particles.X(a),B=surface->particles.X(b);
+            T l2=(A-B).Magnitude_Squared();
+            if(l2<min_edge_length) min_edge_length=l2;}
+        min_edge_length=sqrt(min_edge_length);
+        LOG::cout<<"Marching cube min edge length: "<<min_edge_length<<std::endl;
 
         // Seed surface particles
         int Nold=particles.number;
@@ -656,7 +683,15 @@ Begin_Time_Step(const T time)
         SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)1e-2);
         Add_Force(*stf);
     }
-
+    
+    if(test_number==34){
+        Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,true);
+        Add_Gravity(TV(0,-1));
+        PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness,penalty_damping_stiffness);
+        for(int i=0;i<particles.X.m;i++)
+            if(particles.X(i)(1)>0.8){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
+        Add_Force(*pinning_force);
+    }
 }
 //#####################################################################
 // Function End_Time_Step
