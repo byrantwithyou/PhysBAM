@@ -539,6 +539,7 @@ Initialize()
             Add_Force(*pinning_force);
         } break;
         case 35:{ // snow wedge
+            // ./mpm 35 -flip 0.9 -max_dt 1e-3 -resolution 200 -threads 14
             use_plasticity=true;
             use_variable_coefficients=true;
             particles.Store_Fp(true);
@@ -546,25 +547,30 @@ Initialize()
             particles.Store_Lambda(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.4,0.4)),ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0));
-            Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge),COLLISION_TYPE::separate,10);
-            //this->Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge));
+            ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2)),ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.3));
+            Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge),COLLISION_TYPE::separate,1);
+            // this->Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge));
+            
+            RANGE<TV> ground(TV(-1,0),TV(2,0.1));
+            Add_Collision_Object(ground,COLLISION_TYPE::separate,1);
+            // this->Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(ground));
 
-            T density=(T)1281*scale_mass;
-            T E=5000*scale_E,nu=.4;
+            T density=(T)2*scale_mass;
+            T E=40*scale_E,nu=.2;
             this->mu0=E/(2*(1+nu));
             this->lambda0=E*nu/((1+nu)*(1-2*nu));
-            if(theta_c==0) theta_c=0.01;
-            if(theta_s==0) theta_s=.00001;
-            if(hardening_factor==0) hardening_factor=80;
-            if(max_hardening) max_hardening=5;
+            if(theta_c==0) theta_c=0.015;
+            if(theta_s==0) theta_s=.005;
+            if(hardening_factor==0) hardening_factor=7;
+            if(max_hardening) max_hardening=10;
             Add_Fixed_Corotated(E,nu);
-            RANGE<TV> box(TV(.4,.75),TV(.6,.95));
+            RANGE<TV> box(TV(.3,.7),TV(.7,.9));
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             for(int p=0;p<particles.number;++p){
+                particles.X(p)=random.Get_Uniform_Vector(box);
                 particles.mu(p)=this->mu0;
                 particles.lambda(p)=this->lambda0;}
-            Add_Gravity(TV(0,-9.8));
+            Add_Gravity(TV(0,-2));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
