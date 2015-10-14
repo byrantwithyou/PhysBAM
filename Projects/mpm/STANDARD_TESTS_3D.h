@@ -46,6 +46,8 @@ public:
     using BASE::theta_c;using BASE::theta_s;using BASE::hardening_factor;
     using BASE::max_hardening;using BASE::use_variable_coefficients;
 
+    // surface tension stuff
+    bool use_surface_tension;
     int Nsurface;
     ARRAY<int> steal;
 

@@ -26,6 +26,9 @@
 #include <Hybrid_Methods/Forces/MPM_OLDROYD_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/MPM_VISCOSITY.h>
 #include <Hybrid_Methods/Forces/VOLUME_PRESERVING_OB_NEO_HOOKEAN.h>
+#include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include "STANDARD_TESTS_3D.h"
 namespace PhysBAM{
 //#####################################################################
@@ -329,16 +332,22 @@ Initialize()
             this->deformable_body_collection.Test_Forces(0);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
-        case 13:{ // surface tension stuff
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+        case 13:{ // drip drop
+            grid.Initialize(TV_INT(1,3,1)*resolution,RANGE<TV>(TV(0,-2,0),TV(1,1,1)),true);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,true);
+            Add_Gravity(TV(0,-1,0));
             T density=2*scale_mass;
-            RANGE<TV> box(TV(.3,.3,.3),TV(.5,.5,.5));
+            RANGE<TV> box(TV(.4,.5,.4),TV(.6,.85,.6));
             Seed_Particles_Helper(box,[=](const TV& X){return TV();},0,density,particles_per_cell);
-            RANGE<TV> box2(TV(.5,.35,.35),TV(.8,.45,.45));
-            Seed_Particles_Helper(box2,[=](const TV& X){return TV();},0,density,particles_per_cell);
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
             bool no_mu=true;
-            Add_Fixed_Corotated(scale_E,0.3,&mpm_particles,no_mu);
+            Add_Fixed_Corotated(scale_E*20,0.3,&mpm_particles,no_mu);
+            Add_Force(*new MPM_VISCOSITY<TV>(force_helper,gather_scatter,0,0.000001));
+            use_surface_tension=true;
+            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness,penalty_damping_stiffness);
+            for(int i=0;i<particles.X.m;i++)
+                if(particles.X(i)(1)>0.8){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
+            Add_Force(*pinning_force);
         } break;
         case 14:{ // drop an oldroyd-b to a ground SCA energy
             grid.Initialize(TV_INT(resolution*2,resolution,resolution*2),RANGE<TV>(TV(-1,0,-1),TV(1,1,1)),true);
@@ -534,114 +543,6 @@ Begin_Frame(const int frame)
                 for(int k=old_m;k<old_m+foo_int1;k++) mpm_particles.Append(k);
                 Add_Fixed_Corotated(150*scale_E,0.3,&mpm_particles);}
         } break;
-        case 13:{
-            // Delete old surface partcles and return stolen data
-            int N_non_surface=particles.number-Nsurface;
-            for(int k=N_non_surface;k<particles.number;k++){
-                particles.Add_To_Deletion_List(k);
-                int m=steal(k-N_non_surface);
-                particles.mass(m)+=particles.mass(k);
-                particles.volume(m)+=particles.volume(k);
-                // particles.X(m)=(particles.X(m)+particles.X(k))*0.5;
-                particles.V(m)=(particles.V(m)+particles.V(k))*0.5;
-                if(use_affine) particles.B(m)=(particles.B(m)+particles.B(k))*0.5;}
-            LOG::cout<<"deleting "<<Nsurface<<" particles..."<<std::endl;
-            particles.Delete_Elements_On_Deletion_List();
-            lagrangian_forces.Delete_Pointers_And_Clean_Memory();
-            this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
-
-            // Create surface
-            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-
-            // Mass isocontour approach
-            // T avgmass=0;
-            // for(int k=0;k<particles.number;k++)
-            //     avgmass+=particles.mass(k);
-            // avgmass/=(T)particles.number;
-            // MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,avgmass*.4);
-
-            // Blobby approach
-            T r=grid.DX()(0)*.8;
-            GRID<TV> lsgrid; lsgrid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box());
-            ARRAY<T,TV_INT> phi;
-            phi.Resize(lsgrid.Domain_Indices(ghost));
-            phi.Fill(FLT_MAX);
-            for(int k=0;k<particles.number;k++){
-                TV Xp=particles.X(k);
-                TV_INT cell=lsgrid.Cell(Xp,ghost);
-                for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT()-3,TV_INT()+7));it.Valid();it.Next()){
-                    TV_INT index=cell+it.index;
-                    TV Xi=lsgrid.Node(index);
-                    T d=(Xi-Xp).Magnitude();
-                    if(d<phi(index)) phi(index)=d;}}
-            for(int i=0;i<phi.array.m;i++) phi.array(i)-=r;
-            MARCHING_CUBES<TV>::Create_Surface(*surface,lsgrid,phi,0);
-
-            // Dump_Surface(*surface,VECTOR<T,3>(1,1,0)); 
-
-            // DEBUG
-            T min_marching_length=FLT_MAX;
-            for(int k=0;k<surface->mesh.elements.m;k++){
-                TV A=surface->particles.X(surface->mesh.elements(k).x);
-                TV B=surface->particles.X(surface->mesh.elements(k).y);
-                TV C=surface->particles.X(surface->mesh.elements(k).z);
-                T d=(A-B).Magnitude();
-                d=max(d,(C-B).Magnitude());
-                d=max(d,(C-A).Magnitude());
-                min_marching_length=min(min_marching_length,d);}
-            LOG::cout<<"MIN MARCHING LENGTH: " <<min_marching_length<<std::endl;
-
-            // Seed particles
-            int Nold=particles.number;
-            Nsurface=surface->particles.number;
-            LOG::cout<<"adding "<<Nsurface<<" particles..."<<std::endl;
-            T density=(T)1;
-            TRIANGULATED_SURFACE<T>& new_sc=Seed_Lagrangian_Particles(*surface,0,0,density,true);
-
-            // Build K-d tree for non-surface particles
-            KD_TREE<TV> kdtree;
-            ARRAY<TV> nodes(Nold);
-            for(int p=0;p<Nold;p++) nodes(p)=particles.X(p);
-            kdtree.Create_Left_Balanced_KD_Tree(nodes);
-
-            // Steal data
-            steal.Clean_Memory();
-            for(int k=Nold;k<particles.number;k++){
-
-                // Brute force search nearest particle
-                T dist=FLT_MAX;
-                int m=-1;
-                for(int q=0;q<Nold;q++){
-                    // if(steal.Contains(q)) continue; // !!! We should allow one particle be stolen more than one time! Consider an isolated particle.
-                    T dd=(particles.X(q)-particles.X(k)).Magnitude_Squared();
-                    if(dd<dist){dist=dd;m=q;}}
-                
-                // K-d tree search nearest particle
-                int number_of_points_in_estimate=1;
-                ARRAY<int> points_found(number_of_points_in_estimate);
-                ARRAY<T> squared_distance_to_points_found(number_of_points_in_estimate);
-                int number_of_points_found;T max_squared_distance_to_points_found;
-                kdtree.Locate_Nearest_Neighbors(particles.X(k),FLT_MAX,points_found,
-                    squared_distance_to_points_found,number_of_points_found,max_squared_distance_to_points_found,nodes);
-                PHYSBAM_ASSERT(number_of_points_found==number_of_points_in_estimate);
-                if(m!=points_found(0)){ LOG::cout<<"Disagree!"<<std::endl; PHYSBAM_FATAL_ERROR();}
-
-                T split_mass=particles.mass(m)*.5;
-                T split_volume=particles.volume(m)*.5;
-                TV com=particles.X(m);
-                particles.mass(m)=split_mass;
-                particles.volume(m)=split_volume;
-                // particles.X(m)=com*(T)2-particles.X(k);
-                particles.mass(k)=split_mass;
-                particles.volume(k)=split_volume;
-                particles.V(k)=particles.V(m);
-                if(use_affine) particles.B(k)=particles.B(m);
-                steal.Append(m);}
-
-            SURFACE_TENSION_FORCE_3D<TV>* stf=new SURFACE_TENSION_FORCE_3D<TV>(new_sc,(T)0.01);
-            Add_Force(*stf);
-
-        } break;
         case 15:{
             if(foo_levelset1){
                 PHYSBAM_ASSERT(!foo_cylinder);
@@ -705,6 +606,132 @@ Begin_Time_Step(const T time)
         } break;
         default: break;
     }
+
+    if(use_surface_tension){
+
+        bool use_bruteforce=false;
+        bool use_kdtree=true;
+
+        // Remove old surface particles
+        int N_non_surface=particles.number-Nsurface;
+        for(int k=N_non_surface;k<particles.number;k++){
+            particles.Add_To_Deletion_List(k);
+            int m=steal(k-N_non_surface);
+            TV old_momentum=particles.mass(m)*particles.V(m)+particles.mass(k)*particles.V(k);
+            particles.mass(m)+=particles.mass(k);
+            particles.volume(m)+=particles.volume(k);
+            particles.V(m)=old_momentum/particles.mass(m);
+            if(use_affine) particles.B(m)=(particles.B(m)+particles.B(k))*0.5;}
+        LOG::cout<<"deleting "<<Nsurface<<" particles..."<<std::endl;
+        particles.Delete_Elements_On_Deletion_List();
+        lagrangian_forces.Delete_Pointers_And_Clean_Memory();
+        this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+
+        // Dirty hack of rasterizing mass
+        this->simulated_particles.Remove_All();
+        for(int p=0;p<this->particles.number;p++)
+            if(this->particles.valid(p))
+                this->simulated_particles.Append(p);
+        this->particle_is_simulated.Remove_All();
+        this->particle_is_simulated.Resize(this->particles.X.m);
+        this->particle_is_simulated.Subset(this->simulated_particles).Fill(true);
+        this->weights->Update(this->particles.X);
+        this->gather_scatter.Prepare_Scatter(this->particles);
+        MPM_PARTICLES<TV>& my_particles=this->particles;
+#pragma omp parallel for
+        for(int i=0;i<this->mass.array.m;i++)
+            this->mass.array(i)=0;
+        this->gather_scatter.template Scatter<int>(
+            [this,&my_particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
+            {
+                T w=it.Weight();
+                TV_INT index=it.Index();
+                this->mass(index)+=w*my_particles.mass(p);
+            },false);
+
+        // Marching cube
+        TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+        MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,particles.mass(0)*1.5);
+
+        // Improve surface quality
+        T min_edge_length=FLT_MAX;
+        for(int k=0;k<surface->mesh.elements.m;k++){
+            int a=surface->mesh.elements(k)(0),b=surface->mesh.elements(k)(1);
+            TV A=surface->particles.X(a),B=surface->particles.X(b);
+            T l2=(A-B).Magnitude_Squared();
+            if(l2<min_edge_length) min_edge_length=l2;}
+        min_edge_length=sqrt(min_edge_length);
+        LOG::cout<<"Marching cube min edge length: "<<min_edge_length<<std::endl;
+
+        // Seed surface particles
+        int Nold=particles.number;
+        Nsurface=surface->particles.number;
+        LOG::cout<<"adding "<<Nsurface<<" particles..."<<std::endl;
+        TRIANGULATED_SURFACE<T>& new_sc=Seed_Lagrangian_Particles(*surface,0,0,(T)0.001,true);
+        ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+        for(int i=Nold;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(0,1,0);
+
+        // Build K-d tree for non-surface particles
+        LOG::cout<<"building kdtree..."<<std::endl;
+        KD_TREE<TV> kdtree;
+        ARRAY<TV> nodes(Nold);
+        if(use_kdtree){
+            for(int p=0;p<Nold;p++) nodes(p)=particles.X(p);
+            kdtree.Create_Left_Balanced_KD_Tree(nodes);}
+
+        // Assign physical quantities
+        steal.Clean_Memory();
+        for(int k=Nold;k<particles.number;k++){
+            T dist2=FLT_MAX;
+            int m=-1;
+
+            // Find closest interior particle using brute force
+            if(use_bruteforce){
+                for(int q=0;q<Nold;q++){
+                    T dd=(particles.X(q)-particles.X(k)).Magnitude_Squared();
+                    if(dd<dist2){dist2=dd;m=q;}}}
+
+            // Find closest interior particle using kdtree
+            int number_of_points_in_estimate=1;
+            ARRAY<int> points_found(number_of_points_in_estimate);
+            ARRAY<T> squared_distance_to_points_found(number_of_points_in_estimate);
+            if(use_kdtree){
+                int number_of_points_found;T max_squared_distance_to_points_found;
+                kdtree.Locate_Nearest_Neighbors(particles.X(k),FLT_MAX,points_found,
+                    squared_distance_to_points_found,number_of_points_found,max_squared_distance_to_points_found,nodes);
+                PHYSBAM_ASSERT(number_of_points_found==number_of_points_in_estimate);}
+
+            // Debug kdtree
+            if(use_bruteforce && use_kdtree && m!=points_found(0)){
+                LOG::cout<<"Disagree!"<<std::endl; PHYSBAM_FATAL_ERROR();}
+
+            if(use_kdtree) m=points_found(0);
+
+            T split_mass=particles.mass(m)*.5;
+            T split_volume=particles.volume(m)*.5;
+            TV com=particles.X(m);
+            particles.mass(m)=split_mass;
+            particles.volume(m)=split_volume;
+            particles.mass(k)=split_mass;
+            particles.volume(k)=split_volume;
+            particles.V(k)=particles.V(m);
+            if(use_affine) particles.B(k)=particles.B(m);
+            steal.Append(m);}
+
+        // Add surface tension force
+        SURFACE_TENSION_FORCE_3D<TV>* stf=new SURFACE_TENSION_FORCE_3D<TV>(new_sc,(T)2e-2);
+        Add_Force(*stf);
+    }
+    
+    if(test_number==13){
+        Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,true);
+        Add_Gravity(TV(0,-1,0));
+        PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness,penalty_damping_stiffness);
+        for(int i=0;i<particles.X.m;i++)
+            if(particles.X(i)(1)>0.8){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
+        Add_Force(*pinning_force);
+    }
+
 }
 //#####################################################################
 // Function End_Time_Step
