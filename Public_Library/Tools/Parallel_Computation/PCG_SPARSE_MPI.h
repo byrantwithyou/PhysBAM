@@ -44,13 +44,8 @@ public:
     template<class TYPE> TYPE Global_Max(const TYPE& input)
     {TYPE output;MPI_UTILITIES::Reduce(input,output,MPI::MAX,comm);return output;}
 
-    void Fill_Ghost_Cells(ARRAY<T>& v)
-    {ARRAY<MPI::Request> requests;requests.Preallocate(2*partition.number_of_sides);
-    for(int s=0;s<partition.number_of_sides;s++)if(boundary_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append(comm.Isend(v.x-1,1,boundary_datatypes(s),partition.neighbor_ranks(s),s));
-    for(int s=0;s<partition.number_of_sides;s++)if(ghost_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append(comm.Irecv(v.x-1,1,ghost_datatypes(s),partition.neighbor_ranks(s),((s-1)^1)+1));
-    MPI_UTILITIES::Wait_All(requests);}
-    
 //#####################################################################
+    void Fill_Ghost_Cells(ARRAY<T>& v);
     void Serial_Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,ARRAY<T>& s,ARRAY<T>& r,ARRAY<T>& k,ARRAY<T>& z,const int tag,const T tolerance=1e-7);
     void Parallel_Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance=1e-7,const bool recompute_preconditioner=true);
     void Parallel_Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x_local,ARRAY<T>& b_local,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries,

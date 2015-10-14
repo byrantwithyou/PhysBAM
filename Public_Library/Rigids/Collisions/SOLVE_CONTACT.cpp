@@ -38,6 +38,73 @@ namespace PhysBAM
 {
 namespace SOLVE_CONTACT
 {
+template<class T> static void Compute_Tangent_Helper(CONTACT<VECTOR<T,1> >& contact) {}
+template<class T> static void Compute_Tangent_Helper(CONTACT<VECTOR<T,2> >& contact)
+{
+    contact.tangent(0)=contact.normal.Unit_Orthogonal_Vector();
+}
+template<class T> static void Compute_Tangent_Helper(CONTACT<VECTOR<T,3> >& contact)
+{
+    contact.tangent(0)=contact.normal.Unit_Orthogonal_Vector();
+    contact.tangent(1)=VECTOR<T,3>::Cross_Product(contact.normal,contact.tangent(0)).Normalized();
+}
+
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class TV> CONTACT<TV>::
+CONTACT()
+    :id(0,0)
+{}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class TV> CONTACT<TV>::
+CONTACT(RIGID_BODY<TV>& body_1,RIGID_BODY<TV>& body_2,TV& _location,TV& _normal,T _distance,T dt)
+    :location(_location),normal(_normal),distance(_distance),coefficient_of_friction(RIGID_BODY<TV>::Coefficient_Of_Friction(body_1,body_2))
+{
+    id(0)=body_1.particle_index;
+    id(1)=body_2.particle_index;
+
+    TV r_1=location-body_1.Frame().t;
+    TV r_2=location-body_2.Frame().t;
+
+    normal_constraint(0).linear=-normal;
+    normal_constraint(0).angular=TV::Cross_Product(normal,r_1);
+
+    normal_constraint(1).linear=normal;
+    normal_constraint(1).angular=-TV::Cross_Product(normal,r_2);
+
+    inverse_mass_times_normal_constraint(0)=body_1.Inertia_Inverse_Times(normal_constraint(0));
+    inverse_mass_times_normal_constraint(1)=body_2.Inertia_Inverse_Times(normal_constraint(1));
+
+    normal_diagonal=0;
+    if(!body_1.Has_Infinite_Inertia())
+        normal_diagonal+=TWIST<TV>::Dot_Product(normal_constraint(0),inverse_mass_times_normal_constraint(0));
+    if(!body_2.Has_Infinite_Inertia())
+        normal_diagonal+=TWIST<TV>::Dot_Product(normal_constraint(1),inverse_mass_times_normal_constraint(1));
+    normal_relative_velocity=-distance/dt;
+
+    Compute_Tangent_Helper(*this);
+        
+    for(int i=1;i<d;i++)
+    {
+        tangent_constraint(0)(i).linear=-tangent(i);
+        tangent_constraint(0)(i).angular=TV::Cross_Product(tangent(i),r_1);
+
+        tangent_constraint(1)(i).linear=tangent(i);
+        tangent_constraint(1)(i).angular=-TV::Cross_Product(tangent(i),r_2);
+
+        inverse_mass_times_tangent_constraint(0)(i)=body_1.Inertia_Inverse_Times(tangent_constraint(0)(i));
+        inverse_mass_times_tangent_constraint(1)(i)=body_2.Inertia_Inverse_Times(tangent_constraint(1)(i));
+
+        tangent_diagonal(i)=0;
+        if(!body_1.Has_Infinite_Inertia())
+            tangent_diagonal(i)+=TWIST<TV>::Dot_Product(tangent_constraint(0)(i),inverse_mass_times_tangent_constraint(0)(i));
+        if(!body_2.Has_Infinite_Inertia())
+            tangent_diagonal(i)+=TWIST<TV>::Dot_Product(tangent_constraint(1)(i),inverse_mass_times_tangent_constraint(1)(i));
+    }
+}
 template<class TV>
 bool Solve_Projected_Gauss_Seidel(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks,ARRAY<VECTOR<int,2> >& pairs,HASHTABLE<VECTOR<int,2> >& pairs_processed_by_contact,typename TV::SCALAR desired_separation_distance,typename TV::SCALAR contact_proximity,typename TV::SCALAR dt,typename TV::SCALAR tolerance,int iteration_maximum);
 //#####################################################################

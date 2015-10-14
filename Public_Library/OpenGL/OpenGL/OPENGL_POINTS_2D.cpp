@@ -245,7 +245,30 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection)
     if(selection_points->has_id) output_stream<<selection_points->id;else output_stream<<"N/A";
     output_stream<<")"<<std::endl;
 }
+//#####################################################################
+// Function Set_Points_From_Particles
+//#####################################################################
+template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
+Set_Points_From_Particles(const GEOMETRY_PARTICLES<TV>& particles,bool keep_colors,const bool use_ids)
+{
+    points=particles.X;
+    const ARRAY_VIEW<int>* id=use_ids?particles.template Get_Array<int>(ATTRIBUTE_ID_ID):0;
+    Store_Point_Ids(id!=0);
+    if(point_colors && (!keep_colors || point_colors->m!=particles.Size()))
+        Store_Point_Colors(false);
 
+    if(const ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
+        Store_Point_Colors(true);
+        for(int i=0;i<point_colors->m;i++)
+            (*point_colors)(i)=OPENGL_COLOR((*color_attribute)(i));}
+
+    if(id) *point_ids=*id;
+
+    if(const ARRAY_VIEW<T>* radius_attribute=particles.template Get_Array<T>(ATTRIBUTE_ID_RADIUS)){
+        Store_Point_Radii(true);
+        for(int i=0;i<point_radii->m;i++)
+            (*point_radii)(i)=(*radius_attribute)(i);}
+}
 namespace PhysBAM{
 template class OPENGL_POINTS_2D<float,ARRAY<VECTOR<float,2> > >;
 template class OPENGL_POINTS_2D<float,INDIRECT_ARRAY<ARRAY<VECTOR<float,2> > > >;

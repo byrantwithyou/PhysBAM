@@ -33,24 +33,7 @@ public:
     OPENGL_POINTS_2D(STREAM_TYPE stream_type,T_ARRAY& points_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White(),float point_size = 5);
     virtual ~OPENGL_POINTS_2D();
 
-    void Set_Points_From_Particles(const GEOMETRY_PARTICLES<TV>& particles,bool keep_colors=true,const bool use_ids=true)
-    {points=particles.X;
-    const ARRAY_VIEW<int>* id=use_ids?particles.template Get_Array<int>(ATTRIBUTE_ID_ID):0;
-    Store_Point_Ids(id!=0);
-    if(point_colors && (!keep_colors || point_colors->m!=particles.Size()))
-        Store_Point_Colors(false);
-
-    if(const ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
-        Store_Point_Colors(true);
-        for(int i=0;i<point_colors->m;i++)
-            (*point_colors)(i)=OPENGL_COLOR((*color_attribute)(i));}
-
-    if(id) *point_ids=*id;
-
-    if(const ARRAY_VIEW<T>* radius_attribute=particles.template Get_Array<T>(ATTRIBUTE_ID_RADIUS)){
-        Store_Point_Radii(true);
-        for(int i=0;i<point_radii->m;i++)
-            (*point_radii)(i)=(*radius_attribute)(i);}}
+    void Set_Points_From_Particles(const GEOMETRY_PARTICLES<TV>& particles,bool keep_colors=true,const bool use_ids=true);
 
     bool Use_Bounding_Box() const override {return points.Size()>0;}
     virtual int Particle_Index(const int index) const {return index;}

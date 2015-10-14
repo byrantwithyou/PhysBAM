@@ -380,6 +380,28 @@ Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selectio
     return 0;
 }
 //#####################################################################
+// Function Turn_Smooth_Shading_On
+//#####################################################################
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
+Turn_Smooth_Shading_On()
+{
+    smooth_shading=true;
+    for(int i=0;i<point_simplices_1d_objects.m;i++)
+        if(point_simplices_1d_objects(i))
+            point_simplices_1d_objects(i)->Turn_Smooth_Shading_On();
+}
+//#####################################################################
+// Function Turn_Smooth_Shading_Off
+//#####################################################################
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
+Turn_Smooth_Shading_Off()
+{
+    smooth_shading=false;
+    for(int i=0;i<point_simplices_1d_objects.m;i++)
+        if(point_simplices_1d_objects(i))
+            point_simplices_1d_objects(i)->Turn_Smooth_Shading_Off();
+}
+//#####################################################################
 namespace PhysBAM{
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<float>;
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<double>;

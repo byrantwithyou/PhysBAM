@@ -61,26 +61,13 @@ protected:
     T minimum_sin; // threshold for judging cross product robust
 
 public:
+//#####################################################################
     static VECTOR<int,4> Spring_Nodes(unsigned char pair_id,const VECTOR<int,4>& n);
     static VECTOR<int,2> Edge_Indices(unsigned char pair_id);
-
-    void Set_Stiffness(const T youngs_modulus_input)
-    {Invalidate_CFL();
-    for(int i=0;i<spring_parameters.m;i++) for(int s=0;s<spring_count;s++) spring_parameters(i)(s).youngs_modulus=youngs_modulus_input;}
-
-    void Set_Stiffness(const ARRAY<VECTOR<T,spring_count> >& youngs_modulus_input)
-    {Invalidate_CFL();
-    for(int i=0;i<spring_parameters.m;i++) for(int s=0;s<spring_count;s++) spring_parameters(i)(s).youngs_modulus=youngs_modulus_input(i)(s);}
-
-    void Set_Restlength(const ARRAY<VECTOR<T,spring_count> >& restlength_input)
-    {Invalidate_CFL();
-    for(int i=0;i<spring_parameters.m;i++) for(int s=0;s<spring_count;s++) spring_parameters(i)(s).restlength=restlength_input(i)(s);}
-
-    virtual void Clamp_Restlength(const T clamped_restlength)
-    {Invalidate_CFL();
-    for(int i=0;i<spring_parameters.m;i++) for(int s=0;s<spring_count;s++) spring_parameters(i)(s).restlength=max(spring_parameters(i)(s).visual_restlength,clamped_restlength);}
-
-//#####################################################################
+    void Set_Stiffness(const T youngs_modulus_input);
+    void Set_Stiffness(const ARRAY<VECTOR<T,spring_count> >& youngs_modulus_input);
+    void Set_Restlength(const ARRAY<VECTOR<T,spring_count> >& restlength_input);
+    virtual void Clamp_Restlength(const T clamped_restlength);
     LINEAR_TET_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRON_MESH& mesh);
     virtual ~LINEAR_TET_SPRINGS(){}
     void Set_Restlength_From_Particles();

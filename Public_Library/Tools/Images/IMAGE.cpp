@@ -81,6 +81,70 @@ Is_Supported(const std::string& filename)
     else return false;
 }
 //#####################################################################
+// Function Byte_Color_To_Scalar_Color
+//#####################################################################
+template<class T> template<int d> VECTOR<T,d> IMAGE<T>::
+Byte_Color_To_Scalar_Color(const VECTOR<unsigned char,d> color_in)
+{
+    return (VECTOR<T,d>(color_in)+VECTOR<T,d>::All_Ones_Vector())/(T)256;
+}
+//#####################################################################
+// Function Byte_Color_To_Scalar_Color
+//#####################################################################
+template<class T> T IMAGE<T>::
+Byte_Color_To_Scalar_Color(const unsigned char color_in)
+{
+    return ((T)color_in+(T).5)/256;
+}
+//#####################################################################
+// Function Scalar_Color_To_Byte_Color
+//#####################################################################
+template<class T> template<int d> VECTOR<unsigned char,d> IMAGE<T>::
+Scalar_Color_To_Byte_Color(const VECTOR<T,d> color_in)
+{
+    return VECTOR<unsigned char,d>(clamp(VECTOR<int,d>(VECTOR<T,d>((T)256*color_in)),VECTOR<int,d>(),VECTOR<int,d>(255*VECTOR<int,d>::All_Ones_Vector())));
+}
+//#####################################################################
+// Function Scalar_Color_To_Byte_Color
+//#####################################################################
+template<class T> unsigned char IMAGE<T>::
+Scalar_Color_To_Byte_Color(const T color_in)
+{
+    return clamp((int)((T)256*color_in),0,255);
+}
+//#####################################################################
+// Function Flip_X
+//#####################################################################
+template<class T> template<int d> void IMAGE<T>::
+Flip_X(ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
+{
+    for(int i=0;i<image.m/2;i++)for(int j=0;j<image.n;j++)exchange(image(i,j),image(image.m-i,j));
+}
+//#####################################################################
+// Function Flip_Y
+//#####################################################################
+template<class T> template<int d> void IMAGE<T>::
+Flip_Y(ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
+{
+    for(int j=0;j<image.n/2;j++)for(int i=0;i<image.m;i++)exchange(image(i,j),image(i,image.n-j));
+}
+//#####################################################################
+// Function Invert
+//#####################################################################
+template<class T> template<int d> void IMAGE<T>::
+Invert(ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
+{
+    for(int i=image.domain.min_corner.x;i<image.domain.max_corner.x;i++) for(int j=image.domain.min_corner.y;j<image.domain.max_corner.y;j++) image(i,j)=VECTOR<T,d>::All_Ones_Vector()-image(i,j);
+}
+//#####################################################################
+// Function Threshold
+//#####################################################################
+template<class T> void IMAGE<T>::
+Threshold(ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image,const T threshold,const VECTOR<T,3>& low_color,const VECTOR<T,3>& high_color)
+{
+    for(int i=image.domain.min_corner.x;i<image.domain.max_corner.x;i++) for(int j=image.domain.min_corner.y;j<image.domain.max_corner.y;j++) if(image(i,j).Magnitude()<threshold) image(i,j)=low_color;else image(i,j)=high_color;
+}
+//#####################################################################
 namespace PhysBAM{
 template class IMAGE<float>;
 template void IMAGE<float>::Read(const std::string&,ARRAY<VECTOR<float,3> ,VECTOR<int,2> >&);
@@ -92,4 +156,12 @@ template void IMAGE<double>::Read(const std::string&,ARRAY<VECTOR<double,3> ,VEC
 template void IMAGE<double>::Read(const std::string&,ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&);
 template void IMAGE<double>::Write(const std::string&,const ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&,const double,const double);
 template void IMAGE<double>::Write(const std::string&,const ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&,const double,const double);
+template VECTOR<double,3> IMAGE<double>::Byte_Color_To_Scalar_Color<3>(VECTOR<unsigned char,3>);
+template VECTOR<float,3> IMAGE<float>::Byte_Color_To_Scalar_Color<3>(VECTOR<unsigned char,3>);
+template VECTOR<unsigned char,3> IMAGE<double>::Scalar_Color_To_Byte_Color<3>(VECTOR<double,3>);
+template VECTOR<unsigned char,3> IMAGE<float>::Scalar_Color_To_Byte_Color<3>(VECTOR<float,3>);
+template VECTOR<unsigned char,4> IMAGE<double>::Scalar_Color_To_Byte_Color<4>(VECTOR<double,4>);
+template VECTOR<unsigned char,4> IMAGE<float>::Scalar_Color_To_Byte_Color<4>(VECTOR<float,4>);
+template void IMAGE<float>::Invert<3>(ARRAY<VECTOR<float,3>,VECTOR<int,2> >&);
+template void IMAGE<double>::Invert<3>(ARRAY<VECTOR<double,3>,VECTOR<int,2> >&);
 }

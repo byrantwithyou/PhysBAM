@@ -287,7 +287,6 @@ Print_Restlength_Statistics()
 }
 //#####################################################################
 // Function Find_Shortest_Spring
-// 0: coincident points (use no spring), 1-4: point-face pairs, 5-7: edge-edge pairs
 //#####################################################################
 template<class T> int LINEAR_TET_SPRINGS<T>::
 Find_Shortest_Spring(const int tet,const VECTOR<int,4> element_nodes,VECTOR<int,4>& spring_nodes_output,T& minimum_signed_distance,TV& minimum_normal,TV& weights) const
@@ -346,6 +345,9 @@ Find_Shortest_Spring(const int tet,const VECTOR<int,4> element_nodes,VECTOR<int,
     spring_nodes_output=spring_nodes;
     return maximum_cross_squared_index;
 }
+//#####################################################################
+// Function Spring_Nodes
+//#####################################################################
 template<class T> VECTOR<int,4> LINEAR_TET_SPRINGS<T>::
 Spring_Nodes(unsigned char pair_id,const VECTOR<int,4>& n)
 {
@@ -363,6 +365,9 @@ Edge_Indices(unsigned char pair_id)
         case 4: return VECTOR<int,2>(0,5);case 5: return VECTOR<int,2>(3,2);case 6: return VECTOR<int,2>(1,4);
         default: PHYSBAM_FATAL_ERROR();}
 }
+//#####################################################################
+// Function Create_Tet_Springs
+//#####################################################################
 template<class T> LINEAR_TET_SPRINGS<T>* PhysBAM::
 Create_Tet_Springs(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TETRAHEDRON_MESH& mesh,const T stiffness,const T overdamping_fraction,
     const bool use_compressed_by_threshold_only/*=true*/,const T fraction_compression/*=(T).1*/,const bool limit_time_step_by_strain_rate/*=true*/,const T max_strain_per_time_step/*=(T).1*/,
@@ -379,7 +384,9 @@ Create_Tet_Springs(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TETRAHEDRON_MES
     if(verbose) lts->Print_Restlength_Statistics();
     return lts;
 }
-
+//#####################################################################
+// Function Create_Tet_Springs
+//#####################################################################
 template<class T> LINEAR_TET_SPRINGS<T>* PhysBAM::
 Create_Tet_Springs(TETRAHEDRALIZED_VOLUME<T>& volume,const T stiffness,
     const T overdamping_fraction,const bool use_compressed_by_threshold_only/*=true*/,const T fraction_compression/*=(T).1*/,const bool limit_time_step_by_strain_rate/*=true*/,
@@ -387,6 +394,48 @@ Create_Tet_Springs(TETRAHEDRALIZED_VOLUME<T>& volume,const T stiffness,
 {
     return Create_Tet_Springs(dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(volume.particles),volume.mesh,stiffness,overdamping_fraction,use_compressed_by_threshold_only,fraction_compression,limit_time_step_by_strain_rate,
         max_strain_per_time_step,use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose);
+}
+//#####################################################################
+// Function Set_Stiffness
+//#####################################################################
+template<class T> void LINEAR_TET_SPRINGS<T>::
+Set_Stiffness(const T youngs_modulus_input)
+{
+    Invalidate_CFL();
+    for(int i=0;i<spring_parameters.m;i++)
+        for(int s=0;s<spring_count;s++)
+            spring_parameters(i)(s).youngs_modulus=youngs_modulus_input;
+}
+//#####################################################################
+// Function Set_Stiffness
+//#####################################################################
+template<class T> void LINEAR_TET_SPRINGS<T>::
+Set_Stiffness(const ARRAY<VECTOR<T,spring_count> >& youngs_modulus_input)
+{
+    Invalidate_CFL();
+    for(int i=0;i<spring_parameters.m;i++)
+        for(int s=0;s<spring_count;s++)
+            spring_parameters(i)(s).youngs_modulus=youngs_modulus_input(i)(s);
+}
+//#####################################################################
+// Function Set_Restlength
+//#####################################################################
+template<class T> void LINEAR_TET_SPRINGS<T>::
+Set_Restlength(const ARRAY<VECTOR<T,spring_count> >& restlength_input)
+{Invalidate_CFL();
+    for(int i=0;i<spring_parameters.m;i++)
+        for(int s=0;s<spring_count;s++)
+            spring_parameters(i)(s).restlength=restlength_input(i)(s);
+}
+//#####################################################################
+// Function Clamp_Restlength
+//#####################################################################
+template<class T> void LINEAR_TET_SPRINGS<T>::
+Clamp_Restlength(const T clamped_restlength)
+{Invalidate_CFL();
+    for(int i=0;i<spring_parameters.m;i++)
+        for(int s=0;s<spring_count;s++)
+            spring_parameters(i)(s).restlength=max(spring_parameters(i)(s).visual_restlength,clamped_restlength);
 }
 //#####################################################################
 namespace PhysBAM{

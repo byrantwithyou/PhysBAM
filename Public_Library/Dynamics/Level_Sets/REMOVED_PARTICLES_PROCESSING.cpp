@@ -13,6 +13,24 @@
 #include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
+// Constructor
+//#####################################################################
+template<class T> REMOVED_PARTICLES_PROCESSING<T>::
+REMOVED_PARTICLES_PROCESSING(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles_input)
+    :blending_parameter((T).8),scale((T)1),relative_tolerance((T)0.01),tolerance((T)0),grid_divisions(150)
+{
+    Initialize(particles_input);
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class T> REMOVED_PARTICLES_PROCESSING<T>::
+REMOVED_PARTICLES_PROCESSING(GRID<TV>& grid_input,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> *,VECTOR<int,3> >& particles_array_input)
+    :blending_parameter((T).8),scale((T)1),relative_tolerance((T)0.01),tolerance((T)0),grid_divisions(150)
+{
+    Initialize(grid_input,particles_array_input);
+}
+//#####################################################################
 // Function Setup_Processing
 //#####################################################################
 template<class T> void REMOVED_PARTICLES_PROCESSING<T>::
@@ -95,6 +113,27 @@ Get_Ellipsoid(const int p) const
         return ELLIPSOID<T>(particles.X(p),DIAGONAL_MATRIX<T,3>(3*radius,radius,radius),x_axis,y_axis,z_axis);}
     else{covariance.center=particles.X(p);T clamped_radius=min(3*radius,sqrt(max_squared_distance_to_points_found));
     covariance.radii=DIAGONAL_MATRIX<T,3>(clamped_radius,clamped_radius,(T).5*radius);return covariance;}
+}
+//#####################################################################
+// Function Initialize
+//#####################################################################
+template<class T> void REMOVED_PARTICLES_PROCESSING<T>::
+Initialize(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles_input)
+{
+    particles.Initialize(particles_input);
+    ellipsoids.Resize(particles.Size());metrics.Resize(particles.Size());
+}
+//#####################################################################
+// Function Initialize
+//#####################################################################
+template<class T> void REMOVED_PARTICLES_PROCESSING<T>::
+Initialize(const GRID<TV>& grid,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& particles_array)
+{
+    int number_of_particles=0;
+    for(CELL_ITERATOR<TV> it(grid,3);it.Valid();it.Next()) if(particles_array(it.Cell_Index())) number_of_particles+=particles_array(it.Cell_Index())->Size();
+    LOG::cout<<"Processing "<<number_of_particles<<" removed particles"<<std::endl;
+    particles.Preallocate(number_of_particles);ellipsoids.Resize(number_of_particles);metrics.Resize(number_of_particles);
+    for(CELL_ITERATOR<TV> it(grid,3);it.Valid();it.Next()) if(particles_array(it.Cell_Index())) particles.Take(*particles_array(it.Cell_Index()));
 }
 //#####################################################################
 namespace PhysBAM{

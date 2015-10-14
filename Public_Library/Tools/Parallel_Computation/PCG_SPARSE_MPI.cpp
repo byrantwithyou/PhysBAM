@@ -397,6 +397,18 @@ Fill_Ghost_Cells_Threaded(ARRAY<T>& x)
                 x(columns_to_receive(node_rank)(i))=columns_to_receive_values(node_rank)(i);}
 }
 //#####################################################################
+// Function Fill_Ghost_Cells
+//#####################################################################
+template<class TV> void PCG_SPARSE_MPI<TV>::
+Fill_Ghost_Cells(ARRAY<T>& v)
+{
+    ARRAY<MPI::Request> requests;
+    requests.Preallocate(2*partition.number_of_sides);
+    for(int s=0;s<partition.number_of_sides;s++)if(boundary_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append(comm.Isend(v.x-1,1,boundary_datatypes(s),partition.neighbor_ranks(s),s));
+    for(int s=0;s<partition.number_of_sides;s++)if(ghost_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append(comm.Irecv(v.x-1,1,ghost_datatypes(s),partition.neighbor_ranks(s),((s-1)^1)+1));
+    MPI_UTILITIES::Wait_All(requests);
+}
+//#####################################################################
 template class PCG_SPARSE_MPI<VECTOR<float,1> >;
 template class PCG_SPARSE_MPI<VECTOR<float,2> >;
 template class PCG_SPARSE_MPI<VECTOR<float,3> >;

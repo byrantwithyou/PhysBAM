@@ -877,6 +877,58 @@ Cycle_Interaction_Pair_Display_Mode()
     interaction_pair_display_mode=(interaction_pair_display_mode+1)%4;
 }
 //#####################################################################
+// Function Turn_Smooth_Shading_On
+//#####################################################################
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
+Turn_Smooth_Shading_On()
+{
+    smooth_shading=true;
+    for(int i=0;i<segmented_curve_objects.m;i++)
+        if(segmented_curve_objects(i))
+            segmented_curve_objects(i)->Turn_Smooth_Shading_On();
+    for(int i=0;i<triangulated_surface_objects.m;i++)
+        if(triangulated_surface_objects(i))
+            triangulated_surface_objects(i)->Turn_Smooth_Shading_On();
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++)
+        if(tetrahedralized_volume_objects(i))
+            tetrahedralized_volume_objects(i)->Turn_Smooth_Shading_On();
+    for(int i=0;i<hexahedralized_volume_objects.m;i++)
+        if(hexahedralized_volume_objects(i))
+            hexahedralized_volume_objects(i)->Turn_Smooth_Shading_On();
+    for(int i=0;i<boundary_surface_objects.m;i++)
+        if(boundary_surface_objects(i))
+            boundary_surface_objects(i)->Turn_Smooth_Shading_On();
+    for(int i=0;i<embedded_surface_objects.m;i++)
+        if(embedded_surface_objects(i))
+            embedded_surface_objects(i)->Turn_Smooth_Shading_On();
+}
+//#####################################################################
+// Function Turn_Smooth_Shading_Off
+//#####################################################################
+template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
+Turn_Smooth_Shading_Off()
+{
+    smooth_shading=false;
+    for(int i=0;i<segmented_curve_objects.m;i++)
+        if(segmented_curve_objects(i))
+            segmented_curve_objects(i)->Turn_Smooth_Shading_Off();
+    for(int i=0;i<triangulated_surface_objects.m;i++)
+        if(triangulated_surface_objects(i))
+            triangulated_surface_objects(i)->Turn_Smooth_Shading_Off();
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++)
+        if(tetrahedralized_volume_objects(i))
+            tetrahedralized_volume_objects(i)->Turn_Smooth_Shading_Off();
+    for(int i=0;i<hexahedralized_volume_objects.m;i++)
+        if(hexahedralized_volume_objects(i))
+            hexahedralized_volume_objects(i)->Turn_Smooth_Shading_Off();
+    for(int i=0;i<boundary_surface_objects.m;i++)
+        if(boundary_surface_objects(i))
+            boundary_surface_objects(i)->Turn_Smooth_Shading_Off();
+    for(int i=0;i<embedded_surface_objects.m;i++)
+        if(embedded_surface_objects(i))
+            embedded_surface_objects(i)->Turn_Smooth_Shading_Off();
+}
+//#####################################################################
 namespace PhysBAM{
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<float>;
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<double>;

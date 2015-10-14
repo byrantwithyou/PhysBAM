@@ -276,6 +276,15 @@ Toggle_Draw_Multiple_Levelsets()
 {
     draw_multiple_levelsets=!draw_multiple_levelsets;
 }
+//#####################################################################
+// Function Slice_Has_Changed
+//#####################################################################
+template<class T> void OPENGL_COMPONENT_LEVELSET_3D<T>::
+Slice_Has_Changed()
+{
+    for(int i=0;i<opengl_levelset_multiviews.m;i++)
+        opengl_levelset_multiviews(i)->Set_Slice(slice);
+}
 namespace PhysBAM{
 template class OPENGL_COMPONENT_LEVELSET_3D<float>;
 template class OPENGL_COMPONENT_LEVELSET_3D<double>;

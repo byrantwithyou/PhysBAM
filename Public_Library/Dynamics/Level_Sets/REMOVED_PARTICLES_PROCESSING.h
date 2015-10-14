@@ -36,30 +36,12 @@ public:
     ARRAY<ARRAY<int> ,VECTOR<int,3> > particle_array;
     KD_TREE<TV> particle_tree;
     
-    REMOVED_PARTICLES_PROCESSING(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles_input)
-        :blending_parameter((T).8),scale((T)1),relative_tolerance((T)0.01),tolerance((T)0),grid_divisions(150)
-    {
-        Initialize(particles_input);
-    }
-
-    REMOVED_PARTICLES_PROCESSING(GRID<TV>& grid_input,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> *,VECTOR<int,3> >& particles_array_input)
-        :blending_parameter((T).8),scale((T)1),relative_tolerance((T)0.01),tolerance((T)0),grid_divisions(150)
-    {
-        Initialize(grid_input,particles_array_input);
-    }
+    REMOVED_PARTICLES_PROCESSING(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles_input);
+    REMOVED_PARTICLES_PROCESSING(GRID<TV>& grid_input,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> *,VECTOR<int,3> >& particles_array_input);
 
 private:
-    void Initialize(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles_input)
-    {particles.Initialize(particles_input);
-    ellipsoids.Resize(particles.Size());metrics.Resize(particles.Size());}
-
-    void Initialize(const GRID<TV>& grid,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& particles_array)
-    {int number_of_particles=0;
-    for(CELL_ITERATOR<TV> it(grid,3);it.Valid();it.Next()) if(particles_array(it.Cell_Index())) number_of_particles+=particles_array(it.Cell_Index())->Size();
-    LOG::cout<<"Processing "<<number_of_particles<<" removed particles"<<std::endl;
-    particles.Preallocate(number_of_particles);ellipsoids.Resize(number_of_particles);metrics.Resize(number_of_particles);
-    for(CELL_ITERATOR<TV> it(grid,3);it.Valid();it.Next()) if(particles_array(it.Cell_Index())) particles.Take(*particles_array(it.Cell_Index()));}
-
+    void Initialize(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles_input);
+    void Initialize(const GRID<TV>& grid,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& particles_array);
 //#####################################################################
 public:
     void Setup_Processing();

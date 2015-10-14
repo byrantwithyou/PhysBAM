@@ -137,4 +137,30 @@ Generate_Next_Level_Of_Depth_First_Directed_Graph(DIRECTED_GRAPH_CORE& directed_
             if(!marked(next_node)){marked(next_node)=true;Generate_Next_Level_Of_Depth_First_Directed_Graph(directed_graph,marked,next_node);}}}
 }
 //#####################################################################
+// Function Read
+//#####################################################################
+template<class RW> void UNDIRECTED_GRAPH_CORE::
+Read(std::istream& input)
+{
+    ARRAY<int,int> parent_node_index,child_node_index;
+    Read_Binary<RW>(input,parent_node_index,child_node_index,adjacent_edges);
+    if(parent_node_index.Size()!=child_node_index.Size()) PHYSBAM_FATAL_ERROR();
+    edges.Resize(parent_node_index.Size(),false,false);
+    for(int e=0;e<edges.m;e++){edges(e).x=parent_node_index(e);edges(e).y=child_node_index(e);}
+}
+//#####################################################################
+// Function Write
+//#####################################################################
+template<class RW> void UNDIRECTED_GRAPH_CORE::
+Write(std::ostream& output) const
+{
+    ARRAY<int,int> parent_node_index(edges.m,false),child_node_index(edges.m,false);
+    for(int e=0;e<edges.m;e++){parent_node_index(e)=edges(e).x;child_node_index(e)=edges(e).y;}
+    Write_Binary<RW>(output,parent_node_index,child_node_index,adjacent_edges);
+}
+//#####################################################################
+template void UNDIRECTED_GRAPH_CORE::Read<double>(std::istream&);
+template void UNDIRECTED_GRAPH_CORE::Read<float>(std::istream&);
+template void UNDIRECTED_GRAPH_CORE::Write<double>(std::ostream&) const;
+template void UNDIRECTED_GRAPH_CORE::Write<float>(std::ostream&) const;
 }

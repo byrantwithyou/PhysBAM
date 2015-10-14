@@ -61,17 +61,9 @@ public:
     void Set_Selection(OPENGL_SELECTION<T>* selection) override;
     void Clear_Highlight() override;
     void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
-    
-    void Turn_Smooth_Shading_On() override
-    {smooth_shading=true;
-    for(int i=0;i<point_simplices_1d_objects.m;i++)if(point_simplices_1d_objects(i))point_simplices_1d_objects(i)->Turn_Smooth_Shading_On();}
-    
-    void Turn_Smooth_Shading_Off() override
-    {smooth_shading=false;
-    for(int i=0;i<point_simplices_1d_objects.m;i++)if(point_simplices_1d_objects(i))point_simplices_1d_objects(i)->Turn_Smooth_Shading_Off();}
-
+    void Turn_Smooth_Shading_On() override;
+    void Turn_Smooth_Shading_Off() override;
     OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) override;
-
 
     void Toggle_Active_Value();
     void Toggle_Use_Active_List();

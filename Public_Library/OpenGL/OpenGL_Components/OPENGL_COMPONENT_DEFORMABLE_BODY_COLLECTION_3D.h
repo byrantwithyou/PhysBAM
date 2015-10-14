@@ -92,28 +92,11 @@ public:
     void Clear_Highlight() override;
     void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
     
-    void Turn_Smooth_Shading_On() override
-    {smooth_shading=true;
-    for(int i=0;i<segmented_curve_objects.m;i++)if(segmented_curve_objects(i))segmented_curve_objects(i)->Turn_Smooth_Shading_On();
-    for(int i=0;i<triangulated_surface_objects.m;i++)if(triangulated_surface_objects(i))triangulated_surface_objects(i)->Turn_Smooth_Shading_On();
-    for(int i=0;i<tetrahedralized_volume_objects.m;i++)if(tetrahedralized_volume_objects(i))tetrahedralized_volume_objects(i)->Turn_Smooth_Shading_On();
-    for(int i=0;i<hexahedralized_volume_objects.m;i++)if(hexahedralized_volume_objects(i))hexahedralized_volume_objects(i)->Turn_Smooth_Shading_On();
-    for(int i=0;i<boundary_surface_objects.m;i++)if(boundary_surface_objects(i))boundary_surface_objects(i)->Turn_Smooth_Shading_On();
-    for(int i=0;i<embedded_surface_objects.m;i++)if(embedded_surface_objects(i))embedded_surface_objects(i)->Turn_Smooth_Shading_On();}
-    
-    void Turn_Smooth_Shading_Off() override
-    {smooth_shading=false;
-    for(int i=0;i<segmented_curve_objects.m;i++)if(segmented_curve_objects(i))segmented_curve_objects(i)->Turn_Smooth_Shading_Off();
-    for(int i=0;i<triangulated_surface_objects.m;i++)if(triangulated_surface_objects(i))triangulated_surface_objects(i)->Turn_Smooth_Shading_Off();
-    for(int i=0;i<tetrahedralized_volume_objects.m;i++)if(tetrahedralized_volume_objects(i))tetrahedralized_volume_objects(i)->Turn_Smooth_Shading_Off();
-    for(int i=0;i<hexahedralized_volume_objects.m;i++)if(hexahedralized_volume_objects(i))hexahedralized_volume_objects(i)->Turn_Smooth_Shading_Off();
-    for(int i=0;i<boundary_surface_objects.m;i++)if(boundary_surface_objects(i))boundary_surface_objects(i)->Turn_Smooth_Shading_Off();
-    for(int i=0;i<embedded_surface_objects.m;i++)if(embedded_surface_objects(i))embedded_surface_objects(i)->Turn_Smooth_Shading_Off();}
-
+    void Turn_Smooth_Shading_On() override;
+    void Turn_Smooth_Shading_Off() override;
     void Set_Material(const int object,const OPENGL_MATERIAL& front_material,const OPENGL_MATERIAL& back_material);
     void Set_All_Materials(const OPENGL_MATERIAL& meshfront,const OPENGL_MATERIAL& front_material,const OPENGL_MATERIAL& back_material);
     OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) override;
-
     TRIANGULATED_SURFACE<T>& Create_Hard_Bound_Boundary_Surface(TRIANGULATED_SURFACE<T>& boundary_surface);
 
     void Toggle_Active_Value();
