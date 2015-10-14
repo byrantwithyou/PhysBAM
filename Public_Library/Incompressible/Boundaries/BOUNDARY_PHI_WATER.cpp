@@ -9,7 +9,7 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -63,12 +63,10 @@ Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const GRID<TV>& grid,T_A
             else u_ghost(cell)=u_ghost(boundary_cell);}}
 }
 //#####################################################################
-#define INSTANTIATION_HELPER(T,TV) \
-    template BOUNDARY_PHI_WATER<TV>::BOUNDARY_PHI_WATER(const VECTOR<VECTOR<bool,2>,TV::dimension>&);
-#define P(...) __VA_ARGS__
-INSTANTIATION_HELPER(float,P(VECTOR<float,1>));
-INSTANTIATION_HELPER(float,P(VECTOR<float,2>));
-INSTANTIATION_HELPER(float,P(VECTOR<float,3>));
-INSTANTIATION_HELPER(double,P(VECTOR<double,1>));
-INSTANTIATION_HELPER(double,P(VECTOR<double,2>));
-INSTANTIATION_HELPER(double,P(VECTOR<double,3>));
+template class BOUNDARY_PHI_WATER<VECTOR<float,1> >;
+template class BOUNDARY_PHI_WATER<VECTOR<float,2> >;
+template class BOUNDARY_PHI_WATER<VECTOR<float,3> >;
+template class BOUNDARY_PHI_WATER<VECTOR<double,1> >;
+template class BOUNDARY_PHI_WATER<VECTOR<double,2> >;
+template class BOUNDARY_PHI_WATER<VECTOR<double,3> >;
+}
