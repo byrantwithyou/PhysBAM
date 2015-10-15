@@ -30,7 +30,7 @@ public:
     using RENDERING_OBJECT<T>::flip_normal;using RENDERING_OBJECT<T>::World_Space_Bounding_Box;using RENDERING_OBJECT<T>::name;using RENDERING_OBJECT<T>::two_sided;
     using RENDERING_OBJECT<T>::Inside;using RENDERING_OBJECT<T>::Intersection;using RENDERING_OBJECT<T>::Object_Space_Ray;using RENDERING_OBJECT<T>::Object_Space_Point;
     using RENDERING_OBJECT<T>::Object_Space_Vector;using RENDERING_OBJECT<T>::World_Space_Vector;using RENDERING_OBJECT<T>::World_Space_Point;
-    
+
     TRIANGULATED_SURFACE<T>& triangulated_surface;
     mutable TRIANGULATED_SURFACE<T>* base_triangulated_surface;
     mutable ARRAY<TRIANGLE_3D<T> > world_space_triangles;
@@ -44,139 +44,35 @@ public:
     std::string sample_locations_file;
     bool add_triangles_to_acceleration_structure;
 
-    RENDERING_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& triangulated_surface_input,const int triangles_per_hierarchy_group=0)
-        :triangulated_surface(triangulated_surface_input),base_triangulated_surface(&triangulated_surface),closed_volume(true),texture_coordinates(0),triangle_texture_coordinates(0),tangent_vectors(0),add_triangles_to_acceleration_structure(true)
-    {
-        triangulated_surface.Update_Bounding_Box();if(!triangulated_surface.hierarchy)triangulated_surface.Initialize_Hierarchy(true,triangles_per_hierarchy_group);
-        if(triangulated_surface.use_vertex_normals && !triangulated_surface.face_vertex_normals)triangulated_surface.Update_Vertex_Normals();
-    }
-
-    virtual ~RENDERING_TRIANGULATED_SURFACE()
-    {
-    delete texture_coordinates;delete triangle_texture_coordinates;delete tangent_vectors;}
-
-    bool Intersection(RAY<TV>& ray) const override
-    {RAY<TV> object_space_ray=Object_Space_Ray(ray);
-    if(INTERSECTION::Intersects(object_space_ray,*base_triangulated_surface,small_number)){
-        ray.semi_infinite=false;ray.t_max=object_space_ray.t_max;ray.aggregate_id=object_space_ray.aggregate_id;return true;}
-    else return false;}
-
-    TV Normal(const TV& location,const int aggregate=0) const override
-    {return World_Space_Vector(triangulated_surface.Normal(Object_Space_Point(location),aggregate));}
-
-    bool Inside(const TV& location) const override
-    {return closed_volume && triangulated_surface.Inside(Object_Space_Point(location),small_number);}
-
-    bool Outside(const TV& location) const override
-    {return !closed_volume || triangulated_surface.Outside(Object_Space_Point(location),small_number);}
-
-    bool Boundary(const TV& location) const override
-    {return triangulated_surface.Boundary(Object_Space_Point(location),small_number);}
-
-    TV Surface(const TV& location) const override
-    {return World_Space_Point(triangulated_surface.Surface(Object_Space_Point(location)));}
-
-    bool Has_Bounding_Box() const  override
-    {return true;}
-    
-    RANGE<TV> Object_Space_Bounding_Box() const override
-    {if(!triangulated_surface.bounding_box) triangulated_surface.Update_Bounding_Box();
-    return *triangulated_surface.bounding_box;}
-
-    bool Closed_Volume() const override
-    {return closed_volume;}
-
-    bool Close_To_Open_Surface(const TV& location,const T threshold_distance) const override
-    {assert(!Closed_Volume());int closest_triangle;T distance;
-    triangulated_surface.Surface(Object_Space_Point(location),threshold_distance,small_number,&closest_triangle,&distance);
-    return distance<=threshold_distance;}
-
-    bool Intersection(RAY<TV>& ray,const int aggregate) const override
-    {if(!add_triangles_to_acceleration_structure) return Intersection(ray);
-    if(INTERSECTION::Intersects(ray,(world_space_triangles)(aggregate),small_number)){ray.aggregate_id=aggregate;return true;}else return false;}
-    
-    void Get_Aggregate_World_Space_Bounding_Boxes(ARRAY<RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T> >& primitives) const override
-    {if(add_triangles_to_acceleration_structure){
-        world_space_triangles.Remove_All();
-        for(int i=0;i<triangulated_surface.mesh.elements.m;i++){
-            int node1,node2,node3;triangulated_surface.mesh.elements(i).Get(node1,node2,node3);
-            TRIANGLE_3D<T> world_space_triangle(transform.Homogeneous_Times(triangulated_surface.particles.X(node1)),transform.Homogeneous_Times(triangulated_surface.particles.X(node2)),transform.Homogeneous_Times(triangulated_surface.particles.X(node3)));
-            world_space_triangles.Append(world_space_triangle);
-            primitives.Append(RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>(world_space_triangle.Bounding_Box(),this,i));}}
-    else{
-        triangulated_surface.Update_Bounding_Box();
-        primitives.Append(RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>(World_Space_Bounding_Box(),this,1));}}
-
-    TRIANGULATED_SURFACE<T>* Generate_Triangles() const override
-    {return triangulated_surface.Create_Compact_Copy();}
-    
-    void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const override
-    {assert(texture_coordinates);
-    int node1,node2,node3;triangulated_surface.mesh.elements(aggregate).Get(node1,node2,node3);
-    int uv1,uv2,uv3;(*triangle_texture_coordinates)(aggregate).Get(uv1,uv2,uv3);
-    assert(triangulated_surface.mesh.elements.m==triangle_texture_coordinates->m);
-    TV weights=TRIANGLE_3D<T>::Barycentric_Coordinates(object_space_point,triangulated_surface.particles.X(node1),triangulated_surface.particles.X(node2),triangulated_surface.particles.X(node3));
-    VECTOR<T,2> coordinates=(*texture_coordinates)(uv1)*weights.x+(*texture_coordinates)(uv2)*weights.y+(*texture_coordinates)(uv3)*weights.z;
-    s=coordinates.x;t=coordinates.y;}
-
-    void Get_Object_Space_Tangent_And_Bitangent(const TV& object_space_point,const TV& object_space_normal,const int aggregate,TV& object_tangent,TV& object_bitangent) const override
-    {assert(tangent_vectors);
-    int node1,node2,node3;triangulated_surface.mesh.elements(aggregate).Get(node1,node2,node3);
-    TV weights=TRIANGLE_3D<T>::Barycentric_Coordinates(object_space_point,triangulated_surface.particles.X(node1),triangulated_surface.particles.X(node2),triangulated_surface.particles.X(node3));
-    TV interpolated_tangent=(*tangent_vectors)(node1)*weights.x+(*tangent_vectors)(node2)*weights.y+(*tangent_vectors)(node3)*weights.z;
-    object_tangent=(interpolated_tangent-object_space_normal*TV::Dot_Product(object_space_normal,interpolated_tangent)).Normalized();
-    object_bitangent=-TV::Cross_Product(object_space_normal,object_tangent);}
-
-    void Get_World_Space_Tangent_And_Bitangent(const TV& world_space_point,const TV& world_space_normal,const int aggregate,TV& world_tangent,TV& world_bitangent) const override
-    {TV object_tangent,object_bitangent;
-    Get_Object_Space_Tangent_And_Bitangent(Object_Space_Point(world_space_point),Object_Space_Vector(world_space_normal),aggregate,object_tangent,object_bitangent);
-    world_tangent=World_Space_Vector(object_tangent);world_bitangent=World_Space_Vector(object_bitangent);}
-
-    void Compute_Per_Vertex_Tangent_Vectors()
-    {assert(texture_coordinates&&triangulated_surface.vertex_normals);assert(!tangent_vectors);
-    tangent_vectors=new ARRAY<TV>;
-    tangent_vectors->Resize(triangulated_surface.mesh.number_nodes);
-    for(int i=0;i<triangulated_surface.mesh.elements.m;i++){
-        int index1,index2,index3;triangulated_surface.mesh.elements(i).Get(index1,index2,index3);
-        int uv1,uv2,uv3;(*triangle_texture_coordinates)(i).Get(uv1,uv2,uv3);
-        TV p1=triangulated_surface.particles.X(index1),p2=triangulated_surface.particles.X(index2),p3=triangulated_surface.particles.X(index3);
-        VECTOR<T,2> st1=(*texture_coordinates)(uv1),st2=(*texture_coordinates)(uv2),st3=(*texture_coordinates)(uv3);
-        T denominator=((st2.y-st1.y)*(st3.x-st1.x)-(st3.y-st1.y)*(st2.x-st1.x));
-        TV dpds=((st2.y-st1.y)*(p3-p1)-(st3.y-st1.y)*(p2-p1))/denominator;
-        (*tangent_vectors)(index1)+=dpds;(*tangent_vectors)(index2)+=dpds;(*tangent_vectors)(index3)+=dpds;}
-    for(int i=0;i<tangent_vectors->m;i++){
-        TV cur_normal=(*triangulated_surface.vertex_normals)(i);
-        // Gram-Schmidt orthogonalize and normalize each tangent vector
-        (*tangent_vectors)(i)=((*tangent_vectors)(i)-cur_normal*TV::Dot_Product(cur_normal,(*tangent_vectors)(i))).Normalized();}}
-
-    template<class RW> 
-    void Read_Texture_Coordinates(const std::string& filename)
-    {assert(!texture_coordinates);texture_coordinates=new ARRAY<VECTOR<T,2> >;triangle_texture_coordinates=new ARRAY<VECTOR<int,3> >;
-    int backward_compatible;FILE_UTILITIES::Read_From_File<RW>(filename,*texture_coordinates,backward_compatible,*triangle_texture_coordinates);
-    Compute_Per_Vertex_Tangent_Vectors();}
-
-    void Rescale_Texture_Coordinates(T scale)
-    {assert(texture_coordinates);
-    for(int i=0;i<texture_coordinates->m;i++)
-    {T x_rescaled=(*texture_coordinates)(i).x*scale,y_rescaled=(*texture_coordinates)(i).y*scale;
-    (*texture_coordinates)(i).x=x_rescaled-floor(x_rescaled);
-    (*texture_coordinates)(i).y=y_rescaled-floor(y_rescaled);}}
-
-    void Initialize_Bump_Map(const std::string& filename)
-    {IMAGE<T>::Read(filename,bump_map_pixels);grid.Initialize(bump_map_pixels.Size(),RANGE<VECTOR<T,2> >::Unit_Box());} 
-     
-    void Do_Displacement_Map_Per_Vertex(const T perturb_factor,const T perturb_power)
-    {LOG::cerr<<"Doing per vertex displacement..." << std::endl;
-    // TODO: fix to average all vertex uv's
-    assert(texture_coordinates->m==triangulated_surface.particles.Size());
-    for(int i=0;i<triangulated_surface.mesh.number_nodes;i++){
-        TV current_perturbation=interpolation.Clamped_To_Array_Cell(grid,bump_map_pixels,VECTOR<T,2>((*texture_coordinates)(i).x,(*texture_coordinates)(i).y));
-        current_perturbation=(current_perturbation-TV(0.5,0.5,0.5))*(T)2;
-        T current_perturbation_sum=current_perturbation.x+current_perturbation.y+current_perturbation.z;
-        triangulated_surface.particles.X(i)+=perturb_factor*std::pow(current_perturbation_sum,perturb_power)*(*triangulated_surface.vertex_normals)(i);}
-    triangulated_surface.Initialize_Hierarchy();triangulated_surface.Update_Vertex_Normals();}
-
+    RENDERING_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& triangulated_surface_input,
+        const int triangles_per_hierarchy_group=0);
+    virtual ~RENDERING_TRIANGULATED_SURFACE();
+    bool Intersection(RAY<TV>& ray) const override;
+    TV Normal(const TV& location,const int aggregate=0) const override;
+    bool Inside(const TV& location) const override;
+    bool Outside(const TV& location) const override;
+    bool Boundary(const TV& location) const override;
+    TV Surface(const TV& location) const override;
+    bool Has_Bounding_Box() const  override;
+    RANGE<TV> Object_Space_Bounding_Box() const override;
+    bool Closed_Volume() const override;
+    bool Close_To_Open_Surface(const TV& location,const T threshold_distance) const override;
+    bool Intersection(RAY<TV>& ray,const int aggregate) const override;
+    void Get_Aggregate_World_Space_Bounding_Boxes(
+        ARRAY<RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T> >& primitives) const override;
+    TRIANGULATED_SURFACE<T>* Generate_Triangles() const override;
+    void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const override;
+    void Get_Object_Space_Tangent_And_Bitangent(const TV& object_space_point,const TV& object_space_normal,
+        const int aggregate,TV& object_tangent,TV& object_bitangent) const override;
+    void Get_World_Space_Tangent_And_Bitangent(const TV& world_space_point,const TV& world_space_normal,
+        const int aggregate,TV& world_tangent,TV& world_bitangent) const override;
+    void Compute_Per_Vertex_Tangent_Vectors();
+    template<class RW>
+    void Read_Texture_Coordinates(const std::string& filename);
+    void Rescale_Texture_Coordinates(T scale);
+    void Initialize_Bump_Map(const std::string& filename);
+    void Do_Displacement_Map_Per_Vertex(const T perturb_factor,const T perturb_power);
 //#####################################################################
-};   
+};
 }
 #endif

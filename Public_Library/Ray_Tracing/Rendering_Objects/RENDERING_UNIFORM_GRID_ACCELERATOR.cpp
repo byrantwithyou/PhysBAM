@@ -7,6 +7,57 @@
 #include <Ray_Tracing/Rendering_Objects/RENDERING_UNIFORM_GRID_ACCELERATOR.h>
 using namespace PhysBAM;
 //#####################################################################
+// Constructor
+//#####################################################################
+template<class T> RENDERING_UNIFORM_GRID_ACCELERATOR<T>::
+RENDERING_UNIFORM_GRID_ACCELERATOR()
+    :operation(1)
+{
+}
+//#####################################################################
+// Function Add_Object
+//#####################################################################
+template<class T> void RENDERING_UNIFORM_GRID_ACCELERATOR<T>::
+Add_Object(RENDERING_OBJECT<T>* object) // so this get's into the right bin in render world
+    {if(object->material_shader)material_shader=object->material_shader; 
+    if(object->volumetric_shader)volumetric_shader=object->volumetric_shader;
+    objects.Append(object);
+}
+//#####################################################################
+// Function Preprocess_Efficiency_Structures
+//#####################################################################
+template<class T> void RENDERING_UNIFORM_GRID_ACCELERATOR<T>::
+Preprocess_Efficiency_Structures(RENDER_WORLD<T>& world)
+{
+    for(int i=0;i<objects.m;i++){
+        objects(i)->Get_Aggregate_World_Space_Bounding_Boxes(primitives);
+        objects(i)->Preprocess_Efficiency_Structures(world);}
+    ARRAY<PAIR<RANGE<VECTOR<T,3> >,RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>*> > box_input;
+    for(int i=0;i<primitives.m;i++)
+        box_input.Append(PAIR<RANGE<VECTOR<T,3> >,RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>*>(primitives(i).world_bounding_box,&primitives(i)));
+    uniform_grid.Initialize(box_input);
+}
+//#####################################################################
+// Function Inside
+//#####################################################################
+template<class T> bool RENDERING_UNIFORM_GRID_ACCELERATOR<T>::
+Inside(const VECTOR<T,3>& location,RENDERING_OBJECT<T>** intersected_object) const
+{
+    for(int i=0;i<objects.m;i++)
+        if(objects(i)->support_transparent_overlapping_objects&&objects(i)->Inside(location)){
+            *intersected_object=(RENDERING_OBJECT<T>*)this;
+            return true;}
+    return false;
+}
+//#####################################################################
+// Function Generate_Triangles
+//#####################################################################
+template<class T> TRIANGULATED_SURFACE<T>* RENDERING_UNIFORM_GRID_ACCELERATOR<T>::
+Generate_Triangles() const
+{
+    return 0;
+}
+//#####################################################################
 // Class INTERSECTION_MAP_HELPER
 //#####################################################################
 template<class T> class INTERSECTION_MAP_HELPER {

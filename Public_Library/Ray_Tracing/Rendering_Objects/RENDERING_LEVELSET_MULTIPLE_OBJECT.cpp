@@ -10,10 +10,109 @@
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE_ON_A_RAY.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.h>
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
-// Function Iterative_Solver_Tolerance
+// Constructor
 //#####################################################################
+template<class T_LEVELSET_MULTIPLE> RENDERING_LEVELSET_MULTIPLE_OBJECT<T_LEVELSET_MULTIPLE>::
+RENDERING_LEVELSET_MULTIPLE_OBJECT(GRID<TV>& grid_input,ARRAY<ARRAY<T,VECTOR<int,3> > >& phis_input)        
+    :levelset_multiple(grid_input,phis_input),number_of_regions(phis_input.m)
+{
+    rendering_levelset_multiple_region_objects.Resize(phis_input.m);
+    for(int i=0;i<number_of_regions;i++) rendering_levelset_multiple_region_objects(i)=new RENDERING_LEVELSET_MULTIPLE_REGION_OBJECT<T,T_LEVELSET_MULTIPLE>(levelset_multiple,i);
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class T_LEVELSET_MULTIPLE> RENDERING_LEVELSET_MULTIPLE_OBJECT<T_LEVELSET_MULTIPLE>::
+~RENDERING_LEVELSET_MULTIPLE_OBJECT()
+{
+    for(int i=0;i<rendering_levelset_multiple_region_objects.m;i++) delete rendering_levelset_multiple_region_objects(i);
+}
+//#####################################################################
+// Function Intersection
+//#####################################################################
+template<class T_LEVELSET_MULTIPLE> bool RENDERING_LEVELSET_MULTIPLE_OBJECT<T_LEVELSET_MULTIPLE>::
+Intersection(RAY<VECTOR<T,3> >& ray,const int lowest_priority,const RENDERING_OBJECT<T>** intersected_object) const
+{
+    if(priority<lowest_priority) return false;
+    int region_start,region_end;
+    if(Intersection(ray,region_start,region_end,small_number)){
+        if(region_end==-1) *intersected_object=rendering_levelset_multiple_region_objects(region_start);
+        else if(region_start==-1) *intersected_object=rendering_levelset_multiple_region_objects(region_end);
+        else{
+            if(region_start>0&&rendering_levelset_multiple_region_objects(region_start)->priority>rendering_levelset_multiple_region_objects(region_end)->priority)
+                *intersected_object=rendering_levelset_multiple_region_objects(region_start);
+            else *intersected_object=rendering_levelset_multiple_region_objects(region_end);}
+        return true;}
+    return false;
+}
+//#####################################################################
+// Function Intersected_Region
+//#####################################################################
+template<class T_LEVELSET_MULTIPLE> int RENDERING_LEVELSET_MULTIPLE_OBJECT<T_LEVELSET_MULTIPLE>::
+Intersected_Region(RAY<VECTOR<T,3> >& ray) const
+{
+    int region_start,region_end;        
+    if(Intersection(ray,region_start,region_end,small_number)){
+        if(region_end==-1) return region_start;
+        else if(region_start==-1) return region_end;
+        else{
+            if(region_start>0&&rendering_levelset_multiple_region_objects(region_start)->priority>rendering_levelset_multiple_region_objects(region_end)->priority)
+                return region_start;
+            else return region_end;}
+        return -1;}
+    return -1;
+}
+//#####################################################################
+// Function Inside_Region_Only
+//#####################################################################
+template<class T_LEVELSET_MULTIPLE> bool RENDERING_LEVELSET_MULTIPLE_OBJECT<T_LEVELSET_MULTIPLE>::
+Inside_Region_Only(const VECTOR<T,3>& location,int region_check) const
+{
+    for(int i=0;i<number_of_regions;i++){
+        bool inside_region=rendering_levelset_multiple_region_objects(i)->Inside(location);
+        if(i!=region_check && inside_region) return false;}
+    return true;
+}
+//#####################################################################
+// Function Inside
+//#####################################################################
+template<class T_LEVELSET_MULTIPLE> bool RENDERING_LEVELSET_MULTIPLE_OBJECT<T_LEVELSET_MULTIPLE>::
+Inside(const VECTOR<T,3>& location,RENDERING_OBJECT<T>** intersected_object) const
+{
+    for(int i=0;i<number_of_regions;i++)
+        if(rendering_levelset_multiple_region_objects(i)->Inside(location)){
+            *intersected_object=(RENDERING_OBJECT<T>*)rendering_levelset_multiple_region_objects(i);return true;}
+    return false;
+}
+//#####################################################################
+// Function Object_Space_Bounding_Box
+//#####################################################################
+template<class T_LEVELSET_MULTIPLE> auto RENDERING_LEVELSET_MULTIPLE_OBJECT<T_LEVELSET_MULTIPLE>::
+Object_Space_Bounding_Box() const -> RANGE<VECTOR<T,3> >
+{
+    return levelset_multiple.grid.domain;
+}
+//#####################################################################
+// Function Integration_Step
+//#####################################################################
+template<class T_LEVELSET_MULTIPLE> auto RENDERING_LEVELSET_MULTIPLE_OBJECT<T_LEVELSET_MULTIPLE>::
+Integration_Step(const T phi) const -> T
+{
+    T distance=abs(phi);
+    if(distance > 3*levelset_multiple.grid.dX.Min()) return (T).5*distance;    
+    else if(distance > levelset_multiple.grid.dX.Min()) return (T).25*distance;
+    return (T).1*levelset_multiple.grid.dX.Min();
+}
+//#####################################################################
+// Function Generate_Triangles
+//#####################################################################
+template<class T_LEVELSET_MULTIPLE> auto RENDERING_LEVELSET_MULTIPLE_OBJECT<T_LEVELSET_MULTIPLE>::
+Generate_Triangles() const -> TRIANGULATED_SURFACE<T>*
+{
+    return TRIANGULATED_SURFACE<T>::Create();
+}
 namespace{
 template<class T> T Iterative_Solver_Tolerance(){STATIC_ASSERT((T)false);}
 template<> float Iterative_Solver_Tolerance(){return (float).01;}
@@ -81,7 +180,6 @@ Intersection(RAY<VECTOR<T,3> >& ray,int &region_start,int &region_end,const T th
     else  return false;// exiting ray
 }
 //#####################################################################
-namespace PhysBAM{
 template class RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<VECTOR<float,3> > >;
 template class RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<VECTOR<double,3> > >;
 }

@@ -23,32 +23,15 @@ public:
     ARRAY<RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T> > primitives;
     mutable int operation;
     
-    RENDERING_UNIFORM_GRID_ACCELERATOR()
-        :operation(1)
-    {}
-
-    void Add_Object(RENDERING_OBJECT<T>* object) // so this get's into the right bin in render world
-    {if(object->material_shader)material_shader=object->material_shader; 
-    if(object->volumetric_shader)volumetric_shader=object->volumetric_shader;
-    objects.Append(object);}
-        
-    void Preprocess_Efficiency_Structures(RENDER_WORLD<T>& world) override
-    {for(int i=0;i<objects.m;i++){objects(i)->Get_Aggregate_World_Space_Bounding_Boxes(primitives);objects(i)->Preprocess_Efficiency_Structures(world);}
-    ARRAY<PAIR<RANGE<VECTOR<T,3> >,RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>*> > box_input;
-    for(int i=0;i<primitives.m;i++) box_input.Append(PAIR<RANGE<VECTOR<T,3> >,RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>*>(primitives(i).world_bounding_box,&primitives(i)));
-    uniform_grid.Initialize(box_input);}
-    
-    bool Inside(const VECTOR<T,3>& location,RENDERING_OBJECT<T>** intersected_object) const override
-    {for(int i=0;i<objects.m;i++) if(objects(i)->support_transparent_overlapping_objects&&objects(i)->Inside(location)){*intersected_object=(RENDERING_OBJECT<T>*)this;return true;}
-    return false;}
-
-    TRIANGULATED_SURFACE<T>* Generate_Triangles() const override
-    {return 0;};
-
+    RENDERING_UNIFORM_GRID_ACCELERATOR();
+    void Add_Object(RENDERING_OBJECT<T>* object); // so this get's into the right bin in render world
+    void Preprocess_Efficiency_Structures(RENDER_WORLD<T>& world) override;
+    bool Inside(const VECTOR<T,3>& location,RENDERING_OBJECT<T>** intersected_object) const override;
+    TRIANGULATED_SURFACE<T>* Generate_Triangles() const override;
+    bool Intersection(RAY<VECTOR<T,3> >& ray,const int lowest_priority,
+        const RENDERING_OBJECT<T>** intersected_object) const override;
 //#####################################################################
-    bool Intersection(RAY<VECTOR<T,3> >& ray,const int lowest_priority,const RENDERING_OBJECT<T>** intersected_object) const override;
-//#####################################################################
-};   
+};  
 }
 #endif
 
