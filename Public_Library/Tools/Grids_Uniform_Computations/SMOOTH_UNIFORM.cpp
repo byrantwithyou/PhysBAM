@@ -38,13 +38,13 @@ void Smooth(T_ARRAYS_T2& d,const int steps,const ARRAY<T,VECTOR<int,dim> >* phi)
             for(int n=0;n<GRID<TV>::number_of_neighbors_per_node;n++)sum+=d_ghost(GRID<TV>::Node_Neighbor(node,n));
             d(node)=(T)1/(2*GRID<TV>::number_of_neighbors_per_node)*sum;}}}
 }
-template void SMOOTH::Smooth<float,2,ARRAY<float,VECTOR<int,2> > >(ARRAY<float,VECTOR<int,2> >&,int,
+template void Smooth<float,2,ARRAY<float,VECTOR<int,2> > >(ARRAY<float,VECTOR<int,2> >&,int,
     ARRAY<float,VECTOR<int,2> > const*);
-template void SMOOTH::Smooth<float,3,ARRAY<float,VECTOR<int,3> > >(ARRAY<float,VECTOR<int,3> >&,int,
+template void Smooth<float,3,ARRAY<float,VECTOR<int,3> > >(ARRAY<float,VECTOR<int,3> >&,int,
     ARRAY<float,VECTOR<int,3> > const*);
-template void SMOOTH::Smooth<double,3,ARRAY<VECTOR<double,3>,VECTOR<int,3> > >(
+template void Smooth<double,3,ARRAY<VECTOR<double,3>,VECTOR<int,3> > >(
     ARRAY<VECTOR<double,3>,VECTOR<int,3> >&,int,ARRAY<double,VECTOR<int,3> > const*);
-template void SMOOTH::Smooth<float,3,ARRAY<VECTOR<float,3>,VECTOR<int,3> > >(
+template void Smooth<float,3,ARRAY<VECTOR<float,3>,VECTOR<int,3> > >(
     ARRAY<VECTOR<float,3>,VECTOR<int,3> >&,int,ARRAY<float,VECTOR<int,3> > const*);
 }
 }

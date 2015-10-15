@@ -325,17 +325,17 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
 
     return true;
 }
-template bool PROJECTED_GAUSS_SEIDEL::Solve<VECTOR<double,1> >(RIGID_BODY_COLLECTION<VECTOR<double,1> >&,
+template bool Solve<VECTOR<double,1> >(RIGID_BODY_COLLECTION<VECTOR<double,1> >&,
     ARRAY<SOLVE_CONTACT::CONTACT<VECTOR<double,1> >,int>&,VECTOR<double,1>::SCALAR,int);
-template bool PROJECTED_GAUSS_SEIDEL::Solve<VECTOR<double,2> >(RIGID_BODY_COLLECTION<VECTOR<double,2> >&,
+template bool Solve<VECTOR<double,2> >(RIGID_BODY_COLLECTION<VECTOR<double,2> >&,
     ARRAY<SOLVE_CONTACT::CONTACT<VECTOR<double,2> >,int>&,VECTOR<double,2>::SCALAR,int);
-template bool PROJECTED_GAUSS_SEIDEL::Solve<VECTOR<double,3> >(RIGID_BODY_COLLECTION<VECTOR<double,3> >&,
+template bool Solve<VECTOR<double,3> >(RIGID_BODY_COLLECTION<VECTOR<double,3> >&,
     ARRAY<SOLVE_CONTACT::CONTACT<VECTOR<double,3> >,int>&,VECTOR<double,3>::SCALAR,int);
-template bool PROJECTED_GAUSS_SEIDEL::Solve<VECTOR<float,1> >(RIGID_BODY_COLLECTION<VECTOR<float,1> >&,
+template bool Solve<VECTOR<float,1> >(RIGID_BODY_COLLECTION<VECTOR<float,1> >&,
     ARRAY<SOLVE_CONTACT::CONTACT<VECTOR<float,1> >,int>&,VECTOR<float,1>::SCALAR,int);
-template bool PROJECTED_GAUSS_SEIDEL::Solve<VECTOR<float,2> >(RIGID_BODY_COLLECTION<VECTOR<float,2> >&,
+template bool Solve<VECTOR<float,2> >(RIGID_BODY_COLLECTION<VECTOR<float,2> >&,
     ARRAY<SOLVE_CONTACT::CONTACT<VECTOR<float,2> >,int>&,VECTOR<float,2>::SCALAR,int);
-template bool PROJECTED_GAUSS_SEIDEL::Solve<VECTOR<float,3> >(RIGID_BODY_COLLECTION<VECTOR<float,3> >&,
+template bool Solve<VECTOR<float,3> >(RIGID_BODY_COLLECTION<VECTOR<float,3> >&,
     ARRAY<SOLVE_CONTACT::CONTACT<VECTOR<float,3> >,int>&,VECTOR<float,3>::SCALAR,int);
 }
 }

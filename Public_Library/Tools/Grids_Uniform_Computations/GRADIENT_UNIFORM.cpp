@@ -18,11 +18,11 @@ void Compute_Magnitude(const GRID<TV>& grid,const int number_of_ghost_cells,ARRA
         gradient(cell_index)=sqrt(sum_of_partials);}
     for(CELL_ITERATOR<TV> iterator(grid,number_of_ghost_cells,GRID<TV>::BOUNDARY_INTERIOR_REGION);iterator.Valid();iterator.Next()) gradient(iterator.Cell_Index())=(T)0;
 }
-template void GRADIENT::Compute_Magnitude<double,VECTOR<double,1> >(GRID<VECTOR<double,1> > const&,int,ARRAY<double,VECTOR<int,VECTOR<double,1>::m> >&,ARRAY<double,VECTOR<int,VECTOR<double,1>::m> >&);
-template void GRADIENT::Compute_Magnitude<double,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,int,ARRAY<double,VECTOR<int,VECTOR<double,2>::m> >&,ARRAY<double,VECTOR<int,VECTOR<double,2>::m> >&);
-template void GRADIENT::Compute_Magnitude<double,VECTOR<double,3> >(GRID<VECTOR<double,3> > const&,int,ARRAY<double,VECTOR<int,VECTOR<double,3>::m> >&,ARRAY<double,VECTOR<int,VECTOR<double,3>::m> >&);
-template void GRADIENT::Compute_Magnitude<float,VECTOR<float,1> >(GRID<VECTOR<float,1> > const&,int,ARRAY<float,VECTOR<int,VECTOR<float,1>::m> >&,ARRAY<float,VECTOR<int,VECTOR<float,1>::m> >&);
-template void GRADIENT::Compute_Magnitude<float,VECTOR<float,2> >(GRID<VECTOR<float,2> > const&,int,ARRAY<float,VECTOR<int,VECTOR<float,2>::m> >&,ARRAY<float,VECTOR<int,VECTOR<float,2>::m> >&);
-template void GRADIENT::Compute_Magnitude<float,VECTOR<float,3> >(GRID<VECTOR<float,3> > const&,int,ARRAY<float,VECTOR<int,VECTOR<float,3>::m> >&,ARRAY<float,VECTOR<int,VECTOR<float,3>::m> >&);
+template void Compute_Magnitude<double,VECTOR<double,1> >(GRID<VECTOR<double,1> > const&,int,ARRAY<double,VECTOR<int,VECTOR<double,1>::m> >&,ARRAY<double,VECTOR<int,VECTOR<double,1>::m> >&);
+template void Compute_Magnitude<double,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,int,ARRAY<double,VECTOR<int,VECTOR<double,2>::m> >&,ARRAY<double,VECTOR<int,VECTOR<double,2>::m> >&);
+template void Compute_Magnitude<double,VECTOR<double,3> >(GRID<VECTOR<double,3> > const&,int,ARRAY<double,VECTOR<int,VECTOR<double,3>::m> >&,ARRAY<double,VECTOR<int,VECTOR<double,3>::m> >&);
+template void Compute_Magnitude<float,VECTOR<float,1> >(GRID<VECTOR<float,1> > const&,int,ARRAY<float,VECTOR<int,VECTOR<float,1>::m> >&,ARRAY<float,VECTOR<int,VECTOR<float,1>::m> >&);
+template void Compute_Magnitude<float,VECTOR<float,2> >(GRID<VECTOR<float,2> > const&,int,ARRAY<float,VECTOR<int,VECTOR<float,2>::m> >&,ARRAY<float,VECTOR<int,VECTOR<float,2>::m> >&);
+template void Compute_Magnitude<float,VECTOR<float,3> >(GRID<VECTOR<float,3> > const&,int,ARRAY<float,VECTOR<int,VECTOR<float,3>::m> >&,ARRAY<float,VECTOR<int,VECTOR<float,3>::m> >&);
 }
 }

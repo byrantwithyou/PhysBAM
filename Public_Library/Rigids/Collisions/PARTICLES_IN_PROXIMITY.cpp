@@ -432,22 +432,22 @@ void All_Particles_In_Proximity(RIGID_BODY<TV>& body_1,RIGID_BODY<TV>& body_2,AR
     //    LOG::cout << "contact " << i << " " << normals(i) << " " << distances(i) << std::endl;
     //}
 }
-template void PARTICLES_IN_PROXIMITY::All_Particles_In_Proximity<VECTOR<double,1> >(
+template void All_Particles_In_Proximity<VECTOR<double,1> >(
     RIGID_BODY<VECTOR<double,1> >&,RIGID_BODY<VECTOR<double,1> >&,ARRAY<VECTOR<double,1>,int>&,
     ARRAY<VECTOR<double,1>,int>&,ARRAY<VECTOR<double,1>::SCALAR,int>&,VECTOR<double,1>::SCALAR,bool);
-template void PARTICLES_IN_PROXIMITY::All_Particles_In_Proximity<VECTOR<double,2> >(
+template void All_Particles_In_Proximity<VECTOR<double,2> >(
     RIGID_BODY<VECTOR<double,2> >&,RIGID_BODY<VECTOR<double,2> >&,ARRAY<VECTOR<double,2>,int>&,
     ARRAY<VECTOR<double,2>,int>&,ARRAY<VECTOR<double,2>::SCALAR,int>&,VECTOR<double,2>::SCALAR,bool);
-template void PARTICLES_IN_PROXIMITY::All_Particles_In_Proximity<VECTOR<double,3> >(
+template void All_Particles_In_Proximity<VECTOR<double,3> >(
     RIGID_BODY<VECTOR<double,3> >&,RIGID_BODY<VECTOR<double,3> >&,ARRAY<VECTOR<double,3>,int>&,
     ARRAY<VECTOR<double,3>,int>&,ARRAY<VECTOR<double,3>::SCALAR,int>&,VECTOR<double,3>::SCALAR,bool);
-template void PARTICLES_IN_PROXIMITY::All_Particles_In_Proximity<VECTOR<float,1> >(
+template void All_Particles_In_Proximity<VECTOR<float,1> >(
     RIGID_BODY<VECTOR<float,1> >&,RIGID_BODY<VECTOR<float,1> >&,ARRAY<VECTOR<float,1>,int>&,
     ARRAY<VECTOR<float,1>,int>&,ARRAY<VECTOR<float,1>::SCALAR,int>&,VECTOR<float,1>::SCALAR,bool);
-template void PARTICLES_IN_PROXIMITY::All_Particles_In_Proximity<VECTOR<float,2> >(
+template void All_Particles_In_Proximity<VECTOR<float,2> >(
     RIGID_BODY<VECTOR<float,2> >&,RIGID_BODY<VECTOR<float,2> >&,ARRAY<VECTOR<float,2>,int>&,
     ARRAY<VECTOR<float,2>,int>&,ARRAY<VECTOR<float,2>::SCALAR,int>&,VECTOR<float,2>::SCALAR,bool);
-template void PARTICLES_IN_PROXIMITY::All_Particles_In_Proximity<VECTOR<float,3> >(
+template void All_Particles_In_Proximity<VECTOR<float,3> >(
     RIGID_BODY<VECTOR<float,3> >&,RIGID_BODY<VECTOR<float,3> >&,ARRAY<VECTOR<float,3>,int>&,
     ARRAY<VECTOR<float,3>,int>&,ARRAY<VECTOR<float,3>::SCALAR,int>&,VECTOR<float,3>::SCALAR,bool);
 
