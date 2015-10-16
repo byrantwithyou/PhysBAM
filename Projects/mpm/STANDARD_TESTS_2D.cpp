@@ -29,6 +29,7 @@
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
+#include <fstream>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
 //#####################################################################
@@ -512,9 +513,9 @@ Initialize()
             if(theta_c==0) theta_c=0.01;
             if(theta_s==0) theta_s=.00001;
             if(hardening_factor==0) hardening_factor=80;
-            if(max_hardening) max_hardening=5;
+            if(max_hardening==0) max_hardening=5;
             Add_Fixed_Corotated(E,nu);
-            RANGE<TV> box(TV(.4,.15),TV(.6,.35));
+            RANGE<TV> box(TV(.45,.11),TV(.55,.31));
             Seed_Particles_Helper(box,0,0,density,particles_per_cell);
             for(int p=0;p<particles.number;++p){
                 particles.mu(p)=this->mu0;
@@ -539,7 +540,7 @@ Initialize()
             Add_Force(*pinning_force);
         } break;
         case 35:{ // snow wedge
-            // ./mpm 35 -flip 0.9 -max_dt 1e-3 -resolution 200 -threads 14
+            // ./mpm 35 -flip 0.95 -max_dt .005 -cfl .1 -resolution 200
             use_plasticity=true;
             use_variable_coefficients=true;
             particles.Store_Fp(true);
@@ -547,7 +548,7 @@ Initialize()
             particles.Store_Lambda(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2)),ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.3));
+            ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2)),ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.4-sqrt(2.0)*0.1));
             Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge),COLLISION_TYPE::separate,1);
             // this->Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge));
             
@@ -556,20 +557,37 @@ Initialize()
             // this->Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(ground));
 
             T density=(T)2*scale_mass;
+            int number_of_particles=20000;
             T E=40*scale_E,nu=.2;
             this->mu0=E/(2*(1+nu));
             this->lambda0=E*nu/((1+nu)*(1-2*nu));
             if(theta_c==0) theta_c=0.015;
             if(theta_s==0) theta_s=.005;
             if(hardening_factor==0) hardening_factor=7;
-            if(max_hardening) max_hardening=10;
+            if(max_hardening==0) max_hardening=FLT_MAX;
             Add_Fixed_Corotated(E,nu);
             RANGE<TV> box(TV(.3,.7),TV(.7,.9));
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
-            for(int p=0;p<particles.number;++p){
-                particles.X(p)=random.Get_Uniform_Vector(box);
-                particles.mu(p)=this->mu0;
-                particles.lambda(p)=this->lambda0;}
+            std::ifstream ifs("particles.dat");
+            if(ifs.is_open()){
+                std::string foobar;
+                ifs>>foobar>>foobar>>foobar>>foobar;
+                T x,y,mass,volume;
+                ifs>>x;
+                int p=0;
+                while(!ifs.eof()){
+                    ifs>>y>>mass>>volume>>x;
+                    Add_Particle(TV(x,y),0,0,mass,volume);
+                    particles.mu(p)=this->mu0;
+                    particles.lambda(p)=this->lambda0;
+                    ++p;}
+                PHYSBAM_ASSERT(particles.number==number_of_particles);}
+            else{
+                PHYSBAM_WARNING("Couldn't open 'particles.dat'. Falling back to using random particle positions.");
+                T area_per_particle=box.Size()/number_of_particles;
+                for(int p=0;p<number_of_particles;++p){
+                    Add_Particle(random.Get_Uniform_Vector(box),0,0,density*area_per_particle,area_per_particle);
+                    particles.mu(p)=this->mu0;
+                    particles.lambda(p)=this->lambda0;}}
             Add_Gravity(TV(0,-2));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
