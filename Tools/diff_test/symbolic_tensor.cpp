@@ -247,6 +247,13 @@ void symbolic_tensor::random(random_type& rand,double lo,double hi)
 }
 symbolic_tensor operator/ (const symbolic_tensor& a,const symbolic_tensor& b)
 {
-    assert(b.size.size()==0 && a.x.size()==1);
+    assert(b.size.size()==0);
     return a/b.x[0];
+}
+symbolic_tensor scalar_op(const symbolic_tensor& a,function<double(double)> f)
+{
+    assert(a.size.size()==0);
+    symbolic_tensor r(a);
+    r.x[0]=f(a.x[0]);
+    return r;
 }

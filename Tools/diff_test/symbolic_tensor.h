@@ -11,6 +11,8 @@
 #include <vector>
 #include <random>
 #include <cassert>
+#include <functional>
+#include <cmath>
 using namespace std;
 
 typedef mt19937 random_type;
@@ -83,4 +85,6 @@ symbolic_tensor operator* (const symbolic_tensor& a,const symbolic_tensor& b);
 inline symbolic_tensor operator/ (const symbolic_tensor& a,double b){return a*(1./b);}
 symbolic_tensor operator/ (double b,const symbolic_tensor& a);
 symbolic_tensor operator/ (const symbolic_tensor& a,const symbolic_tensor& b);
+symbolic_tensor scalar_op(const symbolic_tensor& a,function<double(double)> f);
+inline symbolic_tensor sqrt(const symbolic_tensor& a){return scalar_op(a,(double(*)(double))sqrt);}
 #endif
