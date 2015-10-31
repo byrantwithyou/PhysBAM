@@ -7,6 +7,11 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Incompressible/Particles/VORTICITY_PARTICLES.h>
+#include <Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
+#include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
+#include <Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
+#include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
+#include <Dynamics/Particles/SPH_PARTICLES.h>
 #include <OpenGL/OpenGL/ANIMATED_VISUALIZATION.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
 #include <OpenGL/OpenGL/OPENGL_CONSTANT_COLOR_MAP.h>
@@ -29,11 +34,6 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_AREA.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D.h>
-#include <Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
-#include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
-#include <Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
-#include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
-#include <Dynamics/Particles/SPH_PARTICLES.h>
 #include <fstream>
 #include <sstream>
 #include <string.h>

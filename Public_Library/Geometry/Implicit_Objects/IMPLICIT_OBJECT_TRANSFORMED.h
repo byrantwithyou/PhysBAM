@@ -9,11 +9,11 @@
 
 #include <Tools/Matrices/MATRIX_3X3.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
-#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
 
 namespace PhysBAM{
 

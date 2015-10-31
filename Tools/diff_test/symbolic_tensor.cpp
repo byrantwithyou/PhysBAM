@@ -2,8 +2,8 @@
 // Copyright 2015, Daniel Ram, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include "symbolic_tensor.h"
 #include <cctype>
+#include "symbolic_tensor.h"
 symbolic_tensor::symbolic_tensor()
 {
 }

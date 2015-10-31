@@ -8,6 +8,7 @@
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
+#include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <OpenGL/OpenGL/ANIMATED_VISUALIZATION.h>
 #include <OpenGL/OpenGL/OPENGL_CONSTANT_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_1D.h>
@@ -17,7 +18,6 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_1D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_1D.h>
-#include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <fstream>
 #include <sstream>
 #include <string.h>

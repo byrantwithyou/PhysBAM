@@ -15,8 +15,8 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
-#include <Fluids/Fluids/FLUID_COLLECTION.h>
 #include <Compressible/Euler_Equations/EULER.h>
+#include <Fluids/Fluids/FLUID_COLLECTION.h>
 #include <Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>
 #include <Dynamics/Coupled_Evolution/COUPLED_SYSTEM_VECTOR.h>
 #include <Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_BASE.h>

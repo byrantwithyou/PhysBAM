@@ -14,19 +14,10 @@ while(<F>){
 }
 close F;
 
-my @tools = ();
-my @geometry = ();
-my @rigids = ();
-my @deformables = ();
-my @solids = ();
-my @hybrid_methods = ();
-my @incompressible = ();
-my @compressible = ();
-my @fluids = ();
-my @opengl = ();
-my @physbam = ();
+my @order = qw( Core Tools Particles_Tools Grid_Tools Grid_PDE Geometry Rigids Deformables Solids Hybrid_Methods Incompressible Compressible Fluids Dynamics OpenGL Ray_Tracing );
+my %category = ();
+
 my @system = ();
-my @other = ();
 my %system = ("algorithm" => 1, "streambuf" => 1, "iomanip" => 1, "list" => 1, "ostream" => 1,
               "bitset" => 1, "ios" => 1, "locale" => 1, "queue" => 1, "string" => 1, 
               "complex" => 1, "typeinfo" => 1, "iosfwd" => 1, "map" => 1, "set" => 1, 
@@ -36,6 +27,7 @@ my %system = ("algorithm" => 1, "streambuf" => 1, "iomanip" => 1, "list" => 1, "
               "functional" => 1, "limits" => 1, "cassert" => 1, "ciso646" => 1, "csetjmp" => 1, 
               "cstdio" => 1, "ctime" => 1, "cctype" => 1, "climits" => 1, "csignal" => 1, 
               "cstdlib" => 1, "cwchar" => 1, "cerrno" => 1, "clocale" => 1, "cstdarg" => 1, 
+              "random" => 1,
               "cstring" => 1, "cwctype" => 1, "cfloat" => 1, "cmath" => 1, "cstddef" => 1);
 
 my $cf = "";
@@ -43,40 +35,49 @@ my $cf = "";
 my $new;
 my $filename;
 
+my $last = "";
+
+sub dump_headers_set
+{
+    my $L=$_[0];
+    for(sort {$x=lc $$a[0];$y=lc $$b[0];$x=~s/_/0/g;$y=~s/_/0/g;$x cmp $y;} @$L)
+    {
+        print "try $$_[0] in $filename (vs $last)\n";
+        if($$_[0] eq $last){print  "DUPLICATE HEADER: $last in $filename\n";next;}
+        $last = $$_[0];
+        my $end_comment=$$_[2]?" $$_[2]":"";
+        $new.="$$_[1]#include $$_[0]$end_comment\n";
+    }
+}
+
 sub dump_headers
 {
-    if(!@tools && !@geometry && !@rigids && !@deformables && !@solids && !@hybrid_methods && !@incompressible && !@compressible && !@fluids && !@opengl && !@physbam && !@system && !@other){return;}
+    if(! scalar keys %category && !@system && !@other){return;}
     $filename eq $cf or die "Trying to insert includes from $cf into $filename.\n";
-    my $last = "";
-    for $L (\@tools, \@geometry, \@rigids, \@deformables, \@solids, \@hybrid_methods, \@fluids, \@incompressible, \@compressible, \@opengl, \@physbam, \@system, \@other)
+    for my $o (@order)
     {
-        for(sort {$x=lc $$a[0];$y=lc $$b[0];$x=~s/_/0/g;$y=~s/_/0/g;$x cmp $y;} @$L)
+        if(defined $category{$o})
         {
-            if($$_[0] eq $last){print STDERR "DUPLICATE HEADER: $last in $filename\n";next;}
-            $last = $$_[0];
-            my $end_comment=$$_[2]?" $$_[2]":"";
-            $new.="$$_[1]#include $$_[0]$end_comment\n";
+            &dump_headers_set($category{$o});
+            delete $category{$o};
         }
     }
-    @tools = ();
-    @geometry = ();
-    @rigids = ();
-    @deformables = ();
-    @solids = ();
-    @hybrid_methods = ();
-    @incompressible = ();
-    @compressible = ();
-    @fluids = ();
-    @opengl = ();
-    @physbam = ();
+    for my $o (sort keys %category)
+    {
+        &dump_headers_set($category{$o});
+        delete $category{$o};
+    }
+    &dump_headers_set(\@system);
+    &dump_headers_set(\@other);
     @system = ();
     @other = ();
     $cf = "";
+    $last = "";
 }
-
 for $filenamex (@ARGV)
 {
     $filename=$filenamex;
+    print "AAA $filename\n";
     my $orig='';
     $new='';
 
@@ -94,22 +95,15 @@ for $filenamex (@ARGV)
         my $file = $5;
         my $pre = $1;
         my $post = $7;
-        if(!$path && defined $system{$file}){push @system, [$full,$pre,$post];next;}
-        if(!$path){push @other, [$full,$pre,$post];next;}
-        if(defined $system{$file}){print STDERR "system file specified with path: '$path$file' in '$filename'\n";push @system, [$full,$pre,$post];next;}
-        if(!defined $lookup{$file}){print STDERR "include not recognized: '$file' in '$filename'\n";push @other, [$full,$pre,$post];next;}
-        my $header = "<$lookup{$file}>";
-        if($header =~ /<Tools/){push @tools, [$header,$pre,$post];next;}
-        if($header =~ /<Geometry/){push @geometry, [$header,$pre,$post];next;}
-        if($header =~ /<Rigids/){push @rigids, [$header,$pre,$post];next;}
-        if($header =~ /<Deformables/){push @deformables, [$header,$pre,$post];next;}
-        if($header =~ /<Solids/){push @solids, [$header,$pre,$post];next;}
-        if($header =~ /<Hybrid_Methods/){push @hybrid_methods, [$header,$pre,$post];next;}
-        if($header =~ /<Incompressible/){push @incompressible, [$header,$pre,$post];next;}
-        if($header =~ /<Compressible/){push @compressible, [$header,$pre,$post];next;}
-        if($header =~ /<Fluids/){push @fluids, [$header,$pre,$post];next;}
-        if($header =~ /<OpenGL/){push @opengl, [$header,$pre,$post];next;}
-        push @physbam, [$header,$pre,$post];
+        if(!$path && defined $system{$file}){push @system, [$full,$pre,$post];print "system $full\n";next;}
+        if(!$path){push @other, [$full,$pre,$post];print "other $full\n";next;}
+        if(defined $system{$file}){print  "system file specified with path: '$path$file' in '$filename'\n";push @system, [$full,$pre,$post];next;}
+        if(!defined $lookup{$file}){print  "include not recognized: '$file' in '$filename'\n";push @other, [$full,$pre,$post];next;}
+        $lookup{$file}=~/^(.*?)\//;
+        if(!defined $category{$1}){$category{$1}=[];}
+        my $L=$category{$1};
+        print "physbam $lookup{$file}\n";
+        push @$L, ["<$lookup{$file}>",$pre,$post];
     }
     &dump_headers();
     close F;
@@ -120,5 +114,6 @@ for $filenamex (@ARGV)
         print F $new;
         close F;
     }
+    print "BBB $filename\n";
+    $filename='qq';
 }
-

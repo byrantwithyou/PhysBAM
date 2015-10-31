@@ -10,6 +10,10 @@
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Particles/VORTICITY_PARTICLES.h>
+#include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
+#include <Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
+#include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
+#include <Dynamics/Particles/SPH_PARTICLES.h>
 #include <OpenGL/OpenGL/ANIMATED_VISUALIZATION.h>
 #include <OpenGL/OpenGL/OPENGL_BOX_3D.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
@@ -38,10 +42,6 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_SURFACE.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_VORTICITY_PARTICLES_3D.h>
-#include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
-#include <Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
-#include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
-#include <Dynamics/Particles/SPH_PARTICLES.h>
 #include <fstream>
 #include <sstream>
 #include <string.h>

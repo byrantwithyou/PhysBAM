@@ -7,12 +7,12 @@
 #ifndef __symbolic_tensor__
 #define __symbolic_tensor__
 
+#include <cassert>
+#include <cmath>
+#include <functional>
+#include <random>
 #include <string>
 #include <vector>
-#include <random>
-#include <cassert>
-#include <functional>
-#include <cmath>
 using namespace std;
 
 typedef mt19937 random_type;

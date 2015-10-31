@@ -1,7 +1,7 @@
 #include <Tools/Utilities/PROCESS_UTILITIES.h>
 
-#include <Hybrid_Methods/Examples_And_Drivers/MPM_KKT_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_KKT_DRIVER.h>
+#include <Hybrid_Methods/Examples_And_Drivers/MPM_KKT_EXAMPLE.h>
 #include "STANDARD_TESTS_KKT_1D.h"
 #include "STANDARD_TESTS_KKT_2D.h"
 //#include "STANDARD_TESTS_KKT_3D.h"

@@ -43,7 +43,6 @@
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <Fluids/Fluids/FLUID_COLLECTION.h>
 #include <Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
@@ -51,6 +50,7 @@
 #include <Compressible/Euler_Equations/EULER_LAPLACE.h>
 #include <Compressible/Euler_Equations/EULER_PROJECTION_UNIFORM.h>
 #include <Compressible/Euler_Equations/EULER_UNIFORM.h>
+#include <Fluids/Fluids/FLUID_COLLECTION.h>
 #include <Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
 #include <Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION.h>
 #include <Dynamics/Coupled_Evolution/SOLID_FLUID_SYSTEM.h>

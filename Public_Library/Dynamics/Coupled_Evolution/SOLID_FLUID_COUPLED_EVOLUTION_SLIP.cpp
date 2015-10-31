@@ -39,7 +39,6 @@
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
-#include <Fluids/Fluids/FLUID_COLLECTION.h>
 #include <Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Forces/VISCOSITY.h>
@@ -49,6 +48,7 @@
 #include <Compressible/Euler_Equations/EULER_LAPLACE.h>
 #include <Compressible/Euler_Equations/EULER_PROJECTION_UNIFORM.h>
 #include <Compressible/Euler_Equations/EULER_UNIFORM.h>
+#include <Fluids/Fluids/FLUID_COLLECTION.h>
 #include <Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>
 #include <Dynamics/Coupled_Evolution/COMPRESSIBLE_BOUNDARY_CONDITION_WALLS.h>
 #include <Dynamics/Coupled_Evolution/COUPLED_SYSTEM_VECTOR.h>
