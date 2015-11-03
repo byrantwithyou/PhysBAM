@@ -14,6 +14,7 @@ template<class TV> class MPM_KKT_KRYLOV_VECTOR;
 template<class TV> class MPM_KKT_EXAMPLE;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
 template<class T> class KRYLOV_VECTOR_BASE;
+template<class T> class GRID;
 
 template<class TV>
 class MPM_KKT_DRIVER
