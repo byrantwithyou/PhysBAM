@@ -590,6 +590,35 @@ Initialize()
                     particles.lambda(p)=this->lambda0;}}
             Add_Gravity(TV(0,-2));
         } break;
+        case 36:{ // split
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            SPHERE<TV> sphere(TV(.5,.5),.3);
+            T density=2*scale_mass;
+            Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0,0);},0,
+                density,particles_per_cell);
+            particles.F.Fill(MATRIX<T,2>(1,0,0,1));
+            ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
+            Add_Fixed_Corotated(scale_E*10,0.3,&mpm_particles);
+            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness,penalty_damping_stiffness);
+            for(int i=0;i<particles.X.m;i++)
+                if(particles.X(i)(0)<0.25 || particles.X(i)(0)>90.75){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
+            Add_Force(*pinning_force);
+            SEGMENTED_CURVE_2D<T>* sc=SEGMENTED_CURVE_2D<T>::Create();
+            sc->particles.Add_Elements(particles.number);
+            sc->Update_Number_Nodes();
+            for(int p=0;p<particles.number;p++){
+                sc->particles.X(p)=particles.X(p);
+                for(int q=0;q<particles.number;q++){
+                    TV L=particles.X(p),R=particles.X(q);
+                    if(L(0)<=0.5 && R(0)>0.5&&  L(1)>0.5 && R(1)>0.5 && (L-R).Magnitude_Squared()<sqr(grid.dX.Min()*2)){
+                        sc->mesh.elements.Append(TV_INT(p,q));}}}
+            LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,sc->mesh);
+            ARRAY<T> r(sc->mesh.elements.m);r.Fill(grid.dX.Min()*2.1);
+            stf->Set_Restlength(r);
+            stf->Set_Stiffness((T)1);
+            stf->Set_Damping((T)0.1);
+            Add_Force(*stf);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
@@ -620,7 +649,24 @@ Begin_Time_Step(const T time)
             this->output_structures_each_frame=true;
             Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1+(T)(time-10/24.0)*0.08,true);
             Add_Gravity(TV(0,-9.8));}}
-    
+    if(test_number==36){
+        delete lagrangian_forces(lagrangian_forces.m-1);
+        lagrangian_forces.Remove_End();
+        SEGMENTED_CURVE_2D<T>* sc=SEGMENTED_CURVE_2D<T>::Create();
+        sc->particles.Add_Elements(particles.number);
+        sc->Update_Number_Nodes();
+        for(int p=0;p<particles.number;p++){
+            sc->particles.X(p)=particles.X(p);
+            for(int q=0;q<particles.number;q++){
+                TV L=particles.X(p),R=particles.X(q);
+                if(L(0)<=0.5 && R(0)>0.5 && L(1)>0.5 && R(1)>0.5 && (L-R).Magnitude_Squared()<sqr(grid.dX.Min()*2)){
+                    sc->mesh.elements.Append(TV_INT(p,q));}}}
+        LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,sc->mesh);
+        ARRAY<T> r(sc->mesh.elements.m);r.Fill(grid.dX.Min()*2.1);
+        stf->Set_Restlength(r);
+        stf->Set_Stiffness((T)1);
+        stf->Set_Damping((T)0);
+        Add_Force(*stf);}
     if(use_surface_tension){
 
         bool use_bruteforce=true;
