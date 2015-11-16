@@ -13,19 +13,20 @@
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 namespace PhysBAM{
 
-template<class TV> class MPM_PARTICLES;
-template<class TV> class PARTICLE_GRID_FORCES;
-template<class T> class KRYLOV_VECTOR_BASE;
-template<class T> class MPM_KRYLOV_VECTOR;
-template<class TV> class PARTICLE_GRID_WEIGHTS;
-template<class TV> class GATHER_SCATTER;
 template<class TV> class DEBUG_PARTICLES;
-template<class TV> class IMPLICIT_OBJECT;
-template<class TV> class MPM_COLLISION_OBJECT;
 template<class TV> class DEFORMABLES_FORCES;
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
+template<class TV> class GATHER_SCATTER;
+template<class TV> class IMPLICIT_OBJECT;
+template<class T>  class KRYLOV_VECTOR_BASE;
+template<class TV> class MPM_COLLISION_OBJECT;
 template<class TV> class MPM_COLLISION_OBJECT;
 template<class TV> class MPM_FORCE_HELPER;
+template<class T>  class MPM_KRYLOV_VECTOR;
+template<class TV> class MPM_PARTICLES;
+template<class TV> class MPM_PLASTICITY_MODEL;
+template<class TV> class PARTICLE_GRID_FORCES;
+template<class TV> class PARTICLE_GRID_WEIGHTS;
 
 template<class TV>
 class MPM_EXAMPLE:public NONCOPYABLE
@@ -81,7 +82,9 @@ public:
 
     // plasticity
     bool use_plasticity;
+    bool use_clamping_plasticity;
     T theta_c,theta_s,hardening_factor,max_hardening;
+    MPM_PLASTICITY_MODEL<TV>* plasticity;
 
     T initial_time;
     int last_frame;
@@ -112,6 +115,8 @@ public:
     int newton_iterations;
     T solver_tolerance;
     int solver_iterations;
+    T plastic_newton_tolerance;
+    int plastic_newton_iterations;
     bool test_diff;
     int threads;
 

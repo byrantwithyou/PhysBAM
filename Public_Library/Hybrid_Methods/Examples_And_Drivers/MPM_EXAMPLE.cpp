@@ -6,6 +6,7 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
@@ -29,7 +30,7 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     debug_particles(*new DEBUG_PARTICLES<TV>),current_velocity(0),
     lagrangian_forces(deformable_body_collection.deformables_forces),
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
-    force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff)),incompressible(false),kkt(false),
+    force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff)),incompressible(false),kkt(false),plasticity(0),
     initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),
     mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
@@ -46,6 +47,7 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
 template<class TV> MPM_EXAMPLE<TV>::
 ~MPM_EXAMPLE()
 {
+    delete plasticity;
     delete &deformable_body_collection;
     delete &particles;
     delete &debug_particles;

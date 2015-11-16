@@ -62,7 +62,7 @@ template<class T,int d> MATRIX<T,d> HENCKY_ISOTROPIC<T,d>::
 P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const
 {
     PHYSBAM_NOT_IMPLEMENTED();
-    return 0;
+    return MATRIX<T,d>();
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative_Helper

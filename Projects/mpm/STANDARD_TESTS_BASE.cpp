@@ -85,6 +85,9 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-theta_s",&theta_s,"theta_s","Critical stretch coefficient for plasticity");
     parse_args.Add("-hardening",&hardening_factor,"hardening factor","Hardening factor for plasticity");
     parse_args.Add("-max_hardening",&max_hardening,"max hardening coefficient","Maximum hardening coefficient for plasticity");
+    parse_args.Add("-plastic_newton_iterations",&plastic_newton_iterations,"iter","Newton iterations in plastic yield");
+    parse_args.Add("-plastic_newton_tolerance",&plastic_newton_tolerance,"tol","Newton tolerance in plastic yield");
+    parse_args.Add("-use_clamping_plasticity",&use_clamping_plasticity,"clamping plasticity","Use clamping plasticity, as in the snow paper");
 
     parse_args.Parse(true);
 
@@ -117,6 +120,9 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     else if(order==2) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads));
     else if(order==3) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,threads));
     else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
+
+    if(!use_plasticity && use_clamping_plasticity)
+        PHYSBAM_FATAL_ERROR("Can't use clamping plasticity without plasticity!");
 }
 //#####################################################################
 // Destructor

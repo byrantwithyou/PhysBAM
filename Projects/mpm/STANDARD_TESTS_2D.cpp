@@ -17,6 +17,7 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
+#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
@@ -608,22 +609,20 @@ Initialize()
             stf->Set_Damping((T)0.1);
             Add_Force(*stf);
         } break;
-        case 37:{ // sand box drop with Hencky
+        case 37:{ // sand box drop with Hencky, usage: mpm 37 -resolution 100 -plastic_newton_iterations 100 -plastic_newton_tolerance 1e-8
             use_plasticity=true;
+            use_clamping_plasticity=false;
             use_variable_coefficients=true;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::separate,10);
+            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)));
 
             T density=(T)1281*scale_mass;
             T E=5000*scale_E,nu=.4;
-            if(theta_c==0) theta_c=0.01;
-            if(theta_s==0) theta_s=.00001;
-            if(hardening_factor==0) hardening_factor=80;
-            if(max_hardening==0) max_hardening=5;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
+            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(0.19,-0.76);
             RANGE<TV> box(TV(.45,.11),TV(.55,.31));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));

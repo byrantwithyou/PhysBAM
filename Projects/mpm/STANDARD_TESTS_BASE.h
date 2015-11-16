@@ -36,12 +36,14 @@ public:
     using BASE::use_midpoint;using BASE::use_symplectic_euler;using BASE::use_particle_collision;
     using BASE::print_stats;using BASE::flip;using BASE::cfl;using BASE::newton_tolerance;
     using BASE::newton_iterations;using BASE::solver_tolerance;using BASE::solver_iterations;
+    using BASE::plastic_newton_tolerance;using BASE::plastic_newton_iterations;
     using BASE::test_diff;using BASE::threads;using BASE::weights;using BASE::incompressible;
     using BASE::lagrangian_forces;using BASE::stream_type;
     using BASE::Add_Force;using BASE::Set_Weights;using BASE::deformable_body_collection;
     using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;using BASE::data_directory;
     using BASE::kkt;using BASE::Add_Fluid_Wall;using BASE::quad_F_coeff;
-    using BASE::use_plasticity;using BASE::theta_c;using BASE::theta_s;using BASE::hardening_factor;
+    using BASE::use_plasticity;using BASE::use_clamping_plasticity;
+    using BASE::theta_c;using BASE::theta_s;using BASE::hardening_factor;
     using BASE::max_hardening;using BASE::use_variable_coefficients;
 
     int test_number;
