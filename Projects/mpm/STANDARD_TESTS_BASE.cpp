@@ -112,7 +112,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     particles.Store_Fp(use_plasticity);
     particles.Store_B(use_affine && !incompressible);
     particles.Store_C(use_affine && (incompressible || kkt));
-    particles.Store_One_Over_Lambda(kkt);
 
     if(order==1) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,threads));
     else if(order==2) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads));

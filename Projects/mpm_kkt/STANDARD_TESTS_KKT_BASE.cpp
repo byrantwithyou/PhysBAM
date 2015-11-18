@@ -103,7 +103,6 @@ STANDARD_TESTS_KKT_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_ar
     random.Set_Seed(seed);
 
     particles.Store_B(use_affine);
-    particles.Store_One_Over_Lambda(true);
 
     if(order==1) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,threads));
     else if(order==2) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads));
@@ -180,6 +179,7 @@ Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,T
     particles.X(p)=X;
     if(V) particles.V(p)=V(X);
     particles.F(p)=MATRIX<T,TV::m>()+1;
+    if(particles.store_Fp) particles.Fp(p).Set_Identity_Matrix();
     if(particles.store_B && dV) particles.B(p)=dV(X)*weights->Dp(X);
     if(particles.store_C && dV) particles.C(p)=dV(X);
     if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;

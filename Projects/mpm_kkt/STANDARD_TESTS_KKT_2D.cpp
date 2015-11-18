@@ -102,8 +102,7 @@ Initialize()
             TV total_momentum=particles.V.Weighted_Sum(particles.mass);
             TV dV=total_momentum/total_mass;
             particles.V-=dV;
-            for(int p=0;p<particles.X.m;p++)
-                particles.one_over_lambda(p)=1; 
+            particles.lambda.Fill(1); 
             Add_Gravity(TV(0,-0.8));
         } break;
         case 4:{ // colliding of two rings

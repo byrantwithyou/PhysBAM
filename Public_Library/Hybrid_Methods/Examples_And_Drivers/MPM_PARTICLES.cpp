@@ -10,8 +10,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> MPM_PARTICLES<TV>::
 MPM_PARTICLES()
-    :store_B(false),store_S(false),store_C(false),store_one_over_lambda(false),
-    volume(0,0),F(0,0),Fp(0,0),B(0,0),valid(0,0),one_over_lambda(0,0),mu(0,0),lambda(0,0)
+    :store_Fp(false),store_B(false),store_S(false),store_C(false),store_lame(false),store_lame0(false)
 {
     this->Store_Velocity();
     this->Store_Mass();
@@ -36,6 +35,7 @@ Store_Fp(bool store)
     store_Fp=store;
     if(store) Add_Array(ATTRIBUTE_ID_FP,&Fp);
     else Remove_Array(ATTRIBUTE_ID_FP);
+    Store_Lame0(store_lame && store_Fp);
 }
 //#####################################################################
 // Function Store_B
@@ -71,37 +71,35 @@ Store_C(bool store)
     else Remove_Array(ATTRIBUTE_ID_C);
 }
 //#####################################################################
-// Function Store_One_Over_Lambda
+// Function Store_Lame
 //#####################################################################
 template<class TV> void MPM_PARTICLES<TV>::
-Store_One_Over_Lambda(bool store)
+Store_Lame(bool store)
 {
-    if(store_one_over_lambda==store) return;
-    store_one_over_lambda=store;
-    if(store) Add_Array(ATTRIBUTE_ID_ONE_OVER_LAMBDA,&one_over_lambda);
-    else Remove_Array(ATTRIBUTE_ID_ONE_OVER_LAMBDA);
+    if(store_lame==store) return;
+    store_lame=store;
+    if(store){
+        Add_Array(ATTRIBUTE_ID_MU,&mu);
+        Add_Array(ATTRIBUTE_ID_LAMBDA,&lambda);}
+    else{
+        Remove_Array(ATTRIBUTE_ID_MU);
+        Remove_Array(ATTRIBUTE_ID_LAMBDA);}
+    Store_Lame0(store_lame && store_Fp);
 }
 //#####################################################################
-// Function Store_Mu
+// Function Store_Lame0
 //#####################################################################
 template<class TV> void MPM_PARTICLES<TV>::
-Store_Mu(bool store)
+Store_Lame0(bool store)
 {
-    if(store_mu==store) return;
-    store_mu=store;
-    if(store) Add_Array(ATTRIBUTE_ID_MU,&mu);
-    else Remove_Array(ATTRIBUTE_ID_MU);
-}
-//#####################################################################
-// Function Store_Lambda
-//#####################################################################
-template<class TV> void MPM_PARTICLES<TV>::
-Store_Lambda(bool store)
-{
-    if(store_lambda==store) return;
-    store_lambda=store;
-    if(store) Add_Array(ATTRIBUTE_ID_LAMBDA,&lambda);
-    else Remove_Array(ATTRIBUTE_ID_LAMBDA);
+    if(store_lame0==store) return;
+    store_lame0=store;
+    if(store){
+        Add_Array(ATTRIBUTE_ID_MU0,&mu0);
+        Add_Array(ATTRIBUTE_ID_LAMBDA0,&lambda0);}
+    else{
+        Remove_Array(ATTRIBUTE_ID_MU0);
+        Remove_Array(ATTRIBUTE_ID_LAMBDA0);}
 }
 //#####################################################################
 // Function Initialize_MPM_Particles
@@ -113,11 +111,12 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_FP,"Fp");
     Register_Attribute_Name(ATTRIBUTE_ID_B,"B");
     Register_Attribute_Name(ATTRIBUTE_ID_C,"C");
-    Register_Attribute_Name(ATTRIBUTE_ID_ONE_OVER_LAMBDA,"one_over_lambda");
     Register_Attribute_Name(ATTRIBUTE_ID_VALID,"valid");
     Register_Attribute_Name(ATTRIBUTE_ID_S,"S");
     Register_Attribute_Name(ATTRIBUTE_ID_MU,"mu");
     Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA,"lambda");
+    Register_Attribute_Name(ATTRIBUTE_ID_MU0,"mu0");
+    Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA0,"lambda0");
     return 0;
 }
 int initialize_deformables_particles=Initialize_MPM_Particles();

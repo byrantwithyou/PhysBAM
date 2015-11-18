@@ -345,9 +345,7 @@ Initialize()
             Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
             Add_Gravity(TV(0,-1.8));
-            if(this->kkt)
-                for(int p=0;p<particles.number;p++) 
-                    particles.one_over_lambda(p)=(T)0;
+            if(this->kkt) particles.lambda.Fill(FLT_MAX);
             Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(5,0.1))));
         } break;
         case 23:{ // (fluid test) dam break 
@@ -366,9 +364,7 @@ Initialize()
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
             Add_Gravity(TV(0,-1.8));
-            if(this->kkt)
-                for(int p=0;p<particles.number;p++) 
-                    particles.one_over_lambda(p)=(T)0;
+            if(this->kkt) particles.lambda.Fill(FLT_MAX);
         } break;
         case 25:{ // (fluid test) pool of water w/ single particle
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
@@ -500,16 +496,13 @@ Initialize()
             use_plasticity=true;
             use_variable_coefficients=true;
             particles.Store_Fp(true);
-            particles.Store_Mu(true);
-            particles.Store_Lambda(true);
+            particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::separate,10);
 
             T density=(T)1281*scale_mass;
             T E=5000*scale_E,nu=.4;
-            this->mu0=E/(2*(1+nu));
-            this->lambda0=E*nu/((1+nu)*(1-2*nu));
             if(theta_c==0) theta_c=0.01;
             if(theta_s==0) theta_s=.00001;
             if(hardening_factor==0) hardening_factor=80;
@@ -517,9 +510,12 @@ Initialize()
             Add_Fixed_Corotated(E,nu);
             RANGE<TV> box(TV(.45,.11),TV(.55,.31));
             Seed_Particles(box,0,0,density,particles_per_cell);
-            for(int p=0;p<particles.number;++p){
-                particles.mu(p)=this->mu0;
-                particles.lambda(p)=this->lambda0;}
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            particles.mu.Fill(mu);
+            particles.mu0.Fill(mu);
+            particles.lambda.Fill(lambda);
+            particles.lambda0.Fill(lambda);
             Add_Gravity(TV(0,-9.8));
         } break;
         case 34:{ // drip drop
@@ -544,8 +540,7 @@ Initialize()
             use_plasticity=true;
             use_variable_coefficients=true;
             particles.Store_Fp(true);
-            particles.Store_Mu(true);
-            particles.Store_Lambda(true);
+            particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2)),ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.4-sqrt(2.0)*0.1));
@@ -559,8 +554,6 @@ Initialize()
             T density=(T)2*scale_mass;
             int number_of_particles=20000;
             T E=40*scale_E,nu=.2;
-            this->mu0=E/(2*(1+nu));
-            this->lambda0=E*nu/((1+nu)*(1-2*nu));
             if(theta_c==0) theta_c=0.015;
             if(theta_s==0) theta_s=.005;
             if(hardening_factor==0) hardening_factor=7;
@@ -572,22 +565,18 @@ Initialize()
                 std::string foobar;
                 ifs>>foobar>>foobar>>foobar>>foobar;
                 T x,y,mass,volume;
-                ifs>>x;
-                int p=0;
-                while(!ifs.eof()){
-                    ifs>>y>>mass>>volume>>x;
+                while(ifs>>x>>y>>mass>>volume && !ifs.eof())
                     Add_Particle(TV(x,y),0,0,mass,volume);
-                    particles.mu(p)=this->mu0;
-                    particles.lambda(p)=this->lambda0;
-                    ++p;}
                 PHYSBAM_ASSERT(particles.number==number_of_particles);}
             else{
                 PHYSBAM_WARNING("Couldn't open 'particles.dat'. Falling back to using random particle positions.");
-                T area_per_particle=box.Size()/number_of_particles;
-                for(int p=0;p<number_of_particles;++p){
-                    Add_Particle(random.Get_Uniform_Vector(box),0,0,density*area_per_particle,area_per_particle);
-                    particles.mu(p)=this->mu0;
-                    particles.lambda(p)=this->lambda0;}}
+                Seed_Particles(box,0,0,density,number_of_particles*grid.dX.Product()/box.Size());}
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            particles.mu0.Fill(mu);
+            particles.mu.Fill(mu);
+            particles.lambda0.Fill(lambda);
+            particles.lambda.Fill(lambda);
             Add_Gravity(TV(0,-2));
         } break;
         case 36:{ // split

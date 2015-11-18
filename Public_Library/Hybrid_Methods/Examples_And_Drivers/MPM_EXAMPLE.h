@@ -53,7 +53,7 @@ public:
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights;
     GATHER_SCATTER<TV>& gather_scatter;
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
-    ARRAY<IMPLICIT_OBJECT<TV>* > fluid_walls;;
+    ARRAY<IMPLICIT_OBJECT<TV>* > fluid_walls;
     mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
     MPM_FORCE_HELPER<TV>& force_helper;
 
@@ -81,8 +81,7 @@ public:
 
     // plasticity
     bool use_plasticity;
-    T mu0,lambda0,theta_c,theta_s;
-    T hardening_factor, max_hardening;
+    T theta_c,theta_s,hardening_factor,max_hardening;
 
     T initial_time;
     int last_frame;

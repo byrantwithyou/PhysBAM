@@ -111,7 +111,6 @@ Initialize()
     example.particles.Store_B(example.use_affine && !(example.incompressible || example.kkt));
     example.particles.Store_C(example.use_affine && (example.incompressible || example.kkt));
     example.particles.Store_S(example.use_oldroyd);
-    example.particles.Store_One_Over_Lambda(example.kkt);
     example.current_velocity=&example.velocity;
     PHYSBAM_ASSERT(!example.particles.store_B || !example.particles.store_C);
 
@@ -308,7 +307,7 @@ Particle_To_Grid()
                 else V+=dV(p)*(w*scale*(example.grid.Center(index)-particles.X(p)));}
             example.velocity(index)+=particles.mass(p)*V;
             if(example.kkt){
-                example.one_over_lambda(index)+=w*particles.mass(p)*particles.one_over_lambda(p);
+                if(particles.lambda(p)!=FLT_MAX) example.one_over_lambda(index)+=w*particles.mass(p)/particles.lambda(p);
                 example.J(index)+=w*particles.mass(p)*particles.F(p).Determinant();}
         },true);
 
@@ -668,8 +667,8 @@ Update_Plasticity_And_Hardening()
         particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);
 
         T hardening_coeff=exp(min(example.max_hardening,example.hardening_factor*(1-particles.Fp(p).Determinant())));
-        particles.mu(p)=example.mu0*hardening_coeff;
-        particles.lambda(p)=example.lambda0*hardening_coeff;}
+        particles.mu(p)=particles.mu0(p)*hardening_coeff;
+        particles.lambda(p)=particles.lambda0(p)*hardening_coeff;}
 }
 //#####################################################################
 // Function Add_C_Contribution_To_DT

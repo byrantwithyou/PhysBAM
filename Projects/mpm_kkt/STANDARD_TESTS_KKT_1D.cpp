@@ -106,18 +106,15 @@ Initialize()
             Seed_Particles(box,[=](const TV& X){return TV(0.2);},
                 [=](const TV&){return MATRIX<T,1>();},
                 density,particles_per_cell);
-            for(int p=0;p<particles.X.m;p++)
-                particles.one_over_lambda(p)=1;
+            particles.lambda.Fill(1);
         } break;
         case 5:{ // gravity with one_over_lambda
             grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(TV(.45),TV(.55));
             T density=scale_mass;
-            Seed_Particles(box,[=](const TV& X){return TV(0.2);},
-                [=](const TV&){return MATRIX<T,1>();},
+            Seed_Particles(box,[=](const TV& X){return TV(0.2);},0,
                 density,particles_per_cell);
-            for(int p=0;p<particles.X.m;p++)
-                particles.one_over_lambda(p)=1;
+            particles.lambda.Fill(1);
             Add_Gravity(TV(-0.8));
         } break;
         case 6:{ // analytic test
@@ -127,8 +124,7 @@ Initialize()
             Seed_Particles(box,[=](const TV& X){return TV(0.5*cos((T)pi/0.2*(X(0)-0.4)));},
                 [=](const TV&){return MATRIX<T,1>();},
                 density,particles_per_cell);
-            for(int p=0;p<particles.X.m;p++)
-                particles.one_over_lambda(p)=1; 
+            particles.lambda.Fill(1);
         } break;
         case 7:{ // half box
             grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);

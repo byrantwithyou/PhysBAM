@@ -89,7 +89,6 @@ Initialize()
     example.inv_valid_velocity_cell.Resize(example.grid.Domain_Indices(example.ghost));
     example.particles.Store_B(example.use_affine);
     example.particles.Store_S(example.use_oldroyd);
-    example.particles.Store_One_Over_Lambda(true);
     example.current_velocity=&example.velocity;
     PHYSBAM_ASSERT(!example.particles.store_B || !example.particles.store_C);
 
@@ -263,7 +262,7 @@ Particle_To_Grid()
             T w=it.Weight();
             TV_INT index=it.Index();
             example.mass_coarse(index)+=w*particles.mass(p);
-            example.one_over_lambda(index)+=w*particles.mass(p)*particles.one_over_lambda(p);
+            if(particles.lambda(p)!=FLT_MAX) example.one_over_lambda(index)+=w*particles.mass(p)/particles.lambda(p);
             example.J(index)+=w*particles.mass(p)*particles.F(p).Determinant();
         },true);
 
