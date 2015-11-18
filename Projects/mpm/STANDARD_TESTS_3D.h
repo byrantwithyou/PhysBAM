@@ -39,7 +39,7 @@ public:
     using BASE::Add_Fixed_Corotated;using BASE::random;using BASE::Seed_Lagrangian_Particles;
     using BASE::Add_Force;using BASE::Add_Walls;using BASE::data_directory;
     using BASE::stream_type;using BASE::use_oldroyd;using BASE::force_helper;
-    using BASE::Seed_Particles_Helper;using BASE::Add_Neo_Hookean;using BASE::Add_Collision_Object;
+    using BASE::Add_Neo_Hookean;using BASE::Add_Collision_Object;
     using BASE::Add_Particle;using BASE::Add_Penalty_Collision_Object;using BASE::scale_speed;
     using BASE::penalty_collisions_stiffness;using BASE::penalty_damping_stiffness;
     using BASE::quad_F_coeff;using BASE::use_plasticity;

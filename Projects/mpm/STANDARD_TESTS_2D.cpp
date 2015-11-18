@@ -78,7 +78,7 @@ Initialize()
             SPHERE<TV> sphere(TV(.5,.5),.3);
             VECTOR<T,1> angular_velocity(0.4*scale_speed);
             T density=2*scale_mass;
-            Seed_Particles_Helper(sphere,[=](const TV& X){return angular_velocity.Cross(X-sphere.center);},
+            Seed_Particles(sphere,[=](const TV& X){return angular_velocity.Cross(X-sphere.center);},
                 [=](const TV&){return MATRIX<T,2>::Cross_Product_Matrix(angular_velocity);},
                 density,particles_per_cell);
             T total_mass=particles.mass.Sum();
@@ -91,7 +91,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
-            Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0.1,0);},0,
+            Seed_Particles(sphere,[=](const TV& X){return TV(0.1,0);},0,
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
             Add_Fixed_Corotated(1e2*scale_E,0.3);
@@ -100,7 +100,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
-            Seed_Particles_Helper(sphere,0,0,density,particles_per_cell);
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
             Add_Gravity(TV(0,-9.8));
         } break;
         case 4:{ // colliding of two rings
@@ -114,7 +114,7 @@ Initialize()
                 SPHERE<TV>& sphere=spheres(s);
                 T density=1010*scale_mass;
                 int last=particles.number;
-                Seed_Particles_Helper(sphere,[=](const TV& X){return v0(s);},0,density,particles_per_cell);
+                Seed_Particles(sphere,[=](const TV& X){return v0(s);},0,density,particles_per_cell);
                 for(int k=last;k<particles.number;k++){
                     if((particles.X(k)-sphere.center).Magnitude_Squared()<sqr(r(s))){
                         particles.deletion_list.Append(k);}}}
@@ -129,7 +129,7 @@ Initialize()
             Add_Collision_Object(RANGE<TV>(TV(15-dx/2,-5),TV(20,15)),COLLISION_TYPE::slip,0);
             SPHERE<TV> sphere(TV(2.5,2.5),1.5);
             T density=4*scale_mass;
-            Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0.5,0);},0,
+            Seed_Particles(sphere,[=](const TV& X){return TV(0.5,0);},0,
                 density,particles_per_cell);
             Add_Neo_Hookean(85.5*scale_E,0.425); //solve({E/(2*(1+r))=30,E*r/((1+r)*(1-2*r))=170},{E,r});
         } break;
@@ -140,9 +140,9 @@ Initialize()
             grid.Initialize(TV_INT(5,3)*third_resolution+9,RANGE<TV>(TV(),TV(20,12)).Thickened(dx*(T)4.5),true);
             T density=5*scale_mass;
             SPHERE<TV> sphere1(TV(3,3),2);
-            Seed_Particles_Helper(sphere1,[=](const TV& X){return TV(0.75,0);},0,density,particles_per_cell);
+            Seed_Particles(sphere1,[=](const TV& X){return TV(0.75,0);},0,density,particles_per_cell);
             SPHERE<TV> sphere2(TV(16,5),2);
-            Seed_Particles_Helper(sphere2,[=](const TV& X){return TV(-0.75,0);},0,density,particles_per_cell);
+            Seed_Particles(sphere2,[=](const TV& X){return TV(-0.75,0);},0,density,particles_per_cell);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
         case 7:{ // ping-pong ring
@@ -159,7 +159,7 @@ Initialize()
                 SPHERE<TV>& sphere=spheres(s);
                 T density=1010*scale_mass;
                 int last=particles.number;
-                Seed_Particles_Helper(sphere,[=](const TV& X){return v0(s);},0,density,particles_per_cell);
+                Seed_Particles(sphere,[=](const TV& X){return v0(s);},0,density,particles_per_cell);
                 for(int k=last;k<particles.number;k++){
                     if((particles.X(k)-sphere.center).Magnitude_Squared()<sqr(r(s))){
                         particles.deletion_list.Append(k);}}}
@@ -173,7 +173,7 @@ Initialize()
             Add_Collision_Object(SPHERE<TV>(TV(4,3),1),COLLISION_TYPE::separate,.3);
             SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
-            Seed_Particles_Helper(sphere,[=](const TV& X){return TV(3.0,0);},0,
+            Seed_Particles(sphere,[=](const TV& X){return TV(3.0,0);},0,
                 density,particles_per_cell);
             Add_Neo_Hookean(scale_E,0.425);
             Add_Gravity(TV(0,-1.8));
@@ -184,7 +184,7 @@ Initialize()
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,false);
             SPHERE<TV> sphere(TV(2.55,3.55),.3);
             T density=4*scale_mass;
-            Seed_Particles_Helper(sphere,[=](const TV& X){return TV(3.0,0);},0,
+            Seed_Particles(sphere,[=](const TV& X){return TV(3.0,0);},0,
                 density,particles_per_cell);
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
             Add_Neo_Hookean(scale_E,0.425,&mpm_particles);
@@ -204,14 +204,14 @@ Initialize()
             Add_Collision_Object(RANGE<TV>(TV(.45,.15),TV(.65,.25)),COLLISION_TYPE::stick,0);
             {SPHERE<TV> sphere(TV(.2,.5),.06);
                 T density=2*scale_mass;
-                Seed_Particles_Helper(sphere,[=](const TV& X){return TV(1,0);},0,
+                Seed_Particles(sphere,[=](const TV& X){return TV(1,0);},0,
                     density,particles_per_cell);
                 ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
                 Add_Fixed_Corotated(20*scale_E,0.3,&foo);}
             int N_sphere_particles=particles.number;
             {RANGE<TV> box(TV(.5,.2),TV(.6,.8));
                 T density=1*scale_mass;
-                Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+                Seed_Particles(box,0,0,density,particles_per_cell);
                 int N_box_particles=particles.number-N_sphere_particles;
                 ARRAY<int> foo(N_box_particles);
                 for(int k=0;k<foo.m;k++) foo(k)=k+N_sphere_particles;
@@ -223,7 +223,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
-            Seed_Particles_Helper(sphere,0,0,density,particles_per_cell);
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
             ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
             Add_Fixed_Corotated(1*scale_E,0.3,&foo);
             Add_Gravity(TV(0,-9.8));
@@ -236,7 +236,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(TV(.3,.2),TV(.7,.4));
             T density=2*scale_mass;
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
             Add_Fixed_Corotated(20*scale_E,0.4,&foo,false);
             Add_Gravity(TV(0,-9.8));
@@ -269,7 +269,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             T density=2*scale_mass;
             SPHERE<TV> sphere(TV(.5,.5),.2);
-            Seed_Particles_Helper(sphere,0,0,density,particles_per_cell);
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
             bool no_mu=true;
             Add_Fixed_Corotated(scale_E*10,0.3,&mpm_particles,no_mu);
@@ -280,9 +280,9 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             T density=2*scale_mass;
             RANGE<TV> box(TV(.3,.11),TV(.5,.31));
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             RANGE<TV> box2(TV(.6,.15),TV(.8,.25));
-            Seed_Particles_Helper(box2,[=](const TV& X){return TV(-0.1,0);},0,density,particles_per_cell);
+            Seed_Particles(box2,[=](const TV& X){return TV(-0.1,0);},0,density,particles_per_cell);
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
             bool no_mu=true;
             Add_Fixed_Corotated(scale_E*10,0.3,&mpm_particles,no_mu);
@@ -295,7 +295,7 @@ Initialize()
             use_oldroyd=true;
             this->inv_Wi=(T)0;
             particles.Store_S(use_oldroyd);            
-            Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0.1,0);},0,
+            Seed_Particles(sphere,[=](const TV& X){return TV(0.1,0);},0,
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
             particles.S.Fill(SYMMETRIC_MATRIX<T,2>()+sqr(1.5));
@@ -334,7 +334,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-3,-3),TV(4,4)),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
-            Seed_Particles_Helper(sphere,0,0,density,particles_per_cell);
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
             random.Fill_Uniform(particles.V,-1,1);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
         } break;
@@ -342,7 +342,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(grid.dX*2,TV(1-2*grid.dX(0),0.25));
             T density=2*scale_mass;
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
             Add_Gravity(TV(0,-1.8));
             if(this->kkt)
@@ -354,7 +354,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(grid.dX*2,TV(0.2,0.75));
             T density=2*scale_mass;
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
             Add_Gravity(TV(0,-1.8));
         } break;
@@ -363,7 +363,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.7),.2);
             T density=2*scale_mass;
-            Seed_Particles_Helper(sphere,0,0,density,particles_per_cell);
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*scale_E,0.3);
             Add_Gravity(TV(0,-1.8));
             if(this->kkt)
@@ -376,7 +376,7 @@ Initialize()
             T density=2*scale_mass;
             T volume=grid.dX.Product()/particles_per_cell;
             T mass=density*volume;
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Particle(TV(.5,.9),0,0,mass,volume);
             Add_Gravity(TV(0,-1.8));
         } break;
@@ -384,17 +384,17 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(grid.dX*2,TV(1-2*grid.dX(0),0.20));
             T density=2*scale_mass;
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             density*=10;
             box+=TV(0,0.20-2*grid.dX(0));
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Gravity(TV(0,-1.8));
         } break;
         case 98:{ // full box
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(grid.dX*(T)2,TV::All_Ones_Vector()-grid.dX*2);
             T density=2*scale_mass;
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Gravity(TV(0,-1.8));
         } break;
         case 99:{ // single particle
@@ -413,7 +413,7 @@ Initialize()
             use_oldroyd=true;
             this->inv_Wi=(T)100;
             particles.Store_S(use_oldroyd);            
-            Seed_Particles_Helper(sphere,0,0,density,particles_per_cell);
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1);particles.S.Fill(SYMMETRIC_MATRIX<T,2>()+sqr(1));
             LOG::cout<<particles.F<<std::endl<<std::endl;;
             LOG::cout<<particles.S<<std::endl;
@@ -432,7 +432,7 @@ Initialize()
             use_oldroyd=true;
             this->inv_Wi=(T)0;
             particles.Store_S(use_oldroyd);            
-            Seed_Particles_Helper(sphere,0,0,density,particles_per_cell);
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1);particles.S.Fill(SYMMETRIC_MATRIX<T,2>()+sqr(1));
             VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV> *neo=new VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV>;
             neo->mu=0;
@@ -448,7 +448,7 @@ Initialize()
             Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(.1,5)),COLLISION_TYPE::slip,0);
             RANGE<TV> box(TV(.21,.21),TV(.6,.5));
             T density=2*scale_mass;
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Gravity(TV(0,-1.8));
             Add_Fixed_Corotated(1.71*scale_E,0.4);
         } break;
@@ -457,7 +457,7 @@ Initialize()
             SPHERE<TV> sphere(TV(.5,.5),.3);
             VECTOR<T,1> angular_velocity(0.4*scale_speed);
             T density=2*scale_mass;
-            Seed_Particles_Helper(sphere,0,0,density,particles_per_cell);
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
             PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness,
                 penalty_damping_stiffness);
             T pin_radius=sphere.radius*(T).8;
@@ -475,9 +475,9 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-1,-1),TV(2,2)),true);
             T d_small_1=1*scale_mass,d_small_2=1*scale_mass,d_large_1=d_small_1*.9,d_large_2=d_small_2*.9;
             SPHERE<TV> large1(TV(.2,.5),.1);
-            Seed_Particles_Helper(large1,[=](const TV& X){return TV(0.75,0);},0,d_large_1,particles_per_cell);
+            Seed_Particles(large1,[=](const TV& X){return TV(0.75,0);},0,d_large_1,particles_per_cell);
             SPHERE<TV> large2(TV(.6,.5),.1);
-            Seed_Particles_Helper(large2,[=](const TV& X){return TV();},0,d_large_2,particles_per_cell);
+            Seed_Particles(large2,[=](const TV& X){return TV();},0,d_large_2,particles_per_cell);
             for(int k=0;k<particles.number;k++)
                 if((particles.X(k)-large1.center).Magnitude_Squared()<sqr(large1.radius*0.6)
                     || (particles.X(k)-large2.center).Magnitude_Squared()<sqr(large2.radius*0.6))
@@ -489,9 +489,9 @@ Initialize()
             Add_Neo_Hookean(2*scale_E,0.425,&mpm_particles);
             int old_pn=particles.number;
             SPHERE<TV> small1(large1.center,large1.radius*.6);
-            Seed_Particles_Helper(small1,[=](const TV& X){return TV(0.75,0);},0,d_small_1,particles_per_cell);
+            Seed_Particles(small1,[=](const TV& X){return TV(0.75,0);},0,d_small_1,particles_per_cell);
             SPHERE<TV> small2(large2.center,large2.radius*.6);
-            Seed_Particles_Helper(small2,[=](const TV& X){return TV();},0,d_small_2,particles_per_cell);
+            Seed_Particles(small2,[=](const TV& X){return TV();},0,d_small_2,particles_per_cell);
             ARRAY<int> mpm_particles2;for(int i=old_pn;i<particles.number;i++) mpm_particles2.Append(i);
             Add_Neo_Hookean(2000*scale_E,0.3,&mpm_particles2);
             for(int i=old_pn;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(1,1,1);
@@ -516,7 +516,7 @@ Initialize()
             if(max_hardening==0) max_hardening=5;
             Add_Fixed_Corotated(E,nu);
             RANGE<TV> box(TV(.45,.11),TV(.55,.31));
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             for(int p=0;p<particles.number;++p){
                 particles.mu(p)=this->mu0;
                 particles.lambda(p)=this->lambda0;}
@@ -528,7 +528,7 @@ Initialize()
             Add_Gravity(TV(0,-1));
             T density=2*scale_mass;
             RANGE<TV> box(TV(.4,.5),TV(.6,.85));
-            Seed_Particles_Helper(box,[=](const TV& X){return TV(-0.0,0);},0,density,particles_per_cell);
+            Seed_Particles(box,[=](const TV& X){return TV(-0.0,0);},0,density,particles_per_cell);
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
             bool no_mu=true;
             Add_Fixed_Corotated(scale_E*20,0.3,&mpm_particles,no_mu);
@@ -594,7 +594,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
-            Seed_Particles_Helper(sphere,[=](const TV& X){return TV(0,0);},0,
+            Seed_Particles(sphere,[=](const TV& X){return TV(0,0);},0,
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>(1,0,0,1));
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));

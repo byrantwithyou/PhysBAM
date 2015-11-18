@@ -75,7 +75,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=2*scale_mass;
-            Seed_Particles_Helper(sphere,[=](const TV& X){return TV();},
+            Seed_Particles(sphere,[=](const TV& X){return TV();},
                 [=](const TV&){return MATRIX<T,2>();},
                 density,particles_per_cell);
             T total_mass=particles.mass.Sum();
@@ -88,14 +88,14 @@ Initialize()
             grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(grid.DX(),TV::All_Ones_Vector()-grid.DX());
             T density=scale_mass;
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Gravity(TV(0,-1.8));
         } break;
         case 3:{ // circle free fall with lambda
             grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
             SPHERE<TV> sphere(TV(.5,.5),.3);
             T density=scale_mass;
-            Seed_Particles_Helper(sphere,[=](const TV& X){return TV();},
+            Seed_Particles(sphere,[=](const TV& X){return TV();},
                 [=](const TV&){return MATRIX<T,2>();},
                 density,particles_per_cell);
             T total_mass=particles.mass.Sum();
@@ -115,13 +115,13 @@ Initialize()
             for(int s=0;s<spheres.m;s++){
                 SPHERE<TV>& sphere=spheres(s);
                 T density=1010*scale_mass;
-                Seed_Particles_Helper(sphere,[=](const TV& X){return v0(s);},0,density,particles_per_cell);}
+                Seed_Particles(sphere,[=](const TV& X){return v0(s);},0,density,particles_per_cell);}
         } break;
         case 5:{ // pool of standing water 
             grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(TV(),TV(1,0.5));
             T density=scale_mass;
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Gravity(TV(0,-1.8));
             Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(5,0))));
             Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(0,5))));
@@ -131,7 +131,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
             RANGE<TV> box(TV(),TV(0.3,0.75));
             T density=scale_mass;
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Gravity(TV(0,-1.8));
             Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(5,0))));
             Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(0,5))));

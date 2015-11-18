@@ -130,7 +130,7 @@ template<class TV> STANDARD_TESTS_BASE<TV>::
 // Function Seed_Particles
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
+Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
     std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
 {
     POISSON_DISK<TV> poisson_disk(1);
@@ -150,7 +150,7 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
 // Function Seed_Particles
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
+Seed_Particles_Uniform(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
     std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid)
 {
     T volume=seed_grid.dX.Product();
@@ -164,10 +164,10 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
 // Function Seed_Particles
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Seed_Particles_Helper(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
+Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
     std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
 {
-    if(!regular_seeding) return Seed_Particles(object,V,dV,density,particles_per_cell);
+    if(!regular_seeding) return Seed_Particles_Poisson(object,V,dV,density,particles_per_cell);
 
     object.Update_Box();
     RANGE<TV_INT> range=grid.Clamp_To_Cell(object.Box(),3).Intersect(grid.Cell_Indices());
@@ -175,7 +175,7 @@ Seed_Particles_Helper(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V
     TV UB=grid.Node(range.max_corner);
     T scale=pow<1,TV::m>((T)particles_per_cell);
     GRID<TV> seed_grid(range.Edge_Lengths()*scale,RANGE<TV>(LB,UB),true);
-    Seed_Particles(object,V,dV,density,seed_grid);
+    Seed_Particles_Uniform(object,V,dV,density,seed_grid);
 }
 //#####################################################################
 // Function Add_Particle

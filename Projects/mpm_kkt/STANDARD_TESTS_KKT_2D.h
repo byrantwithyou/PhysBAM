@@ -38,8 +38,7 @@ public:
     using BASE::Add_Fixed_Corotated;using BASE::Add_Neo_Hookean;using BASE::random;
     using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
     using BASE::tests;using BASE::Seed_Lagrangian_Particles;using BASE::Add_Collision_Object;
-    using BASE::Seed_Particles_Helper;using BASE::Add_Force;using BASE::Add_Fluid_Wall;
-    using BASE::quad_F_coeff;using BASE::coarse_grid;
+    using BASE::Add_Force;using BASE::Add_Fluid_Wall;using BASE::quad_F_coeff;using BASE::coarse_grid;
 
     // surface tension stuff
     bool use_surface_tension;

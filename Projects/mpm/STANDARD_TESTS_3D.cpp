@@ -197,9 +197,9 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(),TV(30,30,30)),true);
             T density=5*scale_mass;
             SPHERE<TV> sphere1(TV(10,13,15),2);
-            Seed_Particles_Helper(sphere1,[=](const TV& X){return TV(0.75,0,0);},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
+            Seed_Particles(sphere1,[=](const TV& X){return TV(0.75,0,0);},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
             SPHERE<TV> sphere2(TV(20,15,15),2);
-            Seed_Particles_Helper(sphere2,[=](const TV& X){return TV(-0.75,0,0);},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
+            Seed_Particles(sphere2,[=](const TV& X){return TV(-0.75,0,0);},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
 
@@ -311,11 +311,11 @@ Initialize()
             T density=5*scale_mass;
             SPHERE<TV> sphere1(TV(10,13,15),2);
             VECTOR<T,3> angular_velocity1(TV(0,0,foo_T1));
-            Seed_Particles_Helper(sphere1,[=](const TV& X){return angular_velocity1.Cross(X-sphere1.center)+TV(0.75,0,0);},
+            Seed_Particles(sphere1,[=](const TV& X){return angular_velocity1.Cross(X-sphere1.center)+TV(0.75,0,0);},
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity1);},density,particles_per_cell);
             SPHERE<TV> sphere2(TV(20,15,15),2);
             VECTOR<T,3> angular_velocity2(TV(0,0,foo_T2));
-            Seed_Particles_Helper(sphere2,[=](const TV& X){return angular_velocity2.Cross(X-sphere2.center)+TV(-0.75,0,0);},
+            Seed_Particles(sphere2,[=](const TV& X){return angular_velocity2.Cross(X-sphere2.center)+TV(-0.75,0,0);},
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity2);},density,particles_per_cell);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
@@ -338,7 +338,7 @@ Initialize()
             Add_Gravity(TV(0,-1,0));
             T density=2*scale_mass;
             RANGE<TV> box(TV(.4,.5,.4),TV(.6,.85,.6));
-            Seed_Particles_Helper(box,[=](const TV& X){return TV();},0,density,particles_per_cell);
+            Seed_Particles(box,[=](const TV& X){return TV();},0,density,particles_per_cell);
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
             bool no_mu=true;
             Add_Fixed_Corotated(scale_E*20,0.3,&mpm_particles,no_mu);
@@ -358,7 +358,7 @@ Initialize()
             use_oldroyd=true;
             this->inv_Wi=(T)10;
             particles.Store_S(use_oldroyd);            
-            Seed_Particles_Helper(sphere,[=](const TV& X){return TV();},0,density,particles_per_cell);
+            Seed_Particles(sphere,[=](const TV& X){return TV();},0,density,particles_per_cell);
             particles.F.Fill(MATRIX<T,3>()+1);particles.S.Fill(SYMMETRIC_MATRIX<T,3>()+sqr(1));
             VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV> *neo=new VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV>;
             neo->mu=38.462; // E=100, nu=0.3
@@ -415,8 +415,8 @@ Initialize()
             use_oldroyd=true;
             this->inv_Wi=(T)1./foo_T3;
             particles.Store_S(use_oldroyd);            
-            if(foo_int1==1) Seed_Particles_Helper(seeder1,[=](const TV& X){return TV();},0,density,particles_per_cell);
-            else if(foo_int1==2) Seed_Particles_Helper(seeder2,[=](const TV& X){return TV();},0,density,particles_per_cell);
+            if(foo_int1==1) Seed_Particles(seeder1,[=](const TV& X){return TV();},0,density,particles_per_cell);
+            else if(foo_int1==2) Seed_Particles(seeder2,[=](const TV& X){return TV();},0,density,particles_per_cell);
             else PHYSBAM_FATAL_ERROR();
             for(int k=0;k<particles.number;k++){
                 TV X=particles.X(k);
@@ -462,8 +462,8 @@ Initialize()
             use_oldroyd=true;
             this->inv_Wi=(T)1./foo_T3;
             particles.Store_S(use_oldroyd);            
-            if(foo_int1==1) Seed_Particles_Helper(seeder1,[=](const TV& X){return TV();},0,density,particles_per_cell);
-            else if(foo_int1==2) Seed_Particles_Helper(seeder2,[=](const TV& X){return TV();},0,density,particles_per_cell);
+            if(foo_int1==1) Seed_Particles(seeder1,[=](const TV& X){return TV();},0,density,particles_per_cell);
+            else if(foo_int1==2) Seed_Particles(seeder2,[=](const TV& X){return TV();},0,density,particles_per_cell);
             else PHYSBAM_FATAL_ERROR();
             for(int k=0;k<particles.number;k++){
                 TV X=particles.X(k);
@@ -514,7 +514,7 @@ Initialize()
             if(max_hardening) max_hardening=5;
             Add_Fixed_Corotated(E,nu);
             RANGE<TV> box(TV(.4,.15,.4),TV(.6,.35,.6));
-            Seed_Particles_Helper(box,0,0,density,particles_per_cell);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             for(int p=0;p<particles.number;++p){
                 particles.mu(p)=this->mu0;
                 particles.lambda(p)=this->lambda0;}
