@@ -35,8 +35,8 @@ public:
     using BASE::lagrangian_forces;using BASE::use_oldroyd;using BASE::penalty_collisions_stiffness;
     using BASE::test_number;using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Gravity;
     using BASE::Add_Particle;using BASE::gather_scatter;using BASE::penalty_damping_stiffness;
-    using BASE::Add_Fixed_Corotated;using BASE::Add_Neo_Hookean;using BASE::random;
-    using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
+    using BASE::Add_Fixed_Corotated;using BASE::Add_Neo_Hookean;using BASE::Add_St_Venant_Kirchhoff_Hencky_Strain;
+    using BASE::random;using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
     using BASE::tests;using BASE::Seed_Lagrangian_Particles;using BASE::Add_Collision_Object;
     using BASE::Seed_Particles_Helper;using BASE::Add_Force;using BASE::Add_Fluid_Wall;
     using BASE::quad_F_coeff;using BASE::use_plasticity;

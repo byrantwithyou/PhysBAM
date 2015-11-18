@@ -15,6 +15,7 @@
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
+#include <Deformables/Constitutive_Models/ST_VENANT_KIRCHHOFF_HENCKY_STRAIN.h>
 #include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -224,6 +225,18 @@ template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles)
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*new NEO_HOOKEAN<T,TV::m>(E,nu);
+    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,use_variable_coefficients);
+    return Add_Force(fe);
+}
+//#####################################################################
+// Function Add_St_Venant_Kirchhoff_Hencky_Strain
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_St_Venant_Kirchhoff_Hencky_Strain(T E,T nu,ARRAY<int>* affected_particles,bool no_mu)
+{
+    ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>* hencky=new ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>(E,nu);
+    if(no_mu) hencky->Zero_Out_Mu();
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
     MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,use_variable_coefficients);
     return Add_Force(fe);
 }
