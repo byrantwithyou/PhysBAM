@@ -137,7 +137,8 @@ Test(const DIAGONAL_MATRIX<T,d>& F,const int id) const
     DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d> dPi_dF0,dPi_dF[d];
     Isotropic_Stress_Derivative(F,dPi_dF0,id);
     for(int i=0;i<d;i++){
-        DIAGONAL_MATRIX<T,d> Fd=F+DIAGONAL_MATRIX<T,d>(VECTOR<T,d>::Axis_Vector(i+1)*e);
+        DIAGONAL_MATRIX<T,d> Fd=F;
+        Fd.x(i)+=e;
         E[i]=Energy_Density(Fd,id);
         P[i]=P_From_Strain(Fd,id);
         Isotropic_Stress_Derivative(Fd,dPi_dF[i],id);}
