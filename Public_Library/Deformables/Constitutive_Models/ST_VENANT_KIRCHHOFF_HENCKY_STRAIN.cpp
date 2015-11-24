@@ -48,7 +48,7 @@ Zero_Out_Mu()
 template<class T,int d> T ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,d>::
 Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
-    if(F.x(d-1)<0)
+    if(F.x(d-1)<=0)
         return FLT_MAX;
     else{
         T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
@@ -62,7 +62,7 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 template<class T,int d> DIAGONAL_MATRIX<T,d> ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,d>::
 P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
-    if(F.x(d-1)<0)
+    if(F.x(d-1)<=0)
         return DIAGONAL_MATRIX<T,d>();
     else{
         T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
@@ -84,7 +84,7 @@ P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const 
 template<class T> static void
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dPi_dF,T failure_threshold,T mu,T lambda)
 {
-    if(F.x.y<0)
+    if(F.x.y<=0)
         dPi_dF.x0000=dPi_dF.x1111=dPi_dF.x1100=dPi_dF.x1010=dPi_dF.x1001=(T)0;
     else{
         DIAGONAL_MATRIX<T,2> F_threshold=F.Clamp_Min(failure_threshold);
@@ -105,18 +105,18 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 template<class T> static void
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,T failure_threshold,T mu,T lambda)
 {
-    if(F.x.z<0){
+    if(F.x.z<=0){
         dPi_dF.x0000=dPi_dF.x1111=dPi_dF.x2222=dPi_dF.x1100=dPi_dF.x2200=dPi_dF.x2211=dPi_dF.x1010=dPi_dF.x2020=dPi_dF.x2121=dPi_dF.x1001=dPi_dF.x2002=dPi_dF.x2112=(T)0;}
     else{
         DIAGONAL_MATRIX<T,3> F_threshold=F.Clamp_Min(failure_threshold);
         T lambda_plus_two_mu=lambda+2*mu,two_mu=2*mu,s0=F_threshold.x.x,s1=F_threshold.x.y,s2=F_threshold.x.z;
-        T l0=log(abs(s0)),l1=log(abs(s1)),l2=log(abs(s2)),lt=log(abs(s0*s1*s2)),sum_log=l0+l1+l2;
+        T l0=log(s0),l1=log(s1),l2=log(s2),sum_log=l0+l1+l2;
         SYMMETRIC_MATRIX<T,3> F_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(VECTOR<T,3>(s0,s1,s2));
         MATRIX<T,3> sl_outer=MATRIX<T,3>::Outer_Product(VECTOR<T,3>(s0,s1,s2),VECTOR<T,3>(l0,l1,l2));
         //Hessian variables
-        dPi_dF.x0000=(lambda_plus_two_mu-two_mu*l0-lambda*lt)/F_outer.x00;
-        dPi_dF.x1111=(lambda_plus_two_mu-two_mu*l1-lambda*lt)/F_outer.x11;
-        dPi_dF.x2222=(lambda_plus_two_mu-two_mu*l2-lambda*lt)/F_outer.x22;
+        dPi_dF.x0000=(lambda_plus_two_mu-two_mu*l0-lambda*sum_log)/F_outer.x00;
+        dPi_dF.x1111=(lambda_plus_two_mu-two_mu*l1-lambda*sum_log)/F_outer.x11;
+        dPi_dF.x2222=(lambda_plus_two_mu-two_mu*l2-lambda*sum_log)/F_outer.x22;
         dPi_dF.x1100=lambda/F_outer.x10;
         dPi_dF.x2200=lambda/F_outer.x20;
         dPi_dF.x2211=lambda/F_outer.x21;
