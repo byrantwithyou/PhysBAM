@@ -37,8 +37,8 @@ template<class T,int d> T ST_VENANT_KIRCHHOFF<T,d>::
 Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
     T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
-    DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold),strain=(F_threshold*F_threshold-1)*(T).5,strain_squared=strain*strain;
-    return (T).5*id_lambda*strain.Trace()*strain.Trace()+id_mu*strain_squared.Trace();
+    DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold),strain=(F_threshold*F_threshold-1)*(T).5;
+    return (T).5*id_lambda*sqr(strain.Trace())+id_mu*sqr(strain).Trace();
 }
 //#####################################################################
 // Function P_From_Strain
@@ -58,8 +58,8 @@ P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const 
 {
     T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
     DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold);
-    SYMMETRIC_MATRIX<T,d> strain_rate=(F_threshold*F_dot).Symmetric_Part();
-    return F_threshold*(2*id_beta*strain_rate+id_alpha*strain_rate.Trace());
+    SYMMETRIC_MATRIX<T,d> strain_rate=(F_threshold*F_dot).Twice_Symmetric_Part();
+    return F_threshold*(id_beta*strain_rate+(T).5*id_alpha*strain_rate.Trace());
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative_Helper
