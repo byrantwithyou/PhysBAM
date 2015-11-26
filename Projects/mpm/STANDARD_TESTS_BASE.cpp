@@ -302,9 +302,11 @@ Add_Neo_Hookean(T_VOLUME& object,T E,T nu)
 // Function Add_Penalty_Collision_Object
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io)
+Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io,const T coefficient_of_friction)
 {
-    this->Add_Force(*new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,io,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));
+    IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>* pf=new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,io,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length);
+    pf->coefficient_of_friction=coefficient_of_friction;
+    this->Add_Force(*pf);
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;

@@ -94,10 +94,10 @@ public:
     T_STRUCTURE& Seed_Lagrangian_Particles(T_STRUCTURE& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass,bool destroy_after=true);
 
-    void Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io);
+    void Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io,const T coefficient_of_friction=(T)0);
     template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type
-    Add_Penalty_Collision_Object(const OBJECT& object)
-    {Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object));}
+    Add_Penalty_Collision_Object(const OBJECT& object,const T coefficient_of_friction=(T)0)
+    {Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),coefficient_of_friction);}
 
     void Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
         const T mass,const T volume);

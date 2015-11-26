@@ -19,7 +19,10 @@
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Forces/COLLISION_FORCE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
@@ -401,6 +404,20 @@ Grid_To_Particle()
                     B+=it.Weight()/2*(MATRIX<T,TV::m>::Outer_Product(V_grid,Z-particles.X(p)+xi_new-xp_new)
                         +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));
                     if(particles.store_C && example.weights->Order()>1) D+=it.Weight()*MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p),Z-particles.X(p));}
+
+            // apply penalty friction on V_pic
+            if(example.penalty_map.m){
+                const ARRAY<VECTOR<int,2> >& cc=example.penalty_map(p);
+                for(int ob=0;ob<cc.m;ob++){
+                    IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>* cf=dynamic_cast<IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>* >(example.lagrangian_forces(cc(ob).x));
+                    int i=cc(ob).y;
+                    TV f=cf->grad_pe(i);
+                    T fn=f.Normalize();
+                    TV t=V_pic.Projected_Orthogonal_To_Unit_Direction(f);
+                    T t_mag=t.Normalize();
+                    if(t_mag<=cf->coefficient_of_friction*fn/particles.mass(p))
+                        V_pic.Project_On_Unit_Direction(f);
+                    else V_pic-=cf->coefficient_of_friction/particles.mass(p)*fn*t*example.dt;}}
 
             particles.V(p)=V_pic;
             Perform_Particle_Collision(p,example.time+example.dt);
@@ -882,6 +899,24 @@ Apply_Forces()
         example.velocity_new.array(j)=dv.u.array(j)+objective.v0.u.array(j);}
     example.velocity_new.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
     example.current_velocity=&example.velocity_new;
+
+    Register_Active_Penalty_Collisions();
+}
+//#####################################################################
+// Function Register_Active_Penalty_Collisions
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Register_Active_Penalty_Collisions()
+{
+    ARRAY<ARRAY<VECTOR<int,2> > >& map=example.penalty_map;
+    MPM_PARTICLES<TV>& particles=example.particles;
+    map.Clean_Memory();
+    map.Resize(particles.number);
+    for(int ii=0;ii<example.lagrangian_forces.m;ii++)
+        if(IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>* cf=dynamic_cast<IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>* >(example.lagrangian_forces(ii)))
+            for(int i=0;i<cf->penetrating_particles.m;i++){
+                int p=cf->penetrating_particles(i);
+                map(p).Append(VECTOR<int,2>(ii,i));}
 }
 //#####################################################################
 // Function Perform_Particle_Collision

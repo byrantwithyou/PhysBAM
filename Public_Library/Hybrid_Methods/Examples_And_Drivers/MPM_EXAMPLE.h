@@ -86,6 +86,10 @@ public:
     T theta_c,theta_s,hardening_factor,max_hardening;
     MPM_PLASTICITY_MODEL<TV>* plasticity;
 
+    // penalty collision friction helper
+    // : maps particle index to <lagrangian_force_index,penetrating_particles_index>
+    ARRAY<ARRAY<VECTOR<int,2> > > penalty_map;
+
     T initial_time;
     int last_frame;
     std::string frame_title;
