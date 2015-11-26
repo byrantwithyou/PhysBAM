@@ -496,6 +496,7 @@ Initialize()
         case 33:{ // sand box drop
             use_plasticity=true;
             use_variable_coefficients=true;
+            use_clamping_plasticity=true;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
