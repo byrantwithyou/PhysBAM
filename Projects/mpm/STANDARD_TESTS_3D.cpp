@@ -508,7 +508,7 @@ Initialize()
             if(theta_c==0) theta_c=0.01;
             if(theta_s==0) theta_s=.00001;
             if(hardening_factor==0) hardening_factor=80;
-            if(max_hardening) max_hardening=5;
+            if(max_hardening==0) max_hardening=5;
             Add_Fixed_Corotated(E,nu);
             RANGE<TV> box(TV(.4,.15,.4),TV(.6,.35,.6));
             Seed_Particles(box,0,0,density,particles_per_cell);
