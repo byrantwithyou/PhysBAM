@@ -691,6 +691,7 @@ Update_Plasticity_And_Hardening()
             particles.lambda(p)=particles.lambda0(p)*hardening_coeff;}
     }else{
         MPM_PLASTICITY_MODEL<TV> *plasticity=example.plasticity;
+        int num_projected_particles=0,num_non_converged_particles=0;
         for (int k=0;k<example.simulated_particles.m;++k){
             int p=example.simulated_particles(k);
             MATRIX<T,TV::m> Fe=particles.F(p);
@@ -699,10 +700,13 @@ Update_Plasticity_And_Hardening()
             Fe.Fast_Singular_Value_Decomposition(U,singular_values,V);
             plasticity->Set_Lame_Constants_And_F_Elastic(particles.mu(p),particles.lambda(p),singular_values);
             if(plasticity->Yield_Function()>0){
-                plasticity->Project_Stress(example.plastic_newton_iterations,example.plastic_newton_tolerance);}
+                ++num_projected_particles;
+                if(!plasticity->Project_Stress(example.plastic_newton_iterations,example.plastic_newton_tolerance))
+                    ++num_non_converged_particles;}
             singular_values.x=plasticity->Get_Updated_Sigma();
             particles.F(p)=(U*singular_values).Times_Transpose(V);
-            particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);}}
+            particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);}
+        LOG::printf("PLASTICITY: %d/%d/%d (total/projected/non converged particles)\n",example.simulated_particles.m,num_projected_particles,num_non_converged_particles);}
 }
 //#####################################################################
 // Function Add_C_Contribution_To_DT

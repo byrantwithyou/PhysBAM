@@ -32,7 +32,7 @@ public:
     T Yield_Function(const TV& tau) const
     {T trace=tau.Sum();return (tau-trace/d).Magnitude()+rho*trace+sigma_Y;}
 
-    virtual void Project_Stress(int max_iterations,T tolerance);
+    virtual bool Project_Stress(int max_iterations,T tolerance);
     virtual TV Get_Updated_Sigma() const
     {return exp(D*tau_final);}
 

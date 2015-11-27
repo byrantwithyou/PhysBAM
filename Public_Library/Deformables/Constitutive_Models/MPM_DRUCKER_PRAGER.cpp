@@ -22,7 +22,7 @@ Set_Lame_Constants_And_F_Elastic(T mu,T lambda,const DIAGONAL_MATRIX<T,d>& Fe)
 //#####################################################################
 // Function Project_Stress
 //#####################################################################
-template<class TV> void MPM_DRUCKER_PRAGER<TV>::
+template<class TV> bool MPM_DRUCKER_PRAGER<TV>::
 Project_Stress(int max_iterations, T tolerance)
 {
     TVP1 x,residual;
@@ -37,6 +37,7 @@ Project_Stress(int max_iterations, T tolerance)
     //LOG::printf("tau_final=%g\n",tau_final);
     //LOG::printf("F(tau_final)=%g\n",Yield_Function(tau_final));
     //LOG::printf("D*tau_final=%g\n",D*tau_final);
+    return residual.Magnitude_Squared()<=tolerance*tolerance;
 }
 //#####################################################################
 // Function Get_Jacobian
