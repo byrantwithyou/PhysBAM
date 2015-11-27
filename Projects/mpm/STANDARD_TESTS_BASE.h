@@ -44,7 +44,8 @@ public:
     using BASE::kkt;using BASE::Add_Fluid_Wall;using BASE::quad_F_coeff;
     using BASE::use_plasticity;using BASE::use_clamping_plasticity;
     using BASE::theta_c;using BASE::theta_s;using BASE::hardening_factor;
-    using BASE::max_hardening;using BASE::use_variable_coefficients;
+    using BASE::max_hardening;using BASE::friction_angle;using BASE::cohesion;
+    using BASE::use_variable_coefficients;
 
     int test_number;
     int resolution;

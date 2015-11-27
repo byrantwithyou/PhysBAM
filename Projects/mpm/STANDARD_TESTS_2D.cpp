@@ -633,6 +633,30 @@ Initialize()
             particles.lambda0.Fill(lambda);
             Add_Gravity(TV(0,-9.8));
         } break;
+        case 38:{ // sand box drop, better paramaters, with Hencky, usage: mpm 38 -resolution 100 -plastic_newton_iterations 100 -plastic_newton_tolerance 1e-8
+            use_plasticity=true;
+            use_clamping_plasticity=false;
+            use_variable_coefficients=true;
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+
+            T density=(T)2200*scale_mass;
+            T E=35.37e6*scale_E,nu=.3;
+            Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
+            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
+            RANGE<TV> box(TV(.4,.1001),TV(.45,.6001));
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            particles.mu.Fill(mu);
+            particles.mu0.Fill(mu);
+            particles.lambda.Fill(lambda);
+            particles.lambda0.Fill(lambda);
+            Add_Gravity(TV(0,-9.81));
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }

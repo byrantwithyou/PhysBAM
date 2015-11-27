@@ -84,6 +84,7 @@ public:
     bool use_plasticity;
     bool use_clamping_plasticity;
     T theta_c,theta_s,hardening_factor,max_hardening;
+    T friction_angle,cohesion; 
     MPM_PLASTICITY_MODEL<TV>* plasticity;
 
     // penalty collision friction helper

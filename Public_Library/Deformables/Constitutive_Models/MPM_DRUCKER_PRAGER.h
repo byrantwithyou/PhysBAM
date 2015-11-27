@@ -5,6 +5,8 @@
 #ifndef __MPM_DRUCKER_PRAGER__
 #define __MPM_DRUCKER_PRAGER__
 
+#include <cmath>
+
 #include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 namespace PhysBAM{
 
@@ -20,7 +22,7 @@ public:
     TV strain_trial,tau_trial,tau_final;
     SYMMETRIC_MATRIX<T,d> D;
 
-    MPM_DRUCKER_PRAGER(T rho,T sigma_Y):rho(rho),sigma_Y(sigma_Y){}
+    MPM_DRUCKER_PRAGER(T friction_angle,T cohesion):rho(2*sin(friction_angle)/(sqrt(3)*(3-sin(friction_angle)))),sigma_Y(-2*sqrt(3)*cohesion*cos(friction_angle)/(3-sin(friction_angle))){}
     virtual ~MPM_DRUCKER_PRAGER() {}
 
     virtual void Set_Lame_Constants_And_F_Elastic(T mu,T lambda,const DIAGONAL_MATRIX<T,d>& Fe);
