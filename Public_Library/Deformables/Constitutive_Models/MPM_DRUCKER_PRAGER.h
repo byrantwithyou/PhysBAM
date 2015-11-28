@@ -7,6 +7,7 @@
 
 #include <cmath>
 
+#include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 namespace PhysBAM{
 
