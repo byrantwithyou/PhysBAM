@@ -43,8 +43,9 @@ public:
     using BASE::Add_Particle;using BASE::Add_Penalty_Collision_Object;using BASE::scale_speed;
     using BASE::penalty_collisions_stiffness;using BASE::penalty_damping_stiffness;
     using BASE::quad_F_coeff;using BASE::use_plasticity;
-    using BASE::theta_c;using BASE::theta_s;using BASE::hardening_factor;
-    using BASE::max_hardening;using BASE::use_variable_coefficients;
+    using BASE::use_clamping_plasticity;using BASE::theta_c;using BASE::theta_s;using BASE::hardening_factor;
+    using BASE::max_hardening;using BASE::friction_angle;using BASE::cohesion;
+    using BASE::use_variable_coefficients;
 
     // surface tension stuff
     bool use_surface_tension;

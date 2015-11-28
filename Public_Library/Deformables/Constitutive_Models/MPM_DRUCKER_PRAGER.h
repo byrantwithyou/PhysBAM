@@ -22,7 +22,7 @@ public:
     TV strain_trial,tau_trial,tau_final;
     SYMMETRIC_MATRIX<T,d> D;
 
-    MPM_DRUCKER_PRAGER(T friction_angle,T cohesion):rho(2*sin(friction_angle)/(sqrt(3)*(3-sin(friction_angle)))),sigma_Y(-2*sqrt(3)*cohesion*cos(friction_angle)/(3-sin(friction_angle))){}
+    MPM_DRUCKER_PRAGER(T friction_angle,T cohesion):rho(2*sin(friction_angle)/(sqrt(3)*(3-sin(friction_angle)))),sigma_Y(-2*sqrt(3)*cohesion*cos(friction_angle)/(3-sin(friction_angle))){PHYSBAM_ASSERT(cohesion>=0);}
     virtual ~MPM_DRUCKER_PRAGER() {}
 
     virtual void Set_Lame_Constants_And_F_Elastic(T mu,T lambda,const DIAGONAL_MATRIX<T,d>& Fe);
