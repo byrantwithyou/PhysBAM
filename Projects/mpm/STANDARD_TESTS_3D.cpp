@@ -529,7 +529,7 @@ Initialize()
             particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,-0.5)),0.9);
+            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,1.5)),0.9);
 
             T density=(T)2200*scale_mass;
             T E=35.37e6*scale_E,nu=.3;
