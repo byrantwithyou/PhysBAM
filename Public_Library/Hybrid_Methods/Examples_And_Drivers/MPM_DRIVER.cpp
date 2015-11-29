@@ -20,6 +20,7 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
+#include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/COLLISION_FORCE.h>
@@ -691,6 +692,7 @@ Update_Plasticity_And_Hardening()
             particles.lambda(p)=particles.lambda0(p)*hardening_coeff;}
     }else{
         MPM_PLASTICITY_MODEL<TV> *plasticity=example.plasticity;
+        T max_yield_function=0;
         int num_projected_particles=0,num_non_converged_particles=0;
         for (int k=0;k<example.simulated_particles.m;++k){
             int p=example.simulated_particles(k);
@@ -705,7 +707,10 @@ Update_Plasticity_And_Hardening()
                     ++num_non_converged_particles;}
             singular_values.x=plasticity->Get_Updated_Sigma();
             particles.F(p)=(U*singular_values).Times_Transpose(V);
-            particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);}
+            particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);
+            max_yield_function=max(max_yield_function,plasticity->Yield_Function_Final());
+        }
+        LOG::printf("Max yield function value: %g\n",max_yield_function);
         LOG::printf("PLASTICITY: %d/%d/%d (total/projected/non converged particles)\n",example.simulated_particles.m,num_projected_particles,num_non_converged_particles);}
 }
 //#####################################################################

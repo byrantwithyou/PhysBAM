@@ -20,6 +20,7 @@ public:
 
     virtual void Set_Lame_Constants_And_F_Elastic(T mu,T lambda,const DIAGONAL_MATRIX<T,TV::m>& Fe)=0;
     virtual T Yield_Function() const=0;
+    virtual T Yield_Function_Final() const=0;
     virtual bool Project_Stress(int max_iterations,T tolerance)=0;
     virtual TV Get_Updated_Sigma() const=0;
 };

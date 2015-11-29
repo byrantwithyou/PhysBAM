@@ -17,7 +17,7 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
-#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
+#include <Deformables/Constitutive_Models/MPM_SQUARED_DRUCKER_PRAGER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
@@ -622,7 +622,7 @@ Initialize()
             T density=(T)1281*scale_mass;
             T E=5000*scale_E,nu=.4;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(0.19,-0.76);
+            this->plasticity=new MPM_SQUARED_DRUCKER_PRAGER<TV>(0.65,5);
             RANGE<TV> box(TV(.45,.11),TV(.55,.31));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
@@ -643,10 +643,10 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
 
-            T density=(T)2200*scale_mass;
-            T E=35.37e6*scale_E,nu=.3;
+            T density=(T)1281*scale_mass;
+            T E=35.37e6*scale_E,nu=.4;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
+            this->plasticity=new MPM_SQUARED_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
             RANGE<TV> box(TV(.4,.1001),TV(.45,.6001));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
