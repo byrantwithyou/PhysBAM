@@ -49,12 +49,8 @@ Get_Jacobian(const TVP1& x) const
     x.Get_Subvector(0,tau);
     T delta_gamma=x(d);
     TV f_hat_vec=Yield_Function_Derivative(tau);
-    TV s=tau-tau.Sum()/d;
-    T s_norm=s.Magnitude();
-    TV s_normed=s/s_norm;
-    SYMMETRIC_MATRIX<T,d> G_Hessian=(T)2*SYMMETRIC_MATRIX<T,d>::Identity_Matrix()-SYMMETRIC_MATRIX<T,d>::Unit_Matrix((2*rho*rho+(T)2/d));
     MATRIX<T,d+1> ret;
-    ret.Set_Submatrix(0,0,D+delta_gamma*G_Hessian);
+    ret.Set_Submatrix(0,0,D+delta_gamma*Yield_Function_Hessian());
     for(int i=0;i<d;i++){
         ret(i,d)=f_hat_vec(i);
         ret(d,i)=f_hat_vec(i);}
@@ -70,19 +66,23 @@ Yield_Function_Derivative(const TV& tau) const
     return (T)2*(tau-tau.Sum()/d)-2*(rho*tau.Sum()+sigma_Y)*rho;
 }
 //#####################################################################
+// Function Yield_Function_Hessian
+//#####################################################################
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> MPM_SQUARED_DRUCKER_PRAGER<TV>::
+Yield_Function_Hessian() const {
+    return (T)2-SYMMETRIC_MATRIX<T,d>::Unit_Matrix(2*rho*rho+(T)2/d);
+}
+//#####################################################################
 // Function Get_Residual
 //#####################################################################
 template<class TV> typename MPM_SQUARED_DRUCKER_PRAGER<TV>::TVP1 MPM_SQUARED_DRUCKER_PRAGER<TV>::
 Get_Residual(const TVP1& x,const TV& strain_trial,const SYMMETRIC_MATRIX<T,d>& D) const
 {
-    TVP1 ret;
     TV tau;
     x.Get_Subvector(0,tau);
     T delta_gamma=x(d);
     TV strain_residual=D*tau-strain_trial+delta_gamma*Yield_Function_Derivative(tau);
-    ret.Set_Subvector(0,strain_residual);
-    ret(d)=Yield_Function(tau);
-    return ret;
+    return strain_residual.Append(Yield_Function(tau));
 }
 }
 namespace PhysBAM{

@@ -42,6 +42,7 @@ public:
 
     MATRIX<typename TV::SCALAR,TV::m+1> Get_Jacobian(const TVP1& x) const;
     TV Yield_Function_Derivative(const TV& tau) const;
+    SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> Yield_Function_Hessian() const;
     TVP1 Get_Residual(const TVP1& x,const TV& strain_trial,const SYMMETRIC_MATRIX<T,d>& D) const;
 };
 }

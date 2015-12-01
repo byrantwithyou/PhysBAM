@@ -49,12 +49,8 @@ Get_Jacobian(const TVP1& x) const
     x.Get_Subvector(0,tau);
     T delta_gamma=x(d);
     TV f_hat_vec=Yield_Function_Derivative(tau);
-    TV s=tau-tau.Sum()/d;
-    T s_norm=s.Magnitude();
-    TV s_normed=s/s_norm;
-    SYMMETRIC_MATRIX<T,d> G_Hessian=(T)1/s_norm*(SYMMETRIC_MATRIX<T,d>::Identity_Matrix()-SYMMETRIC_MATRIX<T,d>::Unit_Matrix((T)1/d)-SYMMETRIC_MATRIX<T,d>::Outer_Product(s_normed));
     MATRIX<T,d+1> ret;
-    ret.Set_Submatrix(0,0,D+delta_gamma*G_Hessian);
+    ret.Set_Submatrix(0,0,D+delta_gamma*Yield_Function_Hessian(tau));
     for(int i=0;i<d;i++){
         ret(i,d)=f_hat_vec(i);
         ret(d,i)=f_hat_vec(i);}
@@ -68,12 +64,16 @@ Get_Jacobian(const TVP1& x) const
 template<class TV> TV MPM_DRUCKER_PRAGER<TV>::
 Yield_Function_Derivative(const TV& tau) const
 {
+    return (tau-tau.Sum()/d).Normalized()+rho; 
+}
+//#####################################################################
+// Function Yield_Function_Hessian
+//#####################################################################
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> MPM_DRUCKER_PRAGER<TV>::
+Yield_Function_Hessian(TV tau) const {
     TV s=tau-tau.Sum()/d;
-    T s_norm=s.Magnitude_Squared();
-    if(s_norm>1e-8)
-        return s/sqrt(s_norm)+rho;
-    else
-        return TV::Constant_Vector(rho);
+    T s_norm=s.Normalize();
+    return ((T)1-SYMMETRIC_MATRIX<T,d>::Unit_Matrix((T)1/d)-SYMMETRIC_MATRIX<T,d>::Outer_Product(s))/s_norm;
 }
 //#####################################################################
 // Function Get_Residual
@@ -81,14 +81,11 @@ Yield_Function_Derivative(const TV& tau) const
 template<class TV> typename MPM_DRUCKER_PRAGER<TV>::TVP1 MPM_DRUCKER_PRAGER<TV>::
 Get_Residual(const TVP1& x,const TV& strain_trial,const SYMMETRIC_MATRIX<T,d>& D) const
 {
-    TVP1 ret;
     TV tau;
     x.Get_Subvector(0,tau);
     T delta_gamma=x(d);
     TV strain_residual=D*tau-strain_trial+delta_gamma*Yield_Function_Derivative(tau);
-    ret.Set_Subvector(0,strain_residual);
-    ret(d)=Yield_Function(tau);
-    return ret;
+    return strain_residual.Append(Yield_Function(tau));
 }
 }
 namespace PhysBAM{
