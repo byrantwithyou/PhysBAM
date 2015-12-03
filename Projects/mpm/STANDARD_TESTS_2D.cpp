@@ -17,6 +17,7 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
+#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
 #include <Deformables/Constitutive_Models/MPM_SQUARED_DRUCKER_PRAGER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
@@ -647,8 +648,33 @@ Initialize()
             T density=(T)1281*scale_mass;
             T E=35.37e6*scale_E,nu=.4;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            this->plasticity=new MPM_SQUARED_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
+            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
             RANGE<TV> box(TV(.4,.1001),TV(.45,.6001));
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            particles.mu.Fill(mu);
+            particles.mu0.Fill(mu);
+            particles.lambda.Fill(lambda);
+            particles.lambda0.Fill(lambda);
+            Add_Gravity(TV(0,-9.81));
+        } break;
+        case 39:{ // sand box drop, wide
+            use_plasticity=true;
+            use_clamping_plasticity=false;
+            use_variable_coefficients=true;
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::stick,0);
+            //this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+
+            T density=(T)1281*scale_mass;
+            T E=35.37e6*scale_E,nu=.4;
+            Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
+            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
+            RANGE<TV> box(TV(.3,.1001),TV(.7,.1001+0.1));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));

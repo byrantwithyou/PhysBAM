@@ -19,11 +19,14 @@ public:
     typedef typename TV::SCALAR T;
     typedef VECTOR<T,d+1> TVP1;
 
+    T mu,lambda;
     T rho,sigma_Y;
     TV strain_trial,tau_trial,tau_final;
     SYMMETRIC_MATRIX<T,d> D;
+    bool direct_solution;
 
-    MPM_DRUCKER_PRAGER(T friction_angle,T cohesion):rho(2*sin(friction_angle)/(sqrt(3)*(3-sin(friction_angle)))),sigma_Y(-2*sqrt(3)*cohesion*cos(friction_angle)/(3-sin(friction_angle))){PHYSBAM_ASSERT(cohesion>=0);}
+
+    MPM_DRUCKER_PRAGER(T friction_angle,T cohesion,bool direct_solution=true):rho(2*sin(friction_angle)/(sqrt(3)*(3-sin(friction_angle)))),sigma_Y(-2*sqrt(3)*cohesion*cos(friction_angle)/(3-sin(friction_angle))),direct_solution(direct_solution){PHYSBAM_ASSERT(cohesion>=0);}
     virtual ~MPM_DRUCKER_PRAGER() {}
 
     virtual void Set_Lame_Constants_And_F_Elastic(T mu,T lambda,const DIAGONAL_MATRIX<T,d>& Fe);
