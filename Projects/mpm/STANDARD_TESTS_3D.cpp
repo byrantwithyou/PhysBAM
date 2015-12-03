@@ -554,7 +554,10 @@ Initialize()
             particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,1.5)),0.9);
+            if(use_penalty_collisions)
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,1.5)),0.9);
+            else
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,1.5)),COLLISION_TYPE::stick,0);
 
             T density=(T)1281*scale_mass; // source: Sand, dry http://www.engineeringtoolbox.com/density-materials-d_1652.html
             T E=35.37e6*scale_E,nu=.3;

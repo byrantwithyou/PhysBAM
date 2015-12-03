@@ -36,7 +36,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     scale_mass(1),scale_E(1),scale_speed(1),
     penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),
-    penalty_damping_stiffness(0),tests(stream_type_input,deformable_body_collection)
+    penalty_damping_stiffness(0),use_penalty_collisions(false),tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
@@ -90,6 +90,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-plastic_newton_iterations",&plastic_newton_iterations,"iter","Newton iterations in plastic yield");
     parse_args.Add("-plastic_newton_tolerance",&plastic_newton_tolerance,"tol","Newton tolerance in plastic yield");
     parse_args.Add("-use_clamping_plasticity",&use_clamping_plasticity,"clamping plasticity","Use clamping plasticity, as in the snow paper");
+    parse_args.Add("-use_penalty_collisions",&use_penalty_collisions,"penalty collisions","Use penalty collisions objects");
 
     parse_args.Parse(true);
 

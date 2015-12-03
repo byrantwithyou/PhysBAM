@@ -547,12 +547,13 @@ Initialize()
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2)),ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.4-sqrt(2.0)*0.1));
-            Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge),COLLISION_TYPE::separate,1);
-            // this->Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge));
-            
             RANGE<TV> ground(TV(-1,0),TV(2,0.1));
-            Add_Collision_Object(ground,COLLISION_TYPE::separate,1);
-            // this->Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(ground));
+            if(use_penalty_collisions){
+                Add_Penalty_Collision_Object(wedge);
+                Add_Penalty_Collision_Object(ground);}
+            else{
+                Add_Collision_Object(ground,COLLISION_TYPE::separate,1);
+                Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge),COLLISION_TYPE::separate,1);}
 
             T density=(T)2*scale_mass;
             int number_of_particles=20000;
@@ -619,7 +620,10 @@ Initialize()
             particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+            if(use_penalty_collisions)
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+            else
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::stick,0);
 
             T density=(T)1281*scale_mass;
             T E=5000*scale_E,nu=.4;
@@ -643,7 +647,10 @@ Initialize()
             particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+            if(use_penalty_collisions)
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+            else
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::stick,0);
 
             T density=(T)1281*scale_mass;
             T E=35.37e6*scale_E,nu=.4;
@@ -667,8 +674,10 @@ Initialize()
             particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::stick,0);
-            //this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+            if(use_penalty_collisions)
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+            else
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::stick,0);
 
             T density=(T)1281*scale_mass;
             T E=35.37e6*scale_E,nu=.4;

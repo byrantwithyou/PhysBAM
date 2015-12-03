@@ -37,11 +37,12 @@ public:
     using BASE::Add_Particle;using BASE::gather_scatter;using BASE::penalty_damping_stiffness;
     using BASE::Add_Fixed_Corotated;using BASE::Add_Neo_Hookean;using BASE::Add_St_Venant_Kirchhoff_Hencky_Strain;
     using BASE::random;using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
-    using BASE::tests;using BASE::Seed_Lagrangian_Particles;using BASE::Add_Collision_Object;
+    using BASE::tests;using BASE::Seed_Lagrangian_Particles;
+    using BASE::Add_Collision_Object;using BASE::Add_Penalty_Collision_Object;
     using BASE::Add_Force;using BASE::Add_Fluid_Wall;using BASE::quad_F_coeff;using BASE::use_plasticity;
     using BASE::use_clamping_plasticity;using BASE::theta_c;using BASE::theta_s;using BASE::hardening_factor;
     using BASE::max_hardening;using BASE::friction_angle;using BASE::cohesion;
-    using BASE::use_variable_coefficients;
+    using BASE::use_variable_coefficients;using BASE::use_penalty_collisions;
 
     // surface tension stuff
     bool use_surface_tension;
