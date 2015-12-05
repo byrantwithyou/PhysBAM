@@ -9,6 +9,7 @@
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Vectors/SCALAR_POLICY.h>
 #include <Tools/Vectors/VECTOR.h>
+#include <Tools/Vectors/ZERO_VECTOR.h>
 
 namespace PhysBAM{
 
@@ -144,6 +145,9 @@ public:
 
     VECTOR<T,d> operator*(const VECTOR<T,d>& v) const
     {return x*v;}
+
+    ZERO_VECTOR<T,d> operator*(const ZERO_VECTOR<T,d>& v) const
+    {return v;}
 
     DIAGONAL_MATRIX operator*(const DIAGONAL_MATRIX& A) const
     {return DIAGONAL_MATRIX(x*A.x);}

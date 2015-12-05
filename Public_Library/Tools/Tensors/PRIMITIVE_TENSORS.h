@@ -503,6 +503,13 @@ operator+=(TENSOR<T,m,n,p>& a,const ZERO_TENSOR<T,m,n,p>& b)
     return a;
 }
 
+template<class T,int m> TENSOR<T,m>&
+operator+=(TENSOR<T,m>& a,const DIAGONAL_TENSOR<T,m>& b)
+{
+    for(int i=0;i<m;i++) a.x(i)(i,i)+=b.v(i);
+    return a;
+}
+
 template<class T,int m,int n> TENSOR<T,m,n,n>&
 operator+=(TENSOR<T,m,n,n>& a,const SYMMETRIC_TENSOR<T,0,m,n>& b)
 {
@@ -1231,6 +1238,36 @@ Contract(const TENSOR<T,m,n,p>& a,const SYMMETRIC_MATRIX<T,n>& M)
 template<int r,int s,class T,int m,int n,int p>
 typename enable_if<r==2,TENSOR<T,m,n,p> >::type
 Contract(const TENSOR<T,m,n,p>& a,const SYMMETRIC_MATRIX<T,p>& M)
+{
+    TENSOR<T,m,n,p> t;
+    for(int i=0;i<m;i++)
+        t.x(i)+=a.x(i)*M;
+    return t;
+}
+
+template<int r,int s,class T,int m,int n,int p>
+typename enable_if<r==0,TENSOR<T,m,n,p> >::type
+Contract(const TENSOR<T,m,n,p>& a,const DIAGONAL_MATRIX<T,m>& M)
+{
+    TENSOR<T,m,n,p> t;
+    for(int i=0;i<m;i++)
+        t.x(i)+=a.x(i)*M(i,i);
+    return t;
+}
+
+template<int r,int s,class T,int m,int n,int p>
+typename enable_if<r==1,TENSOR<T,m,n,p> >::type
+Contract(const TENSOR<T,m,n,p>& a,const DIAGONAL_MATRIX<T,n>& M)
+{
+    TENSOR<T,m,n,p> t;
+    for(int i=0;i<m;i++)
+        t.x(i)+=M*a.x(i);
+    return t;
+}
+
+template<int r,int s,class T,int m,int n,int p>
+typename enable_if<r==2,TENSOR<T,m,n,p> >::type
+Contract(const TENSOR<T,m,n,p>& a,const DIAGONAL_MATRIX<T,p>& M)
 {
     TENSOR<T,m,n,p> t;
     for(int i=0;i<m;i++)
