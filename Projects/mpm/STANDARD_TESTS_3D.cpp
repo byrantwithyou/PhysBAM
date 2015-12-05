@@ -19,6 +19,7 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
+#include <Deformables/Constitutive_Models/MPM_MATSUOKA_NAKAI.h>
 #include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
 #include <Deformables/Constitutive_Models/MPM_SQUARED_DRUCKER_PRAGER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -522,30 +523,7 @@ Initialize()
             particles.lambda0.Fill(lambda);
             Add_Gravity(TV(0,-9.8,0));
         } break;
-        case 18:{ // sand box drop, better paramaters, with Hencky, usage: mpm 18 -3d -resolution 100 -plastic_newton_iterations 100 -plastic_newton_tolerance 1e-8 -friction_angle 0.65 -cohesion 15
-            use_plasticity=true;
-            use_clamping_plasticity=false;
-            use_variable_coefficients=true;
-            particles.Store_Fp(true);
-            particles.Store_Lame(true);
-
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            this->Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,1.5)),0.9);
-
-            T density=(T)2200*scale_mass;
-            T E=35.37e6*scale_E,nu=.3;
-            Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
-            RANGE<TV> box(TV(.4,.1001,.4),TV(.45,.6001,.45));
-            Seed_Particles(box,0,0,density,particles_per_cell);
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
-            particles.mu.Fill(mu);
-            particles.mu0.Fill(mu);
-            particles.lambda.Fill(lambda);
-            particles.lambda0.Fill(lambda);
-            Add_Gravity(TV(0,-9.81,0));
-        } break;
+        case 18: // sand box drop, better paramaters, with Hencky, usage: mpm 18 -3d -resolution 100 -plastic_newton_iterations 100 -plastic_newton_tolerance 1e-8 -friction_angle 0.65 -cohesion 15
         case 19:{
             use_plasticity=true;
             use_clamping_plasticity=false;
@@ -562,8 +540,11 @@ Initialize()
             T density=(T)1281*scale_mass; // source: Sand, dry http://www.engineeringtoolbox.com/density-materials-d_1652.html
             T E=35.37e6*scale_E,nu=.3;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            this->plasticity=new MPM_SQUARED_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
-            RANGE<TV> box(TV(.4,.1001,.4),TV(.45,.6001,.45));
+            if(test_number==18)
+                this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
+            else
+                this->plasticity=new MPM_MATSUOKA_NAKAI<TV>(friction_angle,cohesion);
+            RANGE<TV> box(TV(.4,.1001+0.2,.4),TV(.45,.6001+0.2,.45));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));

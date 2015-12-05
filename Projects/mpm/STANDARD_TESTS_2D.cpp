@@ -542,6 +542,7 @@ Initialize()
             // ./mpm 35 -flip 0.95 -max_dt .005 -cfl .1 -resolution 200
             use_plasticity=true;
             use_variable_coefficients=true;
+            use_clamping_plasticity=true;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -692,6 +693,48 @@ Initialize()
             particles.lambda.Fill(lambda);
             particles.lambda0.Fill(lambda);
             Add_Gravity(TV(0,-9.81));
+        } break;
+        case 40:{ // DP on wedge
+            use_plasticity=true;
+            use_variable_coefficients=true;
+            use_clamping_plasticity=false;
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2)),ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.4-sqrt(2.0)*0.1));
+            RANGE<TV> ground(TV(-1,0),TV(2,0.1));
+            if(use_penalty_collisions){
+                Add_Penalty_Collision_Object(wedge);
+                Add_Penalty_Collision_Object(ground);}
+            else{
+                Add_Collision_Object(ground,COLLISION_TYPE::separate,1);
+                Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge),COLLISION_TYPE::separate,1);}
+
+            T density=(T)2*scale_mass;
+            int number_of_particles=20000;
+            T E=40*scale_E,nu=.2;
+            Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
+            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
+            RANGE<TV> box(TV(.3,.7),TV(.7,.9));
+            std::ifstream ifs("particles.dat");
+            if(ifs.is_open()){
+                std::string foobar;
+                ifs>>foobar>>foobar>>foobar>>foobar;
+                T x,y,mass,volume;
+                while(ifs>>x>>y>>mass>>volume && !ifs.eof())
+                    Add_Particle(TV(x,y),0,0,mass,volume);
+                PHYSBAM_ASSERT(particles.number==number_of_particles);}
+            else{
+                PHYSBAM_WARNING("Couldn't open 'particles.dat'. Falling back to using random particle positions.");
+                Seed_Particles(box,0,0,density,number_of_particles*grid.dX.Product()/box.Size());}
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            particles.mu0.Fill(mu);
+            particles.mu.Fill(mu);
+            particles.lambda0.Fill(lambda);
+            particles.lambda.Fill(lambda);
+            Add_Gravity(TV(0,-2));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
