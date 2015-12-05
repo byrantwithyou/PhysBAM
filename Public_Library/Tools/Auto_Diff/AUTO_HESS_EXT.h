@@ -31,6 +31,7 @@ using ::PhysBAM::cube;
 struct DIFF_UNUSED
 {
     DIFF_UNUSED operator- () const {return DIFF_UNUSED();}
+    template<class A> DIFF_UNUSED Transpose_Times(const A&) const{return DIFF_UNUSED();}
 };
 
 template<class T,class VEC,class MAT,int Q> struct AUTO_HESS_EXT;
