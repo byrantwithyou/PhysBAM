@@ -267,6 +267,9 @@ struct AUTO_NO_DIFF<TV,TV>
     {return Dot(*this);}
 
     AUTO_NO_DIFF<T,TV> Magnitude() const;
+    
+    AUTO_NO_DIFF<T,TV> Sum() const
+    {return AUTO_NO_DIFF<T,TV>(x.Sum());}
 };
 
 template<class T>

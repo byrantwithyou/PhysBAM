@@ -11,6 +11,7 @@
 #include <Tools/Auto_Diff/HESSIAN_MAT.h>
 #include <Tools/Math_Tools/cube.h>
 #include <Tools/Matrices/MATRIX.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Tensors/DIAGONAL_TENSOR.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>
@@ -266,6 +267,9 @@ struct AUTO_HESS_EXT_VEC
     auto Magnitude() const
         -> decltype(Make_Hess(T(),dx.Transpose_Times(x)/T(),(Contract_0(ddx,x)+Transpose_Times_Self_Q<(Q&2)!=0>(dx))/T()-Outer_Product_Q<(Q&2)!=0>(dx.Transpose_Times(x)/T())/T()))
     {T s=x.Magnitude();auto t=dx.Transpose_Times(x)/s;return Make_Hess(s,t,(Contract_0(ddx,x)+Transpose_Times_Self_Q<(Q&2)!=0>(dx))/s-Outer_Product_Q<(Q&2)!=0>(t)/s);}
+
+    auto Sum() const -> decltype(Make_Hess(this->x.Sum(),this->dx.Transpose_Times(TV::All_Ones_Vector()),Contract_0(this->ddx,TV::All_Ones_Vector())))
+    {return Make_Hess(x.Sum(),dx.Transpose_Times(TV::All_Ones_Vector()),Contract_0(ddx,TV::All_Ones_Vector()));}
 };
 
 

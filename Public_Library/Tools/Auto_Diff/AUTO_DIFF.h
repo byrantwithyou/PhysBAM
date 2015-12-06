@@ -282,6 +282,9 @@ struct AUTO_DIFF<TV,TV>
     {return Dot(*this);}
 
     AUTO_DIFF<T,TV> Magnitude() const;
+
+    AUTO_DIFF<T,TV> Sum() const
+    {return Dot(TV::All_Ones_Vector());}
 };
 
 template<class T>
