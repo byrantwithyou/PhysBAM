@@ -401,20 +401,23 @@ Symmetric_Tensor_Product_12(const BLOCK_vS<OBJ0>& block0,const BLOCK_sS<OBJ1>& b
     return Make_vSS(a+a);
 }
 
-template<class T,class OBJ0,class OBJ1> auto
-Double_Contract_12(const PERMUTATION_TENSOR<T>& a,const BLOCK_vV<OBJ0>& block0,const BLOCK_vV<OBJ1>& block1)
+template<class TEN,class OBJ0,class OBJ1> auto
+Double_Contract_12(const TEN& a,const BLOCK_vV<OBJ0>& block0,const BLOCK_vV<OBJ1>& block1,
+    typename enable_if<IS_TENSOR<TEN>::value,void*>::type=0)
 {
     return Make_vVV(Contract<2,0>(Contract<1,0>(a,block0.obj),block1.obj));
 }
 
-template<class T,class OBJ0,class OBJ1> auto
-Double_Contract_12(const PERMUTATION_TENSOR<T>& a,const BLOCK_vV<OBJ0>& block0,const BLOCK_vS<OBJ1>& block1)
+template<class TEN,class OBJ0,class OBJ1> auto
+Double_Contract_12(const TEN& a,const BLOCK_vV<OBJ0>& block0,const BLOCK_vS<OBJ1>& block1,
+    typename enable_if<IS_TENSOR<TEN>::value,void*>::type=0)
 {
     return Make_vVS(Contract<2>(a,block1.obj)*block0.obj);
 }
 
-template<class T,class OBJ0,class OBJ1> auto
-Double_Contract_12(const PERMUTATION_TENSOR<T>& a,const BLOCK_vS<OBJ0>& block0,const BLOCK_vV<OBJ1>& block1)
+template<class TEN,class OBJ0,class OBJ1> auto
+Double_Contract_12(const TEN& a,const BLOCK_vS<OBJ0>& block0,const BLOCK_vV<OBJ1>& block1,
+    typename enable_if<IS_TENSOR<TEN>::value,void*>::type=0)
 {
     return Make_vSV(Contract<1>(a,block0.obj)*block1.obj);
 }
@@ -423,6 +426,12 @@ template<class T,class OBJ0,class OBJ1> auto
 Double_Contract_12(const PERMUTATION_TENSOR<T>& a,const BLOCK_vS<OBJ0>& block0,const BLOCK_vS<OBJ1>& block1)
 {
     return Make_vSS(a.x*Cross_Product(block0.obj,block1.obj));
+}
+
+template<class T,int d,class OBJ0,class OBJ1> auto
+Double_Contract_12(const DIAGONAL_TENSOR<T,d>& a,const BLOCK_vS<OBJ0>& block0,const BLOCK_vS<OBJ1>& block1)
+{
+    return Make_vSS(a.v*block0.obj*block1.obj);
 }
 
 template<class OBJ0,class OBJ1,class T_TEN> auto

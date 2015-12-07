@@ -49,6 +49,9 @@ template<class T,int d> VECTOR<T,d> operator+ (const ZERO_VECTOR<T,d>& z,const V
 template<class T,int d> VECTOR<T,d> operator+ (const VECTOR<T,d>& v,const ZERO_VECTOR<T,d>& z) {return v;}
 template<class T,int d> VECTOR<T,d> operator- (const ZERO_VECTOR<T,d>& z,const VECTOR<T,d>& v) {return -v;}
 template<class T,int d> VECTOR<T,d> operator- (const VECTOR<T,d>& v,const ZERO_VECTOR<T,d>& z) {return v;}
+template<class T,int d> ZERO_VECTOR<T,d> operator* (const VECTOR<T,d>& v,const ZERO_VECTOR<T,d>& z) {return z;}
+template<class T,int d> ZERO_VECTOR<T,d> operator* (const ZERO_VECTOR<T,d>& z,const VECTOR<T,d>& v) {return z;}
+template<class T,int d> ZERO_VECTOR<T,d> operator* (const ZERO_VECTOR<T,d>& y,const ZERO_VECTOR<T,d>& z) {return z;}
 
 template<class T,int d> void Fill_From(VECTOR<T,d>& m,const ZERO_VECTOR<T,d>& z){m=VECTOR<T,d>();}
 template<class T,int d> inline VECTOR<T,d> Cast_Helper(const VECTOR<T,d>& z){return z;}

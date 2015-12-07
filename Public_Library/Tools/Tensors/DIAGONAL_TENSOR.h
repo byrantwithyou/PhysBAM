@@ -9,6 +9,7 @@
 
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/cube.h>
+#include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/PRIMITIVE_MATRICES.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>

@@ -293,6 +293,10 @@ template<class T,int d> VECTOR<T,d>
 Transpose_Times(const DIAGONAL_MATRIX<T,d>& a,const VECTOR<T,d>& b)
 {return a.Transpose_Times(b);}
 
+template<class T,int d> ZERO_VECTOR<T,d>
+Transpose_Times(const DIAGONAL_MATRIX<T,d>& a,const ZERO_VECTOR<T,d>& b)
+{return b;}
+
 template<class T,int d> DIAGONAL_MATRIX<T,d>
 Transpose_Times_Self(const DIAGONAL_MATRIX<T,d>& a)
 {return a*a;}
