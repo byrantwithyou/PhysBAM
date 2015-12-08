@@ -89,8 +89,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-cohesion",&cohesion,"cohesion","Cohesion used for plasticity");
     parse_args.Add("-plastic_newton_iterations",&plastic_newton_iterations,"iter","Newton iterations in plastic yield");
     parse_args.Add("-plastic_newton_tolerance",&plastic_newton_tolerance,"tol","Newton tolerance in plastic yield");
-    parse_args.Add("-use_clamping_plasticity",&use_clamping_plasticity,"clamping plasticity","Use clamping plasticity, as in the snow paper");
-    parse_args.Add("-use_penalty_collisions",&use_penalty_collisions,"penalty collisions","Use penalty collisions objects");
+    parse_args.Add("-use_clamping_plasticity",&use_clamping_plasticity,"Use clamping plasticity, as in the snow paper");
+    parse_args.Add("-use_penalty_collisions",&use_penalty_collisions,"Use penalty collisions objects");
 
     parse_args.Parse(true);
 

@@ -9,26 +9,6 @@
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 namespace PhysBAM{
 //#####################################################################
-// Function Compute_Invariants_Helper
-//#####################################################################
-template<class T> static void
-Compute_Invariants_Helper(const VECTOR<T,2>& sigma,T& I1,T& I2,T& I3)
-{
-    I1=sigma.Sum();
-    I2=sigma.Product();
-    I3=T();
-}
-//#####################################################################
-// Function Compute_Invariants_Helper
-//#####################################################################
-template<class T> static void
-Compute_Invariants_Helper(const VECTOR<T,3>& sigma,T& I1,T& I2,T& I3)
-{
-    I1=sigma.Sum();
-    I2=sigma.x*sigma.y+sigma.x*sigma.z+sigma.y*sigma.z;
-    I3=sigma.Product();
-}
-//#####################################################################
 // Function Constructor
 //#####################################################################
 template<class TV> MPM_MATSUOKA_NAKAI<TV>::
@@ -51,21 +31,12 @@ Set_Lame_Constants_And_F_Elastic(T mu,T lambda,const DIAGONAL_MATRIX<T,d>& Fe)
 // Function Yield_Function
 //#####################################################################
 template<class TV> typename TV::SCALAR MPM_MATSUOKA_NAKAI<TV>::
-Yield_Function() const
-{
-    T I1,I2,I3;
-    Compute_Invariants_Helper(tau_trial,I1,I2,I3);
-    return 6*(kappa*I3-I1*I2);
-}
-//#####################################################################
-// Function Yield_Function
-//#####################################################################
-template<class TV> typename TV::SCALAR MPM_MATSUOKA_NAKAI<TV>::
 Yield_Function(const TV& tau) const
 {
-    T I1,I2,I3;
-    Compute_Invariants_Helper(tau,I1,I2,I3);
-    return 6*(kappa*I3-I1*I2);
+    T I1=tau.Sum();
+    T I2=0.5*(I1*I1-(tau*tau).Sum());
+    T I3=tau.Product();
+    return 6*(kappa*I3-I1*I2)+(d-3.0)/d*I1*I1*I1;
 }
 //#####################################################################
 // Function Project_Stress
@@ -81,6 +52,8 @@ Project_Stress(int max_iterations, T tolerance)
         x-=Get_Jacobian(x).Inverse_Times(residual);
         residual=Get_Residual(x,strain_trial,D);}
     x.Get_Subvector(0,tau_final);
+    T delta_gamma_final=x(d);
+    LOG::printf("tau_final: %p\tdelta_gamma_final: %g\n", tau_final, delta_gamma_final);
     return residual.Magnitude_Squared()<=tolerance*tolerance;
 }
 //#####################################################################
@@ -107,8 +80,8 @@ Get_Jacobian(const TVP1& x) const
 template<class TV> TV MPM_MATSUOKA_NAKAI<TV>::
 Yield_Function_Derivative(const TV& tau) const
 {
-    T I1,I2,I3;
-    Compute_Invariants_Helper(tau,I1,I2,I3);
+    T I1=tau.Sum();
+    T I3=tau.Product();
     TV s=tau-tau.Sum()/d;
     T s_norm_squared=s.Magnitude_Squared();
     TV oo=TV::All_Ones_Vector();
@@ -119,8 +92,8 @@ Yield_Function_Derivative(const TV& tau) const
 //#####################################################################
 template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> MPM_MATSUOKA_NAKAI<TV>::
 Yield_Function_Hessian(TV tau) const {
-    T I1,I2,I3;
-    Compute_Invariants_Helper(tau,I1,I2,I3);
+    T I1=tau.Sum();
+    T I3=tau.Product();
     TV oo=TV::All_Ones_Vector();
     SYMMETRIC_MATRIX<T,d>  op=SYMMETRIC_MATRIX<T,d>::Outer_Product(Inverse(tau));
     DIAGONAL_MATRIX<T,d> ov(sqr(Inverse(tau)));

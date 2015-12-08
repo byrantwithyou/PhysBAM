@@ -19,8 +19,9 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
-#include <Deformables/Constitutive_Models/MPM_MATSUOKA_NAKAI.h>
 #include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
+#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER_HARDENING.h>
+#include <Deformables/Constitutive_Models/MPM_MATSUOKA_NAKAI.h>
 #include <Deformables/Constitutive_Models/MPM_SQUARED_DRUCKER_PRAGER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
@@ -205,22 +206,6 @@ Initialize()
             Seed_Particles(sphere2,[=](const TV& X){return TV(-0.75,0,0);},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
             Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
-
-        case 22:{ // (fluid test) pool of water 
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box(TV(0,0,0),TV(1,0.25,1));
-            T density=2*scale_mass;
-            Seed_Particles(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
-            Add_Gravity(TV(0,-9.8,0));
-        } break;
-        case 24:{ // (fluid test) circle drop 
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            SPHERE<TV> sphere(TV(.5,.75,.5),.2);
-            T density=2*scale_mass;
-            Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
-            Add_Gravity(TV(0,-9.8,0));
-        } break;
-
         case 8:{ // torus into a box
             // TODO: fix crash ./mpm -3d 8 -affine -last_frame 500 -midpoint -resolution 40 -newton_tolerance 1e-3 
             grid.Initialize(TV_INT(resolution,resolution*2,resolution)+1,RANGE<TV>(TV(),TV(1,2,1)),true);
@@ -544,7 +529,8 @@ Initialize()
                 this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
             else
                 this->plasticity=new MPM_MATSUOKA_NAKAI<TV>(friction_angle,cohesion);
-            RANGE<TV> box(TV(.4,.1001+0.2,.4),TV(.45,.6001+0.2,.45));
+            T gap=grid.dX(1)*0.1;
+            RANGE<TV> box(TV(.4,.1+gap,.4),TV(.45,.1+gap+0.5,.45));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));
@@ -553,6 +539,71 @@ Initialize()
             particles.lambda.Fill(lambda);
             particles.lambda0.Fill(lambda);
             Add_Gravity(TV(0,-9.81,0));
+        } break;
+        case 20:
+        case 21:
+        case 22:
+        case 23:
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+        case 28:
+        case 29:{ // Mast paper
+            static const T as[10][4]={
+                {35,0,0.2,10},
+                {35,4,0.29,10},
+                {35,9,0.3,10},
+                {35,13,0.27,10},
+                {35,0,0.2,6.57},
+                {35,0,0.2,3.33},
+                {35,0,0.2,0},
+                {38.33,0,0.2,13.33},
+                {41.67,0,0.2,16.67},
+                {45,0,0.2,20}};
+            use_plasticity=true;
+            use_clamping_plasticity=false;
+            use_variable_coefficients=true;
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+            particles.Store_Plastic_Deformation(true);
+
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            if(use_penalty_collisions)
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,1.5)),0.9);
+            else
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,1.5)),COLLISION_TYPE::stick,0);
+
+            T density=(T)2200*scale_mass;
+            T E=35.37e6*scale_E,nu=.3;
+            Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
+            this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(as[test_number-20][0],as[test_number-20][1],as[test_number-20][2],as[test_number-20][3]);
+            T gap=grid.dX(1)*0.1;
+            T l0=0.05;
+            T h0=l0*8;
+            CYLINDER<T> cylinder(TV(.5,.1+gap,.5),TV(.5,.1+gap+h0,.5),l0);
+            Seed_Particles(cylinder,0,0,density,particles_per_cell);
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            particles.mu.Fill(mu);
+            particles.mu0.Fill(mu);
+            particles.lambda.Fill(lambda);
+            particles.lambda0.Fill(lambda);
+            Add_Gravity(TV(0,-9.81,0));
+        } break;
+        case 30:{ // (fluid test) pool of water 
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> box(TV(0,0,0),TV(1,0.25,1));
+            T density=2*scale_mass;
+            Seed_Particles(box,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
+            Add_Gravity(TV(0,-9.8,0));
+        } break;
+        case 31:{ // (fluid test) circle drop 
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            SPHERE<TV> sphere(TV(.5,.75,.5),.2);
+            T density=2*scale_mass;
+            Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
+            Add_Gravity(TV(0,-9.8,0));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

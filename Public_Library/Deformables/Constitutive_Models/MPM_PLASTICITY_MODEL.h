@@ -5,6 +5,7 @@
 #ifndef __MPM_PLASTICITY_MODEL__
 #define __MPM_PLASTICITY_MODEL__
 
+#include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Matrices/MATRIX_FORWARD.h>
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Vectors/VECTOR_FORWARD.h>
@@ -23,6 +24,8 @@ public:
     virtual T Yield_Function_Final() const=0;
     virtual bool Project_Stress(int max_iterations,T tolerance)=0;
     virtual TV Get_Updated_Sigma() const=0;
+    virtual void Set_Plastic_Deformation_Lambda(T plastic_def){PHYSBAM_NOT_IMPLEMENTED();}
+    virtual T Get_Updated_Plastic_Deformation_Lambda() const {PHYSBAM_NOT_IMPLEMENTED();}
 };
 }
 #endif

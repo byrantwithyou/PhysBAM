@@ -18,6 +18,8 @@
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
+#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER_HARDENING.h>
+#include <Deformables/Constitutive_Models/MPM_MATSUOKA_NAKAI_WITH_DP.h>
 #include <Deformables/Constitutive_Models/MPM_SQUARED_DRUCKER_PRAGER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
@@ -613,34 +615,7 @@ Initialize()
             stf->Set_Damping((T)0.1);
             Add_Force(*stf);
         } break;
-        case 37:{ // sand box drop with Hencky, usage: mpm 37 -resolution 100 -plastic_newton_iterations 100 -plastic_newton_tolerance 1e-8
-            use_plasticity=true;
-            use_clamping_plasticity=false;
-            use_variable_coefficients=true;
-            particles.Store_Fp(true);
-            particles.Store_Lame(true);
-
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            if(use_penalty_collisions)
-                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
-            else
-                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::stick,0);
-
-            T density=(T)1281*scale_mass;
-            T E=5000*scale_E,nu=.4;
-            Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            this->plasticity=new MPM_SQUARED_DRUCKER_PRAGER<TV>(0.65,5);
-            RANGE<TV> box(TV(.45,.11),TV(.55,.31));
-            Seed_Particles(box,0,0,density,particles_per_cell);
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
-            particles.mu.Fill(mu);
-            particles.mu0.Fill(mu);
-            particles.lambda.Fill(lambda);
-            particles.lambda0.Fill(lambda);
-            Add_Gravity(TV(0,-9.8));
-        } break;
-        case 38:{ // sand box drop, better paramaters, with Hencky, usage: mpm 38 -resolution 100 -plastic_newton_iterations 100 -plastic_newton_tolerance 1e-8
+        case 37:{ // sand box drop, better paramaters, with Hencky, usage: mpm 38 -resolution 100 -plastic_newton_iterations 100 -plastic_newton_tolerance 1e-8
             use_plasticity=true;
             use_clamping_plasticity=false;
             use_variable_coefficients=true;
@@ -667,7 +642,7 @@ Initialize()
             particles.lambda0.Fill(lambda);
             Add_Gravity(TV(0,-9.81));
         } break;
-        case 39:{ // sand box drop, wide
+        case 38:{ // sand box drop, wide
             use_plasticity=true;
             use_clamping_plasticity=false;
             use_variable_coefficients=true;
@@ -694,7 +669,7 @@ Initialize()
             particles.lambda0.Fill(lambda);
             Add_Gravity(TV(0,-9.81));
         } break;
-        case 40:{ // DP on wedge
+        case 39:{ // DP on wedge
             use_plasticity=true;
             use_variable_coefficients=true;
             use_clamping_plasticity=false;
@@ -735,6 +710,57 @@ Initialize()
             particles.lambda0.Fill(lambda);
             particles.lambda.Fill(lambda);
             Add_Gravity(TV(0,-2));
+        } break;
+        case 40:
+        case 41:
+        case 42:
+        case 43:
+        case 44:
+        case 45:
+        case 46:
+        case 47:
+        case 48:
+        case 49:{ // Mast paper
+            static const T as[10][4]={
+                {35,0,0.2,10},
+                {35,4,0.29,10},
+                {35,9,0.3,10},
+                {35,13,0.27,10},
+                {35,0,0.2,6.57},
+                {35,0,0.2,3.33},
+                {35,0,0.2,0},
+                {38.33,0,0.2,13.33},
+                {41.67,0,0.2,16.67},
+                {45,0,0.2,20}};
+            use_plasticity=true;
+            use_clamping_plasticity=false;
+            use_variable_coefficients=true;
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+            particles.Store_Plastic_Deformation(true);
+
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            if(use_penalty_collisions)
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+            else
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::stick,0);
+
+            T density=(T)2200*scale_mass;
+            T E=35.37e6*scale_E,nu=.3;
+            Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
+            this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(as[test_number-40][0],as[test_number-40][1],as[test_number-40][2],as[test_number-40][3]);
+            T l0=0.05;
+            T h0=l0*8;
+            T gap=grid.dX(1)*0.01;
+            RANGE<TV> box(TV(.5-l0,.1+gap),TV(.5+l0,.1+gap+h0));
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            particles.mu.Fill(mu);
+            particles.mu0.Fill(mu);
+            particles.lambda.Fill(lambda);
+            particles.lambda0.Fill(lambda);
+            Add_Gravity(TV(0,-9.81));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

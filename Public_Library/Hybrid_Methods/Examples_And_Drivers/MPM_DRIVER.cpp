@@ -21,6 +21,8 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
+#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER_HARDENING.h>
+#include <Deformables/Constitutive_Models/MPM_MATSUOKA_NAKAI_WITH_DP.h>
 #include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/COLLISION_FORCE.h>
@@ -701,17 +703,18 @@ Update_Plasticity_And_Hardening()
             DIAGONAL_MATRIX<T,TV::m> singular_values;
             Fe.Fast_Singular_Value_Decomposition(U,singular_values,V);
             plasticity->Set_Lame_Constants_And_F_Elastic(particles.mu(p),particles.lambda(p),singular_values);
+            if(particles.store_plastic_def) plasticity->Set_Plastic_Deformation_Lambda(particles.plastic_def(p));
             if(plasticity->Yield_Function()>0){
                 ++num_projected_particles;
-                if(!plasticity->Project_Stress(example.plastic_newton_iterations,example.plastic_newton_tolerance))
-                    ++num_non_converged_particles;}
-            singular_values.x=plasticity->Get_Updated_Sigma();
-            particles.F(p)=(U*singular_values).Times_Transpose(V);
-            particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);
-            max_yield_function=max(max_yield_function,plasticity->Yield_Function_Final());
-        }
+                if(!plasticity->Project_Stress(example.plastic_newton_iterations,example.plastic_newton_tolerance)) ++num_non_converged_particles;
+                if(particles.store_plastic_def) particles.plastic_def(p)=plasticity->Get_Updated_Plastic_Deformation_Lambda();
+                singular_values.x=plasticity->Get_Updated_Sigma();
+                particles.F(p)=(U*singular_values).Times_Transpose(V);
+                particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);
+                max_yield_function=max(max_yield_function,plasticity->Yield_Function_Final());}}
         LOG::printf("Max yield function value: %g\n",max_yield_function);
-        LOG::printf("PLASTICITY: %d/%d/%d (total/projected/non converged particles)\n",example.simulated_particles.m,num_projected_particles,num_non_converged_particles);}
+        LOG::printf("PLASTICITY: %d/%d/%d (total/projected/non converged particles)\n",example.simulated_particles.m,num_projected_particles,num_non_converged_particles);
+    }
 }
 //#####################################################################
 // Function Add_C_Contribution_To_DT
