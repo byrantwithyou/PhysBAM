@@ -39,28 +39,47 @@ template<class TV> bool MPM_DRUCKER_PRAGER_HARDENING<TV>::
 Project_Stress(int max_iterations, T tolerance)
 {
     PHYSBAM_ASSERT(plastic_def>=0 && "Plastic deformation lambda has not been set!");
-    if(tau_trial.Sum()>0){
-        tau_final*=0;
-        delta_gamma_final=0;
-        PHYSBAM_ASSERT(abs(Yield_Function_Final())<1e-2);
-        return true;}
+    if(direct_solution){
+        T g=1/(d*lambda+2*mu);
+        T b=1/(2*mu);
+        T k=strain_trial.Sum();
+        TV sh=strain_trial-k/d*TV::All_Ones_Vector();
+        T q=sh.Magnitude();
+        if(q==0){
+           tau_final=TV();
+           return true;} 
+        else{
+            T dg=(g*q+b*(rho_F*k))/g;
+            T m=k/(d*g);
+            T n=(q-dg)/(b*q);
+            tau_final=m*TV::All_Ones_Vector()+n*sh;
+            T e=n*q;
+            if(e<0) tau_final=TV();
+            T e3=(tau_final-tau_final.Sum()/d).Magnitude()+rho_F*tau_final.Sum();
+            if(abs(e3)>1e-8) LOG::printf("BAD PARTICLE: yield function value:%g\n",e3);
+            return e>=0;}}
     else{
-        TVP1 x,residual;
-        x.Set_Subvector(0,tau_trial);
-        residual=Get_Residual(x,strain_trial,D);
-        int k=0;
-        while(k++<max_iterations && residual.Magnitude_Squared()>tolerance*tolerance){
-            x-=Get_Jacobian(x).Inverse_Times(residual);
-            residual=Get_Residual(x,strain_trial,D);}
-        x.Get_Subvector(0,tau_final);
-        PHYSBAM_ASSERT(abs(Yield_Function_Final())<1e-2);
-        delta_gamma_final=x(d);
-        //LOG::printf("residual(%d):%g\n",k,residual.Magnitude());
-        //LOG::printf("tau_final=%g\n",tau_final);
-        //LOG::printf("F(tau_final)=%g\n",Yield_Function(tau_final));
-        //LOG::printf("D*tau_final=%g\n",D*tau_final);
-        return residual.Magnitude_Squared()<=tolerance*tolerance;
-    }
+        if(tau_trial.Sum()>0){
+            tau_final*=0;
+            delta_gamma_final=0;
+            PHYSBAM_ASSERT(abs(Yield_Function_Final())<1e-2);
+            return true;}
+        else{
+            TVP1 x,residual;
+            x.Set_Subvector(0,tau_trial);
+            residual=Get_Residual(x,strain_trial,D);
+            int k=0;
+            while(k++<max_iterations && residual.Magnitude_Squared()>tolerance*tolerance){
+                x-=Get_Jacobian(x).Inverse_Times(residual);
+                residual=Get_Residual(x,strain_trial,D);}
+            x.Get_Subvector(0,tau_final);
+            PHYSBAM_ASSERT(abs(Yield_Function_Final())<1e-2);
+            delta_gamma_final=x(d);
+            //LOG::printf("residual(%d):%g\n",k,residual.Magnitude());
+            //LOG::printf("tau_final=%g\n",tau_final);
+            //LOG::printf("F(tau_final)=%g\n",Yield_Function(tau_final));
+            //LOG::printf("D*tau_final=%g\n",D*tau_final);
+            return residual.Magnitude_Squared()<=tolerance*tolerance;}}
 }
 //#####################################################################
 // Function Get_Jacobian
