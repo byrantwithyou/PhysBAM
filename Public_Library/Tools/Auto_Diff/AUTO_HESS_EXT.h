@@ -976,7 +976,7 @@ exp(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a)
 
 template<class TV,class VEC,class MAT,int Q> inline auto
 log(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a)
-{TV b=Inverse(a.x);return Make_Hess_Vec(a.x,DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(b)*a.dx,Contract_00(a.ddx,DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(b))-Symmetric_Double_Contract_12_With_Tensor_Q<(Q&2)!=0>(DIAGONAL_TENSOR<typename TV::SCALAR,TV::m>(0.5*b*b),a.dx,a.dx));}
+{TV b=Inverse(a.x);return Make_Hess_Vec(log(a.x),DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(b)*a.dx,Contract_00(a.ddx,DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>(b))-Symmetric_Double_Contract_12_With_Tensor_Q<(Q&2)!=0>(DIAGONAL_TENSOR<typename TV::SCALAR,TV::m>(0.5*b*b),a.dx,a.dx));}
 
 template<class TV,class VEC,class MAT,int Q> inline auto
 sin(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a)
