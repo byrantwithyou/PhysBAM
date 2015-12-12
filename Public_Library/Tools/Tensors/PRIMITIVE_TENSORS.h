@@ -1726,8 +1726,7 @@ template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(c
 template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const MATRIX<T,m>& cm1,const MATRIX<T,m>& cm2)
 {
     SYMMETRIC_TENSOR<T,0,m,m> s;
-    SYMMETRIC_MATRIX<T,m> sm=cm1.Transpose_Times(cm2).Twice_Symmetric_Part();
-    for(int i=0;i<m;i++) s.x(i)=sm*t.v(i);
+    for(int i=0;i<m;i++) s.x(i)=t.v(i)*MATRIX<T,m>::Outer_Product(cm1.Row(i),cm2.Row(i)).Twice_Symmetric_Part();;
     return s;
 }
 

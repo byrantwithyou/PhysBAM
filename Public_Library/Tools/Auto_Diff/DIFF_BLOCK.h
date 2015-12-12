@@ -449,7 +449,7 @@ Symmetric_Double_Contract_12(const PERMUTATION_TENSOR<T>& a,const BLOCK_vS<OBJ0>
 template<class T,int m,class OBJ0,class OBJ1> auto
 Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& a,const BLOCK_vS<OBJ0>& block0,const BLOCK_vS<OBJ1>& block1)
 {
-    return Make_vSS(a.v*block0.obj*block1.obj);
+    return Make_vSS(a.v*2*block0.obj*block1.obj);
 }
 
 template<class OBJ0> auto
