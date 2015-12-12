@@ -34,6 +34,9 @@ public:
     ZERO_TENSOR operator/(T a) const
     {return *this;}
 };
+template<class T,int m,int n,int p> inline std::ostream&
+operator<<(std::ostream& o,const ZERO_TENSOR<T,m,n,p>& A)
+{o<<"(0)";return o;}
 }
 #include <Tools/Tensors/PRIMITIVE_TENSORS.h>
 #endif

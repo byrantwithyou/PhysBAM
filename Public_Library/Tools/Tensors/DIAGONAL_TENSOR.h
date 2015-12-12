@@ -39,6 +39,9 @@ public:
     DIAGONAL_TENSOR operator/(T a) const
     {return DIAGONAL_TENSOR(v/a);}
 };
+template<class T,int d> inline std::ostream&
+operator<<(std::ostream& o,const DIAGONAL_TENSOR<T,d>& A)
+{o<<"("<<A.v<<")";return o;}
 }
 #include <Tools/Tensors/PRIMITIVE_TENSORS.h>
 #endif

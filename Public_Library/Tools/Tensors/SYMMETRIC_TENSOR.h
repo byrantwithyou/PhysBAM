@@ -44,6 +44,10 @@ public:
 template<class T,int u,int m,int n>
 SYMMETRIC_TENSOR<T,u,m,n> operator*(T a,const SYMMETRIC_TENSOR<T,u,m,n>& s)
 {return s*a;}
+
+template<class T,int m,int n,int p> inline std::ostream&
+operator<<(std::ostream& o,const SYMMETRIC_TENSOR<T,m,n,p>& A)
+{o<<"("<<A.x<<")";return o;}
 }
 #include <Tools/Tensors/PRIMITIVE_TENSORS.h>
 #endif

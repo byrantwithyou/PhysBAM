@@ -55,6 +55,10 @@ public:
 template<class T,int m,int n,int p>
 TENSOR<T,m,n,p> operator*(T a,const TENSOR<T,m,n,p>& s)
 {return s*a;}
+
+template<class T,int m,int n,int p> inline std::ostream&
+operator<<(std::ostream& o,const TENSOR<T,m,n,p>& A)
+{o<<"("<<A.x<<")";return o;}
 }
 #include <Tools/Tensors/PRIMITIVE_TENSORS.h>
 #endif
