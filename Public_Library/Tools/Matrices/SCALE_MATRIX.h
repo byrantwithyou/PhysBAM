@@ -136,6 +136,10 @@ template<class T,int m> SYMMETRIC_MATRIX<T,m>
 Transpose_Times(const SYMMETRIC_MATRIX<T,m>& a,const SCALE_MATRIX<T,m>& b)
 {return a*b.x;}
 
+template<class T,int m> DIAGONAL_MATRIX<T,m>
+Transpose_Times(const DIAGONAL_MATRIX<T,m>& a,const SCALE_MATRIX<T,m>& b)
+{return a*b.x;}
+
 template<class T,int d,class OP> auto
 Times_Transpose(const SCALE_MATRIX<T,d>& a,const OP& b) -> decltype(a.x*b.Transposed())
 {return a.x*b.Transposed();}
@@ -146,6 +150,10 @@ Times_Transpose(const MATRIX<T,m,n>& a,const SCALE_MATRIX<T,m>& b)
 
 template<class T,int m> SYMMETRIC_MATRIX<T,m>
 Times_Transpose(const SYMMETRIC_MATRIX<T,m>& a,const SCALE_MATRIX<T,m>& b)
+{return a*b.x;}
+
+template<class T,int m> DIAGONAL_MATRIX<T,m>
+Times_Transpose(const DIAGONAL_MATRIX<T,m>& a,const SCALE_MATRIX<T,m>& b)
 {return a*b.x;}
 
 }

@@ -243,6 +243,10 @@ template<class T,int m,int n> MATRIX<T,m,n>
 Transpose_Times(const SYMMETRIC_MATRIX<T,m>& a,const MATRIX<T,m,n>& b)
 {return a.Transpose_Times(b);}
 
+template<class T,int m,int n> MATRIX<T,m,n>
+Transpose_Times(const DIAGONAL_MATRIX<T,m>& a,const MATRIX<T,m,n>& b)
+{return a.Transpose_Times(b);}
+
 template<class T,int m,int n,int p> MATRIX<T,n,p>
 Transpose_Times(const MATRIX<T,m,n>& a,const MATRIX<T,m,p>& b)
 {return a.Transpose_Times(b);}
@@ -255,12 +259,24 @@ template<class T,int m,int n> MATRIX<T,m,n>
 Times_Transpose(const SYMMETRIC_MATRIX<T,m>& a,const MATRIX<T,m,n>& b)
 {return a.Times_Transpose(b);}
 
+template<class T,int m,int n> MATRIX<T,n,m>
+Transpose_Times(const MATRIX<T,m,n>& a,const DIAGONAL_MATRIX<T,m>& b)
+{return a.Transpose_Times(b);}
+
+template<class T,int m,int n> MATRIX<T,m,n>
+Times_Transpose(const DIAGONAL_MATRIX<T,m>& a,const MATRIX<T,m,n>& b)
+{return a.Times_Transpose(b);}
+
 template<class T,int m,int n,int p> MATRIX<T,n,p>
 Times_Transpose(const MATRIX<T,m,n>& a,const MATRIX<T,m,p>& b)
 {return a.Times_Transpose(b);}
 
 template<class T,int m,int n> MATRIX<T,n,m>
 Times_Transpose(const MATRIX<T,m,n>& a,const SYMMETRIC_MATRIX<T,m>& b)
+{return a.Times_Transpose(b);}
+
+template<class T,int m,int n> MATRIX<T,n,m>
+Times_Transpose(const MATRIX<T,m,n>& a,const DIAGONAL_MATRIX<T,m>& b)
 {return a.Times_Transpose(b);}
 
 template<class T,int m,int n> VECTOR<T,n>
@@ -277,6 +293,14 @@ Double_Contract(const SYMMETRIC_MATRIX<T,m>& a,const MATRIX<T,m,m>& b)
 
 template<class T,int m> T
 Double_Contract(const MATRIX<T,m,m>& b,const SYMMETRIC_MATRIX<T,m>& a)
+{return b.Double_Contract(a);}
+
+template<class T,int m> T
+Double_Contract(const DIAGONAL_MATRIX<T,m>& a,const MATRIX<T,m,m>& b)
+{return b.Double_Contract(a);}
+
+template<class T,int m> T
+Double_Contract(const MATRIX<T,m,m>& b,const DIAGONAL_MATRIX<T,m>& a)
 {return b.Double_Contract(a);}
 
 template<class T,int m,int n> T

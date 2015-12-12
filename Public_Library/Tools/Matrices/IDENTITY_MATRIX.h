@@ -126,6 +126,10 @@ template<class T,int m> SYMMETRIC_MATRIX<T,m>
 Transpose_Times(const SYMMETRIC_MATRIX<T,m>& a,const IDENTITY_MATRIX<T,m>& b)
 {return a;}
 
+template<class T,int m> DIAGONAL_MATRIX<T,m>
+Transpose_Times(const DIAGONAL_MATRIX<T,m>& a,const IDENTITY_MATRIX<T,m>& b)
+{return a;}
+
 template<class T,int d,class OP> auto
 Times_Transpose(const IDENTITY_MATRIX<T,d>& a,const OP& b) -> decltype(b.Transposed())
 {return b.Transposed();}
@@ -136,6 +140,10 @@ Times_Transpose(const MATRIX<T,m,n>& a,const IDENTITY_MATRIX<T,m>& b)
 
 template<class T,int m> SYMMETRIC_MATRIX<T,m>
 Times_Transpose(const SYMMETRIC_MATRIX<T,m>& a,const IDENTITY_MATRIX<T,m>& b)
+{return a;}
+
+template<class T,int m> DIAGONAL_MATRIX<T,m>
+Times_Transpose(const DIAGONAL_MATRIX<T,m>& a,const IDENTITY_MATRIX<T,m>& b)
 {return a;}
 }
 #endif
