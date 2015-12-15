@@ -30,6 +30,7 @@ using ::std::abs;
 using ::std::floor;
 using ::std::ceil;
 using ::std::sqrt;
+using ::std::log;
 
 template<class T_ARRAY,class T_INDICES> class INDIRECT_ARRAY;
 
