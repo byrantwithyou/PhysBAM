@@ -42,5 +42,6 @@ template<class T,int m,int n> struct IS_SYM_TENSOR<2,ZERO_TENSOR<T,n,n,m> > {sta
 template<int s,class T,int m,int n> struct IS_SYM_TENSOR<s,SYMMETRIC_TENSOR<T,s,m,n> > {static const int value=1;};
 template<int s,class T,int m,int n> struct IS_SYM_TENSOR<s,VEC_ID_TENSOR<T,s,m,n> > {static const int value=1;};
 template<int s,class T,int m> struct IS_SYM_TENSOR<s,VEC_ID_SYM_TENSOR<T,s,m> > {static const int value=1;};
+template<class T,int m,int s> struct IS_SYM_TENSOR<s,DIAGONAL_TENSOR<T,m> > {static const int value=1;};
 }
 #endif

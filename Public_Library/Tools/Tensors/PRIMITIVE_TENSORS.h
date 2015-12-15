@@ -601,6 +601,13 @@ operator+=(SYMMETRIC_TENSOR<T,u,m>& a,const VEC_ID_SYM_TENSOR<T,u,m>& b)
     return a;
 }
 
+template<class T,int u,int m> SYMMETRIC_TENSOR<T,u,m,m>&
+operator+=(SYMMETRIC_TENSOR<T,u,m,m>& a,const DIAGONAL_TENSOR<T,m>& b)
+{
+    for(int i=0;i<m;i++) a.x(i)(i,i)+=b.v(i);
+    return a;
+}
+
 //#####################################################################
 // operator-=
 //##################################################################### 
@@ -676,6 +683,13 @@ operator-=(TENSOR<T,3>& a,const PERMUTATION_TENSOR<T>& b)
     return a;
 }
 
+template<class T,int m> TENSOR<T,m>&
+operator-=(TENSOR<T,m>& a,const DIAGONAL_TENSOR<T,m>& b)
+{
+    for(int i=0;i<m;i++) a.x(i)(i,i)-=b.v(i);
+    return a;
+}
+
 template<class T,int u,int m,int n> SYMMETRIC_TENSOR<T,u,m,n>&
 operator-=(SYMMETRIC_TENSOR<T,u,m,n>& a,const SYMMETRIC_TENSOR<T,u,m,n>& b)
 {
@@ -702,6 +716,13 @@ operator-=(SYMMETRIC_TENSOR<T,u,m>& a,const VEC_ID_SYM_TENSOR<T,u,m>& b)
     TENSOR<T,m> t;
     t+=VEC_ID_TENSOR<T,1,m,m>(b.v);
     for(int i=0;i<m;i++) a.x(i)-=t.x(i).Twice_Symmetric_Part();
+    return a;
+}
+
+template<class T,int u,int m> SYMMETRIC_TENSOR<T,u,m,m>&
+operator-=(SYMMETRIC_TENSOR<T,u,m,m>& a,const DIAGONAL_TENSOR<T,m>& b)
+{
+    for(int i=0;i<m;i++) a.x(i)(i,i)-=b.v(i);
     return a;
 }
 
@@ -1496,6 +1517,93 @@ Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
     for(int i=0;i<m;i++)
         for(int j=0;j<n;j++)
             t.x(j).Set_Column(i,M.Transpose_Times(a.x(i).Row(j)));
+    return t;
+}
+
+template<int r,int s,class T,int m> SYMMETRIC_TENSOR<T,r,m>
+Contract(const DIAGONAL_TENSOR<T,m>& a,const SYMMETRIC_MATRIX<T,m>& M)
+{
+    SYMMETRIC_TENSOR<T,r,m> t;
+    for(int i=0;i<m;i++)
+        for(int j=0;j<m;j++)
+            t.x(j)(i,i)+=a.x(i)*M(i,j);
+    return t;
+}
+
+template<int r,int s,class T,int m,int n> SYMMETRIC_TENSOR<T,r,m,n>
+Contract(const SYMMETRIC_TENSOR<T,r,m,n>& a,const DIAGONAL_MATRIX<T,m>& M)
+{
+    SYMMETRIC_TENSOR<T,r,m,n> t;
+    for(int i=0;i<m;i++)
+        t.x(i)+=a.x(i)*M(i,i);
+    return t;
+}
+
+template<int r,int s,class T,int m,int n>
+typename enable_if<r==1,TENSOR<T,m,n,n> >::type
+Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
+{
+    TENSOR<T,m,n,n> t;
+    for(int i=0;i<m;i++)
+        t.x(i)=M.Transpose_Times(a.x(i));
+    return t;
+}
+
+template<int r,int s,class T,int m,int n>
+typename enable_if<r==2,TENSOR<T,m,n,n> >::type
+Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
+{
+    TENSOR<T,m,n,n> t;
+    for(int i=0;i<m;i++)
+        t.x(i)=a.x(i).Times_Transpose(M);
+    return t;
+}
+
+template<int r,int s,class T,int m,int n>
+typename enable_if<r==0,TENSOR<T,n,m,n> >::type
+Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
+{
+    TENSOR<T,n,m,n> t;
+    for(int i=0;i<m;i++)
+        for(int j=0;j<n;j++)
+            for(int k=0;k<n;k++)
+                t.x(j)(i,k)+=a.x(i)(j,k)*M(j,j);
+    return t;
+}
+
+template<int r,int s,class T,int m,int n>
+typename enable_if<r==2,TENSOR<T,n,m,n> >::type
+Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
+{
+    TENSOR<T,n,m,n> t;
+    for(int i=0;i<m;i++)
+        for(int j=0;j<n;j++)
+            for(int k=0;k<n;k++)
+                t.x(j)(i,k)+=a.x(i)(j,k)*M(k,k);
+    return t;
+}
+
+template<int r,int s,class T,int m,int n>
+typename enable_if<r==0,TENSOR<T,n,n,m> >::type
+Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
+{
+    TENSOR<T,n,n,m> t;
+    for(int i=0;i<m;i++)
+        for(int j=0;j<n;j++)
+            for(int k=0;k<n;k++)
+                t.x(j)(k,i)+=a.x(i)(j,k)*M(j,j);
+    return t;
+}
+
+template<int r,int s,class T,int m,int n>
+typename enable_if<r==1,TENSOR<T,n,n,m> >::type
+Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
+{
+    TENSOR<T,n,n,m> t;
+    for(int i=0;i<m;i++)
+        for(int j=0;j<n;j++)
+            for(int k=0;k<n;k++)
+                t.x(j)(k,i)+=a.x(i)(j,k)*M(k,k);
     return t;
 }
 
