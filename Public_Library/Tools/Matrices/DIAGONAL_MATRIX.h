@@ -123,7 +123,7 @@ public:
     {MATRIX<T,d> r(A);for(int i=0;i<d;i++) r(i,i)+=x(i);return r;}
 
     MATRIX<T,d> operator-(const MATRIX<T,d>& A) const
-    {MATRIX<T,d> r(A);for(int i=0;i<d;i++) r(i,i)-=x(i);return r;}
+    {return *this+-A;}
 
     DIAGONAL_MATRIX operator+(const DIAGONAL_MATRIX& A) const
     {return DIAGONAL_MATRIX(x+A.x);}
