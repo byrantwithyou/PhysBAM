@@ -38,5 +38,13 @@ inline T log1p_x_over_x(const T x) // log(x+1)/x
 template<class T>
 inline T diff_log_over_diff(const T x,const T y) // (log(x)-log(y))/(x-y)
 {return log1p_x_over_x((y-x)/x)/x;}
+
+template<class T>
+inline T exp_x_minus_1_over_x(const T x) // (exp(x)-1)/x
+{if(!x) return 1;return expm1(x)/x;}
+
+template<class T>
+inline T diff_exp_over_diff(const T x,const T y) // (exp(x)-exp(y))/(x-y)
+{return exp(x)*exp_x_minus_1_over_x(y-x);}
 }
 #endif
