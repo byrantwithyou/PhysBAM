@@ -638,6 +638,14 @@ public:
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
                 last_frame=120;
                 break;
+            case 200:
+            case 201:
+            case 202:
+                // solids_parameters.cfl=(T)5;
+                solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+                solids_parameters.implicit_solve_parameters.cg_iterations=10;
+                last_frame=120;
+                break;
             default:
                 LOG::cerr<<"Parsing: Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -1780,6 +1788,16 @@ void Get_Initial_Data()
             solid_body_collection.deformable_body_collection.Add_Structure(tv);
             contrail.Resize(1);
             break;}
+        case 201:
+        case 200:
+        case 202:
+            tests.Create_Tetrahedralized_Volume("liver_153k_tets_transformed.tet",RIGID_BODY_STATE<TV>(FRAME<TV>()),true,true,density,m);
+            if(test_number==202){
+                std::ifstream fin("liver_153k_tets_transformed_real_hook_dirichlet_nodes.txt");
+                int n;
+                while(fin>>n) stuck_particles.Append(n);
+                LOG::printf("stuck_particles %P\n",stuck_particles.m);}
+            break;
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -2247,6 +2265,18 @@ void Initialize_Bodies() override
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
             break;}
+        case 200:
+        case 202:
+        case 201:{
+            T youngs_modulus=1e5*unit_p;
+            T poissons_ratio=.3;
+            T damping=0;
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
+            if(test_number==200) particles.X*=1.1;
+            if(test_number==201) rand.Fill_Uniform(particles.X,-1,1);
+            if(test_number==202) Add_Gravity();
+            break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -2490,7 +2520,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         for(int i=0;i<stuck_particles.m;i++){
             int p=stuck_particles(i);
             V(p)=V(p).Projected_Orthogonal_To_Unit_Direction(particles.X(p).Normalized());}}
-    if(test_number==17) V.Subset(stuck_particles).Fill(TV());
+    else V.Subset(stuck_particles).Fill(TV());
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
