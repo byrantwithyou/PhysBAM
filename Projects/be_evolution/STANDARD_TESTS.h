@@ -1791,9 +1791,9 @@ void Get_Initial_Data()
         case 201:
         case 200:
         case 202:
-            tests.Create_Tetrahedralized_Volume("liver_153k_tets_transformed.tet",RIGID_BODY_STATE<TV>(FRAME<TV>()),true,true,density,m);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/liver_153k_tets_transformed.tet",RIGID_BODY_STATE<TV>(FRAME<TV>()),true,true,density,m);
             if(test_number==202){
-                std::ifstream fin("liver_153k_tets_transformed_real_hook_dirichlet_nodes.txt");
+                std::ifstream fin(data_directory+"/Tetrahedralized_Volumes/liver_153k_tets_transformed_real_hook_dirichlet_nodes.txt");
                 int n;
                 while(fin>>n) stuck_particles.Append(n);
                 LOG::printf("stuck_particles %P\n",stuck_particles.m);}
