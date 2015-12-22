@@ -2,22 +2,16 @@
 // Copyright 2015, Craig Schroeder, apt.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
+#include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
-#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_KKT_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
-#include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
-#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
-#include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

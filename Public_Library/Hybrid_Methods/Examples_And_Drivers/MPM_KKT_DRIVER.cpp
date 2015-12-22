@@ -2,21 +2,11 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
-#include <Tools/Krylov_Solvers/GMRES.h>
-#include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/LOG.h>
 #include <Tools/Log/SCOPE.h>
 #include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_KKT_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_KKT_EXAMPLE.h>

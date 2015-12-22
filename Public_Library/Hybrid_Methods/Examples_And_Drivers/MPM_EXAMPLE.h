@@ -19,8 +19,6 @@ template<class TV> class DEFORMABLE_BODY_COLLECTION;
 template<class TV> class GATHER_SCATTER;
 template<class TV> class IMPLICIT_OBJECT;
 template<class T>  class KRYLOV_VECTOR_BASE;
-template<class TV> class MPM_COLLISION_OBJECT;
-template<class TV> class MPM_COLLISION_OBJECT;
 template<class TV> class MPM_FORCE_HELPER;
 template<class T>  class MPM_KRYLOV_VECTOR;
 template<class TV> class MPM_PARTICLES;
