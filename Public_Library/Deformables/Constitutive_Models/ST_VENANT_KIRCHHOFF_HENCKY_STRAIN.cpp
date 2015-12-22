@@ -23,8 +23,9 @@ ST_VENANT_KIRCHHOFF_HENCKY_STRAIN(const T youngs_modulus_input,const T poissons_
     constant_mu=youngs_modulus/(2*(1+poissons_ratio));
     constant_alpha=Rayleigh_coefficient*constant_lambda;
     constant_beta=Rayleigh_coefficient*constant_mu;
-    if(d==2) failure_threshold=sqrt((constant_mu+constant_lambda)/(3*constant_mu+3*constant_lambda));
-    else failure_threshold=sqrt((constant_mu+(T)1.5*constant_lambda)/(3*constant_mu+(T)4.5*constant_lambda));
+    //if(d==2) failure_threshold=sqrt((constant_mu+constant_lambda)/(3*constant_mu+3*constant_lambda));
+    //else failure_threshold=sqrt((constant_mu+(T)1.5*constant_lambda)/(3*constant_mu+(T)4.5*constant_lambda));
+    failure_threshold=0;
 }
 //#####################################################################
 // Destructor
