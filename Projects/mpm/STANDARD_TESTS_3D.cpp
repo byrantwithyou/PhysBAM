@@ -20,7 +20,6 @@
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
 #include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
-#include <Deformables/Constitutive_Models/MPM_MATSUOKA_NAKAI.h>
 #include <Deformables/Constitutive_Models/MPM_SQUARED_DRUCKER_PRAGER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
@@ -519,10 +518,6 @@ Initialize()
             T density=(T)1281*scale_mass; // source: Sand, dry http://www.engineeringtoolbox.com/density-materials-d_1652.html
             T E=35.37e6*scale_E,nu=.3;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            // if(test_number==18)
-            //     this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
-            // else
-            //     this->plasticity=new MPM_MATSUOKA_NAKAI<TV>(friction_angle,cohesion);
             T gap=grid.dX(1)*0.1;
             RANGE<TV> box(TV(.4,.1+gap,.4),TV(.45,.1+gap+0.5,.45));
             Seed_Particles(box,0,0,density,particles_per_cell);
