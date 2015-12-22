@@ -16,6 +16,7 @@ namespace PhysBAM{
 template<class TV> class MPM_PARTICLES;
 template<class TV> class GATHER_SCATTER;
 template<class T,int d> class ISOTROPIC_CONSTITUTIVE_MODEL;
+template<class TV> class MPM_PLASTICITY_MODEL;
 
 template<class TV>
 class MPM_FINITE_ELEMENTS:public PARTICLE_GRID_FORCES<TV>
@@ -26,10 +27,10 @@ class MPM_FINITE_ELEMENTS:public PARTICLE_GRID_FORCES<TV>
 public:
     using BASE::particles;using BASE::force_helper;
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model;
+    MPM_PLASTICITY_MODEL<TV> *plasticity;
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > sigma;
     ARRAY<MATRIX<T,TV::m> > U,FV,PFT;
     bool affect_all;
-    bool use_variable_coefficients;
     GATHER_SCATTER<TV>& gather_scatter;
     mutable ARRAY<MATRIX<T,TV::m> > tmp;
     ARRAY<DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,TV::m> > dPi_dF;
@@ -37,11 +38,11 @@ public:
     MPM_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
         ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
         GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,
-        bool use_variable_coefficients=false);
+        MPM_PLASTICITY_MODEL<TV>* plasticity=0);
     virtual ~MPM_FINITE_ELEMENTS();
 
 //#####################################################################
-    void Precompute(const T time,const T dt) override;
+    void Precompute(const T time,const T dt,bool want_dE,bool want_ddE) override;
     T Potential_Energy(const T time) const override;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const override;
     void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const override;

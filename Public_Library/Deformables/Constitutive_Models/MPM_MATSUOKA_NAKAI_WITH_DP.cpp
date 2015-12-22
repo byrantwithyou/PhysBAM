@@ -1,3 +1,4 @@
+#if 0
 //#####################################################################
 // Copyright 2015, Andre Pradhana, Greg Klar
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
@@ -203,3 +204,4 @@ template class MPM_MATSUOKA_NAKAI_WITH_DP<VECTOR<float,3>>;
 template class MPM_MATSUOKA_NAKAI_WITH_DP<VECTOR<double,2>>;
 template class MPM_MATSUOKA_NAKAI_WITH_DP<VECTOR<double,3>>;
 }
+#endif

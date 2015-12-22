@@ -8,6 +8,7 @@
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
+#include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
@@ -19,10 +20,10 @@ namespace PhysBAM{
 template<class TV> MPM_FINITE_ELEMENTS<TV>::
 MPM_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,
-    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,bool use_variable_coefficients)
-    :BASE(force_helper),constitutive_model(constitutive_model),affect_all(!affected_particles),
-     use_variable_coefficients(use_variable_coefficients),
-     gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles)))
+    GATHER_SCATTER<TV>& gather_scatter_input,ARRAY<int>* affected_particles,
+    MPM_PLASTICITY_MODEL<TV>* plasticity)
+    :BASE(force_helper),constitutive_model(constitutive_model),plasticity(plasticity),affect_all(!affected_particles),
+    gather_scatter(affect_all?gather_scatter_input:*new GATHER_SCATTER<TV>(gather_scatter_input.grid,*new ARRAY<int>(*affected_particles)))
 {
     if(!affect_all){
         gather_scatter.weights=gather_scatter_input.weights;
@@ -39,29 +40,97 @@ template<class TV> MPM_FINITE_ELEMENTS<TV>::
         delete &gather_scatter.simulated_particles;
         delete &gather_scatter;}
     delete &constitutive_model;
+    delete plasticity;
+}
+//#####################################################################
+// Function Transform_Isotropic_Stress_Derivative
+//#####################################################################
+template<class T> void
+Transform_Isotropic_Stress_Derivative(DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>& dPi_dF,
+        const DIAGONAL_MATRIX<T,1>& P,const DIAGONAL_MATRIX<T,1>& P_hat,
+        const MATRIX<T,1>& dstrain,const SYMMETRIC_TENSOR<T,0,1>& ddstrain,
+        const MATRIX<T,1,0>& rdstrain,const MATRIX<T,0>& rxstrain,const VECTOR<T,1>& sigma){
+    dPi_dF.Set_Hessian_Block(Contract(ddstrain,P.x)+SYMMETRIC_MATRIX<T,1>::Conjugate_With_Transpose(dstrain,dPi_dF.Get_Hessian_Block()));
+}
+template<class T> void
+Transform_Isotropic_Stress_Derivative(DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dPi_dF,
+        const DIAGONAL_MATRIX<T,2>& P,const DIAGONAL_MATRIX<T,2>& P_hat,
+        const MATRIX<T,2>& dstrain,const SYMMETRIC_TENSOR<T,0,2>& ddstrain,
+        const MATRIX<T,2,1>& rdstrain,const MATRIX<T,1>& rxstrain,const VECTOR<T,2>& sigma){
+    dPi_dF.Set_Hessian_Block(Contract(ddstrain,P.x)+SYMMETRIC_MATRIX<T,2>::Conjugate_With_Transpose(dstrain,dPi_dF.Get_Hessian_Block()));
+    T c(dPi_dF.x1010+dPi_dF.x1001);
+    T c_hat=rdstrain.Column(0).Dot(P.x)+rxstrain(0,0)*c;
+    T d_hat((P_hat(1)+P_hat(0))/(sigma(1)+sigma(0))); 
+    dPi_dF.x1010=0.5*(c_hat+d_hat);
+    dPi_dF.x1001=0.5*(c_hat-d_hat);
+}
+template<class T> void
+Transform_Isotropic_Stress_Derivative(DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,
+        const DIAGONAL_MATRIX<T,3>& P,const DIAGONAL_MATRIX<T,3>& P_hat,
+        const MATRIX<T,3>& dstrain,const SYMMETRIC_TENSOR<T,0,3>& ddstrain,
+        const MATRIX<T,3,3>& rdstrain,const MATRIX<T,3>& rxstrain,const VECTOR<T,3>& sigma){
+    dPi_dF.Set_Hessian_Block(Contract(ddstrain,P.x)+SYMMETRIC_MATRIX<T,3>::Conjugate_With_Transpose(dstrain,dPi_dF.Get_Hessian_Block()));
+    VECTOR<T,3> c(dPi_dF.x2112+dPi_dF.x2121,dPi_dF.x2020+dPi_dF.x2002,dPi_dF.x1010+dPi_dF.x1001);
+    VECTOR<T,3> c_hat=rdstrain.Transpose_Times(P.x)+rxstrain.Transpose_Times(c);
+    VECTOR<T,3> d_hat((P_hat(1)+P_hat(2))/(sigma(1)+sigma(2)),(P_hat(0)+P_hat(2))/(sigma(0)+sigma(2)),(P_hat(1)+P_hat(0))/(sigma(1)+sigma(0))); 
+    dPi_dF.x1010=0.5*(c_hat(2)+d_hat(2));
+    dPi_dF.x1001=0.5*(c_hat(2)-d_hat(2));
+    dPi_dF.x2020=0.5*(c_hat(1)+d_hat(1));
+    dPi_dF.x2002=0.5*(c_hat(1)-d_hat(1));
+    dPi_dF.x2121=0.5*(c_hat(0)+d_hat(0));
+    dPi_dF.x2112=0.5*(c_hat(0)-d_hat(0));
 }
 //#####################################################################
 // Function Precompute
 //#####################################################################
 template<class TV> void MPM_FINITE_ELEMENTS<TV>:: 
-Precompute(const T time,const T dt)
+Precompute(const T time,const T dt,bool want_dE,bool want_ddE)
 {
+    PHYSBAM_ASSERT(!want_ddE||want_dE);
     U.Resize(particles.X.m);
     FV.Resize(particles.X.m);
     sigma.Resize(particles.X.m);
     dPi_dF.Resize(particles.X.m);
     PFT.Resize(particles.X.m);
-    if(use_variable_coefficients){
-        constitutive_model.mu=particles.mu;
-        constitutive_model.lambda=particles.lambda;}
+
+    if(plasticity && plasticity->use_implicit){
 #pragma omp parallel for
-    for(int k=0;k<gather_scatter.simulated_particles.m;k++){
-        int p=gather_scatter.simulated_particles(k);
-        MATRIX<T,TV::m> V_local;
-        particles.F(p).Fast_Singular_Value_Decomposition(U(p),sigma(p),V_local);
-        FV(p)=force_helper.Fn(p)*V_local;
-        PFT(p)=U(p)*constitutive_model.P_From_Strain(sigma(p),p).Times_Transpose(FV(p));
-        constitutive_model.Isotropic_Stress_Derivative(sigma(p),dPi_dF(p),p);}
+        for(int k=0;k<gather_scatter.simulated_particles.m;k++){
+            int p=gather_scatter.simulated_particles(k);
+            MATRIX<T,TV::m> V_local;
+            particles.F(p).Fast_Singular_Value_Decomposition(U(p),sigma(p),V_local);
+            if(want_dE) FV(p)=force_helper.Fn(p)*V_local;
+            TV strain;
+            MATRIX<T,TV::m> dstrain;
+            SYMMETRIC_TENSOR<T,0,TV::m> ddstrain;
+            MATRIX<T,TV::m,TV::SPIN::m> rdstrain;
+            MATRIX<T,TV::SPIN::m> rxstrain;
+            if(plasticity->Compute(strain,want_dE?&dstrain:0,want_ddE?&ddstrain:0,
+                        want_ddE?&rdstrain:0,want_ddE?&rxstrain:0,sigma(p).x,false,p)){
+                if(want_dE){
+                    DIAGONAL_MATRIX<T,TV::m> P_original=constitutive_model.P_From_Strain(DIAGONAL_MATRIX<T,TV::m>(strain),p);
+                    DIAGONAL_MATRIX<T,TV::m> P_hat(dstrain.Transpose_Times(P_original.x));
+                    PFT(p)=U(p)*P_hat.Times_Transpose(FV(p));
+                    if(want_ddE){
+                        constitutive_model.Isotropic_Stress_Derivative(DIAGONAL_MATRIX<T,TV::m>(strain),dPi_dF(p),p);
+                        Transform_Isotropic_Stress_Derivative(dPi_dF(p),P_original,P_hat,dstrain,ddstrain,rdstrain,rxstrain,sigma(p).x);
+                    }
+                }
+                sigma(p).x=strain;
+            }
+            else{
+                if(want_dE) PFT(p)=U(p)*constitutive_model.P_From_Strain(sigma(p),p).Times_Transpose(FV(p));
+                if(want_ddE) constitutive_model.Isotropic_Stress_Derivative(sigma(p),dPi_dF(p),p);}}}
+    else{
+#pragma omp parallel for
+        for(int k=0;k<gather_scatter.simulated_particles.m;k++){
+            int p=gather_scatter.simulated_particles(k);
+            MATRIX<T,TV::m> V_local;
+            particles.F(p).Fast_Singular_Value_Decomposition(U(p),sigma(p),V_local);
+            if(want_dE){
+                FV(p)=force_helper.Fn(p)*V_local;
+                PFT(p)=U(p)*constitutive_model.P_From_Strain(sigma(p),p).Times_Transpose(FV(p));}
+            if(want_ddE) constitutive_model.Isotropic_Stress_Derivative(sigma(p),dPi_dF(p),p);}}
 }
 //#####################################################################
 // Function Potential_Energy

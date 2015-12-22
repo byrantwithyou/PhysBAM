@@ -35,7 +35,7 @@ operator= (const MPM_KKT_KRYLOV_VECTOR& bv)
     for(int k=0;k<valid_p_indices.m;k++){
         int i=valid_p_indices(k);
         p.array(i)=bv.p.array(i);}
-    for (int k=0;k<lambda.m;k++)
+    for(int k=0;k<lambda.m;k++)
         lambda(k)=bv.lambda(k);
     return *this;
 }
@@ -55,7 +55,7 @@ operator+=(const KRYLOV_VECTOR_BASE<T>& bv)
     for(int k=0;k<valid_p_indices.m;k++){
         int i=valid_p_indices(k);
         p.array(i)+=v.p.array(i);}
-    for (int k=0;k<lambda.m;k++)
+    for(int k=0;k<lambda.m;k++)
         lambda(k)+=v.lambda(k);
     return *this;
 }
@@ -75,7 +75,7 @@ operator-=(const KRYLOV_VECTOR_BASE<T>& bv)
     for(int k=0;k<valid_p_indices.m;k++){
         int i=valid_p_indices(k);
         p.array(i)-=v.p.array(i);}
-    for (int k=0;k<lambda.m;k++)
+    for(int k=0;k<lambda.m;k++)
         lambda(k)-=v.lambda(k);
     return *this;
 }
@@ -93,7 +93,7 @@ operator*=(const T a)
     for(int k=0;k<valid_p_indices.m;k++){
         int i=valid_p_indices(k);
         p.array(i)*=a;}
-    for (int k=0;k<lambda.m;k++)
+    for(int k=0;k<lambda.m;k++)
         lambda(k)*=a;
     return *this;
 }
@@ -114,7 +114,7 @@ Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
     for(int k=0;k<valid_p_indices.m;k++){
         int i=valid_p_indices(k);
         p.array(i)=c*v.p.array(i);}
-    for (int k=0;k<lambda.m;k++)
+    for(int k=0;k<lambda.m;k++)
         lambda(k)=c*v.lambda(k);
 }
 //#####################################################################
@@ -134,7 +134,7 @@ Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv
     for(int k=0;k<valid_p_indices.m;k++){
         int i=valid_p_indices(k);
         p.array(i)=c1*v1.p.array(i)+v2.p.array(i);}
-    for (int k=0;k<lambda.m;k++)
+    for(int k=0;k<lambda.m;k++)
         lambda(k)=c1*v1.lambda(k)+v2.lambda(k);
 }
 //#####################################################################

@@ -14,6 +14,7 @@
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
+#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <Deformables/Constitutive_Models/ST_VENANT_KIRCHHOFF_HENCKY_STRAIN.h>
 #include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
@@ -36,7 +37,10 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     scale_mass(1),scale_E(1),scale_speed(1),
     penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),
-    penalty_damping_stiffness(0),use_penalty_collisions(false),tests(stream_type_input,deformable_body_collection)
+    penalty_damping_stiffness(0),use_penalty_collisions(false),use_plasticity(true),
+    use_theta_c(false),use_theta_s(false),use_hardening_factor(false),use_max_hardening(false),
+    theta_c(0),theta_s(0),hardening_factor(0),max_hardening(0),plastic_newton_tolerance(1e-6),
+    plastic_newton_iterations(500),tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
@@ -81,15 +85,12 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-kkt",&kkt,"Use KKT solver");
     parse_args.Add("-use_exp_F",&use_quasi_exp_F_update,"Use an approximation of the F update that prevents inversion");
     parse_args.Add("-use_plasticity",&use_plasticity,"Use plasticity in the F update");
-    parse_args.Add("-theta_c",&theta_c,"theta_c","Critical compression coefficient for plasticity");
-    parse_args.Add("-theta_s",&theta_s,"theta_s","Critical stretch coefficient for plasticity");
-    parse_args.Add("-hardening",&hardening_factor,"hardening factor","Hardening factor for plasticity");
-    parse_args.Add("-max_hardening",&max_hardening,"max hardening coefficient","Maximum hardening coefficient for plasticity");
-    parse_args.Add("-friction_angle",&friction_angle,"friction angle","Friction angle used for plasticity");
-    parse_args.Add("-cohesion",&cohesion,"cohesion","Cohesion used for plasticity");
+    parse_args.Add("-theta_c",&theta_c,&use_theta_c,"theta_c","Critical compression coefficient for plasticity");
+    parse_args.Add("-theta_s",&theta_s,&use_theta_s,"theta_s","Critical stretch coefficient for plasticity");
+    parse_args.Add("-hardening",&hardening_factor,&use_hardening_factor,"hardening factor","Hardening factor for plasticity");
+    parse_args.Add("-max_hardening",&max_hardening,&use_max_hardening,"max hardening coefficient","Maximum hardening coefficient for plasticity");
     parse_args.Add("-plastic_newton_iterations",&plastic_newton_iterations,"iter","Newton iterations in plastic yield");
     parse_args.Add("-plastic_newton_tolerance",&plastic_newton_tolerance,"tol","Newton tolerance in plastic yield");
-    parse_args.Add("-use_clamping_plasticity",&use_clamping_plasticity,"Use clamping plasticity, as in the snow paper");
     parse_args.Add("-use_penalty_collisions",&use_penalty_collisions,"Use penalty collisions objects");
 
     parse_args.Parse(true);
@@ -123,9 +124,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     else if(order==2) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads));
     else if(order==3) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,threads));
     else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
-
-    if(!use_plasticity && use_clamping_plasticity)
-        PHYSBAM_FATAL_ERROR("Can't use clamping plasticity without plasticity!");
 }
 //#####################################################################
 // Destructor
@@ -223,7 +221,7 @@ Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles,bool no_mu)
     COROTATED_FIXED<T,TV::m>* coro=new COROTATED_FIXED<T,TV::m>(E,nu);
     if(no_mu) coro->Zero_Out_Mu();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*coro;
-    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,use_variable_coefficients);
+    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
     return Add_Force(fe);
 }
 //#####################################################################
@@ -233,7 +231,7 @@ template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles)
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*new NEO_HOOKEAN<T,TV::m>(E,nu);
-    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,use_variable_coefficients);
+    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
     return Add_Force(fe);
 }
 //#####################################################################
@@ -245,8 +243,40 @@ Add_St_Venant_Kirchhoff_Hencky_Strain(T E,T nu,ARRAY<int>* affected_particles,bo
     ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>* hencky=new ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>(E,nu);
     if(no_mu) hencky->Zero_Out_Mu();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
-    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,use_variable_coefficients);
+    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
     return Add_Force(fe);
+}
+//#####################################################################
+// Function Add_Drucker_Prager
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Drucker_Prager(T E,T nu,const T a[],bool use_implicit,ARRAY<int>* affected_particles,bool no_mu)
+{
+    ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>* hencky=new ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>(E,nu);
+    if(no_mu) hencky->Zero_Out_Mu();
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
+    MPM_DRUCKER_PRAGER<TV>* plasticity=new MPM_DRUCKER_PRAGER<TV>(particles,a[0],a[1],a[2],a[3]);
+    plasticity->use_implicit=use_implicit;
+    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,plasticity);
+
+    if(affected_particles)
+        for(int i=0;i<affected_particles->m;++i){
+            int p=(*affected_particles)(i);
+            plasticity->Initialize_Particle(p);}
+    else
+        for(int p=0;p<particles.X.m;++p)
+            plasticity->Initialize_Particle(p);
+
+    return Add_Force(fe);
+}
+//#####################################################################
+// Function Add_Drucker_Prager
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Drucker_Prager(T E,T nu,T phi_F,bool use_impicit,ARRAY<int>* affected_particles,bool no_mu)
+{
+    const T a[4]={phi_F,0,0,0};
+    return Add_Drucker_Prager(E,nu,a,use_impicit,affected_particles,no_mu);
 }
 //#####################################################################
 // Function Add_Walls

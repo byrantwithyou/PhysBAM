@@ -1,3 +1,4 @@
+#if 0
 //#####################################################################
 // Copyright 2015, Andre Pradhana, Greg Klar
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
@@ -7,7 +8,15 @@
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 namespace PhysBAM{
-
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class TV> void MPM_SQUARED_DRUCKER_PRAGER<TV>::
+MPM_SQUARED_DRUCKER_PRAGER(T friction_angle,T cohesion)
+    :rho(2*sin(friction_angle)/(sqrt(3)*(3-sin(friction_angle)))),sigma_Y(-2*sqrt(3)*cohesion*cos(friction_angle)/(3-sin(friction_angle)))
+{
+    PHYSBAM_ASSERT(cohesion>=0);
+}
 //#####################################################################
 // Function Set_Lame_Constants_And_F_Elastic
 //#####################################################################
@@ -91,3 +100,4 @@ template class MPM_SQUARED_DRUCKER_PRAGER<VECTOR<float,3>>;
 template class MPM_SQUARED_DRUCKER_PRAGER<VECTOR<double,2>>;
 template class MPM_SQUARED_DRUCKER_PRAGER<VECTOR<double,3>>;
 }
+#endif

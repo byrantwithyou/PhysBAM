@@ -25,7 +25,6 @@ const ATTRIBUTE_ID ATTRIBUTE_ID_MU(50);
 const ATTRIBUTE_ID ATTRIBUTE_ID_LAMBDA(51);
 const ATTRIBUTE_ID ATTRIBUTE_ID_MU0(52);
 const ATTRIBUTE_ID ATTRIBUTE_ID_LAMBDA0(53);
-const ATTRIBUTE_ID ATTRIBUTE_ID_PLASTIC_DEFORMATION(54);
 
 template<class TV>
 class MPM_PARTICLES:public CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> >
@@ -41,7 +40,6 @@ public:
     ARRAY_VIEW<SYMMETRIC_MATRIX<T,TV::m> > S;
     ARRAY_VIEW<bool> valid;
     ARRAY_VIEW<T> mu,lambda,mu0,lambda0;
-    ARRAY_VIEW<T> plastic_def;
 
     MPM_PARTICLES();
     virtual ~MPM_PARTICLES();
@@ -51,7 +49,6 @@ public:
     void Store_C(bool store);
     void Store_Lame(bool store);
     void Store_Lame0(bool store);
-    void Store_Plastic_Deformation(bool store);
 
 //#####################################################################
 };

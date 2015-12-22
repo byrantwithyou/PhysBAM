@@ -31,8 +31,6 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     lagrangian_forces(deformable_body_collection.deformables_forces),
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
     force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff)),incompressible(false),kkt(false),
-    use_plasticity(false), use_clamping_plasticity(false),theta_c(0),theta_s(0),hardening_factor(0),
-    max_hardening(0),friction_angle(0),cohesion(0),plasticity(0),
     initial_time(0),last_frame(100),
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),
     mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
@@ -49,7 +47,6 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
 template<class TV> MPM_EXAMPLE<TV>::
 ~MPM_EXAMPLE()
 {
-    delete plasticity;
     delete &deformable_body_collection;
     delete &particles;
     delete &debug_particles;
@@ -118,7 +115,7 @@ template<class TV> void MPM_EXAMPLE<TV>::
 Precompute_Forces(const T time,const T dt,const bool update_hessian)
 {
     for(int i=0;i<forces.m;i++)
-        forces(i)->Precompute(time,dt);
+        forces(i)->Precompute(time,dt,true,update_hessian);
     deformable_body_collection.Update_Position_Based_State(time,false,update_hessian);
 }
 //#####################################################################

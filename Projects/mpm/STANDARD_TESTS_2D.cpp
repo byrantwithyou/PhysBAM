@@ -17,10 +17,6 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
-#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
-#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER_HARDENING.h>
-#include <Deformables/Constitutive_Models/MPM_MATSUOKA_NAKAI_WITH_DP.h>
-#include <Deformables/Constitutive_Models/MPM_SQUARED_DRUCKER_PRAGER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
@@ -497,9 +493,6 @@ Initialize()
             for(int i=old_pn;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(1,1,1);
         } break;
         case 33:{ // sand box drop
-            use_plasticity=true;
-            use_variable_coefficients=true;
-            use_clamping_plasticity=true;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -508,10 +501,10 @@ Initialize()
 
             T density=(T)1281*scale_mass;
             T E=5000*scale_E,nu=.4;
-            if(theta_c==0) theta_c=0.01;
-            if(theta_s==0) theta_s=.00001;
-            if(hardening_factor==0) hardening_factor=80;
-            if(max_hardening==0) max_hardening=5;
+            if(!use_theta_c) theta_c=0.01;
+            if(!use_theta_s) theta_s=.00001;
+            if(!use_hardening_factor) hardening_factor=80;
+            if(!use_max_hardening) max_hardening=5;
             Add_Fixed_Corotated(E,nu);
             RANGE<TV> box(TV(.45,.11),TV(.55,.31));
             Seed_Particles(box,0,0,density,particles_per_cell);
@@ -542,9 +535,6 @@ Initialize()
         } break;
         case 35:{ // snow wedge
             // ./mpm 35 -flip 0.95 -max_dt .005 -cfl .1 -resolution 200
-            use_plasticity=true;
-            use_variable_coefficients=true;
-            use_clamping_plasticity=true;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -561,10 +551,10 @@ Initialize()
             T density=(T)2*scale_mass;
             int number_of_particles=20000;
             T E=40*scale_E,nu=.2;
-            if(theta_c==0) theta_c=0.015;
-            if(theta_s==0) theta_s=.005;
-            if(hardening_factor==0) hardening_factor=7;
-            if(max_hardening==0) max_hardening=FLT_MAX;
+            if(!use_theta_c) theta_c=0.015;
+            if(!use_theta_s) theta_s=.005;
+            if(!use_hardening_factor) hardening_factor=7;
+            if(!use_max_hardening) max_hardening=FLT_MAX;
             Add_Fixed_Corotated(E,nu);
             RANGE<TV> box(TV(.3,.7),TV(.7,.9));
             std::ifstream ifs("particles.dat");
@@ -616,9 +606,6 @@ Initialize()
             Add_Force(*stf);
         } break;
         case 37:{ // sand box drop, better paramaters, with Hencky, usage: mpm 38 -resolution 100 -plastic_newton_iterations 100 -plastic_newton_tolerance 1e-8
-            use_plasticity=true;
-            use_clamping_plasticity=false;
-            use_variable_coefficients=true;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -631,7 +618,7 @@ Initialize()
             T density=(T)1281*scale_mass;
             T E=35.37e6*scale_E,nu=.4;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
+//            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
             RANGE<TV> box(TV(.4,.1001),TV(.45,.6001));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
@@ -643,9 +630,6 @@ Initialize()
             Add_Gravity(TV(0,-9.81));
         } break;
         case 38:{ // sand box drop, wide
-            use_plasticity=true;
-            use_clamping_plasticity=false;
-            use_variable_coefficients=true;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -658,8 +642,11 @@ Initialize()
             T density=(T)1281*scale_mass;
             T E=35.37e6*scale_E,nu=.4;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
-            RANGE<TV> box(TV(.3,.1001),TV(.7,.1001+0.1));
+//            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
+            T l0=0.05;
+            T h0=l0*8;
+            T gap=grid.dX(1)*0.01;
+            RANGE<TV> box(TV(.5-l0,.1+gap),TV(.5+l0,.1+gap+h0));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));
@@ -670,9 +657,6 @@ Initialize()
             Add_Gravity(TV(0,-9.81));
         } break;
         case 39:{ // DP on wedge
-            use_plasticity=true;
-            use_variable_coefficients=true;
-            use_clamping_plasticity=false;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -690,7 +674,7 @@ Initialize()
             int number_of_particles=20000;
             T E=40*scale_E,nu=.2;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
+//            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
             RANGE<TV> box(TV(.3,.7),TV(.7,.9));
             std::ifstream ifs("particles.dat");
             if(ifs.is_open()){
@@ -732,12 +716,8 @@ Initialize()
                 {38.33,0,0.2,13.33},
                 {41.67,0,0.2,16.67},
                 {45,0,0.2,20}};
-            use_plasticity=true;
-            use_clamping_plasticity=false;
-            use_variable_coefficients=true;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
-            particles.Store_Plastic_Deformation(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             if(use_penalty_collisions)
@@ -747,8 +727,7 @@ Initialize()
 
             T density=(T)2200*scale_mass;
             T E=35.37e6*scale_E,nu=.3;
-            Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(as[test_number-40][0],as[test_number-40][1],as[test_number-40][2],as[test_number-40][3]);
+            Add_Drucker_Prager(E,nu,as[test_number-40],true);
             T l0=0.05;
             T h0=l0*8;
             T gap=grid.dX(1)*0.01;

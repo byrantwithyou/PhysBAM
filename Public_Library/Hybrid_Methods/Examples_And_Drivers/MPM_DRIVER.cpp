@@ -21,7 +21,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
-#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER_HARDENING.h>
+#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
 #include <Deformables/Constitutive_Models/MPM_MATSUOKA_NAKAI_WITH_DP.h>
 #include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -204,8 +204,7 @@ Advance_One_Time_Step()
     else
         Grid_To_Particle();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
-    if (example.use_plasticity)
-        Update_Plasticity_And_Hardening();
+    Update_Plasticity_And_Hardening();
 
     example.End_Time_Step(example.time);
 }
@@ -677,44 +676,40 @@ Solve_KKT_System()
 template<class TV> void MPM_DRIVER<TV>::
 Update_Plasticity_And_Hardening()
 {
-    MPM_PARTICLES<TV>& particles=example.particles;
-    if(example.use_clamping_plasticity){
-        for (int k=0;k<example.simulated_particles.m;++k){
-            int p=example.simulated_particles(k);
-            MATRIX<T,TV::m> Fe=particles.F(p);
-            MATRIX<T,TV::m> U,V;
-            DIAGONAL_MATRIX<T,TV::m> singular_values;
-            Fe.Fast_Singular_Value_Decomposition(U,singular_values,V);
-            singular_values.x=clamp(singular_values.x,1-example.theta_c,1+example.theta_s);
-            particles.F(p)=(U*singular_values).Times_Transpose(V);
-            particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);
 
-            T hardening_coeff=exp(min(example.max_hardening,example.hardening_factor*(1-particles.Fp(p).Determinant())));
-            particles.mu(p)=particles.mu0(p)*hardening_coeff;
-            particles.lambda(p)=particles.lambda0(p)*hardening_coeff;}
-    }else{
-        MPM_PLASTICITY_MODEL<TV> *plasticity=example.plasticity;
-        T max_yield_function=0;
-        int num_projected_particles=0,num_non_converged_particles=0;
-        for (int k=0;k<example.simulated_particles.m;++k){
-            int p=example.simulated_particles(k);
-            MATRIX<T,TV::m> Fe=particles.F(p);
-            MATRIX<T,TV::m> U,V;
-            DIAGONAL_MATRIX<T,TV::m> singular_values;
-            Fe.Fast_Singular_Value_Decomposition(U,singular_values,V);
-            plasticity->Set_Lame_Constants_And_F_Elastic(particles.mu(p),particles.lambda(p),singular_values);
-            if(particles.store_plastic_def) plasticity->Set_Plastic_Deformation_Lambda(particles.plastic_def(p));
-            if(plasticity->Yield_Function()>0){
-                ++num_projected_particles;
-                if(!plasticity->Project_Stress(example.plastic_newton_iterations,example.plastic_newton_tolerance)) ++num_non_converged_particles;
-                if(particles.store_plastic_def) particles.plastic_def(p)=plasticity->Get_Updated_Plastic_Deformation_Lambda();
-                singular_values.x=plasticity->Get_Updated_Sigma();
-                particles.F(p)=(U*singular_values).Times_Transpose(V);
-                particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);
-                max_yield_function=max(max_yield_function,plasticity->Yield_Function_Final());}}
-        LOG::printf("Max yield function value: %g\n",max_yield_function);
-        LOG::printf("PLASTICITY: %d/%d/%d (total/projected/non converged particles)\n",example.simulated_particles.m,num_projected_particles,num_non_converged_particles);
-    }
+    int num_projected_particles=0;
+    for(int i=0;i<example.forces.m;i++)
+        if(MPM_FINITE_ELEMENTS<TV>* force=dynamic_cast<MPM_FINITE_ELEMENTS<TV>*>(example.forces(i)))
+            if(force->plasticity)
+#pragma omp parallel for reduction(+:num_projected_particles)
+                for(int k=0;k<force->gather_scatter.simulated_particles.m;k++)
+                    num_projected_particles+=force->plasticity->Update_Particle(force->gather_scatter.simulated_particles(k));
+
+
+//     MPM_PARTICLES<TV>& particles=example.particles;
+//     if(example.use_clamping_plasticity){
+//         for(int k=0;k<example.simulated_particles.m;++k){
+//             int p=example.simulated_particles(k);
+//             MATRIX<T,TV::m> Fe=particles.F(p);
+//             MATRIX<T,TV::m> U,V;
+//             DIAGONAL_MATRIX<T,TV::m> singular_values;
+//             Fe.Fast_Singular_Value_Decomposition(U,singular_values,V);
+//             singular_values.x=clamp(singular_values.x,1-example.theta_c,1+example.theta_s);
+//             particles.F(p)=(U*singular_values).Times_Transpose(V);
+//             particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);
+
+//             T hardening_coeff=exp(min(example.max_hardening,example.hardening_factor*(1-particles.Fp(p).Determinant())));
+//             particles.mu(p)=particles.mu0(p)*hardening_coeff;
+//             particles.lambda(p)=particles.lambda0(p)*hardening_coeff;}
+//     }else{
+//         MPM_PLASTICITY_MODEL<TV> *plasticity=example.plasticity;
+//         // T max_yield_function=0;
+//         // int num_projected_particles=0,num_non_converged_particles=0;
+
+// }}
+// //        LOG::printf("Max yield function value: %g\n",max_yield_function);
+        LOG::printf("PLASTICITY: %d/%d (total/projected)\n",example.simulated_particles.m,num_projected_particles);
+//     }
 }
 //#####################################################################
 // Function Add_C_Contribution_To_DT

@@ -44,7 +44,7 @@ template<class TV> MPM_OLDROYD_FINITE_ELEMENTS<TV>::
 // Function Precompute
 //#####################################################################
 template<class TV> void MPM_OLDROYD_FINITE_ELEMENTS<TV>:: 
-Precompute(const T time,const T dt)
+Precompute(const T time,const T dt,bool want_dE,bool want_ddE)
 {
     PHYSBAM_ASSERT(particles.store_S);
     stored_dt=dt;

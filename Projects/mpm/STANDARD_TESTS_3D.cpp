@@ -20,7 +20,6 @@
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
 #include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
-#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER_HARDENING.h>
 #include <Deformables/Constitutive_Models/MPM_MATSUOKA_NAKAI.h>
 #include <Deformables/Constitutive_Models/MPM_SQUARED_DRUCKER_PRAGER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -483,8 +482,6 @@ Initialize()
             Add_Force(*pinning_force);
         } break;
         case 17:{ // sand box drop
-            use_plasticity=true;
-            use_variable_coefficients=true;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -493,10 +490,10 @@ Initialize()
 
             T density=(T)1281*scale_mass;
             T E=5000*scale_E,nu=.4;
-            if(theta_c==0) theta_c=0.01;
-            if(theta_s==0) theta_s=.00001;
-            if(hardening_factor==0) hardening_factor=80;
-            if(max_hardening==0) max_hardening=5;
+            if(!use_theta_c) theta_c=0.01;
+            if(!use_theta_s) theta_s=.00001;
+            if(!use_hardening_factor) hardening_factor=80;
+            if(!use_max_hardening) max_hardening=5;
             Add_Fixed_Corotated(E,nu);
             RANGE<TV> box(TV(.4,.15,.4),TV(.6,.35,.6));
             Seed_Particles(box,0,0,density,particles_per_cell);
@@ -510,9 +507,6 @@ Initialize()
         } break;
         case 18: // sand box drop, better paramaters, with Hencky, usage: mpm 18 -3d -resolution 100 -plastic_newton_iterations 100 -plastic_newton_tolerance 1e-8 -friction_angle 0.65 -cohesion 15
         case 19:{
-            use_plasticity=true;
-            use_clamping_plasticity=false;
-            use_variable_coefficients=true;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -525,10 +519,10 @@ Initialize()
             T density=(T)1281*scale_mass; // source: Sand, dry http://www.engineeringtoolbox.com/density-materials-d_1652.html
             T E=35.37e6*scale_E,nu=.3;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            if(test_number==18)
-                this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
-            else
-                this->plasticity=new MPM_MATSUOKA_NAKAI<TV>(friction_angle,cohesion);
+            // if(test_number==18)
+            //     this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
+            // else
+            //     this->plasticity=new MPM_MATSUOKA_NAKAI<TV>(friction_angle,cohesion);
             T gap=grid.dX(1)*0.1;
             RANGE<TV> box(TV(.4,.1+gap,.4),TV(.45,.1+gap+0.5,.45));
             Seed_Particles(box,0,0,density,particles_per_cell);
@@ -561,12 +555,8 @@ Initialize()
                 {38.33,0,0.2,13.33},
                 {41.67,0,0.2,16.67},
                 {45,0,0.2,20}};
-            use_plasticity=true;
-            use_clamping_plasticity=false;
-            use_variable_coefficients=true;
             particles.Store_Fp(true);
             particles.Store_Lame(true);
-            particles.Store_Plastic_Deformation(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
             if(use_penalty_collisions)
@@ -577,7 +567,7 @@ Initialize()
             T density=(T)2200*scale_mass;
             T E=35.37e6*scale_E,nu=.3;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(as[test_number-20][0],as[test_number-20][1],as[test_number-20][2],as[test_number-20][3]);
+            (void)as;//            this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(as[test_number-20][0],as[test_number-20][1],as[test_number-20][2],as[test_number-20][3]);
             T gap=grid.dX(1)*0.1;
             T l0=0.05;
             T h0=l0*8;
@@ -825,7 +815,6 @@ template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 End_Time_Step(const T time)
 {
 }
-
 //#####################################################################
 // Function Initialize_Implicit_Surface
 //

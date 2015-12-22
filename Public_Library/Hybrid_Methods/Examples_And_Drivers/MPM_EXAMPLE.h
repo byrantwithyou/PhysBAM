@@ -24,7 +24,6 @@ template<class TV> class MPM_COLLISION_OBJECT;
 template<class TV> class MPM_FORCE_HELPER;
 template<class T>  class MPM_KRYLOV_VECTOR;
 template<class TV> class MPM_PARTICLES;
-template<class TV> class MPM_PLASTICITY_MODEL;
 template<class TV> class PARTICLE_GRID_FORCES;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
 
@@ -80,13 +79,6 @@ public:
     ARRAY<T,TV_INT> density;
     SPARSE_MATRIX_FLAT_MXN<T> DT;
 
-    // plasticity
-    bool use_plasticity;
-    bool use_clamping_plasticity;
-    T theta_c,theta_s,hardening_factor,max_hardening;
-    T friction_angle,cohesion; 
-    MPM_PLASTICITY_MODEL<TV>* plasticity;
-
     // penalty collision friction helper
     // : maps particle index to <lagrangian_force_index,penetrating_particles_index>
     ARRAY<ARRAY<VECTOR<int,2> > > penalty_map;
@@ -120,8 +112,6 @@ public:
     int newton_iterations;
     T solver_tolerance;
     int solver_iterations;
-    T plastic_newton_tolerance;
-    int plastic_newton_iterations;
     bool test_diff;
     int threads;
 

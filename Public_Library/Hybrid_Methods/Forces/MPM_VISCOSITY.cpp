@@ -41,7 +41,7 @@ template<class TV> MPM_VISCOSITY<TV>::
 // Function Precompute
 //#####################################################################
 template<class TV> void MPM_VISCOSITY<TV>:: 
-Precompute(const T time,const T dt)
+Precompute(const T time,const T dt,bool want_dE,bool want_ddE)
 {
     stored_dt=dt;
 }

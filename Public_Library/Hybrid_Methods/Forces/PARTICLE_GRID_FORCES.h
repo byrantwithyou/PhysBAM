@@ -27,7 +27,7 @@ public:
     virtual ~PARTICLE_GRID_FORCES();
 
 //#####################################################################
-    virtual void Precompute(const T time,const T dt)=0;
+    virtual void Precompute(const T time,const T dt,bool want_dE,bool want_ddE)=0;
     virtual T Potential_Energy(const T time) const=0;
     virtual void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const=0;
     virtual void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) const=0;

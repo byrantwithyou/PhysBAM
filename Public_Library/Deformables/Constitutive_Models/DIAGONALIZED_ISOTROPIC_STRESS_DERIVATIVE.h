@@ -25,6 +25,12 @@ public:
 //#####################################################################
     void Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,1>& F,const VECTOR<T,1>& dE_ds,const SYMMETRIC_MATRIX<T,1>& dE_dsds); // Not robust
     void Enforce_Definiteness();
+
+    SYMMETRIC_MATRIX<T,1> Get_Hessian_Block() const
+    {return SYMMETRIC_MATRIX<T,1>(x0000);}
+
+    void Set_Hessian_Block(const MATRIX<T,1>& M)
+    {x0000=M(0,0);}
 //#####################################################################
 };
 
@@ -42,6 +48,12 @@ public:
 //#####################################################################
     void Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,2>& F,const VECTOR<T,2>& dE_ds,const SYMMETRIC_MATRIX<T,2>& dE_dsds); // Not robust
     void Enforce_Definiteness();
+
+    SYMMETRIC_MATRIX<T,2> Get_Hessian_Block() const
+    {return SYMMETRIC_MATRIX<T,2>(x0000,x1100,x1111);}
+
+    void Set_Hessian_Block(const SYMMETRIC_MATRIX<T,2>& M)
+    {x0000=M(0,0);x1100=M(1,0);x1111=M(1,1);}
 //#####################################################################
 };
 
@@ -62,6 +74,11 @@ public:
 //#####################################################################
     void Enforce_Definiteness(const T eigenvalue_clamp_percentage=(T)0,const T epsilon=(T)1e-4);
     void Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,3>& F,const VECTOR<T,3>& dE_ds,const SYMMETRIC_MATRIX<T,3>& dE_dsds); // Not robust
+    SYMMETRIC_MATRIX<T,3> Get_Hessian_Block() const
+    {return SYMMETRIC_MATRIX<T,3>(x0000,x1100,x2200,x1111,x2211,x2222);}
+
+    void Set_Hessian_Block(const SYMMETRIC_MATRIX<T,3>& M)
+    {x0000=M(0,0);x1100=M(1,0);x2200=M(2,0);x1111=M(1,1);x2211=M(2,1);x2222=M(2,2);}
 //#####################################################################
 };
 }

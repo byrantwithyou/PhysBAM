@@ -2,8 +2,8 @@
 // Copyright 2015, Andre Pradhana, Greg Klar
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef __MPM_DRUCKER_PRAGER__
-#define __MPM_DRUCKER_PRAGER__
+#ifndef __MPM_PLASTICITY_CLAMP__
+#define __MPM_PLASTICITY_CLAMP__
 
 #include <Tools/Arrays/ATTRIBUTE_ID.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
@@ -11,10 +11,9 @@
 #include <cmath>
 namespace PhysBAM{
 const ATTRIBUTE_ID ATTRIBUTE_ID_PLASTIC_DEFORMATION(54);
-const ATTRIBUTE_ID ATTRIBUTE_ID_DP_RHO_F(55);
 
 template<class TV>
-class MPM_DRUCKER_PRAGER:public MPM_PLASTICITY_MODEL<TV>
+class MPM_PLASTICITY_CLAMP:public MPM_PLASTICITY_MODEL<TV>
 {
     typedef MPM_PLASTICITY_MODEL<TV> BASE;
 public:
@@ -23,18 +22,14 @@ public:
     enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;
 
-    mutable ARRAY_VIEW<T> plastic_def;
-    mutable ARRAY_VIEW<T> rho_F;
-    T a0,a1,a3,a4;
+    T theta_c,theta_s,max_hardening,hardening_factor;
 
-    MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,T a0,T a1,T a3,T a4);
-    virtual ~MPM_DRUCKER_PRAGER();
+    MPM_PLASTICITY_CLAMP(MPM_PARTICLES<TV>& particles,T theta_c,T theta_s,T max_hardening,T hardening_factor);
+    virtual ~MPM_PLASTICITY_CLAMP();
 
-    void Initialize_Particle(int p) const override;
     bool Compute(TV& strain,MATRIX<T,TV::m>* dstrain,SYMMETRIC_TENSOR<T,0,TV::m>* ddstrain,
             MATRIX<T,TV::m,TV::SPIN::m>* rdstrain,MATRIX<T,TV::SPIN::m>* rxstrain,
             const TV& Fe,bool store_hardening,int p) const override;
-    void Update_Hardening(int id,T plastic_def_increment) const;
 };
 }
 #endif

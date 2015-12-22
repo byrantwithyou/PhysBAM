@@ -10,7 +10,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> MPM_PARTICLES<TV>::
 MPM_PARTICLES()
-    :store_Fp(false),store_B(false),store_S(false),store_C(false),store_lame(false),store_lame0(false),store_plastic_def(false)
+    :store_Fp(false),store_B(false),store_S(false),store_C(false),store_lame(false),store_lame0(false)
 {
     this->Store_Velocity();
     this->Store_Mass();
@@ -102,17 +102,6 @@ Store_Lame0(bool store)
         Remove_Array(ATTRIBUTE_ID_LAMBDA0);}
 }
 //#####################################################################
-// Function Store_Plastic_Deformation
-//#####################################################################
-template<class TV> void MPM_PARTICLES<TV>::
-Store_Plastic_Deformation(bool store)
-{
-    if(store_plastic_def==store) return;
-    store_plastic_def=store;
-    if(store) Add_Array(ATTRIBUTE_ID_PLASTIC_DEFORMATION,&plastic_def);
-    else Remove_Array(ATTRIBUTE_ID_PLASTIC_DEFORMATION);
-}
-//#####################################################################
 // Function Initialize_MPM_Particles
 //#####################################################################
 static int Initialize_MPM_Particles()
@@ -128,7 +117,6 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA,"lambda");
     Register_Attribute_Name(ATTRIBUTE_ID_MU0,"mu0");
     Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA0,"lambda0");
-    Register_Attribute_Name(ATTRIBUTE_ID_PLASTIC_DEFORMATION,"plastic_def");
     return 0;
 }
 int initialize_deformables_particles=Initialize_MPM_Particles();
