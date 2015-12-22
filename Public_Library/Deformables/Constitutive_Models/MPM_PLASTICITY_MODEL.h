@@ -26,9 +26,8 @@ public:
     virtual ~MPM_PLASTICITY_MODEL();
 
     virtual void Initialize_Particle(int p) const {};
-    virtual bool Compute(TV& strain,MATRIX<T,TV::m>* dstrain,SYMMETRIC_TENSOR<T,0,TV::m>* ddstrain,
-            MATRIX<T,TV::m,TV::SPIN::m>* rdstrain,MATRIX<T,TV::SPIN::m>* rxstrain,
-            const TV& Fe,bool store_hardening,int p) const=0;
+    virtual bool Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,
+        typename TV::SPIN* r_diff,const TV& Fe,bool store_hardening,int p) const=0;
     virtual bool Update_Particle(int p) const;
 };
 }

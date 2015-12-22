@@ -30,7 +30,7 @@ Update_Particle(int p) const
     DIAGONAL_MATRIX<T,TV::m> singular_values;
     Fe.Fast_Singular_Value_Decomposition(U,singular_values,V);
     TV strain;
-    if(Compute(strain,0,0,0,0,singular_values.x,true,p)){
+    if(Compute(strain,0,0,0,singular_values.x,true,p)){
         singular_values.x=strain;
         particles.F(p)=(U*singular_values).Times_Transpose(V);
         particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);

@@ -28,11 +28,10 @@ template<class TV> MPM_PLASTICITY_CLAMP<TV>::
 // Function Project_Stress
 //#####################################################################
 template<class TV> bool MPM_PLASTICITY_CLAMP<TV>::
-Compute(TV& strain,MATRIX<T,TV::m>* dstrain,SYMMETRIC_TENSOR<T,0,TV::m>* ddstrain,
-        MATRIX<T,TV::m,TV::SPIN::m>* rdstrain,MATRIX<T,TV::SPIN::m>* rxstrain,
-        const TV& Fe,bool store_hardening,int p) const
+Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,
+    typename TV::SPIN* r_diff,const TV& Fe,bool store_hardening,int p) const
 {
-    PHYSBAM_ASSERT(!dstrain && !ddstrain);
+    PHYSBAM_ASSERT(!dstrain);
     strain=clamp(Fe,1-theta_c,1+theta_s);
     if(strain==Fe) return false;
     if(store_hardening){

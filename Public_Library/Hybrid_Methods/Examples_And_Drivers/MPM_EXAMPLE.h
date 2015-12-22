@@ -121,6 +121,7 @@ public:
     T last_grid_ke;
     bool output_structures_each_frame;
     T quad_F_coeff;
+    bool asymmetric_system;
 
     MPM_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~MPM_EXAMPLE();

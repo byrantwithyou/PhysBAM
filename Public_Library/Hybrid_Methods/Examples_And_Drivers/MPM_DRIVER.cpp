@@ -31,6 +31,7 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
+#include <Hybrid_Methods/Forces/MPM_PLASTIC_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <Hybrid_Methods/System/FLUID_KRYLOV_SYSTEM.h>
@@ -676,40 +677,12 @@ Solve_KKT_System()
 template<class TV> void MPM_DRIVER<TV>::
 Update_Plasticity_And_Hardening()
 {
-
-    int num_projected_particles=0;
+//    int num_projected_particles=0;
     for(int i=0;i<example.forces.m;i++)
-        if(MPM_FINITE_ELEMENTS<TV>* force=dynamic_cast<MPM_FINITE_ELEMENTS<TV>*>(example.forces(i)))
-            if(force->plasticity)
-#pragma omp parallel for reduction(+:num_projected_particles)
-                for(int k=0;k<force->gather_scatter.simulated_particles.m;k++)
-                    num_projected_particles+=force->plasticity->Update_Particle(force->gather_scatter.simulated_particles(k));
-
-
-//     MPM_PARTICLES<TV>& particles=example.particles;
-//     if(example.use_clamping_plasticity){
-//         for(int k=0;k<example.simulated_particles.m;++k){
-//             int p=example.simulated_particles(k);
-//             MATRIX<T,TV::m> Fe=particles.F(p);
-//             MATRIX<T,TV::m> U,V;
-//             DIAGONAL_MATRIX<T,TV::m> singular_values;
-//             Fe.Fast_Singular_Value_Decomposition(U,singular_values,V);
-//             singular_values.x=clamp(singular_values.x,1-example.theta_c,1+example.theta_s);
-//             particles.F(p)=(U*singular_values).Times_Transpose(V);
-//             particles.Fp(p)=V*singular_values.Inverse().Times_Transpose(U)*Fe*particles.Fp(p);
-
-//             T hardening_coeff=exp(min(example.max_hardening,example.hardening_factor*(1-particles.Fp(p).Determinant())));
-//             particles.mu(p)=particles.mu0(p)*hardening_coeff;
-//             particles.lambda(p)=particles.lambda0(p)*hardening_coeff;}
-//     }else{
-//         MPM_PLASTICITY_MODEL<TV> *plasticity=example.plasticity;
-//         // T max_yield_function=0;
-//         // int num_projected_particles=0,num_non_converged_particles=0;
-
-// }}
-// //        LOG::printf("Max yield function value: %g\n",max_yield_function);
-        LOG::printf("PLASTICITY: %d/%d (total/projected)\n",example.simulated_particles.m,num_projected_particles);
-//     }
+        if(MPM_PLASTIC_FINITE_ELEMENTS<TV>* force=dynamic_cast<MPM_PLASTIC_FINITE_ELEMENTS<TV>*>(example.forces(i)))
+#pragma omp parallel for // reduction(+:num_projected_particles)
+            for(int k=0;k<force->gather_scatter.simulated_particles.m;k++)
+                force->plasticity.Update_Particle(force->gather_scatter.simulated_particles(k));
 }
 //#####################################################################
 // Function Add_C_Contribution_To_DT
@@ -887,6 +860,10 @@ Apply_Forces()
         newtons_method.max_krylov_iterations=example.solver_iterations;
         newtons_method.use_cg=true;
         newtons_method.debug=true;
+        if(example.asymmetric_system){
+            newtons_method.use_gmres=true;
+            newtons_method.use_cg=false;
+            newtons_method.Make_Vanilla_Newton();}
 
         example.Update_Lagged_Forces(example.time);
         newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance);

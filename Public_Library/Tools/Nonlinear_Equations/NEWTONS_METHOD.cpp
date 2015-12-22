@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
+#include <Tools/Krylov_Solvers/GMRES.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Log/LOG.h>
@@ -22,11 +23,13 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     KRYLOV_VECTOR_BASE<T>& grad=*av.Pop();
     KRYLOV_VECTOR_BASE<T>& dx=*av.Pop();
     KRYLOV_VECTOR_BASE<T>& tm=*av.Pop();
+    GMRES<T> gmres;
     MINRES<T> minres;
     CONJUGATE_GRADIENT<T> cg;
     cg.finish_before_indefiniteness=finish_before_indefiniteness;
     KRYLOV_SOLVER<T>* krylov=&minres;
     if(use_cg) krylov=&cg;
+    if(use_gmres) krylov=&gmres;
     krylov->relative_tolerance=true;
 
     bool result=false;

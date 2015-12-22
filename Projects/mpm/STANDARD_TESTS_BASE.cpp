@@ -21,6 +21,7 @@
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
+#include <Hybrid_Methods/Forces/MPM_PLASTIC_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include "STANDARD_TESTS_BASE.h"
@@ -255,17 +256,18 @@ Add_Drucker_Prager(T E,T nu,const T a[],bool use_implicit,ARRAY<int>* affected_p
     ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>* hencky=new ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>(E,nu);
     if(no_mu) hencky->Zero_Out_Mu();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
-    MPM_DRUCKER_PRAGER<TV>* plasticity=new MPM_DRUCKER_PRAGER<TV>(particles,a[0],a[1],a[2],a[3]);
-    plasticity->use_implicit=use_implicit;
-    MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,plasticity);
+    MPM_DRUCKER_PRAGER<TV>& plasticity=*new MPM_DRUCKER_PRAGER<TV>(particles,a[0],a[1],a[2],a[3]);
+    plasticity.use_implicit=use_implicit;
+    MPM_PLASTIC_FINITE_ELEMENTS<TV>& fe=*new MPM_PLASTIC_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,plasticity);
+    this->asymmetric_system=true;
 
     if(affected_particles)
         for(int i=0;i<affected_particles->m;++i){
             int p=(*affected_particles)(i);
-            plasticity->Initialize_Particle(p);}
+            plasticity.Initialize_Particle(p);}
     else
         for(int p=0;p<particles.X.m;++p)
-            plasticity->Initialize_Particle(p);
+            plasticity.Initialize_Particle(p);
 
     return Add_Force(fe);
 }

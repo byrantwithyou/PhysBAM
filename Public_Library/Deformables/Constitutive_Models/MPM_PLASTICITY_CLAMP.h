@@ -27,9 +27,8 @@ public:
     MPM_PLASTICITY_CLAMP(MPM_PARTICLES<TV>& particles,T theta_c,T theta_s,T max_hardening,T hardening_factor);
     virtual ~MPM_PLASTICITY_CLAMP();
 
-    bool Compute(TV& strain,MATRIX<T,TV::m>* dstrain,SYMMETRIC_TENSOR<T,0,TV::m>* ddstrain,
-            MATRIX<T,TV::m,TV::SPIN::m>* rdstrain,MATRIX<T,TV::SPIN::m>* rxstrain,
-            const TV& Fe,bool store_hardening,int p) const override;
+    bool Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,
+        typename TV::SPIN* r_diff,const TV& Fe,bool store_hardening,int p) const override;
 };
 }
 #endif
