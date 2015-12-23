@@ -46,6 +46,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
+    bool no_affine=false;
     parse_args.Extra(&test_number,"example number","example number to run");
     parse_args.Add("-restart",&restart,"frame","restart frame");
     parse_args.Add("-resolution",&resolution,&user_resolution,"resolution","grid resolution");
@@ -60,13 +61,14 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-min_dt",&min_dt,"dt","Minimum time step size");
     parse_args.Add("-max_dt",&max_dt,"dt","Maximum time step size");
     parse_args.Add("-order",&order,"order","Interpolation basis order");
+    parse_args.Add_Not("-no_affine",&use_affine,"Use affine PIC");
     parse_args.Add("-affine",&use_affine,"Use affine PIC");
     parse_args.Add("-use_f2p",&use_f2p,"Use face to particle (direct) transfer");
     parse_args.Add("-midpoint",&use_midpoint,"Use midpoint rule");
     parse_args.Add("-symplectic_euler",&use_symplectic_euler,"Use forward euler for grid update");
     parse_args.Add("-particle_collision",&use_particle_collision,"Use particle collision");
     parse_args.Add("-print_stats",&print_stats,"Print momentum/energy stats");
-    parse_args.Add("-flip",&flip,"frac","Flip ratio");
+    parse_args.Add("-flip",&flip,&no_affine,"frac","Flip ratio");
     parse_args.Add("-cfl",&cfl,"cfl","CFL number");
     parse_args.Add("-newton_tolerance",&newton_tolerance,"tol","Newton tolerance");
     parse_args.Add("-newton_iterations",&newton_iterations,"iter","Newton iterations");
@@ -98,6 +100,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-no_implicit_plasticity",&no_implicit_plasticity,"Use penalty collisions objects");
 
     parse_args.Parse(true);
+    if(no_affine) use_affine=false;
 
     frame_dt=1/framerate;
 
