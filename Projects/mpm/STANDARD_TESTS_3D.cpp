@@ -551,8 +551,7 @@ Initialize()
 
             T density=(T)2200*scale_mass;
             T E=35.37e6*scale_E,nu=.3;
-            Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
-            (void)as;//            this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(as[test_number-20][0],as[test_number-20][1],as[test_number-20][2],as[test_number-20][3]);
+            Add_Drucker_Prager(E,nu,as[test_number-20]);
             T gap=grid.dX(1)*0.1;
             T l0=0.05;
             T h0=l0*8;
