@@ -41,7 +41,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     penalty_damping_stiffness(0),use_penalty_collisions(false),use_plasticity(true),
     use_theta_c(false),use_theta_s(false),use_hardening_factor(false),use_max_hardening(false),
     theta_c(0),theta_s(0),hardening_factor(0),max_hardening(0),plastic_newton_tolerance(1e-6),
-    plastic_newton_iterations(500),tests(stream_type_input,deformable_body_collection)
+    plastic_newton_iterations(500),use_implicit_plasticity(false),no_implicit_plasticity(false),
+    tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
@@ -93,6 +94,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-plastic_newton_iterations",&plastic_newton_iterations,"iter","Newton iterations in plastic yield");
     parse_args.Add("-plastic_newton_tolerance",&plastic_newton_tolerance,"tol","Newton tolerance in plastic yield");
     parse_args.Add("-use_penalty_collisions",&use_penalty_collisions,"Use penalty collisions objects");
+    parse_args.Add("-use_implicit_plasticity",&use_implicit_plasticity,"Use penalty collisions objects");
+    parse_args.Add("-no_implicit_plasticity",&no_implicit_plasticity,"Use penalty collisions objects");
 
     parse_args.Parse(true);
 
@@ -251,34 +254,33 @@ Add_St_Venant_Kirchhoff_Hencky_Strain(T E,T nu,ARRAY<int>* affected_particles,bo
 // Function Add_Drucker_Prager
 //#####################################################################
 template<class TV> int STANDARD_TESTS_BASE<TV>::
-Add_Drucker_Prager(T E,T nu,const T a[],bool use_implicit,ARRAY<int>* affected_particles,bool no_mu)
+Add_Drucker_Prager(T E,T nu,const T a[],ARRAY<int>* affected_particles,bool no_mu)
 {
     ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>* hencky=new ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>(E,nu);
     if(no_mu) hencky->Zero_Out_Mu();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
-    MPM_DRUCKER_PRAGER<TV>& plasticity=*new MPM_DRUCKER_PRAGER<TV>(particles,a[0],a[1],a[2],a[3]);
-    plasticity.use_implicit=use_implicit;
-    MPM_PLASTIC_FINITE_ELEMENTS<TV>& fe=*new MPM_PLASTIC_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,plasticity);
-    this->asymmetric_system=true;
-
-    if(affected_particles)
-        for(int i=0;i<affected_particles->m;++i){
-            int p=(*affected_particles)(i);
-            plasticity.Initialize_Particle(p);}
-    else
-        for(int p=0;p<particles.X.m;++p)
-            plasticity.Initialize_Particle(p);
-
-    return Add_Force(fe);
+    MPM_DRUCKER_PRAGER<TV>& plasticity=*new MPM_DRUCKER_PRAGER<TV>(particles,0,a[0],a[1],a[2],a[3]);
+    plasticity.use_implicit=use_implicit_plasticity;
+    PARTICLE_GRID_FORCES<TV>* fe=0;
+    if(use_implicit_plasticity){
+        fe=new MPM_PLASTIC_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,plasticity);
+        this->asymmetric_system=true;}
+    else{
+        MPM_FINITE_ELEMENTS<TV>* mfe=new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
+        plasticity.gather_scatter=&mfe->gather_scatter;
+        fe=mfe;}
+    plasticity.Initialize_Particles();
+    plasticity_models.Append(&plasticity);
+    return Add_Force(*fe);
 }
 //#####################################################################
 // Function Add_Drucker_Prager
 //#####################################################################
 template<class TV> int STANDARD_TESTS_BASE<TV>::
-Add_Drucker_Prager(T E,T nu,T phi_F,bool use_impicit,ARRAY<int>* affected_particles,bool no_mu)
+Add_Drucker_Prager(T E,T nu,T phi_F,ARRAY<int>* affected_particles,bool no_mu)
 {
     const T a[4]={phi_F,0,0,0};
-    return Add_Drucker_Prager(E,nu,a,use_impicit,affected_particles,no_mu);
+    return Add_Drucker_Prager(E,nu,a,affected_particles,no_mu);
 }
 //#####################################################################
 // Function Add_Walls

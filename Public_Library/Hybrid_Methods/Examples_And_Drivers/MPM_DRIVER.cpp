@@ -661,12 +661,8 @@ Solve_KKT_System()
 template<class TV> void MPM_DRIVER<TV>::
 Update_Plasticity_And_Hardening()
 {
-//    int num_projected_particles=0;
-    for(int i=0;i<example.forces.m;i++)
-        if(MPM_PLASTIC_FINITE_ELEMENTS<TV>* force=dynamic_cast<MPM_PLASTIC_FINITE_ELEMENTS<TV>*>(example.forces(i)))
-#pragma omp parallel for // reduction(+:num_projected_particles)
-            for(int k=0;k<force->gather_scatter.simulated_particles.m;k++)
-                force->plasticity.Update_Particle(force->gather_scatter.simulated_particles(k));
+    for(int i=0;i<example.plasticity_models.m;i++)
+        example.plasticity_models(i)->Update_Particles();
 }
 //#####################################################################
 // Function Add_C_Contribution_To_DT

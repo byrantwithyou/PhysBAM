@@ -24,6 +24,7 @@ template<class T>  class MPM_KRYLOV_VECTOR;
 template<class TV> class MPM_PARTICLES;
 template<class TV> class PARTICLE_GRID_FORCES;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
+template<class TV> class MPM_PLASTICITY_MODEL;
 
 template<class TV>
 class MPM_EXAMPLE:public NONCOPYABLE
@@ -45,6 +46,7 @@ public:
     ARRAY<int> valid_grid_indices;
     ARRAY<TV_INT> valid_grid_cell_indices;
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
+    ARRAY<MPM_PLASTICITY_MODEL<TV>*> plasticity_models;
     ARRAY<DEFORMABLES_FORCES<TV>*>& lagrangian_forces;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     PARTICLE_GRID_WEIGHTS<TV>* weights;

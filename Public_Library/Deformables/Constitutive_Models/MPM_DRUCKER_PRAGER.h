@@ -18,7 +18,7 @@ class MPM_DRUCKER_PRAGER:public MPM_PLASTICITY_MODEL<TV>
 {
     typedef MPM_PLASTICITY_MODEL<TV> BASE;
 public:
-    using BASE::particles;
+    using BASE::particles;using BASE::gather_scatter;
 
     enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;
@@ -27,10 +27,10 @@ public:
     mutable ARRAY_VIEW<T> rho_F;
     T a0,a1,a3,a4;
 
-    MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,T a0,T a1,T a3,T a4);
+    MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatter,T a0,T a1,T a3,T a4);
     virtual ~MPM_DRUCKER_PRAGER();
 
-    void Initialize_Particle(int p) const override;
+    void Initialize_Particles() const override;
     bool Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,
         typename TV::SPIN* r_diff,const TV& Fe,bool store_hardening,int p) const override;
     void Update_Hardening(int id,T plastic_def_increment) const;

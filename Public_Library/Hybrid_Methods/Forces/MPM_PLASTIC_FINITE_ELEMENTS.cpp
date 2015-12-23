@@ -84,6 +84,7 @@ MPM_PLASTIC_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
         gather_scatter.weights=gather_scatter_input.weights;
         gather_scatter.threads=gather_scatter_input.threads;
         gather_scatter.Prepare_Scatter(particles);}
+    plasticity.gather_scatter=&gather_scatter;
 }
 //#####################################################################
 // Destructor
@@ -95,7 +96,6 @@ template<class TV> MPM_PLASTIC_FINITE_ELEMENTS<TV>::
         delete &gather_scatter.simulated_particles;
         delete &gather_scatter;}
     delete &constitutive_model;
-    delete &plasticity;
 }
 //#####################################################################
 // Function Precompute

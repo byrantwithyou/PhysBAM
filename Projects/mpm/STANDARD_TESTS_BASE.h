@@ -29,7 +29,7 @@ public:
     using BASE::mass;using BASE::force_helper;using BASE::use_oldroyd;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::collision_objects;using BASE::substeps_delay_frame;
-    using BASE::output_directory;using BASE::mass_contour;
+    using BASE::output_directory;using BASE::mass_contour;using BASE::plasticity_models;
     using BASE::restart;using BASE::dt;using BASE::time;using BASE::use_early_gradient_transfer;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
     using BASE::ghost;using BASE::use_reduced_rasterization;using BASE::use_affine;;using BASE::use_f2p;
@@ -60,6 +60,7 @@ public:
     bool use_plasticity,use_theta_c,use_theta_s,use_hardening_factor,use_max_hardening;
     T theta_c,theta_s,hardening_factor,max_hardening,plastic_newton_tolerance;
     int plastic_newton_iterations;
+    bool use_implicit_plasticity,no_implicit_plasticity;
 
     RANDOM_NUMBERS<T> random;
     DEFORMABLES_STANDARD_TESTS<TV> tests;
@@ -108,8 +109,8 @@ public:
     int Add_Fixed_Corotated(T_VOLUME& object,T E,T nu);
     int Add_Neo_Hookean(T_VOLUME& object,T E,T nu);
     int Add_St_Venant_Kirchhoff_Hencky_Strain(T E,T nu,ARRAY<int>* affected_particles=0,bool no_mu=false);
-    int Add_Drucker_Prager(T E,T nu,const T a[],bool use_impicit,ARRAY<int>* affected_particles=0,bool no_mu=false);
-    int Add_Drucker_Prager(T E,T nu,T phi_F,bool use_impicit,ARRAY<int>* affected_particles=0,bool no_mu=false);
+    int Add_Drucker_Prager(T E,T nu,const T a[],ARRAY<int>* affected_particles=0,bool no_mu=false);
+    int Add_Drucker_Prager(T E,T nu,T phi_F,ARRAY<int>* affected_particles=0,bool no_mu=false);
     void Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty); // -x +x -y +y [ -z +z ], as bit flags
 //#####################################################################
 };

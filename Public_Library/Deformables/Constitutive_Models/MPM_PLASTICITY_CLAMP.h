@@ -24,7 +24,8 @@ public:
 
     T theta_c,theta_s,max_hardening,hardening_factor;
 
-    MPM_PLASTICITY_CLAMP(MPM_PARTICLES<TV>& particles,T theta_c,T theta_s,T max_hardening,T hardening_factor);
+    MPM_PLASTICITY_CLAMP(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatter,
+        T theta_c,T theta_s,T max_hardening,T hardening_factor);
     virtual ~MPM_PLASTICITY_CLAMP();
 
     bool Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,

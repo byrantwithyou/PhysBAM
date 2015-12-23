@@ -8,13 +8,14 @@
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> MPM_DRUCKER_PRAGER<TV>::
-MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,T a0,T a1,T a3,T a4)
-    :MPM_PLASTICITY_MODEL<TV>(particles),a0(a0),a1(a1),a3(a3),a4(a4)
+MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatter,T a0,T a1,T a3,T a4)
+    :MPM_PLASTICITY_MODEL<TV>(particles,gather_scatter),a0(a0),a1(a1),a3(a3),a4(a4)
 {
     particles.Add_Array(ATTRIBUTE_ID_PLASTIC_DEFORMATION,&plastic_def);
     particles.Add_Array(ATTRIBUTE_ID_DP_RHO_F,&rho_F);
@@ -27,12 +28,14 @@ template<class TV> MPM_DRUCKER_PRAGER<TV>::
 {
 }
 //#####################################################################
-// Function Project_Stress
+// Function Initialize_Particle
 //#####################################################################
 template<class TV> void MPM_DRUCKER_PRAGER<TV>::
-Initialize_Particle(int p) const
+Initialize_Particles() const
 {
-    Update_Hardening(p,0);
+    for(int k=0;k<gather_scatter->simulated_particles.m;k++){
+        int p=gather_scatter->simulated_particles(k);
+        Update_Hardening(p,0);}
 }
 //#####################################################################
 // Function Project_Stress

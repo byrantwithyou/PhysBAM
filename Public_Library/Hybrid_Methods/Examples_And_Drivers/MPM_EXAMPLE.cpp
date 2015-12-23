@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
@@ -45,6 +46,7 @@ template<class TV> MPM_EXAMPLE<TV>::
     delete weights;
     delete &gather_scatter;
     delete &force_helper;
+    plasticity_models.Delete_Pointers_And_Clean_Memory();
     collision_objects.Delete_Pointers_And_Clean_Memory();
     fluid_walls.Delete_Pointers_And_Clean_Memory();
     forces.Delete_Pointers_And_Clean_Memory();

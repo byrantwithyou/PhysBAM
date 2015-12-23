@@ -12,8 +12,9 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> MPM_PLASTICITY_CLAMP<TV>::
-MPM_PLASTICITY_CLAMP(MPM_PARTICLES<TV>& particles,T theta_c,T theta_s,T max_hardening,T hardening_factor)
-    :MPM_PLASTICITY_MODEL<TV>(particles),theta_c(theta_c),theta_s(theta_s),max_hardening(max_hardening),
+MPM_PLASTICITY_CLAMP(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatter,
+    T theta_c,T theta_s,T max_hardening,T hardening_factor)
+    :MPM_PLASTICITY_MODEL<TV>(particles,gather_scatter),theta_c(theta_c),theta_s(theta_s),max_hardening(max_hardening),
     hardening_factor(hardening_factor)
 {
 }
