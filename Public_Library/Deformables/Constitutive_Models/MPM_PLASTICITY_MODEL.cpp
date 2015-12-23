@@ -34,6 +34,7 @@ Initialize_Particles() const
 template<class TV> void MPM_PLASTICITY_MODEL<TV>::
 Update_Particles() const
 {
+#pragma omp parallel for
     for(int k=0;k<gather_scatter->simulated_particles.m;k++){
         int p=gather_scatter->simulated_particles(k);
         MATRIX<T,TV::m> Fe=particles.F(p),U,V;

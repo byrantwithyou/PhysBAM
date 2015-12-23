@@ -466,6 +466,7 @@ Compute_Cell_C()
 {
     example.cell_C.Fill(MATRIX<T,TV::m>());
     T one_over_dx=example.grid.one_over_dX(0);
+#pragma omp parallel for
     for(int t=0;t<example.valid_grid_cell_indices.m;t++){
         TV_INT index=example.valid_grid_cell_indices(t);
         MATRIX<T,TV::m> C;

@@ -33,6 +33,7 @@ template<class TV> MPM_DRUCKER_PRAGER<TV>::
 template<class TV> void MPM_DRUCKER_PRAGER<TV>::
 Initialize_Particles() const
 {
+#pragma omp parallel for
     for(int k=0;k<gather_scatter->simulated_particles.m;k++){
         int p=gather_scatter->simulated_particles(k);
         Update_Hardening(p,0);}
