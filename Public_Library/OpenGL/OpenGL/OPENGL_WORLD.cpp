@@ -476,7 +476,7 @@ template<class T> void OPENGL_WORLD<T>::Set_External_Mouse_Handler(OPENGL_MOUSE_
 template<class T> void OPENGL_WORLD<T>::Update_Clipping_Planes()
 {
     for(int i=0;i<clipping_planes.m;i++)
-        if(clipping_planes(i)) OpenGL_Clip_Plane(GL_CLIP_PLANE0+(i-1),*clipping_planes(i));
+        if(clipping_planes(i)) OpenGL_Clip_Plane(GL_CLIP_PLANE0+i,*clipping_planes(i));
 }
 //#####################################################################
 // Function Add_Clipping_Plane
@@ -489,7 +489,7 @@ template<class T> GLenum OPENGL_WORLD<T>::Add_Clipping_Plane(const PLANE<T> &pla
     if(index==-1)
         index=clipping_planes.Append(new PLANE<T>(plane));
     else clipping_planes(index)=new PLANE<T>(plane);
-    return GL_CLIP_PLANE0+(index-1);
+    return GL_CLIP_PLANE0+index;
 }
 //#####################################################################
 // Function Set_Clipping_Plane
