@@ -551,6 +551,7 @@ Initialize()
 
             T density=(T)2200*scale_mass;
             T E=35.37e6*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
             Add_Drucker_Prager(E,nu,as[test_number-20]);
             T gap=grid.dX(1)*0.1;
             T l0=0.05;
