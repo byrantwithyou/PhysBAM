@@ -210,13 +210,13 @@ Simulate_To_Frame(const int frame)
             LOG::SCOPE scope("SUBSTEP","substep %d",substep+1);
             example.dt=Compute_Dt();
             example.dt=clamp(example.dt,example.min_dt,example.max_dt);
-            LOG::cout<<"substep dt: "<<example.dt<<std::endl;
             T next_time=example.time+example.dt;
             if(next_time>time_at_frame){
                 next_time=time_at_frame;
                 done=true;}
             else if(next_time+example.dt>time_at_frame) next_time=(example.time+time_at_frame)/2;
             example.dt=next_time-example.time;
+            LOG::cout<<"substep dt: "<<example.dt<<std::endl;
 
             Advance_One_Time_Step();
             example.time=next_time;}
