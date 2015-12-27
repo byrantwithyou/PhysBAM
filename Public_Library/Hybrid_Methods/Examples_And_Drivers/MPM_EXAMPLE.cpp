@@ -150,8 +150,10 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
         forces(i)->Add_Forces(F,time);
 
     if(!lagrangian_forces.m) return;
-    lagrangian_forces_F.Remove_All();
-    lagrangian_forces_F.Resize(particles.X.m);
+    lagrangian_forces_F.Resize(particles.X.m,false,false);
+#pragma parallel for
+    for(int i=0;i<lagrangian_forces_F.m;i++)
+        lagrangian_forces_F(i)=TV();
     deformable_body_collection.Add_Velocity_Independent_Forces(lagrangian_forces_F,time);
     gather_scatter.template Scatter<int>(
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
@@ -167,10 +169,12 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
         forces(i)->Add_Hessian_Times(F,V,time);
 
     if(!lagrangian_forces.m) return;
-    lagrangian_forces_F.Remove_All();
-    lagrangian_forces_V.Remove_All();
-    lagrangian_forces_F.Resize(particles.X.m);
-    lagrangian_forces_V.Resize(particles.X.m);
+    lagrangian_forces_F.Resize(particles.X.m,false,false);
+    lagrangian_forces_V.Resize(particles.X.m,false,false);
+#pragma parallel for
+    for(int i=0;i<lagrangian_forces_F.m;i++){
+        lagrangian_forces_F(i)=TV();
+        lagrangian_forces_V(i)=TV();}
     gather_scatter.template Gather<int>(
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
             lagrangian_forces_V(p)+=it.Weight()*V(it.Index());},false);
