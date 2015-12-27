@@ -242,6 +242,7 @@ Write_Substep(const std::string& title,const int substep,const int level)
 template<class TV> void MPM_DRIVER<TV>::
 Write_Output_Files(const int frame)
 {
+    LOG::SCOPE scope("Write_Output_Files");
     FILE_UTILITIES::Create_Directory(example.output_directory);
     FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
