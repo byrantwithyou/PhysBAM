@@ -101,7 +101,6 @@ Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
 
     //if(system.example.particles.store_S)
     system.example.force_helper.B.Resize(system.example.particles.number);
-
     system.example.gather_scatter.template Gather<HELPER>(
         [](int p,HELPER& h)
         {
@@ -111,9 +110,10 @@ Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
         },
         [this,&v](int p,const PARTICLE_GRID_ITERATOR<TV>& it,HELPER& h)
         {
-            h.Vp+=it.Weight()*v.u(it.Index());
-            h.Vn_interpolate+=it.Weight()*v0.u(it.Index());
-            h.grad_Vp+=MATRIX<T,TV::m>::Outer_Product(v.u(it.Index()),it.Gradient());
+            int i=v.u.Standard_Index(it.Index());
+            h.Vp+=it.Weight()*v.u.array(i);
+            h.Vn_interpolate+=it.Weight()*v0.u.array(i);
+            h.grad_Vp+=MATRIX<T,TV::m>::Outer_Product(v.u.array(i),it.Gradient());
         },
         [this](int p,HELPER& h)
         {
