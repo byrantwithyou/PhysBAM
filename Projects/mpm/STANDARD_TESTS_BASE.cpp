@@ -21,6 +21,7 @@
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
+#include <Hybrid_Methods/Forces/MPM_GRAVITY.h>
 #include <Hybrid_Methods/Forces/MPM_PLASTIC_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
@@ -217,9 +218,9 @@ Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,T
 // Function Add_Gravity
 //#####################################################################
 template<class TV> int STANDARD_TESTS_BASE<TV>::
-Add_Gravity(TV g)
+Add_Gravity(TV g,ARRAY<int>* affected_particles)
 {
-    return Add_Force(*new DEFORMABLE_GRAVITY<TV>(particles,true,g));
+    return Add_Force(*new MPM_GRAVITY<TV>(force_helper,g,gather_scatter,affected_particles));
 }
 //#####################################################################
 // Function Add_Fixed_Corotated

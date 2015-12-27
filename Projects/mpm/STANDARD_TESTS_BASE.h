@@ -105,7 +105,7 @@ public:
 
     void Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
         const T mass,const T volume);
-    int Add_Gravity(TV g);
+    int Add_Gravity(TV g,ARRAY<int>* affected_particles=0);
     int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0,bool no_mu=false);
     int Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles=0);
     int Add_Fixed_Corotated(T_VOLUME& object,T E,T nu);
