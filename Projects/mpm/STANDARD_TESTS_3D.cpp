@@ -5,6 +5,7 @@
 #include <Tools/Data_Structures/KD_TREE.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
+#include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
@@ -72,6 +73,17 @@ Read_Output_Files(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Initialize()
 {
+    static const T mast_constants[10][4]={
+        {35,0,0.2,10},
+        {35,4,0.29,10},
+        {35,9,0.3,10},
+        {35,13,0.27,10},
+        {35,0,0.2,6.57},
+        {35,0,0.2,3.33},
+        {35,0,0.2,0},
+        {38.33,0,0.2,13.33},
+        {41.67,0,0.2,16.67},
+        {45,0,0.2,20}};
     switch(test_number)
     {
         case 1:{ // rotating sphere
@@ -529,17 +541,6 @@ Initialize()
         case 27:
         case 28:
         case 29:{ // Mast paper
-            static const T as[10][4]={
-                {35,0,0.2,10},
-                {35,4,0.29,10},
-                {35,9,0.3,10},
-                {35,13,0.27,10},
-                {35,0,0.2,6.57},
-                {35,0,0.2,3.33},
-                {35,0,0.2,0},
-                {38.33,0,0.2,13.33},
-                {41.67,0,0.2,16.67},
-                {45,0,0.2,20}};
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -552,7 +553,7 @@ Initialize()
             T density=(T)2200*scale_mass;
             T E=35.37e6*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            Add_Drucker_Prager(E,nu,as[test_number-20]);
+            Add_Drucker_Prager(E,nu,mast_constants[test_number-20]);
             T gap=grid.dX(1)*0.1;
             T l0=0.05;
             T h0=l0*8;
@@ -579,6 +580,34 @@ Initialize()
             T density=2*scale_mass;
             Seed_Particles(sphere,[=](const TV& X){return TV();},[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
             Add_Gravity(TV(0,-9.8,0));
+        } break;
+        case 32:{ // sand on wedge
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(0,0,-0.1),TV(0.2,0.2,1.1)),ROTATION<TV>::From_Euler_Angles(TV(0,0,0.25*M_PI)),TV(0.5,0.4-sqrt(2.0)*0.1,0));
+            RANGE<TV> ground(TV(-0.1,0,-0.1),TV(1.1,0.1,1.1));
+            if(use_penalty_collisions){
+                Add_Penalty_Collision_Object(wedge);
+                Add_Penalty_Collision_Object(ground);}
+            else{
+                Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
+                Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge),COLLISION_TYPE::separate,1);}
+
+            T density=(T)2200*scale_mass;
+            T E=35.37e6*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            Add_Drucker_Prager(E,nu,mast_constants[2]);
+            RANGE<TV> box(TV(.3,.7,.3),TV(.7,.9,.7));
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            particles.mu0.Fill(mu);
+            particles.mu.Fill(mu);
+            particles.lambda0.Fill(lambda);
+            particles.lambda.Fill(lambda);
+            Add_Gravity(TV(0,-9.81,0));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
