@@ -287,7 +287,7 @@ Particle_To_Grid()
         scale=example.weights->Constant_Scalar_Inverse_Dp();
     bool use_gradient=!example.incompressible && !example.kkt && example.weights->use_gradient_transfer;
     ARRAY_VIEW<MATRIX<T,TV::m> > dV((example.incompressible || example.kkt)?particles.C:particles.B);
-    example.gather_scatter.template Scatter<int>(
+    example.gather_scatter.template Scatter<int>(true,0,
         [this,scale,&particles,use_gradient,dV](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {
             T w=it.Weight();
@@ -302,7 +302,7 @@ Particle_To_Grid()
             if(example.kkt){
                 if(particles.lambda(p)!=FLT_MAX) example.one_over_lambda(index)+=w*particles.mass(p)/particles.lambda(p);
                 example.J(index)+=w*particles.mass(p)*particles.F(p).Determinant();}
-        },true);
+        });
 
     example.valid_grid_indices.Remove_All();
     example.valid_grid_cell_indices.Remove_All();
@@ -357,17 +357,17 @@ Grid_To_Particle()
         for(int k=a;k<b;k++){
             int p=example.simulated_particles(k);
             TV Vn_interpolate,V_pic,V_flip=particles.V(p);
-            MATRIX<T,TV::m> B,grad_Vp,D;
+        MATRIX<T,TV::m> B,grad_Vp,D;
 
             for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,true,scratch);it.Valid();it.Next()){
-                T w=it.Weight();
-                TV_INT index=it.Index();
-                TV V_grid=example.velocity_new(index);
+            T w=it.Weight();
+            TV_INT index=it.Index();
+            TV V_grid=example.velocity_new(index);
                 V_pic+=w*V_grid;
                 V_flip+=w*(V_grid-example.velocity(index));
                 Vn_interpolate+=w*example.velocity(index);
-                if(example.use_midpoint)
-                    V_grid=(T).5*(V_grid+example.velocity(index));
+            if(example.use_midpoint)
+                V_grid=(T).5*(V_grid+example.velocity(index));
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             MATRIX<T,TV::m> A=dt*grad_Vp+1;
             if(example.quad_F_coeff) A+=sqr(dt*grad_Vp)*example.quad_F_coeff;
@@ -379,20 +379,19 @@ Grid_To_Particle()
                 B=grad_Vp/example.weights->Constant_Scalar_Inverse_Dp();
             else if(example.use_affine)
                 for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,false,scratch);it.Valid();it.Next()){
-                    TV_INT index=it.Index();
-                    TV V_grid=example.velocity_new(index);
-                    TV Z=example.grid.Center(index);
-                    TV xi_new,xp_new;
-                    if(example.use_midpoint){
+                TV_INT index=it.Index();
+                TV V_grid=example.velocity_new(index);
+                TV Z=example.grid.Center(index);
+                TV xi_new,xp_new;
+                if(example.use_midpoint){
                         xi_new=Z+dt/2*(V_grid+example.velocity(index));
                         xp_new=particles.X(p)+dt/2*(Vn_interpolate+V_pic);}
-                    else{
+                else{
                         xi_new=Z+dt*V_grid;
                         xp_new=particles.X(p)+dt*V_pic;}
                     B+=it.Weight()/2*(MATRIX<T,TV::m>::Outer_Product(V_grid,Z-particles.X(p)+xi_new-xp_new)
                         +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));
                     if(particles.store_C && example.weights->Order()>1) D+=it.Weight()*MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p),Z-particles.X(p));}
-
             // apply penalty friction on V_pic
             if(example.penalty_map.m){
                 const ARRAY<VECTOR<int,2> >& cc=example.penalty_map(p);
@@ -435,20 +434,19 @@ Face_To_Particle()
         for(int k=a;k<b;k++){
             int p=example.simulated_particles(k);
             TV Vn_interpolate,V_pic,V_flip=particles.V(p);
-            MATRIX<T,TV::m> C;
+        MATRIX<T,TV::m> C;
             for(int i=0;i<TV::m;++i)
                 for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights(i),p,true,scratch);it.Valid();it.Next()){
-                    T w=it.Weight();
-                    FACE_INDEX<TV::m> face_index(i,it.Index());
-                    T V_grid=example.velocity_new_f(face_index);
-                    V_pic(i)+=w*V_grid;
-                    V_flip(i)+=w*(V_grid-example.velocity_f(face_index));
-                    if(example.use_midpoint){
-                        PHYSBAM_NOT_IMPLEMENTED("Midpoint with Face_To_Particle is not supported");}
-
-                    if(example.use_affine){
-                        TV tmp=example.velocity_new_f(face_index)*it.Gradient();
-                        for(int k=0;k<TV::m;++k)
+            T w=it.Weight();
+            FACE_INDEX<TV::m> face_index(i,it.Index());
+            T V_grid=example.velocity_new_f(face_index);
+            V_pic(i)+=w*V_grid;
+            V_flip(i)+=w*(V_grid-example.velocity_f(face_index));
+            if(example.use_midpoint){
+                PHYSBAM_NOT_IMPLEMENTED("Midpoint with Face_To_Particle is not supported");}
+            if(example.use_affine){
+                TV tmp=example.velocity_new_f(face_index)*it.Gradient();
+                for(int k=0;k<TV::m;++k)
                             C(i,k)+=tmp(k);}}
             particles.V(p)=V_pic;
             Perform_Particle_Collision(p,example.time+example.dt);

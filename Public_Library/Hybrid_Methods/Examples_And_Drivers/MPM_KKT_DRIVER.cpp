@@ -233,7 +233,7 @@ Particle_To_Grid()
         scale=example.weights->Constant_Scalar_Inverse_Dp();
     bool use_gradient=example.weights->use_gradient_transfer;
     ARRAY_VIEW<MATRIX<T,TV::m> > dV(particles.B);
-    example.gather_scatter.template Scatter<int>(
+    example.gather_scatter.template Scatter<int>(true,0,
         [this,scale,&particles,use_gradient,dV](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {
             T w=it.Weight();
@@ -244,9 +244,9 @@ Particle_To_Grid()
                 if(use_gradient) V+=particles.B(p)*it.Gradient();
                 else V+=dV(p)*(w*scale*(example.grid.Center(index)-particles.X(p)));}
             example.velocity(index)+=particles.mass(p)*V;
-        },true);
+        });
 
-    example.gather_scatter_coarse.template Scatter<int>(
+    example.gather_scatter_coarse.template Scatter<int>(true,0,
         [this,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {
             T w=it.Weight();
@@ -254,7 +254,7 @@ Particle_To_Grid()
             example.mass_coarse(index)+=w*particles.mass(p);
             if(particles.lambda(p)!=FLT_MAX) example.one_over_lambda(index)+=w*particles.mass(p)/particles.lambda(p);
             example.J(index)+=w*particles.mass(p)*particles.F(p).Determinant();
-        },true);
+        });
 
     example.valid_velocity_indices.Remove_All();
     example.valid_velocity_cell_indices.Remove_All();

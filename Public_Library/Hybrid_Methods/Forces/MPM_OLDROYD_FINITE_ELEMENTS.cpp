@@ -75,7 +75,7 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
     T zeta=1/(1+stored_dt*inv_Wi);
     T c=force_helper.quad_F_coeff;
-    gather_scatter.template Scatter<MATRIX<T,TV::m> >(
+    gather_scatter.template Scatter<MATRIX<T,TV::m> >(true,
         [this,zeta,c](int p,MATRIX<T,TV::m>& AF)
         {
             SYMMETRIC_MATRIX<T,TV::m> dQ,S=force_helper.Sn(p);
@@ -89,8 +89,7 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
             AF=TP*particles.volume(p);
         },
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,const MATRIX<T,TV::m>& A)
-        {F(it.Index())-=A*it.Gradient();},
-        [](int p,const MATRIX<T,TV::m>& A){},true);
+        {F(it.Index())-=A*it.Gradient();});
 }
 //#####################################################################
 // Function Add_Hessian_Times
@@ -102,7 +101,7 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
 
     T zeta=1/(1+stored_dt*inv_Wi);
     T c=force_helper.quad_F_coeff;
-    gather_scatter.template Gather<int>(
+    gather_scatter.template Gather<int>(true,
         [this](int p,int data){tmp(p)=MATRIX<T,TV::m>();},
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {
@@ -126,11 +125,11 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
             MATRIX<T,TV::m> M=H+K;
             MATRIX<T,TV::m> Z=M+(M.Times_Transpose(B)+B.Transpose_Times(M))*c;
             tmp(p)=(Z+V)*particles.volume(p);
-        },true);
+        });
 
-    gather_scatter.template Scatter<int>(
+    gather_scatter.template Scatter<int>(true,0,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
-        {F(it.Index())+=tmp(p)*it.Gradient();},true);
+        {F(it.Index())+=tmp(p)*it.Gradient();});
 }
 template class MPM_OLDROYD_FINITE_ELEMENTS<VECTOR<float,2> >;
 template class MPM_OLDROYD_FINITE_ELEMENTS<VECTOR<float,3> >;

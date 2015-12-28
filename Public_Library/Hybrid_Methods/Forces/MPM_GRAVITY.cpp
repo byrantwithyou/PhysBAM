@@ -65,9 +65,9 @@ template<class TV> void MPM_GRAVITY<TV>::
 Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
     LOG::SCOPE scope("GR Add_Forces");
-    gather_scatter.template Scatter<int>(
+    gather_scatter.template Scatter<int>(false,0,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
-            F(it.Index())+=it.Weight()*particles.mass(p)*gravity;},false);
+            F(it.Index())+=it.Weight()*particles.mass(p)*gravity;});
 }
 //#####################################################################
 // Function Add_Hessian_Times

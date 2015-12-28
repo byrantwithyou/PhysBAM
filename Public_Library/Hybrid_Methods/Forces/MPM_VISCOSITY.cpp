@@ -68,7 +68,7 @@ template<class TV> void MPM_VISCOSITY<TV>::
 Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
     T c=viscosity/sqr(stored_dt);
-    gather_scatter.template Scatter<MATRIX<T,TV::m> >(
+    gather_scatter.template Scatter<MATRIX<T,TV::m> >(true,
         [this,c](int p,MATRIX<T,TV::m>& A)
         {
             MATRIX<T,TV::m> B=force_helper.B(p);
@@ -76,8 +76,7 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
             A=2*c*particles.volume(p)*force_helper.Fn(p).Determinant()*S;
         },
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,const MATRIX<T,TV::m>& A)
-        {F(it.Index())-=A*it.Gradient();},
-        [](int p,const MATRIX<T,TV::m>& A){},true);
+        {F(it.Index())-=A*it.Gradient();});
 }
 //#####################################################################
 // Function Add_Hessian_Times
@@ -88,15 +87,15 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
     T c=viscosity/sqr(stored_dt);
     tmp.Resize(particles.X.m);
 
-    gather_scatter.template Gather<int>(
+    gather_scatter.template Gather<int>(true,
         [this](int p,int data){tmp(p)=MATRIX<T,TV::m>();},
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {tmp(p)+=SYMMETRIC_MATRIX<T,TV::m>::Symmetric_Outer_Product(V(it.Index()),it.Gradient());},
         [this,c](int p,int data)
-        {tmp(p)*=2*c*force_helper.Fn(p).Determinant()*particles.volume(p);},true);
-    gather_scatter.template Scatter<int>(
+        {tmp(p)*=2*c*force_helper.Fn(p).Determinant()*particles.volume(p);});
+    gather_scatter.template Scatter<int>(true,0,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
-        {F(it.Index())+=tmp(p)*it.Gradient();},true);
+        {F(it.Index())+=tmp(p)*it.Gradient();});
 }
 template class MPM_VISCOSITY<VECTOR<float,2> >;
 template class MPM_VISCOSITY<VECTOR<float,3> >;

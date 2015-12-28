@@ -101,7 +101,7 @@ Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
 
     //if(system.example.particles.store_S)
     system.example.force_helper.B.Resize(system.example.particles.number);
-    system.example.gather_scatter.template Gather<HELPER>(
+    system.example.gather_scatter.template Gather<HELPER>(true,
         [](int p,HELPER& h)
         {
             h.grad_Vp=MATRIX<T,TV::m>();
@@ -127,7 +127,7 @@ Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const
                 system.example.particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,S0(p))+system.example.dt*system.example.inv_Wi)/(1+system.example.dt*system.example.inv_Wi);}
             if(system.example.use_midpoint) system.example.particles.X(p)=X0(p)+system.example.dt/2*(h.Vp+h.Vn_interpolate);
             else system.example.particles.X(p)=X0(p)+system.example.dt*h.Vp;
-        },true);
+        });
 }
 //#####################################################################
 // Function Compute

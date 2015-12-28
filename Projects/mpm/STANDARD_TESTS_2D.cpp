@@ -813,13 +813,13 @@ Begin_Time_Step(const T time)
 #pragma omp parallel for
         for(int i=0;i<this->mass.array.m;i++)
             this->mass.array(i)=0;
-        this->gather_scatter.template Scatter<int>(
+        this->gather_scatter.template Scatter<int>(false,0,
             [this,&my_particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
             {
                 T w=it.Weight();
                 TV_INT index=it.Index();
                 this->mass(index)+=w*my_particles.mass(p);
-            },false);
+            });
 
         // Marching cube
         SEGMENTED_CURVE_2D<T>* surface=SEGMENTED_CURVE_2D<T>::Create();

@@ -155,9 +155,9 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
     for(int i=0;i<lagrangian_forces_F.m;i++)
         lagrangian_forces_F(i)=TV();
     deformable_body_collection.Add_Velocity_Independent_Forces(lagrangian_forces_F,time);
-    gather_scatter.template Scatter<int>(
+    gather_scatter.template Scatter<int>(false,0,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
-            F(it.Index())+=it.Weight()*lagrangian_forces_F(p);},false);
+            F(it.Index())+=it.Weight()*lagrangian_forces_F(p);});
 }
 //#####################################################################
 // Function Add_Hessian_Times
@@ -175,13 +175,13 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
     for(int i=0;i<lagrangian_forces_F.m;i++){
         lagrangian_forces_F(i)=TV();
         lagrangian_forces_V(i)=TV();}
-    gather_scatter.template Gather<int>(
+    gather_scatter.template Gather<int>(false,0,
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
-            lagrangian_forces_V(p)+=it.Weight()*V(it.Index());},false);
+            lagrangian_forces_V(p)+=it.Weight()*V(it.Index());});
     deformable_body_collection.Add_Implicit_Velocity_Independent_Forces(lagrangian_forces_V,lagrangian_forces_F,time);
-    gather_scatter.template Scatter<int>(
+    gather_scatter.template Scatter<int>(false,0,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
-            F(it.Index())-=it.Weight()*lagrangian_forces_F(p);},false);
+            F(it.Index())-=it.Weight()*lagrangian_forces_F(p);});
 }
 //#####################################################################
 // Function Add_Force
