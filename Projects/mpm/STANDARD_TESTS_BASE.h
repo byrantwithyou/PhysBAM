@@ -64,6 +64,7 @@ public:
     bool use_implicit_plasticity,no_implicit_plasticity;
     int hardening_mast_case;
     bool use_hardening_mast_case;
+    bool override_output_directory;
 
     RANDOM_NUMBERS<T> random;
     DEFORMABLES_STANDARD_TESTS<TV> tests;

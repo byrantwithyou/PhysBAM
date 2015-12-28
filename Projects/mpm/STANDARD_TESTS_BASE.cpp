@@ -44,7 +44,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     use_theta_c(false),use_theta_s(false),use_hardening_factor(false),use_max_hardening(false),
     theta_c(0),theta_s(0),hardening_factor(0),max_hardening(0),plastic_newton_tolerance(1e-6),
     plastic_newton_iterations(500),use_implicit_plasticity(false),no_implicit_plasticity(false),
-    hardening_mast_case(0),use_hardening_mast_case(false),
+    hardening_mast_case(0),use_hardening_mast_case(false),override_output_directory(false),
     tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
@@ -58,7 +58,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-last_frame",&last_frame,&user_last_frame,"frame","number of frames to simulate");
     parse_args.Add("-test_diff",&test_diff,"test analytic derivatives");
     parse_args.Add("-threads",&threads,"threads","Number of threads");
-    parse_args.Add("-o",&output_directory,"dir","Output directory");
+    parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
     parse_args.Add("-mass_contour",&mass_contour,"contour","Draw mass contour as a scale to particle average mass");
     parse_args.Add("-framerate",&framerate,"rate","Number of frames per second");
     parse_args.Add("-min_dt",&min_dt,"dt","Minimum time step size");

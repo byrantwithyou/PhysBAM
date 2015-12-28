@@ -39,6 +39,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-fooT3",&foo_T3,"T3","a scalar");
     parse_args.Add("-fooT4",&foo_T4,"T4","a scalar");
     parse_args.Parse();
+    if(!this->override_output_directory) output_directory=LOG::sprintf("Test_3d_%i",test_number);
 }
 //#####################################################################
 // Destructor

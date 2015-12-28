@@ -42,6 +42,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     use_surface_tension(false),Nsurface(0)
 {
     parse_args.Parse();
+    if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
 }
 //#####################################################################
 // Destructor
