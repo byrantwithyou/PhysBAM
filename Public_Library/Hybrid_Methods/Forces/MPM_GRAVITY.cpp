@@ -50,12 +50,11 @@ Precompute(const T time,const T dt,bool want_dE,bool want_ddE)
 template<class TV> typename TV::SCALAR MPM_GRAVITY<TV>:: 
 Potential_Energy(const T time) const
 {
-    LOG::SCOPE scope("GR Potential_Energy");
     T pe=0;
 #pragma omp parallel for reduction(+:pe)
     for(int k=0;k<gather_scatter.simulated_particles.m;k++){
         int p=gather_scatter.simulated_particles(k);
-        pe+=particles.mass(p)*particles.X(p).Dot(gravity);}
+        pe-=particles.mass(p)*particles.X(p).Dot(gravity);}
     return pe;
 }
 //#####################################################################
@@ -64,7 +63,6 @@ Potential_Energy(const T time) const
 template<class TV> void MPM_GRAVITY<TV>:: 
 Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
-    LOG::SCOPE scope("GR Add_Forces");
     gather_scatter.template Scatter<int>(false,0,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
             F(it.Index())+=it.Weight()*particles.mass(p)*gravity;});
