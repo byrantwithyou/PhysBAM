@@ -35,7 +35,7 @@ public:
     void Reset();
     void Compute(const KRYLOV_VECTOR_BASE<T>& dv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const override;
     void Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& dv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const;
-    bool Initial_Guess(KRYLOV_VECTOR_BASE<T>& dv,T tolerance) const;
+    bool Initial_Guess(KRYLOV_VECTOR_BASE<T>& dv,T tolerance,bool no_test) const;
     void Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const;
     void Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const override;
     void Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& dv,bool allow_sep) const;

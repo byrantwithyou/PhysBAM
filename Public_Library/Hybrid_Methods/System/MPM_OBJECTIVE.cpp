@@ -235,8 +235,9 @@ Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const
 // Function Initial_Guess
 //#####################################################################
 template<class TV> bool MPM_OBJECTIVE<TV>::
-Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance) const
+Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance,bool no_test) const
 {
+    if(no_test) LOG::printf("NO TEST INITIAL GUESS\n");
     MPM_KRYLOV_VECTOR<TV>& dv=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(Bdv);
     system.forced_collisions.Remove_All();
     T e0=0,e1=0;
@@ -245,6 +246,7 @@ Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance) const
     T factor=system.example.use_midpoint?4:1;
 
     dv.Copy(-factor,tmp0);
+    if(no_test) return true;
     T norm_grad0=sqrt(system.Inner_Product(tmp0,tmp0));
     Compute(dv,0,&tmp0,&e1);
     T norm_grad1=sqrt(system.Inner_Product(tmp0,tmp0));
