@@ -42,6 +42,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     use_theta_c(false),use_theta_s(false),use_hardening_factor(false),use_max_hardening(false),
     theta_c(0),theta_s(0),hardening_factor(0),max_hardening(0),plastic_newton_tolerance(1e-6),
     plastic_newton_iterations(500),use_implicit_plasticity(false),no_implicit_plasticity(false),
+    hardening_mast_case(0),use_hardening_mast_case(false),
     tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
@@ -96,8 +97,9 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-plastic_newton_iterations",&plastic_newton_iterations,"iter","Newton iterations in plastic yield");
     parse_args.Add("-plastic_newton_tolerance",&plastic_newton_tolerance,"tol","Newton tolerance in plastic yield");
     parse_args.Add("-use_penalty_collisions",&use_penalty_collisions,"Use penalty collisions objects");
-    parse_args.Add("-use_implicit_plasticity",&use_implicit_plasticity,"Use penalty collisions objects");
-    parse_args.Add("-no_implicit_plasticity",&no_implicit_plasticity,"Use penalty collisions objects");
+    parse_args.Add("-use_implicit_plasticity",&use_implicit_plasticity,"Use implicit plasticity");
+    parse_args.Add("-no_implicit_plasticity",&no_implicit_plasticity,"Disable implicit plasticity");
+    parse_args.Add("-mast_case",&hardening_mast_case,&use_hardening_mast_case,"mast_case","The case number from the Mast thesis for hardening parameters");
 
     parse_args.Parse(true);
     if(no_affine) use_affine=false;
@@ -257,12 +259,12 @@ Add_St_Venant_Kirchhoff_Hencky_Strain(T E,T nu,ARRAY<int>* affected_particles,bo
 // Function Add_Drucker_Prager
 //#####################################################################
 template<class TV> int STANDARD_TESTS_BASE<TV>::
-Add_Drucker_Prager(T E,T nu,const T a[],ARRAY<int>* affected_particles,bool no_mu)
+Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,bool no_mu)
 {
     ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>* hencky=new ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>(E,nu);
     if(no_mu) hencky->Zero_Out_Mu();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
-    MPM_DRUCKER_PRAGER<TV>& plasticity=*new MPM_DRUCKER_PRAGER<TV>(particles,0,a[0],a[1],a[2],a[3]);
+    MPM_DRUCKER_PRAGER<TV>& plasticity=*new MPM_DRUCKER_PRAGER<TV>(particles,0,a0,a1,a3,a4);
     plasticity.use_implicit=use_implicit_plasticity;
     PARTICLE_GRID_FORCES<TV>* fe=0;
     if(use_implicit_plasticity){
@@ -282,8 +284,27 @@ Add_Drucker_Prager(T E,T nu,const T a[],ARRAY<int>* affected_particles,bool no_m
 template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Drucker_Prager(T E,T nu,T phi_F,ARRAY<int>* affected_particles,bool no_mu)
 {
-    const T a[4]={phi_F,0,0,0};
-    return Add_Drucker_Prager(E,nu,a,affected_particles,no_mu);
+    return Add_Drucker_Prager(E,nu,phi_F,0,0,0,affected_particles,no_mu);
+}
+//#####################################################################
+// Function Add_Drucker_Prager
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Drucker_Prager_Case(T E,T nu,int case_num,ARRAY<int>* affected_particles,bool no_mu)
+{
+    ARRAY<ARRAY<T>> mast_constants({
+        {35,0,0.2,10},
+        {35,4,0.29,10},
+        {35,9,0.3,10},
+        {35,13,0.27,10},
+        {35,0,0.2,6.57},
+        {35,0,0.2,3.33},
+        {35,0,0.2,0},
+        {38.33,0,0.2,13.33},
+        {41.67,0,0.2,16.67},
+        {45,0,0.2,20}});
+    ARRAY<T>& a=mast_constants(case_num);
+    return Add_Drucker_Prager(E,nu,a(0),a(1),a(2),a(3),affected_particles,no_mu);
 }
 //#####################################################################
 // Function Add_Walls

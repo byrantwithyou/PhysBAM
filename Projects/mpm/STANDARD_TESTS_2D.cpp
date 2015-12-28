@@ -705,18 +705,6 @@ Initialize()
         case 47:
         case 48:
         case 49:{ // Mast paper
-            if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            static const T as[10][4]={
-                {35,0,0.2,10},
-                {35,4,0.29,10},
-                {35,9,0.3,10},
-                {35,13,0.27,10},
-                {35,0,0.2,6.57},
-                {35,0,0.2,3.33},
-                {35,0,0.2,0},
-                {38.33,0,0.2,13.33},
-                {41.67,0,0.2,16.67},
-                {45,0,0.2,20}};
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -728,7 +716,8 @@ Initialize()
 
             T density=(T)2200*scale_mass;
             T E=35.37e6*scale_E,nu=.3;
-            Add_Drucker_Prager(E,nu,as[test_number-40]);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            Add_Drucker_Prager_Case(E,nu,test_number-40);
             T l0=0.05;
             T h0=l0*8;
             T gap=grid.dX(1)*0.01;

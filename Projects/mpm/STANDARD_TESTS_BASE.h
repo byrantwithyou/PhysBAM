@@ -61,6 +61,8 @@ public:
     T theta_c,theta_s,hardening_factor,max_hardening,plastic_newton_tolerance;
     int plastic_newton_iterations;
     bool use_implicit_plasticity,no_implicit_plasticity;
+    int hardening_mast_case;
+    bool use_hardening_mast_case;
 
     RANDOM_NUMBERS<T> random;
     DEFORMABLES_STANDARD_TESTS<TV> tests;
@@ -109,8 +111,9 @@ public:
     int Add_Fixed_Corotated(T_VOLUME& object,T E,T nu);
     int Add_Neo_Hookean(T_VOLUME& object,T E,T nu);
     int Add_St_Venant_Kirchhoff_Hencky_Strain(T E,T nu,ARRAY<int>* affected_particles=0,bool no_mu=false);
-    int Add_Drucker_Prager(T E,T nu,const T a[],ARRAY<int>* affected_particles=0,bool no_mu=false);
+    int Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles=0,bool no_mu=false);
     int Add_Drucker_Prager(T E,T nu,T phi_F,ARRAY<int>* affected_particles=0,bool no_mu=false);
+    int Add_Drucker_Prager_Case(T E,T nu,int case_num_F,ARRAY<int>* affected_particles=0,bool no_mu=false);
     void Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty); // -x +x -y +y [ -z +z ], as bit flags
 //#####################################################################
 };

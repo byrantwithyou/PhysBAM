@@ -73,17 +73,6 @@ Read_Output_Files(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Initialize()
 {
-    static const T mast_constants[10][4]={
-        {35,0,0.2,10},
-        {35,4,0.29,10},
-        {35,9,0.3,10},
-        {35,13,0.27,10},
-        {35,0,0.2,6.57},
-        {35,0,0.2,3.33},
-        {35,0,0.2,0},
-        {38.33,0,0.2,13.33},
-        {41.67,0,0.2,16.67},
-        {45,0,0.2,20}};
     switch(test_number)
     {
         case 1:{ // rotating sphere
@@ -553,7 +542,7 @@ Initialize()
             T density=(T)2200*scale_mass;
             T E=35.37e6*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            Add_Drucker_Prager(E,nu,mast_constants[test_number-20]);
+            Add_Drucker_Prager_Case(E,nu,test_number-20);
             T gap=grid.dX(1)*0.1;
             T l0=0.05;
             T h0=l0*8;
@@ -598,7 +587,8 @@ Initialize()
             T density=(T)2200*scale_mass;
             T E=35.37e6*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            Add_Drucker_Prager(E,nu,mast_constants[2]);
+            int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            Add_Drucker_Prager_Case(E,nu,case_num);
             RANGE<TV> box(TV(.3,.7,.3),TV(.7,.9,.7));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
