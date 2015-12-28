@@ -15,6 +15,7 @@
 namespace PhysBAM{
 
 template<class TV> class STANDARD_TESTS;
+template<class T,int d> class ISOTROPIC_CONSTITUTIVE_MODEL;
 
 template<class TV>
 class STANDARD_TESTS_BASE:public MPM_EXAMPLE<TV>
@@ -115,6 +116,8 @@ public:
     int Add_Drucker_Prager(T E,T nu,T phi_F,ARRAY<int>* affected_particles=0,bool no_mu=false);
     int Add_Drucker_Prager_Case(T E,T nu,int case_num_F,ARRAY<int>* affected_particles=0,bool no_mu=false);
     void Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty); // -x +x -y +y [ -z +z ], as bit flags
+    int Add_Clamped_Plasticity(ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& icm,T theta_c,T theta_s,T max_hardening,
+        T hardening_factor,ARRAY<int>* affected_particles);
 //#####################################################################
 };
 }

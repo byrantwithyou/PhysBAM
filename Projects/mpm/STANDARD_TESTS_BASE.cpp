@@ -15,6 +15,7 @@
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
+#include <Deformables/Constitutive_Models/MPM_PLASTICITY_CLAMP.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <Deformables/Constitutive_Models/ST_VENANT_KIRCHHOFF_HENCKY_STRAIN.h>
 #include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
@@ -306,6 +307,28 @@ Add_Drucker_Prager_Case(T E,T nu,int case_num,ARRAY<int>* affected_particles,boo
         {45,0,0.2,20}});
     ARRAY<T>& a=mast_constants(case_num);
     return Add_Drucker_Prager(E,nu,a(0),a(1),a(2),a(3),affected_particles,no_mu);
+}
+//#####################################################################
+// Function Add_Clamped_Plasticity
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Clamped_Plasticity(ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& icm,T theta_c,T theta_s,T max_hardening,
+    T hardening_factor,ARRAY<int>* affected_particles)
+{
+    MPM_PLASTICITY_CLAMP<TV>& plasticity=*new MPM_PLASTICITY_CLAMP<TV>(particles,0,theta_c,theta_s,
+        max_hardening,hardening_factor);
+    plasticity.use_implicit=use_implicit_plasticity;
+    PARTICLE_GRID_FORCES<TV>* fe=0;
+    if(use_implicit_plasticity){
+        fe=new MPM_PLASTIC_FINITE_ELEMENTS<TV>(force_helper,icm,gather_scatter,affected_particles,plasticity);
+        this->asymmetric_system=true;}
+    else{
+        MPM_FINITE_ELEMENTS<TV>* mfe=new MPM_FINITE_ELEMENTS<TV>(force_helper,icm,gather_scatter,affected_particles);
+        plasticity.gather_scatter=&mfe->gather_scatter;
+        fe=mfe;}
+    plasticity.Initialize_Particles();
+    plasticity_models.Append(&plasticity);
+    return Add_Force(*fe);
 }
 //#####################################################################
 // Function Add_Walls

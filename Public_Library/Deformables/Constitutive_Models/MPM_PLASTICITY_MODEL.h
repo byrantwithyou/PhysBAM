@@ -5,6 +5,7 @@
 #ifndef __MPM_PLASTICITY_MODEL__
 #define __MPM_PLASTICITY_MODEL__
 
+#include <Tools/Arrays/ATTRIBUTE_ID.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Matrices/MATRIX_FORWARD.h>
 #include <Tools/Tensors/SYMMETRIC_TENSOR.h>
@@ -14,6 +15,7 @@ namespace PhysBAM{
 
 template<class TV> class MPM_PARTICLES;
 template<class TV> class GATHER_SCATTER;
+const ATTRIBUTE_ID ATTRIBUTE_ID_PLASTIC_DEFORMATION(54);
 
 template<class TV>
 class MPM_PLASTICITY_MODEL:public NONCOPYABLE

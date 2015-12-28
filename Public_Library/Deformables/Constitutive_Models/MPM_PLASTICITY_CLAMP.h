@@ -10,8 +10,6 @@
 #include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 #include <cmath>
 namespace PhysBAM{
-const ATTRIBUTE_ID ATTRIBUTE_ID_PLASTIC_DEFORMATION(54);
-
 template<class TV>
 class MPM_PLASTICITY_CLAMP:public MPM_PLASTICITY_MODEL<TV>
 {

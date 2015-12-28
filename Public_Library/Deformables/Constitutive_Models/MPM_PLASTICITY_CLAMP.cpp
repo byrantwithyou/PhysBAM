@@ -32,7 +32,6 @@ template<class TV> bool MPM_PLASTICITY_CLAMP<TV>::
 Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,
     typename TV::SPIN* r_diff,const TV& Fe,bool store_hardening,int p) const
 {
-    PHYSBAM_ASSERT(!dstrain);
     strain=clamp(Fe,1-theta_c,1+theta_s);
     if(strain==Fe) return false;
     if(store_hardening){
@@ -40,6 +39,29 @@ Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,
         T hardening_coeff=exp(min(max_hardening,hardening_factor*(1-det)));
         particles.mu(p)=particles.mu0(p)*hardening_coeff;
         particles.lambda(p)=particles.lambda0(p)*hardening_coeff;}
+
+    if(!dstrain) return true;
+    VECTOR<bool,TV::m> cb,ct;
+    DIAGONAL_MATRIX<T,TV::m> D;
+    for(int i=0;i<TV::m;i++){
+        bool b=Fe(i)<1-theta_c;
+        bool t=Fe(i)>1+theta_s;
+        cb(i)=b;
+        ct(i)=t;
+        D(i)=!b&&!t;}
+    *dstrain=D;
+
+    if(!r_diff || !r_sum) return true;
+    for(int i=0;i<TV::SPIN::m;i++){
+        int j=(i+1)%TV::m,k=(i+2)%TV::m;
+        bool b1=cb(j),b2=cb(k);
+        bool t1=ct(j),t2=ct(k);
+        bool c1=b1||t1,c2=b2||t2;
+        T x=Fe(j),y=Fe(k),w=strain(j),z=strain(k);
+        if(!c1 && !c2) (*r_diff)(i)=1;
+        else if((b1 && b2) || (t1 && t2)) (*r_diff)(i)=0;
+        else (*r_diff)(i)=(w-z)/(x-y);
+        (*r_sum)(i)=(w+z)/(x+y);}
     return true;
 }
 template class MPM_PLASTICITY_CLAMP<VECTOR<float,2>>;

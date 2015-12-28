@@ -17,6 +17,7 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
+#include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
@@ -505,7 +506,7 @@ Initialize()
             if(!use_theta_s) theta_s=.00001;
             if(!use_hardening_factor) hardening_factor=80;
             if(!use_max_hardening) max_hardening=5;
-            Add_Fixed_Corotated(E,nu);
+            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             RANGE<TV> box(TV(.45,.11),TV(.55,.31));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
@@ -555,7 +556,7 @@ Initialize()
             if(!use_theta_s) theta_s=.005;
             if(!use_hardening_factor) hardening_factor=7;
             if(!use_max_hardening) max_hardening=FLT_MAX;
-            Add_Fixed_Corotated(E,nu);
+            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             RANGE<TV> box(TV(.3,.7),TV(.7,.9));
             std::ifstream ifs("particles.dat");
             if(ifs.is_open()){
