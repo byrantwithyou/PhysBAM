@@ -39,8 +39,9 @@ namespace PhysBAM{
 template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),
-    use_surface_tension(false),Nsurface(0)
+    use_surface_tension(false),Nsurface(0),foo_T1(0)
 {
+    parse_args.Add("-fooT1",&foo_T1,"T1","a scalar");
     parse_args.Parse();
     if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
 }
@@ -767,7 +768,7 @@ Initialize()
             particles.lambda0.Fill(lambda);
             
             if(test_number==51){
-                T El=5000*scale_E,nul=.3;
+                T El=5000*foo_T1,nul=.3;
                 Add_Lambda_Particles(&sand_particles,El,nul,true);}
 
             Add_Gravity(TV(0,-9.81));

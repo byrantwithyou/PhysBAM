@@ -600,6 +600,49 @@ Initialize()
             particles.lambda.Fill(lambda);
             Add_Gravity(TV(0,-9.81,0));
         } break;
+        case 33:
+        case 34:{ // sand dam break
+            // usage:./mpm 33 -3d -use_exp_F -max_dt 1e-3
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            RANGE<TV> ground(TV(-0.1,0,-0.1),TV(1.1,0.1,1.1));
+            RANGE<TV> left_wall(TV(-0.1,0,-0.1),TV(0.1,1.1,1.1));
+            RANGE<TV> back_wall(TV(-0.1,0,-0.1),TV(1.1,1.1,0.1));
+            if(use_penalty_collisions){
+                Add_Penalty_Collision_Object(ground);
+                Add_Penalty_Collision_Object(left_wall);
+                Add_Penalty_Collision_Object(back_wall);}
+            else{
+                Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
+                Add_Collision_Object(left_wall,COLLISION_TYPE::stick,0);
+                Add_Collision_Object(back_wall,COLLISION_TYPE::stick,0);}
+
+            T density=(T)2200*scale_mass;
+            T E=35.37e6*scale_E,nu=.3;
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            T gap=grid.dX(1)*0.1;
+            RANGE<TV> box(TV(.1+gap,.1+gap,.1+gap),TV(.3,.75,.3));
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
+            //int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            //Add_Drucker_Prager_Case(E,nu,case_num);
+            particles.mu0.Fill(mu);
+            particles.mu.Fill(mu);
+            particles.lambda0.Fill(lambda);
+            particles.lambda.Fill(lambda);
+            
+            if(test_number==34){
+                T El=5000*foo_T1,nul=.3;
+                Add_Lambda_Particles(&sand_particles,El,nul,true);}
+
+            Add_Gravity(TV(0,-9.81,0));
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
