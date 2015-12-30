@@ -34,7 +34,7 @@ public:
     using BASE::solver_iterations;using BASE::test_diff;using BASE::threads;
     using BASE::lagrangian_forces;using BASE::use_oldroyd;using BASE::penalty_collisions_stiffness;
     using BASE::test_number;using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Gravity;
-    using BASE::Add_Particle;using BASE::gather_scatter;using BASE::penalty_damping_stiffness;
+    using BASE::Add_Particle;using BASE::Add_Lambda_Particles;using BASE::gather_scatter;using BASE::penalty_damping_stiffness;
     using BASE::Add_Fixed_Corotated;using BASE::Add_Neo_Hookean;using BASE::Add_St_Venant_Kirchhoff_Hencky_Strain;
     using BASE::Add_Drucker_Prager;using BASE::Add_Drucker_Prager_Case;
     using BASE::use_implicit_plasticity;using BASE::no_implicit_plasticity;

@@ -216,6 +216,36 @@ Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,T
     (*color_attribute)(p)=VECTOR<T,3>(1,1,1);
 }
 //#####################################################################
+// Function Add_Lambda_Particles
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Add_Lambda_Particles(ARRAY<int>* affected_particles,T E,T nu, bool no_mu)
+{
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    ARRAY<int> lambda_particles(affected_particles->m);
+    T lambda=E*nu/((1+nu)*(1-2*nu));
+    for(int k=0;k<affected_particles->m;k++){
+        int p=particles.Add_Element();
+        lambda_particles(k)=p;
+        int i=(*affected_particles)(k);
+        particles.valid(p)=true;
+        particles.X(p)=particles.X(i);
+        particles.V(p)=particles.V(i);
+        particles.F(p)=particles.F(i);
+        if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+        if(particles.store_B) particles.B(p)=particles.B(i);
+        if(particles.store_C) particles.C(p)=particles.C(i);
+        if(particles.store_S) particles.S(p)=particles.S(i);
+        particles.mass(p)=particles.mass(i);
+        particles.volume(p)=particles.volume(i);
+        particles.mu(p)=(T)0;
+        particles.mu0(p)=(T)0;
+        particles.lambda(p)=lambda;
+        particles.lambda0(p)=lambda;
+        (*color_attribute)(p)=VECTOR<T,3>(1,0,0);}
+    Add_Fixed_Corotated(E,nu,&lambda_particles,no_mu);
+}
+//#####################################################################
 // Function Add_Gravity
 //#####################################################################
 template<class TV> int STANDARD_TESTS_BASE<TV>::
