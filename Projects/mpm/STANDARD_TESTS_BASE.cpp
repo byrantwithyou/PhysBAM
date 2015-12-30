@@ -219,10 +219,11 @@ Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,T
 // Function Add_Lambda_Particles
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Add_Lambda_Particles(ARRAY<int>* affected_particles,T E,T nu, bool no_mu)
+Add_Lambda_Particles(ARRAY<int>* affected_particles,T E,T nu,T density,bool no_mu)
 {
     ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     ARRAY<int> lambda_particles(affected_particles->m);
+    T mass_lambda=density*grid.dX.Product()/particles_per_cell;
     T lambda=E*nu/((1+nu)*(1-2*nu));
     for(int k=0;k<affected_particles->m;k++){
         int p=particles.Add_Element();
@@ -236,7 +237,7 @@ Add_Lambda_Particles(ARRAY<int>* affected_particles,T E,T nu, bool no_mu)
         if(particles.store_B) particles.B(p)=particles.B(i);
         if(particles.store_C) particles.C(p)=particles.C(i);
         if(particles.store_S) particles.S(p)=particles.S(i);
-        particles.mass(p)=particles.mass(i);
+        particles.mass(p)=mass_lambda;
         particles.volume(p)=particles.volume(i);
         particles.mu(p)=(T)0;
         particles.mu0(p)=(T)0;

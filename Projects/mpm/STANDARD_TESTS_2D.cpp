@@ -39,9 +39,10 @@ namespace PhysBAM{
 template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),
-    use_surface_tension(false),Nsurface(0),foo_T1(0)
+    use_surface_tension(false),Nsurface(0),foo_T1(0),foo_T2(0)
 {
     parse_args.Add("-fooT1",&foo_T1,"T1","a scalar");
+    parse_args.Add("-fooT2",&foo_T2,"T2","a scalar");
     parse_args.Parse();
     if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
 }
@@ -736,7 +737,7 @@ Initialize()
         } break;
         case 50:
         case 51:{ //lambda particles
-            //usage:./mpm 50 -use_exp_F -max_dt 1e-3 -resolution 100
+            //usage:./mpm 51 -use_exp_F -max_dt 1e-3 -resolution 100 -scale_E 10 -fooT1 10 -fooT2 1000 
             particles.Store_Fp(true);
             particles.Store_Lame(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
@@ -752,7 +753,7 @@ Initialize()
                 Add_Collision_Object(RANGE<TV>(TV(.9,-1),TV(1.5,1.5)),COLLISION_TYPE::stick,0);}
             
             T density=(T)2200*scale_mass;
-            T E=35.37e6*scale_E,nu=.3;
+            T E=35.37e5*scale_E,nu=.3;
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));
             //this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(35,0,0,0);
@@ -768,8 +769,8 @@ Initialize()
             particles.lambda0.Fill(lambda);
             
             if(test_number==51){
-                T El=5000*foo_T1,nul=.3;
-                Add_Lambda_Particles(&sand_particles,El,nul,true);}
+                T El=500*foo_T1,nul=.3;
+                Add_Lambda_Particles(&sand_particles,El,nul,foo_T2,true);}
 
             Add_Gravity(TV(0,-9.81));
         } break;
