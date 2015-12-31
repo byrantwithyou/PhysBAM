@@ -30,7 +30,7 @@ public:
     RANGE<TV> box; // box containing the voxelized implicit surface
     bool use_secondary_interpolation;
 
-    IMPLICIT_OBJECT_INTERSECTION(IMPLICIT_OBJECT<TV> &a,IMPLICIT_OBJECT<TV> &b);
+    IMPLICIT_OBJECT_INTERSECTION(IMPLICIT_OBJECT<TV> *a,IMPLICIT_OBJECT<TV> *b);
     virtual ~IMPLICIT_OBJECT_INTERSECTION();
 
     void Use_Secondary_Interpolation(const bool use_secondary_interpolation_input=true)
