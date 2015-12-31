@@ -4,12 +4,14 @@
 //#####################################################################
 #include <Tools/Data_Structures/KD_TREE.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Geometry/Basic_Geometry/CONE.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
@@ -641,6 +643,37 @@ Initialize()
                 T El=5000*foo_T1,nul=.3;
                 Add_Lambda_Particles(&sand_particles,El,nul,true);}
 
+            Add_Gravity(TV(0,-9.81,0));
+        } break;
+        case 35:{ // cup
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+
+            TV_INT res(resolution,resolution*0.3,resolution);
+            TV extent(res);
+            extent /= 2*resolution;
+            grid.Initialize(res,RANGE<TV>(TV(0.25,0,0.25),TV(0.25,0,0.25)+extent),true);
+            RANGE<TV> ground(TV(-0.1,0,-0.1),TV(1.1,grid.dX(1),1.1));
+            if(use_penalty_collisions)
+                Add_Penalty_Collision_Object(ground);
+            else
+                Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
+
+            T density=(T)2200*scale_mass;
+            T E=35.37e6*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            Add_Drucker_Prager_Case(E,nu,case_num);
+            CONE<T> cone(TV(0.5,grid.dX(1)*1.1,0.5),TV(0.5,0.235+grid.dX(1)*1.1,0.5),0.042);
+            RANGE<TV> box(TV(0.4,0,0.4),TV(0.6,0.095+grid.dX(1)*1.1,0.6));
+            IMPLICIT_OBJECT_INTERSECTION<TV> cup(*new ANALYTIC_IMPLICIT_OBJECT<CONE<T>>(cone),*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV>>(box));
+            Seed_Particles(cup,0,0,density,particles_per_cell);
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            particles.mu0.Fill(mu);
+            particles.mu.Fill(mu);
+            particles.lambda0.Fill(lambda);
+            particles.lambda.Fill(lambda);
             Add_Gravity(TV(0,-9.81,0));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
