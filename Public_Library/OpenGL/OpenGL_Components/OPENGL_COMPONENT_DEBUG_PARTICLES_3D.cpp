@@ -139,7 +139,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection)
     if(selection && selection->type == OPENGL_SELECTION<T>::DEBUG_PARTICLES_3D && selection->object == this){
         OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T>*)selection;
         
-        if(!draw_multiple_particle_sets && 1!=set) return;
+        if(!draw_multiple_particle_sets && set!=0) return;
     
         output_stream<<"Selected particle in ["<<component_name<<"("<<1<<")] (total number = "<<particles.Size()<<")"<<std::endl;
     
