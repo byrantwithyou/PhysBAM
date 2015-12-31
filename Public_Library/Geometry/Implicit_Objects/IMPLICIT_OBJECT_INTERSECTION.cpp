@@ -19,8 +19,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> IMPLICIT_OBJECT_INTERSECTION<TV>::
-IMPLICIT_OBJECT_INTERSECTION(IMPLICIT_OBJECT<TV> *a,IMPLICIT_OBJECT<TV> *b)
-    :A(*a),B(*b),owns_A(true),owns_B(true)
+IMPLICIT_OBJECT_INTERSECTION(IMPLICIT_OBJECT<TV> &a,IMPLICIT_OBJECT<TV> &b)
+    :A(a),B(b),owns_A(true),owns_B(true)
 {
 }
 //#####################################################################
