@@ -823,6 +823,7 @@ Apply_Forces()
 {
     example.Capture_Stress();
     objective.Reset();
+    LOG::printf("max velocity: %P\n",Max_Particle_Speed());
     if(example.use_symplectic_euler){
         objective.tmp2*=0;
         example.Precompute_Forces(example.time,example.dt,false);
@@ -847,7 +848,6 @@ Apply_Forces()
 
         example.Update_Lagged_Forces(example.time);
         newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance,example.asymmetric_system);
-        LOG::printf("max velocity: %P\n",Max_Particle_Speed());
         if(example.test_diff) objective.Test_Diff(dv);
 
         objective.system.forced_collisions.Remove_All();
