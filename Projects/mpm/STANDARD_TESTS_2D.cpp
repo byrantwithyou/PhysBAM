@@ -43,6 +43,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 {
     parse_args.Add("-fooT1",&foo_T1,"T1","a scalar");
     parse_args.Add("-fooT2",&foo_T2,"T2","a scalar");
+    parse_args.Add("-fooT3",&foo_T3,"T3","a scalar");
     parse_args.Parse();
     if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
 }
@@ -737,20 +738,18 @@ Initialize()
         } break;
         case 50:
         case 51:{ //lambda particles
-            //usage:./mpm 51 -use_exp_F -max_dt 1e-3 -resolution 100 -scale_E 10 -fooT1 10 -fooT2 1000 
+            //usage:./mpm 51 -threads 8 -use_exp_F -max_dt 1e-3 -resolution 100 -scale_E 10 -fooT1 10 -fooT2 1000 -fooT3 4 -last_frame 20
             particles.Store_Fp(true);
             particles.Store_Lame(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             //particles.Store_Plastic_Deformation(true);
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            grid.Initialize(TV_INT()+resolution,2*RANGE<TV>::Unit_Box(),true);
             if(use_penalty_collisions){
-                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
-                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(.1,1.5)),0.9);
-                Add_Penalty_Collision_Object(RANGE<TV>(TV(.9,-1),TV(1.5,1.5)),0.9);}
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(2.5,.1)),0.9);
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(.1,1.5)),0.9);}
             else{
-                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::stick,0);
-                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(.1,1.5)),COLLISION_TYPE::stick,0);
-                Add_Collision_Object(RANGE<TV>(TV(.9,-1),TV(1.5,1.5)),COLLISION_TYPE::stick,0);}
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(2.5,.1)),COLLISION_TYPE::stick,0);
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(.1,1.5)),COLLISION_TYPE::stick,0);}
             
             T density=(T)2200*scale_mass;
             T E=35.37e5*scale_E,nu=.3;
@@ -769,7 +768,7 @@ Initialize()
             particles.lambda0.Fill(lambda);
             
             if(test_number==51){
-                T El=500*foo_T1,nul=.3;
+                T El=500*foo_T1,nul=.1*foo_T3;
                 Add_Lambda_Particles(&sand_particles,El,nul,foo_T2,true);}
 
             Add_Gravity(TV(0,-9.81));

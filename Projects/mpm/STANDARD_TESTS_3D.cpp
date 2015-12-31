@@ -604,7 +604,7 @@ Initialize()
         } break;
         case 33:
         case 34:{ // sand dam break
-            // usage:./mpm 33 -3d -use_exp_F -max_dt 1e-3
+            // usage:./mpm 34 -3d -use_exp_F -max_dt 1e-3 -scale_E 10 -fooT1 10 -fooT2 1000 -fooT3 3 -last_frame 20 
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -622,7 +622,7 @@ Initialize()
                 Add_Collision_Object(back_wall,COLLISION_TYPE::stick,0);}
 
             T density=(T)2200*scale_mass;
-            T E=35.37e6*scale_E,nu=.3;
+            T E=35.37e5*scale_E,nu=.3;
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
@@ -640,8 +640,8 @@ Initialize()
             particles.lambda.Fill(lambda);
             
             if(test_number==34){
-                T El=5000*foo_T1,nul=.3;
-                Add_Lambda_Particles(&sand_particles,El,nul,true);}
+                T El=500*foo_T1,nul=0.1*foo_T3;
+                Add_Lambda_Particles(&sand_particles,El,nul,foo_T2,true);}
 
             Add_Gravity(TV(0,-9.81,0));
         } break;
