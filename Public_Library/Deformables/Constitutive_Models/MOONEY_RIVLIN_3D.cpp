@@ -68,6 +68,16 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
     dPi_dF.x1001=beta.x10;dPi_dF.x2002=beta.x20;dPi_dF.x2112=beta.x20;
     if(enforce_definiteness) dPi_dF.Enforce_Definiteness();
 }
+//#####################################################################
+// Function Energy_Density
+//#####################################################################
+template<class T> T MOONEY_RIVLIN_3D<T>::
+Energy_Density(const DIAGONAL_MATRIX<T,3>& F,const int id) const
+{
+    DIAGONAL_MATRIX<T,3> F_threshold=F.Clamp_Min(failure_threshold),C=F_threshold*F_threshold;
+    T I_C=C.Trace(),II_C=(C*C).Trace(),J=F_threshold.Determinant(),Jcc=pow(J,-((T)2/3));
+    return (T)0.5*kappa*sqr(log(J))+(mu_10*I_C+mu_01*II_C*Jcc)*Jcc;
+}
 template class MOONEY_RIVLIN_3D<float>;
 template class MOONEY_RIVLIN_3D<double>;
 }
