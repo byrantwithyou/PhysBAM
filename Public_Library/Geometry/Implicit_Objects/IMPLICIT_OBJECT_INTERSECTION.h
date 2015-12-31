@@ -23,12 +23,12 @@ class IMPLICIT_OBJECT_INTERSECTION:public IMPLICIT_OBJECT<TV>
 public:
     typedef int HAS_TYPED_READ_WRITE;
     typedef TV VECTOR_T;
+    
+    using IMPLICIT_OBJECT<TV>::box;
+    using IMPLICIT_OBJECT<TV>::use_secondary_interpolation;
 
     IMPLICIT_OBJECT<TV> &A,&B;
     bool owns_A,owns_B;
-
-    RANGE<TV> box; // box containing the voxelized implicit surface
-    bool use_secondary_interpolation;
 
     IMPLICIT_OBJECT_INTERSECTION(IMPLICIT_OBJECT<TV> &a,IMPLICIT_OBJECT<TV> &b);
     virtual ~IMPLICIT_OBJECT_INTERSECTION();
