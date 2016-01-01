@@ -39,11 +39,12 @@ namespace PhysBAM{
 template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),
-    use_surface_tension(false),Nsurface(0),foo_T1(0),foo_T2(0)
+    use_surface_tension(false),Nsurface(0),foo_T1(0),foo_T2(0),foo_T4(0)
 {
     parse_args.Add("-fooT1",&foo_T1,"T1","a scalar");
     parse_args.Add("-fooT2",&foo_T2,"T2","a scalar");
     parse_args.Add("-fooT3",&foo_T3,"T3","a scalar");
+    parse_args.Add("-fooT4",&foo_T4,"T4","a scalar");
     parse_args.Parse();
     if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
 }
@@ -737,8 +738,10 @@ Initialize()
             Add_Gravity(TV(0,-9.81));
         } break;
         case 50:
-        case 51:{ //lambda particles
+        case 51:
+        case 52:{ //lambda particles
             //usage:./mpm 51 -threads 8 -use_exp_F -max_dt 1e-3 -resolution 100 -scale_E 10 -fooT1 10 -fooT2 1000 -fooT3 4 -last_frame 20
+            PHYSBAM_ASSERT(foo_T4<particles_per_cell,"Check fooT4"); 
             particles.Store_Fp(true);
             particles.Store_Lame(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
@@ -758,7 +761,8 @@ Initialize()
             //this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(35,0,0,0);
             T gap=grid.dX(1)*0.01;
             RANGE<TV> box(TV(.1+gap,.1+gap),TV(.3,.75));
-            Seed_Particles(box,0,0,density,particles_per_cell);
+            //seed sand particles 
+            Seed_Particles(box,0,0,density,particles_per_cell-foo_T4);
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
@@ -766,10 +770,26 @@ Initialize()
             particles.mu0.Fill(mu);
             particles.lambda.Fill(lambda);
             particles.lambda0.Fill(lambda);
-            
+            //seed lambda particles
             if(test_number==51){
                 T El=500*foo_T1,nul=.1*foo_T3;
                 Add_Lambda_Particles(&sand_particles,El,nul,foo_T2,true);}
+            else if(test_number==52 && foo_T4!=0){
+                T El=500*foo_T1,nul=.1*foo_T3;
+                T lambdal=El*nul/((1+nul)*(1-2*nul));
+                int ns=particles.X.m;
+                Seed_Particles(box,0,0,foo_T2,foo_T4);
+                ARRAY<int> lambda_particles(particles.X.m-ns);
+                ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+                for(int k=0;k<lambda_particles.m;k++){
+                    int p=ns+k;
+                    lambda_particles(k)=p;
+                    particles.mu(p)=(T)0;
+                    particles.mu0(p)=(T)0;
+                    particles.lambda(p)=lambdal;
+                    particles.lambda0(p)=lambdal;
+                    (*color_attribute)(p)=VECTOR<T,3>(0,0,1);}
+                Add_Fixed_Corotated(El,nul,&lambda_particles,true);}
 
             Add_Gravity(TV(0,-9.81));
         } break;
