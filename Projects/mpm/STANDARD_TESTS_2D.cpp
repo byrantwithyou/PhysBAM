@@ -781,9 +781,18 @@ Initialize()
                 Seed_Particles(box,0,0,foo_T2,foo_T4);
                 ARRAY<int> lambda_particles(particles.X.m-ns);
                 ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+                //fix volume and mass
+                T volume=grid.dX.Product()/particles_per_cell;
+                T mass_sand=density*volume;
+                T mass_lambda=foo_T2*volume;
+                for(int p=0;p<ns;p++){
+                    particles.mass(p)=mass_sand;
+                    particles.volume(p)=volume;}
                 for(int k=0;k<lambda_particles.m;k++){
                     int p=ns+k;
                     lambda_particles(k)=p;
+                    particles.mass(p)=mass_lambda;
+                    particles.volume(p)=volume;
                     particles.mu(p)=(T)0;
                     particles.mu0(p)=(T)0;
                     particles.lambda(p)=lambdal;
