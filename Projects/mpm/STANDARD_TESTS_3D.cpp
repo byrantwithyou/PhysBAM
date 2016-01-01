@@ -537,8 +537,12 @@ Initialize()
             particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            if(use_penalty_collisions)
-                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,1.5)),0.9);
+            if(use_penalty_collisions){
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,1.5)),0.9); // ground 
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(0.06-0.3,0.6-0.5,0.5-0.5),TV(0.06+0.3,0.6+0.5,0.5+0.5)),0); // xmin
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(0.94-0.3,0.6-0.5,0.5-0.5),TV(0.94+0.3,0.6+0.5,0.5+0.5)),0); // xmax
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(0.5-0.14,0.6-0.5,0.13-0.3),TV(0.5+0.14,0.6+0.5,0.13+0.3)),0); // zmin
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(0.5-0.14,0.6-0.5,0.86-0.3),TV(0.5+0.14,0.6+0.5,0.86+0.3)),0);} // zmax
             else
                 Add_Collision_Object(RANGE<TV>(TV(-0.5,-1,-0.5),TV(1.5,.1,1.5)),COLLISION_TYPE::stick,0);
 
