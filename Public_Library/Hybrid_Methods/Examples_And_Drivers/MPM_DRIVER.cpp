@@ -831,7 +831,9 @@ Apply_Forces()
 #pragma omp parallel for
         for(int i=0;i<example.valid_grid_indices.m;i++){
             int p=example.valid_grid_indices(i);
-            dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}}
+            dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}
+        objective.system.forced_collisions.Remove_All();
+        objective.Adjust_For_Collision(dv);}
     else{
         NEWTONS_METHOD<T> newtons_method;
         newtons_method.tolerance=example.newton_tolerance*example.dt;
@@ -852,10 +854,9 @@ Apply_Forces()
 
         objective.system.forced_collisions.Remove_All();
         bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
-        if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;}
-
-    Apply_Friction();
-    objective.Restore_F();
+        if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;
+        Apply_Friction();
+        objective.Restore_F();}
 
 #pragma omp parallel for
     for(int i=0;i<example.valid_grid_indices.m;i++){
