@@ -4,8 +4,8 @@
 //#####################################################################
 // Class BSPLINE
 //#####################################################################
-#ifndef BSPLINE__
-#define BSPLINE__
+#ifndef __BSPLINE__
+#define __BSPLINE__
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Log/LOG.h>

@@ -9,8 +9,8 @@
 //   JPEG parameter struct mismatch: library thinks size is 372, caller expects 376
 // with gcc which goes away if you don't use -malign-double
 //#####################################################################
-#ifndef _JPG_FILE_h
-#define _JPG_FILE_h
+#ifndef __JPG_FILE__
+#define __JPG_FILE__
 
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Vectors/VECTOR_FORWARD.h>

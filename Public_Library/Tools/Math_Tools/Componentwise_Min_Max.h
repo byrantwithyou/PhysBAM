@@ -2,8 +2,8 @@
 // Copyright 2006, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef _COMPONENTWISE_MIN_MAX_
-#define _COMPONENTWISE_MIN_MAX_
+#ifndef __COMPONENTWISE_MIN_MAX__
+#define __COMPONENTWISE_MIN_MAX__
 #include <Tools/Math_Tools/max.h>
 #include <Tools/Math_Tools/min.h>
 namespace PhysBAM{

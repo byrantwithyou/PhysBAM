@@ -2,8 +2,8 @@
 // Copyright 2011, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef _PTHREAD_H_
-#define _PTHREAD_H_
+#ifndef __PTHREAD__
+#define __PTHREAD__
 
 #include <Tools/Log/DEBUG_UTILITIES.h>
 

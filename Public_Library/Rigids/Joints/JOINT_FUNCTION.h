@@ -4,8 +4,8 @@
 //#####################################################################
 // Class JOINT_FUNCTION
 //#####################################################################
-#ifndef _JOINT_FUNCTION__
-#define _JOINT_FUNCTION__
+#ifndef __JOINT_FUNCTION__
+#define __JOINT_FUNCTION__
 
 #include <Tools/Matrices/MATRIX_FORWARD.h>
 #include <Tools/Vectors/VECTOR_1D.h>

@@ -4,8 +4,8 @@
 //#####################################################################
 // Class QUADRATIC_PROGRAMMING
 //#####################################################################
-#ifndef _QUADRATIC_PROGRAMMING_
-#define _QUADRATIC_PROGRAMMING_
+#ifndef __QUADRATIC_PROGRAMMING__
+#define __QUADRATIC_PROGRAMMING__
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/PAIR.h>

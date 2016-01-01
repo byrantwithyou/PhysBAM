@@ -4,8 +4,8 @@
 //#####################################################################
 // Class BMP_FILE 
 //#####################################################################
-#ifndef _BMP_FILE_h
-#define _BMP_FILE_h
+#ifndef __BMP_FILE__
+#define __BMP_FILE__
 
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <Tools/Vectors/VECTOR_FORWARD.h>

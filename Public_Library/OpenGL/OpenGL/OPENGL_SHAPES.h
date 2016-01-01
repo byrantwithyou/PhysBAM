@@ -5,8 +5,8 @@
 //#####################################################################
 // Namespace OPENGL_SHAPES
 //#####################################################################
-#ifndef _OPENGL_SHAPES_h
-#define _OPENGL_SHAPES_h
+#ifndef __OPENGL_SHAPES__
+#define __OPENGL_SHAPES__
 
 #include <Tools/Math_Tools/RANGE.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>

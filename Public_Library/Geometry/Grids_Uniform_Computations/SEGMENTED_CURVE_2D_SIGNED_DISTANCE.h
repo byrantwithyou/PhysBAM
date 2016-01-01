@@ -4,8 +4,8 @@
 //#####################################################################
 // Namespace SIGNED_DISTANCE
 //##################################################################### 
-#ifndef SEGMENTED_CURVE_2D_SIGNED_DISTANCE
-#define SEGMENTED_CURVE_2D_SIGNED_DISTANCE
+#ifndef __SEGMENTED_CURVE_2D_SIGNED_DISTANCE__
+#define __SEGMENTED_CURVE_2D_SIGNED_DISTANCE__
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 namespace PhysBAM{

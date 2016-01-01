@@ -4,8 +4,8 @@
 //#####################################################################
 // Class LINEAR_PROGRAMMING
 //#####################################################################
-#ifndef _LINEAR_PROGRAMMING_
-#define _LINEAR_PROGRAMMING_
+#ifndef __LINEAR_PROGRAMMING__
+#define __LINEAR_PROGRAMMING__
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/PAIR.h>
