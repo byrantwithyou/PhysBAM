@@ -79,7 +79,7 @@ Update()
         int idx=0;
         vector_field.Resize(domain.Size());
         vector_locations.Resize(domain.Size());
-        for(RANGE_ITERATOR<TV::m> it(V.domain);it.Valid();it.Next()){
+        for(RANGE_ITERATOR<TV::m> it(domain);it.Valid();it.Next()){
             vector_field(idx)=V(it.index);
             vector_locations(idx)=grid.X(it.index);
             idx++;}}
