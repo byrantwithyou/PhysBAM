@@ -45,8 +45,8 @@ public:
     int Maximum_Slice_Index_In_Current_Mode()
     {
         VECTOR<int,3> grid_cells(grid.numbers_of_cells);
-        if(mode==NODE_SLICE) return grid_cells[axis]+1;
-        else if(mode==CELL_SLICE) return grid_cells[axis];
+        if(mode==NODE_SLICE) return grid_cells[axis];
+        else if(mode==CELL_SLICE) return grid_cells[axis]-1;
         else return -1;
     }
 
@@ -95,7 +95,7 @@ public:
     void Decrement_Slice() override
     {
         if(Is_Slice_Mode()) {
-            index=max(index-1,1);
+            index=max(index-1,0);
             Update_Clip_Planes();
         }
     }
