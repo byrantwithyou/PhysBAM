@@ -12,6 +12,8 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -803,6 +805,55 @@ Initialize()
                 Add_Fixed_Corotated(El,nul,&lambda_particles,true);}
 
             Add_Gravity(m/(s*s)*TV(0,-9.81));
+        } break;
+        case 53:{ // sandbox
+            // ./mpm 53 -threads 10 -use_exp_F -max_dt 1e-3 -resolution 62 -last_frame 20 -fooT1 10
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            if(use_penalty_collisions){
+                LOG::cout<<"ERROR: NOT IMPLEMENTED FOR PENALTY."<<std::endl;;
+                PHYSBAM_FATAL_ERROR();}
+            else{
+                RANGE<TV> ground(TV(-0.5,-1)*m,TV(2.5,.1)*m);
+                RANGE<TV> leftwall(TV(-1,-1)*m,TV(.1,2.5)*m);
+                RANGE<TV> rightwall(TV(0.9,-1)*m,TV(2.5,2.5)*m);
+                ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> > groundimp(ground);
+                ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> > leftwallimp(leftwall);
+                Add_Collision_Object(
+                    new IMPLICIT_OBJECT_UNION<TV>(
+                    *new IMPLICIT_OBJECT_UNION<TV>(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(leftwall)),
+                    *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(rightwall)),
+                    COLLISION_TYPE::stick,0);}
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e5*unit_p*scale_E,nu=.3;
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            //this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(35,0,0,0);
+            T gap=grid.dX(1)*1.1;
+            RANGE<TV> box(TV(.1*m+gap,.1*m+gap),TV(.9*m-gap,.3*m-gap));
+            //seed sand particles 
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
+            particles.mu.Fill(mu);
+            particles.mu0.Fill(mu);
+            particles.lambda.Fill(lambda);
+            particles.lambda0.Fill(lambda);
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
+            // an elastic dropping object
+            {int N_sand=particles.number;
+                SPHERE<TV> sphere(TV(.5,.5)*m,0.05*m);
+                T density=2900*unit_rho*foo_T1;
+                Seed_Particles(sphere,0,0,density,particles_per_cell);
+                int N_box_particles=particles.number-N_sand;
+                ARRAY<int> foo(N_box_particles);
+                for(int k=0;k<foo.m;k++) foo(k)=k+N_sand;
+                Add_Fixed_Corotated(35.37e5*unit_p*scale_E,0.3,&foo);}
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
