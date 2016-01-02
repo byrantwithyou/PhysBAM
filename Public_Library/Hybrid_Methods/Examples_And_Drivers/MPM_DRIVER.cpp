@@ -823,7 +823,7 @@ Apply_Forces()
 {
     example.Capture_Stress();
     objective.Reset();
-    LOG::printf("max velocity: %P\n",Max_Particle_Speed());
+    LOG::printf("max velocity: %.16P\n",Max_Particle_Speed());
     if(example.use_symplectic_euler){
         objective.tmp2*=0;
         example.Precompute_Forces(example.time,example.dt,false);
@@ -915,11 +915,12 @@ Apply_Friction()
     for(int i=0;i<objective.system.collisions.m;i++){
         const typename MPM_KRYLOV_SYSTEM<TV>::COLLISION& c=objective.system.collisions(i);
         TV& v=objective.v1.u.array(c.p);
+        // Note: tmp0,tmp1 already have mass removed; they have units of velocity
         T normal_force=TV::Dot_Product(c.n,objective.tmp0.u.array(c.p)-objective.tmp1.u.array(c.p));
         TV t=v.Projected_Orthogonal_To_Unit_Direction(c.n);
         T t_mag=t.Normalize();
         T coefficient_of_friction=example.collision_objects(c.object)->friction;
-        T k=coefficient_of_friction*normal_force/example.mass.array(c.p);
+        T k=coefficient_of_friction*normal_force;
         if(t_mag<=k)
             v.Project_On_Unit_Direction(c.n);
         else v-=k*t;
