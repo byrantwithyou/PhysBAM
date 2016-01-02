@@ -365,15 +365,16 @@ Grid_To_Particle()
                 TV V_new=example.velocity_new(index);
                 TV V_old=example.velocity(index);
                 TV V_fric=example.velocity_friction(index);
-                TV V_grid=V_new;
-                V_pic+=w*V_grid;
+                V_pic+=w*V_new;
                 V_weight_old+=w*V_old;
-                if(example.use_midpoint)
-                    V_grid=(T).5*(V_grid+V_old);
+                TV V_grid=example.use_midpoint?(T).5*(V_grid+V_old):V_new;
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             MATRIX<T,TV::m> A=dt*grad_Vp+1;
             if(example.quad_F_coeff) A+=sqr(dt*grad_Vp)*example.quad_F_coeff;
             particles.F(p)=A*particles.F(p);
+            TV xp_new;
+            if(example.use_midpoint) xp_new=particles.X(p)+dt/2*(V_weight_old+V_pic);
+            else xp_new=particles.X(p)+dt*V_pic;
             if(particles.store_S){
                 T k=example.dt*example.inv_Wi;
                 particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,particles.S(p))+k)/(1+k);}
@@ -384,21 +385,16 @@ Grid_To_Particle()
                     TV_INT index=it.Index();
                     TV V_grid=example.velocity_new(index);
                     TV Z=example.grid.Center(index);
-                    TV xi_new,xp_new;
-                    if(example.use_midpoint){
-                        xi_new=Z+dt/2*(V_grid+example.velocity(index));
-                        xp_new=particles.X(p)+dt/2*(V_weight_old+V_pic);}
-                    else{
-                        xi_new=Z+dt*V_grid;
-                        xp_new=particles.X(p)+dt*V_pic;}
+                    TV xi_new;
+                    if(example.use_midpoint) xi_new=Z+dt/2*(V_grid+example.velocity(index));
+                    else xi_new=Z+dt*V_grid;
                     B+=it.Weight()/2*(MATRIX<T,TV::m>::Outer_Product(V_grid,Z-particles.X(p)+xi_new-xp_new)
                         +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));
                     if(particles.store_C && example.weights->Order()>1) D+=it.Weight()*MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p),Z-particles.X(p));}
 
             if(particles.store_B) particles.B(p)=B;
             if(particles.store_C) particles.C(p)=example.weights->Order()==1?grad_Vp:B*D.Inverse();
-            if(example.use_midpoint) particles.X(p)+=(V_pic+V_weight_old)*(dt/2);
-            else particles.X(p)+=V_pic*dt;
+            particles.X(p)=xp_new;
             TV V_flip=particles.V(p)+V_pic-V_weight_old;
             particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
 
