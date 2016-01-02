@@ -18,6 +18,7 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE_3D.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_OLDROYD_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/MPM_VISCOSITY.h>
@@ -60,6 +61,7 @@ template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Write_Output_Files(const int frame)
 {
+    if(debug_output_func) debug_output_func(frame);
     BASE::Write_Output_Files(frame);
 }
 //#####################################################################
@@ -719,6 +721,9 @@ Initialize()
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
+    if(forced_collision_type!=-1)
+        for(int i=0;i<collision_objects.m;i++)
+            collision_objects(i)->type=(COLLISION_TYPE)forced_collision_type;
 }
 //#####################################################################
 // Function Begin_Frame

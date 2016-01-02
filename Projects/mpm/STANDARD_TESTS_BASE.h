@@ -51,7 +51,7 @@ public:
     int order;
     int seed;
     int particles_per_cell;
-    bool regular_seeding;
+    bool regular_seeding,no_regular_seeding;
     T scale_mass;
     T scale_E;
     T scale_speed;
@@ -66,6 +66,8 @@ public:
     bool override_output_directory;
     T m,s,kg;
     T unit_p,unit_rho,unit_mu;
+    int forced_collision_type;
+    std::function<void (int frame)> debug_output_func;
 
     RANDOM_NUMBERS<T> random;
     DEFORMABLES_STANDARD_TESTS<TV> tests;

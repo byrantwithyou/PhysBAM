@@ -24,6 +24,7 @@
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_OLDROYD_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/MPM_VISCOSITY.h>
@@ -41,12 +42,13 @@ namespace PhysBAM{
 template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),
-    use_surface_tension(false),Nsurface(0),foo_T1(0),foo_T2(0),foo_T4(0)
+    use_surface_tension(false),Nsurface(0),foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),
+    use_foo_T1(false),use_foo_T2(false),use_foo_T3(false),use_foo_T4(false)
 {
-    parse_args.Add("-fooT1",&foo_T1,"T1","a scalar");
-    parse_args.Add("-fooT2",&foo_T2,"T2","a scalar");
-    parse_args.Add("-fooT3",&foo_T3,"T3","a scalar");
-    parse_args.Add("-fooT4",&foo_T4,"T4","a scalar");
+    parse_args.Add("-fooT1",&foo_T1,&use_foo_T1,"T1","a scalar");
+    parse_args.Add("-fooT2",&foo_T2,&use_foo_T2,"T2","a scalar");
+    parse_args.Add("-fooT3",&foo_T3,&use_foo_T3,"T3","a scalar");
+    parse_args.Add("-fooT4",&foo_T4,&use_foo_T4,"T4","a scalar");
     parse_args.Parse();
     if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
 }
@@ -63,6 +65,7 @@ template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Write_Output_Files(const int frame)
 {
+    if(debug_output_func) debug_output_func(frame);
     BASE::Write_Output_Files(frame);
 }
 //#####################################################################
@@ -339,6 +342,49 @@ Initialize()
             for(int n=0;n<N;n++)
                 for(int d=0;d<TV::m;d++)
                     particles.X(n)(d)+=random.Get_Uniform_Number(-0.2,0.2)*m;
+        } break;
+        case 18:{ // friction test
+            T angle=use_foo_T1?foo_T1:0.1;
+            T initial_velocity=use_foo_T2?foo_T2*(m/s):1*(m/s);
+            T coefficient_of_friction=use_foo_T3?foo_T3:0.3;
+            T g=9.8*m/(s*s);
+            if(!no_regular_seeding) regular_seeding=true;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+            RANGE<TV> box(TV(-.8,0)*m,TV(-.2,.2)*m);
+            T density=unit_rho*scale_mass;
+            Seed_Particles(box,[=](const TV& X){return TV(initial_velocity,0);},0,density,particles_per_cell);
+            Add_Fixed_Corotated(1e5*unit_p*scale_E,0.3);
+            FRAME<TV> frame(TV(),ROTATION<TV>::From_Angle(-angle));
+            ORIENTED_BOX<TV> ground(RANGE<TV>(TV(-5,-5),TV(5,0))*m,frame);
+            Add_Collision_Object(ground,COLLISION_TYPE::slip,coefficient_of_friction);
+            for(int i=0;i<particles.X.m;i++){
+                particles.X(i)=frame*particles.X(i);
+                particles.V(i)=frame.r.Rotate(particles.V(i));}
+            Add_Gravity(TV(0,-g));
+            debug_output_func=[=](int)
+            {
+                T c=sin(angle)*g;
+                T d=coefficient_of_friction*cos(angle)*g;
+                T v0=initial_velocity;
+                T v,x;
+                T t=time;
+                T st=FLT_MAX;
+                T a=c-sign(v0)*d;
+                if(v0*a<0) st=-v0/a;
+                if(t<st){
+                    v=v0+a*t;
+                    x=v0*t+.5*a*t*t;}
+                else{
+                    x=.5*v0*st;
+                    if(abs(c)>d){
+                        a=c+sign(v0)*d;
+                        t-=st;
+                        v=a*t;
+                        x+=.5*a*t*t;}
+                    else v=0;}
+                Add_Debug_Particle(frame*(box.max_corner+TV(x,0)),VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,frame.r.Rotate(TV(v,0)));
+            };
         } break;
         case 21:{ // circle with random initial velocities
             grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-3,-3),TV(4,4))*m,true);
@@ -869,6 +915,9 @@ Initialize()
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
+    if(forced_collision_type!=-1)
+        for(int i=0;i<collision_objects.m;i++)
+            collision_objects(i)->type=(COLLISION_TYPE)forced_collision_type;
 }
 //#####################################################################
 // Function Begin_Frame

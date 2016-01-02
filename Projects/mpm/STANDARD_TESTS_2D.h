@@ -23,7 +23,7 @@ class STANDARD_TESTS<VECTOR<T,2> >:public STANDARD_TESTS_BASE<VECTOR<T,2> >
 
 public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
-    using BASE::mass;using BASE::force_helper;
+    using BASE::mass;using BASE::force_helper;using BASE::debug_output_func;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::particles_per_cell;
     using BASE::substeps_delay_frame;using BASE::scale_mass;using BASE::scale_E;using BASE::scale_speed;
     using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;
@@ -34,9 +34,9 @@ public:
     using BASE::solver_iterations;using BASE::test_diff;using BASE::threads;
     using BASE::lagrangian_forces;using BASE::use_oldroyd;using BASE::penalty_collisions_stiffness;
     using BASE::test_number;using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Gravity;
-    using BASE::Add_Particle;using BASE::Add_Lambda_Particles;using BASE::gather_scatter;using BASE::penalty_damping_stiffness;
+    using BASE::Add_Particle;using BASE::Add_Lambda_Particles;using BASE::gather_scatter;
     using BASE::Add_Fixed_Corotated;using BASE::Add_Neo_Hookean;using BASE::Add_St_Venant_Kirchhoff_Hencky_Strain;
-    using BASE::Add_Drucker_Prager;using BASE::Add_Drucker_Prager_Case;
+    using BASE::Add_Drucker_Prager;using BASE::Add_Drucker_Prager_Case;using BASE::regular_seeding;
     using BASE::use_implicit_plasticity;using BASE::no_implicit_plasticity;
     using BASE::random;using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
     using BASE::tests;using BASE::Seed_Lagrangian_Particles;using BASE::Add_Clamped_Plasticity;
@@ -44,8 +44,10 @@ public:
     using BASE::Add_Force;using BASE::Add_Fluid_Wall;using BASE::quad_F_coeff;using BASE::use_penalty_collisions;
     using BASE::use_theta_c;using BASE::theta_c;using BASE::use_theta_s;using BASE::theta_s;
     using BASE::hardening_factor;using BASE::use_hardening_factor;using BASE::max_hardening;using BASE::use_max_hardening;
-    using BASE::hardening_mast_case;using BASE::use_hardening_mast_case;
+    using BASE::hardening_mast_case;using BASE::use_hardening_mast_case;using BASE::no_regular_seeding;
     using BASE::m;using BASE::s;using BASE::kg;using BASE::unit_p;using BASE::unit_mu;using BASE::unit_rho;
+    using BASE::forced_collision_type;using BASE::penalty_damping_stiffness;
+
 
     // surface tension stuff
     bool use_surface_tension;
@@ -68,6 +70,7 @@ public:
     T foo_T2;
     T foo_T3;
     T foo_T4;
+    bool use_foo_T1,use_foo_T2,use_foo_T3,use_foo_T4;
 
 //#####################################################################
 };

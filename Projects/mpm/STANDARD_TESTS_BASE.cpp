@@ -38,17 +38,18 @@ template<class TV> STANDARD_TESTS_BASE<TV>::
 STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :MPM_EXAMPLE<TV>(stream_type_input),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
-    scale_mass(1),scale_E(1),scale_speed(1),
+    no_regular_seeding(false),scale_mass(1),scale_E(1),scale_speed(1),
     penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),
     penalty_damping_stiffness(0),use_penalty_collisions(false),use_plasticity(true),
     use_theta_c(false),use_theta_s(false),use_hardening_factor(false),use_max_hardening(false),
     theta_c(0),theta_s(0),hardening_factor(0),max_hardening(0),use_implicit_plasticity(false),no_implicit_plasticity(false),
     hardening_mast_case(0),use_hardening_mast_case(false),override_output_directory(false),
-    m(1),s(1),kg(1),tests(stream_type_input,deformable_body_collection)
+    m(1),s(1),kg(1),forced_collision_type(-1),tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
     bool no_affine=false;
+    bool use_separate=false,use_slip=false,use_stick=false;
     parse_args.Extra(&test_number,"example number","example number to run");
     parse_args.Add("-restart",&restart,"frame","restart frame");
     parse_args.Add("-resolution",&resolution,&user_resolution,"resolution","grid resolution");
@@ -85,6 +86,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
     parse_args.Add("-penalty_damping",&penalty_damping_stiffness,"tol","penalty damping stiffness");
     parse_args.Add("-regular_seeding",&regular_seeding,"use regular particle seeding");
+    parse_args.Add_Not("-no_regular_seeding",&no_regular_seeding,"use regular particle seeding");
     parse_args.Add("-use_early_gradient_transfer",&use_early_gradient_transfer,"use early gradient transfer for Cp");
     parse_args.Add("-incompressible",&incompressible,"Make simulated media incompressible");
     parse_args.Add("-kkt",&kkt,"Use KKT solver");
@@ -101,8 +103,19 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-m",&m,"scale","meter scale");
     parse_args.Add("-s",&s,"scale","second scale");
     parse_args.Add("-kg",&kg,"scale","kilogram scale");
+    parse_args.Add("-slip",&use_slip,"force slip collisions");
+    parse_args.Add("-stick",&use_stick,"force stick collisions");
+    parse_args.Add("-separate",&use_separate,"force separating collisions");
+
+        
+
+
 
     parse_args.Parse(true);
+    PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
+    if(use_slip) forced_collision_type=COLLISION_TYPE::slip;
+    if(use_stick) forced_collision_type=COLLISION_TYPE::stick;
+    if(use_separate) forced_collision_type=COLLISION_TYPE::separate;
 
     unit_p=kg*pow<2-TV::m>(m)/(s*s);
     unit_rho=kg*pow<-TV::m>(m);
