@@ -357,17 +357,17 @@ Grid_To_Particle()
         for(int k=a;k<b;k++){
             int p=example.simulated_particles(k);
             TV Vn_interpolate,V_pic,V_flip=particles.V(p);
-        MATRIX<T,TV::m> B,grad_Vp,D;
+            MATRIX<T,TV::m> B,grad_Vp,D;
 
             for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,true,scratch);it.Valid();it.Next()){
-            T w=it.Weight();
-            TV_INT index=it.Index();
-            TV V_grid=example.velocity_new(index);
+                T w=it.Weight();
+                TV_INT index=it.Index();
+                TV V_grid=example.velocity_new(index);
                 V_pic+=w*V_grid;
                 V_flip+=w*(V_grid-example.velocity(index));
                 Vn_interpolate+=w*example.velocity(index);
-            if(example.use_midpoint)
-                V_grid=(T).5*(V_grid+example.velocity(index));
+                if(example.use_midpoint)
+                    V_grid=(T).5*(V_grid+example.velocity(index));
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             MATRIX<T,TV::m> A=dt*grad_Vp+1;
             if(example.quad_F_coeff) A+=sqr(dt*grad_Vp)*example.quad_F_coeff;
@@ -379,25 +379,24 @@ Grid_To_Particle()
                 B=grad_Vp/example.weights->Constant_Scalar_Inverse_Dp();
             else if(example.use_affine)
                 for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,false,scratch);it.Valid();it.Next()){
-                TV_INT index=it.Index();
-                TV V_grid=example.velocity_new(index);
-                TV Z=example.grid.Center(index);
-                TV xi_new,xp_new;
-                if(example.use_midpoint){
+                    TV_INT index=it.Index();
+                    TV V_grid=example.velocity_new(index);
+                    TV Z=example.grid.Center(index);
+                    TV xi_new,xp_new;
+                    if(example.use_midpoint){
                         xi_new=Z+dt/2*(V_grid+example.velocity(index));
                         xp_new=particles.X(p)+dt/2*(Vn_interpolate+V_pic);}
-                else{
+                    else{
                         xi_new=Z+dt*V_grid;
                         xp_new=particles.X(p)+dt*V_pic;}
                     B+=it.Weight()/2*(MATRIX<T,TV::m>::Outer_Product(V_grid,Z-particles.X(p)+xi_new-xp_new)
                         +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));
                     if(particles.store_C && example.weights->Order()>1) D+=it.Weight()*MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p),Z-particles.X(p));}
 
-            particles.V(p)=V_pic;
             if(particles.store_B) particles.B(p)=B;
             if(particles.store_C) particles.C(p)=example.weights->Order()==1?grad_Vp:B*D.Inverse();
-            if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
-            else particles.X(p)+=particles.V(p)*dt;
+            if(example.use_midpoint) particles.X(p)+=(V_pic+Vn_interpolate)*(dt/2);
+            else particles.X(p)+=V_pic*dt;
             particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
 
             if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}}
@@ -814,7 +813,8 @@ Apply_Forces()
         objective.Compute_Unconstrained(objective.tmp1,0,&objective.tmp2,0);
         dv.Copy(-(example.use_midpoint?4:1),objective.tmp2,objective.tmp1);
         objective.system.forced_collisions.Remove_All();
-        objective.Adjust_For_Collision(dv);}
+        objective.Adjust_For_Collision(dv);
+        Apply_Friction();}
     else{
         NEWTONS_METHOD<T> newtons_method;
         newtons_method.tolerance=example.newton_tolerance*example.dt;
@@ -842,8 +842,9 @@ Apply_Forces()
 #pragma omp parallel for
     for(int i=0;i<example.valid_grid_indices.m;i++){
         int j=example.valid_grid_indices(i);
-        example.velocity_new.array(j)=dv.u.array(j)+objective.v0.u.array(j);}
-    example.velocity_new.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
+        example.velocity_new.array(j)=dv.u.array(j)+objective.v0.u.array(j);
+        example.velocity_friction.array(j)+=objective.v0.u.array(j);}
+    example.velocity_friction.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
     example.current_velocity=&example.velocity_new;
 }
 //#####################################################################
@@ -853,7 +854,8 @@ template<class TV> void MPM_DRIVER<TV>::
 Apply_Friction()
 {
     if(!example.collision_objects.m) return;
-    objective.Adjust_For_Collision(dv);
+
+    example.velocity_friction=dv.u;
     objective.Compute_Unconstrained(dv,0,&objective.tmp0,0);
     objective.tmp1=objective.tmp0;
     objective.Project_Gradient_And_Prune_Constraints(objective.tmp1,true);
@@ -871,7 +873,7 @@ Apply_Friction()
         if(t_mag<=k)
             v.Project_On_Unit_Direction(c.n);
         else v-=k*t;
-        dv.u.array(c.p)=v-objective.v0.u.array(c.p);}
+        example.velocity_friction.array(c.p)=v-objective.v0.u.array(c.p);}
 }
 //#####################################################################
 // Function Compute_Dt

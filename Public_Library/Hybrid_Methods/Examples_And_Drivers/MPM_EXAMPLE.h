@@ -42,7 +42,7 @@ public:
     ARRAY<bool> particle_is_simulated;
     ARRAY<T,TV_INT> mass,volume;
     ARRAY<TV,TV_INT> location;
-    ARRAY<TV,TV_INT> velocity,velocity_new,*current_velocity;
+    ARRAY<TV,TV_INT> velocity,velocity_new,velocity_friction,*current_velocity;
     ARRAY<int> valid_grid_indices;
     ARRAY<TV_INT> valid_grid_cell_indices;
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
