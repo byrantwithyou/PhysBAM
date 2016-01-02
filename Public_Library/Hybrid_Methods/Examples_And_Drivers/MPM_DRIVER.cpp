@@ -368,7 +368,15 @@ Grid_To_Particle()
                 V_pic+=w*V_new;
                 V_weight_old+=w*V_old;
                 TV V_grid=example.use_midpoint?(T).5*(V_grid+V_old):V_new;
-                grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
+                grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());
+                if(example.use_affine && !example.use_early_gradient_transfer){
+                    TV Z=example.grid.Center(index);
+                    TV xi_new=Z+dt*V_grid;
+                    B+=w/2*(MATRIX<T,TV::m>::Outer_Product(V_new,Z+xi_new)
+                        +MATRIX<T,TV::m>::Outer_Product(Z-xi_new,V_new));
+                    if(particles.store_C && example.weights->Order()>1)
+                        D+=w*MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p),Z-particles.X(p));}}
+
             MATRIX<T,TV::m> A=dt*grad_Vp+1;
             if(example.quad_F_coeff) A+=sqr(dt*grad_Vp)*example.quad_F_coeff;
             particles.F(p)=A*particles.F(p);
@@ -381,16 +389,8 @@ Grid_To_Particle()
             if(example.use_affine && example.use_early_gradient_transfer)
                 B=grad_Vp/example.weights->Constant_Scalar_Inverse_Dp();
             else if(example.use_affine)
-                for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,false,scratch);it.Valid();it.Next()){
-                    TV_INT index=it.Index();
-                    TV V_grid=example.velocity_new(index);
-                    TV Z=example.grid.Center(index);
-                    TV xi_new;
-                    if(example.use_midpoint) xi_new=Z+dt/2*(V_grid+example.velocity(index));
-                    else xi_new=Z+dt*V_grid;
-                    B+=it.Weight()/2*(MATRIX<T,TV::m>::Outer_Product(V_grid,Z-particles.X(p)+xi_new-xp_new)
-                        +MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p)-xi_new+xp_new,V_grid));
-                    if(particles.store_C && example.weights->Order()>1) D+=it.Weight()*MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p),Z-particles.X(p));}
+                B-=(T).5*(MATRIX<T,TV::m>::Outer_Product(V_pic,particles.X(p)+xp_new)
+                    +MATRIX<T,TV::m>::Outer_Product(particles.X(p)-xp_new,V_pic));
 
             if(particles.store_B) particles.B(p)=B;
             if(particles.store_C) particles.C(p)=example.weights->Order()==1?grad_Vp:B*D.Inverse();
