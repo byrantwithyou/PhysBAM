@@ -41,6 +41,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-fooT2",&foo_T2,"T2","a scalar");
     parse_args.Add("-fooT3",&foo_T3,"T3","a scalar");
     parse_args.Add("-fooT4",&foo_T4,"T4","a scalar");
+    parse_args.Add("-fooT5",&foo_T5,"T5","a scalar");
     parse_args.Parse();
     if(!this->override_output_directory) output_directory=LOG::sprintf("Test_3d_%i",test_number);
 }
@@ -579,13 +580,16 @@ Initialize()
             Seed_Particles(sphere,0,[=](const TV&){return MATRIX<T,3>();},density,particles_per_cell);
             Add_Gravity(m/(s*s)*TV(0,-9.8,0));
         } break;
-        case 32:{ // sand on wedge
+        case 32:
+        case 37:{ // sand on wedge
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(0,0,-0.1),TV(0.2,0.2,1.1))*m,ROTATION<TV>::From_Euler_Angles(TV(0,0,0.25*M_PI)),TV(0.5,0.4-sqrt(2.0)*0.1,0)*m);
             RANGE<TV> ground(TV(-0.1,0,-0.1)*m,TV(1.1,0.1,1.1)*m);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+
             if(use_penalty_collisions){
                 Add_Penalty_Collision_Object(wedge);
                 Add_Penalty_Collision_Object(ground);}
@@ -594,20 +598,28 @@ Initialize()
                 Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge),COLLISION_TYPE::separate,1);}
 
             T density=(T)2200*unit_rho*scale_mass;
-            T E=35.37e6*unit_p*scale_E,nu=.3;
-            if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            int case_num=use_hardening_mast_case?hardening_mast_case:2;
-            Add_Drucker_Prager_Case(E,nu,case_num);
-            RANGE<TV> box(TV(.3,.7,.3)*m,TV(.7,.9,.7)*m);
-            Seed_Particles(box,0,0,density,particles_per_cell);
+            T E=35.37e5*unit_p*scale_E,nu=.3;
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));
+            if(test_number==32){
+                int case_num=use_hardening_mast_case?hardening_mast_case:2;
+                Add_Drucker_Prager_Case(E,nu,case_num);}
+            //add sand particles
+            RANGE<TV> box(TV(.3,.7,.3),TV(.7,.9,.7));
+            Seed_Particles(box,0,0,density,particles_per_cell);
             particles.mu0.Fill(mu);
             particles.mu.Fill(mu);
             particles.lambda0.Fill(lambda);
             particles.lambda.Fill(lambda);
+
+            if(test_number==37){
+                ARRAY<int> sand_particles(particles.X.m);
+                for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+                Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
+                Add_Lambda_Particles(&sand_particles,E*foo_T5,nu,foo_T2*unit_rho,true,foo_T3,foo_T4);}
+
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
-        } break;
+       } break;
         case 33:
         case 34:{ // sand dam break
             // usage:./mpm 34 -3d -use_exp_F -max_dt 1e-3 -unit_p*scale_E 10 -fooT1 10 -fooT2 1000 -fooT3 3 -last_frame 20 

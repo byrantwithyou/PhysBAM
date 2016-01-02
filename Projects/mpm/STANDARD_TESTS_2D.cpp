@@ -792,7 +792,7 @@ Initialize()
         case 51:
         case 52:{ //lambda particles
             //usage:./mpm 51 -threads 8 -use_exp_F -max_dt 1e-3 -resolution 100 -scale_E 10 -fooT1 10 -fooT2 1000 -fooT3 4 -last_frame 20
-            PHYSBAM_ASSERT(foo_T4<particles_per_cell,"Check fooT4"); 
+            PHYSBAM_ASSERT(foo_T4<=particles_per_cell,"You can't have more water particles than total number of particles."); 
             particles.Store_Fp(true);
             particles.Store_Lame(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
@@ -813,7 +813,7 @@ Initialize()
             T gap=grid.dX(1)*0.01;
             RANGE<TV> box(TV(.1*m+gap,.1*m+gap),TV(.3,.75)*m);
             //seed sand particles 
-            Seed_Particles(box,0,0,density,particles_per_cell-foo_T4);
+            if(foo_T4<particles_per_cell) Seed_Particles(box,0,0,density,particles_per_cell-foo_T4);
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
@@ -853,7 +853,9 @@ Initialize()
 
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
-        case 53:{ // sandbox
+        case 53:
+        case 56:
+        case 57:{ // sandbox
             //  ./mpm 53 -threads 10 -use_exp_F -max_dt 7.5e-4 -scale_E 1 -resolution 200 -fooT1 10 -last_frame 10 -o sandbox_implicit
             particles.Store_Fp(true);
             particles.Store_Lame(true);
@@ -873,8 +875,7 @@ Initialize()
                     *new IMPLICIT_OBJECT_UNION<TV>(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(leftwall)),
                     *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(rightwall)),
                     *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(top)),
-                    COLLISION_TYPE::slip,0);
-            }
+                    (test_number==53)?COLLISION_TYPE::slip:COLLISION_TYPE::stick,0);}
 
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e5*unit_p*scale_E,nu=.3;
@@ -888,13 +889,23 @@ Initialize()
             // Seed_Particles(box,0,0,density,particles_per_cell);
 
             // SEED FROM COLUMN COLLAPSES
-            T ymax[5]={.2,.3,.24,.27,.4};
-            T xmin[5]={.2,.33,.51,.63,.84};
-            T xmax[5]={.3,.43,.59,.7,.88};
-            for(int k=0;k<5;k++){
-                RANGE<TV> boxdune(TV(xmin[k]*m+gap,.1*m+gap),TV(xmax[k]*m-gap,ymax[k]*m-gap));
-                Seed_Particles(boxdune,0,0,density,particles_per_cell);}
-
+            if(test_number==53){
+                T ymax[5]={.2,.3,.24,.27,.4};
+                T xmin[5]={.2,.33,.51,.63,.84};
+                T xmax[5]={.3,.43,.59,.7,.88};
+                for(int k=0;k<5;k++){
+                    RANGE<TV> boxdune(TV(xmin[k]*m+gap,.1*m+gap),TV(xmax[k]*m-gap,ymax[k]*m-gap));
+                    Seed_Particles(boxdune,0,0,density,particles_per_cell);}}
+            else{
+                RANGE<TV> box(TV(.1+gap,.1+gap)*m,TV(0.9-gap,.4)*m);
+                Seed_Particles(box,0,0,density,particles_per_cell); 
+                //Add more collision object
+                //foo_T2=stamp velocity
+                //foo_T3=stamp original position 
+                if(!use_foo_T2) foo_T2=(T)0.6; 
+                if(!use_foo_T3) foo_T3=(T)0.5;
+                TV min_corner((T)0.4,foo_T3);
+                Add_Collision_Object(RANGE<TV>(min_corner*m,(min_corner+0.2)*m),COLLISION_TYPE::slip,0);}
             // SAND PROPERTIES
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
@@ -906,6 +917,10 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.81));
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
+            //Add water particles for case 57
+            if(test_number==57){
+                if(!use_foo_T4) foo_T4=(T)1;
+                Add_Lambda_Particles(&sand_particles,E*foo_T4,nu,(T)1000*unit_rho,true,(T)0.3,(T)1);}
 
             // SEED an elastic dropping object
             // {int N_sand=particles.number;
@@ -917,7 +932,6 @@ Initialize()
             //     for(int k=0;k<foo.m;k++) foo(k)=k+N_sand;
             //     Add_Fixed_Corotated(35.37e5*unit_p*scale_E,0.3,&foo);}
         } break;
-
         case 54:{ // sand cup pull
             // ./mpm 54 -threads 10 -use_exp_F -max_dt 7.5e-4  -resolution 50 -last_frame 200
             particles.Store_Fp(true);
@@ -953,7 +967,7 @@ Initialize()
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
         } break;
-        case 55:{ // Moving collision ocject
+        case 55:{ // Moving collision object
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
@@ -1018,6 +1032,26 @@ Begin_Time_Step(const T time)
             this->output_structures_each_frame=true;
             Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1+(T)(time/s-10/24.0)*0.08*m,true);
             Add_Gravity(m/(s*s)*TV(0,-9.8));}}
+
+    if(test_number==56 || test_number==57){
+        T y=0;
+        T v=foo_T2*m/s;
+        T treshold=((T)0.2/v)*m;
+        T stop=2*treshold;
+        if(time<=stop){
+            lagrangian_forces.Delete_Pointers_And_Clean_Memory();
+            this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+            this->output_structures_each_frame=true;
+            delete collision_objects(collision_objects.m-1);
+            collision_objects.Pop();
+            if(time<=treshold) y=(foo_T3-time*v/s)*m;
+            else if(time<=stop) y=0.3;
+            else y=0.3+v*(time-2*treshold); 
+            TV min_corner((T)0.4,y);
+            LOG::printf("time=%P\tmin_corner_y=%P\n",time,y);
+            Add_Collision_Object(RANGE<TV>(min_corner*m,(min_corner+0.2)*m),COLLISION_TYPE::slip,0);
+            Add_Gravity(m/(s*s)*TV(0,-9.8));}}
+    
     if(test_number==36){
         delete lagrangian_forces(lagrangian_forces.m-1);
         lagrangian_forces.Remove_End();
