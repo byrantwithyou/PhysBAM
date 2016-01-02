@@ -356,18 +356,20 @@ Grid_To_Particle()
 
         for(int k=a;k<b;k++){
             int p=example.simulated_particles(k);
-            TV Vn_interpolate,V_pic,V_flip=particles.V(p);
+            TV V_pic,V_weight_old;
             MATRIX<T,TV::m> B,grad_Vp,D;
 
             for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,true,scratch);it.Valid();it.Next()){
                 T w=it.Weight();
                 TV_INT index=it.Index();
-                TV V_grid=example.velocity_new(index);
+                TV V_new=example.velocity_new(index);
+                TV V_old=example.velocity(index);
+                TV V_fric=example.velocity_friction(index);
+                TV V_grid=V_new;
                 V_pic+=w*V_grid;
-                V_flip+=w*(V_grid-example.velocity(index));
-                Vn_interpolate+=w*example.velocity(index);
+                V_weight_old+=w*V_old;
                 if(example.use_midpoint)
-                    V_grid=(T).5*(V_grid+example.velocity(index));
+                    V_grid=(T).5*(V_grid+V_old);
                 grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,it.Gradient());}
             MATRIX<T,TV::m> A=dt*grad_Vp+1;
             if(example.quad_F_coeff) A+=sqr(dt*grad_Vp)*example.quad_F_coeff;
@@ -385,7 +387,7 @@ Grid_To_Particle()
                     TV xi_new,xp_new;
                     if(example.use_midpoint){
                         xi_new=Z+dt/2*(V_grid+example.velocity(index));
-                        xp_new=particles.X(p)+dt/2*(Vn_interpolate+V_pic);}
+                        xp_new=particles.X(p)+dt/2*(V_weight_old+V_pic);}
                     else{
                         xi_new=Z+dt*V_grid;
                         xp_new=particles.X(p)+dt*V_pic;}
@@ -395,8 +397,9 @@ Grid_To_Particle()
 
             if(particles.store_B) particles.B(p)=B;
             if(particles.store_C) particles.C(p)=example.weights->Order()==1?grad_Vp:B*D.Inverse();
-            if(example.use_midpoint) particles.X(p)+=(V_pic+Vn_interpolate)*(dt/2);
+            if(example.use_midpoint) particles.X(p)+=(V_pic+V_weight_old)*(dt/2);
             else particles.X(p)+=V_pic*dt;
+            TV V_flip=particles.V(p)+V_pic-V_weight_old;
             particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
 
             if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}}
