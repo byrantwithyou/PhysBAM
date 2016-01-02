@@ -31,6 +31,7 @@ public:
     T stored_dt;
     T viscosity;
 
+    // TODO: viscosity has the wrong units.  I might be broken.
     MPM_VISCOSITY(MPM_FORCE_HELPER<TV>& force_helper,GATHER_SCATTER<TV>& gather_scatter_input,
         ARRAY<int>* affected_particles,const T viscosity);
     virtual ~MPM_VISCOSITY();
