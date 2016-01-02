@@ -42,10 +42,9 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),
     penalty_damping_stiffness(0),use_penalty_collisions(false),use_plasticity(true),
     use_theta_c(false),use_theta_s(false),use_hardening_factor(false),use_max_hardening(false),
-    theta_c(0),theta_s(0),hardening_factor(0),max_hardening(0),plastic_newton_tolerance(1e-6),
-    plastic_newton_iterations(500),use_implicit_plasticity(false),no_implicit_plasticity(false),
+    theta_c(0),theta_s(0),hardening_factor(0),max_hardening(0),use_implicit_plasticity(false),no_implicit_plasticity(false),
     hardening_mast_case(0),use_hardening_mast_case(false),override_output_directory(false),
-    tests(stream_type_input,deformable_body_collection)
+    m(1),s(1),kg(1),tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
@@ -96,16 +95,29 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-theta_s",&theta_s,&use_theta_s,"theta_s","Critical stretch coefficient for plasticity");
     parse_args.Add("-hardening",&hardening_factor,&use_hardening_factor,"hardening factor","Hardening factor for plasticity");
     parse_args.Add("-max_hardening",&max_hardening,&use_max_hardening,"max hardening coefficient","Maximum hardening coefficient for plasticity");
-    parse_args.Add("-plastic_newton_iterations",&plastic_newton_iterations,"iter","Newton iterations in plastic yield");
-    parse_args.Add("-plastic_newton_tolerance",&plastic_newton_tolerance,"tol","Newton tolerance in plastic yield");
     parse_args.Add("-use_penalty_collisions",&use_penalty_collisions,"Use penalty collisions objects");
     parse_args.Add("-use_implicit_plasticity",&use_implicit_plasticity,"Use implicit plasticity");
     parse_args.Add("-no_implicit_plasticity",&no_implicit_plasticity,"Disable implicit plasticity");
     parse_args.Add("-mast_case",&hardening_mast_case,&use_hardening_mast_case,"mast_case","The case number from the Mast thesis for hardening parameters");
+    parse_args.Add("-m",&m,"scale","meter scale");
+    parse_args.Add("-s",&s,"scale","second scale");
+    parse_args.Add("-kg",&kg,"scale","kilogram scale");
 
     parse_args.Parse(true);
+
+    unit_p=kg*pow<2-TV::m>(m)/(s*s);
+    unit_rho=kg*pow<-TV::m>(m);
+    unit_mu=kg*pow<2-TV::m>(m)/s;
+    mass_contour*=m/kg;
+    min_dt*=s;
+    max_dt*=s;
+    penalty_collisions_separation*=m;
+    penalty_collisions_length*=m;
+    newton_tolerance*=kg*m/(s*s); // TODO: check me.
+
     if(no_affine) use_affine=false;
 
+    framerate/=s;
     frame_dt=1/framerate;
 
     quad_F_coeff=(T)0;
@@ -420,7 +432,7 @@ Add_Neo_Hookean(T_VOLUME& object,T E,T nu)
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io,const T coefficient_of_friction)
 {
-    IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>* pf=new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,io,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length);
+    IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>* pf=new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,io,penalty_collisions_stiffness*kg/(m*s*s),penalty_collisions_separation,penalty_collisions_length);
     pf->coefficient_of_friction=coefficient_of_friction;
     this->Add_Force(*pf);
 }

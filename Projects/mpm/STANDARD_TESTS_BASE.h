@@ -59,12 +59,13 @@ public:
     T penalty_damping_stiffness;
     bool use_penalty_collisions;
     bool use_plasticity,use_theta_c,use_theta_s,use_hardening_factor,use_max_hardening;
-    T theta_c,theta_s,hardening_factor,max_hardening,plastic_newton_tolerance;
-    int plastic_newton_iterations;
+    T theta_c,theta_s,hardening_factor,max_hardening;
     bool use_implicit_plasticity,no_implicit_plasticity;
     int hardening_mast_case;
     bool use_hardening_mast_case;
     bool override_output_directory;
+    T m,s,kg;
+    T unit_p,unit_rho,unit_mu;
 
     RANDOM_NUMBERS<T> random;
     DEFORMABLES_STANDARD_TESTS<TV> tests;

@@ -80,10 +80,10 @@ Initialize()
     switch(test_number)
     {
         case 1:{ // rotating circle
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            SPHERE<TV> sphere(TV(.5,.5),.3);
-            VECTOR<T,1> angular_velocity(0.4*scale_speed);
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            VECTOR<T,1> angular_velocity(0.4*scale_speed/s);
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,[=](const TV& X){return angular_velocity.Cross(X-sphere.center);},
                 [=](const TV&){return MATRIX<T,2>::Cross_Product_Matrix(angular_velocity);},
                 density,particles_per_cell);
@@ -91,170 +91,172 @@ Initialize()
             TV total_momentum=particles.V.Weighted_Sum(particles.mass);
             TV dV=total_momentum/total_mass;
             particles.V-=dV;
-            Add_Neo_Hookean(1e3*scale_E,0.3);
+            Add_Neo_Hookean(1e3*unit_p*scale_E,0.3);
         } break;
         case 2:{ // oscillating circle
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            SPHERE<TV> sphere(TV(.5,.5),.3);
-            T density=2*scale_mass;
-            Seed_Particles(sphere,[=](const TV& X){return TV(0.1,0);},0,
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(sphere,[=](const TV& X){return TV(0.1,0)*(m/s);},0,
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
-            Add_Fixed_Corotated(1e2*scale_E,0.3);
+            Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3);
         } break;
         case 3:{ // freefall circle
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            SPHERE<TV> sphere(TV(.5,.5),.3);
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,0,density,particles_per_cell);
-            Add_Gravity(TV(0,-9.8));
+            Add_Gravity(m/(s*s)*TV(0,-9.8));
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
+//            Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3);
         } break;
         case 4:{ // colliding of two rings
             if(!user_resolution) resolution=48;
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(),TV(0.48,0.48)),true);
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(),TV(0.48,0.48))*m,true);
             ARRAY<SPHERE<TV> > spheres; ARRAY<TV> v0; ARRAY<T> r;
-            spheres.Append(SPHERE<TV>(TV(0.1,0.24),0.04)); spheres.Append(SPHERE<TV>(TV(0.4,0.24),0.04));
-            v0.Append(TV(50,0)); v0.Append(TV(-50,0));
-            r.Append(0.03); r.Append(0.03);
+            spheres.Append(SPHERE<TV>(TV(0.1,0.24)*m,0.04*m)); spheres.Append(SPHERE<TV>(TV(0.4,0.24)*m,0.04*m));
+            v0.Append(TV(50,0)*(m/s)); v0.Append(TV(-50,0)*(m/s));
+            r.Append(0.03*m); r.Append(0.03*m);
             for(int s=0;s<spheres.m;s++){
                 SPHERE<TV>& sphere=spheres(s);
-                T density=1010*scale_mass;
+                T density=1010*unit_rho*scale_mass;
                 int last=particles.number;
                 Seed_Particles(sphere,[=](const TV& X){return v0(s);},0,density,particles_per_cell);
                 for(int k=last;k<particles.number;k++){
                     if((particles.X(k)-sphere.center).Magnitude_Squared()<sqr(r(s))){
                         particles.deletion_list.Append(k);}}}
             particles.Delete_Elements_On_Deletion_List();
-            Add_Neo_Hookean(0.073e9*scale_E,0.4);
+            Add_Neo_Hookean(0.073e9*unit_p*scale_E,0.4);
         } break;
         case 5:{ // rebound of an elastic cylinder
             if(!user_resolution) resolution=10;
-            T dx=(T)5/resolution;
-            grid.Initialize(TV_INT(3,1)*resolution+9,RANGE<TV>(TV(),TV(15,5)).Thickened(dx*(T)4.5),true);
-            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(0+dx/2,15)),COLLISION_TYPE::slip,0);
-            Add_Collision_Object(RANGE<TV>(TV(15-dx/2,-5),TV(20,15)),COLLISION_TYPE::slip,0);
-            SPHERE<TV> sphere(TV(2.5,2.5),1.5);
-            T density=4*scale_mass;
-            Seed_Particles(sphere,[=](const TV& X){return TV(0.5,0);},0,
+            T dx=(T)5/resolution*m;
+            grid.Initialize(TV_INT(3,1)*resolution+9,RANGE<TV>(TV(),TV(15,5)*m).Thickened(dx*(T)4.5),true);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5)*m,TV(0+dx/2,15*m)),COLLISION_TYPE::slip,0);
+            Add_Collision_Object(RANGE<TV>(TV(15*m-dx/2,-5*m),TV(20,15)*m),COLLISION_TYPE::slip,0);
+            SPHERE<TV> sphere(TV(2.5,2.5)*m,1.5*m);
+            T density=4*unit_rho*scale_mass;
+            Seed_Particles(sphere,[=](const TV& X){return TV(0.5*m/s,0);},0,
                 density,particles_per_cell);
-            Add_Neo_Hookean(85.5*scale_E,0.425); //solve({E/(2*(1+r))=30,E*r/((1+r)*(1-2*r))=170},{E,r});
+            Add_Neo_Hookean(85.5*unit_p*scale_E,0.425); //solve({E/(2*(1+r))=30,E*r/((1+r)*(1-2*r))=170},{E,r});
         } break;
         case 6:{ // skew impact of two elastic cylinders
             if(!user_resolution) resolution=12;
             int third_resolution=(resolution+2)/3;
             T dx=(T)4/third_resolution;
-            grid.Initialize(TV_INT(5,3)*third_resolution+9,RANGE<TV>(TV(),TV(20,12)).Thickened(dx*(T)4.5),true);
-            T density=5*scale_mass;
-            SPHERE<TV> sphere1(TV(3,3),2);
-            Seed_Particles(sphere1,[=](const TV& X){return TV(0.75,0);},0,density,particles_per_cell);
-            SPHERE<TV> sphere2(TV(16,5),2);
-            Seed_Particles(sphere2,[=](const TV& X){return TV(-0.75,0);},0,density,particles_per_cell);
-            Add_Neo_Hookean(31.685*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
+            grid.Initialize(TV_INT(5,3)*third_resolution+9,RANGE<TV>(TV(),TV(20,12)*m).Thickened(dx*(T)4.5),true);
+            T density=5*unit_rho*scale_mass;
+            SPHERE<TV> sphere1(TV(3,3)*m,2*m);
+            Seed_Particles(sphere1,[=](const TV& X){return TV(0.75*(m/s),0);},0,density,particles_per_cell);
+            SPHERE<TV> sphere2(TV(16,5)*m,2*m);
+            Seed_Particles(sphere2,[=](const TV& X){return TV(-0.75*(m/s),0);},0,density,particles_per_cell);
+            Add_Neo_Hookean(31.685*unit_p*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
         case 7:{ // ping-pong ring
             // ./mpm 7 -flip 0  -affine -midpoint -max_dt 1e-3 -cfl .1 -framerate 2400 -newton_tolerance 1e-5 -solver_tolerance 1e-5  -last_frame 240 -order 2 -print_stats | grep 'total'
             if(!user_resolution) resolution=480;
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(),TV(0.48,0.48)),true);
-            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(0.11,15)),COLLISION_TYPE::separate,0);
-            Add_Collision_Object(RANGE<TV>(TV(0.3,-5),TV(20,15)),COLLISION_TYPE::separate,0);
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(),TV(0.48,0.48)*m),true);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(0.11,15))*m,COLLISION_TYPE::separate,0);
+            Add_Collision_Object(RANGE<TV>(TV(0.3,-5),TV(20,15))*m,COLLISION_TYPE::separate,0);
             ARRAY<SPHERE<TV> > spheres; ARRAY<TV> v0; ARRAY<T> r;
-            spheres.Append(SPHERE<TV>(TV(0.2,0.24),0.04));
-            v0.Append(TV(50,0));
-            r.Append(0.03);
+            spheres.Append(SPHERE<TV>(TV(0.2,0.24)*m,0.04*m));
+            v0.Append(TV(50*(m/s),0));
+            r.Append(0.03*m);
             for(int s=0;s<spheres.m;s++){
                 SPHERE<TV>& sphere=spheres(s);
-                T density=1010*scale_mass;
+                T density=1010*unit_rho*scale_mass;
                 int last=particles.number;
                 Seed_Particles(sphere,[=](const TV& X){return v0(s);},0,density,particles_per_cell);
                 for(int k=last;k<particles.number;k++){
                     if((particles.X(k)-sphere.center).Magnitude_Squared()<sqr(r(s))){
                         particles.deletion_list.Append(k);}}}
             particles.Delete_Elements_On_Deletion_List();
-            Add_Neo_Hookean(0.073e9*scale_E,0.4);
+            Add_Neo_Hookean(0.073e9*unit_p*scale_E,0.4);
         } break;
         case 8:{ // collision an elastic cylinder (TODO: fix description.)
             if(!user_resolution) resolution=10;
-            grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
-            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,false);
-            Add_Collision_Object(SPHERE<TV>(TV(4,3),1),COLLISION_TYPE::separate,.3);
-            SPHERE<TV> sphere(TV(2.55,3.55),.3);
-            T density=4*scale_mass;
-            Seed_Particles(sphere,[=](const TV& X){return TV(3.0,0);},0,
+            grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5))*m,true);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
+            Add_Collision_Object(SPHERE<TV>(TV(4,3)*m,1*m),COLLISION_TYPE::separate,.3);
+            SPHERE<TV> sphere(TV(2.55,3.55)*m,.3*m);
+            T density=4*unit_rho*scale_mass;
+            Seed_Particles(sphere,[=](const TV& X){return TV(3.0*(m/s),0);},0,
                 density,particles_per_cell);
-            Add_Neo_Hookean(scale_E,0.425);
-            Add_Gravity(TV(0,-1.8));
+            Add_Neo_Hookean(unit_p*scale_E,0.425);
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 9:{ // collision an elastic cylinder (TODO: fix description.)
             if(!user_resolution) resolution=10;
-            grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5)),true);
-            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,false);
-            SPHERE<TV> sphere(TV(2.55,3.55),.3);
-            T density=4*scale_mass;
-            Seed_Particles(sphere,[=](const TV& X){return TV(3.0,0);},0,
+            grid.Initialize(TV_INT()+resolution+9,RANGE<TV>(TV(),TV(5,5))*m,true);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
+            SPHERE<TV> sphere(TV(2.55,3.55)*m,.3*m);
+            T density=4*unit_rho*scale_mass;
+            Seed_Particles(sphere,[=](const TV& X){return TV(3.0*(m/s),0);},0,
                 density,particles_per_cell);
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
-            Add_Neo_Hookean(scale_E,0.425,&mpm_particles);
+            Add_Neo_Hookean(unit_p*scale_E,0.425,&mpm_particles);
 
-            SPHERE<TV> sphere2(TV(3.55,3.35),.3);
+            SPHERE<TV> sphere2(TV(3.55,3.35)*m,.3*m);
             TRIANGULATED_AREA<T>* ta=TESSELLATION::Generate_Triangles(sphere2,ceil(sphere2.radius/grid.dX.x*2));
-            TRIANGULATED_AREA<T>& new_ta=Seed_Lagrangian_Particles(*ta,[=](const TV& X){return TV(-3.0,0);},
+            TRIANGULATED_AREA<T>& new_ta=Seed_Lagrangian_Particles(*ta,[=](const TV& X){return TV(-3.0*(m/s),0);},
                 0,density,true);
-            Add_Neo_Hookean(new_ta,scale_E,0.425);
+            Add_Neo_Hookean(new_ta,unit_p*scale_E,0.425);
 
-            Add_Gravity(TV(0,-1.8));
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 10:{ // mpm projectile vs end-holded wall
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,false);
-            Add_Collision_Object(RANGE<TV>(TV(.45,.75),TV(.65,.85)),COLLISION_TYPE::stick,0);
-            Add_Collision_Object(RANGE<TV>(TV(.45,.15),TV(.65,.25)),COLLISION_TYPE::stick,0);
-            {SPHERE<TV> sphere(TV(.2,.5),.06);
-                T density=2*scale_mass;
-                Seed_Particles(sphere,[=](const TV& X){return TV(1,0);},0,
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
+            Add_Collision_Object(RANGE<TV>(TV(.45,.75),TV(.65,.85))*m,COLLISION_TYPE::stick,0);
+            Add_Collision_Object(RANGE<TV>(TV(.45,.15),TV(.65,.25))*m,COLLISION_TYPE::stick,0);
+            {SPHERE<TV> sphere(TV(.2,.5)*m,.06*m);
+                T density=2*unit_rho*scale_mass;
+                Seed_Particles(sphere,[=](const TV& X){return TV(1,0)*(m/s);},0,
                     density,particles_per_cell);
                 ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
-                Add_Fixed_Corotated(20*scale_E,0.3,&foo);}
+                Add_Fixed_Corotated(20*unit_p*scale_E,0.3,&foo);}
             int N_sphere_particles=particles.number;
-            {RANGE<TV> box(TV(.5,.2),TV(.6,.8));
-                T density=1*scale_mass;
+            {RANGE<TV> box(TV(.5,.2)*m,TV(.6,.8)*m);
+                T density=1*unit_rho*scale_mass;
                 Seed_Particles(box,0,0,density,particles_per_cell);
                 int N_box_particles=particles.number-N_sphere_particles;
                 ARRAY<int> foo(N_box_particles);
                 for(int k=0;k<foo.m;k++) foo(k)=k+N_sphere_particles;
-                Add_Fixed_Corotated(1*scale_E,0.3,&foo);}
+                Add_Fixed_Corotated(1*unit_p*scale_E,0.3,&foo);}
 
-            Add_Gravity(TV(0,-1.8));
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 11:{ // freefall circle, rising ground
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            SPHERE<TV> sphere(TV(.5,.5),.3);
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
-            Add_Fixed_Corotated(1*scale_E,0.3,&foo);
-            Add_Gravity(TV(0,-9.8));
-            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,false);
+            Add_Fixed_Corotated(1*unit_p*scale_E,0.3,&foo);
+            Add_Gravity(m/(s*s)*TV(0,-9.8));
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
             MPM_COLLISION_IMPLICIT_OBJECT<TV>* bottom=dynamic_cast<MPM_COLLISION_IMPLICIT_OBJECT<TV>*>(collision_objects(3));
             bottom->func_frame=[this](T time){return FRAME<TV>(TV(0,(T).75-abs((T).15*time*scale_speed-(T).75)));};
             bottom->func_twist=[this](T time){return TWIST<TV>(TV(0,-sign((T).15*time*scale_speed-(T).75)*(T).15*scale_speed),typename TV::SPIN());};
         } break;
         case 12:{ // jello in a shrinking penalty box
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box(TV(.3,.2),TV(.7,.4));
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            RANGE<TV> box(TV(.3,.2)*m,TV(.7,.4)*m);
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
             ARRAY<int> foo(IDENTITY_ARRAY<>(particles.number));
-            Add_Fixed_Corotated(20*scale_E,0.4,&foo,false);
-            Add_Gravity(TV(0,-9.8));
-            Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1,true);
+            Add_Fixed_Corotated(20*unit_p*scale_E,0.4,&foo,false);
+            Add_Gravity(m/(s*s)*TV(0,-9.8));
+            Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1*m,true);
         } break;
         case 13:{ // surface tension test: fixed topology circle shell
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             SEGMENTED_CURVE_2D<T>* sc=SEGMENTED_CURVE_2D<T>::Create();
-            TV center(0.5,0.5);
-            T radius=0.2;
+            TV center(0.5*m,0.5*m);
+            T radius=0.2*m;
             int N=80;
-            T density=1*scale_mass;
+            T density=1*unit_rho*scale_mass;
             sc->particles.Add_Elements(N);
             sc->Update_Number_Nodes();
             for(int n=0;n<N;n++){
@@ -267,58 +269,58 @@ Initialize()
                 int np1=(n!=N-1)?(n+1):0;
                 sc->mesh.elements.Append(TV_INT(n,np1));
                 LOG::cout<<sc->mesh.elements(n)<<std::endl;}
-            SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*sc,[=](const TV& X){return TV(0.0,0);},0,density,true);
+            SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*sc,[=](const TV& X){return TV(0.0,0)*(m/s);},0,density,true);
             SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)0.01);
             Add_Force(*stf);
         } break;
         case 14:{ // surface tension static circle
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            T density=2*scale_mass;
-            SPHERE<TV> sphere(TV(.5,.5),.2);
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            T density=2*unit_rho*scale_mass;
+            SPHERE<TV> sphere(TV(.5,.5)*m,.2*m);
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
             bool no_mu=true;
-            Add_Fixed_Corotated(scale_E*10,0.3,&mpm_particles,no_mu);
+            Add_Fixed_Corotated(unit_p*scale_E*10,0.3,&mpm_particles,no_mu);
             use_surface_tension=true;
         } break;
         case 15:{ // surface tension become a circle
             //./mpm 15 -affine -resolution 64 -max_dt 1e-3 
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            T density=2*scale_mass;
-            RANGE<TV> box(TV(.3,.11),TV(.5,.31));
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            T density=2*unit_rho*scale_mass;
+            RANGE<TV> box(TV(.3,.11)*m,TV(.5,.31)*m);
             Seed_Particles(box,0,0,density,particles_per_cell);
-            RANGE<TV> box2(TV(.6,.15),TV(.8,.25));
-            Seed_Particles(box2,[=](const TV& X){return TV(-0.1,0);},0,density,particles_per_cell);
+            RANGE<TV> box2(TV(.6,.15)*m,TV(.8,.25)*m);
+            Seed_Particles(box2,[=](const TV& X){return TV(-0.1,0)*(m/s);},0,density,particles_per_cell);
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
             bool no_mu=true;
-            Add_Fixed_Corotated(scale_E*10,0.3,&mpm_particles,no_mu);
+            Add_Fixed_Corotated(unit_p*scale_E*10,0.3,&mpm_particles,no_mu);
             use_surface_tension=true;
         } break;
         case 16:{ // oscillating circle
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            SPHERE<TV> sphere(TV(.5,.5),.3);
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            T density=2*unit_rho*scale_mass;
             use_oldroyd=true;
             this->inv_Wi=(T)0;
             particles.Store_S(use_oldroyd);            
-            Seed_Particles(sphere,[=](const TV& X){return TV(0.1,0);},0,
+            Seed_Particles(sphere,[=](const TV& X){return TV(0.1,0)*(m/s);},0,
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>()+1.5);
             particles.S.Fill(SYMMETRIC_MATRIX<T,2>()+sqr(1.5));
             OLDROYD_NEO_HOOKEAN<TV> *neo=new OLDROYD_NEO_HOOKEAN<TV>;
-            neo->mu=38.462; // E=100, nu=0.3
-            neo->lambda=57.692;
+            neo->mu=38.462*unit_p*scale_E; // E=100, nu=0.3
+            neo->lambda=57.692*unit_p*scale_E;
             MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi,quad_F_coeff);
             Add_Force(*fe);
         } break;
         case 17:{ // spring test
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             SEGMENTED_CURVE_2D<T>* sc=SEGMENTED_CURVE_2D<T>::Create();
-            TV S(0.3,0.6);
-            TV E(0.7,0.5);
+            TV S(0.3*m,0.6*m);
+            TV E(0.7*m,0.5*m);
             int N=20;
             TV D=(E-S)/(T)(N-1);
-            T density=1*scale_mass;
+            T density=1*unit_rho*scale_mass;
             sc->particles.Add_Elements(N);
             sc->Update_Number_Nodes();
             for(int n=0;n<N-1;n++){
@@ -326,7 +328,7 @@ Initialize()
                 sc->particles.X(n)=X;
                 sc->mesh.elements.Append(TV_INT(n,n+1));}
             sc->particles.X(N-1)=E;
-            SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*sc,[=](const TV& X){return TV(0.0,0);},0,density,true);
+            SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*sc,[=](const TV& X){return TV(0.0,0)*(m/s);},0,density,true);
             LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,new_sc.mesh);
             stf->Set_Restlength_From_Particles();
             stf->Set_Stiffness((T)10);
@@ -334,84 +336,84 @@ Initialize()
             Add_Force(*stf);
             for(int n=0;n<N;n++)
                 for(int d=0;d<TV::m;d++)
-                    particles.X(n)(d)+=random.Get_Uniform_Number(-0.2,0.2);
+                    particles.X(n)(d)+=random.Get_Uniform_Number(-0.2,0.2)*m;
         } break;
         case 21:{ // circle with random initial velocities
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-3,-3),TV(4,4)),true);
-            SPHERE<TV> sphere(TV(.5,.5),.3);
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-3,-3),TV(4,4))*m,true);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,0,density,particles_per_cell);
-            random.Fill_Uniform(particles.V,-1,1);
-            Add_Fixed_Corotated(1e3*scale_E,0.3);
+            random.Fill_Uniform(particles.V,-1*(m/s),1*(m/s));
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
         } break;
         case 22:{ // (fluid test) pool of water 
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box(grid.dX*2,TV(1-2*grid.dX(0),0.25));
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            RANGE<TV> box(grid.dX*2,TV(1*m-2*grid.dX(0),0.25*m));
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
-            Add_Fixed_Corotated(1e3*scale_E,0.3);
-            Add_Gravity(TV(0,-1.8));
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
             if(this->kkt) particles.lambda.Fill(FLT_MAX);
-            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(5,0.1))));
+            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(5,0.1))*m));
         } break;
         case 23:{ // (fluid test) dam break 
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box(grid.dX*2,TV(0.2,0.75));
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            RANGE<TV> box(grid.dX*2,TV(0.2,0.75)*m);
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
-            Add_Fixed_Corotated(1e3*scale_E,0.3);
-            Add_Gravity(TV(0,-1.8));
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 24:{ // (fluid test) circle drop 
             // one: ./mpm -kkt -scale_E 0
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            SPHERE<TV> sphere(TV(.5,.7),.2);
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            SPHERE<TV> sphere(TV(.5,.7)*m,.2*m);
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,0,density,particles_per_cell);
-            Add_Fixed_Corotated(1e3*scale_E,0.3);
-            Add_Gravity(TV(0,-1.8));
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
             if(this->kkt) particles.lambda.Fill(FLT_MAX);
         } break;
         case 25:{ // (fluid test) pool of water w/ single particle
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box(grid.dX*(T).5,TV(1-grid.dX(0)*(T).5,0.25));
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            RANGE<TV> box(grid.dX*(T).5,TV(1*m-grid.dX(0)*(T).5,0.25*m));
+            T density=2*unit_rho*scale_mass;
             T volume=grid.dX.Product()/particles_per_cell;
             T mass=density*volume;
             Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Particle(TV(.5,.9),0,0,mass,volume);
-            Add_Gravity(TV(0,-1.8));
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 26:{ // Rayleigh Taylor
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box(grid.dX*2,TV(1-2*grid.dX(0),0.20));
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            RANGE<TV> box(grid.dX*2,TV(1*m-2*grid.dX(0),0.20*m));
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
             density*=10;
-            box+=TV(0,0.20-2*grid.dX(0));
+            box+=TV(0,0.20*m-2*grid.dX(0));
             Seed_Particles(box,0,0,density,particles_per_cell);
-            Add_Gravity(TV(0,-1.8));
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 98:{ // full box
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            RANGE<TV> box(grid.dX*(T)2,TV::All_Ones_Vector()-grid.dX*2);
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            RANGE<TV> box(grid.dX*(T)2,TV::All_Ones_Vector()*m-grid.dX*2);
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
-            Add_Gravity(TV(0,-1.8));
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 99:{ // single particle
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            T density=2*unit_rho*scale_mass;
             T volume=grid.dX.Product()/particles_per_cell;
             T mass=density*volume;
             Add_Particle(TV(.8,.5),0,0,mass,volume);
-            Add_Gravity(TV(0,-1.8));
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 27:{ // drop an oldroyd-b to a ground
-            grid.Initialize(TV_INT(resolution*2,resolution),RANGE<TV>(TV(-1,0),TV(1,1)),true);
-            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(5,.1)),COLLISION_TYPE::stick,0);
-            SPHERE<TV> sphere(TV(.5,.5),.2);
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT(resolution*2,resolution),RANGE<TV>(TV(-1,0),TV(1,1))*m,true);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(5,.1))*m,COLLISION_TYPE::stick,0);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.2*m);
+            T density=2*unit_rho*scale_mass;
             use_oldroyd=true;
             this->inv_Wi=(T)100;
             particles.Store_S(use_oldroyd);            
@@ -420,17 +422,17 @@ Initialize()
             LOG::cout<<particles.F<<std::endl<<std::endl;;
             LOG::cout<<particles.S<<std::endl;
             OLDROYD_NEO_HOOKEAN<TV> *neo=new OLDROYD_NEO_HOOKEAN<TV>;
-            neo->mu=38.462; // E=100, nu=0.3
-            neo->lambda=57.692;
+            neo->mu=38.462*unit_p*scale_E; // E=100, nu=0.3
+            neo->lambda=57.692*unit_p*scale_E;
             MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi,quad_F_coeff);
             Add_Force(*fe);
-            Add_Gravity(TV(0,-1.8));
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 29:{ // drop an oldroyd-b to a ground SCA energy
-            grid.Initialize(TV_INT(resolution*2,resolution),RANGE<TV>(TV(-1,0),TV(1,1)),true);
-            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(5,.1)),COLLISION_TYPE::stick,0);
-            SPHERE<TV> sphere(TV(.5,.5),.2);
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT(resolution*2,resolution),RANGE<TV>(TV(-1,0),TV(1,1))*m,true);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(5,.1))*m,COLLISION_TYPE::stick,0);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.2*m);
+            T density=2*unit_rho*scale_mass;
             use_oldroyd=true;
             this->inv_Wi=(T)0;
             particles.Store_S(use_oldroyd);            
@@ -438,30 +440,30 @@ Initialize()
             particles.F.Fill(MATRIX<T,2>()+1);particles.S.Fill(SYMMETRIC_MATRIX<T,2>()+sqr(1));
             VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV> *neo=new VOLUME_PRESERVING_OB_NEO_HOOKEAN<TV>;
             neo->mu=0;
-            neo->lambda=57.692;
+            neo->lambda=57.692*unit_p*scale_E;
             MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi,quad_F_coeff);
             Add_Force(*fe);
-            Add_Force(*new MPM_VISCOSITY<TV>(force_helper,gather_scatter,0,0.001));
-            Add_Gravity(TV(0,-1.8));
+            Add_Force(*new MPM_VISCOSITY<TV>(force_helper,gather_scatter,0,0.001*unit_mu));
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 28:{ // newton convergence problem: ./mpm 28 -affine -max_dt 1e-3 | grep converge
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(5,.1)),COLLISION_TYPE::slip,0);
-            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(.1,5)),COLLISION_TYPE::slip,0);
-            RANGE<TV> box(TV(.21,.21),TV(.6,.5));
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(5,.1))*m,COLLISION_TYPE::slip,0);
+            Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(.1,5))*m,COLLISION_TYPE::slip,0);
+            RANGE<TV> box(TV(.21,.21)*m,TV(.6,.5)*m);
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
-            Add_Gravity(TV(0,-1.8));
-            Add_Fixed_Corotated(1.71*scale_E,0.4);
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
+            Add_Fixed_Corotated(1.71*unit_p*scale_E,0.4);
         } break;
         case 30:{ // pinned rotating circle
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            SPHERE<TV> sphere(TV(.5,.5),.3);
-            VECTOR<T,1> angular_velocity(0.4*scale_speed);
-            T density=2*scale_mass;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            VECTOR<T,1> angular_velocity(0.4*scale_speed/s);
+            T density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,0,density,particles_per_cell);
-            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness,
-                penalty_damping_stiffness);
+            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(s*s),
+                penalty_damping_stiffness*kg/s);
             T pin_radius=sphere.radius*(T).8;
             for(int i=0;i<particles.X.m;i++)
                 if((particles.X(i)-sphere.center).Magnitude_Squared()>sqr(pin_radius)){
@@ -471,15 +473,15 @@ Initialize()
                             ROTATION<TV> rot=ROTATION<TV>::From_Rotation_Vector(angular_velocity*time);
                             return rot.Rotate(dx)+sphere.center;});}
             Add_Force(*pinning_force);
-            Add_Neo_Hookean(1e3*scale_E,0.3);
+            Add_Neo_Hookean(1e3*unit_p*scale_E,0.3);
         } break;
         case 32:{ // colliding
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-1,-1),TV(2,2)),true);
-            T d_small_1=1*scale_mass,d_small_2=1*scale_mass,d_large_1=d_small_1*.9,d_large_2=d_small_2*.9;
-            SPHERE<TV> large1(TV(.2,.5),.1);
-            Seed_Particles(large1,[=](const TV& X){return TV(0.75,0);},0,d_large_1,particles_per_cell);
-            SPHERE<TV> large2(TV(.6,.5),.1);
-            Seed_Particles(large2,[=](const TV& X){return TV();},0,d_large_2,particles_per_cell);
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-1,-1),TV(2,2))*m,true);
+            T d_small_1=1*unit_rho*scale_mass,d_small_2=1*unit_rho*scale_mass,d_large_1=d_small_1*.9,d_large_2=d_small_2*.9;
+            SPHERE<TV> large1(TV(.2,.5)*m,.1*m);
+            Seed_Particles(large1,[=](const TV& X){return TV(0.75,0)*(m/s);},0,d_large_1,particles_per_cell);
+            SPHERE<TV> large2(TV(.6,.5)*m,.1*m);
+            Seed_Particles(large2,0,0,d_large_2,particles_per_cell);
             for(int k=0;k<particles.number;k++)
                 if((particles.X(k)-large1.center).Magnitude_Squared()<sqr(large1.radius*0.6)
                     || (particles.X(k)-large2.center).Magnitude_Squared()<sqr(large2.radius*0.6))
@@ -488,31 +490,31 @@ Initialize()
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(0,1,1);
             particles.Delete_Elements_On_Deletion_List();
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
-            Add_Neo_Hookean(2*scale_E,0.425,&mpm_particles);
+            Add_Neo_Hookean(2*unit_p*scale_E,0.425,&mpm_particles);
             int old_pn=particles.number;
             SPHERE<TV> small1(large1.center,large1.radius*.6);
-            Seed_Particles(small1,[=](const TV& X){return TV(0.75,0);},0,d_small_1,particles_per_cell);
+            Seed_Particles(small1,[=](const TV& X){return TV(0.75,0)*(m/s);},0,d_small_1,particles_per_cell);
             SPHERE<TV> small2(large2.center,large2.radius*.6);
-            Seed_Particles(small2,[=](const TV& X){return TV();},0,d_small_2,particles_per_cell);
+            Seed_Particles(small2,0,0,d_small_2,particles_per_cell);
             ARRAY<int> mpm_particles2;for(int i=old_pn;i<particles.number;i++) mpm_particles2.Append(i);
-            Add_Neo_Hookean(2000*scale_E,0.3,&mpm_particles2);
+            Add_Neo_Hookean(2000*unit_p*scale_E,0.3,&mpm_particles2);
             for(int i=old_pn;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(1,1,1);
         } break;
         case 33:{ // sand box drop
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::separate,10);
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,COLLISION_TYPE::separate,10);
 
-            T density=(T)1281*scale_mass;
-            T E=5000*scale_E,nu=.4;
+            T density=(T)1281*unit_rho*scale_mass;
+            T E=5000*unit_p*scale_E,nu=.4;
             if(!use_theta_c) theta_c=0.01;
             if(!use_theta_s) theta_s=.00001;
             if(!use_hardening_factor) hardening_factor=80;
             if(!use_max_hardening) max_hardening=5;
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
-            RANGE<TV> box(TV(.45,.11),TV(.55,.31));
+            RANGE<TV> box(TV(.45,.11)*m,TV(.55,.31)*m);
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));
@@ -520,23 +522,23 @@ Initialize()
             particles.mu0.Fill(mu);
             particles.lambda.Fill(lambda);
             particles.lambda0.Fill(lambda);
-            Add_Gravity(TV(0,-9.8));
+            Add_Gravity(m/(s*s)*TV(0,-9.8));
         } break;
         case 34:{ // drip drop
-            grid.Initialize(TV_INT(1,2)*resolution,RANGE<TV>(TV(0,-1),TV(1,1)),true);
-            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,true);
-            Add_Gravity(TV(0,-1));
-            T density=2*scale_mass;
-            RANGE<TV> box(TV(.4,.5),TV(.6,.85));
-            Seed_Particles(box,[=](const TV& X){return TV(-0.0,0);},0,density,particles_per_cell);
+            grid.Initialize(TV_INT(1,2)*resolution,RANGE<TV>(TV(0,-1),TV(1,1))*m,true);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,true);
+            Add_Gravity(m/(s*s)*TV(0,-1));
+            T density=2*unit_rho*scale_mass;
+            RANGE<TV> box(TV(.4,.5)*m,TV(.6,.85)*m);
+            Seed_Particles(box,0,0,density,particles_per_cell);
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
             bool no_mu=true;
-            Add_Fixed_Corotated(scale_E*20,0.3,&mpm_particles,no_mu);
-            Add_Force(*new MPM_VISCOSITY<TV>(force_helper,gather_scatter,0,0.000001));
+            Add_Fixed_Corotated(unit_p*scale_E*20,0.3,&mpm_particles,no_mu);
+            Add_Force(*new MPM_VISCOSITY<TV>(force_helper,gather_scatter,0,0.000001*unit_mu));
             use_surface_tension=true;
-            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness,penalty_damping_stiffness);
+            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(s*s),penalty_damping_stiffness*kg/s);
             for(int i=0;i<particles.X.m;i++)
-                if(particles.X(i)(1)>0.8){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
+                if(particles.X(i)(1)>0.8*m){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
             Add_Force(*pinning_force);
         } break;
         case 35:{ // snow wedge
@@ -544,9 +546,9 @@ Initialize()
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2)),ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.4-sqrt(2.0)*0.1));
-            RANGE<TV> ground(TV(-1,0),TV(2,0.1));
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2))*m,ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.4-sqrt(2.0)*0.1));
+            RANGE<TV> ground(TV(-1,0)*m,TV(2,0.1)*m);
             if(use_penalty_collisions){
                 Add_Penalty_Collision_Object(wedge);
                 Add_Penalty_Collision_Object(ground);}
@@ -554,15 +556,15 @@ Initialize()
                 Add_Collision_Object(ground,COLLISION_TYPE::separate,1);
                 Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge),COLLISION_TYPE::separate,1);}
 
-            T density=(T)2*scale_mass;
+            T density=(T)2*unit_rho*scale_mass;
             int number_of_particles=20000;
-            T E=40*scale_E,nu=.2;
+            T E=40*unit_p*scale_E,nu=.2;
             if(!use_theta_c) theta_c=0.015;
             if(!use_theta_s) theta_s=.005;
             if(!use_hardening_factor) hardening_factor=7;
             if(!use_max_hardening) max_hardening=FLT_MAX;
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
-            RANGE<TV> box(TV(.3,.7),TV(.7,.9));
+            RANGE<TV> box(TV(.3,.7)*m,TV(.7,.9)*m);
             std::ifstream ifs("particles.dat");
             if(ifs.is_open()){
                 std::string foobar;
@@ -580,20 +582,20 @@ Initialize()
             particles.mu.Fill(mu);
             particles.lambda0.Fill(lambda);
             particles.lambda.Fill(lambda);
-            Add_Gravity(TV(0,-2));
+            Add_Gravity(m/(s*s)*TV(0,-2));
         } break;
         case 36:{ // split
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            SPHERE<TV> sphere(TV(.5,.5),.3);
-            T density=2*scale_mass;
-            Seed_Particles(sphere,[=](const TV& X){return TV(0,0);},0,
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(sphere,0,0,
                 density,particles_per_cell);
             particles.F.Fill(MATRIX<T,2>(1,0,0,1));
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
-            Add_Fixed_Corotated(scale_E*10,0.3,&mpm_particles);
-            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness,penalty_damping_stiffness);
+            Add_Fixed_Corotated(unit_p*scale_E*10,0.3,&mpm_particles);
+            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(s*s),penalty_damping_stiffness*kg/s);
             for(int i=0;i<particles.X.m;i++)
-                if(particles.X(i)(0)<0.25 || particles.X(i)(0)>90.75){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
+                if(particles.X(i)(0)<0.25*m || particles.X(i)(0)>90.75*m){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
             Add_Force(*pinning_force);
             SEGMENTED_CURVE_2D<T>* sc=SEGMENTED_CURVE_2D<T>::Create();
             sc->particles.Add_Elements(particles.number);
@@ -602,30 +604,30 @@ Initialize()
                 sc->particles.X(p)=particles.X(p);
                 for(int q=0;q<particles.number;q++){
                     TV L=particles.X(p),R=particles.X(q);
-                    if(L(0)<=0.5 && R(0)>0.5&&  L(1)>0.5 && R(1)>0.5 && (L-R).Magnitude_Squared()<sqr(grid.dX.Min()*2)){
+                    if(L(0)<=0.5*m && R(0)>0.5*m &&  L(1)>0.5*m && R(1)>0.5*m && (L-R).Magnitude_Squared()<sqr(grid.dX.Min()*2)){
                         sc->mesh.elements.Append(TV_INT(p,q));}}}
             LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,sc->mesh);
             ARRAY<T> r(sc->mesh.elements.m);r.Fill(grid.dX.Min()*2.1);
             stf->Set_Restlength(r);
-            stf->Set_Stiffness((T)1);
-            stf->Set_Damping((T)0.1);
+            stf->Set_Stiffness((T)1); // TODO: units
+            stf->Set_Damping((T)0.1); // TODO: units
             Add_Force(*stf);
         } break;
-        case 37:{ // sand box drop, better paramaters, with Hencky, usage: mpm 38 -resolution 100 -plastic_newton_iterations 100 -plastic_newton_tolerance 1e-8
+        case 37:{ // sand box drop, better paramaters, with Hencky, usage: mpm 38 -resolution 100
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             if(use_penalty_collisions)
-                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,0.9);
             else
-                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::stick,0);
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,COLLISION_TYPE::stick,0);
 
-            T density=(T)1281*scale_mass;
-            T E=35.37e6*scale_E,nu=.4;
+            T density=(T)1281*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.4;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
 //            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
-            RANGE<TV> box(TV(.4,.1001),TV(.45,.6001));
+            RANGE<TV> box(TV(.4,.1001)*m,TV(.45,.6001)*m);
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));
@@ -633,26 +635,26 @@ Initialize()
             particles.mu0.Fill(mu);
             particles.lambda.Fill(lambda);
             particles.lambda0.Fill(lambda);
-            Add_Gravity(TV(0,-9.81));
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 38:{ // sand box drop, wide
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             if(use_penalty_collisions)
-                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,0.9);
             else
-                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::stick,0);
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,COLLISION_TYPE::stick,0);
 
-            T density=(T)1281*scale_mass;
-            T E=35.37e6*scale_E,nu=.4;
+            T density=(T)1281*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.4;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
 //            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
-            T l0=0.05;
+            T l0=0.05*m;
             T h0=l0*8;
             T gap=grid.dX(1)*0.01;
-            RANGE<TV> box(TV(.5-l0,.1+gap),TV(.5+l0,.1+gap+h0));
+            RANGE<TV> box(TV(.5*m-l0,.1*m+gap),TV(.5*m+l0,.1*m+gap+h0));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));
@@ -660,15 +662,15 @@ Initialize()
             particles.mu0.Fill(mu);
             particles.lambda.Fill(lambda);
             particles.lambda0.Fill(lambda);
-            Add_Gravity(TV(0,-9.81));
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 39:{ // DP on wedge
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-            ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2)),ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.4-sqrt(2.0)*0.1));
-            RANGE<TV> ground(TV(-1,0),TV(2,0.1));
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2))*m,ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.4-sqrt(2.0)*0.1)*m);
+            RANGE<TV> ground(TV(-1,0)*m,TV(2,0.1)*m);
             if(use_penalty_collisions){
                 Add_Penalty_Collision_Object(wedge);
                 Add_Penalty_Collision_Object(ground);}
@@ -676,19 +678,19 @@ Initialize()
                 Add_Collision_Object(ground,COLLISION_TYPE::separate,1);
                 Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge),COLLISION_TYPE::separate,1);}
 
-            T density=(T)2*scale_mass;
+            T density=(T)2*unit_rho*scale_mass;
             int number_of_particles=20000;
-            T E=40*scale_E,nu=.2;
+            T E=40*unit_p*scale_E,nu=.2;
             Add_St_Venant_Kirchhoff_Hencky_Strain(E,nu);
 //            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
-            RANGE<TV> box(TV(.3,.7),TV(.7,.9));
+            RANGE<TV> box(TV(.3,.7)*m,TV(.7,.9)*m);
             std::ifstream ifs("particles.dat");
             if(ifs.is_open()){
                 std::string foobar;
                 ifs>>foobar>>foobar>>foobar>>foobar;
                 T x,y,mass,volume;
                 while(ifs>>x>>y>>mass>>volume && !ifs.eof())
-                    Add_Particle(TV(x,y),0,0,mass,volume);
+                    Add_Particle(TV(x,y)*m,0,0,mass*kg,volume*pow<TV::m>(m));
                 PHYSBAM_ASSERT(particles.number==number_of_particles);}
             else{
                 PHYSBAM_WARNING("Couldn't open 'particles.dat'. Falling back to using random particle positions.");
@@ -699,7 +701,7 @@ Initialize()
             particles.mu.Fill(mu);
             particles.lambda0.Fill(lambda);
             particles.lambda.Fill(lambda);
-            Add_Gravity(TV(0,-2));
+            Add_Gravity(m/(s*s)*TV(0,-2));
         } break;
         case 40:
         case 41:
@@ -714,20 +716,20 @@ Initialize()
             particles.Store_Fp(true);
             particles.Store_Lame(true);
 
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             if(use_penalty_collisions)
-                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),0.9);
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,0.9);
             else
-                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1)),COLLISION_TYPE::stick,0);
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,COLLISION_TYPE::stick,0);
 
-            T density=(T)2200*scale_mass;
-            T E=35.37e6*scale_E,nu=.3;
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             Add_Drucker_Prager_Case(E,nu,test_number-40);
-            T l0=0.05;
+            T l0=0.05*m;
             T h0=l0*8;
             T gap=grid.dX(1)*0.01;
-            RANGE<TV> box(TV(.5-l0,.1+gap),TV(.5+l0,.1+gap+h0));
+            RANGE<TV> box(TV(.5*m-l0,.1*m+gap),TV(.5*m+l0,.1*m+gap+h0));
             Seed_Particles(box,0,0,density,particles_per_cell);
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));
@@ -735,7 +737,7 @@ Initialize()
             particles.mu0.Fill(mu);
             particles.lambda.Fill(lambda);
             particles.lambda0.Fill(lambda);
-            Add_Gravity(TV(0,-9.81));
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 50:
         case 51:
@@ -746,21 +748,21 @@ Initialize()
             particles.Store_Lame(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             //particles.Store_Plastic_Deformation(true);
-            grid.Initialize(TV_INT()+resolution,2*RANGE<TV>::Unit_Box(),true);
+            grid.Initialize(TV_INT()+resolution,2*RANGE<TV>::Unit_Box()*m,true);
             if(use_penalty_collisions){
-                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(2.5,.1)),0.9);
-                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(.1,1.5)),0.9);}
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(2.5,.1))*m,0.9);
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(.1,1.5))*m,0.9);}
             else{
-                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(2.5,.1)),COLLISION_TYPE::stick,0);
-                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(.1,1.5)),COLLISION_TYPE::stick,0);}
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(2.5,.1))*m,COLLISION_TYPE::stick,0);
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(.1,1.5))*m,COLLISION_TYPE::stick,0);}
             
-            T density=(T)2200*scale_mass;
-            T E=35.37e5*scale_E,nu=.3;
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e5*unit_p*scale_E,nu=.3;
             T mu=E/(2*(1+nu));
             T lambda=E*nu/((1+nu)*(1-2*nu));
             //this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(35,0,0,0);
             T gap=grid.dX(1)*0.01;
-            RANGE<TV> box(TV(.1+gap,.1+gap),TV(.3,.75));
+            RANGE<TV> box(TV(.1*m+gap,.1*m+gap),TV(.3,.75)*m);
             //seed sand particles 
             Seed_Particles(box,0,0,density,particles_per_cell-foo_T4);
             ARRAY<int> sand_particles(particles.X.m);
@@ -800,7 +802,7 @@ Initialize()
                     (*color_attribute)(p)=VECTOR<T,3>(0,0,1);}
                 Add_Fixed_Corotated(El,nul,&lambda_particles,true);}
 
-            Add_Gravity(TV(0,-9.81));
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
@@ -826,12 +828,12 @@ template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Begin_Time_Step(const T time)
 {
     if(test_number==12){
-        if(time>=10/24.0){
+        if(time>=10/24.0*s){
             lagrangian_forces.Delete_Pointers_And_Clean_Memory();
             this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
             this->output_structures_each_frame=true;
-            Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1+(T)(time-10/24.0)*0.08,true);
-            Add_Gravity(TV(0,-9.8));}}
+            Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1+(T)(time/s-10/24.0)*0.08*m,true);
+            Add_Gravity(m/(s*s)*TV(0,-9.8));}}
     if(test_number==36){
         delete lagrangian_forces(lagrangian_forces.m-1);
         lagrangian_forces.Remove_End();
@@ -842,12 +844,12 @@ Begin_Time_Step(const T time)
             sc->particles.X(p)=particles.X(p);
             for(int q=0;q<particles.number;q++){
                 TV L=particles.X(p),R=particles.X(q);
-                if(L(0)<=0.5 && R(0)>0.5 && L(1)>0.5 && R(1)>0.5 && (L-R).Magnitude_Squared()<sqr(grid.dX.Min()*2)){
+                if(L(0)<=0.5*m && R(0)>0.5*m && L(1)>0.5*m && R(1)>0.5*m && (L-R).Magnitude_Squared()<sqr(grid.dX.Min()*2)){
                     sc->mesh.elements.Append(TV_INT(p,q));}}}
         LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,sc->mesh);
         ARRAY<T> r(sc->mesh.elements.m);r.Fill(grid.dX.Min()*2.1);
         stf->Set_Restlength(r);
-        stf->Set_Stiffness((T)1);
+        stf->Set_Stiffness((T)1); // TODO: units
         stf->Set_Damping((T)0);
         Add_Force(*stf);}
     if(use_surface_tension){
@@ -910,7 +912,7 @@ Begin_Time_Step(const T time)
         int Nold=particles.number;
         Nsurface=surface->particles.number;
         LOG::cout<<"adding "<<Nsurface<<" particles..."<<std::endl;
-        SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*surface,0,0,(T)0.001,true);
+        SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*surface,0,0,(T)0.001*unit_rho,true);
         ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
         for(int i=Nold;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(0,1,0);
 
@@ -967,11 +969,11 @@ Begin_Time_Step(const T time)
     }
     
     if(test_number==34){
-        Add_Walls(-1,COLLISION_TYPE::separate,.3,.1,true);
-        Add_Gravity(TV(0,-1));
-        PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness,penalty_damping_stiffness);
+        Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,true);
+        Add_Gravity(m/(s*s)*TV(0,-1));
+        PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(s*s),penalty_damping_stiffness*kg/s);
         for(int i=0;i<particles.X.m;i++)
-            if(particles.X(i)(1)>0.8){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
+            if(particles.X(i)(1)>0.8*m){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
         Add_Force(*pinning_force);
     }
 }

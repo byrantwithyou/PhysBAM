@@ -47,6 +47,7 @@ public:
     using BASE::use_theta_c;using BASE::theta_c;using BASE::use_theta_s;using BASE::theta_s;
     using BASE::hardening_factor;using BASE::use_hardening_factor;using BASE::max_hardening;using BASE::use_max_hardening;
     using BASE::hardening_mast_case;using BASE::use_hardening_mast_case;
+    using BASE::m;using BASE::s;using BASE::kg;using BASE::unit_p;using BASE::unit_mu;using BASE::unit_rho;
 
     // surface tension stuff
     bool use_surface_tension;
