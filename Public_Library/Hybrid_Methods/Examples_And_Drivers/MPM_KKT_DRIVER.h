@@ -49,7 +49,6 @@ public:
     void Grid_To_Particle();
     void Solve_KKT_System();
     void Apply_Forces();
-    void Perform_Particle_Collision(int p,T time);
     void Apply_Friction();
     void Initialize_Location(const RANGE<TV_INT>& range,const GRID<TV>& grid,ARRAY<TV,TV_INT>& location);
     T Compute_Dt() const;

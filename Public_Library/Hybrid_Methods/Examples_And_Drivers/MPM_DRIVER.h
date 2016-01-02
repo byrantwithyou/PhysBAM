@@ -68,7 +68,6 @@ public:
     void Update_Plasticity_And_Hardening();
     void Add_C_Contribution_To_DT(TV_INT id,int a,int row,T val);
     void Apply_Forces();
-    void Perform_Particle_Collision(int p,T time);
     void Apply_Friction();
     T Compute_Dt() const;
     T Max_Particle_Speed() const;

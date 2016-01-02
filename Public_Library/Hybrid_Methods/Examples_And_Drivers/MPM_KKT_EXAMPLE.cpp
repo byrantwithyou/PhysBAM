@@ -29,7 +29,7 @@ MPM_KKT_EXAMPLE(const STREAM_TYPE stream_type)
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),
     mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(5),
     use_reduced_rasterization(false),use_affine(true),use_f2p(false),use_midpoint(false),use_symplectic_euler(false),
-    use_particle_collision(false),use_early_gradient_transfer(false),use_oldroyd(false),print_stats(false),flip(0),
+    use_early_gradient_transfer(false),use_oldroyd(false),print_stats(false),flip(0),
     cfl(1),inv_Wi(0),newton_tolerance(1),newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),
     test_diff(false),threads(1),last_te(0),last_grid_ke(0),output_structures_each_frame(false),
     quad_F_coeff(0),use_FEM_mass(0)

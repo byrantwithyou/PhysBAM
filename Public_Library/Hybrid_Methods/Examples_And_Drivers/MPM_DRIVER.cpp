@@ -394,7 +394,6 @@ Grid_To_Particle()
                     if(particles.store_C && example.weights->Order()>1) D+=it.Weight()*MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p),Z-particles.X(p));}
 
             particles.V(p)=V_pic;
-            Perform_Particle_Collision(p,example.time+example.dt);
             if(particles.store_B) particles.B(p)=B;
             if(particles.store_C) particles.C(p)=example.weights->Order()==1?grad_Vp:B*D.Inverse();
             if(example.use_midpoint) particles.X(p)+=(particles.V(p)+Vn_interpolate)*(dt/2);
@@ -436,7 +435,6 @@ Face_To_Particle()
                 for(int k=0;k<TV::m;++k)
                             C(i,k)+=tmp(k);}}
             particles.V(p)=V_pic;
-            Perform_Particle_Collision(p,example.time+example.dt);
             if(example.use_midpoint) PHYSBAM_NOT_IMPLEMENTED("Midpoint with Face_To_Particle is not supported");
             else particles.X(p)+=particles.V(p)*dt;
             particles.V(p)=V_flip*example.flip+V_pic*(1-example.flip);
@@ -847,22 +845,6 @@ Apply_Forces()
         example.velocity_new.array(j)=dv.u.array(j)+objective.v0.u.array(j);}
     example.velocity_new.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
     example.current_velocity=&example.velocity_new;
-}
-//#####################################################################
-// Function Perform_Particle_Collision
-//#####################################################################
-template<class TV> void MPM_DRIVER<TV>::
-Perform_Particle_Collision(int p,T time)
-{
-    if(!example.use_particle_collision) return;;
-    for(int i=0;i<example.collision_objects.m;i++){
-        TV X=example.particles.X(p);
-        MPM_COLLISION_OBJECT<TV>* io=example.collision_objects(i);
-        T phi=io->Phi(X,time);
-        if(phi>=0) continue;
-        if(example.collision_objects(i)->type==COLLISION_TYPE::stick) return;
-        X-=phi*io->Normal(X,time);
-        example.particles.X(p)=X;}
 }
 //#####################################################################
 // Function Apply_Friction

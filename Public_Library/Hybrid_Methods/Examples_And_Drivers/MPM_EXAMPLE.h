@@ -95,7 +95,6 @@ public:
     bool use_f2p;
     bool use_midpoint;
     bool use_symplectic_euler;
-    bool use_particle_collision;
     bool use_early_gradient_transfer;
     bool use_oldroyd;
     bool use_variable_coefficients;
