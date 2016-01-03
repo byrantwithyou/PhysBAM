@@ -345,67 +345,68 @@ Particle_To_Grid()
 template<class TV> void MPM_DRIVER<TV>::
 Grid_To_Particle()
 {
+    struct HELPER
+    {
+        TV V_pic,V_weight_old,V_pic_fric;
+        MATRIX<T,TV::m> B,grad_Vp,grad_Vp_fric,D;
+    };
+
     MPM_PARTICLES<TV>& particles=example.particles;
     T dt=example.dt;
+    bool need_dv_fric=(example.use_affine && example.use_early_gradient_transfer) ||
+        (particles.store_C && example.weights->Order()==1);
 
-#pragma omp parallel for
-    for(int tid=0;tid<example.gather_scatter.threads;++tid){
-        int a=example.simulated_particles.m*tid/example.gather_scatter.threads;
-        int b=example.simulated_particles.m*(tid+1)/example.gather_scatter.threads;
-        typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
-        bool need_dv_fric=(example.use_affine && example.use_early_gradient_transfer) ||
-            (particles.store_C && example.weights->Order()==1);
-
-        for(int k=a;k<b;k++){
-            int p=example.simulated_particles(k);
-            TV V_pic,V_weight_old,V_pic_fric;
-            MATRIX<T,TV::m> B,grad_Vp,grad_Vp_fric,D;
-
-            for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,p,true,scratch);it.Valid();it.Next()){
-                T w=it.Weight();
-                TV dw=it.Gradient();
-                TV_INT index=it.Index();
-                TV V_new=example.velocity_new(index);
-                TV V_old=example.velocity(index);
-                TV V_fric=example.velocity_friction(index);
-                V_pic+=w*V_new;
-                V_weight_old+=w*V_old;
-                V_pic_fric+=w*V_fric;
-                TV V_grid=example.use_midpoint?(T).5*(V_new+V_old):V_new;
-                grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,dw);
-                if(need_dv_fric){
-                    TV V_grid_fric=example.use_midpoint?(T).5*(V_fric+V_old):V_new;
-                    grad_Vp_fric+=MATRIX<T,TV::m>::Outer_Product(V_grid_fric,dw);}
-                if(example.use_affine && !example.use_early_gradient_transfer){
-                    TV Z=example.grid.Center(index);
-                    TV xi_new=Z+dt*V_grid;
-                    B+=w/2*(MATRIX<T,TV::m>::Outer_Product(V_fric,Z+xi_new)
-                        +MATRIX<T,TV::m>::Outer_Product(Z-xi_new,V_fric));
-                    if(particles.store_C && example.weights->Order()>1)
-                        D+=w*MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p),Z-particles.X(p));}}
-
-            MATRIX<T,TV::m> A=dt*grad_Vp+1;
-            if(example.quad_F_coeff) A+=sqr(dt*grad_Vp)*example.quad_F_coeff;
+    example.gather_scatter.template Gather<HELPER>(true,
+        [](int p,HELPER& h){h=HELPER();},
+        [this,need_dv_fric,dt,&particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,HELPER& h)
+        {
+            T w=it.Weight();
+            TV dw=it.Gradient();
+            TV_INT index=it.Index();
+            TV V_new=example.velocity_new(index);
+            TV V_old=example.velocity(index);
+            TV V_fric=example.velocity_friction(index);
+            h.V_pic+=w*V_new;
+            h.V_weight_old+=w*V_old;
+            h.V_pic_fric+=w*V_fric;
+            TV V_grid=example.use_midpoint?(T).5*(V_new+V_old):V_new;
+            h.grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,dw);
+            if(need_dv_fric){
+                TV V_grid_fric=example.use_midpoint?(T).5*(V_fric+V_old):V_new;
+                h.grad_Vp_fric+=MATRIX<T,TV::m>::Outer_Product(V_grid_fric,dw);}
+            if(example.use_affine && !example.use_early_gradient_transfer){
+                TV Z=example.grid.Center(index);
+                TV xi_new=Z+dt*V_grid;
+                h.B+=w/2*(MATRIX<T,TV::m>::Outer_Product(V_fric,Z+xi_new)
+                    +MATRIX<T,TV::m>::Outer_Product(Z-xi_new,V_fric));
+                if(particles.store_C && example.weights->Order()>1)
+                    h.D+=w*MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p),Z-particles.X(p));}
+        },
+        [this,dt,&particles](int p,HELPER& h)
+        {
+            MATRIX<T,TV::m> A=dt*h.grad_Vp+1;
+            if(example.quad_F_coeff) A+=sqr(dt*h.grad_Vp)*example.quad_F_coeff;
             particles.F(p)=A*particles.F(p);
             TV xp_new;
-            if(example.use_midpoint) xp_new=particles.X(p)+dt/2*(V_weight_old+V_pic);
-            else xp_new=particles.X(p)+dt*V_pic;
+            if(example.use_midpoint) xp_new=particles.X(p)+dt/2*(h.V_weight_old+h.V_pic);
+            else xp_new=particles.X(p)+dt*h.V_pic;
             if(particles.store_S){
                 T k=example.dt*example.inv_Wi;
                 particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,particles.S(p))+k)/(1+k);}
             if(example.use_affine && example.use_early_gradient_transfer)
-                B=grad_Vp_fric/example.weights->Constant_Scalar_Inverse_Dp();
+                h.B=h.grad_Vp_fric/example.weights->Constant_Scalar_Inverse_Dp();
             else if(example.use_affine)
-                B-=(T).5*(MATRIX<T,TV::m>::Outer_Product(V_pic_fric,particles.X(p)+xp_new)
-                    +MATRIX<T,TV::m>::Outer_Product(particles.X(p)-xp_new,V_pic_fric));
+                h.B-=(T).5*(MATRIX<T,TV::m>::Outer_Product(h.V_pic_fric,particles.X(p)+xp_new)
+                    +MATRIX<T,TV::m>::Outer_Product(particles.X(p)-xp_new,h.V_pic_fric));
 
-            if(particles.store_B) particles.B(p)=B;
-            if(particles.store_C) particles.C(p)=example.weights->Order()==1?grad_Vp_fric:B*D.Inverse();
+            if(particles.store_B) particles.B(p)=h.B;
+            if(particles.store_C) particles.C(p)=example.weights->Order()==1?h.grad_Vp_fric:h.B*h.D.Inverse();
             particles.X(p)=xp_new;
-            TV V_flip=particles.V(p)+V_pic_fric-V_weight_old;
-            particles.V(p)=V_flip*example.flip+V_pic_fric*(1-example.flip);
+            TV V_flip=particles.V(p)+h.V_pic_fric-h.V_weight_old;
+            particles.V(p)=V_flip*example.flip+h.V_pic_fric*(1-example.flip);
 
-            if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;}}
+            if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;
+        });
 }
 //#####################################################################
 // Function Face_To_Particle
