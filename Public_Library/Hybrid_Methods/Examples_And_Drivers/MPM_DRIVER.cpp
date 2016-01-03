@@ -860,9 +860,8 @@ Apply_Forces()
 template<class TV> void MPM_DRIVER<TV>::
 Apply_Friction()
 {
-    if(!example.collision_objects.m) return;
-
     example.velocity_friction=dv.u;
+    if(!example.collision_objects.m) return;
     objective.Compute_Unconstrained(dv,0,&objective.tmp0,0);
     objective.tmp1=objective.tmp0;
     objective.Project_Gradient_And_Prune_Constraints(objective.tmp1,true);
