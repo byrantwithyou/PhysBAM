@@ -341,9 +341,9 @@ Average_Particle_Mass() const
 // Function Add_Collision_Object
 //#####################################################################
 template<class TV> void MPM_EXAMPLE<TV>::
-Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction)
+Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist)
 {
-    collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,type,friction));
+    collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,type,friction,func_frame,func_twist));
 }
 //#####################################################################
 // Function Add_Fluid_Wall

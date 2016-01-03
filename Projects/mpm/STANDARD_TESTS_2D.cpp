@@ -945,13 +945,37 @@ Initialize()
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
+        case 55:{ // Moving collision ocject
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            if(use_penalty_collisions)
+                PHYSBAM_NOT_IMPLEMENTED();
+            Add_Collision_Object(RANGE<TV>(TV(0,.2),TV(1,.3))*m,COLLISION_TYPE::stick,0,
+                [=](T time)->FRAME<TV>{
+                    return FRAME<TV>(TV((T).2*cos(-4*time/s),(T).2*sin(-4*time/s))*m);
+                },
+                [](T time)->TWIST<TV>{
+                    return TWIST<TV>();
+                });
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=1e5*unit_p*scale_E,nu=.4;
+            Add_Fixed_Corotated(E,nu);
+            T l0=0.05*m;
+            T h0=l0*8;
+            T gap=grid.dX(1)*0.01;
+            RANGE<TV> box(TV(.5*m-l0,.3*m+gap),TV(.5*m+l0,.3*m+gap+h0));
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
             particles.mu.Fill(mu);
             particles.mu0.Fill(mu);
             particles.lambda.Fill(lambda);
             particles.lambda0.Fill(lambda);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-            for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
