@@ -945,8 +945,14 @@ Initialize()
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
+            particles.mu.Fill(mu);
+            particles.mu0.Fill(mu);
+            particles.lambda.Fill(lambda);
+            particles.lambda0.Fill(lambda);
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
+        } break;
         case 55:{ // Moving collision ocject
             particles.Store_Fp(true);
             particles.Store_Lame(true);
