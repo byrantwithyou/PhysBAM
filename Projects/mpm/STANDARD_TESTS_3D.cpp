@@ -726,6 +726,38 @@ Initialize()
                 if(!use_foo_T5) foo_T5=(T)1e-2;
                 Add_Lambda_Particles(&sand_particles,E*foo_T5,nu,(T)1000*unit_rho,true,(T)0.3,(T)1);}
         } break;
+
+        case 40:{ // dry sand siggraph letters drop
+            particles.Store_Fp(true);
+            grid.Initialize(TV_INT(5,1,1)*resolution,RANGE<TV>(TV(-0.5,0,-0.1)*m,TV(0.5,0.2,0.1)*m),true);
+            LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
+            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,0.02,10)*m);
+            if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
+            else Add_Collision_Object(ground,COLLISION_TYPE::slip,0.2);
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            Add_Drucker_Prager_Case(E,nu,case_num);
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/siggraph_letters.tri.gz",*surface);
+            LOG::cout<<"Read mesh of siggraph letters triangle #"<<surface->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh of siggraph letters particle # "<<surface->particles.number<<std::endl;
+            surface->mesh.Initialize_Adjacent_Elements();    
+            surface->mesh.Initialize_Neighbor_Nodes();
+            surface->mesh.Initialize_Incident_Elements();
+            surface->Update_Bounding_Box();
+            surface->Initialize_Hierarchy();
+            surface->Update_Triangle_List();
+            LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,200);
+            LOG::cout<<"Seeding particles..."<<std::endl;
+            Seed_Particles(*levelset,0,0,density,particles_per_cell);
+            LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
+            Set_Lame_On_Particles(E,nu);
+            Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
