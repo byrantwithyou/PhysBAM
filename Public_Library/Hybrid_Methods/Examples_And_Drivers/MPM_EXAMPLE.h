@@ -99,6 +99,7 @@ public:
     bool use_oldroyd;
     bool use_variable_coefficients;
     bool print_stats;
+    bool only_write_particles;
     T flip;
     T cfl;
     T inv_Wi;

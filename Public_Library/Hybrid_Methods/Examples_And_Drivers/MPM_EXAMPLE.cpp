@@ -28,7 +28,7 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),
     mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
     use_reduced_rasterization(false),use_affine(true),use_f2p(false),use_midpoint(false),use_symplectic_euler(false),
-    use_early_gradient_transfer(false),use_oldroyd(false),print_stats(false),flip(0),
+    use_early_gradient_transfer(false),use_oldroyd(false),print_stats(false),only_write_particles(false),flip(0),
     cfl(1),inv_Wi(0),newton_tolerance(1),newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),
     test_diff(false),threads(1),last_te(0),last_grid_ke(0),output_structures_each_frame(false),
     quad_F_coeff(0),asymmetric_system(false)
@@ -67,34 +67,38 @@ Write_Output_Files(const int frame)
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
 #pragma omp task
         FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
+        
+        if(!only_write_particles){
+
 #pragma omp task
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),*current_velocity);
+            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),*current_velocity);
 #pragma omp task
-        if(incompressible)
-            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),velocity_new_f);
+            if(incompressible)
+                FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),velocity_new_f);
 #pragma omp task
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/density",output_directory.c_str(),frame),mass);
+            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/density",output_directory.c_str(),frame),mass);
 #pragma omp task
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 #pragma omp task
-        {
-            int static_frame=output_structures_each_frame?frame:-1;
-            bool write_structures=(frame==0 || output_structures_each_frame);
-            deformable_body_collection.Write(stream_type,output_directory,output_directory,frame,static_frame,write_structures,false);
-        }
+            {
+                int static_frame=output_structures_each_frame?frame:-1;
+                bool write_structures=(frame==0 || output_structures_each_frame);
+                deformable_body_collection.Write(stream_type,output_directory,output_directory,frame,static_frame,write_structures,false);
+            }
 #pragma omp task
-        {
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-            for(int i=0;i<particles.X.m;i++){
-                Add_Debug_Particle(particles.X(i),particles.valid(i)?(*color_attribute)(i):VECTOR<T,3>(1,0,1));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(i));}
-            GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
-            for(int i=0;i<collision_objects.m;i++)
-                if(IMPLICIT_OBJECT<TV>* io=collision_objects(i)->Get_Implicit_Object(time))
-                    Dump_Levelset(ghost_grid,*io,VECTOR<T,3>(0.7,0.3,0.3));
-            if(mass_contour>=0)
-                Dump_Levelset(grid,mass,VECTOR<T,3>(0.2,0.6,0.2),mass_contour*Average_Particle_Mass());
-            debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
+            {
+                ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+                for(int i=0;i<particles.X.m;i++){
+                    Add_Debug_Particle(particles.X(i),particles.valid(i)?(*color_attribute)(i):VECTOR<T,3>(1,0,1));
+                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(i));}
+                GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
+                for(int i=0;i<collision_objects.m;i++)
+                    if(IMPLICIT_OBJECT<TV>* io=collision_objects(i)->Get_Implicit_Object(time))
+                        Dump_Levelset(ghost_grid,*io,VECTOR<T,3>(0.7,0.3,0.3));
+                if(mass_contour>=0)
+                    Dump_Levelset(grid,mass,VECTOR<T,3>(0.2,0.6,0.2),mass_contour*Average_Particle_Mass());
+                debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
+            }
         }
     }
 }
