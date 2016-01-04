@@ -26,6 +26,7 @@
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Forces/MPM_GRAVITY.h>
 #include <Hybrid_Methods/Forces/MPM_OLDROYD_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/MPM_VISCOSITY.h>
 #include <Hybrid_Methods/Forces/OLDROYD_NEO_HOOKEAN.h>
@@ -853,7 +854,7 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 53:{ // sandbox
-            // ./mpm 53 -threads 10 -use_exp_F -max_dt 5e-4 -resolution 200 -last_frame 100 -fooT1 10 
+            //  ./mpm 53 -threads 10 -use_exp_F -max_dt 7.5e-4 -scale_E 1 -resolution 200 -fooT1 10 -last_frame 10 -o sandbox_implicit
             particles.Store_Fp(true);
             particles.Store_Lame(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
@@ -862,16 +863,19 @@ Initialize()
                 LOG::cout<<"ERROR: NOT IMPLEMENTED FOR PENALTY."<<std::endl;;
                 PHYSBAM_FATAL_ERROR();}
             else{
+                // Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,COLLISION_TYPE::slip,0);
                 RANGE<TV> ground(TV(-0.5,-1)*m,TV(2.5,.1)*m);
                 RANGE<TV> leftwall(TV(-1,-1)*m,TV(.1,2.5)*m);
                 RANGE<TV> rightwall(TV(0.9,-1)*m,TV(2.5,2.5)*m);
-                ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> > groundimp(ground);
-                ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> > leftwallimp(leftwall);
-                Add_Collision_Object(
-                    new IMPLICIT_OBJECT_UNION<TV>(
+                RANGE<TV> top(TV(-0.5,.9)*m,TV(2.5,2)*m);
+                Add_Collision_Object(new IMPLICIT_OBJECT_UNION<TV>(
+                    *new IMPLICIT_OBJECT_UNION<TV>(
                     *new IMPLICIT_OBJECT_UNION<TV>(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(leftwall)),
                     *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(rightwall)),
-                    COLLISION_TYPE::slip,0);}
+                    *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(top)),
+                    COLLISION_TYPE::slip,0);
+            }
+
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e5*unit_p*scale_E,nu=.3;
             T mu=E/(2*(1+nu));
@@ -913,6 +917,42 @@ Initialize()
             //     for(int k=0;k<foo.m;k++) foo(k)=k+N_sand;
             //     Add_Fixed_Corotated(35.37e5*unit_p*scale_E,0.3,&foo);}
         } break;
+
+        case 54:{ // sand cup pull
+            // ./mpm 54 -threads 10 -use_exp_F -max_dt 7.5e-4  -resolution 50 -last_frame 200
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            grid.Initialize(TV_INT(resolution*2,resolution),RANGE<TV>(TV(-1,-0.5),TV(1,0.5)),true);
+            RANGE<TV> cupbottom(TV(-0.3,-0.25),TV(0.3,-0.2));
+            RANGE<TV> cupleft(TV(-0.3,-0.25),TV(-0.25,0.25));
+            RANGE<TV> cupright(TV(0.25,-0.25),TV(0.3,0.25));
+            Add_Collision_Object(new IMPLICIT_OBJECT_UNION<TV>(
+                    *new IMPLICIT_OBJECT_UNION<TV>(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupbottom),*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupleft)),
+                    *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupright)),COLLISION_TYPE::slip,0);
+            Add_Walls(-1,COLLISION_TYPE::stick,0,0.04,false);
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e5*unit_p*scale_E,nu=.3;
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            ARRAY<RANGE<TV> > columns;
+            columns.Append(RANGE<TV>(TV(-0.24,-0.2),TV(-0.2,0.1)));
+            columns.Append(RANGE<TV>(TV(-0.15,-0.2),TV(-0.05,-0.1)));
+            columns.Append(RANGE<TV>(TV(-0.02,-0.2),TV(0.1,0.02)));
+            columns.Append(RANGE<TV>(TV(0.12,-0.2),TV(0.15,0.12)));
+            columns.Append(RANGE<TV>(TV(0.18,-0.2),TV(0.23,-0.15)));
+            for(int k=0;k<columns.m;k++) Seed_Particles(columns(k),0,0,density,particles_per_cell);
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
+            particles.mu.Fill(mu);
+            particles.mu0.Fill(mu);
+            particles.lambda.Fill(lambda);
+            particles.lambda0.Fill(lambda);
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
@@ -925,6 +965,8 @@ Initialize()
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Begin_Frame(const int frame)
 {
+    if(frame==10 && test_number==54)
+        Add_Gravity(TV(0,20));
 }
 //#####################################################################
 // Function End_Frame
