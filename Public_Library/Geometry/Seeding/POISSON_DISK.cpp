@@ -54,7 +54,8 @@ Sample(RANDOM_NUMBERS<T>& random,IMPLICIT_OBJECT<TV>& object,ARRAY<TV>& X)
                 grid_array(grid.Cell(new_point,ghost))=index;}}
         if(!found_at_least_one) active.Remove_Index_Lazy(random_index);}
     for(int i=X.m-1;i>=0;i--)
-        if(!object.Lazy_Inside(X(i)))
+        // if(!object.Lazy_Inside(X(i)))
+        if(object.Extended_Phi(X(i))>0)
             X.Remove_Index_Lazy(i);
 }
 //#####################################################################
