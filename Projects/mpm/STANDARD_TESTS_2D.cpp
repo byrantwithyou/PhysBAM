@@ -354,7 +354,7 @@ Initialize()
             RANGE<TV> box(TV(-.8,0)*m,TV(-.2,.2)*m);
             T density=unit_rho*scale_mass;
             Seed_Particles(box,[=](const TV& X){return TV(initial_velocity,0);},0,density,particles_per_cell);
-            Add_Fixed_Corotated(1e5*unit_p*scale_E,0.3);
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             FRAME<TV> frame(TV(),ROTATION<TV>::From_Angle(-angle));
             ORIENTED_BOX<TV> ground(RANGE<TV>(TV(-5,-5),TV(5,0))*m,frame);
             Add_Collision_Object(ground,COLLISION_TYPE::slip,coefficient_of_friction);
