@@ -139,10 +139,12 @@ public:
     int Add_Force(PARTICLE_GRID_FORCES<TV>& force);
     int Add_Force(DEFORMABLES_FORCES<TV>& force);
     void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
-    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0);
+    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
+        std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0);
     void Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io);
     template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type
-    Add_Collision_Object(const OBJECT& object,COLLISION_TYPE type,T friction,std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0)
+    Add_Collision_Object(const OBJECT& object,COLLISION_TYPE type,T friction,
+        std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0)
     {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),type,friction,func_frame,func_twist);}
 
     TV Total_Particle_Linear_Momentum() const;

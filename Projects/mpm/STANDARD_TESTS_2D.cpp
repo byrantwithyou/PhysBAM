@@ -891,8 +891,11 @@ Initialize()
             RANGE<TV> cupbottom(TV(-0.3,-0.25),TV(0.3,-0.2));
             RANGE<TV> cupleft(TV(-0.3,-0.25),TV(-0.25,0.25));
             RANGE<TV> cupright(TV(0.25,-0.25),TV(0.3,0.25));
-            Add_Collision_Object(new IMPLICIT_OBJECT_UNION<TV>(
-                    *new IMPLICIT_OBJECT_UNION<TV>(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupbottom),*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupleft)),
+            Add_Collision_Object(
+                new IMPLICIT_OBJECT_UNION<TV>(
+                    *new IMPLICIT_OBJECT_UNION<TV>(
+                        *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupbottom),
+                        *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupleft)),
                     *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupright)),COLLISION_TYPE::separate,0);
             Add_Walls(-1,COLLISION_TYPE::stick,0,0.04,false);
             T density=(T)2200*unit_rho*scale_mass;
@@ -923,12 +926,8 @@ Initialize()
             if(use_penalty_collisions)
                 PHYSBAM_NOT_IMPLEMENTED();
             Add_Collision_Object(RANGE<TV>(TV(0,.2),TV(1,.3))*m,COLLISION_TYPE::stick,0,
-                [=](T time)->FRAME<TV>{
-                    return FRAME<TV>(TV(0,max(0.2/s*(time-.4),0.0))*m);
-                },
-                [=](T time)->TWIST<TV>{
-                    return TWIST<TV>(TV(0,0.2/s*(time-.4)>0?0.2*s:0)*m,typename TV::SPIN());
-                });
+                [=](T time){return FRAME<TV>(TV(0,max(0.2/s*(time-.4),0.0))*m);},
+                [=](T time){return TWIST<TV>(TV(0,0.2/s*(time-.4)>0?0.2*s:0)*m,typename TV::SPIN());});
             T density=(T)2200*unit_rho*scale_mass;
             T E=1e5*unit_p*scale_E,nu=.4;
             Add_Fixed_Corotated(E,nu);

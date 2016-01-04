@@ -13,8 +13,10 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> MPM_COLLISION_IMPLICIT_OBJECT<TV>::
-MPM_COLLISION_IMPLICIT_OBJECT(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type_input,T friction_input,std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist)
-    :MPM_COLLISION_OBJECT<TV>(type_input,friction_input),iot_frame(0),iot(0),io(io),func_frame(func_frame),func_twist(func_twist)
+MPM_COLLISION_IMPLICIT_OBJECT(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type_input,T friction_input,
+    std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist)
+    :MPM_COLLISION_OBJECT<TV>(type_input,friction_input),iot_frame(0),iot(0),io(io),func_frame(func_frame),
+    func_twist(func_twist)
 {
 }
 //#####################################################################

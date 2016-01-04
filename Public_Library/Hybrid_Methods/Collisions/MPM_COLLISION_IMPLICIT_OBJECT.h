@@ -20,7 +20,8 @@ public:
     std::function<FRAME<TV>(T)> func_frame;
     std::function<TWIST<TV>(T)> func_twist;
 
-    MPM_COLLISION_IMPLICIT_OBJECT(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type_input,T friction_input,std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0);
+    MPM_COLLISION_IMPLICIT_OBJECT(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type_input,T friction_input,
+        std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0);
     virtual ~MPM_COLLISION_IMPLICIT_OBJECT();
     T Phi(const TV& X,T time) const override;
     TV Normal(const TV& X,T time) const override;
