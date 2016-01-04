@@ -176,10 +176,10 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
             if(type==COLLISION_TYPE::stick) stuck=true;}
         for(int j=0;j<system.example.collision_objects.m && !stuck;j++){
             MPM_COLLISION_OBJECT<TV>* io=system.example.collision_objects(j);
-            T phi0=io->Phi(X0,t0),phi=io->Phi(X,t1)-min(phi0,(T)0);
+            T phi0=io->Phi(X0,t0),phi1=io->Phi(X,t1),phi=phi1-min(phi0,(T)0);
             COLLISION_TYPE type=system.example.collision_objects(j)->type;
-            if(type==COLLISION_TYPE::stick){if(phi0>0) continue;stuck=true;}
-            if(type==COLLISION_TYPE::slip && phi0>0) continue;
+            if(type==COLLISION_TYPE::stick){if(phi0>0 && phi1>0) continue;stuck=true;}
+            if(type==COLLISION_TYPE::slip && phi0>0 && phi1>0) continue;
             if(type==COLLISION_TYPE::separate && phi>collision_thickness) continue;
             if(type!=COLLISION_TYPE::stick && phi>deepest_phi) continue;
             deepest_index=j;

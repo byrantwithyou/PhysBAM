@@ -924,10 +924,10 @@ Initialize()
                 PHYSBAM_NOT_IMPLEMENTED();
             Add_Collision_Object(RANGE<TV>(TV(0,.2),TV(1,.3))*m,COLLISION_TYPE::stick,0,
                 [=](T time)->FRAME<TV>{
-                    return FRAME<TV>(TV((T).2*cos(-4*time/s),(T).2*sin(-4*time/s))*m);
+                    return FRAME<TV>(TV(0,max(0.2/s*(time-.4),0.0))*m);
                 },
-                [](T time)->TWIST<TV>{
-                    return TWIST<TV>();
+                [=](T time)->TWIST<TV>{
+                    return TWIST<TV>(TV(0,0.2/s*(time-.4)>0?0.2*s:0)*m,typename TV::SPIN());
                 });
             T density=(T)2200*unit_rho*scale_mass;
             T E=1e5*unit_p*scale_E,nu=.4;
