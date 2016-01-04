@@ -932,8 +932,9 @@ Initialize()
             //     for(int k=0;k<foo.m;k++) foo(k)=k+N_sand;
             //     Add_Fixed_Corotated(35.37e5*unit_p*scale_E,0.3,&foo);}
         } break;
-        case 54:{ // sand cup pull
-            // ./mpm 54 -threads 10 -use_exp_F -max_dt 7.5e-4  -resolution 50 -last_frame 200
+        case 54:
+        case 58: { // sand cup pull
+            // ./mpm 54 -threads 10 -use_exp_F -max_dt 7.5e-4  -resolution 90 -last_frame 200
             particles.Store_Fp(true);
             particles.Store_Lame(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
@@ -966,6 +967,10 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.81));
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
+            //Add water particles for case 58
+            if(test_number==58){
+                if(!use_foo_T4) foo_T4=(T)1;
+                Add_Lambda_Particles(&sand_particles,E*foo_T4,nu,(T)1000*unit_rho,true,(T)0.3,(T)1);}
         } break;
         case 55:{ // Moving collision object
             particles.Store_Fp(true);
@@ -1009,7 +1014,7 @@ Initialize()
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Begin_Frame(const int frame)
 {
-    if(frame==10 && test_number==54)
+    if(frame==10 && (test_number==54 || test_number==58))
         Add_Gravity(TV(0,20));
 }
 //#####################################################################
