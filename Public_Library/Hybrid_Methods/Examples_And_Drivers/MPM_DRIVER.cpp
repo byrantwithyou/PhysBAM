@@ -820,7 +820,9 @@ Apply_Forces()
         objective.Compute_Unconstrained(objective.tmp1,0,&objective.tmp2,0);
         dv.Copy(-(example.use_midpoint?4:1),objective.tmp2,objective.tmp1);
         objective.system.forced_collisions.Remove_All();
+        objective.tmp1=dv;
         objective.Adjust_For_Collision(dv);
+        objective.tmp0=dv;
         Apply_Friction();}
     else{
         NEWTONS_METHOD<T> newtons_method;
@@ -862,9 +864,12 @@ Apply_Friction()
 {
     example.velocity_friction=dv.u;
     if(!example.collision_objects.m) return;
-    objective.Compute_Unconstrained(dv,0,&objective.tmp0,0);
-    objective.tmp1=objective.tmp0;
-    objective.Project_Gradient_And_Prune_Constraints(objective.tmp1,true);
+    if(example.use_symplectic_euler){
+        objective.v1.Copy(1,objective.v0,dv);}
+    else{
+        objective.Compute_Unconstrained(dv,0,&objective.tmp0,0);
+        objective.tmp1=objective.tmp0;
+        objective.Project_Gradient_And_Prune_Constraints(objective.tmp1,true);}
 
     objective.v1.u.array.Subset(objective.system.stuck_nodes).Fill(TV());
     for(int i=0;i<objective.system.collisions.m;i++){
