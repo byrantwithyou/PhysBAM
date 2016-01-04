@@ -76,6 +76,7 @@ public:
     T foo_T3;
     T foo_T4;
     T foo_T5;
+    bool use_foo_T5;
     TRIANGULATED_SURFACE<T>* foo_surface1;
     TRIANGULATED_SURFACE<T>* foo_surface2;
     LEVELSET_IMPLICIT_OBJECT<TV>* foo_levelset1;
