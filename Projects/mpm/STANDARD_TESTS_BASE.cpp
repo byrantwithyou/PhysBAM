@@ -70,6 +70,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-midpoint",&use_midpoint,"Use midpoint rule");
     parse_args.Add("-symplectic_euler",&use_symplectic_euler,"Use forward euler for grid update");
     parse_args.Add("-print_stats",&print_stats,"Print momentum/energy stats");
+    parse_args.Add("-only_write_particles",&only_write_particles,"Only write particle data (ignore grid data, restart data etc)");
     parse_args.Add("-flip",&flip,&no_affine,"frac","Flip ratio");
     parse_args.Add("-cfl",&cfl,"cfl","CFL number");
     parse_args.Add("-newton_tolerance",&newton_tolerance,"tol","Newton tolerance");

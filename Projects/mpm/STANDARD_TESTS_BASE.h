@@ -35,7 +35,8 @@ public:
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
     using BASE::ghost;using BASE::use_reduced_rasterization;using BASE::use_affine;;using BASE::use_f2p;
     using BASE::use_midpoint;using BASE::use_symplectic_euler;
-    using BASE::print_stats;using BASE::flip;using BASE::cfl;using BASE::newton_tolerance;
+    using BASE::print_stats;using BASE::only_write_particles;
+    using BASE::flip;using BASE::cfl;using BASE::newton_tolerance;
     using BASE::newton_iterations;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::test_diff;using BASE::threads;using BASE::weights;using BASE::incompressible;
     using BASE::lagrangian_forces;using BASE::stream_type;
