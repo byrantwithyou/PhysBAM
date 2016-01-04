@@ -49,7 +49,7 @@ public:
     using BASE::hardening_mast_case;using BASE::use_hardening_mast_case;
     using BASE::m;using BASE::s;using BASE::kg;using BASE::unit_p;using BASE::unit_mu;using BASE::unit_rho;
     using BASE::forced_collision_type;using BASE::scale_speed;using BASE::Add_Drucker_Prager_Case;
-    using BASE::collision_objects;using BASE::debug_output_func;
+    using BASE::collision_objects;using BASE::debug_output_func;using BASE::Set_Lame_On_Particles;
 
     // surface tension stuff
     bool use_surface_tension;

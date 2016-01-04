@@ -551,7 +551,6 @@ Initialize()
         } break;
         case 33:{ // sand box drop
             particles.Store_Fp(true);
-            particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,COLLISION_TYPE::separate,10);
@@ -565,12 +564,7 @@ Initialize()
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             RANGE<TV> box(TV(.45,.11)*m,TV(.55,.31)*m);
             Seed_Particles(box,0,0,density,particles_per_cell);
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
-            particles.mu.Fill(mu);
-            particles.mu0.Fill(mu);
-            particles.lambda.Fill(lambda);
-            particles.lambda0.Fill(lambda);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.8));
         } break;
         case 34:{ // drip drop
@@ -593,7 +587,6 @@ Initialize()
         case 35:{ // snow wedge
             // ./mpm 35 -flip 0.95 -max_dt .005 -cfl .1 -resolution 200
             particles.Store_Fp(true);
-            particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2))*m,ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.4-sqrt(2.0)*0.1));
@@ -625,12 +618,7 @@ Initialize()
             else{
                 PHYSBAM_WARNING("Couldn't open 'particles.dat'. Falling back to using random particle positions.");
                 Seed_Particles(box,0,0,density,number_of_particles*grid.dX.Product()/box.Size());}
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
-            particles.mu0.Fill(mu);
-            particles.mu.Fill(mu);
-            particles.lambda0.Fill(lambda);
-            particles.lambda.Fill(lambda);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-2));
         } break;
         case 36:{ // split
@@ -664,7 +652,6 @@ Initialize()
         } break;
         case 37:{ // sand box drop, better paramaters, with Hencky, usage: mpm 38 -resolution 100
             particles.Store_Fp(true);
-            particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             if(use_penalty_collisions)
@@ -678,17 +665,11 @@ Initialize()
 //            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
             RANGE<TV> box(TV(.4,.1001)*m,TV(.45,.6001)*m);
             Seed_Particles(box,0,0,density,particles_per_cell);
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
-            particles.mu.Fill(mu);
-            particles.mu0.Fill(mu);
-            particles.lambda.Fill(lambda);
-            particles.lambda0.Fill(lambda);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 38:{ // sand box drop, wide
             particles.Store_Fp(true);
-            particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             if(use_penalty_collisions)
@@ -705,17 +686,11 @@ Initialize()
             T gap=grid.dX(1)*0.01;
             RANGE<TV> box(TV(.5*m-l0,.1*m+gap),TV(.5*m+l0,.1*m+gap+h0));
             Seed_Particles(box,0,0,density,particles_per_cell);
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
-            particles.mu.Fill(mu);
-            particles.mu0.Fill(mu);
-            particles.lambda.Fill(lambda);
-            particles.lambda0.Fill(lambda);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 39:{ // DP on wedge
             particles.Store_Fp(true);
-            particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(),TV(0.2,0.2))*m,ROTATION<TV>::From_Angle(0.25*M_PI),TV(0.5,0.4-sqrt(2.0)*0.1)*m);
@@ -744,12 +719,7 @@ Initialize()
             else{
                 PHYSBAM_WARNING("Couldn't open 'particles.dat'. Falling back to using random particle positions.");
                 Seed_Particles(box,0,0,density,number_of_particles*grid.dX.Product()/box.Size());}
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
-            particles.mu0.Fill(mu);
-            particles.mu.Fill(mu);
-            particles.lambda0.Fill(lambda);
-            particles.lambda.Fill(lambda);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-2));
         } break;
         case 40:
@@ -763,7 +733,6 @@ Initialize()
         case 48:
         case 49:{ // Mast paper
             particles.Store_Fp(true);
-            particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             if(use_penalty_collisions)
@@ -780,12 +749,7 @@ Initialize()
             T gap=grid.dX(1)*0.01;
             RANGE<TV> box(TV(.5*m-l0,.1*m+gap),TV(.5*m+l0,.1*m+gap+h0));
             Seed_Particles(box,0,0,density,particles_per_cell);
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
-            particles.mu.Fill(mu);
-            particles.mu0.Fill(mu);
-            particles.lambda.Fill(lambda);
-            particles.lambda0.Fill(lambda);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 50:
@@ -794,7 +758,6 @@ Initialize()
             //usage:./mpm 51 -threads 8 -use_exp_F -max_dt 1e-3 -resolution 100 -scale_E 10 -fooT1 10 -fooT2 1000 -fooT3 4 -last_frame 20
             PHYSBAM_ASSERT(foo_T4<=particles_per_cell,"You can't have more water particles than total number of particles."); 
             particles.Store_Fp(true);
-            particles.Store_Lame(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             //particles.Store_Plastic_Deformation(true);
             grid.Initialize(TV_INT()+resolution,2*RANGE<TV>::Unit_Box()*m,true);
@@ -807,9 +770,6 @@ Initialize()
             
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e5*unit_p*scale_E,nu=.3;
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
-            //this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(35,0,0,0);
             T gap=grid.dX(1)*0.01;
             RANGE<TV> box(TV(.1*m+gap,.1*m+gap),TV(.3,.75)*m);
             //seed sand particles 
@@ -817,10 +777,7 @@ Initialize()
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
-            particles.mu.Fill(mu);
-            particles.mu0.Fill(mu);
-            particles.lambda.Fill(lambda);
-            particles.lambda0.Fill(lambda);
+            Set_Lame_On_Particles(E,nu);
             //seed lambda particles
             if(test_number==51){
                 T El=500*foo_T1,nul=.1*foo_T3;
@@ -858,7 +815,6 @@ Initialize()
         case 57:{ // sandbox
             //  ./mpm 53 -threads 10 -use_exp_F -max_dt 7.5e-4 -scale_E 1 -resolution 200 -fooT1 10 -last_frame 10 -o sandbox_implicit
             particles.Store_Fp(true);
-            particles.Store_Lame(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             if(use_penalty_collisions){
@@ -879,9 +835,6 @@ Initialize()
 
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e5*unit_p*scale_E,nu=.3;
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
-            //this->plasticity=new MPM_DRUCKER_PRAGER_HARDENING<TV>(35,0,0,0);
             T gap=grid.dX(1)*1.1;
 
             // SEED A REGULAR BOX
@@ -910,10 +863,7 @@ Initialize()
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
-            particles.mu.Fill(mu);
-            particles.mu0.Fill(mu);
-            particles.lambda.Fill(lambda);
-            particles.lambda0.Fill(lambda);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
@@ -936,7 +886,6 @@ Initialize()
         case 58: { // sand cup pull
             // ./mpm 54 -threads 10 -use_exp_F -max_dt 7.5e-4  -resolution 90 -last_frame 200
             particles.Store_Fp(true);
-            particles.Store_Lame(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             grid.Initialize(TV_INT(resolution*2,resolution),RANGE<TV>(TV(-1,-0.5),TV(1,0.5)),true);
             RANGE<TV> cupbottom(TV(-0.3,-0.25),TV(0.3,-0.2));
@@ -948,8 +897,6 @@ Initialize()
             Add_Walls(-1,COLLISION_TYPE::stick,0,0.04,false);
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e5*unit_p*scale_E,nu=.3;
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
             ARRAY<RANGE<TV> > columns;
             columns.Append(RANGE<TV>(TV(-0.24,-0.2),TV(-0.2,0.1)));
             columns.Append(RANGE<TV>(TV(-0.15,-0.2),TV(-0.05,-0.1)));
@@ -960,10 +907,7 @@ Initialize()
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
-            particles.mu.Fill(mu);
-            particles.mu0.Fill(mu);
-            particles.lambda.Fill(lambda);
-            particles.lambda0.Fill(lambda);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
@@ -974,7 +918,6 @@ Initialize()
         } break;
         case 55:{ // Moving collision object
             particles.Store_Fp(true);
-            particles.Store_Lame(true);
 
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             if(use_penalty_collisions)
@@ -994,12 +937,7 @@ Initialize()
             T gap=grid.dX(1)*0.01;
             RANGE<TV> box(TV(.5*m-l0,.3*m+gap),TV(.5*m+l0,.3*m+gap+h0));
             Seed_Particles(box,0,0,density,particles_per_cell);
-            T mu=E/(2*(1+nu));
-            T lambda=E*nu/((1+nu)*(1-2*nu));
-            particles.mu.Fill(mu);
-            particles.mu0.Fill(mu);
-            particles.lambda.Fill(lambda);
-            particles.lambda0.Fill(lambda);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");

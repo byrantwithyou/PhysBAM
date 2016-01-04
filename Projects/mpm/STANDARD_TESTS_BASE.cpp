@@ -449,6 +449,20 @@ Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io,const T coefficient_of_fric
     pf->coefficient_of_friction=coefficient_of_friction;
     this->Add_Force(*pf);
 }
+//#####################################################################
+// Function Set_Lame_On_Particles
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Set_Lame_On_Particles(T E,T nu)
+{
+    particles.Store_Lame(true);
+    T mu=E/(2*(1+nu));
+    T lambda=E*nu/((1+nu)*(1-2*nu));
+    particles.mu.Fill(mu);
+    particles.mu0.Fill(mu);
+    particles.lambda.Fill(lambda);
+    particles.lambda0.Fill(lambda);
+}
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
 template class STANDARD_TESTS_BASE<VECTOR<double,2> >;
