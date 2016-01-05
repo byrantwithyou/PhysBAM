@@ -757,6 +757,12 @@ Initialize()
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
         } break;
+        case 41:{ // Draw in sand
+        } break;
+        case 42:{ // Raking
+        } break;
+        case 43:{ // Rotating table
+        } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
