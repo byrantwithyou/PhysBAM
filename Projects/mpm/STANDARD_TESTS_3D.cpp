@@ -852,7 +852,7 @@ Initialize()
             (void)density;
             LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
             Set_Lame_On_Particles(E,nu);
-            Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
+            Add_Gravity(m/(s*s)*TV(0,-9.8,0));
         } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
