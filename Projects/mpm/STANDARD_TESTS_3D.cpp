@@ -290,6 +290,18 @@ Initialize()
             foo_int1=particles.number;
             LOG::cout<<"one torus particle #: "<<foo_int1<<std::endl;
             Add_Gravity(m/(s*s)*TV(0,-9.8,0));
+            begin_frame=[this](int frame)
+                {
+                    if(frame%8==0 && frame<200){
+                        TV center=random.Get_Uniform_Vector(TV(.4,1,.4),TV(.6,1,.6))*m;
+                        T angle=random.Get_Uniform_Number((T)0,(T)pi*2);
+                        ROTATION<TV> rotation(angle,TV(0,1,0));
+                        int old_m=particles.number;
+                        for(int k=0;k<foo_int1;k++) Add_Particle(center+rotation.Rotate(particles.X(k)),0,0,particles.mass(k),particles.volume(k));
+                        ARRAY<int> mpm_particles;
+                        for(int k=old_m;k<old_m+foo_int1;k++) mpm_particles.Append(k);
+                        Add_Fixed_Corotated(150*unit_p*scale_E,0.3,&mpm_particles);}
+                };
         } break;
         case 11:{ // skew impact of two elastic spheres with initial angular velocity
             grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(),TV(30,30,30))*m,true);
@@ -333,6 +345,15 @@ Initialize()
             for(int i=0;i<particles.X.m;i++)
                 if(particles.X(i)(1)>0.8*m){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
             Add_Force(*pinning_force);
+            begin_time_step=[this](T time)
+                {
+                    Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,true);
+                    Add_Gravity(m/(s*s)*TV(0,-1,0));
+                    PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(m*s*s),penalty_damping_stiffness*kg/s);
+                    for(int i=0;i<particles.X.m;i++)
+                        if(particles.X(i)(1)>0.8*m){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
+                    Add_Force(*pinning_force);
+                };
         } break;
         case 14:{ // drop an oldroyd-b to a ground SCA energy
             grid.Initialize(TV_INT(resolution*2,resolution,resolution*2),RANGE<TV>(TV(-1,0,-1),TV(1,1,1))*m,true);
@@ -351,6 +372,15 @@ Initialize()
             MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi,quad_F_coeff);
             Add_Force(*fe);
             Add_Gravity(m/(s*s)*TV(0,-9.8,0));
+            begin_time_step=[this](T time)
+                {
+                    if(time>=10/24.0*s){
+                        lagrangian_forces.Delete_Pointers_And_Clean_Memory();
+                        this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+                        RANGE<TV> ym(TV(-5,0,-5)*m,TV(5,.1+(time/s-10/24.0)*.5,5)*m);
+                        Add_Penalty_Collision_Object(ym);
+                        Add_Gravity(m/(s*s)*TV(0,-9.8,0));}
+                };
         } break;
         case 15:{ // rotating cylinder oldroyd-b SCA energy
             //NEWTONIAN ./mpm -3d 15 -affine -max_dt 5e-4 -resolution 15 -fooint1 2 -fooT1 0 -fooT2 100 -fooT3 1e30 -fooT4 2e-4 -scale_mass 20 -last_frame 30
@@ -419,6 +449,44 @@ Initialize()
             Add_Force(*new MPM_VISCOSITY<TV>(force_helper,gather_scatter,0,foo_T4));
             LOG::cout<<"Polyethylene glycol added. mu="<<neo->mu<<", lambda="<<neo->lambda<<", Weissenbergi="<<foo_T3<<std::endl;
             LOG::cout<<"Particle count: "<<particles.number<<std::endl;
+            begin_frame=[this](int frame)
+                {
+                    if(foo_levelset1){
+                        PHYSBAM_ASSERT(!foo_cylinder);
+                        delete lagrangian_forces(lagrangian_forces.m-1);
+                        lagrangian_forces.Remove_End();
+                        PHYSBAM_ASSERT(this->deformable_body_collection.structures.m==0);
+                        LOG::cout<<"Building levelset for the cylinder stir..."<<std::endl;
+                        if(foo_levelset1) delete foo_levelset1;
+                        LOG::cout<<"Deleted old levelset."<<std::endl;
+                        ROTATION<TV> rotator((T)0.02*frame,TV(0,1,0));
+                        for(int k=0;k<foo_surface1->particles.number;k++)
+                            foo_surface1->particles.X(k)=rotator.Rotate(foo_surface2->particles.X(k));
+                        foo_surface1->Update_Bounding_Box();
+                        foo_surface1->Initialize_Hierarchy();
+                        foo_levelset1=Initialize_Implicit_Surface(*foo_surface1,50);
+                        LOG::cout<<"...done!"<<std::endl;
+                        Add_Penalty_Collision_Object(foo_levelset1);
+                        Dump_Levelset(foo_levelset1->levelset.grid,*foo_levelset1,VECTOR<T,3>(0,1,0));}
+                    else if(foo_cylinder){
+                        LOG::cout<<"Dumping cylinder stirer level set.."<<std::endl;
+                        GRID<TV> ghost_grid(TV_INT(50,50,10),foo_cylinder->Bounding_Box(),true);
+                        Dump_Levelset(ghost_grid,ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(*foo_cylinder),VECTOR<T,3>(1,1,0));
+                        LOG::cout<<"...done!"<<std::endl;}
+                };
+            begin_time_step=[this](T time)
+                {
+                    if(foo_cylinder){
+                        PHYSBAM_ASSERT(!foo_levelset1);
+                        delete lagrangian_forces(lagrangian_forces.m-1);
+                        lagrangian_forces.Remove_End();
+                        PHYSBAM_ASSERT(this->deformable_body_collection.structures.m==0);
+                        LOG::cout<<"Adding new analytic cylinder stirer..."<<std::endl;
+                        ROTATION<TV> rotator((T)3.1415*10*time/s,TV(0,1,0));
+                        foo_cylinder->Set_Endpoints(rotator.Rotate(TV(-0.025,-0.034,0)*m),rotator.Rotate(TV(0.025,-0.034,0)*m));
+                        Add_Penalty_Collision_Object(*foo_cylinder);
+                        LOG::cout<<"...done!"<<std::endl;}
+                };
         } break;
         case 16:{ // rotating cylinder oldroyd-b SCA energy with pinned particles as the cylinder
             // NEWTONIAN ./mpm -3d 16 -affine -max_dt 5e-4 -resolution 15 -fooint1 2 -fooT1 0 -fooT2 100 -fooT3 1e30 -fooT4 1e-4 -scale_mass 20 -last_frame 200 -penalty_stiffness 10 -penalty_damping 0.001 -framerate 72 -cfl .7 -threads 16
@@ -730,6 +798,7 @@ Initialize()
             if(test_number==39){
                 if(!use_foo_T5) foo_T5=(T)1e-2;
                 Add_Lambda_Particles(&sand_particles,E*foo_T5,nu,(T)1000*unit_rho,true,(T)0.3,(T)1);}
+            begin_frame=[this](int frame){if(frame==10) Add_Gravity(TV(0,20,0));};
         } break;
 
         case 40:{ // dry sand siggraph letters drop
@@ -799,49 +868,6 @@ template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Begin_Frame(const int frame)
 {
     if(begin_frame) begin_frame(frame);
-    // static int i=0;
-    switch(test_number)
-    {
-        case 10:{
-            if(frame%8==0 && frame<200){
-                TV center=random.Get_Uniform_Vector(TV(.4,1,.4),TV(.6,1,.6))*m;
-                T angle=random.Get_Uniform_Number((T)0,(T)pi*2);
-                ROTATION<TV> rotation(angle,TV(0,1,0));
-                int old_m=particles.number;
-                for(int k=0;k<foo_int1;k++) Add_Particle(center+rotation.Rotate(particles.X(k)),0,0,particles.mass(k),particles.volume(k));
-                ARRAY<int> mpm_particles;
-                for(int k=old_m;k<old_m+foo_int1;k++) mpm_particles.Append(k);
-                Add_Fixed_Corotated(150*unit_p*scale_E,0.3,&mpm_particles);}
-        } break;
-        case 15:{
-            if(foo_levelset1){
-                PHYSBAM_ASSERT(!foo_cylinder);
-                delete lagrangian_forces(lagrangian_forces.m-1);
-                lagrangian_forces.Remove_End();
-                PHYSBAM_ASSERT(this->deformable_body_collection.structures.m==0);
-                LOG::cout<<"Building levelset for the cylinder stir..."<<std::endl;
-                if(foo_levelset1) delete foo_levelset1;
-                LOG::cout<<"Deleted old levelset."<<std::endl;
-                ROTATION<TV> rotator((T)0.02*frame,TV(0,1,0));
-                for(int k=0;k<foo_surface1->particles.number;k++)
-                foo_surface1->particles.X(k)=rotator.Rotate(foo_surface2->particles.X(k));
-                foo_surface1->Update_Bounding_Box();
-                foo_surface1->Initialize_Hierarchy();
-                foo_levelset1=Initialize_Implicit_Surface(*foo_surface1,50);
-                LOG::cout<<"...done!"<<std::endl;
-                Add_Penalty_Collision_Object(foo_levelset1);
-                Dump_Levelset(foo_levelset1->levelset.grid,*foo_levelset1,VECTOR<T,3>(0,1,0));}
-            else if(foo_cylinder){
-                LOG::cout<<"Dumping cylinder stirer level set.."<<std::endl;
-                GRID<TV> ghost_grid(TV_INT(50,50,10),foo_cylinder->Bounding_Box(),true);
-                Dump_Levelset(ghost_grid,ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(*foo_cylinder),VECTOR<T,3>(1,1,0));
-                LOG::cout<<"...done!"<<std::endl;}
-        } break;
-        case 38:
-        case 39:{
-            if(frame==10) Add_Gravity(TV(0,20,0));
-        } break;
-    }
 }
 //#####################################################################
 // Function End_Frame
@@ -858,30 +884,6 @@ template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Begin_Time_Step(const T time)
 {
     if(begin_time_step) begin_time_step(time);
-    switch(test_number)
-    {
-        case 14:{
-            if(time>=10/24.0*s){
-                lagrangian_forces.Delete_Pointers_And_Clean_Memory();
-                this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
-                RANGE<TV> ym(TV(-5,0,-5)*m,TV(5,.1+(time/s-10/24.0)*.5,5)*m);
-                Add_Penalty_Collision_Object(ym);
-                Add_Gravity(m/(s*s)*TV(0,-9.8,0));}
-        } break;
-        case 15:{
-            if(foo_cylinder){
-                PHYSBAM_ASSERT(!foo_levelset1);
-                delete lagrangian_forces(lagrangian_forces.m-1);
-                lagrangian_forces.Remove_End();
-                PHYSBAM_ASSERT(this->deformable_body_collection.structures.m==0);
-                LOG::cout<<"Adding new analytic cylinder stirer..."<<std::endl;
-                ROTATION<TV> rotator((T)3.1415*10*time/s,TV(0,1,0));
-                foo_cylinder->Set_Endpoints(rotator.Rotate(TV(-0.025,-0.034,0)*m),rotator.Rotate(TV(0.025,-0.034,0)*m));
-                Add_Penalty_Collision_Object(*foo_cylinder);
-                LOG::cout<<"...done!"<<std::endl;}
-        } break;
-        default: break;
-    }
 
     if(use_surface_tension){
 
@@ -998,16 +1000,6 @@ Begin_Time_Step(const T time)
         SURFACE_TENSION_FORCE_3D<TV>* stf=new SURFACE_TENSION_FORCE_3D<TV>(new_sc,(T)2e-2);
         Add_Force(*stf);
     }
-    
-    if(test_number==13){
-        Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,true);
-        Add_Gravity(m/(s*s)*TV(0,-1,0));
-        PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(m*s*s),penalty_damping_stiffness*kg/s);
-        for(int i=0;i<particles.X.m;i++)
-            if(particles.X(i)(1)>0.8*m){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
-        Add_Force(*pinning_force);
-    }
-
 }
 //#####################################################################
 // Function End_Time_Step

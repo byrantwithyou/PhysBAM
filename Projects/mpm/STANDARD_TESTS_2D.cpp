@@ -256,6 +256,15 @@ Initialize()
             Add_Fixed_Corotated(20*unit_p*scale_E,0.4,&foo,false);
             Add_Gravity(m/(s*s)*TV(0,-9.8));
             Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1*m,true);
+            begin_time_step=[this](T time)
+                {
+                    if(time>=10/24.0*s){
+                        lagrangian_forces.Delete_Pointers_And_Clean_Memory();
+                        this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+                        this->output_structures_each_frame=true;
+                        Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1+(T)(time/s-10/24.0)*0.08*m,true);
+                        Add_Gravity(m/(s*s)*TV(0,-9.8));}
+                };
         } break;
         case 13:{ // surface tension test: fixed topology circle shell
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
@@ -584,6 +593,16 @@ Initialize()
             for(int i=0;i<particles.X.m;i++)
                 if(particles.X(i)(1)>0.8*m){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
             Add_Force(*pinning_force);
+            begin_time_step=[this](T time)
+                {
+                    Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,true);
+                    Add_Gravity(m/(s*s)*TV(0,-1));
+                    PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(s*s),penalty_damping_stiffness*kg/s);
+                    for(int i=0;i<particles.X.m;i++)
+                        if(particles.X(i)(1)>0.8*m){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
+                    Add_Force(*pinning_force);
+                };
+
         } break;
         case 35:{ // snow wedge
             // ./mpm 35 -flip 0.95 -max_dt .005 -cfl .1 -resolution 200
@@ -650,6 +669,26 @@ Initialize()
             stf->Set_Stiffness((T)1); // TODO: units
             stf->Set_Damping((T)0.1); // TODO: units
             Add_Force(*stf);
+            begin_time_step=[this](T time)
+                {
+                    delete lagrangian_forces(lagrangian_forces.m-1);
+                    lagrangian_forces.Remove_End();
+                    SEGMENTED_CURVE_2D<T>* sc=SEGMENTED_CURVE_2D<T>::Create();
+                    sc->particles.Add_Elements(particles.number);
+                    sc->Update_Number_Nodes();
+                    for(int p=0;p<particles.number;p++){
+                        sc->particles.X(p)=particles.X(p);
+                        for(int q=0;q<particles.number;q++){
+                            TV L=particles.X(p),R=particles.X(q);
+                            if(L(0)<=0.5*m && R(0)>0.5*m && L(1)>0.5*m && R(1)>0.5*m && (L-R).Magnitude_Squared()<sqr(grid.dX.Min()*2)){
+                                sc->mesh.elements.Append(TV_INT(p,q));}}}
+                    LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,sc->mesh);
+                    ARRAY<T> r(sc->mesh.elements.m);r.Fill(grid.dX.Min()*2.1);
+                    stf->Set_Restlength(r);
+                    stf->Set_Stiffness((T)1); // TODO: units
+                    stf->Set_Damping((T)0);
+                    Add_Force(*stf);
+                };
         } break;
         case 37:{ // sand box drop, better paramaters, with Hencky, usage: mpm 38 -resolution 100
             particles.Store_Fp(true);
@@ -883,6 +922,27 @@ Initialize()
             //     ARRAY<int> foo(N_box_particles);
             //     for(int k=0;k<foo.m;k++) foo(k)=k+N_sand;
             //     Add_Fixed_Corotated(35.37e5*unit_p*scale_E,0.3,&foo);}
+            if(test_number==56 || test_number==57)
+                begin_time_step=[this](T time)
+                {
+                    T y=0;
+                    T v=foo_T2*m/s;
+                    T treshold=((T)0.2/v)*m;
+                    T stop=2*treshold;
+                    if(time<=stop){
+                        lagrangian_forces.Delete_Pointers_And_Clean_Memory();
+                        this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+                        this->output_structures_each_frame=true;
+                        delete collision_objects(collision_objects.m-1);
+                        collision_objects.Pop();
+                        if(time<=treshold) y=(foo_T3-time*v/s)*m;
+                        else if(time<=stop) y=0.3;
+                        else y=0.3+v*(time-2*treshold); 
+                        TV min_corner((T)0.4,y);
+                        LOG::printf("time=%P\tmin_corner_y=%P\n",time,y);
+                        Add_Collision_Object(RANGE<TV>(min_corner*m,(min_corner+0.2)*m),COLLISION_TYPE::slip,0);
+                        Add_Gravity(m/(s*s)*TV(0,-9.8));}
+                };
         } break;
         case 54:
         case 58: { // sand cup pull
@@ -919,6 +979,7 @@ Initialize()
             if(test_number==58){
                 if(!use_foo_T4) foo_T4=(T)1;
                 Add_Lambda_Particles(&sand_particles,E*foo_T4,nu,(T)1000*unit_rho,true,(T)0.3,(T)1);}
+            begin_frame=[this](int frame){if(frame==10) Add_Gravity(TV(0,20));};
         } break;
         case 55:{ // Moving collision object
             particles.Store_Fp(true);
@@ -953,8 +1014,6 @@ template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Begin_Frame(const int frame)
 {
     if(begin_frame) begin_frame(frame);
-    if(frame==10 && (test_number==54 || test_number==58))
-        Add_Gravity(TV(0,20));
 }
 //#####################################################################
 // Function End_Frame
@@ -971,51 +1030,7 @@ template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Begin_Time_Step(const T time)
 {
     if(begin_time_step) begin_time_step(time);
-    if(test_number==12){
-        if(time>=10/24.0*s){
-            lagrangian_forces.Delete_Pointers_And_Clean_Memory();
-            this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
-            this->output_structures_each_frame=true;
-            Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1+(T)(time/s-10/24.0)*0.08*m,true);
-            Add_Gravity(m/(s*s)*TV(0,-9.8));}}
 
-    if(test_number==56 || test_number==57){
-        T y=0;
-        T v=foo_T2*m/s;
-        T treshold=((T)0.2/v)*m;
-        T stop=2*treshold;
-        if(time<=stop){
-            lagrangian_forces.Delete_Pointers_And_Clean_Memory();
-            this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
-            this->output_structures_each_frame=true;
-            delete collision_objects(collision_objects.m-1);
-            collision_objects.Pop();
-            if(time<=treshold) y=(foo_T3-time*v/s)*m;
-            else if(time<=stop) y=0.3;
-            else y=0.3+v*(time-2*treshold); 
-            TV min_corner((T)0.4,y);
-            LOG::printf("time=%P\tmin_corner_y=%P\n",time,y);
-            Add_Collision_Object(RANGE<TV>(min_corner*m,(min_corner+0.2)*m),COLLISION_TYPE::slip,0);
-            Add_Gravity(m/(s*s)*TV(0,-9.8));}}
-    
-    if(test_number==36){
-        delete lagrangian_forces(lagrangian_forces.m-1);
-        lagrangian_forces.Remove_End();
-        SEGMENTED_CURVE_2D<T>* sc=SEGMENTED_CURVE_2D<T>::Create();
-        sc->particles.Add_Elements(particles.number);
-        sc->Update_Number_Nodes();
-        for(int p=0;p<particles.number;p++){
-            sc->particles.X(p)=particles.X(p);
-            for(int q=0;q<particles.number;q++){
-                TV L=particles.X(p),R=particles.X(q);
-                if(L(0)<=0.5*m && R(0)>0.5*m && L(1)>0.5*m && R(1)>0.5*m && (L-R).Magnitude_Squared()<sqr(grid.dX.Min()*2)){
-                    sc->mesh.elements.Append(TV_INT(p,q));}}}
-        LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,sc->mesh);
-        ARRAY<T> r(sc->mesh.elements.m);r.Fill(grid.dX.Min()*2.1);
-        stf->Set_Restlength(r);
-        stf->Set_Stiffness((T)1); // TODO: units
-        stf->Set_Damping((T)0);
-        Add_Force(*stf);}
     if(use_surface_tension){
 
         bool use_bruteforce=true;
@@ -1130,15 +1145,6 @@ Begin_Time_Step(const T time)
         // Add surface tension force
         SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)1e-2);
         Add_Force(*stf);
-    }
-    
-    if(test_number==34){
-        Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,true);
-        Add_Gravity(m/(s*s)*TV(0,-1));
-        PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(s*s),penalty_damping_stiffness*kg/s);
-        for(int i=0;i<particles.X.m;i++)
-            if(particles.X(i)(1)>0.8*m){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
-        Add_Force(*pinning_force);
     }
 }
 //#####################################################################
