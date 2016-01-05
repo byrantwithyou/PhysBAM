@@ -21,6 +21,7 @@
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
+#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
@@ -1007,24 +1008,24 @@ Initialize()
 
         case 59:{ // sand falling into a pile.
             particles.Store_Fp(true);
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            grid.Initialize(TV_INT(4,1)*resolution,RANGE<TV>(TV(-2,0),TV(2,1))*m,true);
             RANGE<TV> ground(TV(-10,-10)*m,TV(10,.1)*m);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
-            else Add_Collision_Object(ground,COLLISION_TYPE::slip,0.2);
+            else Add_Collision_Object(ground,COLLISION_TYPE::slip,0.6);
             T density=(T)2200*unit_rho*scale_mass;
             T E=1e4*unit_p*scale_E,nu=.3;
-            T spout_width=.2*m;
+            T spout_width=.05*m;
             T spout_height=.1*m;
             T seed_buffer=grid.dX.y*5;
-            T pour_speed=1*m/s;
-            T gravity=9.8*m/(s*s);
-            RANGE<TV> seed_range(TV(.5*m-spout_width/2,1*m-spout_height),TV(.5*m+spout_width/2,1*m+seed_buffer));
+            T pour_speed=.4*m/s;
+            TV gravity=TV(0,-9.8*m/(s*s));
+            RANGE<TV> seed_range(TV(-spout_width/2,1*m-spout_height),TV(spout_width/2,1*m+seed_buffer));
 
             T volume=grid.dX.Product()/particles_per_cell;
             T mass=density*volume;
             POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
                 *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1),grid.domain.max_corner,
-                TV(0,-pour_speed),TV(0,-gravity),max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
+                TV(0,-pour_speed),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
             destroy=[=](){delete source;};
             write_output_files=[=](int frame){source->Write_Output_Files(frame);};
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
@@ -1039,6 +1040,10 @@ Initialize()
                         particles.mu0(i)=mu;
                         particles.lambda(i)=lambda;
                         particles.lambda0(i)=lambda;}
+                    for(int i=0;i<plasticity_models.m;i++)
+                        if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
+                            for(int p=n;p<particles.number;p++)
+                                dp->Update_Hardening(p,0);
                 };
             end_time_step=[=](T time){source->End_Time_Step(time);};
 
@@ -1046,7 +1051,7 @@ Initialize()
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
             Add_Drucker_Prager_Case(E,nu,case_num);
             Set_Lame_On_Particles(E,nu);
-            Add_Gravity(TV(0,-gravity));
+            Add_Gravity(gravity);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

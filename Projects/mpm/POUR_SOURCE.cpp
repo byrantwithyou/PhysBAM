@@ -61,7 +61,7 @@ Write_Output_Files(const int frame)
                 T t=-dot/vn;
                 V=velocity+gravity*t;
                 X+=(T).5*t*t*gravity;}
-            Add_Debug_Particle(X,dot<=0?VECTOR<T,3>(.5,.5,.5):waiting_particle_color(i));
+            Add_Debug_Particle(X,waiting_particle_color(i));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,V);}}
 }
 //#####################################################################
@@ -101,7 +101,7 @@ Refill(bool init)
     buffer_left=buffer_capacity;
     if(!init)
         for(int i=waiting_particles.m-1;i>=waiting_particle_color.m;i--)
-            if((waiting_particles(i)-p).Dot(normal)>=0)
+            if((waiting_particles(i)-p).Dot(normal)>=-max_shift/2)
                 waiting_particles.Remove_Index_Lazy(i);
     waiting_particle_color.Resize(waiting_particles.m,true,true,VECTOR<T,3>(next_color&1,(next_color>>1)&1,next_color>>2));
     next_color=next_color%6+1;
