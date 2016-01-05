@@ -838,7 +838,7 @@ Initialize()
         case 43:{ // Rotating table
         } break;
 
-        case 41:{ // sand falling into a pile.
+        case 44:{ // sand falling into a pile.
             particles.Store_Fp(true);
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,1,10)*m);
