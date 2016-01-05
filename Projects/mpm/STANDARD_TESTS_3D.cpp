@@ -768,6 +768,23 @@ Initialize()
         case 43:{ // Rotating table
         } break;
 
+        case 41:{ // sand falling into a pile.
+            particles.Store_Fp(true);
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,1,10)*m);
+            if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
+            else Add_Collision_Object(ground,COLLISION_TYPE::slip,0.2);
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=1e4*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            Add_Drucker_Prager_Case(E,nu,case_num);
+            (void)density;
+            LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
+            Set_Lame_On_Particles(E,nu);
+            Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
