@@ -804,7 +804,7 @@ Initialize()
 
         case 40:{ // dry sand siggraph letters drop
             particles.Store_Fp(true);
-            grid.Initialize(TV_INT(5,1,1)*resolution,RANGE<TV>(TV(-0.5,0,-0.1)*m,TV(0.5,0.2,0.1)*m),true);
+            grid.Initialize(TV_INT(7,1,2)*resolution,RANGE<TV>(TV(-0.7,0,-0.2)*m,TV(0.7,0.2,0.2)*m),true);
             LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
             RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,0.02,10)*m);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
@@ -813,7 +813,6 @@ Initialize()
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
-            Add_Drucker_Prager_Case(E,nu,case_num);
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
             FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/siggraph_letters.tri.gz",*surface);
             LOG::cout<<"Read mesh of siggraph letters triangle #"<<surface->mesh.elements.m<<std::endl;
@@ -831,6 +830,7 @@ Initialize()
             LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
+            Add_Drucker_Prager_Case(E,nu,case_num);
         } break;
         case 41:{ // Draw in sand
         } break;
