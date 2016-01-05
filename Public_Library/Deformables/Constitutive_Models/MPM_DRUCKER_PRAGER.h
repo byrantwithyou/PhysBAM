@@ -25,8 +25,9 @@ public:
     mutable ARRAY_VIEW<T> plastic_def;
     mutable ARRAY_VIEW<T> rho_F;
     T a0,a1,a3,a4;
+    T sigma_Y;
 
-    MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatter,T a0,T a1,T a3,T a4);
+    MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatter,T a0,T a1,T a3,T a4,T sigma_Y=0);
     virtual ~MPM_DRUCKER_PRAGER();
 
     void Initialize_Particles(ARRAY<int>* affected_particles) const override;

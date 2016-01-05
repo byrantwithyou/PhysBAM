@@ -949,7 +949,8 @@ Initialize()
                 };
         } break;
         case 54:
-        case 58: { // sand cup pull
+        case 58:
+        case 61:{ // sand cup pull
             // ./mpm 54 -threads 10 -use_exp_F -max_dt 7.5e-4  -resolution 90 -last_frame 200
             particles.Store_Fp(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
@@ -974,7 +975,7 @@ Initialize()
             for(int k=0;k<columns.m;k++) Seed_Particles(columns(k),0,0,density,particles_per_cell);
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
-            Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,test_number==61?foo_T3:0);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
@@ -1005,7 +1006,6 @@ Initialize()
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
-
         case 59:{ // sand falling into a pile.
             particles.Store_Fp(true);
             grid.Initialize(TV_INT(4,1)*resolution,RANGE<TV>(TV(-2,0),TV(2,1))*m,true);
@@ -1052,6 +1052,29 @@ Initialize()
             Add_Drucker_Prager_Case(E,nu,case_num);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(gravity);
+        } break;
+        case 60:{//cohesion sanity check
+            particles.Store_Fp(true);
+
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            if(use_penalty_collisions)
+                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,0.9);
+            else
+                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,COLLISION_TYPE::stick,0);
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            T l0=0.05*m;
+            T h0=l0*8;
+            T gap=grid.dX(1)*0.01;
+            RANGE<TV> box(TV(.5*m-l0,.1*m+gap),TV(.5*m+l0,.1*m+gap+h0));
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            Set_Lame_On_Particles(E,nu);
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            if(!use_foo_T3) foo_T3=1;
+            Add_Drucker_Prager(E,nu,(T)35,0,0,0,&sand_particles,false,foo_T3);
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

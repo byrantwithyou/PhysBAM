@@ -14,8 +14,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> MPM_DRUCKER_PRAGER<TV>::
-MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatter,T a0,T a1,T a3,T a4)
-    :MPM_PLASTICITY_MODEL<TV>(particles,gather_scatter),a0(a0),a1(a1),a3(a3),a4(a4)
+MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatter,T a0,T a1,T a3,T a4,T sigma_Y)
+    :MPM_PLASTICITY_MODEL<TV>(particles,gather_scatter),a0(a0),a1(a1),a3(a3),a4(a4),sigma_Y(sigma_Y)
 {
     particles.Add_Array(ATTRIBUTE_ID_PLASTIC_DEFORMATION,&plastic_def);
     particles.Add_Array(ATTRIBUTE_ID_DP_RHO_F,&rho_F);
@@ -57,7 +57,8 @@ Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,typename TV
     T mu=particles.mu(id),lambda=particles.lambda(id);
     T g=1/(d*lambda+2*mu);
     T b=1/(2*mu);
-    TV strain_trial=log(abs(Fe));
+    T beta=-sigma_Y*g/(rho_F(id)*TV::m);
+    TV strain_trial=log(abs(Fe))+beta;
     T k=strain_trial.Sum();
     TV sh=strain_trial-k/d;
     T q=sh.Magnitude();
@@ -65,13 +66,13 @@ Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,typename TV
     T dg=q+b*r;
     if(q+g*g*r/b<=0) return false;
     if(q==0 || k>0){
-        strain=TV::All_Ones_Vector();
+        strain=sigma_Y?exp(-beta)*TV::All_Ones_Vector():TV::All_Ones_Vector();
         if(dstrain) *dstrain=MATRIX<T,d>();
-        if(store_hardening) Update_Hardening(id,strain_trial.Magnitude());
+        if(store_hardening) Update_Hardening(id,(strain_trial-beta).Magnitude());
         return true;} 
     T p=r*b/q;
     TV h_strain=k/d-p*sh;
-    strain=exp(h_strain);
+    strain=exp(h_strain-beta);
     if(store_hardening) Update_Hardening(id,dg);
 
 // What if Fe<0?

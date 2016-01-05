@@ -317,12 +317,12 @@ Add_St_Venant_Kirchhoff_Hencky_Strain(T E,T nu,ARRAY<int>* affected_particles,bo
 // Function Add_Drucker_Prager
 //#####################################################################
 template<class TV> int STANDARD_TESTS_BASE<TV>::
-Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,bool no_mu)
+Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,bool no_mu,T sigma_Y)
 {
     ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>* hencky=new ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>(E,nu);
     if(no_mu) hencky->Zero_Out_Mu();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
-    MPM_DRUCKER_PRAGER<TV>& plasticity=*new MPM_DRUCKER_PRAGER<TV>(particles,0,a0,a1,a3,a4);
+    MPM_DRUCKER_PRAGER<TV>& plasticity=*new MPM_DRUCKER_PRAGER<TV>(particles,0,a0,a1,a3,a4,sigma_Y);
     plasticity.use_implicit=use_implicit_plasticity;
     PARTICLE_GRID_FORCES<TV>* fe=0;
     if(use_implicit_plasticity){
@@ -340,9 +340,9 @@ Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,b
 // Function Add_Drucker_Prager
 //#####################################################################
 template<class TV> int STANDARD_TESTS_BASE<TV>::
-Add_Drucker_Prager(T E,T nu,T phi_F,ARRAY<int>* affected_particles,bool no_mu)
+Add_Drucker_Prager(T E,T nu,T phi_F,ARRAY<int>* affected_particles,bool no_mu,T sigma_Y)
 {
-    return Add_Drucker_Prager(E,nu,phi_F,0,0,0,affected_particles,no_mu);
+    return Add_Drucker_Prager(E,nu,phi_F,0,0,0,affected_particles,no_mu,sigma_Y);
 }
 //#####################################################################
 // Function Add_Drucker_Prager

@@ -126,8 +126,8 @@ public:
     int Add_Fixed_Corotated(T_VOLUME& object,T E,T nu);
     int Add_Neo_Hookean(T_VOLUME& object,T E,T nu);
     int Add_St_Venant_Kirchhoff_Hencky_Strain(T E,T nu,ARRAY<int>* affected_particles=0,bool no_mu=false);
-    int Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles=0,bool no_mu=false);
-    int Add_Drucker_Prager(T E,T nu,T phi_F,ARRAY<int>* affected_particles=0,bool no_mu=false);
+    int Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles=0,bool no_mu=false,T sigma_Y=0);
+    int Add_Drucker_Prager(T E,T nu,T phi_F,ARRAY<int>* affected_particles=0,bool no_mu=false,T sigma_Y=0);
     int Add_Drucker_Prager_Case(T E,T nu,int case_num_F,ARRAY<int>* affected_particles=0,bool no_mu=false);
     void Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty); // -x +x -y +y [ -z +z ], as bit flags
     int Add_Clamped_Plasticity(ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& icm,T theta_c,T theta_s,T max_hardening,
