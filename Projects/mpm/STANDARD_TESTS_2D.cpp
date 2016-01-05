@@ -14,6 +14,7 @@
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
+#include <Geometry/Seeding/POISSON_DISK.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -35,6 +36,7 @@
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <fstream>
+#include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
 //#####################################################################
@@ -59,6 +61,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 ~STANDARD_TESTS()
 {
+    if(destroy) destroy();
 }
 //#####################################################################
 // Function Write_Output_Files
@@ -1005,18 +1008,45 @@ Initialize()
         case 59:{ // sand falling into a pile.
             particles.Store_Fp(true);
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-            RANGE<TV> ground(TV(-10,-10)*m,TV(10,1)*m);
+            RANGE<TV> ground(TV(-10,-10)*m,TV(10,.1)*m);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
             else Add_Collision_Object(ground,COLLISION_TYPE::slip,0.2);
             T density=(T)2200*unit_rho*scale_mass;
             T E=1e4*unit_p*scale_E,nu=.3;
+            T spout_width=.2*m;
+            T spout_height=.1*m;
+            T seed_buffer=grid.dX.y*5;
+            T pour_speed=1*m/s;
+            T gravity=9.8*m/(s*s);
+            RANGE<TV> seed_range(TV(.5*m-spout_width/2,1*m-spout_height),TV(.5*m+spout_width/2,1*m+seed_buffer));
+
+            T volume=grid.dX.Product()/particles_per_cell;
+            T mass=density*volume;
+            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
+                *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1),grid.domain.max_corner,
+                TV(0,-pour_speed),TV(0,-gravity),max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
+            destroy=[=](){delete source;};
+            write_output_files=[=](int frame){source->Write_Output_Files(frame);};
+            read_output_files=[=](int frame){source->Read_Output_Files(frame);};
+            begin_time_step=[=](T time)
+                {
+                    int n=particles.number;
+                    source->Begin_Time_Step(time);
+                    T mu=E/(2*(1+nu));
+                    T lambda=E*nu/((1+nu)*(1-2*nu));
+                    for(int i=n;i<particles.number;i++){
+                        particles.mu(i)=mu;
+                        particles.mu0(i)=mu;
+                        particles.lambda(i)=lambda;
+                        particles.lambda0(i)=lambda;}
+                };
+            end_time_step=[=](T time){source->End_Time_Step(time);};
+
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
             Add_Drucker_Prager_Case(E,nu,case_num);
-            (void)density;
-            LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
             Set_Lame_On_Particles(E,nu);
-            Add_Gravity(m/(s*s)*TV(0,-9.8));
+            Add_Gravity(TV(0,-gravity));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

@@ -182,9 +182,6 @@ Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> 
     poisson_disk.Set_Distance_By_Volume(grid.dX.Product()/particles_per_cell);
     poisson_disk.Sample(random,object,X);
 
-    object.Update_Box();
-    RANGE<TV_INT> range=grid.Cell_Indices(0).Intersect(grid.Clamp_To_Cell(object.Box(),3));
-
     T volume=grid.dX.Product()/particles_per_cell;
     T mass=density*volume;
     for(int i=0;i<X.m;i++)

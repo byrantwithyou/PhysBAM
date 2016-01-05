@@ -56,6 +56,7 @@ template<class T> STANDARD_TESTS<VECTOR<T,3> >::
     if(foo_surface2) delete foo_surface2;
     if(foo_levelset1) delete foo_levelset1;
     if(foo_cylinder) delete foo_cylinder;
+    if(destroy) destroy();
 }
 //#####################################################################
 // Function Write_Output_Files

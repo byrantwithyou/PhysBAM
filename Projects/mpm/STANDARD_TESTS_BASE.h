@@ -76,6 +76,7 @@ public:
     std::function<void (int frame)> end_frame;
     std::function<void (T time)> begin_time_step;
     std::function<void (T time)> end_time_step;
+    std::function<void ()> destroy;
 
     RANDOM_NUMBERS<T> random;
     DEFORMABLES_STANDARD_TESTS<TV> tests;
