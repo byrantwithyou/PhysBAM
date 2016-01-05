@@ -35,7 +35,7 @@ template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),Nsurface(0),
     foo_int1(0),foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),foo_T5(0),use_foo_T5(false),
-    foo_surface1(0),foo_surface2(0),foo_levelset1(0),foo_cylinder(0) 
+    foo_surface1(0),foo_surface2(0),foo_levelset1(0),foo_cylinder(0)
 {
     parse_args.Add("-fooint1",&foo_int1,"int1","a interger");
     parse_args.Add("-fooT1",&foo_T1,"T1","a scalar");

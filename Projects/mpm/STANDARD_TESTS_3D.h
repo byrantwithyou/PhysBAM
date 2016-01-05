@@ -70,7 +70,7 @@ public:
     void Begin_Time_Step(const T time) override;
     void End_Time_Step(const T time) override;
 
-    LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res);
+    LEVELSET_IMPLICIT_OBJECT<TV>* Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res);
 
     // additional storage
     int foo_int1;
@@ -80,6 +80,7 @@ public:
     T foo_T4;
     T foo_T5;
     bool use_foo_T5;
+
     TRIANGULATED_SURFACE<T>* foo_surface1;
     TRIANGULATED_SURFACE<T>* foo_surface2;
     LEVELSET_IMPLICIT_OBJECT<TV>* foo_levelset1;
