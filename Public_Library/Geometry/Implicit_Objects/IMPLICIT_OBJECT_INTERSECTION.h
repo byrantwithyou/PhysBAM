@@ -27,11 +27,21 @@ public:
     using IMPLICIT_OBJECT<TV>::box;
     using IMPLICIT_OBJECT<TV>::use_secondary_interpolation;
 
-    IMPLICIT_OBJECT<TV> &A,&B;
-    bool owns_A,owns_B;
+    ARRAY<IMPLICIT_OBJECT<TV>*> io;
+    ARRAY<bool> owns_io;
 
-    IMPLICIT_OBJECT_INTERSECTION(IMPLICIT_OBJECT<TV> &a,IMPLICIT_OBJECT<TV> &b);
+    template<class...Args>
+    IMPLICIT_OBJECT_INTERSECTION(Args&&... args)
+    {
+        Add_Implicit_Object(args...);
+    }
     virtual ~IMPLICIT_OBJECT_INTERSECTION();
+
+    template<class...Args>
+    void Add_Implicit_Object(IMPLICIT_OBJECT<TV>* o,Args&&... args)
+    {io.Append(o);owns_io.Append(true);Add_Implicit_Object(args...);}
+
+    void Add_Implicit_Object(){}
 
     void Use_Secondary_Interpolation(const bool use_secondary_interpolation_input=true)
     {use_secondary_interpolation=use_secondary_interpolation_input;}
@@ -69,6 +79,7 @@ public:
     T_CURVATURES Principal_Curvatures(const TV& X) const override;
     T Integration_Step(const T phi) const override;
     T Minimum_Cell_Size() const override;
+    int Active_Levelset(const TV& X) const;
     void Read(TYPED_ISTREAM& input) override;
     void Write(TYPED_OSTREAM& output) const override;
 //#####################################################################

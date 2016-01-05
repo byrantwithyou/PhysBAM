@@ -826,11 +826,12 @@ Initialize()
                 RANGE<TV> leftwall(TV(-1,-1)*m,TV(.1,2.5)*m);
                 RANGE<TV> rightwall(TV(0.9,-1)*m,TV(2.5,2.5)*m);
                 RANGE<TV> top(TV(-0.5,.9)*m,TV(2.5,2)*m);
-                Add_Collision_Object(new IMPLICIT_OBJECT_UNION<TV>(
-                    *new IMPLICIT_OBJECT_UNION<TV>(
-                    *new IMPLICIT_OBJECT_UNION<TV>(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(leftwall)),
-                    *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(rightwall)),
-                    *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(top)),
+                Add_Collision_Object(
+                    new IMPLICIT_OBJECT_UNION<TV>(
+                        new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),
+                        new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(leftwall),
+                        new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(rightwall),
+                        new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(top)),
                     (test_number==53)?COLLISION_TYPE::slip:COLLISION_TYPE::stick,0);}
 
             T density=(T)2200*unit_rho*scale_mass;
@@ -893,10 +894,9 @@ Initialize()
             RANGE<TV> cupright(TV(0.25,-0.25),TV(0.3,0.25));
             Add_Collision_Object(
                 new IMPLICIT_OBJECT_UNION<TV>(
-                    *new IMPLICIT_OBJECT_UNION<TV>(
-                        *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupbottom),
-                        *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupleft)),
-                    *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupright)),COLLISION_TYPE::separate,0);
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupbottom),
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupleft),
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupright)),COLLISION_TYPE::separate,0);
             Add_Walls(-1,COLLISION_TYPE::stick,0,0.04,false);
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e5*unit_p*scale_E,nu=.3;

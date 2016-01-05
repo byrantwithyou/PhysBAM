@@ -655,7 +655,7 @@ Initialize()
             Add_Drucker_Prager_Case(E,nu,case_num);
             CONE<T> cone(TV(0.5,grid.dX(1)/m*1.1,0.5)*m,TV(0.5,0.235+grid.dX(1)/m*1.1,0.5)*m,0.042*m);
             RANGE<TV> box(TV(0.4,0,0.4)*m,TV(0.6*m,0.095*m+grid.dX(1)*1.1,0.6*m));
-            IMPLICIT_OBJECT_INTERSECTION<TV> cup(*new ANALYTIC_IMPLICIT_OBJECT<CONE<T>>(cone),*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV>>(box));
+            IMPLICIT_OBJECT_INTERSECTION<TV> cup(new ANALYTIC_IMPLICIT_OBJECT<CONE<T>>(cone),new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV>>(box));
             Seed_Particles(cup,0,0,density,particles_per_cell);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
@@ -700,8 +700,12 @@ Initialize()
             RANGE<TV> cupright(TV(0.25,-0.25,-0.3),TV(0.3,0.25,0.3));
             RANGE<TV> cupback(TV(-0.3,-0.25,-0.3),TV(0.3,0.25,-0.25));
             RANGE<TV> cupfront(TV(-0.3,-0.25,0.25),TV(0.3,0.25,0.3));
-            IMPLICIT_OBJECT_UNION<TV>* lbr=new IMPLICIT_OBJECT_UNION<TV>(*new IMPLICIT_OBJECT_UNION<TV>(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupbottom),*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupleft)),*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupright));//left bottom right
-            IMPLICIT_OBJECT_UNION<TV>* cup=new IMPLICIT_OBJECT_UNION<TV>(*lbr,*new IMPLICIT_OBJECT_UNION<TV>(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupback),*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupfront)));
+            IMPLICIT_OBJECT_UNION<TV>* cup=new IMPLICIT_OBJECT_UNION<TV>(
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupbottom),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupleft),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupright),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupback),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupfront));
             Add_Collision_Object(cup,COLLISION_TYPE::separate,0);
             Add_Walls(-1,COLLISION_TYPE::stick,0,0.04,false);
             //Add sands

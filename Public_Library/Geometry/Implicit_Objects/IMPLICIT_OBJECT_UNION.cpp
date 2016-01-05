@@ -16,21 +16,12 @@
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 namespace PhysBAM{
 //#####################################################################
-// Constructor
-//#####################################################################
-template<class TV> IMPLICIT_OBJECT_UNION<TV>::
-IMPLICIT_OBJECT_UNION(IMPLICIT_OBJECT<TV> &a,IMPLICIT_OBJECT<TV> &b)
-    :A(a),B(b),owns_A(true),owns_B(true)
-{
-}
-//#####################################################################
 // Destructor
 //#####################################################################
 template<class TV> IMPLICIT_OBJECT_UNION<TV>::
 ~IMPLICIT_OBJECT_UNION()
 {
-    if(owns_A) delete &A;
-    if(owns_B) delete &B;
+    for(int i=0;i<io.m;i++) if(owns_io(i)) delete io(i);
 }
 //#####################################################################
 // Function Update_Box
@@ -38,9 +29,11 @@ template<class TV> IMPLICIT_OBJECT_UNION<TV>::
 template<class TV> void IMPLICIT_OBJECT_UNION<TV>::
 Update_Box()
 {
-    A.Update_Box();
-    B.Update_Box();
-    box=A.box.Intersect(B.box);
+    io(0)->Update_Box();
+    box=io(0)->box;
+    for(int i=1;i<io.m;i++){
+        io(i)->Update_Box();
+        box=box.Unite(io(i)->box);}
 }
 //#####################################################################
 // Function Update_Minimum_Cell_Size
@@ -48,8 +41,7 @@ Update_Box()
 template<class TV> void IMPLICIT_OBJECT_UNION<TV>::
 Update_Minimum_Cell_Size(const int maximum_depth)
 {
-    A.Update_Minimum_Cell_Size(maximum_depth);
-    B.Update_Minimum_Cell_Size(maximum_depth);
+    for(int i=0;i<io.m;i++) io(i)->Update_Minimum_Cell_Size(maximum_depth);
 }
 //#####################################################################
 // Function Minimum_Cell_Size_Within_Box
@@ -57,49 +49,78 @@ Update_Minimum_Cell_Size(const int maximum_depth)
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_UNION<TV>::
 Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const
 {
-    return A.Minimum_Cell_Size_Within_Box(box);
+    return io(0)->Minimum_Cell_Size_Within_Box(box);
 }
 //#####################################################################
 // Function operator
 //#####################################################################
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_UNION<TV>::
-operator()(const TV& location) const
+operator()(const TV& X) const
 {
-    return min(A(location),B(location));
+    T phi=(*io(0))(X);
+    for(int i=1;i<io.m;i++)
+        phi=min(phi,(*io(i))(X));
+    return phi;
 }
 //#####################################################################
 // Function Extended_Phi
 //#####################################################################
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_UNION<TV>::
-Extended_Phi(const TV& location) const
+Extended_Phi(const TV& X) const
 {
-    return min(A.Extended_Phi(location),B.Extended_Phi(location));
+    T phi=io(0)->Extended_Phi(X);
+    for(int i=1;i<io.m;i++)
+        phi=min(phi,io(i)->Extended_Phi(X));
+    return phi;
 }
 //#####################################################################
 // Function Phi_Secondary
 //#####################################################################
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_UNION<TV>::
-Phi_Secondary(const TV& location) const
+Phi_Secondary(const TV& X) const
 {
-    return min(A.Phi_Secondary(location),B.Phi_Secondary(location));
+    T phi=io(0)->Phi_Secondary(X);
+    for(int i=1;i<io.m;i++)
+        phi=min(phi,io(i)->Phi_Secondary(X));
+    return phi;
+}
+//#####################################################################
+// Function Active_Levelset
+//#####################################################################
+template<class TV> int IMPLICIT_OBJECT_UNION<TV>::
+Active_Levelset(const TV& X) const
+{
+    T phi=(*io(0))(X);
+    int best_index=0;
+    for(int i=1;i<io.m;i++){
+        T p=(*io(i))(X);
+        if(p<phi){
+            phi=p;
+            best_index=i;}}
+    return best_index;
 }
 //#####################################################################
 // Function Normal
 //#####################################################################
 template<class TV> TV IMPLICIT_OBJECT_UNION<TV>::
-Normal(const TV& location,const int aggregate) const
+Normal(const TV& X,const int aggregate) const
 {
-    if(A(location)<B(location)) return A.Normal(location,aggregate);
-    return B.Normal(location,aggregate);
+    return io(Active_Levelset(X))->Normal(X,aggregate);
 }
 //#####################################################################
 // Function Extended_Normal
 //#####################################################################
 template<class TV> TV IMPLICIT_OBJECT_UNION<TV>::
-Extended_Normal(const TV& location,const int aggregate) const
+Extended_Normal(const TV& X,const int aggregate) const
 {
-    if(A.Extended_Phi(location)<B.Extended_Phi(location)) return A.Extended_Normal(location,aggregate);
-    return B.Extended_Normal(location,aggregate);
+    T phi=io(0)->Extended_Phi(X);
+    int best_index=0;
+    for(int i=1;i<io.m;i++){
+        T p=io(i)->Extended_Phi(X);
+        if(p<phi){
+            phi=p;
+            best_index=i;}}
+    return io(best_index)->Extended_Normal(X,aggregate);
 }
 //#####################################################################
 // Function Compute_Normals
@@ -107,8 +128,7 @@ Extended_Normal(const TV& location,const int aggregate) const
 template<class TV> void IMPLICIT_OBJECT_UNION<TV>::
 Compute_Normals()
 {
-    A.Compute_Normals();
-    B.Compute_Normals();
+    for(int i=0;i<io.m;i++) io(i)->Compute_Normals();
 }
 //#####################################################################
 // Function Compute_Cell_Minimum_And_Maximum
@@ -116,8 +136,7 @@ Compute_Normals()
 template<class TV> void IMPLICIT_OBJECT_UNION<TV>::
 Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
 {
-    A.Compute_Cell_Minimum_And_Maximum(recompute_if_exists);
-    B.Compute_Cell_Minimum_And_Maximum(recompute_if_exists);
+    for(int i=0;i<io.m;i++) io(i)->Compute_Cell_Minimum_And_Maximum(recompute_if_exists);
 }
 //#####################################################################
 // Function Rescale
@@ -125,8 +144,7 @@ Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
 template<class TV> void IMPLICIT_OBJECT_UNION<TV>::
 Rescale(const T scaling_factor)
 {
-    A.Rescale(scaling_factor);
-    B.Rescale(scaling_factor);
+    for(int i=0;i<io.m;i++) io(i)->Rescale(scaling_factor);
 }
 //#####################################################################
 // Function Translate
@@ -134,8 +152,7 @@ Rescale(const T scaling_factor)
 template<class TV> void IMPLICIT_OBJECT_UNION<TV>::
 Translate(const TV& translation)
 {
-    A.Translate(translation);
-    B.Translate(translation);
+    for(int i=0;i<io.m;i++) io(i)->Translate(translation);
 }
 //#####################################################################
 // Function Inflate
@@ -143,102 +160,123 @@ Translate(const TV& translation)
 template<class TV> void IMPLICIT_OBJECT_UNION<TV>::
 Inflate(const T inflation_distance)
 {
-    A.Inflate(inflation_distance);
-    B.Inflate(inflation_distance);
+    for(int i=0;i<io.m;i++) io(i)->Inflate(inflation_distance);
 }
 //#####################################################################
 // Function Inside
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT_UNION<TV>::
-Inside(const TV& location,const T thickness_over_two) const
+Inside(const TV& X,const T thickness_over_two) const
 {
-    return A.Inside(location,thickness_over_two) || B.Inside(location,thickness_over_two);
+    for(int i=0;i<io.m;i++)
+        if(io(i)->Inside(X,thickness_over_two))
+            return true;
+    return false;
 }
 //#####################################################################
 // Function Outside
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT_UNION<TV>::
-Outside(const TV& location,const T thickness_over_two) const
+Outside(const TV& X,const T thickness_over_two) const
 {
-    return A.Outside(location,thickness_over_two) && B.Outside(location,thickness_over_two);
+    for(int i=0;i<io.m;i++)
+        if(!io(i)->Outside(X,thickness_over_two))
+            return false;
+    return true;
 }
 //#####################################################################
 // Function Boundary
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT_UNION<TV>::
-Boundary(const TV& location,const T thickness_over_two) const
+Boundary(const TV& X,const T thickness_over_two) const
 {
-    if(A.Boundary(location,thickness_over_two) || B.Inside(location,-thickness_over_two)) return true;
-    if(B.Boundary(location,thickness_over_two) || A.Inside(location,-thickness_over_two)) return true;
-    return false;
+    return !Inside(X,thickness_over_two) && !Outside(X,thickness_over_two);
 }
 //#####################################################################
 // Function Lazy_Inside
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT_UNION<TV>::
-Lazy_Inside(const TV& location,const T contour_value) const
+Lazy_Inside(const TV& X,const T contour_value) const
 {
-    return A.Lazy_Inside(location,contour_value) || B.Lazy_Inside(location,contour_value);
+    for(int i=0;i<io.m;i++)
+        if(io(i)->Lazy_Inside(X,contour_value))
+            return true;
+    return false;
 }
 //#####################################################################
 // Function Lazy_Inside_And_Value
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT_UNION<TV>::
-Lazy_Inside_And_Value(const TV& location,T& phi_value,const T contour_value) const
+Lazy_Inside_And_Value(const TV& X,T& phi_value,const T contour_value) const
 {
-    T a,b;
-    bool c=A.Lazy_Inside_And_Value(location,a,contour_value);
-    bool d=B.Lazy_Inside_And_Value(location,b,contour_value);
-    phi_value=min(a,b);
-    return c||d;
+    bool in=io(0)->Lazy_Inside_And_Value(X,phi_value,contour_value);
+    for(int i=1;i<io.m;i++){
+        T phi=0;
+        bool b=io(i)->Lazy_Inside_And_Value(X,phi,contour_value);
+        in=in||b;
+        phi_value=min(phi_value,phi);}
+    return in;
 }
 //#####################################################################
 // Function Lazy_Inside_Extended_Levelset
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT_UNION<TV>::
-Lazy_Inside_Extended_Levelset(const TV& unclamped_X,const T contour_value) const
+Lazy_Inside_Extended_Levelset(const TV& X,const T contour_value) const
 {
-    return A.Lazy_Inside_Extended_Levelset(unclamped_X,contour_value) || B.Lazy_Inside_Extended_Levelset(unclamped_X,contour_value);
+    for(int i=0;i<io.m;i++)
+        if(io(i)->Lazy_Inside_Extended_Levelset(X,contour_value))
+            return true;
+    return false;
 }
 //#####################################################################
 // Function Lazy_Inside_Extended_Levelset_And_Value
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT_UNION<TV>::
-Lazy_Inside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value) const
+Lazy_Inside_Extended_Levelset_And_Value(const TV& X,T& phi_value,const T contour_value) const
 {
-    T a,b;
-    bool c=A.Lazy_Inside_Extended_Levelset_And_Value(unclamped_X,a,contour_value);
-    bool d=B.Lazy_Inside_Extended_Levelset_And_Value(unclamped_X,b,contour_value);
-    phi_value=min(a,b);
-    return c||d;
+    bool in=io(0)->Lazy_Inside_Extended_Levelset_And_Value(X,phi_value,contour_value);
+    for(int i=1;i<io.m;i++){
+        T phi=0;
+        bool b=io(i)->Lazy_Inside_Extended_Levelset_And_Value(X,phi,contour_value);
+        in=in||b;
+        phi_value=min(phi_value,phi);}
+    return in;
 }
 //#####################################################################
 // Function Lazy_Outside
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT_UNION<TV>::
-Lazy_Outside(const TV& location,const T contour_value) const
+Lazy_Outside(const TV& X,const T contour_value) const
 {
-    return A.Lazy_Outside(location,contour_value) && B.Lazy_Outside(location,contour_value);
+    for(int i=0;i<io.m;i++)
+        if(!io(i)->Lazy_Outside(X,contour_value))
+            return false;
+    return true;
 }
 //#####################################################################
 // Function Lazy_Outside_Extended_Levelset
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT_UNION<TV>::
-Lazy_Outside_Extended_Levelset(const TV& unclamped_X,const T contour_value) const
+Lazy_Outside_Extended_Levelset(const TV& X,const T contour_value) const
 {
-    return A.Lazy_Outside_Extended_Levelset(unclamped_X,contour_value) && B.Lazy_Outside_Extended_Levelset(unclamped_X,contour_value);
+    for(int i=0;i<io.m;i++)
+        if(!io(i)->Lazy_Outside_Extended_Levelset(X,contour_value))
+            return false;
+    return true;
 }
 //#####################################################################
 // Function Lazy_Outside_Extended_Levelset_And_Value
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT_UNION<TV>::
-Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value) const
+Lazy_Outside_Extended_Levelset_And_Value(const TV& X,T& phi_value,const T contour_value) const
 {
-    T a,b;
-    bool c=A.Lazy_Outside_Extended_Levelset_And_Value(unclamped_X,a,contour_value);
-    bool d=B.Lazy_Outside_Extended_Levelset_And_Value(unclamped_X,b,contour_value);
-    phi_value=min(a,b);
-    return c&&d;
+    bool in=io(0)->Lazy_Inside_Extended_Levelset_And_Value(X,phi_value,contour_value);
+    for(int i=1;i<io.m;i++){
+        T phi=0;
+        bool b=io(i)->Lazy_Inside_Extended_Levelset_And_Value(X,phi,contour_value);
+        in=in&&b;
+        phi_value=min(phi_value,phi);}
+    return in;
 }
 //#####################################################################
 // Function Min_Phi
@@ -246,7 +284,7 @@ Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,cons
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_UNION<TV>::
 Min_Phi() const
 {
-    return A.Min_Phi();
+    return io(0)->Min_Phi();
 }
 //#####################################################################
 // Function Intersection
@@ -254,33 +292,27 @@ Min_Phi() const
 template<class TV> bool IMPLICIT_OBJECT_UNION<TV>::
 Intersection(RAY<TV>& ray,const T thickness) const
 {
-    RAY<TV> rayB(ray);
-    if(!A.Intersection(ray,thickness))
-        return false;
-    if(!B.Intersection(rayB,thickness)){
-        ray=rayB;
-        return false;}
-    if(ray.t_max<ray.t_max)
-        ray=rayB;
-    return true;
+    bool hit=false;
+    for(int i=0;i<io.m;i++)
+        if(io(i)->Intersection(ray,thickness))
+            hit=true;
+    return hit;
 }
 //#####################################################################
 // Function Closest_Point_On_Boundary
 //#####################################################################
 template<class TV> TV IMPLICIT_OBJECT_UNION<TV>::
-Closest_Point_On_Boundary(const TV& location,const T tolerance,const int max_iterations,T* distance) const
+Closest_Point_On_Boundary(const TV& X,const T tolerance,const int max_iterations,T* distance) const
 {
-    if(A(location)<B(location)) return A.Closest_Point_On_Boundary(location,tolerance,max_iterations,distance);
-    return B.Closest_Point_On_Boundary(location,tolerance,max_iterations,distance);
+    return io(Active_Levelset(X))->Closest_Point_On_Boundary(X,tolerance,max_iterations,distance);
 }
 //#####################################################################
 // Function Velocity
 //#####################################################################
 template<class TV> TV IMPLICIT_OBJECT_UNION<TV>::
-Velocity(const TV& location) const
+Velocity(const TV& X) const
 {
-    if(A(location)<B(location)) return A.Velocity(location);
-    return B.Velocity(location);
+    return io(Active_Levelset(X))->Velocity(X);
 }
 //#####################################################################
 // Function Velocity
@@ -288,8 +320,7 @@ Velocity(const TV& location) const
 template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> IMPLICIT_OBJECT_UNION<TV>::
 Hessian(const TV& X) const
 {
-    if(A(X)<B(X)) return A.Hessian(X);
-    return B.Hessian(X);
+    return io(Active_Levelset(X))->Hessian(X);
 }
 //#####################################################################
 // Function Velocity
@@ -297,8 +328,7 @@ Hessian(const TV& X) const
 template<class TV> auto IMPLICIT_OBJECT_UNION<TV>::
 Principal_Curvatures(const TV& X) const -> T_CURVATURES
 {
-    if(A(X)<B(X)) return A.Principal_Curvatures(X);
-    return B.Principal_Curvatures(X);
+    return io(Active_Levelset(X))->Principal_Curvatures(X);
 }
 //#####################################################################
 // Function Integration_Step
@@ -306,7 +336,7 @@ Principal_Curvatures(const TV& X) const -> T_CURVATURES
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_UNION<TV>::
 Integration_Step(const T phi) const
 {
-    return A.Integration_Step(phi);
+    return io(0)->Integration_Step(phi);
 }
 //#####################################################################
 // Function Minimum_Cell_Size
@@ -314,7 +344,7 @@ Integration_Step(const T phi) const
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_UNION<TV>::
 Minimum_Cell_Size() const
 {
-    return A.Minimum_Cell_Size();
+    return io(0)->Minimum_Cell_Size();
 }
 //#####################################################################
 // Function Read
@@ -322,8 +352,7 @@ Minimum_Cell_Size() const
 template<class TV> void IMPLICIT_OBJECT_UNION<TV>::
 Read(TYPED_ISTREAM& input)
 {
-    A.Read(input);
-    B.Read(input);
+    for(int i=0;i<io.m;i++) io(i)->Read(input);
 }
 //#####################################################################
 // Function Write
@@ -331,8 +360,7 @@ Read(TYPED_ISTREAM& input)
 template<class TV> void IMPLICIT_OBJECT_UNION<TV>::
 Write(TYPED_OSTREAM& output) const
 {
-    A.Write(output);
-    B.Write(output);
+    for(int i=0;i<io.m;i++) io(i)->Write(output);
 }
 template class IMPLICIT_OBJECT_UNION<VECTOR<float,1> >;
 template class IMPLICIT_OBJECT_UNION<VECTOR<float,2> >;
