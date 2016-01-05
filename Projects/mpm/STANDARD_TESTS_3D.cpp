@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Tools/Data_Structures/KD_TREE.h>
 #include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Tools/Matrices/FRAME.h>
 #include <Geometry/Basic_Geometry/CONE.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
@@ -885,6 +886,56 @@ Initialize()
         case 41:{ // Draw in sand
         } break;
         case 42:{ // Raking
+            particles.Store_Fp(true);
+            grid.Initialize(TV_INT(4,1,4)*resolution,RANGE<TV>(TV(),TV(1,0.25,1)*m),true);
+            LOG::printf("REAL GRID: %P\n",grid);
+
+            if(!friction_is_set)friction=0.5;
+            //const T edge=0.05/2*m;
+            //const RANGE<TV> tooth=RANGE<TV>::Centered_Box()*0.5*edge;
+            //const ROTATION<TV> r45=ROTATION<TV>::From_Euler_Angles(0,0,pi/4);
+            //const T shift=sqrt(2)*edge;
+            const T rake_half_width=0.14*m;
+            const TV obstacle=TV(0.5,0,0.5)*m;
+            const T obstacle_r=0.15*m;
+            const TV start_pos(obstacle_r+rake_half_width,0,0);
+
+            LEVELSET_IMPLICIT_OBJECT<TV>* rock=Levelset_From_File<T>(data_directory+"/../Private_Data/rock.tri.gz");
+            RANGE<TV> outside(TV(-0.1,-0.1,-0.1)*m,TV(1.1,0.3,1.1)*m);
+            RANGE<TV> inside(TV(0.05,0.05,0.05)*m,TV(0.95,0.4,0.95)*m);
+            IMPLICIT_OBJECT_UNION<TV> *sandbox=new IMPLICIT_OBJECT_UNION<TV>(
+                    rock,
+                    new ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T>>(CYLINDER<T>(obstacle,obstacle+TV(0,0.2,0)*m,obstacle_r)),
+                    new IMPLICIT_OBJECT_INTERSECTION<TV>(
+                        new IMPLICIT_OBJECT_INVERT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV>>(inside)),
+                        new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV>>(outside)));
+            Add_Collision_Object(sandbox,COLLISION_TYPE::stick,friction);
+
+            LEVELSET_IMPLICIT_OBJECT<TV>* rake=Levelset_From_File<T>(data_directory+"/../Private_Data/rake.tri.gz");
+
+            const T settle_wait(0.1);
+            const T final_t(10-settle_wait);
+            Add_Collision_Object(rake,COLLISION_TYPE::separate,friction,
+                    [=](T time){
+                        if(time<settle_wait) return FRAME<TV>(TV(-10,-10,-10));
+                        time-=settle_wait;
+                        ROTATION<TV> R=ROTATION<TV>::From_Euler_Angles(0,2*pi*time/final_t,0);
+                        return FRAME<TV>(TV(0,0.135*m,0)+obstacle+R.Rotate(start_pos),R);},
+                    [=](T time){return TWIST<TV>(TV(),typename TV::SPIN(0,time<settle_wait?0:2*pi/final_t,0));});
+
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Levelset_From_File<T>(data_directory+"/../Private_Data/sanddune_square.tri.gz");
+            Seed_Particles(*levelset,0,0,density,particles_per_cell);
+            LOG::printf("Particle count: %d\n",particles.number);
+            Set_Lame_On_Particles(E,nu);
+
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            Add_Drucker_Prager_Case(E,nu,case_num);
+            Add_Gravity(m/(s*s)*TV(0,-9.8,0));
         } break;
         case 43:{ // Rotating table
         } break;
