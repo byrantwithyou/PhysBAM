@@ -66,7 +66,7 @@ template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Write_Output_Files(const int frame)
 {
-    if(debug_output_func) debug_output_func(frame);
+    if(write_output_files) write_output_files(frame);
     BASE::Write_Output_Files(frame);
 }
 //#####################################################################
@@ -75,6 +75,7 @@ Write_Output_Files(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Read_Output_Files(const int frame)
 {
+    if(read_output_files) read_output_files(frame);
     BASE::Read_Output_Files(frame);
 }
 //#####################################################################
@@ -362,7 +363,7 @@ Initialize()
                 particles.X(i)=frame*particles.X(i);
                 particles.V(i)=frame.r.Rotate(particles.V(i));}
             Add_Gravity(TV(0,-g));
-            debug_output_func=[=](int)
+            write_output_files=[=](int)
             {
                 T c=sin(angle)*g;
                 T d=coefficient_of_friction*cos(angle)*g;
@@ -951,6 +952,7 @@ Initialize()
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Begin_Frame(const int frame)
 {
+    if(begin_frame) begin_frame(frame);
     if(frame==10 && (test_number==54 || test_number==58))
         Add_Gravity(TV(0,20));
 }
@@ -960,6 +962,7 @@ Begin_Frame(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 End_Frame(const int frame)
 {
+    if(end_frame) end_frame(frame);
 }
 //#####################################################################
 // Function Begin_Time_Step
@@ -967,6 +970,7 @@ End_Frame(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Begin_Time_Step(const T time)
 {
+    if(begin_time_step) begin_time_step(time);
     if(test_number==12){
         if(time>=10/24.0*s){
             lagrangian_forces.Delete_Pointers_And_Clean_Memory();
@@ -1143,6 +1147,7 @@ Begin_Time_Step(const T time)
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 End_Time_Step(const T time)
 {
+    if(end_time_step) end_time_step(time);
 }
 template class STANDARD_TESTS<VECTOR<float,2> >;
 template class STANDARD_TESTS<VECTOR<double,2> >;

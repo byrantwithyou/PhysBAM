@@ -23,7 +23,7 @@ class STANDARD_TESTS<VECTOR<T,2> >:public STANDARD_TESTS_BASE<VECTOR<T,2> >
 
 public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
-    using BASE::mass;using BASE::force_helper;using BASE::debug_output_func;
+    using BASE::mass;using BASE::force_helper;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::particles_per_cell;
     using BASE::substeps_delay_frame;using BASE::scale_mass;using BASE::scale_E;using BASE::scale_speed;
     using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;
@@ -48,7 +48,8 @@ public:
     using BASE::m;using BASE::s;using BASE::kg;using BASE::unit_p;using BASE::unit_mu;using BASE::unit_rho;
     using BASE::forced_collision_type;using BASE::penalty_damping_stiffness;using BASE::Set_Lame_On_Particles;
     using BASE::friction;using BASE::friction_is_set;
-
+    using BASE::write_output_files;using BASE::read_output_files;using BASE::begin_frame;
+    using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
 
     // surface tension stuff
     bool use_surface_tension;

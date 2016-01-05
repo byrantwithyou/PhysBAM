@@ -63,7 +63,7 @@ template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Write_Output_Files(const int frame)
 {
-    if(debug_output_func) debug_output_func(frame);
+    if(write_output_files) write_output_files(frame);
     BASE::Write_Output_Files(frame);
 }
 //#####################################################################
@@ -72,6 +72,7 @@ Write_Output_Files(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Read_Output_Files(const int frame)
 {
+    if(read_output_files) read_output_files(frame);
     BASE::Read_Output_Files(frame);
 }
 //#####################################################################
@@ -797,6 +798,7 @@ Initialize()
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Begin_Frame(const int frame)
 {
+    if(begin_frame) begin_frame(frame);
     // static int i=0;
     switch(test_number)
     {
@@ -847,6 +849,7 @@ Begin_Frame(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 End_Frame(const int frame)
 {
+    if(end_frame) end_frame(frame);
 }
 //#####################################################################
 // Function Begin_Time_Step
@@ -854,6 +857,7 @@ End_Frame(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Begin_Time_Step(const T time)
 {
+    if(begin_time_step) begin_time_step(time);
     switch(test_number)
     {
         case 14:{
@@ -1011,6 +1015,7 @@ Begin_Time_Step(const T time)
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 End_Time_Step(const T time)
 {
+    if(end_time_step) end_time_step(time);
 }
 //#####################################################################
 // Function Initialize_Implicit_Surface

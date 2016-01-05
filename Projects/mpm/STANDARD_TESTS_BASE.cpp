@@ -44,7 +44,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     use_theta_c(false),use_theta_s(false),use_hardening_factor(false),use_max_hardening(false),
     theta_c(0),theta_s(0),hardening_factor(0),max_hardening(0),use_implicit_plasticity(false),no_implicit_plasticity(false),
     hardening_mast_case(0),use_hardening_mast_case(false),override_output_directory(false),
-    m(1),s(1),kg(1),forced_collision_type(-1),friction(0),friction_is_set(false),tests(stream_type_input,deformable_body_collection)
+    m(1),s(1),kg(1),forced_collision_type(-1),friction(0),friction_is_set(false),write_output_files(0),read_output_files(0),
+    begin_frame(0),end_frame(0),begin_time_step(0),end_time_step(0),tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
