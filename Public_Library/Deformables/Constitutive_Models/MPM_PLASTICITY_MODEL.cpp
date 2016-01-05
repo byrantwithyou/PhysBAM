@@ -25,7 +25,7 @@ template<class TV> MPM_PLASTICITY_MODEL<TV>::
 // Function Initialize_Particle
 //#####################################################################
 template<class TV> void MPM_PLASTICITY_MODEL<TV>::
-Initialize_Particles() const
+Initialize_Particles(ARRAY<int>* affected_particles) const
 {
 }
 //#####################################################################

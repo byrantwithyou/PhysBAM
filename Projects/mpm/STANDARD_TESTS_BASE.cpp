@@ -332,7 +332,7 @@ Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,b
         MPM_FINITE_ELEMENTS<TV>* mfe=new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
         plasticity.gather_scatter=&mfe->gather_scatter;
         fe=mfe;}
-    plasticity.Initialize_Particles();
+    plasticity.Initialize_Particles(affected_particles);
     plasticity_models.Append(&plasticity);
     return Add_Force(*fe);
 }
@@ -382,7 +382,7 @@ Add_Clamped_Plasticity(ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& icm,T theta_c,T th
         MPM_FINITE_ELEMENTS<TV>* mfe=new MPM_FINITE_ELEMENTS<TV>(force_helper,icm,gather_scatter,affected_particles);
         plasticity.gather_scatter=&mfe->gather_scatter;
         fe=mfe;}
-    plasticity.Initialize_Particles();
+    plasticity.Initialize_Particles(affected_particles);
     plasticity_models.Append(&plasticity);
     return Add_Force(*fe);
 }

@@ -31,12 +31,20 @@ template<class TV> MPM_DRUCKER_PRAGER<TV>::
 // Function Initialize_Particle
 //#####################################################################
 template<class TV> void MPM_DRUCKER_PRAGER<TV>::
-Initialize_Particles() const
+Initialize_Particles(ARRAY<int>* affected_particles) const
 {
+    if(affected_particles)
 #pragma omp parallel for
-    for(int k=0;k<gather_scatter->simulated_particles.m;k++){
-        int p=gather_scatter->simulated_particles(k);
-        Update_Hardening(p,0);}
+        for(int k=0;k<affected_particles->m;k++){
+            int p=(*affected_particles)(k);
+            Update_Hardening(p,0);}
+    else
+        if(particles.X.m==0)
+            PHYSBAM_WARNING("Adding Drucker-Prager before partices have been added to the system: NO PARTICLES WILL BE INITIALIZED!");
+        else
+#pragma omp parallel for
+            for(int p=0;p<particles.X.m;p++)
+                Update_Hardening(p,0);
 }
 //#####################################################################
 // Function Project_Stress
