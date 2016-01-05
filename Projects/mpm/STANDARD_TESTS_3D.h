@@ -50,6 +50,7 @@ public:
     using BASE::m;using BASE::s;using BASE::kg;using BASE::unit_p;using BASE::unit_mu;using BASE::unit_rho;
     using BASE::forced_collision_type;using BASE::scale_speed;using BASE::Add_Drucker_Prager_Case;
     using BASE::collision_objects;using BASE::debug_output_func;using BASE::Set_Lame_On_Particles;
+    using BASE::friction;using BASE::friction_is_set;
 
     // surface tension stuff
     bool use_surface_tension;

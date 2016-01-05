@@ -68,6 +68,8 @@ public:
     T m,s,kg;
     T unit_p,unit_rho,unit_mu;
     int forced_collision_type;
+    T friction;
+    bool friction_is_set;
     std::function<void (int frame)> debug_output_func;
 
     RANDOM_NUMBERS<T> random;
