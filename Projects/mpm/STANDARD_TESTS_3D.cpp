@@ -12,6 +12,7 @@
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
@@ -736,30 +737,35 @@ Initialize()
             particles.Store_Fp(true);
             grid.Initialize(TV_INT(4,9,4)*resolution,RANGE<TV>(TV(-0.2,-0.45,-0.2)*m,TV(0.2,0.45,0.2)*m),true);
             LOG::cout<<"GRID DX: " <<grid.dX<<std::endl;
-            if(use_penalty_collisions){
-                TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-                FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/hourglass_closed.tri.gz",*surface);
-                LOG::cout<<"Read mesh elements "<<surface->mesh.elements.m<<std::endl;
-                LOG::cout<<"Read mesh particles "<<surface->particles.number<<std::endl;
-                surface->mesh.Initialize_Adjacent_Elements();    
-                surface->mesh.Initialize_Neighbor_Nodes();
-                surface->mesh.Initialize_Incident_Elements();
-                surface->Update_Bounding_Box();
-                surface->Initialize_Hierarchy();
-                surface->Update_Triangle_List();
-                LOG::cout<<"Building levelset for the collision object..."<<std::endl;
-                LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,100);
-                LOG::cout<<"...done!"<<std::endl;
-                Add_Penalty_Collision_Object(levelset);}
-            else
-                PHYSBAM_FATAL_ERROR();
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/hourglass_closed.tri.gz",*surface);
+            LOG::cout<<"Read mesh elements "<<surface->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh particles "<<surface->particles.number<<std::endl;
+            surface->mesh.Initialize_Adjacent_Elements();    
+            surface->mesh.Initialize_Neighbor_Nodes();
+            surface->mesh.Initialize_Incident_Elements();
+            surface->Update_Bounding_Box();
+            surface->Initialize_Hierarchy();
+            surface->Update_Triangle_List();
+            LOG::cout<<"Building levelset for the collision object..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,200);
+            LOG::cout<<"...done!"<<std::endl;
+            if(use_penalty_collisions) Add_Penalty_Collision_Object(levelset);
+            else Add_Collision_Object(levelset,COLLISION_TYPE::separate,.3);
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            Add_Drucker_Prager_Case(E,nu,2);
-            SPHERE<TV> sphere(TV(0,0.2,0)*m,0.1*m);
-            Seed_Particles(sphere,0,0,density,particles_per_cell);
+            RANGE<TV> fill_part=grid.domain;
+            fill_part.min_corner.y=0;
+            fill_part.max_corner.y=.2;
+            ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> > io_fill_part(fill_part);
+            IMPLICIT_OBJECT_INVERT<TV> inv(levelset);
+            inv.owns_io=false;
+            IMPLICIT_OBJECT_INTERSECTION<TV> ioi(&io_fill_part,&inv);
+            ioi.owns_io.Fill(false);
+            Seed_Particles(ioi,0,0,density,particles_per_cell);
             Set_Lame_On_Particles(E,nu);
+            Add_Drucker_Prager_Case(E,nu,2);
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
         case 38:
