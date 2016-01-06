@@ -806,11 +806,11 @@ Initialize()
 
         case 40:{ // dry sand siggraph letters drop
             particles.Store_Fp(true);
-            grid.Initialize(TV_INT(7,1,2)*resolution,RANGE<TV>(TV(-0.7,0,-0.2)*m,TV(0.7,0.2,0.2)*m),true);
+            grid.Initialize(TV_INT(6,1,2)*resolution,RANGE<TV>(TV(-0.75,0,-0.25)*m,TV(0.75,0.25,0.25)*m),true);
             LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
-            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,0.02,10)*m);
+            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,0.05,10)*m);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
-            else Add_Collision_Object(ground,COLLISION_TYPE::slip,foo_T1);
+            else Add_Collision_Object(ground,COLLISION_TYPE::slip,10);
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
