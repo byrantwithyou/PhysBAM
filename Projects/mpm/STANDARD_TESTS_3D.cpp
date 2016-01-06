@@ -850,18 +850,18 @@ Initialize()
 
         case 44:{ // sand falling into a pile.
             particles.Store_Fp(true);
-            grid.Initialize(TV_INT(2,1,2)*resolution,RANGE<TV>(TV(-1,0,-1),TV(1,1,1))*m,true);
-            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,.1,10)*m);
+            grid.Initialize(TV_INT(2,1,2)*resolution,RANGE<TV>(TV(-.15,-0.05,-0.15),TV(0.15,0.1,0.15))*m,true);
+            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,0,10)*m);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
-            else Add_Collision_Object(ground,COLLISION_TYPE::slip,0.6);
+            else Add_Collision_Object(ground,COLLISION_TYPE::slip,foo_T1);
             T density=(T)2200*unit_rho*scale_mass;
             T E=1e4*unit_p*scale_E,nu=.3;
-            T spout_width=.05*m;
-            T spout_height=.1*m;
+            T spout_width=8.334e-3*m;
+            T spout_height=.01*m;//??what is this
             T seed_buffer=grid.dX.y*5;
-            T pour_speed=.4*m/s;
+            T pour_speed=.1653*m/s;
             TV gravity=TV(0,-9.8*m/(s*s),0);
-            CYLINDER<T> seed_range(TV(0,1*m-spout_height,0),TV(0,1*m+seed_buffer,0),spout_width/2);
+            CYLINDER<T> seed_range(TV(0,0.1*m-spout_height,0),TV(0,0.1*m+seed_buffer,0),spout_width/2);
 
             T volume=grid.dX.Product()/particles_per_cell;
             T mass=density*volume;
@@ -886,12 +886,24 @@ Initialize()
                         if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
                             for(int p=n;p<particles.number;p++)
                                 dp->Update_Hardening(p,0);
+                
                 };
-            end_time_step=[=](T time){source->End_Time_Step(time);};
+            end_time_step=[=](T time){
+                source->End_Time_Step(time);
+            };
+
+
 
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            int case_num=use_hardening_mast_case?hardening_mast_case:2;
-            Add_Drucker_Prager_Case(E,nu,case_num);
+            //int case_num=use_hardening_mast_case?hardening_mast_case:2;
+
+            //ARRAY<int> sand_particles(particles.X.m);
+            //for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+
+            // Add_Drucker_Prager(E,nu,foo_T2,&sand_particles);
+            Add_Drucker_Prager(E,nu,foo_T2);
+
+            // Add_Drucker_Prager_Case(E,nu,case_num);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(gravity);
         } break;
@@ -1005,6 +1017,7 @@ End_Frame(const int frame)
     if(end_frame) end_frame(frame);
 }
 //#####################################################################
+
 // Function Begin_Time_Step
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
