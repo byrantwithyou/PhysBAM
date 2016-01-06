@@ -897,7 +897,7 @@ Initialize()
 
          case 45:{ // sand castle
             particles.Store_Fp(true);
-            grid.Initialize(TV_INT(5,2,5)*resolution,RANGE<TV>(TV(-1.0,-0.1,-1.0)*m,TV(1.0,0.7,1.0)*m),true);
+            grid.Initialize(TV_INT(5,2,5)*resolution,RANGE<TV>(TV(-0.8,-0.1,-1.0)*m,TV(1.2,0.7,1.0)*m),true);
             LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
             RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,0,10)*m);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
@@ -922,8 +922,16 @@ Initialize()
             Seed_Particles(*levelset,0,0,density,particles_per_cell);
             LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
             Set_Lame_On_Particles(E,nu);
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager_Case(E,nu,case_num,&sand_particles);
+            SPHERE<TV> sphere1(TV(-0.64,0.52,0)*m,.1*m);
+            T density_sphere=1e5*unit_rho*scale_mass;
+            VECTOR<T,3> angular_velocity1(TV(0,0,foo_T2));
+            Seed_Particles(sphere1,[=](const TV& X){return angular_velocity1.Cross(X-sphere1.center)+TV(2.5,0,0)*(m/s);},
+                [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity1);},density_sphere,particles_per_cell);
+            Add_Fixed_Corotated(40e4*unit_p,0.3);
             Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
-            Add_Drucker_Prager_Case(E,nu,case_num);
         } break;    
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
