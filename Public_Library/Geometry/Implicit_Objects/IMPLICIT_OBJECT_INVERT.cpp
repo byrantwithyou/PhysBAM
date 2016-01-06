@@ -85,7 +85,7 @@ Normal(const TV& X,const int aggregate) const
 template<class TV> TV IMPLICIT_OBJECT_INVERT<TV>::
 Extended_Normal(const TV& X,const int aggregate) const
 {
-    return -Extended_Normal(X,aggregate);
+    return -io.Extended_Normal(X,aggregate);
 }
 //#####################################################################
 // Function Compute_Normals
