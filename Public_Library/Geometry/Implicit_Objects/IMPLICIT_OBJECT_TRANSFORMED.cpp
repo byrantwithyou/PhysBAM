@@ -149,11 +149,6 @@ Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T& phi_value,const T
     phi_value=World_Space_Length(phi_value);
     return result;
 }
-template<class TV,class TRANSFORM> typename TV::SCALAR IMPLICIT_OBJECT_TRANSFORMED<TV,TRANSFORM>::
-Min_Phi() const
-{
-    return World_Space_Length(object_space_implicit_object->Min_Phi());
-}
 template<class TV,class TRANSFORM> TV IMPLICIT_OBJECT_TRANSFORMED<TV,TRANSFORM>::
 Velocity(const TV& location) const
 {

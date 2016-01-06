@@ -209,14 +209,6 @@ Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,cons
     return levelset.Lazy_Outside_Extended_Levelset_And_Value(unclamped_X,phi_value,contour_value);
 }
 //#####################################################################
-// Function Min_Phi
-//#####################################################################
-template<class TV> typename TV::SCALAR LEVELSET_IMPLICIT_OBJECT<TV>::
-Min_Phi() const
-{
-    return levelset.phi.Min();
-}
-//#####################################################################
 // Function Velocity
 //#####################################################################
 template<class TV> TV LEVELSET_IMPLICIT_OBJECT<TV>::

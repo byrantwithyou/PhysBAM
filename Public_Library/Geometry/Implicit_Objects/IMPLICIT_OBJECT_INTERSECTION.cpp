@@ -279,14 +279,6 @@ Lazy_Outside_Extended_Levelset_And_Value(const TV& X,T& phi_value,const T contou
     return in;
 }
 //#####################################################################
-// Function Min_Phi
-//#####################################################################
-template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_INTERSECTION<TV>::
-Min_Phi() const
-{
-    return io(0)->Min_Phi();
-}
-//#####################################################################
 // Function Intersection
 //#####################################################################
 template<class TV> bool IMPLICIT_OBJECT_INTERSECTION<TV>::

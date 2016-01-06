@@ -70,7 +70,6 @@ public:
     bool Lazy_Outside(const TV& location,const T contour_value=0) const override;
     bool Lazy_Outside_Extended_Levelset(const TV& unclamped_X,const T contour_value=0) const override;
     bool Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value=0) const override;
-    T Min_Phi() const override;
     bool Intersection(RAY<TV>& ray,const T thickness=0) const override;
     TV Closest_Point_On_Boundary(const TV& location,const T tolerance=0,const int max_iterations=1,T* distance=0) const override;
     TV Velocity(const TV& location) const override;

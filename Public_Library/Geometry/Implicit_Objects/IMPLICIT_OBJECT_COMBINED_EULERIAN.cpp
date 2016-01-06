@@ -246,14 +246,6 @@ Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T& phi_value,const T
     return !Lazy_Inside_Extended_Levelset_And_Value(location,phi_value,contour_value);
 }
 //#####################################################################
-// Function Min_Phi
-//#####################################################################
-template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>::
-Min_Phi() const
-{
-    PHYSBAM_NOT_IMPLEMENTED();
-}
-//#####################################################################
 // Function Hessian
 //#####################################################################
 template<class TV> auto IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>::

@@ -59,7 +59,6 @@ public:
     virtual bool Lazy_Outside(const TV& location,const T contour_value=0) const;
     virtual bool Lazy_Outside_Extended_Levelset(const TV& unclamped_X,const T contour_value=0) const;
     virtual bool Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value=0) const;
-    virtual T Min_Phi() const;
     virtual bool Intersection(RAY<TV>& ray,const T thickness=0) const;
     virtual TV Closest_Point_On_Boundary(const TV& location,const T tolerance=0,const int max_iterations=1,T* distance=0) const;
     virtual TV Velocity(const TV& location) const;

@@ -268,16 +268,6 @@ Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,cons
     return levelset_value;
 }
 //#####################################################################
-// Function Min_Phi
-//#####################################################################
-template<class TV> typename TV::SCALAR MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>::
-Min_Phi() const
-{
-    T min_phi=(T)FLT_MAX;
-    for(int i=0;i<levelsets->m;i++) min_phi=min(min_phi,(*levelsets)(i)->Min_Phi());
-    return min_phi;
-}
-//#####################################################################
 // Function Rescale
 //#####################################################################
 template<class TV> void MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>::

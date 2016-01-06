@@ -246,7 +246,6 @@ public:
     bool Lazy_Outside(const TV& location,const T contour_value=0) const override;
     bool Lazy_Outside_Extended_Levelset(const TV& location,const T contour_value=0) const override;
     bool Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T& phi_value,const T contour_value=0) const override;
-    T Min_Phi() const override;
     TV Velocity(const TV& location) const override;
     SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const override;
     VECTOR<T,d-1> Principal_Curvatures(const TV& X) const override

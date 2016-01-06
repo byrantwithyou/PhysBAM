@@ -58,7 +58,6 @@ public:
     bool Lazy_Outside(const TV& location,const T contour_value=0) const override;
     bool Lazy_Outside_Extended_Levelset(const TV& unclamped_X,const T contour_value=0) const override;
     bool Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value=0) const override;
-    T Min_Phi() const override;
     void Rescale(const T scaling_factor) override;
     void Translate(const TV& translation) override;
     VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const override;

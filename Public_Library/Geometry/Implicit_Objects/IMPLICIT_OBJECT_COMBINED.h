@@ -102,9 +102,6 @@ public:
     bool Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T& phi_value,const T contour_value=0) const override
     {return !Lazy_Inside_Extended_Levelset_And_Value(location,phi_value,contour_value);}
 
-    T Min_Phi() const override
-    {PHYSBAM_NOT_IMPLEMENTED();}
-
     TV Velocity(const TV& location) const override
     {return (1-alpha)*implicit_object1->Velocity(location)+alpha*implicit_object2->Velocity(location);}
 
