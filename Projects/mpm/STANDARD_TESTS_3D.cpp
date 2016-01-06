@@ -14,6 +14,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
@@ -933,6 +934,53 @@ Initialize()
             Add_Fixed_Corotated(40e4*unit_p,0.3);
             Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
         } break;    
+
+        case 46:{ // sandbox
+            particles.Store_Fp(true);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            RANGE<TV> domain(TV(0,0,0)*m,TV(0.5,0.5,0.25)*m);
+            grid.Initialize(TV_INT(2*resolution,2*resolution,resolution),domain,true);
+            RANGE<TV> sand_box(domain.min_corner-0.25*m,domain.max_corner+TV(0.25,0,0.25)*m);
+            RANGE<TV> sand_box_interior(domain.min_corner+0.05*m,domain.max_corner-TV(0.05,0,0.05)*m);
+            auto sand_box_walls=
+                new IMPLICIT_OBJECT_INTERSECTION<TV>(
+                        new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sand_box),
+                        new IMPLICIT_OBJECT_INVERT<TV>(
+                            new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sand_box_interior)));
+            if(use_penalty_collisions){
+                Add_Penalty_Collision_Object(sand_box_walls);}
+            else{
+                Add_Collision_Object(sand_box_walls,COLLISION_TYPE::stick,0);}
+
+            T density=(T)1582*unit_rho;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+
+            RANGE<TV> sand(sand_box_interior.min_corner,sand_box_interior.max_corner-TV(0,0.1,0)*m);
+            Seed_Particles(sand,0,0,density,particles_per_cell); 
+            // SAND PROPERTIES
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
+            Set_Lame_On_Particles(E,nu);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
+            {
+                int N_sand=particles.number;
+                SPHERE<TV> sphere(TV(0.15,0.45,0.125)*m,0.007*m);
+                T density=11340*unit_rho*scale_mass;
+                VECTOR<T,3> velocity(TV(100,-300,0)*m/s);
+                VECTOR<T,3> angular_velocity(TV(100,-300,0)/s);
+                Seed_Particles(sphere,[=](const TV& X){return velocity+angular_velocity.Cross(X-sphere.center);},
+                        [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity);}
+                        ,density,particles_per_cell);
+                int N_box_particles=particles.number-N_sand;
+                LOG::cout<<N_sand<<" sand particles "<<N_box_particles<<" ball particles\n";
+                ARRAY<int> ball_particles(N_box_particles);
+                for(int k=0;k<ball_particles.m;k++) ball_particles(k)=k+N_sand;
+                Add_Fixed_Corotated(16e9*unit_p*scale_E,0.44,&ball_particles);
+            }
+            Add_Gravity(m/(s*s)*TV(0,-9.81,0));
+        } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
