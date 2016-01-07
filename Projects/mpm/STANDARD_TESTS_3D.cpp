@@ -79,14 +79,15 @@ Levelset_From_File(const std::string& filename,int max_resolution=200)
 template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),Nsurface(0),
-    foo_int1(0),foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),foo_T5(0),use_foo_T5(false),
+    foo_int1(0),foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),foo_T5(0),
+    use_foo_T1(false),use_foo_T2(false),use_foo_T3(false),use_foo_T4(false),use_foo_T5(false),
     foo_surface1(0),foo_surface2(0),foo_levelset1(0),foo_cylinder(0)
 {
     parse_args.Add("-fooint1",&foo_int1,"int1","a interger");
-    parse_args.Add("-fooT1",&foo_T1,"T1","a scalar");
-    parse_args.Add("-fooT2",&foo_T2,"T2","a scalar");
-    parse_args.Add("-fooT3",&foo_T3,"T3","a scalar");
-    parse_args.Add("-fooT4",&foo_T4,"T4","a scalar");
+    parse_args.Add("-fooT1",&foo_T1,&use_foo_T1,"T1","a scalar");
+    parse_args.Add("-fooT2",&foo_T2,&use_foo_T2,"T2","a scalar");
+    parse_args.Add("-fooT3",&foo_T3,&use_foo_T3,"T3","a scalar");
+    parse_args.Add("-fooT4",&foo_T4,&use_foo_T4,"T4","a scalar");
     parse_args.Add("-fooT5",&foo_T5,&use_foo_T5,"T5","a scalar");
     parse_args.Parse();
     if(!this->override_output_directory) output_directory=LOG::sprintf("Test_3d_%i",test_number);
@@ -1033,13 +1034,25 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
         } break;    
 
-        case 46:{ // sandbox
+        case 46:{ // sandbox with simulated ball
+            if(!use_foo_T1) foo_T1=1;
+            if(!use_foo_T2) foo_T2=1;
+            if(!use_foo_T3) foo_T3=1;
             particles.Store_Fp(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            RANGE<TV> domain(TV(0,0,0)*m,TV(0.5,0.5,0.25)*m);
-            grid.Initialize(TV_INT(2*resolution,2*resolution,resolution),domain,true);
-            RANGE<TV> sand_box(domain.min_corner-0.25*m,domain.max_corner+TV(0.25,0,0.25)*m);
-            RANGE<TV> sand_box_interior(domain.min_corner+0.05*m,domain.max_corner-TV(0.05,0,0.05)*m);
+            T sand_depth=0.35*m;
+            T air_height=0.65*m;
+            T sand_length=1*m;
+            T sand_width=1*m;
+            T wall_thickness=0.2*m;
+            RANGE<TV> sand(TV(-sand_width/2,-sand_depth,-sand_length/2),TV(sand_width/2,0,sand_length/2));
+            RANGE<TV> sand_box(sand.Thickened(wall_thickness));
+            RANGE<TV> sand_box_interior(sand);
+            sand_box_interior.max_corner(1)=sand_box.max_corner(1);
+            RANGE<TV> domain(sand);
+            domain.max_corner(1)=air_height;
+            domain=domain.Thickened(0.05*m);
+            grid.Initialize(TV_INT(domain.Edge_Lengths()*resolution),domain,true);
             auto sand_box_walls=
                 new IMPLICIT_OBJECT_INTERSECTION<TV>(
                         new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sand_box),
@@ -1053,21 +1066,23 @@ Initialize()
             T density=(T)1582*unit_rho;
             T E=35.37e6*unit_p*scale_E,nu=.3;
 
-            RANGE<TV> sand(sand_box_interior.min_corner,sand_box_interior.max_corner-TV(0,0.1,0)*m);
             Seed_Particles(sand,0,0,density,particles_per_cell); 
             // SAND PROPERTIES
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
-            Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
+            Add_Drucker_Prager(E,nu,(T)21,&sand_particles);
             Set_Lame_On_Particles(E,nu);
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            T g=9.81*m/(s*s);
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
             {
                 int N_sand=particles.number;
-                SPHERE<TV> sphere(TV(0.15,0.45,0.125)*m,0.007*m);
+                VECTOR<T,3> velocity(TV(5,-5,0)*foo_T1*m/s);
+                VECTOR<T,3> angular_velocity(TV(0,0,10)*foo_T2/s);
+                T y0=0.15*m;
+                T t_impact=(velocity(1)+sqrt(sqr(velocity(1))+2*y0*g))/g;
+                SPHERE<TV> sphere(TV(-velocity(0)*t_impact,y0,-velocity(2)*t_impact),0.1*foo_T3*m);
                 T density=11340*unit_rho*scale_mass;
-                VECTOR<T,3> velocity(TV(100,-300,0)*m/s);
-                VECTOR<T,3> angular_velocity(TV(100,-300,0)/s);
                 Seed_Particles(sphere,[=](const TV& X){return velocity+angular_velocity.Cross(X-sphere.center);},
                         [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity);}
                         ,density,particles_per_cell);
@@ -1075,9 +1090,66 @@ Initialize()
                 LOG::cout<<N_sand<<" sand particles "<<N_box_particles<<" ball particles\n";
                 ARRAY<int> ball_particles(N_box_particles);
                 for(int k=0;k<ball_particles.m;k++) ball_particles(k)=k+N_sand;
-                Add_Fixed_Corotated(16e9*unit_p*scale_E,0.44,&ball_particles);
+                Add_Fixed_Corotated(16e7*unit_p*scale_E,0.44,&ball_particles);
             }
-            Add_Gravity(m/(s*s)*TV(0,-9.81,0));
+            Add_Gravity(TV(0,-g,0));
+        } break;
+
+        case 47:{ // sandbox with collision object ball
+            if(!use_foo_T1) foo_T1=1;
+            if(!use_foo_T2) foo_T2=1;
+            if(!use_foo_T3) foo_T3=1;
+            particles.Store_Fp(true);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            T sand_depth=0.35*m;
+            T air_height=0.65*m;
+            T sand_length=1*m;
+            T sand_width=1*m;
+            T wall_thickness=0.2*m;
+            RANGE<TV> sand(TV(-sand_width/2,-sand_depth,-sand_length/2),TV(sand_width/2,0,sand_length/2));
+            RANGE<TV> sand_box(sand.Thickened(wall_thickness));
+            RANGE<TV> sand_box_interior(sand);
+            sand_box_interior.max_corner(1)=sand_box.max_corner(1);
+            RANGE<TV> domain(sand);
+            domain.max_corner(1)=air_height;
+            domain=domain.Thickened(0.05*m);
+            grid.Initialize(TV_INT(domain.Edge_Lengths()*resolution),domain,true);
+            auto sand_box_walls=
+                new IMPLICIT_OBJECT_INTERSECTION<TV>(
+                        new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sand_box),
+                        new IMPLICIT_OBJECT_INVERT<TV>(
+                            new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sand_box_interior)));
+            if(use_penalty_collisions){
+                Add_Penalty_Collision_Object(sand_box_walls);}
+            else{
+                Add_Collision_Object(sand_box_walls,COLLISION_TYPE::stick,0);}
+
+            T y0=0.15*m;
+            T v0=-1*m/s;
+            T g=9.81*m/(s*s);
+            T radius=0.1*foo_T3*m;
+            SPHERE<TV> sphere(TV(0,y0,0),radius);
+            T stop_time=(v0+sqrt(sqr(v0)+2*(y0-radius+sand_depth-0.05*m)*g))/g;
+            Add_Collision_Object(sphere,COLLISION_TYPE::separate,friction,
+                    [=](T time){
+                        if(time>stop_time) time=stop_time;
+                        return FRAME<TV>(TV(0,v0*time-0.5*g*sqr(time),0));},
+                    [=](T time){
+                        if(time>stop_time) time=stop_time;
+                        return TWIST<TV>(TV(0,v0-g*time,0),typename TV::SPIN());});
+
+            T density=(T)1582*unit_rho;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+
+            Seed_Particles(sand,0,0,density,particles_per_cell); 
+            // SAND PROPERTIES
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager(E,nu,(T)21,&sand_particles);
+            Set_Lame_On_Particles(E,nu);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
+            Add_Gravity(TV(0,-g,0));
         } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");

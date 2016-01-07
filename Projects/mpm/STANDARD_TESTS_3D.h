@@ -77,6 +77,10 @@ public:
     T foo_T3;
     T foo_T4;
     T foo_T5;
+    bool use_foo_T1;
+    bool use_foo_T2;
+    bool use_foo_T3;
+    bool use_foo_T4;
     bool use_foo_T5;
 
     TRIANGULATED_SURFACE<T>* foo_surface1;
