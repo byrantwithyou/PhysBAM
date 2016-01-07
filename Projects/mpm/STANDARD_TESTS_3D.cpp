@@ -997,11 +997,23 @@ Initialize()
 
          case 45:{ // sand castle
             particles.Store_Fp(true);
-            grid.Initialize(TV_INT(5,2,5)*resolution,RANGE<TV>(TV(-0.8,-0.1,-1.0)*m,TV(1.2,0.7,1.0)*m),true);
+            grid.Initialize(TV_INT(11,7,10)*resolution,RANGE<TV>(TV(-1.0,-0.1,-1.0)*m,TV(1.2,1.3,1.0)*m),true);
             LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
-            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,0,10)*m);
-            if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
-            else Add_Collision_Object(ground,COLLISION_TYPE::separate,0.6);
+            RANGE<TV> boxymin(TV(-10,-10,-10)*m,TV(10,0,10)*m);
+            RANGE<TV> boxymax(TV(-10,1.2,-10)*m,TV(10,10,10)*m);
+            RANGE<TV> boxxmin(TV(-10,-10,-10)*m,TV(-0.9,10,10)*m);
+            RANGE<TV> boxxmax(TV(1.1,-10,-10)*m,TV(10,10,10)*m);
+            RANGE<TV> boxzmin(TV(-10,-10,-10)*m,TV(10,10,-0.9)*m);
+            RANGE<TV> boxzmax(TV(-10,-10,0.9)*m,TV(10,10,10)*m);
+            IMPLICIT_OBJECT_UNION<TV>* box=new IMPLICIT_OBJECT_UNION<TV>(
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxxmin),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxxmax),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxymin),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxymax),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxzmin),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxzmax));
+            if(use_penalty_collisions) PHYSBAM_FATAL_ERROR();
+            else Add_Collision_Object(box,COLLISION_TYPE::separate,0.3);
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
@@ -1025,12 +1037,12 @@ Initialize()
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager_Case(E,nu,case_num,&sand_particles);
-            SPHERE<TV> sphere1(TV(-0.64,0.52,0)*m,.1*m);
-            T density_sphere=1e5*unit_rho*scale_mass;
+            SPHERE<TV> sphere1(TV(-0.64,0.52,0)*m,.15*m);
+            T density_sphere=1e4*unit_rho*scale_mass;
             VECTOR<T,3> angular_velocity1(TV(0,0,foo_T2));
-            Seed_Particles(sphere1,[=](const TV& X){return angular_velocity1.Cross(X-sphere1.center)+TV(2.5,0,0)*(m/s);},
+            Seed_Particles(sphere1,[=](const TV& X){return angular_velocity1.Cross(X-sphere1.center)+TV(10,-3,0)*(m/s);},
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity1);},density_sphere,particles_per_cell);
-            Add_Fixed_Corotated(40e4*unit_p,0.3);
+            Add_Fixed_Corotated(40e5*unit_p,0.3);
             Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
         } break;    
 
