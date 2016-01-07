@@ -362,6 +362,9 @@ Display() const
 
     if(selected_vertex>=0) OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(deformable_body_collection.particles.X(selected_vertex),selected_vertex);
 
+    if(slice && slice->Is_Slice_Mode()){
+        glPushAttrib(GL_ENABLE_BIT);
+        slice->Enable_Clip_Planes();}
     if(draw_velocity_vectors) velocity_field.Display();
 
     // Visualize relative velocity on edges
@@ -391,7 +394,6 @@ Display() const
         if(hard_bound_boundary_surface_objects(i) && display_hard_bound_boundary_surface_objects){
             hard_bound_boundary_surface_objects(i)->wireframe_only=(display_mode==3);glPushName(5);hard_bound_boundary_surface_objects(i)->Display();glPopName();}
         glPopName();}
-    if(slice && slice->Is_Slice_Mode()) glPopAttrib();
 
     if(interaction_pair_display_mode){
         glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT);
@@ -451,6 +453,7 @@ Display() const
             OpenGL_Line(force_data.first_action_point,force_data.second_action_point);}
         OpenGL_End();
         glPopAttrib();}
+    if(slice && slice->Is_Slice_Mode()) glPopAttrib();
 }
 //#####################################################################
 // Function Cycle_Display_Mode
