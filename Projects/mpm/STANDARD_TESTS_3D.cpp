@@ -891,21 +891,15 @@ Initialize()
             LOG::printf("REAL GRID: %P\n",grid);
 
             if(!friction_is_set)friction=0.5;
-            //const T edge=0.05/2*m;
-            //const RANGE<TV> tooth=RANGE<TV>::Centered_Box()*0.5*edge;
-            //const ROTATION<TV> r45=ROTATION<TV>::From_Euler_Angles(0,0,pi/4);
-            //const T shift=sqrt(2)*edge;
             const T rake_half_width=0.14*m;
             const TV obstacle=TV(0.5,0,0.5)*m;
             const T obstacle_r=0.15*m;
             const TV start_pos(obstacle_r+rake_half_width,0,0);
 
-            LEVELSET_IMPLICIT_OBJECT<TV>* rock=Levelset_From_File<T>(data_directory+"/../Private_Data/rock.tri.gz");
             RANGE<TV> outside(TV(-0.1,-0.1,-0.1)*m,TV(1.1,0.3,1.1)*m);
             RANGE<TV> inside(TV(0.05,0.05,0.05)*m,TV(0.95,0.4,0.95)*m);
             IMPLICIT_OBJECT_UNION<TV> *sandbox=new IMPLICIT_OBJECT_UNION<TV>(
-                    rock,
-                    new ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T>>(CYLINDER<T>(obstacle,obstacle+TV(0,0.2,0)*m,obstacle_r)),
+                    Levelset_From_File<T>(data_directory+"/../Private_Data/rock.tri.gz"),
                     new IMPLICIT_OBJECT_INTERSECTION<TV>(
                         new IMPLICIT_OBJECT_INVERT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV>>(inside)),
                         new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV>>(outside)));
