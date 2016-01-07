@@ -765,6 +765,7 @@ Initialize()
             IMPLICIT_OBJECT_INTERSECTION<TV> ioi(&io_fill_part,&inv);
             ioi.owns_io.Fill(false);
             Seed_Particles(ioi,0,0,density,particles_per_cell);
+            LOG::printf("added %i particles.",particles.X.m);
             Set_Lame_On_Particles(E,nu);
             Add_Drucker_Prager_Case(E,nu,2);
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
