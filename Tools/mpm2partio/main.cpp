@@ -68,7 +68,7 @@ void Convert(const std::string& input_directory,const std::string& output_filena
     MPM_PARTICLES<VECTOR<T,N> > particles;
     int last_frame;
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);
-    PHYSBAM_ASSERT(start_at>0 && start_at<=last_frame);
+    PHYSBAM_ASSERT(start_at>=0 && start_at<=last_frame);
     for(int i=start_at;i<=last_frame;++i){
         FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%d/mpm_particles.gz",input_directory,i),particles);
         writePartio<T,N>(LOG::sprintf(output_filename_pattern.c_str(),i),particles,dump_valid);
