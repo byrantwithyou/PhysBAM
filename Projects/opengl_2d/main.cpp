@@ -135,7 +135,10 @@ Parse_Arguments(PARSE_ARGS& parse_args)
     opengl_window_title="opengl_2d: " + FILE_UTILITIES::Real_Path(basedir);
 #endif
 
-    if(FILE_UTILITIES::File_Exists(basedir+"/common/first_frame")) FILE_UTILITIES::Read_From_Text_File(basedir+"/common/first_frame",start_frame);
+    if(FILE_UTILITIES::File_Exists(basedir+"/common/first_frame")){
+       int start_frame_from_file;
+       FILE_UTILITIES::Read_From_Text_File(basedir+"/common/first_frame",start_frame_from_file);
+       start_frame=std::max(start_frame,start_frame_from_file);}
 
     ANIMATED_VISUALIZATION<T>::Parse_Arguments(parse_args);
 
