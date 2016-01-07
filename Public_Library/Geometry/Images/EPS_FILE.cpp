@@ -25,6 +25,7 @@ template<class T> EPS_FILE<T>::
     if(!stream) return;
     T scale;
     TV shift;
+    stream<<"showpage"<<std::endl;
     Compute_Transform(scale,shift);
     stream.seekp(head_offset,std::ios::beg);
     Emit(shift);
@@ -107,7 +108,6 @@ Update_Effective_Formatting()
     // if(effective_color!=cur_format.line_color){
     //     effective_color=cur_format.line_color;
     //     stream<<effective_color.x<<" "<<effective_color.y<<" "<<effective_color.z<<" setrgbcolor"<<std::endl;}
-//    T effective_line_width,effective_point_radius,effective_line_opacity,effective_fill_opacity;
 }
 //#####################################################################
 // Function Draw_Point
