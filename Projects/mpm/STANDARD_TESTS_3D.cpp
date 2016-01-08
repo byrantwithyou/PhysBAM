@@ -1095,6 +1095,18 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.8,0));
         } break;
         case 43:{ // Rotating table
+            particles.Store_Fp(true);
+            grid.Initialize(TV_INT(4,1,4)*resolution,RANGE<TV>(TV(),TV(1,0.25,1)*m),true);
+            LOG::printf("REAL GRID: %P\n",grid);
+
+            if(!friction_is_set)friction=0.5;
+            const T omega=0.5*pi/s;
+            Add_Collision_Object(
+                    CYLINDER<T>(TV(0,-0.1,0),TV(0,-0.1,0),0.5),
+                    COLLISION_TYPE::separate,friction,
+                    [=](T time){return FRAME<TV>(TV(),ROTATION<TV>::From_Euler_Angles(0,omega*time,0));},
+                    [=](T time){return TWIST<TV>(TV(),typename TV::SPIN(0,omega,0));});
+            Add_Gravity(m/(s*s)*TV(0,-9.8,0));
         } break;
 
         case 44:{ // sand falling into a pile.
