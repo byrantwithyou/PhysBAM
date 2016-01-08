@@ -169,6 +169,9 @@ public:
     SYMMETRIC_MATRIX<T,2> Normal_Equations_Matrix() const // 9 mults, 6 adds
     {return SYMMETRIC_MATRIX<T,2>(x[0]*x[0]+x[1]*x[1]+x[2]*x[2],x[3]*x[0]+x[4]*x[1]+x[5]*x[2],x[3]*x[3]+x[4]*x[4]+x[5]*x[5]);}
 
+    SYMMETRIC_MATRIX<T,3> Outer_Product_Matrix() const // 12 mults, 6 adds
+    {return SYMMETRIC_MATRIX<T,3>(x[0]*x[0]+x[3]*x[3],x[0]*x[1]+x[3]*x[4],x[0]*x[2]+x[3]*x[5],x[1]*x[1]+x[4]*x[4],x[1]*x[2]+x[4]*x[5],x[2]*x[2]+x[5]*x[5]);}
+
     MATRIX<T,2> Transpose_Times(const MATRIX& A) const // 12 mults, 8 adds
     {return MATRIX<T,2>(x[0]*A.x[0]+x[1]*A.x[1]+x[2]*A.x[2],x[3]*A.x[0]+x[4]*A.x[1]+x[5]*A.x[2],x[0]*A.x[3]+x[1]*A.x[4]+x[2]*A.x[5],x[3]*A.x[3]+x[4]*A.x[4]+x[5]*A.x[5]);}
 

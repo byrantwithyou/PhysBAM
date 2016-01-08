@@ -14,6 +14,7 @@ template<class T_input>
 class MATRIX<T_input,2,3>:public MATRIX_BASE<T_input,MATRIX<T_input,2,3> >
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T_input T;typedef T SCALAR;
     typedef MATRIX_BASE<T,MATRIX<T,2,3> > BASE;
     enum WORKAROUND1 {m=2,n=3};
@@ -121,6 +122,12 @@ public:
     MATRIX<T,2,3> Cofactor_Matrix() const
     {return Transposed(transpose.Cofactor_Matrix());}
 
+    SYMMETRIC_MATRIX<T,3> Normal_Equations_Matrix() const
+    {return transpose.Outer_Product_Matrix();}
+
+    SYMMETRIC_MATRIX<T,2> Outer_Product_Matrix() const
+    {return transpose.Normal_Equations_Matrix();}
+
     static MATRIX<T,2,3> Outer_Product(const VECTOR<T,m>& u,const VECTOR<T,n>& v)
     {MATRIX<T,2,3> result;result.transpose=MATRIX<T,3,2>::Outer_Product(v,u);return result;}
 
@@ -156,6 +163,12 @@ public:
 
     void Fast_Singular_Value_Decomposition(MATRIX<T,2>& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX<T,3,2>& V) const
     {transpose.Fast_Singular_Value_Decomposition(V,singular_values,U);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,transpose);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,transpose);}
 
 //#####################################################################
 };

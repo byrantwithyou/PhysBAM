@@ -98,10 +98,10 @@ template<class T,int d> SCALE_MATRIX<T,d> operator*(const IDENTITY_MATRIX<T,d>& 
 template<class T,int d> ZERO_MATRIX<T,d> operator*(const ZERO_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a;}
 template<class T,int d> ZERO_MATRIX<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,const ZERO_MATRIX<T,d>& b) {return b;}
 template<class T,int d> IDENTITY_MATRIX<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return b;}
-template<class T,int d> MATRIX<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,const MATRIX<T,d>& b) {return b;}
+template<class T,int m,int n> MATRIX<T,m,n> operator*(const IDENTITY_MATRIX<T,m>& a,const MATRIX<T,m,n>& b) {return b;}
 template<class T,int d> SYMMETRIC_MATRIX<T,d> operator*(const IDENTITY_MATRIX<T,d>& a,const SYMMETRIC_MATRIX<T,d>& b) {return b;}
 template<class T,int d> SYMMETRIC_MATRIX<T,d> operator*(const SYMMETRIC_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a;}
-template<class T,int d> MATRIX<T,d> operator*(const MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a;}
+template<class T,int m,int n> MATRIX<T,m,n> operator*(const MATRIX<T,m,n>& a,const IDENTITY_MATRIX<T,n>& b) {return a;}
 template<class T,int d> DIAGONAL_MATRIX<T,d> operator*(const DIAGONAL_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a;}
 
 template<class T,int d> T Double_Contract(const SCALE_MATRIX<T,d>& a,const IDENTITY_MATRIX<T,d>& b) {return a.Trace();}
