@@ -199,6 +199,7 @@ template<class OP> struct VEC_MAP_1
     template<class OBJ,class BASE,class ...Args> static decltype(TYPE_VEC_MAP_1<OP,VEC_HOLDER<OBJ,BASE> >::Type(typename remove_reference<Args>::type()...))
     Type(VEC_HOLDER<OBJ,BASE>,Args...);
     template<class ...Args> static VEC_END Type(VEC_END,Args...);
+    template<class ...Args> static DIFF_UNUSED Type(DIFF_UNUSED,Args&&...);
     template<class OBJ,class BASE,class ...Args> static void Type_Debug(VEC_HOLDER<OBJ,BASE>,Args...)
     {TYPE_VEC_MAP_1<OP,VEC_HOLDER<OBJ,BASE> >::Type_Debug(typename remove_reference<Args>::type()...);}
     template<class ...Args> static void Type_Debug(VEC_END,Args...){}
@@ -232,6 +233,7 @@ template<class OP> struct VEC_MAP_2
     template<class OBJ0,class BASE0,class OBJ1,class BASE1,class ...Args> static decltype(TYPE_VEC_MAP_2<OP,VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1> >::Type(typename remove_reference<Args>::type()...))
     Type(VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1>,Args...);
     template<class ...Args> static VEC_END Type(VEC_END,VEC_END,Args...);
+    template<class ...Args> static DIFF_UNUSED Type(DIFF_UNUSED,Args&&...);
 
     template<class OBJ0,class BASE0,class OBJ1,class BASE1,class ...Args> static void
     Type_Debug(VEC_HOLDER<OBJ0,BASE0>,VEC_HOLDER<OBJ1,BASE1>,Args...)
