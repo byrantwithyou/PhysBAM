@@ -73,15 +73,15 @@ Contract_0(const HESSIAN_VEC<TV,MAT>& h,const TV2& v,typename enable_if<IS_VECTO
 
 template<class TV,class MAT,class T_MAT> auto
 Contract_00(const HESSIAN_VEC<TV,MAT>& h,const T_MAT& v,typename enable_if<IS_MATRIX<T_MAT>::value,void*>::type=0)
-{HESSIAN_VEC<TV,decltype(MAT_CONTRACT_00::Type(MAT(),T_MAT()))> r;MAT_CONTRACT_00()(r.x,h.x,v);return r;}
+{HESSIAN_VEC<VECTOR<typename TV::SCALAR,T_MAT::n>,decltype(MAT_CONTRACT_00::Type(MAT(),T_MAT()))> r;MAT_CONTRACT_00()(r.x,h.x,v);return r;}
 
-template<class TV,class VEC,class VEC1,class T_TEN> auto
-Symmetric_Double_Contract_12_With_Tensor(const T_TEN& t,const GRADIENT_VEC<TV,VEC>& a,const GRADIENT_VEC<TV,VEC1>& b)
-{HESSIAN_VEC<TV,decltype(MAT_SYM_DOUBLE_CONTRACT_12::Type(VEC(),VEC1(),T_TEN()))> r;MAT_SYM_DOUBLE_CONTRACT_12()(r.x,a.x,b.x,t);return r;}
+template<class TV,class TV2,class VEC,class VEC1,class T_TEN> auto
+Symmetric_Double_Contract_12_With_Tensor(const T_TEN& t,const GRADIENT_VEC<TV,VEC>& a,const GRADIENT_VEC<TV2,VEC1>& b)
+{HESSIAN_VEC<VECTOR<typename TV::SCALAR,T_TEN::m>,decltype(MAT_SYM_DOUBLE_CONTRACT_12::Type(VEC(),VEC1(),T_TEN()))> r;MAT_SYM_DOUBLE_CONTRACT_12()(r.x,a.x,b.x,t);return r;}
 
 template<class TV,class MAT,class T_MAT> auto
 Contract_01(const HESSIAN_VEC<TV,MAT>& h,const T_MAT& v,typename enable_if<IS_MATRIX<T_MAT>::value,void*>::type=0)
-{HESSIAN_VEC<TV,decltype(MAT_CONTRACT_01::Type(MAT(),T_MAT()))> r;MAT_CONTRACT_01()(r.x,h.x,v);return r;}
+{HESSIAN_VEC<VECTOR<typename TV::SCALAR,T_MAT::m>,decltype(MAT_CONTRACT_01::Type(MAT(),T_MAT()))> r;MAT_CONTRACT_01()(r.x,h.x,v);return r;}
 }
 }
 

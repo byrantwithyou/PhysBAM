@@ -57,9 +57,9 @@ template<class T,int d,class VEC> auto
 Outer_Product(const VECTOR<T,d>& u,const GRADIENT<T,VEC>& v)
 {GRADIENT_VEC<VECTOR<T,d>,decltype(VEC_OUTER_PRODUCT_REV::Type(VEC(),VECTOR<T,d>()))> r;VEC_OUTER_PRODUCT_REV()(r.x,v.x,u);return r;}
 
-template<class TV,class VEC,class T_MAT> typename enable_if<IS_MATRIX<T_MAT>::value,GRADIENT_VEC<TV,decltype(VEC_MUL_MB::Type(VEC(),T_MAT()))> >::type
+template<class TV,class VEC,class T_MAT> typename enable_if<IS_MATRIX<T_MAT>::value,GRADIENT_VEC<VECTOR<typename TV::SCALAR,T_MAT::m>,decltype(VEC_MUL_MB::Type(VEC(),T_MAT()))> >::type
 operator* (const T_MAT& a,const GRADIENT_VEC<TV,VEC>& u)
-{GRADIENT_VEC<TV,decltype(VEC_MUL_MB::Type(VEC(),T_MAT()))> r;VEC_MUL_MB()(r.x,u.x,a);return r;}
+{GRADIENT_VEC<VECTOR<typename TV::SCALAR,T_MAT::m>,decltype(VEC_MUL_MB::Type(VEC(),T_MAT()))> r;VEC_MUL_MB()(r.x,u.x,a);return r;}
 
 template<int i,class TV,class A,int d,class VEC> inline void
 Extract(VECTOR<A,d>& dx,const GRADIENT_VEC<TV,VEC>& v)
