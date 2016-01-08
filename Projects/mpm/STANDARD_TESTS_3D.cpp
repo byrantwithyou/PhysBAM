@@ -800,15 +800,15 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
         case 38:
-        case 39:{ // hourglass as a penalty collision object
+        case 39:{//cup flip
             particles.Store_Fp(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             grid.Initialize(TV_INT(resolution*2,resolution,2*resolution),RANGE<TV>(TV(-1,-0.5,-1),TV(1,0.5,1)),true);
-            RANGE<TV> cupbottom(TV(-0.3,-0.25,-0.3),TV(0.3,-0.2,0.3));
-            RANGE<TV> cupleft(TV(-0.3,-0.25,-0.3),TV(-0.25,0.25,0.3));
-            RANGE<TV> cupright(TV(0.25,-0.25,-0.3),TV(0.3,0.25,0.3));
-            RANGE<TV> cupback(TV(-0.3,-0.25,-0.3),TV(0.3,0.25,-0.25));
-            RANGE<TV> cupfront(TV(-0.3,-0.25,0.25),TV(0.3,0.25,0.3));
+            RANGE<TV> cupbottom(TV(-0.3,-0.40,-0.3),TV(0.3,-0.35,0.3));
+            RANGE<TV> cupleft(TV(-0.3,-0.40,-0.3),TV(-0.25,0.25,0.3));
+            RANGE<TV> cupright(TV(0.25,-0.40,-0.3),TV(0.3,0.25,0.3));
+            RANGE<TV> cupback(TV(-0.3,-0.40,-0.3),TV(0.3,0.25,-0.25));
+            RANGE<TV> cupfront(TV(-0.3,-0.40,0.25),TV(0.3,0.25,0.3));
             IMPLICIT_OBJECT_UNION<TV>* cup=new IMPLICIT_OBJECT_UNION<TV>(
                 new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupbottom),
                 new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupleft),
@@ -816,29 +816,136 @@ Initialize()
                 new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupback),
                 new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupfront));
             Add_Collision_Object(cup,COLLISION_TYPE::separate,0);
-            Add_Walls(-1,COLLISION_TYPE::stick,0,0.04,false);
+            Add_Walls(-1,COLLISION_TYPE::slip,0.3,0.04,false);
             //Add sands
-            T density=(T)2200*unit_rho*scale_mass;
+            T density;
+            if(use_cohesion && sigma_Y!=0)
+                density=(T)1808.89*unit_rho*scale_mass;
+            else
+                density=(T)1582.22*unit_rho*scale_mass;
             T E=35.37e5*unit_p*scale_E,nu=.3;
-            ARRAY<RANGE<TV> > columns;
-            columns.Append(RANGE<TV>(TV(-0.24,-0.2,-0.24),TV(0.2,0.2,0.2)));
-            //columns.Append(RANGE<TV>(TV(-0.15,-0.2,-0.15),TV(0.05,0.2,0.1)));
-            //columns.Append(RANGE<TV>(TV(-0.02,-0.2,-0.2),TV(0.1,0.18,0.1)));
-            //columns.Append(RANGE<TV>(TV(0.12,-0.2,0.12),TV(0.15,0.12,0.15)));
-            //columns.Append(RANGE<TV>(TV(0.18,-0.2,0.18),TV(0.23,0.15,0.23)));
-            for(int k=0;k<columns.m;k++) Seed_Particles(columns(k),0,0,density,particles_per_cell);
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/voronoi_fracture_sphere.tri.gz",*surface);
+            LOG::cout<<"Read mesh of voronoi sphere #"<<surface->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh of voronoi sphere particle # "<<surface->particles.number<<std::endl;
+            surface->mesh.Initialize_Adjacent_Elements();    
+            surface->mesh.Initialize_Neighbor_Nodes();
+            surface->mesh.Initialize_Incident_Elements();
+            surface->Update_Bounding_Box();
+            surface->Initialize_Hierarchy();
+            surface->Update_Triangle_List();
+            LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,200);
+            LOG::cout<<"Seeding particles..."<<std::endl;
+            Seed_Particles(*levelset,0,0,density,particles_per_cell);
+            LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
+            //Sand properties
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
-            Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,test_number==38?sigma_Y:0);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
-            //Add water particles for case 57
+            //Add water particles for case 39
             if(test_number==39){
                 if(!use_foo_T5) foo_T5=(T)1e-2;
                 Add_Lambda_Particles(&sand_particles,E*foo_T5,nu,(T)1000*unit_rho,true,(T)0.3,(T)1);}
-            begin_frame=[this](int frame){if(frame==10) Add_Gravity(TV(0,20,0));};
+            int add_gravity_frame=restart?restart:10;
+            begin_frame=[this,add_gravity_frame](int frame){if(frame==add_gravity_frame) Add_Gravity(TV(0,20,0));};
+        } break;
+        case 48:{ // sand ball
+            particles.Store_Fp(true); if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            grid.Initialize(TV_INT(resolution,resolution,resolution),RANGE<TV>(TV(-.05,-.07,-.05),TV(.05,.03,.05)),true);
+            //Add sands
+            T density;
+            if(use_cohesion && sigma_Y!=0)
+                density=(T)1808.89*unit_rho*scale_mass;
+            else
+                density=(T)1582.22*unit_rho*scale_mass;
+            T E=35.37e4*unit_p*scale_E,nu=.3;
+
+            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,-0.05,10)*m);
+            Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
+            //strong levelset
+            TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
+            for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
+            strong->mesh.Initialize_Adjacent_Elements();    
+            strong->mesh.Initialize_Neighbor_Nodes();
+            strong->mesh.Initialize_Incident_Elements();
+            strong->Update_Bounding_Box();
+            strong->Initialize_Hierarchy();
+            strong->Update_Triangle_List();
+            LOG::cout<<"Converting strong mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* strong_levelset=Initialize_Implicit_Surface(*strong,200);
+            //full sphere
+            TRIANGULATED_SURFACE<T>* full=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
+            LOG::cout<<"Read mesh of full #"<<full->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read particles of full #"<<full->particles.number<<std::endl;
+            for(int i=0;i<full->particles.number;i++) full->particles.X(i)/=20;
+            full->mesh.Initialize_Adjacent_Elements();    
+            full->mesh.Initialize_Neighbor_Nodes();
+            full->mesh.Initialize_Incident_Elements();
+            full->Update_Bounding_Box();
+            full->Initialize_Hierarchy();
+            full->Update_Triangle_List();
+            LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* full_levelset=Initialize_Implicit_Surface(*full,200);
+            LOG::cout<<"Seeding particles..."<<std::endl;
+            Seed_Particles(*full_levelset,0,0,density,particles_per_cell);
+            LOG::cout<<"Sand particle count: "<<this->particles.number<<std::endl;
+            LOG::printf("Sand particle count=%P\n",particles.X.m);
+
+            //Sand properties
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,0);
+            Set_Lame_On_Particles(E,nu);
+            Add_Gravity(m/(s*s)*TV(0,-9.8,0));
+
+            T porosity=0.3;
+            T saturation_level=1;
+            T water_density=(T)1000*unit_rho;
+            T water_E=E*foo_T5;
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY<int> strong_lambda_particles;
+            ARRAY<int> weak_lambda_particles;
+            T volume_lambda=particles.volume(0)*porosity*saturation_level;
+            T mass_lambda=water_density*volume_lambda;
+            T lambda=water_E*nu/((1+nu)*(1-2*nu));
+            for(int k=0;k<sand_particles.m;k++){
+                int p=particles.Add_Element();
+                if(strong_levelset->Extended_Phi(particles.X(k))<=0){
+                    strong_lambda_particles.Append(p);
+                    (*color_attribute)(p)=VECTOR<T,3>(1,0,0);
+                    (*color_attribute)(k)=VECTOR<T,3>(1,0,0);}
+                else{
+                    weak_lambda_particles.Append(p);
+                    (*color_attribute)(p)=VECTOR<T,3>(0,1,0);
+                    (*color_attribute)(k)=VECTOR<T,3>(0,1,0);}
+                //lambda_particles(k)=p;
+                int i=sand_particles(k);
+                particles.valid(p)=true;
+                particles.X(p)=particles.X(i);
+                particles.V(p)=particles.V(i);
+                particles.F(p)=particles.F(i);
+                if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+                if(particles.store_B) particles.B(p)=particles.B(i);
+                if(particles.store_C) particles.C(p)=particles.C(i);
+                if(particles.store_S) particles.S(p)=particles.S(i);
+                particles.mass(p)=mass_lambda;
+                particles.volume(p)=volume_lambda;
+                particles.mu(p)=(T)0;
+                particles.mu0(p)=(T)0;
+                particles.lambda(p)=lambda;
+                particles.lambda0(p)=lambda;}
+            Add_Fixed_Corotated(water_E,nu,&strong_lambda_particles,true);
+            Add_Fixed_Corotated(water_E*0.1,nu,&weak_lambda_particles,true);
+            //if strong level set extended phi<0 then it means that we are in the strong level set
         } break;
 
         case 40:{ // dry sand siggraph letters drop

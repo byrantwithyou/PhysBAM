@@ -977,7 +977,7 @@ Initialize()
             for(int k=0;k<columns.m;k++) Seed_Particles(columns(k),0,0,density,particles_per_cell);
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
-            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,test_number==61?foo_T3:0);
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,test_number==61?sigma_Y:0);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
@@ -1074,8 +1074,8 @@ Initialize()
             Set_Lame_On_Particles(E,nu);
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
-            if(!use_foo_T3) foo_T3=1;
-            Add_Drucker_Prager(E,nu,(T)35,0,0,0,&sand_particles,false,foo_T3);
+            if(!use_cohesion) sigma_Y=1;
+            Add_Drucker_Prager(E,nu,(T)35,0,0,0,&sand_particles,false,sigma_Y);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 62:{ // hourglass

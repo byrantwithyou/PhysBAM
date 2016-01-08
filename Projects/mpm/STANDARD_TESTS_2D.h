@@ -47,9 +47,9 @@ public:
     using BASE::hardening_mast_case;using BASE::use_hardening_mast_case;using BASE::no_regular_seeding;
     using BASE::m;using BASE::s;using BASE::kg;using BASE::unit_p;using BASE::unit_mu;using BASE::unit_rho;
     using BASE::forced_collision_type;using BASE::penalty_damping_stiffness;using BASE::Set_Lame_On_Particles;
-    using BASE::friction;using BASE::friction_is_set;using BASE::destroy;using BASE::plasticity_models;
-    using BASE::write_output_files;using BASE::read_output_files;using BASE::begin_frame;
-    using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
+    using BASE::friction;using BASE::friction_is_set;using BASE::sigma_Y;using BASE::use_cohesion;
+    using BASE::destroy;using BASE::plasticity_models;using BASE::write_output_files;using BASE::read_output_files;
+    using BASE::begin_frame;using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
 
     // surface tension stuff
     bool use_surface_tension;
