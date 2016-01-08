@@ -7,12 +7,14 @@
 #include <Tools/Matrices/FRAME.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Basic_Geometry/HOURGLASS.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
@@ -1074,6 +1076,29 @@ Initialize()
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             if(!use_foo_T3) foo_T3=1;
             Add_Drucker_Prager(E,nu,(T)35,0,0,0,&sand_particles,false,foo_T3);
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
+        } break;
+        case 62:{ // hourglass
+            particles.Store_Fp(true);
+            grid.Initialize(TV_INT(4,9)*resolution,RANGE<TV>(TV(-0.2,-0.45)*m,TV(0.2,0.45)*m),true);
+            LOG::cout<<"GRID DX: " <<grid.dX<<std::endl;
+            IMPLICIT_OBJECT<TV>* hg=new ANALYTIC_IMPLICIT_OBJECT<HOURGLASS<TV> >(HOURGLASS<TV>(TV::Axis_Vector(1),TV(),(T).16,(T).0225,(T).8,(T).0225));
+            IMPLICIT_OBJECT<TV>* inv=new IMPLICIT_OBJECT_INVERT<TV>(hg);
+            if(use_penalty_collisions) Add_Penalty_Collision_Object(inv);
+            else Add_Collision_Object(inv,COLLISION_TYPE::separate,.3);
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            RANGE<TV> fill_part=grid.domain;
+            fill_part.min_corner.y=0;
+            fill_part.max_corner.y=.1;
+            ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> > io_fill_part(fill_part);
+            IMPLICIT_OBJECT_INTERSECTION<TV> ioi(&io_fill_part,hg);
+            ioi.owns_io.Fill(false);
+            Seed_Particles(ioi,0,0,density,particles_per_cell);
+            LOG::printf("added %i particles.",particles.X.m);
+            Set_Lame_On_Particles(E,nu);
+            Add_Drucker_Prager_Case(E,nu,2);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
