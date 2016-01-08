@@ -892,30 +892,21 @@ Initialize()
             LOG::printf("REAL GRID: %P\n",grid);
 
             if(!friction_is_set)friction=0.5;
-            const T rake_half_width=0.14*m;
-            const TV obstacle=TV(0.5,0,0.5)*m;
-            const T obstacle_r=0.15*m;
-            const TV start_pos(obstacle_r+rake_half_width,0,0);
+            const TV start_pos(0.25*m,0,0);
 
-            RANGE<TV> outside(TV(-0.1,-0.1,-0.1)*m,TV(1.1,0.3,1.1)*m);
-            RANGE<TV> inside(TV(0.05,0.05,0.05)*m,TV(0.95,0.4,0.95)*m);
-            IMPLICIT_OBJECT_UNION<TV> *sandbox=new IMPLICIT_OBJECT_UNION<TV>(
-                    Levelset_From_File<T>(data_directory+"/../Private_Data/rock.tri.gz"),
-                    new IMPLICIT_OBJECT_INTERSECTION<TV>(
-                        new IMPLICIT_OBJECT_INVERT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV>>(inside)),
-                        new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV>>(outside)));
+            IMPLICIT_OBJECT<TV> *sandbox=Levelset_From_File<T>(data_directory+"/../Private_Data/sandbox.tri.gz");
             Add_Collision_Object(sandbox,COLLISION_TYPE::stick,friction);
 
             LEVELSET_IMPLICIT_OBJECT<TV>* rake=Levelset_From_File<T>(data_directory+"/../Private_Data/rake.tri.gz");
 
             const T settle_wait(0.1);
-            const T final_t(10-settle_wait);
+            const T final_t(10);
             Add_Collision_Object(rake,COLLISION_TYPE::separate,friction,
                     [=](T time){
                         if(time<settle_wait) return FRAME<TV>(TV(-10,-10,-10));
                         time-=settle_wait;
                         ROTATION<TV> R=ROTATION<TV>::From_Euler_Angles(0,2*pi*time/final_t,0);
-                        return FRAME<TV>(TV(0,0.135*m,0)+obstacle+R.Rotate(start_pos),R);},
+                        return FRAME<TV>(TV(0.5,0.056,0.5)*m+R.Rotate(start_pos),R);},
                     [=](T time){return TWIST<TV>(TV(),typename TV::SPIN(0,time<settle_wait?0:2*pi/final_t,0));});
 
             T density=(T)2200*unit_rho*scale_mass;
