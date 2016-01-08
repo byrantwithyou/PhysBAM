@@ -1098,7 +1098,7 @@ Initialize()
                 new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxzmin),
                 new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxzmax));
             if(use_penalty_collisions) PHYSBAM_FATAL_ERROR();
-            else Add_Collision_Object(box,COLLISION_TYPE::separate,0.3);
+            else Add_Collision_Object(box,COLLISION_TYPE::stick,0);
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
