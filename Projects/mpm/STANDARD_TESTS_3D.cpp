@@ -7,6 +7,7 @@
 #include <Tools/Matrices/FRAME.h>
 #include <Geometry/Basic_Geometry/CONE.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
+#include <Geometry/Basic_Geometry/HOURGLASS.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
@@ -15,7 +16,6 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
-#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
@@ -776,35 +776,22 @@ Initialize()
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
-        case 36:{ // hourglass as a penalty collision object
+        case 36:{ // hourglass
             particles.Store_Fp(true);
             grid.Initialize(TV_INT(4,9,4)*resolution,RANGE<TV>(TV(-0.2,-0.45,-0.2)*m,TV(0.2,0.45,0.2)*m),true);
             LOG::cout<<"GRID DX: " <<grid.dX<<std::endl;
-            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/hourglass_closed.tri.gz",*surface);
-            LOG::cout<<"Read mesh elements "<<surface->mesh.elements.m<<std::endl;
-            LOG::cout<<"Read mesh particles "<<surface->particles.number<<std::endl;
-            surface->mesh.Initialize_Adjacent_Elements();    
-            surface->mesh.Initialize_Neighbor_Nodes();
-            surface->mesh.Initialize_Incident_Elements();
-            surface->Update_Bounding_Box();
-            surface->Initialize_Hierarchy();
-            surface->Update_Triangle_List();
-            LOG::cout<<"Building levelset for the collision object..."<<std::endl;
-            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,200);
-            LOG::cout<<"...done!"<<std::endl;
-            if(use_penalty_collisions) Add_Penalty_Collision_Object(levelset);
-            else Add_Collision_Object(levelset,COLLISION_TYPE::separate,.3);
+            IMPLICIT_OBJECT<TV>* hg=new ANALYTIC_IMPLICIT_OBJECT<HOURGLASS<TV> >(HOURGLASS<TV>(TV::Axis_Vector(1),TV(),(T).16,(T).0225,(T).8,(T).0225));
+            IMPLICIT_OBJECT<TV>* inv=new IMPLICIT_OBJECT_INVERT<TV>(hg);
+            if(use_penalty_collisions) Add_Penalty_Collision_Object(inv);
+            else Add_Collision_Object(inv,COLLISION_TYPE::separate,.3);
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             RANGE<TV> fill_part=grid.domain;
             fill_part.min_corner.y=0;
-            fill_part.max_corner.y=.2;
+            fill_part.max_corner.y=.1;
             ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> > io_fill_part(fill_part);
-            IMPLICIT_OBJECT_INVERT<TV> inv(levelset);
-            inv.owns_io=false;
-            IMPLICIT_OBJECT_INTERSECTION<TV> ioi(&io_fill_part,&inv);
+            IMPLICIT_OBJECT_INTERSECTION<TV> ioi(&io_fill_part,hg);
             ioi.owns_io.Fill(false);
             Seed_Particles(ioi,0,0,density,particles_per_cell);
             LOG::printf("added %i particles.",particles.X.m);
