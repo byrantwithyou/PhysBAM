@@ -714,7 +714,45 @@ Initialize()
 
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
        } break;
-        case 33:
+        case 33:{ // dry sand notch dam break, wedging friction angle
+            particles.Store_Fp(true);
+            grid.Initialize(TV_INT(5,3,5)*resolution,RANGE<TV>(TV(0,0,0)*m,TV(2,1.2,2)*m),true);
+            LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
+
+            RANGE<TV> ground(TV(-10,-5,-5)*m,TV(10,0.1,10)*m);
+            RANGE<TV> left_wall(TV(-5,-5,-5)*m,TV(0.1,10,10)*m);
+            RANGE<TV> back_wall(TV(-5,-1,-10)*m,TV(10,10,0.1)*m);
+            IMPLICIT_OBJECT_UNION<TV>* bounds=new IMPLICIT_OBJECT_UNION<TV>(
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(left_wall),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(back_wall));
+            Add_Collision_Object(bounds,COLLISION_TYPE::stick,0);
+
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/notch.tri.gz",*surface);
+            LOG::cout<<"Read mesh of notch triangle #"<<surface->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh of notch particle # "<<surface->particles.number<<std::endl;
+            surface->mesh.Initialize_Adjacent_Elements();
+            surface->mesh.Initialize_Neighbor_Nodes();
+            surface->mesh.Initialize_Incident_Elements();
+            surface->Update_Bounding_Box();
+            surface->Initialize_Hierarchy();
+            surface->Update_Triangle_List();
+            LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,200);
+            LOG::cout<<"Seeding particles..."<<std::endl;
+            Seed_Particles(*levelset,0,0,density,particles_per_cell);
+            LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
+            Set_Lame_On_Particles(E,nu);
+            Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
+            Add_Drucker_Prager_Case(E,nu,case_num);
+
+            
+        }break;
         case 34:{ // sand dam break
             // usage:./mpm 34 -3d -use_exp_F -max_dt 1e-3 -unit_p*scale_E 10 -fooT1 10 -fooT2 1000 -fooT3 3 -last_frame 20 
             particles.Store_Fp(true);
@@ -1044,26 +1082,26 @@ Initialize()
             write_output_files=[=](int frame){source->Write_Output_Files(frame);};
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
             begin_time_step=[=](T time)
-              {
-              if(time<0.08||time>= foo_T3) return;
-              int n=particles.number;
-              source->Begin_Time_Step(time);
-              T mu=E/(2*(1+nu));
-              T lambda=E*nu/((1+nu)*(1-2*nu));
-              for(int i=n;i<particles.number;i++){
-                particles.mu(i)=mu;
-                particles.mu0(i)=mu;
-                particles.lambda(i)=lambda;
-                particles.lambda0(i)=lambda;}
-              for(int i=0;i<plasticity_models.m;i++)
-                if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                  for(int p=n;p<particles.number;p++)
-                    dp->Update_Hardening(p,0);
+                {
+                    if(time<0.08||time>= foo_T3) return;
+                    int n=particles.number;
+                    source->Begin_Time_Step(time);
+                    T mu=E/(2*(1+nu));
+                    T lambda=E*nu/((1+nu)*(1-2*nu));
+                    for(int i=n;i<particles.number;i++){
+                        particles.mu(i)=mu;
+                        particles.mu0(i)=mu;
+                        particles.lambda(i)=lambda;
+                        particles.lambda0(i)=lambda;}
+                    for(int i=0;i<plasticity_models.m;i++)
+                        if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
+                            for(int p=n;p<particles.number;p++)
+                                dp->Update_Hardening(p,0);
                 
-              };
+                };
             end_time_step=[=](T time){
-             if(time<=foo_T3)
-              source->End_Time_Step(time);
+                if(time<=foo_T3)
+                    source->End_Time_Step(time);
             };
 
 
