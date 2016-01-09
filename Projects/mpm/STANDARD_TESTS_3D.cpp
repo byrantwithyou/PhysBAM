@@ -18,11 +18,13 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
+#include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
 #include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE_3D.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_SPHERE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_OLDROYD_FINITE_ELEMENTS.h>
@@ -30,9 +32,9 @@
 #include <Hybrid_Methods/Forces/VOLUME_PRESERVING_OB_NEO_HOOKEAN.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
+#include <fstream>
 #include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_3D.h"
-#include <fstream>
 namespace PhysBAM{
 //#####################################################################
 // Function Initialize_Implicit_Surface
@@ -657,12 +659,12 @@ Initialize()
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            Add_Drucker_Prager_Case(E,nu,test_number-20);
             T gap=grid.dX(1)*0.1;
             T l0=0.05*m;
             T h0=l0*8;
             CYLINDER<T> cylinder(TV(.5*m,.1+gap,.5*m),TV(.5*m,.1*m+gap+h0,.5*m),l0);
             Seed_Particles(cylinder,0,0,density,particles_per_cell);
+            Add_Drucker_Prager_Case(E,nu,test_number-20);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
@@ -915,17 +917,17 @@ Initialize()
         } break;
         case 48:{ // sand ball
             particles.Store_Fp(true); if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            grid.Initialize(TV_INT(resolution,resolution,resolution),RANGE<TV>(TV(-.05,-.07,-.05),TV(.05,.03,.05)),true);
+            grid.Initialize(TV_INT(2*resolution,resolution,2*resolution),RANGE<TV>(TV(-.05,-.03,-.05),TV(.05,.02,.05)),true);
             //Add sands
             T density;
             if(use_cohesion && sigma_Y!=0)
                 density=(T)1808.89*unit_rho*scale_mass;
             else
                 density=(T)1582.22*unit_rho*scale_mass;
-            T E=35.37e4*unit_p*scale_E,nu=.3;
+            T E=35.37e5*unit_p*scale_E,nu=.3;
 
-            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,-0.05,10)*m);
-            Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
+            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,-0.015,10)*m);
+            Add_Collision_Object(ground,COLLISION_TYPE::slip,0.1);
             //strong levelset
             TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
             FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
@@ -955,7 +957,7 @@ Initialize()
             LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
             LEVELSET_IMPLICIT_OBJECT<TV>* full_levelset=Initialize_Implicit_Surface(*full,200);
             LOG::cout<<"Seeding particles..."<<std::endl;
-            Seed_Particles(*full_levelset,0,0,density,particles_per_cell);
+            Seed_Particles(*full_levelset,[=](const TV& X){return TV(0,-2.5,0);},0,density,particles_per_cell);
             LOG::cout<<"Sand particle count: "<<this->particles.number<<std::endl;
             LOG::printf("Sand particle count=%P\n",particles.X.m);
 
@@ -967,7 +969,7 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.8,0));
 
             T porosity=0.3;
-            T saturation_level=1;
+            T saturation_level=foo_T3;
             T water_density=(T)1000*unit_rho;
             T water_E=E*foo_T5;
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
@@ -977,18 +979,114 @@ Initialize()
             T mass_lambda=water_density*volume_lambda;
             T lambda=water_E*nu/((1+nu)*(1-2*nu));
             for(int k=0;k<sand_particles.m;k++){
-                int p=particles.Add_Element();
                 if(strong_levelset->Extended_Phi(particles.X(k))<=0){
+                    int p=particles.Add_Element();
+                    particles.mass(p)=mass_lambda;
                     strong_lambda_particles.Append(p);
+                    particles.lambda(p)=lambda;
+                    particles.lambda0(p)=lambda;
                     (*color_attribute)(p)=VECTOR<T,3>(1,0,0);
-                    (*color_attribute)(k)=VECTOR<T,3>(1,0,0);}
-                else{
-                    weak_lambda_particles.Append(p);
-                    (*color_attribute)(p)=VECTOR<T,3>(0,1,0);
+                    (*color_attribute)(k)=VECTOR<T,3>(1,0,0);
+                    int i=sand_particles(k);
+                    particles.valid(p)=true;
+                    particles.X(p)=particles.X(i);
+                    particles.V(p)=particles.V(i);
+                    particles.F(p)=particles.F(i);
+                    if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+                    if(particles.store_B) particles.B(p)=particles.B(i);
+                    if(particles.store_C) particles.C(p)=particles.C(i);
+                    if(particles.store_S) particles.S(p)=particles.S(i);
+                    particles.volume(p)=volume_lambda;
+                    particles.mu(p)=(T)0;
+                    particles.mu0(p)=(T)0;}
+                else
                     (*color_attribute)(k)=VECTOR<T,3>(0,1,0);}
-                //lambda_particles(k)=p;
-                int i=sand_particles(k);
+            Add_Fixed_Corotated(water_E,nu,&strong_lambda_particles,true);
+            //Add_Fixed_Corotated(water_E,nu,&weak_lambda_particles,true);
+            //if strong level set extended phi<0 then it means that we are in the strong level set
+        } break;
+
+        case 71:{
+        //./mpm 71 -resolution 120 -max_dt 2e-6 -fooT4 10 -fooT2 1e-7 -cohesion 100 -no_implicit_plasticity -symplectic_euler -threads 8 -framerate 240 -last_frame 24 
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            grid.Initialize(TV_INT(3*resolution,resolution,3*resolution),RANGE<TV>(TV(-.06,-0.04,-0.06),TV(0.06,.0,0.06)),true);
+            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,-0.035,10)*m);
+            Add_Collision_Object(ground,COLLISION_TYPE::slip,0.3);
+            // voronoi
+            TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
+            for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
+            strong->mesh.Initialize_Adjacent_Elements();    
+            strong->mesh.Initialize_Neighbor_Nodes();
+            strong->mesh.Initialize_Incident_Elements();
+            strong->Update_Bounding_Box();
+            strong->Initialize_Hierarchy();
+            strong->Update_Triangle_List();
+            LOG::cout<<"Converting strong mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* strong_levelset=Initialize_Implicit_Surface(*strong,200);
+
+            //full sphere
+            TRIANGULATED_SURFACE<T>* full=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
+            LOG::cout<<"Read mesh of full #"<<full->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read particles of full #"<<full->particles.number<<std::endl;
+            for(int i=0;i<full->particles.number;i++) full->particles.X(i)/=20;
+            full->mesh.Initialize_Adjacent_Elements();    
+            full->mesh.Initialize_Neighbor_Nodes();
+            full->mesh.Initialize_Incident_Elements();
+            full->Update_Bounding_Box();
+            full->Initialize_Hierarchy();
+            full->Update_Triangle_List();
+            LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* full_levelset=Initialize_Implicit_Surface(*full,200);
+
+            //sand
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e5*unit_p*scale_E,nu=.3;
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            LOG::cout<<"Seeding particles..."<<std::endl;
+            Seed_Particles(*full_levelset,[=](const TV& X){return TV(0,-2.7,0);},0,density,particles_per_cell);
+            LOG::printf("Sand particles count=%P\n",particles.X.m);
+            
+            particles.mu.Fill(mu);
+            particles.mu0.Fill(mu);
+            particles.lambda.Fill(lambda);
+            particles.lambda0.Fill(lambda);
+            if(!use_foo_T2) foo_T2=1e-3;
+            //if we are in the weak region, we use E that is scaled by foo_T2
+            ARRAY<int> sand_particles;
+            for(int k=0;k<particles.X.m;k++){
+                sand_particles.Append(k);
+                if(strong_levelset->Extended_Phi(VECTOR<T,3>(particles.X(k)(0),particles.X(k)(1),0))>0){
+                    //particles.mu(k)=mu*foo_T2;
+                    //particles.mu0(k)=mu*foo_T2;
+                    particles.lambda(k)=lambda*foo_T2;
+                    particles.lambda0(k)=lambda*foo_T2;}}
+            Add_Drucker_Prager(0,0,(T)35,&sand_particles,false,sigma_Y);
+            //water
+            T porosity=0.3;
+            T saturation_level=1;
+            T water_density=(T)1000*unit_rho;
+            if(!use_foo_T4) foo_T4=1e-3;
+            T water_E=E*foo_T4;
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY<int> lambda_particles;
+            T volume_lambda=particles.volume(0)*porosity*saturation_level;
+            T mass_lambda=water_density*volume_lambda;
+            T lambda_water_strong=water_E*nu/((1+nu)*(1-2*nu));
+            T lambda_water_weak=foo_T2*water_E*nu/((1+nu)*(1-2*nu));
+            for(int k=0;k<sand_particles.m;k++){
+                bool inside=strong_levelset->Extended_Phi(VECTOR<T,3>(particles.X(k)(0),particles.X(k)(1),0))<=0;
+                int p=particles.Add_Element();
+                lambda_particles.Append(p);
                 particles.valid(p)=true;
+                particles.mass(p)=mass_lambda;
+                int i=sand_particles(k);
                 particles.X(p)=particles.X(i);
                 particles.V(p)=particles.V(i);
                 particles.F(p)=particles.F(i);
@@ -996,16 +1094,162 @@ Initialize()
                 if(particles.store_B) particles.B(p)=particles.B(i);
                 if(particles.store_C) particles.C(p)=particles.C(i);
                 if(particles.store_S) particles.S(p)=particles.S(i);
-                particles.mass(p)=mass_lambda;
                 particles.volume(p)=volume_lambda;
                 particles.mu(p)=(T)0;
                 particles.mu0(p)=(T)0;
-                particles.lambda(p)=lambda;
-                particles.lambda0(p)=lambda;}
-            Add_Fixed_Corotated(water_E,nu,&strong_lambda_particles,true);
-            Add_Fixed_Corotated(water_E*0.1,nu,&weak_lambda_particles,true);
-            //if strong level set extended phi<0 then it means that we are in the strong level set
+                particles.lambda(p)=inside?lambda_water_strong:lambda_water_weak;
+                particles.lambda0(p)=inside?lambda_water_strong:lambda_water_weak;
+                (*color_attribute)(p)=inside?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0);
+                (*color_attribute)(k)=inside?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0);}
+            Add_Fixed_Corotated(water_E,nu,&lambda_particles,true);
+
+            T radius=0;
+            for(int p=0;p<particles.X.m;p++){
+                if(particles.X(p)(1)>radius) radius=particles.X(p)(1);}
+            LOG::printf("check radius=%P\n",radius);
+            const SPHERE<TV> ball(TV()*m,.021*m);
+            const SPHERE<TV> padded_ball(ball.center,0.011*m);
+
+            ARRAY<SPHERE<TV> > spheres;
+            for(int i=1;i<=500;i++){
+                TV offset=random.template Get_Vector_In_Unit_Sphere<TV>()*padded_ball.radius;
+                if(offset.Magnitude()<padded_ball.radius*0.5 || offset.Magnitude()>padded_ball.radius*0.9)
+                {i--;continue;}
+                T radius=random.Get_Uniform_Number(0,padded_ball.radius-offset.Magnitude());
+                if(radius<padded_ball.radius*0.1)
+                {i--;continue;}
+                spheres.Append(SPHERE<TV>(offset+padded_ball.center,radius));}
+            const T h=10;
+            const T a=1.025;
+            const T ea=exp((a-1)*h); 
+            //particles.Preallocate(number_of_particles);
+            for(int p=0;p<particles.X.m;p++){
+                LOG::cout<<"p=:"<<p<<std::endl;
+                bool inside=ball.Inside(particles.X(p),0);
+                for(int j=0;j<spheres.m;j++)
+                    inside|=spheres(j).Inside(particles.X(p),0);
+                if(!inside){p--;continue;}
+
+                T mult=1;
+                for(int i=0;i<10;i++)
+                    if((particles.X(p)-ball.center).Magnitude()>(i+1)*ball.radius/10){
+                        particles.mass(p)/=a;
+                        particles.lambda(p)/=ea;
+                        particles.lambda0(p)/=ea;
+                        particles.mu(p)/=ea;
+                        particles.mu0(p)/=ea;}
+                else mult*=a;
+
+                if(Uniform(0,1)>mult) p--;}
+
+
+            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
+            for(int p=0;p<particles.X.m;p++) particles.X(p)+=TV(0,-0.02,0);
+            Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
+
+
+        case 50:{
+        //./mpm 50 -resolution 120 -max_dt 2e-6 -fooT4 10 -fooT2 1e-7 -cohesion 100 -no_implicit_plasticity -symplectic_euler -threads 8 -framerate 240 -last_frame 24 
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            grid.Initialize(TV_INT(3*resolution,resolution,3*resolution),RANGE<TV>(TV(-.06,-0.04,-0.06),TV(0.06,.0,0.06)),true);
+            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,-0.035,10)*m);
+            Add_Collision_Object(ground,COLLISION_TYPE::slip,0.3);
+            // voronoi
+            TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
+            for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
+            strong->mesh.Initialize_Adjacent_Elements();    
+            strong->mesh.Initialize_Neighbor_Nodes();
+            strong->mesh.Initialize_Incident_Elements();
+            strong->Update_Bounding_Box();
+            strong->Initialize_Hierarchy();
+            strong->Update_Triangle_List();
+            LOG::cout<<"Converting strong mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* strong_levelset=Initialize_Implicit_Surface(*strong,200);
+
+            //full sphere
+            TRIANGULATED_SURFACE<T>* full=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
+            LOG::cout<<"Read mesh of full #"<<full->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read particles of full #"<<full->particles.number<<std::endl;
+            for(int i=0;i<full->particles.number;i++) full->particles.X(i)/=20;
+            full->mesh.Initialize_Adjacent_Elements();    
+            full->mesh.Initialize_Neighbor_Nodes();
+            full->mesh.Initialize_Incident_Elements();
+            full->Update_Bounding_Box();
+            full->Initialize_Hierarchy();
+            full->Update_Triangle_List();
+            LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* full_levelset=Initialize_Implicit_Surface(*full,200);
+
+            //sand
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e5*unit_p*scale_E,nu=.3;
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            LOG::cout<<"Seeding particles..."<<std::endl;
+            Seed_Particles(*full_levelset,[=](const TV& X){return TV(0,-2.7,0);},0,density,particles_per_cell);
+            LOG::printf("Sand particles count=%P\n",particles.X.m);
+            
+            particles.mu.Fill(mu);
+            particles.mu0.Fill(mu);
+            particles.lambda.Fill(lambda);
+            particles.lambda0.Fill(lambda);
+            if(!use_foo_T2) foo_T2=1e-3;
+            //if we are in the weak region, we use E that is scaled by foo_T2
+            ARRAY<int> sand_particles;
+            for(int k=0;k<particles.X.m;k++){
+                sand_particles.Append(k);
+                if(strong_levelset->Extended_Phi(VECTOR<T,3>(particles.X(k)(0),particles.X(k)(1),0))>0){
+                    //particles.mu(k)=mu*foo_T2;
+                    //particles.mu0(k)=mu*foo_T2;
+                    particles.lambda(k)=lambda*foo_T2;
+                    particles.lambda0(k)=lambda*foo_T2;}}
+            Add_Drucker_Prager(0,0,(T)35,&sand_particles,false,sigma_Y);
+            //water
+            T porosity=0.3;
+            T saturation_level=1;
+            T water_density=(T)1000*unit_rho;
+            if(!use_foo_T4) foo_T4=1e-3;
+            T water_E=E*foo_T4;
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY<int> lambda_particles;
+            T volume_lambda=particles.volume(0)*porosity*saturation_level;
+            T mass_lambda=water_density*volume_lambda;
+            T lambda_water_strong=water_E*nu/((1+nu)*(1-2*nu));
+            T lambda_water_weak=foo_T2*water_E*nu/((1+nu)*(1-2*nu));
+            for(int k=0;k<sand_particles.m;k++){
+                bool inside=strong_levelset->Extended_Phi(VECTOR<T,3>(particles.X(k)(0),particles.X(k)(1),0))<=0;
+                int p=particles.Add_Element();
+                lambda_particles.Append(p);
+                particles.valid(p)=true;
+                particles.mass(p)=mass_lambda;
+                int i=sand_particles(k);
+                particles.X(p)=particles.X(i);
+                particles.V(p)=particles.V(i);
+                particles.F(p)=particles.F(i);
+                if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+                if(particles.store_B) particles.B(p)=particles.B(i);
+                if(particles.store_C) particles.C(p)=particles.C(i);
+                if(particles.store_S) particles.S(p)=particles.S(i);
+                particles.volume(p)=volume_lambda;
+                particles.mu(p)=(T)0;
+                particles.mu0(p)=(T)0;
+                particles.lambda(p)=inside?lambda_water_strong:lambda_water_weak;
+                particles.lambda0(p)=inside?lambda_water_strong:lambda_water_weak;
+                (*color_attribute)(p)=inside?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0);
+                (*color_attribute)(k)=inside?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0);}
+            for(int p=0;p<particles.X.m;p++) particles.X(p)+=TV(0,-0.02,0);
+            Add_Fixed_Corotated(water_E,nu,&lambda_particles,true);
+            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
+            Add_Gravity(m/(s*s)*TV(0,-9.81,0));
+        } break;
+
 
         case 40:{ // dry sand siggraph letters drop
             particles.Store_Fp(true);
@@ -1373,7 +1617,7 @@ Initialize()
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
 
-            const SPHERE<TV> ball(TV(0,0.75,0)*m,.1*m);
+            const SPHERE<TV> ball(TV(0.5,0.75,0.5)*m,.1*m);
             const SPHERE<TV> padded_ball(ball.center,0.11*m);
             const T ball_volume=ball.Size();
             const int number_of_particles=particles_per_cell*ball_volume/grid.dX.Product();
@@ -1392,7 +1636,10 @@ Initialize()
             const T h=10;
             const T a=1.025;
             const T ea=exp((a-1)*h); 
-            particles.Preallocate(number_of_particles);
+            //particles.Preallocate(number_of_particles);
+            particles.Resize(number_of_particles);
+            ARRAY<int> sand_particles(number_of_particles);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
             for(int p=0;p<number_of_particles;p++){
                 particles.valid(p)=true;
@@ -1405,7 +1652,7 @@ Initialize()
                     inside|=spheres(j).Inside(particles.X(p),0);
                 if(!inside){p--;continue;}
 
-                particles.V(p)=TV(0,-1.2,0);
+                particles.V(p)=TV(0,-2.7,0);
                 particles.mass(p)=density*volume_per_particle*Perturb(0.5);
                 particles.volume(p)=volume_per_particle;
 
@@ -1420,11 +1667,59 @@ Initialize()
                     if((particles.X(p)-ball.center).Magnitude()>(i+1)*ball.radius/10){
                         particles.mass(p)*=a;
                         particles.lambda(p)*=ea;
-                        particles.mu(p)*=ea;}
+                        particles.lambda0(p)*=ea;
+                        particles.mu(p)*=ea;
+                        particles.mu0(p)*=ea;}
                     else mult/=a;
 
                 if(Uniform(0,1)>mult) p--;}
 
+            //water
+            T porosity=0.3;
+            T saturation_level=1;
+            T water_density=(T)1000*unit_rho;
+            if(!use_foo_T4) foo_T4=1e-3;
+            T water_E=E*foo_T4;
+            ARRAY<int> lambda_particles;
+            T volume_lambda=particles.volume(0)*porosity*saturation_level;
+            T mass_lambda=water_density*volume_lambda;
+            T lambda_water=water_E*nu/((1+nu)*(1-2*nu));
+            for(int k=0;k<sand_particles.m;k++){
+                int p=particles.Add_Element();
+                lambda_particles.Append(p);
+                particles.valid(p)=true;
+                particles.mass(p)=mass_lambda;
+                int i=sand_particles(k);
+                particles.X(p)=particles.X(i);
+                particles.V(p)=particles.V(i);
+                particles.F(p)=particles.F(i);
+                if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+                if(particles.store_B) particles.B(p)=particles.B(i);
+                if(particles.store_C) particles.C(p)=particles.C(i);
+                if(particles.store_S) particles.S(p)=particles.S(i);
+                particles.volume(p)=volume_lambda;
+                particles.mu(p)=(T)0;
+                particles.mu0(p)=(T)0;
+                particles.lambda(p)=lambda_water;
+                particles.lambda0(p)=lambda_water;}
+            for(int p=number_of_particles;p<particles.X.m;p++){
+                T mult=1;
+                for(int i=0;i<10;i++)
+                    if((particles.X(p)-ball.center).Magnitude()>(i+1)*ball.radius/10){
+                        particles.mass(p)*=a;
+                        particles.lambda(p)*=ea;
+                        particles.lambda0(p)*=ea;}
+                    else mult/=a;
+
+                if(Uniform(0,1)>mult) p--;}
+            //Add constitutive model
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,0);
+            Add_Fixed_Corotated(water_E,nu,&lambda_particles,true);
+            if(!use_theta_c) theta_c=0.01;
+            if(!use_theta_s) theta_s=.00001;
+            if(!use_hardening_factor) hardening_factor=80;
+            if(!use_max_hardening) max_hardening=5;
+            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(water_E,nu),theta_c,theta_s,max_hardening,hardening_factor,&lambda_particles); 
             for(int k=0;k<500;k++){
                 const TV offset=random.template Get_Vector_In_Unit_Sphere<TV>()*padded_ball.radius*5;
                 const T radius=random.Get_Uniform_Number(padded_ball.radius,padded_ball.radius*10);
@@ -1440,14 +1735,15 @@ Initialize()
                         particles.lambda(i)*=0.5;
                         particles.mu(i)*=0.5;
                         (*color_attribute)(i)(2)*=0.5;}}
-            
 
-            ARRAY<int> sand_particles(particles.X.m);
-            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
-            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,0);
-            Add_Lambda_Particles(&sand_particles,E,nu,unit_rho,true,0.3,1.0);
+            LOG::printf("check number_of_particles=%P\n",number_of_particles);
+            LOG::printf("check particles.X.m=%P\n",particles.X.m);
+            LOG::printf("particles count=%P\n",particles.X.m);
+            //shift the particles
+            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
+            for(int p=0;p<particles.X.m;p++) particles.X(p)+=TV(0,-0.60,0);
             Add_Gravity(TV(0,-9.81,0));
-        }
+        } break;
 
         case 947:{ // sand shovel
             //  ./mpm 947 -3d  -resolution 5 -max_dt 1e-4 -scale_E 0.01 -mast_case 0 -last_frame 120 -symplectic_euler -no_implicit_plasticity -o shovel
@@ -1552,6 +1848,89 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
 
+        case 70:{//shrinking ball
+            //./mpm -3d 70 -resolution 90 -max_dt 1e-5 -no_implicit_plasticity -symplectic_euler -threads 8 -framerate 120 -last_frame 120 -o Test_3d_1001_res_90 -fooT1 10 -fooT2 0.3
+            particles.Store_Fp(true);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            grid.Initialize(TV_INT(resolution*2,resolution,2*resolution),RANGE<TV>(TV(-1,-0.5,-1),TV(1,0.5,1)),true);
+
+            //Add sands
+            T density;
+            if(use_cohesion && sigma_Y!=0)
+                density=(T)1808.89*unit_rho*scale_mass;
+            else
+                density=(T)1582.22*unit_rho*scale_mass;
+            T E=35.37e5*unit_p*scale_E,nu=.3;
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/voronoi_fracture_sphere.tri.gz",*surface);
+            LOG::cout<<"Read mesh of voronoi sphere #"<<surface->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh of voronoi sphere particle # "<<surface->particles.number<<std::endl;
+            surface->mesh.Initialize_Adjacent_Elements();    
+            surface->mesh.Initialize_Neighbor_Nodes();
+            surface->mesh.Initialize_Incident_Elements();
+            surface->Update_Bounding_Box();
+            surface->Initialize_Hierarchy();
+            surface->Update_Triangle_List();
+            LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,200);
+            LOG::cout<<"Seeding particles..."<<std::endl;
+            Seed_Particles(*levelset,0,0,density,particles_per_cell);
+            LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
+            //Sand properties
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,0);
+            Set_Lame_On_Particles(E,nu);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            //water
+            T porosity=0.3;
+            T saturation_level=1;
+            T water_density=(T)1000*unit_rho;
+            if(!use_foo_T4) foo_T4=0.5;
+            T water_E=E*foo_T4;
+            ARRAY<int> lambda_particles;
+            T volume_lambda=particles.volume(0)*porosity*saturation_level;
+            T mass_lambda=water_density*volume_lambda;
+            T lambda_water_strong=water_E*nu/((1+nu)*(1-2*nu));
+            for(int k=0;k<sand_particles.m;k++){
+                int p=particles.Add_Element();
+                lambda_particles.Append(p);
+                particles.valid(p)=true;
+                particles.mass(p)=mass_lambda;
+                int i=sand_particles(k);
+                particles.X(p)=particles.X(i);
+                particles.V(p)=particles.V(i);
+                particles.F(p)=particles.F(i);
+                if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+                if(particles.store_B) particles.B(p)=particles.B(i);
+                if(particles.store_C) particles.C(p)=particles.C(i);
+                if(particles.store_S) particles.S(p)=particles.S(i);
+                particles.volume(p)=volume_lambda;
+                particles.mu(p)=(T)0;
+                particles.mu0(p)=(T)0;
+                particles.lambda(p)=lambda_water_strong;
+                particles.lambda0(p)=lambda_water_strong;
+                (*color_attribute)(p)=VECTOR<T,3>(1,0,0);
+                (*color_attribute)(k)=VECTOR<T,3>(1,0,0);}
+            Add_Fixed_Corotated(water_E,nu,&lambda_particles,true);
+            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
+            T max_radius=0;
+            for(int p=0;p<particles.X.m;p++) if(particles.X(p).Magnitude()>max_radius) max_radius=particles.X(p).Magnitude();
+            LOG::printf("max_radius=%P\n",max_radius);
+            if(!use_foo_T2) foo_T2=0.1;
+            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,-1.5*max_radius,10)*m);
+            Add_Collision_Object(ground,COLLISION_TYPE::slip,0.3);
+            collision_objects.Append(new MPM_COLLISION_IMPLICIT_SPHERE<TV>(COLLISION_TYPE::separate,0.3,0,0,TV(0,0,0),1.02*max_radius,foo_T2));
+            if(!use_foo_T1) foo_T1=10;
+            int add_gravity_frame=restart?restart:foo_T1;
+            begin_frame=[this,add_gravity_frame](int frame){
+                if(frame==add_gravity_frame){
+                    Add_Gravity(TV(0,-9.8,0));
+                    collision_objects.Pop(); 
+                    for(int p=0;p<particles.X.m;p++) particles.V(p)+=TV(0,-2.7,0);}};
+
+            LOG::printf("particles.velocity=%P\n",particles.V);
+        } break;
 
         case 949:{ // lambda voronoi sand ball
             // ./mpm 949 -3d -resolution 60 -threads 1 -max_dt 1e-4 -scale_E 0.01 -framerate 120 -last_frame 20 -fooT3 1 -fooT5 5 -symplectic_euler -no_implicit_plasticity -o zz

@@ -26,7 +26,7 @@ public:
     using BASE::mass;using BASE::force_helper;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::particles_per_cell;
     using BASE::substeps_delay_frame;using BASE::scale_mass;using BASE::scale_E;using BASE::scale_speed;
-    using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;
+    using BASE::data_directory;using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;using BASE::order;
     using BASE::ghost;using BASE::use_reduced_rasterization;using BASE::use_affine;
     using BASE::use_midpoint;using BASE::print_stats;using BASE::flip;using BASE::cfl;

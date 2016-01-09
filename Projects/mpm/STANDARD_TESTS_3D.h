@@ -36,7 +36,7 @@ public:
     using BASE::lagrangian_forces;using BASE::mass;using BASE::gather_scatter;
     using BASE::solver_iterations;using BASE::test_diff;using BASE::threads;using BASE::test_number;
     using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Gravity;
-    using BASE::Add_Fixed_Corotated;using BASE::random;using BASE::Seed_Lagrangian_Particles;
+    using BASE::Add_Fixed_Corotated;using BASE::random;using BASE::Seed_Lagrangian_Particles;using BASE::Add_Clamped_Plasticity;
     using BASE::Add_Force;using BASE::Add_Walls;using BASE::data_directory;
     using BASE::stream_type;using BASE::use_oldroyd;using BASE::force_helper;
     using BASE::Add_Neo_Hookean;using BASE::Add_St_Venant_Kirchhoff_Hencky_Strain;using BASE::Add_Collision_Object;

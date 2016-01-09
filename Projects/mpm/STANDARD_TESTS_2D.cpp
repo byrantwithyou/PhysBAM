@@ -7,19 +7,23 @@
 #include <Tools/Matrices/FRAME.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/HOURGLASS.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
@@ -42,6 +46,27 @@
 #include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
+//#####################################################################
+// Function Initialize_Implicit_Surface
+//
+// This was copied from DEFORMABLES_STANDARD_TESTS.cpp
+// TODO: put this function somewhere more convenient (maybe as a constructor of LEVELSET_IMPLICIT_OBJECT?)
+//#####################################################################
+template<class T> LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >*
+Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res)
+{
+    typedef VECTOR<int,3> TV_INT;
+    LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >::Create();
+    surface.Update_Bounding_Box();
+    RANGE<VECTOR<T,3> > box=*surface.bounding_box;
+    GRID<VECTOR<T,3> >& ls_grid=undeformed_levelset.levelset.grid;
+    ARRAY<T,TV_INT>& phi=undeformed_levelset.levelset.phi;
+    ls_grid=GRID<VECTOR<T,3> >::Create_Grid_Given_Cell_Size(box,box.Edge_Lengths().Max()/max_res,false,5);
+    phi.Resize(ls_grid.Domain_Indices(3));
+    LEVELSET_MAKER_UNIFORM<VECTOR<T,3> >::Compute_Level_Set(surface,ls_grid,3,phi);
+    undeformed_levelset.Update_Box();
+    return &undeformed_levelset;
+}
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -1106,6 +1131,282 @@ Initialize()
             LOG::printf("added %i particles.",particles.X.m);
             Set_Lame_On_Particles(E,nu);
             Add_Drucker_Prager_Case(E,nu,2);
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
+        } break;
+        case 63:{
+            particles.Store_Fp(true);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            grid.Initialize(TV_INT(resolution,2*resolution),RANGE<TV>(TV(-.05,-0.07),TV(0.05,.13)),true);
+            RANGE<TV> ground(TV(-0.1,-2)*m,TV(2,-0.05)*m);
+            RANGE<TV> leftwall(TV(-10,-10)*m,TV(-0.051,10)*m);
+            RANGE<TV> rightwall(TV(0.049,-10)*m,TV(10,10)*m);
+            Add_Collision_Object(ground,COLLISION_TYPE::slip,0.3);
+            Add_Collision_Object(leftwall,COLLISION_TYPE::stick,0);
+            Add_Collision_Object(rightwall,COLLISION_TYPE::stick,0);
+            T cs=(T).25/20;
+            RANGE<TV> cuptop(TV(-cs-0.01,0.025)*m,TV(cs+0.01,0.035)*m);
+            RANGE<TV> cupleft(TV(-cs-0.01,-0.02)*m,TV(-cs,0.025)*m);
+            RANGE<TV> cupright(TV(cs,-0.02)*m,TV(cs+0.01,0.025)*m);
+            Add_Collision_Object(
+                    new IMPLICIT_OBJECT_UNION<TV>(
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cuptop),
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupleft),
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(cupright)),COLLISION_TYPE::separate,0);
+
+            // voronoi
+            TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
+            for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
+            strong->mesh.Initialize_Adjacent_Elements();    
+            strong->mesh.Initialize_Neighbor_Nodes();
+            strong->mesh.Initialize_Incident_Elements();
+            strong->Update_Bounding_Box();
+            strong->Initialize_Hierarchy();
+            strong->Update_Triangle_List();
+            LOG::cout<<"Converting strong mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* strong_levelset=Initialize_Implicit_Surface(*strong,200);
+
+            ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> > sphere(SPHERE<TV> (TV()*m,(.5/20)*m));
+            RANDOM_NUMBERS<T> random;
+            ARRAY<TV> X;
+            POISSON_DISK<TV> poisson_disk(1);
+            poisson_disk.Set_Distance_By_Volume(grid.dX.Product()/particles_per_cell);
+            poisson_disk.Sample(random,sphere,X);
+
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e5*unit_p*scale_E,nu=.3;
+            T volume=grid.dX.Product()/particles_per_cell;
+            T mass=density*volume;
+            for(int i=0;i<X.m;i++)
+                if(strong_levelset->Extended_Phi(VECTOR<T,3>(X(i)(0),X(i)(1),0))<=(T)0)
+                    Add_Particle(X(i),0,0,mass,volume);
+
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,0);
+            Set_Lame_On_Particles(E,nu);
+            Add_Gravity(m/(s*s)*TV(0,9.81));
+            //water
+            if(!use_foo_T4) foo_T4=(T)1;
+            Add_Lambda_Particles(&sand_particles,E*foo_T4,nu,(T)1000*unit_rho,true,(T)0.3,(T)1);
+            int add_gravity_frame=restart?restart:60;
+            begin_frame=[this,add_gravity_frame](int frame){if(frame==add_gravity_frame) Add_Gravity(TV(0,-20));};
+        } break;
+        case 64:{
+            particles.Store_Fp(true);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            grid.Initialize(TV_INT(resolution,resolution),RANGE<TV>(TV(-.04,-0.04),TV(0.04,.04)),true);
+            RANGE<TV> ground(TV(-2,-2)*m,TV(2,-0.035)*m);
+            RANGE<TV> leftwall(TV(-10,-10)*m,TV(-0.035,10)*m);
+            RANGE<TV> rightwall(TV(0.035,-10)*m,TV(10,10)*m);
+            Add_Collision_Object(
+                    new IMPLICIT_OBJECT_UNION<TV>(
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(leftwall),
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(rightwall)),COLLISION_TYPE::slip,0.3);
+            // voronoi
+            TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
+            for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
+            strong->mesh.Initialize_Adjacent_Elements();    
+            strong->mesh.Initialize_Neighbor_Nodes();
+            strong->mesh.Initialize_Incident_Elements();
+            strong->Update_Bounding_Box();
+            strong->Initialize_Hierarchy();
+            strong->Update_Triangle_List();
+            LOG::cout<<"Converting strong mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* strong_levelset=Initialize_Implicit_Surface(*strong,200);
+
+            //full sphere
+            TRIANGULATED_SURFACE<T>* full=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
+            LOG::cout<<"Read mesh of full #"<<full->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read particles of full #"<<full->particles.number<<std::endl;
+            for(int i=0;i<full->particles.number;i++) full->particles.X(i)/=20;
+            full->mesh.Initialize_Adjacent_Elements();    
+            full->mesh.Initialize_Neighbor_Nodes();
+            full->mesh.Initialize_Incident_Elements();
+            full->Update_Bounding_Box();
+            full->Initialize_Hierarchy();
+            full->Update_Triangle_List();
+            LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* full_levelset=Initialize_Implicit_Surface(*full,200);
+
+            //sand
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e5*unit_p*scale_E,nu=.3;
+            T volume=grid.dX.Product()/particles_per_cell;
+            T mass=density*volume;
+            LOG::cout<<"Seeding particles..."<<std::endl;
+            ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> > sphere(SPHERE<TV> (TV()*m,(.55/20)*m));
+            RANDOM_NUMBERS<T> random;
+            ARRAY<TV> X;
+            POISSON_DISK<TV> poisson_disk(1);
+            poisson_disk.Set_Distance_By_Volume(grid.dX.Product()/particles_per_cell);
+            poisson_disk.Sample(random,sphere,X);
+            for(int i=0;i<X.m;i++)
+                if(full_levelset->Extended_Phi(VECTOR<T,3>(X(i)(0),X(i)(1),0))<=(T)0)
+                    Add_Particle(X(i),[=](const TV& X){return TV(0,-0.7);},0,mass,volume);
+            LOG::printf("Sand particles count=%P\n",particles.X.m);
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,0);
+            Set_Lame_On_Particles(E,nu);
+            //water
+            T porosity=0.3;
+            T saturation_level=1;
+            T water_density=(T)1000*unit_rho;
+            T water_E=E*foo_T4;
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY<int> strong_lambda_particles;
+            T volume_lambda=particles.volume(0)*porosity*saturation_level;
+            T mass_lambda=water_density*volume_lambda;
+            T lambda=water_E*nu/((1+nu)*(1-2*nu));
+            for(int k=0;k<sand_particles.m;k++){
+                if(strong_levelset->Extended_Phi(VECTOR<T,3>(particles.X(k)(0),particles.X(k)(1),0))<=0){
+                    int p=particles.Add_Element();
+                    particles.mass(p)=mass_lambda;
+                    strong_lambda_particles.Append(p);
+                    particles.lambda(p)=lambda;
+                    particles.lambda0(p)=lambda;
+                    (*color_attribute)(p)=VECTOR<T,3>(1,0,0);
+                    (*color_attribute)(k)=VECTOR<T,3>(1,0,0);
+                    int i=sand_particles(k);
+                    particles.valid(p)=true;
+                    particles.X(p)=particles.X(i);
+                    particles.V(p)=particles.V(i);
+                    particles.F(p)=particles.F(i);
+                    if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+                    if(particles.store_B) particles.B(p)=particles.B(i);
+                    if(particles.store_C) particles.C(p)=particles.C(i);
+                    if(particles.store_S) particles.S(p)=particles.S(i);
+                    particles.volume(p)=volume_lambda;
+                    particles.mu(p)=(T)0;
+                    particles.mu0(p)=(T)0;}
+                else{
+                    (*color_attribute)(k)=VECTOR<T,3>(0,1,0);}}
+            for(int p=0;p<particles.X.m;p++) particles.X(p)+=TV(0,-0.02);
+            Add_Fixed_Corotated(water_E,nu,&strong_lambda_particles,true);
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
+        } break;
+        case 65:{
+        //./mpm 65 -resolution 120 -max_dt 2e-6 -fooT4 10 -fooT2 1e-7 -cohesion 100 -no_implicit_plasticity -symplectic_euler -threads 8 -framerate 240 -last_frame 24 
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            grid.Initialize(TV_INT(3*resolution,resolution),RANGE<TV>(TV(-.06,-0.04),TV(0.06,.0)),true);
+            RANGE<TV> ground(TV(-2,-2)*m,TV(2,-0.035)*m);
+            RANGE<TV> leftwall(TV(-10,-10)*m,TV(-0.055,10)*m);
+            RANGE<TV> rightwall(TV(0.055,-10)*m,TV(10,10)*m);
+            Add_Collision_Object(
+                    new IMPLICIT_OBJECT_UNION<TV>(
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(leftwall),
+                    new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(rightwall)),COLLISION_TYPE::slip,0.3);
+            // voronoi
+            TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
+            for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
+            strong->mesh.Initialize_Adjacent_Elements();    
+            strong->mesh.Initialize_Neighbor_Nodes();
+            strong->mesh.Initialize_Incident_Elements();
+            strong->Update_Bounding_Box();
+            strong->Initialize_Hierarchy();
+            strong->Update_Triangle_List();
+            LOG::cout<<"Converting strong mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* strong_levelset=Initialize_Implicit_Surface(*strong,200);
+
+            //full sphere
+            TRIANGULATED_SURFACE<T>* full=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
+            LOG::cout<<"Read mesh of full #"<<full->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read particles of full #"<<full->particles.number<<std::endl;
+            for(int i=0;i<full->particles.number;i++) full->particles.X(i)/=20;
+            full->mesh.Initialize_Adjacent_Elements();    
+            full->mesh.Initialize_Neighbor_Nodes();
+            full->mesh.Initialize_Incident_Elements();
+            full->Update_Bounding_Box();
+            full->Initialize_Hierarchy();
+            full->Update_Triangle_List();
+            LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* full_levelset=Initialize_Implicit_Surface(*full,200);
+
+            //sand
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e5*unit_p*scale_E,nu=.3;
+            T mu=E/(2*(1+nu));
+            T lambda=E*nu/((1+nu)*(1-2*nu));
+            T volume=grid.dX.Product()/particles_per_cell;
+            T mass=density*volume;
+            LOG::cout<<"Seeding particles..."<<std::endl;
+            ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> > sphere(SPHERE<TV> (TV()*m,(.55/20)*m));
+            RANDOM_NUMBERS<T> random;
+            ARRAY<TV> X;
+            POISSON_DISK<TV> poisson_disk(1);
+            poisson_disk.Set_Distance_By_Volume(grid.dX.Product()/particles_per_cell);
+            poisson_disk.Sample(random,sphere,X);
+            for(int i=0;i<X.m;i++)
+                if(full_levelset->Extended_Phi(VECTOR<T,3>(X(i)(0),X(i)(1),0))<=(T)0)
+                    Add_Particle(X(i),[=](const TV& X){return TV(0,-2.7);},0,mass,volume);
+            LOG::printf("Sand particles count=%P\n",particles.X.m);
+            
+            particles.mu.Fill(mu);
+            particles.mu0.Fill(mu);
+            particles.lambda.Fill(lambda);
+            particles.lambda0.Fill(lambda);
+            if(!use_foo_T2) foo_T2=1e-3;
+            //if we are in the weak region, we use E that is scaled by foo_T2
+            ARRAY<int> sand_particles;
+            for(int k=0;k<particles.X.m;k++){
+                sand_particles.Append(k);
+                if(strong_levelset->Extended_Phi(VECTOR<T,3>(particles.X(k)(0),particles.X(k)(1),0))>0){
+                    particles.mu(k)=mu*foo_T2;
+                    particles.mu0(k)=mu*foo_T2;
+                    particles.lambda(k)=lambda*foo_T2;
+                    particles.lambda0(k)=lambda*foo_T2;}}
+            Add_Drucker_Prager(0,0,(T)35,&sand_particles,false,sigma_Y);
+            //water
+            T porosity=0.3;
+            T saturation_level=1;
+            T water_density=(T)1000*unit_rho;
+            if(!use_foo_T4) foo_T4=1e-3;
+            T water_E=E*foo_T4;
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY<int> lambda_particles;
+            T volume_lambda=particles.volume(0)*porosity*saturation_level;
+            T mass_lambda=water_density*volume_lambda;
+            T lambda_water_strong=water_E*nu/((1+nu)*(1-2*nu));
+            T lambda_water_weak=foo_T2*water_E*nu/((1+nu)*(1-2*nu));
+            for(int k=0;k<sand_particles.m;k++){
+                bool inside=strong_levelset->Extended_Phi(VECTOR<T,3>(particles.X(k)(0),particles.X(k)(1),0))<=0;
+                int p=particles.Add_Element();
+                lambda_particles.Append(p);
+                particles.valid(p)=true;
+                particles.mass(p)=mass_lambda;
+                int i=sand_particles(k);
+                particles.X(p)=particles.X(i);
+                particles.V(p)=particles.V(i);
+                particles.F(p)=particles.F(i);
+                if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+                if(particles.store_B) particles.B(p)=particles.B(i);
+                if(particles.store_C) particles.C(p)=particles.C(i);
+                if(particles.store_S) particles.S(p)=particles.S(i);
+                particles.volume(p)=volume_lambda;
+                particles.mu(p)=(T)0;
+                particles.mu0(p)=(T)0;
+                particles.lambda(p)=inside?lambda_water_strong:lambda_water_weak;
+                particles.lambda0(p)=inside?lambda_water_strong:lambda_water_weak;
+                (*color_attribute)(p)=inside?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0);
+                (*color_attribute)(k)=inside?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0);}
+            for(int p=0;p<particles.X.m;p++) particles.X(p)+=TV(0,-0.02);
+            Add_Fixed_Corotated(water_E,nu,&lambda_particles,true);
+            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
