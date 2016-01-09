@@ -1017,6 +1017,45 @@ Initialize()
             Add_Drucker_Prager_Case(E,nu,case_num);
         } break;
         case 41:{ // Draw in sand
+            particles.Store_Fp(true);
+            grid.Initialize(TV_INT(4,1,4)*resolution,RANGE<TV>(TV(),TV(1,0.25,1)*m),true);
+            LOG::printf("REAL GRID: %P\n",grid);
+
+            if(!friction_is_set)friction=0.5;
+            IMPLICIT_OBJECT<TV> *sandbox=Levelset_From_File<T>(data_directory+"/../Private_Data/sandbox_only.tri.gz");
+            Add_Collision_Object(sandbox,COLLISION_TYPE::stick,friction);
+
+
+            const T stylus_r=0.01*m;
+            const T settle_wait(0.1);
+            const T final_t(10-settle_wait);
+            Add_Collision_Object(
+                    CYLINDER<T>(TV(0,0.056*m,0),TV(0,0.3*m,0),stylus_r),COLLISION_TYPE::separate,friction,
+                    [=](T time){
+                        T t=std::max((T)0,time-settle_wait)*2*pi/final_t;
+                        T x=-(4*cos(t)*cos(16*t)+17*cos(t)*sin(7*t)-20*cos(t)*sin(5*t)+20*cos(t)*cos(4*t)-25*cos(t)*sin(3*t)-30*cos(t)*cos(2*t)+5*cos(t)*sin(t)-90*cos(t)-150)/300.0*m;
+                        T y=-(4*sin(t)*cos(16*t)+17*sin(t)*sin(7*t)-20*sin(t)*sin(5*t)+20*sin(t)*cos(4*t)-25*sin(t)*sin(3*t)-30*sin(t)*cos(2*t)+5*sqr(sin(t))-90*sin(t)-150)/300.0*m;
+                        return FRAME<TV>(TV(x,0,y));},
+                    [=](T time){
+                        if(time<settle_wait) return TWIST<TV>();
+                        T t=(time-settle_wait)*2*pi/final_t;
+                        T dx=-(-64*cos(t)*sin(16*t)-4*sin(t)*cos(16*t)-17*sin(t)*sin(7*t)+119*cos(t)*cos(7*t)+20*sin(t)*sin(5*t)-100*cos(t)*cos(5*t)-80*cos(t)*sin(4*t)-20*sin(t)*cos(4*t)+25*sin(t)*sin(3*t)-75*cos(t)*cos(3*t)+60*cos(t)*sin(2*t)+30*sin(t)*cos(2*t)-5*sqr(sin(t))+90*sin(t)+5*sqr(cos(t)))/300.0;
+                        T dy=-(-64*sin(t)*sin(16*t)+4*cos(t)*cos(16*t)+17*cos(t)*sin(7*t)+119*sin(t)*cos(7*t)-20*cos(t)*sin(5*t)-100*sin(t)*cos(5*t)-80*sin(t)*sin(4*t)+20*cos(t)*cos(4*t)-25*cos(t)*sin(3*t)-75*sin(t)*cos(3*t)+60*sin(t)*sin(2*t)-30*cos(t)*cos(2*t)+10*cos(t)*sin(t)-90*cos(t))/300.0;
+                        return TWIST<TV>(TV(dx,0,dy),typename TV::SPIN());});
+
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Levelset_From_File<T>(data_directory+"/../Private_Data/sanddune_square.tri.gz");
+            Seed_Particles(*levelset,0,0,density,particles_per_cell);
+            LOG::printf("Particle count: %d\n",particles.number);
+            Set_Lame_On_Particles(E,nu);
+
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            Add_Drucker_Prager_Case(E,nu,case_num);
+            Add_Gravity(m/(s*s)*TV(0,-9.8,0));
         } break;
         case 42:{ // Raking
             particles.Store_Fp(true);
