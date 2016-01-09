@@ -66,15 +66,15 @@ Write_Output_Files(const int frame)
 #pragma omp task
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
 #pragma omp task
-        system(LOG::sprintf("rm -f %s/%d/mpm_particles.gz ;  ln -s ./deformable_object_particles.gz %s/%d/mpm_particles.gz",output_directory.c_str(),frame,output_directory.c_str(),frame).c_str());
+        if(!system(LOG::sprintf("rm -f %s/%d/mpm_particles.gz ;  ln -s ./deformable_object_particles.gz %s/%d/mpm_particles.gz",output_directory.c_str(),frame,output_directory.c_str(),frame).c_str())){}
 #pragma omp task
-            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 #pragma omp task
-            {
-                int static_frame=output_structures_each_frame?frame:-1;
-                bool write_structures=(frame==0 || output_structures_each_frame);
-                deformable_body_collection.Write(stream_type,output_directory,output_directory,frame,static_frame,write_structures,false);
-            }
+        {
+            int static_frame=output_structures_each_frame?frame:-1;
+            bool write_structures=(frame==0 || output_structures_each_frame);
+            deformable_body_collection.Write(stream_type,output_directory,output_directory,frame,static_frame,write_structures,false);
+        }
 
         if(!only_write_particles){
 #pragma omp task
