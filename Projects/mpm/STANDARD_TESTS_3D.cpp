@@ -1022,18 +1022,18 @@ Initialize()
 
         case 44:{ // sand falling into a pile.
             particles.Store_Fp(true);
-            grid.Initialize(TV_INT(2,1,2)*resolution,RANGE<TV>(TV(-.15,-0.05,-0.15),TV(0.15,0.1,0.15))*m,true);
+            grid.Initialize(TV_INT(5,2,5)*resolution,RANGE<TV>(TV(-.1,-0.02,-0.1),TV(0.1,0.06,0.1))*m,true);
             RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,0,10)*m);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
-            else Add_Collision_Object(ground,COLLISION_TYPE::slip,foo_T1);
+            else Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
             T density=(T)2200*unit_rho*scale_mass;
             T E=1e4*unit_p*scale_E,nu=.3;
             T spout_width=8.334e-3*m;
-            T spout_height=.01*m;//??what is this
+            T spout_height=.01*m;
             T seed_buffer=grid.dX.y*5;
-            T pour_speed=.1653*m/s;
+            T pour_speed=.16319*m/s;
             TV gravity=TV(0,-9.8*m/(s*s),0);
-            CYLINDER<T> seed_range(TV(0,0.1*m-spout_height,0),TV(0,0.1*m+seed_buffer,0),spout_width/2);
+            CYLINDER<T> seed_range(TV(0,0.06*m-spout_height,0),TV(0,0.06*m+seed_buffer,0),spout_width/2);
 
             T volume=grid.dX.Product()/particles_per_cell;
             T mass=density*volume;
@@ -1044,24 +1044,26 @@ Initialize()
             write_output_files=[=](int frame){source->Write_Output_Files(frame);};
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
             begin_time_step=[=](T time)
-                {
-                    int n=particles.number;
-                    source->Begin_Time_Step(time);
-                    T mu=E/(2*(1+nu));
-                    T lambda=E*nu/((1+nu)*(1-2*nu));
-                    for(int i=n;i<particles.number;i++){
-                        particles.mu(i)=mu;
-                        particles.mu0(i)=mu;
-                        particles.lambda(i)=lambda;
-                        particles.lambda0(i)=lambda;}
-                    for(int i=0;i<plasticity_models.m;i++)
-                        if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                            for(int p=n;p<particles.number;p++)
-                                dp->Update_Hardening(p,0);
+              {
+              if(time<0.08||time>= foo_T3) return;
+              int n=particles.number;
+              source->Begin_Time_Step(time);
+              T mu=E/(2*(1+nu));
+              T lambda=E*nu/((1+nu)*(1-2*nu));
+              for(int i=n;i<particles.number;i++){
+                particles.mu(i)=mu;
+                particles.mu0(i)=mu;
+                particles.lambda(i)=lambda;
+                particles.lambda0(i)=lambda;}
+              for(int i=0;i<plasticity_models.m;i++)
+                if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
+                  for(int p=n;p<particles.number;p++)
+                    dp->Update_Hardening(p,0);
                 
-                };
+              };
             end_time_step=[=](T time){
-                source->End_Time_Step(time);
+             if(time<=foo_T3)
+              source->End_Time_Step(time);
             };
 
 
