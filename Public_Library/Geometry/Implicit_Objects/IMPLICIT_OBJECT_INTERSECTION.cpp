@@ -94,7 +94,7 @@ Active_Levelset(const TV& X) const
     int best_index=0;
     for(int i=1;i<io.m;i++){
         T p=(*io(i))(X);
-        if(p<phi){
+        if(p>phi){
             phi=p;
             best_index=i;}}
     return best_index;
@@ -117,7 +117,7 @@ Extended_Normal(const TV& X,const int aggregate) const
     int best_index=0;
     for(int i=1;i<io.m;i++){
         T p=io(i)->Extended_Phi(X);
-        if(p<phi){
+        if(p>phi){
             phi=p;
             best_index=i;}}
     return io(best_index)->Extended_Normal(X,aggregate);
