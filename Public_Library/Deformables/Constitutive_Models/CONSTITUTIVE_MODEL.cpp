@@ -84,17 +84,6 @@ Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input
     constant_alpha=Rayleigh_coefficient_input*constant_lambda;
     constant_beta=Rayleigh_coefficient_input*constant_mu;
 }
-//#####################################################################
-// Function Update_Variable_Coefficients
-//#####################################################################
-template<class T,int d> void CONSTITUTIVE_MODEL<T,d>::
-Update_Variable_Coefficients(int size)
-{
-    lambda.Resize(size,true,true,constant_lambda);
-    mu.Resize(size,true,true,constant_mu);
-    alpha.Resize(size,true,true,constant_alpha);
-    beta.Resize(size,true,true,constant_beta);
-}
 namespace PhysBAM{
 template class CONSTITUTIVE_MODEL<float,1>;
 template class CONSTITUTIVE_MODEL<float,2>;

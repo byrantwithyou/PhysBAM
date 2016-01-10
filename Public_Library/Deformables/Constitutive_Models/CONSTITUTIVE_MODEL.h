@@ -22,8 +22,8 @@ public:
     bool enforce_definiteness;
     T constant_lambda,constant_mu; // Lame coefficients (used by almost all derived models)
     T constant_alpha,constant_beta; // isotropic damping parameters (used by all current derived models)
-    ARRAY<T> lambda,mu; // spatially varying Lame coefficients
-    ARRAY<T> alpha,beta; // spatially varying damping parameters
+    ARRAY_VIEW<T> lambda,mu; // spatially varying Lame coefficients
+    ARRAY_VIEW<T> alpha,beta; // spatially varying damping parameters
 
 private:
     CONSTITUTIVE_MODEL();
@@ -45,7 +45,6 @@ public:
     virtual void P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const int id) const;
     virtual MATRIX<T,d> P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,const ARRAY_VIEW<const T> aggregate,const int id) const;
     virtual void Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input,const T Rayleigh_coefficient_input);
-    void Update_Variable_Coefficients(int size);
 //#####################################################################
 };
 }

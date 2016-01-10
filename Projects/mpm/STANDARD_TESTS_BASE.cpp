@@ -463,6 +463,25 @@ Set_Lame_On_Particles(T E,T nu)
     particles.mu0.Fill(mu);
     particles.lambda.Fill(lambda);
     particles.lambda0.Fill(lambda);
+    Update_Variable_Lame_Parameters_On_Constitutive_Models();
+}
+//#####################################################################
+// Function Update_Variable_Lame_Parameters_On_Constitutive_Models
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Update_Variable_Lame_Parameters_On_Constitutive_Models()
+{
+    for(int i=0;i<this->forces.m;++i){
+        MPM_FINITE_ELEMENTS<TV> *fe;
+        MPM_PLASTIC_FINITE_ELEMENTS<TV> *pfe;
+        if((fe=dynamic_cast<MPM_FINITE_ELEMENTS<TV>*>(this->forces(i)))){
+            fe->constitutive_model.mu.Set(particles.mu);
+            fe->constitutive_model.lambda.Set(particles.lambda);
+        }else if((pfe=dynamic_cast<MPM_PLASTIC_FINITE_ELEMENTS<TV>*>(this->forces(i)))){
+            pfe->constitutive_model.mu.Set(particles.mu);
+            pfe->constitutive_model.lambda.Set(particles.lambda);
+        }
+    }
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
