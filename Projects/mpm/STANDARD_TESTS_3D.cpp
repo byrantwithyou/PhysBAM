@@ -32,6 +32,7 @@
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_3D.h"
+#include <fstream>
 namespace PhysBAM{
 //#####################################################################
 // Function Initialize_Implicit_Surface
@@ -1435,6 +1436,167 @@ Initialize()
             Add_Fixed_Corotated(water_E,nu,&strong_lambda_particles,true);
 
         } break;
+
+        case 950:{ // kdtree wet sand ball
+            // ./mpm 950 -3d -resolution 50 -threads 10 -max_dt 1e-5 -framerate 120 -last_frame 20 -fooT3 1 -fooT5 5 -fooT1 0.01 -fooT4 0.1 -symplectic_euler -no_implicit_plasticity -o kdball
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+            grid.Initialize(TV_INT(4,1,4)*resolution,RANGE<TV>(TV(-0.5,0,-0.5)*m,TV(0.5,0.25,0.5)*m),true);
+            LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
+            RANGE<TV> boxymin(TV(-10,-10,-10)*m,TV(10,0.03,10)*m);
+            if(use_penalty_collisions) PHYSBAM_FATAL_ERROR();
+            else Add_Collision_Object(boxymin,COLLISION_TYPE::slip,0.7);
+
+            T density_sand=(T)2200*unit_rho*scale_mass;
+            T density_water=(T)1000*unit_rho;
+            T nu=0.3;
+            T E_strong_sand=35.37e4*unit_p;
+            T E_strong_water=E_strong_sand*foo_T5; // foo_T5 = 5 is the water youngs moudulus over sand youngs modulus
+            T E_weak_sand=E_strong_sand*foo_T1; // foo_T1 is the softening ratio
+            T E_weak_water=E_strong_water*foo_T1;
+            T porosity=0.3;
+            T saturation_level=foo_T3; // foo_T3 = 0 - 1 is saturation
+            T ratio_of_max_distance_considered_to_be_weak=foo_T4; // foo_T4 is the thickness of weak layer (0 - 1)
+
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+
+            // SEEDING ALL SAND
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_100.tri.gz",*surface);
+            LOG::cout<<"Read mesh of full sandball triangle #"<<surface->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh of full sandbval particle # "<<surface->particles.number<<std::endl;
+            for(int i=0;i<surface->particles.number;i++){surface->particles.X(i)/=3;surface->particles.X(i)+=TV(0,0.15,0);}
+            surface->mesh.Initialize_Adjacent_Elements();    
+            surface->mesh.Initialize_Neighbor_Nodes();
+            surface->mesh.Initialize_Incident_Elements();
+            surface->Update_Bounding_Box();
+            surface->Initialize_Hierarchy();
+            surface->Update_Triangle_List();
+            LOG::cout<<"Converting the full mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,100);
+            LOG::cout<<"Seeding particles..."<<std::endl;
+            Seed_Particles(*levelset,[=](const TV& X){return TV(0,-6,0);},0,density_sand,particles_per_cell);
+            LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
+            
+            // CLASSIFY STRONG AND WEAK SAND
+            ARRAY<int> strong_sand;
+            ARRAY<int> weak_sand;
+            LOG::cout<<"Building kdtree from grain boundary point cloud..."<<std::endl;
+            KD_TREE<TV> kdtree;
+            ARRAY<TV> point_cloud;
+            std::ifstream fs;
+            std::string filename=data_directory+"/../Private_Data/voronoi_100seeds_grain_pc.obj";
+            fs.open(filename.c_str());
+            std::string line;
+            while(std::getline(fs,line)){
+                std::stringstream ss(line);
+                if(line[0]!='v') continue;
+                else{ss.ignore();TV x;
+                    for(int i=0;i<3;++i) ss>>x(i);
+                    x/=3;x+=TV(0,0.15,0);
+                    point_cloud.Append(x);}}
+            kdtree.Create_Left_Balanced_KD_Tree(point_cloud);
+            ARRAY<T> distance2;
+            int number_of_points_in_estimate=1;
+            for(int i=0;i<particles.number;i++){
+                ARRAY<int> points_found(number_of_points_in_estimate);
+                ARRAY<T> squared_distance_to_points_found(number_of_points_in_estimate);
+                int number_of_points_found;T max_squared_distance_to_points_found;
+                kdtree.Locate_Nearest_Neighbors(particles.X(i),FLT_MAX,points_found,
+                    squared_distance_to_points_found,number_of_points_found,max_squared_distance_to_points_found,point_cloud);
+                distance2.Append(max_squared_distance_to_points_found);
+                PHYSBAM_ASSERT(number_of_points_found==number_of_points_in_estimate);}
+            T max_distance=sqrt(distance2.Max());
+            T min_distance=sqrt(distance2.Min());
+            LOG::cout<<"sand to grain boudnary distance measure: "<<std::endl;
+            LOG::cout<<"max distance: "<<max_distance<<std::endl;
+            LOG::cout<<"min distance: "<<min_distance<<std::endl;
+            T critical_distance2=sqr(ratio_of_max_distance_considered_to_be_weak*max_distance);
+            for(int i=0;i<particles.number;i++){
+                if(distance2(i)<critical_distance2) weak_sand.Append(i);
+                else strong_sand.Append(i);}
+            LOG::cout<<"# strong sand: "<<strong_sand.m<<std::endl;
+            LOG::cout<<"# weak sand: "<<weak_sand.m<<std::endl;
+            
+            ARRAY<int> all_sand;
+            for(int i=0;i<particles.number;i++) all_sand.Append(i);
+            Add_Drucker_Prager(0,0,(T)35,&all_sand,false,0);
+
+            // GRAVITY
+            Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
+
+            // WATER MASS AND VOLUME
+            T volume_water=particles.volume(0)*porosity*saturation_level;
+            T mass_water=density_water*volume_water;
+
+            // STRONG WATER
+            ARRAY<int> strong_water;
+            T lambda_strong_water=E_strong_water*nu/((1+nu)*(1-2*nu));
+            for(int k=0;k<strong_sand.m;k++){
+                int i=strong_sand(k);
+                int p=particles.Add_Element();
+                particles.mass(p)=mass_water;
+                strong_water.Append(p);
+                particles.lambda(p)=lambda_strong_water;
+                particles.lambda0(p)=lambda_strong_water;
+                particles.valid(p)=true;
+                particles.X(p)=particles.X(i);
+                particles.V(p)=particles.V(i);
+                particles.F(p)=particles.F(i);
+                if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+                if(particles.store_B) particles.B(p)=particles.B(i);
+                if(particles.store_C) particles.C(p)=particles.C(i);
+                if(particles.store_S) particles.S(p)=particles.S(i);
+                particles.volume(p)=volume_water;
+                particles.mu(p)=(T)0;
+                particles.mu0(p)=(T)0;}
+            Add_Fixed_Corotated(E_strong_water,nu,&strong_water,true);
+
+            // WEAK WATER
+            ARRAY<int> weak_water;
+            T lambda_weak_water=E_weak_water*nu/((1+nu)*(1-2*nu));
+            for(int k=0;k<weak_sand.m;k++){
+                int i=weak_sand(k);
+                int p=particles.Add_Element();
+                particles.mass(p)=mass_water;
+                weak_water.Append(p);
+                particles.lambda(p)=lambda_weak_water;
+                particles.lambda0(p)=lambda_weak_water;
+                particles.valid(p)=true;
+                particles.X(p)=particles.X(i);
+                particles.V(p)=particles.V(i);
+                particles.F(p)=particles.F(i);
+                if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+                if(particles.store_B) particles.B(p)=particles.B(i);
+                if(particles.store_C) particles.C(p)=particles.C(i);
+                if(particles.store_S) particles.S(p)=particles.S(i);
+                particles.volume(p)=volume_water;
+                particles.mu(p)=(T)0;
+                particles.mu0(p)=(T)0;}
+            Add_Fixed_Corotated(E_weak_water,nu,&weak_water,true);
+
+            // ASSIGN MU AND LAMBDA FOR ALL SAND
+            T mu_strong_sand=E_strong_sand/(2*(1+nu));
+            T lambda_strong_sand=(E_strong_sand*nu)/((1+nu)*(1-2*nu));
+            for(int k=0;k<strong_sand.m;k++){
+                int i=strong_sand(k);
+                particles.mu(i)=mu_strong_sand;
+                particles.mu0(i)=mu_strong_sand;
+                particles.lambda(i)=lambda_strong_sand;
+                particles.lambda0(i)=lambda_strong_sand;}
+            T mu_weak_sand=E_weak_sand/(2*(1+nu));
+            T lambda_weak_sand=(E_weak_sand*nu)/((1+nu)*(1-2*nu));
+            for(int k=0;k<weak_sand.m;k++){
+                int i=weak_sand(k);
+                particles.mass(i)*=0.99; // fanfu hack
+                particles.mu(i)=mu_weak_sand;
+                particles.mu0(i)=mu_weak_sand;
+                particles.lambda(i)=lambda_weak_sand;
+                particles.lambda0(i)=lambda_weak_sand;}
+            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
+
+        } break;
+
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
