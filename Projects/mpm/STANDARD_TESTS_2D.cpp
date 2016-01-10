@@ -1106,6 +1106,7 @@ Initialize()
     if(forced_collision_type!=-1)
         for(int i=0;i<collision_objects.m;i++)
             collision_objects(i)->type=(COLLISION_TYPE)forced_collision_type;
+    Update_Variable_Lame_Parameters_On_Constitutive_Models();
 }
 //#####################################################################
 // Function Begin_Frame

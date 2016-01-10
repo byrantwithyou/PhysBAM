@@ -454,16 +454,24 @@ Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io,const T coefficient_of_fric
 // Function Set_Lame_On_Particles
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Set_Lame_On_Particles(T E,T nu)
+Set_Lame_On_Particles(T E,T nu,ARRAY<int>* affected_particles)
 {
     particles.Store_Lame(true);
     T mu=E/(2*(1+nu));
     T lambda=E*nu/((1+nu)*(1-2*nu));
-    particles.mu.Fill(mu);
-    particles.mu0.Fill(mu);
-    particles.lambda.Fill(lambda);
-    particles.lambda0.Fill(lambda);
-    Update_Variable_Lame_Parameters_On_Constitutive_Models();
+    if(affected_particles)
+#pragma omp parallel for
+        for(int k=0;k<affected_particles->m;k++){
+            int p=(*affected_particles)(k);
+            particles.mu(p)=mu;
+            particles.mu0(p)=mu;
+            particles.lambda(p)=lambda;
+            particles.lambda0(p)=lambda;}
+    else{
+        particles.mu.Fill(mu);
+        particles.mu0.Fill(mu);
+        particles.lambda.Fill(lambda);
+        particles.lambda0.Fill(lambda);}
 }
 //#####################################################################
 // Function Update_Variable_Lame_Parameters_On_Constitutive_Models
@@ -479,9 +487,7 @@ Update_Variable_Lame_Parameters_On_Constitutive_Models()
             fe->constitutive_model.lambda.Set(particles.lambda);
         }else if((pfe=dynamic_cast<MPM_PLASTIC_FINITE_ELEMENTS<TV>*>(this->forces(i)))){
             pfe->constitutive_model.mu.Set(particles.mu);
-            pfe->constitutive_model.lambda.Set(particles.lambda);
-        }
-    }
+            pfe->constitutive_model.lambda.Set(particles.lambda);}}
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;

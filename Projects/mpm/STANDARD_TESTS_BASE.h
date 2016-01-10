@@ -134,7 +134,7 @@ public:
     void Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty); // -x +x -y +y [ -z +z ], as bit flags
     int Add_Clamped_Plasticity(ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& icm,T theta_c,T theta_s,T max_hardening,
         T hardening_factor,ARRAY<int>* affected_particles);
-    void Set_Lame_On_Particles(T E,T nu);
+    void Set_Lame_On_Particles(T E,T nu,ARRAY<int>* affected_particles=0);
     void Update_Variable_Lame_Parameters_On_Constitutive_Models();
 //#####################################################################
 };
