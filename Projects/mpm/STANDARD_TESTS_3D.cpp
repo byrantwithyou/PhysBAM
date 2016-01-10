@@ -1437,26 +1437,33 @@ Initialize()
 
         } break;
 
-        case 950:{ // kdtree wet sand ball
-            // ./mpm 950 -3d -resolution 50 -threads 10 -max_dt 1e-5 -framerate 120 -last_frame 20 -fooT3 1 -fooT5 5 -fooT1 0.01 -fooT4 0.1 -symplectic_euler -no_implicit_plasticity -o kdball
+        case 950:{ // kdtree wet sand ball (filled with weak)
+            // ./mpm 950 -3d -resolution 50 -threads 10 -max_dt 1e-4 -framerate 120 -last_frame 120 -fooT1 0.000001 -fooT2 1000 -fooT4 0.2 -symplectic_euler -no_implicit_plasticity -o bbb
             particles.Store_Fp(true);
             particles.Store_Lame(true);
             grid.Initialize(TV_INT(4,1,4)*resolution,RANGE<TV>(TV(-0.5,0,-0.5)*m,TV(0.5,0.25,0.5)*m),true);
             LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
+
             RANGE<TV> boxymin(TV(-10,-10,-10)*m,TV(10,0.03,10)*m);
+            // RANGE<TV> boxzmin(TV(-10,-10,-10)*m,TV(10,10,-0.47)*m);
+            // IMPLICIT_OBJECT_UNION<TV>* bounds=new IMPLICIT_OBJECT_UNION<TV>(
+            //     new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxymin),
+            //     new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxzmin));
+
             if(use_penalty_collisions) PHYSBAM_FATAL_ERROR();
-            else Add_Collision_Object(boxymin,COLLISION_TYPE::slip,0.7);
+            else Add_Collision_Object(boxymin,COLLISION_TYPE::slip,0.3);
 
             T density_sand=(T)2200*unit_rho*scale_mass;
-            T density_water=(T)1000*unit_rho;
+            // T density_water=(T)1000*unit_rho;
             T nu=0.3;
-            T E_strong_sand=35.37e4*unit_p;
-            T E_strong_water=E_strong_sand*foo_T5; // foo_T5 = 5 is the water youngs moudulus over sand youngs modulus
+            T E_strong_sand=35.37e4*unit_p*scale_E;
+            // T E_strong_water=E_strong_sand*foo_T5; // foo_T5 = 5 is the water youngs moudulus over sand youngs modulus
             T E_weak_sand=E_strong_sand*foo_T1; // foo_T1 is the softening ratio
-            T E_weak_water=E_strong_water*foo_T1;
-            T porosity=0.3;
-            T saturation_level=foo_T3; // foo_T3 = 0 - 1 is saturation
+            // T E_weak_water=E_strong_water*foo_T1;
+            // T porosity=0.3;
+            // T saturation_level=foo_T3; // foo_T3 = 0 - 1 is saturation
             T ratio_of_max_distance_considered_to_be_weak=foo_T4; // foo_T4 is the thickness of weak layer (0 - 1)
+            T cohesion=foo_T2; // foo_T2 is cohesion
 
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
 
@@ -1475,7 +1482,7 @@ Initialize()
             LOG::cout<<"Converting the full mesh to a level set..."<<std::endl;
             LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,100);
             LOG::cout<<"Seeding particles..."<<std::endl;
-            Seed_Particles(*levelset,[=](const TV& X){return TV(0,-6,0);},0,density_sand,particles_per_cell);
+            Seed_Particles(*levelset,[=](const TV& X){return TV(0,-3,0);},0,density_sand,particles_per_cell);  // initial velocity
             LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
             
             // CLASSIFY STRONG AND WEAK SAND
@@ -1518,62 +1525,73 @@ Initialize()
             LOG::cout<<"# strong sand: "<<strong_sand.m<<std::endl;
             LOG::cout<<"# weak sand: "<<weak_sand.m<<std::endl;
             
+            // DELETE WEAK PARTICLES (HOLLOOWWW)
+            for(int k=0;k<weak_sand.m;k++){
+                int i=weak_sand(k);
+                particles.Add_To_Deletion_List(i);}
+            particles.Delete_Elements_On_Deletion_List();
+            strong_sand.Clean_Memory();
+            weak_sand.Clean_Memory();
+            for(int k=0;k<particles.number;k++) strong_sand.Append(k);
+
             ARRAY<int> all_sand;
             for(int i=0;i<particles.number;i++) all_sand.Append(i);
-            Add_Drucker_Prager(0,0,(T)35,&all_sand,false,0);
+            Add_Drucker_Prager(0,0,(T)35,&all_sand,false,cohesion);
 
             // GRAVITY
             Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
+            // Add_Gravity(m/(s*s)*TV(0,0,-9.80665));
 
-            // WATER MASS AND VOLUME
-            T volume_water=particles.volume(0)*porosity*saturation_level;
-            T mass_water=density_water*volume_water;
 
-            // STRONG WATER
-            ARRAY<int> strong_water;
-            T lambda_strong_water=E_strong_water*nu/((1+nu)*(1-2*nu));
-            for(int k=0;k<strong_sand.m;k++){
-                int i=strong_sand(k);
-                int p=particles.Add_Element();
-                particles.mass(p)=mass_water;
-                strong_water.Append(p);
-                particles.lambda(p)=lambda_strong_water;
-                particles.lambda0(p)=lambda_strong_water;
-                particles.valid(p)=true;
-                particles.X(p)=particles.X(i);
-                particles.V(p)=particles.V(i);
-                particles.F(p)=particles.F(i);
-                if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
-                if(particles.store_B) particles.B(p)=particles.B(i);
-                if(particles.store_C) particles.C(p)=particles.C(i);
-                if(particles.store_S) particles.S(p)=particles.S(i);
-                particles.volume(p)=volume_water;
-                particles.mu(p)=(T)0;
-                particles.mu0(p)=(T)0;}
-            Add_Fixed_Corotated(E_strong_water,nu,&strong_water,true);
+            // // WATER MASS AND VOLUME
+            // T volume_water=particles.volume(0)*porosity*saturation_level;
+            // T mass_water=density_water*volume_water;
 
-            // WEAK WATER
-            ARRAY<int> weak_water;
-            T lambda_weak_water=E_weak_water*nu/((1+nu)*(1-2*nu));
-            for(int k=0;k<weak_sand.m;k++){
-                int i=weak_sand(k);
-                int p=particles.Add_Element();
-                particles.mass(p)=mass_water;
-                weak_water.Append(p);
-                particles.lambda(p)=lambda_weak_water;
-                particles.lambda0(p)=lambda_weak_water;
-                particles.valid(p)=true;
-                particles.X(p)=particles.X(i);
-                particles.V(p)=particles.V(i);
-                particles.F(p)=particles.F(i);
-                if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
-                if(particles.store_B) particles.B(p)=particles.B(i);
-                if(particles.store_C) particles.C(p)=particles.C(i);
-                if(particles.store_S) particles.S(p)=particles.S(i);
-                particles.volume(p)=volume_water;
-                particles.mu(p)=(T)0;
-                particles.mu0(p)=(T)0;}
-            Add_Fixed_Corotated(E_weak_water,nu,&weak_water,true);
+            // // STRONG WATER
+            // ARRAY<int> strong_water;
+            // T lambda_strong_water=E_strong_water*nu/((1+nu)*(1-2*nu));
+            // for(int k=0;k<strong_sand.m;k++){
+            //     int i=strong_sand(k);
+            //     int p=particles.Add_Element();
+            //     particles.mass(p)=mass_water;
+            //     strong_water.Append(p);
+            //     particles.lambda(p)=lambda_strong_water;
+            //     particles.lambda0(p)=lambda_strong_water;
+            //     particles.valid(p)=true;
+            //     particles.X(p)=particles.X(i);
+            //     particles.V(p)=particles.V(i);
+            //     particles.F(p)=particles.F(i);
+            //     if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+            //     if(particles.store_B) particles.B(p)=particles.B(i);
+            //     if(particles.store_C) particles.C(p)=particles.C(i);
+            //     if(particles.store_S) particles.S(p)=particles.S(i);
+            //     particles.volume(p)=volume_water;
+            //     particles.mu(p)=(T)0;
+            //     particles.mu0(p)=(T)0;}
+            // Add_Fixed_Corotated(E_strong_water,nu,&strong_water,true);
+
+            // // WEAK WATER
+            // ARRAY<int> weak_water;
+            // T lambda_weak_water=E_weak_water*nu/((1+nu)*(1-2*nu));
+            // for(int k=0;k<weak_sand.m;k++){
+            //     int i=weak_sand(k);
+            //     int p=particles.Add_Element();
+            //     particles.mass(p)=mass_water;
+            //     weak_water.Append(p);
+            //     particles.lambda(p)=lambda_weak_water;
+            //     particles.lambda0(p)=lambda_weak_water;
+            //     particles.valid(p)=true;
+            //     particles.X(p)=particles.X(i);
+            //     particles.V(p)=particles.V(i);
+            //     particles.F(p)=particles.F(i);
+            //     if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
+            //     if(particles.store_B) particles.B(p)=particles.B(i);
+            //     if(particles.store_C) particles.C(p)=particles.C(i);
+            //     if(particles.store_S) particles.S(p)=particles.S(i);
+            //     particles.volume(p)=volume_water;
+            //     particles.mu(p)=(T)0;
+            //     particles.mu0(p)=(T)0;}
+            // Add_Fixed_Corotated(E_weak_water,nu,&weak_water,true);
 
             // ASSIGN MU AND LAMBDA FOR ALL SAND
             T mu_strong_sand=E_strong_sand/(2*(1+nu));
@@ -1596,7 +1614,6 @@ Initialize()
             this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
 
         } break;
-
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
