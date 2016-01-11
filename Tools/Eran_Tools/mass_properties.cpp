@@ -86,13 +86,9 @@ int main(int argc,char *argv[])
     parse_args.Parse(true);
 
     if(!type_double && !write_double) Get_Mass_Properties<float,float>(parse_args);
-#ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    else PHYSBAM_FATAL_ERROR("double support not enabled.");
-#else
     else if(!type_double && write_double) Get_Mass_Properties<float,double>(parse_args);
     else if(type_double && !write_double) Get_Mass_Properties<double,float>(parse_args);
     else Get_Mass_Properties<double,double>(parse_args);
-#endif
     LOG::cout<<std::flush;
     return 0;
 }

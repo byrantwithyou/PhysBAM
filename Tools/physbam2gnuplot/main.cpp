@@ -113,13 +113,8 @@ int main(int argc,char* argv[])
     parse_args.Add("-double",&use_double,"Read in file in double format");
     parse_args.Parse(true);
 
-#ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    if(use_double) PHYSBAM_FATAL_ERROR("No double support");
-#endif
-
     if(verbosity>0) std::cout<<"dimension="<<dimension<<std::endl;
     if(use_double){
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
         switch(dimension){
             case 1:
                 PhysBAM_To_Gnuplot<VECTOR<double,1>,double>(parse_args,verbosity);
@@ -129,9 +124,7 @@ int main(int argc,char* argv[])
                 break;
             case 3:
                 PhysBAM_To_Gnuplot<VECTOR<double,3>,double>(parse_args,verbosity);
-                break;}
-#endif
-    }
+                break;}}
     else{
         switch(dimension){
             case 1:

@@ -438,11 +438,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-double",&opt_double,"input data is in doubles");
     parse_args.Parse(true);
 
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     if(opt_double) Do_Merge<double>(parse_args); 
     else Do_Merge<float>(parse_args);
-#else
-    Do_Merge<float>(parse_args);
-#endif
 }
 //#####################################################################

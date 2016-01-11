@@ -194,16 +194,8 @@ int main(int argc,char *argv[])
 
     if(!type_double){
         if(compute_using_doubles){
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
             std::cout<<"COMPUTING USING DOUBLES!"<<std::endl;
             Convert<double,float>(boundary_cells,parse_args);
-#else
-            std::cerr<<"Double support not enabled."<<std::endl;exit(1);
-#endif
         }else{Convert<float,float>(boundary_cells,parse_args);}}
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else Convert<double,double>(boundary_cells,parse_args);
-#else
-    else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
-#endif
 }

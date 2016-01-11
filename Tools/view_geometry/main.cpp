@@ -62,12 +62,7 @@ int main(int argc,char *argv[])
 
     for(int i=0;i<files.m;i++){
         if(!type_double) Add_File<float>(files(i),i);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        else Add_File<double>(files(i),i);
-#else
-        else{LOG::cerr<<"Double support not enabled."<<std::endl;exit(1);}
-#endif
-        }
+        else Add_File<double>(files(i),i);}
     return 0;
 }
 //#################################################################

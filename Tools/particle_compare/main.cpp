@@ -230,11 +230,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Parse(true);
 
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     if(type_double) Find_Dimension<double>(parse_args); 
     else Find_Dimension<float>(parse_args);
-#else
-    Find_Dimension<float>(parse_args);
-#endif
 }
 //#####################################################################

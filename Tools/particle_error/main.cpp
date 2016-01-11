@@ -57,16 +57,8 @@ int main(int argc,char *argv[])
 
     if(!type_double){
         if(compute_using_doubles){
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
             std::cout<<"COMPUTING USING DOUBLES!"<<std::endl;
             Compute_Errors<double,float>(input_filename,last_frame,resolutions);
-#else
-            std::cerr<<"Double support not enabled."<<std::endl;exit(1);
-#endif
         }else{Compute_Errors<float,float>(input_filename,last_frame,resolutions);}}
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else Compute_Errors<double,double>(input_filename,last_frame,resolutions);
-#else
-    else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
-#endif
 }

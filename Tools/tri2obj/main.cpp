@@ -54,16 +54,8 @@ int main(int argc,char *argv[])
 
     if(!type_double){
         if(compute_using_doubles){
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
             std::cout<<"COMPUTING USING DOUBLES!"<<std::endl;
             Convert<double,float>(input_filename,output_filename);
-#else
-            std::cerr<<"Double support not enabled."<<std::endl;exit(1);
-#endif
         }else{Convert<float,float>(input_filename,output_filename);}}
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else Convert<double,double>(input_filename,output_filename);
-#else
-    else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
-#endif
 }

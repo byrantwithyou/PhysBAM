@@ -38,9 +38,7 @@ int main(int argc,char *argv[])
     if(!type_double && dim==1) Read_Particles<VECTOR<float,1> >(stream_type,filename);
     if(!type_double && dim==2) Read_Particles<VECTOR<float,2> >(stream_type,filename);
     if(!type_double && dim==3) Read_Particles<VECTOR<float,3> >(stream_type,filename);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     if(type_double && dim==1) Read_Particles<VECTOR<double,1> >(stream_type,filename);
     if(type_double && dim==2) Read_Particles<VECTOR<double,2> >(stream_type,filename);
     if(type_double && dim==3) Read_Particles<VECTOR<double,3> >(stream_type,filename);
-#endif
 }
