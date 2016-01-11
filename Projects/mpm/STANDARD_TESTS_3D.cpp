@@ -1341,6 +1341,94 @@ Initialize()
             Add_Gravity(TV(0,-g,0));
         } break;
 
+        case 69:{ // Magic balls
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+            grid.Initialize(TV_INT(1,1,1)*resolution,RANGE<TV>::Unit_Box()*m,true);
+            LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
+            RANGE<TV> boxymin(TV(-10,-10,-10)*m,TV(10,0.03,10)*m);
+            if(use_penalty_collisions) PHYSBAM_FATAL_ERROR();
+            else Add_Collision_Object(boxymin,COLLISION_TYPE::slip,0.7);
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+
+            const SPHERE<TV> ball(TV(0,0.75,0)*m,.1*m);
+            const SPHERE<TV> padded_ball(ball.center,0.11*m);
+            const T ball_volume=ball.Size();
+            const int number_of_particles=particles_per_cell*ball_volume/grid.dX.Product();
+            const T volume_per_particle=ball_volume/number_of_particles;
+
+            ARRAY<SPHERE<TV> > spheres;
+            for(int i=1;i<=500;i++){
+                TV offset=random.template Get_Vector_In_Unit_Sphere<TV>()*padded_ball.radius;
+                if(offset.Magnitude()<padded_ball.radius*0.5 || offset.Magnitude()>padded_ball.radius*0.9)
+                {i--;continue;}
+                T radius=random.Get_Uniform_Number(0,padded_ball.radius-offset.Magnitude());
+                if(radius<padded_ball.radius*0.1)
+                {i--;continue;}
+                spheres.Append(SPHERE<TV>(offset+padded_ball.center,radius));}
+
+            const T h=10;
+            const T a=1.025;
+            const T ea=exp((a-1)*h); 
+            particles.Preallocate(number_of_particles);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            for(int p=0;p<number_of_particles;p++){
+                particles.valid(p)=true;
+                particles.X(p)=random.template Get_Vector_In_Unit_Sphere<TV>()*padded_ball.radius+padded_ball.center;
+                particles.F(p)=MATRIX<T,TV::m>()+1;
+                if(particles.store_Fp) particles.Fp(p).Set_Identity_Matrix();
+
+                bool inside=ball.Inside(particles.X(p),0);
+                for(int j=0;j<spheres.m;j++)
+                    inside|=spheres(j).Inside(particles.X(p),0);
+                if(!inside){p--;continue;}
+
+                particles.V(p)=TV(0,-1.2,0);
+                particles.mass(p)=density*volume_per_particle*Perturb(0.5);
+                particles.volume(p)=volume_per_particle;
+
+                (*color_attribute)(p)=VECTOR<T,3>(1,1,1);
+                T E_local=E*Perturb(0.5);
+                T nu_local=nu*Perturb(0.1);
+                particles.mu(p)=E_local/(2*(1+nu_local));
+                particles.lambda(p)=E_local*nu_local/((1+nu_local)*(1-2*nu_local));
+
+                T mult=1;
+                for(int i=0;i<10;i++)
+                    if((particles.X(p)-ball.center).Magnitude()>(i+1)*ball.radius/10){
+                        particles.mass(p)*=a;
+                        particles.lambda(p)*=ea;
+                        particles.mu(p)*=ea;}
+                    else mult/=a;
+
+                if(Uniform(0,1)>mult) p--;}
+
+            for(int k=0;k<500;k++){
+                const TV offset=random.template Get_Vector_In_Unit_Sphere<TV>()*padded_ball.radius*5;
+                const T radius=random.Get_Uniform_Number(padded_ball.radius,padded_ball.radius*10);
+                SPHERE<TV> sphere_big(offset+padded_ball.center,radius+grid.dX.Min()/2*2);
+                SPHERE<TV> sphere_small(offset+padded_ball.center,radius-grid.dX.Min()/2*2);
+                const TV offset_new=random.template Get_Vector_In_Unit_Sphere<TV>()*padded_ball.radius*5;
+                const T radius_new=random.Get_Uniform_Number(padded_ball.radius,padded_ball.radius*10);
+                SPHERE<TV> sphere_new(offset_new+padded_ball.center,radius_new);
+                if(offset_new.Magnitude()+ball.radius<radius_new) continue;
+                if((offset-offset_new).Magnitude()+radius<radius_new) continue;
+                for(int i=0;i<particles.X.m;i++)
+                    if(sphere_big.Inside(particles.X(i),0)&&!sphere_small.Inside(particles.X(i),0)&&sphere_new.Inside(particles.X(i),0)){
+                        particles.lambda(i)*=0.5;
+                        particles.mu(i)*=0.5;
+                        (*color_attribute)(i)(2)*=0.5;}}
+            
+
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,0);
+            Add_Lambda_Particles(&sand_particles,E,nu,unit_rho,true,0.3,1.0);
+            Add_Gravity(TV(0,-9.81,0));
+        }
+
         case 949:{ // lambda voronoi sand ball
             // ./mpm 949 -3d -resolution 60 -threads 1 -max_dt 1e-4 -scale_E 0.01 -framerate 120 -last_frame 20 -fooT3 1 -fooT5 5 -symplectic_euler -no_implicit_plasticity -o zz
             particles.Store_Fp(true);

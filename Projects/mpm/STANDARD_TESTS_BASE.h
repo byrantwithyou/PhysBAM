@@ -86,6 +86,9 @@ public:
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
 
+    T Perturb(T a);
+    T Uniform(T a,T b);
+
     void Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell);
 

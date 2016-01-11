@@ -220,6 +220,22 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
     Seed_Particles_Uniform(object,V,dV,density,seed_grid);
 }
 //#####################################################################
+// Function Perturb
+//#####################################################################
+template<class TV> auto STANDARD_TESTS_BASE<TV>::
+Perturb(T a) -> T
+{
+    return random.Get_Uniform_Number(1-a,1+a);
+}
+//#####################################################################
+// Function Uniform
+//#####################################################################
+template<class TV> auto STANDARD_TESTS_BASE<TV>::
+Uniform(T a,T b) -> T
+{
+    return random.Get_Uniform_Number(a,b);
+}
+//#####################################################################
 // Function Add_Particle
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
