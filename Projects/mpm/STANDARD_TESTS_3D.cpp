@@ -1297,11 +1297,10 @@ Initialize()
             T sand_width=1*m;
             T wall_thickness=0.2*m;
             RANGE<TV> sand(TV(-sand_width/2,-sand_depth,-sand_length/2),TV(sand_width/2,0,sand_length/2));
-            RANGE<TV> sand_box(sand.Thickened(wall_thickness));
-            RANGE<TV> sand_box_interior(sand);
-            sand_box_interior.max_corner(1)=sand_box.max_corner(1);
             RANGE<TV> domain(sand);
             domain.max_corner(1)=air_height;
+            RANGE<TV> sand_box(domain.Thickened(wall_thickness));
+            RANGE<TV> sand_box_interior(domain);
             domain=domain.Thickened(0.05*m);
             grid.Initialize(TV_INT(domain.Edge_Lengths()*resolution),domain,true);
             auto sand_box_walls=
@@ -1312,10 +1311,10 @@ Initialize()
             if(use_penalty_collisions){
                 Add_Penalty_Collision_Object(sand_box_walls);}
             else{
-                Add_Collision_Object(sand_box_walls,COLLISION_TYPE::stick,0);}
+                Add_Collision_Object(sand_box_walls,COLLISION_TYPE::slip,0);}
 
             T y0=0.15*m;
-            T v0=-1*m/s;
+            T v0=-1*m/s*foo_T1;
             T g=9.81*m/(s*s);
             T radius=0.1*foo_T3*m;
             SPHERE<TV> sphere(TV(0,y0,0),radius);
@@ -1325,11 +1324,11 @@ Initialize()
                         if(time>stop_time) time=stop_time;
                         return FRAME<TV>(TV(0,v0*time-0.5*g*sqr(time),0));},
                     [=](T time){
-                        if(time>stop_time) time=stop_time;
+                        if(time>=stop_time) return TWIST<TV>(TV(),typename TV::SPIN());
                         return TWIST<TV>(TV(0,v0-g*time,0),typename TV::SPIN());});
 
             T density=(T)1582*unit_rho;
-            T E=35.37e6*unit_p*scale_E,nu=.3;
+            T E=35.37e6*unit_p*scale_E,nu=.2;
 
             Seed_Particles(sand,0,0,density,particles_per_cell); 
             // SAND PROPERTIES
