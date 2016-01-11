@@ -1074,8 +1074,7 @@ Initialize()
             const T final_t(10);
             Add_Collision_Object(rake,COLLISION_TYPE::separate,friction,
                     [=](T time){
-                        if(time<settle_wait) return FRAME<TV>(TV(-10,-10,-10));
-                        time-=settle_wait;
+                        time=max((T)0,time-settle_wait);
                         ROTATION<TV> R=ROTATION<TV>::From_Euler_Angles(0,2*pi*time/final_t,0);
                         return FRAME<TV>(TV(0.5,0.056,0.5)*m+R.Rotate(start_pos),R);},
                     [=](T time){return TWIST<TV>(TV(),typename TV::SPIN(0,time<settle_wait?0:2*pi/final_t,0));});
