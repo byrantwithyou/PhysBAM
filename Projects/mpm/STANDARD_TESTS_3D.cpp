@@ -715,9 +715,9 @@ Initialize()
 
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
        } break;
-        case 33:{ // dry sand notch dam break, wedging friction angle
+        case 33:{// dry sand notch dam break, wedging friction angle
             particles.Store_Fp(true);
-            grid.Initialize(TV_INT(5,3,5)*resolution,RANGE<TV>(TV(0,0,0)*m,TV(2,1.2,2)*m),true);
+            grid.Initialize(TV_INT(1,1,1)*resolution,RANGE<TV>(TV(0,0,0)*m,TV(0.3,0.3,0.3)*m),true);
             LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
 
             RANGE<TV> ground(TV(-10,-5,-5)*m,TV(10,0.1,10)*m);
@@ -727,16 +727,18 @@ Initialize()
                 new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),
                 new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(left_wall),
                 new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(back_wall));
-            Add_Collision_Object(bounds,COLLISION_TYPE::stick,0);
+            Add_Collision_Object(bounds,COLLISION_TYPE::slip,foo_T1);
 
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            int case_num=use_hardening_mast_case?hardening_mast_case:2;
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
             FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/notch.tri.gz",*surface);
             LOG::cout<<"Read mesh of notch triangle #"<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh of notch particle # "<<surface->particles.number<<std::endl;
+            for(int i=0;i<surface->particles.number;i++){
+                surface->particles.X(i)=(surface->particles.X(i)-TV(0.1,0.1,0.1))*0.1+TV(0.1,0.1,0.1);}
+            
             surface->mesh.Initialize_Adjacent_Elements();
             surface->mesh.Initialize_Neighbor_Nodes();
             surface->mesh.Initialize_Incident_Elements();
@@ -750,8 +752,8 @@ Initialize()
             LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
-            Add_Drucker_Prager_Case(E,nu,case_num);
-
+            //foo_T2 is the friction angle
+            Add_Drucker_Prager(E,nu,foo_T2);
             
         }break;
         case 34:{ // sand dam break
