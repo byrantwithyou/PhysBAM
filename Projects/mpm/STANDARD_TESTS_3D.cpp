@@ -1119,7 +1119,7 @@ Initialize()
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
             else Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
             T density=(T)2200*unit_rho*scale_mass;
-            T E=1e4*unit_p*scale_E,nu=.3;
+            T E=35.37e4*unit_p*scale_E,nu=.3;
             T spout_width=8.334e-3*m;
             T spout_height=.01*m;
             T seed_buffer=grid.dX.y*5;
