@@ -39,6 +39,7 @@ Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,
         T hardening_coeff=exp(min(max_hardening,hardening_factor*(1-det)));
         particles.mu(p)=particles.mu0(p)*hardening_coeff;
         particles.lambda(p)=particles.lambda0(p)*hardening_coeff;}
+    // NOTE: updating particles.mu and particles.lambda is not enough; the constitutive models do not use these.
 
     if(!dstrain) return true;
     VECTOR<bool,TV::m> cb,ct;
