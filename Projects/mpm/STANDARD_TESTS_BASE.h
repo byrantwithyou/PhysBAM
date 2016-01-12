@@ -81,6 +81,7 @@ public:
     std::function<void ()> destroy;
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;
+    bool dump_collision_objects;
 
     RANDOM_NUMBERS<T> random;
     DEFORMABLES_STANDARD_TESTS<TV> tests;

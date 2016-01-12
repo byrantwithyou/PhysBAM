@@ -45,7 +45,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     theta_c(0),theta_s(0),hardening_factor(0),max_hardening(0),use_implicit_plasticity(false),no_implicit_plasticity(false),
     hardening_mast_case(0),use_hardening_mast_case(false),override_output_directory(false),
     m(1),s(1),kg(1),forced_collision_type(-1),friction(0),friction_is_set(false),sigma_Y(0),use_cohesion(false),write_output_files(0),read_output_files(0),
-    begin_frame(0),end_frame(0),begin_time_step(0),end_time_step(0),tests(stream_type_input,deformable_body_collection)
+    begin_frame(0),end_frame(0),begin_time_step(0),end_time_step(0),dump_collision_objects(false),tests(stream_type_input,deformable_body_collection)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
@@ -112,6 +112,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-cohesion",&sigma_Y,&use_cohesion,"cohesion","sigma_Y in Drucker Prager");
     parse_args.Add("-T",&extra_T,"float","extra float argument");
     parse_args.Add("-I",&extra_int,"int","extra int argument");
+    parse_args.Add("-dump_collisions",&dump_collision_objects,"dump out collision objects");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);

@@ -838,13 +838,15 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
         case 36:{ // hourglass
+            if(!use_foo_T1) foo_T1=.3; // coefficient of friction
             particles.Store_Fp(true);
             grid.Initialize(TV_INT(4,9,4)*resolution,RANGE<TV>(TV(-0.2,-0.45,-0.2)*m,TV(0.2,0.45,0.2)*m),true);
             LOG::cout<<"GRID DX: " <<grid.dX<<std::endl;
-            IMPLICIT_OBJECT<TV>* hg=new ANALYTIC_IMPLICIT_OBJECT<HOURGLASS<TV> >(HOURGLASS<TV>(TV::Axis_Vector(1),TV(),(T).16,(T).0225,(T).8,(T).0225));
+            HOURGLASS<TV> hourglass(TV::Axis_Vector(1),TV(),(T).16,(T).0225,(T).8,(T).0225);
+            IMPLICIT_OBJECT<TV>* hg=new ANALYTIC_IMPLICIT_OBJECT<HOURGLASS<TV> >(hourglass);
             IMPLICIT_OBJECT<TV>* inv=new IMPLICIT_OBJECT_INVERT<TV>(hg);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(inv);
-            else Add_Collision_Object(inv,COLLISION_TYPE::separate,.3);
+            else Add_Collision_Object(inv,COLLISION_TYPE::separate,foo_T1);
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
@@ -859,6 +861,10 @@ Initialize()
             Set_Lame_On_Particles(E,nu);
             Add_Drucker_Prager_Case(E,nu,2);
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
+            if(dump_collision_objects){
+                TRIANGULATED_SURFACE<T>* ts=TESSELLATION::Tessellate_Boundary(hourglass,extra_int(0),extra_int(1));
+                FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("hourglass-%d-%d.tri.gz",extra_int(0),extra_int(1)),*ts);
+                delete ts;}
         } break;
         case 38:
         case 39:{//cup flip
