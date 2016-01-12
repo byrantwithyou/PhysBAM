@@ -339,7 +339,7 @@ Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,b
     ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>* hencky=new ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>(E,nu);
     if(no_mu) hencky->Zero_Out_Mu();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
-    MPM_DRUCKER_PRAGER<TV>& plasticity=*new MPM_DRUCKER_PRAGER<TV>(particles,0,a0,a1,a3,a4,sigma_Y);
+    MPM_DRUCKER_PRAGER<TV>& plasticity=*new MPM_DRUCKER_PRAGER<TV>(particles,0,a0,a1,a3,a4);
     plasticity.use_implicit=use_implicit_plasticity;
     PARTICLE_GRID_FORCES<TV>* fe=0;
     if(use_implicit_plasticity){
@@ -349,7 +349,7 @@ Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,b
         MPM_FINITE_ELEMENTS<TV>* mfe=new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
         plasticity.gather_scatter=&mfe->gather_scatter;
         fe=mfe;}
-    plasticity.Initialize_Particles(affected_particles);
+    plasticity.Initialize_Particles(affected_particles,sigma_Y);
     plasticity_models.Append(&plasticity);
     return Add_Force(*fe);
 }
