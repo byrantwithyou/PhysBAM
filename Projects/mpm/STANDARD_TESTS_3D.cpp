@@ -1428,6 +1428,78 @@ Initialize()
             Add_Gravity(TV(0,-9.81,0));
         }
 
+        case 947:{ // sand shovel
+            //  ./mpm 947 -3d  -resolution 5 -max_dt 1e-4 -scale_E 0.01 -mast_case 0 -last_frame 120 -symplectic_euler -no_implicit_plasticity -o shovel
+            particles.Store_Fp(true);
+            // ----------------- GRID ------------------------------------------
+            TV grid_size(1.1*m,0.5*m,0.7*m);
+            TV grid_center(0.5*m,0.19*m,0.298*m);
+            TV_INT grid_resolution=TV_INT(11,5,7)*resolution;
+            RANGE<TV> grid_domain(grid_center-grid_size/2,grid_center+grid_size/2);
+            grid.Initialize(grid_resolution,grid_domain,true);
+            LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
+            // ----------------- BOX -------------------------------------------
+            RANGE<TV> boxymin(TV(-10,-10,-10)*m,TV(10,0,10)*m);
+            // RANGE<TV> boxymax(TV(-10,1.2,-10)*m,TV(10,10,10)*m);
+            RANGE<TV> boxxmin(TV(-10,-10,-10)*m,TV(0,10,10)*m);
+            RANGE<TV> boxxmax(TV(1,-10,-10)*m,TV(10,10,10)*m);
+            RANGE<TV> boxzmin(TV(-10,-10,-10)*m,TV(10,10,0)*m);
+            RANGE<TV> boxzmax(TV(-10,-10,0.6)*m,TV(10,10,10)*m);
+            IMPLICIT_OBJECT_UNION<TV>* box=new IMPLICIT_OBJECT_UNION<TV>(
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxxmin),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxxmax),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxymin),
+                // new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxymax),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxzmin),
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(boxzmax));
+            if(use_penalty_collisions) PHYSBAM_FATAL_ERROR();
+            else Add_Collision_Object(box,COLLISION_TYPE::stick,0); // THE BOX IS STICKY
+            // ----------------- SHOVEL ----------------------------------------
+            LOG::cout<<"READING SHOVEL AND CONVERTING TO LEVELSET COLLISION OBJECT..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* shovel=Levelset_From_File<T>(data_directory+"/../Private_Data/shovel.tri.gz",350); // MAY NEED HIGHRES TO CAPTURE THIN SHELL 
+            TV vA((1.0/100.0)/(1.0/24.0),(-1.0/200.0)/(1.0/24.0),0);
+            TV vB((1.0/100.0)/(1.0/24.0),(1.0/120.0)/(1.0/24.0),0);
+            TV critical_location(0.24,-0.12,0);
+            T critical_time=1.0;
+            T stop_time=2.0;
+
+            Add_Collision_Object(shovel,COLLISION_TYPE::slip,friction, // SLIP WITH FRICTION
+                [=](T time){
+                    if(time>stop_time) time=stop_time;
+                    if(time<critical_time) return FRAME<TV>(vA*time);
+                    else return FRAME<TV>(critical_location+vB*(time-critical_time));},
+                [=](T time){
+                    if(time>=stop_time) return TWIST<TV>(TV(),typename TV::SPIN());
+                    if(time<critical_time) return TWIST<TV>(vA,typename TV::SPIN());
+                    else return TWIST<TV>(vB,typename TV::SPIN());});
+            // ----------------- SAND ------------------------------------------
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/shovel_dune.tri.gz",*surface);
+            LOG::cout<<"Read mesh of dune triangle #"<<surface->mesh.elements.m<<std::endl;
+            LOG::cout<<"Read mesh of dune particle # "<<surface->particles.number<<std::endl;
+            surface->mesh.Initialize_Adjacent_Elements();    
+            surface->mesh.Initialize_Neighbor_Nodes();
+            surface->mesh.Initialize_Incident_Elements();
+            surface->Update_Bounding_Box();
+            surface->Initialize_Hierarchy();
+            surface->Update_Triangle_List();
+            LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,200);
+            LOG::cout<<"Seeding particles..."<<std::endl;
+            Seed_Particles(*levelset,0,0,density,particles_per_cell);
+            LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
+            Set_Lame_On_Particles(E,nu);
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Add_Drucker_Prager_Case(E,nu,case_num,&sand_particles);
+            // ----------------- GRAVITY ---------------------------------------
+            Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
+        } break;
+
         case 948:{ // column collapse wedge firction angle
             particles.Store_Fp(true);
 
