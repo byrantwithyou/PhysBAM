@@ -25,10 +25,9 @@ public:
     typedef TV VECTOR_T;
 
     MATRIX<T,TV::m> R;
-    TV center;
+    TV axis,center;
     T o,q,r0,r1;
     TV N,C0,C1,v0;
-    RANGE<TV> bounding_box;
 
     HOURGLASS(const TV& axis,const TV& center,T bulb_radius,T neck_radius,T height,T neck_width);
 
@@ -58,7 +57,7 @@ public:
     {Write_Binary<RW>(output,R,center,o,q,N,C0,C1,v0,r0,r1);}
 
 //#####################################################################
-    RANGE<TV> Bounding_Box() const {return bounding_box;}
+    RANGE<TV> Bounding_Box() const;
     static std::string Name() {return "HOURGLASS<VECTOR<T,2> >";}
 //#####################################################################
 };   
@@ -96,5 +95,11 @@ public:
     static std::string Name() {return "HOURGLASS<VECTOR<T,3> >";}
 //#####################################################################
 };   
+template<class T> class TRIANGULATED_SURFACE;
+template<class T> class SEGMENTED_CURVE_2D;
+namespace TESSELLATION{
+template<class T> SEGMENTED_CURVE_2D<T>* Tessellate_Boundary(const HOURGLASS<VECTOR<T,2> >& hourglass,int axis_div=32);
+template<class T> TRIANGULATED_SURFACE<T>* Tessellate_Boundary(const HOURGLASS<VECTOR<T,3> >& hourglass,int axis_div=32,int circ_div=16);
+}
 }
 #endif
