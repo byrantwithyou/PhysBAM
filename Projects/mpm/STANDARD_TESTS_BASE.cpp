@@ -110,10 +110,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-separate",&use_separate,"force separating collisions");
     parse_args.Add("-friction",&friction,&friction_is_set,"friction","Coefficient of friction");
     parse_args.Add("-cohesion",&sigma_Y,&use_cohesion,"cohesion","sigma_Y in Drucker Prager");
-
-        
-
-
+    parse_args.Add("-T",&extra_T,"float","extra float argument");
+    parse_args.Add("-I",&extra_int,"int","extra int argument");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);

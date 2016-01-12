@@ -51,6 +51,7 @@ public:
     using BASE::destroy;using BASE::plasticity_models;using BASE::write_output_files;using BASE::read_output_files;
     using BASE::begin_frame;using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
     using BASE::Update_Variable_Lame_Parameters_On_Constitutive_Models;
+    using BASE::extra_T;using BASE::extra_int;
 
     // surface tension stuff
     bool use_surface_tension;
