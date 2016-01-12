@@ -1033,6 +1033,7 @@ Initialize()
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
             begin_time_step=[=](T time)
                 {
+                    ARRAY<int> affected_particles;
                     int n=particles.number;
                     source->Begin_Time_Step(time);
                     T mu=E/(2*(1+nu));
@@ -1041,11 +1042,11 @@ Initialize()
                         particles.mu(i)=mu;
                         particles.mu0(i)=mu;
                         particles.lambda(i)=lambda;
-                        particles.lambda0(i)=lambda;}
+                        particles.lambda0(i)=lambda;
+                        affected_particles.Append(n);}
                     for(int i=0;i<plasticity_models.m;i++)
                         if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                            for(int p=n;p<particles.number;p++)
-                                dp->Update_Hardening(p,0);
+                            dp->Initialize_Particles(&affected_particles);
                 };
             end_time_step=[=](T time){source->End_Time_Step(time);};
 
