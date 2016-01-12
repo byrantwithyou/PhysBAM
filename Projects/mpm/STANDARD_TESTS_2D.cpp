@@ -855,6 +855,12 @@ Initialize()
                 Add_Fixed_Corotated(El,nul,&lambda_particles,true);}
 
             Add_Gravity(m/(s*s)*TV(0,-9.81));
+            if(extra_T.m>=2){
+                MPM_VISCOSITY<TV>* visc=new MPM_VISCOSITY<TV>(force_helper,gather_scatter,0,0*unit_mu);
+                visc->Use_Variable_Viscosity();
+                for(int i=0;i<particles.X.m;i++)
+                    visc->viscosity(i)=extra_T(particles.X(i).y>.4);
+                Add_Force(*visc);}
         } break;
         case 53:
         case 56:
