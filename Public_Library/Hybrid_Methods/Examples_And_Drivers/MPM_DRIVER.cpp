@@ -159,6 +159,7 @@ Initialize()
     //     for(int k=0;k<fluid_walls.m;k++){
     //         if(fluid_walls(k)->Lazy_Inside(iterator.Location())){
     //             cell_soli....
+    Update_Simulated_Particles();
 
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
