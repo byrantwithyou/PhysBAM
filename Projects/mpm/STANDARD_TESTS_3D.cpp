@@ -1313,8 +1313,8 @@ Initialize()
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             T sand_depth=0.35*m;
             T air_height=0.65*m;
-            T sand_length=1*m;
-            T sand_width=1*m;
+            T sand_length=foo_T2*m;
+            T sand_width=foo_T2*m;
             T wall_thickness=0.2*m;
             RANGE<TV> sand(TV(-sand_width/2,-sand_depth,-sand_length/2),TV(sand_width/2,0,sand_length/2));
             RANGE<TV> domain(sand);
