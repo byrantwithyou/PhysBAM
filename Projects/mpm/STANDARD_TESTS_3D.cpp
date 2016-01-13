@@ -1752,24 +1752,17 @@ Initialize()
         } break;
 
         case 947:{ // sand shovel
-            //  ./mpm 947 -3d  -resolution 5 -max_dt 1e-4 -scale_E 0.01 -mast_case 0 -last_frame 120 -symplectic_euler -no_implicit_plasticity -o shovel
+            //  ./mpm 947 -3d  -resolution 5 -max_dt 1e-4 -scale_E 0.01 -mast_case 0 -last_frame 120 -symplectic_euler -no_implicit_plasticity -o shoveln
             particles.Store_Fp(true);
             // ----------------- GRID ------------------------------------------
-            // TV grid_size(1.1*m,0.5*m,0.7*m);
-            // TV grid_center(0.5*m,0.19*m,0.298*m);
-            // TV_INT grid_resolution=TV_INT(11,5,7)*resolution;
             TV grid_size(0.8*m,0.5*m,0.5*m);
-            TV grid_center(0.5*m,0.19*m,0.298*m);
+            TV grid_center(0.5*m,0.25*m,0.298*m);
             TV_INT grid_resolution=TV_INT(8,5,5)*resolution;
             RANGE<TV> grid_domain(grid_center-grid_size/2,grid_center+grid_size/2);
             grid.Initialize(grid_resolution,grid_domain,true);
             LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
             // ----------------- BOX -------------------------------------------
-            RANGE<TV> boxymin(TV(-10,-10,-10)*m,TV(10,0,10)*m);
-            // RANGE<TV> boxxmin(TV(-10,-10,-10)*m,TV(0,10,10)*m);
-            // RANGE<TV> boxxmax(TV(1,-10,-10)*m,TV(10,10,10)*m);
-            // RANGE<TV> boxzmin(TV(-10,-10,-10)*m,TV(10,10,0)*m);
-            // RANGE<TV> boxzmax(TV(-10,-10,0.6)*m,TV(10,10,10)*m);
+            RANGE<TV> boxymin(TV(-10,-10,-10)*m,TV(10,0.04,10)*m);
             RANGE<TV> boxxmin(TV(-10,-10,-10)*m,TV(0.15,10,10)*m);
             RANGE<TV> boxxmax(TV(0.85,-10,-10)*m,TV(10,10,10)*m);
             RANGE<TV> boxzmin(TV(-10,-10,-10)*m,TV(10,10,0.1)*m);
@@ -1784,22 +1777,25 @@ Initialize()
             else Add_Collision_Object(box,COLLISION_TYPE::stick,0); // THE BOX IS STICKY
             // ----------------- SHOVEL ----------------------------------------
             LOG::cout<<"READING SHOVEL AND CONVERTING TO LEVELSET COLLISION OBJECT..."<<std::endl;
-            LEVELSET_IMPLICIT_OBJECT<TV>* shovel=Levelset_From_File<T>(data_directory+"/../Private_Data/shovel.tri.gz",350); // MAY NEED HIGHRES TO CAPTURE THIN SHELL 
+            LEVELSET_IMPLICIT_OBJECT<TV>* shovel=Levelset_From_File<T>(data_directory+"/../Private_Data/shovel.tri.gz",400); // MAY NEED HIGHRES TO CAPTURE THIN SHELL 
             TV vA((1.0/100.0)/(1.0/24.0),(-1.0/200.0)/(1.0/24.0),0);
-            TV vB((1.0/100.0)/(1.0/24.0),(1.0/120.0)/(1.0/24.0),0);
+            TV vB((1.0/200.0)/(1.0/24.0),(1.0/120.0)/(1.0/24.0),0);
             TV critical_location(0.24,-0.12,0);
-            T critical_time=1.0;
-            T stop_time=2.0;
+            T start_time=0.5;
+            T critical_time=1.5;
+            T stop_time=2.5;
 
             Add_Collision_Object(shovel,COLLISION_TYPE::stick,0, // THE SHOVEL IS STICKY (FOR NOW)
                 [=](T time){
-                    if(time>stop_time) time=stop_time;
-                    if(time<critical_time) return FRAME<TV>(vA*time);
-                    else return FRAME<TV>(critical_location+vB*(time-critical_time));},
+                    if(time<start_time) return FRAME<TV>(TV());
+                    else if(time<critical_time) return FRAME<TV>(vA*(time-start_time));
+                    else if(time<stop_time) return FRAME<TV>(critical_location+vB*(time-critical_time));
+                    else return FRAME<TV>(critical_location+vB*(stop_time-critical_time));},
                 [=](T time){
-                    if(time>=stop_time) return TWIST<TV>(TV(),typename TV::SPIN());
-                    if(time<critical_time) return TWIST<TV>(vA,typename TV::SPIN());
-                    else return TWIST<TV>(vB,typename TV::SPIN());});
+                    if(time<start_time) return TWIST<TV>(TV(),typename TV::SPIN());
+                    else if(time<critical_time) return TWIST<TV>(vA,typename TV::SPIN());
+                    else if(time<stop_time) return TWIST<TV>(vB,typename TV::SPIN());
+                    else return TWIST<TV>(TV(),typename TV::SPIN());});
             // ----------------- SAND ------------------------------------------
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
