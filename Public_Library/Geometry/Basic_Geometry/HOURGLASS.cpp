@@ -118,7 +118,6 @@ Tessellate_Boundary(const HOURGLASS<VECTOR<T,2> >& h,int axis_div)
 template<class T> TRIANGULATED_SURFACE<T>*
 Tessellate_Boundary(const HOURGLASS<VECTOR<T,3> >& h,int axis_div,int circ_div)
 {
-    typedef VECTOR<T,3> TV;
     TRIANGULATED_SURFACE<T>& ts=*TRIANGULATED_SURFACE<T>::Create();
     SEGMENTED_CURVE_2D<T>* sc=Tessellate_Boundary(h.hg2,axis_div);
     ts.mesh.Initialize_Cylinder_Mesh(axis_div-1,circ_div,true);
