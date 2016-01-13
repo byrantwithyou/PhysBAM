@@ -715,7 +715,7 @@ Initialize()
 
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
        } break;
-        case 33:{// dry sand notch dam break, wedging friction angle
+        case 33:{// dry sand notch dam break
             // ./mpm 33 -3d -threads 8 -resolution 30 -last_frame 40 -framerate 48 -fooT1 4 -fooT2 30 -max_dt 1e-4 -scale_E 0.01 -symplectic_euler -no_implicit_plasticity -o notch30
             particles.Store_Fp(true);
             grid.Initialize(TV_INT(5,2,5)*resolution,RANGE<TV>(TV(0.08,0.09,0.08)*m,TV(0.38,0.21,0.38)*m),true);
@@ -753,6 +753,27 @@ Initialize()
             //foo_T2 is the friction angle
             Add_Drucker_Prager(E,nu,foo_T2);
         }break;
+
+        case 133:{// column collapse for friction angle wedge
+            particles.Store_Fp(true);
+            grid.Initialize(TV_INT(3,2,3)*resolution,RANGE<TV>(TV(-0.3,-0.1,-0.3)*m,TV(0.3,0.3,0.3)*m),true);
+            RANGE<TV> ground(TV(-10,-5,-5)*m,TV(10,0,10)*m);            
+            Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),COLLISION_TYPE::stick,0);
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            T column_height=0.08;
+            T column_radius=0.01;
+            CYLINDER<T> column(TV(0,0,0),TV(0,column_height,0),column_radius);
+            Seed_Particles(column,0,0,density,particles_per_cell);
+            ARRAY<int> sand_particles(particles.X.m);
+            for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
+            Set_Lame_On_Particles(E,nu);
+            Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
+            //foo_T1 is the friction angle
+            Add_Drucker_Prager(E,nu,foo_T1);
+        }break;
+
         case 34:{ // sand dam break
             // usage:./mpm 34 -3d -use_exp_F -max_dt 1e-3 -unit_p*scale_E 10 -fooT1 10 -fooT2 1000 -fooT3 3 -last_frame 20 
             particles.Store_Fp(true);
