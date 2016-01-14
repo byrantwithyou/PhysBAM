@@ -22,8 +22,8 @@ public:
     bool enforce_definiteness;
     T constant_lambda,constant_mu; // Lame coefficients (used by almost all derived models)
     T constant_alpha,constant_beta; // isotropic damping parameters (used by all current derived models)
-    ARRAY_VIEW<T> lambda,mu; // spatially varying Lame coefficients
-    ARRAY_VIEW<T> alpha,beta; // spatially varying damping parameters
+    const ARRAY_VIEW<T> *lambda,*mu; // spatially varying Lame coefficients
+    const ARRAY_VIEW<T> *alpha,*beta; // spatially varying damping parameters
 
 private:
     CONSTITUTIVE_MODEL();
@@ -37,6 +37,11 @@ public:
 
     virtual T Maximum_Elastic_Stiffness(const int id) const; // for elastic CFL computation
     virtual T Maximum_Damping_Stiffness(const int id) const; // for damping CFL computation
+
+    T Mu(const int id) const {return mu?(*mu)(id):constant_mu;}
+    T Lambda(const int id) const {return lambda?(*lambda)(id):constant_lambda;}
+    T Alpha(const int id) const {return alpha?(*alpha)(id):constant_alpha;}
+    T Beta(const int id) const {return beta?(*beta)(id):constant_beta;}
 
 //#####################################################################
     virtual MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const=0;

@@ -48,7 +48,7 @@ P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const int id) const
 template<class T> MATRIX<T,3> MOONEY_RIVLIN_3D2<T>::
 P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const int id) const
 {
-    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    T id_alpha=Alpha(id),id_beta=Beta(id);
     SYMMETRIC_MATRIX<T,3> strain_rate=F_dot.Symmetric_Part(); 
     return 2*id_beta*strain_rate+id_alpha*strain_rate.Trace();
 }

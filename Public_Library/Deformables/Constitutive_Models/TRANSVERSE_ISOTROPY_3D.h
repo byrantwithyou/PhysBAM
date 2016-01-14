@@ -20,7 +20,7 @@ public:
     typedef ANISOTROPIC_CONSTITUTIVE_MODEL<T,3> BASE;
     using BASE::enforce_definiteness;using BASE::constant_alpha;using BASE::constant_beta;
     using BASE::use_isotropic_component_of_stress_derivative_only;
-    using BASE::alpha;using BASE::beta;using BASE::lambda;using BASE::mu;
+    using BASE::Alpha;using BASE::Beta;using BASE::Lambda;using BASE::Mu;
     
     T failure_threshold;
     ARRAY<VECTOR<T,3> > fiber_field;

@@ -85,6 +85,8 @@ MPM_PLASTIC_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
         gather_scatter.threads=gather_scatter_input.threads;
         gather_scatter.Prepare_Scatter(particles);}
     plasticity.gather_scatter=&gather_scatter;
+    constitutive_model.mu=&particles.mu;
+    constitutive_model.lambda=&particles.lambda;
 }
 //#####################################################################
 // Destructor

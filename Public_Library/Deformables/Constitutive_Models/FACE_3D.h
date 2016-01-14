@@ -25,7 +25,7 @@ public:
     using BASE::enforce_definiteness;using BASE::constant_lambda;using BASE::constant_mu;
     using BASE::constant_alpha;using BASE::constant_beta;
     using BASE::use_isotropic_component_of_stress_derivative_only;
-    using BASE::alpha;using BASE::beta;using BASE::lambda;using BASE::mu;
+    using BASE::Alpha;using BASE::Beta;using BASE::Lambda;using BASE::Mu;
 
     T constant_mu_10,constant_mu_01,constant_kappa;
     ARRAY<T> *tet_mu_10,*tet_mu_01,*tet_kappa;
@@ -125,7 +125,7 @@ public:
 
     MATRIX<T,3> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const int tetrahedron) const override
     {
-        T id_alpha=(alpha.m?alpha(tetrahedron):constant_alpha),id_beta=(beta.m?beta(tetrahedron):constant_beta);
+        T id_alpha=Alpha(tetrahedron),id_beta=Beta(tetrahedron);
         SYMMETRIC_MATRIX<T,3> strain_rate=F_dot.Symmetric_Part(); 
         return 2*id_beta*strain_rate+id_alpha*strain_rate.Trace();
     }

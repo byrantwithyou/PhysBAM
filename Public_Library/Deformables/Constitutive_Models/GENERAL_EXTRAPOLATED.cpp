@@ -280,7 +280,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
 template<class T,int d> MATRIX<T,d> GENERAL_EXTRAPOLATED<T,d>::
 P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const
 {
-    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    T id_alpha=Alpha(id),id_beta=Beta(id);
     SYMMETRIC_MATRIX<T,d> strain_rate=F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
     return 2*id_beta*strain_rate+id_alpha*strain_rate.Trace();
 }
@@ -298,7 +298,7 @@ P_From_Strain_Rate_Forces_Size() const
 template<class T,int d> void GENERAL_EXTRAPOLATED<T,d>::
 P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const int id) const
 {
-    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    T id_alpha=Alpha(id),id_beta=Beta(id);
     SYMMETRIC_MATRIX<T,d> strain_rate=F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
     T sb=sqrt(2*id_beta);
     T dd=sb/TV::dimension;
@@ -312,7 +312,7 @@ P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggreg
 template<class T,int d> MATRIX<T,d> GENERAL_EXTRAPOLATED<T,d>::
 P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T> aggregate,const int id) const
 {
-    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    T id_alpha=Alpha(id),id_beta=Beta(id);
     SYMMETRIC_MATRIX<T,d> strain_rate=(*(const MATRIX<T,d>*)aggregate.Get_Array_Pointer()).Symmetric_Part(); // use linear damping because of problems with inverting elements...
     T sb=sqrt(2*id_beta);
     T dd=sb/TV::dimension;

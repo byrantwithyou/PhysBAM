@@ -1149,7 +1149,6 @@ Initialize()
                 if(Uniform(0,1)>mult) p--;}
 
 
-            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
             for(int p=0;p<particles.X.m;p++) particles.X(p)+=TV(0,-0.02,0);
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
@@ -1252,7 +1251,6 @@ Initialize()
                 (*color_attribute)(k)=inside?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0);}
             for(int p=0;p<particles.X.m;p++) particles.X(p)+=TV(0,-0.02,0);
             Add_Fixed_Corotated(water_E,nu,&lambda_particles,true);
-            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
 
@@ -1746,7 +1744,6 @@ Initialize()
             LOG::printf("check particles.X.m=%P\n",particles.X.m);
             LOG::printf("particles count=%P\n",particles.X.m);
             //shift the particles
-            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
             for(int p=0;p<particles.X.m;p++) particles.X(p)+=TV(0,-0.60,0);
             Add_Gravity(TV(0,-9.81,0));
         } break;
@@ -1915,7 +1912,6 @@ Initialize()
                 (*color_attribute)(p)=VECTOR<T,3>(1,0,0);
                 (*color_attribute)(k)=VECTOR<T,3>(1,0,0);}
             Add_Fixed_Corotated(water_E,nu,&lambda_particles,true);
-            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
             T max_radius=0;
             for(int p=0;p<particles.X.m;p++) if(particles.X(p).Magnitude()>max_radius) max_radius=particles.X(p).Magnitude();
             LOG::printf("max_radius=%P\n",max_radius);
@@ -2203,7 +2199,6 @@ Initialize()
                 particles.mu0(i)=mu_weak_sand;
                 particles.lambda(i)=lambda_weak_sand;
                 particles.lambda0(i)=lambda_weak_sand;}
-            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
 
         } break;
 
@@ -2212,7 +2207,6 @@ Initialize()
     if(forced_collision_type!=-1)
         for(int i=0;i<collision_objects.m;i++)
             collision_objects(i)->type=(COLLISION_TYPE)forced_collision_type;
-    Update_Variable_Lame_Parameters_On_Constitutive_Models();
 }
 //#####################################################################
 // Function Begin_Frame

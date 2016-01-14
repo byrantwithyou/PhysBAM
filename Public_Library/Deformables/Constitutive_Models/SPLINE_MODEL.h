@@ -17,7 +17,7 @@ class SPLINE_MODEL:public COROTATED<T,d>
     typedef VECTOR<T,d> TV;
 public:
     typedef COROTATED<T,d> BASE;
-    using BASE::constant_lambda;using BASE::constant_mu;using BASE::lambda;using BASE::mu;
+    using BASE::constant_lambda;using BASE::constant_mu;using BASE::Lambda;using BASE::Mu;
 
 private:
     ARRAY<T> hardening_deformation,hardening_strength;

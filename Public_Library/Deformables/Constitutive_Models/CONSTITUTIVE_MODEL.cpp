@@ -13,7 +13,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,int d> CONSTITUTIVE_MODEL<T,d>::
 CONSTITUTIVE_MODEL()
-    :enforce_definiteness(false),constant_lambda(0),constant_mu(0),constant_alpha(0),constant_beta(0)
+    :enforce_definiteness(false),constant_lambda(0),constant_mu(0),constant_alpha(0),constant_beta(0),
+    lambda(0),mu(0),alpha(0),beta(0)
 {
 }
 //#####################################################################
@@ -29,7 +30,7 @@ template<class T,int d> CONSTITUTIVE_MODEL<T,d>::
 template<class T,int d> T CONSTITUTIVE_MODEL<T,d>::
 Maximum_Elastic_Stiffness(const int id) const // for elastic CFL computation
 {
-    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
+    T id_mu=Mu(id),id_lambda=Lambda(id);
     return id_lambda+2*id_mu;
 }
 //#####################################################################
@@ -38,7 +39,7 @@ Maximum_Elastic_Stiffness(const int id) const // for elastic CFL computation
 template<class T,int d> T CONSTITUTIVE_MODEL<T,d>::
 Maximum_Damping_Stiffness(const int id) const // for damping CFL computation
 {
-    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    T id_alpha=Alpha(id),id_beta=Beta(id);
     return id_alpha+2*id_beta;
 }
 //#####################################################################

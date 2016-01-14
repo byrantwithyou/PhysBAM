@@ -11,7 +11,7 @@ namespace PhysBAM{
 template<class T,int d> DIAGONAL_MATRIX<T,d> SPLINE_MODEL<T,d>::
 P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
-    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
+    T id_mu=Mu(id),id_lambda=Lambda(id);
     DIAGONAL_MATRIX<T,d> strain=F-1,strain_abs=strain.Abs(),strain_sign=strain.Sign();
     DIAGONAL_MATRIX<T,d> D;
     int index=hardening_deformation.m>1?id:1;

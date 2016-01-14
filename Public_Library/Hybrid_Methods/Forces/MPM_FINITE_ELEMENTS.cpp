@@ -27,6 +27,8 @@ MPM_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
         gather_scatter.weights=gather_scatter_input.weights;
         gather_scatter.threads=gather_scatter_input.threads;
         gather_scatter.Prepare_Scatter(particles);}
+    constitutive_model.mu=&particles.mu;
+    constitutive_model.lambda=&particles.lambda;
 }
 //#####################################################################
 // Destructor

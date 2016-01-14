@@ -36,7 +36,7 @@ template<class T,int d> ST_VENANT_KIRCHHOFF<T,d>::
 template<class T,int d> T ST_VENANT_KIRCHHOFF<T,d>::
 Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
-    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
+    T id_mu=Mu(id),id_lambda=Lambda(id);
     DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold),strain=(F_threshold*F_threshold-1)*(T).5;
     return (T).5*id_lambda*sqr(strain.Trace())+id_mu*sqr(strain).Trace();
 }
@@ -46,7 +46,7 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 template<class T,int d> DIAGONAL_MATRIX<T,d> ST_VENANT_KIRCHHOFF<T,d>::
 P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 {
-    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
+    T id_mu=Mu(id),id_lambda=Lambda(id);
     DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold),twice_strain=F_threshold*F_threshold-1;
     return F_threshold*(id_mu*twice_strain+(T).5*id_lambda*twice_strain.Trace());
 }
@@ -56,7 +56,7 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 template<class T,int d> MATRIX<T,d> ST_VENANT_KIRCHHOFF<T,d>::
 P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const
 {
-    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    T id_alpha=Alpha(id),id_beta=Beta(id);
     DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold);
     SYMMETRIC_MATRIX<T,d> strain_rate=(F_threshold*F_dot).Twice_Symmetric_Part();
     return F_threshold*(id_beta*strain_rate+(T).5*id_alpha*strain_rate.Trace());
@@ -110,7 +110,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
 template<class T,int d> void ST_VENANT_KIRCHHOFF<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int id) const
 {
-    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
+    T id_mu=Mu(id),id_lambda=Lambda(id);
     Isotropic_Stress_Derivative_Helper(F,dP_dF,failure_threshold,id_mu,id_lambda);
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }

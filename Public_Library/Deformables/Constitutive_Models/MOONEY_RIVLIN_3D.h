@@ -22,7 +22,7 @@ public:
     typedef ISOTROPIC_CONSTITUTIVE_MODEL<T,3> BASE;
     using BASE::enforce_definiteness;using BASE::constant_lambda;using BASE::constant_mu;
     using BASE::constant_alpha;using BASE::constant_beta;
-    using BASE::alpha;using BASE::beta;using BASE::lambda;using BASE::mu;
+    using BASE::Alpha;using BASE::Beta;using BASE::Lambda;using BASE::Mu;
 
     T mu_10,mu_01,kappa;
     T failure_threshold;

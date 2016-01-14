@@ -52,7 +52,7 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
     if(F.x(d-1)<=0)
         return FLT_MAX;
     else{
-        T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
+        T id_mu=Mu(id),id_lambda=Lambda(id);
         DIAGONAL_MATRIX<T,d> log_F=log(F);
         T sum_sqr=sqr(log_F.Trace());
         return id_mu*log_F.Frobenius_Norm_Squared()+(T)0.5*id_lambda*sum_sqr;}
@@ -66,7 +66,7 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
     if(F.x(d-1)<=0)
         return DIAGONAL_MATRIX<T,d>();
     else{
-        T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
+        T id_mu=Mu(id),id_lambda=Lambda(id);
         DIAGONAL_MATRIX<T,d> log_E=log(F);
         DIAGONAL_MATRIX<T,d> F_Inv=F.Inverse();
         return ((T)2*id_mu*log_E+id_lambda*log_E.Trace())*F_Inv;}
@@ -141,7 +141,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
 template<class T,int d> void ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int id) const
 {
-    T id_mu=(mu.m?mu(id):constant_mu),id_lambda=(lambda.m?lambda(id):constant_lambda);
+    T id_mu=Mu(id),id_lambda=Lambda(id);
     Isotropic_Stress_Derivative_Helper(F,dP_dF,failure_threshold,id_mu,id_lambda);
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }

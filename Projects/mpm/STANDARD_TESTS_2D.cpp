@@ -1414,7 +1414,6 @@ Initialize()
                 (*color_attribute)(k)=inside?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0);}
             for(int p=0;p<particles.X.m;p++) particles.X(p)+=TV(0,-0.02);
             Add_Fixed_Corotated(water_E,nu,&lambda_particles,true);
-            this->Update_Variable_Lame_Parameters_On_Constitutive_Models();
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
@@ -1422,7 +1421,6 @@ Initialize()
     if(forced_collision_type!=-1)
         for(int i=0;i<collision_objects.m;i++)
             collision_objects(i)->type=(COLLISION_TYPE)forced_collision_type;
-    Update_Variable_Lame_Parameters_On_Constitutive_Models();
 }
 //#####################################################################
 // Function Begin_Frame

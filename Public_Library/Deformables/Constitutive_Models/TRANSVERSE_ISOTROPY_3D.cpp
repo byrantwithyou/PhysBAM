@@ -77,7 +77,7 @@ P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const int id) c
 template<class T> MATRIX<T,3> TRANSVERSE_ISOTROPY_3D<T>::
 P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const int id) const
 {
-    T id_alpha=(alpha.m?alpha(id):constant_alpha),id_beta=(beta.m?beta(id):constant_beta);
+    T id_alpha=Alpha(id),id_beta=Beta(id);
     SYMMETRIC_MATRIX<T,3> strain_rate=F_dot.Symmetric_Part(); // Use linear damping by default
     return 2*id_beta*strain_rate+id_alpha*strain_rate.Trace();
 }

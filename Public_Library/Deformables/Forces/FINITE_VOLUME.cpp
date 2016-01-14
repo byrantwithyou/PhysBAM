@@ -396,8 +396,8 @@ Add_Semi_Implicit_Impulse(const int element,const T dt,T* time_plus_dt)
     MATRIX<T,d> F_dot_cap=Q.Transpose_Times(STRAIN_MEASURE<TV,d>::Ds(particles.V,data.nodes))*data.Dm_inverse;
     SYMMETRIC_MATRIX<T,d> F_dot_cap_twice_symmetric_part=F_dot_cap.Twice_Symmetric_Part();
     if(time_plus_dt) *time_plus_dt=data.time+min(data.dt_cfl,twice_max_strain_per_time_step/F_dot_cap_twice_symmetric_part.Max_Abs());
-    T alpha=isotropic_model->alpha.m?isotropic_model->alpha(element):isotropic_model->constant_alpha;
-    T beta=isotropic_model->beta.m?isotropic_model->beta(element):isotropic_model->constant_beta;
+    T alpha=isotropic_model->Alpha(element);
+    T beta=isotropic_model->Beta(element);
     P0_cap+=dt_scale*beta*F_dot_cap_twice_symmetric_part+dt_scale*alpha*F_dot_cap.Trace();
     // solve for -s dt P^{n+1}
     T dt_beta=dt*beta,dt_alpha=dt*alpha;
