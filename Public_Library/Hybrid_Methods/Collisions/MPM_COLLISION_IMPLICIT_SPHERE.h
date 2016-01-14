@@ -33,6 +33,7 @@ public:
     TV Velocity(const TV& X,T time) const override;
     IMPLICIT_OBJECT<TV>* Get_Implicit_Object(T time) override;
     void Update(T time) const;
+    T Get_Radius() const{return sphere->analytic.radius;}
 //#####################################################################
 };
 }

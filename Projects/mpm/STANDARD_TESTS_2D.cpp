@@ -829,6 +829,9 @@ Initialize()
                 Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
                 Seed_Particles(box,0,0,density,particles_per_cell);
                 Set_Lame_On_Particles(E,nu);}
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            Add_Drucker_Prager_Case(E,nu,test_number-40);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 50:
@@ -1052,7 +1055,7 @@ Initialize()
             grid.Initialize(TV_INT(4,1)*resolution,RANGE<TV>(TV(-2,0),TV(2,1))*m,true);
             RANGE<TV> ground(TV(-10,-10)*m,TV(10,.1)*m);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
-            else Add_Collision_Object(ground,COLLISION_TYPE::slip,0.6);
+            else Add_Collision_Object(ground,COLLISION_TYPE::slip,0.3);
             T density=(T)2200*unit_rho*scale_mass;
             T E=1e4*unit_p*scale_E,nu=.3;
             T spout_width=.05*m;
@@ -1072,6 +1075,7 @@ Initialize()
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
             begin_time_step=[=](T time)
                 {
+                    if(time<(T)foo_T3){
                     ARRAY<int> affected_particles;
                     int n=particles.number;
                     source->Begin_Time_Step(time);
@@ -1082,16 +1086,16 @@ Initialize()
                         particles.mu0(i)=mu;
                         particles.lambda(i)=lambda;
                         particles.lambda0(i)=lambda;
-                        affected_particles.Append(n);}
+                        affected_particles.Append(i);}
                     for(int i=0;i<plasticity_models.m;i++)
                         if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                            dp->Initialize_Particles(&affected_particles);
+                            dp->Initialize_Particles(&affected_particles);}
                 };
-            end_time_step=[=](T time){source->End_Time_Step(time);};
+            end_time_step=[=](T time){if(time<=foo_T3) source->End_Time_Step(time);};
 
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            int case_num=use_hardening_mast_case?hardening_mast_case:2;
-            Add_Drucker_Prager_Case(E,nu,case_num);
+                int case_num=use_hardening_mast_case?hardening_mast_case:2;
+                Add_Drucker_Prager_Case(E,nu,case_num);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(gravity);
         } break;

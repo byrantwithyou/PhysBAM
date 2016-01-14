@@ -1513,7 +1513,7 @@ Initialize()
                         particles.mu0(i)=mu;
                         particles.lambda(i)=lambda;
                         particles.lambda0(i)=lambda;
-                        affected_particles.Append(n);}
+                        affected_particles.Append(i);}
                     for(int i=0;i<plasticity_models.m;i++)
                         if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
                             dp->Initialize_Particles(&affected_particles);
@@ -1971,7 +1971,8 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
 
-        case 70:{//shrinking ball
+        case 70:
+        case 75:{//shrinking ball
             //./mpm -3d 70 -resolution 90 -max_dt 1e-5 -no_implicit_plasticity -symplectic_euler -threads 8 -framerate 120 -last_frame 120 -o Test_3d_1001_res_90 -fooT1 10 -fooT2 0.3
             particles.Store_Fp(true);
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
@@ -1985,7 +1986,8 @@ Initialize()
                 density=(T)1582.22*unit_rho*scale_mass;
             T E=35.37e5*unit_p*scale_E,nu=.3;
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/voronoi_fracture_sphere.tri.gz",*surface);
+            if(test_number==70) FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/voronoi_fracture_sphere.tri.gz",*surface);
+            else FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.d),data_directory+"/../Private_Data/100_strong.tri.gz",*surface);
             LOG::cout<<"Read mesh of voronoi sphere #"<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh of voronoi sphere particle # "<<surface->particles.number<<std::endl;
             surface->mesh.Initialize_Adjacent_Elements();    
@@ -2002,9 +2004,14 @@ Initialize()
             //Sand properties
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
-            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,0);
+            if(!use_cohesion) sigma_Y=0;
+            Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,sigma_Y);
             Set_Lame_On_Particles(E,nu);
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            //deal with radius
+            T max_radius=0;
+            for(int p=0;p<particles.X.m;p++) if(particles.X(p).Magnitude()>max_radius) max_radius=particles.X(p).Magnitude();
+            LOG::printf("max_radius=%P\n",max_radius);
             //water
             T porosity=0.3;
             T saturation_level=1;
@@ -2015,11 +2022,17 @@ Initialize()
             T volume_lambda=particles.volume(0)*porosity*saturation_level;
             T mass_lambda=water_density*volume_lambda;
             T lambda_water_strong=water_E*nu/((1+nu)*(1-2*nu));
+            T sr=1;
+            RANDOM_NUMBERS<T> random;
+            random.Set_Seed(1234);
+
+            const T h=10;
+            const T a=1.025;
+            const T ea=exp((a-1)*h); 
             for(int k=0;k<sand_particles.m;k++){
                 int p=particles.Add_Element();
                 lambda_particles.Append(p);
                 particles.valid(p)=true;
-                particles.mass(p)=mass_lambda;
                 int i=sand_particles(k);
                 particles.X(p)=particles.X(i);
                 particles.V(p)=particles.V(i);
@@ -2031,27 +2044,58 @@ Initialize()
                 particles.volume(p)=volume_lambda;
                 particles.mu(p)=(T)0;
                 particles.mu0(p)=(T)0;
-                particles.lambda(p)=lambda_water_strong;
-                particles.lambda0(p)=lambda_water_strong;
+                sr=random.Get_Uniform_Number((T)0.75,(T)3);
+                particles.mass(p)=sr*mass_lambda;
+                particles.lambda(p)=sr*lambda_water_strong;
+                particles.lambda0(p)=sr*lambda_water_strong;
+
+                T mult=1;
+                for(int i=0;i<10;i++)
+                    if(particles.X(p).Magnitude()>(i+1)*max_radius/10){
+                        particles.mass(p)*=a;
+                        particles.lambda(p)*=ea;
+                        particles.lambda0(p)*=ea;
+                        particles.mu(k)*=ea;
+                        particles.mu0(k)*=ea;}
+                    else mult/=a;
+                //if(particles.X(p).Magnitude()<0.3*max_radius) sr=random.Get_Uniform_Number((T)0.75,(T)3);
+                //else if(particles.X(p).Magnitude()<0.5*max_radius) sr=random.Get_Uniform_Number((T)0.1,(T)0.75);
+                //else if(particles.X(p).Magnitude()<0.7*max_radius) sr=random.Get_Uniform_Number((T)0.05,(T)0.1);
+                //else if(particles.X(p).Magnitude()<0.8*max_radius) sr=random.Get_Uniform_Number((T)0.01,(T)0.05);
+                //else sr=random.Get_Uniform_Number((T)0.005,(T)0.01);
+                //if(particles.X(p).Magnitude()<0.3*max_radius) sr=3;
+                //else if(particles.X(p).Magnitude()<0.5*max_radius) sr=2;
+                //else if(particles.X(p).Magnitude()<0.7*max_radius) sr=1.5;
+                //else sr=0.75;
                 (*color_attribute)(p)=VECTOR<T,3>(1,0,0);
                 (*color_attribute)(k)=VECTOR<T,3>(1,0,0);}
             Add_Fixed_Corotated(water_E,nu,&lambda_particles,true);
-            T max_radius=0;
-            for(int p=0;p<particles.X.m;p++) if(particles.X(p).Magnitude()>max_radius) max_radius=particles.X(p).Magnitude();
-            LOG::printf("max_radius=%P\n",max_radius);
             if(!use_foo_T2) foo_T2=0.1;
-            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,-1.5*max_radius,10)*m);
+            RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,-1.1*max_radius,10)*m);
             Add_Collision_Object(ground,COLLISION_TYPE::slip,0.3);
-            collision_objects.Append(new MPM_COLLISION_IMPLICIT_SPHERE<TV>(COLLISION_TYPE::separate,0.3,0,0,TV(0,0,0),1.02*max_radius,foo_T2));
+            MPM_COLLISION_IMPLICIT_SPHERE<TV>* shrinking_sphere=new MPM_COLLISION_IMPLICIT_SPHERE<TV>(COLLISION_TYPE::separate,0.3,0,0,TV(0,0,0),1.02*max_radius,foo_T2);
+            T resting_radius;
+            collision_objects.Append(shrinking_sphere);
             if(!use_foo_T1) foo_T1=10;
             int add_gravity_frame=restart?restart:foo_T1;
-            begin_frame=[this,add_gravity_frame](int frame){
-                if(frame==add_gravity_frame){
+            T pass_speed=foo_T2;
+            begin_frame=[this,add_gravity_frame,shrinking_sphere,pass_speed,&resting_radius](int frame){
+                if(restart){
+                if(frame==restart){
                     Add_Gravity(TV(0,-9.8,0));
-                    collision_objects.Pop(); 
-                    for(int p=0;p<particles.X.m;p++) particles.V(p)+=TV(0,-2.7,0);}};
-
-            LOG::printf("particles.velocity=%P\n",particles.V);
+                    collision_objects.Pop();}}
+                else{
+                    if(frame==add_gravity_frame){
+                        Add_Gravity(TV(0,-9.8,0));
+                        resting_radius=shrinking_sphere->Get_Radius();
+                        collision_objects.Pop(); 
+                        collision_objects.Append(new MPM_COLLISION_IMPLICIT_SPHERE<TV>(COLLISION_TYPE::separate,0.3,0,0,TV(0,0,0),resting_radius,0));}
+                    else if(frame==add_gravity_frame+4){
+                        collision_objects.Pop();
+                        collision_objects.Append(new MPM_COLLISION_IMPLICIT_SPHERE<TV>(COLLISION_TYPE::separate,0.3,0,0,TV(0,0,0),resting_radius,-foo_T2));}
+                    else if(frame==add_gravity_frame+9){
+                        collision_objects.Pop(); 
+                        for(int p=0;p<particles.X.m;p++) particles.V(p)+=TV(0,-5.4,0);}}};
         } break;
 
         case 949:{ // lambda voronoi sand ball
