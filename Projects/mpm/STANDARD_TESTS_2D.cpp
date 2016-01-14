@@ -804,23 +804,19 @@ Initialize()
         case 48:
         case 49:{ // Mast paper
             particles.Store_Fp(true);
-
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-            if(use_penalty_collisions)
-                Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,0.9);
-            else
-                Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,COLLISION_TYPE::stick,0);
-
+            if(use_penalty_collisions) Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,0.9);
+            else Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,COLLISION_TYPE::stick,0);
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            Add_Drucker_Prager_Case(E,nu,test_number-40);
             T l0=0.05*m;
             T h0=l0*8;
             T gap=grid.dX(1)*0.01;
             RANGE<TV> box(TV(.5*m-l0,.1*m+gap),TV(.5*m+l0,.1*m+gap+h0));
             Seed_Particles(box,0,0,density,particles_per_cell);
             Set_Lame_On_Particles(E,nu);
+            Add_Drucker_Prager_Case(E,nu,test_number-40);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 50:
