@@ -152,7 +152,7 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 
     if(!lagrangian_forces.m) return;
     lagrangian_forces_F.Resize(particles.X.m,false,false);
-#pragma parallel for
+#pragma omp parallel for
     for(int i=0;i<lagrangian_forces_F.m;i++)
         lagrangian_forces_F(i)=TV();
     deformable_body_collection.Add_Velocity_Independent_Forces(lagrangian_forces_F,time);
@@ -172,7 +172,7 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
     if(!lagrangian_forces.m) return;
     lagrangian_forces_F.Resize(particles.X.m,false,false);
     lagrangian_forces_V.Resize(particles.X.m,false,false);
-#pragma parallel for
+#pragma omp parallel for
     for(int i=0;i<lagrangian_forces_F.m;i++){
         lagrangian_forces_F(i)=TV();
         lagrangian_forces_V(i)=TV();}
