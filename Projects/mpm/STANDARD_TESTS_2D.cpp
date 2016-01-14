@@ -802,21 +802,33 @@ Initialize()
         case 46:
         case 47:
         case 48:
-        case 49:{ // Mast paper
+        case 49:{ // sand column collapse (drucker prager v.s. snow-style)
+            //  ./mpm 42 -use_exp_F -max_dt 7.5e-4 -scale_E 0.1 -resolution 100 -foo_T1 0(1)
+            // fooT1=1:  use drucker prager    
+            // fooT1=0:  use snow-style plasticity
             particles.Store_Fp(true);
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,0.9);
             else Add_Collision_Object(RANGE<TV>(TV(-0.5,-1),TV(1.5,.1))*m,COLLISION_TYPE::stick,0);
-            T density=(T)2200*unit_rho*scale_mass;
-            T E=35.37e6*unit_p*scale_E,nu=.3;
-            if(!no_implicit_plasticity) use_implicit_plasticity=true;
             T l0=0.05*m;
             T h0=l0*8;
             T gap=grid.dX(1)*0.01;
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
             RANGE<TV> box(TV(.5*m-l0,.1*m+gap),TV(.5*m+l0,.1*m+gap+h0));
-            Seed_Particles(box,0,0,density,particles_per_cell);
-            Set_Lame_On_Particles(E,nu);
-            Add_Drucker_Prager_Case(E,nu,test_number-40);
+            if(foo_T1){
+                if(!no_implicit_plasticity) use_implicit_plasticity=true;
+                Seed_Particles(box,0,0,density,particles_per_cell);
+                Set_Lame_On_Particles(E,nu);
+                Add_Drucker_Prager_Case(E,nu,test_number-40);}
+            else{
+                if(!use_theta_c) theta_c=0.015;
+                if(!use_theta_s) theta_s=.000001;
+                if(!use_hardening_factor) hardening_factor=20;
+                if(!use_max_hardening) max_hardening=FLT_MAX;
+                Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
+                Seed_Particles(box,0,0,density,particles_per_cell);
+                Set_Lame_On_Particles(E,nu);}
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 50:
