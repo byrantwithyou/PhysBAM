@@ -839,10 +839,17 @@ Initialize()
         } break;
         case 36:{ // hourglass
             if(!use_foo_T1) foo_T1=.3; // coefficient of friction
+            if(extra_int.m<1) extra_int.Append(150);
+            if(extra_int.m<2) extra_int.Append(80);
+            if(extra_T.m<1) extra_int.Append(.16);
+            if(extra_T.m<2) extra_int.Append(.0225);
+            if(extra_T.m<3) extra_int.Append(.8);
+            if(extra_T.m<4) extra_int.Append(.0225);
+            if(extra_T.m<5) extra_int.Append(.1);
             particles.Store_Fp(true);
             grid.Initialize(TV_INT(4,9,4)*resolution,RANGE<TV>(TV(-0.2,-0.45,-0.2)*m,TV(0.2,0.45,0.2)*m),true);
             LOG::cout<<"GRID DX: " <<grid.dX<<std::endl;
-            HOURGLASS<TV> hourglass(TV::Axis_Vector(1),TV(),(T).16,(T).0225,(T).8,(T).0225);
+            HOURGLASS<TV> hourglass(TV::Axis_Vector(1),TV(),extra_T(0),extra_T(1),extra_T(2),extra_T(3));
             IMPLICIT_OBJECT<TV>* hg=new ANALYTIC_IMPLICIT_OBJECT<HOURGLASS<TV> >(hourglass);
             IMPLICIT_OBJECT<TV>* inv=new IMPLICIT_OBJECT_INVERT<TV>(hg);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(inv);
@@ -852,7 +859,7 @@ Initialize()
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             RANGE<TV> fill_part=grid.domain;
             fill_part.min_corner.y=0;
-            fill_part.max_corner.y=.1;
+            fill_part.max_corner.y=extra_T(4);
             ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> > io_fill_part(fill_part);
             IMPLICIT_OBJECT_INTERSECTION<TV> ioi(&io_fill_part,hg);
             ioi.owns_io.Fill(false);
