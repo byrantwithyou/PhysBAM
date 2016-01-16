@@ -16,6 +16,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_DILATE.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
@@ -1571,22 +1572,46 @@ Initialize()
             T sand_length=foo_T2*m;
             T sand_width=foo_T2*m;
             T wall_thickness=0.2*m;
+            T lip_height=0.05*m;
             RANGE<TV> sand(TV(-sand_width/2,-sand_depth,-sand_length/2),TV(sand_width/2,0,sand_length/2));
             RANGE<TV> domain(sand);
             domain.max_corner(1)=air_height;
-            RANGE<TV> sand_box(domain.Thickened(wall_thickness));
-            RANGE<TV> sand_box_interior(domain);
-            domain=domain.Thickened(0.05*m);
-            grid.Initialize(TV_INT(domain.Edge_Lengths()*resolution),domain,true);
+            T dx=domain.Edge_Lengths().Min()/resolution;
+            RANGE<TV> sand_box_interior(sand);
+            RANGE<TV> sand_box(sand_box_interior.Thickened(wall_thickness));
+            sand_box_interior.max_corner(1)=sand_box.max_corner(1)=lip_height;
+            domain=domain.Thickened(0.5*m);
+            RANGE<TV> outer_box(domain.Thickened(wall_thickness));
+            grid.Initialize(TV_INT(domain.Edge_Lengths()/dx),domain,true);
+            domain=domain.Thickened(-0.05*m);
+
+            RANGE<TV> sides[6];
+            for(int i=0;i<3;i++){
+                sides[2*i]=sand_box.Thickened(-lip_height);
+                sides[2*i+1]=sand_box.Thickened(-lip_height);
+                sides[2*i].min_corner(i)=sand_box_interior.max_corner(i)+lip_height;
+                sides[2*i+1].max_corner(i)=sand_box_interior.min_corner(i)-lip_height;}
+            
             auto sand_box_walls=
+                new IMPLICIT_OBJECT_DILATE<TV>(
+                        new IMPLICIT_OBJECT_UNION<TV>(
+                            new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sides[0]),
+                            new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sides[1]),
+                            new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sides[3]),
+                            new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sides[4]),
+                            new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sides[5])),
+                        lip_height);
+            auto outer_box_walls=
                 new IMPLICIT_OBJECT_INTERSECTION<TV>(
-                        new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sand_box),
+                        new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(outer_box),
                         new IMPLICIT_OBJECT_INVERT<TV>(
-                            new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(sand_box_interior)));
+                            new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(domain)));
             if(use_penalty_collisions){
-                Add_Penalty_Collision_Object(sand_box_walls);}
+                Add_Penalty_Collision_Object(sand_box_walls);
+                Add_Penalty_Collision_Object(outer_box_walls);}
             else{
-                Add_Collision_Object(sand_box_walls,COLLISION_TYPE::slip,0);}
+                Add_Collision_Object(sand_box_walls,COLLISION_TYPE::slip,0);
+                Add_Collision_Object(outer_box_walls,COLLISION_TYPE::slip,0);}
 
             T y0=0.15*m;
             T v0=-1*m/s*foo_T1;
