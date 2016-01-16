@@ -175,7 +175,7 @@ template<class TV> STANDARD_TESTS_BASE<TV>::
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
-    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
+    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
 {
     POISSON_DISK<TV> poisson_disk(1);
     ARRAY<TV> X;
@@ -206,7 +206,7 @@ Seed_Particles_Uniform(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> 
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
-    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,int particles_per_cell)
+    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
 {
     if(!regular_seeding) return Seed_Particles_Poisson(object,V,dV,density,particles_per_cell);
 
