@@ -157,47 +157,63 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
     T t0=system.example.time;
     T t1=t0+system.example.dt;
 
-    // TODO: parallelize
-    for(int k=0;k<system.example.valid_grid_indices.m;k++){
-        int i=system.example.valid_grid_indices(k);
-        TV V=v0.u.array(i)+midpoint_scale*dv.u.array(i);
-        TV X0=system.example.location.array(i);
-        TV X=X0+system.example.dt*V;
-        T deepest_phi=FLT_MAX;
-        int deepest_index=-1;
-        MPM_COLLISION_OBJECT<TV>* deepest_io=0;
-        bool stuck=false;
-        if(int* object_index=system.forced_collisions.Get_Pointer(i)){
-            deepest_index=*object_index;
-            deepest_io=system.example.collision_objects(deepest_index);
-            T phi0=deepest_io->Phi(X0,t0),phi=deepest_io->Phi(X,t1)-min(phi0,(T)0);
-            deepest_phi=phi;
-            COLLISION_TYPE type=system.example.collision_objects(deepest_index)->type;
-            if(type==COLLISION_TYPE::stick) stuck=true;}
-        for(int j=0;j<system.example.collision_objects.m && !stuck;j++){
-            MPM_COLLISION_OBJECT<TV>* io=system.example.collision_objects(j);
-            T phi0=io->Phi(X0,t0),phi=io->Phi(X,t1)-min(phi0,(T)0);
-            COLLISION_TYPE type=system.example.collision_objects(j)->type;
-            if(type==COLLISION_TYPE::stick){if(phi0>0) continue;stuck=true;}
-            if(type==COLLISION_TYPE::slip && phi0>0) continue;
-            if(type==COLLISION_TYPE::separate && phi>collision_thickness) continue;
-            if(type!=COLLISION_TYPE::stick && phi>deepest_phi) continue;
-            deepest_index=j;
-            deepest_io=io;
-            deepest_phi=phi;}
-        if(deepest_index==-1) continue;
-        if(stuck){
-            TV SV=deepest_io->Velocity(X,t1);
-            system.stuck_nodes.Append(i);
-            system.stuck_velocity.Append(SV);
-            dv.u.array(i)=(SV-v0.u.array(i))/midpoint_scale; // Come to rest
-            continue;}
-        bool allow_sep=system.example.collision_objects(deepest_index)->type==COLLISION_TYPE::separate;
-        COLLISION c={deepest_index,i,deepest_phi,0,deepest_io->Normal(X,t1),TV(),deepest_io->Hessian(X,t1),allow_sep};
-        system.collisions.Append(c);
-        X-=deepest_phi*c.n;
-        V=(X-system.example.location.array(i))/system.example.dt;
-        dv.u.array(i)=(V-v0.u.array(i))/midpoint_scale;}
+#pragma omp parallel for
+    for(int tid=0;tid<system.example.gather_scatter.threads;tid++){
+        int a=tid*system.example.valid_grid_indices.m/system.example.gather_scatter.threads;
+        int b=(tid+1)*system.example.valid_grid_indices.m/system.example.gather_scatter.threads;
+        ARRAY<COLLISION> thread_collisions;
+        ARRAY<int> thread_stuck_nodes;
+        ARRAY<TV> thread_stuck_velocity;
+        for(int k=a;k<b;k++){
+            int i=system.example.valid_grid_indices(k);
+            TV V=v0.u.array(i)+midpoint_scale*dv.u.array(i);
+            TV X0=system.example.location.array(i);
+            TV X=X0+system.example.dt*V;
+            T deepest_phi=FLT_MAX;
+            int deepest_index=-1;
+            MPM_COLLISION_OBJECT<TV>* deepest_io=0;
+            bool stuck=false;
+            if(int* object_index=system.forced_collisions.Get_Pointer(i)){
+                deepest_index=*object_index;
+                deepest_io=system.example.collision_objects(deepest_index);
+                T phi0=deepest_io->Phi(X0,t0),phi=deepest_io->Phi(X,t1)-min(phi0,(T)0);
+                deepest_phi=phi;
+                COLLISION_TYPE type=system.example.collision_objects(deepest_index)->type;
+                if(type==COLLISION_TYPE::stick) stuck=true;}
+            for(int j=0;j<system.example.collision_objects.m && !stuck;j++){
+                MPM_COLLISION_OBJECT<TV>* io=system.example.collision_objects(j);
+                T phi0=io->Phi(X0,t0),phi=io->Phi(X,t1)-min(phi0,(T)0);
+                COLLISION_TYPE type=system.example.collision_objects(j)->type;
+                if(type==COLLISION_TYPE::stick){if(phi0>0) continue;stuck=true;}
+                if(type==COLLISION_TYPE::slip && phi0>0) continue;
+                if(type==COLLISION_TYPE::separate && phi>collision_thickness) continue;
+                if(type!=COLLISION_TYPE::stick && phi>deepest_phi) continue;
+                deepest_index=j;
+                deepest_io=io;
+                deepest_phi=phi;}
+            if(deepest_index==-1) continue;
+            if(stuck){
+                TV SV=deepest_io->Velocity(X,t1);
+                thread_stuck_nodes.Append(i);
+                thread_stuck_velocity.Append(SV);
+                dv.u.array(i)=(SV-v0.u.array(i))/midpoint_scale; // Come to rest
+                continue;}
+            bool allow_sep=system.example.collision_objects(deepest_index)->type==COLLISION_TYPE::separate;
+            COLLISION c={deepest_index,i,deepest_phi,0,deepest_io->Normal(X,t1),TV(),deepest_io->Hessian(X,t1),allow_sep};
+            thread_collisions.Append(c);
+            X-=deepest_phi*c.n;
+            V=(X-system.example.location.array(i))/system.example.dt;
+            dv.u.array(i)=(V-v0.u.array(i))/midpoint_scale;}
+#pragma omp critical
+        {
+            if(!system.stuck_nodes.m) system.stuck_nodes.Exchange(thread_stuck_nodes);
+            else system.stuck_nodes.Append_Elements(thread_stuck_nodes);
+            if(!system.stuck_velocity.m) system.stuck_velocity.Exchange(thread_stuck_velocity);
+            else system.stuck_velocity.Append_Elements(thread_stuck_velocity);
+            if(!system.collisions.m) system.collisions.Exchange(thread_collisions);
+            else system.collisions.Append_Elements(thread_collisions);
+        }
+    }
 }
 //#####################################################################
 // Function Project_Gradient_And_Prune_Constraints
@@ -207,7 +223,9 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep)
 {
     if(!system.collisions.m && !system.stuck_nodes.m) return;
     MPM_KRYLOV_VECTOR<TV>& g=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(Bg);
-    g.u.array.Subset(system.stuck_nodes).Fill(TV());
+#pragma omp parallel for
+    for(int i=0;i<system.stuck_nodes.m;i++)
+        g.u.array(system.stuck_nodes(i))=TV();
 
 #pragma omp parallel for
     for(int i=0;i<system.collisions.m;i++){

@@ -32,7 +32,10 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
     const MPM_KRYLOV_VECTOR<TV>& V=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(BV);
     MPM_KRYLOV_VECTOR<TV>& F=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(BF);
     tmp=V;
-    tmp.u.array.Subset(stuck_nodes).Fill(TV());
+#pragma omp parallel for
+    for(int i=0;i<stuck_nodes.m;i++)
+        tmp.u.array(stuck_nodes(i))=TV();
+#pragma omp parallel for
     for(int i=0;i<collisions.m;i++){
         const COLLISION& c=collisions(i);
         tmp.u.array(c.p).Project_Orthogonal_To_Unit_Direction(c.n);}
@@ -46,7 +49,10 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
         int i=example.valid_grid_indices(k);
         F.u.array(i)=scaled_dt_squared/example.mass.array(i)*F.u.array(i)+tmp.u.array(i)*scale;}
 
-    F.u.array.Subset(stuck_nodes).Fill(TV());
+#pragma omp parallel for
+    for(int i=0;i<stuck_nodes.m;i++)
+        F.u.array(stuck_nodes(i))=TV();
+#pragma omp parallel for
     for(int i=0;i<collisions.m;i++){
         const COLLISION& c=collisions(i);
         TV& v=F.u.array(c.p),tt=V.u.array(c.p); // tmp -> V?
