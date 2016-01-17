@@ -1589,7 +1589,9 @@ Initialize()
             VECTOR<T,3> angular_velocity1(TV(0,0,foo_T2));
             Seed_Particles(sphere1,[=](const TV& X){return angular_velocity1.Cross(X-sphere1.center)+TV(5,-1.5,0)*(m/s);},
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity1);},density_sphere,8);
-            Add_Fixed_Corotated(40e5*unit_p,0.3);
+            ARRAY<int> ball_particles;
+            for(int p=sand_particles.m;p<particles.X.m;p++) ball_particles.Append(p);
+            Add_Fixed_Corotated(40e5*unit_p,0.3,&ball_particles);
             Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
         } break;    
 
