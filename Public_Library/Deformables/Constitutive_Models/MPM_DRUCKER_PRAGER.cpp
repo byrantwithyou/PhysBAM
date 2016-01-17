@@ -75,7 +75,7 @@ Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,typename TV
     T q=sh.Magnitude();
     T r=rho_F(id)*k/g;
     T dg=q+b*r;
-    if(q+g*g*r/b<=0) return false;
+    if(dg<=0) return false;
     if(q==0 || k>0){
         strain=sigma_Y(id)?exp(-beta)*TV::All_Ones_Vector():TV::All_Ones_Vector();
         if(dstrain) *dstrain=MATRIX<T,d>();
