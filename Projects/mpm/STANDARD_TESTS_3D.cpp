@@ -1592,6 +1592,7 @@ Initialize()
             ARRAY<int> ball_particles;
             for(int p=sand_particles.m;p<particles.X.m;p++) ball_particles.Append(p);
             Add_Fixed_Corotated(40e5*unit_p,0.3,&ball_particles);
+            Set_Lame_On_Particles(40e5*unit_p,0.3,&ball_particles);
             Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
         } break;    
 
