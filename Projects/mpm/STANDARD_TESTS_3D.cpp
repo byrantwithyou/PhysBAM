@@ -763,12 +763,13 @@ Initialize()
             RANGE<TV> ground(TV(-10,-5,-5)*m,TV(10,0,10)*m);            
             Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),COLLISION_TYPE::stick,0);
             T density=(T)2200*unit_rho*scale_mass;
-            T E=35.37e6*unit_p*scale_E,nu=.3;
+            T E=35.37e4*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             T column_height=0.08;
             T column_radius=0.02;
             CYLINDER<T> column(TV(0,0,0),TV(0,column_height,0),column_radius);
             Seed_Particles(column,0,0,density,particles_per_cell);
+            LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Set_Lame_On_Particles(E,nu);
