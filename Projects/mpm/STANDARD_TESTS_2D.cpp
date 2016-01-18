@@ -1075,7 +1075,7 @@ Initialize()
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
             begin_time_step=[=](T time)
                 {
-                    if(time<(T)foo_T3){
+                    if(time>foo_T3) return;
                     ARRAY<int> affected_particles;
                     int n=particles.number;
                     source->Begin_Time_Step(time);
@@ -1089,13 +1089,13 @@ Initialize()
                         affected_particles.Append(i);}
                     for(int i=0;i<plasticity_models.m;i++)
                         if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                            dp->Initialize_Particles(&affected_particles);}
+                            dp->Initialize_Particles(&affected_particles);
                 };
             end_time_step=[=](T time){if(time<=foo_T3) source->End_Time_Step(time);};
 
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-                int case_num=use_hardening_mast_case?hardening_mast_case:2;
-                Add_Drucker_Prager_Case(E,nu,case_num);
+            int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            Add_Drucker_Prager_Case(E,nu,case_num);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(gravity);
         } break;
