@@ -9,6 +9,9 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Partio.h>
 #include <regex>
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
 
 using namespace PhysBAM;
 
@@ -65,7 +68,6 @@ void writePartio(const std::string& output_filename,const MPM_PARTICLES<VECTOR<T
 template<class T,int N>
 void Convert(const std::string& input,const std::string& output_filename_pattern,int start_at,bool dump_valid,bool attentive)
 {
-    MPM_PARTICLES<VECTOR<T,N> > particles;
     bool has_format_str=std::regex_match(output_filename_pattern,std::regex(".*%[0-9]*d.*"));
     if(FILE_UTILITIES::Directory_Exists(input)){
         if(!has_format_str){
@@ -75,7 +77,9 @@ void Convert(const std::string& input,const std::string& output_filename_pattern
         int last_frame;
         FILE_UTILITIES::Read_From_Text_File(input+"/common/last_frame",last_frame);
         PHYSBAM_ASSERT(start_at>=0 && start_at<=last_frame);
+#pragma omp parallel for
         for(int i=start_at;i<=last_frame;++i){
+            MPM_PARTICLES<VECTOR<T,N> > particles;
             FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%d/mpm_particles.gz",input,i),particles);
             writePartio<T,N>(LOG::sprintf(output_filename_pattern.c_str(),i),particles,dump_valid);
             if(attentive)
@@ -84,6 +88,7 @@ void Convert(const std::string& input,const std::string& output_filename_pattern
         if(has_format_str){
             LOG::printf("Format string found in output file name! Did you want to convert a whole sim?\n");
             exit(-1);}
+        MPM_PARTICLES<VECTOR<T,N> > particles;
         FILE_UTILITIES::Read_From_File<T>(input,particles);
         writePartio<T,N>(output_filename_pattern,particles,dump_valid);}
 }
@@ -94,7 +99,7 @@ int main(int argc,char *argv[])
     bool dump_valid=false;
     bool use_3d=false;
     bool attentive=true;
-    int start_at=0;
+    int start_at=0,threads=1;
     std::string input,output_filename_pattern;
 
     PARSE_ARGS parse_args(argc,argv);
@@ -104,9 +109,22 @@ int main(int argc,char *argv[])
     parse_args.Add("-3d",&use_3d,"Convert 3D examples");
     parse_args.Add("-start",&start_at,"start_at","Start conversion from this frame");
     parse_args.Add_Not("-no_attentive",&attentive,"Don't look for new frames during conversion");
+    parse_args.Add("-threads",&threads,"threads","Number of threads");
     parse_args.Extra(&input,"input","Simulation output directory or single file");
     parse_args.Extra(&output_filename_pattern,"output","Output partio file name. Use format string (e.g. %04d), if converting whole directory");
     parse_args.Parse();
+
+#ifdef USE_OPENMP
+    omp_set_num_threads(threads);
+#pragma omp parallel
+#pragma omp single
+    {
+        if(omp_get_num_threads()!=threads) PHYSBAM_FATAL_ERROR();
+        LOG::cout<<"Running on "<<threads<<" threads"<<std::endl;
+    }
+#else
+    PHYSBAM_ASSERT(threads==1);
+#endif
 
     if(output_filename_pattern.length()<5||output_filename_pattern.substr(output_filename_pattern.length()-5,5)!=".bgeo"){
         LOG::printf("Missing \".bgeo\" from output file name. Appending.\n");
