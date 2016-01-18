@@ -19,7 +19,7 @@ TEX_FILE(const std::string& filename,const RANGE<TV>& box)
     stream<<"\\begin{document}\n";
     stream<<"\\psset{unit=";
     unit_offset=stream.tellp();
-    stream<<"                         pt}\n";
+    stream<<"                         px}\n";
     stream<<"\\noindent\\begin{pspicture}";
     frame_offset=stream.tellp();
     stream<<"                                                      "<<std::endl;
