@@ -14,6 +14,7 @@ TEX_FILE(const std::string& filename,const RANGE<TV>& box)
     stream<<"\\usepackage[margin=0cm,papersize={"<<size.x<<"px,"<<size.y<<"px}]{geometry}\n";
     stream<<"\\usepackage{pstricks}\n";
     stream<<"\\usepackage{color}\n";
+    stream<<"\\usepackage{pst-plot}\n";
     stream<<"\\definecolor{fc}{rgb}{0,0,0}\n";
     stream<<"\\definecolor{lc}{rgb}{0,0,0}\n";
     stream<<"\\begin{document}\n";
