@@ -132,6 +132,8 @@ Tessellate_Boundary(const HOURGLASS<VECTOR<T,3> >& h,int axis_div,int circ_div)
     VECTOR<T,2> Y1(sc->particles.X(axis_div));
     ts.particles.X(ts.particles.X.m-2)=h.center+h.axis*Y0.y;
     ts.particles.X(ts.particles.X.m-1)=h.center+h.axis*Y1.y;
+    for(int i=0;i<ts.mesh.elements.m;i++)
+        exchange(ts.mesh.elements(i).x,ts.mesh.elements(i).y);
     delete sc;
     return &ts;
 }
