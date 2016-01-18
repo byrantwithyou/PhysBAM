@@ -843,11 +843,11 @@ Initialize()
             if(!use_foo_T1) foo_T1=.3; // coefficient of friction
             if(extra_int.m<1) extra_int.Append(150);
             if(extra_int.m<2) extra_int.Append(80);
-            if(extra_T.m<1) extra_int.Append(.16);
-            if(extra_T.m<2) extra_int.Append(.0225);
-            if(extra_T.m<3) extra_int.Append(.8);
-            if(extra_T.m<4) extra_int.Append(.0225);
-            if(extra_T.m<5) extra_int.Append(.1);
+            if(extra_T.m<1) extra_T.Append(.16);
+            if(extra_T.m<2) extra_T.Append(.0225);
+            if(extra_T.m<3) extra_T.Append(.8);
+            if(extra_T.m<4) extra_T.Append(.0225);
+            if(extra_T.m<5) extra_T.Append(.1);
             particles.Store_Fp(true);
             grid.Initialize(TV_INT(4,9,4)*resolution,RANGE<TV>(TV(-0.2,-0.45,-0.2)*m,TV(0.2,0.45,0.2)*m),true);
             LOG::cout<<"GRID DX: " <<grid.dX<<std::endl;
