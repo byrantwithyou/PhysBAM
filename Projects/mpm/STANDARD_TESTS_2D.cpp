@@ -1420,6 +1420,62 @@ Initialize()
             Add_Fixed_Corotated(water_E,nu,&lambda_particles,true);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
+
+        case 66:{ // sand flow apic vs flip
+
+            // ./mpm 66 -last_frame 36 -max_dt 2e-4 -scale_E 1000 -resolution 64 -fooT3 3 -particles_per_cell 20  -symplectic_euler -no_implicit_plasticity  -o sand_apic
+            // ./mpm 66 -last_frame 36 -max_dt 2e-4 -scale_E 1000 -resolution 64 -fooT3 3 -particles_per_cell 20  -symplectic_euler -no_implicit_plasticity  -no_affine -flip 1 -o sand_flip
+
+            particles.Store_Fp(true);
+            grid.Initialize(TV_INT(4,2)*resolution,RANGE<TV>(TV(-2,0),TV(2,2))*m,true);
+            RANGE<TV> ground(TV(-10,-10)*m,TV(10,.1)*m);
+
+            if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
+            else Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=1e4*unit_p*scale_E,nu=.3;
+            T spout_width=.05*m;
+            T spout_height=.1*m;
+            T seed_buffer=grid.dX.y*5;
+            T pour_speed=.4*m/s;
+            TV gravity=TV(0,-9.8*m/(s*s));
+            RANGE<TV> seed_range(TV(-spout_width/2,2*m-spout_height),TV(spout_width/2,2*m+seed_buffer));
+
+            T volume=grid.dX.Product()/particles_per_cell;
+            T mass=density*volume;
+            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
+                *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1),grid.domain.max_corner,
+                TV(0,-pour_speed),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
+            destroy=[=](){delete source;};
+            write_output_files=[=](int frame){source->Write_Output_Files(frame);};
+            read_output_files=[=](int frame){source->Read_Output_Files(frame);};
+            begin_time_step=[=](T time)
+                {
+                    if(time>foo_T3) return;
+                    ARRAY<int> affected_particles;
+                    int n=particles.number;
+                    source->Begin_Time_Step(time);
+                    T mu=E/(2*(1+nu));
+                    T lambda=E*nu/((1+nu)*(1-2*nu));
+                    for(int i=n;i<particles.number;i++){
+                        particles.mu(i)=mu;
+                        particles.mu0(i)=mu;
+                        particles.lambda(i)=lambda;
+                        particles.lambda0(i)=lambda;
+                        affected_particles.Append(i);}
+                    for(int i=0;i<plasticity_models.m;i++)
+                        if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
+                            dp->Initialize_Particles(&affected_particles);
+                };
+            end_time_step=[=](T time){if(time<=foo_T3) source->End_Time_Step(time);};
+
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            Add_Drucker_Prager_Case(E,nu,case_num);
+            Set_Lame_On_Particles(E,nu);
+            Add_Gravity(gravity);
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
