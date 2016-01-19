@@ -20,6 +20,7 @@ POUR_SOURCE(STANDARD_TESTS_BASE<TV>& example,IMPLICIT_OBJECT<TV>& seed_area,
     p(release_plane_pt),max_shift(max_shift),buffer_capacity(seeding_buffer),buffer_left(-1),mass(mass),
     volume(volume),cur_time(0),output_file("spout"),show_waiting_particles(true),next_color(1)
 {
+    random.Set_Seed(0);
     T vn=velocity.Dot(normal),gn=gravity.Dot(normal);
     PHYSBAM_ASSERT(vn>0 && gn>=0);
 
