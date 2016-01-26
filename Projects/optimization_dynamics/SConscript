@@ -1,0 +1,5 @@
+# SConscript
+
+Import('env Automatic_Program')
+env=env.Copy(USE_GEOMETRY=1,USE_DEFORMABLES=1)
+Automatic_Program(env,"od",["main.cpp","STANDARD_TESTS_BASE.cpp","STANDARD_TESTS_2D.cpp","STANDARD_TESTS_3D.cpp","OD_DRIVER.cpp","OD_EXAMPLE.cpp"])
