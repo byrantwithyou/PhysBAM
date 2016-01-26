@@ -1476,6 +1476,55 @@ Initialize()
             Add_Gravity(gravity);
         } break;
 
+        case 67:{ // shake
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            Add_Walls(-1,COLLISION_TYPE::stick,0,.1*m,false);
+            SEGMENTED_CURVE_2D<T>* sc=SEGMENTED_CURVE_2D<T>::Create();
+            T density=1*unit_rho*scale_mass;
+            int number_strainds=40;
+            for(int z=0;z<number_strainds;z++){
+                int newindex=sc->particles.X.m;
+                TV S((0.4+z*0.2/number_strainds)*m,0.8*m);
+                TV E((0.4+z*0.2/number_strainds)*m,0.3*m);
+                int N=100;
+                TV D=(E-S)/(T)(N-1);
+                sc->particles.Add_Elements(N);
+                sc->Update_Number_Nodes();
+                for(int n=0;n<N-1;n++){
+                    TV X=S+D*n;
+                    sc->particles.X(newindex+n)=X;
+                    sc->mesh.elements.Append(TV_INT(newindex+n,newindex+n+1));}
+                sc->particles.X(newindex+N-1)=E;}
+            SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*sc,[=](const TV& X){return TV(0.0,0)*(m/s);},0,density,true);
+            LINEAR_SPRINGS<TV>* stf=new LINEAR_SPRINGS<TV>(particles,new_sc.mesh);
+            stf->Set_Restlength_From_Particles();
+            stf->Set_Stiffness((T)50);
+            stf->Set_Damping((T)0);
+            Add_Force(*stf);
+
+            ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
+            T E=10,nu=0.3;
+            Add_Fixed_Corotated(unit_p*scale_E*E,nu,&mpm_particles,true);
+            Set_Lame_On_Particles(unit_p*scale_E*E,nu);
+            for(int i=0;i<particles.number;i++){
+                particles.mu(i)=0;
+                particles.mu0(i)=0;}
+
+            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(s*s),
+                penalty_damping_stiffness*kg/s);
+            for(int i=0;i<particles.X.m;i++)
+                if(particles.X(i)(1)>0.79){
+                    TV dx=particles.X(i);
+                    pinning_force->Add_Target(i,
+                        [=](T time){
+                            return dx+TV(0.2*sin(4*time),0);
+                        });}
+            Add_Force(*pinning_force);
+
+            TV gravity=TV(0,-9.8*m/(s*s));
+            Add_Gravity(gravity);
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
