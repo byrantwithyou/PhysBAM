@@ -976,7 +976,7 @@ Initialize()
             LOG::cout<<"Sand particle count: "<<this->particles.number<<std::endl;
             LOG::printf("Sand particle count=%P\n",particles.X.m);
 
-            //Sand properties
+            //sand properties
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,0);
@@ -2196,7 +2196,50 @@ Initialize()
             Add_Fixed_Corotated(water_E,nu,&strong_lambda_particles,true);
 
         } break;
+        case 72: { 
+            //flip .95, max_dt 0.005, cfl 0.05
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+            resolution=150;
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
 
+            ORIENTED_BOX<TV> wedge(RANGE<TV>(TV(0,0,-0.1),TV(0.2,0.2,1.1))*m,ROTATION<TV>::From_Euler_Angles(TV(0,0,0.25*M_PI)),TV(0.5,0.4-sqrt(2.0)*0.1,0)*m);
+            RANGE<TV> ground(TV(-1,0,-1)*m,TV(2,0.1,2)*m);
+            Add_Collision_Object(ground,COLLISION_TYPE::separate,1);
+            Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >(wedge),COLLISION_TYPE::separate,1);
+            Add_Gravity(m/(s*s)*TV(0,-2.5,0));
+
+            T density=(T)3*unit_rho*scale_mass;
+            T E=360*unit_p*scale_E,nu=0.3;
+            const int number_of_particles=337500;
+            const RANGE<TV> block(TV(.3,.7,.4),TV(.7,.9,.6));
+            const T block_volume=block.Size();
+            const T volume_per_particle=block_volume/number_of_particles;
+            particles.Resize(number_of_particles);
+
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            for(int p=0;p<number_of_particles;p++){
+                particles.valid(p)=true;
+                particles.X(p)=random.Get_Uniform_Vector(block);
+                particles.F(p)=MATRIX<T,TV::m>()+1;
+                if(particles.store_Fp) particles.Fp(p).Set_Identity_Matrix();
+                particles.V(p)=TV();
+                particles.mass(p)=density*volume_per_particle*Perturb(0.5);
+                particles.volume(p)=volume_per_particle;
+                particles.mass(p)=scale_mass*density*volume_per_particle;
+                (*color_attribute)(p)=VECTOR<T,3>(1,1,1);}
+            for(int k=0;k<number_of_particles;k++) 
+                if(particles.F(k)==MATRIX<T,TV::m>()){
+                LOG::cout<<"F("<<k<<")="<<particles.F(k)<<std::endl;
+                PHYSBAM_FATAL_ERROR();}
+            Set_Lame_On_Particles(E,nu);
+            if(!use_theta_c) theta_c=0.025;
+            if(!use_theta_s) theta_s=.005;
+            if(!use_hardening_factor) hardening_factor=10;
+            if(!use_max_hardening) max_hardening=FLT_MAX;
+            Add_Fixed_Corotated(E*unit_p*scale_E,nu);
+            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,NULL); 
+        } break;
         case 950:{ // kdtree wet sand ball (filled with weak)
             // ./mpm 950 -3d -resolution 50 -threads 10 -max_dt 1e-4 -framerate 120 -last_frame 120 -fooT1 0.000001 -fooT2 1000 -fooT4 0.2 -symplectic_euler -no_implicit_plasticity -o bbb
             particles.Store_Fp(true);
