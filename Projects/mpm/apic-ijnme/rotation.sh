@@ -1,21 +1,21 @@
 #!/bin/bash
 
 NAME=`basename $0 | sed 's/\.sh$//'`
-ARGS="1 -max_dt 1e-2 -newton_tolerance 1e-4 -regular_seeding -print_stats -last_frame 120"
-if : ; then
-../mpm -affine -midpoint -o $NAME-apic $ARGS >/dev/null &
-../mpm -midpoint -o $NAME-pic $ARGS >/dev/null &
-../mpm -flip 1 -midpoint -o $NAME-flip $ARGS >/dev/null &
-
-../mpm -affine -o $NAME-apic-be $ARGS >/dev/null &
-../mpm -o $NAME-pic-be $ARGS >/dev/null &
-../mpm -flip 1 -o $NAME-flip-be $ARGS >/dev/null &
-
-../mpm -affine -symplectic_euler -o $NAME-apic-symp $ARGS -max_dt 1e-3 >/dev/null &
-../mpm -symplectic_euler -o $NAME-pic-symp $ARGS -max_dt 1e-3 >/dev/null &
-../mpm -flip 1 -symplectic_euler -o $NAME-flip-symp $ARGS -max_dt 1e-3 >/dev/null &
-wait
-fi
+# ARGS="1 -max_dt 1e-2 -newton_tolerance 1e-4 -regular_seeding -print_stats -last_frame 120"
+# if : ; then
+# ../mpm -affine -midpoint -o $NAME-apic $ARGS >/dev/null &
+# ../mpm -midpoint -o $NAME-pic $ARGS >/dev/null &
+# ../mpm -flip 1 -midpoint -o $NAME-flip $ARGS >/dev/null &
+#
+# ../mpm -affine -o $NAME-apic-be $ARGS >/dev/null &
+# ../mpm -o $NAME-pic-be $ARGS >/dev/null &
+# ../mpm -flip 1 -o $NAME-flip-be $ARGS >/dev/null &
+#
+# ../mpm -affine -symplectic_euler -o $NAME-apic-symp $ARGS -max_dt 1e-3 >/dev/null &
+# ../mpm -symplectic_euler -o $NAME-pic-symp $ARGS -max_dt 1e-3 >/dev/null &
+# ../mpm -flip 1 -symplectic_euler -o $NAME-flip-symp $ARGS -max_dt 1e-3 >/dev/null &
+# wait
+# fi
 
 for i in {apic,pic,flip}{,-be,-symp} ; do
     grep 'particle state angular' $NAME-$i/common/log.txt | awk '{print $5 " " $7}' | sed 's/[()]//g' > am-$i.txt
@@ -40,7 +40,7 @@ end
 legend(legs,"location","southeast");
 xlabel('Time');
 ylabel('Angular momentum');
-title('Angular momentum for varous schemes');
+title('Total Angular Momentum Comparisons');
 print -color -deps "all-am-$NAME.pdf";
 EOF
 octave -q st.m \
@@ -72,7 +72,7 @@ end
 legend(legs,"location","southeast");
 xlabel('Time');
 ylabel('Energy');
-title('Total energy for varous schemes');
+title('Total Energy Comparisons');
 print -color -deps "all-en-$NAME.pdf";
 EOF
 octave -q st.m \

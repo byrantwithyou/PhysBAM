@@ -17,11 +17,11 @@ NAME=`basename $0 | sed 's/\.sh$//'`
 # wait
 # fi
 
-# for i in {apic,pic,flip}{,-be,-symp} ; do
-#     grep 'particle state angular' $NAME-$i/common/log.txt | awk '{print $5 " " $7}' | sed 's/[()]//g' > am-$i.txt
-#     grep 'after particle to grid particle total energy' $NAME-$i/common/log.txt | awk '{print $9 " " $11}' | sed 's/<.*//g' > en-p-$i.txt
-#     grep 'after particle to grid total energy' $NAME-$i/common/log.txt | awk '{print $8 " " $10}' | sed 's/<.*//g' > en-g-$i.txt
-# done
+for i in {apic,pic,flip}{,-be,-symp} ; do
+    grep 'particle state angular' $NAME-$i/common/log.txt | awk '{print $5 " " $7}' | sed 's/[()]//g' > am-$i.txt
+    grep 'after particle to grid particle total energy' $NAME-$i/common/log.txt | awk '{print $9 " " $11}' | sed 's/<.*//g' > en-p-$i.txt
+    grep 'after particle to grid total energy' $NAME-$i/common/log.txt | awk '{print $8 " " $10}' | sed 's/<.*//g' > en-g-$i.txt
+done
 
 cat <<EOF > st.m
 n=size(argv())(1);
@@ -40,7 +40,7 @@ end
 legend(legs,"location","northeast");
 xlabel('Time');
 ylabel('Angular momentum');
-title('Angular momentum for varous schemes');
+title('Total Angular Momentum Comparisons');
 print -color -deps "all-am-$NAME.pdf";
 EOF
 octave -q st.m \
@@ -72,7 +72,7 @@ end
 legend(legs,"location","northeast");
 xlabel('Time');
 ylabel('Energy');
-title('Total energy for varous schemes');
+title('Total Energy Comparisons');
 print -color -deps "all-en-$NAME.pdf";
 EOF
 octave -q st.m \
