@@ -43,11 +43,19 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
     deformable_body_collection.particles.Add_Array(ATTRIBUTE_ID(100),&particle_A);
     ARRAY<T,FACE_INDEX<d> > face_velocities;
 
+    FILE_UTILITIES::Create_Directory(output_directory);
+    FILE_UTILITIES::Create_Directory(output_directory+"/common");
+    FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/first_frame",0);
+
     for(int frame=0;/*TODO*/;frame++)
     {
         std::string simfile = LOG::sprintf("%s/%s-%04i.sand",input_directory,input_name,frame);
         std::fstream file(simfile.c_str(), std::ios::in|std::ios::binary);
-        PHYSBAM_ASSERT(file);
+        if(!file)
+        {
+            FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/last_frame",frame-1);
+            break;
+        }
         int32_t frame_=0,zb=0,np=0,nb=0,nsm=0;
         file.read((char*)&frame_, 4);
         PHYSBAM_ASSERT(frame==frame_);
@@ -93,7 +101,8 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
 
         if(d==2) file.read(buff, 4*7);
 
-        std::string f=LOG::sprintf("%d",frame);
+//        std::string f=LOG::sprintf("%d",frame);
+        FILE_UTILITIES::Create_Directory(output_directory+LOG::sprintf("/%d",frame));
         FILE_UTILITIES::Write_To_File(STREAM_TYPE((T)0),output_directory+"/common/grid",grid);
         if(!system(LOG::sprintf("rm -f %s/%d/mpm_particles.gz ;  ln -s ./deformable_object_particles.gz %s/%d/mpm_particles.gz",output_directory.c_str(),frame,output_directory.c_str(),frame).c_str())){}
         deformable_body_collection.Write(STREAM_TYPE((T)0),output_directory,output_directory,frame,-1,frame==0,false);
@@ -102,6 +111,8 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
             Add_Debug_Particle(deformable_body_collection.particles.X(i),VECTOR<T,3>(1,0,1));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,deformable_body_collection.particles.V(i));}
         debug_particles.Write_Debug_Particles(STREAM_TYPE((T)0),output_directory,frame);
+        FILE_UTILITIES::Write_To_File(STREAM_TYPE((T)0),LOG::sprintf("%s/%d/frame_title",output_directory.c_str(),frame),"");
+        FILE_UTILITIES::Write_To_File(STREAM_TYPE((T)0),output_directory+"/common/grid",grid);
     }
 }
 
