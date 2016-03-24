@@ -19,6 +19,7 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <fstream>
 #include <btBulletCollisionCommon.h>
 #include <btBulletDynamicsCommon.h>
@@ -63,14 +64,15 @@ LEVELSET_IMPLICIT_OBJECT<TV>* Read_Implicit_Object(const std::string& filename)
     std::fstream file(filename.c_str(), std::ios::in|std::ios::binary);
     file.read((char*)&size, sizeof(size));
     file.read((char*)&dx, sizeof(dx));
-    ARRAY<T> data(size.Size());
+    ARRAY<T> data(size.Product());
     Read_Binary_Array<T>(file,data.Get_Array_Pointer(),data.m);
+    LOG::printf("allocate lio\n");
     LEVELSET_IMPLICIT_OBJECT<TV> *lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-    lio->levelset.grid.Initialize(size,RANGE<TV>(TV(),TV(size)*dx),false);
+    lio->levelset.grid.Initialize(size,RANGE<TV>(-TV(size)*dx/2,TV(size)*dx/2),false);
     lio->levelset.phi.Resize(RANGE<TV_INT>(TV_INT(),size));
     TV_INT stride(TV_INT()+1);
     for(int i=1;i<TV_INT::m;i++)
-        stride(i)=stride(i-1)*size(i);
+        stride(i)=stride(i-1)*size(i-1);
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),size));it.Valid();it.Next())
         lio->levelset.phi(it.index)=data(it.index.Dot(stride));
 //    LOG::printf("DUMP:%P %P %P\n%P\n",size,dx,filename,lio->levelset.phi);
@@ -113,8 +115,14 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particles;
     DEBUG_PARTICLES<TV> debug_particles;
-    ARRAY_VIEW<MATRIX<T,3> > particle_A;
+    ARRAY_VIEW<MATRIX<T,3> > particle_A,particle_F;
+    ARRAY_VIEW<bool> particle_valid;
+    ARRAY_VIEW<T> particle_volume;
     deformable_body_collection.particles.Add_Array(ATTRIBUTE_ID(100),&particle_A);
+    deformable_body_collection.particles.Add_Array(ATTRIBUTE_ID_VOLUME,&particle_volume);
+    deformable_body_collection.particles.Add_Array(ATTRIBUTE_ID_F,&particle_F);
+    deformable_body_collection.particles.Add_Array(ATTRIBUTE_ID_VALID,&particle_valid);
+
     ARRAY<T,FACE_INDEX<d> > face_velocities;
 
     FILE_UTILITIES::Create_Directory(output_directory);
@@ -206,19 +214,23 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
 
             if(!rigid_body_collection.Exists(i))
             {
-                RIGID_BODY<TV>* rb=new RIGID_BODY<TV>(rigid_body_collection,false,i);
+                LOG::printf("allocate rigid body\n");
+                RIGID_BODY<TV>* rb=new RIGID_BODY<TV>(rigid_body_collection,false,-1);
                 rb->thin_shell=false;
             
                 rb->Update_Angular_Momentum();
                 LEVELSET_IMPLICIT_OBJECT<TV>* lio=Read_Implicit_Object<TV>(models_directory+"/"+src+".dist");
                 typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
                 T_SURFACE* surface=T_SURFACE::Create();
-                MARCHING_CUBES<TV>::Create_Surface(*surface,lio->levelset.grid,lio->levelset.phi,-offset*scale);
+                LOG::printf("allocate surface\n");
+                MARCHING_CUBES<TV>::Create_Surface(*surface,lio->levelset.grid,lio->levelset.phi,offset*scale);
                 surface->particles.X*=scale;
 //                LOG::printf("%P %P\n",surface->particles.X,surface->mesh.elements);
                 IMPLICIT_OBJECT<TV>* io=lio;
+                LOG::printf("allocate implicit object\n");
                 if(scale!=1) io=new IMPLICIT_OBJECT_TRANSFORMED<TV,T>(io,false,TV(),scale);
-                if(offset) io=new IMPLICIT_OBJECT_DILATE<TV>(io,-offset);
+                LOG::printf("allocate implicit object\n");
+                if(offset) io=new IMPLICIT_OBJECT_DILATE<TV>(io,offset);
                 rb->Add_Structure(*io);
 
                 rb->Add_Structure(*surface);
@@ -236,6 +248,7 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
 
         if(d==2) file.read(buff, 4*7);
 
+        particle_valid.Fill(true);
 //        std::string f=LOG::sprintf("%d",frame);
         FILE_UTILITIES::Create_Directory(output_directory+LOG::sprintf("/%d",frame));
         FILE_UTILITIES::Write_To_File(STREAM_TYPE((T)0),output_directory+"/common/grid",grid);
