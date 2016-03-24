@@ -13,6 +13,7 @@
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_DILATE.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
@@ -113,6 +114,12 @@ bool Register_Structures(){
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,3>,float> >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,2>,float> >();
     STRUCTURE_REGISTRY<VECTOR<float,1> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,1>,float> >();
+    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<IMPLICIT_OBJECT_DILATE<VECTOR<float,3> > >();
+    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<IMPLICIT_OBJECT_DILATE<VECTOR<float,2> > >();
+    STRUCTURE_REGISTRY<VECTOR<float,1> >::Register<IMPLICIT_OBJECT_DILATE<VECTOR<float,1> > >();
+    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<IMPLICIT_OBJECT_DILATE<VECTOR<double,3> > >();
+    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<IMPLICIT_OBJECT_DILATE<VECTOR<double,2> > >();
+    STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<IMPLICIT_OBJECT_DILATE<VECTOR<double,1> > >();
     return true;
 }
 bool registered_structures_asdf=Register_Structures();
