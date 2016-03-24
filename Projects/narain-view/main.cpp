@@ -73,7 +73,7 @@ LEVELSET_IMPLICIT_OBJECT<TV>* Read_Implicit_Object(const std::string& filename)
         stride(i)=stride(i-1)*size(i);
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),size));it.Valid();it.Next())
         lio->levelset.phi(it.index)=data(it.index.Dot(stride));
-    LOG::printf("DUMP:%P %P %P\n%P\n",size,dx,filename,lio->levelset.phi);
+//    LOG::printf("DUMP:%P %P %P\n%P\n",size,dx,filename,lio->levelset.phi);
     implicit_object_hash.Set(filename,lio);
     return lio;
 }
@@ -215,7 +215,7 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
                 T_SURFACE* surface=T_SURFACE::Create();
                 MARCHING_CUBES<TV>::Create_Surface(*surface,lio->levelset.grid,lio->levelset.phi,-offset*scale);
                 surface->particles.X*=scale;
-                LOG::printf("%P %P\n",surface->particles.X,surface->mesh.elements);
+//                LOG::printf("%P %P\n",surface->particles.X,surface->mesh.elements);
                 IMPLICIT_OBJECT<TV>* io=lio;
                 if(scale!=1) io=new IMPLICIT_OBJECT_TRANSFORMED<TV,T>(io,false,TV(),scale);
                 if(offset) io=new IMPLICIT_OBJECT_DILATE<TV>(io,-offset);
@@ -240,7 +240,7 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
         FILE_UTILITIES::Create_Directory(output_directory+LOG::sprintf("/%d",frame));
         FILE_UTILITIES::Write_To_File(STREAM_TYPE((T)0),output_directory+"/common/grid",grid);
         if(!system(LOG::sprintf("rm -f %s/%d/mpm_particles.gz ;  ln -s ./deformable_object_particles.gz %s/%d/mpm_particles.gz",output_directory.c_str(),frame,output_directory.c_str(),frame).c_str())){}
-        solid_body_collection.Write(STREAM_TYPE((T)0),output_directory,frame,0,frame==0,true,true,false,false);
+        solid_body_collection.Write(STREAM_TYPE((T)0),output_directory,frame,0,false,true,true,false,false);
         FILE_UTILITIES::Write_To_File(STREAM_TYPE((T)0),LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),face_velocities);
         for(int i=0;i<deformable_body_collection.particles.X.m;i++){
             Add_Debug_Particle(deformable_body_collection.particles.X(i),VECTOR<T,3>(1,0,1));
