@@ -45,6 +45,7 @@ public:
     void Read_Structure(TYPED_ISTREAM& input);
     void Write_Structure(TYPED_OSTREAM& output);
     static STRUCTURE<TV>* Create_Structure(TYPED_ISTREAM& input,GEOMETRY_PARTICLES<TV>& particles);
+    static STRUCTURE<TV>* Create_Structure(TYPED_ISTREAM& input);
     template<class RW> static STRUCTURE<TV>* Create_From_File(const std::string& filename);
     virtual std::string Name() const;
     virtual std::string Extension() const;

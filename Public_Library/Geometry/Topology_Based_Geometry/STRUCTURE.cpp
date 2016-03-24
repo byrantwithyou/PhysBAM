@@ -137,6 +137,18 @@ Create_Structure(TYPED_ISTREAM& input,GEOMETRY_PARTICLES<TV>& particles)
     return structure;
 }
 //#####################################################################
+// Function Create_Structure
+//#####################################################################
+template<class TV> STRUCTURE<TV>*  STRUCTURE<TV>::
+Create_Structure(TYPED_ISTREAM& input)
+{
+    std::string name;
+    Read_Binary(input,name);
+    STRUCTURE<TV>* structure=STRUCTURE<TV>::Create_From_Name(name);
+    structure->Read(input);
+    return structure;
+}
+//#####################################################################
 // Function Create_From_File
 //#####################################################################
 template<class TV> template<class RW> STRUCTURE<TV>*  STRUCTURE<TV>::
