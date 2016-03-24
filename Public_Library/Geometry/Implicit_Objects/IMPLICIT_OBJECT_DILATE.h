@@ -25,15 +25,15 @@ public:
     typedef int HAS_TYPED_READ_WRITE;
     typedef TV VECTOR_T;
     
-    using IMPLICIT_OBJECT<TV>::box;
+    using IMPLICIT_OBJECT<TV>::box;using IMPLICIT_OBJECT<TV>::Create_Structure;
     using IMPLICIT_OBJECT<TV>::use_secondary_interpolation;
 
-    IMPLICIT_OBJECT<TV>& io;
+    IMPLICIT_OBJECT<TV>* io;
     bool owns_io;
     T dilation;
 
     IMPLICIT_OBJECT_DILATE(IMPLICIT_OBJECT<TV>* o,T dilation)
-        :io(*o),owns_io(true),dilation(dilation)
+        :io(o),owns_io(true),dilation(dilation)
     {
     }
     virtual ~IMPLICIT_OBJECT_DILATE();
@@ -42,6 +42,7 @@ public:
     {use_secondary_interpolation=use_secondary_interpolation_input;}
 
 //#####################################################################
+    static IMPLICIT_OBJECT_DILATE* Create();
     void Update_Box() override;
     void Update_Minimum_Cell_Size(const int maximum_depth=0) override;
     T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const override;
@@ -68,6 +69,10 @@ public:
     T_CURVATURES Principal_Curvatures(const TV& X) const override;
     T Integration_Step(const T phi) const override;
     T Minimum_Cell_Size() const override;
+    virtual std::string Name() const override {return Static_Name();}
+    virtual std::string Extension() const override {return Static_Extension();}
+    static std::string Static_Name();
+    static std::string Static_Extension();
     void Read(TYPED_ISTREAM& input) override;
     void Write(TYPED_OSTREAM& output) const override;
 //#####################################################################
