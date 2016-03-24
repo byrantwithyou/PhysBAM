@@ -107,6 +107,12 @@ bool Register_Structures(){
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<B_SPLINE_PATCH<VECTOR<double,3>,3> >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<OPENSUBDIV_SURFACE<VECTOR<float,3>,3> >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<OPENSUBDIV_SURFACE<VECTOR<double,3>,3> >();
+    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<double,3>,double> >();
+    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<double,2>,double> >();
+    STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<double,1>,double> >();
+    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,3>,float> >();
+    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,2>,float> >();
+    STRUCTURE_REGISTRY<VECTOR<float,1> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,1>,float> >();
     return true;
 }
 bool registered_structures_asdf=Register_Structures();
