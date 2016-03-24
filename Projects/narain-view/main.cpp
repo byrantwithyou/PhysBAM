@@ -73,6 +73,7 @@ LEVELSET_IMPLICIT_OBJECT<TV>* Read_Implicit_Object(const std::string& filename)
         stride(i)=stride(i-1)*size(i);
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),size));it.Valid();it.Next())
         lio->levelset.phi(it.index)=data(it.index.Dot(stride));
+    LOG::printf("DUMP:%P %P %P\n%P\n",size,dx,filename,lio->levelset.phi);
     implicit_object_hash.Set(filename,lio);
     return lio;
 }
@@ -194,7 +195,7 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
                 frame=bullet_frames(bf++);
             }
             int32_t len;
-            char src[256];
+            char src[256]="";
             T scale,offset;
             file.read((char*)&len, 4);
             file.read(src, len);
@@ -214,6 +215,7 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
                 T_SURFACE* surface=T_SURFACE::Create();
                 MARCHING_CUBES<TV>::Create_Surface(*surface,lio->levelset.grid,lio->levelset.phi,-offset*scale);
                 surface->particles.X*=scale;
+                LOG::printf("%P %P\n",surface->particles.X,surface->mesh.elements);
                 IMPLICIT_OBJECT<TV>* io=lio;
                 if(scale!=1) io=new IMPLICIT_OBJECT_TRANSFORMED<TV,T>(io,false,TV(),scale);
                 if(offset) io=new IMPLICIT_OBJECT_DILATE<TV>(io,-offset);
