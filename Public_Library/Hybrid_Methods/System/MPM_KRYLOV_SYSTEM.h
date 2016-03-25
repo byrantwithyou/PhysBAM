@@ -46,6 +46,7 @@ public:
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& V) const override;
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const override;
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const override;
+    void Sanity(const KRYLOV_VECTOR_BASE<T>& v,const char* str) const;
 };
 }
 #endif

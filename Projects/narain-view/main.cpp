@@ -132,6 +132,7 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
     for(int frame=0;/*TODO*/;frame++)
     {
         std::string simfile = LOG::sprintf("%s/%s-%04i.sand",input_directory,input_name,frame);
+        LOG::printf("file: %s\n",simfile);
         std::fstream file(simfile.c_str(), std::ios::in|std::ios::binary);
         if(!file)
         {
@@ -163,6 +164,10 @@ void Narain_To_PhysBAM(PARSE_ARGS& parse_args)
             file.read((char*)&deformable_body_collection.particles.V(i), d*4);
             file.read((char*)&deformable_body_collection.particles.mass(i), 4);
             file.read((char*)&particle_A(i), d*d*4);
+            int id;
+            file.read((char*)&id, 4);
+            particle_F(i)(0,0)=id;
+            PHYSBAM_ASSERT(id>=0 && id<8000000);
         }
 
         ARRAY<FRAME<TV> > bullet_frames;

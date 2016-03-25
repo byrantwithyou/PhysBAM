@@ -24,6 +24,20 @@ template<class TV> MPM_KRYLOV_SYSTEM<TV>::
     delete &tmp;
 }
 //#####################################################################
+// Function Sanity
+//#####################################################################
+template<class TV> void MPM_KRYLOV_SYSTEM<TV>::
+Sanity(const KRYLOV_VECTOR_BASE<T>& v,const char* str) const
+{
+    return;
+    const MPM_KRYLOV_VECTOR<TV>& vv=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(v);
+    LOG::printf("%s: ",str);
+    for(int i=0;i<collisions.m;i++){
+        auto& c=collisions(i);
+        LOG::printf("%P ",vv.u.array(c.p).Dot(c.n));}
+    LOG::printf("\n");
+}
+//#####################################################################
 // Function Multiply
 //#####################################################################
 template<class TV> void MPM_KRYLOV_SYSTEM<TV>::
@@ -39,6 +53,8 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
     for(int i=0;i<collisions.m;i++){
         const COLLISION& c=collisions(i);
         tmp.u.array(c.p).Project_Orthogonal_To_Unit_Direction(c.n);}
+    
+    LOG::printf("project: %i\n",collisions.m);
 
     F*=0;
     example.Add_Hessian_Times(F.u,tmp.u,example.time);
@@ -57,6 +73,8 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
         const COLLISION& c=collisions(i);
         TV& v=F.u.array(c.p),tt=V.u.array(c.p); // tmp -> V?
         v-=c.n*c.n.Dot(v)+example.dt*(c.H*tt*c.n_dE+c.n.Dot(tt)*c.H_dE+c.H_dE.Dot(tt)*c.n);}
+
+//    Sanity(BF,"H");
 }
 //#####################################################################
 // Function Inner_Product

@@ -57,6 +57,8 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
         for(int i=0;i<system.collisions.m;i++){
             const COLLISION& c=system.collisions(i);
             system.forced_collisions.Insert(c.p,c.object);}}
+
+//    if(g) system.Sanity(*g,"g");
 }
 //#####################################################################
 // Function Compute
@@ -179,7 +181,14 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
                 T phi0=deepest_io->Phi(X0,t0),phi=deepest_io->Phi(X,t1)-min(phi0,(T)0);
                 deepest_phi=phi;
                 COLLISION_TYPE type=system.example.collision_objects(deepest_index)->type;
-                if(type==COLLISION_TYPE::stick) stuck=true;}
+                if(type==COLLISION_TYPE::stick) stuck=true;
+
+            bool allow_sep=system.example.collision_objects(deepest_index)->type==COLLISION_TYPE::separate;
+            COLLISION c={deepest_index,i,deepest_phi,0,deepest_io->Normal(X,t1),TV(),deepest_io->Hessian(X,t1),allow_sep};
+            thread_collisions.Append(c);
+            X-=deepest_phi*c.n;
+
+}
             for(int j=0;j<system.example.collision_objects.m && !stuck;j++){
                 MPM_COLLISION_OBJECT<TV>* io=system.example.collision_objects(j);
                 T phi0=io->Phi(X0,t0),phi=io->Phi(X,t1)-min(phi0,(T)0);
@@ -187,10 +196,16 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
                 if(type==COLLISION_TYPE::stick){if(phi0>0) continue;stuck=true;}
                 if(type==COLLISION_TYPE::slip && phi0>0) continue;
                 if(type==COLLISION_TYPE::separate && phi>collision_thickness) continue;
-                if(type!=COLLISION_TYPE::stick && phi>deepest_phi) continue;
+                if(type!=COLLISION_TYPE::stick && phi>FLT_MAX) continue;
                 deepest_index=j;
                 deepest_io=io;
-                deepest_phi=phi;}
+                deepest_phi=phi;
+
+            bool allow_sep=system.example.collision_objects(deepest_index)->type==COLLISION_TYPE::separate;
+            COLLISION c={deepest_index,i,deepest_phi,0,deepest_io->Normal(X,t1),TV(),deepest_io->Hessian(X,t1),allow_sep};
+            thread_collisions.Append(c);
+            X-=deepest_phi*c.n;
+}
             if(deepest_index==-1) continue;
             if(stuck){
                 TV SV=deepest_io->Velocity(X,t1);
@@ -198,10 +213,10 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
                 thread_stuck_velocity.Append(SV);
                 dv.u.array(i)=(SV-v0.u.array(i))/midpoint_scale; // Come to rest
                 continue;}
-            bool allow_sep=system.example.collision_objects(deepest_index)->type==COLLISION_TYPE::separate;
-            COLLISION c={deepest_index,i,deepest_phi,0,deepest_io->Normal(X,t1),TV(),deepest_io->Hessian(X,t1),allow_sep};
-            thread_collisions.Append(c);
-            X-=deepest_phi*c.n;
+
+
+
+
             V=(X-system.example.location.array(i))/system.example.dt;
             dv.u.array(i)=(V-v0.u.array(i))/midpoint_scale;}
 #pragma omp critical
@@ -240,6 +255,8 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep)
         const COLLISION& c=system.collisions(i);
         if(allow_sep && c.allow_sep && c.n_dE<0)
             system.collisions.Remove_Index_Lazy(i);}
+
+    LOG::printf("collisions: %i\n",system.collisions.m);
 }
 //#####################################################################
 // Function Make_Feasible
@@ -247,7 +264,14 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep)
 template<class TV> void MPM_OBJECTIVE<TV>::
 Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const
 {
+//    system.Sanity(dv,"before make feasible");
+
+    tmp2.Copy(0,tmp2,dv);
     Adjust_For_Collision(dv);
+    tmp2.Copy(-1,dv,tmp2);
+    system.Sanity(tmp2,"make feasible diff");
+
+//    system.Sanity(dv,"after make feasible");
 }
 //#####################################################################
 // Function Initial_Guess

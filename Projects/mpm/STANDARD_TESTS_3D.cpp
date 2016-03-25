@@ -721,38 +721,32 @@ Initialize()
         case 33:{// dry sand notch dam break
             // ./mpm 33 -3d -threads 8 -resolution 30 -last_frame 40 -framerate 48 -fooT1 4 -fooT2 30 -max_dt 1e-4 -scale_E 0.01 -symplectic_euler -no_implicit_plasticity -o notch30
             particles.Store_Fp(true);
-            grid.Initialize(TV_INT(5,2,5)*resolution,RANGE<TV>(TV(0.08,0.09,0.08)*m,TV(0.38,0.21,0.38)*m),true);
+            grid.Initialize(TV_INT(3,2,3)*resolution,RANGE<TV>(TV(),TV(1.5,1,1.5))*m,true);
             LOG::cout<<"GRID dx: "<<grid.dX<<std::endl;
-            RANGE<TV> ground(TV(-10,-5,-5)*m,TV(10,0.1,10)*m);
-            RANGE<TV> left_wall(TV(-5,-5,-5)*m,TV(0.1,10,10)*m);
-            RANGE<TV> back_wall(TV(-5,-1,-10)*m,TV(10,10,0.1)*m);
-            IMPLICIT_OBJECT_UNION<TV>* bounds=new IMPLICIT_OBJECT_UNION<TV>(
-                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),
-                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(left_wall),
-                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(back_wall));
-            Add_Collision_Object(bounds,COLLISION_TYPE::slip,foo_T1);
-            T density=(T)2200*unit_rho*scale_mass;
+            RANGE<TV> ground(TV(-10,-5,-5)*m,TV(10,0.05,10)*m);
+            RANGE<TV> left_wall(TV(-5,-5,-5)*m,TV(0.05,10,10)*m);
+            RANGE<TV> back_wall(TV(-5,-1,-10)*m,TV(10,10,0.05)*m);
+//            IMPLICIT_OBJECT<TV>* bounds=new IMPLICIT_OBJECT_DILATE<TV>(new IMPLICIT_OBJECT_INVERT<TV>(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(grid.domain.Thickened(-.05))),-.01);
+
+            
+            // IMPLICIT_OBJECT_UNION<TV>* bounds=new IMPLICIT_OBJECT_UNION<TV>(
+            //     ,
+            //     new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(left_wall),
+            //     new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(back_wall));
+            Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(ground),COLLISION_TYPE::slip,foo_T1);
+            Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(left_wall),COLLISION_TYPE::slip,foo_T1);
+            Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(back_wall),COLLISION_TYPE::slip,foo_T1);
+            T density=(T)1600*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/notch.tri.gz",*surface);
-            LOG::cout<<"Read mesh of notch triangle #"<<surface->mesh.elements.m<<std::endl;
-            LOG::cout<<"Read mesh of notch particle # "<<surface->particles.number<<std::endl;
-            for(int i=0;i<surface->particles.number;i++){
-                surface->particles.X(i)=(surface->particles.X(i)-TV(0.1,0.1,0.1))*0.1+TV(0.1,0.1,0.1);}
-            surface->mesh.Initialize_Adjacent_Elements();
-            surface->mesh.Initialize_Neighbor_Nodes();
-            surface->mesh.Initialize_Incident_Elements();
-            surface->Update_Bounding_Box();
-            surface->Initialize_Hierarchy();
-            surface->Update_Triangle_List();
-            LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
-            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Initialize_Implicit_Surface(*surface,200);
-            LOG::cout<<"Seeding particles..."<<std::endl;
-            Seed_Particles(*levelset,0,0,density,particles_per_cell);
+            IMPLICIT_OBJECT_INTERSECTION<TV>* fill_sand=new IMPLICIT_OBJECT_INTERSECTION<TV>(
+                new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV()+0.05,TV(0.5,0.8,0.5)+0.05)),
+                new IMPLICIT_OBJECT_INVERT<TV>(
+                    new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(SPHERE<TV>(TV(0.5,0.4,0.5)+0.05,0.225))));
+            Seed_Particles(*fill_sand,0,0,density,particles_per_cell);
             LOG::cout<<"Particle count: "<<this->particles.number<<std::endl;
             Set_Lame_On_Particles(E,nu);
-            Add_Gravity(m/(s*s)*TV(0,-9.80665,0));
+            Add_Gravity(m/(s*s)*TV(0,-1,0));
             //foo_T2 is the friction angle
             Add_Drucker_Prager(E,nu,foo_T2);
         }break;

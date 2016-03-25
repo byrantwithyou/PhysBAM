@@ -263,7 +263,7 @@
 
 (defun physbam-grep-cpp-and-headers (directory_prefix querystr)
   (let ((path (concat (getenv "PHYSBAM") "/" directory_prefix "/")))
-  (grep (concat "(find " path " -name '*.h' -o -name '*.cpp' | xargs grep -n -e \"" querystr "\") # "))))
+  (grep (concat "(find " path " -name '*.h' -o -name '*.hpp' -o -name '*.cpp' | xargs grep -n -e \"" querystr "\") # "))))
 
 (defun physbam-grep-public (querystr)
   "grep in Public_Library"
@@ -290,7 +290,7 @@
 (defun grep-cpp-and-headers (querystr)
   "grep headers and source files recursively in current directory"
   (interactive "sGrep for:")
-  (grep (concat "(find . -name '*.h' -o -name '*.cpp' | xargs grep -n -e \"" querystr "\") # ")))
+  (grep (concat "(find . -name '*.h' -o -name '*.hpp' -o -name '*.cpp' | xargs grep -n -e \"" querystr "\") # ")))
 
 
 ;#####################################################################

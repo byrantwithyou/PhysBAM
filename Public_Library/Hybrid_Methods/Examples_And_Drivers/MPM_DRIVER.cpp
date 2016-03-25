@@ -844,7 +844,9 @@ Apply_Forces()
         if(example.test_diff) objective.Test_Diff(dv);
 
         objective.system.forced_collisions.Remove_All();
+
         bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
+
         if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;
         Apply_Friction();
         objective.Restore_F();}
