@@ -33,12 +33,12 @@ void symbolic_tensor::set(const std::string& ind,int fixed_size)
     fill(size.begin(),size.end(),fixed_size);
     compute_strides();
 }
-static void reordered_strides(vector<int>& strides,const symbolic_tensor& a,const std::string& indices)
+static void reordered_strides(vector<int>& new_strides,const std::string& new_indices,const vector<int>& old_strides,const std::string& old_indices)
 {
-    strides.resize(indices.size());
-    for(int i=0;i<(int)indices.size();i++){
-        int f=a.indices.find(indices[i]);
-        strides[i]=f>=0?a.strides[f]:0;}
+    new_strides.resize(new_indices.size());
+    for(int i=0;i<(int)new_indices.size();i++){
+        int f=old_indices.find(new_indices[i]);
+        new_strides[i]=f>=0?old_strides[f]:0;}
 }
 static void recurse_assign(symbolic_tensor& r,const symbolic_tensor& a,const vector<int>& as,int i,int ir,int ia)
 {
@@ -56,7 +56,7 @@ void symbolic_tensor::set(const std::string& ind,const symbolic_tensor& a)
         size[i]=a.size[a.indices.find(indices[i])];
     compute_strides();
     vector<int> as;
-    reordered_strides(as,a,indices);
+    reordered_strides(as,indices,a.strides,a.indices);
     recurse_assign(*this,a,as,0,0,0);
 }
 void symbolic_tensor::set_id(const std::string& ind,int new_size)
@@ -103,7 +103,7 @@ symbolic_tensor operator+ (const symbolic_tensor& a,const symbolic_tensor& b)
 {
     symbolic_tensor r(a);
     vector<int> bs;
-    reordered_strides(bs,b,r.indices);
+    reordered_strides(bs,r.indices,b.strides,b.indices);
     recurse_op(r,a,b,a.strides,bs,[](double u,double v){return u+v;},0,0,0,0);
     return r;
 }
@@ -111,7 +111,7 @@ symbolic_tensor operator- (const symbolic_tensor& a,const symbolic_tensor& b)
 {
     symbolic_tensor r(a);
     vector<int> bs;
-    reordered_strides(bs,b,r.indices);
+    reordered_strides(bs,r.indices,b.strides,b.indices);
     recurse_op(r,a,b,a.strides,bs,[](double u,double v){return u-v;},0,0,0,0);
     return r;
 }
@@ -169,10 +169,10 @@ symbolic_tensor operator* (const symbolic_tensor& a,const symbolic_tensor& b)
         r.size.push_back(b.size[i]);}
     r.compute_strides();
     vector<int> as,bs,as_sum,bs_sum;
-    reordered_strides(as,a,r.indices);
-    reordered_strides(bs,b,r.indices);
-    reordered_strides(as_sum,a,sum);
-    reordered_strides(bs_sum,b,sum);
+    reordered_strides(as,r.indices,a.strides,a.indices);
+    reordered_strides(bs,r.indices,b.strides,b.indices);
+    reordered_strides(as_sum,sum,a.strides,a.indices);
+    reordered_strides(bs_sum,sum,b.strides,b.indices);
     recurse_mul(r,a,b,sum,sum_size,as,bs,as_sum,bs_sum,0,0,0,0);
     return r;
 }
@@ -235,7 +235,7 @@ symbolic_tensor symbolic_tensor::operator()(const std::string& new_indices) cons
         r.indices=new_indices;
         return r;}
     symbolic_tensor r(reduced_indices,new_size);
-    reordered_strides(as,*this,r.indices);
+    reordered_strides(as,r.indices,strides,new_indices);
     recurse_contract(r,*this,sum,sum_size,as,sum_strides,0,0,0);
     return r;
 }
