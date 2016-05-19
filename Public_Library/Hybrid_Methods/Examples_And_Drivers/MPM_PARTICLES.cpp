@@ -119,7 +119,7 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA0,"lambda0");
     return 0;
 }
-int initialize_deformables_particles=Initialize_MPM_Particles();
+int initialize_mpm_particles=Initialize_MPM_Particles();
 //#####################################################################
 template class MPM_PARTICLES<VECTOR<float,1> >;
 template class MPM_PARTICLES<VECTOR<float,2> >;
