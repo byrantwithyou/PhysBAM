@@ -289,7 +289,7 @@ template<int d> static void Initialize_Interior_Case_Table(ARRAY<MARCHING_CUBES_
     UNION_FIND<> uf(MARCHING_CUBES_CASE<d>::num_pts);
     for(int in=0;in<2;in++){
         int j=0;
-        VECTOR<int,d> elements[2*d*(d-1)+MARCHING_CUBES_CASE<d>::max_elements];
+        VECTOR<int,d> elements[2*d*(d-1)*(d-1)+MARCHING_CUBES_CASE<d>::max_elements];
         int count=Get_Interface_Elements(elements,cs);
         if(!in)
             for(int i=0;i<count;i++)
