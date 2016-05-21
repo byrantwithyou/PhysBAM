@@ -347,7 +347,7 @@ Run(T tol)
     HASHTABLE<I3,I3> ht;
     UNION_FIND<int> uf(parent_particles.m);
     UNION_FIND<int> sim_uf(sim_parent_particles.m);
-    for(HASHTABLE_ITERATOR<int> it(split_tris);it.Valid();it.Next()){
+    for(HASHTABLE<int>::ITERATOR it(split_tris);it.Valid();it.Next()){
         int tri_id=it.Key();
         I3 tri=ta->mesh.elements(tri_id);
         int parent_tri_id=tri_in_sim(tri_id);

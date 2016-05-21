@@ -16,8 +16,21 @@
 namespace PhysBAM{
 
 enum HASHTABLE_ENTRY_STATE{ENTRY_FREE,ENTRY_ACTIVE,ENTRY_DELETED};
-template<class TK,class T> struct HASHTABLE_ENTRY_TEMPLATE{HASHTABLE_ENTRY_STATE state;TK key;T data;};
-template<class TK> struct HASHTABLE_ENTRY_TEMPLATE<TK,void>{HASHTABLE_ENTRY_STATE state;TK key;};
+template<class TK,class T> struct HASHTABLE_ENTRY_TEMPLATE
+{
+    HASHTABLE_ENTRY_STATE state;
+    TK key;
+    T data;
+};
+template<class TK> struct HASHTABLE_ENTRY_TEMPLATE<TK,void>
+{
+    HASHTABLE_ENTRY_STATE state;
+    TK key;
+    TK& operator*(){return key;}
+    const TK& operator*() const {return key;}
+    TK* operator->(){return &key;}
+    const TK* operator->() const {return &key;}
+};
 
 template<class TK,class T> // T = void
 class HASHTABLE
@@ -29,21 +42,13 @@ private:
 public:
     typedef TK KEY;
     typedef T ELEMENT;
-    typedef ENTRY* iterator; // for stl
     typedef ENTRY value_type; // for stl
-    typedef HASHTABLE_ITERATOR<TK,T> ITERATOR;
-    typedef HASHTABLE_ITERATOR<TK,const T> CONST_ITERATOR;
     typedef FIELD_PROJECTOR<HASHTABLE_ENTRY_TEMPLATE<TK,T>,HASHTABLE_ENTRY_STATE,&HASHTABLE_ENTRY_TEMPLATE<TK,T>::state> T_FIELD_PROJECTOR;
     typedef int HAS_UNTYPED_READ_WRITE;
 
     ARRAY<ENTRY> table;
     int number_of_entries;
     int next_resize;
-
-private:
-    friend class HASHTABLE_ITERATOR<TK,T>;
-    friend class HASHTABLE_ITERATOR<TK,const T_UNLESS_VOID>;
-public:
 
     HASHTABLE(const int estimated_max_number_of_entries=5)
     {
@@ -232,18 +237,6 @@ public:
     void Get_Data(ARRAY<T_UNLESS_VOID>& data) const
     {data.Remove_All();Append_Data(data);}
 
-    ENTRY* begin()
-    {return table.Get_Array_Pointer();}
-
-    const ENTRY* begin() const
-    {return table.Get_Array_Pointer();}
-
-    ENTRY* end()
-    {return table.Get_Array_Pointer()+table.Size();}
-
-    const ENTRY* end() const
-    {return table.Get_Array_Pointer()+table.Size();}
-
     template<class RW> void Read(typename conditional<is_same<T,void>::value,std::istream&,UNUSABLE>::type input) // void version
     {int entries;Read_Binary<RW>(input,entries);Initialize_New_Table(entries);
     for(int i=0;i<entries;i++){TK key;Read_Binary<RW>(input,key);Insert(key);}}
@@ -260,19 +253,134 @@ public:
     {Write_Binary<RW>(output,number_of_entries);
     for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) Write_Binary<RW>(output,table(h).key,table(h).data);}
 
-//#####################################################################
+    template<bool is_const>
+    class HASHTABLE_ITERATOR
+    {
+        typedef typename std::conditional<is_const,const HASHTABLE,HASHTABLE>::type IT_HASHTABLE;
+        typedef typename std::conditional<is_const,const T_UNLESS_VOID,T_UNLESS_VOID>::type IT_T_UNLESS_VOID;
+        typedef typename std::conditional<is_const,const ENTRY,ENTRY>::type IT_ENTRY;
+    public:
+
+        IT_HASHTABLE& hashtable;
+        int index;
+        enum INVALID_ENUM {END_ITERATOR};
+        
+        HASHTABLE_ITERATOR(IT_HASHTABLE& hashtable)
+            :hashtable(hashtable),index(0)
+        {
+            Advance_Until_Valid();
+        }
+
+        HASHTABLE_ITERATOR(IT_HASHTABLE& hashtable,INVALID_ENUM)
+            :hashtable(hashtable),index(hashtable.table.m)
+        {}
+        
+        const TK& Key() const PHYSBAM_ALWAYS_INLINE
+        {return hashtable.table(index).key;}
+
+        IT_T_UNLESS_VOID& Data() PHYSBAM_ALWAYS_INLINE
+        {return hashtable.table(index).data;}
+
+        const T_UNLESS_VOID& Data() const PHYSBAM_ALWAYS_INLINE
+        {return hashtable.table(index).data;}
+
+        bool Valid() const PHYSBAM_ALWAYS_INLINE
+        {return index<hashtable.table.m;}
+
+        void Next() PHYSBAM_ALWAYS_INLINE
+        {assert(Valid());index++;Advance_Until_Valid();}
+
+        void Advance_Until_Valid()
+        {for(;index<hashtable.table.m;index++) if(hashtable.table(index).state==ENTRY_ACTIVE) return;}
+
+        void Prev() PHYSBAM_ALWAYS_INLINE
+        {assert(Valid());index--;Reverse_Until_Valid();}
+
+        void Reverse_Until_Valid()
+        {for(;index>=0;index--) if(hashtable.table(index).state==ENTRY_ACTIVE) return;}
+
+        // stl
+        HASHTABLE_ITERATOR& operator++()
+        {Next();return *this;}
+
+        HASHTABLE_ITERATOR operator++(int)
+        {HASHTABLE_ITERATOR it(*this);Next();return it;}
+
+        // stl
+        HASHTABLE_ITERATOR& operator--()
+        {Prev();return *this;}
+
+        HASHTABLE_ITERATOR operator--(int)
+        {HASHTABLE_ITERATOR it(*this);Prev();return it;}
+
+        auto* operator->()
+        {return &Dereference_Operator((T*)0);}
+
+        const auto* operator->() const
+        {return &Dereference_Operator((T*)0);}
+
+        auto& operator*()
+        {return Dereference_Operator((T*)0);}
+
+        const auto& operator*() const
+        {return Dereference_Operator((T*)0);}
+
+        const TK& Dereference_Operator(const void*) const
+        {return Key();}
+
+        const ENTRY& Dereference_Operator(const T_UNLESS_VOID*) const
+        {return hashtable.table(index);}
+
+        IT_ENTRY& Dereference_Operator(const T_UNLESS_VOID*)
+        {return hashtable.table(index);}
+
+        template<bool isc> bool operator==(const HASHTABLE_ITERATOR<isc>& it) const
+        {return index==it.index;}
+
+        template<bool isc> bool operator!=(const HASHTABLE_ITERATOR<isc>& it) const
+        {return index!=it.index;}
+
+        template<bool isc> bool operator<(const HASHTABLE_ITERATOR<isc>& it) const
+        {return index<it.index;}
+
+        template<bool isc> bool operator>(const HASHTABLE_ITERATOR<isc>& it) const
+        {return index>it.index;}
+
+        template<bool isc> bool operator<=(const HASHTABLE_ITERATOR<isc>& it) const
+        {return index<=it.index;}
+
+        template<bool isc> bool operator>=(const HASHTABLE_ITERATOR<isc>& it) const
+        {return index>=it.index;}
+    };
+
+    typedef HASHTABLE_ITERATOR<false> ITERATOR;
+    typedef HASHTABLE_ITERATOR<true> CONST_ITERATOR;
+    typedef ITERATOR iterator; // for stl
+    typedef CONST_ITERATOR const_iterator; // for stl
+
+    // stl
+    iterator begin()
+    {return iterator(*this);}
+
+    const_iterator begin() const
+    {return const_iterator(*this);}
+
+    iterator end()
+    {return iterator(*this,iterator::END_ITERATOR);}
+
+    const_iterator end() const
+    {return const_iterator(*this,const_iterator::END_ITERATOR);}
 };
 }
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 namespace PhysBAM{
 template<class K,class T>
 std::ostream& operator<<(std::ostream& output,const HASHTABLE<K,T>& hashtable)
 {
     output<<"(";
     bool first=true;
-    for(typename HASHTABLE<K,const T>::ITERATOR iterator(hashtable);iterator.Valid();iterator.Next()){
-        if(!first) output<<" ";first=false;
-        output<<iterator.Key()<<":"<<iterator.Data();}
+    for(const auto& it:hashtable){
+        if(!first){output<<" ";first=false;}
+        output<<it.key<<":"<<it.data;}
     output<<")";
     return output;
 }
@@ -282,9 +390,9 @@ std::ostream& operator<<(std::ostream& output,const HASHTABLE<K,void>& hashtable
 {
     output<<"(";
     bool first=true;
-    for(typename HASHTABLE<K,void>::ITERATOR iterator(hashtable);iterator.Valid();iterator.Next()){
-        if(!first) output<<" ";first=false;
-        output<<iterator.Key();}
+    for(const auto& data:hashtable){
+        if(!first){output<<" ";first=false;}
+        output<<data;}
     output<<")";
     return output;
 }

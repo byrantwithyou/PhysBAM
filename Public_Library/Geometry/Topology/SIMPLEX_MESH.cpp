@@ -6,7 +6,6 @@
 //#####################################################################
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Data_Structures/UNION_FIND.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology/SIMPLEX_MESH.h>
@@ -205,7 +204,7 @@ Delete_Sorted_Elements(const ARRAY<int>& deletion_list,HASHTABLE<int,int>& index
             if(reverse_index_map.Get(elements.m,previous_index)) reverse_index_map.Delete(elements.m);
             reverse_index_map.Insert(curr,previous_index);}
         elements.Remove_Index_Lazy(curr);}
-    for(HASHTABLE_ITERATOR<int,int> iter(reverse_index_map);iter.Valid();iter.Next()) index_map.Insert(iter.Data(),iter.Key());
+    for(HASHTABLE<int,int>::ITERATOR iter(reverse_index_map);iter.Valid();iter.Next()) index_map.Insert(iter.Data(),iter.Key());
     for(int i=0;i<unique_deletion_list.m;i++) index_map.Insert(unique_deletion_list(i),0);
     elements.Compact();Refresh_Auxiliary_Structures();
 }

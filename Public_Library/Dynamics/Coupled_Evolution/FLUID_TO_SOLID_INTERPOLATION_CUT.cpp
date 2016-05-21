@@ -4,7 +4,6 @@
 //#####################################################################
 // Class FLUID_TO_SOLID_INTERPOLATION_CUT
 //##################################################################### 
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>

@@ -12,7 +12,6 @@ namespace PhysBAM{
 template<class T1,class T2> class PAIR;
 template<class T1,class T2,class T3> class TRIPLE;
 template<class TK,class T=void> class HASHTABLE;
-template<class TK,class T=void> class HASHTABLE_ITERATOR;
 template<class ID=int> class UNION_FIND;
 template<class ID=int> class SPARSE_UNION_FIND;
 

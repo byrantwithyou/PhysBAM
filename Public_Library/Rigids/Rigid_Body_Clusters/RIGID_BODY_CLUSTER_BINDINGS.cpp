@@ -4,7 +4,6 @@
 //#####################################################################
 // Class RIGID_BODY_CLUSTER_BINDINGS
 //##################################################################### 
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <Tools/Data_Structures/TRIPLE.h>
 #include <Tools/Matrices/MATRIX.h>
@@ -35,8 +34,8 @@ RIGID_BODY_CLUSTER_BINDINGS(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_inp
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Update_All_Joint_Structures()
 {
-    for(T_REVERSE_BINDING_ITERATOR i(reverse_bindings);i.Valid();i.Next())
-        Update_Joint_Structures(i.Key());
+    for(const auto& it:reverse_bindings)
+        Update_Joint_Structures(it.key);
 }
 //#####################################################################
 // Function Update_Joint_Structures
@@ -235,8 +234,8 @@ Get_Child_To_Parent_Frame(int child_particle_index) const
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Clamp_Particles_To_Embedded_Positions() const
 {
-    for(T_REVERSE_BINDING_ITERATOR i(reverse_bindings);i.Valid();i.Next())
-        Clamp_Particles_To_Embedded_Positions(i.Key());
+    for(const auto& it:reverse_bindings)
+        Clamp_Particles_To_Embedded_Positions(it.key);
 }
 //#####################################################################
 // Function Clamp_Particles_To_Embedded_Velocities
@@ -244,8 +243,8 @@ Clamp_Particles_To_Embedded_Positions() const
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Clamp_Particles_To_Embedded_Velocities() const
 {
-    for(T_REVERSE_BINDING_ITERATOR iterator(reverse_bindings);iterator.Valid();iterator.Next())
-        Clamp_Particles_To_Embedded_Velocities(iterator.Key());
+    for(const auto& it:reverse_bindings)
+        Clamp_Particles_To_Embedded_Velocities(it.key);
 }
 //#####################################################################
 // Function Clamp_Particles_To_Embedded_Velocities
@@ -253,8 +252,8 @@ Clamp_Particles_To_Embedded_Velocities() const
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Clamp_Particles_To_Embedded_Velocities(ARRAY_VIEW<TWIST<TV> > twist) const
 {
-    for(T_REVERSE_BINDING_ITERATOR iterator(reverse_bindings);iterator.Valid();iterator.Next())
-        Clamp_Particles_To_Embedded_Velocities(iterator.Key(),twist);
+    for(const auto& it:reverse_bindings)
+        Clamp_Particles_To_Embedded_Velocities(it.key,twist);
 }
 //#####################################################################
 // Function Distribute_Force_To_Parents
@@ -262,9 +261,9 @@ Clamp_Particles_To_Embedded_Velocities(ARRAY_VIEW<TWIST<TV> > twist) const
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Distribute_Force_To_Parents(ARRAY_VIEW<TWIST<TV> > wrench_full) const
 {
-    for(T_REVERSE_BINDING_ITERATOR iterator(reverse_bindings);iterator.Valid();iterator.Next()){
-        int parent=iterator.Key();
-        const CLUSTER& cluster=*iterator.Data();
+    for(const auto& it:reverse_bindings){
+        int parent=it.key;
+        const CLUSTER& cluster=*it.data;
         if(cluster.active && !cluster.infinite_body) for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<cluster.children.Size();j++){
             const int child=cluster.children(j);
             if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) continue;
@@ -318,9 +317,11 @@ Clamp_Particles_To_Embedded_Velocities(const int parent,ARRAY_VIEW<TWIST<TV> >& 
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Clear_Hard_Bound_Particles(ARRAY<bool>& particle_is_simulated) const
 {
-    for(T_REVERSE_BINDING_ITERATOR i(reverse_bindings);i.Valid();i.Next()){
-        const CLUSTER& bindings=*i.Data();
-        if(bindings.active) for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<bindings.children.Size();j++) particle_is_simulated(bindings.children(j))=false;}
+    for(const auto& it:reverse_bindings){
+        const CLUSTER& bindings=*it.data;
+        if(bindings.active)
+            for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<bindings.children.Size();j++)
+                particle_is_simulated(bindings.children(j))=false;}
 }
 //#####################################################################
 // Function Distribute_Force_To_Parents
@@ -328,8 +329,8 @@ Clear_Hard_Bound_Particles(ARRAY<bool>& particle_is_simulated) const
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Distribute_Mass_To_All_Active_Parents()
 {
-    for(T_REVERSE_BINDING_ITERATOR i(reverse_bindings);i.Valid();i.Next())
-        if(i.Data()->active) Clamp_Particles_To_Embedded_Velocities(i.Key());
+    for(const auto& it:reverse_bindings)
+        if(it.data->active) Clamp_Particles_To_Embedded_Velocities(it.key);
 }
 //#####################################################################
 // Function Distribute_Force_To_Parents

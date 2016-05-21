@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <sstream>

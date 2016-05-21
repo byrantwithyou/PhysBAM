@@ -11,7 +11,6 @@
 #include <Tools/Arrays/CONSTANT_ARRAY.h>
 #include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
@@ -70,16 +69,15 @@ public:
     if(max_tie) ranks.Get_Or_Insert(root)++;return root;}
 
     void Merge(const SPARSE_UNION_FIND<ID>& union_find)
-    {assert(Size()==union_find.Size());
-    for(HASHTABLE_ITERATOR<ID,ID> iterator(union_find.parents);iterator.Valid();iterator.Next()) Union(iterator.Key(),iterator.Data());}
+    {assert(Size()==union_find.Size());for(const auto& it:union_find.parents) Union(it.Key(),it.Data());}
 
     // Okay for map to yield invalid indices for isolated elements
     template<class ID2,class T_ARRAY>
     void Mapped_Merge(const SPARSE_UNION_FIND<ID2>& union_find,const T_ARRAY& map)
-    {for(HASHTABLE_ITERATOR<ID2,ID2> iterator(union_find.parents);iterator.Valid();iterator.Next()) Union(map(iterator.Key()),map(iterator.Data()));}
+    {for(const auto& it:union_find.parents) Union(map(it.Key()),map(it.Data()));}
 
     void Forest_Edges(ARRAY<PAIR<ID,ID> >& pairs) const
-    {pairs.Remove_All();for(HASHTABLE_ITERATOR<ID,ID> iterator(parents);iterator.Valid();iterator.Next()) pairs.Append(PAIR<ID,ID>(iterator.Key(),iterator.Data()));}
+    {pairs.Remove_All();for(const auto& it:parents) pairs.Append(PAIR<ID,ID>(it.Key(),it.Data()));}
 
     void Merge_Forest_Edges(const ARRAY<PAIR<ID,ID> >& pairs)
     {for(int i=0;i<pairs.m;i++) Union(pairs(i).x,pairs(i).y);}

@@ -6,7 +6,6 @@
 //#####################################################################
 #ifndef __ARMADILLO_TEST__
 #define __ARMADILLO_TEST__
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET_MAKER.h>
@@ -187,14 +186,14 @@ void Initialize_Bodies() override
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override
 {
-    for(HASHTABLE_ITERATOR<int> i(constrained_nodes);i.Valid();i.Next()) V(i.Key())=TV();
+    for(HASHTABLE<int>::ITERATOR i(constrained_nodes);i.Valid();i.Next()) V(i.Key())=TV();
 }
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override
 {
-    for(HASHTABLE_ITERATOR<int> i(constrained_nodes);i.Valid();i.Next()) V(i.Key())=TV();
+    for(HASHTABLE<int>::ITERATOR i(constrained_nodes);i.Valid();i.Next()) V(i.Key())=TV();
 }
 //#####################################################################
 };

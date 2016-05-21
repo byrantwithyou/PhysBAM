@@ -1,6 +1,5 @@
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Data_Structures/UNION_FIND.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Symbolics/CODE_BLOCK.h>
@@ -1095,7 +1094,7 @@ Sparse_Conditional_Constant_Propagation()
     while(block_worklist.m || op_worklist.m){
         while(op_worklist.m){
             CODE_BLOCK_NODE* N=op_worklist.Pop();
-            for(typename HASHTABLE<CODE_BLOCK_NODE*>::ITERATOR it(Get_Uses(N));it.Valid();it.Next()){
+            for(typename HASHTABLE<CODE_BLOCK_NODE*>::CONST_ITERATOR it(Get_Uses(N));it.Valid();it.Next()){
                 if(block_exec(it.Key()->block->id))
                     SCCP_Visit_Instruction(it.Key(),variable_state,block_worklist,op_worklist,block_exec);}}
 

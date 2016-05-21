@@ -4,7 +4,6 @@
 //#####################################################################
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Solids/Forces_And_Torques/SOLIDS_FORCES.h>
 using namespace PhysBAM;

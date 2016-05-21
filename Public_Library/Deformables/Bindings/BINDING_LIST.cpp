@@ -5,7 +5,6 @@
 // Class BINDING_LIST
 //#####################################################################
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>

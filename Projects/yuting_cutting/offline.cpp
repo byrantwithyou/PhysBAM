@@ -1737,7 +1737,7 @@ int main(int argc, char** argv) {
                 PhysBAM::MATRIX<double,2> rotation(cos(dtheta),sin(dtheta),-sin(dtheta),cos(dtheta));
                 for (int r = 0; r < cutting_ratio; r++) {
                     int i = 0;
-                    for (HASHTABLE_ITERATOR<int> it(mcut->diri_nodes); it.Valid(); it.Next()) {
+                    for (HASHTABLE<int>::ITERATOR it(mcut->diri_nodes); it.Valid(); it.Next()) {
                         int fixed_node = it.Key();
                         T oldx=mcut->deformable_object->X(fixed_node)(0);
                         T oldy=mcut->deformable_object->X(fixed_node)(1);

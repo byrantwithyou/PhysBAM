@@ -4,7 +4,6 @@
 //#####################################################################
 // Class RIGID_DEFORMABLE_COLLISIONS
 //#####################################################################
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Math_Tools/clamp.h>
@@ -107,7 +106,7 @@ Get_Particles_Intersecting_Rigid_Body(const RIGID_BODY<TV>& rigid_body,ARRAY<int
     if(!candidate_particles) return;
 
     T depth=0;
-    for(HASHTABLE<int>::ITERATOR i(*candidate_particles);i.Valid();i.Next()){int p=i.Key();
+    for(HASHTABLE<int>::CONST_ITERATOR i(*candidate_particles);i.Valid();i.Next()){int p=i.Key();
         if(solid_body_collection.deformable_body_collection.binding_list.Binding_Index_From_Particle_Index(p)<0
           && rigid_body.Implicit_Geometry_Lazy_Inside_And_Value(deformable_body_collection.particles.X(p),depth,solids_parameters.rigid_body_collision_parameters.collision_body_thickness)){
             depth-=solids_parameters.rigid_body_collision_parameters.collision_body_thickness;
@@ -587,7 +586,7 @@ Process_Contact(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_
             if(use_saved_pairs){
                 const HASHTABLE<int>* contact_particles=particles_contacting_rigid_body.Get_Pointer(rigid_body.particle_index);
                 if(!contact_particles) continue;
-                for(HASHTABLE<int>::ITERATOR i(*contact_particles);i.Valid();i.Next()){int p=i.Key();
+                for(HASHTABLE<int>::CONST_ITERATOR i(*contact_particles);i.Valid();i.Next()){int p=i.Key();
                     Update_Rigid_Deformable_Contact_Pair(rigid_body,p,dt,time,1,X_save,rigid_frame_save,collision_body_thickness,true);}}
             else{
                 ARRAY<int> particles;
@@ -610,7 +609,7 @@ Get_Particles_Contacting_Rigid_Body(const RIGID_BODY<TV>& rigid_body,ARRAY<int>&
     if(!candidate_particles) return;
 
     // NOTE: use time n normals, but get intersections based on time n+1
-    for(HASHTABLE<int>::ITERATOR i(*candidate_particles);i.Valid();i.Next()){int p=i.Key();
+    for(HASHTABLE<int>::CONST_ITERATOR i(*candidate_particles);i.Valid();i.Next()){int p=i.Key();
         if(solid_body_collection.deformable_body_collection.binding_list.Binding_Index_From_Particle_Index(p)<0 && (include_soft_bound || !soft_bindings.Particle_Is_Bound(p))
           && rigid_body.Implicit_Geometry_Lazy_Inside(deformable_body_collection.particles.X(p),solids_parameters.rigid_body_collision_parameters.collision_body_thickness)){
             particles.Append(p);

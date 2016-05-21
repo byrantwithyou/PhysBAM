@@ -5,7 +5,6 @@
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Tools/Data_Structures/ELEMENT_ID.h>
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Data_Structures/KD_TREE.h>
 #include <Tools/Data_Structures/OPERATION_HASH.h>
 #include <Tools/Data_Structures/PAIR.h>
@@ -273,12 +272,10 @@ template<class TV> template<int d1,int d2> void MPI_SOLIDS<TV>::
 All_Gather_Intersecting_Pairs(HASHTABLE<VECTOR<int,d1> >& intersecting_point_face_pairs,HASHTABLE<VECTOR<int,d2> >& intersecting_edge_edge_pairs)
 {
     // put local pairs into arrays
-    ARRAY<VECTOR<int,d1> > local_point_face_pairs(intersecting_point_face_pairs.Size(),false);
-    {HASHTABLE_ITERATOR<VECTOR<int,d1> > iterator(intersecting_point_face_pairs);
-    for(int i=1;iterator.Valid();iterator.Next(),i++) local_point_face_pairs(i)=iterator.Key();}
-    ARRAY<VECTOR<int,d2> > local_edge_edge_pairs(intersecting_edge_edge_pairs.Size(),false);
-    {HASHTABLE_ITERATOR<VECTOR<int,d2> > iterator(intersecting_edge_edge_pairs);
-    for(int i=1;iterator.Valid();iterator.Next(),i++) local_edge_edge_pairs(i)=iterator.Key();}
+    ARRAY<VECTOR<int,d1> > local_point_face_pairs;
+    intersecting_point_face_pairs.Get_Keys(local_point_face_pairs);
+    ARRAY<VECTOR<int,d2> > local_edge_edge_pairs;
+    intersecting_edge_edge_pairs.Get_Keys(local_edge_edge_pairs);
 
     // gather counts
     VECTOR<int,2> local_counts(intersecting_point_face_pairs.Size(),intersecting_edge_edge_pairs.Size());

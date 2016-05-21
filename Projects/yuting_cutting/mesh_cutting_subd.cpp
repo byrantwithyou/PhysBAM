@@ -248,7 +248,7 @@ void MESH_CUTTING<T>::Subdivide_Cutting_Mesh_Into_Eyeball()
     }
     
     //subdivide
-    for (HASHTABLE_ITERATOR<EDGE, T> it(intersections); it.Valid(); it.Next()) {
+    for (typename HASHTABLE<EDGE, T>::ITERATOR it(intersections); it.Valid(); it.Next()) {
         T w = it.Data();
         if (w > 0) {
             EDGE e = it.Key();
@@ -579,7 +579,7 @@ void MESH_CUTTING<T>::Initialize_Elasticity()
         my_constrained = new ALGEBRA::VECTOR<int>(3*diri_nodes.Size());
         my_constrained_locations = new ALGEBRA::VECTOR<ST>(3*diri_nodes.Size());
         int i = 0;
-        for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
+        for (HASHTABLE<int>::ITERATOR it(diri_nodes); it.Valid(); it.Next()) {
             int fixed_node = it.Key();
             my_constrained->Set_Value(3*i,3*fixed_node); my_constrained->Set_Value(3*i+1,3*fixed_node+1); my_constrained->Set_Value(3*i+2,3*fixed_node+2); // first node constrained
             my_constrained_locations->Set_Value(3*i,sim_volume->particles.X(fixed_node)(0));
@@ -593,7 +593,7 @@ void MESH_CUTTING<T>::Initialize_Elasticity()
         my_constrained = new ALGEBRA::VECTOR<int>(2*diri_nodes.Size()+sim_volume->particles.X.m);
         my_constrained_locations = new ALGEBRA::VECTOR<ST>(2*diri_nodes.Size()+sim_volume->particles.X.m);
         int i = 0;
-        for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
+        for (HASHTABLE<int>::ITERATOR it(diri_nodes); it.Valid(); it.Next()) {
             int fixed_node = it.Key();
             my_constrained->Set_Value(i,3*fixed_node);
             my_constrained->Set_Value(i+1,3*fixed_node+1);
@@ -674,7 +674,7 @@ void MESH_CUTTING<T>::Reinitialize_Elasticity()
         my_constrained = new ALGEBRA::VECTOR<int>(3*diri_nodes.Size());
         my_constrained_locations = new ALGEBRA::VECTOR<ST>(3*diri_nodes.Size());
         int i = 0;
-        for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
+        for (HASHTABLE<int>::ITERATOR it(diri_nodes); it.Valid(); it.Next()) {
             int fixed_node = it.Key();
             my_constrained->Set_Value(3*i,3*fixed_node); my_constrained->Set_Value(3*i+1,3*fixed_node+1); my_constrained->Set_Value(3*i+2,3*fixed_node+2); // first node constrained
             my_constrained_locations->Set_Value(3*i,sim_volume->particles.X(fixed_node)(0));
@@ -688,7 +688,7 @@ void MESH_CUTTING<T>::Reinitialize_Elasticity()
         my_constrained = new ALGEBRA::VECTOR<int>(2*diri_nodes.Size()+sim_volume->particles.X.m);
         my_constrained_locations = new ALGEBRA::VECTOR<ST>(2*diri_nodes.Size()+sim_volume->particles.X.m);
         int i = 0;
-        for (HASHTABLE_ITERATOR<int> it(diri_nodes); it.Valid(); it.Next()) {
+        for (HASHTABLE<int>::ITERATOR it(diri_nodes); it.Valid(); it.Next()) {
             int fixed_node = it.Key();
             my_constrained->Set_Value(i,3*fixed_node);
             my_constrained->Set_Value(i+1,3*fixed_node+1);

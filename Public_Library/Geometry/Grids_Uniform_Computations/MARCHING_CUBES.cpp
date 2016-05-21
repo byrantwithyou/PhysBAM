@@ -74,7 +74,7 @@ static int has_ambig(int n)
     return false;
 }
 //#####################################################################
-// Function Initialize_Case_Table
+// Function Initialize_Neighbor_Cases
 //#####################################################################
 template<int d> static void Initialize_Neighbor_Cases(ARRAY<MARCHING_CUBES_CASE<d> >& table, int c)
 {
@@ -338,7 +338,7 @@ static void Initialize_Interior_Case_Table(ARRAY<MARCHING_CUBES_INTERIOR_CASE<1>
     table(3)=c3;
 }
 //#####################################################################
-// Function Get_Triangles_For_Cell
+// Function Compute_Phis_For_Cell
 //#####################################################################
 template<class TV> void MARCHING_CUBES<TV>::
 Compute_Phis_For_Cell(VECTOR<T,num_corners>& phis,const ARRAY<T,TV_INT>& phi,const TV_INT& cell)
@@ -348,7 +348,7 @@ Compute_Phis_For_Cell(VECTOR<T,num_corners>& phis,const ARRAY<T,TV_INT>& phi,con
         phis(i)=phi(cell+bits(i));
 }
 //#####################################################################
-// Function Get_Triangles_For_Cell
+// Function Compute_Points_For_Cell
 //#####################################################################
 template<class TV> int MARCHING_CUBES<TV>::
 Compute_Points_For_Cell(VECTOR<TV,num_pts>& pts,const VECTOR<T,num_corners>& phis)
@@ -403,7 +403,7 @@ Get_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m> >& surface,const VECTOR<VECTOR<ARRA
                     for(int i=0;i<len;i++) ar->Append(VECTOR<TV,TV::m>(pts.Subset(tmp_elements[i])));}
 }
 //#####################################################################
-// Function Get_Elements_For_Cell
+// Function Get_Interior_Elements_For_Cell
 //#####################################################################
 template<class TV> void MARCHING_CUBES<TV>::
 Get_Interior_Elements_For_Cell(ARRAY<VECTOR<TV,TV::m+1> >* interior,ARRAY<VECTOR<TV,TV::m+1> >* exterior,
@@ -469,7 +469,7 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
     return cut_cells;
 }
 //#####################################################################
-// Function Create_Surface
+// Function Create_Interior
 //#####################################################################
 template<class TV> int MARCHING_CUBES<TV>::
 Create_Interior(T_VOLUME& volume,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,bool inside,T contour_value)

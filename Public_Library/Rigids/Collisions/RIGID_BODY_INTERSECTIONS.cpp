@@ -2,7 +2,6 @@
 // Copyright 2002-2007, Ronald Fedkiw, Eran Guendelman, Craig Schroeder, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Data_Structures/PAIR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>

@@ -8,7 +8,6 @@
 #define __TEST_BASE__
 
 #include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Log/LOG.h>
 #include <string>
 namespace PhysBAM{
@@ -72,8 +71,7 @@ public:
     {if(TEST_BASE* test=Lookup_Test_Suite(test_name)) return test->Run_All_Suite_Tests(verbose);if(verbose) Report_Registry_Failure(test_name);return registry_failure;}
 
     static TEST_RESULT Run_All_Tests(bool verbose=true)
-    {TEST_RESULT result=success;HASHTABLE_ITERATOR<std::string,TEST_BASE*> iterator(Test_Registry());
-    for(;iterator.Valid();iterator.Next()) result=Merge_Results(result,iterator.Data()->Run_All_Suite_Tests(verbose));return result;}
+    {TEST_RESULT result=success;for(const auto& it:Test_Registry()) result=Merge_Results(result,it.data->Run_All_Suite_Tests(verbose));return result;}
 
 //#####################################################################
     static HASHTABLE<std::string,TEST_BASE*>& Test_Registry();

@@ -2,7 +2,6 @@
 // Copyright 2009, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Parsing/STRING_UTILITIES.h>
 #include "FINITE_DIFFERENCE_DISCRETIZATION.h"
 #include "STENCIL_ITERATOR.h"
@@ -39,7 +38,7 @@ public:
         for(T_CONST_STENCIL_ITERATOR iterator(stencil);iterator.Valid();iterator.Next())
             hash.Get_Or_Insert(iterator.Data(),ARRAY<T_INDEX>()).Append(iterator.Key());
         bool on_first_coefficient=true;
-        for(HASHTABLE_ITERATOR<T,ARRAY<T_INDEX> > iterator(hash);iterator.Valid();iterator.Next()){
+        for(typename HASHTABLE<T,ARRAY<T_INDEX> >::ITERATOR iterator(hash);iterator.Valid();iterator.Next()){
             output<<"    result";
             if(!on_first_coefficient) output<<"+";else on_first_coefficient=false;
             output<<"=(T)"<<iterator.Key()<<"*(";

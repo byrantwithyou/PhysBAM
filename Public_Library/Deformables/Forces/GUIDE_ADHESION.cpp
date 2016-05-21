@@ -5,7 +5,6 @@
 // Class GUIDE_ADHESION
 #include <Tools/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Data_Structures/QUEUE.h>
 #include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/RANGE.h>
@@ -146,12 +145,11 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class TV> void GUIDE_ADHESION<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    for(HASHTABLE_ITERATOR<VECTOR<int,2>,const SPRING_STATE> i(*springs);i.Valid();i.Next()){
-        const SPRING_STATE& state=i.Data();
+    for(const auto& i:*springs){
+        const SPRING_STATE& state=i.data;
         TV force=youngs_modulus*(state.distance/state.restlength-(T)1)*state.normal;
         F(state.nodes[0])-=((T)1-state.weights[0])*force;F(state.nodes[1])-=state.weights[0]*force;
-        F(state.nodes[2])+=((T)1-state.weights[1])*force;F(state.nodes[3])+=state.weights[1]*force;
-    }
+        F(state.nodes[2])+=((T)1-state.weights[1])*force;F(state.nodes[3])+=state.weights[1]*force;}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -159,13 +157,12 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class TV> void GUIDE_ADHESION<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    for(HASHTABLE_ITERATOR<VECTOR<int,2>,const SPRING_STATE> i(*springs);i.Valid();i.Next()){
-        const SPRING_STATE& state=i.Data();
+    for(const auto& i:*springs){
+        const SPRING_STATE& state=i.data;
         TV force=state.damping/state.restlength*TV::Dot_Product(((T)1-state.weights[0])*V(state.nodes[0])+state.weights[0]*V(state.nodes[1])
                                        -((T)1-state.weights[1])*V(state.nodes[2])-state.weights[1]*V(state.nodes[3]),state.normal)*state.normal;
         F(state.nodes[0])-=((T)1-state.weights[0])*force;F(state.nodes[1])-=state.weights[0]*force;
-        F(state.nodes[2])+=((T)1-state.weights[1])*force;F(state.nodes[3])+=state.weights[1]*force;
-    }
+        F(state.nodes[2])+=((T)1-state.weights[1])*force;F(state.nodes[3])+=state.weights[1]*force;}
 }
 //#####################################################################
 // Function Enforce_Definiteness

@@ -2,7 +2,6 @@
 // Copyright 2004-2007, Zhaosheng Bao, Eilene Hao, Geoffrey Irving, Sergey Koltakov, Frank Losasso, Andrew Selle, Tamar Shinar, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Interpolation/BSPLINE.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>

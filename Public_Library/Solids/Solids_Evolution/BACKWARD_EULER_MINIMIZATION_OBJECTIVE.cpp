@@ -138,17 +138,17 @@ Update_Position_Based_State_Early_Out(T time,bool is_position_update,T energy_ea
 
     if(energy>energy_early_out) return energy;
 
-    for(HASHTABLE<int>::ITERATOR it(solids_forces_lazy);it.Valid();it.Next()){
-        solid_body_collection.solids_forces(it.Key())->Update_Position_Based_State(time);
-        energy+=solid_body_collection.solids_forces(it.Key())->Potential_Energy(time);
+    for(auto it:solids_forces_lazy){
+        solid_body_collection.solids_forces(it)->Update_Position_Based_State(time);
+        energy+=solid_body_collection.solids_forces(it)->Potential_Energy(time);
         if(energy>energy_early_out) return energy;}
-    for(HASHTABLE<int>::ITERATOR it(rigids_forces_lazy);it.Valid();it.Next()){
-        solid_body_collection.rigid_body_collection.rigids_forces(it.Key())->Update_Position_Based_State(time);
-        energy+=solid_body_collection.rigid_body_collection.rigids_forces(it.Key())->Potential_Energy(time);
+    for(auto it:rigids_forces_lazy){
+        solid_body_collection.rigid_body_collection.rigids_forces(it)->Update_Position_Based_State(time);
+        energy+=solid_body_collection.rigid_body_collection.rigids_forces(it)->Potential_Energy(time);
         if(energy>energy_early_out) return energy;}
-    for(HASHTABLE<int>::ITERATOR it(deformables_forces_lazy);it.Valid();it.Next()){
-        solid_body_collection.deformable_body_collection.deformables_forces(it.Key())->Update_Position_Based_State(time,is_position_update,update_hessian);
-        energy+=solid_body_collection.deformable_body_collection.deformables_forces(it.Key())->Potential_Energy(time);
+    for(auto it:deformables_forces_lazy){
+        solid_body_collection.deformable_body_collection.deformables_forces(it)->Update_Position_Based_State(time,is_position_update,update_hessian);
+        energy+=solid_body_collection.deformable_body_collection.deformables_forces(it)->Potential_Energy(time);
         if(energy>energy_early_out) return energy;}
     return energy;
 }

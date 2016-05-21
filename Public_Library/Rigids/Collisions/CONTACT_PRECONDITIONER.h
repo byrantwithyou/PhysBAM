@@ -9,7 +9,6 @@
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Log/SCOPE.h>
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/FRAME.h>

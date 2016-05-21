@@ -325,11 +325,6 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class TV> void SEGMENT_ADHESION<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    //for(HASHTABLE_ITERATOR<VECTOR<int,2>,const SPRING_STATE> i(*springs);i.Valid();i.Next()){
-    //    const SPRING_STATE& state=i.Data();
-    //    TV force=youngs_modulus*(state.distance/restlength-(T)1)*state.normal;
-    //    F(state.nodes[0])-=((T)1-state.weights[0])*force;F(state.nodes[1])-=state.weights[0]*force;
-    //    F(state.nodes[2])+=((T)1-state.weights[1])*force;F(state.nodes[3])+=state.weights[1]*force;}
     for(int i=0;i<internal_springs.m;i++){
         const SPRING_STATE& state=internal_springs(i);
         TV force=youngs_modulus*(state.distance/restlength-(T)1)*state.normal;
@@ -347,13 +342,6 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class TV> void SEGMENT_ADHESION<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    //for(HASHTABLE_ITERATOR<VECTOR<int,2>,const SPRING_STATE> i(*springs);i.Valid();i.Next()){
-    //    const SPRING_STATE& state=i.Data();
-    //    TV force=state.damping/restlength*TV::Dot_Product(((T)1-state.weights[0])*V(state.nodes[0])+state.weights[0]*V(state.nodes[1])
-    //                                   -((T)1-state.weights[1])*V(state.nodes[2])-state.weights[1]*V(state.nodes[3]),state.normal)*state.normal;
-    //    F(state.nodes[0])-=((T)1-state.weights[0])*force;F(state.nodes[1])-=state.weights[0]*force;
-    //    F(state.nodes[2])+=((T)1-state.weights[1])*force;F(state.nodes[3])+=state.weights[1]*force;
-    //}
     for(int i=0;i<internal_springs.m;i++){
         const SPRING_STATE& state=internal_springs(i);
         TV force=state.damping/restlength*TV::Dot_Product(((T)1-state.weights[0])*V(state.nodes[0])+state.weights[0]*V(state.nodes[1])

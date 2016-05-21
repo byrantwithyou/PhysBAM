@@ -4,7 +4,6 @@
 //#####################################################################
 // Class FLUID_TO_SOLID_INTERPOLATION_PHI
 //##################################################################### 
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
@@ -80,8 +79,7 @@ Setup_Mesh()
         cut_faces.Get_Or_Insert(face.Second_Cell_Index()).Append(face);}
     LOG::cout<<"interface linf error "<<mx<<std::endl;
 
-
-    HASHTABLE_ITERATOR<FACE_INDEX<TV::m>,TV> it(HX);
+    typename HASHTABLE<FACE_INDEX<TV::m>,TV>::ITERATOR it(HX);
     if(!it.Valid()) return;
     FACE_INDEX<TV::m> prev_face(it.Key());
     TV_INT node1=prev_face.index,node2=prev_face.index+TV_INT::Axis_Vector(1-prev_face.axis);

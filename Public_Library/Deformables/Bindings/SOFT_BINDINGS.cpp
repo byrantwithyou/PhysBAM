@@ -4,7 +4,6 @@
 //#####################################################################
 // Class SOFT_BINDINGS
 //#####################################################################
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <Tools/Log/LOG.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>

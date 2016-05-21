@@ -6,7 +6,6 @@
 //##################################################################### 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <Tools/Data_Structures/STACK.h>
 #include <Tools/Data_Structures/UNION_FIND.h>
 #include <Tools/Math_Tools/cyclic_shift.h>
