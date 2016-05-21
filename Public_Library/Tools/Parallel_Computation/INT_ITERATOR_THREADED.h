@@ -13,38 +13,6 @@
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 namespace PhysBAM{
 
-/*template<class TYPE>
-class INT_ITERATOR_THREADED
-{
-public:
-    int row_jump;
-    int start_index,end_index;
-    THREAD_QUEUE* thread_queue;
-    TYPE& threaded_class;
-
-    INT_ITERATOR_THREADED(const int start_index_input,const int end_index_input,THREAD_QUEUE* thread_queue_input,TYPE& threaded_class_input)
-        :row_jump(1),start_index(start_index_input),end_index(end_index_input),thread_queue(thread_queue_input),threaded_class(threaded_class_input)
-    {
-        if(thread_queue) row_jump=(end_index-start_index+1)/thread_queue->Number_Of_Threads()+1;
-    }
-
-    void Run()
-    {
-        if(!thread_queue){threaded_class.Run(start_index,end_index);return;}
-#ifdef USE_PTHREADS
-        int min_value=start_index,max_value=end_index;
-        int local_start_index,local_end_index;
-        for(int i=min_value;i<max_value;i+=row_jump){
-            local_start_index=min(i,max_value);local_end_index=min(i+row_jump-1,max_value);
-            INT_ITERATOR_TASK<TYPE>* task=new INT_ITERATOR_TASK<TYPE>(threaded_class,local_start_index,local_end_index);
-            thread_queue->Queue(task);}
-        thread_queue->Wait();
-#else
-        PHYSBAM_FATAL_ERROR();
-#endif
-    }
-};*/
-
 template<class TYPE>
 class INT_ITERATOR_THREADED_ALPHA
 {
