@@ -1,7 +1,0 @@
-# SConscript
-
-Import('env Automatic_Program')
-env=env.Copy(USE_DEFORMABLES=1)
-cpps=['mass_properties.cpp']
-modules=map(lambda x: x.replace(".cpp",""),cpps)
-map(lambda x: Automatic_Program(env,x),modules)
