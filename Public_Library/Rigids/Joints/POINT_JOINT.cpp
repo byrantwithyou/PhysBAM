@@ -77,8 +77,7 @@ Update_State_From_Joint_Frame(const bool enforce_constraints)
 template<class TV> void POINT_JOINT<TV>::
 Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix) const
 {
-    Constraint_Matrix_Helper(parent_frame.r*F_pj().r,constrained_matrix,unconstrained_matrix,T_SPIN::Componentwise_Greater_Equal(rotation_limits.min_corner,
-        rotation_limits.max_corner));
+    Constraint_Matrix_Helper(parent_frame.r*F_pj().r,constrained_matrix,unconstrained_matrix,rotation_limits.min_corner.Componentwise_Greater_Equal(rotation_limits.max_corner));
 }
 //#####################################################################
 namespace PhysBAM{

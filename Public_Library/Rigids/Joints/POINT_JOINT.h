@@ -60,7 +60,7 @@ public:
     {STATIC_ASSERT(dof==3);constrain.z=false;rotation_limits.min_corner.z=-FLT_MAX;rotation_limits.max_corner.z=FLT_MAX;}
 
     VECTOR<bool,T_SPIN::dimension> Angular_Constraints() const override
-    {return T_SPIN::Componentwise_Greater_Equal(rotation_limits.min_corner,rotation_limits.max_corner);}
+    {return rotation_limits.min_corner.Componentwise_Greater_Equal(rotation_limits.max_corner);}
 
 //#####################################################################
     void Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const override;

@@ -42,13 +42,7 @@ template<class TV> struct ELEMENT_OF_VECTOR {private:struct UNUSABLE;public:type
 template<class T,int d> struct ELEMENT_OF_VECTOR<VECTOR<T,d> > {typedef T TYPE;};
 
 template<class T> struct CAN_REFERENCE_ELEMENTS {static const int value=true;};
-template<class T_ARRAY0,class T_ARRAY1> struct CAN_REFERENCE_ELEMENTS<ARRAY_SUM<T_ARRAY0,T_ARRAY1> > {static const int value=false;};
-template<class T_ARRAY0,class T_ARRAY1> struct CAN_REFERENCE_ELEMENTS<ARRAY_DIFFERENCE<T_ARRAY0,T_ARRAY1> > {static const int value=false;};
-template<class T_ARRAY0,class T_ARRAY1> struct CAN_REFERENCE_ELEMENTS<ARRAY_PRODUCT<T_ARRAY0,T_ARRAY1> > {static const int value=false;};
-template<class T_ARRAY0,class T_ARRAY1> struct CAN_REFERENCE_ELEMENTS<ARRAY_QUOTIENT<T_ARRAY0,T_ARRAY1> > {static const int value=false;};
-template<class T_ARRAY0> struct CAN_REFERENCE_ELEMENTS<ARRAY_NEGATION<T_ARRAY0> > {static const int value=false;};
-template<class T_ARRAY0,class T> struct CAN_REFERENCE_ELEMENTS<ARRAY_PLUS_SCALAR<T_ARRAY0,T> > {static const int value=false;};
-template<class T_ARRAY0,class T> struct CAN_REFERENCE_ELEMENTS<ARRAY_LEFT_MULTIPLE<T_ARRAY0,T> > {static const int value=false;};
+template<class OP,class ID> struct CAN_REFERENCE_ELEMENTS<ARRAY_EXPRESSION<OP,ID> > {static const int value=false;};
 
 template<class T_ARRAY0,class enabler=void> struct EQUIVALENT_ARRAY;
 template<class T> struct EQUIVALENT_ARRAY<T,typename enable_if<!IS_ARRAY<T>::value>::type> {typedef T TYPE;};
@@ -370,7 +364,7 @@ public:
     return v;}
 
     template<class T_ARRAY1>
-    ARRAY_DIFFERENCE<T_ARRAY,ARRAY_LEFT_MULTIPLE<T,T_ARRAY1> > Householder_Transform(const ARRAY_BASE<T,T_ARRAY1>& v) const
+    auto Householder_Transform(const ARRAY_BASE<T,T_ARRAY1>& v) const
     {Assert_Same_Size(*this,v);
     T v_dot_a=0,v_dot_v=0;for(int i=0;i<Size();i++){v_dot_a+=v(i)*(*this)(i);v_dot_v+=sqr(v(i));}
     return *this-2*v_dot_a/v_dot_v*v;}
@@ -392,13 +386,13 @@ public:
     {Assert_Same_Size(u,v);T u2=0,u1=u(0),v1=v(0),uv=0;for(int i=1;i<u.Size();i++){T ui=u(i);u2+=sqr(ui);uv+=ui*v(i);}u1+=sign_nonzero(u1)*sqrt(u2+sqr(u1));
     T factor=2*(uv+u1*v1)/(u2+sqr(u1)),R01=v1-factor*u1,R11=0;for(int i=1;i<u.Size();i++) R11+=sqr(v(i)-factor*u(i));return atan2(sqrt(R11),-R01*sign_nonzero(u1));}
 
-    template<class T_ARRAY0,class T_ARRAY1>
-    static typename T_ARRAY0::template REBIND<bool>::TYPE Componentwise_Greater_Equal(const ARRAY_BASE<T,T_ARRAY0>& u,const ARRAY_BASE<T,T_ARRAY1>& v)
-    {Assert_Same_Size(u,v);typename T_ARRAY0::template REBIND<bool>::TYPE result(INITIAL_SIZE(u.Size()));for(int i=0;i<u.Size();i++) result(i)=u(i)>=v(i);return result;}
+    template<class T_ARRAY1>
+    auto Componentwise_Greater_Equal(const ARRAY_BASE<T,T_ARRAY1>& v) const
+    {Assert_Same_Size(*this,v);return Array_Expression_Helper(*this,v,[](const T& a,const T& b){return a>=b;});}
 
-    template<class T_ARRAY0,class T_ARRAY1>
-    static T_ARRAY0 Componentwise_And(const ARRAY_BASE<bool,T_ARRAY0>& u,const ARRAY_BASE<bool,T_ARRAY1>& v)
-    {Assert_Same_Size(u,v);T_ARRAY0 result(INITIAL_SIZE(u.Size()));for(int i=0;i<u.Size();i++) result(i)=(u(i) && v(i));return result;}
+    template<class T_ARRAY1>
+    auto Componentwise_And(const ARRAY_BASE<bool,T_ARRAY1>& v) const
+    {Assert_Same_Size(*this,v);STATIC_ASSERT((is_same<bool,T>::value));return Array_Expression_Helper(*this,v,[](bool a,bool b){return a && b;});}
 
     void Reverse()
     {for(ID i(0),s=Size();i<s-1-i;i++) exchange((*this)(i),(*this)(s-1-i));}
@@ -621,13 +615,7 @@ template<class T_ARRAY> struct HASH_REDUCE<T_ARRAY,typename enable_if<(IS_ARRAY<
 {static int H(const T_ARRAY& key){return Hash_Reduce_Array_Helper(key);}};
 }
 //#####################################################################
-#include <Tools/Arrays/ARRAY_DIFFERENCE.h>
-#include <Tools/Arrays/ARRAY_LEFT_MULTIPLE.h>
-#include <Tools/Arrays/ARRAY_NEGATION.h>
-#include <Tools/Arrays/ARRAY_PLUS_SCALAR.h>
-#include <Tools/Arrays/ARRAY_PRODUCT.h>
-#include <Tools/Arrays/ARRAY_QUOTIENT.h>
-#include <Tools/Arrays/ARRAY_SUM.h>
+#include <Tools/Arrays/ARRAY_EXPRESSION.h>
 #include <Tools/Arrays/ARRAY_VIEW.h>
 #include <Tools/Arrays/IDENTITY_ARRAY.h>
 #include <Tools/Arrays/INDIRECT_ARRAY.h>

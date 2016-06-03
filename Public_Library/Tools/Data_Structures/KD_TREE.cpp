@@ -176,7 +176,7 @@ Sub_KD_Tree_Using_Leaf_Nodes(KD_TREE_NODE<T>* cell,const int first_index,const i
 template<class TV> void KD_TREE<TV>::
 Median_Split(const int partition_index,const int first_index,const int last_index,ARRAY_VIEW<const TV> points,ARRAY_VIEW<int> permutation_array,const int axis)
 {
-    ARRAY_VIEW<int> permutation_subset(permutation_array.Subset(first_index+IDENTITY_ARRAY<>(last_index-first_index)));
+    ARRAY_VIEW<int> permutation_subset(permutation_array.Array_View(first_index,last_index-first_index));
     ARRAY<T> values(points.Subset(permutation_subset).Project(axis)); // copy so that nth_element doesn't mess up original values
 
     std::nth_element(values.begin(),&values(partition_index-first_index),values.end());
@@ -186,7 +186,6 @@ Median_Split(const int partition_index,const int first_index,const int last_inde
     int* middle=std::stable_partition(permutation_subset.begin(),permutation_subset.end(),partition_helper_less);
     std::stable_partition(middle,permutation_subset.end(),partition_helper_less_equal);
     assert(points(permutation_array(partition_index-1))[axis]<=split_value && split_value<=points(permutation_array(partition_index))[axis]);
-
 }
 //#####################################################################
 // Function Find_Points_Within_Radius

@@ -886,7 +886,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
                 RIGID_BODY<TV>& parent_other_rigid_body=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
                 if(parent_other_rigid_body.Has_Infinite_Inertia()) R_R_transpose+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(rigid_body_collision_locations(i)-parent_rigid_body.Frame().t-centroid);}
             R_R_transpose.Solve_Eigenproblem(eigenvalues,eigenvectors);
-            int rank=TV::Componentwise_Greater_Equal(eigenvalues.To_Vector(),TV::All_Ones_Vector()*threshold).Number_True();
+            int rank=eigenvalues.To_Vector().Componentwise_Greater_Equal(TV::All_Ones_Vector()*threshold).Number_True();
             if(rank==0) equation_type=1; // 3/6 dof (2/3 dof in 2d) specified by static bodies
             else if(rank==1 && TV::dimension==3) equation_type=2; // 5 dof specified by static bodies (not possible in 2d)
             else equation_type=3;} // full constrained by static bodies

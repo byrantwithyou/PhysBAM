@@ -68,7 +68,8 @@ Add_Elements_From_Deletion_List(const int count,ARRAY<int>& added_indices)
     added_indices.Preallocate(added_indices.Size()+count);
     int added=min(deletion_list.m,count);
     added_indices.Append_Elements(deletion_list.Pop_Elements(added));
-    added_indices.Append_Elements(Add_Elements(count-added));
+    int p=Add_Elements(count-added);
+    for(int i=p;i<count-added+p;i++) added_indices.Append(i);
 }
 //#####################################################################
 // Function Delete_Elements_On_Deletion_List

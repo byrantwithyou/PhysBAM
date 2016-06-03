@@ -50,8 +50,8 @@ template<class T_ARRAY,class ENABLER=void> struct IS_ARRAY_VIEW {static const bo
 template<class T_ARRAY> struct IS_ARRAY_VIEW<const T_ARRAY>:public IS_ARRAY_VIEW<T_ARRAY>{};
 
 template<class T,int d> class VECTOR;
-template<class TV> struct FIXED_SIZE_VECTOR {static const int value=false;};
-template<class T,int d> struct FIXED_SIZE_VECTOR<VECTOR<T,d> > {static const int value=true;};
+template<class TV> struct FIXED_SIZE_VECTOR {static const int value=false;static const int size=-1;};
+template<class T,int d> struct FIXED_SIZE_VECTOR<VECTOR<T,d> > {static const int value=true;static const int size=d;};
 
 template<class T> struct HAS_CHEAP_COPY {static const bool value=is_fundamental<T>::value || is_enum<T>::value || IS_ARRAY_VIEW<T>::value;};
 

@@ -9,7 +9,6 @@
 
 #include <Tools/Arrays/ARRAY_BASE.h>
 #include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
@@ -303,10 +302,10 @@ public:
         new_copy(it.index)=old_copy(it.index+shift);}
 
     static void Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy)
-    {if(&old_copy!=&new_copy) Put(FIXED_NUMBER<T,1>(),old_copy,new_copy,RANGE<TV_INT>::Intersect(old_copy.Domain_Indices(),new_copy.Domain_Indices()));}
+    {if(&old_copy!=&new_copy) Put(old_copy,new_copy,RANGE<TV_INT>::Intersect(old_copy.Domain_Indices(),new_copy.Domain_Indices()));}
 
     void Put_With_Range(RANGE<TV_INT>& range,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy)
-    {if(&old_copy!=&new_copy) Put(FIXED_NUMBER<T,1>(),old_copy,new_copy,range);}
+    {if(&old_copy!=&new_copy) Put(old_copy,new_copy,range);}
 
     static void Shifted_Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const TV_INT& shift)
     {if(shift==TV_INT()) Put(old_copy,new_copy);
@@ -323,19 +322,20 @@ protected:
     for(RANGE_ITERATOR<TV_INT::m> it(box);it.Valid();it.Next()) new_copy(it.index)=constant*old_copy(it.index);}
 
     static void Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<TV_INT>& box)
-    {Put(FIXED_NUMBER<T,1>(),old_copy,new_copy,box);}
+    {assert(old_copy.Domain_Indices().Contains(box));assert(new_copy.Domain_Indices().Contains(box));
+    for(RANGE_ITERATOR<TV_INT::m> it(box);it.Valid();it.Next()) new_copy(it.index)=old_copy(it.index);}
 public:
     // note that these functions move the *contents* of the grid, not the grid itself, being careful about the order of grid traversal.
     void Move_Contents_By_Offset(const VECTOR<int,3>& offset)
-    {STATIC_ASSERT(d==3);TV_INT i,s(TV_INT::Componentwise_Greater_Equal(offset,TV_INT())),c(s*2-1),e(s*domain.Edge_Lengths()),a(domain.max_corner-e),b(domain.min_corner+e);
+    {STATIC_ASSERT(d==3);TV_INT i,s(offset.Componentwise_Greater_Equal(TV_INT())),c(s*2-1),e(s*domain.Edge_Lengths()),a(domain.max_corner-e),b(domain.min_corner+e);
     for(i.x=a.x;i.x<=b.x;i.x+=c.x) for(i.y=a.y;i.y<=b.y;i.y+=c.y) for(i.z=a.z;i.z<=b.z;i.z+=c.z) (*this)(i)=(*this)(i+offset);}
 
     void Move_Contents_By_Offset(const VECTOR<int,2>& offset)
-    {STATIC_ASSERT(d==2);TV_INT i,s(TV_INT::Componentwise_Greater_Equal(offset,TV_INT())),c(s*2-1),e(s*domain.Edge_Lengths()),a(domain.max_corner-e),b(domain.min_corner+e);
+    {STATIC_ASSERT(d==2);TV_INT i,s(offset.Componentwise_Greater_Equal(TV_INT())),c(s*2-1),e(s*domain.Edge_Lengths()),a(domain.max_corner-e),b(domain.min_corner+e);
     for(i.x=a.x;i.x<=b.x;i.x+=c.x) for(i.y=a.y;i.y<=b.y;i.y+=c.y) (*this)(i)=(*this)(i+offset);}
 
     void Move_Contents_By_Offset(const VECTOR<int,1>& offset)
-    {STATIC_ASSERT(d==1);TV_INT i,s(TV_INT::Componentwise_Greater_Equal(offset,TV_INT())),c(s*2-1),e(s*domain.Edge_Lengths()),a(domain.max_corner-e),b(domain.min_corner+e);
+    {STATIC_ASSERT(d==1);TV_INT i,s(offset.Componentwise_Greater_Equal(TV_INT())),c(s*2-1),e(s*domain.Edge_Lengths()),a(domain.max_corner-e),b(domain.min_corner+e);
     for(i.x=a.x;i.x<=b.x;i.x+=c.x) (*this)(i)=(*this)(i+offset);}
 
 //#####################################################################

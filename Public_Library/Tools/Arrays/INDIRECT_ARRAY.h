@@ -84,22 +84,13 @@ public:
     {return BASE::operator=(source);}
 
     typename conditional<is_const<T_ARRAY>::value,const T*,T*>::type Get_Array_Pointer()
-    {return array.Get_Array_Pointer()+Offset_If_Contiguous(indices);}
+    {return array.Get_Array_Pointer();}
 
     const T* Get_Array_Pointer() const
-    {return array.Get_Array_Pointer()+Offset_If_Contiguous(indices);}
+    {return array.Get_Array_Pointer();}
 
     bool Using_Externally_Allocated_Pointer()
     {return array.Using_Externally_Allocated_Pointer();}
-
-private:
-    static ID Offset_If_Contiguous(const IDENTITY_ARRAY<ID>& indices) // for contiguous indices, we can extract an offset
-    {return ID();}
-
-    template<class T_INDICES_2>
-    static ID Offset_If_Contiguous(const ARRAY_PLUS_SCALAR<int,T_INDICES_2>& indices)
-    {return indices.c+Offset_If_Contiguous(indices.array);}
-public:
 
     SIMPLE_ITERATOR<INDIRECT_ARRAY> begin()
     {return SIMPLE_ITERATOR<INDIRECT_ARRAY>(*this,0);}

@@ -32,7 +32,7 @@ public:
 
 private:
     VECTOR<bool,TV::m> Equality_Constraint() const
-    {return TV::Componentwise_And(constrain,TV::Componentwise_Greater_Equal(prismatic_min,prismatic_max));}
+    {return constrain.Componentwise_And(prismatic_min.Componentwise_Greater_Equal(prismatic_max));}
 public:
 //#####################################################################
     bool Has_Prismatic_Constraint() const override;
