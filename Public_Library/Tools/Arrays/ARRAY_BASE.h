@@ -69,7 +69,6 @@ public:
     typedef T& RESULT_TYPE;
     typedef const T& CONST_RESULT_TYPE;
     typedef typename SCALAR_POLICY<T>::TYPE SCALAR;
-    template<class T2> struct REBIND{typedef ARRAY_BASE<T2,typename T_ARRAY::template REBIND<T2>::TYPE,ID> TYPE;};
 
 protected:
     ARRAY_BASE(){}

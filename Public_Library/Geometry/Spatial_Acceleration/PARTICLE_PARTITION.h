@@ -20,10 +20,9 @@ class PARTICLE_PARTITION
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
     typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_T;
-    typedef typename REBIND<T_ARRAYS_T,ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
 public:
     GRID<TV> grid;
-    T_ARRAYS_ARRAY_INT partition;
+    ARRAY<ARRAY<int>,TV_INT> partition;
 private:
     bool use_radius;
     T_ARRAYS_T radius;

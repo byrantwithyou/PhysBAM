@@ -25,7 +25,7 @@ class EULER
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;typedef typename T_ARRAYS_BASE::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_BASE;
+    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;typedef ARRAYS_ND_BASE<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_BASE;
     enum {d=TV::m+2};
 public:
     EOS<T>* eos;

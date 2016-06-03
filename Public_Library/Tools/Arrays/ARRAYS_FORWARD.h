@@ -28,12 +28,7 @@ template<class T_ARRAY,class T_PROJECTOR> class PROJECTED_ARRAY;
 template<class T_STRUCT,class T_FIELD,T_FIELD T_STRUCT::* field> struct FIELD_PROJECTOR;
 struct INDEX_PROJECTOR;
 
-template<class T_ARRAY,class T_NEW> struct REBIND;
-template<class T,class T_NEW> struct REBIND<ARRAY<T>,T_NEW>{typedef ARRAY<T_NEW> TYPE;};
-template<class T,class T_NEW,class T_ARRAY,class ID> struct REBIND<ARRAY_BASE<T,T_ARRAY,ID>,T_NEW>{typedef ARRAY_BASE<T_NEW,typename T_ARRAY::template REBIND<T_NEW>::TYPE,ID> TYPE;};
-
 template<class T,int d> class VECTOR;
-template<class T_ARRAY,int length_new> struct REBIND_LENGTH;
 
 template<class T_ARRAY> struct ARRAY_RESULT_TYPE{typedef typename T_ARRAY::RESULT_TYPE TYPE;};
 template<class T_ARRAY> struct ARRAY_RESULT_TYPE<const T_ARRAY>{typedef typename T_ARRAY::CONST_RESULT_TYPE TYPE;};
@@ -52,5 +47,7 @@ template<int d> class FACE_INDEX;
 template<class T> struct DOMAIN_INDEX_TYPE {typedef INTERVAL<T> TYPE;};
 template<int d> struct DOMAIN_INDEX_TYPE<VECTOR<int,d> > {typedef RANGE<VECTOR<int,d> > TYPE;};
 template<int d> struct DOMAIN_INDEX_TYPE<FACE_INDEX<d> > {typedef RANGE<VECTOR<int,d> > TYPE;};
+
+
 }
 #endif

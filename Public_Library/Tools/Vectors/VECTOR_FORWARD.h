@@ -23,8 +23,6 @@ template<class T> class TETRAHEDRAL_GROUP;
 template<class TV> class FRAME;
 template<class TV> class TWIST;
 
-template<class T_VECTOR,class T_NEW> struct REBIND;
-template<class T,int d,class T_NEW> struct REBIND<VECTOR<T,d>,T_NEW>{typedef VECTOR<T_NEW,d> TYPE;};
 template<class T_VECTOR1,class T_VECTOR2> class VECTOR_SUM;
 template<class T_VECTOR1,class T_VECTOR2> class VECTOR_DIFFERENCE;
 template<class T_VECTOR,class T2> class VECTOR_SCALE;

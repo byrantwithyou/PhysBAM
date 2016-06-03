@@ -30,7 +30,6 @@ class ARRAY:public ARRAY_BASE<T,ARRAY<T,ID>,ID>
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     template<class T2> struct REBIND{typedef ARRAY<T2,ID> TYPE;};
-    template<int length> struct REBIND_LENGTH:public PhysBAM::REBIND_LENGTH<ARRAY,length>{};
     typedef T ELEMENT;typedef ID INDEX;
     using ARRAY_BASE<T,ARRAY<T,ID>,ID>::Same_Array;
     typedef T* iterator; // for stl

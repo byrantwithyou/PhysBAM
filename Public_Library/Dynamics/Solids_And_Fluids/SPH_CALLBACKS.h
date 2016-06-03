@@ -20,8 +20,6 @@ template<class TV>
 class SPH_CALLBACKS
 {    
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > FACE_ARRAYS;
-    typedef typename REBIND<FACE_ARRAYS,bool>::TYPE FACE_ARRAYS_BOOL;
 public:
 
     SPH_CALLBACKS()

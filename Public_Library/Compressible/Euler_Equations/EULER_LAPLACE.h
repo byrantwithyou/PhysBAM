@@ -20,7 +20,6 @@ template<class T_LAPLACE>
 class EULER_LAPLACE:public T_LAPLACE
 {
     typedef typename T_LAPLACE::GRID_T::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename REBIND<ARRAY<T,TV_INT>,int>::TYPE T_ARRAYS_INT;
     typedef TV_INT INDEX;
 public:
     typedef T_LAPLACE BASE;
@@ -42,7 +41,7 @@ public:
     T_LAPLACE::Solve(time,true);}
 
     void Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,
-            T_ARRAYS_INT& cell_index_to_matrix_index)
+            ARRAY<int,TV_INT>& cell_index_to_matrix_index)
     {assert(dt_is_set);dt_is_set=false;
 
     T_LAPLACE::Find_A(domain,A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);

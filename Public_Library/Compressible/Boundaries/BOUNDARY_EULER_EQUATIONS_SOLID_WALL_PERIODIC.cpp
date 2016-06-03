@@ -86,11 +86,11 @@ Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,4> ,VECTOR<int
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<TV,T2>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DIMENSION_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
+Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const
 {
     //TODO: get rid of the helper functions
     //Fill_Ghost_Cells_Helper(grid,u,u_ghost,dt,time,number_of_ghost_cells);
-    T_ARRAYS_DIMENSION_BASE::Put(u,u_ghost); // interior
+    ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
     VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
 
     for(int axis=0;axis<TV::m;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
@@ -170,7 +170,7 @@ Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,4> ,VECTOR<i
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<TV,T2>::
-Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u,const T time) const
+Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) const
 {
     //TODO: get rid of the helper functions
     //Apply_Boundary_Condition_Helper(grid,u,time);
@@ -178,7 +178,7 @@ Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u,const T
         if(periodic[axis] && repeats_at_last_node[axis]){
             for(CELL_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_INTERIOR_REGION,2*axis);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 TV_INT opposite_cell=cell_index;opposite_cell[axis]=1;
-                typename T_ARRAYS_DIMENSION_BASE::ELEMENT u_average=(u(cell_index)+u(opposite_cell))*(T).5;
+                typename ARRAYS_ND_BASE<T2,TV_INT>::ELEMENT u_average=(u(cell_index)+u(opposite_cell))*(T).5;
                 u(cell_index)=u_average;u(opposite_cell)=u_average;}}
 }
 template class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<VECTOR<double,1>,VECTOR<double,3> >;

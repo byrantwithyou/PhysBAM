@@ -29,7 +29,6 @@ template<class T_LAPLACE>
 class HEAT_LAPLACE:public T_LAPLACE
 {
     typedef typename T_LAPLACE::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename REBIND<ARRAY<T,TV_INT>,int>::TYPE T_ARRAYS_INT;
 public:
     typedef T_LAPLACE BASE;
     using BASE::filled_region_touches_dirichlet;using BASE::Solve;using BASE::Find_Solution_Regions;using BASE::f;
@@ -49,7 +48,7 @@ public:
     filled_region_touches_dirichlet.Fill(true); // don't need to worry about Neumann regions in heat flow
     T_LAPLACE::Solve(time,true);}
 
-    void Find_A_Part_Two(RANGE<VECTOR<int,TV::dimension> >& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+    void Find_A_Part_Two(RANGE<VECTOR<int,TV::dimension> >& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,ARRAY<int,TV_INT>& cell_index_to_matrix_index)
     {if(!coefficient) PHYSBAM_FATAL_ERROR();
     if(coefficient!=1) f/=coefficient; // this will cancel with the multiplication below, leaving only the Dirichlet part multiplied by coefficient
     T_LAPLACE::Find_A_Part_Two(domain,A_array,b_array,cell_index_to_matrix_index);

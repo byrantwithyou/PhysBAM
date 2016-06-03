@@ -20,7 +20,6 @@ class ADVECTION_SEMI_LAGRANGIAN_UNIFORM:public ADVECTION<TV,T2,typename T_AVERAG
     typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
 public:
     using ADVECTION<TV,T2,typename T_AVERAGING::FACE_LOOKUP>::Update_Advection_Equation_Cell;
-    template<class T3> struct REBIND{typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T3,T_AVERAGING,typename T_INTERPOLATION::template REBIND<T3>::TYPE> TYPE;};
     template<class T_INTERPOLATION_2> struct REBIND_INTERPOLATION{typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T2,T_AVERAGING,T_INTERPOLATION_2> TYPE;};
 
 //#####################################################################
