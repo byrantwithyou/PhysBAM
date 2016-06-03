@@ -85,7 +85,7 @@ public:
     template<class T_ARRAY>
     static typename enable_if<is_same<typename T_ARRAY::ELEMENT,TV>::value && T_ARRAY::m==1,TV>::type
     Point_From_Barycentric_Coordinates(const FIXED_NUMBER<T,1>,const T_ARRAY& X)
-    {return X(1);}
+    {return X(0);}
 
     TV Point_From_Barycentric_Coordinates(const FIXED_NUMBER<T,1>) const
     {return X.x;}
