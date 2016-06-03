@@ -35,6 +35,8 @@ class PROJECTED_ARRAY:public PROJECTED_ARRAY_BASE<T_ARRAY>,public ARRAY_BASE<typ
     typedef typename T_PROJECTOR::template RESULT<typename T_ARRAY::ELEMENT>::TYPE RESULT_NONCONST;
     typedef typename T_PROJECTOR::template RESULT<const typename T_ARRAY::ELEMENT>::TYPE RESULT_CONST;
 public:
+    typedef SIMPLE_ITERATOR<PROJECTED_ARRAY> iterator;
+    typedef SIMPLE_ITERATOR<const PROJECTED_ARRAY> const_iterator;
     typedef T ELEMENT;typedef typename T_ARRAY::INDEX INDEX;
 
     T_ARRAY& array;
@@ -71,6 +73,18 @@ public:
     template<class T_ARRAY1>
     PROJECTED_ARRAY operator=(const T_ARRAY1& source)
     {return ARRAY_BASE<T,PROJECTED_ARRAY>::operator=(source);}
+
+    SIMPLE_ITERATOR<PROJECTED_ARRAY> begin()
+    {return SIMPLE_ITERATOR<PROJECTED_ARRAY>(*this,0);}
+
+    SIMPLE_ITERATOR<const PROJECTED_ARRAY> begin() const
+    {return SIMPLE_ITERATOR<const PROJECTED_ARRAY>(*this,0);}
+
+    SIMPLE_ITERATOR<PROJECTED_ARRAY> end()
+    {return SIMPLE_ITERATOR<PROJECTED_ARRAY>(*this,Size());}
+
+    SIMPLE_ITERATOR<const PROJECTED_ARRAY> end() const
+    {return SIMPLE_ITERATOR<const PROJECTED_ARRAY>(*this,Size());}
 };
 //#####################################################################
 // Class FIELD_PROJECTOR

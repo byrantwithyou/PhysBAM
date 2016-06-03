@@ -8,6 +8,7 @@
 #define __IDENTITY_ARRAY__
 
 #include <Tools/Arrays/ARRAY_BASE.h>
+#include <Tools/Arrays/SIMPLE_ITERATOR.h>
 #include <cassert>
 namespace PhysBAM{
 
@@ -23,6 +24,8 @@ public:
 private:
     ID m;
 public:
+    typedef SIMPLE_ITERATOR<const IDENTITY_ARRAY> iterator;
+    typedef SIMPLE_ITERATOR<const IDENTITY_ARRAY> const_iterator;
 
     explicit IDENTITY_ARRAY(const ID m)
         :m(m)
@@ -33,6 +36,12 @@ public:
 
     ID operator()(const ID i) const
     {assert((unsigned)i<(unsigned)m);return i;}
+
+    SIMPLE_ITERATOR<const IDENTITY_ARRAY> begin() const
+    {return SIMPLE_ITERATOR<const IDENTITY_ARRAY>(*this,0);}
+
+    SIMPLE_ITERATOR<const IDENTITY_ARRAY> end() const
+    {return SIMPLE_ITERATOR<const IDENTITY_ARRAY>(*this,Size());}
 
 //#####################################################################
 };

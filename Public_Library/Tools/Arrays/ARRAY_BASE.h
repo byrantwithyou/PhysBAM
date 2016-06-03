@@ -62,8 +62,6 @@ public:
     typedef T ELEMENT;
     typedef ID INDEX;
     typedef T value_type; // for stl
-    typedef T* iterator; // for stl
-    typedef const T* const_iterator; // for stl
     typedef int difference_type; // for stl
 
     typedef typename conditional<CAN_REFERENCE_ELEMENTS<T_ARRAY>::value,T&,T>::type T_REF_IF_POSSIBLE;
@@ -578,16 +576,16 @@ public:
     for(ID i(0);i<b.Size();i++) (*this)(i+a.Size())=b(i);
     for(ID i(0);i<c.Size();i++) (*this)(i+a.Size()+b.Size())=b(i);}
 
-    T* begin() // for stl
+    auto begin() // for stl
     {return Derived().begin();}
 
-    const T* begin() const // for stl
+    auto begin() const // for stl
     {return Derived().begin();}
 
-    T* end() // for stl
+    auto end() // for stl
     {return Derived().end();}
 
-    const T* end() const // for stl
+    auto end() const // for stl
     {return Derived().end();}
 
     ID Binary_Search(const T& value) const // lower_bound binary search
@@ -602,6 +600,7 @@ public:
 
 //#####################################################################
 };
+
 template<class T,class T_ARRAY,class ID>
 inline std::ostream& operator<<(std::ostream& output,const ARRAY_BASE<T,T_ARRAY,ID>& a)
 {output<<"(";a.Write_Raw(output);output<<")";return output;}

@@ -9,6 +9,7 @@
 
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Arrays/ARRAY_BASE.h>
+#include <Tools/Arrays/SIMPLE_ITERATOR.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR_FORWARD.h>
@@ -38,6 +39,8 @@ public:
     typedef T ELEMENT;typedef ID INDEX;
     typedef typename ARRAY_RESULT_TYPE<T_ARRAY>::TYPE RESULT_TYPE;
     typedef typename T_ARRAY::CONST_RESULT_TYPE CONST_RESULT_TYPE;
+    typedef SIMPLE_ITERATOR<INDIRECT_ARRAY> iterator;
+    typedef SIMPLE_ITERATOR<const INDIRECT_ARRAY> const_iterator;
 
     T_ARRAY_VIEW array;
     CONST_T_INDICES indices;
@@ -96,7 +99,21 @@ private:
     template<class T_INDICES_2>
     static ID Offset_If_Contiguous(const ARRAY_PLUS_SCALAR<int,T_INDICES_2>& indices)
     {return indices.c+Offset_If_Contiguous(indices.array);}
+public:
 
+    SIMPLE_ITERATOR<INDIRECT_ARRAY> begin()
+    {return SIMPLE_ITERATOR<INDIRECT_ARRAY>(*this,0);}
+
+    SIMPLE_ITERATOR<const INDIRECT_ARRAY> begin() const
+    {return SIMPLE_ITERATOR<const INDIRECT_ARRAY>(*this,0);}
+
+    SIMPLE_ITERATOR<INDIRECT_ARRAY> end()
+    {return SIMPLE_ITERATOR<INDIRECT_ARRAY>(*this,Size());}
+
+    SIMPLE_ITERATOR<const INDIRECT_ARRAY> end() const
+    {return SIMPLE_ITERATOR<const INDIRECT_ARRAY>(*this,Size());}
+
+private:
     template<class RW> void Read(std::istream& input)
     {PHYSBAM_NOT_IMPLEMENTED();}
 

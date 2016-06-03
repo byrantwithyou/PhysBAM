@@ -26,15 +26,15 @@ template<class T,class ID> struct CANONICALIZE_CONST_ARRAY<ARRAY<T,ID> >:public 
 template<class T,class ID>
 class ARRAY:public ARRAY_BASE<T,ARRAY<T,ID>,ID>
 {
+    struct UNUSABLE{};
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     template<class T2> struct REBIND{typedef ARRAY<T2,ID> TYPE;};
     template<int length> struct REBIND_LENGTH:public PhysBAM::REBIND_LENGTH<ARRAY,length>{};
     typedef T ELEMENT;typedef ID INDEX;
     using ARRAY_BASE<T,ARRAY<T,ID>,ID>::Same_Array;
-private:
-    struct UNUSABLE{};
-public:
+    typedef T* iterator; // for stl
+    typedef const T* const_iterator; // for stl
     T* base_pointer;
     ID buffer_size;
 

@@ -23,6 +23,8 @@ private:
     ID m;
     T constant;
 public:
+    typedef SIMPLE_ITERATOR<const CONSTANT_ARRAY> iterator;
+    typedef SIMPLE_ITERATOR<const CONSTANT_ARRAY> const_iterator;
 
     CONSTANT_ARRAY(const ID m,const T constant)
         :m(m),constant(constant)
@@ -33,6 +35,12 @@ public:
 
     const T& operator()(const ID i) const
     {assert((unsigned)i<(unsigned)m);return constant;}
+
+    SIMPLE_ITERATOR<const CONSTANT_ARRAY> begin() const
+    {return SIMPLE_ITERATOR<const CONSTANT_ARRAY>(*this,0);}
+
+    SIMPLE_ITERATOR<const CONSTANT_ARRAY> end() const
+    {return SIMPLE_ITERATOR<const CONSTANT_ARRAY>(*this,Size());}
 
 //#####################################################################
 };

@@ -49,6 +49,7 @@ public:
     typedef int INDEX;
     typedef T value_type; // for stl
     typedef T* iterator; // for stl
+    typedef const T* const_iterator; // for stl
     enum WORKAROUND1 {dimension=3};
     enum WORKAROUND2 {m=3};
 

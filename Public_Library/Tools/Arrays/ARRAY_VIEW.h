@@ -27,6 +27,8 @@ public:
     typedef int HAS_UNTYPED_READ_WRITE;
     typedef typename remove_const<T>::type ELEMENT;typedef ID INDEX;
     typedef T& RESULT_TYPE;
+    typedef T* iterator; // for stl
+    typedef const T* const_iterator; // for stl
 
     // m and base_pointer inherit constness of T
     typename COPY_CONST<ID>::TYPE m;
