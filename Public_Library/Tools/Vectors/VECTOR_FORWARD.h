@@ -25,16 +25,15 @@ template<class TV> class TWIST;
 
 template<class T_VECTOR,class T_NEW> struct REBIND;
 template<class T,int d,class T_NEW> struct REBIND<VECTOR<T,d>,T_NEW>{typedef VECTOR<T_NEW,d> TYPE;};
-
 template<class T_VECTOR1,class T_VECTOR2> class VECTOR_SUM;
 template<class T_VECTOR1,class T_VECTOR2> class VECTOR_DIFFERENCE;
 template<class T_VECTOR,class T2> class VECTOR_SCALE;
 template<class T_VECTOR> class VECTOR_NEGATION;
 
-template<class T> struct is_scalar_BLOCK;
-template<class T> struct is_scalar_VECTOR_SPACE;
-template<class T,int d> struct is_scalar_BLOCK<VECTOR<T,d> > {static const bool value=(d>0) && is_scalar_BLOCK<T>::value;};
-template<class T,int d> struct is_scalar_VECTOR_SPACE<VECTOR<T,d> > {static const bool value=(d>0) && is_scalar_VECTOR_SPACE<T>::value;};
+template<class T> struct IS_SCALAR_BLOCK;
+template<class T> struct IS_SCALAR_VECTOR_SPACE;
+template<class T,int d> struct IS_SCALAR_BLOCK<VECTOR<T,d> > {static const bool value=(d>0) && IS_SCALAR_BLOCK<T>::value;};
+template<class T,int d> struct IS_SCALAR_VECTOR_SPACE<VECTOR<T,d> > {static const bool value=(d>0) && IS_SCALAR_VECTOR_SPACE<T>::value;};
 template<class T,int d,class RW> struct IS_BINARY_IO_SAFE<VECTOR<T,d>,RW> {static const bool value=(d>0) && IS_BINARY_IO_SAFE<T,RW>::value;};
 
 template<class T> struct HAS_CHEAP_COPY;

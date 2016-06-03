@@ -13,8 +13,8 @@
 namespace PhysBAM{
 
 template<class T> struct HAS_CHEAP_COPY<SYMMETRIC_MATRIX<T,3> > {static const bool value=true;};
-template<class T> struct is_scalar_BLOCK<SYMMETRIC_MATRIX<T,3> >:public is_scalar_BLOCK<T>{};
-template<class T> struct is_scalar_VECTOR_SPACE<SYMMETRIC_MATRIX<T,3> >:public is_scalar_VECTOR_SPACE<T>{};
+template<class T> struct IS_SCALAR_BLOCK<SYMMETRIC_MATRIX<T,3> >:public IS_SCALAR_BLOCK<T>{};
+template<class T> struct IS_SCALAR_VECTOR_SPACE<SYMMETRIC_MATRIX<T,3> >:public IS_SCALAR_VECTOR_SPACE<T>{};
 template<class T,class RW> struct IS_BINARY_IO_SAFE<SYMMETRIC_MATRIX<T,3>,RW>:public IS_BINARY_IO_SAFE<T,RW>{};
 
 template<class T>

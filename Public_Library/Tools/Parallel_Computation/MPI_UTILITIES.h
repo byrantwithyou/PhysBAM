@@ -44,7 +44,7 @@ template<class T> struct DATATYPE_HELPER<VECTOR<T,1> >:public DATATYPE_HELPER<T>
 template<class T> struct DATATYPE_HELPER<MATRIX<T,1,1> >:public DATATYPE_HELPER<T>{};
 
 template<class T,int d> MPI::Datatype Scalar_Block_Datatype();
-template<class TV> struct DATATYPE_HELPER<TV,typename enable_if<is_scalar_BLOCK<TV>::value && (sizeof(TV)>sizeof(typename TV::SCALAR))>::type>{static MPI::Datatype Datatype()
+template<class TV> struct DATATYPE_HELPER<TV,typename enable_if<IS_SCALAR_BLOCK<TV>::value && (sizeof(TV)>sizeof(typename TV::SCALAR))>::type>{static MPI::Datatype Datatype()
 {typedef typename TV::SCALAR T;return Scalar_Block_Datatype<T,sizeof(TV)/sizeof(T)>();}};
 
 template<class T> struct DATATYPE_HELPER<SPARSE_MATRIX_ENTRY<T> >{static MPI::Datatype Datatype();};

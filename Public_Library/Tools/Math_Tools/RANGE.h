@@ -24,7 +24,7 @@
 namespace PhysBAM{
 
 template<class TV> class RANGE;
-template<class TV> struct is_scalar_BLOCK<RANGE<TV> >:public is_scalar_BLOCK<TV>{};
+template<class TV> struct IS_SCALAR_BLOCK<RANGE<TV> >:public IS_SCALAR_BLOCK<TV>{};
 template<class TV,class RW> struct IS_BINARY_IO_SAFE<RANGE<TV>,RW> {static const bool value=false;}; // required since memory format differs from disk format
 
 template<class TV>

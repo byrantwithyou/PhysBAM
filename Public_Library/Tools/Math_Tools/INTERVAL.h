@@ -16,7 +16,7 @@
 #include <cfloat>
 namespace PhysBAM{
 
-template<class TV> struct is_scalar_BLOCK<INTERVAL<TV> >:public is_scalar_BLOCK<TV>{};
+template<class TV> struct IS_SCALAR_BLOCK<INTERVAL<TV> >:public IS_SCALAR_BLOCK<TV>{};
 template<class TV,class RW> struct IS_BINARY_IO_SAFE<INTERVAL<TV>,RW> {static const bool value=true;};
 
 template<class T>

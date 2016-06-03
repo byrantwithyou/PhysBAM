@@ -23,10 +23,10 @@ template<class T,int mm,int nn=mm> class ZERO_MATRIX;
 template<class T,int d> class IDENTITY_MATRIX;
 template<class T,int d> class SCALE_MATRIX;
 
-template<class T> struct is_scalar_BLOCK;
-template<class T> struct is_scalar_VECTOR_SPACE;
-template<class T,int m,int n> struct is_scalar_BLOCK<MATRIX<T,m,n> > {static const bool value=is_scalar_BLOCK<T>::value;};
-template<class T,int m,int n> struct is_scalar_VECTOR_SPACE<MATRIX<T,m,n> > {static const bool value=is_scalar_VECTOR_SPACE<T>::value;};
+template<class T> struct IS_SCALAR_BLOCK;
+template<class T> struct IS_SCALAR_VECTOR_SPACE;
+template<class T,int m,int n> struct IS_SCALAR_BLOCK<MATRIX<T,m,n> > {static const bool value=IS_SCALAR_BLOCK<T>::value;};
+template<class T,int m,int n> struct IS_SCALAR_VECTOR_SPACE<MATRIX<T,m,n> > {static const bool value=IS_SCALAR_VECTOR_SPACE<T>::value;};
 template<class T,int m,int n,class RW> struct IS_BINARY_IO_SAFE<MATRIX<T,m,n>,RW> {static const bool value=(m>0) && (n>0) && IS_BINARY_IO_SAFE<T,RW>::value;};
 template<class T,int m,int n,class SCALAR> struct REPLACE_FLOATING_POINT<MATRIX<T,m,n>,SCALAR> {typedef MATRIX<typename REPLACE_FLOATING_POINT<T,SCALAR>::TYPE,m,n> TYPE;};
 template<class T,int d,class SCALAR> struct REPLACE_FLOATING_POINT<DIAGONAL_MATRIX<T,d>,SCALAR> {typedef DIAGONAL_MATRIX<typename REPLACE_FLOATING_POINT<T,SCALAR>::TYPE,d> TYPE;};

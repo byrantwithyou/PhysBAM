@@ -18,7 +18,7 @@ using ::std::atan2;
 
 template<class TV> class ROTATION;
 
-template<class TV> struct is_scalar_BLOCK<ROTATION<TV> > {static const bool value=(TV::m>1) && is_scalar_BLOCK<TV>::value;};
+template<class TV> struct IS_SCALAR_BLOCK<ROTATION<TV> > {static const bool value=(TV::m>1) && IS_SCALAR_BLOCK<TV>::value;};
 template<class TV,class RW> struct IS_BINARY_IO_SAFE<ROTATION<TV>,RW> {static const bool value=(TV::m>1) && IS_BINARY_IO_SAFE<TV,RW>::value;};
 template<class TV> struct HAS_CHEAP_COPY<ROTATION<TV> > {static const bool value=true;};
 
