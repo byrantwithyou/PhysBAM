@@ -12,6 +12,7 @@
 #include <Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Tools/Math_Tools/constants.h>
+#include <Tools/Math_Tools/INTERVAL.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Tools/Utilities/NONCOPYABLE.h>

@@ -9,6 +9,7 @@
 
 #include <Tools/Arrays/ARRAY_BASE.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Math_Tools/Inverse.h>
 #include <Tools/Vectors/SCALAR_POLICY.h>
 #include <cmath>
