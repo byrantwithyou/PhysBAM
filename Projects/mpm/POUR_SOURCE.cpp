@@ -54,7 +54,6 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(example.stream_type,file,waiting_particles,buffer_left,cur_time,waiting_particle_color,next_color,random);
     if(show_waiting_particles){
         T vn=velocity.Dot(normal);
-        T speed=velocity.Magnitude();
         for(int i=0;i<waiting_particles.m;i++){
             TV X=waiting_particles(i),V=velocity;
             T dot=(X-p).Dot(normal);
@@ -113,8 +112,7 @@ Refill(bool init)
 template<class TV> void POUR_SOURCE<TV>::
 Emit()
 {
-    T vn=velocity.Dot(normal),gn=gravity.Dot(normal);
-    T speed=velocity.Magnitude();
+    T vn=velocity.Dot(normal);
     for(int i=waiting_particles.m-1;i>=0;i--){
         TV X=waiting_particles(i);
         T dot=(X-p).Dot(normal);
@@ -123,7 +121,6 @@ Emit()
         waiting_particle_color.Remove_Index_Lazy(i);
         T t=dot/vn;
         TV X1=X+(T).5*t*t*gravity;
-        T a=sqrt(vn*vn+2*gn*((X1-p).Dot(normal)));
         example.Add_Particle(X1,func_V,func_dV,mass,volume);}
 }
 //#####################################################################

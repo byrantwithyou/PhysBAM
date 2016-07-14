@@ -1985,7 +1985,7 @@ Initialize()
             T E=35.37e5*unit_p*scale_E,nu=.3;
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
             if(test_number==70) FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/voronoi_fracture_sphere.tri.gz",*surface);
-            else FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.d),data_directory+"/../Private_Data/100_strong.tri.gz",*surface);
+            else FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.),data_directory+"/../Private_Data/100_strong.tri.gz",*surface);
             LOG::cout<<"Read mesh of voronoi sphere #"<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh of voronoi sphere particle # "<<surface->particles.number<<std::endl;
             surface->mesh.Initialize_Adjacent_Elements();    
