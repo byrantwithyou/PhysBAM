@@ -5,56 +5,6 @@
 ;#####################################################################
 
 ;#####################################################################
-; Bind Projects to Viewers
-;#####################################################################
-(setq physbam-projects-to-viewers
-      '(("solids_3d" . "opengl_3d")
-        ("solids_2d" . "opengl_2d")
-        ("levelset_quadtree" . "opengl_2d")
-        ("fluids_2d" . "opengl_2d")
-        ("fluids_quadtree" . "opengl_2d")
-        ("fluids_3d" . "opengl_3d")
-        ("fluids_octree" . "opengl_3d")
-        ("smoke_and_fire_2d" . "opengl_2d")
-        ("smoke_and_fire_quadtree" . "opengl_2d")
-        ("smoke_and_fire_3d" . "opengl_3d")
-        ("smoke_and_fire_octree" . "opengl_3d")
-        ("water_free_surface_2d" . "opengl_2d")
-        ("water_free_surface_quadtree" . "opengl_2d")
-        ("water_free_surface_3d" . "opengl_3d")
-        ("face" . "opengl_3d")
-        ("articulated_rigid_bodies" . "opengl_3d")
-        ("water_free_surface_octree" . "opengl_3d")))
-
-;#####################################################################
-; Compiler Table
-;#####################################################################
-(setq physbam-compilers
-      '(("gcc-3.4" . ("/usr/local/compilers/gcc-3.4/bin/gcc" 
-                      "/usr/local/compilers/gcc-3.4/bin/g++" 
-                      "/usr/local/compilers/icecream/gcc-3.4.tar.bz2"))
-        ("gcc-3.4-64" .  ("/usr/local/compilers/gcc-3.4-64/bin/gcc" 
-                          "/usr/local/compilers/gcc-3.4-64/bin/g++" 
-                          "/usr/local/compilers/icecream/gcc-3.4-64.tar.bz2,i686:/usr/local/compilers/icecream/gcc-3.4-64-cross.tar.bz2"))
-        ("gcc-3.3.2" .  ("/usr/local/compilers/gcc-3.3.2/bin/gcc" 
-                         "/usr/local/compilers/gcc-3.3.2/bin/g++" 
-                         "/usr/local/compilers/icecream/gcc-3.3.2.tar.bz2"))
-        ("gcc-4.0.1" .  ("/usr/local/compilers/gcc-4.0.1-i686-i686/bin/gcc" 
-                         "/usr/local/compilers/gcc-4.0.1-i686-i686/bin/g++" 
-                         "/usr/local/compilers/icecream/gcc-4.0.1-i686-i686.tar.bz2"))
-        ("gcc-4.1.1" .  ("/usr/local/compilers/gcc-4.1.1-i686-i686/bin/gcc" 
-                         "/usr/local/compilers/gcc-4.1.1-i686-i686/bin/g++" 
-                         "/usr/local/compilers/icecream/gcc-4.1.1-i686-i686.tar.bz2"))
-        ("gcc-4.0.1-64" .  ("/usr/local/compilers/gcc-4.0.1-x86_64-x86_64/bin/gcc" 
-                            "/usr/local/compilers/gcc-4.0.1-x86_64-x86_64/bin/g++" 
-                            "/usr/local/compilers/icecream/gcc-4.0.1-x86_64-x86_64.tar.bz2,i686:/usr/local/compilers/icecream/gcc-4.0.1-i686-x86_64.tar.bz2"))
-        ("gcc-4.1.1-64" .  ("/usr/local/compilers/gcc-4.1.1-x86_64-x86_64/bin/gcc" 
-                            "/usr/local/compilers/gcc-4.1.1-x86_64-x86_64/bin/g++" 
-                            "/usr/local/compilers/icecream/gcc-4.1.1-x86_64-x86_64.tar.bz2,i686:/usr/local/compilers/icecream/gcc-4.1.1-i686-x86_64.tar.bz2"))
-        ("gcc" .  ("gcc" "g++" "none"))
-        ("icc" .  ("icc" "icc" "none"))))
-
-;#####################################################################
 ; PhysBAM Style
 ;#####################################################################
 
@@ -144,20 +94,6 @@
 (c-add-style "physbam" physbam-c-style)
 
 ;#####################################################################
-; PhysBAM Syntax Highlighting
-;#####################################################################
-
-;; (setq font-lock-keyword-case-fold-search nil) ; Need to be case sensitive
-;; (font-lock-add-keywords 'c++-mode  '(("[^[:lower:]]\\([[:upper:]][[:upper:][:digit:]_]*\\)[<> ,]" 1 font-lock-type-face t))) ; match class names
-
-;; (make-face 'font-lock-operators-face)
-;; (font-lock-add-keywords 'c++-mode '(("[;<>:=!]\\|->" . 'font-lock-operators-face)))
-
-;; (make-face 'font-lock-preprocessor-face)
-;; (font-lock-add-keywords 'c++-mode '(("\\#[a-zA-Z0-9]*[ ]" . 'font-lock-preprocessor-face)))
-
-
-;#####################################################################
 ; PhysBAM Helper Routines
 ;#####################################################################
 
@@ -185,33 +121,6 @@
       (if doth
           (find-file (concat (substring (buffer-file-name) 0 doth) ".cpp"))
         (message "Not a cpp or h file!!")))))
-
-(defun physbam-dimension-flip ()
-  "Find the .h file for this .C file (or vice versa)."
-  (interactive)
-  (let ((buf (buffer-name)))
-    (if (string-match "\\(.+\\)\\(1D\\|2D\\|3D\\)\\(.+\\)"  buf)
-      (let ((current (match-string 2 buf))
-            (left (match-string 1 buf))
-            (right (match-string 3 buf)))
-        (find-file (concat left
-                (cond ((string= "1D" current) "2D") ((string= "2D" current) "3D") ((string= "3D" current) "1D"))
-                right))))))
-
-(defun physbam-update-tags ()
-  "Run update-tags.sh script to rebuild"
-  (interactive) 
-  (call-process "~/bin/update_tags.sh" nil nil)
-  (kill-buffer "TAGS"))
-
-
-(defun physbam-setup-filename-search ()
-  (interactive)
-  (if (not (eq (get-buffer "*physbam-filenames*") nil))
-      (kill-buffer "*physbam-filenames*"))
-  (call-process "find" nil "*physbam-filenames*" nil
-                (getenv "PHYSBAM") "-name" "*.h" "-or" "-name" "*.cpp")
-  (message "Done"))
 
 (defun physbam-open-parent ()
   "Open header of parent class"
@@ -291,7 +200,6 @@
   "grep headers and source files recursively in current directory"
   (interactive "sGrep for:")
   (grep (concat "(find . -name '*.h' -o -name '*.hpp' -o -name '*.cpp' | xargs grep -n -e \"" querystr "\") # ")))
-
 
 ;#####################################################################
 ; PhysBAM Formatting Helpers
@@ -439,75 +347,20 @@
     (insert (format "template class %s<float>;\n" classname))
     (insert (format "template class %s<double>;\n" classname))))
 
-(defun physbam-shift-indent-left ()
-  (interactive) 
-  (indent-rigidly (region-beginning) (region-end) -4))
-
-(defun physbam-shift-indent-right ()
-  (interactive) 
-  (indent-rigidly (region-beginning) (region-end) 4))
-
 ;#####################################################################
 ; PhysBAM Build / Run Commands
 ;#####################################################################
 ; returns the last eleement of the path i.e. the project
-(defun physbam-project-name (directory)
-  (car (last (split-string directory "/" t))))
-
-(getenv "DEFAULT_ARCH")
-
-; Returns executable name in form <proj>_<release/debug>_<PLATFORM>  
-(defun physbam-executable-name (base-executable use-release-always)
-  (concat base-executable
-;          (if (or (string= (getenv "PLATFORM") nil) (string= (getenv "PLATFORM") "pentium4")) "" (concat "_" (getenv "PLATFORM")))
-          (if (or use-release-always (string= physbam-project-type "release")) "" (concat "_" physbam-project-type))))
-
-; runs a simulation
-(setq-default physbam-run-parameters-history nil)
-(defun physbam-run (run-params)
-  (interactive (list (let ((execname (physbam-executable-name (physbam-project-name physbam-project-directory) nil))
-                           (last-command (if physbam-run-parameters-history (car physbam-run-parameters-history) nil)))
-                       (read-string (format "Run %s with%s as sim %s: "
-                                            execname (if last-command (format " (%s)" last-command) "") current-prefix-arg)
-                                    (if last-command last-command "")
-                                    'physbam-run-parameters-history))))
-  (let ((sim-number current-prefix-arg))
-    (let* ((execname (physbam-executable-name (physbam-project-name physbam-project-directory) nil))
-           (command (if physbam-tee-output
-                        (format "cd %s; ./%s %s | tee output-%s.txt &"  physbam-project-directory execname run-params sim-number)
-                      (format "cd %s; ./%s %s > output-%s.txt &"  physbam-project-directory execname run-params sim-number))))
-      (shell-command command (concat "simulation-" (physbam-project-name physbam-project-directory) (if sim-number (format "-%s" sim-number) ""))))))
-
-(defun physbam-run-debug ()
-  (interactive)
-  (let ((execname (physbam-executable-name (physbam-project-name physbam-project-directory) nil))
-        (cmd (format "gdb --annotate=3 -d %s -cd=%s %s/%s" physbam-project-directory physbam-project-directory physbam-project-directory (physbam-executable-name (physbam-project-name physbam-project-directory) nil))))
-    (message cmd)
-    (gdb cmd)))
-
-; runs the viewer
-(defun physbam-run-viewer ()
-  (interactive)
-  (if (eq nil (assoc (physbam-project-name  physbam-project-directory) physbam-projects-to-viewers))
-      (message (format "No viewer associated with project %s"
-                       physbam-project-directory))
-    (let ((viewer-name (cdr (assoc (physbam-project-name  physbam-project-directory) physbam-projects-to-viewers))))
-      (shell-command (format "cd %s; %s . &" physbam-output-directory
-                             (format "%s/Projects/%s/%s" (getenv "PHYSBAM") viewer-name (physbam-executable-name viewer-name t)))))))
 
 (defun physbam-set-project-type (type)
   (setq physbam-project-type type)
-  (physbam-setup-compile-command t))
-
-(defun physbam-set-compile-mode (val)
-  (setq physbam-compile-mode val)
-  (physbam-setup-compile-command nil))
+  (physbam-setup-compile-command))
 
 (defun physbam-set-project-directory (project-directory)
   (setq physbam-project-directory project-directory)
   (setq physbam-project-directory (concat physbam-project-directory (if (string= (substring physbam-project-directory -1 nil) "/") "" "/")))
   (physbam-read-project-settings)
-  (physbam-setup-compile-command nil))
+  (physbam-setup-compile-command))
 
 (defun physbam-choose-project-directory ()
   (interactive)
@@ -517,34 +370,12 @@
 (defun physbam-choose-output-directory ()
   (interactive)
   (setq physbam-output-directory (read-file-name "New output directory: " physbam-output-directory () nil))
-  (physbam-setup-compile-command t))
-
-(defun physbam-update-output-directory-menu ()
-  (let* ((output-list (physbam-filter (lambda (x) 
-                                        (and 
-                                         (file-directory-p x) 
-                                         (not (string= "." (substring x -1 nil))) 
-                                         (not (string= ".." (substring x -2 nil)))
-                                         (not (string= "CVS" (substring x -3 nil)))))
-                                      (directory-files physbam-project-directory t)))
-         (keymap-form (mapcar (lambda (x) `(,(file-name-nondirectory x) ,(file-name-nondirectory x) (nil) . (lambda () (interactive) (setq physbam-output-directory ,(concat x "/output")) (physbam-setup-compile-command t)))) output-list)))
-    (define-key global-map [menu-bar physbam output-directory-list] 
-      (cons '"Output Directories" (cons 'keymap (cons '"Select Output Directory" keymap-form))))))
+  (physbam-setup-compile-command))
 
 (defun physbam-set-compile-count (count)
   (interactive)
   (setq physbam-compile-count count)
-  (physbam-setup-compile-command t))
-
-(defun physbam-set-compiler (compiler)
-  (interactive)
-  (setq physbam-compiler-id compiler)
-  (let ((compiler-info (assoc physbam-compiler-id physbam-compilers)))
-    (setq physbam-compiler (car (cdr (cdr compiler-info))))
-    (setenv "ICECC_CXX" (car (cdr (cdr compiler-info))))
-    (setenv "ICECC_CC" (car (cdr compiler-info)))
-    (setenv "ICECC_VERSION" (car (cdr (cdr (cdr compiler-info))))))
-  (physbam-setup-compile-command t))
+  (physbam-setup-compile-command))
 
 (defun physbam-compile ()
   (interactive)
@@ -553,108 +384,34 @@
     (call-interactively 'compile)
     (setq default-directory old-default-directory)))
 
+(setq compile-current-file-command "g++ -c -g -Wno-unused-local-typedefs -Wall -Werror -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -std=gnu++14 -Wno-unknown-pragmas -Wno-strict-overflow -Wno-sign-compare -I$PHYSBAM/Public_Library -o /dev/null ")
 (defun physbam-compile-current-file ()
   (interactive)
-  (let ((compile-command (concat physbam-compiler " -I$PHYSBAM/Public_Library -c -g -Wall -Werror -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing -std=gnu++0x -Wno-unknown-pragmas " (buffer-file-name))))
+  (let ((old-compile-command compile-command))
+    (setq compile-command (concat compile-current-file-command (buffer-file-name)))
     (save-buffer)
     (call-interactively 'compile)
-    (physbam-setup-compile-command nil)))
+    (setq compile-command old-compile-command)))
 
-(defun physbam-compile-current-file-msvc ()
-  (interactive)
-  (let ((compile-command (concat "clwrap /nologo /MD /TP /O2 /GR /W3 /Wp64 /wd4996 /wd4355 /wd4150 /WL /EHsc /MD /DWIN32 /I$PHYSBAM/External_Libraries/boost /I$PHYSBAM/Public_Library /c " (file-name-nondirectory (buffer-file-name)) " /Fotest.obj " )))
-    (save-buffer)
-    (call-interactively 'compile)
-    (physbam-setup-compile-command nil)))
-
-(defun physbam-setup-compile-command (write_settings)
-  (if physbam-use-scons
-      (setq compile-command (format "nice scons --warn=no-duplicate-environment --warn=no-deprecated -Q --implicit-cache -k -u TYPE=%s %s"
-                                physbam-project-type
-                                (cond ((string= physbam-compile-mode "distcc") (format "CXX=\"distcc %s\" -j %d" physbam-compiler physbam-compile-count))
-                                      ((string= physbam-compile-mode "icecream") (format "CXX=\"/opt/icecream/bin/g++\" -j %d" physbam-compile-count))
-                                      (physbam-compiler (format "-j %d" physbam-compile-count))
-                                      (t (format "-j %d" physbam-compile-count)))))
-      (setq compile-command (format "make -k TYPE=%s %s"
-                                physbam-project-type
-                                (cond ((string= physbam-compile-mode "distcc") (format "PHYSBAM_CC=\"distcc %s\" -j %d" physbam-compiler physbam-compile-count))
-                                      ((string= physbam-compile-mode "icecream") (format "PHYSBAM_CC=\"/opt/icecream/bin/g++\" -j %d" physbam-compile-count))
-                                      (t (format "PHYSBAM_CC=%s -j %d" physbam-compiler physbam-compile-count))))))
+(defun physbam-setup-compile-command ()
+  (setq compile-command (format "if [ -e Makefile ] ; then make -k -j %d ; else nice scons --warn=no-duplicate-environment --warn=no-deprecated -Q --implicit-cache -k -u TYPE=%s -j %d ; fi" physbam-compile-count physbam-project-type physbam-compile-count))
   (message (format "New compile command is: %s" compile-command))
-  (define-key global-map [menu-bar physbam project-dir] '(menu-item (concat  "Project: " physbam-project-directory) physbam-choose-project-directory))
-  (define-key global-map [menu-bar physbam output-dir] '(menu-item (concat  "Output: " physbam-output-directory) physbam-choose-output-directory))
-  (setq compilation-read-command nil)
-  (if (eq write_settings t) (physbam-write-project-settings)))
-
-; commands to store variables
-(defun physbam-set-variables-string (variables)
-  (physbam-reduce 'concat
-          (mapcar (lambda (x) (with-output-to-string (print x) (princ "\n")))
-                  (mapcar (lambda (x) `(setq ,x ,(eval x))) variables))))
-
-(defun physbam-write-project-settings ()
-  (if (not (string= (replace-regexp-in-string "PhysBAM" "" physbam-project-directory) physbam-project-directory))
-      (with-temp-file (format "%s/.emacs_project_config" physbam-project-directory)
-        (insert (physbam-set-variables-string '(physbam-project-type
-                                                physbam-compile-mode
-                                                physbam-compile-count
-                                                physbam-output-directory))))))
-    
-(defun physbam-read-project-settings ()
-  (let ((filename (format "%s/.emacs_project_config" physbam-project-directory))) 
-    (if (file-exists-p filename)
-        (load-file filename))
-    (physbam-update-output-directory-menu)))
+ (define-key global-map [menu-bar physbam project-dir] '(menu-item (concat  "Project: " physbam-project-directory) physbam-choose-project-directory)))
 
 ;#####################################################################
 ; Menu Bar
 ;#####################################################################
 ; Generic helpful scripts
 (define-key global-map [menu-bar physbam] (cons "PhysBAM" (make-sparse-keymap "PhysBAM")))
-(define-key global-map [menu-bar physbam edit-sconstruct-settings] '("Edit SConstruct" . (lambda () (interactive) (find-file (concat (getenv "PHYSBAM") "/Scripts/scons/SConstruct")))))
 (define-key global-map [menu-bar physbam edit-physbam-settings] '("Edit PhysBAM Emacs" . (lambda () (interactive) (find-file (concat (getenv "PHYSBAM") "/Scripts/emacs/physbam.el")))))
 (define-key global-map [menu-bar physbam edit-settings] '("Edit .emacs" . (lambda () (interactive) (find-file (concat (getenv "PHYSBAM") "~/.emacs")))))
 (define-key global-map [menu-bar physbam sep0] '(menu-item "--single-line"))
 (define-key global-map [menu-bar physbam fix-copyright] '("Fix Copyright" . physbam-fix-copyright))
 (define-key global-map [menu-bar physbam fix-function-comment] '("Fix Function Comment" . physbam-fix-function-comment))
-(define-key global-map [menu-bar physbam update-tags] '("Update Tags" . physbam-update-tags))
 (define-key global-map [menu-bar physbam sep1] '(menu-item "--single-line"))
-(define-key global-map [menu-bar physbam teeoutput] '(menu-item "Tee Output On Run" (lambda () (interactive) (setq physbam-tee-output (if physbam-tee-output nil t))) :button (:toggle . physbam-tee-output)))
-(define-key global-map [menu-bar physbam run] '("Run Program" . physbam-run))
-(define-key global-map [menu-bar physbam runviewer] '("Run Viewer" . physbam-run-viewer))
-(define-key global-map [menu-bar physbam run-debug] '("Run Debugger" . physbam-run-debug))
-(define-key global-map [menu-bar physbam sep1a] '(menu-item "--single-line"))
-; Settings menu
-(define-key global-map [menu-bar physbam compilesettings] (cons "Compile Settings" (make-sparse-keymap "Compile Settings")))
-(define-key global-map [menu-bar physbam compilesettings  mode-distcc] '(menu-item "distcc" (lambda () (interactive) (physbam-set-compile-mode "distcc")) :button (:toggle . (string= physbam-compile-mode "distcc"))))
-(define-key global-map [menu-bar physbam compilesettings  mode-icecc] '(menu-item "icecream" (lambda () (interactive) (physbam-set-compile-mode "icecream")) :button (:toggle . (string= physbam-compile-mode "icecream"))))
-(define-key global-map [menu-bar physbam compilesettings  mode-single] '(menu-item "single" (lambda () (interactive) (physbam-set-compile-mode "single")) :button (:toggle . (string= physbam-compile-mode "single"))))
-(define-key global-map [menu-bar physbam compilesettings sep5] '(menu-item "--single-line"))
-(define-key global-map [menu-bar physbam compilesettings j1] '(menu-item "-j 1" (lambda () (interactive) (physbam-set-compile-count 1)) :button (:toggle . (= physbam-compile-count 1))))
-(define-key global-map [menu-bar physbam compilesettings j2] '(menu-item "-j 2" (lambda () (interactive) (physbam-set-compile-count 2)) :button (:toggle . (= physbam-compile-count 2))))
-(define-key global-map [menu-bar physbam compilesettings j3] '(menu-item "-j 3" (lambda () (interactive) (physbam-set-compile-count 3)) :button (:toggle . (= physbam-compile-count 3))))
-(define-key global-map [menu-bar physbam compilesettings j4] '(menu-item "-j 4" (lambda () (interactive) (physbam-set-compile-count 4)) :button (:toggle . (= physbam-compile-count 4))))
-(define-key global-map [menu-bar physbam compilesettings j8] '(menu-item "-j 8" (lambda () (interactive) (physbam-set-compile-count 8)) :button (:toggle . (= physbam-compile-count 8))))
-(define-key global-map [menu-bar physbam compilesettings j12] '(menu-item "-j 12" (lambda () (interactive) (physbam-set-compile-count 12)) :button (:toggle . (= physbam-compile-count 12))))
-(define-key global-map [menu-bar physbam compilesettings j16] '(menu-item "-j 16" (lambda () (interactive) (physbam-set-compile-count 16)) :button (:toggle . (= physbam-compile-count 16))))
-(define-key global-map [menu-bar physbam compilesettings j32] '(menu-item "-j 32" (lambda () (interactive) (physbam-set-compile-count 32)) :button (:toggle . (= physbam-compile-count 32))))
-(define-key global-map [menu-bar physbam compilesettings j64] '(menu-item "-j 64" (lambda () (interactive) (physbam-set-compile-count 64)) :button (:toggle . (= physbam-compile-count 64))))
-(define-key global-map [menu-bar physbam compilesettings sep6] '(menu-item "--single-line"))
-(define-key global-map [menu-bar physbam compilesettings g++] '(menu-item "g++" (lambda () (interactive) (physbam-set-compiler "g++")) :button (:toggle . (string= physbam-compiler-id "g++"))))
-(define-key global-map [menu-bar physbam compilesettings g++-3.4] '(menu-item "g++ 3.4" (lambda () (interactive) (physbam-set-compiler "gcc-3.4")) :button (:toggle . (string= physbam-compiler-id "gcc-3.4"))))
-(define-key global-map [menu-bar physbam compilesettings g++-3.4-64] '(menu-item "g++ 3.4 64" (lambda () (interactive) (physbam-set-compiler "gcc-3.4-64")) :button (:toggle . (string= physbam-compiler-id "gcc-3.4-64"))))
-(define-key global-map [menu-bar physbam compilesettings g++-4.0.1] '(menu-item "g++ 3.4" (lambda () (interactive) (physbam-set-compiler "gcc-3.4")) :button (:toggle . (string= physbam-compiler-id "gcc-3.4"))))
-(define-key global-map [menu-bar physbam compilesettings g++-4.0.1] '(menu-item "g++ 4.0.1" (lambda () (interactive) (physbam-set-compiler "gcc-4.0.1")) :button (:toggle . (string= physbam-compiler-id "gcc-4.0.1"))))
-(define-key global-map [menu-bar physbam compilesettings g++-4.0.1] '(menu-item "g++ 4.1.1" (lambda () (interactive) (physbam-set-compiler "gcc-4.1.1")) :button (:toggle . (string= physbam-compiler-id "gcc-4.1.1"))))
-(define-key global-map [menu-bar physbam compilesettings g++-4.0.1-64] '(menu-item "g++ 4.0.1 64" (lambda () (interactive) (physbam-set-compiler "gcc-4.0.1-64")) :button (:toggle . (string= physbam-compiler-id "gcc-4.0.1-64"))))
-(define-key global-map [menu-bar physbam compilesettings g++-4.1.1-64] '(menu-item "g++ 4.1.1 64" (lambda () (interactive) (physbam-set-compiler "gcc-4.1.1-64")) :button (:toggle . (string= physbam-compiler-id "gcc-4.1.1-64"))))
-(define-key global-map [menu-bar physbam compilesettings g++-3.3.2] '(menu-item "g++ 3.3.2" (lambda () (interactive) (physbam-set-compiler "gcc-3.3.2")) :button (:toggle . (string= physbam-compiler-id "gcc-3.3.2"))))
-(define-key global-map [menu-bar physbam compilesettings icc] '(menu-item "icc" (lambda () (interactive) (physbam-set-compiler "icc")) :button (:toggle . (string= physbam-compiler-id "icc"))))
-(define-key global-map [menu-bar physbam compilesettings sep7] '(menu-item "--single-line"))
 ; other compile stuff
 (define-key global-map [menu-bar physbam compile] '("Compile Project" . physbam-compile))
 (define-key global-map [menu-bar physbam compile-file] '("Compile Current Buffer" . physbam-compile-current-file))
-(define-key global-map [menu-bar physbam compile-file-msvc] '("Compile Current Buffer with MSVC" . physbam-compile-current-file-msvc))
 (define-key global-map [menu-bar physbam sep1b] '(menu-item "--single-line"))
 ; Debug or release
 (define-key global-map [menu-bar physbam release] '(menu-item "Release" (lambda () (interactive) (physbam-set-project-type "release")) :button (:toggle . (string= physbam-project-type "release"))))
@@ -680,34 +437,9 @@
 
 (physbam-find-project)
 
-;(setq physbam-compiler (if (string= (getenv "PLATFORM") "nocona")  "/usr/local/compilers/gcc-3.4-64/bin/g++" "icc"))
 (setq physbam-project-type "release")
 (setq physbam-compile-count (let ((count (getenv "PHYSBAM_COMPILE_COUNT"))) (if count (string-to-number count) 4)))
-(setq physbam-tee-output t) ; dump output to buffer on runs
-(setq compile-command (format "make -k" physbam-project-directory))
-(setq tags-file-name (format "%s/TAGS" (getenv "PHYSBAM")))
-(setq physbam-compile-mode "single")
-; Setup default project to be currenct directory
-(setq physbam-output-directory (format "%s/Projects/articulated_rigid_bodies/Blocks/output" (getenv "PHYSBAM")))
-; Read project settings
-;(physbam-read-project-settings)
-; NOTE ALL FUNCTIONS THAT MODIFY STATUS AND SAVE SHOULD BE BELOW ABOVE READ PROJECT SETTINGS
-(physbam-set-compiler (if (or (string= (getenv "PLATFORM") "opteron") (string= (getenv "PLATFORM") "nocona"))  "gcc" "gcc"))
-(physbam-set-compiler "gcc")
-(physbam-setup-compile-command nil)
+(physbam-setup-compile-command)
 (setq truncate-partial-width-windows nil)
 (setq compilation-scroll-output t) ; scroll to end by default
-
-;#####################################################################
-; Example binds
-;#####################################################################
-;(global-set-key "\^Xh" 'physbam-header-flip)
-;(global-set-key (kbd "<f2>") 'physbam-fix-copyright)
-;(global-set-key (kbd "<f3>") 'physbam-fix-function-comment)
-;(global-set-key (kbd "<f4>") 'next-error)
-;(global-set-key (kbd "<f5>") 'physbam-run)
-;(global-set-key (kbd "C-<f5>") 'physbam-run-debug)
-;(global-set-key (kbd "<f6>") 'physbam-run-viewer)
-;(global-set-key (kbd "<f7>") 'compile)
-
-
+(setq compilation-read-command nil)
