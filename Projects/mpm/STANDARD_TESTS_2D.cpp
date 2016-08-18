@@ -129,7 +129,10 @@ Initialize()
             TV total_momentum=particles.V.Weighted_Sum(particles.mass);
             TV dV=total_momentum/total_mass;
             particles.V-=dV;
-            Add_Neo_Hookean(1e3*unit_p*scale_E,0.3);
+            T E=1e3*unit_p*scale_E;
+            T nu=0.3;
+            Add_Neo_Hookean(E,nu);
+            Set_Lame_On_Particles(E,nu);
         } break;
         case 2:{ // oscillating circle
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
