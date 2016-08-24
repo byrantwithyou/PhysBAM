@@ -275,7 +275,10 @@ First_Three_Points(TV A,TV B,TV C)
     cellA->X=A;
     cellB->X=B;
     cellC->X=C;
-
+    cellA->outside=true;
+    cellB->outside=true;
+    cellC->outside=true;
+    
     COEDGE* AB = new COEDGE;
     COEDGE* BA = new COEDGE;
     COEDGE* AC = new COEDGE;
@@ -363,7 +366,7 @@ Visualize_State(const char* title) const
 
         TV dir=(XH-XT).Normalized()*offset,dir_in=dir.Rotate_Counterclockwise_90();
             
-        Add_Debug_Object(VECTOR<TV,2>(XH-dir+dir_in,XT+dir+dir_in),it==*coedges.begin()?color_cv:color_c);
+        Add_Debug_Object(VECTOR<TV,2>(XH-dir+dir_in,XT+dir+dir_in),color_c);
     }
 
     Flush_Frame<TV>(title);
@@ -402,6 +405,93 @@ Print() const
     for(int i=0;i<cells.m;i++) cells(i)->Print();
     for(auto ce:coedges) ce->Print();
     for(auto v:vertices) v->Print();
+}
+//#####################################################################
+// Function Update_Piece_Tree
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::
+Update_Piece_Tree(int i,double diff_area)
+{
+    pieces(i).this_area+=diff_area;
+    for(;i>0;i=(i-1)/2)
+        pieces(i).subtree_area+=diff_area;
+    pieces(i).subtree_area+=diff_area;
+}
+//#####################################################################
+// Function Insert_Coedge
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::
+Insert_Coedge(COEDGE* ce)
+{
+    double area = Compute_Available_Area(ce);
+    PIECE p;
+    p.coedge=ce;
+    int i=pieces.Append(p);
+    Update_Piece_Tree(i,area);
+    ce->piece=i;
+}
+//#####################################################################
+// Function Remove_Coedge
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::
+Remove_Coedge(COEDGE* ce)
+{
+    int p=ce->piece;
+    PIECE& last=pieces.Last(), &rem=pieces(p);
+    if(p==pieces.m-1)
+        Update_Piece_Tree(p,-rem.this_area);
+    else{
+        Update_Piece_Tree(pieces.m-1,-last.this_area);
+        Update_Piece_Tree(p,last.this_area-rem.this_area);
+        rem.coedge=last.coedge;
+        last.coedge->piece=p;}
+    pieces.Pop();
+}
+//#####################################################################
+// Function Update_Coedge
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::
+Update_Coedge(COEDGE* ce)
+{
+    double area = Compute_Available_Area(ce);
+    if(!area) Remove_Coedge(ce);
+    else Update_Piece_Tree(ce->piece,area-pieces(ce->piece).this_area);
+}
+//#####################################################################
+// Function Choose_Piece
+//#####################################################################
+template<class T> int VORONOI_DIAGRAM<T>::
+Choose_Piece()
+{
+    T r=random.Get_Uniform_Number(0,pieces(0).subtree_area);
+    int i=0;
+    while(1){
+        if(r<=pieces(i).this_area) return i;
+        int j=2*i+1,k=j+1;
+        r-=pieces(i).this_area;
+        if(j>=pieces.m){assert(r<1e-5);return i;}
+        if(r<=pieces(j).subtree_area){i=j;continue;}
+        r-=pieces(j).subtree_area;
+        if(k>=pieces.m){assert(r<1e-5);return j;}
+        i=k;}
+}
+//#####################################################################
+// Function Compute_Available_Area
+//#####################################################################
+template<class T> double VORONOI_DIAGRAM<T>::
+Compute_Available_Area(COEDGE* ce)
+{
+    // TODO: write this
+    return 0;
+}
+//#####################################################################
+// Function Choose_Feasible_Point
+//#####################################################################
+template<class T> auto VORONOI_DIAGRAM<T>::
+Choose_Feasible_Point(COEDGE* ce) -> TV
+{
+    // TODO: write this
+    return TV();
 }
 namespace PhysBAM{
 template class VORONOI_DIAGRAM<float>;

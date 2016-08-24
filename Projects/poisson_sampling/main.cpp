@@ -30,12 +30,14 @@ int main(int argc, char* argv[])
     vd.Visualize_State("Initial");
     vd.Sanity_Checks();
 
-    auto ce = *vd.coedges.begin();
-    vd.Insert_Point(ce,TV(.3,.1));
-    vd.Visualize_State("Initial");
+    while(vd.pieces.m){
+        int p=vd.Choose_Piece();
+        TV X=vd.Choose_Feasible_Point(vd.pieces(p).coedge);
+        vd.Insert_Point(vd.pieces(p).coedge,X);
+        vd.Visualize_State("After insert");}
 
     Flush_Frame<TV>("end");
-    
+
     return 0;
 }
 

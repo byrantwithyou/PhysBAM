@@ -6,9 +6,9 @@
 //#####################################################################
 // Class VORONOI_DIAGRAM
 //##################################################################### 
-
+#include <Tools/Math_Tools/RANGE.h>
+#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <set>
-
 namespace PhysBAM{
 
 template<class T>
@@ -49,7 +49,8 @@ struct VORONOI_DIAGRAM
         COEDGE* pair, *next, *prev;
         CELL* cell;
         char name;
-
+        int piece;
+        
         COEDGE()
             :head(0),tail(0),pair(0),next(0),prev(0),cell(0),name(next_coedge++)
         {}
@@ -61,10 +62,11 @@ struct VORONOI_DIAGRAM
         TV X;
         CELL_STATE state;
         COEDGE * first_coedge;
+        bool outside;
         char name;
 
         CELL()
-            :state(non_incident),first_coedge(0),name(next_cell++)
+            :state(non_incident),first_coedge(0),outside(false),name(next_cell++)
         {}
         void Print() const;
     };
@@ -72,21 +74,31 @@ struct VORONOI_DIAGRAM
     ARRAY<CELL*> cells;
     std::set<COEDGE*> coedges;
     std::set<VERTEX*> vertices;
-
-    void Insert_Coedge(COEDGE* ce)
+    T radius;
+    RANGE<TV> bounding_box;
+    RANDOM_NUMBERS<T> random;
+    
+    struct PIECE
     {
-        coedges.insert(ce);
-    }
+        double this_area;
+        double subtree_area;
+        COEDGE* coedge;
 
-    void Remove_Coedge(COEDGE* ce)
-    {
-        coedges.erase(ce);
-    }
+        PIECE()
+            :this_area(0),subtree_area(0),coedge(0)
+        {}
+    };
+    ARRAY<PIECE> pieces;
 
-    void Update_Coedge(COEDGE* ce)
-    {
-    }
+    void Update_Piece_Tree(int i,double diff_area);
+    void Insert_Coedge(COEDGE* ce);
+    void Remove_Coedge(COEDGE* ce);
+    void Update_Coedge(COEDGE* ce);
 
+    double Compute_Available_Area(COEDGE* ce);
+    TV Choose_Feasible_Point(COEDGE* ce);
+    int Choose_Piece();
+    
     void Discover_Inside(ARRAY<COEDGE*>& in,ARRAY<COEDGE*>& adj,
         ARRAY<VERTEX*>& out_v,ARRAY<VERTEX*>& in_v,COEDGE* ce,const TV& new_pt);
     void Insert_Point(COEDGE* start,const TV& new_pt);
