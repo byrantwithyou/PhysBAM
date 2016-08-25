@@ -77,26 +77,61 @@ struct VORONOI_DIAGRAM
     T radius;
     RANGE<TV> bounding_box;
     RANDOM_NUMBERS<T> random;
+    enum PIECE_TYPE {unset,empty,no_disc,full_disc,out0,out1,both_out};
+
+    struct PIECE_HELPER
+    {
+        PIECE_TYPE type;
+        TV A,B,C;
+        T aux0,aux1,aux2;
+
+        PIECE_HELPER()
+            :type(unset),aux0(0),aux1(0),aux2(0)
+        {}
+
+        T Compute(COEDGE* ce,T radius,bool clipped);
+        TV Choose_Feasible_Point(RANDOM_NUMBERS<T>& random,T radius) const;
+    };
     
+    static const int first_clipped_piece_index=1<<30;
     struct PIECE
     {
-        double this_area;
-        double subtree_area;
+        T this_area;
+        T subtree_area;
         COEDGE* coedge;
-
+        PIECE_HELPER h;
+        
         PIECE()
             :this_area(0),subtree_area(0),coedge(0)
         {}
     };
     ARRAY<PIECE> pieces;
 
-    void Update_Piece_Tree(int i,double diff_area);
+    struct CLIPPED_PIECE:PIECE
+    {
+        T this_area;
+        T subtree_area;
+        COEDGE* coedge;
+        int num_sub_pieces;
+        PIECE_HELPER sub_pieces[4];
+        CLIPPED_PIECE()
+            :this_area(0),subtree_area(0),coedge(0),num_sub_pieces(0)
+        {}
+    };
+    ARRAY<CLIPPED_PIECE> clipped_pieces;
+
+    void Init(const RANGE<TV>& box);
+    
+    void Update_Piece_Tree(int i,T diff_area);
+    void Update_Clipped_Piece_Tree(int i,T diff_area);
     void Insert_Coedge(COEDGE* ce);
     void Remove_Coedge(COEDGE* ce);
     void Update_Coedge(COEDGE* ce);
-
-    double Compute_Available_Area(COEDGE* ce);
-    TV Choose_Feasible_Point(COEDGE* ce);
+    void Remove_Piece(int p);
+    void Remove_Clipped_Piece(int p);
+    void Insert_Clipped_Coedge(COEDGE* ce);
+    
+    T Compute_Available_Area(TV A,TV B,TV C,bool first_vertex_disk); // ccw order
     int Choose_Piece();
     
     void Discover_Inside(ARRAY<COEDGE*>& in,ARRAY<COEDGE*>& adj,

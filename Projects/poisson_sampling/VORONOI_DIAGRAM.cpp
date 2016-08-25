@@ -2,6 +2,7 @@
 // Copyright 2016, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Polynomials/QUADRATIC.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "VORONOI_DIAGRAM.h"
@@ -410,12 +411,23 @@ Print() const
 // Function Update_Piece_Tree
 //#####################################################################
 template<class T> void VORONOI_DIAGRAM<T>::
-Update_Piece_Tree(int i,double diff_area)
+Update_Piece_Tree(int i,T diff_area)
 {
-    pieces(i).this_area+=diff_area;
-    for(;i>0;i=(i-1)/2)
-        pieces(i).subtree_area+=diff_area;
     pieces(i).subtree_area+=diff_area;
+    while(i>0){
+        i=(i-1)/2;
+        pieces(i).subtree_area+=diff_area;}
+}
+//#####################################################################
+// Function Update_Clipped_Piece_Tree
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::
+Update_Clipped_Piece_Tree(int i,T diff_area)
+{
+    clipped_pieces(i).this_area+=diff_area;
+    for(;i>0;i=(i-1)/2)
+        clipped_pieces(i).subtree_area+=diff_area;
+    clipped_pieces(i).subtree_area+=diff_area;
 }
 //#####################################################################
 // Function Insert_Coedge
@@ -423,12 +435,30 @@ Update_Piece_Tree(int i,double diff_area)
 template<class T> void VORONOI_DIAGRAM<T>::
 Insert_Coedge(COEDGE* ce)
 {
-    double area = Compute_Available_Area(ce);
-    PIECE p;
-    p.coedge=ce;
-    int i=pieces.Append(p);
-    Update_Piece_Tree(i,area);
-    ce->piece=i;
+    if(!ce->head || !ce->tail){ // Infinite edges should not intersect the bounding box.
+        assert(ce->cell->outside);
+        assert(ce->head || ce->tail);
+        if(ce->tail) assert(!bounding_box.Lazy_Inside(ce->tail->X));
+        if(ce->head) assert(!bounding_box.Lazy_Inside(ce->head->X));}
+    else if(!bounding_box.Lazy_Inside(ce->head->X) || !bounding_box.Lazy_Inside(ce->tail->X))
+        Insert_Clipped_Coedge(ce);
+    else{
+        PIECE p;
+        p.coedge=ce;
+        T area=p.h.Compute(ce,radius,false);
+        int i=pieces.Append(p);
+        p.this_area=area;
+        Update_Piece_Tree(i,area);
+        ce->piece=i;}
+}
+//#####################################################################
+// Function Insert_Clipped_Coedge
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::
+Insert_Clipped_Coedge(COEDGE* ce)
+{
+    // TODO
+    // triangulate region, insert clipped_pieces for each part.
 }
 //#####################################################################
 // Function Remove_Coedge
@@ -436,16 +466,42 @@ Insert_Coedge(COEDGE* ce)
 template<class T> void VORONOI_DIAGRAM<T>::
 Remove_Coedge(COEDGE* ce)
 {
-    int p=ce->piece;
+    if(ce->piece<first_clipped_piece_index) Remove_Piece(ce->piece);
+    else Remove_Clipped_Piece(ce->piece-first_clipped_piece_index);
+}
+//#####################################################################
+// Function Remove_Piece
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::
+Remove_Piece(int p)
+{
     PIECE& last=pieces.Last(), &rem=pieces(p);
     if(p==pieces.m-1)
         Update_Piece_Tree(p,-rem.this_area);
     else{
         Update_Piece_Tree(pieces.m-1,-last.this_area);
-        Update_Piece_Tree(p,last.this_area-rem.this_area);
-        rem.coedge=last.coedge;
-        last.coedge->piece=p;}
+        T diff=last.this_area-rem.this_area;
+        last.subtree_area=rem.subtree_area;
+        rem=last;
+        Update_Piece_Tree(p,diff);}
     pieces.Pop();
+}
+//#####################################################################
+// Function Remove_Piece
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::
+Remove_Clipped_Piece(int p)
+{
+    CLIPPED_PIECE& last=clipped_pieces.Last(), &rem=clipped_pieces(p);
+    if(p==clipped_pieces.m-1)
+        Update_Piece_Tree(p,-rem.this_area);
+    else{
+        Update_Piece_Tree(clipped_pieces.m-1,-last.this_area);
+        T diff=last.this_area-rem.this_area;
+        last.subtree_area=rem.subtree_area;
+        rem=last;
+        Update_Piece_Tree(p,diff);}
+    clipped_pieces.Pop();
 }
 //#####################################################################
 // Function Update_Coedge
@@ -453,9 +509,8 @@ Remove_Coedge(COEDGE* ce)
 template<class T> void VORONOI_DIAGRAM<T>::
 Update_Coedge(COEDGE* ce)
 {
-    double area = Compute_Available_Area(ce);
-    if(!area) Remove_Coedge(ce);
-    else Update_Piece_Tree(ce->piece,area-pieces(ce->piece).this_area);
+    Remove_Coedge(ce);
+    Insert_Coedge(ce);
 }
 //#####################################################################
 // Function Choose_Piece
@@ -463,35 +518,152 @@ Update_Coedge(COEDGE* ce)
 template<class T> int VORONOI_DIAGRAM<T>::
 Choose_Piece()
 {
-    T r=random.Get_Uniform_Number(0,pieces(0).subtree_area);
+    T total_area=0;
+    if(pieces.m) total_area+=pieces(0).subtree_area;
+    if(clipped_pieces.m) total_area+=clipped_pieces(0).subtree_area;
+    T r=random.Get_Uniform_Number(0,total_area);
     int i=0;
-    while(1){
-        if(r<=pieces(i).this_area) return i;
-        int j=2*i+1,k=j+1;
-        r-=pieces(i).this_area;
-        if(j>=pieces.m){assert(r<1e-5);return i;}
-        if(r<=pieces(j).subtree_area){i=j;continue;}
-        r-=pieces(j).subtree_area;
-        if(k>=pieces.m){assert(r<1e-5);return j;}
-        i=k;}
+    if(r<=clipped_pieces(0).subtree_area){
+        r-=clipped_pieces(0).subtree_area;
+        while(1){
+            if(r<=clipped_pieces(i).this_area) return first_clipped_piece_index+i;
+            int j=2*i+1,k=j+1;
+            r-=clipped_pieces(i).this_area;
+            if(j>=clipped_pieces.m){assert(r<1e-5);return first_clipped_piece_index+i;}
+            if(r<=clipped_pieces(j).subtree_area){i=j;continue;}
+            r-=clipped_pieces(j).subtree_area;
+            if(k>=clipped_pieces.m){assert(r<1e-5);return first_clipped_piece_index+j;}
+            i=k;}}
+    else{
+        while(1){
+            if(r<=pieces(i).this_area) return i;
+            int j=2*i+1,k=j+1;
+            r-=pieces(i).this_area;
+            if(j>=pieces.m){assert(r<1e-5);return i;}
+            if(r<=pieces(j).subtree_area){i=j;continue;}
+            r-=pieces(j).subtree_area;
+            if(k>=pieces.m){assert(r<1e-5);return j;}
+            i=k;}}
+}
+template<class TV,class T>
+inline T Disk_Inside_Triangle(TV B,TV C,T radius)
+{
+    return B.Cross(C).x - TV::Angle_Between(B,C)*sqr(radius)/2;
 }
 //#####################################################################
 // Function Compute_Available_Area
 //#####################################################################
-template<class T> double VORONOI_DIAGRAM<T>::
-Compute_Available_Area(COEDGE* ce)
+template<class T> T VORONOI_DIAGRAM<T>::PIECE_HELPER::
+Compute(COEDGE* ce,T radius,bool clipped)
 {
-    // TODO: write this
-    return 0;
+    if(!clipped){
+        A=ce->cell->X;
+        B=ce->tail->X-A;
+        C=ce->head->X-A;}
+
+    if(ce->cell->outside){
+        type=no_disc;
+        return B.Cross(C).x;} // Just a triangle: case A
+
+    T B_mag2_min_r2=B.Magnitude_Squared()-sqr(radius);
+    T C_mag2_min_r2=C.Magnitude_Squared()-sqr(radius);
+    bool B_in_disk=B_mag2_min_r2<=0;
+    bool C_in_disk=C_mag2_min_r2<=0;
+    if(B_in_disk && C_in_disk){
+        type=empty;
+        return 0;} // entire triangle in circle: case B
+
+    QUADRATIC<T> quad((B-C).Magnitude_Squared(),-2*B.Dot(B-C),B_mag2_min_r2);
+    quad.Compute_Roots();
+    if(quad.roots==1){quad.roots=2;quad.root2=quad.root1;}
+    if(quad.roots==0 || quad.root1>=1 || quad.root2<=0){
+        type=full_disc;
+        aux0=(quad.root1+quad.root2)/2; // for point sampling
+        aux1=Disk_Inside_Triangle(B,C,radius);
+        return aux1;} // case C
+
+    if(quad.root1<=0 && quad.root2>=1){
+        type=empty;
+        return 0;} // case B (numerical error)
+
+    if(quad.root1>0 && quad.root2<1){ // case E
+        type=both_out;
+        TV P=B+quad.root1*(C-B),Q=B+quad.root2*(C-B);
+        aux0=quad.root1;
+        aux1=quad.root2;
+        T A0=Disk_Inside_Triangle(B,P,radius);
+        T A1=Disk_Inside_Triangle(Q,C,radius);
+        aux2=A0/(A0+A1);
+        return A0+A1;}
+
+    aux0=quad.root1>0?quad.root1:quad.root2;
+    TV P=B+aux0*(C-B);
+    if(B_in_disk){
+        type=out1;
+        return Disk_Inside_Triangle(P,C,radius);} // case D
+    type=out0;
+    return Disk_Inside_Triangle(B,P,radius); // case D
+}
+template<class TV,class T>
+inline TV Random_Sample_In_Triangle(RANDOM_NUMBERS<T>& random,const TV& B,const TV& C)
+{
+    T a=random.Get_Uniform_Number(0,1);
+    T b=random.Get_Uniform_Number(0,1);
+    if(a+b>1){a=1-a;b=1-b;}
+    return a*B+b*C;
+}
+// Triangle OBC, with circle (O,radius) removed
+// B lies on circle
+// C lies outside circle
+// interior of BC is outside circle
+// Each random sample succeeds with probability >= 2/3
+template<class TV,class T>
+inline TV Random_Sample_In_Cut_Triangle(RANDOM_NUMBERS<T>& random,const TV& B,const TV& C,T radius)
+{
+    TV D=C*(radius/C.Magnitude());
+    while(1)
+    {
+        TV X=Random_Sample_In_Triangle(random,B-D,C-D)+D;
+        if(X.Magnitude_Squared()>=sqr(radius)) return X;
+    }
 }
 //#####################################################################
-// Function Choose_Feasible_Point
+// Function Compute_Available_Area
 //#####################################################################
-template<class T> auto VORONOI_DIAGRAM<T>::
-Choose_Feasible_Point(COEDGE* ce) -> TV
+template<class T> auto VORONOI_DIAGRAM<T>::PIECE_HELPER::
+Choose_Feasible_Point(RANDOM_NUMBERS<T>& random,T radius) const -> TV
 {
-    // TODO: write this
-    return TV();
+    assert(type!=unset && type!=empty);
+    if(type==no_disc) return Random_Sample_In_Triangle(random,B,C)+A; // case A
+    if(type==full_disc){
+        TV P=B+aux0*(C-B);
+        P*=radius/P.Magnitude();
+        T p=random.Get_Uniform_Number(0,aux1);
+        T AT=(B-P).Cross(C-P).x;
+        if(p<AT) return Random_Sample_In_Triangle(random,B-P,C-P)+P+A;
+        p-=AT;
+        if(p<Disk_Inside_Triangle(P,C,radius))
+            return Random_Sample_In_Cut_Triangle(random,P,B,radius);
+        return Random_Sample_In_Cut_Triangle(random,P,C,radius);}
+    if(type==out0) return Random_Sample_In_Cut_Triangle(random,B+aux0*(C-B),C,radius);
+    if(type==out1) return Random_Sample_In_Cut_Triangle(random,B+aux0*(C-B),B,radius);
+
+    // case E
+    if(random.Get_Uniform_Number(0,1)>aux2)
+        return Random_Sample_In_Cut_Triangle(random,B+aux0*(C-B),B,radius);
+    return Random_Sample_In_Cut_Triangle(random,B+aux1*(C-B),C,radius);
+}
+//#####################################################################
+// Function Init
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::
+Init(const RANGE<TV>& box)
+{
+    // TODO:
+    // 1. Choose a set of points so that no infinite edge can reach inside the box
+    // 2. Initialize with 3 of the vertices
+    // 3. Insert the rest
+    // 4. Set up pieces and clipped pieces.
 }
 namespace PhysBAM{
 template class VORONOI_DIAGRAM<float>;

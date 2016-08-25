@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 
     while(vd.pieces.m){
         int p=vd.Choose_Piece();
-        TV X=vd.Choose_Feasible_Point(vd.pieces(p).coedge);
+        TV X=vd.pieces(p).h.Choose_Feasible_Point(vd.random,vd.radius);
         vd.Insert_Point(vd.pieces(p).coedge,X);
         vd.Visualize_State("After insert");}
 
