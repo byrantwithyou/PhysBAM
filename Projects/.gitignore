@@ -120,3 +120,4 @@ volume_collisions/test_proj
 volume_test/volume_test
 curvature/curvature
 fluids_stress_2d/fluids_stress_2d
+poisson_sampling/sampling
