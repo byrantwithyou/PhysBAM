@@ -12,7 +12,6 @@
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Nonlinear_Equations/PARAMETRIC_LINE.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <Hybrid_Methods/System/MPM_KRYLOV_SYSTEM.h>
 #include <functional>
 using namespace PhysBAM;
 //#####################################################################
@@ -70,17 +69,8 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         T a=Line_Search(F,sys,x,dx,grad,tm);
         if(a<=0) break;
 
-//        static_cast<MPM_KRYLOV_SYSTEM<VECTOR<T,3> >&>(sys).Sanity(dx,"dx");
-
-//        LOG::printf("NEW STATE: %.16P %.16P\n", dx.Raw_Get(1), x.Raw_Get(1));
-//        F.Make_Feasible(x);
         x.Copy(a,dx,x);
-//        LOG::printf("NEW STATE: %.16P %.16P\n", dx.Raw_Get(1), x.Raw_Get(1));
-        // F.Make_Feasible(x);
-        // F.Make_Feasible(x);
-        // F.Make_Feasible(x);
         F.Make_Feasible(x);
-//        LOG::printf("NEW STATE: %.16P %.16P\n", dx.Raw_Get(1), x.Raw_Get(1));
         last_E=E;}
 
     av.Append(&tm);
