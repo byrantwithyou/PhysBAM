@@ -11,7 +11,6 @@
 #include <Tools/Matrices/MATRIX.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <sstream>
 #include <string>
 #include "OPENSUBDIV_SURFACE.h"
@@ -192,17 +191,18 @@ Compute_G0()
                     G0_det(k)=abs(G0_inv(k).Determinant());
                     G0_inv(k).Invert();}}}}
 }
+//#####################################################################
+// Function Set_Mass
+//#####################################################################
 template<class TV,int gauss_order> void OPENSUBDIV_SURFACE<TV,gauss_order>::
 Set_Mass(T density,bool use_constant_mass) const
 {
-    DEFORMABLE_PARTICLES<TV>* parts=dynamic_cast<DEFORMABLE_PARTICLES<TV>*>(&particles);
-    PHYSBAM_ASSERT(parts);
-    parts->Store_Mass();
-
+    ARRAY_VIEW<T>* mass_attr=particles.template Get_Array<T>(ATTRIBUTE_ID_MASS);
+    PHYSBAM_ASSERT(mass_attr);
     if(use_constant_mass&&control_points.m)
         PHYSBAM_NOT_IMPLEMENTED(); // would need Total_Size() for this class.
     else{
-    parts->mass.Subset(control_points).Fill((T)0);
+        mass_attr->Subset(control_points).Fill((T)0);
     for(int face=0;face<m;face++){
         const ARRAY<int> nodes(control_points.Subset(face_data(face).nodes));
         for(int i=0;i<gauss_order;i++){
@@ -218,7 +218,7 @@ Set_Mass(T density,bool use_constant_mass) const
                 PHYSBAM_ASSERT(mass>0); // will fail here if G0 hasn't been computed yet.
                 
                 for(int a=0;a<nodes.m;a++)
-                    parts->mass(nodes(a))+=mass*w(a)(i,j);}}}}
+                    (*mass_attr)(nodes(a))+=mass*w(a)(i,j);}}}}
 }
 //#####################################################################
 // Function Create_Triangulated_Surface
