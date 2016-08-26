@@ -7,7 +7,7 @@
 
 #include <Tools/Arrays/ATTRIBUTE_ID.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
+#include <Hybrid_Methods/MPM_PLASTICITY_MODEL.h>
 #include <cmath>
 namespace PhysBAM{
 const ATTRIBUTE_ID ATTRIBUTE_ID_DP_RHO_F(55);

@@ -8,11 +8,11 @@
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
-#include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
 #include <Hybrid_Methods/Forces/MPM_PLASTIC_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
+#include <Hybrid_Methods/MPM_PLASTICITY_MODEL.h>
 namespace PhysBAM{
 //#####################################################################
 // Function Times

@@ -2,9 +2,9 @@
 // Copyright 2015, Andre Pradhana, Greg Klar
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
+#include <Hybrid_Methods/MPM_PLASTICITY_MODEL.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor

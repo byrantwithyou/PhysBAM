@@ -6,9 +6,9 @@
 #include <Tools/Matrices/DIAGONAL_MATRIX.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
+#include <Hybrid_Methods/MPM_DRUCKER_PRAGER.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor

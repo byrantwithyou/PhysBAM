@@ -2,7 +2,6 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
@@ -11,6 +10,7 @@
 #include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_WEIGHTS_SPLINE.h>
+#include <Hybrid_Methods/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################

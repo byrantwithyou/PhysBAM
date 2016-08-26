@@ -11,13 +11,13 @@
 #include <Tools/Log/SCOPE.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
-#include <Deformables/Constitutive_Models/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_PLASTIC_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
+#include <Hybrid_Methods/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/System/FLUID_KRYLOV_SYSTEM.h>
 #include <Hybrid_Methods/System/FLUID_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/KKT_KRYLOV_SYSTEM.h>
