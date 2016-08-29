@@ -3,20 +3,28 @@
 require strict;
 
 my %lookup;
+my %local_lookup;
 
 open F, shift @ARGV;
 
 while(<F>){
     chomp;
-    /.*\/(.*)/ or die "Failed to parse '$_' as a valid header.\n";
-    (defined $lookup{$1}) and die "Duplicate file '$1' encountered\n.";
-    $lookup{$1} = $_;
+    if(/.*\/(.*)/)
+    {
+        (defined $lookup{$1}) and die "Duplicate file '$1' encountered\n.";
+        $lookup{$1} = $_;
+    }
+    elsif(!defined $local_lookup{$_})
+    {
+        $local_lookup{$_} = $_;
+    }
 }
 close F;
 
 my @order = qw( Core Tools Particles_Tools Grid_Tools Grid_PDE Geometry Rigids Deformables Solids Hybrid_Methods Incompressible Compressible Fluids Dynamics OpenGL Ray_Tracing );
 my %category = ();
 
+my @local_includes = ();
 my @system = ();
 my %system = ("algorithm" => 1, "streambuf" => 1, "iomanip" => 1, "list" => 1, "ostream" => 1,
               "bitset" => 1, "ios" => 1, "locale" => 1, "queue" => 1, "string" => 1, 
@@ -42,7 +50,7 @@ sub dump_headers_set
     my $L=$_[0];
     for(sort {$x=lc $$a[0];$y=lc $$b[0];$x=~s/_/0/g;$y=~s/_/0/g;$x cmp $y;} @$L)
     {
-        print "try $$_[0] in $filename (vs $last)\n";
+#        print "try $$_[0] in $filename (vs $last)\n";
         if($$_[0] eq $last){print  "DUPLICATE HEADER: $last in $filename\n";next;}
         $last = $$_[0];
         my $end_comment=$$_[2]?" $$_[2]":"";
@@ -52,7 +60,7 @@ sub dump_headers_set
 
 sub dump_headers
 {
-    if(! scalar keys %category && !@system && !@other){return;}
+    if(! scalar keys %category && !@system && !@other && !@local_includes){return;}
     $filename eq $cf or die "Trying to insert includes from $cf into $filename.\n";
     for my $o (@order)
     {
@@ -68,8 +76,10 @@ sub dump_headers
         delete $category{$o};
     }
     &dump_headers_set(\@system);
+    &dump_headers_set(\@local_includes);
     &dump_headers_set(\@other);
     @system = ();
+    @local_includes = ();
     @other = ();
     $cf = "";
     $last = "";
@@ -77,7 +87,6 @@ sub dump_headers
 for $filenamex (@ARGV)
 {
     $filename=$filenamex;
-    print "AAA $filename\n";
     my $orig='';
     $new='';
 
@@ -95,15 +104,19 @@ for $filenamex (@ARGV)
         my $file = $5;
         my $pre = $1;
         my $post = $7;
-        if(!$path && defined $system{$file}){push @system, [$full,$pre,$post];print "system $full\n";next;}
-        if(!$path){push @other, [$full,$pre,$post];print "other $full\n";next;}
-        if(defined $system{$file}){print  "system file specified with path: '$path$file' in '$filename'\n";push @system, [$full,$pre,$post];next;}
-        if(!defined $lookup{$file}){print  "include not recognized: '$file' in '$filename'\n";push @other, [$full,$pre,$post];next;}
-        $lookup{$file}=~/^(.*?)\//;
-        if(!defined $category{$1}){$category{$1}=[];}
-        my $L=$category{$1};
-        print "physbam $lookup{$file}\n";
-        push @$L, ["<$lookup{$file}>",$pre,$post];
+        if(defined $system{$file}){push @system, [$full,$pre,$post];next;}
+        if(defined $local_lookup{$file}){push @local_includes, ["\"$local_lookup{$file}\"",$pre,$post];next;}
+        if(defined $lookup{$file})
+        {
+            $lookup{$file}=~/^(.*?)\//;
+            if(!defined $category{$1}){$category{$1}=[];}
+            my $L=$category{$1};
+            push @$L, ["<$lookup{$file}>",$pre,$post];
+            next;
+        }
+        if(!$path){push @other, [$full,$pre,$post];next;}
+        print  "include not recognized: '$file' in '$filename'\n";
+        push @other, [$full,$pre,$post];
     }
     &dump_headers();
     close F;
@@ -114,6 +127,5 @@ for $filenamex (@ARGV)
         print F $new;
         close F;
     }
-    print "BBB $filename\n";
     $filename='qq';
 }
