@@ -425,10 +425,10 @@ Update_Piece_Tree(int i,T diff_area)
 template<class T> void VORONOI_DIAGRAM<T>::
 Update_Clipped_Piece_Tree(int i,T diff_area)
 {
-    clipped_pieces(i).this_area+=diff_area;
-    for(;i>0;i=(i-1)/2)
-        clipped_pieces(i).subtree_area+=diff_area;
     clipped_pieces(i).subtree_area+=diff_area;
+    while(i>0){
+        i=(i-1)/2;
+        clipped_pieces(i).subtree_area+=diff_area;}
 }
 //#####################################################################
 // Function Insert_Coedge
@@ -458,8 +458,55 @@ Insert_Coedge(COEDGE* ce)
 template<class T> void VORONOI_DIAGRAM<T>::
 Insert_Clipped_Coedge(COEDGE* ce)
 {
-    // TODO
-    // triangulate region, insert clipped_pieces for each part.
+    assert(bounding_box.Lazy_Inside(ce->cell->X));
+
+    ARRAY<TV> vert;
+    vert.Append(ce->cell->X);
+    vert.Append(ce->tail->X);
+    vert.Append(ce->head->X);
+    vert.Append(ce->cell->X);
+
+    TV bound[2]={bounding_box.min_corner,bounding_box.max_corner};
+    for(int s=0;s<2;s++){
+        int sign=2*s-1;
+        for(int a=0;a<2;a++){
+            int i=1,j;
+            for(;i<vert.m-1;i++)
+                if(vert(i)(a)*sign<bound[s](a)*sign)
+                    break;
+            if(i==vert.m-1) continue;
+            for(j=i+1;j<vert.m-1;j++)
+                if(vert(j)(a)*sign>=bound[s](a)*sign)
+                    break;
+
+            T u=(bound[s](a)-vert(i)(a))/(vert(i-1)(a)-vert(i)(a));
+            T v=(bound[s](a)-vert(j)(a))/(vert(j-1)(a)-vert(j)(a));
+
+            TV A=vert(i)+u*(vert(i-1)-vert(i));
+            TV B=vert(j)+v*(vert(j-1)-vert(j));
+
+            ARRAY<TV> tmp(vert.Array_View(0,i));
+            tmp.Append(A);
+            tmp.Append(B);
+            tmp.Append_Elements(vert.Array_View(j,vert.m-j));
+            tmp.Exchange(vert);}}
+    vert.Pop();
+
+    assert(vert.m<=6);
+    CLIPPED_PIECE p;
+    p.coedge=ce;
+    p.num_sub_pieces=vert.m-2;
+    T area=0;
+    for(int i=0;i<vert.m-2;i++){
+        p.sub_pieces[i].A=vert(0);
+        p.sub_pieces[i].B=vert(i+1);
+        p.sub_pieces[i].C=vert(i+2);
+        area+=p.sub_pieces[i].Compute(ce,radius,true);}
+
+    int i=clipped_pieces.Append(p);
+    p.this_area=area;
+    Update_Clipped_Piece_Tree(i,area);
+    ce->piece=first_clipped_piece_index+i;
 }
 //#####################################################################
 // Function Remove_Coedge
