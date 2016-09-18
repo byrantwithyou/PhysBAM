@@ -8,10 +8,10 @@
 #define __IMPLICIT_OBJECT_DILATE__
 
 #include <Tools/Math_Tools/RANGE.h>
-#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Utilities/TYPE_UTILITIES.h>
 #include <Geometry/Basic_Geometry/RAY.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
 namespace PhysBAM{
 

@@ -6,8 +6,8 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
+#include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include "OPENSUBDIV_SURFACE_CURVATURE_FORCE.h"
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif

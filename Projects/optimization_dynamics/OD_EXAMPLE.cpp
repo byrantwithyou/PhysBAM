@@ -6,9 +6,8 @@
 #include <Tools/Read_Write/TYPED_STREAM.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include "OD_EXAMPLE.h"
 using namespace PhysBAM;
 //#####################################################################

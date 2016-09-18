@@ -5,8 +5,8 @@
 #ifndef __OD_EXAMPLE__
 #define __OD_EXAMPLE__
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Utilities/Find_Type.h>
+#include <Tools/Utilities/NONCOPYABLE.h>
 #include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 

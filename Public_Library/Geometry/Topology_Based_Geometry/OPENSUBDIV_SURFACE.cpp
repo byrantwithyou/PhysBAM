@@ -10,10 +10,10 @@
 #include <Tools/Matrices/BANDED_MATRIX.h>
 #include <Tools/Matrices/MATRIX.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
+#include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <sstream>
 #include <string>
-#include "OPENSUBDIV_SURFACE.h"
 
 using namespace PhysBAM;
 //#####################################################################

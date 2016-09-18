@@ -14,8 +14,6 @@
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
-#include <Deformables/Constitutive_Models/MPM_DRUCKER_PRAGER.h>
-#include <Deformables/Constitutive_Models/MPM_PLASTICITY_CLAMP.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <Deformables/Constitutive_Models/ST_VENANT_KIRCHHOFF_HENCKY_STRAIN.h>
 #include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
@@ -26,6 +24,8 @@
 #include <Hybrid_Methods/Forces/MPM_PLASTIC_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
+#include <Hybrid_Methods/MPM_DRUCKER_PRAGER.h>
+#include <Hybrid_Methods/MPM_PLASTICITY_CLAMP.h>
 #include "STANDARD_TESTS_BASE.h"
 #ifdef USE_OPENMP
 #include <omp.h>
