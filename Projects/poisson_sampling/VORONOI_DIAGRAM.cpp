@@ -707,11 +707,22 @@ Choose_Feasible_Point(RANDOM_NUMBERS<T>& random,T radius) const -> TV
 template<class T> void VORONOI_DIAGRAM<T>::
 Init(const RANGE<TV>& box)
 {
-    // TODO:
-    // 1. Choose a set of points so that no infinite edge can reach inside the box
-    // 2. Initialize with 3 of the vertices
-    // 3. Insert the rest
-    // 4. Set up pieces and clipped pieces.
+    bounding_box=box;
+    TV e=box.Edge_Lengths();
+
+    // Four points far enough out from the corners that no infinite edge can reach the box.
+    TV P[4];
+    P[0]=box.Center()+e*2;
+    P[2]=box.Center()-e*2;
+    P[1]=TV(P[0].x,P[2].y);
+    P[3]=TV(P[2].x,P[0].y);
+
+    TV Q=random.Get_Uniform_Vector(box);
+
+    // TODO: Construct initial diagram.
+
+
+    
 }
 namespace PhysBAM{
 template struct VORONOI_DIAGRAM<float>;
