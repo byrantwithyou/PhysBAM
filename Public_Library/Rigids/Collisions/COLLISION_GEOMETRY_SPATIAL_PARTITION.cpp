@@ -130,7 +130,7 @@ Print_Initial_Statistics() const
         int size=Number_Of_Voxels_Occupied(i);min_size=min(min_size,size);max_size=max(max_size,size);average_size+=size;}
     average_size/=number;
     LOG::printf("Spatial partition statistics: %P, %P, %P, %P\n",voxel_size,min_size,average_size,max_size);
-    LOG::printf("Spatial partition bodies: %P, %P, %P, %P\n",bodies_not_in_partition.m,hashtable.Size());
+    LOG::printf("Spatial partition bodies: %P, %P\n",bodies_not_in_partition.m,hashtable.Size());
 }
 //#####################################################################
 // Function Update_Body

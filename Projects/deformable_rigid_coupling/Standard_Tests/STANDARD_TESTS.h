@@ -1164,7 +1164,7 @@ void Sidewinding()
 
     for(int i=0;i<count;i++) for(int j=0;j<6;j++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("plank",(T)1,friction);
-        rigid_body.Frame().t=TV((T)(-(T)35+10*j),(T).2*steps[i-1]-(T).1,(T)(-4-2*i));
+        rigid_body.Frame().t=TV((T)(-(T)35+10*j),(T).2*steps[i]-(T).1,(T)(-4-2*i));
         rigid_body.Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
         rigid_body.name="obstruction";
         rigid_body.is_static=true;

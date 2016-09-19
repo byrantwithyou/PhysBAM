@@ -79,7 +79,7 @@ public:
         :fp(fp)
     {
         start_offset=ftell(fp);
-        uint dummy;
+        uint dummy=0;
         fwrite(&dummy,4,1,fp);
         fputs(type,fp);
     }

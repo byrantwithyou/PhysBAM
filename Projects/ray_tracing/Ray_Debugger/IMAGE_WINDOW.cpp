@@ -128,7 +128,7 @@ draw()
         float *temp_image=new float[image.m*image.n*3];memset(temp_image,0,image.m*image.n*3);
         for(int i=0;i<image.m;i++)for(int j=0;j<image.n;j++)for(int k=0;k<3;k++)temp_image[3*((j-1)*image.m+(i-1))+k-1]=float(image(i,j)[k]);
         glTexSubImage2D(GL_TEXTURE_2D,0,0,0,image.m,image.n,GL_RGB,GL_FLOAT,temp_image);
-        delete temp_image;
+        delete [] temp_image;
         update_image=false;
     }
     

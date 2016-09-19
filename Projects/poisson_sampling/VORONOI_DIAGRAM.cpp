@@ -666,6 +666,6 @@ Init(const RANGE<TV>& box)
     // 4. Set up pieces and clipped pieces.
 }
 namespace PhysBAM{
-template class VORONOI_DIAGRAM<float>;
-template class VORONOI_DIAGRAM<double>;
+template struct VORONOI_DIAGRAM<float>;
+template struct VORONOI_DIAGRAM<double>;
 }

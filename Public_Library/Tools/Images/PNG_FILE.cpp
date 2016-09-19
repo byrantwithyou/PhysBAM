@@ -51,10 +51,19 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     if(!file) throw READ_ERROR(LOG::sprintf("Failed to open %s for reading",filename.c_str()));
 
     png_structp png_ptr=png_create_read_struct(PNG_LIBPNG_VER_STRING,0,0,0);
-    if(!png_ptr) throw READ_ERROR(LOG::sprintf("Error reading png file %s",filename.c_str()));
+    if(!png_ptr){
+        fclose(file);
+        png_destroy_read_struct(&png_ptr,0,0);
+        throw READ_ERROR(LOG::sprintf("Error reading png file %s",filename.c_str()));}
     png_infop info_ptr=png_create_info_struct(png_ptr);
-    if(!info_ptr) throw READ_ERROR(LOG::sprintf("Error reading png file %s",filename.c_str()));
-    if(setjmp(png_jmpbuf(png_ptr))) throw READ_ERROR(LOG::sprintf("Error reading png file %s",filename.c_str()));
+    if(!info_ptr){
+        fclose(file);
+        png_destroy_read_struct(&png_ptr,&info_ptr,0);
+        throw READ_ERROR(LOG::sprintf("Error reading png file %s",filename.c_str()));}
+    if(setjmp(png_jmpbuf(png_ptr))){
+        fclose(file);
+        png_destroy_read_struct(&png_ptr,&info_ptr,0);
+        throw READ_ERROR(LOG::sprintf("Error reading png file %s",filename.c_str()));}
     png_init_io(png_ptr,file);
     png_read_png(png_ptr,info_ptr,PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_STRIP_ALPHA | PNG_TRANSFORM_PACKING,0);
     int width=png_get_image_width(png_ptr,info_ptr),height=png_get_image_height(png_ptr,info_ptr);
@@ -64,7 +73,9 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     VECTOR<unsigned char,3>** row_pointers=(VECTOR<unsigned char,3>**)png_get_rows(png_ptr,info_ptr);
     for(int i=0;i<width;i++)for(int j=0;j<height;j++)image(i,j)=IMAGE<T>::Byte_Color_To_Scalar_Color(row_pointers[height-j-1][i]);
         
-    png_destroy_read_struct(&png_ptr,&info_ptr,0);fclose(file);return;
+    png_destroy_read_struct(&png_ptr,&info_ptr,0);
+    fclose(file);
+    return;
 }
 template<class T> void PNG_FILE<T>::
 Read(const std::string& filename,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& image)

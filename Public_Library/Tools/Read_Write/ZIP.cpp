@@ -441,7 +441,7 @@ Find_And_Read_Central_Header()
     for(unsigned int i=0;(int)i<read_start-3;i++){
         if(buf[i]==0x50 && buf[i+1]==0x4b && buf[i+2]==0x05 && buf[i+3]==0x06){found=i;break;}}
     delete [] buf;
-    if(found==-1){LOG::cerr<<"ZIP: Failed to find zip header"<<std::endl;return false;}
+    if(found==-1){LOG::cerr<<"ZIP: Failed to find zip header"<<std::endl;delete [] buf;return false;}
     // seek to end of central header and read
     istream.seekg(end_position-(read_start-found));
     unsigned int word;

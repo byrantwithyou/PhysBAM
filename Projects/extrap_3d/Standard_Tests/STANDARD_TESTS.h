@@ -1604,10 +1604,10 @@ void Initialize_Bodies() override
         case 10:{
             bool* bools[7]={&use_corotated,0,&use_constant_ife,0,&use_extended_neohookean,0,0};
             for(int i=0;i<7;i++){
-                if(bools[i-1]) *bools[i-1]=true;
+                if(bools[i]) *bools[i]=true;
                 TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
                 Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
-                if(bools[i-1]) *bools[i-1]=false;}
+                if(bools[i]) *bools[i]=false;}
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 11:{
