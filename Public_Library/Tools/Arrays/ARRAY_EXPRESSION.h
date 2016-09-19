@@ -10,7 +10,7 @@
 #include <Tools/Arrays/ARRAY_BASE.h>
 #include <Tools/Arrays/SIMPLE_ITERATOR.h>
 #include <Tools/Math_Tools/Inverse.h>
-#include <cassert>
+#include <tuple>
 namespace PhysBAM{
 
 template<class OP,class ID> class ARRAY_EXPRESSION;
