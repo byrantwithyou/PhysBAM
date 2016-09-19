@@ -1248,13 +1248,6 @@ Clean_Up_Fractured_Items_From_Lists(ARRAY<VECTOR<int,2> >& pairs,const int curre
 //#####################################################################
 // Function Initialize_All_Contact_Projections
 //#####################################################################
-namespace{
-struct COMPARE
-{
-    template<class A,class B,class C> bool operator()(const TRIPLE<A,B,C>& a1,const TRIPLE<A,B,C>& a2) const
-    {if(a1.x!=a2.x) return a1.x<a2.x;if(a1.y!=a2.y) return a1.y<a2.y;return LEXICOGRAPHIC_COMPARE()(a1.z,a2.z);}
-};
-}
 template<class TV> void RIGID_BODY_COLLISIONS<TV>::
 Initialize_All_Contact_Projections(const bool enforce_rigid_rigid_contact_in_cg)
 {

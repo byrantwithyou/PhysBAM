@@ -42,19 +42,6 @@ private:
 
     int Choose_Partition_Axis(const TV& DX) const
     {return DX.Arg_Max();}
-
-    class Partition_Helper_Less{
-    public:
-        ARRAY_VIEW<const TV>* points;int axis;T split_value;
-        Partition_Helper_Less(ARRAY_VIEW<const TV>* p,int a,T s){points=p;axis=a;split_value=s;}
-        bool operator()(int i){return (*points)(i)[axis]<split_value;}};
-
-    class Partition_Helper_Less_Equal{
-    public:
-        ARRAY_VIEW<const TV>* points;int axis;T split_value;
-        Partition_Helper_Less_Equal(ARRAY_VIEW<const TV>* p,int a,T s){points=p;axis=a;split_value=s;}
-        bool operator()(int i){return (*points)(i)[axis]<=split_value;}};
-
 public:
 
 //#####################################################################

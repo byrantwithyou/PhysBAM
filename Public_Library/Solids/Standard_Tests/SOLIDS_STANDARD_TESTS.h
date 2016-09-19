@@ -40,7 +40,7 @@ public:
     {Substitute_Soft_Bindings_For_Nodes(object,soft_bindings,persistent_soft_bindings,true);}
 
     TRIANGULATED_SURFACE<T>& Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_BODY_STATE<TV>& initial_state,
-        TRIANGULATED_SURFACE_CLIPPING_HELPER<T> *clipping_function,ARRAY<int>* particle_indices=0)
+        std::function<void (TRIANGULATED_SURFACE<T>&)> clipping_function,ARRAY<int>* particle_indices=0)
     {return Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,&initial_state,clipping_function,particle_indices);}
 
     TRIANGULATED_SURFACE<T>& Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_BODY_STATE<TV>* initial_state,ARRAY<int>* particle_indices=0)

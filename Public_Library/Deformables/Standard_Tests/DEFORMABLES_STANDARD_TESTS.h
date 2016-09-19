@@ -14,6 +14,7 @@
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_STATE.h>
+#include <functional>
 namespace PhysBAM{
 
 template<class TV> class SOFT_BINDINGS;
@@ -27,14 +28,6 @@ template<class TV,int d> class EMBEDDED_MATERIAL_SURFACE;
 template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
 template<class TV> class GRID;
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
-
-template<class T>
-class TRIANGULATED_SURFACE_CLIPPING_HELPER
-{
-public:
-    virtual ~TRIANGULATED_SURFACE_CLIPPING_HELPER() {};
-    virtual void operator()(TRIANGULATED_SURFACE<T>& surface) const=0;
-};
 
 template<class TV>
 class DEFORMABLES_STANDARD_TESTS
@@ -59,7 +52,7 @@ public:
     {Substitute_Soft_Bindings_For_Nodes(object,soft_bindings,persistent_soft_bindings,true);}
 
     TRIANGULATED_SURFACE<T>& Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_BODY_STATE<TV>& initial_state,
-        TRIANGULATED_SURFACE_CLIPPING_HELPER<T> *clipping_function,ARRAY<int>* particle_indices=0)
+        std::function<void (TRIANGULATED_SURFACE<T>&)> clipping_function,ARRAY<int>* particle_indices=0)
     {return Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,&initial_state,clipping_function,particle_indices);}
 
     TRIANGULATED_SURFACE<T>& Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_BODY_STATE<TV>* initial_state,ARRAY<int>* particle_indices=0)
@@ -99,7 +92,7 @@ public:
     template <int gauss_order> static void Set_Mass_Of_Particles(const OPENSUBDIV_SURFACE<TV,gauss_order>& volume,const T density,const bool use_constant_mass=false);
     void PD_Curl(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p,const int number_of_joints,const bool parent_static=true,const T friction=.5);
     TRIANGULATED_SURFACE<T>& Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_BODY_STATE<TV>* initial_state,
-        TRIANGULATED_SURFACE_CLIPPING_HELPER<T> *clipping_function,ARRAY<int>* particle_indices);
+        std::function<void (TRIANGULATED_SURFACE<T>&)> clipping_function,ARRAY<int>* particle_indices);
     void Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const PARTICLES_SUBSET<VECTOR<T,3>,
         DEFORMABLE_PARTICLES<VECTOR<T,3> > >& particles_to_embed,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T thickness_over_two);
     void Mark_Hard_Bindings_With_Free_Particles();

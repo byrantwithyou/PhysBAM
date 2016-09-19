@@ -513,29 +513,6 @@ FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const RANGE<TV>& bounding_box
     PHYSBAM_FATAL_ERROR("Could not find suitable placement");
 }
 //#####################################################################
-// TRAMPOLINE_CLIPPING
-//#####################################################################
-class TRAMPOLINE_CLIPPING:public TRIANGULATED_SURFACE_CLIPPING_HELPER<T>
-{
-public:
-    TV axis;
-    T radius_squared;
-    TRAMPOLINE_CLIPPING(const TV& axis_input,const T radius)
-        :axis(axis_input.Normalized()),radius_squared(sqr(radius))
-    {}
-
-    bool Prune(const TV& pt) const
-    {return pt.Projected_Orthogonal_To_Unit_Direction(axis).Magnitude_Squared()>radius_squared;}
-
-    void operator()(TRIANGULATED_SURFACE<T>& surface) const
-    {
-        for(int i=surface.mesh.elements.m-1;i>=0;i--){const VECTOR<int,3>& elements(surface.mesh.elements(i));
-            for(int j=0;j<3;j++) if(Prune(surface.particles.X(elements(j)))){surface.mesh.elements.Remove_Index_Lazy(i);break;}}
-        surface.Discard_Valence_Zero_Particles_And_Renumber();
-        static_cast<DEFORMABLE_PARTICLES<TV>&>(surface.particles).mass*=20;
-    }
-};
-//#####################################################################
 // Function Trampoline
 //#####################################################################
 void Trampoline()
@@ -570,8 +547,22 @@ void Trampoline()
     torus.Frame().r=torus_rotation;
 
     TORUS<T> torus_geometry(static_cast<ANALYTIC_IMPLICIT_OBJECT<TORUS<T> >&>(*torus.implicit_object->object_space_implicit_object).analytic);
-    TRAMPOLINE_CLIPPING clipping(torus.World_Space_Vector(torus_geometry.axis),torus_geometry.inner_radius+torus_geometry.outer_radius);
-    TRIANGULATED_SURFACE<T>& cloth=tests.Create_Cloth_Panel(number_side_panels,(T)15,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,3,0))),&clipping);
+
+    TV clip_axis=torus.World_Space_Vector(torus_geometry.axis);
+    T clip_radius_squared=sqr(torus_geometry.inner_radius+torus_geometry.outer_radius);
+    auto clipping = [=](TRIANGULATED_SURFACE<T>& surface)
+    {
+        for(int i=surface.mesh.elements.m-1;i>=0;i--){
+            const VECTOR<int,3>& elements(surface.mesh.elements(i));
+            for(int j=0;j<3;j++)
+                if(surface.particles.X(elements(j)).Projected_Orthogonal_To_Unit_Direction(clip_axis).Magnitude_Squared()>clip_radius_squared){
+                    surface.mesh.elements.Remove_Index_Lazy(i);
+                    break;}}
+        surface.Discard_Valence_Zero_Particles_And_Renumber();
+        static_cast<DEFORMABLE_PARTICLES<TV>&>(surface.particles).mass*=20;
+    };
+
+    TRIANGULATED_SURFACE<T>& cloth=tests.Create_Cloth_Panel(number_side_panels,(T)15,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,3,0))),clipping);
     (void)cloth;
 
     tests.Bind_Particles_In_Rigid_Body(torus);

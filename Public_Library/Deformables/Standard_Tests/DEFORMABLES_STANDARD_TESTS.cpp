@@ -398,7 +398,7 @@ Set_Mass_Of_Particles(const OPENSUBDIV_SURFACE<TV,gauss_order>& object,const T d
 //#####################################################################
 template<class TV> TRIANGULATED_SURFACE<typename TV::SCALAR>& DEFORMABLES_STANDARD_TESTS<TV>::
 Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_BODY_STATE<TV>* initial_state,
-    TRIANGULATED_SURFACE_CLIPPING_HELPER<T> *clipping_function,ARRAY<int>* particle_indices)
+    std::function<void (TRIANGULATED_SURFACE<T>&)> clipping_function,ARRAY<int>* particle_indices)
 {
     DEFORMABLE_PARTICLES<TV>& particles=*(new DEFORMABLE_PARTICLES<TV>());
     TRIANGULATED_SURFACE<T>& triangulated_surface=*TRIANGULATED_SURFACE<T>::Create(particles);
@@ -410,7 +410,7 @@ Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspe
     T dx=aspect_ratio*side_length/(m-1),dy=side_length/(n-1);
     for(int i=0;i<m;i++) for(int j=0;j<n;j++) particles.X(i+m*j)=TV(i*dx,(T).5,j*dy);
     if(initial_state) Set_Initial_Particle_Configuration(particles,*initial_state,true);
-    if(clipping_function) (*clipping_function)(triangulated_surface);
+    if(clipping_function) clipping_function(triangulated_surface);
     TRIANGULATED_SURFACE<T>& copy=Copy_And_Add_Structure(triangulated_surface,particle_indices);
     delete &particles;
     return copy;
@@ -657,7 +657,7 @@ Mark_Hard_Bindings_With_Free_Particles()
     template TRIANGULATED_AREA<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Copy_And_Add_Structure(TRIANGULATED_AREA<T>&,ARRAY<int>*,bool); \
     template SEGMENTED_CURVE<VECTOR<T,2> >& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Copy_And_Add_Structure(SEGMENTED_CURVE<VECTOR<T,2> >&,ARRAY<int>*,bool); \
     template TRIANGULATED_SURFACE<T>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Cloth_Panel(const int,const T,const T,const RIGID_BODY_STATE<VECTOR<T,3> >*, \
-        TRIANGULATED_SURFACE_CLIPPING_HELPER<T>*,ARRAY<int>*); \
+        std::function<void (TRIANGULATED_SURFACE<T>&)>,ARRAY<int>*);                  \
     template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Set_Mass_Of_Particles<SEGMENTED_CURVE<VECTOR<T,2> > >(SEGMENTED_CURVE<VECTOR<T,2> > const&,T,bool); \
     template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Set_Mass_Of_Particles<SEGMENTED_CURVE<VECTOR<T,3> > >(SEGMENTED_CURVE<VECTOR<T,3> > const&,T,bool); \
     template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Set_Mass_Of_Particles<SEGMENTED_CURVE_2D<T> >(SEGMENTED_CURVE_2D<T> const&,T,bool);

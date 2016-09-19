@@ -181,10 +181,9 @@ Median_Split(const int partition_index,const int first_index,const int last_inde
 
     std::nth_element(values.begin(),&values(partition_index-first_index),values.end());
     T split_value=values(partition_index-first_index);
-    Partition_Helper_Less_Equal partition_helper_less_equal(&points,axis,split_value);
-    Partition_Helper_Less partition_helper_less(&points,axis,split_value);
-    int* middle=std::stable_partition(permutation_subset.begin(),permutation_subset.end(),partition_helper_less);
-    std::stable_partition(middle,permutation_subset.end(),partition_helper_less_equal);
+
+    int* middle=std::stable_partition(permutation_subset.begin(),permutation_subset.end(),[=](int i){return points(i)[axis]<split_value;});
+    std::stable_partition(middle,permutation_subset.end(),[=](int i){return points(i)[axis]<=split_value;});
     assert(points(permutation_array(partition_index-1))[axis]<=split_value && split_value<=points(permutation_array(partition_index))[axis]);
 }
 //#####################################################################

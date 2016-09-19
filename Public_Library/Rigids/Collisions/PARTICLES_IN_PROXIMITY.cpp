@@ -7,15 +7,6 @@ namespace PhysBAM{
 
 namespace PARTICLES_IN_PROXIMITY
 {
-template<class T> 
-class CONVEX_HULL_COMPARATOR
-{
-public:
-    bool operator()(const PAIR<T,int>& p0,const PAIR<T,int>& p1)
-    {
-        return p0.x<p1.x;
-    };
-};
 template<class T>
 ARRAY<int> Convex_Hull(ARRAY<VECTOR<T,2> >& points)
 {
@@ -41,8 +32,7 @@ ARRAY<int> Convex_Hull(ARRAY<VECTOR<T,2> >& points)
         T angle=atan2(direction(1),direction(0));
         angles(i)=PAIR<T,int>(angle,i);
     }
-    CONVEX_HULL_COMPARATOR<T> comparator;
-    angles.Sort(comparator);
+    angles.Sort([](const PAIR<T,int>& p0,const PAIR<T,int>& p1){return p0.x<p1.x;});
 
     /*for(int i=0;i<angles.m;i++)
       LOG::cout << "angle " << i << " " << angles(i).x << " " << angles(i).y << std::endl;*/

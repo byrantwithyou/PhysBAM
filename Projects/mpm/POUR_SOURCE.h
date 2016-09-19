@@ -8,7 +8,7 @@
 #include <Tools/Arrays/ARRAY.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <functional>
 namespace PhysBAM{
 
 template<class TV> class STANDARD_TESTS_BASE;
