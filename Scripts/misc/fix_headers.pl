@@ -105,7 +105,6 @@ for $filenamex (@ARGV)
         my $pre = $1;
         my $post = $7;
         if(defined $system{$file}){push @system, [$full,$pre,$post];next;}
-        if(defined $local_lookup{$file}){push @local_includes, ["\"$local_lookup{$file}\"",$pre,$post];next;}
         if(defined $lookup{$file})
         {
             $lookup{$file}=~/^(.*?)\//;
@@ -114,6 +113,7 @@ for $filenamex (@ARGV)
             push @$L, ["<$lookup{$file}>",$pre,$post];
             next;
         }
+        if(defined $local_lookup{$file}){push @local_includes, ["\"$local_lookup{$file}\"",$pre,$post];next;}
         if(!$path){push @other, [$full,$pre,$post];next;}
         print  "include not recognized: '$file' in '$filename'\n";
         push @other, [$full,$pre,$post];
