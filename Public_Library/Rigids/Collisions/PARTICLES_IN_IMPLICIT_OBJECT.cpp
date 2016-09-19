@@ -217,7 +217,7 @@ Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& body0,R
                     if(INTERSECTION::Lazy_Intersects(ray,(*body1.simplicial_object->triangle_list)(triangle_list2(k)))){
                         bool going_in=TV::Dot_Product((*body1.simplicial_object->triangle_list)(triangle_list2(k)).Normal(),ray.direction) < 0;
                         intersections.Append(PAIR<T,bool>(ray.t_max,going_in));}}
-                intersections.Sort(Field_Comparison(&PAIR<T,bool>::x));
+                intersections.Sort([](const auto& a,const auto& b){return a.x<b.x;});
                 for(int kk=1;kk<intersections.m;kk++) // find midpoints of intersecting edges
                     if(intersections(kk).y && !intersections(kk+1).y){              
                         T s=(T).5*(intersections(kk).x+intersections(kk+1).x)*one_over_t_max;

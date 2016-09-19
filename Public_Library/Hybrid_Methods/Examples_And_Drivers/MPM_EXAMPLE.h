@@ -11,6 +11,7 @@
 #include <Tools/Utilities/NONCOPYABLE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
+#include <functional>
 namespace PhysBAM{
 
 template<class TV> class DEBUG_PARTICLES;

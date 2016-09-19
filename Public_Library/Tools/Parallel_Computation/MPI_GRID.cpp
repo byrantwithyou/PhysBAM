@@ -129,7 +129,7 @@ Initialize_Communicator(const bool manual,MPI::Group* group)
         // sort axes in decreasing order of how much we have to communicate along them
         ARRAY<int> axes(TV::m);ARRAY<T> axis_lengths(TV::m);
         for(int axis=0;axis<TV::m;axis++){axes(axis)=axis;axis_lengths(axis)=(T)global_grid.Domain_Indices().Maximum_Corner()[axis]/extents[axis];}
-        axes.Sort(Indirect_Comparison(axis_lengths));
+        axes.Sort([](int a,int b){return axis_lengths(a)<axis_lengths(b);});
         // lay out process ranks on grid
         Fill_Process_Ranks(process_grid,process_ranks,axes);
         // fill in ghost process_ranks for periodic domains

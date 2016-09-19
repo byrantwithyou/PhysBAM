@@ -6,6 +6,7 @@
 #define __MPM_COLLISION_IMPLICIT_OBJECT__
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
+#include <functional>
 namespace PhysBAM{
 
 template<class TV>

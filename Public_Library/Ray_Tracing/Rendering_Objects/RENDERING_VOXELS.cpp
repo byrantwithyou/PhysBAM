@@ -35,7 +35,7 @@ Precompute_Light_Data(bool use_fast_precomputation,RENDER_WORLD<T>& world)
         average_sample_point/=(T)sample_array.m;
         if(use_fast_precomputation){
             for(int i=0;i<location_list.m;i++)distance_squared_to_light(i)=(average_sample_point-location_list(i)).Magnitude_Squared();
-            node_indirection.Sort(Indirect_Comparison(distance_squared_to_light));}
+            node_indirection.Sort([&](int a,int b){return distance_squared_to_light(a)<distance_squared_to_light(b);});}
         for(int i=0;i<location_list.m;i++){
             SEGMENT_3D<T> s(location_list(node_indirection(i)),average_sample_point);
             RAY<VECTOR<T,3> > rr(s);
