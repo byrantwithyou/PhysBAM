@@ -55,10 +55,10 @@ Build_Collision_Geometry(STRUCTURE<TV>& structure)
 {
     Clean_Memory();
     if((segmented_curve=Segmented_Curve(&structure)))
-        segmented_curve->mesh.elements.Flattened().Get_Unique(active_indices);
+        Get_Unique(active_indices,segmented_curve->mesh.elements.Flattened());
     else if((triangulated_surface=Triangulated_Surface(&structure))){
 
-        triangulated_surface->mesh.elements.Flattened().Get_Unique(active_indices);
+        Get_Unique(active_indices,triangulated_surface->mesh.elements.Flattened());
         triangulated_surface->Update_Number_Nodes();
         if(!triangulated_surface->mesh.segment_mesh) triangulated_surface->mesh.Initialize_Segment_Mesh();
         segmented_curve=new T_SEGMENTED_CURVE(*triangulated_surface->mesh.segment_mesh,full_particles); // TODO: This is broken; long term shallow copy of a temporary auxiliary structure

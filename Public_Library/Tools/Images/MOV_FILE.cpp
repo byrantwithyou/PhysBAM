@@ -6,6 +6,7 @@
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Tools/Images/IMAGE.h>
 #include <Tools/Images/MOV_FILE.h>
+#include <Tools/Log/LOG.h>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>

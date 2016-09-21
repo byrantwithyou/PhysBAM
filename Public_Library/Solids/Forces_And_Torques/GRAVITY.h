@@ -39,7 +39,7 @@ public:
         const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::dimension==1)))
         :POINTWISE_FORCE<TV>(particles_input,rigid_body_collection_input,mesh,influenced_rigid_body_particles_input),gravity(gravity_input)
     {
-        mesh.elements.Flattened().Get_Unique(*influenced_particles);
+        Get_Unique(*influenced_particles,mesh.elements.Flattened());
     }
 
     virtual ~GRAVITY()

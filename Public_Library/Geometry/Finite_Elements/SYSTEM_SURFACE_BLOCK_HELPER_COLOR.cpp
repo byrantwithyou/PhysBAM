@@ -24,7 +24,7 @@ Initialize(CELL_DOMAIN_INTERFACE_COLOR<TV> &cdi_input,const BASIS_STENCIL_UNIFOR
 
     for(int i=0;i<s.diced.m;i++) flat_diff.Append(cdi->Flatten_Diff(s.diced(i).index_offset));
 
-    flat_diff.Prune_Duplicates();
+    Prune_Duplicates(flat_diff);
     flat_diff.Sort();
 
     for(int i=0;i<TV::m;i++){

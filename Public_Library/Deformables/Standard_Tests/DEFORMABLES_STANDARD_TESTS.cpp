@@ -280,7 +280,8 @@ Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bind
     const bool use_impulses_for_collisions)
 {
     DEFORMABLE_PARTICLES<TV>& particles=soft_bindings.particles;
-    ARRAY<int> nodes;object.mesh.elements.Flattened().Get_Unique(nodes);
+    ARRAY<int> nodes;
+    Get_Unique(nodes,object.mesh.elements.Flattened());
     ARRAY<int> map_to_new_particles(IDENTITY_ARRAY<>(particles.Size()));
     for(int i=0;i<nodes.m;i++) if(!embedded_only || soft_bindings.binding_list.Binding_Index_From_Particle_Index(nodes(i))>=0){
         int node=nodes(i),bound_node;
@@ -354,7 +355,8 @@ Create_Drifted_Surface(const TRIANGULATED_SURFACE<T>& triangulated_surface,SOFT_
 {
     assert(&triangulated_surface.particles==&soft_bindings.particles);
     DEFORMABLE_PARTICLES<TV>& particles=soft_bindings.particles;
-    ARRAY<int> triangulated_surface_nodes;triangulated_surface.mesh.elements.Flattened().Get_Unique(triangulated_surface_nodes);
+    ARRAY<int> triangulated_surface_nodes;
+    Get_Unique(triangulated_surface_nodes,triangulated_surface.mesh.elements.Flattened());
     ARRAY<int> child_particles(particles.Size());
     particles.Preallocate(particles.Size()+triangulated_surface_nodes.m);
     for(int i=0;i<triangulated_surface_nodes.m;i++){int p=triangulated_surface_nodes(i);
@@ -374,7 +376,8 @@ Set_Mass_Of_Particles(const T_OBJECT& object,const T density,const bool use_cons
     if(!object.mesh.elements.m) return;
     DEFORMABLE_PARTICLES<TV>& particles=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(object.particles);
     particles.Store_Mass();
-    ARRAY<int> nodes;object.mesh.elements.Flattened().Get_Unique(nodes);
+    ARRAY<int> nodes;
+    Get_Unique(nodes,object.mesh.elements.Flattened());
     if(use_constant_mass&&nodes.m){
         T mass_per_node=density*object.Total_Size()/nodes.m;
         particles.mass.Subset(nodes).Fill(mass_per_node);}

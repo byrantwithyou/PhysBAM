@@ -4,6 +4,7 @@
 //#####################################################################
 #ifndef __DRIVER__
 #define __DRIVER__
+#include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{

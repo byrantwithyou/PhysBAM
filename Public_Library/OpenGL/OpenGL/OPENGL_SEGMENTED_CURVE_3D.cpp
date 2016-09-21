@@ -118,8 +118,10 @@ template<class T> void OPENGL_SEGMENTED_CURVE_3D<T>::
 Initialize_Vertex_Normals() const
 {
     TV camera_direction=TV(OPENGL_WORLD<T>::Singleton()->Get_Camera_Position()-OPENGL_WORLD<T>::Singleton()->Get_Target_Position()).Normalized();
-    bool incident_segments_defined=(curve.mesh.incident_elements!=0);if(!incident_segments_defined) curve.mesh.Initialize_Incident_Elements();
-    segment_nodes.Remove_All();curve.mesh.elements.Flattened().Get_Unique(segment_nodes);
+    bool incident_segments_defined=(curve.mesh.incident_elements!=0);
+    if(!incident_segments_defined) curve.mesh.Initialize_Incident_Elements();
+    segment_nodes.Remove_All();
+    Get_Unique(segment_nodes,curve.mesh.elements.Flattened());
     vertex_normals.Remove_All();
     for(int i=0;i<segment_nodes.m;i++){int p=segment_nodes(i);
         const ARRAY<int>& incident=(*curve.mesh.incident_elements)(p);

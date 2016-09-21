@@ -671,7 +671,8 @@ void Initialize_Bodies() override
             FREE_PARTICLES<TV>& interior=*FREE_PARTICLES<TV>::Create(particles);
             for(int s=0;s<deformable_body_collection.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(s))){
                 if(!volume->mesh.node_on_boundary) volume->mesh.Initialize_Node_On_Boundary();
-                ARRAY<int> nodes;volume->mesh.elements.Flattened().Get_Unique(nodes);
+                ARRAY<int> nodes;
+                Get_Unique(nodes,volume->mesh.elements.Flattened());
                 for(int i=0;i<nodes.m;i++)if(!(*volume->mesh.node_on_boundary)(nodes(i))) interior.nodes.Append(nodes(i));}
             LOG::Stat("interior particles",interior.nodes.m);
             solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(&interior);}}

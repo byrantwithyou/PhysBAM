@@ -34,7 +34,7 @@ public:
     DEFORMABLE_GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,const T_MESH& mesh,const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::dimension==1)))
         :POINTWISE_DEFORMABLE_FORCE<TV>(particles_input,mesh),gravity(gravity_input)
     {
-        mesh.elements.Flattened().Get_Unique(*influenced_particles);
+        Get_Unique(*influenced_particles,mesh.elements.Flattened());
     }
 
     virtual ~DEFORMABLE_GRAVITY()

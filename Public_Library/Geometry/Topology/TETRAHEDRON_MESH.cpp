@@ -289,7 +289,7 @@ Initialize_Boundary_Nodes()
     if(!boundary_mesh_defined){delete boundary_mesh;boundary_mesh=0;}
 
     boundary_nodes->Sort();
-    boundary_nodes->Prune_Duplicates();
+    Prune_Duplicates(*boundary_nodes);
 }
 //#####################################################################
 // Function Initialize_Edge_Tetrahedrons

@@ -7,6 +7,7 @@
 #ifndef __BOUNDED_HORIZONTAL_PLANE__
 #define __BOUNDED_HORIZONTAL_PLANE__
 
+#include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Vectors/VECTOR_3D.h>
 namespace PhysBAM{

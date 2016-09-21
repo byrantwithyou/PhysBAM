@@ -9,7 +9,6 @@
 
 #include <Tools/Arrays/ARRAY_BASE.h>
 #include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG_PRINTF.h>
 #include <Tools/Math_Tools/min.h>
 #include <Tools/Utilities/EXCEPTIONS.h>
 #include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
@@ -209,10 +208,6 @@ public:
     ARRAY<T2,ID>::Put(array,*temporary_array);for(ID i(0);i<compaction_array_m;i++) if(compaction_array(i)>0) array(compaction_array(i))=(*temporary_array)(i);
     if(!temporary_array_defined){delete temporary_array;temporary_array=0;}}
 
-    template<class T_ARRAY0,class T_ARRAY1>
-    void Find_Common_Elements(const ARRAY_BASE<T,T_ARRAY0,ID>& a,const ARRAY_BASE<T,T_ARRAY1,ID>& b)
-    {HASHTABLE<T> ht;ht.Set_All(b);Remove_All();for(ID i(0),m=a.Size();i<m;i++) if(ht.Contains(a(i))) Append(a(i));}
-
     T* begin() // for stl
     {return Get_Array_Pointer();}
 
@@ -237,7 +232,10 @@ public:
 
     template<class RW> void Read(std::istream& input)
     {Clean_Memory();ID m;Read_Binary<RW>(input,m);
-    if(m<ID()) throw READ_ERROR(LOG::sprintf("Invalid negative array size %d",Value(m)));
+    if(m<ID()){
+        char buff[100];
+        sprintf(buff,"Invalid negative array size %d",Value(m));
+        throw READ_ERROR(buff);}
     if(!m) return;
     Exact_Resize(m);
     Read_Binary_Array<RW>(input,Get_Array_Pointer(),Value(m));}

@@ -27,7 +27,7 @@ Initialize(CELL_DOMAIN_INTERFACE_COLOR<TV> &cdi_input,const BASIS_STENCIL_UNIFOR
     for(int i=0;i<s0.diced.m;i++)
         Initialize_Helper(s0.diced(i).subcell,diffs,s0.diced(i).index_offset,args...);
 
-    flat_diff.Prune_Duplicates();
+    Prune_Duplicates(flat_diff);
     flat_diff.Sort(LEXICOGRAPHIC_COMPARE());
     
     data.Resize(cdi->colors);

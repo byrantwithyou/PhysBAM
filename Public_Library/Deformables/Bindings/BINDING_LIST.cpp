@@ -198,7 +198,7 @@ Update_Neighbor_Bindings()
         bindings(k)->Parents(parents);
         for(int i=0;i<parents.m;i++)
             neighbor_bindings(bindings(k)->particle_index).Append_Elements(children(parents(i)));
-        neighbor_bindings(bindings(k)->particle_index).Prune_Duplicates();}
+        Prune_Duplicates(neighbor_bindings(bindings(k)->particle_index));}
 }
 //#####################################################################
 // Function Apply_Impulse

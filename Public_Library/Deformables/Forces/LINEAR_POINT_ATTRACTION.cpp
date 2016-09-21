@@ -14,7 +14,7 @@ template<class TV> LINEAR_POINT_ATTRACTION<TV>::
 LINEAR_POINT_ATTRACTION(T_MESH& mesh,const TV& pt,T coefficient_input)
     :BASE(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(mesh.particles)),surface(mesh),coefficient(coefficient_input),point(pt),dt(0),apply_explicit_forces(true),apply_implicit_forces(true)
 {
-    mesh.mesh.elements.Flattened().Get_Unique(referenced_particles);
+    Get_Unique(referenced_particles,mesh.mesh.elements.Flattened());
 }
 //#####################################################################
 // Destructor

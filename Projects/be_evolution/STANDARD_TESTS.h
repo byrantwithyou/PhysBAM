@@ -2320,7 +2320,7 @@ void Initialize_Bodies() override
                     undeformed_triangulated_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation);
                 if(self_collide_surface_only){
                     coll->colliding_particles=tetrahedralized_volume.triangulated_surface->mesh.elements.Flattened();
-                    coll->colliding_particles.Prune_Duplicates();}
+                    Prune_Duplicates(coll->colliding_particles);}
                 int force_id=solid_body_collection.Add_Force(coll);
                 if(backward_euler_evolution) backward_euler_evolution->minimization_objective.deformables_forces_lazy.Set(force_id);}}
         else{
@@ -2666,7 +2666,7 @@ void Postprocess_Substep(const T dt,const T time) override
               tetrahedralized_volume.Update_Bounding_Box();
               if(tetrahedralized_volume.bounding_box->min_corner.y>10*m){
                 ARRAY<int> mesh_particles;
-                tetrahedralized_volume.mesh.elements.Flattened().Get_Unique(mesh_particles);
+                Get_Unique(mesh_particles,tetrahedralized_volume.mesh.elements.Flattened());
                 for(int i=0;i<mesh_particles.m;i++)
                   if(particles.V(mesh_particles(i)).y<-attachment_velocity)
                     particles.V(mesh_particles(i)).y=-attachment_velocity;}}}

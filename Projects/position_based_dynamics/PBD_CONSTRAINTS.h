@@ -4,6 +4,7 @@
 //#####################################################################
 #ifndef __PBD_CONSTRAINTS__
 #define __PBD_CONSTRAINTS__
+#include <Tools/Log/LOG.h>
 #include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{

@@ -154,7 +154,7 @@ void Preprocess_Frame(const int frame) override
     TRIANGULATED_SURFACE<T>& triangulated_surface=redgreen->object;
     ARRAY<int> surface_particles;
     while(1){
-        triangulated_surface.mesh.elements.Flattened().Get_Unique(surface_particles);
+        Get_Unique(surface_particles,triangulated_surface.mesh.elements.Flattened());
         ARRAY<T> particle_distances(particles.Size());
         particle_distances.Subset(surface_particles).Fill((T)FLT_MAX);
         for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
@@ -177,7 +177,7 @@ void Preprocess_Frame(const int frame) override
     delete redgreen->free_segment_midpoints;redgreen->free_segment_midpoints=0;
     ARRAY<int> parents;ARRAY<T> weights;
     binding_list.Clean_Memory();
-    triangulated_surface.mesh.elements.Flattened().Get_Unique(surface_particles);
+    Get_Unique(surface_particles,triangulated_surface.mesh.elements.Flattened());
     for(int i=0;i<surface_particles.m;i++){
         redgreen->Unrefined_Parents(surface_particles(i),parents,weights);
         switch(parents.m){

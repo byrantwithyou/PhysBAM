@@ -47,7 +47,7 @@ public:
         :DEFORMABLES_FORCES<TV>(particles_input),influenced_particles(new ARRAY<int>),
         need_destroy_influenced_particles(true),influence_all_particles(false)
     {
-        mesh.elements.Flattened().Get_Unique(*influenced_particles);
+        Get_Unique(*influenced_particles,mesh.elements.Flattened());
     }
 
     virtual ~POINTWISE_DEFORMABLE_FORCE()

@@ -194,7 +194,8 @@ Draw_Vertices_For_Selection(const SIMPLEX_MESH<d>& mesh,const GEOMETRY_PARTICLES
     glPushAttrib(GL_POINT_BIT);
     glPointSize(OPENGL_PREFERENCES::selection_point_size);
     glPushName(0);
-    ARRAY<int> particles_in_mesh;mesh.elements.Flattened().Get_Unique(particles_in_mesh);
+    ARRAY<int> particles_in_mesh;
+    Get_Unique(particles_in_mesh,mesh.elements.Flattened());
     ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
     for(int i=0;i<particles_in_mesh.m;i++){const int p=particles_in_mesh(i);
         glLoadName(p);

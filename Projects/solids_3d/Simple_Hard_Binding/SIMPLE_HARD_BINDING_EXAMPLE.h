@@ -105,7 +105,8 @@ void Initialize_Redgreen()
     redgreen->Initialize_Segment_Index_From_Midpoint_Index();
     triangle_free_particles.Resize(surface->mesh.elements.m,true);
 
-    ARRAY<int> surface_particles;surface->mesh.elements.Flattened().Get_Unique(surface_particles);
+    ARRAY<int> surface_particles;
+    Get_Unique(surface_particles,surface->mesh.elements.Flattened());
     for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
         ARRAY<int> parents_list;ARRAY<T> weights_list;
         redgreen->Unrefined_Parents(p,parents_list,weights_list);
@@ -303,7 +304,8 @@ void Preprocess_Solids_Substep(const T time,const int substep) override
     ARRAY<VECTOR<int,2> > new_soft_bindings;
 
     // surface particles
-    ARRAY<int> surface_particles;surface_elements.Flattened().Get_Unique(surface_particles);
+    ARRAY<int> surface_particles;
+    Get_Unique(surface_particles,surface_elements.Flattened());
 
     // clamp binding list and redgreen bindings
     binding_list.Clamp_Particles_To_Embedded_Positions();

@@ -121,7 +121,7 @@ void Initialize_Bodies() override
     for(int i=0;i<deformable_body_collection.structures.m;i++){
         if(SEGMENTED_CURVE<TV>* curve=dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.structures(i))){
             ARRAY<int>& referenced_nodes=*new ARRAY<int>; // hey craig, look a memory leak.  hi, andy, fix this one, too.
-            curve->mesh.elements.Flattened().Get_Unique(referenced_nodes);
+            Get_Unique(referenced_nodes,curve->mesh.elements.Flattened());
             solid_body_collection.Add_Force(Create_Edge_Springs(*curve,100/(1+sqrt((T)2)),(T)3));
             solid_body_collection.Add_Force(Create_Segment_Bending_Springs(*curve,100/(1+sqrt((T)2)),(T)3));
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,&referenced_nodes,0));}}

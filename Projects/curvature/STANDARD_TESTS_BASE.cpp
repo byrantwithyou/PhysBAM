@@ -413,7 +413,7 @@ Initialize_Bodies_After()
                         undeformed_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation);
                 if(self_collide_surface_only){
                     coll->colliding_particles=surface.mesh.elements.Flattened();
-                    coll->colliding_particles.Prune_Duplicates();}
+                    Prune_Duplicates(coll->colliding_particles);}
                 int force_id=solid_body_collection.Add_Force(coll);
                 if(backward_euler_evolution) backward_euler_evolution->minimization_objective.deformables_forces_lazy.Set(force_id);}}}
 

@@ -10,6 +10,7 @@
 #include <Tools/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Arrays/SORT.h>
 #include <Tools/Data_Structures/ELEMENT_ID.h>
+#include <Tools/Data_Structures/HASH_REDUCE.h>
 #include <Tools/Math_Tools/exchange.h>
 #include <Tools/Math_Tools/max.h>
 #include <Tools/Math_Tools/maxabs.h>
@@ -442,12 +443,6 @@ public:
 
     int Number_False() const
     {STATIC_ASSERT_SAME(T,bool);return Count_Matches(false);}
-
-    void Get_Unique(ARRAY<T>& array) const
-    {const T_ARRAY& self=Derived();HASHTABLE<T> hash(Value(self.Size())*3/2);array.Remove_All();for(int i=0;i<self.Size();i++) if(hash.Set(self(i))) array.Append(self(i));}
-
-    void Prune_Duplicates()
-    {T_ARRAY& self=Derived();HASHTABLE<T> hash(Value(self.Size())*3/2);int j=0;for(int i=0;i<self.Size();i++) if(hash.Set(self(i))) self(j++)=self(i);self.Resize(j);}
 
     void Coalesce()
     {Sort();T_ARRAY& self=Derived();int j=-1;if(self.Size()>0) j=0;for(int i=1;i<self.Size();i++){if(!(self(j)<self(i))) self(j).Merge(self(i));else self(++j)=self(i);}self.Resize(j+1);}

@@ -32,7 +32,7 @@ POINTWISE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<
     influenced_rigid_body_particles(influenced_rigid_body_particles_input),
     need_destroy_influenced_particles(true),need_destroy_influenced_rigid_body_particles(false),influence_all_particles(false),influence_all_rigid_body_particles(false)
 {
-    mesh.elements.Flattened().Get_Unique(*influenced_particles);
+    Get_Unique(*influenced_particles,mesh.elements.Flattened());
 }
 template<class TV> POINTWISE_FORCE<TV>::
 ~POINTWISE_FORCE()

@@ -88,7 +88,8 @@ void Get_Initial_Data()
     if(use_bindings){
         // compute the embedding
         volume.Initialize_Hierarchy();
-        ARRAY<int> tri_nodes;surface.mesh.elements.Flattened().Get_Unique(tri_nodes);
+        ARRAY<int> tri_nodes;
+        Get_Unique(tri_nodes,surface.mesh.elements.Flattened());
         ARRAY<int> list;
         for(int i=0;i<tri_nodes.m;i++){int p=tri_nodes(i);
             list.Remove_All();
@@ -116,7 +117,8 @@ void Get_Initial_Data()
     for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
         
     // set constrained nodes
-    ARRAY<int> tet_nodes;volume.mesh.elements.Flattened().Get_Unique(tet_nodes);
+    ARRAY<int> tet_nodes;
+    Get_Unique(tet_nodes,volume.mesh.elements.Flattened());
     for(int i=0;i<tet_nodes.m;i++) if(particles.X(tet_nodes(i)).y<(T).17) constrained_nodes.Insert(tet_nodes(i));
 
     // tet mass
@@ -167,7 +169,7 @@ void Initialize_Bodies() override
     for(int i=0;i<deformable_body_collection.structures.m;i++){
         if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(i))){
             ARRAY<int>& referenced_nodes=*new ARRAY<int>; // hey craig, look a memory leak.  cool andy, why don't you fix it?
-            volume->mesh.elements.Flattened().Get_Unique(referenced_nodes);
+            Get_Unique(referenced_nodes,volume->mesh.elements.Flattened());
             for(int i=referenced_nodes.m;i>=1;i--) if(constrained_nodes.Contains(referenced_nodes(i))) referenced_nodes.Remove_Index_Lazy(i);
             solid_body_collection.Add_Force(Create_Edge_Springs(*volume,(T)100,(T)3));
             solid_body_collection.Add_Force(Create_Altitude_Springs(*volume,(T)100,(T)3));

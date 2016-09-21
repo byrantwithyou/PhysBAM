@@ -32,7 +32,8 @@ FINITE_VOLUME_HEXAHEDRONS(STRAIN_MEASURE_HEXAHEDRONS<T>& strain_measure,CONSTITU
     strain_measure.mesh.Initialize_Incident_Elements();
     if(use_uniform_density){
         T total_mass=0;
-        ARRAY<int> mesh_particles;strain_measure.mesh_object.mesh.elements.Flattened().Get_Unique(mesh_particles);
+        ARRAY<int> mesh_particles;
+        Get_Unique(mesh_particles,strain_measure.mesh_object.mesh.elements.Flattened());
         for(int i=0;i<mesh_particles.m;i++) total_mass+=particles.mass(mesh_particles(i));
         density=total_mass/strain_measure.mesh_object.Total_Volume();
         if(density==0) density=TV::dimension==1?1:TV::dimension==2?100:1000;}

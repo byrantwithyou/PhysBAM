@@ -1404,7 +1404,7 @@ void Initialize_Dynamic_Subsampling()
         triangulated_surface->Update_Number_Nodes();
         surface_elements.Append_Elements(triangulated_surface->mesh.elements);}
 
-    surface_elements.Flattened().Get_Unique(surface_particles);
+    Get_Unique(surface_particles,surface_elements.Flattened());
 
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create(deformable_body_collection.particles);
     deformable_body_collection.Add_Structure(&free_particles);

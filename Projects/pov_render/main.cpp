@@ -284,7 +284,7 @@ void Create_Texture_Map(std::ofstream& fout,const HASHTABLE<std::string,std::str
         PATCH& p=patches(i);
         for(int j=0;j<p.patch_elements.m;j++)
             p.patch_vertices.Append_Elements(ts->mesh.elements(p.patch_elements(j)));
-        p.patch_vertices.Prune_Duplicates();
+        Prune_Duplicates(p.patch_vertices);
         p.coords.Resize(ts->particles.X.m);
         for(int j=0;j<p.patch_vertices.m;j++){
             int q=p.patch_vertices(j);

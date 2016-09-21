@@ -121,7 +121,7 @@ void Get_Initial_Data()
         ARRAY<int> tri_particles;
         TRIANGULATED_SURFACE<T>* esurface=(TRIANGULATED_SURFACE<T>::Create(particles));
         HASHTABLE<int,int> hard_to_soft;
-        surface->mesh.elements.Flattened().Get_Unique(tri_particles);
+        Get_Unique(tri_particles,surface->mesh.elements.Flattened());
         particles.Preallocate(tri_particles.m);
         for(int t=0;t<volume->mesh.elements.m;t++){
             const VECTOR<int,4>& nodes=volume->mesh.elements(t);

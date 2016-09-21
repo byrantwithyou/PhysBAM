@@ -40,7 +40,7 @@ Add_Mesh(OBJECT& object,const IMPLICIT_OBJECT<TV>& implicit_surface)
     collision_bodies.Append(&object);
     object.mesh.Initialize_Adjacent_Elements();
     ARRAY<int> unique_particles(object.mesh.elements.Flattened());
-    unique_particles.Prune_Duplicates();
+    Prune_Duplicates(unique_particles);
     for(int i=0;i<unique_particles.m;i++)
         undeformed_phi(unique_particles(i))=implicit_surface(particles.X(unique_particles(i)));
     OBJECT_BOUNDARY& ob=object.Get_Boundary_Object();

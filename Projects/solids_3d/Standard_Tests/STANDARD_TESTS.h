@@ -1120,7 +1120,8 @@ void Get_Initial_Data()
         case 42: 
             {TRIANGULATED_SURFACE<T>& surface=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,2,0))));
             RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("box",1,0);rigid_body->is_static=true;
-            ARRAY<int> referenced_particles;surface.mesh.elements.Flattened().Get_Unique(referenced_particles);
+            ARRAY<int> referenced_particles;
+            Get_Unique(referenced_particles,surface.mesh.elements.Flattened());
             SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);
             for(int i=0;i<referenced_particles.m;i++){int p=referenced_particles(i);
                 int rigid_p=particles.Add_Element();
@@ -1172,7 +1173,8 @@ void Get_Initial_Data()
                 volume_appended->Initialize_Hierarchy();
                 SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*volume,1,true);
                 deformable_body_collection.Add_Structure(volume_appended);
-                ARRAY<int> volume_elements;volume_appended->mesh.elements.Flattened().Get_Unique(volume_elements);
+                ARRAY<int> volume_elements;
+                Get_Unique(volume_elements,volume_appended->mesh.elements.Flattened());
                 for(int i=0;i<volume_elements.m;i++){int p=volume_elements(i);
                     if(particles.X(p).y<=particles.X(base_particle).y+1e-4){
                         fixed_particles.Append(p);

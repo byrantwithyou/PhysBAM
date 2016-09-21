@@ -6,6 +6,7 @@
 #include <Tools/Grids_Uniform/CELL_ITERATOR.h>
 #include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/GNUPLOT_OUTPUT.h>
 using namespace PhysBAM;
 //#####################################################################

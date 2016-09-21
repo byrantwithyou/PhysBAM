@@ -371,8 +371,6 @@ public:
     const_iterator end() const
     {return const_iterator(*this,const_iterator::END_ITERATOR);}
 };
-}
-namespace PhysBAM{
 template<class K,class T>
 std::ostream& operator<<(std::ostream& output,const HASHTABLE<K,T>& hashtable)
 {
@@ -395,6 +393,26 @@ std::ostream& operator<<(std::ostream& output,const HASHTABLE<K,void>& hashtable
         output<<data;}
     output<<")";
     return output;
+}
+template<class T,class T_ARRAY>
+void Get_Unique(ARRAY<T>& uniq,const ARRAY_BASE<T,T_ARRAY>& array)
+{
+    const T_ARRAY& self=array.Derived();
+    HASHTABLE<T> hash(Value(self.Size())*3/2);
+    uniq.Remove_All();
+    for(int i=0;i<self.Size();i++)
+        if(hash.Set(self(i)))
+            uniq.Append(self(i));
+}
+template<class T>
+void Prune_Duplicates(ARRAY<T>& array)
+{
+    HASHTABLE<T> hash(Value(array.Size())*3/2);
+    int j=0;
+    for(int i=0;i<array.Size();i++)
+        if(hash.Set(array(i)))
+            array(j++)=array(i);
+    array.Resize(j);
 }
 }
 #endif

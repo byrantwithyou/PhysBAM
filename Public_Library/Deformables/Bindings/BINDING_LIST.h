@@ -81,7 +81,10 @@ public:
 
     template<class T_INDEX>
     void Flatten_Indices(ARRAY<int>& flat_indices,const T_INDEX& indices) const
-    {for(int i=0;i<indices.Size();i++) Parents(flat_indices,indices(i));flat_indices.Prune_Duplicates();}
+    {
+        for(int i=0;i<indices.Size();i++) Parents(flat_indices,indices(i));
+        Prune_Duplicates(flat_indices);
+    }
 
     template<class T_INDEX,class T_WEIGHT>
     void Flatten_Weights(ARRAY<int>& flat_indices,ARRAY<T>& flat_weights,const T_INDEX& indices,const T_WEIGHT& weights) const

@@ -33,7 +33,8 @@ LINEAR_FINITE_VOLUME(T_OBJECT& object,const T youngs_modulus,const T poissons_ra
     mesh.Initialize_Incident_Elements();
     if(use_uniform_density){
         T total_mass=0;
-        ARRAY<int> mesh_particles;mesh.elements.Flattened().Get_Unique(mesh_particles);
+        ARRAY<int> mesh_particles;
+        Get_Unique(mesh_particles,mesh.elements.Flattened());
         for(int i=0;i<mesh_particles.m;i++) total_mass+=particles.mass(mesh_particles(i));
         density=total_mass/object.Total_Size();
         if(density==0) density=TV::dimension==1?1:TV::dimension==2?100:1000;}

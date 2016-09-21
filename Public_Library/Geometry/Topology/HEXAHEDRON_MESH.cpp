@@ -137,7 +137,7 @@ Initialize_Boundary_Nodes()
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
 
     boundary_nodes->Sort();
-    boundary_nodes->Prune_Duplicates();
+    Prune_Duplicates(*boundary_nodes);
 }
 //#####################################################################
 // Function Number_Of_Hexahedrons_Across_Face

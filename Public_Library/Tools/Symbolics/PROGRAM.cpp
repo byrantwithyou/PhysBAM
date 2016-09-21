@@ -1654,7 +1654,7 @@ Simplify_With_Distributive_Law(CODE_BLOCK_NODE* N)
     ARRAY<DISTRIBUTE_HELPER<T> > summands;
     Simplify_With_Distributive_Law_Helper(N->inst.dest,1,extra_nodes,summands);
     if(!extra_nodes.m) return N->prev;
-    extra_nodes.Prune_Duplicates();
+    Prune_Duplicates(extra_nodes);
     for(int i=0;i<extra_nodes.m;i++)
         if(extra_nodes(i)!=N)
             Delete_Instruction(extra_nodes(i));

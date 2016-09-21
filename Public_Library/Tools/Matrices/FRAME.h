@@ -7,6 +7,7 @@
 #ifndef __FRAME__
 #define __FRAME__
 
+#include <Tools/Log/LOG.h>
 #include <Tools/Math_Tools/FIXED_NUMBER.h>
 #include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Matrices/ROTATION.h>

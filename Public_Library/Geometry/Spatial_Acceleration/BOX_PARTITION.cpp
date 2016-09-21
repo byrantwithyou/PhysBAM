@@ -50,7 +50,7 @@ Find(const RANGE<TV>& range,ARRAY<int>& ids) const
 {
     for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices().Intersect(Range(range)));it.Valid();it.Next())
         cells(it.index).Append_Keys(ids);
-    ids.Prune_Duplicates();
+    Prune_Duplicates(ids);
 }
 //#####################################################################
 // Function Find

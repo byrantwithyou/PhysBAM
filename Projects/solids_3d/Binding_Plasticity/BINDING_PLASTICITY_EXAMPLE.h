@@ -98,7 +98,8 @@ void Create_Duplicate_Mesh(const TRIANGLE_MESH& mesh,TRIANGLE_MESH& duplicate_me
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
-    ARRAY<int> mesh_nodes;mesh.elements.Flattened().Get_Unique(mesh_nodes);
+    ARRAY<int> mesh_nodes;
+    Get_Unique(mesh_nodes,mesh.elements.Flattened());
     ARRAY<int> child_map(particles.Size());
     for(int i=0;i<mesh_nodes.m;i++){int p=mesh_nodes(i);
         child_map(p)=particles.Append(particles,p);}
@@ -160,8 +161,10 @@ TETRAHEDRALIZED_VOLUME<T>& Create_Deformable_Mattress()
     
     // add hard bindings between duplicate surface and mattress surface
     redgreen->Initialize_Segment_Index_From_Midpoint_Index();
-    ARRAY<int> refined_particles;embedding.material_surface_mesh.elements.Flattened().Get_Unique(refined_particles);
-    ARRAY<int> parents;ARRAY<T> weights;
+    ARRAY<int> refined_particles;
+    Get_Unique(refined_particles,embedding.material_surface_mesh.elements.Flattened());
+    ARRAY<int> parents;
+    ARRAY<T> weights;
     for(int i=0;i<refined_particles.m;i++){int p=refined_particles(i);
         redgreen->Unrefined_Parents(p,parents,weights);
         Add_Binding(p,parents,weights,parent_map);}
