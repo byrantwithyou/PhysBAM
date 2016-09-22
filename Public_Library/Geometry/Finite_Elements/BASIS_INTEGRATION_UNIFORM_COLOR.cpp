@@ -170,6 +170,7 @@ Compute_Open_Entries()
         tol=max(tol,uncut_subcell[i](TV_INT()));}
     tol*=1e-14;
 
+    auto func=[](OPEN_ENTRY& t,const OPEN_ENTRY& oe){t.x+=oe.x;};
     for(int k=0;k<volume_blocks.m;k++){
         VOLUME_BLOCK* vb=volume_blocks(k);
         for(int i=0;i<vb->overlap_polynomials.m;i++){
@@ -182,9 +183,9 @@ Compute_Open_Entries()
                     vb->open_subcell_entries[b].Append(me);}}
 
         for(int b=0;b<(1<<TV::m);b++){
-            vb->open_subcell_entries[b].Coalesce();
+            vb->open_subcell_entries[b].Coalesce(func);
             vb->open_entries.Append_Elements(vb->open_subcell_entries[b]);}
-        vb->open_entries.Coalesce();}
+        vb->open_entries.Coalesce(func);}
 }
 //#####################################################################
 // Function Add_Uncut_Fine_Cell

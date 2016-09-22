@@ -106,8 +106,9 @@ Compute(const int ghost_cells)
             for(int i=0;i<row.deformable_weights.m;i++) row.deformable_weights(i).weight=weight;
             for(int i=0;i<row.rigid_weights.m;i++) row.rigid_weights(i).weight=weight;}
 
-        row.deformable_weights.Coalesce();
-        row.rigid_weights.Coalesce();}
+        auto coalesce_func=[](WEIGHT_HELPER& a,const WEIGHT_HELPER& b){a.weight+=b.weight;};
+        row.deformable_weights.Coalesce(coalesce_func);
+        row.rigid_weights.Coalesce(coalesce_func);}
 }
 //#####################################################################
 // Function Times_Add

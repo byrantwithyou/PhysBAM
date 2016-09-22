@@ -257,7 +257,7 @@ public:
     {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();for(ID i(1);i<m;i++) result=PhysBAM::max(result,self(i));return result;}
 
     T Max_Abs() const
-    {const T_ARRAY& self=Derived();T result=T();;ID m=self.Size();for(ID i(0);i<m;i++) result=PhysBAM::max(result,abs(self(i)));return result;}
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result=PhysBAM::max(result,abs(self(i)));return result;}
 
     T Max_Mag() const
     {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result=PhysBAM::maxmag(result,self(i));return result;}
@@ -444,8 +444,9 @@ public:
     int Number_False() const
     {STATIC_ASSERT_SAME(T,bool);return Count_Matches(false);}
 
-    void Coalesce()
-    {Sort();T_ARRAY& self=Derived();int j=-1;if(self.Size()>0) j=0;for(int i=1;i<self.Size();i++){if(!(self(j)<self(i))) self(j).Merge(self(i));else self(++j)=self(i);}self.Resize(j+1);}
+    template<class F>
+    void Coalesce(F f)
+    {Sort();T_ARRAY& self=Derived();int j=-1;if(self.Size()>0) j=0;for(int i=1;i<self.Size();i++){if(!(self(j)<self(i))) f(self(j),self(i));else self(++j)=self(i);}self.Resize(j+1);}
 
     template<class T_COMPARE>
     void Sort(const T_COMPARE comparison)

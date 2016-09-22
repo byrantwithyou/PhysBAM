@@ -33,8 +33,6 @@ public:
             if(flat_index_offset!=oe.flat_index_offset) return flat_index_offset<oe.flat_index_offset; 
             return flat_index_diff_ref<oe.flat_index_diff_ref; 
         }
-        
-        void Merge(const OPEN_ENTRY& oe){x+=oe.x;}
     };
     
     struct OVERLAP_POLYNOMIAL

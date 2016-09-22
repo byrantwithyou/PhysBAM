@@ -26,7 +26,6 @@ class MATRIX_SOLID_INTERPOLATION:public MATRIX_SOLID_INTERPOLATION_BASE<TV>
         T weight;
         WEIGHT_HELPER(int i,T w):index(i),weight(w) {}
         bool operator<(const WEIGHT_HELPER& w) const {return index<w.index;}
-        void Merge(const WEIGHT_HELPER& w){assert(index==w.index);weight+=w.weight;}
     };
 
     struct DEFORMABLE_WEIGHT:public WEIGHT_HELPER

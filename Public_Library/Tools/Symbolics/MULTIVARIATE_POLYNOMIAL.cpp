@@ -23,7 +23,7 @@ template<class TV> MULTIVARIATE_POLYNOMIAL<TV>::
 template<class TV> void MULTIVARIATE_POLYNOMIAL<TV>::
 Simplify()
 {
-    terms.Coalesce();
+    terms.Coalesce([](MULTIVARIATE_MONOMIAL<TV>& a,const MULTIVARIATE_MONOMIAL<TV>& b){a.coeff+=b.coeff;});
     int k=0;
     for(int i=0;i<terms.m;i++) if(terms(i).coeff) terms(k++)=terms(i);
     terms.Resize(k);
