@@ -4,12 +4,12 @@
 //#####################################################################
 // Class HEXAHEDRON_MESH
 //##################################################################### 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Data_Structures/STACK.h>
-#include <Tools/Math_Tools/exchange_sort.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Data_Structures/STACK.h>
+#include <Core/Math_Tools/exchange_sort.h>
 #include <Geometry/Topology/HEXAHEDRON_MESH.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>

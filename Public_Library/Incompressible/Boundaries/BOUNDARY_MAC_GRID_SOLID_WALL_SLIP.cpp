@@ -2,9 +2,9 @@
 // Copyright 2005-2006, Eran Guendelman, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
 using namespace PhysBAM;
 template<class TV> BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>::

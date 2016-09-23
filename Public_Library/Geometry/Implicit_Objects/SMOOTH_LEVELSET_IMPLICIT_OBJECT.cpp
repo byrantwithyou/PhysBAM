@@ -4,10 +4,10 @@
 //#####################################################################
 // Class SMOOTH_LEVELSET_IMPLICIT_OBJECT
 //#####################################################################
-#include <Tools/Grids_Uniform_Interpolation/CUBIC_SPLINE_INTERPOLATION_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Grid_PDE/Interpolation/CUBIC_SPLINE_INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Implicit_Objects/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>

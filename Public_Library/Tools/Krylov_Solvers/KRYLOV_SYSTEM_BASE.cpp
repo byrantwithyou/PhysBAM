@@ -2,15 +2,15 @@
 // Copyright 2008, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/maxabs.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Utilities/DEBUG_CAST.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/maxabs.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Utilities/DEBUG_CAST.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

@@ -4,12 +4,12 @@
 //#####################################################################
 // Class EXTRAPOLATION_UNIFORM  
 //##################################################################### 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 using namespace PhysBAM;
 //#####################################################################

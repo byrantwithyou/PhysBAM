@@ -4,9 +4,9 @@
 //#####################################################################
 // Class SPHERE
 //##################################################################### 
-#include <Tools/Math_Tools/choice.h>
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Math_Tools/choice.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 using namespace PhysBAM;
 //#####################################################################

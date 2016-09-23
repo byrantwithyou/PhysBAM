@@ -2,8 +2,8 @@
 // Copyright 2002-2005, Ronald Fedkiw, Duc Nguyen.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Math_Tools/max.h>
+#include <Core/Math_Tools/max.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Compressible/Reactive_Euler_Equations/REACTIVE_EULER_2D.h>
 using namespace PhysBAM;
 //#####################################################################

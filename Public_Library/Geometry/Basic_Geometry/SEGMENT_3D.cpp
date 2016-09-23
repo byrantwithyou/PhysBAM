@@ -4,13 +4,13 @@
 //#####################################################################
 // Class SEGMENT_3D  
 //##################################################################### 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/clamp.h>
-#include <Tools/Math_Tools/INTERVAL.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/clamp.h>
+#include <Core/Math_Tools/INTERVAL.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Tools/Polynomials/CUBIC.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/SEGMENT_3D.h>
 using namespace PhysBAM;
 //#####################################################################

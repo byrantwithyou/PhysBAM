@@ -2,7 +2,7 @@
 // Copyright 2004-2008, Zhaosheng Bao, Eilene Hao, Sergey Koltakov, Frank Losasso, Craig Schroeder, Andrew Selle, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
 #include <Ray_Tracing/Rendering_Lights/RENDERING_DIRECTIONAL_LIGHT.h>
 #include <Ray_Tracing/Rendering_Lights/RENDERING_POINT_LIGHT.h>

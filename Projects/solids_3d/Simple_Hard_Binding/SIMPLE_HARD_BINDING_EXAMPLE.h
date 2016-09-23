@@ -7,9 +7,9 @@
 #ifndef __SIMPLE_HARD_BINDING_EXAMPLE__
 #define __SIMPLE_HARD_BINDING_EXAMPLE__
 
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 #include <Deformables/Bindings/PARTICLE_BINDING.h>

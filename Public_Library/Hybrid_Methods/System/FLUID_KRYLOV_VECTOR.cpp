@@ -2,7 +2,7 @@
 // Copyright 2015, Greg Klar, Andre Pradhana
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Utilities/DEBUG_CAST.h>
+#include <Core/Utilities/DEBUG_CAST.h>
 #include <Hybrid_Methods/System/FLUID_KRYLOV_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################

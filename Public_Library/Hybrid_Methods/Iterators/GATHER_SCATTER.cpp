@@ -2,9 +2,9 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>

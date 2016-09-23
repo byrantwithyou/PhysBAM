@@ -3,15 +3,15 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class SEGMENT_ADHESION
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/QUEUE.h>
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_2D.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/QUEUE.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Vectors/VECTOR_2D.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/SEGMENT_3D.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <Deformables/Collisions_And_Interactions/EDGE_EDGE_ADHESION_VISITOR.h>

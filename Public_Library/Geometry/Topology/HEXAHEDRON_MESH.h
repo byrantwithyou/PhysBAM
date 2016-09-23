@@ -7,9 +7,9 @@
 #ifndef __HEXAHEDRON_MESH__
 #define __HEXAHEDRON_MESH__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{ 
 
 class SEGMENT_MESH;

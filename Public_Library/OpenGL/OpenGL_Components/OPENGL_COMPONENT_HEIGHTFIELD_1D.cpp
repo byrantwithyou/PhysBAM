@@ -2,7 +2,7 @@
 // Copyright 2004, Eran Guendelman.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_HEIGHTFIELD_1D.h>
 using namespace PhysBAM;

@@ -7,8 +7,8 @@
 #ifndef __SEGMENT_MESH__
 #define __SEGMENT_MESH__
 
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Topology/SIMPLEX_MESH.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 namespace PhysBAM{

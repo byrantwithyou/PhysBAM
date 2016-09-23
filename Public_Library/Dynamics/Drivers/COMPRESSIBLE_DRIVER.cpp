@@ -2,11 +2,11 @@
 // Copyright 2009, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>

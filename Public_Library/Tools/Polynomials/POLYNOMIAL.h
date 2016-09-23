@@ -7,8 +7,8 @@
 #ifndef __POLYNOMIAL__
 #define __POLYNOMIAL__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 #include <cassert>
 namespace PhysBAM{

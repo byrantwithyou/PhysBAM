@@ -7,7 +7,7 @@
 #ifndef __HYPOTHETICAL_NODE__
 #define __HYPOTHETICAL_NODE__
 
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Deformables/Fracture/EMBEDDED_OBJECT.h>
 namespace PhysBAM{
 

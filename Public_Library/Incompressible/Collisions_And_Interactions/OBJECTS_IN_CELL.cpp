@@ -2,8 +2,8 @@
 // Copyright 2005, Geoffrey Irving, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/BLOCK_UNIFORM.h>
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/BLOCK_UNIFORM.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Incompressible/Collisions_And_Interactions/OBJECTS_IN_CELL.h>
 #include <climits>

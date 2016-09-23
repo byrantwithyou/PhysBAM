@@ -7,10 +7,10 @@
 #ifndef __MOONEY_RIVLIN_3D__
 #define __MOONEY_RIVLIN_3D__
 
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 namespace PhysBAM{
 

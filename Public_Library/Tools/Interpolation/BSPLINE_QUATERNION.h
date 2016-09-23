@@ -7,9 +7,9 @@
 #ifndef __BSPLINE_QUATERNION__
 #define __BSPLINE_QUATERNION__
 
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/ROTATION.h>
 #include <Tools/Interpolation/BSPLINE.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/ROTATION.h>
 namespace PhysBAM{
 
 template<class T>

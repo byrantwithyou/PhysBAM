@@ -4,11 +4,11 @@
 //#####################################################################
 // Class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/SCOPE.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_MPI.h>
 #include <Geometry/Basic_Geometry/POLYGON.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Intersections/BOX_POLYGON_INTERSECTION_AREA.h>

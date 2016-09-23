@@ -7,7 +7,7 @@
 #ifndef __DEFORMABLE_PARTICLES__
 #define __DEFORMABLE_PARTICLES__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Tools/Clone/CLONEABLE.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>

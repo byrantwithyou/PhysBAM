@@ -2,11 +2,11 @@
 // Copyright 2002-2007, Ronald Fedkiw, Geoffrey Irving, Nipun Kwatra, Frank Losasso.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
 namespace PhysBAM{
 //#####################################################################

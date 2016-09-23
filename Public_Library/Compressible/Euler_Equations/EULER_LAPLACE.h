@@ -7,11 +7,11 @@
 #ifndef __EULER_LAPLACE__
 #define __EULER_LAPLACE__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Grid_Tools/Arrays/ARRAYS_UNIFORM_FORWARD.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 namespace PhysBAM{
 
 template<class TV> struct GRID_ARRAYS_POLICY;

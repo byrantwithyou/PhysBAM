@@ -7,8 +7,8 @@
 #ifndef __NEWMARK_EVOLUTION__
 #define __NEWMARK_EVOLUTION__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 namespace PhysBAM{
 

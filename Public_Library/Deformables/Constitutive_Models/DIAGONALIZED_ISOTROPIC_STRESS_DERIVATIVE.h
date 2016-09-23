@@ -7,8 +7,8 @@
 #ifndef __DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE__
 #define __DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE__
 
-#include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
 template<class T,int d> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;

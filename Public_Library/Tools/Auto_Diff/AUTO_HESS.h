@@ -7,10 +7,10 @@
 #ifndef __AUTO_HESS__
 #define __AUTO_HESS__
 
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Vectors/VECTOR.h>
 #include <cmath>
 namespace PhysBAM{
 

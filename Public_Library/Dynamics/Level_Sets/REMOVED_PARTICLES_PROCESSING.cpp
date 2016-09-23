@@ -2,11 +2,11 @@
 // Copyright 2005-2006, Geoffrey Irving, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/KD_TREE.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Math_Tools/sign.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Data_Structures/KD_TREE.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Math_Tools/sign.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Dynamics/Level_Sets/REMOVED_PARTICLES_BLENDER_3D.h>
 #include <Dynamics/Level_Sets/REMOVED_PARTICLES_PROCESSING.h>

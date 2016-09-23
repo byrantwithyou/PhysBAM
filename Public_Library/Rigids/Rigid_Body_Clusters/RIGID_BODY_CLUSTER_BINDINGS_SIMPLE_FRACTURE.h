@@ -4,8 +4,8 @@
 //#####################################################################
 #ifndef __RIGID_BODY_CLUSTER_BINDINGS_SIMPLE_FRACTURE__
 #define __RIGID_BODY_CLUSTER_BINDINGS_SIMPLE_FRACTURE__
-#include <Tools/Data_Structures/UNDIRECTED_GRAPH.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Data_Structures/UNDIRECTED_GRAPH.h>
+#include <Core/Log/LOG.h>
 #include <Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
 
 namespace PhysBAM{

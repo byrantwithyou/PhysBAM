@@ -7,9 +7,9 @@
 #ifndef __SMOOTH_GEAR__
 #define __SMOOTH_GEAR__
 
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class TV> class SMOOTH_GEAR;

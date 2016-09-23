@@ -2,11 +2,11 @@
 // Copyright 2009.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include <Tools/Utilities/DEBUG_CAST.h>
-#include <Tools/Vectors/TWIST.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/UNION_FIND.h>
+#include <Core/Utilities/DEBUG_CAST.h>
+#include <Core/Vectors/TWIST.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_SYSTEM.h>

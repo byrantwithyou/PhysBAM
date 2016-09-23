@@ -2,13 +2,13 @@
 // Copyright 2003-2007, Zhaosheng Bao, Ron Fedkiw, Eran Guendelman, Don Hatch, Geoffrey Irving, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/FACTORIAL.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/FACTORIAL.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>

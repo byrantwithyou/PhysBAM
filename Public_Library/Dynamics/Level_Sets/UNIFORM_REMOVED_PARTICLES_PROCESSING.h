@@ -7,8 +7,8 @@
 #ifndef __UNIFORM_REMOVED_PARTICLES_PROCESSING__
 #define __UNIFORM_REMOVED_PARTICLES_PROCESSING__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Grid_Tools/Grids/GRID.h>
 namespace PhysBAM{
 
 template<class TV> class PARTICLE_LEVELSET_REMOVED_PARTICLES;

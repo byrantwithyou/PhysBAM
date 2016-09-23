@@ -7,13 +7,13 @@
 #ifndef __DEFORMABLES_FORCES__
 #define __DEFORMABLES_FORCES__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Data_Structures/ELEMENT_ID.h>
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Data_Structures/ELEMENT_ID.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 

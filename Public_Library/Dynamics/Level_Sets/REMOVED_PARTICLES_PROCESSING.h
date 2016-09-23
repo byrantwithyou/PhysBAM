@@ -7,10 +7,10 @@
 #ifndef __REMOVED_PARTICLES_PROCESSING__
 #define __REMOVED_PARTICLES_PROCESSING__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/KD_TREE.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/KD_TREE.h>
+#include <Core/Log/LOG.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Geometry/Basic_Geometry/ELLIPSOID.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 namespace PhysBAM{

@@ -7,8 +7,8 @@
 #ifndef __BW_COLLISIONS__
 #define __BW_COLLISIONS__    
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 
 namespace PhysBAM{

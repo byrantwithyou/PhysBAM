@@ -7,7 +7,7 @@
 #ifndef __NORMAL_JOINT__
 #define __NORMAL_JOINT__
 
-#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Rigids/Joints/JOINT.h>
 namespace PhysBAM{
 

@@ -7,7 +7,7 @@
 #ifndef __PLASTICITY_CONTROL_3D__
 #define __PLASTICITY_CONTROL_3D__
 
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Deformables/Constitutive_Models/PLASTICITY_MODEL.h>
 namespace PhysBAM{

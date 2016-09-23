@@ -4,15 +4,15 @@
 //#####################################################################
 // Class IMAGE
 //#####################################################################
+#include <Core/Log/LOG.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Images/BMP_FILE.h>
 #include <Tools/Images/IMAGE.h>
 #include <Tools/Images/JPG_FILE.h>
 #include <Tools/Images/PNG_FILE.h>
 #include <Tools/Images/PPM_FILE.h>
 #include <Tools/Images/RGB_FILE.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Read

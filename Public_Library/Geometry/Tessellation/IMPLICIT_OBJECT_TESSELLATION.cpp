@@ -4,9 +4,9 @@
 //#####################################################################
 // namespace TESSELLATION
 //##################################################################### 
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/FRAME.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/FRAME.h>
 #include <Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
 #include <Geometry/Basic_Geometry/BOWL.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>

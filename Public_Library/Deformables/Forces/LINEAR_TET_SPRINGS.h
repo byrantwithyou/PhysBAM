@@ -5,8 +5,8 @@
 #ifndef __LINEAR_TET_SPRINGS__
 #define __LINEAR_TET_SPRINGS__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 template<class T> class TETRAHEDRALIZED_VOLUME;

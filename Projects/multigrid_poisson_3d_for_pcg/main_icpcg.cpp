@@ -3,15 +3,15 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.
 //#####################################################################
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 
 #include "../multigrid_poisson_3d_optimized_kernels/Thread_Queueing/PTHREAD_QUEUE.h"
 #include "MG_PRECONDITIONED_CONJUGATE_GRADIENT.h"

@@ -4,22 +4,22 @@
 //#####################################################################
 // Class FLUIDS_PARAMETERS_UNIFORM
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_WENO.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_MACCORMACK_UNIFORM.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
-#include <Tools/Grids_Uniform_Computations/GRADIENT_UNIFORM.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Utilities/Find_Type.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/Find_Type.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Computations/GRADIENT_UNIFORM.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Grid_PDE/Advection/ADVECTION_HAMILTON_JACOBI_WENO.h>
+#include <Grid_PDE/Advection/ADVECTION_MACCORMACK_UNIFORM.h>
+#include <Grid_PDE/Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>

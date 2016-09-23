@@ -7,7 +7,7 @@
 #ifndef __RIGID_PARTICLE_EXAMPLE__
 #define __RIGID_PARTICLE_EXAMPLE__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SEGMENT_BENDING_ELEMENTS.h>

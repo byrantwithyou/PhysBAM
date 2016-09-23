@@ -4,17 +4,17 @@
 //#####################################################################
 // Class ARTICULATED_RIGID_BODY
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX_MXN.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Utilities/DEBUG_CAST.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <Tools/Utilities/DEBUG_CAST.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY.h>

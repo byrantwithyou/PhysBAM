@@ -4,8 +4,8 @@
 //#####################################################################
 // Namespace INTERSECTION
 //##################################################################### 
-#include <Tools/Math_Tools/sqr.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Math_Tools/sqr.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Intersections/BOX_SPHERE_INTERSECTION.h>
 namespace PhysBAM{

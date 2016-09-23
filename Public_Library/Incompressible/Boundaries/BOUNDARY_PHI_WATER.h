@@ -7,9 +7,9 @@
 #ifndef __BOUNDARY_PHI_WATER__
 #define __BOUNDARY_PHI_WATER__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Incompressible/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
 namespace PhysBAM{
 

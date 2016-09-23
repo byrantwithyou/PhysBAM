@@ -2,7 +2,7 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Forces/LINEAR_POINT_ATTRACTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>

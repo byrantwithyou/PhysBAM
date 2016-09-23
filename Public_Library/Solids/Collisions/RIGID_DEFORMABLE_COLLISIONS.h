@@ -7,10 +7,10 @@
 #ifndef __RIGID_DEFORMABLE_COLLISIONS__
 #define __RIGID_DEFORMABLE_COLLISIONS__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>

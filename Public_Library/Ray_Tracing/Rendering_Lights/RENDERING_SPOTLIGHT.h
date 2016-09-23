@@ -5,7 +5,7 @@
 #ifndef __RENDERING_SPOTLIGHT__
 #define __RENDERING_SPOTLIGHT__
 
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX_3X3.h>
 #include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
 #include <cstdio>
 namespace PhysBAM{

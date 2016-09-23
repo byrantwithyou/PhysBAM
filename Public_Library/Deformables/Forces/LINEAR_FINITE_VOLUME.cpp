@@ -2,14 +2,14 @@
 // Copyright 2004-2007, Zhaosheng Bao, Ron Fedkiw, Geoffrey Irving, Sergey Koltakov, Igor Neverov, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Matrices/MATRIX_2X2.h>
-#include <Tools/Matrices/MATRIX_2X3.h>
-#include <Tools/Matrices/MATRIX_3X2.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Matrices/MATRIX_2X2.h>
+#include <Core/Matrices/MATRIX_2X3.h>
+#include <Core/Matrices/MATRIX_3X2.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>

@@ -5,8 +5,8 @@
 #ifndef __MPM_PLASTICITY_CLAMP__
 #define __MPM_PLASTICITY_CLAMP__
 
-#include <Tools/Arrays/ATTRIBUTE_ID.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Arrays/ATTRIBUTE_ID.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Hybrid_Methods/MPM_PLASTICITY_MODEL.h>
 #include <cmath>
 namespace PhysBAM{

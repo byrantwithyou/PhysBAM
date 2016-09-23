@@ -2,14 +2,14 @@
 // Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/CONSTANT_ARRAY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Core/Arrays/CONSTANT_ARRAY.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE_ITERATOR.h>
+#include <Core/Utilities/DEBUG_CAST.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Math_Tools/RANGE_ITERATOR.h>
-#include <Tools/Utilities/DEBUG_CAST.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM_COLOR.h>

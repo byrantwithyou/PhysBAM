@@ -7,9 +7,9 @@
 #ifndef __ADVECTION_UPWIND__
 #define __ADVECTION_UPWIND__
 
-#include <Tools/Advection/ADVECTION.h>
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_PDE/Advection/ADVECTION.h>
+#include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM.h>
 #include <functional>
 namespace PhysBAM{
 

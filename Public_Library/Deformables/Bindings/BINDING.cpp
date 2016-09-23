@@ -2,9 +2,9 @@
 // Copyright 2006, Geoffrey Irving, Andrew Selle, Tamar Shinar, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Deformables/Bindings/BINDING.h>

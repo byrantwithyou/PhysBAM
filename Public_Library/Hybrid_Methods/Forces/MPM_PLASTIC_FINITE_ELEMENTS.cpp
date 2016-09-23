@@ -2,10 +2,10 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>

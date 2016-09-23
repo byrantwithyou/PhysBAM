@@ -4,7 +4,7 @@
 //#####################################################################
 // Class TRIANGLE_REPULSIONS_POINT_FACE_VISITOR
 //##################################################################### 
-#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
 #include <Deformables/Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h>

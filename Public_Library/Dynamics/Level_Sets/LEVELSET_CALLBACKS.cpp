@@ -2,9 +2,9 @@
 // Copyright 2003-2005, Ronald Fedkiw, Geoffrey Irving, Andrew Selle, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 using namespace PhysBAM;

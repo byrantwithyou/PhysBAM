@@ -4,12 +4,12 @@
 //#####################################################################
 // Class EULER_UNIFORM
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/SCOPE.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/SCOPE.h>
+#include <Grid_Tools/Arrays/ARRAYS_UTILITIES.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #include <Compressible/Euler_Equations/EULER_1D_EIGENSYSTEM_F.h>
 #include <Compressible/Euler_Equations/EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY.h>

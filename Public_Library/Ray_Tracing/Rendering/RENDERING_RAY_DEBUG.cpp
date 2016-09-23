@@ -2,8 +2,8 @@
 // Copyright 2004, Ron Fedkiw, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY_DEBUG.h>
 namespace PhysBAM{

@@ -8,8 +8,8 @@
 #define __HIDDEN_SURFACE_PRIMITIVES__
 
 #ifdef USE_BOOST_GEOMETRY
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <boost/geometry.hpp>

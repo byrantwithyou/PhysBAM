@@ -7,7 +7,7 @@
 #ifndef __PARAMETER_SPACE__
 #define __PARAMETER_SPACE__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 namespace PhysBAM{
 
 template<class T>

@@ -2,12 +2,12 @@
 // Copyright 2004, Eran Guendelman.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Computations/VORTICITY_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Grid_Tools/Computations/VORTICITY_UNIFORM.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D.h>

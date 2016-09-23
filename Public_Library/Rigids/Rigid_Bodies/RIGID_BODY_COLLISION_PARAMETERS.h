@@ -7,8 +7,8 @@
 #ifndef __RIGID_BODY_COLLISION_PARAMETERS__
 #define __RIGID_BODY_COLLISION_PARAMETERS__
 
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 #include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 

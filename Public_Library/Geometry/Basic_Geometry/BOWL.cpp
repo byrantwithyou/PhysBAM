@@ -4,12 +4,12 @@
 //#####################################################################
 // Class BOWL
 //##################################################################### 
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Auto_Diff/AUTO_DIFF.h>
 #include <Tools/Auto_Diff/AUTO_HESS.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Polynomials/QUADRATIC.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/BOWL.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 namespace PhysBAM{

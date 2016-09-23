@@ -7,11 +7,11 @@
 #ifndef __RENDERING_INFINITE_REFLECTION_SHADER__
 #define __RENDERING_INFINITE_REFLECTION_SHADER__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Core/Math_Tools/wrap.h>
+#include <Core/Random_Numbers/NOISE.h>
 #include <Tools/Images/IMAGE.h>
-#include <Tools/Math_Tools/wrap.h>
-#include <Tools/Random_Numbers/NOISE.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{
 

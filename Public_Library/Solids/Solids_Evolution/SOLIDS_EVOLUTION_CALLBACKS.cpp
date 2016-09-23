@@ -2,8 +2,8 @@
 // Copyright 2004-2008, Ronald Fedkiw, Geoffrey Irving, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION_CALLBACKS.h>
 #include <cfloat>
 using namespace PhysBAM;

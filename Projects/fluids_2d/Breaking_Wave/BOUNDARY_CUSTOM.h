@@ -7,7 +7,7 @@
 #ifndef __BOUNDARY_CUSTOM__
 #define __BOUNDARY_CUSTOM__
 
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 template<class T,class TV>

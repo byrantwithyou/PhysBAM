@@ -7,10 +7,10 @@
 #ifndef __PARTICLE_LEVELSET_VISITOR__
 #define __PARTICLE_LEVELSET_VISITOR__
 
-#include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Spatial_Acceleration/SPATIAL_ACCELERATION_FORWARD.h>
 namespace PhysBAM{

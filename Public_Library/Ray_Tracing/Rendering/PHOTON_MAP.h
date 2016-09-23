@@ -5,10 +5,10 @@
 #ifndef __PHOTON_MAP__
 #define __PHOTON_MAP__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Ray_Tracing/Rendering/PHOTON.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY.h>
 namespace PhysBAM{

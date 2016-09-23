@@ -7,7 +7,7 @@
 #ifndef __BASIS_STENCIL_UNIFORM__
 #define __BASIS_STENCIL_UNIFORM__
 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Tools/Symbolics/STATIC_POLYNOMIAL.h>
 namespace PhysBAM{
 

@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
+#include <Core/Utilities/PROCESS_UTILITIES.h>
+#include <Core/Utilities/TEST_BASE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
-#include <Tools/Utilities/TEST_BASE.h>
 #include <cstdlib>
 using namespace PhysBAM; 
 

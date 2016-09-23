@@ -7,9 +7,9 @@
 #ifndef __ARTICULATED_RIGID_BODY_3D__
 #define __ARTICULATED_RIGID_BODY_3D__
 
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY.h>
 namespace PhysBAM{
 

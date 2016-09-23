@@ -7,9 +7,9 @@
 #ifndef __RED_GREEN_TRIANGLES__
 #define __RED_GREEN_TRIANGLES__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/OPERATION_HASH.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/OPERATION_HASH.h>
+#include <Core/Log/LOG.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>

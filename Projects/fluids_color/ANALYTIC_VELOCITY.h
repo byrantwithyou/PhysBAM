@@ -5,11 +5,11 @@
 #ifndef __ANALYTIC_VELOCITY__
 #define __ANALYTIC_VELOCITY__
 
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Symbolics/PROGRAM.h>
 #include <Tools/Symbolics/PROGRAM_CONTEXT.h>
 #include <Tools/Tensors/SYMMETRIC_TENSOR.h>

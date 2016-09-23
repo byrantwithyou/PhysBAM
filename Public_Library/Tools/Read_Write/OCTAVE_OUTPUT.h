@@ -7,7 +7,7 @@
 #ifndef __OCTAVE_OUTPUT__
 #define __OCTAVE_OUTPUT__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <fstream>
 namespace PhysBAM{
 template<class T,class T_MATRIX> class MATRIX_BASE;

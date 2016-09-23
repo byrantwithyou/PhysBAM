@@ -2,8 +2,8 @@
 // Copyright 2004-2009, Eran Guendelman, Geoffrey Irving, Frank Losasso, Tamar Shinar, Eftychios Sifakis, Jonathan Su, Wen Zheng.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>

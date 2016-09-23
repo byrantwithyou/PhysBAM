@@ -4,13 +4,13 @@
 //#####################################################################
 // Class MULTIGRID_POISSON
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
-//#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
+//#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include "BOX_ITERATOR.h"
 #include "MULTIGRID_POISSON.h"
 
-#include <Tools/Arrays/SORT.h>
+#include <Core/Arrays/SORT.h>
 
 #ifndef MGPCG_UNOPTIMIZED
 #include "../multigrid_poisson_3d_optimized_kernels/Multiplication_And_Dot_Product/Multiplication_And_Dot_Product_Helper.h"

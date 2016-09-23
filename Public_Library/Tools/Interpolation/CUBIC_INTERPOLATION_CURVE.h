@@ -7,8 +7,8 @@
 #ifndef __CUBIC_INTERPOLATION_CURVE__
 #define __CUBIC_INTERPOLATION_CURVE__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
 template<class T,class T2>

@@ -2,9 +2,9 @@
 // Copyright 2015, Andre Pradhana, Greg Klar
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/MPM_PLASTICITY_CLAMP.h>
 namespace PhysBAM{

@@ -7,10 +7,10 @@
 #ifndef __MARCHING_CUBES_COLOR__
 #define __MARCHING_CUBES_COLOR__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Math_Tools/INTERVAL.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Math_Tools/INTERVAL.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 

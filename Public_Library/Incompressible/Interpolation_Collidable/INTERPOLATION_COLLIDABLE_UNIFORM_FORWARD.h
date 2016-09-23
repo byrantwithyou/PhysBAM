@@ -7,8 +7,8 @@
 #ifndef __INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD__
 #define __INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD__
 
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM_FORWARD.h>
 #include <Tools/Interpolation/INTERPOLATION_FORWARD.h>
+#include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM_FORWARD.h>
 
 namespace PhysBAM{
 

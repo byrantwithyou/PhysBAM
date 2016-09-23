@@ -4,8 +4,8 @@
 //#####################################################################
 #ifndef __INCOMPRESSIBLE_DRIVER__
 #define __INCOMPRESSIBLE_DRIVER__
-#include <Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_PDE/Advection/ADVECTION_UNIFORM_FORWARD.h>
 #include <Rigids/Rigids_Evolution/KINEMATIC_EVOLUTION.h>
 namespace PhysBAM{
 

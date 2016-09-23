@@ -7,10 +7,10 @@
 #ifndef __SIMPLEX_MESH__
 #define __SIMPLEX_MESH__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 class SEGMENT_MESH;

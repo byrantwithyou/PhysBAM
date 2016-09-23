@@ -7,8 +7,8 @@
 #ifndef __ANALYTIC_SURFACE_MUSCLE_SEGMENT__
 #define __ANALYTIC_SURFACE_MUSCLE_SEGMENT__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Rigids/Muscles/MUSCLE_SEGMENT.h>
 namespace PhysBAM{
 

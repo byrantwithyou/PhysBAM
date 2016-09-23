@@ -7,9 +7,9 @@
 #ifndef __TRIANGLE_3D__
 #define __TRIANGLE_3D__
 
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Basic_Geometry/SEGMENT_3D.h>
 namespace PhysBAM{

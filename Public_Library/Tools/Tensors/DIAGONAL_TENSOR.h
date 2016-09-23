@@ -7,14 +7,14 @@
 #ifndef __DIAGONAL_TENSOR__
 #define __DIAGONAL_TENSOR__
 
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/PRIMITIVE_MATRICES.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/PRIMITIVE_MATRICES.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Tensors/TENSORS_FORWARD.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <cmath>
 namespace PhysBAM{
 

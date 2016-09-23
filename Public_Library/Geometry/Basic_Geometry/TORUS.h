@@ -7,10 +7,10 @@
 #ifndef __TORUS__
 #define __TORUS__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Vectors/Dot_Product.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Vectors/Dot_Product.h>
 #include <string>
 namespace PhysBAM{
 

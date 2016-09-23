@@ -7,8 +7,8 @@
 #ifndef __JOINT_FUNCTION__
 #define __JOINT_FUNCTION__
 
-#include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Vectors/VECTOR_1D.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Vectors/VECTOR_1D.h>
 #include <cassert>
 #include <cmath>
 namespace PhysBAM{

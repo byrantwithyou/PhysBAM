@@ -14,8 +14,8 @@
 #ifndef __PCG_SPARSE__
 #define __PCG_SPARSE__
 
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T> class SPARSE_MATRIX_FLAT_MXN;

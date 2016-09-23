@@ -7,10 +7,10 @@
 #ifndef __INCOMPRESSIBLE_FLUID_EVOLUTION__
 #define __INCOMPRESSIBLE_FLUID_EVOLUTION__
 
-#include <Tools/Advection/ADVECTION_FORWARD.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Utilities/Find_Type.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Utilities/Find_Type.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Grid_PDE/Advection/ADVECTION_FORWARD.h>
 namespace PhysBAM{
 template<class TV> class INCOMPRESSIBLE_FLUIDS_FORCES;
 template<class TV> class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP;

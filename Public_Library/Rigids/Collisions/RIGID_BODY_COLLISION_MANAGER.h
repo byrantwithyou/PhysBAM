@@ -7,8 +7,8 @@
 #ifndef __RIGID_BODY_COLLISION_MANAGER__
 #define __RIGID_BODY_COLLISION_MANAGER__
 
-#include <Tools/Data_Structures/ELEMENT_ID.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Data_Structures/ELEMENT_ID.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 class RIGID_BODY_COLLISION_MANAGER:public NONCOPYABLE

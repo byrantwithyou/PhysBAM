@@ -2,11 +2,11 @@
 // Copyright 2002-2012, Robert Bridson, Eran Guendelman, Eilene Hao, Geoffrey Irving, Cynthia Lau, Neil Molino, Avi Robinson-Mosher, Andrew Selle, Eftychios Sifakis, Alexey Stomakhin, Jerry Talton, Joseph Teran, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Log/SCOPE.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Grids_Uniform_Computations/DUALCONTOUR_2D.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>

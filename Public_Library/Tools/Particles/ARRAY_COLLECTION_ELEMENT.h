@@ -7,7 +7,7 @@
 #ifndef __ARRAY_COLLECTION_ELEMENT__
 #define __ARRAY_COLLECTION_ELEMENT__
 
-#include <Tools/Arrays/ARRAY_VIEW.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
 #include <Tools/Clone/CLONEABLE.h>
 #include <Tools/Particles/ARRAY_COLLECTION_ELEMENT_BASE.h>
 namespace PhysBAM{

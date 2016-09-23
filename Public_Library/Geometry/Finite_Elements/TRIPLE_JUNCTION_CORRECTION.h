@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __TRIPLE_JUNCTION_CORRECTION__
 #define __TRIPLE_JUNCTION_CORRECTION__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
 namespace PhysBAM{
 template<class TV>

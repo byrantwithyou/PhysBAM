@@ -4,7 +4,7 @@
 //#####################################################################
 // Class EMBEDDED_MATERIAL_SURFACE
 //##################################################################### 
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>

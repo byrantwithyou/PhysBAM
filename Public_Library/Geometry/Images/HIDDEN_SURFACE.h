@@ -8,7 +8,7 @@
 #define __HIDDEN_SURFACE__
 
 #ifdef USE_BOOST_GEOMETRY
-#include <Tools/Data_Structures/DIRECTED_GRAPH.h>
+#include <Core/Data_Structures/DIRECTED_GRAPH.h>
 #include <Geometry/Images/HIDDEN_SURFACE_PRIMITIVES.h>
 
 namespace PhysBAM{

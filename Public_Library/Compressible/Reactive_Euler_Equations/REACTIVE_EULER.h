@@ -12,7 +12,7 @@
 #ifndef __REACTIVE_EULER__
 #define __REACTIVE_EULER__    
 
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <Compressible/Equations_Of_State/REACTIVE_EOS.h>
 namespace PhysBAM{

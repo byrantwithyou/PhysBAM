@@ -7,7 +7,7 @@
 #ifndef __OPENGL_INDEXED_COLOR_MAP__
 #define __OPENGL_INDEXED_COLOR_MAP__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_MAP.h>
 
 namespace PhysBAM{

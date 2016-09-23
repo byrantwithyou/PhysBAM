@@ -7,8 +7,8 @@
 #ifndef __MULTIVARIATE_POLYNOMIAL__
 #define __MULTIVARIATE_POLYNOMIAL__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class TV>

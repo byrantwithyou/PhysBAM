@@ -7,11 +7,11 @@
 #ifndef __RENDERING_OBJECT__
 #define __RENDERING_OBJECT__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Matrices/MATRIX_4X4.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Matrices/MATRIX_4X4.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

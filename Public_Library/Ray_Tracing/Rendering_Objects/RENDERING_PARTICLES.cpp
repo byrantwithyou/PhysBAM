@@ -2,7 +2,7 @@
 // Copyright 2002-2005, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################/
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Intersections/RAY_SPHERE_INTERSECTION.h>

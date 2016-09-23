@@ -4,8 +4,8 @@
 //#####################################################################
 // Class COUPLED_SYSTEM_VECTOR
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/LOG.h>
 #include <Dynamics/Coupled_Evolution/COUPLED_SYSTEM_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################

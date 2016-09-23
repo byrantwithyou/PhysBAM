@@ -2,8 +2,8 @@
 // Copyright 2009.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Vectors/TWIST.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Vectors/TWIST.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>

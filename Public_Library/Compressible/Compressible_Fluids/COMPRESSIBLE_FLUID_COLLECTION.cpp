@@ -2,8 +2,8 @@
 // Copyright 2009, Jon Gretarsson.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Compressible_Fluids/COMPRESSIBLE_AUXILIARY_DATA.h>
 #include <Compressible/Compressible_Fluids/COMPRESSIBLE_FLUID_COLLECTION.h>
 namespace PhysBAM{

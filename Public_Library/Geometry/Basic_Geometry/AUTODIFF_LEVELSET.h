@@ -7,12 +7,12 @@
 #ifndef __AUTODIFF_LEVELSET__
 #define __AUTODIFF_LEVELSET__
 
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/MATRIX.h>
 #include <Tools/Polynomials/QUADRATIC.h>
-#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class T,class AH> void inline

@@ -7,7 +7,7 @@
 #ifndef __RENDERING_BOX__
 #define __RENDERING_BOX__
 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Tessellation/RANGE_TESSELLATION.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>

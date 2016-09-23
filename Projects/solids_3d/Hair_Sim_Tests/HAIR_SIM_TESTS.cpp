@@ -4,9 +4,9 @@
 //#####################################################################
 // HAIR_SIM_TESTS
 //#####################################################################
-#include <Tools/Data_Structures/KD_TREE.h>
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
+#include <Core/Data_Structures/KD_TREE.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Data_Structures/UNION_FIND.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>

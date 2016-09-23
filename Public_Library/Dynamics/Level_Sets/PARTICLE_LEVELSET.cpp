@@ -4,9 +4,9 @@
 //#####################################################################
 // Class PARTICLE_LEVELSET
 //##################################################################### 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Math_Tools/pow.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Core/Math_Tools/pow.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Level_Sets/LEVELSET_COLLIDABLE.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET.h>

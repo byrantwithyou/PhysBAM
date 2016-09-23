@@ -4,7 +4,7 @@
 //#####################################################################
 // Class INTERFACE_POISSON_SYSTEM_VECTOR_COLOR
 //#####################################################################
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h>
 #ifdef USE_OPENMP
 #include <omp.h>

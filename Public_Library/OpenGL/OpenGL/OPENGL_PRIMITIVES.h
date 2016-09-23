@@ -21,10 +21,10 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #endif
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Vectors/VECTOR_2D.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Vectors/VECTOR_2D.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <OpenGL/OpenGL/OPENGL_EPS_OUTPUT.h>
 #include <OpenGL/OpenGL/OPENGL_POLICY.h>

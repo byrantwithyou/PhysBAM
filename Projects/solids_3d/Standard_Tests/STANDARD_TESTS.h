@@ -58,12 +58,12 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>

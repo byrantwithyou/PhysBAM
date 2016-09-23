@@ -7,7 +7,7 @@
 #ifndef __THREAD_PACKAGE__
 #define __THREAD_PACKAGE__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 
 namespace PhysBAM{
 

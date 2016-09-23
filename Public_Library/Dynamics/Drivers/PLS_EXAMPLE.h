@@ -4,15 +4,15 @@
 //#####################################################################
 #ifndef __PLS_EXAMPLE__
 #define __PLS_EXAMPLE__
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_PDE/Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
-#include <Incompressible/Projection/PROJECTION_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 namespace PhysBAM{

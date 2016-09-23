@@ -6,8 +6,8 @@
 //#####################################################################
 #ifndef __EDGE_EDGE_ADHESION_VISITOR__
 #define __EDGE_EDGE_ADHESION_VISITOR__
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/PAIR.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/PAIR.h>
 
 namespace PhysBAM{
 template<class TV> class SEGMENT_ADHESION;

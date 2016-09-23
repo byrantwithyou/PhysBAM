@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __BACKWARD_EULER_MINIMIZATION_OBJECTIVE__
 #define __BACKWARD_EULER_MINIMIZATION_OBJECTIVE__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/PAIR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/PAIR.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>

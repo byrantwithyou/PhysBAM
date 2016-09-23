@@ -7,9 +7,9 @@
 #ifndef __WIND_DRAG__
 #define __WIND_DRAG__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Solids/Forces_And_Torques/SOLIDS_FORCES.h>

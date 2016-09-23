@@ -2,12 +2,12 @@
 // Copyright 2007, Geoffrey Irving, Craig Schroeder, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Arrays/CONSTANT_ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/cyclic_shift.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Arrays/CONSTANT_ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/cyclic_shift.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Deformables/Forces/LINEAR_BENDING_ELEMENTS.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>

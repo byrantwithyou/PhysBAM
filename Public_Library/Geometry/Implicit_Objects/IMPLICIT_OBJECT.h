@@ -7,9 +7,9 @@
 #ifndef __IMPLICIT_OBJECT__
 #define __IMPLICIT_OBJECT__
 
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
 namespace PhysBAM{

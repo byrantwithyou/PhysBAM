@@ -7,7 +7,7 @@
 #ifndef __OPENGL_KEY__
 #define __OPENGL_KEY__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h> // just so we get gl in the right order
 #include <string>
 namespace PhysBAM{

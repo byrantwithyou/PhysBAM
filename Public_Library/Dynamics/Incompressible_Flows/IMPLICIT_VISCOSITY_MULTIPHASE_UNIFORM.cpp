@@ -2,10 +2,10 @@
 // Copyright 2005-2006, Geoffrey Irving, Frank Losasso, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #include <Dynamics/Heat_Flows/HEAT_LAPLACE.h>
 #include <Dynamics/Incompressible_Flows/IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM.h>

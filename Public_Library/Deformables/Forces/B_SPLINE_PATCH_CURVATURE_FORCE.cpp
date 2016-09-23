@@ -2,8 +2,8 @@
 // Copyright 2014.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Deformables/Forces/B_SPLINE_PATCH_CURVATURE_FORCE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>

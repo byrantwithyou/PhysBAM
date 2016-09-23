@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __IMPLICIT_BOUNDARY_CONDITION_COLLECTION__
 #define __IMPLICIT_BOUNDARY_CONDITION_COLLECTION__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Incompressible/Solids_And_Fluids/BOUNDARY_CONDITIONS_CALLBACKS.h>
 #include <Dynamics/Coupled_Evolution/BOUNDARY_CONDITION_INFO.h>
 #include <Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.h>

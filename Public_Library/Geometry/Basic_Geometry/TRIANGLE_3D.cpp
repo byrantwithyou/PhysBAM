@@ -4,10 +4,10 @@
 //#####################################################################
 // Class TRIANGLE_3D
 //##################################################################### 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Math_Tools/INTERVAL.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <Tools/Math_Tools/INTERVAL.h>
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Tools/Polynomials/CUBIC.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>

@@ -7,7 +7,7 @@
 #ifndef __PARTICLES_IN_IMPLICIT_OBJECT__
 #define __PARTICLES_IN_IMPLICIT_OBJECT__
 
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 
 namespace PhysBAM{

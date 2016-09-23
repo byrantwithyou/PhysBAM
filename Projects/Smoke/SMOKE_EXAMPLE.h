@@ -4,17 +4,17 @@
 //#####################################################################
 #ifndef __SMOKE_EXAMPLE__
 #define __SMOKE_EXAMPLE__
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Interpolation/CUBIC_MONOTONIC_INTERPOLATION_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_PDE/Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Interpolation/CUBIC_MONOTONIC_INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include <Incompressible/Projection/PROJECTION_UNIFORM.h>
 
 namespace PhysBAM{
 

@@ -4,8 +4,8 @@
 //#####################################################################
 // Class IMAGE_WINDOW
 //#####################################################################
+#include <Core/Math_Tools/integer_log.h>
 #include <Tools/Images/IMAGE.h>
-#include <Tools/Math_Tools/integer_log.h>
 #include <fstream>
 #include "IMAGE_WINDOW.h"
 #include <Fl/Fl.h>

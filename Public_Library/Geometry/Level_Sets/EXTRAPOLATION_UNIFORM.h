@@ -12,7 +12,7 @@
 #ifndef __EXTRAPOLATION_UNIFORM__
 #define __EXTRAPOLATION_UNIFORM__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{

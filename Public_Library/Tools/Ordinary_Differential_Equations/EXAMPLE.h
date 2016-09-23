@@ -4,12 +4,12 @@
 //#####################################################################
 #ifndef __EXAMPLE__
 #define __EXAMPLE__
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_PDE/Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 class PARSE_ARGS;

@@ -2,7 +2,7 @@
 // Copyright 2007, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_1D.h>
 #include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 using namespace PhysBAM;

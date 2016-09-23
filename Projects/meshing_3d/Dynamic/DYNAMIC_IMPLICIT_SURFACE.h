@@ -7,9 +7,9 @@
 #ifndef __DYNAMIC_IMPLICIT_SURFACE__
 #define __DYNAMIC_IMPLICIT_SURFACE__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <string>
 namespace PhysBAM{

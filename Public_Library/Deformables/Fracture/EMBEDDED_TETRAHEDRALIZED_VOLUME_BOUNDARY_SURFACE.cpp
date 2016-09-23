@@ -4,9 +4,9 @@
 //#####################################################################
 // Class EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Math_Tools/exchange_sort.h>
-#include <Tools/Math_Tools/permutation.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Math_Tools/exchange_sort.h>
+#include <Core/Math_Tools/permutation.h>
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 using namespace PhysBAM;

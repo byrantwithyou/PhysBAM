@@ -4,9 +4,9 @@
 //#####################################################################
 #ifndef __PCG_SPARSE_SYSTEM__
 #define __PCG_SPARSE_SYSTEM__
+#include <Core/Vectors/Dot_Product.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
-#include <Tools/Vectors/Dot_Product.h>
 namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;

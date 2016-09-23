@@ -7,10 +7,10 @@
 #ifndef __OPENGL_SYMMETRIC_MATRIX_FIELD_3D__
 #define __OPENGL_SYMMETRIC_MATRIX_FIELD_3D__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 namespace PhysBAM{

@@ -9,9 +9,9 @@
 #ifndef __BMP_HEADER__
 #define __BMP_HEADER__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG_PRINTF.h>
-#include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG_PRINTF.h>
+#include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
 namespace PhysBAM{
 
 struct BMP_HEADER{

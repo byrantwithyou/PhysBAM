@@ -7,7 +7,7 @@
 #ifndef __OPENGL_COMPONENT_DEBUG_PARTICLES_3D__
 #define __OPENGL_COMPONENT_DEBUG_PARTICLES_3D__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <OpenGL/OpenGL/OPENGL_DEBUG_PARTICLES_3D.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>

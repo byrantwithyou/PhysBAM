@@ -2,8 +2,8 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Incompressible/Incompressible_Flows/LEVELSET_INDEX_MAP_UNIFORM.h>
 #include <Incompressible/Solids_And_Fluids/BOUNDARY_CONDITIONS_CALLBACKS.h>
 using namespace PhysBAM;

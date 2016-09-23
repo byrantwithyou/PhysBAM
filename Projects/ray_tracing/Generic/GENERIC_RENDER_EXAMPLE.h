@@ -7,10 +7,10 @@
 #ifndef __GENERIC_RENDER_EXAMPLE__
 #define __GENERIC_RENDER_EXAMPLE__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/STACK.h>
-#include <Tools/Matrices/MATRIX_4X4.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/STACK.h>
+#include <Core/Matrices/MATRIX_4X4.h>
 #include <Tools/Parsing/GENERIC_PARSER.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>

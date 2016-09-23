@@ -7,7 +7,7 @@
 #ifndef __SUBSURFACE_SCATTERING_IRRADIANCE_SAMPLE__
 #define __SUBSURFACE_SCATTERING_IRRADIANCE_SAMPLE__
 
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 
 template<class T>

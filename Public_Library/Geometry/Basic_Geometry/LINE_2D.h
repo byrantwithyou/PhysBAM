@@ -7,9 +7,9 @@
 #ifndef __LINE_2D__
 #define __LINE_2D__
 
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Vectors/VECTOR_2D.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Vectors/VECTOR_2D.h>
 #include <cfloat>
 namespace PhysBAM{
 

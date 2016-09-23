@@ -9,10 +9,10 @@
 #ifndef __RGB_HEADER__
 #define __RGB_HEADER__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG_PRINTF.h>
-#include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
-#include <Tools/Utilities/EXCEPTIONS.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG_PRINTF.h>
+#include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
+#include <Core/Utilities/EXCEPTIONS.h>
 #include <cstring>
 namespace PhysBAM{
 

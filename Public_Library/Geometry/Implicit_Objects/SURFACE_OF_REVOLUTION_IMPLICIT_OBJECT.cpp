@@ -2,8 +2,8 @@
 // Copyright 2007, Geoffrey Irving, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Images/IMAGE.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>

@@ -7,7 +7,7 @@
 #ifndef __RENDERING_LIGHT_SHADER__
 #define __RENDERING_LIGHT_SHADER__
 
-#include <Tools/Math_Tools/constants.h>
+#include <Core/Math_Tools/constants.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{
 

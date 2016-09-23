@@ -4,8 +4,8 @@
 //#####################################################################
 // Class CONSERVATION_CENTRAL_ENO  
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/Minmod.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/Minmod.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_CENTRAL_ENO.h>
 #include <Compressible/Conservation_Law_Solvers/EIGENSYSTEM.h>
 using namespace PhysBAM;

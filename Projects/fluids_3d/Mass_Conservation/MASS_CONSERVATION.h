@@ -18,11 +18,11 @@
 #ifndef __MASS_CONSERVATION__
 #define __MASS_CONSERVATION__
 
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>

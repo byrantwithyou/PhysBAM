@@ -12,9 +12,9 @@
 #ifndef __BOUNDARY_EULER_EQUATIONS_SPHERICAL__
 #define __BOUNDARY_EULER_EQUATIONS_SPHERICAL__
 
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 template<class T_input>

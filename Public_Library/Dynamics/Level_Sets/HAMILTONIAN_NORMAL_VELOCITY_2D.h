@@ -7,7 +7,7 @@
 #ifndef __HAMILTONIAN_NORMAL_VELOCITY_2D__
 #define __HAMILTONIAN_NORMAL_VELOCITY_2D__   
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Dynamics/Level_Sets/HAMILTONIAN_2D.h>
 namespace PhysBAM{
 

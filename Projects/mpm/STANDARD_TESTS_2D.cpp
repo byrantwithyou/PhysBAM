@@ -2,12 +2,12 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/KD_TREE.h>
-#include <Tools/Math_Tools/RANGE_ITERATOR.h>
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Data_Structures/KD_TREE.h>
+#include <Core/Math_Tools/RANGE_ITERATOR.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/HOURGLASS.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>

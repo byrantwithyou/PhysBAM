@@ -7,8 +7,8 @@
 #ifndef __MUSCLE_LIST__
 #define __MUSCLE_LIST__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/TRIPLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/TRIPLE.h>
 #include <Rigids/Muscles/MUSCLE.h>
 #include <Rigids/Muscles/MUSCLE_FORCE_CURVE.h>
 namespace PhysBAM{

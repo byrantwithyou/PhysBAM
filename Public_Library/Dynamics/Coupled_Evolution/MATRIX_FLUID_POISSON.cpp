@@ -4,11 +4,11 @@
 //#####################################################################
 // Class MATRIX_FLUID_POISSON
 //##################################################################### 
-#include <Tools/Grids_Uniform/SIDED_FACE_INDEX.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/SIDED_FACE_INDEX.h>
 #include <Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>
 #include <Dynamics/Coupled_Evolution/MATRIX_FLUID_POISSON.h>
 #include <Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h>

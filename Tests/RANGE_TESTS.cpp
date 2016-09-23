@@ -10,14 +10,14 @@
 // 4.  Tests functions in box .cpp file
 //#####################################################################
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/cyclic_shift.h>
-#include <Tools/Math_Tools/pow.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/cyclic_shift.h>
+#include <Core/Math_Tools/pow.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Utilities/TEST_BASE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Utilities/TEST_BASE.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Intersections/BOX_SPHERE_INTERSECTION.h>

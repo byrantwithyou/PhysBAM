@@ -14,7 +14,7 @@
 #ifndef __WATER_STANDARD_TESTS_MULTIPHASE__
 #define __WATER_STANDARD_TESTS_MULTIPHASE__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 namespace PhysBAM{
 
 template<class TV> class SOLIDS_FLUIDS_EXAMPLE_UNIFORM;

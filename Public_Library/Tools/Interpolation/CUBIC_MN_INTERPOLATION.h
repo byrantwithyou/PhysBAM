@@ -7,7 +7,7 @@
 #ifndef __CUBIC_MN_INTERPOLATION__
 #define __CUBIC_MN_INTERPOLATION__
 
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T,class T2>

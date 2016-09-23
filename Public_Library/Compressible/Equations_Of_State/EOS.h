@@ -13,9 +13,9 @@
 #ifndef __EOS__
 #define __EOS__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/sqr.h>
 #include <cmath>
 namespace PhysBAM{
 

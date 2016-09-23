@@ -1,10 +1,10 @@
 #ifndef __HELPER__
 #define __HELPER__
 
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Tools/Auto_Diff/DIFF_LAYOUT.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 
 typedef float RW;

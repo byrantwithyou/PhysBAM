@@ -7,7 +7,7 @@
 #ifndef __RENDERING_SHOCKS__
 #define __RENDERING_SHOCKS__
 
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>

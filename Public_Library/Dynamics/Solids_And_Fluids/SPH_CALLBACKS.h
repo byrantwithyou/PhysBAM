@@ -7,9 +7,9 @@
 #ifndef __SPH_CALLBACKS__
 #define __SPH_CALLBACKS__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 

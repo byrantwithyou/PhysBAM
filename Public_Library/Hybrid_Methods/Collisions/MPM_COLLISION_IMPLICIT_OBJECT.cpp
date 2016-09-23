@@ -2,9 +2,9 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Vectors/TWIST.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Vectors/TWIST.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>

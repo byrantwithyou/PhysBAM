@@ -7,9 +7,9 @@
 #ifndef __COLLISION_BODY_COLLECTION__
 #define __COLLISION_BODY_COLLECTION__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>

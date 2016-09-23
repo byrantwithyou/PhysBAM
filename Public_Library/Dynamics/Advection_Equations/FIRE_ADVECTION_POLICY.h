@@ -5,8 +5,8 @@
 #ifndef __FIRE_ADVECTION_POLICY__
 #define __FIRE_ADVECTION_POLICY__
 
-#include <Tools/Advection/ADVECTION_FORWARD.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
+#include <Grid_PDE/Advection/ADVECTION_FORWARD.h>
+#include <Grid_PDE/Advection/ADVECTION_UNIFORM_FORWARD.h>
 #include <Incompressible/Advection_Collidable/ADVECTION_COLLIDABLE_FORWARD.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <Dynamics/Advection_Equations/FIRE_ADVECTION_FORWARD.h>

@@ -6,11 +6,11 @@
 //#####################################################################
 #ifndef __INTERFACE_STOKES_SYSTEM_COLOR__
 #define __INTERFACE_STOKES_SYSTEM_COLOR__
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <functional>

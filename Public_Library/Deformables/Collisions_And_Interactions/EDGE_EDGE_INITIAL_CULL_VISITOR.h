@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __EDGE_EDGE_INITIAL_CULL_VISITOR__
 #define __EDGE_EDGE_INITIAL_CULL_VISITOR__
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 
 namespace PhysBAM{
 template<class TV> class SEGMENT_ADHESION;

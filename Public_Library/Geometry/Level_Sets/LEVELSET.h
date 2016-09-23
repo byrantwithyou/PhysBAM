@@ -7,16 +7,16 @@
 #ifndef __LEVELSET__
 #define __LEVELSET__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/INTERVAL.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/INTERVAL.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/SCALAR_POLICY.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/SCALAR_POLICY.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
+#include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <cassert>
 #include <cfloat>

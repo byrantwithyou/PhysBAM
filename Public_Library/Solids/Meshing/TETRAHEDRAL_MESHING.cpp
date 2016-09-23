@@ -4,12 +4,12 @@
 //#####################################################################
 // Class TETRAHEDRAL_MESHING
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX_4X4.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Utilities/INTERRUPTS.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX_4X4.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/INTERRUPTS.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>

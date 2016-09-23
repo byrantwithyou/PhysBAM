@@ -2,11 +2,11 @@
 // Copyright 2006-2008, Elliot English, Geoffrey Irving, Michael Lentine, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Jonathan Su, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Math_Tools/sign.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Vectors/TWIST.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <Tools/Math_Tools/sign.h>
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Vectors/TWIST.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>

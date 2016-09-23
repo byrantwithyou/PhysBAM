@@ -4,7 +4,7 @@
 //#####################################################################
 // Class SEGMENT_MESH
 //#####################################################################
-#include <Tools/Data_Structures/UNION_FIND.h>
+#include <Core/Data_Structures/UNION_FIND.h>
 #include <Geometry/Topology/POINT_SIMPLEX_MESH.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 using namespace PhysBAM;

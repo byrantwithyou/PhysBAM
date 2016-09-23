@@ -4,8 +4,8 @@
 //#####################################################################
 #ifndef __PLS_FC_DRIVER__
 #define __PLS_FC_DRIVER__
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 namespace PhysBAM{
 
 template<class TV> class PLS_FC_EXAMPLE;

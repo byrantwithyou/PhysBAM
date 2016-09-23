@@ -31,7 +31,7 @@ namespace PhysBAM{
     };
 }
 #else
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 namespace PhysBAM {
     class OPENGL_PBUFFER
     {

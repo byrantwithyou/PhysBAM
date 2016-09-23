@@ -2,8 +2,8 @@
 // Copyright 2004-2009, Jon Gretarsson, Eran Guendelman, Nipun Kwatra, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>

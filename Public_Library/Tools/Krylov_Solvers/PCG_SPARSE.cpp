@@ -2,12 +2,12 @@
 // Copyright 2003-2008, Ron Fedkiw, Frederic Gibou, Geoffrey Irving, Michael Lentine, Frank Losasso, Craig Schroeder, Andrew Selle, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE_SYSTEM.h>
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Solve  

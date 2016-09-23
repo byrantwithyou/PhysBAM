@@ -4,10 +4,10 @@
 //#####################################################################
 // Class IMPLICIT_OBJECT_TRANSFORMED
 //#####################################################################
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>
 using namespace PhysBAM;

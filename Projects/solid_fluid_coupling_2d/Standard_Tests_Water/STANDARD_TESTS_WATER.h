@@ -17,8 +17,8 @@
 #ifndef __STANDARD_TESTS_WATER__
 #define __STANDARD_TESTS_WATER__
 
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>

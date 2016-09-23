@@ -7,7 +7,7 @@
 #ifndef __FORCE_KINK_HELPER__
 #define __FORCE_KINK_HELPER__
 
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
 namespace PhysBAM{
 
 template<class TV,int d>

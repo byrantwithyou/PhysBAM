@@ -6,13 +6,13 @@
 //#####################################################################
 #ifndef __MATRIX_FLUID_GRADIENT_BASE__
 #define __MATRIX_FLUID_GRADIENT_BASE__
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 
 namespace PhysBAM{
 

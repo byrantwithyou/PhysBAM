@@ -4,8 +4,8 @@
 //#####################################################################
 // Class SOLIDS_PARAMETERS
 //#####################################################################
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Vectors/VECTOR_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>

@@ -7,10 +7,10 @@
 #ifndef __Convert_1d_To_3d__
 #define __Convert_1d_To_3d__
 
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/ROTATION.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/ROTATION.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class T> inline VECTOR<T,3> Convert_1d_To_3d(const VECTOR<T,1>& v)

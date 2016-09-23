@@ -7,10 +7,10 @@
 #ifndef __PARTICLE_LEVELSET__
 #define __PARTICLE_LEVELSET__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/PAIR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Particles/POINTS_POOL.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Incompressible/Level_Sets/LEVELSET_COLLIDABLE.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>

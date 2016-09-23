@@ -7,10 +7,10 @@
 #ifndef __TRIANGLE_2D__
 #define __TRIANGLE_2D__
 
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/MATRIX_2X2.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/MATRIX_2X2.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 

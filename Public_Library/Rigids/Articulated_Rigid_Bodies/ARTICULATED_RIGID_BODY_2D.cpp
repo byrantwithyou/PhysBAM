@@ -2,7 +2,7 @@
 // Copyright 2004-2007, Craig Schroeder, Tamar Shinar, Eftychios Sifakis, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>

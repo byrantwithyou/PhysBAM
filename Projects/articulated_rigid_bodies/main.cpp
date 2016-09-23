@@ -2,9 +2,9 @@
 // Copyright 2004-2007, Craig Schroeder, Tamar Shinar, Joseph Teran, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 //#include "ARB/ARB_EXAMPLE_3D.h"

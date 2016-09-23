@@ -7,7 +7,7 @@
 #ifndef __FLUID_STRAIN__
 #define __FLUID_STRAIN__
 
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T>

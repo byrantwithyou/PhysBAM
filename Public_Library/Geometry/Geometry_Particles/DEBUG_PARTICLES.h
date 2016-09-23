@@ -7,9 +7,9 @@
 #ifndef __DEBUG_PARTICLES__
 #define __DEBUG_PARTICLES__
 
-#include <Tools/Arrays/ATTRIBUTE_ID.h>
-#include <Tools/Read_Write/TYPED_STREAM.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ATTRIBUTE_ID.h>
+#include <Core/Read_Write/TYPED_STREAM.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 template<class TV> class GEOMETRY_PARTICLES;
 template<class TV> class GRID;

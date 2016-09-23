@@ -7,8 +7,8 @@
 #ifndef __FLUID_KRYLOV_VECTOR__
 #define __FLUID_KRYLOV_VECTOR__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 namespace PhysBAM{
 

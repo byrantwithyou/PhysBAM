@@ -2,8 +2,8 @@
 // Copyright 2002, Ronald Fedkiw
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Math_Tools/max.h>
-#include <Tools/Math_Tools/min.h>
+#include <Core/Math_Tools/max.h>
+#include <Core/Math_Tools/min.h>
 #include <Compressible/Lagrange_Equations/ARTIFICIAL_VISCOSITY_WILKINS_1D.h>
 using namespace PhysBAM;
 //#####################################################################

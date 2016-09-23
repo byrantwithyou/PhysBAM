@@ -7,8 +7,8 @@
 #ifndef __OPENGL_SCALAR_FIELD_2D__
 #define __OPENGL_SCALAR_FIELD_2D__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>

@@ -2,7 +2,7 @@
 // Copyright 2007, Joyce Pan.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Math_Tools/max.h>
+#include <Core/Math_Tools/max.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>

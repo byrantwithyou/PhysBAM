@@ -7,8 +7,8 @@
 #ifndef __LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM__
 #define __LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM__
 
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
+#include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_UNIFORM.h>
 namespace PhysBAM{
 

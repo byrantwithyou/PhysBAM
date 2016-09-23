@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __ANALYTIC_LEVELSET__
 #define __ANALYTIC_LEVELSET__
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 
 namespace PhysBAM{
 template<class TV>

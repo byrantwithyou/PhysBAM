@@ -2,10 +2,10 @@
 // Copyright 2004-2006, Ron Fedkiw, Geoffrey Irving, Sergey Koltakov, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/KD_TREE.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/FRAME.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/KD_TREE.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/FRAME.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 using namespace PhysBAM;

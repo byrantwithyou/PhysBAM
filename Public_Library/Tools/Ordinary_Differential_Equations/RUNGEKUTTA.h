@@ -7,7 +7,7 @@
 #ifndef __RUNGEKUTTA__
 #define __RUNGEKUTTA__
 
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 static const double rk_table[4][3][2]=

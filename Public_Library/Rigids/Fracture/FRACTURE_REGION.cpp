@@ -4,8 +4,8 @@
 //#####################################################################
 // Class FRACTURE_REGION
 //##################################################################### 
-#include <Tools/Grids_Uniform_Arrays/FLOOD_FILL.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
+#include <Grid_Tools/Arrays/FLOOD_FILL.h>
 #include <Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <Rigids/Fracture/FRACTURE_REGION.h>
 using namespace PhysBAM;

@@ -11,7 +11,7 @@
 #ifndef __SHALLOW_WATER__
 #define __SHALLOW_WATER__    
 
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 namespace PhysBAM{
 

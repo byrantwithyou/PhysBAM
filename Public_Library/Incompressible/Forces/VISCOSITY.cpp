@@ -2,11 +2,11 @@
 // Copyright 2009, Avi Robinson-Mosher.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
 #include <Incompressible/Forces/VISCOSITY.h>
 #include <Incompressible/Incompressible_Flows/IMPLICIT_VISCOSITY_UNIFORM.h>
-#include <Incompressible/Projection/PROJECTION_UNIFORM.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

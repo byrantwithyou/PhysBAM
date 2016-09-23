@@ -2,11 +2,11 @@
 // Copyright 2008, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/LOG.h>
 #include <Tools/Images/IMAGE.h>
 #include <Tools/Images/MOV_FILE.h>
-#include <Tools/Log/LOG.h>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>

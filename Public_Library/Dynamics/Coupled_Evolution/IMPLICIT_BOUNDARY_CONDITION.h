@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __IMPLICIT_BOUNDARY_CONDITION__
 #define __IMPLICIT_BOUNDARY_CONDITION__
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 namespace PhysBAM{
 template<class TV> class GRID;
 template<class TV>

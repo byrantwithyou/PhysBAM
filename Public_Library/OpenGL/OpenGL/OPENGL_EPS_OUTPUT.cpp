@@ -2,9 +2,9 @@
 // Copyright 2009.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <OpenGL/OpenGL/OPENGL_EPS_OUTPUT.h>
 #ifdef _WIN32
 #define NOMINMAX

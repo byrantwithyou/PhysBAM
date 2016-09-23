@@ -7,7 +7,7 @@
 #ifndef __SOLID_FLUID_COUPLED_EVOLUTION_SLIP__
 #define __SOLID_FLUID_COUPLED_EVOLUTION_SLIP__
 
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Dynamics/Coupled_Evolution/COUPLED_SYSTEM_VECTOR.h>

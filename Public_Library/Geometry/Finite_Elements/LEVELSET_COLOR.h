@@ -7,9 +7,9 @@
 #ifndef __LEVELSET_COLOR__
 #define __LEVELSET_COLOR__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Grid_Tools/Grids/GRID.h>
 
 namespace PhysBAM{
 

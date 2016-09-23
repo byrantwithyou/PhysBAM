@@ -7,9 +7,9 @@
 #ifndef __TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY__
 #define __TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR_2D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR_2D.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 namespace PhysBAM{
 

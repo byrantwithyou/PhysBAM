@@ -2,11 +2,11 @@
 // Copyright 2004-2009, Eran Guendelman, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_2D.h>
 #include <OpenGL/OpenGL/OPENGL_MAC_VELOCITY_FIELD_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_2D.h>

@@ -7,10 +7,10 @@
 #ifndef __DEPTH_BUFFERING__
 #define __DEPTH_BUFFERING__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR_2D.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR_2D.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 
 #define DB_TOL_PLANE    1e-7

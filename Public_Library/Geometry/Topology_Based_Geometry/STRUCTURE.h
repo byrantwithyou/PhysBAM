@@ -7,13 +7,13 @@
 #ifndef __STRUCTURE__
 #define __STRUCTURE__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Read_Write/TYPED_STREAM.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Read_Write/TYPED_STREAM.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 #include <string>
 #include <typeinfo>
 namespace PhysBAM{

@@ -2,7 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Rigids/Collisions/COLLISION_HELPER.h>
 using namespace PhysBAM;
 //#####################################################################

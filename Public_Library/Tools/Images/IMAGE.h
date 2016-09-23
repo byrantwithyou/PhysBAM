@@ -7,9 +7,9 @@
 #ifndef __IMAGE__
 #define __IMAGE__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/exchange.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/exchange.h>
+#include <Core/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 
 template<class T>

@@ -7,7 +7,7 @@
 #ifndef __TRANSVERSE_ISOTROPY_3D__
 #define __TRANSVERSE_ISOTROPY_3D__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Deformables/Constitutive_Models/ANISOTROPIC_CONSTITUTIVE_MODEL.h>
 namespace PhysBAM{

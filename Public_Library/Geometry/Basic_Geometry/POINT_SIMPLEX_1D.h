@@ -7,12 +7,12 @@
 #ifndef __POINT_SIMPLEX_1D__
 #define __POINT_SIMPLEX_1D__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/FIXED_NUMBER.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_1D.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/FIXED_NUMBER.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
+#include <Core/Vectors/VECTOR_1D.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 

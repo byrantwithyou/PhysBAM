@@ -7,8 +7,8 @@
 #ifndef __OPENGL_AXES__
 #define __OPENGL_AXES__
 
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/FRAME.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/FRAME.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 namespace PhysBAM{

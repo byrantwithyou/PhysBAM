@@ -4,8 +4,8 @@
 //#####################################################################
 // Class SOFT_BINDINGS
 //#####################################################################
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Log/LOG.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 using namespace PhysBAM;

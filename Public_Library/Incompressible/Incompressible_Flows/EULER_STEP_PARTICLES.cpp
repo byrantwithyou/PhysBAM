@@ -4,7 +4,7 @@
 //#####################################################################
 // Class EULER_STEP_PARTICLES
 //#####################################################################
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Incompressible/Incompressible_Flows/EULER_STEP_PARTICLES.h>
 namespace PhysBAM{
 //#####################################################################

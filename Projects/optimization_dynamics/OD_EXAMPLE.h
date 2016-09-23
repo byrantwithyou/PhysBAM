@@ -4,10 +4,10 @@
 //#####################################################################
 #ifndef __OD_EXAMPLE__
 #define __OD_EXAMPLE__
+#include <Core/Utilities/Find_Type.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Utilities/Find_Type.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class TV> class DEBUG_PARTICLES;

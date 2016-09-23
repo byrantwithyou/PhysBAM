@@ -7,9 +7,9 @@
 #ifndef __ARTICULATED_SYSTEM__
 #define __ARTICULATED_SYSTEM__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <Tools/Matrices/MATRIX.h>
 #include <Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
 

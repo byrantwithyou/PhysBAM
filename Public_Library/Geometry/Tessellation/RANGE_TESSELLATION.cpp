@@ -4,7 +4,7 @@
 //#####################################################################
 // namespace TESSELLATION
 //##################################################################### 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Tessellation/RANGE_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 

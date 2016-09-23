@@ -7,9 +7,9 @@
 #ifndef __MESHING_DRIVER__
 #define __MESHING_DRIVER__
 
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Solids/Meshing/TETRAHEDRAL_MESHING.h>

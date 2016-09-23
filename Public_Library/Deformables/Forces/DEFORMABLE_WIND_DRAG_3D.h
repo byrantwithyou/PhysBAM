@@ -7,8 +7,8 @@
 #ifndef __DEFORMABLE_WIND_DRAG_3D__
 #define __DEFORMABLE_WIND_DRAG_3D__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>

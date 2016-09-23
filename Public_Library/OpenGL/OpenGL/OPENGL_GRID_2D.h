@@ -7,8 +7,8 @@
 #ifndef __OPENGL_GRID_2D__
 #define __OPENGL_GRID_2D__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>

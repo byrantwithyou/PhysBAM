@@ -7,8 +7,8 @@
 #ifndef __OBJECTS_IN_CELL__    
 #define __OBJECTS_IN_CELL__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/OPERATION_HASH.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/OPERATION_HASH.h>
 namespace PhysBAM{
 
 template<class TV> struct GRID_ARRAYS_POLICY;

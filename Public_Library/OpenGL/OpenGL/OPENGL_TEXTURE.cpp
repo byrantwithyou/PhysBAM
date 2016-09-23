@@ -2,7 +2,7 @@
 // Copyright 2004, Eran Guendelman.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Utilities/STATIC_ASSERT.h>
+#include <Core/Utilities/STATIC_ASSERT.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_TEXTURE.h>
 #include <cmath>

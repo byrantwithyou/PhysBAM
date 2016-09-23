@@ -16,8 +16,8 @@
 #include <iostream>
 #include "math.h"
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 //#include <Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_RF.h>

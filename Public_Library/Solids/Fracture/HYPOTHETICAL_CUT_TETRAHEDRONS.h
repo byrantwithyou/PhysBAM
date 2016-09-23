@@ -7,7 +7,7 @@
 #ifndef __HYPOTHETICAL_CUT_TETRAHEDRONS__
 #define __HYPOTHETICAL_CUT_TETRAHEDRONS__
 
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Solids/Fracture/HYPOTHETICAL_CUT.h>
 namespace PhysBAM{
 

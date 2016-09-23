@@ -7,8 +7,8 @@
 #ifndef __TRIANGLE_REPULSIONS__
 #define __TRIANGLE_REPULSIONS__
 
+#include <Core/Utilities/PHYSBAM_ATTRIBUTE.h>
 #include <Tools/Parallel_Computation/PARTITION_ID.h>
-#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLES_COLLISIONS_FORWARD.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>

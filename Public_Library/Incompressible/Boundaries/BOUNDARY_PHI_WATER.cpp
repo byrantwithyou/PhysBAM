@@ -4,10 +4,10 @@
 //#####################################################################
 // Class BOUNDARY_PHI_WATER
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 namespace PhysBAM{
 //#####################################################################

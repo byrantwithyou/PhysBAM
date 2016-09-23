@@ -4,11 +4,11 @@
 //#####################################################################
 // Namespace SIGNED_DISTANCE
 //##################################################################### 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Grids_Uniform_Computations/SEGMENTED_CURVE_2D_SIGNED_DISTANCE.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 namespace PhysBAM{

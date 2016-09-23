@@ -7,9 +7,9 @@
 #ifndef __GLASS__
 #define __GLASS__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Images/IMAGE.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SPH_CALLBACKS.h>

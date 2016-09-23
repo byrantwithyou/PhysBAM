@@ -7,7 +7,7 @@
 #ifndef __ETHER_DRAG__
 #define __ETHER_DRAG__
 
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Solids/Forces_And_Torques/POINTWISE_FORCE.h>
 namespace PhysBAM{
 

@@ -5,12 +5,12 @@
 #ifndef __MPM_PLASTICITY_MODEL__
 #define __MPM_PLASTICITY_MODEL__
 
-#include <Tools/Arrays/ATTRIBUTE_ID.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Core/Arrays/ATTRIBUTE_ID.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 #include <Tools/Tensors/SYMMETRIC_TENSOR.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> class MPM_PARTICLES;

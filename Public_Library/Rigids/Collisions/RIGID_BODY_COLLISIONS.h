@@ -7,12 +7,12 @@
 #ifndef __RIGID_BODY_COLLISIONS__
 #define __RIGID_BODY_COLLISIONS__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>

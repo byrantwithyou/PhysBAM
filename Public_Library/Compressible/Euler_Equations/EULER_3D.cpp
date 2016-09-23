@@ -2,10 +2,10 @@
 // Copyright 2002, Ronald Fedkiw.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Math_Tools/maxabs.h>
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/maxabs.h>
+#include <Core/Math_Tools/sqr.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Compressible/Euler_Equations/EULER_3D.h>
 using namespace PhysBAM;
 //#####################################################################

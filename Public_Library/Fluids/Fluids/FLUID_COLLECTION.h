@@ -7,7 +7,7 @@
 #ifndef __FLUID_COLLECTION__
 #define __FLUID_COLLECTION__
 
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Incompressible/Incompressible_Fluids/INCOMPRESSIBLE_FLUID_COLLECTION.h>
 namespace PhysBAM{
 

@@ -7,9 +7,9 @@
 #ifndef __LEVELSET_VISCOSITY_UNIFORM_SYSTEM__
 #define __LEVELSET_VISCOSITY_UNIFORM_SYSTEM__
 
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <Incompressible/Incompressible_Flows/LEVELSET_FACE_POISSON_UNIFORM.h>
 namespace PhysBAM{
 

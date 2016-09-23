@@ -7,9 +7,9 @@
 #ifndef __EPS_FILE__
 #define __EPS_FILE__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Images/VECTOR_IMAGE.h>
 #include <iostream>
 #include <string>

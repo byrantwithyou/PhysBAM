@@ -2,12 +2,12 @@
 // Copyright 2002-2006, Ronald Fedkiw, Geoffrey Irving, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Math_Tools/max.h>
-#include <Tools/Math_Tools/sqr.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Math_Tools/max.h>
+#include <Core/Math_Tools/sqr.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Dynamics/Heat_Flows/HEAT_UNIFORM.h>

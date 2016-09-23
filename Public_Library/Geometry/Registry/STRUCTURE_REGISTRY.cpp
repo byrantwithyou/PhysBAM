@@ -2,8 +2,8 @@
 // Copyright 2006-2009, Jon Gretarsson, Geoffrey Irving, Andrew Selle, Tamar Shinar, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
 #include <Geometry/Basic_Geometry/BOWL.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>

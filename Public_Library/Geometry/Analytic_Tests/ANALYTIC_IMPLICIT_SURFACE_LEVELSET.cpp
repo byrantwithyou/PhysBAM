@@ -2,7 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_IMPLICIT_SURFACE_LEVELSET.h>
 namespace PhysBAM{
 //#####################################################################

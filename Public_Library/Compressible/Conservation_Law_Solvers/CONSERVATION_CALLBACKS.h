@@ -7,8 +7,8 @@
 #ifndef __CONSERVATION_CALLBACKS__
 #define __CONSERVATION_CALLBACKS__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 namespace PhysBAM{
 
 template<class T>

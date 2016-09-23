@@ -4,10 +4,10 @@
 //#####################################################################
 // Class WATER_STANDARD_TESTS_3D
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Matrices/MATRIX_4X4.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Matrices/MATRIX_4X4.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>

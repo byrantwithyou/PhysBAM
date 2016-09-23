@@ -5,7 +5,7 @@
 #ifndef __H_OPENGL_ARCBALL__
 #define __H_OPENGL_ARCBALL__
 
-#include <Tools/Matrices/MATRIX_4X4.h>
+#include <Core/Matrices/MATRIX_4X4.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>

@@ -7,8 +7,8 @@
 #ifndef __BACKWARD_EULER_EVOLUTION__
 #define __BACKWARD_EULER_EVOLUTION__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 namespace PhysBAM{

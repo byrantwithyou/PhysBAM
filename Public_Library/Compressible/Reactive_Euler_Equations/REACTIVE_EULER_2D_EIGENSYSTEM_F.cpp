@@ -2,7 +2,7 @@
 // Copyright 2002-2007, Ronald Fedkiw, Nipun Kwatra, Duc Nguyen.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Math_Tools/sqr.h>
 #include <Compressible/Reactive_Euler_Equations/REACTIVE_EULER_2D_EIGENSYSTEM_F.h>
 using namespace PhysBAM;
 //#####################################################################

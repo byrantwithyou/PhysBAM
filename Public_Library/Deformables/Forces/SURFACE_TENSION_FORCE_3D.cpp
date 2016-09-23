@@ -2,9 +2,9 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Matrices/MATRIX.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE_3D.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;

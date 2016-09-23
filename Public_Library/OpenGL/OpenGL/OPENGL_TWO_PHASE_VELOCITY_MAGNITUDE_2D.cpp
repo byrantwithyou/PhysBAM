@@ -2,8 +2,8 @@
 // Copyright 2004-2005, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <OpenGL/OpenGL/OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D.h>
 using namespace PhysBAM;
 using namespace std;

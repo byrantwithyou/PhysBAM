@@ -7,11 +7,11 @@
 #ifndef __MATRIX_SYSTEM__
 #define __MATRIX_SYSTEM__
 
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 //#####################################################################
 // Class MATRIX_SYSTEM

@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __RENDERING_CAMERA_ORIENTED_NORMAL_SHADER__
 #define __RENDERING_CAMERA_ORIENTED_NORMAL_SHADER__
-#include <Tools/Math_Tools/max.h>
+#include <Core/Math_Tools/max.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_SEGMENTED_CURVE.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>

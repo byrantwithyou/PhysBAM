@@ -7,8 +7,8 @@
 #ifndef __DEFORMABLES_STANDARD_TESTS__
 #define __DEFORMABLES_STANDARD_TESTS__
 
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_POLICY.h>

@@ -7,7 +7,7 @@
 #ifndef __SPLINE_MODEL__
 #define __SPLINE_MODEL__
 
-#include <Tools/Math_Tools/constants.h>
+#include <Core/Math_Tools/constants.h>
 #include <Deformables/Constitutive_Models/COROTATED.h>
 namespace PhysBAM{
 

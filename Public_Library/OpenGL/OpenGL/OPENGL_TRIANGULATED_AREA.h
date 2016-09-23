@@ -7,7 +7,7 @@
 #ifndef __OPENGL_TRIANGULATED_AREA__
 #define __OPENGL_TRIANGULATED_AREA__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 namespace PhysBAM{

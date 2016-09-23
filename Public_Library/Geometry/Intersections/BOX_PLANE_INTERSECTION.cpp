@@ -4,8 +4,8 @@
 //#####################################################################
 // Namespace INTERSECTION
 //##################################################################### 
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Intersections/BOX_PLANE_INTERSECTION.h>
 namespace PhysBAM{

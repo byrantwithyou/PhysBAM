@@ -7,9 +7,9 @@
 #ifndef __RIGID_BODY_SKIP_COLLISION_CHECK__
 #define __RIGID_BODY_SKIP_COLLISION_CHECK__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 class RIGID_BODY_SKIP_COLLISION_CHECK

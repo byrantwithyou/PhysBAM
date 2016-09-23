@@ -2,10 +2,10 @@
 // Copyright 2009-2010, Nipun Kwatra, Avi Robinson-Mosher.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Incompressible/Incompressible_Fluids/INCOMPRESSIBLE_FLUID_COLLECTION.h>
 using namespace PhysBAM;
 //#####################################################################

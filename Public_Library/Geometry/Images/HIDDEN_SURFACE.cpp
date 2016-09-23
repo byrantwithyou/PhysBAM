@@ -3,7 +3,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Geometry/Images/HIDDEN_SURFACE.h>
 using namespace PhysBAM;
 template<class TV> void HIDDEN_SURFACE<TV>::

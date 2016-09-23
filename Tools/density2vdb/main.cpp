@@ -2,12 +2,12 @@
 // Copyright 2015
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <openvdb/openvdb.h>
 using namespace PhysBAM;
 

@@ -14,9 +14,9 @@
 #ifndef __SMOKE_STANDARD_TESTS_3D__
 #define __SMOKE_STANDARD_TESTS_3D__
 
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Matrices/MATRIX_4X4.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Matrices/MATRIX_4X4.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 namespace PhysBAM{
 
 template<class TV> class RANGE;

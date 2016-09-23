@@ -5,9 +5,9 @@
 #ifndef __RENDERING_VOXEL_SHADER__
 #define __RENDERING_VOXEL_SHADER__
 
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Ray_Tracing/Rendering/BLACKBODY.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.h>
 #include <Ray_Tracing/Rendering_Shaders/VOLUMETRIC_SHADER.h>

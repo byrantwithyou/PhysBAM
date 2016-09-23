@@ -5,7 +5,7 @@
 #ifndef __RENDERING_DIRECTIONAL_LIGHT__
 #define __RENDERING_DIRECTIONAL_LIGHT__
 
-#include <Tools/Math_Tools/constants.h>
+#include <Core/Math_Tools/constants.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
 namespace PhysBAM{

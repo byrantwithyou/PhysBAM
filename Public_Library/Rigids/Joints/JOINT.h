@@ -7,10 +7,10 @@
 #ifndef __JOINT__
 #define __JOINT__
 
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/TWIST.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/TWIST.h>
 #include <Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
 

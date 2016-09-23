@@ -7,13 +7,13 @@
 #ifndef __PARTICLES_IN_PROXIMITY__
 #define __PARTICLES_IN_PROXIMITY__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include <Tools/Vectors/VECTOR_1D.h>
-#include <Tools/Vectors/VECTOR_2D.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/UNION_FIND.h>
+#include <Core/Vectors/VECTOR_1D.h>
+#include <Core/Vectors/VECTOR_2D.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>

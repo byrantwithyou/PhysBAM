@@ -8,16 +8,16 @@
 #ifndef __WIND_TUNNEL__
 #define __WIND_TUNNEL__
 
-#include <Tools/Log/SCOPE.h>
+#include <Core/Log/SCOPE.h>
 #include <fstream>
 #include <iostream>
 #include "math.h"
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MULTIPLE_UNIFORM.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_MULTIPLE_UNIFORM.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>

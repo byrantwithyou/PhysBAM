@@ -2,7 +2,7 @@
 // Copyright 2004-2009, Zhaosheng Bao, Eilene Hao, Sergey Koltakov, Nipun Kwatra, Frank Losasso, Andrew Selle, Jerry Talton, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt. 
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>

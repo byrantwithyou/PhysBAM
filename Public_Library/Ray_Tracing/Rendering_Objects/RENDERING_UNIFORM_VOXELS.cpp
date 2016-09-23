@@ -4,10 +4,10 @@
 //#####################################################################
 // Class RENDERING_UNIFORM_VOXELS
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Grids_Uniform_Computations/SMOOTH_UNIFORM.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Computations/SMOOTH_UNIFORM.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_UNIFORM_VOXELS.h>
 #include <Ray_Tracing/Rendering_Shaders/RENDERING_VOXEL_SHADER.h>

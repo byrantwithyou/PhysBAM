@@ -2,7 +2,7 @@
 // Copyright 2007, Craig Schroeder, Tamar Shinar, Jonathan Su
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include <Rigids/Joints/PRISMATIC_TWIST_JOINT.h>
 using namespace PhysBAM;
 //#####################################################################

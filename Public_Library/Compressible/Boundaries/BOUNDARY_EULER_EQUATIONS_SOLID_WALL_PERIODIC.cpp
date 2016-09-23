@@ -2,12 +2,12 @@
 // Copyright 2002-2007, Doug Enright, Jon Gretarsson, Nipun Kwatra, Andrew Selle
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR_3D.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC.h>
 namespace PhysBAM{
 #if 0

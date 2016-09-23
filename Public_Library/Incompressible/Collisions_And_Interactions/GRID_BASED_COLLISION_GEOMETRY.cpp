@@ -4,9 +4,9 @@
 //#####################################################################
 // Class GRID_BASED_COLLISION_GEOMETRY
 //#####################################################################
-#include <Tools/Grids_Uniform/BLOCK_UNIFORM.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/BLOCK_UNIFORM.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>

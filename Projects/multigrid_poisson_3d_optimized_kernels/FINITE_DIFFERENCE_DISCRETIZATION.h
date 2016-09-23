@@ -7,7 +7,7 @@
 #ifndef __FINITE_DIFFERENCE_DISCRETIZATION__
 #define __FINITE_DIFFERENCE_DISCRETIZATION__
 
-#include <Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <Core/Math_Tools/RANGE_ITERATOR.h>
 namespace PhysBAM{
 
 template<class T,int d> class FINITE_DIFFERENCE_DISCRETIZATION;

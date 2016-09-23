@@ -7,10 +7,10 @@
 #ifndef __DEFORMABLE_BODY_COLLECTION__
 #define __DEFORMABLE_BODY_COLLECTION__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
-#include <Tools/Utilities/Find_Type.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
+#include <Core/Utilities/Find_Type.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 

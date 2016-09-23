@@ -2,8 +2,8 @@
 // Copyright 2015
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Read_Write/TYPED_STREAM.h>
+#include <Core/Log/LOG.h>
+#include <Core/Read_Write/TYPED_STREAM.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include "PBD_EXAMPLE.h"

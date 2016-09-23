@@ -2,9 +2,9 @@
 // Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_TETRAHEDRA.h>

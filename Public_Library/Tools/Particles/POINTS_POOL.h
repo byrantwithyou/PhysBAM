@@ -7,9 +7,9 @@
 #ifndef __POINTS_POOL__
 #define __POINTS_POOL__
 
+#include <Core/Data_Structures/STACK.h>
+#include <Core/Log/LOG.h>
 #include <Tools/Clone/CLONE_ARRAY.h>
-#include <Tools/Data_Structures/STACK.h>
-#include <Tools/Log/LOG.h>
 namespace PhysBAM{
 
 template<class T_PARTICLES>

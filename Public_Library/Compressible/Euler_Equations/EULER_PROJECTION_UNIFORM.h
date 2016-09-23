@@ -7,8 +7,8 @@
 #ifndef __EULER_PROJECTION_UNIFORM__
 #define __EULER_PROJECTION_UNIFORM__
 
-#include <Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
-#include <Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
+#include <Grid_PDE/Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
 #include <Compressible/Euler_Equations/BOUNDARY_OBJECT_REFLECTION.h>
 #include <Compressible/Euler_Equations/EULER_PROJECTION.h>
 namespace PhysBAM{

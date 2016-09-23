@@ -7,8 +7,8 @@
 #ifndef __SYSTEM_VOLUME_BLOCK_COLOR__
 #define __SYSTEM_VOLUME_BLOCK_COLOR__
 
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Symbolics/STATIC_POLYNOMIAL.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 #include <Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h>
 
 namespace PhysBAM{

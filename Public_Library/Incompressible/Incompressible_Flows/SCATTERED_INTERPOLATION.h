@@ -7,8 +7,8 @@
 #ifndef __SCATTERED_INTERPOLATION__
 #define __SCATTERED_INTERPOLATION__
 
-#include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Math_Tools/RANGE.h>
 namespace PhysBAM{
 
 template<class TV>

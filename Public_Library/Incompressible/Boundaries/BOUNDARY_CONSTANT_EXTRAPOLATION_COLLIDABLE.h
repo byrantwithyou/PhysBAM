@@ -7,7 +7,7 @@
 #ifndef __BOUNDARY_CONSTANT_EXTRAPOLATION_COLLIDABLE__
 #define __BOUNDARY_CONSTANT_EXTRAPOLATION_COLLIDABLE__
 
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 template<class TV,class T2>

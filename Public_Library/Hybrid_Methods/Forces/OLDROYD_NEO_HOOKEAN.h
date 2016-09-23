@@ -7,10 +7,10 @@
 #ifndef __OLDROYD_NEO_HOOKEAN__
 #define __OLDROYD_NEO_HOOKEAN__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Hybrid_Methods/Forces/OLDROYD_CONSTITUTIVE_MODEL.h>
 namespace PhysBAM{
 

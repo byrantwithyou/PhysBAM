@@ -3,16 +3,16 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 
 using namespace PhysBAM;
 

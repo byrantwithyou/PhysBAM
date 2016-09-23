@@ -7,7 +7,7 @@
 #ifndef __ADVECTION_WRAPPER_COLLIDABLE_FACE__
 #define __ADVECTION_WRAPPER_COLLIDABLE_FACE__
 
-#include <Tools/Advection/ADVECTION.h>
+#include <Grid_PDE/Advection/ADVECTION.h>
 
 namespace PhysBAM{
 

@@ -2,7 +2,7 @@
 // Copyright 2006-2008, Geoffrey Irving, Andrew Selle, Tamar Shinar, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Deformables/Bindings/BINDING.h>
 #include <Deformables/Bindings/LINEAR_BINDING_DYNAMIC.h>
 namespace PhysBAM{

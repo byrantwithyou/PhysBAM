@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __ANALYTIC_LEVELSET_ROTATE__
 #define __ANALYTIC_LEVELSET_ROTATE__
-#include <Tools/Matrices/ROTATION.h>
+#include <Core/Matrices/ROTATION.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 
 namespace PhysBAM{

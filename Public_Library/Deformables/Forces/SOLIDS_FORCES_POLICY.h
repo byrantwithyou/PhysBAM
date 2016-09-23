@@ -7,7 +7,7 @@
 #ifndef __SOLIDS_FORCES_POLICY__
 #define __SOLIDS_FORCES_POLICY__
 
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> class SOLIDS_FORCES;

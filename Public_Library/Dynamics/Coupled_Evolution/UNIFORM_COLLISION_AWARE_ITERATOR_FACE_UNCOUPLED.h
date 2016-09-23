@@ -7,9 +7,9 @@
 #ifndef __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED__
 #define __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED__
 
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 
 namespace PhysBAM{
 template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;

@@ -7,7 +7,7 @@
 #ifndef __SOLID_BODY_COLLECTION__
 #define __SOLID_BODY_COLLECTION__
 
-#include <Tools/Utilities/Find_Type.h>
+#include <Core/Utilities/Find_Type.h>
 #include <Solids/Collisions/SOLIDS_COLLISIONS_FORWARD.h>
 #include <Solids/Forces_And_Torques/SOLIDS_FORCES.h>
 namespace PhysBAM{

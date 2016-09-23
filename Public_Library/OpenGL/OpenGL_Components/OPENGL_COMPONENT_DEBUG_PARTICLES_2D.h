@@ -7,7 +7,7 @@
 #ifndef __OPENGL_COMPONENT_DEBUG_PARTICLES_2D__
 #define __OPENGL_COMPONENT_DEBUG_PARTICLES_2D__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_DEBUG_PARTICLES_2D.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>

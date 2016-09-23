@@ -2,7 +2,7 @@
 // Copyright 2004-2009, Geoffrey Irving, Sergey Koltakov, Nipun Kwatra, Michael Lentine, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>

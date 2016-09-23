@@ -11,7 +11,7 @@
 #ifndef __SHALLOW_WATER_1D_SPECIALIZED__
 #define __SHALLOW_WATER_1D_SPECIALIZED__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_1D_SPECIALIZED_EIGENSYSTEM_F.h>
 namespace PhysBAM{

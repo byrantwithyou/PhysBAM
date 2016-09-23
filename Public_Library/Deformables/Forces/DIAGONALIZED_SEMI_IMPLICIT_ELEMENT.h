@@ -7,8 +7,8 @@
 #ifndef __DIAGONALIZED_SEMI_IMPLICIT_ELEMENT__
 #define __DIAGONALIZED_SEMI_IMPLICIT_ELEMENT__
 
-#include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV,int d>

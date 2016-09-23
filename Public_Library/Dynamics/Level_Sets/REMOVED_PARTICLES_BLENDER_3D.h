@@ -7,9 +7,9 @@
 #ifndef __REMOVED_PARTICLES_BLENDER_3D__
 #define __REMOVED_PARTICLES_BLENDER_3D__
 
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 #include <Tools/Polynomials/CUBIC.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> class RANGE;

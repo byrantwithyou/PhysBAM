@@ -2,9 +2,9 @@
 // Copyright 2002, Ronald Fedkiw.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/sqr.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/sqr.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/POLYGON.h>
 #include <Compressible/Lagrange_Equations/GRID_LAGRANGE_2D.h>
 using namespace PhysBAM;

@@ -4,8 +4,8 @@
 //#####################################################################
 // Class B_SPLINE
 //##################################################################### 
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
-#include <Tools/Matrices/BANDED_MATRIX.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Matrices/BANDED_MATRIX.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>

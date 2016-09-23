@@ -2,8 +2,8 @@
 // Copyright 2004, Geoffrey Irving, Igor Neverov.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/LOG.h>
 #include <Tools/Images/IMAGE.h>
-#include <Tools/Log/LOG.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Ray_Tracing/Rendering/PHOTON_MAP.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>

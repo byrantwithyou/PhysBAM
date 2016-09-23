@@ -7,7 +7,7 @@
 #ifndef __DOMINATORS__
 #define __DOMINATORS__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 namespace PhysBAM{
 struct DOMINATORS
 {

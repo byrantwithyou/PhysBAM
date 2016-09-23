@@ -7,9 +7,9 @@
 #ifndef __SEGMENT_2D__
 #define __SEGMENT_2D__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_2D.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
+#include <Core/Vectors/VECTOR_2D.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 

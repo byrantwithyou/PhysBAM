@@ -2,7 +2,7 @@
 // Copyright 2007, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Random_Numbers/NOISE.h>
+#include <Core/Random_Numbers/NOISE.h>
 #include <Ray_Tracing/Rendering/PHOTON_MAP.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>

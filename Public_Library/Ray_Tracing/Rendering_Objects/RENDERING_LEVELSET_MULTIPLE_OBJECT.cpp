@@ -2,9 +2,9 @@
 // Copyright 2005, Jiayi Chong, Jeong-Mo Hong, Geoffrey Irving, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX_3X3.h>
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>

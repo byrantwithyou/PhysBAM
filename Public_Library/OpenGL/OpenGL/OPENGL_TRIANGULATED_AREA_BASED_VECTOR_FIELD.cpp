@@ -2,7 +2,7 @@
 // Copyright 2004, Eran Guendelman.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <OpenGL/OpenGL/OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD.h>
 using namespace PhysBAM;

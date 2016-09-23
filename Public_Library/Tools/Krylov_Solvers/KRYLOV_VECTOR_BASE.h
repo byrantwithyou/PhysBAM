@@ -7,7 +7,7 @@
 #ifndef __KRYLOV_VECTOR_BASE__
 #define __KRYLOV_VECTOR_BASE__
 
-#include <Tools/Utilities/DEBUG_CAST.h>
+#include <Core/Utilities/DEBUG_CAST.h>
 #include <iostream>
 namespace PhysBAM{
 

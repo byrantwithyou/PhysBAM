@@ -7,7 +7,7 @@
 #ifndef __PROJECTION_DYNAMICS_UNIFORM__
 #define __PROJECTION_DYNAMICS_UNIFORM__
 
-#include <Tools/Data_Structures/TRIPLE.h>
+#include <Core/Data_Structures/TRIPLE.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/PROJECTION_COLLIDABLE_UNIFORM.h>
 #include <Dynamics/Incompressible_Flows/PROJECTION_DYNAMICS.h>

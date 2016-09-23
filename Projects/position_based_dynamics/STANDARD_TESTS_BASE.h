@@ -5,8 +5,8 @@
 #ifndef __STANDARD_TESTS_BASE__
 #define __STANDARD_TESTS_BASE__
 
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include "PBD_EXAMPLE.h"
 
 namespace PhysBAM{

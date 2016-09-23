@@ -7,7 +7,7 @@
 #ifndef __PARAMETRIC_LINE__
 #define __PARAMETRIC_LINE__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 namespace PhysBAM{
 

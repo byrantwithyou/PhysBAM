@@ -2,11 +2,11 @@
 // Copyright 2003-2007, Robert Bridson, Ronald Fedkiw, Eran Guendelman, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE_ITERATOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Geometry/Spatial_Acceleration/BOX_PARTITION.h>
 namespace PhysBAM{
 //#####################################################################

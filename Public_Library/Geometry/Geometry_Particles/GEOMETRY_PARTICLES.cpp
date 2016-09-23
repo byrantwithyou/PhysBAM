@@ -2,13 +2,13 @@
 // Copyright 2009, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Vectors/TWIST.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
-#include <Tools/Vectors/TWIST.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 namespace PhysBAM{

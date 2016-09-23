@@ -2,10 +2,10 @@
 // Copyright 2004-2007, Zhaosheng Bao, Eilene Hao, Geoffrey Irving, Sergey Koltakov, Frank Losasso, Andrew Selle, Tamar Shinar, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Interpolation/BSPLINE.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
 #include "GENERIC_RENDER_EXAMPLE.h"

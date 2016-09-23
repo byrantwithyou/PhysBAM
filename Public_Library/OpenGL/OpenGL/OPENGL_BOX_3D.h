@@ -7,7 +7,7 @@
 #ifndef __OPENGL_BOX_3D__
 #define __OPENGL_BOX_3D__
 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 

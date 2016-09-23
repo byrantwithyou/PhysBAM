@@ -6,7 +6,7 @@
 //##################################################################### 
 #ifndef __RAY_TRIANGLE_3D_INTERSECTION__
 #define __RAY_TRIANGLE_3D_INTERSECTION__
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 namespace INTERSECTION{

@@ -7,9 +7,9 @@
 #ifndef __BINDING__
 #define __BINDING__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Registry/REGISTRY.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{

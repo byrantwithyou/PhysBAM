@@ -2,8 +2,8 @@
 // Copyright 2002-2007, Doug Enright, Ronald Fedkiw, Nipun Kwatra, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_F.h>
 #include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 namespace PhysBAM{

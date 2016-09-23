@@ -7,8 +7,8 @@
 #ifndef __QUASISTATIC_EVOLUTION__
 #define __QUASISTATIC_EVOLUTION__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 namespace PhysBAM{
 

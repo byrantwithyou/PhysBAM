@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __INTERFACE_STOKES_MULTIGRID__
 #define __INTERFACE_STOKES_MULTIGRID__
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
 
 namespace PhysBAM{

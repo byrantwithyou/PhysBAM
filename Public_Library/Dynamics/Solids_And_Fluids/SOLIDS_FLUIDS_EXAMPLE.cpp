@@ -4,12 +4,12 @@
 //#####################################################################
 // Class SOLIDS_FLUIDS_EXAMPLE
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>

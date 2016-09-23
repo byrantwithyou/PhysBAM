@@ -7,7 +7,7 @@
 #ifndef __FACE_3D__
 #define __FACE_3D__
 
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Deformables/Constitutive_Models/ANISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Deformables/Constitutive_Models/STRAIN_MEASURE_HEXAHEDRONS.h>

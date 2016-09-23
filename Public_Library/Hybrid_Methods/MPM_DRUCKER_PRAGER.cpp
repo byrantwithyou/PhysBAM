@@ -2,10 +2,10 @@
 // Copyright 2015, Andre Pradhana, Greg Klar
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Math_Tools/Robust_Functions.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Math_Tools/Robust_Functions.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/MPM_DRUCKER_PRAGER.h>

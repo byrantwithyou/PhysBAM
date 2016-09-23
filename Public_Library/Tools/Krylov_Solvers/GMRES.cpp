@@ -4,11 +4,11 @@
 //#####################################################################
 // Class GMRES
 //#####################################################################
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX_2X2.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/GMRES.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/MATRIX_2X2.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <cfloat>
 #include <limits>
 using namespace PhysBAM;

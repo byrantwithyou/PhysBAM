@@ -2,15 +2,15 @@
 // Copyright 2002-2005, Ronald Fedkiw, Geoffrey Irving, Duc Nguyen, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Images/PNG_FILE.h>
-#include <Tools/Log/LOG.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Symbolics/PROGRAM.h>
 #include <Tools/Symbolics/PROGRAM_CONTEXT.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>

@@ -15,8 +15,8 @@
 #ifndef __CAMERA__
 #define __CAMERA__
 
-#include <Tools/Matrices/MATRIX_4X4.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Matrices/MATRIX_4X4.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Ray_Tracing/Rendering/FILM.h>
 namespace PhysBAM{
 

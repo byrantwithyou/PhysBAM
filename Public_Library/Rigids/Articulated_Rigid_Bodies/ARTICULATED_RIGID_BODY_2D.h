@@ -7,7 +7,7 @@
 #ifndef __ARTICULATED_RIGID_BODY_2D__
 #define __ARTICULATED_RIGID_BODY_2D__
 
-#include <Tools/Data_Structures/PAIR.h>
+#include <Core/Data_Structures/PAIR.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY.h>
 namespace PhysBAM{
 

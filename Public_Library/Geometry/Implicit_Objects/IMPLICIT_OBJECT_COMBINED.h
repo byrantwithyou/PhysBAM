@@ -7,8 +7,8 @@
 #ifndef __IMPLICIT_OBJECT_COMBINED__
 #define __IMPLICIT_OBJECT_COMBINED__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/RAY.h>

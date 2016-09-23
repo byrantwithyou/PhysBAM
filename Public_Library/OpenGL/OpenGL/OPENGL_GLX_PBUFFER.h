@@ -18,7 +18,7 @@
 #endif
 #endif
 #ifndef OPENGL_GLX_PBUFFER_SUPPORTED
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #endif
 
 namespace PhysBAM{

@@ -7,8 +7,8 @@
 #ifndef __LANCZOS_ITERATION__
 #define __LANCZOS_ITERATION__
 
+#include <Core/Matrices/BANDED_SYMMETRIC_MATRIX.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <Tools/Matrices/BANDED_SYMMETRIC_MATRIX.h>
 namespace PhysBAM{
 
 // See Golub and Van Loan, 9.2.1, p. 480 for details.

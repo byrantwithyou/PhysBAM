@@ -7,7 +7,7 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>

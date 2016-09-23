@@ -4,9 +4,9 @@
 //#####################################################################
 // Class CONSERVATION_ENO_LLF  
 //#####################################################################
-#include <Tools/Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Grid_PDE/Advection/ADVECTION_SEPARABLE_UNIFORM.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <Compressible/Conservation_Law_Solvers/EIGENSYSTEM.h>
 using namespace PhysBAM;

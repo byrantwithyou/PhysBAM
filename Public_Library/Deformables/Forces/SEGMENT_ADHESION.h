@@ -7,8 +7,8 @@
 #ifndef __SEGMENT_ADHESION__
 #define __SEGMENT_ADHESION__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/PAIR.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/PAIR.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>

@@ -3,10 +3,10 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Vectors/VECTOR.h>
 
 using namespace PhysBAM;
 using namespace PhysBAM::HETERO_DIFF;

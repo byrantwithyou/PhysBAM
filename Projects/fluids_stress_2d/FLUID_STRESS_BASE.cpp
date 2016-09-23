@@ -2,14 +2,14 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Interpolation/CUBIC_MN_INTERPOLATION_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_PDE/Interpolation/CUBIC_MN_INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_BOX.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_CONST.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_ELLIPSOID.h>

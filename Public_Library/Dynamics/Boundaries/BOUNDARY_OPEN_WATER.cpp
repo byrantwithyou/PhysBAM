@@ -2,10 +2,10 @@
 // Copyright 2002-2006, Nipun Kwatra, Frank Losasso, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Incompressible/Boundaries/BOUNDARY_FORWARD.h>
 #include <Dynamics/Boundaries/BOUNDARY_OPEN_WATER.h>
 namespace PhysBAM{

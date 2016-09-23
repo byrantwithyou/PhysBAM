@@ -4,8 +4,8 @@
 //#####################################################################
 // Class TRIANGLE_COLLISIONS_POINT_FACE_VISITOR
 //##################################################################### 
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
 #include <Deformables/Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISIONS_POINT_FACE_VISITOR.h>

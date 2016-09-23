@@ -3,12 +3,12 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Images/PNG_FILE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Images/EPS_FILE.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

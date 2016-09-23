@@ -4,9 +4,9 @@
 //#####################################################################
 // Class MATRIX_SOLID_FORCES
 //##################################################################### 
-#include <Tools/Arrays/CONSTANT_ARRAY.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Arrays/CONSTANT_ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_MASS.h>

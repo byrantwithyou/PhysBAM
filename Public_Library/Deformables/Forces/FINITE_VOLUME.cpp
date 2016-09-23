@@ -2,18 +2,18 @@
 // Copyright 2003-2007, Ron Fedkiw, Geoffrey Irving, Igor Neverov, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX_2X2.h>
-#include <Tools/Matrices/MATRIX_3X2.h>
-#include <Tools/Matrices/MATRIX_4X4.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX_2X2.h>
+#include <Core/Matrices/MATRIX_3X2.h>
+#include <Core/Matrices/MATRIX_4X4.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>

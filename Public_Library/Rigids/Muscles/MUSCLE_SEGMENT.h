@@ -7,10 +7,10 @@
 #ifndef __MUSCLE_SEGMENT__
 #define __MUSCLE_SEGMENT__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <string>
 namespace PhysBAM{
 

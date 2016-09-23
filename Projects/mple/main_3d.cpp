@@ -2,12 +2,12 @@
 // Copyright 2013, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/ROTATION.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/ROTATION.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include "MPLE_DRIVER.h"
 
 using namespace PhysBAM;

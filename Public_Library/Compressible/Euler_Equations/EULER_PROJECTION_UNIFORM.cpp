@@ -2,10 +2,10 @@
 // Copyright 2007, Jon Gretarsson, Nipun Kwatra, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
-#include <Tools/Log/SCOPE.h>
+#include <Core/Log/SCOPE.h>
+#include <Grid_Tools/Arrays/ARRAYS_UTILITIES.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>

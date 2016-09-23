@@ -2,19 +2,19 @@
 // Copyright 2005-2008, Geoffrey Irving, Eran Guendelman, Frank Losasso, Andrew Selle, Tamar Shinar, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET.h>
 #include <Dynamics/Parallel_Computation/MPI_UNIFORM_PARTICLES.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 #ifdef USE_MPI
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/PAIR.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #endif
 namespace PhysBAM{
 

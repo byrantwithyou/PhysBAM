@@ -2,10 +2,10 @@
 // Copyright 2003-2009, Zhaosheng Bao, Jon Gretarsson, Eran Guendelman, Geoffrey Irving, Nipun Kwatra, Michael Lentine, Frank Losasso, Nick Rasmussen, Avi Robinson-Mosher, Craig Schroeder, Andrew Selle, Andrew Selle, Tamar Shinar, Jonathan Su, Jerry Talton, Joseph Teran, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>

@@ -2,20 +2,20 @@
 // Copyright 2006-2008, Geoffrey Irving, Craig Schroeder, Andrew Selle, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Math_Tools/Robust_Arithmetic.h>
+#include <Core/Matrices/MATRIX_2X2.h>
+#include <Core/Matrices/MATRIX_3X2.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/LANCZOS_ITERATION.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Math_Tools/Robust_Arithmetic.h>
-#include <Tools/Matrices/MATRIX_2X2.h>
-#include <Tools/Matrices/MATRIX_3X2.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology/TETRAHEDRON_MESH.h>

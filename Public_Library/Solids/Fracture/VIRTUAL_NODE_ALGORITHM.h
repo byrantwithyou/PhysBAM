@@ -7,7 +7,7 @@
 #ifndef __VIRTUAL_NODE_ALGORITHM__
 #define __VIRTUAL_NODE_ALGORITHM__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Deformables/Fracture/EMBEDDING_POLICY.h>
 namespace PhysBAM{
 namespace VIRTUAL_NODE_ALGORITHM{

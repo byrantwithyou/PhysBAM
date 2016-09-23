@@ -5,9 +5,9 @@
 #ifndef __RENDERING_LIGHT__
 #define __RENDERING_LIGHT__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 namespace PhysBAM{
 

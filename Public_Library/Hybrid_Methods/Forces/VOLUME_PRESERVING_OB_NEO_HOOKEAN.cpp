@@ -2,7 +2,7 @@
 // Copyright 2015
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Math_Tools/pow.h>
+#include <Core/Math_Tools/pow.h>
 #include <Hybrid_Methods/Forces/VOLUME_PRESERVING_OB_NEO_HOOKEAN.h>
 namespace PhysBAM{
 //#####################################################################

@@ -5,9 +5,9 @@
 // Class QUEUE_TESTS
 //#####################################################################
 
-#include <Tools/Data_Structures/QUEUE.h>
-#include <Tools/Utilities/TEST_BASE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Data_Structures/QUEUE.h>
+#include <Core/Utilities/TEST_BASE.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 class QUEUE_TESTS:public TEST_BASE

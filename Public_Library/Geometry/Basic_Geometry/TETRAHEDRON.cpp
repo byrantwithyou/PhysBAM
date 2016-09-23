@@ -4,12 +4,12 @@
 //#####################################################################
 // Class TETRAHEDRON
 //##################################################################### 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>

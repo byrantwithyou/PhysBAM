@@ -4,8 +4,8 @@
 //#####################################################################
 // Class MATRIX_FLUID_GRADIENT_BASE
 //##################################################################### 
-#include <Tools/Log/LOG.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Dynamics/Coupled_Evolution/MATRIX_FLUID_GRADIENT_BASE.h>
 using namespace PhysBAM;

@@ -7,11 +7,11 @@
 #ifndef __MUSCLE_FORCE_CURVE__
 #define __MUSCLE_FORCE_CURVE__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_1D.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Vectors/VECTOR_1D.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Interpolation/LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM.h>
 #include <fstream>
 
 namespace PhysBAM{

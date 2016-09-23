@@ -2,8 +2,8 @@
 // Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_POISSON_TEST.h>
 using namespace PhysBAM;
 template<class TV> void ANALYTIC_POISSON_TEST<TV>::

@@ -2,17 +2,17 @@
 // Copyright 2005-2006, Eran Guendelman, Geoffrey Irving, Frank Losasso, Tamar Shinar, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_MPI.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_UNIFORM.h>
 #ifdef USE_MPI
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include <Tools/Parallel_Computation/FLOOD_FILL_MPI.h>
+#include <Core/Data_Structures/UNION_FIND.h>
 #include <Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
-#include <Tools/Parallel_Computation/PCG_SPARSE_MPI.h>
+#include <Grid_Tools/Parallel_Computation/FLOOD_FILL_MPI.h>
+#include <Grid_Tools/Parallel_Computation/PCG_SPARSE_MPI.h>
 #endif
 using namespace PhysBAM;
 

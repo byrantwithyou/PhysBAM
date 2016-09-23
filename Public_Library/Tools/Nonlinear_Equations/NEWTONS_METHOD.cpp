@@ -2,12 +2,12 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/GMRES.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Nonlinear_Equations/LINE_SEARCH.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Nonlinear_Equations/PARAMETRIC_LINE.h>

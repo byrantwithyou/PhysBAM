@@ -4,8 +4,8 @@
 //#####################################################################
 // Class MATRIX_FLUID_INTERPOLATION_BASE
 //##################################################################### 
-#include <Tools/Arrays/CONSTANT_ARRAY.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Arrays/CONSTANT_ARRAY.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>

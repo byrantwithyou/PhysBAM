@@ -11,8 +11,8 @@
 #ifndef __BURGERS_1D__
 #define __BURGERS_1D__
 
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Compressible/Burgers_Equation/BURGERS_1D_EIGENSYSTEM_F.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <cfloat>

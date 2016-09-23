@@ -7,11 +7,11 @@
 #ifndef __THIN_SHELLS_FLUID_COUPLING_UTILITIES__
 #define __THIN_SHELLS_FLUID_COUPLING_UTILITIES__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Read_Write/TYPED_STREAM.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Read_Write/TYPED_STREAM.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 #include <string>
 namespace PhysBAM{

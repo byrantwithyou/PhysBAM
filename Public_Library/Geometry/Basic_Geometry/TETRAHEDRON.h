@@ -7,8 +7,8 @@
 #ifndef __TETRAHEDRON__
 #define __TETRAHEDRON__
 
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 namespace PhysBAM{
 

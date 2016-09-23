@@ -4,9 +4,9 @@
 //#####################################################################
 // Class FLUID_TO_SOLID_INTERPOLATION
 //##################################################################### 
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>

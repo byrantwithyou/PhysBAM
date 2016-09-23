@@ -7,11 +7,11 @@
 #ifndef __RIGID_BODY_CLUSTER_BINDINGS__
 #define __RIGID_BODY_CLUSTER_BINDINGS__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Rigids/Joints/JOINT_ID.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>

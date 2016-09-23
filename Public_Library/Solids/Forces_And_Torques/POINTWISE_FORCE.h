@@ -7,9 +7,9 @@
 #ifndef __POINTWISE_FORCE__
 #define __POINTWISE_FORCE__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 #include <Solids/Forces_And_Torques/SOLIDS_FORCES.h>
 namespace PhysBAM{

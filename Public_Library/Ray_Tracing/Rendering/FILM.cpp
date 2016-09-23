@@ -1,6 +1,6 @@
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Ray_Tracing/Rendering/CAMERA.h>
 #include <Ray_Tracing/Rendering/FILM.h>
 using namespace PhysBAM;

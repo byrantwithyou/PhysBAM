@@ -7,7 +7,7 @@
 #ifndef __BOUNDARY_REFLECTION_WATER__
 #define __BOUNDARY_REFLECTION_WATER__
 
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 template<class TV,class T2>

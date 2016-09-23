@@ -11,11 +11,11 @@
 #ifndef __BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC__
 #define __BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR_3D.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;

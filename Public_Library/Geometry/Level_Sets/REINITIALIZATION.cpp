@@ -2,11 +2,11 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_PDE/Advection/ADVECTION_SEPARABLE_UNIFORM.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;

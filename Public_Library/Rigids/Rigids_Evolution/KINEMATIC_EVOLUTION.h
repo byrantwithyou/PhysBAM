@@ -7,8 +7,8 @@
 #ifndef __KINEMATIC_EVOLUTION__
 #define __KINEMATIC_EVOLUTION__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
 namespace PhysBAM{
 
 template<class TV> class RIGID_BODY_COLLECTION;

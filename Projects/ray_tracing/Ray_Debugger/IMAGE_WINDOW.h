@@ -7,8 +7,8 @@
 
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h> // To get gl, glu in a portable manner
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Vectors/VECTOR.h>
 #include <FL/Fl_Gl_Window.h>
 namespace PhysBAM{
 

@@ -2,9 +2,9 @@
 // Copyright 2006-2007, Jeong-Mo Hong, Nipun Kwatra, Tamar Shinar, Jonatthan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>

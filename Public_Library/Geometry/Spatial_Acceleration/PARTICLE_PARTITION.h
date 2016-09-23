@@ -7,9 +7,9 @@
 #ifndef __PARTICLE_PARTITION__
 #define __PARTICLE_PARTITION__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 namespace PhysBAM{

@@ -4,9 +4,9 @@
 //#####################################################################
 // Class BW_BACKWARD_EULER_SYSTEM
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Matrices/MATRIX_3X3.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>

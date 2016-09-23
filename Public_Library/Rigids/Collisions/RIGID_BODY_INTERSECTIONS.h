@@ -7,8 +7,8 @@
 #ifndef __RIGID_BODY_INTERSECTIONS__
 #define __RIGID_BODY_INTERSECTIONS__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 namespace PhysBAM{

@@ -7,12 +7,12 @@
 #ifndef __RIGID_BODY_PARTICLES__
 #define __RIGID_BODY_PARTICLES__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/ELEMENT_ID.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Vectors/TWIST.h>
 #include <Tools/Clone/CLONEABLE.h>
-#include <Tools/Data_Structures/ELEMENT_ID.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
 #include <Tools/Particles/PARTICLES.h>
-#include <Tools/Vectors/TWIST.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 

@@ -7,10 +7,10 @@
 #ifndef __BOUNDARY_OPEN_WATER__
 #define __BOUNDARY_OPEN_WATER__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Incompressible/Boundaries/BOUNDARY_FORWARD.h>
 namespace PhysBAM{
 

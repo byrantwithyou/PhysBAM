@@ -7,7 +7,7 @@
 #ifndef __SOLIDS_FLUIDS_PARAMETERS__
 #define __SOLIDS_FLUIDS_PARAMETERS__
 
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 

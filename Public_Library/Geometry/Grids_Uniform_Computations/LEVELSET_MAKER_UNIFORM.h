@@ -7,7 +7,7 @@
 #ifndef __LEVELSET_MAKER_UNIFORM__
 #define __LEVELSET_MAKER_UNIFORM__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 namespace PhysBAM{
 

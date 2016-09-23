@@ -7,9 +7,9 @@
 #ifndef __SOLIDS_FLUIDS_CALLBACKS__
 #define __SOLIDS_FLUIDS_CALLBACKS__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 template<class TV> class TWIST;

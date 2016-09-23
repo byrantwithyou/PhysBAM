@@ -2,9 +2,9 @@
 // Copyright 2002-2003, Ronald Fedkiw.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_CYLINDRICAL.h>
 namespace PhysBAM{
 //#####################################################################

@@ -7,9 +7,9 @@
 #ifndef __OPENGL_POINTS_2D__
 #define __OPENGL_POINTS_2D__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Vectors/VECTOR_2D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Vectors/VECTOR_2D.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>

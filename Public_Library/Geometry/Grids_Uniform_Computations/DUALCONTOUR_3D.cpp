@@ -4,7 +4,7 @@
 //#####################################################################
 // Class DUALCONTOUR_3D
 //#####################################################################
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

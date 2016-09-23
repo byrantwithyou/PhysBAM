@@ -2,7 +2,7 @@
 // Copyright 2007, Andrew Selle, Justin Solomon.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/PROJECTED_ARRAY.h>
+#include <Core/Arrays/PROJECTED_ARRAY.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Intersections/RAY_CYLINDER_INTERSECTION.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>

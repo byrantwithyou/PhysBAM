@@ -8,15 +8,15 @@
 #include <Dynamics/Parallel_Computation/MPI_SOLID_FLUID.h>
 #ifdef USE_MPI
 #include <Tools/Parallel_Computation/MPI_PACKAGE.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #endif
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Vectors/Dot_Product.h>
+#include <Core/Vectors/TWIST.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Vectors/Dot_Product.h>
-#include <Tools/Vectors/TWIST.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

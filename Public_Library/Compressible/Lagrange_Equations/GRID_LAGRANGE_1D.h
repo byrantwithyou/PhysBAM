@@ -11,7 +11,7 @@
 #ifndef __GRID_LAGRANGE_1D__
 #define __GRID_LAGRANGE_1D__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Compressible/Lagrange_Equations/GRID_LAGRANGE.h>
 namespace PhysBAM{
 

@@ -7,8 +7,8 @@
 #ifndef __ARRAY_COLLECTION_ELEMENT_BASE__
 #define __ARRAY_COLLECTION_ELEMENT_BASE__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Arrays/ATTRIBUTE_ID.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ATTRIBUTE_ID.h>
 #include <Tools/Clone/CLONEABLE.h>
 namespace PhysBAM{
 

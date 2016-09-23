@@ -7,9 +7,9 @@
 #ifndef __TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR__
 #define __TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Utilities/PHYSBAM_ATTRIBUTE.h>
+#include <Core/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 template<class TV> struct REPULSION_PAIR;
 template<class TV> class STRUCTURE_INTERACTION_GEOMETRY;

@@ -2,8 +2,8 @@
 // Copyright 2002, Ronald Fedkiw.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Math_Tools/sqr.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Reactive_Euler_Equations/REACTIVE_EULER.h>
 #include <cmath>
 using namespace PhysBAM;

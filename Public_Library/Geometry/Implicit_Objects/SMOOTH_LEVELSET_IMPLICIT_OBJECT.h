@@ -7,7 +7,7 @@
 #ifndef __SMOOTH_LEVELSET_IMPLICIT_OBJECT__
 #define __SMOOTH_LEVELSET_IMPLICIT_OBJECT__
 
-#include <Tools/Grids_Uniform_Interpolation/CUBIC_SPLINE_INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/CUBIC_SPLINE_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 namespace PhysBAM{
 

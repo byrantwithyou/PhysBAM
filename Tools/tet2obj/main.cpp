@@ -1,7 +1,7 @@
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <fstream>
 #include <iostream>

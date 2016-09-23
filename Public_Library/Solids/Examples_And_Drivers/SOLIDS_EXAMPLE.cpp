@@ -4,22 +4,22 @@
 //#####################################################################
 // Class SOLIDS_EXAMPLE
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/MATRIX_4X4.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/MATRIX_4X4.h>
-#include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_MPI.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>

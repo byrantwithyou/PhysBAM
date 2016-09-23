@@ -7,7 +7,7 @@
 #ifndef __DEFORMABLE_OBJECT_FLUID_COLLISIONS__
 #define __DEFORMABLE_OBJECT_FLUID_COLLISIONS__
 
-#include <Tools/Data_Structures/PAIR.h>
+#include <Core/Data_Structures/PAIR.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>

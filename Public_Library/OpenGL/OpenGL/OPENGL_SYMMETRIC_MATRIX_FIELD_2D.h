@@ -7,10 +7,10 @@
 #ifndef __OPENGL_SYMMETRIC_MATRIX_FIELD_2D__
 #define __OPENGL_SYMMETRIC_MATRIX_FIELD_2D__
 
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 namespace PhysBAM{

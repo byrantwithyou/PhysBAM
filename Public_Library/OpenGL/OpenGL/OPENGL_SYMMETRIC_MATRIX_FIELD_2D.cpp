@@ -2,8 +2,8 @@
 // Copyright 2004, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX_2X2.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX_2X2.h>
 #include <OpenGL/OpenGL/OPENGL_SYMMETRIC_MATRIX_FIELD_2D.h>
 using namespace PhysBAM;
 //#####################################################################

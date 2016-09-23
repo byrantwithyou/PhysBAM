@@ -2,7 +2,7 @@
 // Copyright 2004-2008, Eran Guendelman, Craig Schroeder, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <OpenGL/OpenGL/OPENGL_POINTS_3D.h>
 using namespace PhysBAM;
 //#####################################################################

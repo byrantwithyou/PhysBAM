@@ -4,9 +4,9 @@
 //#####################################################################
 #ifndef __STRESS_EXAMPLE__
 #define __STRESS_EXAMPLE__
-#include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 

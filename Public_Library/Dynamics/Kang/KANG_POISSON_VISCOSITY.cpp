@@ -4,20 +4,20 @@
 //#####################################################################
 // Class KANG_POISSON_VISCOSITY
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <Dynamics/Kang/KANG_POISSON_VISCOSITY.h>

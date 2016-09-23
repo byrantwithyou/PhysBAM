@@ -4,9 +4,9 @@
 //#####################################################################
 // MAIN  
 //##################################################################### 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
 using namespace PhysBAM;
 
 // for i in `seq 0 \`cat last_frame\``; do ../adjust_temperature_16 $i; done

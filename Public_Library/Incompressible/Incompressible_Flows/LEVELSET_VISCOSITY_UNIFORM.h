@@ -7,7 +7,7 @@
 #ifndef __LEVELSET_VISCOSITY_UNIFORM__
 #define __LEVELSET_VISCOSITY_UNIFORM__
 
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Incompressible/Incompressible_Flows/LEVELSET_INDEX_MAP_UNIFORM.h>
 #include <Incompressible/Incompressible_Flows/LEVELSET_VISCOSITY_UNIFORM_SYSTEM.h>
 namespace PhysBAM{

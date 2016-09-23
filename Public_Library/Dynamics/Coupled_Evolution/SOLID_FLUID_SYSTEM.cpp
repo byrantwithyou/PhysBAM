@@ -4,9 +4,9 @@
 //#####################################################################
 // Class SOLID_FLUID_SYSTEM
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Vectors/Dot_Product.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Vectors/Dot_Product.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>

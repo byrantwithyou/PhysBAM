@@ -7,8 +7,8 @@
 #ifndef __DEFORMABLE_OBJECT_COLLISION_PARAMETERS__
 #define __DEFORMABLE_OBJECT_COLLISION_PARAMETERS__
 
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 #include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 namespace PhysBAM{

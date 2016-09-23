@@ -4,9 +4,9 @@
 //#####################################################################
 // Class EDGE_EDGE_INITIAL_CULL_VISITOR
 //##################################################################### 
-#include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/SEGMENT_3D.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
 #include <Deformables/Collisions_And_Interactions/EDGE_EDGE_INITIAL_CULL_VISITOR.h>

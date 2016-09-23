@@ -7,9 +7,9 @@
 #ifndef __OPENGL_COMPONENT_HEIGHTFIELD_1D__
 #define __OPENGL_COMPONENT_HEIGHTFIELD_1D__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 #include <OpenGL/OpenGL/OPENGL_VECTOR_FIELD_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>

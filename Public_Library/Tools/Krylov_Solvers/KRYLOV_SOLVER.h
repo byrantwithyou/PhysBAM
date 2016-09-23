@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __KRYLOV_SOLVER__
 #define __KRYLOV_SOLVER__
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
 namespace PhysBAM{
 template<class T_MATRIX> struct IS_MATRIX;
 enum KRYLOV_SOLVER_TYPE {krylov_solver_cg,krylov_solver_cr,krylov_solver_symmqmr};

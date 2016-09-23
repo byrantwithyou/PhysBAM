@@ -7,7 +7,7 @@
 #ifndef __FLUID_GRAVITY__
 #define __FLUID_GRAVITY__
 
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Incompressible/Forces/INCOMPRESSIBLE_FLUIDS_FORCES.h>
 namespace PhysBAM{
 

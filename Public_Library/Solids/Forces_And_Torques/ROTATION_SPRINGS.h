@@ -7,8 +7,8 @@
 #ifndef __ROTATION_SPRINGS__
 #define __ROTATION_SPRINGS__
 
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
 namespace PhysBAM{
 

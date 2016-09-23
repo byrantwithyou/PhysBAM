@@ -7,7 +7,7 @@
 #ifndef __OPENGL_MAC_VELOCITY_FIELD_2D__
 #define __OPENGL_MAC_VELOCITY_FIELD_2D__
 
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <OpenGL/OpenGL/OPENGL_VECTOR_FIELD_2D.h>
 namespace PhysBAM{
 

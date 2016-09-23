@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS__
 #define __INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS__
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 namespace PhysBAM{
 template<class TV> class GRID;
 

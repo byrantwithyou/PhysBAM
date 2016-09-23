@@ -7,9 +7,9 @@
 #ifndef __MPI_UNIFORM_PARTICLES__
 #define __MPI_UNIFORM_PARTICLES__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 
 template<class TV> class PARTICLE_LEVELSET;
 

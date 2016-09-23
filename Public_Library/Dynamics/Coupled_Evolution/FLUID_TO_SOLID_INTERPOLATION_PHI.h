@@ -6,8 +6,8 @@
 //#####################################################################
 #ifndef __FLUID_TO_SOLID_INTERPOLATION_PHI__
 #define __FLUID_TO_SOLID_INTERPOLATION_PHI__
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_CUT.h>
 
 namespace PhysBAM{

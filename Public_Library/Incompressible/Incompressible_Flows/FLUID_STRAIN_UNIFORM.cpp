@@ -2,17 +2,17 @@
 // Copyright 2004-2007, Doug Enright, Ron Fedkiw, Geoffrey Irving, Frank Losasso, Andy Lutomirski, Paul-James White.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
-#include <Tools/Matrices/MATRIX_1X1.h>
-#include <Tools/Matrices/MATRIX_2X2.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/ROTATION.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/MATRIX_1X1.h>
+#include <Core/Matrices/MATRIX_2X2.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/ROTATION.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Grid_PDE/Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Incompressible/Incompressible_Flows/EXTERNAL_STRAIN_ADJUSTMENT.h>

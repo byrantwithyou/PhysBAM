@@ -12,8 +12,8 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Core/Matrices/MATRIX_MXN.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Joints/ANGLE_JOINT.h>

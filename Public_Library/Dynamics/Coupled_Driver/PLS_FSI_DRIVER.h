@@ -7,9 +7,9 @@
 #ifndef __PLS_FSI_DRIVER__
 #define __PLS_FSI_DRIVER__    
 
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Ordinary_Differential_Equations/DRIVER.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Dynamics/Coupled_Driver/PLS_FSI_EXAMPLE.h>
 namespace PhysBAM{
 

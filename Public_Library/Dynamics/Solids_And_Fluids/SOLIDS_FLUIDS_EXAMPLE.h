@@ -7,11 +7,11 @@
 #ifndef __SOLIDS_FLUIDS_EXAMPLE__
 #define __SOLIDS_FLUIDS_EXAMPLE__
 
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 #include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION_CALLBACKS.h>
 #include <Incompressible/Incompressible_Flows/EXTERNAL_STRAIN_ADJUSTMENT.h>

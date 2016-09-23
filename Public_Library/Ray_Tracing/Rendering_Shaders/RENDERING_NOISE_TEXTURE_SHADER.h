@@ -7,7 +7,7 @@
 #ifndef __RENDERING_NOISE_TEXTURE_SHADER__
 #define __RENDERING_NOISE_TEXTURE_SHADER__
 
-#include <Tools/Random_Numbers/NOISE.h>
+#include <Core/Random_Numbers/NOISE.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{

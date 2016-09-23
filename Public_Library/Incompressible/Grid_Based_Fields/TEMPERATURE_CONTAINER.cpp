@@ -4,10 +4,10 @@
 //#####################################################################
 // Class TEMPERATURE_CONTAINER
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Math_Tools/cube.h>
+#include <Core/Math_Tools/cube.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Incompressible/Advection_Collidable/ADVECTION_WRAPPER_COLLIDABLE_CELL.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 #include <Incompressible/Grid_Based_Fields/TEMPERATURE_CONTAINER.h>

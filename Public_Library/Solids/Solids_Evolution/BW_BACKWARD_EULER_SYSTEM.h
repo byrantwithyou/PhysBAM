@@ -7,9 +7,9 @@
 #ifndef __BW_BACKWARD_EULER_SYSTEM__
 #define __BW_BACKWARD_EULER_SYSTEM__
 
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 namespace PhysBAM{
 template<class TV> class SOLIDS_EVOLUTION;

@@ -7,8 +7,8 @@
 #ifndef __ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM__
 #define __ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM__
 
-#include <Tools/Advection/ADVECTION.h>
-#include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
+#include <Grid_PDE/Advection/ADVECTION.h>
+#include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 namespace PhysBAM{

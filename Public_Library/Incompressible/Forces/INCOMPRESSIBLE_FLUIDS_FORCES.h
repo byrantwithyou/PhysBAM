@@ -7,11 +7,11 @@
 #ifndef __INCOMPRESSIBLE_FLUIDS_FORCES__
 #define __INCOMPRESSIBLE_FLUIDS_FORCES__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;

@@ -7,8 +7,8 @@
 #ifndef __IMPLICIT_VISCOSITY_UNIFORM__
 #define __IMPLICIT_VISCOSITY_UNIFORM__
 
-#include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
 namespace PhysBAM{
 
 template<class TV> class LAPLACE_UNIFORM;

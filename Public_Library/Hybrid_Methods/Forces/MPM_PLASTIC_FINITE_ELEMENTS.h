@@ -7,8 +7,8 @@
 #ifndef __MPM_PLASTIC_FINITE_ELEMENTS__
 #define __MPM_PLASTIC_FINITE_ELEMENTS__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
 namespace PhysBAM{

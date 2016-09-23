@@ -8,8 +8,8 @@
 #ifndef __TANK_EXAMPLE__
 #define __TANK_EXAMPLE__
 
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <Rigids/Joints/POINT_JOINT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>

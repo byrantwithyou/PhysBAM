@@ -7,8 +7,8 @@
 #ifndef __SEGMENT_3D__
 #define __SEGMENT_3D__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 
 template<class T>

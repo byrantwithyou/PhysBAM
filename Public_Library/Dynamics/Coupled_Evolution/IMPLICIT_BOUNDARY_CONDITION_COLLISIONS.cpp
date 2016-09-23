@@ -4,9 +4,9 @@
 //#####################################################################
 // Class IMPLICIT_BOUNDARY_CONDITION_COLLISIONS
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>

@@ -4,8 +4,8 @@
 //#####################################################################
 // Class EULER_FLUID_FORCES
 //#####################################################################
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>

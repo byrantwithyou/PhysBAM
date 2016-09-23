@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __ANALYTIC_POISSON_SOLUTION__
 #define __ANALYTIC_POISSON_SOLUTION__
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 
 namespace PhysBAM{
 

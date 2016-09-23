@@ -4,7 +4,7 @@
 //#####################################################################
 // Class SOFT_BINDINGS
 //#####################################################################
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 using namespace PhysBAM;
 //#####################################################################

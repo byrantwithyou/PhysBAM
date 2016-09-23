@@ -7,8 +7,8 @@
 #ifndef __PINNING_FORCE__
 #define __PINNING_FORCE__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
 #include <functional>
 namespace PhysBAM{

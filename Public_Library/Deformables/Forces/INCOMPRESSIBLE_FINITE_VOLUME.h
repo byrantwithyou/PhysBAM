@@ -7,9 +7,9 @@
 #ifndef __INCOMPRESSIBLE_FINITE_VOLUME__
 #define __INCOMPRESSIBLE_FINITE_VOLUME__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Math_Tools/FACTORIAL.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
-#include <Tools/Math_Tools/FACTORIAL.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>

@@ -7,10 +7,10 @@
 #ifndef __EXTERNAL_STRAIN_ADJUSTMENT__
 #define __EXTERNAL_STRAIN_ADJUSTMENT__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
+#include <Grid_Tools/Arrays/ARRAYS_UNIFORM_FORWARD.h>
 namespace PhysBAM{
 
 template<class T>

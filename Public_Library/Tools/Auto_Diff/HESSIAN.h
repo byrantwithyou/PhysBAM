@@ -7,14 +7,14 @@
 #ifndef __HESSIAN__
 #define __HESSIAN__
 
+#include <Core/Math_Tools/cube.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/PRIMITIVE_MATRICES.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Auto_Diff/GRADIENT.h>
 #include <Tools/Auto_Diff/GRADIENT_VEC.h>
 #include <Tools/Auto_Diff/MAT_HOLDER.h>
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/PRIMITIVE_MATRICES.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <cmath>
 namespace PhysBAM{
 namespace HETERO_DIFF{

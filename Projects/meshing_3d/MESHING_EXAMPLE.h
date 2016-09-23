@@ -7,8 +7,8 @@
 #ifndef __MESHING_EXAMPLE__
 #define __MESHING_EXAMPLE__
 
-#include <Tools/Log/LOG.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Solids/Meshing/TETRAHEDRAL_MESHING.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>

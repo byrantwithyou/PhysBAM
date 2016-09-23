@@ -2,8 +2,8 @@
 // Copyright 2004-2007, Kevin Der, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include <Tools/Optimization/LINEAR_PROGRAMMING.h>
 #include <Tools/Optimization/QUADRATIC_PROGRAMMING.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>

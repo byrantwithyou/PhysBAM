@@ -7,9 +7,9 @@
 #ifndef __OPENGL_COLOR__
 #define __OPENGL_COLOR__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 namespace PhysBAM{
 

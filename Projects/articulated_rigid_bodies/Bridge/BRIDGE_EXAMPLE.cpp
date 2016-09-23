@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license 
 // contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Rigids/Joints/ANGLE_JOINT.h>
 #include <Rigids/Joints/JOINT_MESH.h>
 #include <Rigids/Joints/POINT_JOINT.h>

@@ -7,8 +7,8 @@
 #ifndef __STRUCTURE_LIST__
 #define __STRUCTURE_LIST__
 
-#include <Tools/Data_Structures/DYNAMIC_LIST.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Data_Structures/DYNAMIC_LIST.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
 namespace PhysBAM{
 

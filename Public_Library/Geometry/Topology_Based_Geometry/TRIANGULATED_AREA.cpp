@@ -2,10 +2,10 @@
 // Copyright 2003-2008, Christopher Allocco, Ronald Fedkiw, Geoffrey Irving, Sergey Koltakov, Neil Molino, Duc Nguyen, Andrew Selle, Eftychios Sifakis, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Log/LOG.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>

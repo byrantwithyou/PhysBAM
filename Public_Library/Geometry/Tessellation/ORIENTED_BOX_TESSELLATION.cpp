@@ -4,8 +4,8 @@
 //#####################################################################
 // namespace TESSELLATION
 //##################################################################### 
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/FRAME.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/FRAME.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Tessellation/ORIENTED_BOX_TESSELLATION.h>
 #include <Geometry/Tessellation/RANGE_TESSELLATION.h>

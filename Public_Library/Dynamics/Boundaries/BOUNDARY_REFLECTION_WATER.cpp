@@ -2,7 +2,7 @@
 // Copyright 2004-2007, Geoffrey Irving, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Dynamics/Boundaries/BOUNDARY_REFLECTION_WATER.h>
 namespace PhysBAM{
 //#####################################################################

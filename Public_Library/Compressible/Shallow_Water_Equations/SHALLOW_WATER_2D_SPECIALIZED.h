@@ -11,8 +11,8 @@
 #ifndef __SHALLOW_WATER_2D_SPECIALIZED__
 #define __SHALLOW_WATER_2D_SPECIALIZED__
 
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G.h>

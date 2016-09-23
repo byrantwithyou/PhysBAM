@@ -4,9 +4,9 @@
 //#####################################################################
 // Class RENDER_WORLD
 //#####################################################################
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/PROGRESS_INDICATOR.h>
-#include <Tools/Log/SCOPE.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/PROGRESS_INDICATOR.h>
+#include <Core/Log/SCOPE.h>
 #include <Ray_Tracing/Rendering/RAY_TRACER_DEBUG_DATA.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY.h>

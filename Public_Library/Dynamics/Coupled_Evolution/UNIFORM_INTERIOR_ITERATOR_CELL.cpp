@@ -4,8 +4,8 @@
 //#####################################################################
 // Class UNIFORM_INTERIOR_ITERATOR_CELL
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h>
 #include <Dynamics/Coupled_Evolution/UNIFORM_INTERIOR_ITERATOR_CELL.h>
 using namespace PhysBAM;

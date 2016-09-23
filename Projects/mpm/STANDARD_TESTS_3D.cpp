@@ -2,9 +2,9 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/KD_TREE.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Matrices/FRAME.h>
+#include <Core/Data_Structures/KD_TREE.h>
+#include <Core/Matrices/FRAME.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/CONE.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/HOURGLASS.h>

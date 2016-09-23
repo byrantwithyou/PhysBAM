@@ -7,9 +7,9 @@
 #ifndef __FINITE_VOLUME__
 #define __FINITE_VOLUME__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Math_Tools/FACTORIAL.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Math_Tools/FACTORIAL.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Deformables/Constitutive_Models/CONSTITUTIVE_MODELS_FORWARD.h>

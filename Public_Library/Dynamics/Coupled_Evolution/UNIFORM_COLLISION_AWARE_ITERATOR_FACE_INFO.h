@@ -6,11 +6,11 @@
 //#####################################################################
 #ifndef __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO__
 #define __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 
 namespace PhysBAM{

@@ -7,7 +7,7 @@
 #ifndef __ARTIFICIAL_VISCOSITY_2D__
 #define __ARTIFICIAL_VISCOSITY_2D__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Compressible/Equations_Of_State/EOS.h>
 #include <Compressible/Lagrange_Equations/ARTIFICIAL_VISCOSITY.h>
 #include <Compressible/Lagrange_Equations/GRID_LAGRANGE_2D.h>

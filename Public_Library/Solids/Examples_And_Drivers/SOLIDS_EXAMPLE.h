@@ -7,11 +7,11 @@
 #ifndef __SOLIDS_EXAMPLE__
 #define __SOLIDS_EXAMPLE__
 
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>

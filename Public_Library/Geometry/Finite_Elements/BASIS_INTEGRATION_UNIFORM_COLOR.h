@@ -7,9 +7,9 @@
 #ifndef __BASIS_INTEGRATION_UNIFORM_COLOR__
 #define __BASIS_INTEGRATION_UNIFORM_COLOR__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/STATIC_TENSOR.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/STATIC_TENSOR.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_COLOR.h>
 #include <Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_COLOR.h>

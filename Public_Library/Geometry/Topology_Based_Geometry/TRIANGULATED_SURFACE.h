@@ -7,9 +7,9 @@
 #ifndef __TRIANGULATED_SURFACE__
 #define __TRIANGULATED_SURFACE__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Spatial_Acceleration/SPATIAL_ACCELERATION_FORWARD.h>

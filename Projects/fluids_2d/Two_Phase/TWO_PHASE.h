@@ -7,8 +7,8 @@
 #ifndef __TWO_PHASE__
 #define __TWO_PHASE__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <Dynamics/Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE_2D.h>
 

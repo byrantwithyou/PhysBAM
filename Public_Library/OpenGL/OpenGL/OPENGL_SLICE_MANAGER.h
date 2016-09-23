@@ -7,7 +7,7 @@
 #ifndef __OPENGL_SLICE_MANAGER__
 #define __OPENGL_SLICE_MANAGER__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_SLICE.h>

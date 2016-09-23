@@ -7,7 +7,7 @@
 #ifndef __MULTILINEAR_SPRINGS__
 #define __MULTILINEAR_SPRINGS__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 namespace PhysBAM{
 

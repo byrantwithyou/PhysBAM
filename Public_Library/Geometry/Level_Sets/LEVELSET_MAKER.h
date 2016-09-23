@@ -7,10 +7,10 @@
 #ifndef __LEVELSET_MAKER__
 #define __LEVELSET_MAKER__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 namespace PhysBAM{
 

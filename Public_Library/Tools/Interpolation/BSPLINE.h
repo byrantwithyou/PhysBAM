@@ -7,10 +7,10 @@
 #ifndef __BSPLINE__
 #define __BSPLINE__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/clamp.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/clamp.h>
+#include <Core/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 
 template<class T,class T2>

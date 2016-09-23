@@ -7,15 +7,15 @@
 #ifndef __CONTACT_PRECONDITIONER__
 #define __CONTACT_PRECONDITIONER__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/ROTATION.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <Tools/Vectors/TWIST.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/ROTATION.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Vectors/TWIST.h>
 #include <Rigids/Collisions/PROJECTED_GAUSS_SEIDEL.h>
 #include <Rigids/Collisions/SOLVE_CONTACT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>

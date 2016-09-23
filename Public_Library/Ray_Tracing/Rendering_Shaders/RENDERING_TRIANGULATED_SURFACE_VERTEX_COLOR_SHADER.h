@@ -5,7 +5,7 @@
 #ifndef __RENDERING_TRIANGULATED_SURFACE_VERTEX_COLOR_SHADER__
 #define __RENDERING_TRIANGULATED_SURFACE_VERTEX_COLOR_SHADER__
 
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_TRIANGULATED_SURFACE.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{

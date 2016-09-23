@@ -7,8 +7,8 @@
 #ifndef __OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D__
 #define __OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/PAIR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/PAIR.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_LEVELSET_MULTIVIEW.h>

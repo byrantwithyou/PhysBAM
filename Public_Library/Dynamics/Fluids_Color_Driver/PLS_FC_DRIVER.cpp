@@ -2,27 +2,27 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Extrapolation/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
-#include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Vectors/VECTOR_UTILITIES.h>
 #include <Tools/Krylov_Solvers/GMRES.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
-#include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <Tools/Vectors/VECTOR_UTILITIES.h>
+#include <Grid_Tools/Extrapolation/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Grid_PDE/Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_MPI.h>
+#include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
+#include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>
+#include <Grid_PDE/Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
 #include <Geometry/Finite_Elements/INTERFACE_STOKES_MULTIGRID.h>

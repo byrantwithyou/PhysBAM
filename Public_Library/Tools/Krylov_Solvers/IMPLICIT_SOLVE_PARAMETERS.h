@@ -7,8 +7,8 @@
 #ifndef __IMPLICIT_SOLVE_PARAMETERS__
 #define __IMPLICIT_SOLVE_PARAMETERS__
 
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV>

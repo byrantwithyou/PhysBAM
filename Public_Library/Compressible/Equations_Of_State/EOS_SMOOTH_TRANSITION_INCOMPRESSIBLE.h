@@ -7,7 +7,7 @@
 #ifndef __EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE__
 #define __EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE__
 
-#include <Tools/Math_Tools/constants.h>
+#include <Core/Math_Tools/constants.h>
 #include <Compressible/Equations_Of_State/EOS.h>
 namespace PhysBAM{
 

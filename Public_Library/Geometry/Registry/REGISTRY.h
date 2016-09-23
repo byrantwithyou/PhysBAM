@@ -7,9 +7,9 @@
 #ifndef __REGISTRY__
 #define __REGISTRY__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <string>
 namespace PhysBAM{

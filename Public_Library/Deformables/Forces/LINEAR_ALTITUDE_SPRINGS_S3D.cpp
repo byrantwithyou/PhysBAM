@@ -2,8 +2,8 @@
 // Copyright 2003-2007, Zhaosheng Bao, Ronald Fedkiw, Geoffrey Irving, Neil Molino, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/Robust_Arithmetic.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/Robust_Arithmetic.h>
 #include <Geometry/Basic_Geometry/SEGMENT_3D.h>
 #include <Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>

@@ -4,7 +4,7 @@
 //#####################################################################
 // Namespace INTERSECTION
 //##################################################################### 
-#include <Tools/Vectors/VECTOR_1D.h>
+#include <Core/Vectors/VECTOR_1D.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>

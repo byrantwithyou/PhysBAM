@@ -2,15 +2,15 @@
 // Copyright 2006-2009, Jon Gretarsson, Geoffrey Irving, Nipun Kwatra, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Data_Structures/ELEMENT_ID.h>
-#include <Tools/Data_Structures/KD_TREE.h>
-#include <Tools/Data_Structures/OPERATION_HASH.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Data_Structures/ELEMENT_ID.h>
+#include <Core/Data_Structures/KD_TREE.h>
+#include <Core/Data_Structures/OPERATION_HASH.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Data_Structures/UNION_FIND.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>

@@ -2,8 +2,8 @@
 // Copyright 2002-2008, Ronald Fedkiw, Eran Guendelman, Eilene Hao, Sergey Koltakov, Neil Molino, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Matrices/MATRIX_3X3.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 #include <OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>

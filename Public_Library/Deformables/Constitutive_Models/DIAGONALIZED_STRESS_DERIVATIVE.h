@@ -7,11 +7,11 @@
 #ifndef __DIAGONALIZED_STRESS_DERIVATIVE__
 #define __DIAGONALIZED_STRESS_DERIVATIVE__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
 template<class T,int d> class DIAGONALIZED_STRESS_DERIVATIVE;

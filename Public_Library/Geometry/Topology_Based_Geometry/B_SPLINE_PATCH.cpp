@@ -4,10 +4,10 @@
 //#####################################################################
 // Class B_SPLINE_PATCH
 //##################################################################### 
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Matrices/BANDED_MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
-#include <Tools/Matrices/BANDED_MATRIX.h>
-#include <Tools/Matrices/MATRIX.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

@@ -2,7 +2,7 @@
 // Copyright 2005-2007, Kevin Der, Eran Guendelman, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Rigids/Muscles/ATTACHMENT_POINT.h>
 #include <Rigids/Muscles/MUSCLE.h>
 #include <Rigids/Muscles/MUSCLE_FORCE_CURVE.h>

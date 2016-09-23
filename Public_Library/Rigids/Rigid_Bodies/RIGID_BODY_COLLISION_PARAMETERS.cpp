@@ -4,7 +4,7 @@
 //#####################################################################
 // Class RIGID_BODY_COLLISION_PARAMETERS
 //#####################################################################
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 namespace PhysBAM{
 //#####################################################################

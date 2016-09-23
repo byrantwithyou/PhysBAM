@@ -7,8 +7,8 @@
 #ifndef __SOLIDS_FLUIDS_DRIVER_UNIFORM__
 #define __SOLIDS_FLUIDS_DRIVER_UNIFORM__    
 
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h>

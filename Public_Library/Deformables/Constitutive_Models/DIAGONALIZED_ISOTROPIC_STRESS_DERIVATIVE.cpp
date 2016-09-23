@@ -4,15 +4,15 @@
 //#####################################################################
 // Class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX_1X1.h>
-#include <Tools/Matrices/MATRIX_2X2.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_1X1.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX_1X1.h>
+#include <Core/Matrices/MATRIX_2X2.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_1X1.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 using namespace PhysBAM;
 //#####################################################################

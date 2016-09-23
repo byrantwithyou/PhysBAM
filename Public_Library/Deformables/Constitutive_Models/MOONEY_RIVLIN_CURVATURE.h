@@ -7,7 +7,7 @@
 //#####################################################################
 #ifndef __MOONEY_RIVLIN_CURVATURE__
 #define __MOONEY_RIVLIN_CURVATURE__
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 
 namespace PhysBAM{
 

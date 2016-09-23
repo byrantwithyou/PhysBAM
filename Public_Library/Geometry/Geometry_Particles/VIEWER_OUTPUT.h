@@ -7,7 +7,7 @@
 #ifndef __VIEWER_OUTPUT__
 #define __VIEWER_OUTPUT__
 
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class TV> class DEBUG_PARTICLES;

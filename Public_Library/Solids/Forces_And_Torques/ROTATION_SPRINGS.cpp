@@ -4,7 +4,7 @@
 //#####################################################################
 // Class ROTATION_SPRINGS
 //#####################################################################
-#include <Tools/Vectors/Dot_Product.h>
+#include <Core/Vectors/Dot_Product.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>

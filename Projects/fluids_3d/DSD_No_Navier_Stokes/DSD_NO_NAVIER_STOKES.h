@@ -7,7 +7,7 @@
 #ifndef __DSD_NO_NAVIER_STOKES__
 #define __DSD_NO_NAVIER_STOKES__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>

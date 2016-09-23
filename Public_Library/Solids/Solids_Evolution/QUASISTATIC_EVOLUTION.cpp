@@ -4,12 +4,12 @@
 //#####################################################################
 // Class QUASISTATIC_EVOLUTION
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Log/LOG.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
-#include <Tools/Log/LOG.h>
 #include <Deformables/Bindings/BINDING_LIST.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>

@@ -7,9 +7,9 @@
 #ifndef __CONSTITUTIVE_MODEL__
 #define __CONSTITUTIVE_MODEL__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Deformables/Constitutive_Models/CONSTITUTIVE_MODELS_FORWARD.h>
 namespace PhysBAM{
 

@@ -4,9 +4,9 @@
 //#####################################################################
 // Class VIRTUAL_NODE_ALGORITHM
 //#####################################################################
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Log/LOG.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Fracture/EMBEDDED_TRIANGULATED_OBJECT.h>

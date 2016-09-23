@@ -2,14 +2,14 @@
 // Copyright 2004-2007, Eran Guendelman, Avi Robinson-Mosher, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Computations/VORTICITY_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Grid_Tools/Computations/VORTICITY_UNIFORM.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_2D.h>

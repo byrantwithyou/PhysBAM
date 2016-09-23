@@ -4,8 +4,8 @@
 //#####################################################################
 // Class BACKWARD_EULER_SYSTEM
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>

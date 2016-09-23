@@ -7,7 +7,7 @@
 #ifndef __SEGMENTED_CURVE__
 #define __SEGMENTED_CURVE__
 
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <Geometry/Basic_Geometry/SEGMENT_1D.h>
 #include <Geometry/Spatial_Acceleration/SPATIAL_ACCELERATION_FORWARD.h>

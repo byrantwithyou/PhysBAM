@@ -7,11 +7,11 @@
 #ifndef __PARSE_ARGS__
 #define __PARSE_ARGS__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Log/LOG.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 class PARSE_ARGS:public NONCOPYABLE

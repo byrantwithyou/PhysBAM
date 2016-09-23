@@ -7,8 +7,8 @@
 #ifndef __POINT_SIMPLICES_1D__
 #define __POINT_SIMPLICES_1D__
 
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>

@@ -2,13 +2,13 @@
 // Copyright 2003-2009, Zhaosheng Bao, Ronald Fedkiw, Jon Gretarsson, Eran Guendelman, Geoffrey Irving, Sergey Koltakov, Nipun Kwatra, Michael Lentine, Frank Losasso, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/PROJECTED_ARRAY.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
-#include <Tools/Vectors/Dot_Product.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/PROJECTED_ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX_MXN.h>
+#include <Core/Vectors/Dot_Product.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Grids_Uniform_Computations/TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h>

@@ -2,11 +2,11 @@
 // Copyright 2005, Geoffrey Irving, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Math_Tools/exchange.h>
-#include <Tools/Matrices/MATRIX_4X4.h>
-#include <Tools/Random_Numbers/NOISE.h>
+#include <Core/Math_Tools/exchange.h>
+#include <Core/Matrices/MATRIX_4X4.h>
+#include <Core/Random_Numbers/NOISE.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>

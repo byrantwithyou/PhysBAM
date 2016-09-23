@@ -2,8 +2,8 @@
 // Copyright 2012, Alexey, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/LOG.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <Tools/Log/LOG.h>
 #include <Geometry/Images/DEPTH_BUFFERING.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;

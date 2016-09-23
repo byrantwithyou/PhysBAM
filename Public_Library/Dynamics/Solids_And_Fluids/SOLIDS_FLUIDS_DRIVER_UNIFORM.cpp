@@ -4,14 +4,14 @@
 //#####################################################################
 // Class SOLIDS_FLUIDS_DRIVER_UNIFORM
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Utilities/INTERRUPTS.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Utilities/INTERRUPTS.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISIONS.h>

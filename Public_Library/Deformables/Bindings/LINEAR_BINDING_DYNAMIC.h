@@ -7,7 +7,7 @@
 #ifndef __LINEAR_BINDING_DYNAMIC__
 #define __LINEAR_BINDING_DYNAMIC__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Deformables/Bindings/BINDING.h>
 namespace PhysBAM{
 

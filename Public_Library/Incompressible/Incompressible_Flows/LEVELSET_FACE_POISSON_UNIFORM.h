@@ -7,9 +7,9 @@
 #ifndef __LEVELSET_FACE_POISSON_UNIFORM__
 #define __LEVELSET_FACE_POISSON_UNIFORM__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;

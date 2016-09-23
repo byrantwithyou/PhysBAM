@@ -7,8 +7,8 @@
 #ifndef __AUTO_DIFF__
 #define __AUTO_DIFF__
 
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Vectors/VECTOR.h>
 #include <cmath>
 namespace PhysBAM{
 

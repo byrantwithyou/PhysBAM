@@ -4,14 +4,14 @@
 //#####################################################################
 // Class HYBRID_SL_ENO_CONSERVATION  
 //##################################################################### 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Log/SCOPE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/SCOPE.h>
+#include <Grid_Tools/Arrays/ARRAYS_UTILITIES.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Compressible/Conservation_Law_Solvers/BOUNDARY_OBJECT.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION.h>
 #include <Compressible/Conservation_Law_Solvers/EIGENSYSTEM.h>

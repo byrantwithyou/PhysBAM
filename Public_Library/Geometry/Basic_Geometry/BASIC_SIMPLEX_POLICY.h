@@ -7,8 +7,8 @@
 #ifndef __BASIC_SIMPLEX_POLICY__
 #define __BASIC_SIMPLEX_POLICY__
 
+#include <Core/Utilities/STATIC_ASSERT.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
-#include <Tools/Utilities/STATIC_ASSERT.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <Geometry/Spatial_Acceleration/SPATIAL_ACCELERATION_FORWARD.h>
 namespace PhysBAM{

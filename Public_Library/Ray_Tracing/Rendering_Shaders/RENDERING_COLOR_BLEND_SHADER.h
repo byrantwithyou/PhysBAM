@@ -5,7 +5,7 @@
 #ifndef __RENDERING_COLOR_BLEND_SHADER__
 #define __RENDERING_COLOR_BLEND_SHADER__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{
 

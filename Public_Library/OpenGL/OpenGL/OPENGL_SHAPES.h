@@ -8,7 +8,7 @@
 #ifndef __OPENGL_SHAPES__
 #define __OPENGL_SHAPES__
 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>

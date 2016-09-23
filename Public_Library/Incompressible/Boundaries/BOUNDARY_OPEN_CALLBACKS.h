@@ -7,8 +7,8 @@
 #ifndef __BOUNDARY_OPEN_CALLBACKS__
 #define __BOUNDARY_OPEN_CALLBACKS__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV>

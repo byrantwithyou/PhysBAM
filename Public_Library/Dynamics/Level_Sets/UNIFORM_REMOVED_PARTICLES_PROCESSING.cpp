@@ -2,9 +2,9 @@
 // Copyright 2005-2006, Geoffrey Irving, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Math_Tools/cube.h>
+#include <Core/Math_Tools/cube.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Dynamics/Level_Sets/REMOVED_PARTICLES_BLENDER_3D.h>
 #include <Dynamics/Level_Sets/UNIFORM_REMOVED_PARTICLES_PROCESSING.h>

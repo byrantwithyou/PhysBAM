@@ -4,9 +4,9 @@
 //#####################################################################
 // Class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.h>
 #include <Compressible/Conservation_Law_Solvers/EIGENSYSTEM.h>
 #include <Compressible/Euler_Equations/EULER_UNIFORM.h>

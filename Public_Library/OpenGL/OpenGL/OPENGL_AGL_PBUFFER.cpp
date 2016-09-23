@@ -7,7 +7,7 @@
 // written by Brain Paul (April 1997; Updated on 5 October 2002)
 //#####################################################################
 #ifdef __APPLE__
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <OpenGL/OpenGL/OPENGL_AGL_PBUFFER.h>
 #include <cstdio>
 #include <cstring>

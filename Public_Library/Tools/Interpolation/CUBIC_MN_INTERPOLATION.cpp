@@ -1,4 +1,4 @@
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Tools/Interpolation/CUBIC_MN_INTERPOLATION.h>
 using namespace PhysBAM;
 //#####################################################################

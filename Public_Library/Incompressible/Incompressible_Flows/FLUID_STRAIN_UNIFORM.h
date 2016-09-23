@@ -7,11 +7,11 @@
 #ifndef __FLUID_STRAIN_UNIFORM__
 #define __FLUID_STRAIN_UNIFORM__
 
-#include <Tools/Advection/ADVECTION_FORWARD.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Grid_PDE/Advection/ADVECTION_FORWARD.h>
+#include <Grid_PDE/Advection/ADVECTION_UNIFORM_FORWARD.h>
 #include <Incompressible/Boundaries/BOUNDARY_FORWARD.h>
 #include <Incompressible/Incompressible_Flows/FLUID_STRAIN.h>
 namespace PhysBAM{

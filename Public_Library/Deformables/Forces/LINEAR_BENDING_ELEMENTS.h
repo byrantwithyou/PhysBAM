@@ -7,7 +7,7 @@
 #ifndef __LINEAR_BENDING_ELEMENTS__
 #define __LINEAR_BENDING_ELEMENTS__
 
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{

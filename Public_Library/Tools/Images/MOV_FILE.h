@@ -5,7 +5,7 @@
 #ifndef __MOV_FILE__
 #define __MOV_FILE__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <cstdio>
 namespace PhysBAM{
 class QT_ATOM;

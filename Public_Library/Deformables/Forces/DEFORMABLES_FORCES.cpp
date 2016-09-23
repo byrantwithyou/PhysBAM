@@ -2,10 +2,10 @@
 // Copyright 2007-2008, Michael Lentine, Craig Schroeder, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 using namespace PhysBAM;
 //#####################################################################

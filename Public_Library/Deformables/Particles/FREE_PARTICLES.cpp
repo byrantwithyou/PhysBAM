@@ -4,8 +4,8 @@
 //######################################################################
 // Class FREE_PARTICLES
 //######################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>
 #include <Deformables/Particles/FREE_PARTICLES.h>
 using namespace PhysBAM;

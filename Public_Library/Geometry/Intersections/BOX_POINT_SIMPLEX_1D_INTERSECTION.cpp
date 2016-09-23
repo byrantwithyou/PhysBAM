@@ -4,7 +4,7 @@
 //#####################################################################
 // Namespace INTERSECTION
 //##################################################################### 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <Geometry/Intersections/BOX_POINT_SIMPLEX_1D_INTERSECTION.h>
 namespace PhysBAM{

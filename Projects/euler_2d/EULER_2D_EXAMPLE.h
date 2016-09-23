@@ -15,10 +15,10 @@
 #include <fstream>
 #include <iostream>
 
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Read_Write/MATLAB_OUTPUT.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_Tools/Debug_Output/MATLAB_OUTPUT.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION.h>
 #include <Compressible/Equations_Of_State/EOS.h>
 

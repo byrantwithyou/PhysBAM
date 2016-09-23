@@ -7,8 +7,8 @@
 #ifndef __RAY__
 #define __RAY__
 
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/SEGMENT_1D.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/SEGMENT_3D.h>

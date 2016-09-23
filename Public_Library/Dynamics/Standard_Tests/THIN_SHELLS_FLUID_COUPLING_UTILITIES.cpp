@@ -2,12 +2,12 @@
 // Copyright 2004-2008, Eran Guendelman, Frank Losasso, Tamar Shinar, Eftychios Sifakis, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Matrices/MATRIX_4X4.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/MATRIX_4X4.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

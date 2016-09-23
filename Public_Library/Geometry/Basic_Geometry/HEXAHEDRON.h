@@ -7,7 +7,7 @@
 #ifndef __HEXAHEDRON__
 #define __HEXAHEDRON__
 
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 
 template<class T>

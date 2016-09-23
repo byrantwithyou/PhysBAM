@@ -7,7 +7,7 @@
 #ifndef __BASIC_VISUALIZATION__
 #define __BASIC_VISUALIZATION__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 #include <OpenGL/OpenGL/OPENGL_WORLD.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>

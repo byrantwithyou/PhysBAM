@@ -2,7 +2,7 @@
 // Copyright 2013.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>

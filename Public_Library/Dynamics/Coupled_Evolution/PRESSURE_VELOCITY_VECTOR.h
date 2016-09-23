@@ -7,7 +7,7 @@
 #ifndef __PRESSURE_VELOCITY_VECTOR__
 #define __PRESSURE_VELOCITY_VECTOR__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 namespace PhysBAM{

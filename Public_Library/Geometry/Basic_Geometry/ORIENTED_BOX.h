@@ -7,12 +7,12 @@
 #ifndef __ORIENTED_BOX__
 #define __ORIENTED_BOX__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 

@@ -7,9 +7,9 @@
 #ifndef __BOUNDARY_LINEAR_EXTRAPOLATION__
 #define __BOUNDARY_LINEAR_EXTRAPOLATION__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 template<class TV,class T2>

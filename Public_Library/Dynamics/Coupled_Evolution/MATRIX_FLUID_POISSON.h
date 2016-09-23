@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __MATRIX_FLUID_POISSON__
 #define __MATRIX_FLUID_POISSON__
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 template<class TV> class COLLISION_AWARE_INDEX_MAP;

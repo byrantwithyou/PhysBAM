@@ -4,15 +4,15 @@
 //#####################################################################
 // Class NEWMARK_EVOLUTION
 //#####################################################################
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Vectors/TWIST.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Krylov_Solvers/LANCZOS_ITERATION.h>
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/LOG.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <Tools/Vectors/TWIST.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_1D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>

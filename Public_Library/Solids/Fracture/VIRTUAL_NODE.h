@@ -7,7 +7,7 @@
 #ifndef __VIRTUAL_NODE__
 #define __VIRTUAL_NODE__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 namespace PhysBAM{
 
 class VIRTUAL_NODE

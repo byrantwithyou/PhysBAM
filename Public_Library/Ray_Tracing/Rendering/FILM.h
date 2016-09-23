@@ -7,14 +7,14 @@
 #ifndef __FILM__
 #define __FILM__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/Robust_Functions.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Tools/Images/IMAGE.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/Robust_Functions.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Grid_Tools/Grids/GRID.h>
 namespace PhysBAM{
 template<class T> class CAMERA;
 

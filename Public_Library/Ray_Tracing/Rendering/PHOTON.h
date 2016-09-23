@@ -5,7 +5,7 @@
 #ifndef __PHOTON__
 #define __PHOTON__
 
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 
 template<class T>

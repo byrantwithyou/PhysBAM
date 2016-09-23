@@ -7,8 +7,8 @@
 #ifndef __PARTICLE_GRID_FORCES__
 #define __PARTICLE_GRID_FORCES__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV> class MPM_PARTICLES;

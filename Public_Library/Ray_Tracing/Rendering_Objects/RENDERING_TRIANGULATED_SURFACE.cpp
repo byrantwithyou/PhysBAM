@@ -2,13 +2,13 @@
 // Copyright 2002-2006, Robert Bridson, Ronald Fedkiw, Geoffrey Irving, Sergey Koltakov, Andrew Selle, Michael Turitzin, Jiayi Chong.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/PROJECTED_ARRAY.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Core/Arrays/PROJECTED_ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/PROGRESS_INDICATOR.h>
 #include <Tools/Images/BMP_FILE.h>
 #include <Tools/Images/IMAGE.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/PROGRESS_INDICATOR.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

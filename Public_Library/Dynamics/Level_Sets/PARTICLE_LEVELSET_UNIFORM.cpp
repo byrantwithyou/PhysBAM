@@ -2,13 +2,13 @@
 // Copyright 2002-2007, Ronald Fedkiw, Eran Guendelman, Geoffrey Irving, Sergey Koltakov, Frank Losasso, Duc Nguyen, Nick Rasmussen, Avi Robinson-Mosher, Andrew Selle, Tamar Shinar, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Data_Structures/HEAPIFY.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Math_Tools/pow.h>
-#include <Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Core/Data_Structures/HEAPIFY.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Math_Tools/pow.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Grid_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>

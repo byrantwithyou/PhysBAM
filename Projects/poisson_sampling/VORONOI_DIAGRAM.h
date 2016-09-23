@@ -6,8 +6,8 @@
 //#####################################################################
 // Class VORONOI_DIAGRAM
 //##################################################################### 
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <set>
 namespace PhysBAM{
 

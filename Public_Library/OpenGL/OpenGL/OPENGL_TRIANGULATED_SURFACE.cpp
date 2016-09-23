@@ -2,8 +2,8 @@
 // Copyright 2002-2005, Eran Guendelman, Eilene Hao, Neil Molino, Robert Bridson, Igor Neverov, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/MATRIX_4X4.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX_4X4.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>

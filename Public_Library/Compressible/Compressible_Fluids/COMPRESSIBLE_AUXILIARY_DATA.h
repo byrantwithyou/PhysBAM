@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __COMPRESSIBLE_AUXILIARY_DATA__
 #define __COMPRESSIBLE_AUXILIARY_DATA__
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Compressible_Fluids/COMPRESSIBLE_FLUID_COLLECTION.h>
 #include <string>
 

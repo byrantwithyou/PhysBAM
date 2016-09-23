@@ -7,7 +7,7 @@
 #ifndef __HAIR_ID__
 #define __HAIR_ID__
 
-#include <Tools/Data_Structures/ELEMENT_ID.h>
+#include <Core/Data_Structures/ELEMENT_ID.h>
 namespace PhysBAM{
 
 #ifndef COMPILE_ID_TYPES_AS_INT

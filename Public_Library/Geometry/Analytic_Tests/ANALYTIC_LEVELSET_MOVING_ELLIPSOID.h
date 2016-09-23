@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __ANALYTIC_LEVELSET_MOVING_ELLIPSOID__
 #define __ANALYTIC_LEVELSET_MOVING_ELLIPSOID__
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_IMPLICIT_SURFACE_LEVELSET.h>
 #include <functional>
 

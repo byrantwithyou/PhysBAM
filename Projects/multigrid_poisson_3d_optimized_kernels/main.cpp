@@ -2,7 +2,7 @@
 // Copyright 2009, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Parsing/STRING_UTILITIES.h>
+#include <Core/Read_Write/STRING_UTILITIES.h>
 #include "FINITE_DIFFERENCE_DISCRETIZATION.h"
 #include "STENCIL_ITERATOR.h"
 using namespace PhysBAM;

@@ -11,10 +11,10 @@
 #ifndef __INTERPOLATION_CURVE__
 #define __INTERPOLATION_CURVE__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
 template<class T,class S> struct INTERPOLATION_CURVE_HELPER

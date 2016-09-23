@@ -7,9 +7,9 @@
 #ifndef __EULER_PROJECTION__
 #define __EULER_PROJECTION__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Compressible/Euler_Equations/EULER.h>
 namespace PhysBAM{
 

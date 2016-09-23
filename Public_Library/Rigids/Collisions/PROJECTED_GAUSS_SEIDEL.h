@@ -7,12 +7,12 @@
 #ifndef __PROJECTED_GAUSS_SEIDEL__
 #define __PROJECTED_GAUSS_SEIDEL__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Rigids/Collisions/SOLVE_CONTACT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 

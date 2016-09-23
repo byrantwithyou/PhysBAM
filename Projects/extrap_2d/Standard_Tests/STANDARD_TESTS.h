@@ -31,13 +31,13 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Images/PPM_FILE.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>

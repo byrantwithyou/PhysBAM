@@ -7,11 +7,11 @@
 #ifndef __STATIC_POLYNOMIAL__
 #define __STATIC_POLYNOMIAL__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Math_Tools/RANGE_ITERATOR.h>
-#include <Tools/Vectors/STATIC_TENSOR.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE_ITERATOR.h>
+#include <Core/Vectors/STATIC_TENSOR.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class T,int rank,int d> struct STATIC_POLYNOMIAL;

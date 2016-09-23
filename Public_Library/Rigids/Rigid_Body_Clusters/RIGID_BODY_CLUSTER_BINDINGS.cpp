@@ -4,9 +4,9 @@
 //#####################################################################
 // Class RIGID_BODY_CLUSTER_BINDINGS
 //##################################################################### 
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>

@@ -2,7 +2,7 @@
 // Copyright 2003-2005, Geoffrey Irving, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>

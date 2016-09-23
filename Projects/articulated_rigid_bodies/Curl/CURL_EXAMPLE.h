@@ -8,8 +8,8 @@
 #ifndef __CURL_EXAMPLE__
 #define __CURL_EXAMPLE__
 
+#include <Core/Math_Tools/wrap.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <Tools/Math_Tools/wrap.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
 #include <Rigids/Joints/ANGLE_JOINT.h>

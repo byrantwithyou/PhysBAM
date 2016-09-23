@@ -4,13 +4,13 @@
 //#####################################################################
 // Class TETRAHEDRON_MESH
 //##################################################################### 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/STACK.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include <Tools/Math_Tools/cyclic_shift.h>
-#include <Tools/Math_Tools/exchange_sort.h>
-#include <Tools/Math_Tools/permutation.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/STACK.h>
+#include <Core/Data_Structures/UNION_FIND.h>
+#include <Core/Math_Tools/cyclic_shift.h>
+#include <Core/Math_Tools/exchange_sort.h>
+#include <Core/Math_Tools/permutation.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology/TETRAHEDRON_MESH.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>

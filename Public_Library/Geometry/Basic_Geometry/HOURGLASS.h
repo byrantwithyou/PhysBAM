@@ -7,10 +7,10 @@
 #ifndef __HOURGLASS__
 #define __HOURGLASS__
 
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/AUTODIFF_LEVELSET.h>
 namespace PhysBAM{
 

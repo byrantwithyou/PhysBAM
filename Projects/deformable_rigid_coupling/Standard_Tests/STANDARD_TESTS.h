@@ -32,12 +32,12 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/SCOPE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>

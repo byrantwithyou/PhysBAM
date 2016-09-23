@@ -7,7 +7,7 @@
 #ifndef __MESH_OBJECT__
 #define __MESH_OBJECT__
 
-#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Spatial_Acceleration/SPATIAL_ACCELERATION_FORWARD.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>

@@ -2,9 +2,9 @@
 // Copyright 2007, Avi Robinson-Mosher, Tamar Shinar, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>

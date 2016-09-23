@@ -2,9 +2,9 @@
 // Copyright 2006-2009, Nipun Kwatra, Andrew Selle, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Vectors/VECTOR.h>
 #include <OpenGL/OpenGL/OPENGL_SCALAR_FIELD_1D.h>
 using namespace PhysBAM;
 //#####################################################################

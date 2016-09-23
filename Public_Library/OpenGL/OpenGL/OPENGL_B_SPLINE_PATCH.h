@@ -7,8 +7,8 @@
 #ifndef __OPENGL_B_SPLINE_PATCH__
 #define __OPENGL_B_SPLINE_PATCH__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>

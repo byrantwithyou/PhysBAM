@@ -4,9 +4,9 @@
 //#####################################################################
 // Class CONSERVATION_ENO_LLF_AND_CENTRAL  
 //#####################################################################
-#include <Tools/Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/Minmod.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/Minmod.h>
+#include <Grid_PDE/Advection/ADVECTION_SEPARABLE_UNIFORM.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF_AND_CENTRAL.h>
 #include <Compressible/Conservation_Law_Solvers/EIGENSYSTEM.h>
 using namespace PhysBAM;

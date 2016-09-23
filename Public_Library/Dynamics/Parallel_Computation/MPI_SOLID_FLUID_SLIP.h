@@ -7,14 +7,14 @@
 #ifndef __MPI_SOLID_FLUID_SLIP__
 #define __MPI_SOLID_FLUID_SLIP__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 namespace MPI{class Group;class Intracomm;class Request;class Status;class Op;}
 namespace PhysBAM{

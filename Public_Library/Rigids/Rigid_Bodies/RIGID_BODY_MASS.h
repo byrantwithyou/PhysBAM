@@ -7,13 +7,13 @@
 #ifndef __RIGID_BODY_MASS__
 #define __RIGID_BODY_MASS__
 
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX_0X0.h>
-#include <Tools/Matrices/MATRIX_1X1.h>
-#include <Tools/Matrices/MATRIX_2X2.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX_0X0.h>
+#include <Core/Matrices/MATRIX_1X1.h>
+#include <Core/Matrices/MATRIX_2X2.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_FORWARD.h>
 namespace PhysBAM{
 

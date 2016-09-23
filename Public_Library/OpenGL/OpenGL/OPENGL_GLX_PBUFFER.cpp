@@ -7,7 +7,7 @@
 // written by Brain Paul (April 1997; Updated on 5 October 2002)
 //#####################################################################
 #ifdef __linux__
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <OpenGL/OpenGL/OPENGL_GLX_PBUFFER.h>
 #include <cstdio>
 #include <cstring>

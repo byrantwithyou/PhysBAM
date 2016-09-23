@@ -7,9 +7,9 @@
 #ifndef __CELL_MAPPING__
 #define __CELL_MAPPING__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;

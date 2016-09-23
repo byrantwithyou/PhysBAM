@@ -4,11 +4,11 @@
 //#####################################################################
 // Class RIGID_DEFORMABLE_COLLISIONS
 //#####################################################################
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Math_Tools/clamp.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Vectors/Dot_Product.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Math_Tools/clamp.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Vectors/Dot_Product.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>

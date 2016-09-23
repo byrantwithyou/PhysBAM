@@ -5,8 +5,8 @@
 #ifndef __RENDERING_TORRANCE_SPARROW_SHADER__
 #define __RENDERING_TORRANCE_SPARROW_SHADER__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Math_Tools/constants.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Math_Tools/constants.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Ray_Tracing/Rendering/FRESNEL.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>

@@ -2,9 +2,9 @@
 // Copyright 2002-2007, Robert Bridson, Ronald Fedkiw, Geoffrey Irving, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/KD_TREE.h>
-#include <Tools/Matrices/FRAME.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/KD_TREE.h>
+#include <Core/Matrices/FRAME.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>

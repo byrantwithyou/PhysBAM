@@ -4,7 +4,7 @@
 //#####################################################################
 // Class SHALLOW_WATER_2D_EIGENSYSTEM_F  
 //##################################################################### 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_2D_EIGENSYSTEM_F.h>
 using namespace PhysBAM;
 //#####################################################################

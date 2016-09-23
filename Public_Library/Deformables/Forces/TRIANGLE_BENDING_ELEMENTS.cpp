@@ -2,11 +2,11 @@
 // Copyright 2002-2007, Zhaosheng Bao, Robert Bridson, Ronald Fedkiw, Geoffrey Irving, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/cyclic_shift.h>
-#include <Tools/Math_Tools/Robust_Arithmetic.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/cyclic_shift.h>
+#include <Core/Math_Tools/Robust_Arithmetic.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Deformables/Forces/TRIANGLE_BENDING_ELEMENTS.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>

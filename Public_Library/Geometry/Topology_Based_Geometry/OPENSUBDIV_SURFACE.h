@@ -7,8 +7,8 @@
 #ifndef __OPENSUBDIV_SURFACE__
 #define __OPENSUBDIV_SURFACE__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 namespace PhysBAM{

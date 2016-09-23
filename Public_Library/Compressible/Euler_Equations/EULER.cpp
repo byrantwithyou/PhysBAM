@@ -4,7 +4,7 @@
 //#####################################################################
 // Class EULER
 //##################################################################### 
-#include <Tools/Log/SCOPE.h>
+#include <Core/Log/SCOPE.h>
 #include <Compressible/Euler_Equations/EULER.h>
 using namespace PhysBAM;
 //#####################################################################

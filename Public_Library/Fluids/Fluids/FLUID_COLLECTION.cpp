@@ -2,7 +2,7 @@
 // Copyright 2009, Avi Robinson-Mosher.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Incompressible/Incompressible_Fluids/INCOMPRESSIBLE_FLUID_COLLECTION.h>
 #include <Fluids/Fluids/FLUID_COLLECTION.h>
 using namespace PhysBAM;

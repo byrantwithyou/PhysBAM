@@ -8,7 +8,7 @@
 #ifndef __MAGNETS_EXAMPLE__
 #define __MAGNETS_EXAMPLE__
 
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 namespace PhysBAM{
 

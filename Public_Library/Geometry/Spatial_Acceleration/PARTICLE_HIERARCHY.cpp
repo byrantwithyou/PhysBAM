@@ -2,9 +2,9 @@
 // Copyright 2005-2006, Eran Guendelman, Geoffrey Irving, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/KD_TREE.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/KD_TREE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 using namespace PhysBAM;
 //#####################################################################

@@ -6,12 +6,12 @@
 //#####################################################################
 #ifndef __COLLISION_AWARE_INDEX_MAP__
 #define __COLLISION_AWARE_INDEX_MAP__
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Grids_Uniform/SIDED_FACE_INDEX.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/SIDED_FACE_INDEX.h>
 #include <Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h>
 
 namespace PhysBAM{

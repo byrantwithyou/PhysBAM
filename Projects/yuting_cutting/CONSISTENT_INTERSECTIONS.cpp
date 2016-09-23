@@ -4,8 +4,8 @@
 //#####################################################################
 // Class CONSISTENT_INTERSECTIONS
 //##################################################################### 
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>

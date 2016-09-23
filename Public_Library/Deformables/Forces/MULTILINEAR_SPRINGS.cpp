@@ -4,9 +4,9 @@
 //#####################################################################
 // Class MULTILINEAR_SPRINGS
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/Robust_Arithmetic.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/Robust_Arithmetic.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Deformables/Forces/MULTILINEAR_SPRINGS.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>

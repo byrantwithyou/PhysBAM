@@ -5,12 +5,12 @@
 #ifndef __ANALYTIC_POLYMER_STRESS__
 #define __ANALYTIC_POLYMER_STRESS__
 
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/IDENTITY_MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/IDENTITY_MATRIX.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Symbolics/PROGRAM_CONTEXT.h>
 #include <Tools/Tensors/SYMMETRIC_TENSOR.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>

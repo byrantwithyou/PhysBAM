@@ -5,9 +5,9 @@
 // Namespace MPI_UTILITIES
 //#####################################################################
 #ifdef USE_MPI
-#include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <Tools/Parsing/PARSE_ARGS.h>

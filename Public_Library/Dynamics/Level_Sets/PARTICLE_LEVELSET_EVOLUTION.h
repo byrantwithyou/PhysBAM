@@ -7,7 +7,7 @@
 #ifndef __PARTICLE_LEVELSET_EVOLUTION__
 #define __PARTICLE_LEVELSET_EVOLUTION__
 
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <cassert>
 namespace PhysBAM{
 

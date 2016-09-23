@@ -7,8 +7,8 @@
 #ifndef __QUADRATIC__
 #define __QUADRATIC__
 
-#include <Tools/Math_Tools/exchange.h>
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Math_Tools/exchange.h>
+#include <Core/Math_Tools/sqr.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 namespace PhysBAM{
 

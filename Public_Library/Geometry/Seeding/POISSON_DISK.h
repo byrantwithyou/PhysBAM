@@ -6,8 +6,8 @@
 //#####################################################################
 #ifndef __POISSON_DISK__
 #define __POISSON_DISK__
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 template<class TV> class GRID;
 template<class TV> class IMPLICIT_OBJECT;;

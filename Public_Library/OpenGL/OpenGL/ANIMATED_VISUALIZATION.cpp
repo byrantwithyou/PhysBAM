@@ -2,13 +2,13 @@
 // Copyright 2004-2009, Eran Guendelman, Geoffrey Irving, Andrew Selle, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/LOG.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Read_Write/STRING_UTILITIES.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Images/IMAGE.h>
 #include <Tools/Images/MOV_FILE.h>
-#include <Tools/Log/LOG.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <OpenGL/OpenGL/ANIMATED_VISUALIZATION.h>
 #include <climits>
 #include <cstdlib>

@@ -2,9 +2,9 @@
 // Copyright 2009, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

@@ -4,12 +4,12 @@
 //#####################################################################
 // Class MATRIX_VISCOUS_FORCES
 //##################################################################### 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>
 #include <Dynamics/Coupled_Evolution/MATRIX_VISCOUS_FORCES.h>
 #include <Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h>

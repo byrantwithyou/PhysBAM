@@ -2,9 +2,9 @@
 // Copyright 2007, Avi Robinson-Mosher, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/RANGE.h>
 #include <Geometry/Basic_Geometry/SEGMENT_1D.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>

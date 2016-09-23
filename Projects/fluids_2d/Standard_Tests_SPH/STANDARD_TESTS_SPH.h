@@ -6,8 +6,8 @@
 //#####################################################################
 #ifndef __STANDARD_TESTS_SPH__
 #define __STANDARD_TESTS_SPH__
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Matrices/FRAME.h>
+#include <Core/Matrices/FRAME.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>

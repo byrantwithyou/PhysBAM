@@ -2,8 +2,8 @@
 // Copyright 2004-2008, Zhaosheng Bao, Eilene Hao, Jeong-Mo Hong, Geoffrey Irving, Sergey Koltakov, Frank Losasso, Avi Robinson-Mosher, Andrew Selle, Tamar Shinar, Jerry Talton, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Computations/GRADIENT_UNIFORM.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Grid_Tools/Computations/GRADIENT_UNIFORM.h>
 #include <Geometry/Implicit_Objects/SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>

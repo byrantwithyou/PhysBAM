@@ -5,7 +5,7 @@
 #ifndef __FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM__
 #define __FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM__
 
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 namespace PhysBAM{
 

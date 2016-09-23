@@ -4,17 +4,17 @@
 //#####################################################################
 #ifndef __MATRIX_TESTS__
 #define __MATRIX_TESTS__
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_0X0.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_1X1.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Utilities/TEST_BASE.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX_MXN.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_0X0.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_1X1.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Utilities/TEST_BASE.h>
 #include <limits>
 namespace PhysBAM{
 

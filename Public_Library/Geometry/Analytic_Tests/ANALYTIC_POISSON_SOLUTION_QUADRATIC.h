@@ -6,8 +6,8 @@
 //#####################################################################
 #ifndef __ANALYTIC_POISSON_SOLUTION_QUADRATIC__
 #define __ANALYTIC_POISSON_SOLUTION_QUADRATIC__
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_POISSON_SOLUTION.h>
 
 namespace PhysBAM{

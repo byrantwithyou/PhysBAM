@@ -7,7 +7,7 @@
 #ifndef __SHALLOW_WATER_2D_EIGENSYSTEM_G__
 #define __SHALLOW_WATER_2D_EIGENSYSTEM_G__   
 
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Compressible/Conservation_Law_Solvers/EIGENSYSTEM.h>
 namespace PhysBAM{
 

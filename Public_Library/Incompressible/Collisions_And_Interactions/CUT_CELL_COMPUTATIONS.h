@@ -6,8 +6,8 @@
 //#####################################################################
 #ifndef __CUT_CELL_COMPUTATIONS__
 #define __CUT_CELL_COMPUTATIONS__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Incompressible/Collisions_And_Interactions/CUT_CELL.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 namespace PhysBAM {

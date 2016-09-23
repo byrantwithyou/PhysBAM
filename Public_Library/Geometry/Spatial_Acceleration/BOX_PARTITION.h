@@ -7,9 +7,9 @@
 #ifndef __BOX_PARTITION__
 #define __BOX_PARTITION__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Grid_Tools/Grids/GRID.h>
 namespace PhysBAM{
 
 template<class TV>

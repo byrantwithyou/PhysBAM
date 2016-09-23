@@ -4,14 +4,14 @@
 //#####################################################################
 // Class RIGID_LINEAR_SPRINGS
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Math_Tools/Robust_Arithmetic.h>
-#include <Tools/Math_Tools/sign.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Math_Tools/Robust_Arithmetic.h>
+#include <Core/Math_Tools/sign.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Polynomials/QUADRATIC.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>

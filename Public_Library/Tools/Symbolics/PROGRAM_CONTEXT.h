@@ -7,8 +7,8 @@
 #ifndef __PROGRAM_CONTEXT__
 #define __PROGRAM_CONTEXT__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAY_VIEW.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
 namespace PhysBAM{
 template<class T> struct PROGRAM;
 template<class T>

@@ -7,7 +7,7 @@
 #ifndef __REACTIVE_EULER_2D_EIGENSYSTEM_F__
 #define __REACTIVE_EULER_2D_EIGENSYSTEM_F__   
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Compressible/Conservation_Law_Solvers/EIGENSYSTEM.h>
 #include <Compressible/Reactive_Euler_Equations/REACTIVE_EULER.h>
 namespace PhysBAM{

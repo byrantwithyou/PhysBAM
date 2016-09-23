@@ -2,11 +2,11 @@
 // Copyright 2002-2006, Robert Bridson, Ronald Fedkiw, Eilene Hao, Geoffrey Irving, Igor Neverov, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Math_Tools/cyclic_shift.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Math_Tools/cyclic_shift.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>

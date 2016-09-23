@@ -7,7 +7,7 @@
 //##################################################################### 
 #ifndef __OPENGL_COLOR_RAMP__
 #define __OPENGL_COLOR_RAMP__
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_MAP.h>
 namespace PhysBAM{
 

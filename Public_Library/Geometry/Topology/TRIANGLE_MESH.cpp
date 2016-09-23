@@ -3,14 +3,14 @@
 // Geoffrey Irving, Frank Losasso, Neil Molino, Duc Nguyen, Eftychios Sifakis, Jerry Talton, Joseph Teran, Jeffrey Hellrung.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include <Tools/Math_Tools/cyclic_shift.h>
-#include <Tools/Math_Tools/exchange.h>
-#include <Tools/Math_Tools/exchange_sort.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/UNION_FIND.h>
+#include <Core/Math_Tools/cyclic_shift.h>
+#include <Core/Math_Tools/exchange.h>
+#include <Core/Math_Tools/exchange_sort.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>
 #include <climits>

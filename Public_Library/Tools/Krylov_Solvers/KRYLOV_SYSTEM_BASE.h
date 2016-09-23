@@ -7,7 +7,7 @@
 #ifndef __KRYLOV_SYSTEM_BASE__
 #define __KRYLOV_SYSTEM_BASE__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 namespace PhysBAM{
 
 template<class T> class KRYLOV_VECTOR_BASE;

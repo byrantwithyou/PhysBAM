@@ -7,7 +7,7 @@
 #ifndef __HYPOTHETICAL_CUT__
 #define __HYPOTHETICAL_CUT__
 
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Fracture/EMBEDDED_TRIANGULATED_OBJECT.h>
 #include <Deformables/Fracture/EMBEDDING_POLICY.h>

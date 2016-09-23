@@ -7,13 +7,13 @@
 #ifndef __FLOW_PAST_CIRCLE__
 #define __FLOW_PAST_CIRCLE__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Computations/VORTICITY_UNIFORM.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_Tools/Computations/VORTICITY_UNIFORM.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
 #include <Rigids/Standard_Tests/RIGIDS_STANDARD_TESTS.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <Incompressible/Projection/PROJECTION_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 
 namespace PhysBAM{

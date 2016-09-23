@@ -7,7 +7,7 @@
 #ifndef __BW_GRAVITY__
 #define __BW_GRAVITY__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 

@@ -7,7 +7,7 @@
 #ifndef __STANDARD_TESTS_SPH__
 #define __STANDARD_TESTS_SPH__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Particles/SPH_PARTICLES.h>

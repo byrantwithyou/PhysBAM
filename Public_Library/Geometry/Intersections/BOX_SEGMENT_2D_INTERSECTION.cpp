@@ -4,7 +4,7 @@
 //#####################################################################
 // Namespace INTERSECTION
 //##################################################################### 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Intersections/BOX_SEGMENT_2D_INTERSECTION.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>

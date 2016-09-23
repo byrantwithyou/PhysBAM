@@ -2,13 +2,13 @@
 // Copyright 2004-2009, Geoffrey Irving, Michael Lentine, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include <Tools/Math_Tools/FACTORIAL.h>
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Utilities/DEBUG_CAST.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/UNION_FIND.h>
+#include <Core/Math_Tools/FACTORIAL.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Utilities/DEBUG_CAST.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_PARTITION.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>

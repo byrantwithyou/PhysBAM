@@ -7,7 +7,7 @@
 #ifndef __CODE_BLOCK__
 #define __CODE_BLOCK__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/HASHTABLE.h>
 namespace PhysBAM{
 
 struct CODE_BLOCK_NODE;

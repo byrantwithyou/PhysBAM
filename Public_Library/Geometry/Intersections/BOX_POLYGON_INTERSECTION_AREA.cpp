@@ -4,11 +4,11 @@
 //#####################################################################
 // Namespace INTERSECTION
 //##################################################################### 
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/exchange.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/exchange.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/POLYGON.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Intersections/BOX_POLYGON_INTERSECTION_AREA.h>

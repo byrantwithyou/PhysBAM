@@ -7,8 +7,8 @@
 #ifndef __OPENGL_VECTOR_FIELD_3D__
 #define __OPENGL_VECTOR_FIELD_3D__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 namespace PhysBAM{

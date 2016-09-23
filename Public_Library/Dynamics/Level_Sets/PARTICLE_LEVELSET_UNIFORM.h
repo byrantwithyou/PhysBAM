@@ -7,7 +7,7 @@
 #ifndef __PARTICLE_LEVELSET_UNIFORM__
 #define __PARTICLE_LEVELSET_UNIFORM__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD.h>
 #ifdef USE_PTHREADS
 #include <Tools/Parallel_Computation/PTHREAD.h>

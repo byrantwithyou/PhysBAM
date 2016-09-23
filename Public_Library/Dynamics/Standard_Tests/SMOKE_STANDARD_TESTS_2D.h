@@ -14,9 +14,9 @@
 #ifndef __SMOKE_STANDARD_TESTS_2D__
 #define __SMOKE_STANDARD_TESTS_2D__
 
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/FRAME.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/FRAME.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 namespace PhysBAM{
 
 template<class TV> class SOLIDS_FLUIDS_EXAMPLE;

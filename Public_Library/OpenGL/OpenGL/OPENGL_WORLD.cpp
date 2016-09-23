@@ -4,12 +4,12 @@
 //#####################################################################
 // Class OPENGL_WORLD
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/TIMER.h>
 #include <Tools/Images/IMAGE.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Utilities/TIMER.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <OpenGL/OpenGL/OPENGL_ARCBALL.h>
 #include <OpenGL/OpenGL/OPENGL_LIGHT.h>

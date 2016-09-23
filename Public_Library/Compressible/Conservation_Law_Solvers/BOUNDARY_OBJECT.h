@@ -7,7 +7,7 @@
 #ifndef __BOUNDARY_OBJECT__
 #define __BOUNDARY_OBJECT__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_CALLBACKS.h>
 namespace PhysBAM{
 

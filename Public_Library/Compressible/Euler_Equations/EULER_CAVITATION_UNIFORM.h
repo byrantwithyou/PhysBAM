@@ -7,7 +7,7 @@
 #ifndef __EULER_CAVITATION_UNIFORM__
 #define __EULER_CAVITATION_UNIFORM__
 
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/GRID.h>
 namespace PhysBAM{
 
 template<class TV> class EULER_UNIFORM;

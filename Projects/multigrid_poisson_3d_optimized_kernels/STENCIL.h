@@ -7,15 +7,15 @@
 #ifndef __STENCIL__
 #define __STENCIL__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Vectors/VECTOR_2D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Vectors/VECTOR_2D.h>
 #include <limits.h>
 #define SUPPORT_FORMATTED_STENCIL_OUTPUT
 
 #ifdef SUPPORT_FORMATTED_STENCIL_OUTPUT
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <iomanip>
 #endif
 

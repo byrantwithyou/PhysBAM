@@ -27,8 +27,8 @@
 #ifndef __WATER_STANDARD_TESTS_2D__
 #define __WATER_STANDARD_TESTS_2D__
 
-#include <Tools/Grids_Uniform/GRID.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/LINE_2D.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>

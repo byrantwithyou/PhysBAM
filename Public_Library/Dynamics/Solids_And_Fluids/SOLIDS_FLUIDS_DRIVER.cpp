@@ -4,9 +4,9 @@
 //#####################################################################
 // Class SOLIDS_FLUIDS_DRIVER
 //#####################################################################
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>

@@ -1,5 +1,5 @@
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Math_Tools/INTERVAL.h>
+#include <Core/Math_Tools/INTERVAL.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Compressible/Conservation_Law_Solvers/BOUNDARY_OBJECT.h>
 using namespace PhysBAM;
 //#####################################################################

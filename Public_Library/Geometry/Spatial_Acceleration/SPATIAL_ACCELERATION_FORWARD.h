@@ -7,7 +7,7 @@
 #ifndef __SPATIAL_ACCELERATION_FORWARD__
 #define __SPATIAL_ACCELERATION_FORWARD__
 
-#include <Tools/Arrays/ARRAY_VIEW.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
 
 namespace PhysBAM{
 template<class TV> class BOX_HIERARCHY;

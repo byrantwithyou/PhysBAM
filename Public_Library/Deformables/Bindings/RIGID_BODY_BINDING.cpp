@@ -2,8 +2,8 @@
 // Copyright 2006-2008, Geoffrey Irving, Sergey Levine, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Deformables/Bindings/RIGID_BODY_BINDING.h>
 using namespace PhysBAM;
 //#####################################################################

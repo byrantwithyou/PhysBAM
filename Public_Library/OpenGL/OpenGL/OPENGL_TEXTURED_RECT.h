@@ -7,7 +7,7 @@
 #ifndef __OPENGL_TEXTURED_RECT__
 #define __OPENGL_TEXTURED_RECT__
 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_TEXTURE.h>
 

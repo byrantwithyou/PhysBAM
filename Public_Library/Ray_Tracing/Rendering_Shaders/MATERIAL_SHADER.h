@@ -7,7 +7,7 @@
 #ifndef __MATERIAL_SHADER__
 #define __MATERIAL_SHADER__
 
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T,int d> class VECTOR;

@@ -2,7 +2,7 @@
 // Copyright 2013.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Deformables/Forces/RALEIGH_DAMPING_FORCE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;

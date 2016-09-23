@@ -7,8 +7,8 @@
 #ifndef __RENDERING_BUMP_MAP_IMAGE_SHADER__
 #define __RENDERING_BUMP_MAP_IMAGE_SHADER__
 
+#include <Core/Log/LOG.h>
 #include <Tools/Images/IMAGE.h>
-#include <Tools/Log/LOG.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Ray_Tracing/Rendering_Shaders/RENDERING_BUMP_MAP_SHADER.h>
 namespace PhysBAM{

@@ -7,9 +7,9 @@
 #ifndef __MULTIPHASE_FIRE_EXAMPLES__
 #define __MULTIPHASE_FIRE_EXAMPLES__
 
-#include <Tools/Boundaries/BOUNDARY.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include "MULTIPHASE_FIRE_EXAMPLES_UNIFORM.h"
 namespace PhysBAM{

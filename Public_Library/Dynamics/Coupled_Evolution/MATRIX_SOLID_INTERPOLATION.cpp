@@ -4,8 +4,8 @@
 //#####################################################################
 // Class MATRIX_SOLID_INTERPOLATION
 //##################################################################### 
-#include <Tools/Arrays/CONSTANT_ARRAY.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Arrays/CONSTANT_ARRAY.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>

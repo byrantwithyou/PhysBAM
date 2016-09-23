@@ -7,8 +7,8 @@
 #ifndef __TOPOLOGY_BASED_SIMPLEX_POLICY__
 #define __TOPOLOGY_BASED_SIMPLEX_POLICY__
 
+#include <Core/Utilities/STATIC_ASSERT.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
-#include <Tools/Utilities/STATIC_ASSERT.h>
 #include <Geometry/Spatial_Acceleration/SPATIAL_ACCELERATION_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_POLICY.h>
 namespace PhysBAM{

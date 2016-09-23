@@ -5,10 +5,10 @@
 // Class ARRAY_TESTS
 //#####################################################################
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAY_BASE.h>
-#include <Tools/Utilities/TEST_BASE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY_BASE.h>
+#include <Core/Utilities/TEST_BASE.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 class ARRAY_TESTS:public TEST_BASE

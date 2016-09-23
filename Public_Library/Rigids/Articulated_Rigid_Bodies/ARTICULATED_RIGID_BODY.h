@@ -7,9 +7,9 @@
 #ifndef __ARTICULATED_RIGID_BODY__
 #define __ARTICULATED_RIGID_BODY__
 
-#include <Tools/Data_Structures/DIRECTED_GRAPH.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Core/Data_Structures/DIRECTED_GRAPH.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_1D.h>
 namespace PhysBAM{
 template<class TV> class JOINT_MESH;

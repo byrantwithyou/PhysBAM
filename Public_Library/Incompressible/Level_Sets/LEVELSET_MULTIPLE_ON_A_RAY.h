@@ -7,8 +7,8 @@
 #ifndef __LEVELSET_MULTIPLE_ON_A_RAY__
 #define __LEVELSET_MULTIPLE_ON_A_RAY__
 
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
-#include <Tools/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>
 namespace PhysBAM{

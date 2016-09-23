@@ -12,7 +12,7 @@
 #ifndef __WATER_STANDARD_TESTS_MULTIPHASE_3D__
 #define __WATER_STANDARD_TESTS_MULTIPHASE_3D__
 
-#include <Tools/Random_Numbers/NOISE.h>
+#include <Core/Random_Numbers/NOISE.h>
 #include <Dynamics/Standard_Tests/WATER_STANDARD_TESTS_3D.h>
 #include <Dynamics/Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE.h>
 namespace PhysBAM{

@@ -6,8 +6,8 @@
 //#####################################################################
 #ifndef __BACKWARD_EULER_MINIMIZATION_SYSTEM__
 #define __BACKWARD_EULER_MINIMIZATION_SYSTEM__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>

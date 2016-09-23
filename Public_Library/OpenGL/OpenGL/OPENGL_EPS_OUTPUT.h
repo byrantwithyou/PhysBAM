@@ -6,8 +6,8 @@
 //#####################################################################
 #ifndef __OPENGL_EPS_OUTPUT__
 #define __OPENGL_EPS_OUTPUT__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 template<class T>
 class OPENGL_EPS_OUTPUT

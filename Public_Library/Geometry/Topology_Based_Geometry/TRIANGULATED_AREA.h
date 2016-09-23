@@ -7,7 +7,7 @@
 #ifndef __TRIANGULATED_AREA__
 #define __TRIANGULATED_AREA__
 
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Spatial_Acceleration/SPATIAL_ACCELERATION_FORWARD.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>
 #include <Geometry/Topology_Based_Geometry/MESH_OBJECT.h>

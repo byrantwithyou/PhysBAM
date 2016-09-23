@@ -2,9 +2,9 @@
 // Copyright 2009, Jon Gretarsson, Nipun Kwatra, Wen Zheng.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Matrices/MATRIX_MXN.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h> // TODO: remove once MUSCLE.cpp exists (workaround for windows compiler bug)
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>

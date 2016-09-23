@@ -4,7 +4,7 @@
 //#####################################################################
 // Class VORTICITY_PARTICLES
 //#####################################################################
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 namespace PhysBAM{
 //#####################################################################

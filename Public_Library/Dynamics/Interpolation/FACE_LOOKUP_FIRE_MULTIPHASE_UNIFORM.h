@@ -5,7 +5,7 @@
 #ifndef __FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM__
 #define __FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM__
 
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Dynamics/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 #include <cassert>
 namespace PhysBAM{

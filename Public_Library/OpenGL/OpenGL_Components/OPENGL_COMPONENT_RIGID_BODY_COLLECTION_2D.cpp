@@ -2,9 +2,9 @@
 // Copyright 2004-2009, Eran Guendelman, Geoffrey Irving, Tamar Shinar, Eftychios Sifakis, Rachel Weinstein, Wen Zheng.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Matrices/MATRIX_MXN.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>

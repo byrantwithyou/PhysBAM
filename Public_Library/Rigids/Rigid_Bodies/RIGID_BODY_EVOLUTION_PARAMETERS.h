@@ -7,8 +7,8 @@
 #ifndef __RIGID_BODY_EVOLUTION_PARAMETERS__
 #define __RIGID_BODY_EVOLUTION_PARAMETERS__
 
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 namespace PhysBAM{
 

@@ -2,13 +2,13 @@
 // Copyright 2009, Nipun Kwatra, Jon Gretarsson, Avi Robinson-Mosher, Craig Schroeder
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>

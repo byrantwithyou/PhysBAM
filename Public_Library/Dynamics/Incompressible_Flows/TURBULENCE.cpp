@@ -2,15 +2,15 @@
 // Copyright 2002-2003, Robert Bridson, Ron Fedkiw, Eran Guendelman.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Fourier_Transforms/FFT_1D.h>
-#include <Tools/Fourier_Transforms/FFT_2D.h>
-#include <Tools/Fourier_Transforms/FFT_3D.h>
-#include <Tools/Fourier_Transforms/FFT_POLICY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/sqr.h>
-#include <Tools/Vectors/COMPLEX.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/sqr.h>
+#include <Core/Vectors/COMPLEX.h>
+#include <Grid_Tools/Fourier_Transforms/FFT_1D.h>
+#include <Grid_Tools/Fourier_Transforms/FFT_2D.h>
+#include <Grid_Tools/Fourier_Transforms/FFT_3D.h>
+#include <Grid_Tools/Fourier_Transforms/FFT_POLICY.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Dynamics/Incompressible_Flows/TURBULENCE.h>
 using namespace PhysBAM;
 //#####################################################################

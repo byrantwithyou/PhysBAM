@@ -4,12 +4,12 @@
 //#####################################################################
 #ifndef __COMPRESSIBLE_EXAMPLE__
 #define __COMPRESSIBLE_EXAMPLE__
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Grid_PDE/Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Compressible/Compressible_Fluids/COMPRESSIBLE_FLUID_COLLECTION.h>
 #include <Compressible/Euler_Equations/EULER_UNIFORM.h>
 #include <Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>

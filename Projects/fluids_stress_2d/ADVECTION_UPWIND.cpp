@@ -2,14 +2,14 @@
 // Copyright 2014.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
+#include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include "ADVECTION_UPWIND.h"

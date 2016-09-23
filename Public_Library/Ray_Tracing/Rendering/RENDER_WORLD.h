@@ -7,9 +7,9 @@
 #ifndef __RENDER_WORLD__
 #define __RENDER_WORLD__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Log/PROGRESS_INDICATOR.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/PROGRESS_INDICATOR.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Ray_Tracing/Rendering/CAMERA.h>
 #include <Ray_Tracing/Rendering/PHOTON_MAP.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY.h>

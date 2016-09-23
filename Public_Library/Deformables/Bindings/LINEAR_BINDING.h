@@ -7,7 +7,7 @@
 #ifndef __LINEAR_BINDING__
 #define __LINEAR_BINDING__
 
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Deformables/Bindings/BINDING.h>
 namespace PhysBAM{
 

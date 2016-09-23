@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __SOLID_SYSTEM_MPI_SLIP__
 #define __SOLID_SYSTEM_MPI_SLIP__
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE_SYSTEM.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
 namespace PhysBAM{
 //#####################################################################

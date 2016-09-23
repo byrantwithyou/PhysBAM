@@ -2,7 +2,7 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_DEBUG_PARTICLES_3D.h>
 #include <OpenGL/OpenGL/OPENGL_MATERIAL.h>

@@ -7,7 +7,7 @@
 #ifndef __RAY_TRACING_DRIVER_WITH_PREVIEW__
 #define __RAY_TRACING_DRIVER_WITH_PREVIEW__
 
-#include <Tools/Log/SCOPE.h>
+#include <Core/Log/SCOPE.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 #include "RAY_TRACING_DRIVER.h"
 namespace PhysBAM{

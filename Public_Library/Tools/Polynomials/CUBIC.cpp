@@ -2,12 +2,12 @@
 // Copyright 2002, 2003, Zhaosheng Bao, Ronald Fedkiw.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Math_Tools/exchange_sort.h>
-#include <Tools/Math_Tools/INTERVAL.h>
-#include <Tools/Math_Tools/max.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Math_Tools/exchange_sort.h>
+#include <Core/Math_Tools/INTERVAL.h>
+#include <Core/Math_Tools/max.h>
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Tools/Polynomials/CUBIC.h>
 #include <Tools/Polynomials/QUADRATIC.h>

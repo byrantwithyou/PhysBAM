@@ -7,7 +7,7 @@
 #ifndef __RENDERING_PARTICLES__
 #define __RENDERING_PARTICLES__
 
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Intersections/RAY_SPHERE_INTERSECTION.h>

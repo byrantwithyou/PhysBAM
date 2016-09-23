@@ -12,9 +12,9 @@
 #ifndef __TURBULENCE__
 #define __TURBULENCE__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Grid_Tools/Arrays/ARRAYS_UNIFORM_FORWARD.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;

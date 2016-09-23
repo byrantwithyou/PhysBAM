@@ -7,13 +7,13 @@
 #ifndef __CELL_DOMAIN_INTERFACE_COLOR__
 #define __CELL_DOMAIN_INTERFACE_COLOR__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/LINE_2D.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>

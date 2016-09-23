@@ -4,7 +4,7 @@
 //#####################################################################
 // Class TRIANGLE_2D
 //##################################################################### 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
 #include <Geometry/Basic_Geometry/LINE_2D.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>

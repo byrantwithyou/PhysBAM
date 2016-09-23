@@ -7,10 +7,10 @@
 #ifndef __BOUNDARY_CONDITIONS_CALLBACKS__
 #define __BOUNDARY_CONDITIONS_CALLBACKS__
 
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 namespace PhysBAM{
 
 template<class TV>

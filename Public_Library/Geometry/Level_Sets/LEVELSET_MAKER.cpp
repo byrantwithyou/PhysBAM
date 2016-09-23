@@ -2,12 +2,12 @@
 // Copyright 2004-2005, Ron Fedkiw, Eran Guendelman, Geoffrey Irving, Frank Losasso, Andrew Selle, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/FLOOD_FILL.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR_3D.h>
+#include <Grid_Tools/Arrays/FLOOD_FILL.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Geometry/Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>

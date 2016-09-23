@@ -7,7 +7,7 @@
 #ifndef __OPENGL_FACE_SCALAR_FIELD_1D__
 #define __OPENGL_FACE_SCALAR_FIELD_1D__
 
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 

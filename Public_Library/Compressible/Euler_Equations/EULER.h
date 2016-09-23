@@ -12,8 +12,8 @@
 #ifndef __EULER__
 #define __EULER__    
 
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <Compressible/Equations_Of_State/EOS_GAMMA.h>
 #include <Compressible/Euler_Equations/BOUNDARY_OBJECT_EULER.h>

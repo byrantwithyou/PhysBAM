@@ -2,9 +2,9 @@
 // Copyright 2009-2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_2D_HELPER_DEFINITIONS.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_3D_HELPER_DEFINITIONS.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC_HELPER.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC_2D_HELPER_DEFINITIONS.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC_3D_HELPER_DEFINITIONS.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC_HELPER.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_UNIFORM.h>
 #include <Dynamics/Interpolation/FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM.h>

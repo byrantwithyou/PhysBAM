@@ -6,8 +6,8 @@
 //#####################################################################
 #ifndef __TRIANGLE_REPULSIONS_POINT_FACE_VISITOR__
 #define __TRIANGLE_REPULSIONS_POINT_FACE_VISITOR__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLES_COLLISIONS_FORWARD.h>

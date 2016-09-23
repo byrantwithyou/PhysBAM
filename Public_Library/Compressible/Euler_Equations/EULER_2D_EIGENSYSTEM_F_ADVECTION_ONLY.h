@@ -8,7 +8,7 @@
 #ifndef __EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY__
 #define __EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 namespace PhysBAM{
 

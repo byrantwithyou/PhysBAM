@@ -2,11 +2,11 @@
 // Copyright 2009, Jon Gretarsson, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Grids_Uniform_Computations/GRADIENT_UNIFORM.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Computations/GRADIENT_UNIFORM.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Compressible_Fluids/COMPRESSIBLE_AUXILIARY_DATA.h>
 #include <Compressible/Compressible_Fluids/COMPRESSIBLE_FLUID_COLLECTION.h>
 #include <Compressible/Equations_Of_State/EOS.h>

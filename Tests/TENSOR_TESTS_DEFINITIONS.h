@@ -4,11 +4,11 @@
 //###################################################################
 #ifndef __TENSOR_TESTS_DEFINITIONS__
 #define __TENSOR_TESTS_DEFINITIONS__
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/PRIMITIVE_MATRICES.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/PRIMITIVE_MATRICES.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Tensors/PRIMITIVE_TENSORS.h>
 #include <Tools/Tensors/TENSOR.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include "TENSOR_TESTS.h"
 using namespace PhysBAM;
 //#####################################################################

@@ -7,12 +7,12 @@
 #ifndef __COLLISION_GEOMETRY__
 #define __COLLISION_GEOMETRY__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/ELEMENT_ID.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/FIXED_NUMBER.h>
-#include <Tools/Read_Write/TYPED_STREAM.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/ELEMENT_ID.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/FIXED_NUMBER.h>
+#include <Core/Read_Write/TYPED_STREAM.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>

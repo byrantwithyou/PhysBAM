@@ -2,19 +2,19 @@
 // Copyright 2007-2009, Jon Gretarsson, Nipun Kwatra, Michael Lentine, Avi Robinson-Mosher, Craig Schroeder, Andrew Selle, Tamar Shinar, Jonathan Su.
 // This file is part of PhysBAM hose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Math_Tools/Inverse.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Krylov_Solvers/LANCZOS_ITERATION.h>
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Math_Tools/Inverse.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>

@@ -7,8 +7,8 @@
 #ifndef __RANDOM_PLACEMENT__
 #define __RANDOM_PLACEMENT__
 
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <Rigids/Collisions/RIGID_BODY_INTERSECTIONS.h>
 #include <Rigids/Standard_Tests/RIGIDS_STANDARD_TESTS.h>

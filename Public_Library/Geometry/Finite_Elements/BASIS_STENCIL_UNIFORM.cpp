@@ -2,9 +2,9 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Tools/Symbolics/STATIC_POLYNOMIAL.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 using namespace PhysBAM;
 //#####################################################################

@@ -4,10 +4,10 @@
 //#####################################################################
 // Class EDGE_EDGE_ADHESION_VISITOR
 //##################################################################### 
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/HEAPIFY.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/Robust_Arithmetic.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/HEAPIFY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/Robust_Arithmetic.h>
 #include <Geometry/Basic_Geometry/SEGMENT_3D.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
 #include <Deformables/Collisions_And_Interactions/EDGE_EDGE_ADHESION_VISITOR.h>

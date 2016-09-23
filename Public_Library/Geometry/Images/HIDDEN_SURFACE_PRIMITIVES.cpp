@@ -3,10 +3,10 @@
 // Copyright 2012, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/DIRECTED_GRAPH.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/DIRECTED_GRAPH.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Log/LOG.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <Tools/Log/LOG.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Images/HIDDEN_SURFACE_PRIMITIVES.h>

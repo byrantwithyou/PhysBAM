@@ -7,7 +7,7 @@
 #ifndef __LAPLACE_COLLIDABLE__
 #define __LAPLACE_COLLIDABLE__
 
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 

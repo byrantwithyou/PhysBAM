@@ -7,7 +7,7 @@
 #ifndef __CONSISTENT_INTERSECTIONS__
 #define __CONSISTENT_INTERSECTIONS__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/HASHTABLE.h>
 namespace PhysBAM{
 
 template<class TV> class CONSISTENT_INTERSECTIONS;

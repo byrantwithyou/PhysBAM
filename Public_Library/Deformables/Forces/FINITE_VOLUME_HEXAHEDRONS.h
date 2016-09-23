@@ -7,9 +7,9 @@
 #ifndef __FINITE_VOLUME_HEXAHEDRONS__
 #define __FINITE_VOLUME_HEXAHEDRONS__
 
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{

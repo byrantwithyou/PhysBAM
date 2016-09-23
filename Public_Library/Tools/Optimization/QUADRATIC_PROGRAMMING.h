@@ -7,9 +7,9 @@
 #ifndef __QUADRATIC_PROGRAMMING__
 #define __QUADRATIC_PROGRAMMING__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 
 namespace PhysBAM{
 

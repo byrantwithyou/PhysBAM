@@ -7,9 +7,9 @@
 #ifndef __FLUIDS_PARAMETERS_CALLBACKS__
 #define __FLUIDS_PARAMETERS_CALLBACKS__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Incompressible/Solids_And_Fluids/BOUNDARY_CONDITIONS_CALLBACKS.h>
 namespace PhysBAM{

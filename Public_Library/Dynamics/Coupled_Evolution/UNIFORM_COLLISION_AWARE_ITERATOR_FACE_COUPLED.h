@@ -7,8 +7,8 @@
 #ifndef __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED__
 #define __UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED__
 
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/SIDED_FACE_INDEX.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/SIDED_FACE_INDEX.h>
 
 namespace PhysBAM{
 

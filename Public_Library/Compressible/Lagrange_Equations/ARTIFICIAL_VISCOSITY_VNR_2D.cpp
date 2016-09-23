@@ -2,10 +2,10 @@
 // Copyright 2002, Ronald Fedkiw
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Math_Tools/max.h>
-#include <Tools/Math_Tools/maxabs.h>
-#include <Tools/Math_Tools/min.h>
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Math_Tools/max.h>
+#include <Core/Math_Tools/maxabs.h>
+#include <Core/Math_Tools/min.h>
+#include <Core/Math_Tools/sqr.h>
 #include <Compressible/Lagrange_Equations/ARTIFICIAL_VISCOSITY_VNR_2D.h>
 using namespace PhysBAM;
 //#####################################################################

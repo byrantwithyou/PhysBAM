@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license 
 // contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
 #include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 #include "Standard_Tests/STANDARD_TESTS.h"

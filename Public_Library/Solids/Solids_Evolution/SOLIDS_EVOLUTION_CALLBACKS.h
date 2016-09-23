@@ -7,7 +7,7 @@
 #ifndef __SOLIDS_EVOLUTION_CALLBACKS__
 #define __SOLIDS_EVOLUTION_CALLBACKS__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 namespace PhysBAM{
 
 class RIGID_BODY_COLLISION_MANAGER;

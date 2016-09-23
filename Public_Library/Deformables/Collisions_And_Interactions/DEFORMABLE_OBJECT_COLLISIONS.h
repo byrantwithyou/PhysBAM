@@ -7,9 +7,9 @@
 #ifndef __DEFORMABLE_OBJECT_COLLISIONS__
 #define __DEFORMABLE_OBJECT_COLLISIONS__
 
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Collisions/COLLISION_PARTICLE_STATE.h>

@@ -4,14 +4,14 @@
 //#####################################################################
 // Class FLUID_TO_SOLID_INTERPOLATION_PHI
 //##################################################################### 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Tools/Polynomials/CUBIC.h>
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Intersections/RAY_SEGMENT_2D_INTERSECTION.h>

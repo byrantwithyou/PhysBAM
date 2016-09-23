@@ -7,8 +7,8 @@
 #ifndef __LEVELSET_CALLBACKS__
 #define __LEVELSET_CALLBACKS__
 
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 namespace PhysBAM{
 

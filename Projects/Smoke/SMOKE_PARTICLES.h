@@ -5,8 +5,8 @@
 #ifndef __SMOKE_PARTICLES__
 #define __SMOKE_PARTICLES__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 

@@ -4,13 +4,13 @@
 //#####################################################################
 // Class CONE
 //##################################################################### 
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Auto_Diff/AUTO_DIFF.h>
 #include <Tools/Auto_Diff/AUTO_HESS.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Tools/Auto_Diff/AUTO_NO_DIFF.h>
-#include <Tools/Math_Tools/RANGE.h>
 #include <Tools/Polynomials/QUADRATIC.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/CONE.h>
 namespace PhysBAM{
 template<class DT,class DTV,class T,class TV>

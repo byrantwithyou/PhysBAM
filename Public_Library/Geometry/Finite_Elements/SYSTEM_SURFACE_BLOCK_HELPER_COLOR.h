@@ -8,9 +8,9 @@
 #ifndef __SYSTEM_SURFACE_BLOCK_HELPER_COLOR__
 #define __SYSTEM_SURFACE_BLOCK_HELPER_COLOR__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/MATRIX_MXN.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 
 namespace PhysBAM{

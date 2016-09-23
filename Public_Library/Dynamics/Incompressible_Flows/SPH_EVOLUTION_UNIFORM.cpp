@@ -4,16 +4,16 @@
 //#####################################################################
 // Class SPH_EVOLUTION_UNIFORM
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Grid_Tools/Arrays/ARRAYS_UTILITIES.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>

@@ -7,7 +7,7 @@
 #ifndef __EULER_STEP_PARTICLES__
 #define __EULER_STEP_PARTICLES__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 
 namespace PhysBAM{
 

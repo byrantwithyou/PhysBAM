@@ -4,7 +4,7 @@
 //#####################################################################
 // Class SHALLOW_WATER_1D_SPECIALIZED  
 //##################################################################### 
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_1D_SPECIALIZED.h>
 using namespace PhysBAM;
 //#####################################################################

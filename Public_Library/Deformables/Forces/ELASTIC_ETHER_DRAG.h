@@ -7,8 +7,8 @@
 #ifndef __ELASTIC_ETHER_DRAG__
 #define __ELASTIC_ETHER_DRAG__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Deformables/Forces/POINTWISE_DEFORMABLE_FORCE.h>
 namespace PhysBAM{
 

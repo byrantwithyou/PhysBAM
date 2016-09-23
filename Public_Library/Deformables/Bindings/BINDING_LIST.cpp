@@ -4,9 +4,9 @@
 //#####################################################################
 // Class BINDING_LIST
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Deformables/Bindings/BINDING_LIST.h>
 #include <Deformables/Bindings/PARTICLE_BINDING.h>

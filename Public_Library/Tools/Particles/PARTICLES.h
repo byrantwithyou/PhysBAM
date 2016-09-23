@@ -7,17 +7,17 @@
 #ifndef __PARTICLES__
 #define __PARTICLES__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAY_VIEW.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Arrays_Nd/ARRAYS_ND_BASE.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Clone/CLONEABLE.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND_BASE.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <Tools/Particles/ARRAY_COLLECTION_ELEMENT.h>
 #include <Tools/Particles/ARRAY_COLLECTION_ELEMENT_BASE.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Grid_Tools/Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <memory>
 namespace PhysBAM{
 

@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __THREAD_QUEUE__
 #define __THREAD_QUEUE__
-#include <Tools/Data_Structures/QUEUE.h>
+#include <Core/Data_Structures/QUEUE.h>
 #ifdef USE_PTHREADS
 #include <pthread.h>
 #endif

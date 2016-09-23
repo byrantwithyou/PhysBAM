@@ -4,9 +4,9 @@
 //#####################################################################
 // Class CONJUGATE_RESIDUAL
 //#####################################################################
+#include <Core/Log/LOG.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <Tools/Log/LOG.h>
 #include <cfloat>
 #include <cmath>
 #include <limits>

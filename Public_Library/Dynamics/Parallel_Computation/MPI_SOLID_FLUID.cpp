@@ -4,9 +4,9 @@
 //#####################################################################
 // Class MPI_SOLID_FLUID
 //#####################################################################
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Vectors/TWIST.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Vectors/TWIST.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
@@ -15,7 +15,7 @@
 #include <Dynamics/Parallel_Computation/MPI_SOLID_FLUID.h>
 #ifdef USE_MPI
 #include <Tools/Parallel_Computation/MPI_PACKAGE.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #endif
 namespace PhysBAM{
 

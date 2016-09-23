@@ -7,7 +7,7 @@
 #ifndef __BINDING_SPRINGS_TEST__
 #define __BINDING_SPRINGS_TEST__
 
-#include <Tools/Arrays/PROJECTED_ARRAY.h>
+#include <Core/Arrays/PROJECTED_ARRAY.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Deformables/Bindings/LINEAR_BINDING.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>

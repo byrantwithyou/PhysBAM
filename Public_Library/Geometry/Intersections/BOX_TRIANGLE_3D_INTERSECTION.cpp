@@ -4,8 +4,8 @@
 //#####################################################################
 // Namespace INTERSECTION
 //##################################################################### 
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Intersections/BOX_PLANE_INTERSECTION.h>

@@ -2,10 +2,10 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_KKT_DRIVER.h>

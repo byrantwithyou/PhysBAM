@@ -6,11 +6,11 @@
 //#####################################################################
 #ifndef __MATRIX_FLUID_INTERPOLATION_BASE__
 #define __MATRIX_FLUID_INTERPOLATION_BASE__
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 
 namespace PhysBAM{

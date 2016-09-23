@@ -7,9 +7,9 @@
 #ifndef __OPENGL_UNIFORM_SLICE__
 #define __OPENGL_UNIFORM_SLICE__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Math_Tools/max.h>
-#include <Tools/Math_Tools/min.h>
+#include <Core/Math_Tools/max.h>
+#include <Core/Math_Tools/min.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 #include <OpenGL/OpenGL/OPENGL_SLICE.h>

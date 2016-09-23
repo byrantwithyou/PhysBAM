@@ -7,9 +7,9 @@
 #ifndef __OPENGL_SELECTION__
 #define __OPENGL_SELECTION__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Topology/SIMPLEX_MESH.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>

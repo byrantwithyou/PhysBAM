@@ -12,9 +12,9 @@
 //#####################################################################1
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>

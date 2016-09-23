@@ -4,10 +4,10 @@
 //#####################################################################
 // Class FRACTURE_TETRAHEDRALIZED_VOLUME
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Math_Tools/cyclic_shift.h>
-#include <Tools/Math_Tools/permutation.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Math_Tools/cyclic_shift.h>
+#include <Core/Math_Tools/permutation.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Solids/Fracture/FRACTURE_TETRAHEDRALIZED_VOLUME.h>
 #include <Solids/Fracture/HYPOTHETICAL_CUT_TETRAHEDRONS.h>

@@ -7,8 +7,8 @@
 #ifndef __EULER_3D_EIGENSYSTEM_F__
 #define __EULER_3D_EIGENSYSTEM_F__   
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 namespace PhysBAM{
 

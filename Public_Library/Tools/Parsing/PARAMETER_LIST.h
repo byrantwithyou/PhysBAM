@@ -29,10 +29,10 @@
 #ifndef __PARAMETER_LIST__
 #define __PARAMETER_LIST__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Log/LOG.h>
 namespace PhysBAM{
 
 class PARAMETER_LIST:public NONCOPYABLE

@@ -4,9 +4,9 @@
 //#####################################################################
 // Class OPENGL_COMPONENT_LEVELSET_1D
 //##################################################################### 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_1D.h>
 using namespace PhysBAM;
 //#####################################################################

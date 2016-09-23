@@ -2,10 +2,10 @@
 // Copyright 2005, Ron Fedkiw, Eran Guendelman, Frank Losasso, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION_MULTIPLE.h>

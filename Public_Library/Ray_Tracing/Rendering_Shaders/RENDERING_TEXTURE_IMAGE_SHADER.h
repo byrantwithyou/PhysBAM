@@ -7,9 +7,9 @@
 #ifndef __RENDERING_TEXTURE_IMAGE_SHADER__
 #define __RENDERING_TEXTURE_IMAGE_SHADER__
 
-#include <Tools/Grids_Uniform_Interpolation/CUBIC_MN_INTERPOLATION_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Random_Numbers/NOISE.h>
+#include <Core/Random_Numbers/NOISE.h>
+#include <Grid_PDE/Interpolation/CUBIC_MN_INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{
 

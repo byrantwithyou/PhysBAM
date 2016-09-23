@@ -2,11 +2,11 @@
 // Copyright 2003-2009, Zhaosheng Bao, Kevin Der, Ron Fedkiw, Eran Guendelman, Geoffrey Irving, Nipun Kwatra, Cynthia Lau, Michael Lentine, Sergey Levine, Frank Losasso, Nick Rasmussen, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Jonathan Su, Jerry Talton, Joseph Teran, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Particles/VORTICITY_PARTICLES.h>

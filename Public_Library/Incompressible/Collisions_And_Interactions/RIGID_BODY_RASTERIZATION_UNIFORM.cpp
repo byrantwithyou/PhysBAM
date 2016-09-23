@@ -4,13 +4,13 @@
 //#####################################################################
 // Namespace RASTERIZATION
 //##################################################################### 
-#include <Tools/Grids_Uniform/BLOCK_UNIFORM.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/BLOCK_UNIFORM.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>

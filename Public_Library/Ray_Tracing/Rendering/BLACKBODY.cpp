@@ -2,9 +2,9 @@
 // Copyright 2002, Ronald Fedkiw, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //##################################################################### 
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Math_Tools/sqr.h>
 #include <Ray_Tracing/Rendering/BLACKBODY.h>
 #include <cmath>
 using namespace PhysBAM;

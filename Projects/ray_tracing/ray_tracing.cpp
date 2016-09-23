@@ -2,9 +2,9 @@
 // Copyright 2002-2005, Ronald Fedkiw, Geoffrey Irving, Duc Nguyen, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include "Generic/GENERIC_RENDER_EXAMPLE.h"
 #include "RAY_TRACING_DRIVER.h"
 #include "RAY_TRACING_DRIVER_WITH_PREVIEW.h"

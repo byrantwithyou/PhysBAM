@@ -4,10 +4,10 @@
 //#####################################################################
 // Class PARSE_ARGS
 //#####################################################################
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <cstring>
 using namespace PhysBAM;
 //#####################################################################

@@ -7,7 +7,7 @@
 #ifndef __GRID_LAGRANGE_2D__
 #define __GRID_LAGRANGE_2D__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Compressible/Lagrange_Equations/GRID_LAGRANGE.h>
 namespace PhysBAM{
 

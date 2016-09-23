@@ -7,11 +7,11 @@
 #ifndef __SOLIDS_EVOLUTION__
 #define __SOLIDS_EVOLUTION__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/ELEMENT_ID.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/ELEMENT_ID.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 #include <Rigids/Rigids_Evolution/RIGIDS_KINEMATIC_EVOLUTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION_CALLBACKS.h>

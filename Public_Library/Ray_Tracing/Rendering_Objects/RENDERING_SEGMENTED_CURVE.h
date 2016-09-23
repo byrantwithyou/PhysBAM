@@ -7,7 +7,7 @@
 #ifndef __RENDERING_SEGMENTED_CURVE__
 #define __RENDERING_SEGMENTED_CURVE__
 
-#include <Tools/Arrays/PROJECTED_ARRAY.h>
+#include <Core/Arrays/PROJECTED_ARRAY.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Intersections/RAY_CYLINDER_INTERSECTION.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>

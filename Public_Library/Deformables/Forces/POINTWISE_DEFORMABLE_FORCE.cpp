@@ -2,7 +2,7 @@
 // Copyright 2007-2008, Michael Lentine, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
 #include <Deformables/Forces/POINTWISE_DEFORMABLE_FORCE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;

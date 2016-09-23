@@ -4,7 +4,7 @@
 //#####################################################################
 // Class POISSON_DISK
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
 using namespace PhysBAM;

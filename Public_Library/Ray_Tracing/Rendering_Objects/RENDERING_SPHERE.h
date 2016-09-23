@@ -7,7 +7,7 @@
 #ifndef __RENDERING_SPHERE__
 #define __RENDERING_SPHERE__
 
-#include <Tools/Math_Tools/constants.h>
+#include <Core/Math_Tools/constants.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Intersections/RAY_SPHERE_INTERSECTION.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>

@@ -2,7 +2,7 @@
 // Copyright 2004, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX_3X3.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D.h>
 using namespace PhysBAM;
 //#####################################################################

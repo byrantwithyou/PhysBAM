@@ -7,7 +7,7 @@
 #ifndef __SOLIDS_PARAMETERS__
 #define __SOLIDS_PARAMETERS__
 
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV> class TRIANGLE_COLLISION_PARAMETERS;

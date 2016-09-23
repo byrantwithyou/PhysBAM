@@ -7,7 +7,7 @@
 #ifndef __RIGIDS_STANDARD_TESTS__
 #define __RIGIDS_STANDARD_TESTS__
 
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
 

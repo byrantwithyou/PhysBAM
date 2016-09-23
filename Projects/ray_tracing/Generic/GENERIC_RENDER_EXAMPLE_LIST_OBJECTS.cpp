@@ -2,9 +2,9 @@
 // Copyright 2004-2008, Zhaosheng Bao, Eilene Hao, Jeong-Mo Hong, Geoffrey Irving, Sergey Koltakov, Frank Losasso, Avi Robinson-Mosher, Craig Schroeder, Andrew Selle, Tamar Shinar, Jerry Talton, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
 #include <Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>

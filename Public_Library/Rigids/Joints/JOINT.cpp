@@ -2,7 +2,7 @@
 // Copyright 2004-2008, Ron Fedkiw, Eran Guendelman, Michael Lentine, Craig Schroeder, Tamar Shinar, Joseph Teran, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include <Rigids/Joints/JOINT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 using namespace PhysBAM;

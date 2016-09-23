@@ -2,7 +2,7 @@
 // Copyright 2006-2007, Kevin Der, Craig Schroeder, Tamar Shinar, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/QUEUE.h>
+#include <Core/Data_Structures/QUEUE.h>
 #include <Geometry/Registry/REGISTRY.h>
 #include <Rigids/Muscles/ANALYTIC_SURFACE_MUSCLE_SEGMENT.h>
 #include <Rigids/Muscles/ATTACHMENT_POINT.h>

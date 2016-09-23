@@ -6,7 +6,7 @@
 //##################################################################### 
 #ifndef __TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM__
 #define __TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM__
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 template<class TV> class GRID;

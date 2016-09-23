@@ -7,7 +7,7 @@
 #ifndef __MPI_WORLD__
 #define __MPI_WORLD__
 
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 class PARSE_ARGS;

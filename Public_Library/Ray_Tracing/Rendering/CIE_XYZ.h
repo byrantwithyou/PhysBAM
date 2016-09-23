@@ -7,9 +7,9 @@
 #ifndef __CIE_XYZ__
 #define __CIE_XYZ__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Vectors/VECTOR_3D.h>
+#include <Grid_Tools/Grids/GRID.h>
 namespace PhysBAM{
 
 template<class T>

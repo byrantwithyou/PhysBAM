@@ -7,7 +7,7 @@
 #ifndef __RIGID_WIND_DRAG__
 #define __RIGID_WIND_DRAG__
 
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>

@@ -4,9 +4,9 @@
 //#####################################################################
 // Class SEGMENTED_CURVE_2D  
 //##################################################################### 
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Intersections/SEGMENT_2D_SEGMENT_2D_INTERSECTION.h>
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>

@@ -12,7 +12,7 @@
 #ifndef __EOS_TAIT__
 #define __EOS_TAIT__
 
-#include <Tools/Math_Tools/max.h>
+#include <Core/Math_Tools/max.h>
 #include <Compressible/Equations_Of_State/EOS.h>
 namespace PhysBAM{
 

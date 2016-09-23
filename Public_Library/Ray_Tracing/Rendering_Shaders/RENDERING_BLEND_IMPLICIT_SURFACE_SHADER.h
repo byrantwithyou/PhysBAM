@@ -5,7 +5,7 @@
 #ifndef __RENDERING_BLEND_IMPLICIT_SURFACE_SHADER__
 #define __RENDERING_BLEND_IMPLICIT_SURFACE_SHADER__
 
-#include <Tools/Math_Tools/INTERVAL.h>
+#include <Core/Math_Tools/INTERVAL.h>
 #include <Ray_Tracing/Rendering_Shaders/RENDERING_BLEND_SHADER.h>
 namespace PhysBAM{
 

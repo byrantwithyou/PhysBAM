@@ -7,7 +7,7 @@
 #ifndef __BASIS_STENCIL_BOUNDARY_UNIFORM__
 #define __BASIS_STENCIL_BOUNDARY_UNIFORM__
 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Tools/Symbolics/MULTIVARIATE_POLYNOMIAL.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 namespace PhysBAM{

@@ -7,12 +7,12 @@
 #ifndef __RENDERING_TRIANGULATED_SURFACE__
 #define __RENDERING_TRIANGULATED_SURFACE__
 
-#include <Tools/Arrays/PROJECTED_ARRAY.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Core/Arrays/PROJECTED_ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/PROGRESS_INDICATOR.h>
 #include <Tools/Images/BMP_FILE.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/PROGRESS_INDICATOR.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

@@ -4,8 +4,8 @@
 //#####################################################################
 // Class TRIANGLE_COLLISIONS_EDGE_EDGE_VISITOR
 //##################################################################### 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
 #include <Deformables/Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISIONS_EDGE_EDGE_VISITOR.h>

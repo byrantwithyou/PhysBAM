@@ -7,11 +7,11 @@
 #ifndef __GRID_AND_ARRAY_CONTAINER__    
 #define __GRID_AND_ARRAY_CONTAINER__
 
-#include <Tools/Advection/ADVECTION_FORWARD.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR_UTILITIES.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR_UTILITIES.h>
+#include <Grid_PDE/Advection/ADVECTION_FORWARD.h>
+#include <Grid_PDE/Advection/ADVECTION_UNIFORM_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> struct BOUNDARY_POLICY;

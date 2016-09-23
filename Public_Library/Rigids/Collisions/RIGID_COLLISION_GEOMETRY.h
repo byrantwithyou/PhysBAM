@@ -7,10 +7,10 @@
 #ifndef __RIGID_COLLISION_GEOMETRY__
 #define __RIGID_COLLISION_GEOMETRY__
 
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR_1D.h>
-#include <Tools/Vectors/VECTOR_2D.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR_1D.h>
+#include <Core/Vectors/VECTOR_2D.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 namespace PhysBAM{
 

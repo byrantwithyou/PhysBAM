@@ -7,9 +7,9 @@
 #ifndef __ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM__
 #define __ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM__
 
-#include <Tools/Advection/ADVECTION.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_PDE/Advection/ADVECTION.h>
+#include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <Incompressible/Interpolation_Collidable/AVERAGING_COLLIDABLE_UNIFORM.h>

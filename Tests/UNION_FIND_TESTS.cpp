@@ -4,11 +4,11 @@
 //#####################################################################
 // Class UNION_FIND_TESTS
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/CONSTANT_ARRAY.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include <Tools/Utilities/TEST_BASE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/CONSTANT_ARRAY.h>
+#include <Core/Data_Structures/UNION_FIND.h>
+#include <Core/Utilities/TEST_BASE.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 class UNION_FIND_TESTS:public TEST_BASE

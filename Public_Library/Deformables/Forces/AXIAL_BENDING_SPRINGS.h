@@ -11,8 +11,8 @@
 #ifndef __AXIAL_BENDING_SPRINGS__
 #define __AXIAL_BENDING_SPRINGS__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{

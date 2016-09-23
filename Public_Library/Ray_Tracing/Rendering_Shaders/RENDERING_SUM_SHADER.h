@@ -5,7 +5,7 @@
 #ifndef __RENDERING_SUM_SHADER__
 #define __RENDERING_SUM_SHADER__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{
 

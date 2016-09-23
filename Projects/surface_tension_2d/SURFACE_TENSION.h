@@ -21,12 +21,12 @@
 #ifndef __SURFACE_TENSION__
 #define __SURFACE_TENSION__
 
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>

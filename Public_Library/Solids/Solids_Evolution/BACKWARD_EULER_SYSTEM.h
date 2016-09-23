@@ -7,9 +7,9 @@
 #ifndef __BACKWARD_EULER_SYSTEM__
 #define __BACKWARD_EULER_SYSTEM__
 
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_MASS.h>
 #include <Deformables/Parallel_Computation/MPI_SOLIDS.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>

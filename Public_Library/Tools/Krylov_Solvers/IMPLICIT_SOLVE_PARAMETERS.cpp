@@ -4,8 +4,8 @@
 //#####################################################################
 // Class IMPLICIT_SOLVE_PARAMETERS
 //#####################################################################
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <climits>
 namespace PhysBAM{
 //#####################################################################

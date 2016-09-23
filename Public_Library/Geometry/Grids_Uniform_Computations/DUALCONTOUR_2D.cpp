@@ -4,8 +4,8 @@
 //#####################################################################
 // Class DUALCONTOUR_2D
 //#####################################################################
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Math_Tools/sign.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/sign.h>
 #include <Geometry/Grids_Uniform_Computations/DUALCONTOUR_2D.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>

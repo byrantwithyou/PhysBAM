@@ -7,9 +7,9 @@
 #ifndef __OLDROYD_CONSTITUTIVE_MODEL__
 #define __OLDROYD_CONSTITUTIVE_MODEL__
 
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV>

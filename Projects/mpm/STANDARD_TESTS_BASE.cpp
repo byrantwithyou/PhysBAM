@@ -2,10 +2,10 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Math_Tools/RANGE_ITERATOR.h>
+#include <Core/Math_Tools/RANGE_ITERATOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>

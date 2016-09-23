@@ -5,9 +5,9 @@
 // Class DIRECTED_GRAPH_TESTS
 //#####################################################################
 
-#include <Tools/Data_Structures/DIRECTED_GRAPH.h>
-#include <Tools/Utilities/TEST_BASE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Data_Structures/DIRECTED_GRAPH.h>
+#include <Core/Utilities/TEST_BASE.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 class DIRECTED_GRAPH_TESTS:public TEST_BASE

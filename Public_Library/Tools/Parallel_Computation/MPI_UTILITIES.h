@@ -9,17 +9,17 @@
 
 #ifdef USE_MPI
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Data_Structures/UNION_FIND.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 #include <Tools/Particles/PARTICLES.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
 #include <mpi.h>
 namespace PhysBAM{
 

@@ -5,7 +5,7 @@
 #ifndef __PTHREAD__
 #define __PTHREAD__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 
 #include <pthread.h>
 #ifdef __APPLE__

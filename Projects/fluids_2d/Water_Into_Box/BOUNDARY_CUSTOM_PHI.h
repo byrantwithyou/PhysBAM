@@ -12,7 +12,7 @@
 #ifndef __BOUNDARY_CUSTOM_PHI__
 #define __BOUNDARY_CUSTOM_PHI__
 
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 class BOUNDARY_CUSTOM_PHI:public BOUNDARY

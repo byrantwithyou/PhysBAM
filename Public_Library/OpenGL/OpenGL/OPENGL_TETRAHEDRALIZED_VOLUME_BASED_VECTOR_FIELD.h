@@ -7,8 +7,8 @@
 #ifndef __OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD__
 #define __OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <OpenGL/OpenGL/OPENGL_VECTOR_FIELD_3D.h>
 namespace PhysBAM{
 

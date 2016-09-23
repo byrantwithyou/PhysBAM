@@ -7,16 +7,16 @@
 #ifndef __STRAIN_MEASURE__
 #define __STRAIN_MEASURE__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Matrices/MATRIX_2X2.h>
-#include <Tools/Matrices/MATRIX_3X2.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/MATRIX_BASE.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Matrices/MATRIX_2X2.h>
+#include <Core/Matrices/MATRIX_3X2.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX_BASE.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>

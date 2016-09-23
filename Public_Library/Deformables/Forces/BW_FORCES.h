@@ -7,8 +7,8 @@
 #ifndef __BW_FORCES__
 #define __BW_FORCES__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 

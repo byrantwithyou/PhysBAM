@@ -4,9 +4,9 @@
 //#####################################################################
 // Class LEVELSET_UTILITIES
 //#####################################################################
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Polynomials/CUBIC.h>
 #include <Tools/Polynomials/QUADRATIC.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/POLYGON.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;

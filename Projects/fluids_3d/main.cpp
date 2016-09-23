@@ -4,10 +4,10 @@
 //#####################################################################
 // MAIN
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>

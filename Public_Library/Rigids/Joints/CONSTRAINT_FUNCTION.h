@@ -5,8 +5,8 @@
 #ifndef __CONSTRAINT_FUNCTION__
 #define __CONSTRAINT_FUNCTION__
 
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
 

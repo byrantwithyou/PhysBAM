@@ -8,7 +8,7 @@
 #ifndef __ARB_EXAMPLE_3D__
 #define __ARB_EXAMPLE_3D__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 

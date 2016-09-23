@@ -4,7 +4,7 @@
 //#####################################################################
 // Class CONSTRAINT_FUNCTION
 //#####################################################################
-#include <Tools/Math_Tools/Robust_Functions.h>
+#include <Core/Math_Tools/Robust_Functions.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <Rigids/Joints/CONSTRAINT_FUNCTION.h>

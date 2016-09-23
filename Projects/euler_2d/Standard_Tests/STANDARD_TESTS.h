@@ -12,11 +12,11 @@
 #include <iostream>
 #include "math.h"
 
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Rigids/Rigid_Bodies/MASS_PROPERTIES.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>

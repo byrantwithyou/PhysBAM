@@ -12,9 +12,9 @@
 #ifndef __INCOMPRESSIBLE__
 #define __INCOMPRESSIBLE__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>
 #include <Dynamics/Advection_Equations/FIRE_ADVECTION_POLICY.h>
 namespace PhysBAM{

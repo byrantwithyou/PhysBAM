@@ -2,7 +2,7 @@
 // Copyright 2009-2010, Michael Lentine, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
+#include <Grid_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_WEIGHTS_SPLINE.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>

@@ -7,8 +7,8 @@
 #ifndef __RENDERING_UNIFORM_VOXELS__
 #define __RENDERING_UNIFORM_VOXELS__
 
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_VOXELS.h>
 namespace PhysBAM{

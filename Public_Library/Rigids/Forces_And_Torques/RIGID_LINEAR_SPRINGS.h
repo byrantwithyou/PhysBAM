@@ -7,8 +7,8 @@
 #ifndef __RIGID_LINEAR_SPRINGS__
 #define __RIGID_LINEAR_SPRINGS__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Vectors/VECTOR_2D.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Vectors/VECTOR_2D.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
 namespace PhysBAM{

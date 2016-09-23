@@ -7,8 +7,8 @@
 #ifndef __PARTICLES_SUBSET__
 #define __PARTICLES_SUBSET__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
 namespace PhysBAM{
 
 template<class TV,class T_PARTICLES> //At the moment this only works for PARTICLE

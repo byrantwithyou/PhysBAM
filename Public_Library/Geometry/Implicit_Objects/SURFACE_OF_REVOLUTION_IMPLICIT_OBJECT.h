@@ -5,8 +5,8 @@
 #ifndef __SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT__
 #define __SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT__
 
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
 #include <Tools/Images/IMAGE.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{

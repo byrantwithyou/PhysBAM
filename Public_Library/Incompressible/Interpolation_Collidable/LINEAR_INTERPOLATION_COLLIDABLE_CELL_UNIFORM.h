@@ -7,9 +7,9 @@
 #ifndef __LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM__
 #define __LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM__
 
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
+#include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 namespace PhysBAM{
 

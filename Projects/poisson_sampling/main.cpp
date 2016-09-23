@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <Tools/Grids_Uniform/GRID.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "VORONOI_DIAGRAM.h"
 

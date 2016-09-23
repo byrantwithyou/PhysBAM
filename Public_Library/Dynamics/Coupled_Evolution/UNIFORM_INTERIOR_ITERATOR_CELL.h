@@ -7,7 +7,7 @@
 #ifndef __UNIFORM_INTERIOR_ITERATOR_CELL__
 #define __UNIFORM_INTERIOR_ITERATOR_CELL__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 
 namespace PhysBAM{
 

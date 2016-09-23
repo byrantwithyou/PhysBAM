@@ -1,7 +1,7 @@
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/UNION_FIND.h>
+#include <Core/Log/LOG.h>
 #include <Tools/Symbolics/CODE_BLOCK.h>
 #include <Tools/Symbolics/DOMINATORS.h>
 #include <Tools/Symbolics/INSTRUCTION.h>

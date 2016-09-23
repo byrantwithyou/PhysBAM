@@ -4,13 +4,13 @@
 //#####################################################################
 // Class MPI_WORLD
 //#####################################################################
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
 
 #ifdef USE_MPI
 
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept>

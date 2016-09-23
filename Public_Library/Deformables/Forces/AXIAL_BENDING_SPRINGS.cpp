@@ -2,10 +2,10 @@
 // Copyright 2004-2007, Eran Guendelman, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Math_Tools/cyclic_shift.h>
-#include <Tools/Math_Tools/Robust_Arithmetic.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Math_Tools/cyclic_shift.h>
+#include <Core/Math_Tools/Robust_Arithmetic.h>
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Geometry/Basic_Geometry/SEGMENT_3D.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>

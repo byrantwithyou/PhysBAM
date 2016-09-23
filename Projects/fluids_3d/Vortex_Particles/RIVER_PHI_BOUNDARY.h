@@ -7,7 +7,7 @@
 #ifndef __RIVER_PHI_BOUNDARY__
 #define __RIVER_PHI_BOUNDARY__
 
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 template<class T,class T2>
 class RIVER_PHI_BOUNDARY:public BOUNDARY<T,T>

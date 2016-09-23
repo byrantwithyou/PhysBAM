@@ -4,8 +4,8 @@
 //#####################################################################
 // Class BEZIER_SPLINE_PATCH
 //##################################################################### 
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
-#include <Tools/Matrices/BANDED_MATRIX.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Matrices/BANDED_MATRIX.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE_PATCH.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>

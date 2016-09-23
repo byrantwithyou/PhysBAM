@@ -30,7 +30,10 @@ variables.AddVariables(
     BoolVariable('USE_RIGIDS','Use rigid bodies',0),
     BoolVariable('USE_SOLIDS','Use solids',0),
     BoolVariable('USE_HYBRID','Use hybrid methods',0),
+    BoolVariable('USE_GRID_PDE','Use grid PDE',0),
+    BoolVariable('USE_GRID_TOOLS','Use grid tools',0),
     BoolVariable('USE_TOOLS','Use tools',0),
+    BoolVariable('USE_CORE','Use core',0),
     BoolVariable('USE_LEX_YACC','Use lex and yacc to allow parsing for symbolics',0),
     BoolVariable('compile_id_types_as_int','Treat ID types as int to avoid possible performance consequences',0),
     BoolVariable('fast_math','compile with -ffast-math',0),
@@ -250,8 +253,17 @@ def Link_Flags(env):
         env['USE_GEOMETRY']=1
     if env['USE_GEOMETRY']:
         env.Append(LIBS=['PhysBAM_Geometry'+library_suffix])
+        env['USE_GRID_PDE']=1
+    if env['USE_GRID_PDE']:
+        env.Append(LIBS=['PhysBAM_Grid_PDE'+library_suffix])
+        env['USE_GRID_TOOLS']=1
+    if env['USE_GRID_TOOLS']:
+        env.Append(LIBS=['PhysBAM_Grid_Tools'+library_suffix])
         env['USE_TOOLS']=1
-    if env['USE_TOOLS']: env.Append(LIBS=['PhysBAM_Tools'+library_suffix])
+    if env['USE_TOOLS']:
+        env.Append(LIBS=['PhysBAM_Tools'+library_suffix])
+        env['USE_CORE']=1
+    if env['USE_CORE']: env.Append(LIBS=['PhysBAM_Core'+library_suffix])
     for name,lib in external_libraries.items():
         if env['USE_'+name.upper()]:
             env.Append(LINKFLAGS=lib['linkflags'],LIBS=lib['libs'])

@@ -7,9 +7,9 @@
 #ifndef __INTERFACE_STOKES_SYSTEM_VECTOR_COLOR__
 #define __INTERFACE_STOKES_SYSTEM_VECTOR_COLOR__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class TV>

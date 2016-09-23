@@ -5,12 +5,12 @@
 #ifndef __FLUID_STRESS__
 #define __FLUID_STRESS__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_BOX.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_CONST.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_ELLIPSOID.h>

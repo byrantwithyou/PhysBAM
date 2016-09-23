@@ -4,7 +4,7 @@
 //#####################################################################
 // namespace TESSELLATION
 //##################################################################### 
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX_3X3.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Tessellation/TORUS_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

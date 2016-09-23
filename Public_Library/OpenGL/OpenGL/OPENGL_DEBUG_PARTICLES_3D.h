@@ -7,10 +7,10 @@
 #ifndef __OPENGL_DEBUG_PARTICLES_3D__
 #define __OPENGL_DEBUG_PARTICLES_3D__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Tools/Particles/PARTICLES.h>
-#include <Tools/Vectors/VECTOR_3D.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>

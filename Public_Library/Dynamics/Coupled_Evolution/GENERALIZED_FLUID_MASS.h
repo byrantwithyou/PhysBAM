@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __GENERALIZED_FLUID_MASS__
 #define __GENERALIZED_FLUID_MASS__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 template<class TV> class COLLISION_AWARE_INDEX_MAP;

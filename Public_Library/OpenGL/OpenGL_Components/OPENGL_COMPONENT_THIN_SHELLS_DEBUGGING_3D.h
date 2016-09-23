@@ -7,9 +7,9 @@
 #ifndef __OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D__
 #define __OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D__
 
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL/OPENGL_CONSTANT_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_SCALAR_FIELD_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>

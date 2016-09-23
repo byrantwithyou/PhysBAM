@@ -2,17 +2,17 @@
 // Copyright 2002-2010, Mridul Aanjaneya, Doug Enright, Ronald Fedkiw, Eran Guendelman, Geoffrey Irving, Michael Lentine, Frank Losasso, Duc Nguyen, Nick Rasmussen, Andrew Selle, Tamar Shinar, Jonathan Su, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_MACCORMACK_UNIFORM.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Grids_Uniform_Computations/VORTICITY_UNIFORM.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Computations/VORTICITY_UNIFORM.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Grid_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Grid_PDE/Advection/ADVECTION_MACCORMACK_UNIFORM.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>

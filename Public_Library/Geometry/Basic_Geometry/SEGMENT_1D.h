@@ -7,10 +7,10 @@
 #ifndef __SEGMENT_1D__
 #define __SEGMENT_1D__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_2D.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
+#include <Core/Vectors/VECTOR_2D.h>
 namespace PhysBAM{
 
 template<class TV> class RANGE;

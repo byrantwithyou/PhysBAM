@@ -4,8 +4,8 @@
 //#####################################################################
 // Class CONSERVATION_ENO_RF  
 //##################################################################### 
-#include <Tools/Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_PDE/Advection/ADVECTION_SEPARABLE_UNIFORM.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_RF.h>
 #include <Compressible/Conservation_Law_Solvers/EIGENSYSTEM.h>
 using namespace PhysBAM;

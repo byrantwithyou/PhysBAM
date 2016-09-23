@@ -7,10 +7,10 @@
 #ifndef __MULTIPHASE_FIRE_EXAMPLES__
 #define __MULTIPHASE_FIRE_EXAMPLES__
 
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform_Computations/SMOOTH_UNIFORM.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
+#include <Grid_Tools/Computations/SMOOTH_UNIFORM.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>

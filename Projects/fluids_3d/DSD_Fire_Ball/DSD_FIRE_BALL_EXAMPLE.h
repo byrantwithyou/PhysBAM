@@ -8,8 +8,8 @@
 #ifndef __DSD_FIRE_BALL_EXAMPLE__
 #define __DSD_FIRE_BALL_EXAMPLE__
 
-#include <Tools/Grids_Uniform_Advection/ADVECTION_MACCORMACK_UNIFORM.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
+#include <Grid_PDE/Advection/ADVECTION_MACCORMACK_UNIFORM.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Dynamics/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>

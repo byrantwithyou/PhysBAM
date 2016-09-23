@@ -7,9 +7,9 @@
 #ifndef _levelset_mesh_cutting_h
 #define _levelset_mesh_cutting_h
 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Data_Structures/UNION_FIND.h>
 
 using namespace PhysBAM;
 

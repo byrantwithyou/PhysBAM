@@ -7,9 +7,9 @@
 #ifndef __RENDERING_WALL__
 #define __RENDERING_WALL__
 
-#include <Tools/Math_Tools/clamp.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Math_Tools/clamp.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Intersections/RAY_PLANE_INTERSECTION.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>

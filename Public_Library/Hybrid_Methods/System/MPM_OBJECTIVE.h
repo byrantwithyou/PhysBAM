@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __MPM_OBJECTIVE__
 #define __MPM_OBJECTIVE__
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>

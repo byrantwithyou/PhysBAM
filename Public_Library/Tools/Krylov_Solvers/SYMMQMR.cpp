@@ -4,10 +4,10 @@
 //#####################################################################
 // Class SYMMQMR
 //#####################################################################
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/sqr.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/sqr.h>
 #include <cfloat>
 #include <cmath>
 #include <limits>

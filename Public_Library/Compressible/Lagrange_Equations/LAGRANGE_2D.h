@@ -17,7 +17,7 @@
 #ifndef __LAGRANGE_2D__
 #define __LAGRANGE_2D__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Compressible/Lagrange_Equations/ARTIFICIAL_VISCOSITY_2D.h>
 #include <Compressible/Lagrange_Equations/ARTIFICIAL_VISCOSITY_VNR_2D.h>
 #include <Compressible/Lagrange_Equations/GRID_LAGRANGE_2D.h>

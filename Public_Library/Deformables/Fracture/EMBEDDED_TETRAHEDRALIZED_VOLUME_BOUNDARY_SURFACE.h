@@ -7,8 +7,8 @@
 #ifndef __EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE__
 #define __EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Log/LOG.h>
 #include <Deformables/Fracture/EMBEDDED_MATERIAL_SURFACE.h>
 namespace PhysBAM{
 

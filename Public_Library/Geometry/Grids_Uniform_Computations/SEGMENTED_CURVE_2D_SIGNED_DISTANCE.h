@@ -6,7 +6,7 @@
 //##################################################################### 
 #ifndef __SEGMENTED_CURVE_2D_SIGNED_DISTANCE__
 #define __SEGMENTED_CURVE_2D_SIGNED_DISTANCE__
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 template<class TV> class GRID;

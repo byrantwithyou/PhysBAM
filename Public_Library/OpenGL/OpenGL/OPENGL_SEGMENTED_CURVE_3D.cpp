@@ -2,10 +2,10 @@
 // Copyright 2002-2008, Kevin Der, Ronald Fedkiw, Eran Guendelman, Sergey Koltakov, Michael Lentine, Andrew Selle, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/QUEUE.h>
-#include <Tools/Math_Tools/sign.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/QUEUE.h>
+#include <Core/Math_Tools/sign.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>

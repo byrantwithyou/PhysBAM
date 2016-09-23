@@ -7,7 +7,7 @@
 #ifndef __KANG_POISSON_VISCOSITY__
 #define __KANG_POISSON_VISCOSITY__
 
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 namespace PhysBAM{
 
 template<class TV> class FLUIDS_PARAMETERS_UNIFORM;

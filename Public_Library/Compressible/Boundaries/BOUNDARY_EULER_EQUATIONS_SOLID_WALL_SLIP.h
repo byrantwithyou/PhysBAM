@@ -7,7 +7,7 @@
 #ifndef __BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP__
 #define __BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP__
 
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;

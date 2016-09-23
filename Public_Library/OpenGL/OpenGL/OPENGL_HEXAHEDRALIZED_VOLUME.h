@@ -7,7 +7,7 @@
 #ifndef __OPENGL_HEXAHEDRALIZED_VOLUME__
 #define __OPENGL_HEXAHEDRALIZED_VOLUME__
 
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Topology/HEXAHEDRON_MESH.h>
 #include <OpenGL/OpenGL/OPENGL_MATERIAL.h>

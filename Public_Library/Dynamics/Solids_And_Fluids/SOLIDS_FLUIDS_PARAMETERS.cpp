@@ -4,7 +4,7 @@
 //#####################################################################
 // Class SOLIDS_FLUIDS_PARAMETERS
 //#####################################################################
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Dynamics/Parallel_Computation/MPI_SOLID_FLUID.h>
 #include <Dynamics/Parallel_Computation/MPI_SOLID_FLUID_SLIP.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h>

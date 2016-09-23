@@ -3,9 +3,9 @@
 //#####################################################################
 // Class MPI_SOLID_FLUID_SLIP
 //#####################################################################
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Vectors/TWIST.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Vectors/TWIST.h>
 #include <Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
@@ -13,10 +13,10 @@
 #include <Dynamics/Parallel_Computation/MPI_SOLID_FLUID_SLIP.h>
 #include <Dynamics/Parallel_Computation/SYMMQMR_SPARSE_MPI.h>
 #ifdef USE_MPI
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
 #include <Tools/Parallel_Computation/MPI_PACKAGE.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #endif
 namespace PhysBAM{

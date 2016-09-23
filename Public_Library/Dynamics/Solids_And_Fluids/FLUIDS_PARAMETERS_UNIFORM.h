@@ -7,11 +7,11 @@
 #ifndef __FLUIDS_PARAMETERS_UNIFORM__    
 #define __FLUIDS_PARAMETERS_UNIFORM__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>

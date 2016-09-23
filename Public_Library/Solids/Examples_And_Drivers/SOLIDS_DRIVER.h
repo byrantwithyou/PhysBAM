@@ -7,10 +7,10 @@
 #ifndef __SOLIDS_DRIVER__
 #define __SOLIDS_DRIVER__    
 
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Ordinary_Differential_Equations/DRIVER.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 namespace PhysBAM{
 

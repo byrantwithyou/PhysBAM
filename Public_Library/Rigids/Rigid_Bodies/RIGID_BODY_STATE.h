@@ -7,8 +7,8 @@
 #ifndef __RIGID_BODY_STATE__
 #define __RIGID_BODY_STATE__
 
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Vectors/TWIST.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Vectors/TWIST.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_MASS.h>
 namespace PhysBAM{
 

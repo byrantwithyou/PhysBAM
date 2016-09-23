@@ -7,7 +7,7 @@
 #ifndef __FAST_MARCHING_METHOD_UNIFORM__
 #define __FAST_MARCHING_METHOD_UNIFORM__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <functional>

@@ -7,8 +7,8 @@
 #ifndef __TRIANGLE_COLLISION_PARAMETERS__
 #define __TRIANGLE_COLLISION_PARAMETERS__
 
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 namespace PhysBAM{
 

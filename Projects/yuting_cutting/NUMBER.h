@@ -12,9 +12,9 @@ struct NUMBER;
 inline NUMBER Magnitude_Squared(const NUMBER& a);
 }
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
 #include <cmath>
 #include <string>
 using std::abs;

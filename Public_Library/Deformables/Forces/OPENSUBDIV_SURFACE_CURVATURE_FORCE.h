@@ -7,9 +7,9 @@
 #ifndef __OPENSUBDIV_SURFACE_CURVATURE_FORCE__
 #define __OPENSUBDIV_SURFACE_CURVATURE_FORCE__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>

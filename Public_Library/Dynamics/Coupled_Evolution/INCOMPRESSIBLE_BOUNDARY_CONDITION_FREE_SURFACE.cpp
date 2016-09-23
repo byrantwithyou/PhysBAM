@@ -2,7 +2,7 @@
 // Copyright 2009, Avi Robinson-Mosher, Craig Schroeder
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Dynamics/Coupled_Evolution/INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE.h>
 using namespace PhysBAM;
 //#####################################################################

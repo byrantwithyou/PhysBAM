@@ -4,8 +4,8 @@
 //#####################################################################
 #ifndef __MPM_DRIVER__
 #define __MPM_DRIVER__
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 namespace PhysBAM{
 

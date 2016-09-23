@@ -7,7 +7,7 @@
 #ifndef __CONSTITUTIVE_MODELS_FORWARD__
 #define __CONSTITUTIVE_MODELS_FORWARD__
 
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV,int d> class STRAIN_MEASURE;

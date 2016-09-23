@@ -7,7 +7,7 @@
 #ifndef __RENDERING_VOXELS__
 #define __RENDERING_VOXELS__
 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 namespace PhysBAM{

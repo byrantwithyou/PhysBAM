@@ -6,16 +6,16 @@
 #ifndef __MPLE_DRIVER__
 #define __MPLE_DRIVER__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Fourier_Transforms/FFT_2D.h>
-#include <Tools/Fourier_Transforms/FFT_3D.h>
-#include <Tools/Fourier_Transforms/FFT_POLICY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Vectors/COMPLEX.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Vectors/COMPLEX.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Fourier_Transforms/FFT_2D.h>
+#include <Grid_Tools/Fourier_Transforms/FFT_3D.h>
+#include <Grid_Tools/Fourier_Transforms/FFT_POLICY.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>

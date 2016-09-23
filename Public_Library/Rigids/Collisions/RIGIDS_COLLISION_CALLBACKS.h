@@ -7,8 +7,8 @@
 #ifndef __RIGIDS_COLLISION_CALLBACKS__
 #define __RIGIDS_COLLISION_CALLBACKS__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 

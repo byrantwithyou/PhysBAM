@@ -7,7 +7,7 @@
 #ifndef __TRIANGLE_MESH__
 #define __TRIANGLE_MESH__
 
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Topology/SIMPLEX_MESH.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 namespace PhysBAM{

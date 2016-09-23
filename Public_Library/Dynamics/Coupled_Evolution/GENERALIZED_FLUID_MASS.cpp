@@ -4,7 +4,7 @@
 //#####################################################################
 // Class COLLISION_AWARE_INDEX_MAP
 //##################################################################### 
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>

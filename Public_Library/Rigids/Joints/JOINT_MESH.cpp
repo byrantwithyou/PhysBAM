@@ -2,8 +2,8 @@
 // Copyright 2004-2008, Ron Fedkiw, Eran Guendelman, Craig Schroeder, Tamar Shinar, Joseph Teran, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include <Rigids/Joints/ANGLE_JOINT.h>
 #include <Rigids/Joints/JOINT_MESH.h>
 #include <Rigids/Joints/NORMAL_JOINT.h>

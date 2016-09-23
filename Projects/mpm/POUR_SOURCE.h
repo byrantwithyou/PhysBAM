@@ -5,9 +5,9 @@
 #ifndef __POUR_SOURCE__
 #define __POUR_SOURCE__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <functional>
 namespace PhysBAM{
 

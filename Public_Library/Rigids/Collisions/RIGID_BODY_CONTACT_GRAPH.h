@@ -7,10 +7,10 @@
 #ifndef __RIGID_BODY_CONTACT_GRAPH__
 #define __RIGID_BODY_CONTACT_GRAPH__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/DIRECTED_GRAPH.h>
-#include <Tools/Data_Structures/ELEMENT_ID.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/DIRECTED_GRAPH.h>
+#include <Core/Data_Structures/ELEMENT_ID.h>
+#include <Core/Log/LOG.h>
 #include <Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 namespace PhysBAM{

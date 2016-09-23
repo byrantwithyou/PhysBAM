@@ -7,7 +7,7 @@
 #ifndef __ORIENTED_BOX_TESSELLATION__
 #define __ORIENTED_BOX_TESSELLATION__
 
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 template<class TV> class ORIENTED_BOX;
 template<class T> class TRIANGULATED_SURFACE;

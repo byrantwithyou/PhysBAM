@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __INTERFACE_POISSON_SYSTEM_COLOR__
 #define __INTERFACE_POISSON_SYSTEM_COLOR__
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 #include <Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>

@@ -7,7 +7,7 @@
 #ifndef __RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES__
 #define __RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> class TWIST;

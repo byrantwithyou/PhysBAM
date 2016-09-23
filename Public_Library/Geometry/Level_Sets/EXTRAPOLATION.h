@@ -7,10 +7,10 @@
 #ifndef __EXTRAPOLATION__
 #define __EXTRAPOLATION__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND_BASE.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND_BASE.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV> struct GRID_ARRAYS_POLICY;

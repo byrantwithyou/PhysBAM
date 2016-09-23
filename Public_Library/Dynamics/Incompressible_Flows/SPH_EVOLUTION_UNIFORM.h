@@ -7,9 +7,9 @@
 #ifndef __SPH_EVOLUTION_UNIFORM__
 #define __SPH_EVOLUTION_UNIFORM__
 
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <Dynamics/Particles/SPH_PARTICLES.h>

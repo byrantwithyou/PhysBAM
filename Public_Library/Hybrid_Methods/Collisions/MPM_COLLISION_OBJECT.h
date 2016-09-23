@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __MPM_COLLISION_OBJECT__
 #define __MPM_COLLISION_OBJECT__
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 namespace PhysBAM{
 template<class TV> class IMPLICIT_OBJECT;
 

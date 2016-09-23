@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS__
 #define __INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS__
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
 #include <Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.h>
 namespace PhysBAM{
 template<class TV>

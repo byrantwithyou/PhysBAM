@@ -7,11 +7,11 @@
 #ifndef __LAPLACE_COLLIDABLE_MPI__
 #define __LAPLACE_COLLIDABLE_MPI__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Parallel_Computation/MPI_GRID.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
+#include <Grid_Tools/Parallel_Computation/MPI_GRID.h>
 namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;

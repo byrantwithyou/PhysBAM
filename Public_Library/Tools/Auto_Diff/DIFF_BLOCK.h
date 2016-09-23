@@ -6,10 +6,10 @@
 //##################################################################### 
 #ifndef __DIFF_BLOCK__
 #define __DIFF_BLOCK__
-#include <Tools/Math_Tools/FIXED_NUMBER.h>
+#include <Core/Math_Tools/FIXED_NUMBER.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 #include <Tools/Tensors/DIAGONAL_TENSOR.h>
 #include <Tools/Tensors/PRIMITIVE_TENSORS.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
 #include <type_traits>
 using std::enable_if;
 

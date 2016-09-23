@@ -7,9 +7,9 @@
 #ifndef __CLONEABLE__
 #define __CLONEABLE__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Utilities/STATIC_ASSERT.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Utilities/STATIC_ASSERT.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
 #include <typeinfo>
 namespace PhysBAM{
 

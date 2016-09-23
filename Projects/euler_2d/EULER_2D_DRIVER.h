@@ -12,7 +12,7 @@
 #ifndef __EULER_2D_DRIVER__
 #define __EULER_2D_DRIVER__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_F.h>
 #include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_G.h>

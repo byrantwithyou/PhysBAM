@@ -7,7 +7,7 @@
 #ifndef __NONLINEAR_FUNCTION__
 #define __NONLINEAR_FUNCTION__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Tools/Nonlinear_Equations/PARAMETER_SPACE.h>
 namespace PhysBAM{
 

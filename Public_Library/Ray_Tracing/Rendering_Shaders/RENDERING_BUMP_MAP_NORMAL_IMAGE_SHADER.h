@@ -7,9 +7,9 @@
 #ifndef __RENDERING_BUMP_MAP_NORMAL_IMAGE_SHADER__
 #define __RENDERING_BUMP_MAP_NORMAL_IMAGE_SHADER__
 
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Tools/Images/IMAGE.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Ray_Tracing/Rendering_Shaders/RENDERING_BUMP_MAP_SHADER.h>
 namespace PhysBAM{
 

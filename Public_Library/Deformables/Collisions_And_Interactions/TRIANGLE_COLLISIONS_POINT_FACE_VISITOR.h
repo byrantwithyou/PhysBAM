@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __TRIANGLE_COLLISIONS_POINT_FACE_VISITOR__
 #define __TRIANGLE_COLLISIONS_POINT_FACE_VISITOR__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Vectors/VECTOR_3D.h>
 
 namespace PhysBAM{
 template<class TV> class STRUCTURE_INTERACTION_GEOMETRY;

@@ -4,8 +4,8 @@
 //#####################################################################
 // TESSELLATION
 //##################################################################### 
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <Geometry/Tessellation/GEAR_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>

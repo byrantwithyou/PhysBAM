@@ -13,8 +13,8 @@
 #ifndef __RISING_BUBBLE__
 #define __RISING_BUBBLE__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Particles/HEAVY_PARTICLES.h>
 
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>

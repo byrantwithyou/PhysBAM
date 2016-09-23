@@ -2,9 +2,9 @@
 // Copyright 2005-2007, Eran Guendelman, Michael Lentine, Craig Schroeder, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Math_Tools/wrap.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <Tools/Math_Tools/wrap.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
 #include <Rigids/Joints/JOINT.h>
 #include <Rigids/Joints/JOINT_FUNCTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>

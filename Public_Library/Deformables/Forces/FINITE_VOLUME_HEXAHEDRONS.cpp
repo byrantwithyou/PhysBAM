@@ -2,9 +2,9 @@
 // Copyright 2005-2007, Geoffrey Irving, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Geometry/Basic_Geometry/HEXAHEDRON.h>
 #include <Geometry/Topology/HEXAHEDRON_MESH.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>

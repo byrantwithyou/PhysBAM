@@ -7,9 +7,9 @@
 #ifndef __POLYGON__
 #define __POLYGON__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <cfloat>
 namespace PhysBAM{

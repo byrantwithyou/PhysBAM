@@ -7,12 +7,12 @@
 #ifndef __COLLISION_GEOMETRY_SPATIAL_PARTITION__
 #define __COLLISION_GEOMETRY_SPATIAL_PARTITION__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/OPERATION_HASH.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/OPERATION_HASH.h>
+#include <Core/Log/LOG.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
 #include <climits> // for INT_MAX (for old gcc)

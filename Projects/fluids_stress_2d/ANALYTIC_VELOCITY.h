@@ -5,9 +5,9 @@
 #ifndef __ANALYTIC_VELOCITY__
 #define __ANALYTIC_VELOCITY__
 
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 #include <functional>
 

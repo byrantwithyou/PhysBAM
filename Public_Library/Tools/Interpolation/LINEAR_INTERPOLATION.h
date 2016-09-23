@@ -7,8 +7,8 @@
 #ifndef __LINEAR_INTERPOLATION__
 #define __LINEAR_INTERPOLATION__
 
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class T,class T2>

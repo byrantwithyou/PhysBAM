@@ -7,7 +7,7 @@
 #ifndef __SOLVE_CONTACT__
 #define __SOLVE_CONTACT__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 
 namespace PhysBAM{

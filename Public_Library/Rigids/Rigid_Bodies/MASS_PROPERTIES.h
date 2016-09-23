@@ -7,10 +7,10 @@
 #ifndef __MASS_PROPERTIES__
 #define __MASS_PROPERTIES__
 
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
 #include <Tools/Particles/PARTICLES.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 namespace PhysBAM{
 

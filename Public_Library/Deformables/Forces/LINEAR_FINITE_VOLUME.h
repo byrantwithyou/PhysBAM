@@ -7,10 +7,10 @@
 #ifndef __LINEAR_FINITE_VOLUME__
 #define __LINEAR_FINITE_VOLUME__
 
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Math_Tools/FACTORIAL.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Math_Tools/FACTORIAL.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Deformables/Constitutive_Models/CONSTITUTIVE_MODELS_FORWARD.h>

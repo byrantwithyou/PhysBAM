@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __ANALYTIC_IMPLICIT_SURFACE_LEVELSET__
 #define __ANALYTIC_IMPLICIT_SURFACE_LEVELSET__
-#include <Tools/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SIGNED.h>
 
 namespace PhysBAM{

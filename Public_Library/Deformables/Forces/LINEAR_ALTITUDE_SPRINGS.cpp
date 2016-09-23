@@ -4,11 +4,11 @@
 //#####################################################################
 // Class LINEAR_ALTITUDE_SPRINGS
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/sign.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/sign.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology/TETRAHEDRON_MESH.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>

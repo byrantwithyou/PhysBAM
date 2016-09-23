@@ -7,7 +7,7 @@
 #ifndef __GEOMETRY_PARTICLES__
 #define __GEOMETRY_PARTICLES__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 namespace PhysBAM{

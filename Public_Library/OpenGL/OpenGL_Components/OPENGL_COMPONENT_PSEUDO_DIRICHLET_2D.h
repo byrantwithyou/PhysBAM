@@ -7,10 +7,10 @@
 #ifndef __OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D__
 #define __OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Vectors/VECTOR_2D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Vectors/VECTOR_2D.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 
 namespace PhysBAM

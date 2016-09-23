@@ -7,7 +7,7 @@
 #ifndef __LINEAR_ALTITUDE_SPRINGS__
 #define __LINEAR_ALTITUDE_SPRINGS__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Deformables/Forces/SOLIDS_FORCES_POLICY.h>

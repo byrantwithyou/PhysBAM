@@ -2,8 +2,8 @@
 // Copyright 2004, Eran Guendelman, Geoffrey Irving, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Matrices/MATRIX_3X3.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>

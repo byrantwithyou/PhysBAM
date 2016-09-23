@@ -2,9 +2,9 @@
 // Copyright 2009, Jon Gretarsson, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <OpenGL/OpenGL/OPENGL_FACE_SCALAR_FIELD_1D.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_1D.h>
 #include <OpenGL/OpenGL/OPENGL_WORLD.h>

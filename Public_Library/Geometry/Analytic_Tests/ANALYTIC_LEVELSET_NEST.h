@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __ANALYTIC_LEVELSET_NEST__
 #define __ANALYTIC_LEVELSET_NEST__
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 
 namespace PhysBAM{

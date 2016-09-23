@@ -4,12 +4,12 @@
 //#####################################################################
 // Class TETRAHEDRALIZED_VOLUME
 //#####################################################################
-#include <Tools/Arrays/CONSTANT_ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/FRAME.h>
+#include <Core/Arrays/CONSTANT_ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/FRAME.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>

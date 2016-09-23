@@ -2,7 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYREGHT.txt.
 //#####################################################################
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Tools/Symbolics/CODE_BLOCK.h>
 #include <Tools/Symbolics/CODE_BLOCK_NODE.h>
 using namespace PhysBAM;

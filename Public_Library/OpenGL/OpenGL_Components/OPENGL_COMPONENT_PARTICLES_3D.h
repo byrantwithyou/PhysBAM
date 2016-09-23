@@ -7,7 +7,7 @@
 #ifndef __OPENGL_COMPONENT_PARTICLES_3D__
 #define __OPENGL_COMPONENT_PARTICLES_3D__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_POINTS_3D.h>
 #include <OpenGL/OpenGL/OPENGL_VECTOR_FIELD_3D.h>

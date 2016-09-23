@@ -7,9 +7,9 @@
 #ifndef __EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY__
 #define __EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/sqr.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 namespace PhysBAM{
 

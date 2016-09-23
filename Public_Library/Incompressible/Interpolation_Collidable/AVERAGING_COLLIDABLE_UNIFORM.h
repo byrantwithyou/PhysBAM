@@ -5,7 +5,7 @@
 #ifndef __AVERAGING_COLLIDABLE_UNIFORM__
 #define __AVERAGING_COLLIDABLE_UNIFORM__
 
-#include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
+#include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
 namespace PhysBAM{
 
 template<class TV> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;

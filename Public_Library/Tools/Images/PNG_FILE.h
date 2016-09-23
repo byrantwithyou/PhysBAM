@@ -7,8 +7,8 @@
 #ifndef __PNG_FILE__
 #define __PNG_FILE__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 #include <string>
 namespace PhysBAM{
 

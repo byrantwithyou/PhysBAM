@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __PARTICLE_GRID_WEIGHTS__
 #define __PARTICLE_GRID_WEIGHTS__
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 namespace PhysBAM{
 

@@ -5,8 +5,8 @@
 #include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 #include "Standard_Tests/STANDARD_TESTS.h"
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 
 using namespace PhysBAM;
 

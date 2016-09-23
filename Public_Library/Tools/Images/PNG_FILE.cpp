@@ -4,12 +4,12 @@
 //#####################################################################
 // Class PNG_FILE  
 //#####################################################################
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Tools/Images/IMAGE.h>
 #include <Tools/Images/PNG_FILE.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_3D.h>
 #ifdef USE_LIBPNG
 #include <png.h>
 #endif

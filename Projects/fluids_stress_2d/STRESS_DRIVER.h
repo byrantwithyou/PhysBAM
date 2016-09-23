@@ -4,8 +4,8 @@
 //#####################################################################
 #ifndef __STRESS_DRIVER__
 #define __STRESS_DRIVER__
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 namespace PhysBAM{
 
 template<class TV> class STRESS_EXAMPLE;

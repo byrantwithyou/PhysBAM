@@ -2,10 +2,10 @@
 // Copyright 2014.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Auto_Diff/AUTO_HESS.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Polynomials/QUADRATIC.h>
-#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 template<class T> VECTOR<T,2>
 Principal_Curvatures(const AUTO_HESS<T,VECTOR<T,3> >& h)

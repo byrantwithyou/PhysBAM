@@ -2,11 +2,11 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Math_Tools/pow.h>
-#include <Tools/Math_Tools/RANGE_ITERATOR.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Math_Tools/pow.h>
+#include <Core/Math_Tools/RANGE_ITERATOR.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 namespace PhysBAM{
 //#####################################################################

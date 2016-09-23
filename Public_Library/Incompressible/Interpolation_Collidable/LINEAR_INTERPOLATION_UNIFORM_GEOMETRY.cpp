@@ -1,4 +1,4 @@
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM_DEFINITIONS.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM_DEFINITIONS.h>
 #include <Incompressible/Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_UNIFORM.h>
 

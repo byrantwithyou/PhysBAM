@@ -7,7 +7,7 @@
 #ifndef __FAST_MARCHING__
 #define __FAST_MARCHING__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 namespace PhysBAM{
 

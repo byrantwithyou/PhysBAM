@@ -5,9 +5,9 @@
 #ifndef __EOS_CLAMPED_INTERNAL_ENERGY__
 #define __EOS_CLAMPED_INTERNAL_ENERGY__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/sqr.h>
 #include <Compressible/Equations_Of_State/EOS.h>
 #include <cmath>
 namespace PhysBAM{

@@ -4,7 +4,7 @@
 //#####################################################################
 // Class CYLINDER
 //##################################################################### 
-#include <Tools/Math_Tools/cube.h>
+#include <Core/Math_Tools/cube.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 using namespace PhysBAM;

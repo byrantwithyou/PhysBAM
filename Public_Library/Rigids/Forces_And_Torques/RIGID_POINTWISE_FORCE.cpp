@@ -2,7 +2,7 @@
 // Copyright 2009.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
 #include <Rigids/Forces_And_Torques/RIGID_POINTWISE_FORCE.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>

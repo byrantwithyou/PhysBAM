@@ -7,8 +7,8 @@
 #ifndef __TRIANGLE_BENDING_ELEMENTS__
 #define __TRIANGLE_BENDING_ELEMENTS__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{

@@ -2,19 +2,19 @@
 // Copyright 2008-2009, Elliot English, Jon Gretarsson, Nipun Kwatra, Avi Robinson-Mosher.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Math_Tools/Inverse.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Krylov_Solvers/LANCZOS_ITERATION.h>
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Math_Tools/Inverse.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Intersections/RAY_POINT_SIMPLICES_1D_INTERSECTION.h>
 #include <Geometry/Intersections/RAY_SEGMENTED_CURVE_2D_INTERSECTION.h>
 #include <Geometry/Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>

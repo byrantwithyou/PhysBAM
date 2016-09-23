@@ -7,7 +7,7 @@
 #ifndef __PARTICLE_BINDING__
 #define __PARTICLE_BINDING__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Deformables/Bindings/BINDING.h>
 namespace PhysBAM{
 

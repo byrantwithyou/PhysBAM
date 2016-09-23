@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM__
 #define __SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM__
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 

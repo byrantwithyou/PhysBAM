@@ -1,8 +1,8 @@
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Parallel_Computation/MPI_WORLD.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include "SMOKE_DRIVER.h"
 #include "SMOKE_EXAMPLE.h"

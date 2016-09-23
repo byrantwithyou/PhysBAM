@@ -12,10 +12,10 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>

@@ -7,10 +7,10 @@
 #ifndef __RENDERING_VOXEL_FIRE_LIGHT__
 #define __RENDERING_VOXEL_FIRE_LIGHT__
 
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/PROGRESS_INDICATOR.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Random_Numbers/PIECEWISE_CONSTANT_PDF.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/PROGRESS_INDICATOR.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Random_Numbers/PIECEWISE_CONSTANT_PDF.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>

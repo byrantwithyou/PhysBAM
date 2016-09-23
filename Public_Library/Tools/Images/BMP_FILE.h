@@ -7,8 +7,8 @@
 #ifndef __BMP_FILE__
 #define __BMP_FILE__
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
+#include <Grid_Tools/Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <string>
 namespace PhysBAM{
 

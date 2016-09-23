@@ -7,7 +7,7 @@
 #ifndef __PARTICLE_LEVELSET_REMOVED_PARTICLES__
 #define __PARTICLE_LEVELSET_REMOVED_PARTICLES__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Tools/Clone/CLONEABLE.h>
 #include <Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 namespace PhysBAM{

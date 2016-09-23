@@ -6,10 +6,10 @@
 //#####################################################################
 #ifndef __CUT_CELL__
 #define __CUT_CELL__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Vectors/VECTOR_1D.h>
-#include <Tools/Vectors/VECTOR_2D.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR_1D.h>
+#include <Core/Vectors/VECTOR_2D.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/POLYGON.h>
 namespace PhysBAM {
 template<class T,int d>

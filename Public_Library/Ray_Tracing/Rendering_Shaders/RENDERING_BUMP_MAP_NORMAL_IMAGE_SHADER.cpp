@@ -2,9 +2,9 @@
 // Copyright 2004, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Tools/Images/IMAGE.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Ray_Tracing/Rendering/PHOTON_MAP.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 #include <Ray_Tracing/Rendering_Shaders/RENDERING_BUMP_MAP_NORMAL_IMAGE_SHADER.h>

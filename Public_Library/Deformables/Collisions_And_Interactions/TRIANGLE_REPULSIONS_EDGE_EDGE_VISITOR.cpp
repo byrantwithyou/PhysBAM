@@ -4,7 +4,7 @@
 //#####################################################################
 // Class TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR
 //##################################################################### 
-#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Geometry/Basic_Geometry/POINT_2D.h>
 #include <Geometry/Basic_Geometry/SEGMENT_3D.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>

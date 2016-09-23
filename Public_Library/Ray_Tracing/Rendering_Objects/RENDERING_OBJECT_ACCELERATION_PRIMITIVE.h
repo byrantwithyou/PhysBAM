@@ -7,7 +7,7 @@
 #ifndef __RENDERING_OBJECT_ACCELERATION_PRIMITIVE__
 #define __RENDERING_OBJECT_ACCELERATION_PRIMITIVE__
 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 namespace PhysBAM{
 
 template<class T> class RENDERING_OBJECT;

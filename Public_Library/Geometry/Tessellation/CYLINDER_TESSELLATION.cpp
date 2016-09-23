@@ -4,8 +4,8 @@
 //#####################################################################
 // namespace TESSELLATION
 //##################################################################### 
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/MATRIX_3X3.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Tessellation/CYLINDER_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

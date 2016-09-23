@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef __PARTICLES_FORWARD__
 #define __PARTICLES_FORWARD__
-#include <Tools/Arrays/ATTRIBUTE_ID.h>
+#include <Core/Arrays/ATTRIBUTE_ID.h>
 
 namespace PhysBAM{
 

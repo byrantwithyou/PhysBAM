@@ -6,8 +6,8 @@
 //#####################################################################
 #ifndef __SOLID_FLUID_SYSTEM__
 #define __SOLID_FLUID_SYSTEM__
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Dynamics/Coupled_Evolution/PRESSURE_VELOCITY_VECTOR.h>
 namespace PhysBAM{
 

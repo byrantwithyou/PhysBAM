@@ -6,10 +6,10 @@
 //#####################################################################
 #ifndef __GENERAL_ENERGY__
 #define __GENERAL_ENERGY__
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Vectors/VECTOR.h>
 
 namespace PhysBAM{
 

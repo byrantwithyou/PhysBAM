@@ -2,12 +2,12 @@
 // Copyright 2009, Geoffrey Irving, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX_MXN.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/MATRIX_MXN.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

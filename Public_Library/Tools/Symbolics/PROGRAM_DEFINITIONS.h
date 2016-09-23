@@ -7,13 +7,13 @@
 #ifndef __PROGRAM_DEFINITIONS__
 #define __PROGRAM_DEFINITIONS__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Symbolics/CODE_BLOCK.h>
 #include <Tools/Symbolics/CODE_BLOCK_NODE.h>
 #include <Tools/Symbolics/INSTRUCTION.h>
 #include <Tools/Symbolics/PROGRAM_CONTEXT.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <map>
 #include <string>
 

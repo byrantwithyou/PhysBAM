@@ -4,8 +4,8 @@
 //#####################################################################
 // Class BOWL_TESSELLATION
 //##################################################################### 
-#include <Tools/Matrices/MATRIX_3X2.h>
-#include <Tools/Vectors/COMPLEX.h>
+#include <Core/Matrices/MATRIX_3X2.h>
+#include <Core/Vectors/COMPLEX.h>
 #include <Geometry/Basic_Geometry/BOWL.h>
 #include <Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

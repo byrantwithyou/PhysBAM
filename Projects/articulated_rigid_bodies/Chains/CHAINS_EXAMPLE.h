@@ -8,8 +8,8 @@
 #ifndef __CHAINS_EXAMPLE__
 #define __CHAINS_EXAMPLE__
 
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
 #include <Rigids/Joints/JOINT_FUNCTION.h>

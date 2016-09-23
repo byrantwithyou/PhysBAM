@@ -2,16 +2,16 @@
 // Copyright 2009-2010, Mridul Aanjaneya, Michael Lentine, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
-#include <Tools/Parallel_Computation/BOUNDARY_MPI.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_MPI.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Incompressible/Drivers/INCOMPRESSIBLE_DRIVER.h>
 #include <Incompressible/Drivers/INCOMPRESSIBLE_EXAMPLE.h>
 
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 using namespace PhysBAM;
 namespace{
 template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)

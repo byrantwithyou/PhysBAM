@@ -7,8 +7,8 @@
 #ifndef __INCOMPRESSIBLE_FLUID_COLLECTION__
 #define __INCOMPRESSIBLE_FLUID_COLLECTION__
 
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <Incompressible/Grid_Based_Fields/DENSITY_CONTAINER.h>
 #include <Incompressible/Grid_Based_Fields/TEMPERATURE_CONTAINER.h>
 namespace PhysBAM{

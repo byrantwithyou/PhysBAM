@@ -7,8 +7,8 @@
 #ifndef __VECTOR_IMAGE__
 #define __VECTOR_IMAGE__
 
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR.h>
 #include <fstream>
 #include <string>
 namespace PhysBAM{

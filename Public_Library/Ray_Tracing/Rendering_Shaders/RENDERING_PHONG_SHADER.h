@@ -5,7 +5,7 @@
 #ifndef __RENDERING_PHONG_SHADER__
 #define __RENDERING_PHONG_SHADER__
 
-#include <Tools/Math_Tools/max.h>
+#include <Core/Math_Tools/max.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{

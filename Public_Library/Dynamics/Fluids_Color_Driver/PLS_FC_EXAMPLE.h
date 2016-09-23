@@ -4,15 +4,15 @@
 //#####################################################################
 #ifndef __PLS_FC_EXAMPLE__
 #define __PLS_FC_EXAMPLE__
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_PDE/Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
+#include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
 #include <Geometry/Finite_Elements/LEVELSET_COLOR.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
-#include <Incompressible/Projection/PROJECTION_UNIFORM.h>
 #include <Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 namespace PhysBAM{
 

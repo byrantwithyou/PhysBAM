@@ -7,8 +7,8 @@
 #ifndef __IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES__
 #define __IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES__
 
-#include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Deformables/Forces/COLLISION_FORCE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{

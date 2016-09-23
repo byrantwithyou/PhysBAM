@@ -4,8 +4,8 @@
 //#####################################################################
 #ifndef __PLS_DRIVER__
 #define __PLS_DRIVER__
-#include <Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_PDE/Advection/ADVECTION_UNIFORM_FORWARD.h>
 namespace PhysBAM{
 
 

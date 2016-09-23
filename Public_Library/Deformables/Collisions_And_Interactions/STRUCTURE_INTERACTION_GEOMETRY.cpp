@@ -4,10 +4,10 @@
 //#####################################################################
 // Class STRUCTURE_INTERACTION_GEOMETRY
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE.h>

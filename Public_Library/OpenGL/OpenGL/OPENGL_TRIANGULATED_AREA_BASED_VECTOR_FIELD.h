@@ -7,8 +7,8 @@
 #ifndef __OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD__
 #define __OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Vectors/VECTOR_2D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR_2D.h>
 #include <OpenGL/OpenGL/OPENGL_VECTOR_FIELD_2D.h>
 namespace PhysBAM{
 

@@ -8,8 +8,8 @@
 #ifndef __SYSTEM_SURFACE_BLOCK_COLOR__
 #define __SYSTEM_SURFACE_BLOCK_COLOR__
 
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Symbolics/STATIC_POLYNOMIAL.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 #include <Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_HELPER_COLOR.h>
 #include <functional>
 

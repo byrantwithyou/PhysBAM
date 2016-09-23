@@ -7,13 +7,13 @@
 #ifndef __RIGID_BODY__
 #define __RIGID_BODY__
 
-#include <Tools/Data_Structures/ELEMENT_ID.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/FRAME.h>
-#include <Tools/Utilities/Find_Type.h>
-#include <Tools/Utilities/PHYSBAM_ATTRIBUTE.h>
+#include <Core/Data_Structures/ELEMENT_ID.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Utilities/Find_Type.h>
+#include <Core/Utilities/PHYSBAM_ATTRIBUTE.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/RAY.h>

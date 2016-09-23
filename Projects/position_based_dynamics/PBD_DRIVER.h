@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __PBD_DRIVER__
 #define __PBD_DRIVER__
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 #include "PBD_EXAMPLE.h"
 namespace PhysBAM{
 

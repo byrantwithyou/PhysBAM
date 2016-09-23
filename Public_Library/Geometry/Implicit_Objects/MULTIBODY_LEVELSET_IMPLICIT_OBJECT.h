@@ -7,9 +7,9 @@
 #ifndef __MULTIBODY_LEVELSET_IMPLICIT_OBJECT__
 #define __MULTIBODY_LEVELSET_IMPLICIT_OBJECT__
 
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Tools/Interpolation/INTERPOLATION_FORWARD.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>

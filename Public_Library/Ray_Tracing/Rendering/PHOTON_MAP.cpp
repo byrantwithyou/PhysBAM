@@ -3,12 +3,12 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Structure of this class is inspired by Henrik Wann Jackassen's "Realistic Synthesis Using Photon Mapping" Appendix B
-#include <Tools/Data_Structures/HEAPIFY.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/integer_log.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Data_Structures/HEAPIFY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/integer_log.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Ray_Tracing/Rendering/PHOTON_MAP.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY_DEBUG.h>
 using namespace PhysBAM;

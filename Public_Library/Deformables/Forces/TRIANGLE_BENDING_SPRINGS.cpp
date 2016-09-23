@@ -2,8 +2,8 @@
 // Copyright 2004-2006, Ron Fedkiw, Unnur Gretarsdottir, Geoffrey Irving, Andrew Selle, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Math_Tools/cyclic_shift.h>
-#include <Tools/Math_Tools/Robust_Arithmetic.h>
+#include <Core/Math_Tools/cyclic_shift.h>
+#include <Core/Math_Tools/Robust_Arithmetic.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

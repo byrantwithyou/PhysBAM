@@ -19,8 +19,8 @@
 #ifndef __MULTIGRID_POISSON_TESTS__
 #define __MULTIGRID_POISSON_TESTS__
 
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <memory>
 #include "MG_PRECONDITIONED_CONJUGATE_GRADIENT.h"
 #include "MULTIGRID_POISSON_SOLVER.h"

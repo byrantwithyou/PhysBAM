@@ -4,7 +4,7 @@
 //#####################################################################
 // Class TRIANGLES_OF_MATERIAL
 //##################################################################### 
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Geometry/Registry/STRUCTURE_REGISTRY.h>
 #include <Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>
 using namespace PhysBAM;

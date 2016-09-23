@@ -2,8 +2,8 @@
 // Copyright 2009.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Utilities/DEBUG_CAST.h>
-#include <Tools/Vectors/TWIST.h>
+#include <Core/Utilities/DEBUG_CAST.h>
+#include <Core/Vectors/TWIST.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################

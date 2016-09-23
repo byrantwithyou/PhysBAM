@@ -7,8 +7,8 @@
 #ifndef __MARCHING_TETRAHEDRA__
 #define __MARCHING_TETRAHEDRA__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 namespace PhysBAM{

@@ -4,11 +4,11 @@
 //#####################################################################
 // Class GENERIC_PARSER
 //#####################################################################
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Read_Write/STRING_UTILITIES.h>
 #include <Tools/Parsing/GENERIC_PARSER.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
 #include <fstream>
 using namespace PhysBAM;
 //#####################################################################

@@ -5,7 +5,7 @@
 #ifndef __OPENGL_COMPONENT_DIAGNOSTICS__
 #define __OPENGL_COMPONENT_DIAGNOSTICS__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 namespace PhysBAM{
 

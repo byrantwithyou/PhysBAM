@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __PARTICLE_GRID_ITERATOR__
 #define __PARTICLE_GRID_ITERATOR__
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class TV> class PARTICLE_GRID_WEIGHTS;

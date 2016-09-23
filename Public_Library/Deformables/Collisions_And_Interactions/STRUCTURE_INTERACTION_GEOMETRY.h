@@ -7,9 +7,9 @@
 #ifndef __STRUCTURE_INTERACTION_GEOMETRY__
 #define __STRUCTURE_INTERACTION_GEOMETRY__
 
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/choice.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/choice.h>
 #include <Tools/Parallel_Computation/PARTITION_ID.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>

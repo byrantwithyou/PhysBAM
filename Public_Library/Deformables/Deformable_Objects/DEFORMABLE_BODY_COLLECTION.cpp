@@ -4,11 +4,11 @@
 //#####################################################################
 // Class DEFORMABLE_BODY_COLLECTION
 //#####################################################################
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Collisions_And_Interactions/COLLISION_PENALTY_FORCES.h>

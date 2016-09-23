@@ -4,9 +4,9 @@
 //#####################################################################
 // Class DEFORMABLE_OBJECT_COLLISIONS
 //#####################################################################
-#include <Tools/Arrays/CONSTANT_ARRAY.h>
-#include <Tools/Arrays/PROJECTED_ARRAY.h>
-#include <Tools/Utilities/Find_Type.h>
+#include <Core/Arrays/CONSTANT_ARRAY.h>
+#include <Core/Arrays/PROJECTED_ARRAY.h>
+#include <Core/Utilities/Find_Type.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
 #include <Geometry/Topology_Based_Geometry/BEZIER_SPLINE.h>

@@ -7,9 +7,9 @@
 #ifndef __COUPLED_SYSTEM_VECTOR__
 #define __COUPLED_SYSTEM_VECTOR__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 #include <Dynamics/Coupled_Evolution/FORCE_AGGREGATE_ID.h>
 #include <Dynamics/Coupled_Evolution/VISCOUS_FORCE_ID.h>

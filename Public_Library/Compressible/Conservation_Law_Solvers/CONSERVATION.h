@@ -15,13 +15,13 @@
 #ifndef __CONSERVATION__
 #define __CONSERVATION__   
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Grids_Uniform_Arrays/FLOOD_FILL.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Utilities/STATIC_ASSERT.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Utilities/STATIC_ASSERT.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Arrays/FLOOD_FILL.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_CALLBACKS.h>
 namespace PhysBAM{
 

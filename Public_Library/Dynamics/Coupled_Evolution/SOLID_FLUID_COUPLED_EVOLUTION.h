@@ -7,7 +7,7 @@
 #ifndef __SOLID_FLUID_COUPLED_EVOLUTION__
 #define __SOLID_FLUID_COUPLED_EVOLUTION__
 
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>

@@ -4,7 +4,7 @@
 //#####################################################################
 // Class PLANE
 //##################################################################### 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Intersections/RAY_PLANE_INTERSECTION.h>
 using namespace PhysBAM;

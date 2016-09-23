@@ -7,13 +7,13 @@
 #ifndef __OPENGL_OBJECT__
 #define __OPENGL_OBJECT__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/ROTATION.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/ROTATION.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <OpenGL/OpenGL/Convert_1d_To_3d.h>
 #include <OpenGL/OpenGL/Convert_2d_To_3d.h>

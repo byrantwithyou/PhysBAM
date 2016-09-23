@@ -37,9 +37,9 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 #include <Tools/Ordinary_Differential_Equations/ODE_SOLVER.h>
 #include <Tools/Parsing/PARSE_ARGS.h>

@@ -7,10 +7,10 @@
 #ifndef __EIGENSYSTEM__
 #define __EIGENSYSTEM__   
 
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Vectors/VECTOR_3D.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Vectors/VECTOR_3D.h>
+#include <Grid_Tools/Arrays/ARRAYS_UNIFORM_FORWARD.h>
 namespace PhysBAM{
 
 template<class T,class TV_DIMENSION>

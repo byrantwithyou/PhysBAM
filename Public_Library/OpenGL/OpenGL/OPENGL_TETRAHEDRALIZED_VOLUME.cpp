@@ -2,9 +2,9 @@
 // Copyright 2005-2009, Zhaosheng Bao, Eran Guendelman, Geoffrey Irving, Nipun Kwatra, Sergey Koltakov, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/MATRIX_4X4.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/MATRIX_4X4.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>

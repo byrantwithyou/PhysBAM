@@ -7,7 +7,7 @@
 #ifndef __ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM__
 #define __ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM__
 
-#include <Tools/Advection/ADVECTION.h>
+#include <Grid_PDE/Advection/ADVECTION.h>
 #include <Dynamics/Interpolation/FIRE_INTERPOLATION_FORWARD.h>
 namespace PhysBAM{
 

@@ -2,7 +2,7 @@
 // Copyright 2007, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 using namespace PhysBAM;
 

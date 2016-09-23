@@ -1,10 +1,10 @@
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/UNION_FIND.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/UNION_FIND.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Images/EPS_FILE.h>
 #include <Geometry/Images/TEX_FILE.h>

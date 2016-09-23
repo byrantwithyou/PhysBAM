@@ -4,13 +4,13 @@
 //#####################################################################
 // Class BW_BENDING_FORCES
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Math_Tools/cyclic_shift.h>
-#include <Tools/Math_Tools/Robust_Functions.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/MATRIX_2X3.h>
-#include <Tools/Matrices/MATRIX_3X2.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Math_Tools/cyclic_shift.h>
+#include <Core/Math_Tools/Robust_Functions.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/MATRIX_2X3.h>
+#include <Core/Matrices/MATRIX_3X2.h>
+#include <Core/Matrices/MATRIX_3X3.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>

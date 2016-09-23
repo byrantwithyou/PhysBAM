@@ -7,7 +7,7 @@
 #ifndef __PRISMATIC_TWIST_JOINT__
 #define __PRISMATIC_TWIST_JOINT__
 
-#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Rigids/Joints/ANGLE_JOINT.h>
 namespace PhysBAM{
 

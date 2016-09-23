@@ -4,9 +4,9 @@
 //#####################################################################
 // Namespace SIGNED_DISTANCE
 //##################################################################### 
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Grids_Uniform_Computations/TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>

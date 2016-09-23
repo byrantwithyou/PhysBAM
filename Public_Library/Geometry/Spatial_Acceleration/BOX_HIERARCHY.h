@@ -7,14 +7,14 @@
 #ifndef __BOX_HIERARCHY__
 #define __BOX_HIERARCHY__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/STACK.h>
-#include <Tools/Math_Tools/FIXED_NUMBER.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/MATRIX_1X1.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/STACK.h>
+#include <Core/Math_Tools/FIXED_NUMBER.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/MATRIX_1X1.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 namespace PhysBAM{
 

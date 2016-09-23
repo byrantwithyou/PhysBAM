@@ -4,7 +4,7 @@
 //#####################################################################
 // Namespace INTERSECTION
 //##################################################################### 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Geometry/Basic_Geometry/LINE_2D.h>
 #include <Geometry/Intersections/BOX_LINE_2D_INTERSECTION.h>
 namespace PhysBAM{

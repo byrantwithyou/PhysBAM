@@ -7,8 +7,8 @@
 #ifndef __INT_ITERATOR_THREADED__
 #define __INT_ITERATOR_THREADED__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/INTERVAL.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/INTERVAL.h>
 #include <Tools/Parallel_Computation/ITERATOR_TASK.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 namespace PhysBAM{

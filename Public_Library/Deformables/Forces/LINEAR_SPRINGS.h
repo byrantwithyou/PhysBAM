@@ -7,10 +7,10 @@
 #ifndef __LINEAR_SPRINGS__
 #define __LINEAR_SPRINGS__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Matrices/MATRIX_FORWARD.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
+#include <Core/Vectors/VECTOR_2D.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
-#include <Tools/Vectors/VECTOR_2D.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 

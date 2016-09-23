@@ -7,11 +7,11 @@
 #ifndef __SOLIDS_FORCES__
 #define __SOLIDS_FORCES__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Tools/Data_Structures/ELEMENT_ID.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <Core/Data_Structures/ELEMENT_ID.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{

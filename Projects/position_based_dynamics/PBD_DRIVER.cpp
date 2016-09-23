@@ -1,6 +1,6 @@
-#include <Tools/Log/DEBUG_SUBSTEPS.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Log/SCOPE.h>
+#include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
 #include <iomanip>
 #include "PBD_CONSTRAINTS.h"
 #include "PBD_DRIVER.h"

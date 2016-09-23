@@ -4,9 +4,9 @@
 //#####################################################################
 // Class LANCZOS_ITERATION
 //#####################################################################
+#include <Core/Log/LOG.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Krylov_Solvers/LANCZOS_ITERATION.h>
-#include <Tools/Log/LOG.h>
 #include <cfloat>
 #include <limits>
 using namespace PhysBAM;

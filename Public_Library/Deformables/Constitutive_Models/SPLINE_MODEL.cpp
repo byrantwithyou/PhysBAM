@@ -2,7 +2,7 @@
 // Copyright 2003-2008, Ron Fedkiw, Geoffrey Irving, Igor Neverov, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Deformables/Constitutive_Models/SPLINE_MODEL.h>
 namespace PhysBAM{
 //#####################################################################

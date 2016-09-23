@@ -2,7 +2,7 @@
 // Copyright 2003-2009, Eran Guendelman, Geoffrey Irving, Sndrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_2D.h>
 #include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 using namespace PhysBAM;

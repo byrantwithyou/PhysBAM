@@ -7,8 +7,8 @@
 #ifndef __HAMILTONIAN_1D__
 #define __HAMILTONIAN_1D__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Vectors/VECTOR_1D.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Vectors/VECTOR_1D.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;

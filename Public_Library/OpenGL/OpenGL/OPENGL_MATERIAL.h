@@ -7,9 +7,9 @@
 #ifndef __OPENGL_MATERIAL__
 #define __OPENGL_MATERIAL__
 
-#include <Tools/Log/LOG.h>
-#include <Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
-#include <Tools/Utilities/EXCEPTIONS.h>
+#include <Core/Log/LOG.h>
+#include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
+#include <Core/Utilities/EXCEPTIONS.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 namespace PhysBAM{
 

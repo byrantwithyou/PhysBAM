@@ -2,9 +2,9 @@
 // Copyright 2006-2007, Kevin Der, Ranjitha Kumar, Eftychios Sifakis, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Data_Structures/QUEUE.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Data_Structures/QUEUE.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/sqr.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Rigids/Muscles/ANALYTIC_SURFACE_MUSCLE_SEGMENT.h>
 #include <cassert>

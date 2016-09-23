@@ -4,11 +4,11 @@
 //#####################################################################
 // Class QUADRATIC_PROGRAMMING
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/givens_rotate.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/givens_rotate.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Optimization/QUADRATIC_PROGRAMMING.h>
-#include <Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 
 //####################################################################################

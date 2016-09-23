@@ -7,11 +7,11 @@
 #ifndef __FLUIDS_PARAMETERS__
 #define __FLUIDS_PARAMETERS__
 
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
+#include <Core/Vectors/VECTOR_FORWARD.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
 #include <Tools/Parallel_Computation/THREAD_QUEUE.h>
-#include <Tools/Vectors/VECTOR_FORWARD.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>

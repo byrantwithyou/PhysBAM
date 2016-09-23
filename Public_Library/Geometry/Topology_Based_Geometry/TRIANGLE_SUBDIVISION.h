@@ -7,8 +7,8 @@
 #ifndef __TRIANGLE_SUBDIVISION__
 #define __TRIANGLE_SUBDIVISION__
 
-#include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 class TRIANGLE_MESH;

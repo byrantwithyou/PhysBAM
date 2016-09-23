@@ -9,10 +9,10 @@
 
 #ifdef USE_MPI
 
-#include <Tools/Arrays/CONSTANT_ARRAY.h>
-#include <Tools/Arrays/PROJECTED_ARRAY.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays/CONSTANT_ARRAY.h>
+#include <Core/Arrays/PROJECTED_ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 namespace PhysBAM{
 

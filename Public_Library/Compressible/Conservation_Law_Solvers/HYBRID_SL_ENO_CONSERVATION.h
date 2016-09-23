@@ -7,10 +7,10 @@
 #ifndef __HYBRID_SL_ENO_CONSERVATION__
 #define __HYBRID_SL_ENO_CONSERVATION__   
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION.h>
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_CALLBACKS.h>
 namespace PhysBAM{

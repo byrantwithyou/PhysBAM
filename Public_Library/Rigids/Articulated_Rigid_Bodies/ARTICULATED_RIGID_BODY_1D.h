@@ -7,10 +7,10 @@
 #ifndef __ARTICULATED_RIGID_BODY_1D__
 #define __ARTICULATED_RIGID_BODY_1D__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
-#include <Tools/Vectors/VECTOR_1D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Core/Vectors/VECTOR_1D.h>
 #include <Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
 template<class TV> class RIGID_BODY_CONTACT_GRAPH;

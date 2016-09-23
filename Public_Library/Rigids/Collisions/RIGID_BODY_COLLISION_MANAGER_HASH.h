@@ -7,8 +7,8 @@
 #ifndef __RIGID_BODY_COLLISION_MANAGER_HASH__
 #define __RIGID_BODY_COLLISION_MANAGER_HASH__
 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Data_Structures/PAIR.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/PAIR.h>
 #include <Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
 namespace PhysBAM{
 

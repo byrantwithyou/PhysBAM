@@ -7,7 +7,7 @@
 #ifndef __STANDARD_TESTS_MULTIPHASE__
 #define __STANDARD_TESTS_MULTIPHASE__
 
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <Dynamics/Standard_Tests/WATER_STANDARD_TESTS_MULTIPHASE_3D.h>
 namespace PhysBAM{

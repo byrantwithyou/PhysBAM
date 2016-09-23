@@ -2,8 +2,8 @@
 // Copyright 2002-2004, Zhaosheng Bao.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Data_Structures/KD_TREE.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Data_Structures/KD_TREE.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY_2D.h>
 using namespace PhysBAM;

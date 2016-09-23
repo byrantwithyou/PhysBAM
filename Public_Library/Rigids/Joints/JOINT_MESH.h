@@ -7,9 +7,9 @@
 #ifndef __JOINT_MESH__
 #define __JOINT_MESH__
 
-#include <Tools/Data_Structures/DYNAMIC_LIST.h>
-#include <Tools/Data_Structures/UNDIRECTED_GRAPH.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Data_Structures/DYNAMIC_LIST.h>
+#include <Core/Data_Structures/UNDIRECTED_GRAPH.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
 

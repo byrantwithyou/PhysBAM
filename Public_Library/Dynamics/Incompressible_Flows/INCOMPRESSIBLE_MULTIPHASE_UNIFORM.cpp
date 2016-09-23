@@ -2,17 +2,17 @@
 // Copyright 2002-2007, Ronald Fedkiw, Frank Losasso, Duc Nguyen, Tamar Shinar, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Advection/ADVECTION.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Grids_Uniform_Computations/VORTICITY_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/maxabs.h>
-#include <Tools/Math_Tools/min.h>
-#include <Tools/Math_Tools/minmag.h>
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/maxabs.h>
+#include <Core/Math_Tools/min.h>
+#include <Core/Math_Tools/minmag.h>
+#include <Core/Math_Tools/sqr.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Computations/VORTICITY_UNIFORM.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_PDE/Advection/ADVECTION.h>
+#include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>

@@ -4,8 +4,8 @@
 //#####################################################################
 #ifndef __COMPRESSIBLE_DRIVER__
 #define __COMPRESSIBLE_DRIVER__
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Ordinary_Differential_Equations/DRIVER.h>
-#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class TV> class COMPRESSIBLE_EXAMPLE;

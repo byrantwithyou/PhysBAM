@@ -12,7 +12,7 @@
 #ifndef __EOS_JWL__
 #define __EOS_JWL__
 
-#include <Tools/Math_Tools/sqr.h>
+#include <Core/Math_Tools/sqr.h>
 #include <Compressible/Equations_Of_State/EOS.h>
 namespace PhysBAM{
 

@@ -7,7 +7,7 @@
 #ifndef __TETRAHEDRON_MESH__
 #define __TETRAHEDRON_MESH__
 
-#include <Tools/Math_Tools/permutation.h>
+#include <Core/Math_Tools/permutation.h>
 #include <Geometry/Topology/SIMPLEX_MESH.h>
 namespace PhysBAM{ 
 

@@ -7,8 +7,8 @@
 #ifndef __BLACKBODY__
 #define __BLACKBODY__
 
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Ray_Tracing/Rendering/CIE_XYZ.h>
 namespace PhysBAM{
 

@@ -2,11 +2,11 @@
 // Copyright 2004-2009, Eran Guendelman, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND_VIEW.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND_VIEW.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <OpenGL/OpenGL/OPENGL_FACE_SCALAR_FIELD_3D.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_3D.h>
 #include <OpenGL/OpenGL/OPENGL_POINTS_3D.h>

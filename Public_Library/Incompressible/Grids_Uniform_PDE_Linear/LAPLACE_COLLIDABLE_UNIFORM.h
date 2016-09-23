@@ -7,12 +7,12 @@
 #ifndef __LAPLACE_COLLIDABLE_UNIFORM__
 #define __LAPLACE_COLLIDABLE_UNIFORM__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
+#include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Poisson/LAPLACE_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE.h>
-#include <Incompressible/Projection/LAPLACE_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;

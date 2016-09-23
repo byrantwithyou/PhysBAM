@@ -4,12 +4,12 @@
 //#####################################################################
 // Class STRAIN_MEASURE
 //#####################################################################
-#include <Tools/Log/LOG.h>
-#include <Tools/Matrices/MATRIX_2X2.h>
-#include <Tools/Matrices/MATRIX_3X2.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
-#include <Tools/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
+#include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX_2X2.h>
+#include <Core/Matrices/MATRIX_3X2.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
+#include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>

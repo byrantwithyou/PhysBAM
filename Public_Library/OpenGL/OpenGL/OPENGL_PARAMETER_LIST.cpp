@@ -4,8 +4,8 @@
 //#####################################################################
 // OpenGL-related functions for PARAMETER_LIST
 //##################################################################### 
+#include <Core/Read_Write/STRING_UTILITIES.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
-#include <Tools/Parsing/STRING_UTILITIES.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <sstream>
 namespace PhysBAM{

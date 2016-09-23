@@ -7,7 +7,7 @@
 #ifndef __HEXAHEDRALIZED_VOLUME__
 #define __HEXAHEDRALIZED_VOLUME__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Topology/HEXAHEDRON_MESH.h>
 #include <Geometry/Topology_Based_Geometry/MESH_OBJECT.h>

@@ -7,8 +7,8 @@
 #ifndef __GENERIC_PARSER__
 #define __GENERIC_PARSER__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Read_Write/READ_WRITE_FORWARD.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Read_Write/READ_WRITE_FORWARD.h>
 #include <string>
 namespace PhysBAM{
 

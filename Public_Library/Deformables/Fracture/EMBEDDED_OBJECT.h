@@ -7,8 +7,8 @@
 #ifndef __EMBEDDED_OBJECT__
 #define __EMBEDDED_OBJECT__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
 #include <Tools/Particles/PARTICLES_SUBSET.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>

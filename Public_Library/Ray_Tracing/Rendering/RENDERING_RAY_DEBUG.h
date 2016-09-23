@@ -7,8 +7,8 @@
 #ifndef __RENDERING_RAY_DEBUG__
 #define __RENDERING_RAY_DEBUG__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY.h>
 namespace PhysBAM{
 

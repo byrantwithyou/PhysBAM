@@ -12,7 +12,7 @@
 #endif
 #if defined(WIN32) && defined(OPENGL_WGL_PBUFFER_SUPPORTED) 
 
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <GL/gl.h>
 #include <OpenGL/OpenGL/glATI.h>
 #include <OpenGL/OpenGL/wglATI.h>
@@ -62,7 +62,7 @@ namespace PhysBAM
     };
 }
 #else
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <iostream>
 namespace PhysBAM
 {

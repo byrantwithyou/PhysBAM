@@ -4,12 +4,12 @@
 //#####################################################################
 // Class FRACTURE_OBJECT
 //#####################################################################
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
-#include <Tools/Math_Tools/sign.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Math_Tools/sign.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Solids/Fracture/FRACTURE_OBJECT.h>
 #include <Solids/Fracture/VIRTUAL_NODE_ALGORITHM.h>
 using namespace PhysBAM;

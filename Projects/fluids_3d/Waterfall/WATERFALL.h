@@ -7,9 +7,9 @@
 #ifndef __WATERFALL__
 #define __WATERFALL__
 
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Random_Numbers/NOISE.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Random_Numbers/NOISE.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Incompressible/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
 #include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>

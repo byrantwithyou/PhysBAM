@@ -6,13 +6,13 @@
 //#####################################################################
 #ifndef __MATRIX_VISCOUS_FORCES__
 #define __MATRIX_VISCOUS_FORCES__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/ARRAY_VIEW.h>
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/PAIR.h>
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/PAIR.h>
+#include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
+#include <Core/Utilities/NONCOPYABLE.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Dynamics/Coupled_Evolution/VISCOUS_FORCE_ID.h>
 
 namespace PhysBAM{

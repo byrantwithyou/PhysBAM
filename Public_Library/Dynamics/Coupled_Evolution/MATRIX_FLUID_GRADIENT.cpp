@@ -4,10 +4,10 @@
 //#####################################################################
 // Class MATRIX_FLUID_GRADIENT
 //##################################################################### 
-#include <Tools/Data_Structures/HASHTABLE.h>
-#include <Tools/Grids_Uniform/SIDED_FACE_INDEX.h>
-#include <Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/SIDED_FACE_INDEX.h>
 #include <Dynamics/Coupled_Evolution/BOUNDARY_CONDITION_INFO.h>
 #include <Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>
 #include <Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION_COLLECTION.h>

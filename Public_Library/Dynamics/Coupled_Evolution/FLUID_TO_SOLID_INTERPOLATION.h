@@ -6,9 +6,9 @@
 //#####################################################################
 #ifndef __FLUID_TO_SOLID_INTERPOLATION__
 #define __FLUID_TO_SOLID_INTERPOLATION__
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_BASE.h>
 

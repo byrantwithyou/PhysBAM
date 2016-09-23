@@ -2,17 +2,17 @@
 // Copyright 2004-2005, Ron Fedkiw, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform/FACE_ITERATOR.h>
-#include <Tools/Grids_Uniform/NODE_ITERATOR.h>
-#include <Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <Tools/Grids_Uniform_Computations/VORTICITY_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/cube.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <Grid_Tools/Computations/VORTICITY_UNIFORM.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Incompressible/Incompressible_Flows/EULER_STEP_PARTICLES.h>
 #include <Incompressible/Incompressible_Flows/VORTEX_PARTICLE_EVOLUTION_3D.h>
 #include <Dynamics/Parallel_Computation/MPI_UNIFORM_PARTICLES.h>

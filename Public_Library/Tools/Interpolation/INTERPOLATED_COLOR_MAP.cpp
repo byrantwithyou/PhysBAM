@@ -2,8 +2,8 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
-#include <Tools/Vectors/VECTOR_3D.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

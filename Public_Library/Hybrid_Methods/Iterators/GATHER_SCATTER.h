@@ -4,11 +4,11 @@
 //#####################################################################
 #ifndef __GATHER_SCATTER__
 #define __GATHER_SCATTER__
-#include <Tools/Grids_Uniform/FACE_INDEX.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Log/SCOPE.h>
-#include <Tools/Utilities/TIMER.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Log/SCOPE.h>
+#include <Core/Utilities/TIMER.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_Tools/Grids/FACE_INDEX.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>

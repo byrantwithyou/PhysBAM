@@ -7,11 +7,11 @@
 #ifndef __SPHERE__
 #define __SPHERE__
 
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Math_Tools/constants.h>
-#include <Tools/Math_Tools/pow.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/constants.h>
+#include <Core/Math_Tools/pow.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 namespace PhysBAM{
 
 template<class TV>

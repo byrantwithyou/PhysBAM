@@ -7,8 +7,8 @@
 #ifndef __RIGID_BODY_BINDING__
 #define __RIGID_BODY_BINDING__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/SPARSE_UNION_FIND.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/SPARSE_UNION_FIND.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Bindings/BINDING.h>

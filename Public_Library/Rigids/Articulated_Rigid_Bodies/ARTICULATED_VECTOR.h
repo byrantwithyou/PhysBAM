@@ -7,7 +7,7 @@
 #ifndef __ARTICULATED_VECTOR__
 #define __ARTICULATED_VECTOR__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{

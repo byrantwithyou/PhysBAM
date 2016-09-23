@@ -4,13 +4,13 @@
 //#####################################################################
 // Class SOLID_SYSTEM_MPI_SLIP
 //#####################################################################
-#include <Tools/Arrays/IDENTITY_ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/LOG.h>
+#include <Core/Vectors/Dot_Product.h>
+#include <Core/Vectors/TWIST.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
-#include <Tools/Log/DEBUG_UTILITIES.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Vectors/Dot_Product.h>
-#include <Tools/Vectors/TWIST.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
@@ -18,8 +18,8 @@
 #include <Dynamics/Parallel_Computation/SOLID_SYSTEM_MPI_SLIP.h>
 #ifdef USE_MPI
 #include <Tools/Parallel_Computation/MPI_PACKAGE.h>
-#include <Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
+#include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #endif
 using namespace PhysBAM;
 //#####################################################################

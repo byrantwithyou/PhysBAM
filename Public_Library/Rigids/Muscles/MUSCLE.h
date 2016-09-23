@@ -7,8 +7,8 @@
 #ifndef __MUSCLE__
 #define __MUSCLE__
 
-#include <Tools/Data_Structures/TRIPLE.h>
-#include <Tools/Log/LOG.h>
+#include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Log/LOG.h>
 #include <Rigids/Muscles/ANALYTIC_SURFACE_MUSCLE_SEGMENT.h>
 namespace PhysBAM{
 

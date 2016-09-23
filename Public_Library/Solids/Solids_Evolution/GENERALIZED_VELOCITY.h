@@ -7,11 +7,11 @@
 #ifndef __GENERALIZED_VELOCITY__
 #define __GENERALIZED_VELOCITY__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Vectors/TWIST.h>
+#include <Core/Vectors/VECTOR_3D.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <Tools/Vectors/TWIST.h>
-#include <Tools/Vectors/VECTOR_3D.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 namespace PhysBAM{
 template<class TV> class SOLID_BODY_COLLECTION;

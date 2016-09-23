@@ -5,10 +5,10 @@
 #ifndef __MPI_SOLIDS__
 #define __MPI_SOLIDS__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/ELEMENT_ID.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/ELEMENT_ID.h>
+#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Parallel_Computation/PARTITION_ID.h>
-#include <Tools/Utilities/NONCOPYABLE.h>
 #ifdef Status // Splendid choice for a macro.
 #undef Status
 #endif

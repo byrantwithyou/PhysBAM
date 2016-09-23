@@ -7,7 +7,7 @@
 #ifndef __DUALCONTOUR_2D__
 #define __DUALCONTOUR_2D__
 
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 

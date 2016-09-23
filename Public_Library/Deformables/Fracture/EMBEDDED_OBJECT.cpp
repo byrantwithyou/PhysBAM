@@ -4,11 +4,11 @@
 //#####################################################################
 // Class EMBEDDED_OBJECT
 //#####################################################################
-#include <Tools/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Log/LOG.h>
+#include <Core/Math_Tools/permutation.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <Tools/Log/LOG.h>
-#include <Tools/Math_Tools/permutation.h>
-#include <Tools/Math_Tools/RANGE.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>

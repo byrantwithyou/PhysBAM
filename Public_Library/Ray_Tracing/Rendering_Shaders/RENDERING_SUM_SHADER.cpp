@@ -2,7 +2,7 @@
 // Copyright 2006, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Ray_Tracing/Rendering/PHOTON_MAP.h>
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 #include <Ray_Tracing/Rendering_Shaders/RENDERING_SUM_SHADER.h>

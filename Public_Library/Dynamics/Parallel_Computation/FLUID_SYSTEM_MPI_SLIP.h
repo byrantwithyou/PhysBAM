@@ -6,10 +6,10 @@
 //#####################################################################
 #ifndef __FLUID_SYSTEM_MPI_SLIP__
 #define __FLUID_SYSTEM_MPI_SLIP__
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE_SYSTEM.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 #include <Dynamics/Parallel_Computation/MPI_SOLID_FLUID_SLIP.h>
 namespace PhysBAM{

@@ -13,7 +13,7 @@
 #ifndef __BOUNDARY_CUSTOM_V__
 #define __BOUNDARY_CUSTOM_V__
 
-#include <Tools/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
 namespace PhysBAM{
 
 template<class T,class T2>

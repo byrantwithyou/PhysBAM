@@ -7,8 +7,8 @@
 #ifndef __BINDING_LIST__
 #define __BINDING_LIST__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Deformables/Bindings/BINDING.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>

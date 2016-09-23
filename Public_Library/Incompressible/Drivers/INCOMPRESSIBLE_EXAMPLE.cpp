@@ -2,7 +2,7 @@
 // Copyright 2009, Michael Lentine, Avi Robinson-Mosher, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Tools/Utilities/PROCESS_UTILITIES.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Incompressible/Drivers/INCOMPRESSIBLE_EXAMPLE.h>
 #include <Incompressible/Forces/FLUID_GRAVITY.h>

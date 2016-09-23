@@ -7,12 +7,12 @@
 #ifndef __DETONATION_SHOCK_DYNAMICS__
 #define __DETONATION_SHOCK_DYNAMICS__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Boundaries/BOUNDARY.h>
-#include <Tools/Grids_Uniform/CELL_ITERATOR.h>
-#include <Tools/Grids_Uniform_Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
-#include <Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Tools/Vectors/VECTOR_2D.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Vectors/VECTOR_2D.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_PDE/Boundaries/BOUNDARY.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Incompressible/Grid_Based_Fields/GRID_AND_ARRAY_CONTAINER.h>
 namespace PhysBAM{
 

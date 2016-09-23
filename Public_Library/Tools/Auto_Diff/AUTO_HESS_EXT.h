@@ -7,15 +7,15 @@
 #ifndef __AUTO_HESS_EXT__
 #define __AUTO_HESS_EXT__
 
+#include <Core/Math_Tools/cube.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Utilities/TYPE_UTILITIES.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Auto_Diff/GRADIENT_MAT.h>
 #include <Tools/Auto_Diff/HESSIAN_MAT.h>
-#include <Tools/Math_Tools/cube.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Tensors/DIAGONAL_TENSOR.h>
-#include <Tools/Utilities/TYPE_UTILITIES.h>
-#include <Tools/Vectors/VECTOR.h>
 #include <cmath>
 namespace PhysBAM{
 namespace HETERO_DIFF{

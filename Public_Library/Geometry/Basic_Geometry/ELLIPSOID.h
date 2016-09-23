@@ -7,11 +7,11 @@
 #ifndef __ELLIPSOID__
 #define __ELLIPSOID__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Matrices/DIAGONAL_MATRIX.h>
-#include <Tools/Matrices/MATRIX_3X3.h>
-#include <Tools/Matrices/ROTATION.h>
-#include <Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/ROTATION.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 namespace PhysBAM{
 

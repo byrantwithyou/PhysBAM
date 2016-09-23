@@ -4,7 +4,7 @@
 //#####################################################################
 // Class REMOVED_PARTICLES_BLENDER_3D
 //##################################################################### 
-#include <Tools/Log/LOG.h>
+#include <Core/Log/LOG.h>
 #include <Geometry/Basic_Geometry/ELLIPSOID.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Dynamics/Level_Sets/REMOVED_PARTICLES_BLENDER_3D.h>

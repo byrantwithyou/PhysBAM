@@ -6,11 +6,11 @@
 //#####################################################################
 #ifndef __KKT_KRYLOV_SYSTEM__
 #define __KKT_KRYLOV_SYSTEM__
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Data_Structures/HASHTABLE.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 template<class TV> class MPM_EXAMPLE;
 template<class TV> class KKT_KRYLOV_VECTOR;

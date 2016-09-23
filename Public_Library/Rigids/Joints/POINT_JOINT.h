@@ -7,7 +7,7 @@
 #ifndef __POINT_JOINT__
 #define __POINT_JOINT__
 
-#include <Tools/Math_Tools/RANGE.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Rigids/Joints/JOINT.h>
 namespace PhysBAM{
 

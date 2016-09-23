@@ -7,8 +7,8 @@
 #ifndef __RIGID_POINTWISE_FORCE__
 #define __RIGID_POINTWISE_FORCE__
 
-#include <Tools/Data_Structures/FORCE_ELEMENTS.h>
-#include <Tools/Vectors/VECTOR.h>
+#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Vectors/VECTOR.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
 namespace PhysBAM{
 

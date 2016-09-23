@@ -7,7 +7,7 @@
 #ifndef __STRAIN_MEASURE_HEXAHEDRONS__
 #define __STRAIN_MEASURE_HEXAHEDRONS__
 
-#include <Tools/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX_3X3.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{

@@ -4,9 +4,9 @@
 //#####################################################################
 // Class CONJUGATE_GRADIENT
 //#####################################################################
+#include <Core/Log/LOG.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <Tools/Log/LOG.h>
 #include <cfloat>
 #include <limits>
 using namespace PhysBAM;

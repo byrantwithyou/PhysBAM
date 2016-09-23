@@ -7,8 +7,8 @@
 #ifndef __RIGIDS_KINEMATIC_EVOLUTION__
 #define __RIGIDS_KINEMATIC_EVOLUTION__
 
-#include <Tools/Arrays/ARRAYS_FORWARD.h>
-#include <Tools/Matrices/MATRIX_POLICY.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Matrices/MATRIX_POLICY.h>
 #include <Rigids/Rigids_Evolution/KINEMATIC_EVOLUTION.h>
 namespace PhysBAM{
 

@@ -2,10 +2,10 @@
 // Copyright 2002-2006, Geoffrey Irving, Igor Neverov, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Tools/Images/BMP_FILE.h>
 #include <Tools/Images/BMP_HEADER.h>
 #include <Tools/Images/IMAGE.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Read

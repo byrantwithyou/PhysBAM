@@ -5,12 +5,12 @@
 #ifndef __PHONEME__
 #define __PHONEME__
 
-#include <Tools/Arrays/ARRAY.h>
-#include <Tools/Grids_Uniform/GRID.h>
-#include <Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
-#include <Tools/Math_Tools/RANGE.h>
-#include <Tools/Read_Write/FILE_UTILITIES.h>
+#include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Math_Tools/RANGE.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_STATE.h>
 namespace PhysBAM{
 
