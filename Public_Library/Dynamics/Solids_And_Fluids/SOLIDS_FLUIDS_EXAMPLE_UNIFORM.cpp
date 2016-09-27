@@ -547,10 +547,8 @@ Write_Output_Files(const int frame) const
             oo.Write("rb_frame",f);
             ARRAY_VIEW<T> t(particle.twist.m*TWIST<TV>::m,(T*)particle.twist.Get_Array_Pointer());
             oo.Write("rb_twist",t);}
-        if(fluids_parameters.incompressible){
-            const ARRAY<T,FACE_INDEX<TV::m> >& u=fluid_collection.incompressible_fluid_collection.face_velocities;
-            ARRAY_VIEW<T> a(u.buffer_size,u.base_pointer);
-            oo.Write("if_u",a);}
+        if(fluids_parameters.incompressible)
+            oo.Write("if_u",fluid_collection.incompressible_fluid_collection.face_velocities.array);
         if(fluids_parameters.euler) oo.Write("cf_U",fluids_parameters.euler->U.array.Flattened());}
 
 

@@ -21,8 +21,7 @@ class ARRAY<T,FACE_INDEX<d> >
     typedef VECTOR<T,d> TV;typedef VECTOR<int,d> TV_INT;
     struct UNUSABLE{};
 public:
-    T* base_pointer;
-    int buffer_size;
+    ARRAY_VIEW<T> array; // one-dimensional data storage
 
     enum {dimension=TV::dimension};
     template<class T2> struct REBIND{typedef ARRAY<T2,FACE_INDEX<dimension> > TYPE;};
@@ -35,24 +34,20 @@ public:
     VECTOR<T_ARRAY_VIEW,dimension> data;
    
     ARRAY()
-        :base_pointer(0),buffer_size(0)
     {}
 
     template<class T2>
     ARRAY(const GRID<VECTOR<T2,dimension> >& grid,const int ghost_cells=0,const bool initialize_using_default_constructor=true)
-        :base_pointer(0),buffer_size(0)
     {Resize(grid,ghost_cells,initialize_using_default_constructor);}
 
     ARRAY(const RANGE<TV_INT>& domain_indices_input,const bool initialize_using_default_constructor=true)
-        :base_pointer(0),buffer_size(0)
     {Resize(domain_indices_input,initialize_using_default_constructor);}
 
     ARRAY(const ARRAY& old_array)
-        :base_pointer(0),buffer_size(0)
     {Resize(old_array.Domain_Indices(),false,false);Copy(old_array);}
 
     virtual ~ARRAY()
-    {delete[] base_pointer;}
+    {delete[] array.base_pointer;}
 
     template<class T2>
     ARRAY& operator*=(const T2 a)
@@ -80,8 +75,8 @@ public:
     domain_indices=domain;
     for(int i=0;i<dimension;i++){domains(i)=domain;domains(i).max_corner(i)++;sizes_new(i)=(domains(i).Edge_Lengths()).Product();if(domains(i)!=data(i).Domain_Indices()) early_return=false;}
     if(early_return) return;
-    buffer_size=sizes_new.Sum();
-    T* p=new T[buffer_size];
+    int new_length=sizes_new.Sum();
+    T* p=new T[new_length];
     if(initialize_new_elements){T* p_start=p;
         for(int i=0;i<dimension;i++){
             T_ARRAY_VIEW array_new(domains(i),p_start);
@@ -97,14 +92,14 @@ public:
         T_ARRAY_VIEW array_new(domains(i),p_start);
         T_ARRAY_VIEW::Exchange(array_new,data(i));
         p_start+=sizes_new(i);}
-    delete[] base_pointer;
-    base_pointer=p;}
+    delete[] array.base_pointer;
+    array.Set(new_length,p);}
 
     void Clean_Memory()
     {Resize(RANGE<TV_INT>(TV_INT::All_Ones_Vector(),TV_INT()),false,false);}
 
     void Delete_Pointers_And_Clean_Memory()
-    {for(int i=0;i<buffer_size;i++) delete base_pointer[i];Clean_Memory();}
+    {for(int i=0;i<array.m;i++) delete array.base_pointer[i];Clean_Memory();}
 
     int Number_Of_Ghost_Cells() const
     {return -domain_indices.min_corner.x;}
@@ -166,7 +161,7 @@ public:
     {a.Exchange(b);}
 
     void Exchange(ARRAY& a)
-    {exchange(domain_indices,a.domain_indices);exchange(base_pointer,a.base_pointer);exchange(buffer_size,a.buffer_size);
+    {exchange(domain_indices,a.domain_indices);array.Exchange(a.array);
     for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Exchange(data(i),a.data(i));}
 
     template<class T_INDICES>
@@ -178,15 +173,15 @@ public:
     {return INDIRECT_ARRAY<const ARRAY,T_INDICES&>(*this,indices);}
     
     template<class RW> void Read(std::istream& input)
-    {Clean_Memory();Read_Binary<RW>(input,domain_indices);Read_Binary<RW>(input,buffer_size);
-    if(buffer_size<0){
+    {Clean_Memory();Read_Binary<RW>(input,domain_indices);Read_Binary<RW>(input,array.m);
+    if(array.m<0){
         char buff[100];
-        sprintf(buff,"Invalid negative array size %d",buffer_size);
+        sprintf(buff,"Invalid negative array size %d",array.m);
         throw READ_ERROR(buff);}
-    if(!buffer_size) return;
-    base_pointer=new T[buffer_size];
-    Read_Binary_Array<RW>(input,base_pointer,buffer_size);
-    T* p_start=base_pointer;
+    if(!array.m) return;
+    array.base_pointer=new T[array.m];
+    Read_Binary_Array<RW>(input,array.base_pointer,array.m);
+    T* p_start=array.base_pointer;
     for(int i=0;i<d;i++){
         RANGE<TV_INT> domain;
         Read_Binary<RW>(input,domain);
@@ -195,7 +190,7 @@ public:
         p_start+=(domain.Edge_Lengths()).Product();}}
 
     template<class RW> void Write(std::ostream& output) const
-    {Write_Binary<RW>(output,domain_indices);Write_Binary<RW>(output,buffer_size);Write_Binary_Array<RW>(output,base_pointer,buffer_size);for(int i=0;i<d;i++) Write_Binary<RW>(output,data(i).domain);}
+    {Write_Binary<RW>(output,domain_indices);Write_Binary<RW>(output,array.m);Write_Binary_Array<RW>(output,array.base_pointer,array.m);for(int i=0;i<d;i++) Write_Binary<RW>(output,data(i).domain);}
 //#####################################################################
 };
 

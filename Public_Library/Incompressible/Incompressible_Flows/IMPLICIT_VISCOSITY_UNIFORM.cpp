@@ -158,7 +158,7 @@ Setup_Boundary_Conditions(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
             if(p_psi_N(other_axis,p_node_index-axis_offset)||p_psi_N(other_axis,p_node_index)) psi_N(other_axis,face_index)=true;}}
 
     // set slip boundary conditions for tangential walls
-    if(p_psi_R.base_pointer)
+    if(p_psi_R.array.base_pointer)
         for(int other_axis=0;other_axis<TV::m;other_axis++) if(other_axis!=axis){
             for(FACE_ITERATOR<TV> iterator(face_grid,0,GRID<TV>::BOUNDARY_REGION,-1,other_axis);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index(),p_node_index=face_index;
                 T a=p_psi_R(other_axis,p_node_index-axis_offset),b=p_psi_R(other_axis,p_node_index);

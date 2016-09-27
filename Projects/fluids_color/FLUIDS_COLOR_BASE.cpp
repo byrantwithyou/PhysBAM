@@ -577,9 +577,8 @@ Write_Output_Files(const int frame)
         std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),test_output_prefix.c_str(),frame);
         OCTAVE_OUTPUT<T> oo(file.c_str());
         ARRAY<T> u;
-        for(int c=0;c<face_velocities.m;c++){
-            ARRAY_VIEW<T> a(face_velocities(c).buffer_size,face_velocities(c).base_pointer);
-            u.Append_Elements(a);}
+        for(int c=0;c<face_velocities.m;c++)
+            u.Append_Elements(face_velocities(c).array);
         oo.Write("u",u);}
 }
 //#####################################################################

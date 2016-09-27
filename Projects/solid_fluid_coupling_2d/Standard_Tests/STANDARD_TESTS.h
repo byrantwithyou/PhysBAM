@@ -561,8 +561,7 @@ void Initialize_Velocities() override
     if(test_number==42){
         RANDOM_NUMBERS<T> random;
         random.Set_Seed(123);
-        ARRAY_VIEW<T> av(fluid_collection.incompressible_fluid_collection.face_velocities.buffer_size,fluid_collection.incompressible_fluid_collection.face_velocities.base_pointer);
-        random.Fill_Uniform(av,-1,1);}
+        random.Fill_Uniform(fluid_collection.incompressible_fluid_collection.face_velocities.array,-1,1);}
 
     if(test_number==43){
         // fluid velocities
