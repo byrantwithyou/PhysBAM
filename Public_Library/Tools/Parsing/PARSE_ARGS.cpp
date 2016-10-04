@@ -37,8 +37,9 @@ Parse(bool partial)
         if(OPTION* o=options.Get_Pointer(argv[i])){
             if(o->found) *o->found=o->found_value;
             if(o->store)
-                if(!argv[++i] || !o->store_func(o->store,argv[i]))
-                    Print_Usage(true);}
+                if(!argv[++i] || !o->store_func(o->store,argv[i])){
+                    LOG::cerr<<"Option '"<<argv[i]<<"' expects an argument."<<std::endl;
+                    Print_Usage(true);}}
         else argv[kept++]=argv[i];}
     argc=kept;
     argv[argc]=0;
@@ -46,18 +47,22 @@ Parse(bool partial)
     if(!partial){
         int k=0;
         for(int i=1;i<argc;i++){
-            if(argv[i][0]=='-' && isalpha(argv[i][1])) Print_Usage(true);
+            if(argv[i][0]=='-' && isalpha(argv[i][1])){
+                LOG::cerr<<"Failed to parse option '"<<argv[i]<<"'."<<std::endl;
+                Print_Usage(true);}
             if(k<extras.m){
                 if(extras(k).found) *extras(k).found=true;
                 if(extras(k).store)
-                    if(!extras(k).store_func(extras(k).store,argv[i]))
-                        Print_Usage(true);
+                    if(!extras(k).store_func(extras(k).store,argv[i])){
+                        LOG::cerr<<"Failed to parse extra argument '"<<argv[i]<<"'."<<std::endl;
+                        Print_Usage(true);}
                 if(!extras(k).exhaust) k++;}
             else unclaimed_arguments=true;}
         if(k<extras.m && extras(k).exhaust) k++;
         for(;k<extras.m;k++)
-            if(extras(k).required)
-                Print_Usage(true);}
+            if(extras(k).required){
+                LOG::cerr<<"Missing required extra argument '<"<<extras(k).name<<">'."<<std::endl;
+                Print_Usage(true);}}
 }
 //#####################################################################
 // Function Get_Program_Name
