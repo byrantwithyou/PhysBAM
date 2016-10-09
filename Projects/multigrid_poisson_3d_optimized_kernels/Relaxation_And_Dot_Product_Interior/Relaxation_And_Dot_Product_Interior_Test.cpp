@@ -6,16 +6,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#ifdef ENABLE_TIMING
+#include <x86intrin.h>
+#endif
 
 #include "../Thread_Queueing/PTHREAD_QUEUE.h"
 #include "Relaxation_And_Dot_Product_Interior_Helper.h"
 using namespace PhysBAM;
 extern PhysBAM::PTHREAD_QUEUE* pthread_queue;
 
-unsigned long long read_tsc(){__asm__("rdtsc");}
 struct timeval starttime,stoptime;
-void start_timer(){gettimeofday(&starttime,NULL);read_tsc();}
-void stop_timer(){gettimeofday(&stoptime,NULL);read_tsc();}
+void start_timer(){gettimeofday(&starttime,NULL);__rdtsc();}
+void stop_timer(){gettimeofday(&stoptime,NULL);__rdtsc();}
 double get_time(){return (double)stoptime.tv_sec-(double)starttime.tv_sec+(double)1e-6*(double)stoptime.tv_usec-(double)1e-6*(double)starttime.tv_usec;}
 
 int main(int argc,char *argv[]){

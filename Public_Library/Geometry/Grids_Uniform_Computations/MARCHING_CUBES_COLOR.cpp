@@ -30,6 +30,9 @@
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#ifdef ENABLE_TIMING
+#include <x86intrin.h>
+#endif
 
 using namespace PhysBAM;
 //#define ENABLE_TIMING
@@ -84,14 +87,6 @@ const int permute_rx_corners[8]={2,3,6,7,0,1,4,5};
 const int permute_ry_corners[8]={4,0,6,2,5,1,7,3};
 const int permute_flip_corners[8]={1,0,3,2,5,4,7,6};
 int face_edges[6][4];
-#ifdef ENABLE_TIMING
-#define rdtscll(val) do { \
-     unsigned int __a,__d; \
-     asm volatile("rdtsc" : "=a" (__a), "=d" (__d)); \
-     (val) = ((unsigned long long)__a) | (((unsigned long long)__d)<<32); \
-} while(0)
-inline unsigned long long rdtsc(){unsigned long long x;rdtscll(x);return x;}
-#endif
 
 inline EDGE Rotate_X(const EDGE& ep)
 {
@@ -597,12 +592,12 @@ Initialize_Case_Table()
     if(!first) return;
     first=false;
 #ifdef ENABLE_TIMING
-    unsigned long long t0=rdtsc();
+    unsigned long long t0=__rdtsc();
 #endif
     if(TV::m==3) Initialize_Case_Table_3D();
     if(TV::m==2) Initialize_Case_Table_2D();
 #ifdef ENABLE_TIMING
-    unsigned long long t1=rdtsc();
+    unsigned long long t1=__rdtsc();
     printf("setup: %.2f\n", (t1-t0)/3059.107);
 #endif
 }
@@ -614,7 +609,7 @@ Get_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,ARRAY<BOUNDARY_ELEMENT
     const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi)
 {
 #ifdef ENABLE_TIMING
-    unsigned long long t0=rdtsc();
+    unsigned long long t0=__rdtsc();
 #endif
     int next_color=0;
     HASHTABLE<int,int> color_map;
@@ -639,7 +634,7 @@ Get_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,ARRAY<BOUNDARY_ELEMENT
             color_map.Set(colors(i+num_corners/2),next_color++);}
     Get_Boundary_Elements_For_Cell(boundary,re_color2,colors.array+num_corners/2,phi.array+num_corners/2,1,color_list);
 #ifdef ENABLE_TIMING
-    unsigned long long t5=rdtsc();
+    unsigned long long t5=__rdtsc();
     printf("query: %.2f\n", (t5-t0)/3059.107);
 #endif
 }
