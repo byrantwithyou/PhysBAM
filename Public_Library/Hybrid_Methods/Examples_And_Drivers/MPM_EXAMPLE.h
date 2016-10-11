@@ -97,7 +97,6 @@ public:
     bool use_symplectic_euler;
     bool use_early_gradient_transfer;
     bool use_oldroyd;
-    bool use_variable_coefficients;
     bool print_stats;
     bool only_write_particles;
     T flip;
