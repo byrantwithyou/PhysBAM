@@ -76,7 +76,7 @@ Zero_Out_Neumann_Pocket_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     // zero out the velocities in neumann pockets to prevent gravity from accumulating
     ARRAY<bool,FACE_INDEX<TV::m> > &psi_N=elliptic_solver->psi_N;
-    if(!elliptic_solver->solve_neumann_regions){ 
+    if(!elliptic_solver->solve_neumann_regions){
         for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
             int color1=elliptic_solver->filled_region_colors(first_cell),color2=elliptic_solver->filled_region_colors(second_cell);
@@ -91,12 +91,12 @@ template<class TV> void PROJECTION_UNIFORM<TV>::
 Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,bool scale_by_dt)
 {
     Zero_Out_Neumann_Pocket_Velocities(face_velocities);
-    // find divergence free u, v and w 
+    // find divergence free u, v and w
     TV dx=p_grid.dX,one_over_dx=Inverse(dx);
     ARRAY<bool,TV_INT>& psi_D=elliptic_solver->psi_D;
     ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=elliptic_solver->psi_N;
     if(scale_by_dt) p*=dt;
-    if(laplace) 
+    if(laplace)
         for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
             if(!psi_N.Component(axis)(face_index) && !(psi_D(first_cell) && psi_D(second_cell)))

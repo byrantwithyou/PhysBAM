@@ -2,7 +2,7 @@
 // Copyright 2002-2010, Ronald Fedkiw, Eran Guendelman, Michael Lentine, Frank Losasso, Avi Robinson-Mosher, Andrew Selle, Tamar Shinar, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class PROJECTION_UNIFORM  
+// Class PROJECTION_UNIFORM
 //#####################################################################
 #ifndef __PROJECTION_UNIFORM__
 #define __PROJECTION_UNIFORM__
@@ -22,14 +22,14 @@ class PROJECTION_UNIFORM:public PROJECTION<typename TV::SCALAR>
 public:
     typedef PROJECTION<T> BASE;
     using PROJECTION<T>::use_non_zero_divergence;
-    
+
     GRID<TV> p_grid; // p_grid is a cell centered MAC grid
     ARRAY<T,TV_INT> p;
     ARRAY<T,TV_INT> p_save_for_projection;
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_save_for_projection;
     LAPLACE_UNIFORM<TV>* elliptic_solver;
-    LAPLACE_UNIFORM<TV>* laplace; 
-    POISSON_UNIFORM<TV>* poisson;     
+    LAPLACE_UNIFORM<TV>* laplace;
+    POISSON_UNIFORM<TV>* poisson;
     ARRAY<T,TV_INT> divergence; // use this to set up a non-zero divergence
     bool use_divergence_multiplier;
     ARRAY<T,TV_INT> divergence_multiplier;

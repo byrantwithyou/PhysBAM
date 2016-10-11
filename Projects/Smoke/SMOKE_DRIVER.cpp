@@ -203,19 +203,18 @@ Grid_To_Particle()
                     particles.C(p).Add_Column(d,dx*w*3.0/(example.mac_grid.dX(0)*example.mac_grid.dX(0))*face_velocities_ghost(face_index));}
                 else PHYSBAM_FATAL_ERROR();}            }
     LOG::cout << "max_gradient: " << max_gradient<< std::endl;
-  example.boundary->Set_Fixed_Boundary(false);
+    example.boundary->Set_Fixed_Boundary(false);
 
-  //Print vp, C_norm
-// LOG::cout<<"max(V(p))"<< Max_Particle_Speed()<<std::endl;
-  LOG::cout<<"max||C||"<< Max_C()<<std::endl;
-  LOG::cout << "grid-to-particle" << std::endl;
-  LOG::cout<<"Total Grid Kinetic Energy"<<Total_Grid_Kinetic_Energy()<<std::endl;
-  // LOG::cout<<"Total Particle Linear  Momentum"<<Total_Particle_Linear_Momentum() <<std::endl;
-  // LOG::cout << "Total_Grid_Linear_Momentum(): " << Total_Grid_Linear_Momentum() << std::endl;
-  // LOG::cout<<"Total Kinetic Energy"<<Total_Particle_Kinetic_Energy()<<std::endl;
-  LOG::cout<<"Total_Grid_Mass(): "<<Total_Grid_Mass()<<std::endl;
-  // LOG::cout<<"Min_Face_Mass():"<<Min_Face_Mass()<<std::endl;
-
+    //Print vp, C_norm
+    // LOG::cout<<"max(V(p))"<< Max_Particle_Speed()<<std::endl;
+    LOG::cout<<"max||C||"<< Max_C()<<std::endl;
+    LOG::cout << "grid-to-particle" << std::endl;
+    LOG::cout<<"Total Grid Kinetic Energy"<<Total_Grid_Kinetic_Energy()<<std::endl;
+    // LOG::cout<<"Total Particle Linear  Momentum"<<Total_Particle_Linear_Momentum() <<std::endl;
+    // LOG::cout << "Total_Grid_Linear_Momentum(): " << Total_Grid_Linear_Momentum() << std::endl;
+    // LOG::cout<<"Total Kinetic Energy"<<Total_Particle_Kinetic_Energy()<<std::endl;
+    LOG::cout<<"Total_Grid_Mass(): "<<Total_Grid_Mass()<<std::endl;
+    // LOG::cout<<"Min_Face_Mass():"<<Min_Face_Mass()<<std::endl;
 }
 
 //#####################################################################

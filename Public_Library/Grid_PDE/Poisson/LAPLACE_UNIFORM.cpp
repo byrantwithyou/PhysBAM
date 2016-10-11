@@ -274,8 +274,10 @@ template<class TV> void LAPLACE_UNIFORM<TV>::
 Initialize_Grid(const GRID<TV>& mac_grid_input)
 {
     assert(mac_grid_input.DX()==TV() || mac_grid_input.Is_MAC_Grid());
-    grid=mac_grid_input;f.Resize(grid.Domain_Indices(1));
-    psi_N.Resize(grid,1);psi_D.Resize(grid.Domain_Indices(1));
+    grid=mac_grid_input;
+    f.Resize(grid.Domain_Indices(1));
+    psi_N.Resize(grid,1);
+    psi_D.Resize(grid.Domain_Indices(1));
     filled_region_colors.Resize(grid.Domain_Indices(1));
 }
 //#####################################################################
