@@ -81,7 +81,6 @@ public:
     int restart;
     T dt,time,frame_dt,min_dt,max_dt;
     int ghost;
-    bool use_reduced_rasterization;
     bool use_affine;
     bool use_f2p;
     bool use_midpoint;
