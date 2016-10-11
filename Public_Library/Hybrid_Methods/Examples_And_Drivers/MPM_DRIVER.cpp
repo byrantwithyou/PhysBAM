@@ -288,7 +288,7 @@ Particle_To_Grid()
         scale=example.weights->Constant_Scalar_Inverse_Dp();
     bool use_gradient=!example.incompressible && !example.kkt && example.weights->use_gradient_transfer;
     ARRAY_VIEW<MATRIX<T,TV::m> > dV((example.incompressible || example.kkt)?particles.C:particles.B);
-    example.gather_scatter.template Scatter<int>(true,0,
+    example.gather_scatter.template Scatter<int>(true,
         [this,scale,&particles,use_gradient,dV](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {
             T w=it.Weight();

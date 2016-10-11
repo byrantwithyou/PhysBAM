@@ -197,7 +197,7 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& Z,const T time) co
             tmp(p)=M*particles.volume(p);
         });
 
-    gather_scatter.template Scatter<int>(true,0,
+    gather_scatter.template Scatter<int>(true,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {F(it.Index())+=tmp(p)*it.Gradient();});
 }

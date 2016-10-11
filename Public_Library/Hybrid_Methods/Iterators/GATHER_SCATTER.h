@@ -11,6 +11,7 @@
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_ITERATOR.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -21,6 +22,8 @@ template<class TV> class MPM_EXAMPLE;
 template<class TV> class MPM_OBJECTIVE;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
 
+// TODO: probably need to leave an extra cell width to avoid collisions for MAC transfers.
+
 template<class TV>
 class GATHER_SCATTER
 {
@@ -28,8 +31,10 @@ class GATHER_SCATTER
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH T_SCRATCH;
+    typedef typename PARTICLE_GRID_FACE_ITERATOR<TV>::SCRATCH T_FACE_SCRATCH;
     const ARRAY<int>& simulated_particles;
     const PARTICLE_GRID_WEIGHTS<TV>* weights;
+    VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights;
     const GRID<TV>& grid;
     ARRAY<ARRAY<int> > bins;
     int threads;
@@ -51,16 +56,16 @@ public:
                 for(int i=0;i<threads;++i){
                     DATA data((DATA()));
                     int bin_id=i*partitions+pass;
-                    T_SCRATCH scratch;
+                    T_FACE_SCRATCH face_scratch;
                     for(int k=0;k<bins(bin_id).m;k++){
                         int p=bins(bin_id)(k);
-                        Helper_P(scratch,want_gradient,p,data,args...);}}}}
+                        Helper(face_scratch,want_gradient,p,data,args...);}}}}
         else{
-            T_SCRATCH scratch;
+            T_FACE_SCRATCH face_scratch;
             DATA data((DATA()));
             for(int k=0;k<simulated_particles.m;k++){
                 int p=simulated_particles(k);
-                Helper_P(scratch,want_gradient,p,data,args...);}}
+                Helper(face_scratch,want_gradient,p,data,args...);}}
     }
 
     // Safe to write to particle data
@@ -72,46 +77,40 @@ public:
             int a=tid*simulated_particles.m/threads;
             int b=(tid+1)*simulated_particles.m/threads;
             DATA data((DATA()));
-            T_SCRATCH scratch;
+            T_FACE_SCRATCH face_scratch;
             for(int k=a;k<b;k++){
                 int p=simulated_particles(k);
-                Helper_P(scratch,want_gradient,p,data,args...);}}
+                Helper(face_scratch,want_gradient,p,data,args...);}}
     }
 
     template<class DATA,class F,class... Args>
-    void Helper_P(T_SCRATCH& scratch,bool want_gradient,int p,DATA& data,F f,Args&&... args)
+    typename std::enable_if<sizeof(((*(F*)0)(0,*(DATA*)0),true))>::type
+    Helper(T_FACE_SCRATCH& face_scratch,bool want_gradient,int p,DATA& data,F f,Args&&... args)
     {
         f(p,data);
-        Helper_G(scratch,want_gradient,p,data,args...);
-    }
-
-    template<class DATA,class... Args>
-    void Helper_P(T_SCRATCH& scratch,bool want_gradient,int p,DATA& data,int f,Args&&... args)
-    {
-        Helper_G(scratch,want_gradient,p,data,args...);
-    }
-
-    template<class DATA>
-    void Helper_P(T_SCRATCH& scratch,bool want_gradient,int p,DATA& data)
-    {
+        Helper(face_scratch,want_gradient,p,data,args...);
     }
 
     template<class DATA,class F,class... Args>
-    void Helper_G(T_SCRATCH& scratch,bool want_gradient,int p,DATA& data,F f,Args&&... args)
+    typename std::enable_if<sizeof(((*(F*)0)(0,*(PARTICLE_GRID_ITERATOR<TV>*)0,*(DATA*)0),true))>::type
+    Helper(T_FACE_SCRATCH& face_scratch,bool want_gradient,int p,DATA& data,F f,Args&&... args)
     {
-        for(PARTICLE_GRID_ITERATOR<TV> it(weights,p,want_gradient,scratch);it.Valid();it.Next())
+        for(PARTICLE_GRID_ITERATOR<TV> it(weights,p,want_gradient,face_scratch(0));it.Valid();it.Next())
             f(p,it,data);
-        Helper_P(scratch,want_gradient,p,data,args...);
+        Helper(face_scratch,want_gradient,p,data,args...);
     }
 
-    template<class DATA,class... Args>
-    void Helper_G(T_SCRATCH& scratch,bool want_gradient,int p,DATA& data,int f,Args&&... args)
+    template<class DATA,class F,class... Args>
+    typename std::enable_if<sizeof(((*(F*)0)(0,*(PARTICLE_GRID_FACE_ITERATOR<TV>*)0,*(DATA*)0),true))>::type
+    Helper(T_FACE_SCRATCH& face_scratch,bool want_gradient,int p,DATA& data,F f,Args&&... args)
     {
-        Helper_P(scratch,want_gradient,p,data,args...);
+        for(PARTICLE_GRID_FACE_ITERATOR<TV> it(face_weights,p,want_gradient,face_scratch);it.Valid();it.Next())
+            f(p,it,data);
+        Helper(face_scratch,want_gradient,p,data,args...);
     }
 
     template<class DATA>
-    void Helper_G(T_SCRATCH& scratch,bool want_gradient,int p,DATA& data)
+    void Helper(T_FACE_SCRATCH& face_scratch,bool want_gradient,int p,DATA& data)
     {
     }
     

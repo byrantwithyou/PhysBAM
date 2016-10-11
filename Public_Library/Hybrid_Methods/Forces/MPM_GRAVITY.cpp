@@ -63,7 +63,7 @@ Potential_Energy(const T time) const
 template<class TV> void MPM_GRAVITY<TV>:: 
 Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
-    gather_scatter.template Scatter<int>(false,0,
+    gather_scatter.template Scatter<int>(false,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
             F(it.Index())+=it.Weight()*particles.mass(p)*gravity;});
 }
