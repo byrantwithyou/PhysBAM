@@ -35,7 +35,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     
     TV_INT counts=TV_INT::All_Ones_Vector()*scale/2;counts(1)=scale;
     example->Initialize_Grid(counts,range);
-    LOG::cout<<"Grid dX "<<example->mac_grid.dX<<std::endl;
+    LOG::cout<<"Grid dX "<<example->grid.dX<<std::endl;
     example->last_frame=1000;// default last_frame = 100
     parse_args.Add("-restart",&example->restart,"frame","restart frame");
     parse_args.Add("-substeps",&example->write_substeps_level,"level","output-substep level");
@@ -51,9 +51,9 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
 
     parse_args.Parse();
     
-    if(example->eapic_order==1) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(example->mac_grid,/*threads*/1));
-    else if(example->eapic_order==2) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(example->mac_grid,/*threads*/1));
-    else if(example->eapic_order==3) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(example->mac_grid,/*threads*/1));
+    if(example->eapic_order==1) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(example->grid,/*threads*/1));
+    else if(example->eapic_order==2) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(example->grid,/*threads*/1));
+    else if(example->eapic_order==3) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(example->grid,/*threads*/1));
     else PHYSBAM_FATAL_ERROR();
 
     // INITIALIZE PARTICLES, FILL THE GRID.
@@ -79,11 +79,11 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
                 a(0)=5*dx;a(1)=dx;samples.Append(a);
                 a(0)=5*dx;a(1)=3*dx;samples.Append(a);
                 a(0)=5*dx;a(1)=5*dx;samples.Append(a);
-                for(CELL_ITERATOR<TV> iterator(example->mac_grid,2);iterator.Valid();iterator.Next()){
+                for(CELL_ITERATOR<TV> iterator(example->grid,2);iterator.Valid();iterator.Next()){
                     TV X;
                     for(int t=0;t<9;t++){
                         // rand.Fill_Uniform(X,iterator.Bounding_Box());
-                        X=iterator.Bounding_Box().min_corner+samples(t)*example->mac_grid.dX.Min();
+                        X=iterator.Bounding_Box().min_corner+samples(t)*example->grid.dX.Min();
                         int p=example->particles.Add_Element();
                         example->particles.X(p)=X;
                         example->particles.X0(p)=X;
@@ -108,11 +108,11 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
                 a(0)=5*dx;a(1)=dx;samples.Append(a);
                 a(0)=5*dx;a(1)=3*dx;samples.Append(a);
                 a(0)=5*dx;a(1)=5*dx;samples.Append(a);
-                for(CELL_ITERATOR<TV> iterator(example->mac_grid,2);iterator.Valid();iterator.Next()){
+                for(CELL_ITERATOR<TV> iterator(example->grid,2);iterator.Valid();iterator.Next()){
                     TV X;
                     for(int t=0;t<8;t++){
                         // rand.Fill_Uniform(X,iterator.Bounding_Box());
-                        X=iterator.Bounding_Box().min_corner+samples(t)*example->mac_grid.dX.Min();
+                        X=iterator.Bounding_Box().min_corner+samples(t)*example->grid.dX.Min();
                         int p=example->particles.Add_Element();
                         example->particles.X(p)=X;
                         example->particles.X0(p)=X;
@@ -131,11 +131,11 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
                 a(0)=0.75;a(1)=0.25;samples.Append(a);
                 a(0)=0.25;a(1)=0.75;samples.Append(a);
                 a(0)=0.75;a(1)=0.75;samples.Append(a);
-                for(CELL_ITERATOR<TV> iterator(example->mac_grid,2);iterator.Valid();iterator.Next()){
+                for(CELL_ITERATOR<TV> iterator(example->grid,2);iterator.Valid();iterator.Next()){
                     TV X;
                     for(int t=0;t<4;t++){
                         // rand.Fill_Uniform(X,iterator.Bounding_Box());
-                        X=iterator.Bounding_Box().min_corner+samples(t)*example->mac_grid.dX.Min();
+                        X=iterator.Bounding_Box().min_corner+samples(t)*example->grid.dX.Min();
                         int p=example->particles.Add_Element();
                         example->particles.X(p)=X;
                         example->particles.X0(p)=X;
@@ -149,9 +149,9 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
                 ARRAY<TV> samples;
                 TV a;
                 a(0)=0.5;a(1)=0.5;samples.Append(a);      
-                for(CELL_ITERATOR<TV> iterator(example->mac_grid,2);iterator.Valid();iterator.Next()){
+                for(CELL_ITERATOR<TV> iterator(example->grid,2);iterator.Valid();iterator.Next()){
                     TV X;
-                    X=iterator.Bounding_Box().min_corner+samples(0)*example->mac_grid.dX.Min();
+                    X=iterator.Bounding_Box().min_corner+samples(0)*example->grid.dX.Min();
                     int p=example->particles.Add_Element();
                     example->particles.X(p)=X;
                     example->particles.X0(p)=X;
@@ -161,7 +161,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
             break;
     }
 // RANDOM_NUMBERS<typename TV::SCALAR> rand;
-    // for(CELL_ITERATOR<TV> iterator(example->mac_grid);iterator.Valid();iterator.Next()){
+    // for(CELL_ITERATOR<TV> iterator(example->grid);iterator.Valid();iterator.Next()){
     //     TV X;
     //     for(int t=0;t<4;t++){
     //         rand.Fill_Uniform(X,iterator.Bounding_Box());
@@ -190,7 +190,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     // MPI CRAP
     if(mpi_world.initialized){
         LOG::cout<<"ERROR: MPI initialized? Shouldn't reach here."<<std::endl;
-        example->mpi_grid=new MPI_UNIFORM_GRID<TV>(example->mac_grid,5);
+        example->mpi_grid=new MPI_UNIFORM_GRID<TV>(example->grid,5);
         if(example->mpi_grid->Number_Of_Processors()>1) example->output_directory+=LOG::sprintf("/%d",(mpi_world.rank+1));}
 
     // OUTPUT DIR

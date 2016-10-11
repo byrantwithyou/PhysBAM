@@ -50,7 +50,7 @@ public:
     T alpha;
     T beta;
     T cfl;
-    GRID<TV> mac_grid;
+    GRID<TV> grid;
     MPI_UNIFORM_GRID<TV> *mpi_grid;
     THREAD_QUEUE* thread_queue;    
     PROJECTION_UNIFORM<TV> projection;

@@ -68,10 +68,10 @@ Initialize()
     example.projection.elliptic_solver->thread_queue=example.thread_queue;
 
     // setup grids and velocities
-    example.projection.Initialize_Grid(example.mac_grid);
-    example.face_velocities.Resize(example.mac_grid);
-    example.density.Resize(example.mac_grid.Domain_Indices(ghost));
-    example.temperature.Resize(example.mac_grid.Domain_Indices(ghost));  // add temperature
+    example.projection.Initialize_Grid(example.grid);
+    example.face_velocities.Resize(example.grid);
+    example.density.Resize(example.grid.Domain_Indices(ghost));
+    example.temperature.Resize(example.grid.Domain_Indices(ghost));  // add temperature
     example.Initialize_Fields();
 
     // setup laplace
@@ -90,8 +90,8 @@ Initialize()
     // EAPIC
     if(example.use_eapic){
         // Resize mass array
-        example.mass.Resize(example.mac_grid.Domain_Indices(example.ghost));
-        example.face_mass.Resize(example.mac_grid.Domain_Indices(example.ghost));
+        example.mass.Resize(example.grid.Domain_Indices(example.ghost));
+        example.face_mass.Resize(example.grid.Domain_Indices(example.ghost));
         // Compute born weights
         for(int i=0;i<TV::m;++i) example.face_weights0(i)->Update(example.particles.X);}
 
@@ -122,8 +122,8 @@ Particle_To_Grid()
     example.face_velocities.Fill((T)0);
 
     example.boundary->Set_Fixed_Boundary(true,0);
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,ghost,false);
-    example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time,ghost);
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.grid,ghost,false);
+    example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time,ghost);
 
     // Rasterize mass and momentum to faces
     typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
@@ -134,11 +134,11 @@ Particle_To_Grid()
                 T w=it.Weight();
                 FACE_INDEX<TV::m> face_index(d,it.Index());
                 example.face_mass(face_index)+=w*particles.mass(p);
-                TV dx=example.mac_grid.Face(face_index)-particles.X(p);
+                TV dx=example.grid.Face(face_index)-particles.X(p);
                 T v=particles.V(p)(d)+TV::Dot_Product(particles.C(p).Column(d),dx);
                 face_velocities_ghost(face_index)+=w*particles.mass(p)*v;}}}
     // Divide out masses
-    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(example.grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
         if(example.face_mass(face_index))
             example.face_velocities(face_index)=face_velocities_ghost(face_index)/example.face_mass(face_index);}
@@ -163,8 +163,8 @@ template<class TV> void SMOKE_DRIVER<TV>::
 Grid_To_Particle()
 {
     example.boundary->Set_Fixed_Boundary(true,0);
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,ghost,false);
-    example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time,ghost);
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.grid,ghost,false);
+    example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time,ghost);
 
     SMOKE_PARTICLES<TV>& particles=example.particles;
     typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
@@ -196,11 +196,11 @@ Grid_To_Particle()
                     if(it.Gradient().Magnitude_Squared() > max_gradient) max_gradient = it.Gradient().Magnitude_Squared();
                 }
                 else if(example.eapic_order==2){
-                    TV dx=example.mac_grid.Face(face_index)-particles.X(p);
-                    particles.C(p).Add_Column(d,dx*w*4.0/(example.mac_grid.dX(0)*example.mac_grid.dX(0))*face_velocities_ghost(face_index));}
+                    TV dx=example.grid.Face(face_index)-particles.X(p);
+                    particles.C(p).Add_Column(d,dx*w*4.0/(example.grid.dX(0)*example.grid.dX(0))*face_velocities_ghost(face_index));}
                 else if(example.eapic_order==3){
-                    TV dx=example.mac_grid.Face(face_index)-particles.X(p);
-                    particles.C(p).Add_Column(d,dx*w*3.0/(example.mac_grid.dX(0)*example.mac_grid.dX(0))*face_velocities_ghost(face_index));}
+                    TV dx=example.grid.Face(face_index)-particles.X(p);
+                    particles.C(p).Add_Column(d,dx*w*3.0/(example.grid.dX(0)*example.grid.dX(0))*face_velocities_ghost(face_index));}
                 else PHYSBAM_FATAL_ERROR();}            }
     LOG::cout << "max_gradient: " << max_gradient<< std::endl;
     example.boundary->Set_Fixed_Boundary(false);
@@ -240,10 +240,10 @@ Move_Particles(const T dt)
 template<class TV> void SMOKE_DRIVER<TV>::
 Add_Buoyancy_Force(const T dt,const T time)
 {
-    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(example.grid);iterator.Valid();iterator.Next()){
         if(iterator.axis==1){
             TV_INT c1,c2;
-            example.mac_grid.Cells_Touching_Face(iterator.axis,iterator.Face_Index(),c1,c2);
+            example.grid.Cells_Touching_Face(iterator.axis,iterator.Face_Index(),c1,c2);
             T rho=(example.density(c1)+example.density(c2))*(T).5;
             T tem=(example.temperature(c1)+example.temperature(c2))*(T).5; // add temperature 
             example.face_velocities(iterator.Full_Index())+=-dt*example.alpha*rho+dt*example.beta*tem;}}// add temperature
@@ -255,13 +255,13 @@ template<class TV> void SMOKE_DRIVER<TV>::
 Scalar_Advance(const T dt,const T time)
 {  
     example.Get_Scalar_Field_Sources(time);
-    ARRAY<T,TV_INT> density_ghost(example.mac_grid.Domain_Indices(ghost));
-    ARRAY<T,TV_INT> temperature_ghost(example.mac_grid.Domain_Indices(ghost));  // add temperature
+    ARRAY<T,TV_INT> density_ghost(example.grid.Domain_Indices(ghost));
+    ARRAY<T,TV_INT> temperature_ghost(example.grid.Domain_Indices(ghost));  // add temperature
     example.boundary->Set_Fixed_Boundary(true,0);
-    example.boundary->Fill_Ghost_Cells(example.mac_grid,example.density,density_ghost,dt,time,ghost);
-    example.boundary->Fill_Ghost_Cells(example.mac_grid,example.temperature,temperature_ghost,dt,time,ghost);
-    example.advection_scalar.Update_Advection_Equation_Cell(example.mac_grid,example.density,density_ghost,example.face_velocities,*example.boundary,dt,time);
-    example.advection_scalar.Update_Advection_Equation_Cell(example.mac_grid,example.temperature,temperature_ghost,example.face_velocities,*example.boundary,dt,time);
+    example.boundary->Fill_Ghost_Cells(example.grid,example.density,density_ghost,dt,time,ghost);
+    example.boundary->Fill_Ghost_Cells(example.grid,example.temperature,temperature_ghost,dt,time,ghost);
+    example.advection_scalar.Update_Advection_Equation_Cell(example.grid,example.density,density_ghost,example.face_velocities,*example.boundary,dt,time);
+    example.advection_scalar.Update_Advection_Equation_Cell(example.grid,example.temperature,temperature_ghost,example.face_velocities,*example.boundary,dt,time);
     example.boundary->Set_Fixed_Boundary(false);
 }
 //#####################################################################
@@ -277,10 +277,10 @@ Convect(const T dt,const T time)
         Particle_To_Grid();}
     else{
         example.boundary->Set_Fixed_Boundary(true,0);
-        ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,ghost,false);
-        example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time,ghost);
+        ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.grid,ghost,false);
+        example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time,ghost);
         example.advection_scalar.Update_Advection_Equation_Face(
-        example.mac_grid,example.face_velocities,face_velocities_ghost,face_velocities_ghost,*example.boundary,dt,time);
+        example.grid,example.face_velocities,face_velocities_ghost,face_velocities_ghost,*example.boundary,dt,time);
         example.boundary->Set_Fixed_Boundary(false);}
 }
 //#####################################################################
@@ -291,7 +291,7 @@ Project(const T dt,const T time)
 {
     example.Set_Boundary_Conditions(time+dt,1);  // set 0 then it doesn't have velocity after initial
     example.projection.p*=dt; // rescale pressure for guess
-    example.boundary->Apply_Boundary_Condition_Face(example.mac_grid,example.face_velocities,time+dt);
+    example.boundary->Apply_Boundary_Condition_Face(example.grid,example.face_velocities,time+dt);
     example.projection.Make_Divergence_Free(example.face_velocities,dt,time);
     example.projection.p*=(1/dt); // unscale pressure
      LOG::cout << "projection" << std::endl;
@@ -366,7 +366,7 @@ Print_Max_Divergence(const char* str)
 {
     if(!example.debug_divergence) return;
     T max_div=(T)0;
-    for(CELL_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(example.grid);iterator.Valid();iterator.Next()){
         T d=0;
         for(int axis=0;axis<TV::m;axis++)
             d+=example.face_velocities(FACE_INDEX<TV::m>(axis,iterator.Second_Face_Index(axis)))
@@ -466,7 +466,7 @@ template<class TV> typename TV::SCALAR SMOKE_DRIVER<TV>::
 Total_Grid_Kinetic_Energy() const
 {
     T result=0;
-    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(example.grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
         if(example.face_mass(face_index)){
             result+=(T).5*example.face_mass(face_index)*example.face_velocities(face_index)*example.face_velocities(face_index);}}
@@ -479,7 +479,7 @@ template<class TV> typename TV::SCALAR SMOKE_DRIVER<TV>::
 Total_Grid_Mass() const
 {
     T result=0;
-    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(example.grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
         if(example.face_mass(face_index)){
             result+=example.face_mass(face_index);}}
@@ -493,7 +493,7 @@ Total_Grid_Linear_Momentum() const
 
 {
     TV result;
-    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(example.grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
         if(example.face_mass(face_index)){
             switch(iterator.Axis()){
@@ -514,7 +514,7 @@ Min_Face_Mass() const
 {
     T result=1000;
     FACE_INDEX<TV::m> min_face_mass_index;
-    for(FACE_ITERATOR<TV> iterator(example.mac_grid);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR<TV> iterator(example.grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
         if(example.face_mass(face_index)<result)
         {
