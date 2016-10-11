@@ -386,18 +386,15 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         if(node_based){
             vector_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,regular_grid,filename);
-            vector_velocity_component->opengl_grid_based_vector_field.size=.01;
             vector_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             Add_Component(vector_velocity_component,"Node velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
         else{
             mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-            mac_velocity_component->opengl_mac_velocity_field->size=.01;
             mac_velocity_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Green();
             Add_Component(mac_velocity_component,"MAC velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}}
     filename=basedir+"/%d/kinetic_energy";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         ke_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-        ke_component->opengl_mac_velocity_field->size=.01;
         ke_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Green();
         ke_component->opengl_mac_velocity_field->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
         ke_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
@@ -405,7 +402,6 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/mac_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-        mac_velocity_component->opengl_mac_velocity_field->size=.01;
         mac_velocity_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Magenta();
         mac_velocity_component->opengl_mac_velocity_field->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
         mac_velocity_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
@@ -413,7 +409,6 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/compressible_mac_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-        mac_velocity_component->opengl_mac_velocity_field->size=.01;
         mac_velocity_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Magenta();
         mac_velocity_component->opengl_mac_velocity_field->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
         mac_velocity_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
@@ -421,14 +416,12 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/centered_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         vector_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,mac_grid,filename);
-        vector_velocity_component->opengl_grid_based_vector_field.size=.01;
         vector_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
         Add_Component(vector_velocity_component,"Centered velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/mass_fluxes";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         std::cout<<"Using mass fluxes (from "<<filename<<")"<<std::endl;
         OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>* face_flux_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-        face_flux_component->opengl_mac_velocity_field->size=.01;
         face_flux_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Magenta();
         face_flux_component->opengl_mac_velocity_field->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
         face_flux_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
@@ -470,7 +463,6 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/mac_velocities_fuel";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>* mac_velocity_fuel_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-        mac_velocity_fuel_component->opengl_mac_velocity_field->size=.01;
         mac_velocity_fuel_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Cyan();
         mac_velocity_fuel_component->opengl_mac_velocity_field->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
         Add_Component(mac_velocity_fuel_component,"MAC velocities fuel",'B',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
@@ -483,7 +475,6 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         if(node_based){
             vector_velocity_ghost_minus_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,regular_grid,filename);
-            vector_velocity_ghost_minus_component->opengl_grid_based_vector_field.size=.01;
             vector_velocity_ghost_minus_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             Add_Component(vector_velocity_ghost_minus_component,"Node ghost fuel velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             opengl_world.Append_Bind_Key('c',vector_velocity_ghost_minus_component->viewer_callbacks.Get("toggle_draw"));
@@ -492,7 +483,6 @@ Initialize_Components_And_Key_Bindings()
             opengl_world.Append_Bind_Key('-',vector_velocity_ghost_minus_component->viewer_callbacks.Get("decrease_vector_size"));}
         else{
             OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>* mac_velocity_ghost_minus_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-            mac_velocity_ghost_minus_component->opengl_mac_velocity_field->size=.01;
             mac_velocity_ghost_minus_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Green();
             mac_velocity_ghost_minus_component->Set_Draw(false);
             Add_Component(mac_velocity_ghost_minus_component,"MAC ghost fuel velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
@@ -506,7 +496,6 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         if(node_based){
             vector_velocity_ghost_plus_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,regular_grid,filename);
-            vector_velocity_ghost_plus_component->opengl_grid_based_vector_field.size=.01;
             vector_velocity_ghost_plus_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             vector_velocity_ghost_plus_component->Set_Draw(false);
             Add_Component(vector_velocity_ghost_plus_component,"Node ghost velocities",'b',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
@@ -515,7 +504,6 @@ Initialize_Components_And_Key_Bindings()
             opengl_world.Append_Bind_Key('-',vector_velocity_ghost_plus_component->viewer_callbacks.Get("decrease_vector_size"));}
         else{
             OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>* mac_velocity_ghost_plus_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
-            mac_velocity_ghost_plus_component->opengl_mac_velocity_field->size=.01;
             mac_velocity_ghost_plus_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Green();
             mac_velocity_ghost_plus_component->Set_Draw(false);
             Add_Component(mac_velocity_ghost_plus_component,"MAC ghost velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
@@ -540,7 +528,6 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/center_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>* center_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,mac_grid,filename);
-        center_velocity_component->opengl_grid_based_vector_field.size=.01;
         center_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
         Add_Component(center_velocity_component,"Centered velocities",'V',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',center_velocity_component->viewer_callbacks.Get("increase_vector_size"));
@@ -673,7 +660,6 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/pressure_jumps";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>* pressure_jump_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,grid,filename);
-        pressure_jump_component->opengl_grid_based_vector_field.size=.01;
         pressure_jump_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Magenta();
         Add_Component(pressure_jump_component,"Pressure jumps",'&',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',pressure_jump_component->viewer_callbacks.Get("increase_vector_size"));

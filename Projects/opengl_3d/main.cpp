@@ -438,7 +438,6 @@ Initialize_Components_And_Key_Bindings()
         if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
             if(node_based){
                 vector_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,regular_grid,filename);
-                vector_velocity_component->opengl_grid_based_vector_field.size=0.01;
                 vector_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
                 Add_Component(vector_velocity_component,"Node velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
                 slice_manager.Add_Object(vector_velocity_component);}
@@ -475,7 +474,6 @@ Initialize_Components_And_Key_Bindings()
         filename=basedir+"/%d/centered_velocities";
         if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
             OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* center_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,mac_grid,filename);
-            center_velocity_component->opengl_grid_based_vector_field.size=0.1;
             center_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             Add_Component(center_velocity_component,"Centered velocities",'B',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             opengl_world.Append_Bind_Key('=',center_velocity_component->viewer_callbacks.Get("increase_vector_size"));
@@ -486,7 +484,6 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/object_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* object_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,regular_grid,filename);
-        object_velocity_component->opengl_grid_based_vector_field.size=0.01;
         object_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Yellow();
         Add_Component(object_velocity_component,"Object velocities",'%',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',object_velocity_component->viewer_callbacks.Get("increase_vector_size"));
@@ -510,7 +507,6 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         if(node_based){
             OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* vector_velocity_ghost_plus_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,regular_grid,filename);
-            vector_velocity_ghost_plus_component->opengl_grid_based_vector_field.size=0.01;
             vector_velocity_ghost_plus_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             Add_Component(vector_velocity_ghost_plus_component,"Node ghost plus velocities",'b',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             opengl_world.Append_Bind_Key('h',vector_velocity_ghost_plus_component->viewer_callbacks.Get("toggle_arrowhead"));
@@ -522,7 +518,6 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         if(node_based){
             OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* vector_velocity_ghost_minus_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,regular_grid,filename);
-            vector_velocity_ghost_minus_component->opengl_grid_based_vector_field.size=0.01;
             vector_velocity_ghost_minus_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             vector_velocity_ghost_minus_component->Set_Draw(false);
             Add_Component(vector_velocity_ghost_minus_component,"Node ghost minus velocities",'c',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
@@ -534,7 +529,6 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/center_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame) && parameter_list.template Get_Parameter<bool>("use_cell_centered_velocities",false)){
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* center_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,mac_grid,filename);
-        center_velocity_component->opengl_grid_based_vector_field.size=0.1;
         center_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
         Add_Component(center_velocity_component,"Centered velocities",'V',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',center_velocity_component->viewer_callbacks.Get("increase_vector_size"));
@@ -545,7 +539,6 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/pressure_jumps";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* pressure_jump_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,grid,filename);
-        pressure_jump_component->opengl_grid_based_vector_field.size=0.001;
         pressure_jump_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Magenta();
         Add_Component(pressure_jump_component,"Pressure jumps",'&',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',pressure_jump_component->viewer_callbacks.Get("increase_vector_size"));
