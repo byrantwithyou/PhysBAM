@@ -286,6 +286,10 @@ public:
     GRID<TV> Get_Face_Grid(const int axis) const
     {TV_INT numbers=numbers_of_cells;numbers(axis)++;TV offset((T).5*dX);offset(axis)=0;
     return GRID<TV>(TV_INT::Componentwise_Max(TV_INT(),numbers),RANGE<TV>(domain.min_corner+offset,domain.max_corner-offset));}
+
+    GRID<TV> Get_Face_MAC_Grid(const int axis) const
+    {TV_INT numbers=numbers_of_cells;numbers(axis)++;TV offset;offset(axis)=(T).5*dX(axis);
+    return GRID<TV>(TV_INT::Componentwise_Max(TV_INT(),numbers),RANGE<TV>(domain.min_corner-offset,domain.max_corner+offset),true);}
     
     GRID<TV> Get_Center_Grid() const
     {TV offset((T).5*dX);

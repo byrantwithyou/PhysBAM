@@ -254,7 +254,7 @@ template<class TV> void KANG_POISSON_VISCOSITY<TV>::
 Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool implicit) const
 {
     const GRID<TV>& grid=*fluids_parameters.grid;
-    const GRID<TV> dual_grid=fluids_parameters.grid->Get_Face_Grid(axis).Get_MAC_Grid_At_Regular_Positions();
+    const GRID<TV> dual_grid=fluids_parameters.grid->Get_Face_MAC_Grid(axis);
 
     int num_dual_cells=0;
     ARRAY<int,TV_INT> dual_cell_index(dual_grid.Domain_Indices(3));

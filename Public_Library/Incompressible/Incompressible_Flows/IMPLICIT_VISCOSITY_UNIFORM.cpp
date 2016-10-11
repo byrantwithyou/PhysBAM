@@ -23,7 +23,7 @@ IMPLICIT_VISCOSITY_UNIFORM(LAPLACE_UNIFORM<TV>& elliptic_solver_input,const ARRA
     mpi_grid(mpi_grid_input),axis(axis_input),heat_solver(0),use_variable_viscosity(use_variable_viscosity_input),use_psi_R(use_psi_R_input)
 {
     if(mpi_grid) face_grid=mpi_grid->Get_Non_Overlapping_Face_Grid(axis);
-    else face_grid=elliptic_solver.grid.Get_Face_Grid(axis).Get_MAC_Grid_At_Regular_Positions();
+    else face_grid=elliptic_solver.grid.Get_Face_MAC_Grid(axis);
     u.Resize(face_grid.Domain_Indices(mpi_grid?1:0));
 }
 //#####################################################################
