@@ -18,7 +18,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>
         int side=2*axis+axis_side;
         if(use_extrapolation_mode && Constant_Extrapolation(side)) BOUNDARY<TV,T>::Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
         else{ // either phi=phi_object for a wall, or no wall
-            int inward_sign=axis_side==0?1:-1;T dx=grid.DX()[axis],half_dx=(T).5*dx;
+            int inward_sign=axis_side==0?1:-1;T dx=grid.dX[axis],half_dx=(T).5*dx;
             int cell_boundary=Boundary(side,regions(side)),face_boundary=cell_boundary+axis_side;
             int reflection_times_two=2*cell_boundary+(axis_side==0?-1:1);
             for(CELL_ITERATOR<TV> iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();

@@ -895,9 +895,9 @@ Apply_Friction()
 template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
 Compute_Dt() const
 {
-    T critical_speed=example.cfl*example.grid.DX().Min()/example.max_dt;
+    T critical_speed=example.cfl*example.grid.dX.Min()/example.max_dt;
     T v=Grid_V_Upper_Bound();
-    return (v>critical_speed)?(example.cfl*example.grid.DX().Min()/v):example.max_dt;
+    return (v>critical_speed)?(example.cfl*example.grid.dX.Min()/v):example.max_dt;
 }
 //#####################################################################
 // Function Max_Particle_Speed
@@ -920,7 +920,7 @@ Grid_V_Upper_Bound() const
 {
     if(!example.use_affine || !example.weights->constant_scalar_inertia_tensor) return Max_Particle_Speed();
     T result=0;
-    T xi=(T)6*sqrt((T)TV::m)*example.grid.One_Over_DX().Min();
+    T xi=(T)6*sqrt((T)TV::m)*example.grid.one_over_dX.Min();
 #pragma omp parallel for reduction(max:result)
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);

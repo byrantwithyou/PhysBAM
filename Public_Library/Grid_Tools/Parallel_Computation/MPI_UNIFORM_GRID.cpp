@@ -149,7 +149,7 @@ Get_Non_Overlapping_Face_Grid(const int axis) const
     GRID<TV> face_grid=local_grid.Get_Face_Grid(axis);
     if(side_neighbor_ranks(2*axis)!=MPI::PROC_NULL){
         const TV_INT counts=face_grid.Numbers_Of_Cells()+TV_INT::All_Ones_Vector()-TV_INT::Axis_Vector(axis);
-        const RANGE<TV> box=face_grid.Domain()+RANGE<TV>(TV(),-face_grid.DX()*TV::Axis_Vector(axis));
+        const RANGE<TV> box=face_grid.Domain()+RANGE<TV>(TV(),-face_grid.dX*TV::Axis_Vector(axis));
         return GRID<TV>(counts,box).Get_MAC_Grid_At_Regular_Positions();}
     else return face_grid.Get_MAC_Grid_At_Regular_Positions();
 }

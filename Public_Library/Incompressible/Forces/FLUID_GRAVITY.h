@@ -32,7 +32,7 @@ public:
     void Add_Implicit_Forces_Projection(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) override {}
     void Initialize_Grids(const GRID<TV>& grid) override {}
     T CFL(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) override
-    {return (gravity/grid.DX()).Sum_Abs();}
+    {return (gravity/grid.dX).Sum_Abs();}
 //#####################################################################
 };
 }

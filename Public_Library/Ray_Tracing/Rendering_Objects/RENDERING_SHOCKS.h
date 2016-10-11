@@ -133,7 +133,7 @@ public:
     TV Normal(const TV& location,const int aggregate=0) const override
     {TV object_space_location=Object_Space_Point(location);
 
-    TV dX=grid.DX();
+    TV dX=grid.dX;
     TV object_space_normal=TV(
     (Medium_For_Intersection(object_space_location+dX(0)*TV::Axis_Vector(0))-Medium_For_Intersection(object_space_location-dX(0)*TV::Axis_Vector(0)))/(2*dX(0)),
     (Medium_For_Intersection(object_space_location+dX(1)*TV::Axis_Vector(1))-Medium_For_Intersection(object_space_location-dX(1)*TV::Axis_Vector(1)))/(2*dX(1)),

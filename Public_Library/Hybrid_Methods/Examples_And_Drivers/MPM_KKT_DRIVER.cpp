@@ -416,7 +416,7 @@ Solve_KKT_System()
     example.Capture_Stress();
     example.Precompute_Forces(example.time,example.dt,false);
     example.Add_Forces(kkt_rhs.u,example.time);
-    const T pressure_volume_scale=example.coarse_grid.DX().Product();
+    const T pressure_volume_scale=example.coarse_grid.dX.Product();
     if(example.use_FEM_mass){
         int index=example.M.offsets(0);
         for(int row=0;row<example.M.m;row++){
@@ -481,9 +481,9 @@ Apply_Friction()
 template<class TV> typename TV::SCALAR MPM_KKT_DRIVER<TV>::
 Compute_Dt() const
 {
-    T critical_speed=example.cfl*example.grid.DX().Min()/example.max_dt;
+    T critical_speed=example.cfl*example.grid.dX.Min()/example.max_dt;
     T v=Grid_V_Upper_Bound();
-    return (v>critical_speed)?(example.cfl*example.grid.DX().Min()/v):example.max_dt;
+    return (v>critical_speed)?(example.cfl*example.grid.dX.Min()/v):example.max_dt;
 }
 //#####################################################################
 // Function Max_Particle_Speed
@@ -506,7 +506,7 @@ Grid_V_Upper_Bound() const
 {
     if(!example.use_affine || !example.weights->constant_scalar_inertia_tensor) return Max_Particle_Speed();
     T result=0;
-    T xi=(T)6*sqrt((T)TV::m)*example.grid.One_Over_DX().Min();
+    T xi=(T)6*sqrt((T)TV::m)*example.grid.one_over_dX.Min();
 #pragma omp parallel for reduction(max:result)
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);
@@ -613,7 +613,7 @@ RANGE<TV_INT> velocity_range(TV_INT(),TV_INT::Constant_Vector(3));
 template<class TV> void MPM_KKT_DRIVER<TV>::
 Build_FEM_Mass_Matrix()
 {
-    T dx_scale=example.grid.DX().Product();
+    T dx_scale=example.grid.dX.Product();
     ARRAY<ARRAY<T,TV_INT>,TV_INT> wt=Get_Appropriate_Mass_Element<TV>(dx_scale);
     example.M.Reset(example.velocity.array.m);
     LOG::printf("example.velocity.array.m=%P\n",example.velocity.array.m);

@@ -16,7 +16,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>
     for(int axis=0;axis<TV::m;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side,outward_sign=axis_side?-1:1;
         TV direction=outward_sign*TV::Axis_Vector(axis);
-        T signed_dx=outward_sign*grid.DX()[axis];
+        T signed_dx=outward_sign*grid.dX[axis];
         int boundary=Boundary(side,regions(side));
         for(NODE_ITERATOR<TV> iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
             TV_INT boundary_node=node;boundary_node[axis]=boundary;T ray_length=signed_dx*(node[axis]-boundary);

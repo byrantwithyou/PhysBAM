@@ -84,7 +84,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
             sum+=B.A(index).a*V.u.array.Flattened()(col);}
         F.lambda(row)+=sum;}
     //-(one_over_lambda/(J*dt))*p
-    const T pressure_volume_scale=example.coarse_grid.DX().Product();
+    const T pressure_volume_scale=example.coarse_grid.dX.Product();
     for(int t=0;t<example.valid_pressure_indices.m;t++){
         TV_INT cell=example.valid_pressure_cell_indices(t);
         if(example.mass_coarse(cell))
@@ -242,9 +242,9 @@ Build_B_Matrix(bool& have_non_zero)
 {
     have_non_zero=false;
     PHYSBAM_ASSERT(example.weights->Order()==2);
-    T dx_scale=pow(example.grid.DX()(0),TV::m-1);
-    T coarse_grid_dx=example.coarse_grid.DX()(0);
-    T grid_dx=example.grid.DX()(0);
+    T dx_scale=pow(example.grid.dX(0),TV::m-1);
+    T coarse_grid_dx=example.coarse_grid.dX(0);
+    T grid_dx=example.grid.dX(0);
     B.Reset(TV::m*example.velocity.array.m);
     for(int row=0;row<example.valid_pressure_indices.m;row++){
         int id=example.valid_pressure_indices(row);
@@ -307,7 +307,7 @@ template<class TV> void MPM_KKT_KRYLOV_SYSTEM<TV>::
 Build_Div_Matrix()
 {
     PHYSBAM_ASSERT(example.weights->Order()==2);
-    T dx_scale=pow(example.grid.DX()(0),TV::m-1);
+    T dx_scale=pow(example.grid.dX(0),TV::m-1);
     D.Reset(TV::m*example.velocity.array.m);
     for(int row=0;row<example.valid_pressure_indices.m;row++){
         TV_INT pid=example.valid_pressure_cell_indices(row);

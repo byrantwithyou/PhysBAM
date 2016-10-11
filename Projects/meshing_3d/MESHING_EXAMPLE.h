@@ -85,7 +85,7 @@ virtual void Initialize_Implicit_Surface()
             FILE_UTILITIES::Create_From_File(stream_type,LOG::sprintf("%s_secondary_%d",implicit_surface_filename.c_str(),secondary_index),
                 multiple_levelset_implicit_surface.secondary_levelsets(secondary_index));
             LOG::Stop_Time();
-            max_secondary_cell_size=max(max_secondary_cell_size,multiple_levelset_implicit_surface.secondary_levelsets(secondary_index)->levelset.grid.DX().Max());}
+            max_secondary_cell_size=max(max_secondary_cell_size,multiple_levelset_implicit_surface.secondary_levelsets(secondary_index)->levelset.grid.dX.Max());}
         tetrahedral_meshing.Initialize(&multiple_levelset_implicit_surface);
         multiple_levelset_implicit_surface.Compute_Normals();multiple_levelset_implicit_surface.Update_Box();multiple_levelset_implicit_surface.Update_Minimum_Cell_Size();
         multiple_levelset_implicit_surface.Set_Inside_Threshold((T)3*max_secondary_cell_size);}

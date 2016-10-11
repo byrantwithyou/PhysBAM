@@ -264,7 +264,7 @@ Exchange_Overlapping_Block_Particles_Threaded(const THREADED_UNIFORM_GRID<TV>& t
     // send particles that have exited the domain
     ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(GRID<TV>::number_of_one_ring_neighbors_per_cell);
     // TODO: this is inefficient because it does an entire box check even if only some sides are needed, and send a lot more corner particles than it should
-    RANGE<TV> block_domain=threaded_grid.local_grid.Domain();block_domain.Change_Size(-(T).5*threaded_grid.local_grid.DX());
+    RANGE<TV> block_domain=threaded_grid.local_grid.Domain();block_domain.Change_Size(-(T).5*threaded_grid.local_grid.dX);
     for(int n=0;n<send_regions.m;n++) if(threaded_grid.all_neighbor_ranks(n)!=-1){
         exchange_particles(n).Preallocate(100);
         for(NODE_ITERATOR<TV> iterator(threaded_grid.local_grid,send_regions(n));iterator.Valid();iterator.Next())if(particles(iterator.Node_Index())){
@@ -313,7 +313,7 @@ Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const 
     ARRAY<ARRAY<char> > buffers(GRID<TV>::number_of_one_ring_neighbors_per_cell);
     ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(GRID<TV>::number_of_one_ring_neighbors_per_cell);
     // TODO: this is inefficient because it does an entire box check even if only some sides are needed, and send a lot more corner particles than it should
-    RANGE<TV> block_domain=mpi_grid.local_grid.Domain();block_domain.Change_Size(-(T).5*mpi_grid.local_grid.DX());
+    RANGE<TV> block_domain=mpi_grid.local_grid.Domain();block_domain.Change_Size(-(T).5*mpi_grid.local_grid.dX);
     for(int n=0;n<send_regions.m;n++) if(mpi_grid.all_neighbor_ranks(n)!=MPI::PROC_NULL){
         exchange_particles(n).Preallocate(100);
         for(NODE_ITERATOR<TV> iterator(mpi_grid.local_grid,send_regions(n));iterator.Valid();iterator.Next())if(particles(iterator.Node_Index())){
