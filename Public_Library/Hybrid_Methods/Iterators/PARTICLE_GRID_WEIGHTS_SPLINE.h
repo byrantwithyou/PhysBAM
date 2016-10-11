@@ -24,13 +24,13 @@ public:
         VECTOR<TV,n> w,dw;
     };
 
-    const GRID<TV>& grid;
+    GRID<TV> grid;
     ARRAY<PRECOMPUTE_DATA> precompute_data;
 
     PARTICLE_GRID_WEIGHTS_SPLINE(const GRID<TV>& grid,int threads=1);
     virtual ~PARTICLE_GRID_WEIGHTS_SPLINE();
 
-    void Compute(int p,typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH& scratch,bool want_gradient) const;
+    void Compute(int p,typename BASE::SCRATCH& scratch,bool want_gradient) const;
     void Update(const ARRAY_VIEW<TV>& X);
     T Constant_Scalar_Inverse_Dp() const;
     SYMMETRIC_MATRIX<T,TV::m> Dp(const TV& X) const;

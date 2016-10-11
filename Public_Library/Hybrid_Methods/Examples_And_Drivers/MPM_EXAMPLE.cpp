@@ -9,7 +9,7 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
-#include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_WEIGHTS_SPLINE.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include <Hybrid_Methods/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 using namespace PhysBAM;
@@ -208,14 +208,15 @@ Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input)
 {
     weights=weights_input;
     gather_scatter.weights=weights;
-    for(int i=0;i<TV::m;++i)
+    for(int i=0;i<TV::m;++i){
+        GRID<TV> face_grid=grid.Get_Face_MAC_Grid(i);
         if(weights->Order()==1)
-            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,1>(grid,threads,i);
+            face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(face_grid,threads);
         else if(weights->Order()==2)
-            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,2>(grid,threads,i);
+            face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(face_grid,threads);
         else if(weights->Order()==3)
-            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,3>(grid,threads,i);
-        else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
+            face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(face_grid,threads);
+        else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");}
 }
 //#####################################################################
 // Function Total_Particle_Linear_Momentum

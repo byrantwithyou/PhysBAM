@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Math_Tools/cube.h>
 #include <Core/Math_Tools/pow.h>
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
@@ -30,7 +31,7 @@ template<class TV,int degree> PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
 // Function Compute
 //#####################################################################
 template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
-Compute(int p,typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH& scratch,bool want_gradient) const
+Compute(int p,typename BASE::SCRATCH& scratch,bool want_gradient) const
 {
     const PRECOMPUTE_DATA& pd=precompute_data(p);
     int pow_n=pow<TV::m,int>(n);

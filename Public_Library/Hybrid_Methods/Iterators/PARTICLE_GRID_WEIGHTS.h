@@ -5,7 +5,6 @@
 #ifndef __PARTICLE_GRID_WEIGHTS__
 #define __PARTICLE_GRID_WEIGHTS__
 #include <Core/Vectors/VECTOR.h>
-#include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 namespace PhysBAM{
 
 template<class T,int d> class SYMMETRIC_MATRIX;
@@ -15,8 +14,14 @@ class PARTICLE_GRID_WEIGHTS
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH SCRATCH;
 public:
+    struct SCRATCH
+    {
+        ARRAY<TV_INT> index;
+        ARRAY<T> weight;
+        ARRAY<TV> gradient;
+    };
+
     bool use_gradient_transfer;
     bool constant_scalar_inertia_tensor;
 

@@ -50,11 +50,8 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     parse_args.Add("-np",&example->np,"number of points per cell","number of points per cell");
 
     parse_args.Parse();
-    
-    if(example->eapic_order==1) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(example->grid,/*threads*/1));
-    else if(example->eapic_order==2) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(example->grid,/*threads*/1));
-    else if(example->eapic_order==3) example->Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(example->grid,/*threads*/1));
-    else PHYSBAM_FATAL_ERROR();
+
+    example->Set_Weights(example->eapic_order);
 
     // INITIALIZE PARTICLES, FILL THE GRID.
     // TODO: X0, X, V, C, MASS(=1)

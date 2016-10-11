@@ -8,6 +8,7 @@
 #include <Grid_PDE/Boundaries/BOUNDARY_MPI.h>
 #include <Grid_PDE/Boundaries/BOUNDARY_THREADED.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_ITERATOR.h>
 #include "SMOKE_DRIVER.h"
 #include "SMOKE_EXAMPLE.h"
 #include "SMOKE_PARTICLES.h"
@@ -93,7 +94,7 @@ Initialize()
         example.mass.Resize(example.grid.Domain_Indices(example.ghost));
         example.face_mass.Resize(example.grid.Domain_Indices(example.ghost));
         // Compute born weights
-        for(int i=0;i<TV::m;++i) example.face_weights0(i)->Update(example.particles.X);}
+        for(int i=0;i<TV::m;++i) example.weights0(i)->Update(example.particles.X);}
 
     if(!example.restart) Write_Output_Files(example.first_frame);
     output_number=example.first_frame;
@@ -105,8 +106,7 @@ template<class TV> void SMOKE_DRIVER<TV>::
 Update_Particle_Weights()
 {
     PHYSBAM_ASSERT(example.use_eapic);
-    example.weights->Update(example.particles.X);
-    for(int i=0;i<TV::m;++i) example.face_weights(i)->Update(example.particles.X);
+    for(int i=0;i<TV::m;++i) example.weights(i)->Update(example.particles.X);
 }
 //#####################################################################
 // Function Particle_To_Grid
@@ -126,17 +126,16 @@ Particle_To_Grid()
     example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time,ghost);
 
     // Rasterize mass and momentum to faces
-    typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
+    typename PARTICLE_GRID_FACE_ITERATOR<TV>::SCRATCH scratch;
     for(int p=0;p<particles.number;p++){
-        for(int d=0;d<TV::m;++d){
-            // LOG::cout << "example.face_weights(d): "<< example.face_weights(d) << std::endl;
-            for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights(d),p,true,scratch);it.Valid();it.Next()){
+            // LOG::cout << "example.weights(d): "<< example.weights(d) << std::endl;
+            for(PARTICLE_GRID_FACE_ITERATOR<TV> it(example.weights,p,true,scratch);it.Valid();it.Next()){
+                FACE_INDEX<TV::m> face_index=it.Index();
                 T w=it.Weight();
-                FACE_INDEX<TV::m> face_index(d,it.Index());
                 example.face_mass(face_index)+=w*particles.mass(p);
                 TV dx=example.grid.Face(face_index)-particles.X(p);
-                T v=particles.V(p)(d)+TV::Dot_Product(particles.C(p).Column(d),dx);
-                face_velocities_ghost(face_index)+=w*particles.mass(p)*v;}}}
+                T v=particles.V(p)(face_index.axis)+TV::Dot_Product(particles.C(p).Column(face_index.axis),dx);
+                face_velocities_ghost(face_index)+=w*particles.mass(p)*v;}}
     // Divide out masses
     for(FACE_ITERATOR<TV> iterator(example.grid);iterator.Valid();iterator.Next()){
         FACE_INDEX<TV::m> face_index=iterator.Full_Index();
@@ -167,13 +166,13 @@ Grid_To_Particle()
     example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time,ghost);
 
     SMOKE_PARTICLES<TV>& particles=example.particles;
-    typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
+    typename PARTICLE_GRID_FACE_ITERATOR<TV>::SCRATCH scratch;
 
     LOG::cout<<"G2P"<<std::endl;
     LOG::cout<<"#p"<<particles.number<<std::endl;
 
     // compute new face weights
-    if(example.nrs)for(int i=0;i<TV::m;++i) example.face_weights0(i)->Update(example.particles.X);
+    if(example.nrs)for(int i=0;i<TV::m;++i) example.weights0(i)->Update(example.particles.X);
 
     //define max weight gradient
     T max_gradient = 0;
@@ -185,23 +184,21 @@ Grid_To_Particle()
         particles.C(p)=MATRIX<T,TV::m>();       
         
         // Compute new V and C
-        for(int d=0;d<TV::m;++d)
-            for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights0(d),p,true,scratch);it.Valid();it.Next()){
-                T w=it.Weight();
-                FACE_INDEX<TV::m> face_index(d,it.Index());
-                particles.V(p)(d)+=w*face_velocities_ghost(face_index);
-                if(example.eapic_order==1){
-                    particles.C(p).Add_Column(d,face_velocities_ghost(face_index)*it.Gradient());
-                    // LOG::cout << "it.Gradient().Magnitude_Squared()" << it.Gradient().Magnitude_Squared() << std::endl;
-                    if(it.Gradient().Magnitude_Squared() > max_gradient) max_gradient = it.Gradient().Magnitude_Squared();
-                }
-                else if(example.eapic_order==2){
-                    TV dx=example.grid.Face(face_index)-particles.X(p);
-                    particles.C(p).Add_Column(d,dx*w*4.0/(example.grid.dX(0)*example.grid.dX(0))*face_velocities_ghost(face_index));}
-                else if(example.eapic_order==3){
-                    TV dx=example.grid.Face(face_index)-particles.X(p);
-                    particles.C(p).Add_Column(d,dx*w*3.0/(example.grid.dX(0)*example.grid.dX(0))*face_velocities_ghost(face_index));}
-                else PHYSBAM_FATAL_ERROR();}            }
+        for(PARTICLE_GRID_FACE_ITERATOR<TV> it(example.weights0,p,true,scratch);it.Valid();it.Next()){
+            T w=it.Weight();
+            FACE_INDEX<TV::m> face_index=it.Index();
+            particles.V(p)(face_index.axis)+=w*face_velocities_ghost(face_index);
+            if(example.eapic_order==1){
+                particles.C(p).Add_Column(face_index.axis,face_velocities_ghost(face_index)*it.Gradient());
+                // LOG::cout << "it.Gradient().Magnitude_Squared()" << it.Gradient().Magnitude_Squared() << std::endl;
+                if(it.Gradient().Magnitude_Squared() > max_gradient) max_gradient = it.Gradient().Magnitude_Squared();}
+            else if(example.eapic_order==2){
+                TV dx=example.grid.Face(face_index)-particles.X(p);
+                particles.C(p).Add_Column(face_index.axis,dx*w*4.0/(example.grid.dX(0)*example.grid.dX(0))*face_velocities_ghost(face_index));}
+            else if(example.eapic_order==3){
+                TV dx=example.grid.Face(face_index)-particles.X(p);
+                particles.C(p).Add_Column(face_index.axis,dx*w*3.0/(example.grid.dX(0)*example.grid.dX(0))*face_velocities_ghost(face_index));}
+            else PHYSBAM_FATAL_ERROR();}}
     LOG::cout << "max_gradient: " << max_gradient<< std::endl;
     example.boundary->Set_Fixed_Boundary(false);
 
@@ -453,7 +450,7 @@ Total_Particle_Mass() const
 //         particles.C(p)=MATRIX<T,TV::m>();
 //         // Compute new V and C
 //         for(int d=0;d<TV::m;++d)
-//             for(PARTICLE_GRID_ITERATOR<TV> it(example.face_weights0(d),p,true,scratch);it.Valid();it.Next()){
+//             for(PARTICLE_GRID_ITERATOR<TV> it(example.weights0(d),p,true,scratch);it.Valid();it.Next()){
 //                 T w=it.Weight();
 //                 FACE_INDEX<TV::m> face_index(d,it.Index());
 //                 particles.V(p)(d)+=w*face_velocities_ghost(face_index);

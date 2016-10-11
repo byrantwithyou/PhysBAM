@@ -4,8 +4,8 @@
 //#####################################################################
 #include <Grid_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_WEIGHTS_SPLINE.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include "SMOKE_EXAMPLE.h"
 #include "SMOKE_PARTICLES.h"
 #include <pthread.h>
@@ -22,7 +22,7 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     debug_divergence(false),alpha(0.1),beta(0.00366),
     cfl(.9),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(grid,false,false,thread_queue),boundary(0),
-    use_eapic(false),eapic_order(1),weights(0),particles(*new SMOKE_PARTICLES<TV>)
+    use_eapic(false),eapic_order(1),particles(*new SMOKE_PARTICLES<TV>)
 {
     np=1; //number of points per cell
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
@@ -37,7 +37,7 @@ template<class TV> SMOKE_EXAMPLE<TV>::
     if(mpi_grid || thread_queue) delete boundary;
     delete thread_queue;    
     delete &debug_particles;
-    delete weights;
+    for(int i=0;i<TV::m;i++) delete weights(i);
     delete &particles;
 }
 //#####################################################################
@@ -109,22 +109,22 @@ Get_Scalar_Field_Sources(const T time)
 // Function Set_Weights
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
-Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input)
+Set_Weights(int order)
 {
-    weights=weights_input;
     for(int i=0;i<TV::m;++i){
-        if(weights->Order()==1){
-            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,1>(grid,/*threads*/1,i);
-            face_weights0(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,1>(grid,/*threads*/1,i);}
-        else if(weights->Order()==2){
-            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,2>(grid,/*threads*/1,i);
-            face_weights0(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,2>(grid,/*threads*/1,i);}
-        else if(weights->Order()==3){
-            face_weights(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,3>(grid,/*threads*/1,i);
-            face_weights0(i)=new PARTICLE_GRID_FACE_WEIGHTS_SPLINE<TV,3>(grid,/*threads*/1,i);}
+        GRID<TV> face_grid=grid.Get_Face_Grid(i).Get_MAC_Grid_At_Regular_Positions();
+        if(order==1){
+            weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,/*threads*/1);
+            weights0(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,/*threads*/1);}
+        else if(order==2){
+            weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,/*threads*/1);
+            weights0(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,/*threads*/1);}
+        else if(order==3){
+            weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,/*threads*/1);
+            weights0(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,/*threads*/1);}
         else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
-        face_weights(i)->use_gradient_transfer=true;
-        face_weights0(i)->use_gradient_transfer=true;}
+        weights(i)->use_gradient_transfer=true;
+        weights0(i)->use_gradient_transfer=true;}
 }
 //#####################################################################
 // Function Set_Boundary_Conditions

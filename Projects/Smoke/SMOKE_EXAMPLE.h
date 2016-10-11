@@ -70,9 +70,8 @@ public:
     int eapic_order;
     bool nrs;
     int np;
-    PARTICLE_GRID_WEIGHTS<TV>* weights; // cell center weights
-    VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights; // face weights
-    VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights0; // face weights of X0
+    VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights; // face weights
+    VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights0; // face weights of X0
     SMOKE_PARTICLES<TV>& particles;
     ARRAY<T,TV_INT> mass;
     ARRAY<T,FACE_INDEX<TV::m> > face_mass;
@@ -85,7 +84,7 @@ public:
     void Initialize_Grid(TV_INT counts,RANGE<TV> domain);
     void Initialize_Fields();
     void Get_Scalar_Field_Sources(const T time);
-    void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
+    void Set_Weights(int order);
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);
     virtual void Set_Boundary_Conditions(const T time, const T source_velocities = 0);
