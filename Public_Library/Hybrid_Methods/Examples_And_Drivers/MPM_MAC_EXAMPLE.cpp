@@ -62,6 +62,7 @@ Write_Output_Files(const int frame)
 #pragma omp task
         FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 #pragma omp task
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
 
         if(!only_write_particles){
 #pragma omp task
