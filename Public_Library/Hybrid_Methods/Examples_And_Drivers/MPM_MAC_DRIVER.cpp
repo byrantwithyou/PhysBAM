@@ -293,20 +293,20 @@ Pressure_Projection()
     example.projection->elliptic_solver->Set_Dirichlet_Outer_Boundaries();
 
     for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        TV X=it.Location();
+        bool fixed=false;
+        for(int i=0;i<example.collision_objects.m;i++){
+            MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
+            if(o->Phi(X,example.time)<0){
+                fixed=true;
+                psi_N(it.Full_Index())=true;
+                example.velocity(it.Full_Index())=o->Velocity(X,example.time)(it.axis);
+                break;}}
+        if(fixed) continue;
         if(!example.mass(it.Full_Index())){
             psi_D(it.First_Cell_Index())=true;
             psi_D(it.Second_Cell_Index())=true;}
         else{
-            TV X=it.Location();
-            bool fixed=false;
-            for(int i=0;i<example.collision_objects.m;i++){
-                MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
-                if(o->Phi(X,example.time)<0){
-                    fixed=true;
-                    psi_N(it.Full_Index())=true;
-                    example.velocity(it.Full_Index())=o->Velocity(X,example.time)(it.axis);
-                    break;}}
-            if(fixed) continue;
             example.projection->poisson->beta_face(it.Full_Index())=1/example.mass(it.Full_Index());}}
 
     example.projection->Make_Divergence_Free(example.velocity,example.dt,example.time);
