@@ -105,7 +105,19 @@ Initialize()
 {
     switch(test_number)
     {
-        case 1:{ // rotating circle
+        case 1:{ // stationary circle
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
+        } break;
+        case 2:{ // translating circle
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(sphere,[=](const TV& X){return TV(m/s,0);},0,density,particles_per_cell);
+        } break;
+        case 3:{ // rotating circle
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
             VECTOR<T,1> angular_velocity(0.4/s);
@@ -118,20 +130,20 @@ Initialize()
             TV dV=total_momentum/total_mass;
             particles.V-=dV;
         } break;
-        case 2:{ // oscillating circle
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
-            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
-            T density=2*unit_rho*scale_mass;
-            Seed_Particles(sphere,[=](const TV& X){return TV(0.1,0)*(m/s);},0,
-                density,particles_per_cell);
-        } break;
-        case 3:{ // freefall circle
+        case 4:{ // freefall circle
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
             T density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
-            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
+            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
+        } break;
+        case 5:{ // stationary pool
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(RANGE<TV>(TV(.1*m,.1*m),TV(.9*m,.5*m)),0,0,density,particles_per_cell);
+            gravity=TV(0,-1)*m/sqr(s);
+            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
