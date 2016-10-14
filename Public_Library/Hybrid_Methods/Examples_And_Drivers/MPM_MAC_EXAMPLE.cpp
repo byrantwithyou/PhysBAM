@@ -4,8 +4,6 @@
 //#####################################################################
 #include <Grid_PDE/Poisson/LAPLACE_UNIFORM.h>
 #include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
-#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -57,8 +55,6 @@ Write_Output_Files(const int frame)
     {
 #pragma omp task
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
-#pragma omp task
-        if(!system(LOG::sprintf("rm -f %s/%d/mpm_particles.gz ;  ln -s ./deformable_object_particles.gz %s/%d/mpm_particles.gz",output_directory.c_str(),frame,output_directory.c_str(),frame).c_str())){}
 #pragma omp task
         FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 #pragma omp task
