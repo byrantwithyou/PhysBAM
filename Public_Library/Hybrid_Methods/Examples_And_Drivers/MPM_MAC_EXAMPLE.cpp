@@ -155,7 +155,7 @@ Total_Grid_Linear_Momentum() const
         TV result_local;
         for(int k=a;k<b;k++){
             int j=valid_flat_indices(k);
-            result_local+=mass.array(j)*velocity.array(j);}
+            result_local(valid_indices(k).axis)+=mass.array(j)*velocity.array(j);}
 #pragma omp critical
         result+=result_local;}
     return result;
