@@ -309,6 +309,13 @@ Pressure_Projection()
         else{
             example.projection->poisson->beta_face(it.Full_Index())=1/example.mass(it.Full_Index());}}
 
+    for(FACE_ITERATOR<TV> it(example.grid,1);it.Valid();it.Next())
+        if(psi_N(it.Full_Index()))
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));
+    for(CELL_ITERATOR<TV> it(example.grid,1);it.Valid();it.Next())
+        if(psi_D(it.index))
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,1));
+    
     example.projection->Make_Divergence_Free(example.velocity,example.dt,example.time);
 }
 //#####################################################################
