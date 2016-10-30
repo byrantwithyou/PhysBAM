@@ -7,7 +7,6 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Log/LOG.h>
 #include <Core/Math_Tools/constants.h>
-#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Core/Utilities/TIMER.h>
 #include <Tools/Images/IMAGE.h>
 #include <Geometry/Basic_Geometry/RAY.h>
