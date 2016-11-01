@@ -1,0 +1,17 @@
+To check:
+
+* Look into MPM MAC transfer stability
+
+
+Broken:
+
+* Viewing velocities for 2d fluids   (o-fl2-00)
+
+* ? does not work in viewer
+
+* hide object does not seem to work now
+
+* selecting grid cell in slice mode in 3d, nothing gets printed
+
+* cannot select anything o-be3-08
+
