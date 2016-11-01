@@ -11,16 +11,17 @@ namespace PhysBAM{
 template<class T>
 class IRRADIANCE_SAMPLE
 {
+    typedef VECTOR<T,3> TV;
 public:
-    VECTOR<T,3> location;
-    VECTOR<T,3> direction;
-    VECTOR<T,3> irradiance;
+    TV location;
+    TV direction;
+    TV irradiance;
     T harmonic_mean_distance;
     
     IRRADIANCE_SAMPLE()
     {}
 
-    IRRADIANCE_SAMPLE(const VECTOR<T,3>& location_input,const VECTOR<T,3>& direction_input,const VECTOR<T,3>& irradiance_input,const T harmonic_mean_distance_input)
+    IRRADIANCE_SAMPLE(const TV& location_input,const TV& direction_input,const TV& irradiance_input,const T harmonic_mean_distance_input)
         :location(location_input),direction(direction_input),irradiance(irradiance_input),harmonic_mean_distance(harmonic_mean_distance_input)
     {}
     
